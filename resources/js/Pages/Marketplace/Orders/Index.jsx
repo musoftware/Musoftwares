@@ -1,10 +1,10 @@
 import React from 'react';
 import { Head, Link } from '@inertiajs/react';
 import MarketplaceLayout from '@/Layouts/MarketplaceLayout';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/Components/ui/tabs';
+import { Badge } from '@/Components/ui/badge';
+import { Button } from '@/Components/ui/button';
+import { Card, CardContent } from '@/Components/ui/card';
 
 export default function Index() {
     const ordersAsBuyer = [

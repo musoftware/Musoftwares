@@ -1,10 +1,10 @@
 import React from 'react';
 import { Head, Link } from '@inertiajs/react';
 import MarketplaceLayout from '@/Layouts/MarketplaceLayout';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Button } from '@/Components/ui/button';
+import { Card, CardContent } from '@/Components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/Components/ui/tabs';
+import { Avatar, AvatarFallback, AvatarImage } from '@/Components/ui/avatar';
 import { ChevronRight, Star, Clock, RefreshCw, Check } from 'lucide-react';
 
 export default function Show() {
