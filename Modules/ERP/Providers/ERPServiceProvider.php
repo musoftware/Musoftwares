@@ -18,6 +18,8 @@ class ERPServiceProvider extends ServiceProvider
             module_path('ERP', 'Database/Migrations')
         );
 
+        $this->loadViewsFrom(module_path('ERP', 'resources/views'), 'erp');
+
         if ($this->app->runningInConsole()) {
             $this->commands([
                 ProcessRecurringEntries::class,
