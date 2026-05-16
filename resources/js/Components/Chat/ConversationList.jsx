@@ -1,99 +1,98 @@
-import React, { useState, useEffect, useRef } from 'react';
-import axios from 'axios';
-import { usePage } from '@inertiajs/react';
+import React, { useState } from 'react';
 
-export default function ConversationList({ onSelectConversation, selectedId }) {
-    const { auth } = usePage().props;
-    const [conversations, setConversations] = useState([]);
-    const pollingIntervalRef = useRef(null);
+export default function ConversationList({
+    conversations = [],
+    selectedId = null,
+    onSelect = () => {},
+}) {
+    const [filter, setFilter] = useState('all'); // all, orders, contracts, support
 
-    const fetchConversations = async () => {
-        try {
-            const res = await axios.get('/api/conversations');
-            // Expected response format is an array of conversations.
-            // We format it mapping over to simulate the UI state.
-            const formatted = res.data.map(conv => {
-                // Determine the other participant name (simplification for UI)
-                const otherParticipant = conv.participants?.find(p => p.user_id !== auth.user.id);
-                const name = otherParticipant?.user?.name || `Conversation #${conv.id}`;
+    const filteredConversations = conversations.filter((c) => {
+        if (filter === 'all') return true;
+        return c.type === filter;
+    });
 
-                return {
-                    id: conv.id,
-                    user: { name: name, isOnline: false }, // Polling doesn't support real-time presence well
-                    lastMessage: conv.messages?.[0] || null, // Assuming backend sends latest message
-                    unreadCount: 0 // In real app, calculate based on last_read_at
-                };
-            });
-
-            setConversations(formatted);
-        } catch (err) {
-            console.error("Failed to fetch conversations", err);
-        }
+    const formatTime = (dateString) => {
+        if (!dateString) return '';
+        const d = new Date(dateString);
+        // Simple formatter, could be improved for "yesterday", etc.
+        return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     };
 
-    useEffect(() => {
-        fetchConversations();
-
-        pollingIntervalRef.current = setInterval(() => {
-            fetchConversations();
-        }, 5000); // Poll every 5 seconds
-
-        return () => {
-            if (pollingIntervalRef.current) clearInterval(pollingIntervalRef.current);
-        };
-    }, []);
-
     return (
-        <div className="flex flex-col h-[600px] bg-white border rounded-lg shadow-sm w-80">
-            <div className="p-4 border-b font-semibold text-lg">
-                Conversations
-            </div>
-            <div className="flex-1 overflow-y-auto">
-                {conversations.length === 0 ? (
-                    <div className="p-4 text-center text-gray-500">No conversations</div>
-                ) : (
-                    conversations.map(conv => (
-                        <div
-                            key={conv.id}
-                            onClick={() => {
-                                // Mark as read locally
-                                setConversations(prev => prev.map(c => c.id === conv.id ? {...c, unreadCount: 0} : c));
-                                onSelectConversation(conv.id);
-                            }}
-                            className={`p-4 border-b cursor-pointer hover:bg-gray-50 flex items-center gap-3 transition-colors ${selectedId === conv.id ? 'bg-blue-50' : ''}`}
+        <div className="flex flex-col h-full bg-white border-r border-gray-200">
+            <div className="p-4 border-b border-gray-200">
+                <h2 className="text-lg font-semibold text-gray-800 mb-4">Messages</h2>
+
+                {/* Filters */}
+                <div className="flex space-x-2 overflow-x-auto pb-2 scrollbar-hide">
+                    {['all', 'orders', 'contracts', 'support'].map((type) => (
+                        <button
+                            key={type}
+                            onClick={() => setFilter(type)}
+                            className={`px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap transition-colors ${
+                                filter === type
+                                    ? 'bg-indigo-100 text-indigo-700'
+                                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                            }`}
                         >
-                            <div className="relative">
-                                <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center font-bold text-gray-600">
-                                    {conv.user.name.charAt(0)}
-                                </div>
-                                {conv.user.isOnline && (
-                                    <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></div>
-                                )}
-                            </div>
-                            <div className="flex-1 min-w-0">
-                                <div className="flex justify-between items-baseline mb-1">
-                                    <h4 className="font-semibold text-sm truncate">
-                                        {conv.user.name}
-                                    </h4>
-                                    {conv.lastMessage && (
-                                        <span className="text-[10px] text-gray-500">
-                                            {new Date(conv.lastMessage.created_at).toLocaleDateString(undefined, {month: 'short', day: 'numeric'})}
-                                        </span>
-                                    )}
-                                </div>
-                                <div className="flex justify-between items-center">
-                                    <p className={`text-xs truncate ${conv.unreadCount > 0 ? 'font-semibold text-gray-900' : 'text-gray-500'}`}>
-                                        {conv.lastMessage?.body || 'No messages'}
-                                    </p>
-                                    {conv.unreadCount > 0 && (
-                                        <span className="bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[1.25rem] text-center">
-                                            {conv.unreadCount}
-                                        </span>
-                                    )}
-                                </div>
-                            </div>
-                        </div>
-                    ))
+                            {type.charAt(0).toUpperCase() + type.slice(1)}
+                        </button>
+                    ))}
+                </div>
+            </div>
+
+            <div className="flex-1 overflow-y-auto">
+                {filteredConversations.length === 0 ? (
+                    <div className="p-4 text-center text-gray-500 text-sm">
+                        No conversations found.
+                    </div>
+                ) : (
+                    <ul className="divide-y divide-gray-100">
+                        {filteredConversations.map((conv) => {
+                            const isSelected = selectedId === conv.id;
+                            return (
+                                <li
+                                    key={conv.id}
+                                    onClick={() => onSelect(conv)}
+                                    className={`p-4 cursor-pointer hover:bg-gray-50 transition-colors ${
+                                        isSelected ? 'bg-indigo-50/50' : ''
+                                    }`}
+                                >
+                                    <div className="flex items-center space-x-3">
+                                        <div className="relative flex-shrink-0">
+                                            <div className="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-600 font-bold">
+                                                {conv.name?.charAt(0) || '?'}
+                                            </div>
+                                            {conv.isOnline && (
+                                                <span className="absolute bottom-0 right-0 block h-2.5 w-2.5 rounded-full bg-green-400 ring-2 ring-white"></span>
+                                            )}
+                                        </div>
+                                        <div className="flex-1 min-w-0">
+                                            <div className="flex items-center justify-between">
+                                                <p className="text-sm font-medium text-gray-900 truncate">
+                                                    {conv.name}
+                                                </p>
+                                                <p className="text-xs text-gray-500 whitespace-nowrap">
+                                                    {formatTime(conv.last_message_at)}
+                                                </p>
+                                            </div>
+                                            <div className="flex items-center justify-between mt-1">
+                                                <p className={`text-sm truncate ${conv.unread_count > 0 ? 'text-gray-900 font-semibold' : 'text-gray-500'}`}>
+                                                    {conv.last_message || 'Start a conversation'}
+                                                </p>
+                                                {conv.unread_count > 0 && (
+                                                    <span className="inline-flex items-center justify-center h-5 w-5 rounded-full bg-indigo-600 text-white text-[10px] font-bold ml-2">
+                                                        {conv.unread_count}
+                                                    </span>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                            );
+                        })}
+                    </ul>
                 )}
             </div>
         </div>
