@@ -85,13 +85,28 @@ class FreelanceJobController extends Controller
         return redirect()->route('freelance.my-jobs')->with('success', 'Job posted successfully.');
     }
 
+    public function create()
+    {
+        return Inertia::render('Freelance/Jobs/Create');
+    }
+
     public function show(Job $job)
     {
-        $job->load(['client', 'skills']);
+        $job->load(['client', 'skills', 'proposals.freelancer']);
         return Inertia::render('Freelance/Jobs/Show', [
             'job' => $job,
             'pointsCost' => 2 // Example cost to submit a proposal
         ]);
+    }
+
+    public function edit(Job $job)
+    {
+        if ($job->client_id !== auth()->id()) {
+            abort(403);
+        }
+
+        $job->load('skills');
+        return Inertia::render('Freelance/Jobs/Edit', ['job' => $job]);
     }
 
     public function update(Request $request, Job $job)

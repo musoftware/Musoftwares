@@ -1,13 +1,13 @@
 import React from 'react';
 import FreelanceLayout from '../Layout';
-import { useForm } from '@inertiajs/react';
+import { useForm, router } from '@inertiajs/react';
 
 export default function PointsIndex({ auth, packages, transactions }) {
     const { post, processing } = useForm();
 
     const handlePurchase = (packageId) => {
         if (confirm('Are you sure you want to purchase this point package?')) {
-            post(route('freelance.point-purchases.store', { package_id: packageId }));
+            router.post(route('freelance.point-purchases.store'), { package_id: packageId });
         }
     };
 
