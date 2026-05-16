@@ -13,18 +13,20 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             RolesAndPermissionsSeeder::class,
+            CurrenciesSeeder::class,
+            SiteSettingsSeeder::class,
+            AdminUserSeeder::class,
         ]);
 
-        $admin = \App\Models\User::factory()->create([
-            'name' => 'Admin User',
-            'email' => 'admin@example.com',
-        ]);
-        $admin->assignRole('admin');
-
-        $client = \App\Models\User::factory()->create([
-            'name' => 'Client User',
-            'email' => 'client@example.com',
-        ]);
+        $client = \App\Models\User::firstOrCreate(
+            ['email' => 'client@example.com'],
+            [
+                'name' => 'Client User',
+                'password' => bcrypt('password'),
+                'role' => 'client',
+                'email_verified_at' => now(),
+            ]
+        );
         $client->assignRole('client');
     }
 }
