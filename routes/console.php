@@ -3,9 +3,14 @@
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Schedule;
+use Modules\Core\Console\FetchExchangeRates;
+use Modules\ERP\Console\ProcessRecurringEntries;
+use Modules\Freelance\Console\ExpireOldJobs;
 
 Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->purpose('Display an inspiring quote')->hourly();
 
-Schedule::command('currency:fetch-rates')->daily();
+Schedule::command(FetchExchangeRates::class)->dailyAt('00:00');
+Schedule::command(ProcessRecurringEntries::class)->dailyAt('01:00');
+Schedule::command(ExpireOldJobs::class)->dailyAt('02:00');
