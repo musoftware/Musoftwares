@@ -9,9 +9,8 @@ class RecurringEntry extends TenantModel
 {
     protected $fillable = [
         'tenant_id', 'type', 'title', 'description',
-        'amount', 'currency_code', 'amount_currency', 'business_amount', 'business_currency',
+        'amount', 'amount_currency', 'business_amount', 'business_currency',
         'exchange_rate', 'exchange_rate_date', 'frequency', 'frequency_day', 'frequency_month',
-        'day_of_week', 'day_of_month', 'month_of_year',
         'starts_at', 'ends_at', 'next_run_at', 'last_run_at', 'next_date', 'end_date',
         'status', 'is_active', 'created_by'
     ];
@@ -46,10 +45,4 @@ class RecurringEntry extends TenantModel
     {
         return $this->hasMany(RecurringExecutionLog::class);
     }
-
-    public function logs(): HasMany
-    {
-        return $this->hasMany(RecurringEntryLog::class);
-    }
 }
-

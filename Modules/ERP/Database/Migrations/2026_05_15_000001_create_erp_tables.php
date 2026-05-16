@@ -275,6 +275,7 @@ return new class extends Migration
             $table->date('last_run_at')->nullable();
 
             $table->enum('status', ['active', 'paused', 'cancelled'])->default('active');
+            $table->boolean('is_active')->default(true);
 
             $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();

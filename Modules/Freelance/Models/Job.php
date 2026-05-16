@@ -8,9 +8,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Models\User;
 
 class Job extends Model
-    use Searchable;
 {
-    use SoftDeletes;
+    use Searchable, SoftDeletes;
 
     protected $table = 'freelance_jobs';
 

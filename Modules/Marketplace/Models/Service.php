@@ -8,9 +8,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Models\User;
 
 class Service extends Model
-    use Searchable;
 {
-    use SoftDeletes;
+    use Searchable, SoftDeletes;
 
     protected $table = 'marketplace_services';
 
