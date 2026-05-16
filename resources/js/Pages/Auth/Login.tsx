@@ -1,8 +1,15 @@
-import Checkbox from '@/Components/Checkbox';
 import InputError from '@/Components/InputError';
-import InputLabel from '@/Components/InputLabel';
-import PrimaryButton from '@/Components/PrimaryButton';
-import TextInput from '@/Components/TextInput';
+import { Button } from '@/components/ui/button';
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardFooter,
+    CardHeader,
+    CardTitle,
+} from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import GuestLayout from '@/Layouts/GuestLayout';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { FormEventHandler } from 'react';
@@ -32,79 +39,103 @@ export default function Login({
         <GuestLayout>
             <Head title="Log in" />
 
-            {status && (
-                <div className="mb-4 text-sm font-medium text-green-600">
-                    {status}
-                </div>
-            )}
+            <div className="flex min-h-screen flex-col items-center justify-center px-4 py-12 sm:px-6 lg:px-8">
+                <Card className="w-full max-w-md">
+                    <CardHeader className="space-y-1">
+                        <CardTitle className="text-2xl font-bold tracking-tight">
+                            Log in to your account
+                        </CardTitle>
+                        <CardDescription>
+                            Enter your email below to log in to your account
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        {status && (
+                            <div className="mb-4 text-sm font-medium text-green-600">
+                                {status}
+                            </div>
+                        )}
+                        <form onSubmit={submit} className="space-y-4">
+                            <div className="space-y-2">
+                                <Label htmlFor="email">Email</Label>
+                                <Input
+                                    id="email"
+                                    type="email"
+                                    placeholder="m@example.com"
+                                    value={data.email}
+                                    autoComplete="username"
+                                    autoFocus
+                                    onChange={(e) =>
+                                        setData('email', e.target.value)
+                                    }
+                                />
+                                <InputError message={errors.email} />
+                            </div>
 
-            <form onSubmit={submit}>
-                <div>
-                    <InputLabel htmlFor="email" value="Email" />
+                            <div className="space-y-2">
+                                <div className="flex items-center justify-between">
+                                    <Label htmlFor="password">Password</Label>
+                                    {canResetPassword && (
+                                        <Link
+                                            href={route('password.request')}
+                                            className="text-muted-foreground hover:text-primary text-sm font-medium"
+                                        >
+                                            Forgot password?
+                                        </Link>
+                                    )}
+                                </div>
+                                <Input
+                                    id="password"
+                                    type="password"
+                                    value={data.password}
+                                    autoComplete="current-password"
+                                    onChange={(e) =>
+                                        setData('password', e.target.value)
+                                    }
+                                />
+                                <InputError message={errors.password} />
+                            </div>
 
-                    <TextInput
-                        id="email"
-                        type="email"
-                        name="email"
-                        value={data.email}
-                        className="mt-1 block w-full"
-                        autoComplete="username"
-                        isFocused={true}
-                        onChange={(e) => setData('email', e.target.value)}
-                    />
+                            <div className="flex items-center space-x-2">
+                                <input
+                                    type="checkbox"
+                                    id="remember"
+                                    checked={data.remember}
+                                    onChange={(e) =>
+                                        setData('remember', e.target.checked)
+                                    }
+                                    className="text-primary focus:ring-primary h-4 w-4 rounded border-gray-300"
+                                />
+                                <Label
+                                    htmlFor="remember"
+                                    className="text-muted-foreground cursor-pointer text-sm font-normal"
+                                >
+                                    Remember me
+                                </Label>
+                            </div>
 
-                    <InputError message={errors.email} className="mt-2" />
-                </div>
-
-                <div className="mt-4">
-                    <InputLabel htmlFor="password" value="Password" />
-
-                    <TextInput
-                        id="password"
-                        type="password"
-                        name="password"
-                        value={data.password}
-                        className="mt-1 block w-full"
-                        autoComplete="current-password"
-                        onChange={(e) => setData('password', e.target.value)}
-                    />
-
-                    <InputError message={errors.password} className="mt-2" />
-                </div>
-
-                <div className="mt-4 block">
-                    <label className="flex items-center">
-                        <Checkbox
-                            name="remember"
-                            checked={data.remember}
-                            onChange={(e) =>
-                                setData(
-                                    'remember',
-                                    (e.target.checked || false) as false,
-                                )
-                            }
-                        />
-                        <span className="ms-2 text-sm text-gray-600">
-                            Remember me
-                        </span>
-                    </label>
-                </div>
-
-                <div className="mt-4 flex items-center justify-end">
-                    {canResetPassword && (
-                        <Link
-                            href={route('password.request')}
-                            className="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                        >
-                            Forgot your password?
-                        </Link>
-                    )}
-
-                    <PrimaryButton className="ms-4" disabled={processing}>
-                        Log in
-                    </PrimaryButton>
-                </div>
-            </form>
+                            <Button
+                                className="w-full"
+                                type="submit"
+                                disabled={processing}
+                            >
+                                Log in
+                            </Button>
+                        </form>
+                    </CardContent>
+                    <CardFooter className="flex justify-center">
+                        <p className="text-muted-foreground text-sm">
+                            Don't have an account?{' '}
+                            <Link
+                                href={route('register')}
+                                className="text-primary font-medium hover:underline"
+                            >
+                                Sign up
+                            </Link>
+                        </p>
+                    </CardFooter>
+                </Card>
+            </div>
         </GuestLayout>
     );
 }

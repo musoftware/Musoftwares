@@ -19,3 +19,4 @@ export function formatDate(dateString: string | Date) {
   const date = typeof dateString === 'string' ? new Date(dateString) : dateString;
   return format(date, 'MMM d, yyyy');
 }
+

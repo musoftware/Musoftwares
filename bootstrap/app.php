@@ -17,7 +17,12 @@ return Application::configure(basePath: dirname(__DIR__))
             \Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets::class,
         ]);
 
-        //
+        $middleware->alias([
+            'admin' => \App\Http\Middleware\AdminMiddleware::class,
+            'client' => \App\Http\Middleware\ClientMiddleware::class,
+            'tenant' => \App\Http\Middleware\TenantMiddleware::class,
+            'subscription' => \App\Http\Middleware\SubscriptionMiddleware::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->respond(function (\Symfony\Component\HttpFoundation\Response $response, \Throwable $exception, \Illuminate\Http\Request $request) {
