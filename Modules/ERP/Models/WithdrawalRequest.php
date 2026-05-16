@@ -3,8 +3,10 @@
 namespace Modules\ERP\Models;
 
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Laravel\Scout\Searchable;
 
 class WithdrawalRequest extends TenantModel
+    use Searchable;
 {
     protected $fillable = [
         'tenant_id', 'client_id', 'payment_method_id', 'status',

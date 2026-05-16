@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, usePage } from '@inertiajs/react';
 import axios from 'axios';
+import AdminNotesPanel from '@/Components/AdminNotesPanel';
 
 export default function Index({ invoices }: any) {
     const { auth } = usePage().props;
@@ -86,6 +87,10 @@ export default function Index({ invoices }: any) {
                                 </li>
                             )) || <li className="py-2 text-gray-500">No invoices available</li>}
                         </ul>
+                    </div>
+
+                    <div className="mt-8">
+                        <AdminNotesPanel noteableType="invoice" noteableId={1} />
                     </div>
                 </div>
             </div>
