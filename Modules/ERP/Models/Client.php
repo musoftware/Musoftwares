@@ -5,7 +5,7 @@ namespace Modules\ERP\Models;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class Client extends TenantAwareModel
+class Client extends TenantModel
 {
     protected $table = 'tenant_clients';
 
