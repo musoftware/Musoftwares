@@ -5,7 +5,7 @@ namespace Modules\ERP\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 
-abstract class TenantAwareModel extends Model
+abstract class TenantModel extends Model
 {
     protected static function booted()
     {
