@@ -1,8 +1,8 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link, useForm } from '@inertiajs/react';
-import PageHeader from '@/Components/PageHeader';
-import CurrencyDisplay from '@/Components/CurrencyDisplay';
-import StatusBadge from '@/Components/StatusBadge';
+import { PageHeader } from '@/Components/ui/PageHeader';
+import { CurrencyDisplay } from '@/Components/ui/CurrencyDisplay';
+import { StatusBadge } from '@/Components/ui/StatusBadge';
 import {
     Calendar,
     MoreHorizontal,

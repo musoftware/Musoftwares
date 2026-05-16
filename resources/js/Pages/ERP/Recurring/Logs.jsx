@@ -1,8 +1,8 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link } from '@inertiajs/react';
-import PageHeader from '@/Components/PageHeader';
-import CurrencyDisplay from '@/Components/CurrencyDisplay';
-import StatusBadge from '@/Components/StatusBadge';
+import { PageHeader } from '@/Components/ui/PageHeader';
+import { CurrencyDisplay } from '@/Components/ui/CurrencyDisplay';
+import { StatusBadge } from '@/Components/ui/StatusBadge';
 import Pagination from '@/Components/Pagination';
 import { format } from 'date-fns';
 import { ArrowLeft, CheckCircle2, XCircle } from 'lucide-react';
