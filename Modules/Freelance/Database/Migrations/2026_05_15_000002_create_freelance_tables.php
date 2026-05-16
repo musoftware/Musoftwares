@@ -90,8 +90,10 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->integer('points');
-            $table->string('type'); // earned, spent
-            $table->string('description');
+            $table->string('type'); // earned, spent, credit, debit
+            $table->string('description')->nullable();
+            $table->string('reference_type')->nullable();
+            $table->string('reference_id')->nullable();
             $table->timestamps();
         });
     }
