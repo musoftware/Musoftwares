@@ -1,18 +1,25 @@
 import React, { useState, useEffect, useRef } from 'react';
-import axios from 'axios';
-import { usePage } from '@inertiajs/react';
-import Message from './Message';
+import { router } from '@inertiajs/react';
 
-export default function ChatWindow({ conversationId }) {
-    const { auth } = usePage().props;
-    const [messages, setMessages] = useState([]);
+export default function ChatWindow({
+    conversationId,
+    currentUserId,
+    participants = [],
+    initialMessages = [],
+    readOnly = false,
+    title = 'Chat',
+    subtitle = '',
+    status = '',
+    unreadCount = 0,
+}) {
+    const [messages, setMessages] = useState(initialMessages);
     const [newMessage, setNewMessage] = useState('');
+    const [typingUsers, setTypingUsers] = useState([]);
+    const [selectedImage, setSelectedImage] = useState(null);
     const [attachment, setAttachment] = useState(null);
-    const [preview, setPreview] = useState(null);
-
+    const [attachmentPreview, setAttachmentPreview] = useState(null);
     const messagesEndRef = useRef(null);
     const fileInputRef = useRef(null);
-    const pollingIntervalRef = useRef(null);
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -22,180 +29,258 @@ export default function ChatWindow({ conversationId }) {
         scrollToBottom();
     }, [messages]);
 
-    const fetchMessages = async () => {
-        if (!conversationId) return;
-        try {
-            const res = await axios.get(`/api/conversations/${conversationId}/messages`);
-            const newMessages = res.data.data.reverse();
-
-            setMessages(prev => {
-                // Check if the last message ID has changed or if length differs
-                const prevLastId = prev.length > 0 ? prev[prev.length - 1].id : null;
-                const newLastId = newMessages.length > 0 ? newMessages[newMessages.length - 1].id : null;
-
-                if (prevLastId !== newLastId || prev.length !== newMessages.length) {
-                    return newMessages;
-                }
-                return prev;
-            });
-        } catch (err) {
-            console.error("Error fetching messages:", err);
-        }
-    };
-
     useEffect(() => {
-        if (!conversationId) return;
+        if (!conversationId || typeof window === 'undefined' || !window.Echo) return;
 
-        // Fetch initial messages
-        fetchMessages();
+        const channel = window.Echo.private(`conversation.${conversationId}`);
 
-        // Start polling
-        pollingIntervalRef.current = setInterval(() => {
-            fetchMessages();
-        }, 3000);
+        channel.listen('MessageSent', (e) => {
+            if (e.message) {
+                setMessages((prev) => [...prev, e.message]);
+            }
+        });
+
+        channel.listenForWhisper('typing', (e) => {
+            if (e.user) {
+                setTypingUsers((prev) => {
+                    if (!prev.find((u) => u.id === e.user.id)) {
+                        return [...prev, e.user];
+                    }
+                    return prev;
+                });
+
+                // Remove typing indicator after 2 seconds
+                setTimeout(() => {
+                    setTypingUsers((prev) => prev.filter((u) => u.id !== e.user.id));
+                }, 2000);
+            }
+        });
 
         return () => {
-            if (pollingIntervalRef.current) clearInterval(pollingIntervalRef.current);
+            channel.stopListening('MessageSent');
+            channel.stopListeningForWhisper('typing');
+            window.Echo.leave(`conversation.${conversationId}`);
         };
     }, [conversationId]);
 
-    const markAsRead = () => {
-        if (!conversationId) return;
-        axios.post(`/api/conversations/${conversationId}/read`).catch(console.error);
-    };
-
-    const handleFocus = () => {
-        markAsRead();
-    };
-
-    const handleTyping = (e) => {
-        setNewMessage(e.target.value);
+    const handleTyping = () => {
+        if (!conversationId || typeof window === 'undefined' || !window.Echo) return;
+        window.Echo.private(`conversation.${conversationId}`).whisper('typing', {
+            user: { id: currentUserId, name: 'User' }, // Adjust as needed
+        });
     };
 
     const handleFileChange = (e) => {
         const file = e.target.files[0];
         if (file) {
-            if (file.size > 5 * 1024 * 1024) {
-                alert('File size must be less than 5MB');
-                return;
-            }
             setAttachment(file);
-            setPreview(URL.createObjectURL(file));
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setAttachmentPreview(reader.result);
+            };
+            reader.readAsDataURL(file);
         }
     };
 
-    const removeAttachment = () => {
-        setAttachment(null);
-        setPreview(null);
-        if (fileInputRef.current) fileInputRef.current.value = '';
-    };
-
-    const sendMessage = async (e) => {
+    const handleSendMessage = (e) => {
         e.preventDefault();
-        if (!newMessage.trim() && !attachment) return;
+        if ((!newMessage.trim() && !attachment) || readOnly) return;
 
         const formData = new FormData();
-        if (newMessage.trim()) formData.append('body', newMessage.trim());
-        if (attachment) formData.append('attachment', attachment);
-
-        // Optimistic UI update
-        const tempMessage = {
-            id: Date.now(),
-            body: newMessage.trim(),
-            sender_id: auth.user.id,
-            created_at: new Date().toISOString(),
-            isTemp: true,
-            attachments: preview ? [{ id: Date.now(), type: 'image', path: preview, isTempUrl: true }] : []
-        };
-
-        setMessages(prev => [...prev, tempMessage]);
-        setNewMessage('');
-        removeAttachment();
-
-        try {
-            const res = await axios.post(`/api/conversations/${conversationId}/messages`, formData, {
-                headers: { 'Content-Type': 'multipart/form-data' }
-            });
-            // Replace temp message with real one
-            setMessages(prev => prev.map(m => m.id === tempMessage.id ? res.data : m));
-        } catch (error) {
-            console.error('Error sending message:', error);
-            // Remove temp message on error
-            setMessages(prev => prev.filter(m => m.id !== tempMessage.id));
-            alert('Failed to send message');
+        formData.append('content', newMessage);
+        if (attachment) {
+            formData.append('attachment', attachment);
         }
+
+        router.post(
+            `/chat/conversations/${conversationId}/messages`,
+            formData,
+            {
+                preserveScroll: true,
+                onSuccess: () => {
+                    setNewMessage('');
+                    setAttachment(null);
+                    setAttachmentPreview(null);
+                    if (fileInputRef.current) {
+                        fileInputRef.current.value = '';
+                    }
+                },
+            }
+        );
     };
 
+    const formatTime = (dateString) => {
+        if (!dateString) return '';
+        const d = new Date(dateString);
+        return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    };
+
+    const getParticipant = (userId) => {
+        return participants.find((p) => p.id === userId) || { name: 'Unknown' };
+    };
+
+    // Determine where to place the unread separator
+    const unreadIndex = messages.length - unreadCount;
+
     return (
-        <div className="flex flex-col h-[600px] bg-white border rounded-lg shadow-sm" onFocus={handleFocus}>
-            <div className="flex-1 overflow-y-auto p-4 bg-gray-50">
-                {messages.map((msg) => (
-                    <Message
-                        key={msg.id}
-                        message={msg}
-                        isOwnMessage={msg.sender_id === auth.user.id}
-                    />
-                ))}
+        <div className="flex flex-col h-full bg-white rounded-lg shadow border border-gray-200">
+            {/* Header */}
+            <div className="p-4 border-b border-gray-200 flex items-center justify-between bg-gray-50 rounded-t-lg">
+                <div className="flex items-center space-x-3">
+                    <div className="h-10 w-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-bold">
+                        {title.charAt(0)}
+                    </div>
+                    <div>
+                        <h3 className="font-semibold text-gray-800">{title}</h3>
+                        <p className="text-xs text-gray-500">
+                            {status && <span className="mr-2">Status: {status}</span>}
+                            {subtitle}
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            {/* Messages Area */}
+            <div className="flex-1 p-4 overflow-y-auto space-y-4 bg-gray-50">
+                {messages.map((msg, index) => {
+                    const isOwn = msg.user_id === currentUserId;
+                    const sender = isOwn ? { name: 'You' } : getParticipant(msg.user_id);
+                    const showUnreadSeparator = unreadCount > 0 && index === unreadIndex;
+
+                    return (
+                        <React.Fragment key={msg.id || index}>
+                            {showUnreadSeparator && (
+                                <div className="flex items-center text-xs text-gray-400 my-4">
+                                    <div className="flex-1 border-t border-gray-200"></div>
+                                    <span className="px-2">── {unreadCount} new messages ──</span>
+                                    <div className="flex-1 border-t border-gray-200"></div>
+                                </div>
+                            )}
+                            <div className={`flex ${isOwn ? 'justify-end' : 'justify-start'}`}>
+                                <div className={`max-w-[70%] group flex flex-col ${isOwn ? 'items-end' : 'items-start'}`}>
+                                    <span className="text-xs text-gray-500 mb-1 px-1">
+                                        {sender.name}
+                                    </span>
+                                    <div
+                                        className={`px-4 py-2 rounded-2xl relative ${
+                                            isOwn
+                                                ? 'bg-indigo-600 text-white rounded-tr-none'
+                                                : 'bg-white border border-gray-200 text-gray-800 rounded-tl-none shadow-sm'
+                                        }`}
+                                        title={formatTime(msg.created_at)}
+                                    >
+                                        {msg.content && <p className="text-sm whitespace-pre-wrap">{msg.content}</p>}
+
+                                        {/* Image Attachment */}
+                                        {msg.attachment_url && (
+                                            <div className="mt-2 cursor-pointer" onClick={() => setSelectedImage(msg.attachment_url)}>
+                                                <img
+                                                    src={msg.attachment_url}
+                                                    alt="attachment"
+                                                    className="max-h-32 rounded-lg object-cover"
+                                                />
+                                            </div>
+                                        )}
+
+                                        {/* Read Receipt */}
+                                        {isOwn && (
+                                            <span className="absolute bottom-1 right-2 text-[10px] opacity-70">
+                                                {msg.read_at ? '✓✓' : '✓'}
+                                            </span>
+                                        )}
+                                    </div>
+                                    <span className="text-[10px] text-gray-400 mt-1 px-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                        {formatTime(msg.created_at)}
+                                    </span>
+                                </div>
+                            </div>
+                        </React.Fragment>
+                    );
+                })}
+
+                {typingUsers.length > 0 && (
+                    <div className="text-xs text-gray-500 italic">
+                        {typingUsers.map((u) => u.name).join(', ')} is typing...
+                    </div>
+                )}
                 <div ref={messagesEndRef} />
             </div>
 
-            <div className="p-4 bg-white border-t rounded-b-lg">
-                {preview && (
-                    <div className="relative inline-block mb-2">
-                        <img src={preview} alt="Preview" className="h-20 w-20 object-cover rounded-md border" />
+            {/* Input Area */}
+            {!readOnly && (
+                <div className="p-4 border-t border-gray-200 bg-white rounded-b-lg">
+                    {attachmentPreview && (
+                        <div className="mb-2 relative inline-block">
+                            <img src={attachmentPreview} alt="Preview" className="h-20 w-20 object-cover rounded-md border" />
+                            <button
+                                type="button"
+                                className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 w-5 h-5 flex items-center justify-center text-xs"
+                                onClick={() => {
+                                    setAttachment(null);
+                                    setAttachmentPreview(null);
+                                    if (fileInputRef.current) {
+                                        fileInputRef.current.value = '';
+                                    }
+                                }}
+                            >
+                                ✕
+                            </button>
+                        </div>
+                    )}
+                    <form onSubmit={handleSendMessage} className="flex items-end space-x-2">
+                        <input
+                            type="file"
+                            accept="image/*"
+                            ref={fileInputRef}
+                            onChange={handleFileChange}
+                            className="hidden"
+                        />
                         <button
-                            onClick={removeAttachment}
-                            className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs"
+                            type="button"
+                            className="p-2 text-gray-500 hover:text-indigo-600 hover:bg-gray-100 rounded-full transition-colors"
+                            title="Attach File"
+                            onClick={() => fileInputRef.current?.click()}
                         >
-                            &times;
+                            📎
                         </button>
-                    </div>
-                )}
+                        <div className="flex-1 bg-gray-100 rounded-2xl px-4 py-2">
+                            <textarea
+                                value={newMessage}
+                                onChange={(e) => {
+                                    setNewMessage(e.target.value);
+                                    handleTyping();
+                                }}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter' && !e.shiftKey) {
+                                        e.preventDefault();
+                                        handleSendMessage(e);
+                                    }
+                                }}
+                                placeholder="Type a message..."
+                                className="w-full bg-transparent border-none focus:ring-0 resize-none max-h-32 text-sm text-gray-800"
+                                rows={1}
+                            />
+                        </div>
+                        <button
+                            type="submit"
+                            disabled={!newMessage.trim() && !attachment}
+                            className="p-2 bg-indigo-600 text-white rounded-full hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                        >
+                            Send →
+                        </button>
+                    </form>
+                </div>
+            )}
 
-                <form onSubmit={sendMessage} className="flex items-end gap-2">
-                    <input
-                        type="file"
-                        ref={fileInputRef}
-                        onChange={handleFileChange}
-                        accept="image/*"
-                        className="hidden"
-                    />
-                    <button
-                        type="button"
-                        onClick={() => fileInputRef.current?.click()}
-                        className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-full transition-colors"
-                        title="Attach image"
-                    >
-                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path>
-                        </svg>
-                    </button>
-
-                    <textarea
-                        value={newMessage}
-                        onChange={handleTyping}
-                        placeholder="Type a message..."
-                        className="flex-1 resize-none rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500 max-h-32 min-h-[44px] py-2 px-3"
-                        rows="1"
-                        onKeyDown={(e) => {
-                            if (e.key === 'Enter' && !e.shiftKey) {
-                                e.preventDefault();
-                                sendMessage(e);
-                            }
-                        }}
-                    />
-
-                    <button
-                        type="submit"
-                        disabled={!newMessage.trim() && !attachment}
-                        className="p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                    >
-                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
-                        </svg>
-                    </button>
-                </form>
-            </div>
+            {/* Image Modal */}
+            {selectedImage && (
+                <div
+                    className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-75 p-4"
+                    onClick={() => setSelectedImage(null)}
+                >
+                    <img src={selectedImage} alt="Enlarged" className="max-w-full max-h-full rounded" />
+                </div>
+            )}
         </div>
     );
 }
