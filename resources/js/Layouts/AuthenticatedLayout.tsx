@@ -3,19 +3,47 @@ import Dropdown from '@/Components/Dropdown';
 import NavLink from '@/Components/NavLink';
 import ResponsiveNavLink from '@/Components/ResponsiveNavLink';
 import { Link, usePage } from '@inertiajs/react';
-import { PropsWithChildren, ReactNode, useState } from 'react';
+import { PropsWithChildren, ReactNode, useEffect, useState } from 'react';
+import { Bell } from 'lucide-react';
+import CommandPalette from '@/Components/CommandPalette';
+import { Toaster } from '@/Components/ui/toaster';
+import { useToast } from '@/Components/ui/use-toast';
 
 export default function Authenticated({
     header,
     children,
 }: PropsWithChildren<{ header?: ReactNode }>) {
-    const user = usePage().props.auth.user;
+    const { auth, notifications, flash } = usePage().props as any;
+    const user = auth.user;
+    const isImpersonating = auth.is_impersonating;
+    const { toast } = useToast();
 
     const [showingNavigationDropdown, setShowingNavigationDropdown] =
         useState(false);
 
+    useEffect(() => {
+        if (flash?.message) {
+            toast({
+                description: flash.message,
+            });
+        }
+    }, [flash]);
+
     return (
         <div className="min-h-screen bg-gray-100">
+            {isImpersonating && (
+                <div className="bg-amber-500 text-white px-4 py-2 text-center text-sm font-medium">
+                    Viewing as {user.name} —
+                    <Link
+                        href={route('stop-impersonating')}
+                        method="post"
+                        as="button"
+                        className="ml-2 underline hover:text-amber-100"
+                    >
+                        [Stop]
+                    </Link>
+                </div>
+            )}
             <nav className="border-b border-gray-100 bg-white">
                 <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                     <div className="flex h-16 justify-between">
@@ -36,7 +64,49 @@ export default function Authenticated({
                             </div>
                         </div>
 
-                        <div className="hidden sm:ms-6 sm:flex sm:items-center">
+                        <div className="hidden sm:ms-6 sm:flex sm:items-center space-x-4">
+
+                            {/* Notifications Dropdown */}
+                            <div className="relative">
+                                <Dropdown>
+                                    <Dropdown.Trigger>
+                                        <button className="relative p-2 text-gray-400 hover:text-gray-500 focus:outline-none focus:text-gray-500 transition duration-150 ease-in-out">
+                                            <Bell className="w-6 h-6" />
+                                            {notifications?.unread_count > 0 && (
+                                                <span className="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-red-100 transform translate-x-1/4 -translate-y-1/4 bg-red-600 rounded-full">
+                                                    {notifications.unread_count}
+                                                </span>
+                                            )}
+                                        </button>
+                                    </Dropdown.Trigger>
+
+                                    <Dropdown.Content align="right" width="48">
+                                        <div className="px-4 py-2 text-xs text-gray-500 border-b">
+                                            Recent Notifications
+                                        </div>
+                                        {notifications?.recent?.length > 0 ? (
+                                            notifications.recent.map((notification: any) => (
+                                                <Dropdown.Link
+                                                    key={notification.id}
+                                                    href={route('notifications.mark-read', { id: notification.id })}
+                                                    method="post"
+                                                    as="button"
+                                                    className="w-full text-left"
+                                                >
+                                                    {notification.data?.message || 'New notification'}
+                                                </Dropdown.Link>
+                                            ))
+                                        ) : (
+                                            <div className="px-4 py-2 text-sm text-gray-500">No new notifications</div>
+                                        )}
+                                        <div className="border-t border-gray-100"></div>
+                                        <Dropdown.Link href={route('notifications.index')} className="text-center text-sm text-indigo-600 font-medium">
+                                            View All
+                                        </Dropdown.Link>
+                                    </Dropdown.Content>
+                                </Dropdown>
+                            </div>
+
                             <div className="relative ms-3">
                                 <Dropdown>
                                     <Dropdown.Trigger>
@@ -174,6 +244,8 @@ export default function Authenticated({
             )}
 
             <main>{children}</main>
+            <CommandPalette />
+            <Toaster />
         </div>
     );
 }
