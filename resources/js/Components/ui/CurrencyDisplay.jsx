@@ -1,0 +1,61 @@
+import { cn, formatMoney } from '@/lib/utils';
+
+export function CurrencyDisplay({
+    amount,
+    currency = 'USD',
+    businessAmount,
+    businessCurrency,
+    size = 'md',
+    colorize = false,
+    className,
+}) {
+    const numericAmount =
+        typeof amount === 'string' ? parseFloat(amount) : amount;
+
+    const sizeClasses = {
+        sm: 'text-[13px]',
+        md: 'text-[14px]',
+        lg: 'text-[16px]',
+    };
+
+    const secondarySizeClasses = {
+        sm: 'text-[11px]',
+        md: 'text-[12px]',
+        lg: 'text-[13px]',
+    };
+
+    let colorClass = 'text-text-primary';
+    if (colorize) {
+        if (numericAmount > 0) colorClass = 'text-success';
+        else if (numericAmount < 0) colorClass = 'text-danger';
+    }
+
+    const hasSecondary =
+        businessAmount !== undefined &&
+        businessCurrency !== undefined &&
+        currency !== businessCurrency;
+
+    return (
+        <div className={cn('flex flex-col font-mono', className)}>
+            <span
+                className={cn(
+                    'font-medium',
+                    sizeClasses[size] || sizeClasses.md,
+                    colorClass,
+                )}
+            >
+                {formatMoney(amount, currency)}
+            </span>
+            {hasSecondary && (
+                <span
+                    className={cn(
+                        'text-text-muted mt-0.5',
+                        secondarySizeClasses[size] || secondarySizeClasses.md,
+                    )}
+                >
+                    ≈ {formatMoney(businessAmount, businessCurrency)}
+                </span>
+            )}
+        </div>
+    );
+}
