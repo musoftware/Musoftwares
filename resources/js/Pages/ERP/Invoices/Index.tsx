@@ -57,11 +57,16 @@ export default function Index({ invoices }: any) {
     };
 
     return (
-        <AuthenticatedLayout header={<h2 className="text-xl font-semibold leading-tight text-gray-800">Invoices</h2>}>
+        <AuthenticatedLayout
+            header={
+                <h2 className="text-xl font-semibold leading-tight text-gray-800">
+                    Invoices
+                </h2>
+            }
+        >
             <Head title="Invoices" />
             <div className="py-12">
                 <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
-
                     <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6 mb-6 flex justify-between items-center">
                         <h3 className="text-lg font-bold">Active Timer</h3>
                         <div className="flex items-center gap-4">
