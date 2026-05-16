@@ -1,0 +1,52 @@
+<?php
+
+namespace Modules\ERP\Models;
+
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+
+class ExpenseTransaction extends TenantModel
+{
+    protected $fillable = [
+        'tenant_id', 'invoice_cost_id', 'invoice_id', 'client_id',
+        'type', 'direction', 'amount', 'amount_currency', 'business_amount', 'business_currency',
+        'exchange_rate', 'exchange_rate_date', 'balance_before', 'balance_after',
+        'note', 'created_by'
+    ];
+
+    const UPDATED_AT = null;
+
+    protected $casts = [
+        'amount' => 'decimal:2',
+        'business_amount' => 'decimal:2',
+        'exchange_rate' => 'decimal:6',
+        'exchange_rate_date' => 'date',
+        'balance_before' => 'decimal:2',
+        'balance_after' => 'decimal:2',
+        'created_at' => 'datetime',
+    ];
+
+    public function tenant(): BelongsTo
+    {
+        return $this->belongsTo(Tenant::class);
+    }
+
+    public function invoiceCost(): BelongsTo
+    {
+        return $this->belongsTo(InvoiceCost::class);
+    }
+
+    public function invoice(): BelongsTo
+    {
+        return $this->belongsTo(Invoice::class);
+    }
+
+    public function client(): BelongsTo
+    {
+        return $this->belongsTo(TenantClient::class, 'client_id');
+    }
+
+    public function creator(): BelongsTo
+    {
+        return $this->belongsTo(\App\Models\User::class, 'created_by');
+    }
+}
