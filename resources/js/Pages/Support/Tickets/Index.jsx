@@ -1,12 +1,12 @@
 import ChatWindow from '@/Components/Chat/ChatWindow';
-import DataTable from '@/Components/DataTable';
 import InputError from '@/Components/InputError';
 import InputLabel from '@/Components/InputLabel';
 import Modal from '@/Components/Modal';
 import PrimaryButton from '@/Components/PrimaryButton';
 import SecondaryButton from '@/Components/SecondaryButton';
-import StatusBadge from '@/Components/StatusBadge';
 import TextInput from '@/Components/TextInput';
+import { DataTable } from '@/Components/ui/DataTable';
+import { StatusBadge } from '@/Components/ui/StatusBadge';
 import { Head, router, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 

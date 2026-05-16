@@ -1,99 +1,113 @@
-@import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
 @import "tailwindcss";
 
 @plugin "@tailwindcss/forms";
 
 @theme {
-    --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif,
+    --font-sora: "Sora", sans-serif;
+    --font-sans: "DM Sans", "Figtree", ui-sans-serif, system-ui, sans-serif,
         "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol",
         "Noto Color Emoji";
-
-    --color-background: #f8f9fc;
-    --color-surface: #ffffff;
-    --color-surface-raised: #f1f4f9;
-    --color-border: #e2e8f0;
-    --color-border-strong: #cbd5e1;
-    --color-primary: #6366f1;
-    --color-primary-hover: #4f46e5;
-    --color-primary-light: #eef2ff;
-    --color-accent: #0ea5e9;
-    --color-success: #10b981;
-    --color-success-light: #ecfdf5;
-    --color-warning: #f59e0b;
-    --color-warning-light: #fffbeb;
-    --color-danger: #ef4444;
-    --color-danger-light: #fef2f2;
-    --color-text-primary: #0f172a;
-    --color-text-secondary: #475569;
-    --color-text-muted: #94a3b8;
-
-    --font-display: "Sora", sans-serif;
-    --font-body: "DM Sans", sans-serif;
     --font-mono: "JetBrains Mono", monospace;
 
-    --shadow-soft: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+    --color-background: var(--background);
+    --color-surface: var(--surface);
+    --color-surface-raised: var(--surface-raised);
+    --color-border: var(--border);
+    --color-border-strong: var(--border-strong);
+    --color-primary: var(--primary);
+    --color-primary-hover: var(--primary-hover);
+    --color-primary-light: var(--primary-light);
+    --color-success: var(--success);
+    --color-success-light: var(--success-light);
+    --color-warning: var(--warning);
+    --color-warning-light: var(--warning-light);
+    --color-danger: var(--danger);
+    --color-danger-light: var(--danger-light);
+    --color-text-primary: var(--text-primary);
+    --color-text-secondary: var(--text-secondary);
+    --color-text-muted: var(--text-muted);
+
+    --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+    --shadow-md: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+    --shadow-lg: 0 4px 6px rgba(0,0,0,0.07), 0 2px 4px rgba(0,0,0,0.05);
 }
 
 @layer base {
   :root {
-    --background: 228 33% 98%; /* #f8f9fc */
-    --foreground: 222.2 84% 4.9%; /* #0f172a / text-primary approx */
+    --background:     #f8f9fc;
+    --surface:        #ffffff;
+    --surface-raised: #f1f4f9;
+    --border:         #e2e8f0;
+    --border-strong:  #cbd5e1;
+    --primary:        #6366f1;
+    --primary-hover:  #4f46e5;
+    --primary-light:  #eef2ff;
+    --success:        #10b981;
+    --success-light:  #ecfdf5;
+    --warning:        #f59e0b;
+    --warning-light:  #fffbeb;
+    --danger:         #ef4444;
+    --danger-light:   #fef2f2;
+    --text-primary:   #0f172a;
+    --text-secondary: #475569;
+    --text-muted:     #94a3b8;
 
-    --card: 0 0% 100%; /* #ffffff */
+    /* Shadcn compatibility vars */
+    --foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;
     --card-foreground: 222.2 84% 4.9%;
-
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
-
-    --primary: 239 84% 67%; /* #6366f1 */
     --primary-foreground: 210 40% 98%;
-
     --secondary: 210 40% 96.1%;
     --secondary-foreground: 222.2 47.4% 11.2%;
-
-    --muted: 210 40% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;
-
-    --accent: 199 89% 48%; /* #0ea5e9 */
-    --accent-foreground: 210 40% 98%;
-
-    --destructive: 0 84.2% 60.2%; /* #ef4444 */
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+    --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
-
-    --border: 214.3 31.8% 91.4%; /* #e2e8f0 approx */
     --input: 214.3 31.8% 91.4%;
-    --ring: 239 84% 67%; /* #6366f1 */
-
+    --ring: 222.2 84% 4.9%;
     --radius: 0.5rem;
   }
 }
 
 @layer base {
   * {
-    border-color: hsl(var(--border));
+    border-color: var(--border);
   }
   body {
-    background-color: hsl(var(--background));
-    color: hsl(var(--foreground));
-    font-family: var(--font-body);
+    background-color: var(--background);
+    color: var(--text-primary);
+    font-family: var(--font-sans);
+  }
+  /* Global transition requested */
+  *, ::before, ::after {
+    transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 200ms;
   }
 }
 
-@keyframes skeleton {
-  0% { background-color: var(--color-surface-raised); }
-  50% { background-color: var(--color-border); }
-  100% { background-color: var(--color-surface-raised); }
-}
+@layer utilities {
+  .skeleton {
+    animation: skeleton-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    background-image: linear-gradient(90deg, var(--surface-raised) 0%, var(--border) 50%, var(--surface-raised) 100%);
+    background-size: 200% 100%;
+  }
 
-.skeleton {
-  animation: skeleton 1.5s infinite ease-in-out;
-}
+  @keyframes skeleton-pulse {
+    0% {
+      background-position: 200% 0;
+    }
+    100% {
+      background-position: -200% 0;
+    }
+  }
 
-input:focus {
-  box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
-}
-
-.backdrop-blur-glass {
-  backdrop-filter: blur(8px);
-  background-color: rgba(255, 255, 255, 0.8);
+  .section-label {
+    font-size: 12px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
 }

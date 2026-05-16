@@ -1,4 +1,4 @@
-import StatusBadge from '@/Components/StatusBadge';
+import { StatusBadge } from '@/Components/ui/StatusBadge';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, router, usePage } from '@inertiajs/react';
 import { useState } from 'react';
