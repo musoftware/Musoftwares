@@ -13,16 +13,47 @@ class RolesAndPermissionsSeeder extends Seeder
         // Reset cached roles and permissions
         app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
 
-        // Create Permissions (example)
-        Permission::create(['name' => 'impersonate users']);
-        Permission::create(['name' => 'manage currencies']);
-        Permission::create(['name' => 'moderate marketplace']);
-        Permission::create(['name' => 'manage subscriptions']);
+        // Create Permissions
+        $permissions = [
+            'manage invoices',
+            'manage withdrawals',
+            'manage marketplace',
+            'manage services',
+            'manage users',
+            'impersonate users',
+            'manage settings',
+            'manage referrals',
+        ];
 
-        // Create Roles and assign created permissions
-        $clientRole = Role::create(['name' => 'client']);
+        foreach ($permissions as $permission) {
+            Permission::findOrCreate($permission);
+        }
 
-        $adminRole = Role::create(['name' => 'admin']);
-        $adminRole->givePermissionTo(Permission::all());
+        // Create Roles
+        $roles = [
+            'super_admin',
+            'admin',
+            'accountant',
+            'moderator',
+            'support_agent',
+            'client',
+            'freelancer',
+            'seller'
+        ];
+
+        foreach ($roles as $roleName) {
+            $role = Role::findOrCreate($roleName);
+
+            // Assign permissions based on role
+            if ($roleName === 'super_admin' || $roleName === 'admin') {
+                $role->givePermissionTo(Permission::all());
+            } elseif ($roleName === 'accountant') {
+                $role->givePermissionTo(['manage invoices', 'manage withdrawals']);
+            } elseif ($roleName === 'moderator') {
+                $role->givePermissionTo(['manage marketplace', 'manage services', 'manage users']);
+            } elseif ($roleName === 'support_agent') {
+                $role->givePermissionTo(['impersonate users']);
+            }
+        }
     }
 }

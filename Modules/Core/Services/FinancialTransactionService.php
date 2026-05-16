@@ -4,6 +4,9 @@ namespace Modules\Core\Services;
 
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use App\Events\WalletCredited;
+use App\Events\WalletDebited;
+use Modules\Core\Models\WalletTransaction;
 
 class FinancialTransactionService
 {
@@ -119,7 +122,7 @@ class FinancialTransactionService
 
             // Debit Source
             $newSourceBalance = $sourceWallet->balance - $amount;
-            DB::table('wallet_transactions')->insert([
+            $debitTxId = DB::table('wallet_transactions')->insertGetId([
                 'wallet_id' => $sourceWalletId,
                 'type' => 'debit',
                 'amount' => $amount,
@@ -133,9 +136,12 @@ class FinancialTransactionService
             ]);
             DB::table('wallets')->where('id', $sourceWalletId)->update(['balance' => $newSourceBalance, 'updated_at' => now()]);
 
+            $debitTx = WalletTransaction::find($debitTxId);
+            event(new WalletDebited($debitTx));
+
             // Credit Destination
             $newDestBalance = $destWallet->balance + $amount;
-            DB::table('wallet_transactions')->insert([
+            $creditTxId = DB::table('wallet_transactions')->insertGetId([
                 'wallet_id' => $destinationWalletId,
                 'type' => 'credit',
                 'amount' => $amount,
@@ -148,6 +154,9 @@ class FinancialTransactionService
                 'updated_at' => now(),
             ]);
             DB::table('wallets')->where('id', $destinationWalletId)->update(['balance' => $newDestBalance, 'updated_at' => now()]);
+
+            $creditTx = WalletTransaction::find($creditTxId);
+            event(new WalletCredited($creditTx));
         });
     }
 }
