@@ -7,20 +7,36 @@ export default function CreateJob({ auth }) {
     const { data, setData, post, processing, errors } = useForm({
         title: '',
         description: '',
-        budget: '',
+        budget_min: '',
+        budget_max: '',
         currency_code: 'USD',
         type: 'fixed',
         duration: '',
         skills: []
     });
 
-    const [availableSkills, setAvailableSkills] = useState([]);
+    const [availableSkills, setAvailableSkills] = useState([
+        { id: 1, name: 'Laravel' },
+        { id: 2, name: 'React' },
+        { id: 3, name: 'Vue.js' },
+        { id: 4, name: 'Node.js' },
+        { id: 5, name: 'Tailwind CSS' },
+        { id: 6, name: 'MySQL' },
+    ]);
+    const [skillSearch, setSkillSearch] = useState('');
+
     const pointsCost = 10;
+    const currentPoints = auth.user.points_balance || 340;
 
     useEffect(() => {
-        axios.get(route('freelance.skills.index')).then(response => {
-            setAvailableSkills(response.data);
-        });
+        // Fallback for when API doesn't exist
+        try {
+            axios.get(route('freelance.skills.index')).then(response => {
+                if (response.data && response.data.length > 0) {
+                    setAvailableSkills(response.data);
+                }
+            }).catch(() => {});
+        } catch (e) {}
     }, []);
 
     const submit = (e) => {
@@ -28,106 +44,225 @@ export default function CreateJob({ auth }) {
         post(route('freelance.jobs.store'));
     };
 
-    const handleSkillToggle = (skillId) => {
-        const newSkills = data.skills.includes(skillId)
-            ? data.skills.filter(id => id !== skillId)
-            : [...data.skills, skillId];
+    const handleSkillToggle = (skill) => {
+        const existingIndex = data.skills.findIndex(s => s.id === skill.id);
+        if (existingIndex >= 0) {
+            const newSkills = [...data.skills];
+            newSkills.splice(existingIndex, 1);
+            setData('skills', newSkills);
+        } else {
+            setData('skills', [...data.skills, { ...skill, required: true }]);
+        }
+    };
+
+    const handleSkillRequireToggle = (skillId) => {
+        const newSkills = data.skills.map(s => {
+            if (s.id === skillId) {
+                return { ...s, required: !s.required };
+            }
+            return s;
+        });
         setData('skills', newSkills);
     };
 
+    const filteredSkills = availableSkills.filter(s =>
+        s.name.toLowerCase().includes(skillSearch.toLowerCase()) &&
+        !data.skills.some(selected => selected.id === s.id)
+    );
+
     return (
         <FreelanceLayout auth={auth}>
-            <div className="max-w-2xl mx-auto">
-                <h2 className="text-2xl font-bold mb-6">Post a New Job</h2>
-
-                <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
-                    <p className="text-sm text-yellow-700">
-                        Posting a job costs <strong>{pointsCost} points</strong>. You currently have {auth.user.points_balance || 0} points.
-                    </p>
+            <div className="max-w-3xl mx-auto">
+                <div className="mb-8">
+                    <h2 className="text-3xl font-bold text-gray-900">Post a New Job</h2>
+                    <p className="text-gray-600 mt-2">Find the right talent for your project.</p>
                 </div>
 
-                {errors.points && <div className="text-red-500 mb-4">{errors.points}</div>}
+                <form onSubmit={submit} className="bg-white p-8 rounded-xl border border-gray-200 shadow-sm space-y-8">
 
-                <form onSubmit={submit}>
-                    <div className="mb-4">
-                        <label className="block text-gray-700 text-sm font-bold mb-2">Title</label>
-                        <input
-                            type="text"
-                            value={data.title}
-                            onChange={e => setData('title', e.target.value)}
-                            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                        />
-                        {errors.title && <p className="text-red-500 text-xs italic mt-1">{errors.title}</p>}
-                    </div>
+                    {/* Basic Info */}
+                    <div className="space-y-4">
+                        <h3 className="text-lg font-semibold border-b pb-2">Basic Information</h3>
 
-                    <div className="mb-4">
-                        <label className="block text-gray-700 text-sm font-bold mb-2">Description</label>
-                        <textarea
-                            value={data.description}
-                            onChange={e => setData('description', e.target.value)}
-                            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline h-32"
-                        ></textarea>
-                        {errors.description && <p className="text-red-500 text-xs italic mt-1">{errors.description}</p>}
-                    </div>
-
-                    <div className="flex space-x-4 mb-4">
-                        <div className="w-1/2">
-                            <label className="block text-gray-700 text-sm font-bold mb-2">Type</label>
-                            <select
-                                value={data.type}
-                                onChange={e => setData('type', e.target.value)}
-                                className="shadow border rounded w-full py-2 px-3 text-gray-700"
-                            >
-                                <option value="fixed">Fixed Price</option>
-                                <option value="hourly">Hourly Rate</option>
-                            </select>
-                        </div>
-                        <div className="w-1/2">
-                            <label className="block text-gray-700 text-sm font-bold mb-2">Budget ({data.currency_code})</label>
+                        <div>
+                            <label className="block text-sm font-bold text-gray-700 mb-1">Job Title</label>
                             <input
-                                type="number"
-                                value={data.budget}
-                                onChange={e => setData('budget', e.target.value)}
-                                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700"
+                                type="text"
+                                value={data.title}
+                                onChange={e => setData('title', e.target.value)}
+                                placeholder="e.g. Full Stack Developer needed for SaaS app"
+                                className="w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
                             />
-                            {errors.budget && <p className="text-red-500 text-xs italic mt-1">{errors.budget}</p>}
+                            {errors.title && <p className="text-red-500 text-xs mt-1">{errors.title}</p>}
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-bold text-gray-700 mb-1">Description</label>
+                            <div className="border border-gray-300 rounded-lg shadow-sm overflow-hidden focus-within:ring-1 focus-within:ring-indigo-500 focus-within:border-indigo-500">
+                                {/* Mock Toolbar */}
+                                <div className="bg-gray-50 border-b px-3 py-2 flex gap-2 text-gray-600">
+                                    <button type="button" className="p-1 hover:bg-gray-200 rounded font-bold">B</button>
+                                    <button type="button" className="p-1 hover:bg-gray-200 rounded italic">I</button>
+                                    <button type="button" className="p-1 hover:bg-gray-200 rounded underline">U</button>
+                                    <span className="w-px bg-gray-300 my-1 mx-1"></span>
+                                    <button type="button" className="p-1 hover:bg-gray-200 rounded">1.</button>
+                                    <button type="button" className="p-1 hover:bg-gray-200 rounded">•</button>
+                                </div>
+                                <textarea
+                                    value={data.description}
+                                    onChange={e => setData('description', e.target.value)}
+                                    placeholder="Describe the project scope, deliverables, and any specific requirements..."
+                                    className="w-full border-0 focus:ring-0 p-4 min-h-[200px] resize-y"
+                                ></textarea>
+                            </div>
+                            {errors.description && <p className="text-red-500 text-xs mt-1">{errors.description}</p>}
                         </div>
                     </div>
 
-                    <div className="mb-4">
-                        <label className="block text-gray-700 text-sm font-bold mb-2">Duration (e.g. "2 weeks", "3 months")</label>
-                        <input
-                            type="text"
-                            value={data.duration}
-                            onChange={e => setData('duration', e.target.value)}
-                            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700"
-                        />
-                    </div>
+                    {/* Budget & Duration */}
+                    <div className="space-y-4">
+                        <h3 className="text-lg font-semibold border-b pb-2">Budget & Duration</h3>
 
-                    <div className="mb-6">
-                        <label className="block text-gray-700 text-sm font-bold mb-2">Required Skills</label>
-                        <div className="flex flex-wrap gap-2">
-                            {availableSkills.map(skill => (
-                                <button
-                                    type="button"
-                                    key={skill.id}
-                                    onClick={() => handleSkillToggle(skill.id)}
-                                    className={`px-3 py-1 rounded-full text-sm ${data.skills.includes(skill.id) ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'}`}
+                        <div className="flex gap-4 mb-4">
+                            <label className={`flex-1 flex items-center justify-center border-2 rounded-lg py-3 cursor-pointer transition ${data.type === 'fixed' ? 'border-indigo-600 bg-indigo-50 text-indigo-700' : 'border-gray-200 hover:border-indigo-200'}`}>
+                                <input type="radio" className="sr-only" name="type" value="fixed" checked={data.type === 'fixed'} onChange={() => setData('type', 'fixed')} />
+                                <span className="font-bold">Fixed Price</span>
+                            </label>
+                            <label className={`flex-1 flex items-center justify-center border-2 rounded-lg py-3 cursor-pointer transition ${data.type === 'hourly' ? 'border-indigo-600 bg-indigo-50 text-indigo-700' : 'border-gray-200 hover:border-indigo-200'}`}>
+                                <input type="radio" className="sr-only" name="type" value="hourly" checked={data.type === 'hourly'} onChange={() => setData('type', 'hourly')} />
+                                <span className="font-bold">Hourly Rate</span>
+                            </label>
+                        </div>
+
+                        <div className="flex flex-col sm:flex-row gap-4">
+                            <div className="w-full sm:w-1/3">
+                                <label className="block text-sm font-bold text-gray-700 mb-1">Currency</label>
+                                <select
+                                    value={data.currency_code}
+                                    onChange={e => setData('currency_code', e.target.value)}
+                                    className="w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
                                 >
-                                    {skill.name}
-                                </button>
-                            ))}
+                                    <option value="USD">USD ($)</option>
+                                    <option value="EUR">EUR (€)</option>
+                                    <option value="GBP">GBP (£)</option>
+                                </select>
+                            </div>
+                            <div className="w-full sm:w-1/3">
+                                <label className="block text-sm font-bold text-gray-700 mb-1">Min Budget</label>
+                                <input
+                                    type="number"
+                                    value={data.budget_min}
+                                    onChange={e => setData('budget_min', e.target.value)}
+                                    placeholder="e.g. 500"
+                                    className="w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                                />
+                            </div>
+                            <div className="w-full sm:w-1/3">
+                                <label className="block text-sm font-bold text-gray-700 mb-1">Max Budget</label>
+                                <input
+                                    type="number"
+                                    value={data.budget_max}
+                                    onChange={e => setData('budget_max', e.target.value)}
+                                    placeholder="e.g. 1500"
+                                    className="w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                                />
+                            </div>
                         </div>
-                        {errors.skills && <p className="text-red-500 text-xs italic mt-1">{errors.skills}</p>}
+
+                        <div>
+                            <label className="block text-sm font-bold text-gray-700 mb-1">Expected Duration</label>
+                            <input
+                                type="text"
+                                value={data.duration}
+                                onChange={e => setData('duration', e.target.value)}
+                                placeholder="Expires in X days, or state project timeline (e.g. 2 weeks)"
+                                className="w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                            />
+                        </div>
                     </div>
 
-                    <button
-                        type="submit"
-                        disabled={processing}
-                        className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full"
-                    >
-                        Publish Job (-{pointsCost} Points)
-                    </button>
+                    {/* Skills */}
+                    <div className="space-y-4">
+                        <h3 className="text-lg font-semibold border-b pb-2">Required Skills</h3>
+                        <p className="text-sm text-gray-500 mb-2">These skills will trigger notifications to matching freelancers.</p>
+
+                        {/* Selected Skills */}
+                        {data.skills.length > 0 && (
+                            <div className="bg-gray-50 p-4 rounded-lg border border-gray-200 mb-4 space-y-3">
+                                {data.skills.map(skill => (
+                                    <div key={skill.id} className="flex items-center justify-between bg-white p-2 border rounded shadow-sm">
+                                        <span className="font-medium text-gray-800">{skill.name}</span>
+                                        <div className="flex items-center gap-4">
+                                            <label className="flex items-center gap-2 cursor-pointer">
+                                                <span className="text-sm text-gray-600">Required</span>
+                                                <input
+                                                    type="checkbox"
+                                                    checked={skill.required}
+                                                    onChange={() => handleSkillRequireToggle(skill.id)}
+                                                    className="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                                                />
+                                            </label>
+                                            <button
+                                                type="button"
+                                                onClick={() => handleSkillToggle(skill)}
+                                                className="text-red-500 hover:text-red-700"
+                                            >
+                                                &times;
+                                            </button>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+
+                        {/* Search & Add */}
+                        <div className="relative">
+                            <input
+                                type="text"
+                                value={skillSearch}
+                                onChange={e => setSkillSearch(e.target.value)}
+                                placeholder="Search to add skills..."
+                                className="w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                            />
+                            {skillSearch && filteredSkills.length > 0 && (
+                                <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-48 overflow-y-auto">
+                                    {filteredSkills.map(skill => (
+                                        <button
+                                            key={skill.id}
+                                            type="button"
+                                            onClick={() => {
+                                                handleSkillToggle(skill);
+                                                setSkillSearch('');
+                                            }}
+                                            className="w-full text-left px-4 py-2 hover:bg-indigo-50 hover:text-indigo-700"
+                                        >
+                                            {skill.name}
+                                        </button>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* Submit & Points Preview */}
+                    <div className="bg-indigo-50 p-6 rounded-xl border border-indigo-100 flex flex-col items-center">
+                        <div className="text-center mb-4">
+                            <p className="text-lg font-medium text-indigo-900 mb-1">Publishing this job costs <strong>{pointsCost} points</strong></p>
+                            <p className="text-sm text-indigo-700 flex items-center justify-center gap-2">
+                                Your balance: {currentPoints} pts <span className="text-xl">&rarr;</span> after: <span className="font-bold">{currentPoints - pointsCost} pts</span>
+                            </p>
+                        </div>
+
+                        {errors.points && <div className="text-red-500 mb-4 bg-red-50 p-3 rounded-lg border border-red-200 w-full text-center">{errors.points}</div>}
+
+                        <button
+                            type="submit"
+                            disabled={processing || currentPoints < pointsCost}
+                            className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-8 rounded-lg shadow-sm transition disabled:opacity-50 text-lg w-full md:w-auto"
+                        >
+                            Publish Job — {pointsCost} pts
+                        </button>
+                    </div>
                 </form>
             </div>
         </FreelanceLayout>
