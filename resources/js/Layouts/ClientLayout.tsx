@@ -54,32 +54,39 @@ export default function ClientLayout({
         : defaultModules;
 
     return (
-        <div className="flex min-h-screen bg-gray-50">
+        <div className="flex min-h-screen bg-background">
             {/* Sidebar */}
-            <aside className="flex hidden w-64 flex-col border-r border-gray-200 bg-white md:flex">
-                <div className="flex h-16 items-center border-b border-gray-200 px-6">
-                    <span className="text-xl font-bold text-gray-900">
+            <aside className="flex hidden w-64 flex-col border-r border-border bg-surface md:flex">
+                <div className="flex h-16 items-center border-b border-border px-6">
+                    <span className="text-xl font-bold text-text-primary">
                         Client Portal
                     </span>
                 </div>
                 <nav className="flex-1 space-y-2 px-4 py-6">
-                    {modules.map((item) => (
-                        <Link
-                            key={item.name}
-                            href={route(item.route)}
-                            className="flex items-center rounded-md bg-gray-100 px-4 py-2 text-gray-700 hover:bg-gray-200 hover:text-gray-900"
-                        >
-                            <item.icon className="mr-3 h-5 w-5" />
-                            {item.name}
-                        </Link>
-                    ))}
+                    {modules.map((item) => {
+                        const isActive = route().current(item.route);
+                        return (
+                            <Link
+                                key={item.name}
+                                href={route(item.route)}
+                                className={`flex items-center rounded-md px-4 py-2 text-text-secondary transition-colors duration-200 border-l-4 ${
+                                    isActive
+                                        ? 'border-primary bg-primary-light text-primary'
+                                        : 'border-transparent hover:bg-surface-raised hover:text-text-primary'
+                                }`}
+                            >
+                                <item.icon className={`mr-3 h-5 w-5 ${isActive ? 'text-primary' : 'text-text-secondary'}`} />
+                                {item.name}
+                            </Link>
+                        );
+                    })}
                 </nav>
             </aside>
 
             {/* Main Content */}
             <main className="flex min-w-0 flex-1 flex-col overflow-hidden">
                 {/* Top Bar */}
-                <header className="flex h-16 items-center justify-between border-b border-gray-200 bg-white px-6">
+                <header className="flex h-16 items-center justify-between border-b border-border bg-surface px-6">
                     <div className="flex items-center">
                         <span className="text-lg font-semibold text-gray-800">
                             Dashboard
@@ -155,7 +162,7 @@ export default function ClientLayout({
                 </header>
 
                 {/* Page Content */}
-                <div className="flex-1 overflow-auto bg-gray-50 p-6">
+                <div className="flex-1 overflow-auto bg-background p-6">
                     {children}
                 </div>
             </main>
