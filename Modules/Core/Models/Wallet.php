@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Wallet extends Model
 {
-    protected $fillable = ['owner_id', 'owner_type', 'context', 'balance', 'currency'];
+    protected $fillable = ['owner_id', 'owner_type', 'context', 'balance', 'currency', 'locked_balance'];
 
     public function owner(): MorphTo
     {
