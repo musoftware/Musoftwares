@@ -7,7 +7,7 @@ import SecondaryButton from '@/Components/SecondaryButton';
 import { format, addDays, addWeeks, addMonths, addYears, nextDay, parseISO, set } from 'date-fns';
 import { useState, useEffect } from 'react';
 import { TrendingUp, TrendingDown, Calendar as CalendarIcon } from 'lucide-react';
-import CurrencyDisplay from '@/Components/CurrencyDisplay';
+import { CurrencyDisplay } from '@/Components/ui/CurrencyDisplay';
 
 export default function RecurringForm({ entry = null, business_currency = 'USD' }) {
     const isEditing = !!entry;

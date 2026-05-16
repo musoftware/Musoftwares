@@ -1,7 +1,7 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head } from '@inertiajs/react';
 import RecurringForm from './RecurringForm';
-import PageHeader from '@/Components/PageHeader';
+import { PageHeader } from '@/Components/ui/PageHeader';
 
 export default function Edit({ entry, business_currency }) {
     return (

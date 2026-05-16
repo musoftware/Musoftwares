@@ -15,7 +15,7 @@ import {
 import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
 import { Textarea } from '@/Components/ui/textarea';
-import StatusBadge from '@/Components/StatusBadge';
+import { StatusBadge } from '@/Components/ui/StatusBadge';
 import {
     Plus,
     Building,

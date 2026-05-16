@@ -3,7 +3,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link } from '@inertiajs/react';
 import { Card, CardContent } from '@/Components/ui/card';
 import { Button } from '@/Components/ui/button';
-import CurrencyDisplay from '@/Components/CurrencyDisplay';
+import { CurrencyDisplay } from '@/Components/ui/CurrencyDisplay';
 import {
     Receipt,
     FileText,
