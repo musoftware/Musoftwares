@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, usePage } from '@inertiajs/react';
 import axios from 'axios';
+import { useEffect, useRef, useState } from 'react';
 
 export default function Index({ invoices }: any) {
     const { auth } = usePage().props;
@@ -18,7 +18,7 @@ export default function Index({ invoices }: any) {
             setTimer(res.data.duration_seconds || 0);
             setTimerState(res.data.stopped_at ? 'stopped' : 'running');
         } catch (err) {
-            console.error("Failed to fetch timer state", err);
+            console.error('Failed to fetch timer state', err);
         }
     };
 
@@ -31,7 +31,8 @@ export default function Index({ invoices }: any) {
         }, 30000);
 
         return () => {
-            if (pollingIntervalRef.current) clearInterval(pollingIntervalRef.current);
+            if (pollingIntervalRef.current)
+                clearInterval(pollingIntervalRef.current);
         };
     }, []);
 
@@ -59,7 +60,7 @@ export default function Index({ invoices }: any) {
     return (
         <AuthenticatedLayout
             header={
-                <h2 className="text-xl font-semibold leading-tight text-gray-800">
+                <h2 className="text-xl leading-tight font-semibold text-gray-800">
                     Invoices
                 </h2>
             }
@@ -67,24 +68,33 @@ export default function Index({ invoices }: any) {
             <Head title="Invoices" />
             <div className="py-12">
                 <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
-                    <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6 mb-6 flex justify-between items-center">
+                    <div className="mb-6 flex items-center justify-between overflow-hidden bg-white p-6 shadow-sm sm:rounded-lg">
                         <h3 className="text-lg font-bold">Active Timer</h3>
                         <div className="flex items-center gap-4">
-                            <span className="text-sm text-gray-500">Status: {timerState}</span>
-                            <span className="text-2xl font-mono bg-gray-100 px-4 py-2 rounded-lg">
+                            <span className="text-sm text-gray-500">
+                                Status: {timerState}
+                            </span>
+                            <span className="rounded-lg bg-gray-100 px-4 py-2 font-mono text-2xl">
                                 {formatTime(timer)}
                             </span>
                         </div>
                     </div>
 
-                    <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
-                        <h3 className="text-lg font-bold mb-4">Invoices List</h3>
+                    <div className="overflow-hidden bg-white p-6 shadow-sm sm:rounded-lg">
+                        <h3 className="mb-4 text-lg font-bold">
+                            Invoices List
+                        </h3>
                         <ul>
                             {invoices?.data?.map((invoice: any) => (
-                                <li key={invoice.id} className="py-2 border-b">
-                                    Invoice #{invoice.number} - {invoice.client?.name}
+                                <li key={invoice.id} className="border-b py-2">
+                                    Invoice #{invoice.number} -{' '}
+                                    {invoice.client?.name}
                                 </li>
-                            )) || <li className="py-2 text-gray-500">No invoices available</li>}
+                            )) || (
+                                <li className="py-2 text-gray-500">
+                                    No invoices available
+                                </li>
+                            )}
                         </ul>
                     </div>
                 </div>

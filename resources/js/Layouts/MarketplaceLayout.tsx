@@ -13,33 +13,50 @@ export default function MarketplaceLayout({
         <div className="min-h-screen bg-gray-100">
             <nav className="border-b border-gray-100 bg-white">
                 <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                    <div className="flex h-16 justify-between items-center">
+                    <div className="flex h-16 items-center justify-between">
                         <div className="flex items-center">
                             <Link href="/">
                                 <ApplicationLogo className="block h-9 w-auto fill-current text-gray-800" />
                             </Link>
-                            <span className="ml-4 text-xl font-bold text-gray-800">Marketplace</span>
+                            <span className="ml-4 text-xl font-bold text-gray-800">
+                                Marketplace
+                            </span>
                         </div>
 
                         <div className="flex items-center space-x-4">
-                            <Link href={route('marketplace.services.index')} className="text-gray-600 hover:text-gray-900">
+                            <Link
+                                href={route('marketplace.services.index')}
+                                className="text-gray-600 hover:text-gray-900"
+                            >
                                 Browse
                             </Link>
                             {user ? (
                                 <>
-                                    <Link href={route('marketplace.orders.index')} className="text-gray-600 hover:text-gray-900">
+                                    <Link
+                                        href={route('marketplace.orders.index')}
+                                        className="text-gray-600 hover:text-gray-900"
+                                    >
                                         Orders
                                     </Link>
-                                    <Link href={route('dashboard')} className="text-gray-600 hover:text-gray-900">
+                                    <Link
+                                        href={route('dashboard')}
+                                        className="text-gray-600 hover:text-gray-900"
+                                    >
                                         Dashboard
                                     </Link>
                                 </>
                             ) : (
                                 <>
-                                    <Link href={route('login')} className="text-gray-600 hover:text-gray-900">
+                                    <Link
+                                        href={route('login')}
+                                        className="text-gray-600 hover:text-gray-900"
+                                    >
                                         Log in
                                     </Link>
-                                    <Link href={route('register')} className="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700">
+                                    <Link
+                                        href={route('register')}
+                                        className="rounded-md bg-indigo-600 px-4 py-2 text-white hover:bg-indigo-700"
+                                    >
                                         Register
                                     </Link>
                                 </>
