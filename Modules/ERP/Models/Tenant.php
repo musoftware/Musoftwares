@@ -5,23 +5,34 @@ namespace Modules\ERP\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use App\Models\User;
 
 class Tenant extends Model
 {
-    protected $fillable = ['owner_id', 'name', 'domain', 'is_active'];
+    protected $fillable = ['user_id', 'name', 'status', 'trial_ends_at', 'subscription_ends_at'];
 
-    public function owner(): BelongsTo
+    protected $casts = [
+        'trial_ends_at' => 'datetime',
+        'subscription_ends_at' => 'datetime',
+    ];
+
+    public function user(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'owner_id');
+        return $this->belongsTo(User::class);
     }
 
     public function clients(): HasMany
     {
-        return $this->hasMany(Client::class);
+        return $this->hasMany(TenantClient::class);
     }
 
     public function invoices(): HasMany
     {
         return $this->hasMany(Invoice::class);
+    }
+
+    public function wallets(): HasMany
+    {
+        return $this->hasMany(ClientWallet::class);
     }
 }
