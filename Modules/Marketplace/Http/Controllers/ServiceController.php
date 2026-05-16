@@ -47,7 +47,7 @@ class ServiceController extends Controller
             }
         }
 
-        return Inertia::render('Marketplace/Show', [
+        return Inertia::render('Marketplace/Services/Show', [
             'service' => $service,
         ]);
     }
