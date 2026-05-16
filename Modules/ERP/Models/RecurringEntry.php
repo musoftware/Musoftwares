@@ -5,13 +5,15 @@ namespace Modules\ERP\Models;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class RecurringEntry extends TenantModel
+class RecurringEntry extends TenantAwareModel
 {
     protected $fillable = [
         'tenant_id', 'type', 'title', 'description',
-        'amount', 'amount_currency', 'business_amount', 'business_currency',
+        'amount', 'currency_code', 'amount_currency', 'business_amount', 'business_currency',
         'exchange_rate', 'exchange_rate_date', 'frequency', 'frequency_day', 'frequency_month',
-        'starts_at', 'ends_at', 'next_run_at', 'last_run_at', 'status', 'created_by'
+        'day_of_week', 'day_of_month', 'month_of_year',
+        'starts_at', 'ends_at', 'next_run_at', 'last_run_at', 'next_date', 'end_date',
+        'status', 'is_active', 'created_by'
     ];
 
     protected $casts = [
@@ -23,8 +25,11 @@ class RecurringEntry extends TenantModel
         'ends_at' => 'date',
         'next_run_at' => 'date',
         'last_run_at' => 'date',
+        'next_date' => 'date',
+        'end_date' => 'date',
         'frequency_day' => 'integer',
         'frequency_month' => 'integer',
+        'is_active' => 'boolean',
     ];
 
     public function tenant(): BelongsTo
@@ -41,4 +46,10 @@ class RecurringEntry extends TenantModel
     {
         return $this->hasMany(RecurringExecutionLog::class);
     }
+
+    public function logs(): HasMany
+    {
+        return $this->hasMany(RecurringEntryLog::class);
+    }
 }
+
