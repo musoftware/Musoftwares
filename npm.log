@@ -1,0 +1,118 @@
+
+> dev
+> vite
+
+
+  VITE v7.3.3  ready in 311 ms
+
+  ➜  Local:   http://localhost:5173/
+  ➜  Network: use --host to expose
+
+  LARAVEL v12.59.0  plugin v2.1.0
+
+  ➜  APP_URL: http://localhost
+6:44:10 PM [vite] (client) hmr update /resources/js/Pages/Welcome.tsx, /resources/css/app.css
+6:45:47 PM [vite] Internal server error: Transform failed with 1 error:
+/app/resources/js/Pages/Welcome.tsx:387:7: ERROR: Multiple exports with the same name "default"
+  Plugin: vite:esbuild
+  File: /app/resources/js/Pages/Welcome.tsx:368:0
+
+  Multiple exports with the same name "default"
+  385 |  }_c = WelcomeOriginal;
+  386 |  import Dashboard from './Dashboard';
+  387 |  export default function Welcome() {
+      |         ^
+  388 |    return <Dashboard />;
+  389 |  }_c2 = Welcome;var _c, _c2;$RefreshReg$(_c, "WelcomeOriginal");$RefreshReg$(_c2, "Welcome");
+
+      at failureErrorWithLog (/app/node_modules/esbuild/lib/main.js:1748:15)
+      at /app/node_modules/esbuild/lib/main.js:1017:50
+      at responseCallbacks.<computed> (/app/node_modules/esbuild/lib/main.js:884:9)
+      at handleIncomingPacket (/app/node_modules/esbuild/lib/main.js:939:12)
+      at Socket.readFromStdout (/app/node_modules/esbuild/lib/main.js:862:7)
+      at Socket.emit (node:events:519:28)
+      at addChunk (node:internal/streams/readable:561:12)
+      at readableAddChunkPushByteMode (node:internal/streams/readable:512:3)
+      at Readable.push (node:internal/streams/readable:392:5)
+      at Pipe.onStreamRead (node:internal/stream_base_commons:189:23)
+6:45:48 PM [vite] Internal server error: Transform failed with 1 error:
+/app/resources/js/Pages/Welcome.tsx:387:7: ERROR: Multiple exports with the same name "default"
+  Plugin: vite:esbuild
+  File: /app/resources/js/Pages/Welcome.tsx:368:0
+
+  Multiple exports with the same name "default"
+  385 |  }_c = WelcomeOriginal;
+  386 |  import Dashboard from './Dashboard';
+  387 |  export default function Welcome() {
+      |         ^
+  388 |    return <Dashboard />;
+  389 |  }_c2 = Welcome;var _c, _c2;$RefreshReg$(_c, "WelcomeOriginal");$RefreshReg$(_c2, "Welcome");
+
+      at failureErrorWithLog (/app/node_modules/esbuild/lib/main.js:1748:15)
+      at /app/node_modules/esbuild/lib/main.js:1017:50
+      at responseCallbacks.<computed> (/app/node_modules/esbuild/lib/main.js:884:9)
+      at handleIncomingPacket (/app/node_modules/esbuild/lib/main.js:939:12)
+      at Socket.readFromStdout (/app/node_modules/esbuild/lib/main.js:862:7)
+      at Socket.emit (node:events:519:28)
+      at addChunk (node:internal/streams/readable:561:12)
+      at readableAddChunkPushByteMode (node:internal/streams/readable:512:3)
+      at Readable.push (node:internal/streams/readable:392:5)
+      at Pipe.onStreamRead (node:internal/stream_base_commons:189:23)
+6:47:42 PM [vite] (client) hmr update /resources/js/Pages/Welcome.tsx, /resources/css/app.css
+6:55:18 PM [vite] (client) page reload resources/js/Pages/Auth/ConfirmPassword.tsx
+6:55:18 PM [vite] (client) page reload resources/js/Pages/Auth/ForgotPassword.tsx
+6:55:18 PM [vite] (client) page reload resources/js/Pages/Auth/Login.tsx
+6:55:18 PM [vite] (client) page reload resources/js/Pages/Auth/Register.tsx
+6:55:18 PM [vite] (client) page reload resources/js/Pages/Auth/ResetPassword.tsx
+6:55:18 PM [vite] (client) page reload resources/js/Pages/Auth/VerifyEmail.tsx
+6:55:18 PM [vite] (client) page reload resources/js/Pages/Profile/Edit.tsx
+6:55:18 PM [vite] (client) page reload resources/js/Pages/Profile/Partials/DeleteUserForm.tsx
+6:55:18 PM [vite] (client) page reload resources/js/Pages/Profile/Partials/UpdatePasswordForm.tsx
+6:55:18 PM [vite] (client) page reload resources/js/Pages/Profile/Partials/UpdateProfileInformationForm.tsx
+7:01:47 PM [vite] (client) hmr update /resources/css/app.css
+7:01:47 PM [vite] (client) hmr update /resources/css/app.css
+7:01:47 PM [vite] (client) hmr update /resources/css/app.css
+7:01:47 PM [vite] (client) hmr update /resources/css/app.css
+7:01:47 PM [vite] (client) hmr update /resources/css/app.css
+7:01:47 PM [vite] (client) hmr update /resources/css/app.css
+7:01:47 PM [vite] (client) hmr update /resources/css/app.css
+7:01:47 PM [vite] (client) hmr update /resources/css/app.css
+7:01:47 PM [vite] (client) hmr update /resources/css/app.css
+7:03:46 PM [vite] (client) hmr update /resources/css/app.css
+7:03:46 PM [vite] (client) hmr update /resources/css/app.css
+7:03:46 PM [vite] (client) hmr update /resources/css/app.css
+7:03:46 PM [vite] (client) hmr update /resources/css/app.css
+7:03:46 PM [vite] (client) hmr update /resources/js/Pages/Dashboard.tsx, /resources/css/app.css
+7:03:46 PM [vite] (client) hmr update /resources/css/app.css
+7:03:46 PM [vite] (client) hmr update /resources/css/app.css
+7:03:46 PM [vite] (client) hmr update /resources/css/app.css
+7:03:46 PM [vite] (client) hmr update /resources/css/app.css
+7:03:46 PM [vite] (client) hmr update /resources/css/app.css
+7:03:46 PM [vite] (client) hmr update /resources/css/app.css
+7:03:46 PM [vite] (client) hmr update /resources/css/app.css
+7:03:46 PM [vite] (client) hmr update /resources/css/app.css
+7:03:46 PM [vite] (client) hmr update /resources/css/app.css
+7:03:46 PM [vite] (client) hmr update /resources/js/Pages/Welcome.tsx, /resources/css/app.css
+7:05:54 PM [vite] (client) hmr update /resources/css/app.css
+7:05:54 PM [vite] (client) hmr update /resources/css/app.css
+7:06:50 PM [vite] (client) hmr update /resources/css/app.css
+7:06:50 PM [vite] (client) hmr update /resources/css/app.css
+7:06:50 PM [vite] (client) hmr update /resources/css/app.css
+7:06:50 PM [vite] (client) hmr update /resources/css/app.css
+7:06:50 PM [vite] (client) page reload resources/js/Pages/ERP/Dashboard.tsx
+7:06:50 PM [vite] (client) page reload resources/js/Pages/ERP/Invoices/Index.tsx
+7:06:50 PM [vite] (client) hmr update /resources/css/app.css
+7:06:50 PM [vite] (client) page reload resources/js/Pages/Freelance/Dashboard.tsx
+7:06:50 PM [vite] (client) page reload resources/js/Pages/Freelance/Jobs/Index.tsx
+7:06:50 PM [vite] (client) page reload resources/js/Pages/Marketplace/Dashboard.tsx
+7:06:50 PM [vite] (client) page reload resources/js/Pages/Marketplace/Services/Index.tsx
+7:06:50 PM [vite] (client) page reload resources/js/Pages/Notifications/Index.tsx
+7:58:18 PM [vite] (client) hmr update /resources/js/Pages/Welcome.tsx, /resources/css/app.css
+7:59:55 PM [vite] (client) hmr update /resources/js/Pages/Dashboard.tsx, /resources/css/app.css
+8:09:35 PM [vite] (client) hmr update /resources/css/app.css
+8:09:35 PM [vite] (client) hmr update /resources/css/app.css
+8:09:35 PM [vite] (client) hmr update /resources/js/Pages/Dashboard.tsx, /resources/css/app.css
+8:09:35 PM [vite] (client) hmr update /resources/css/app.css
+8:09:35 PM [vite] (client) hmr update /resources/js/Pages/Welcome.tsx, /resources/css/app.css
+8:13:00 PM [vite] (client) hmr update /resources/js/Pages/Welcome.tsx, /resources/css/app.css
+8:14:04 PM [vite] (client) hmr update /resources/js/Pages/Welcome.tsx, /resources/css/app.css

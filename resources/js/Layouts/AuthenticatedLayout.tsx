@@ -6,8 +6,8 @@ import { Link, usePage } from '@inertiajs/react';
 import { PropsWithChildren, ReactNode, useEffect, useState } from 'react';
 import { Bell } from 'lucide-react';
 import CommandPalette from '@/Components/CommandPalette';
-import { Toaster } from '@/Components/ui/toaster';
-import { useToast } from '@/Components/ui/use-toast';
+
+
 
 export default function Authenticated({
     header,
@@ -16,14 +16,14 @@ export default function Authenticated({
     const { auth, notifications, flash } = usePage().props as any;
     const user = auth.user;
     const isImpersonating = auth.is_impersonating;
-    const { toast } = useToast();
+
 
     const [showingNavigationDropdown, setShowingNavigationDropdown] =
         useState(false);
 
     useEffect(() => {
         if (flash?.message) {
-            toast({
+            console.log({
                 description: flash.message,
             });
         }
@@ -245,7 +245,7 @@ export default function Authenticated({
 
             <main>{children}</main>
             <CommandPalette />
-            <Toaster />
+
         </div>
     );
 }

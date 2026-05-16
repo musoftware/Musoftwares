@@ -3,60 +3,12 @@
 
   Press Ctrl+C to stop the server
 
-  2026-05-16 12:18:26 /login ..................................... ~ 500.42ms
-  2026-05-16 12:18:27 /build/assets/app-W9R980Bj.css ............... ~ 0.04ms
-  2026-05-16 12:18:27 /build/assets/app-C7lKAIiF.js ................ ~ 0.02ms
-  2026-05-16 12:18:27 /build/assets/Login-BPG-a39o.js .............. ~ 0.06ms
-  2026-05-16 12:18:27 /build/assets/TextInput-CtzBd_Hl.js .......... ~ 0.22ms
-  2026-05-16 12:18:27 /build/assets/InputLabel-LltBOfxF.js ......... ~ 0.32ms
-  2026-05-16 12:18:27 /build/assets/PrimaryButton-UvZ5I-ro.js ...... ~ 0.41ms
-  2026-05-16 12:18:27 /build/assets/GuestLayout-77-4gBVs.js ........ ~ 0.49ms
-  2026-05-16 12:18:27 /build/assets/ApplicationLogo-CttX3SF8.js .... ~ 0.57ms
-  2026-05-16 12:18:27 /build/assets/ConfirmPassword-Cpmn_CPM.js .... ~ 0.11ms
-  2026-05-16 12:18:27 /build/assets/ForgotPassword-B8NZpuKq.js ..... ~ 0.20ms
-  2026-05-16 12:18:27 /build/assets/Register-BWcDJFGQ.js ........... ~ 0.27ms
-  2026-05-16 12:18:27 /build/assets/ResetPassword-D8Fba6hQ.js ...... ~ 0.04ms
-  2026-05-16 12:18:27 /build/assets/VerifyEmail-D1_uEM2i.js ........ ~ 0.11ms
-  2026-05-16 12:18:27 /build/assets/Dashboard-CLf-t-2d.js .......... ~ 0.19ms
-  2026-05-16 12:18:27 /build/assets/AuthenticatedLayout-BNbmHgYQ.js  ~ 0.04ms
-  2026-05-16 12:18:27 /build/assets/transition-D9EKwBs0.js ......... ~ 0.09ms
-  2026-05-16 12:18:27 /build/assets/Dashboard-BEDwxA0l.js .......... ~ 0.21ms
-  2026-05-16 12:18:27 /register .................................... ~ 0.05ms
-  2026-05-16 12:18:27 /build/assets/Index-CzEtLkni.js .............. ~ 0.34ms
-  2026-05-16 12:18:27 /build/assets/Pagination-Ck6Vx9V7.js ......... ~ 0.47ms
-  2026-05-16 12:18:27 /build/assets/Error--k2Rxf33.js .............. ~ 0.57ms
-  2026-05-16 12:18:28 /build/assets/app-W9R980Bj.css ............... ~ 0.03ms
-  2026-05-16 12:18:28 /build/assets/Register-BWcDJFGQ.js ........... ~ 0.07ms
-  2026-05-16 12:18:28 /build/assets/TextInput-CtzBd_Hl.js .......... ~ 0.20ms
-  2026-05-16 12:18:28 /build/assets/InputLabel-LltBOfxF.js ......... ~ 0.29ms
-  2026-05-16 12:18:28 /build/assets/PrimaryButton-UvZ5I-ro.js ...... ~ 0.38ms
-  2026-05-16 12:18:28 /build/assets/GuestLayout-77-4gBVs.js ........ ~ 0.45ms
-  2026-05-16 12:18:28 /build/assets/app-C7lKAIiF.js ................ ~ 0.57ms
-  2026-05-16 12:18:28 /build/assets/ApplicationLogo-CttX3SF8.js .... ~ 0.02ms
-  2026-05-16 12:18:28 /build/assets/ConfirmPassword-Cpmn_CPM.js .... ~ 0.04ms
-  2026-05-16 12:18:28 /build/assets/ForgotPassword-B8NZpuKq.js ..... ~ 0.10ms
-  2026-05-16 12:18:28 /build/assets/Login-BPG-a39o.js .............. ~ 0.24ms
-  2026-05-16 12:18:28 /build/assets/ResetPassword-D8Fba6hQ.js ...... ~ 0.04ms
-  2026-05-16 12:18:28 /build/assets/VerifyEmail-D1_uEM2i.js ........ ~ 0.14ms
-  2026-05-16 12:18:28 /build/assets/Dashboard-CLf-t-2d.js .......... ~ 0.14ms
-  2026-05-16 12:18:28 /build/assets/AuthenticatedLayout-BNbmHgYQ.js  ~ 0.05ms
-  2026-05-16 12:18:28 /build/assets/transition-D9EKwBs0.js ......... ~ 0.10ms
-  2026-05-16 12:18:28 /build/assets/Dashboard-BEDwxA0l.js .......... ~ 0.20ms
-  2026-05-16 12:18:28 /build/assets/Index-CzEtLkni.js .............. ~ 0.11ms
-  2026-05-16 12:18:28 /build/assets/Pagination-Ck6Vx9V7.js ......... ~ 0.03ms
-  2026-05-16 12:18:28 /build/assets/Dashboard-BuzD-DMB.js .......... ~ 0.04ms
-  2026-05-16 12:18:28 /build/assets/Error--k2Rxf33.js .............. ~ 0.22ms
-  2026-05-16 12:18:28 /build/assets/Index-C_379F6J.js .............. ~ 0.02ms
-  2026-05-16 12:18:28 /build/assets/Dashboard--0YgQ20L.js .......... ~ 0.03ms
-  2026-05-16 12:18:28 /build/assets/Index-Cl5X8iXU.js .............. ~ 0.12ms
-  2026-05-16 12:18:28 /build/assets/Index-DckePGVE.js .............. ~ 0.02ms
-  2026-05-16 12:18:28 /build/assets/Edit-BhlGthc3.js ............... ~ 0.03ms
-  2026-05-16 12:18:28 /build/assets/DeleteUserForm-CDraP4u2.js ..... ~ 0.15ms
-  2026-05-16 12:18:28 /build/assets/UpdatePasswordForm-CbxAQEdG.js . ~ 0.04ms
-  2026-05-16 12:18:28 /build/assets/UpdateProfileInformationForm-BpjObMzr.js  ~ 0.03ms
-  2026-05-16 12:18:28 /build/assets/Welcome-Bi4J8yxg.js ............ ~ 0.10ms
-  2026-05-16 12:18:28 /register .................................. ~ 500.48ms
-  2026-05-16 12:18:28 /dashboard ................................... ~ 0.03ms
-  2026-05-16 12:18:28 /build/assets/Dashboard-CLf-t-2d.js .......... ~ 0.04ms
-  2026-05-16 12:18:28 /build/assets/AuthenticatedLayout-BNbmHgYQ.js  ~ 0.13ms
-  2026-05-16 12:18:28 /build/assets/transition-D9EKwBs0.js ......... ~ 0.17ms
+  2026-05-16 18:35:25 / ................................................ ~ 1s
+  2026-05-16 18:42:14 / ............................................ ~ 0.16ms
+  2026-05-16 18:45:47 / ............................................ ~ 0.22ms
+  2026-05-16 18:49:17 / ............................................ ~ 0.15ms
+  2026-05-16 21:20:09 / ........................................... ~ 24.33ms
+  2026-05-16 21:21:32 /register .................................... ~ 0.16ms
+  2026-05-16 21:25:10 /register .................................... ~ 0.28ms
+  2026-05-16 21:25:10 /register .................................. ~ 501.12ms
+  2026-05-16 21:25:11 /dashboard ................................... ~ 0.04ms
