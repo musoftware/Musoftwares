@@ -3,10 +3,12 @@
 namespace Modules\Freelance\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Laravel\Scout\Searchable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Models\User;
 
 class Job extends Model
+    use Searchable;
 {
     use SoftDeletes;
 
