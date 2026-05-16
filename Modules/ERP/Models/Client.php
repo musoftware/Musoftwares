@@ -5,7 +5,7 @@ namespace Modules\ERP\Models;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class Client extends TenantAwareModel
+class Client extends TenantModel
 {
     protected $fillable = ['tenant_id', 'name', 'email', 'phone', 'address', 'referral_code', 'referred_by'];
 
