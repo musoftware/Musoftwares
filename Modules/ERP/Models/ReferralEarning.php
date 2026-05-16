@@ -4,12 +4,12 @@ namespace Modules\ERP\Models;
 
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class ReferralEarning extends TenantModel
+class ReferralEarning extends TenantAwareModel
 {
     protected $fillable = [
-        'tenant_id', 'invoice_id', 'referrer_id', 'referee_id', 'level',
+        'tenant_id', 'client_id', 'invoice_id', 'referrer_id', 'referee_id', 'level',
         'amount', 'amount_currency', 'business_amount', 'business_currency',
-        'exchange_rate', 'exchange_rate_date', 'commission_rate', 'status'
+        'exchange_rate', 'exchange_rate_date', 'commission_rate', 'description', 'status'
     ];
 
     protected $casts = [
@@ -39,4 +39,10 @@ class ReferralEarning extends TenantModel
     {
         return $this->belongsTo(TenantClient::class, 'referee_id');
     }
+
+    public function client(): BelongsTo
+    {
+        return $this->belongsTo(Client::class);
+    }
 }
+
