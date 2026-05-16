@@ -4,7 +4,7 @@ namespace Modules\ERP\Models;
 
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class ReferralEarning extends TenantAwareModel
+class ReferralEarning extends TenantModel
 {
     protected $table = 'client_referral_earnings';
 
