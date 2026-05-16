@@ -3,13 +3,12 @@
 namespace Modules\Core\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Currency extends Model
 {
-    protected $fillable = ['code', 'name', 'symbol', 'exchange_rate', 'exchange_rate_date', 'is_active'];
+    protected $fillable = ['code', 'name', 'symbol', 'is_active'];
     protected $casts = [
-        'exchange_rate' => 'decimal:8',
-        'exchange_rate_date' => 'date',
         'is_active' => 'boolean',
     ];
 }

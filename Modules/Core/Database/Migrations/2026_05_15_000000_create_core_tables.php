@@ -8,26 +8,90 @@ return new class extends Migration
 {
     public function up()
     {
-        // Settings
-        Schema::create('settings', function (Blueprint $table) {
-            $table->id();
-            $table->string('key')->unique();
-            $table->text('value')->nullable();
-            $table->timestamps();
-        });
-
-        // Currencies
+        // 2. currencies table
         Schema::create('currencies', function (Blueprint $table) {
             $table->id();
             $table->string('code', 3)->unique();
             $table->string('name');
             $table->string('symbol')->nullable();
-            $table->decimal('exchange_rate', 20, 8)->default(1.0);
-            $table->date('exchange_rate_date')->nullable();
             $table->boolean('is_active')->default(true);
             $table->timestamps();
         });
 
+        // 3. exchange_rates table
+        Schema::create('exchange_rates', function (Blueprint $table) {
+            $table->id();
+            $table->string('from_currency', 3);
+            $table->string('to_currency', 3);
+            $table->decimal('rate', 15, 6);
+            $table->date('effective_date');
+            $table->enum('source', ['manual', 'api_auto']);
+            $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->timestamps();
+
+            $table->unique(['from_currency', 'to_currency', 'effective_date']);
+        });
+
+        // 4. site_settings table
+        Schema::create('site_settings', function (Blueprint $table) {
+            $table->id();
+            $table->string('key')->unique();
+            $table->text('value')->nullable();
+            $table->enum('group', ['general', 'currency', 'referral', 'service', 'withdrawal', 'points']);
+            $table->timestamps();
+        });
+
+        // 5. support_tickets table
+        Schema::create('support_tickets', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('client_id')->constrained('users')->cascadeOnDelete();
+            $table->string('subject');
+            $table->enum('status', ['open', 'pending', 'resolved', 'closed']);
+            $table->enum('priority', ['low', 'medium', 'high', 'urgent']);
+            $table->timestamps();
+        });
+
+        // 6. conversations table
+        Schema::create('conversations', function (Blueprint $table) {
+            $table->id();
+            $table->morphs('conversable'); // conversable_type, conversable_id
+            $table->enum('type', ['marketplace_order', 'freelance_contract', 'support_ticket']);
+            $table->enum('status', ['open', 'closed', 'archived']);
+            $table->timestamps();
+        });
+
+        // 7. conversation_participants table
+        Schema::create('conversation_participants', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('conversation_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->enum('role', ['client', 'freelancer', 'seller', 'buyer', 'admin']);
+            $table->timestamp('last_read_at')->nullable();
+            $table->timestamps();
+        });
+
+        // 8. messages table
+        Schema::create('messages', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('conversation_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('sender_id')->constrained('users')->cascadeOnDelete();
+            $table->text('body')->nullable();
+            $table->timestamp('created_at')->nullable();
+        });
+
+        // 9. message_attachments table
+        Schema::create('message_attachments', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('message_id')->constrained()->cascadeOnDelete();
+            $table->enum('type', ['image', 'file']);
+            $table->string('path');
+            $table->string('mime_type');
+            $table->bigInteger('size_bytes');
+            $table->string('original_name');
+            $table->timestamps();
+        });
+
+        // Account / Ledger setup
         // Ledgers
         Schema::create('ledgers', function (Blueprint $table) {
             $table->id();
@@ -54,7 +118,7 @@ return new class extends Migration
             $table->string('reference_id')->nullable();
             $table->string('description');
             $table->date('date');
-            $table->timestamps(); // Created at matters for audit
+            $table->timestamps();
         });
 
         // Journal Entry Lines
@@ -104,34 +168,6 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        // Conversations (Chat System)
-        Schema::create('conversations', function (Blueprint $table) {
-            $table->id();
-            $table->morphs('conversable'); // polymorphic conversation
-            $table->softDeletes();
-            $table->timestamps();
-        });
-
-        // Conversation Participants
-        Schema::create('conversation_participants', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('conversation_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
-            $table->timestamp('last_read_at')->nullable();
-            $table->timestamps();
-        });
-
-        // Messages
-        Schema::create('messages', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('conversation_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
-            $table->text('body');
-            $table->json('attachments')->nullable();
-            $table->softDeletes();
-            $table->timestamps();
-        });
-
         // Audit Logs
         Schema::create('audit_logs', function (Blueprint $table) {
             $table->id();
@@ -162,16 +198,19 @@ return new class extends Migration
     {
         Schema::dropIfExists('impersonation_logs');
         Schema::dropIfExists('audit_logs');
-        Schema::dropIfExists('messages');
-        Schema::dropIfExists('conversation_participants');
-        Schema::dropIfExists('conversations');
         Schema::dropIfExists('wallet_transactions');
         Schema::dropIfExists('wallets');
         Schema::dropIfExists('journal_entry_lines');
         Schema::dropIfExists('journal_entries');
         Schema::dropIfExists('accounts');
         Schema::dropIfExists('ledgers');
+        Schema::dropIfExists('message_attachments');
+        Schema::dropIfExists('messages');
+        Schema::dropIfExists('conversation_participants');
+        Schema::dropIfExists('conversations');
+        Schema::dropIfExists('support_tickets');
+        Schema::dropIfExists('site_settings');
+        Schema::dropIfExists('exchange_rates');
         Schema::dropIfExists('currencies');
-        Schema::dropIfExists('settings');
     }
 };

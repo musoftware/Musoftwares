@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class User extends Authenticatable
 {
@@ -16,6 +17,9 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'role',
+        'avatar',
+        'phone',
     ];
 
     protected $hidden = [
@@ -29,5 +33,20 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function supportTickets(): HasMany
+    {
+        return $this->hasMany(\Modules\Core\Models\SupportTicket::class, 'client_id');
+    }
+
+    public function conversationParticipations(): HasMany
+    {
+        return $this->hasMany(\Modules\Core\Models\ConversationParticipant::class, 'user_id');
+    }
+
+    public function messages(): HasMany
+    {
+        return $this->hasMany(\Modules\Core\Models\Message::class, 'sender_id');
     }
 }
