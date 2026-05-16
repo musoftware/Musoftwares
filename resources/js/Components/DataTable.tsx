@@ -36,9 +36,9 @@ export default function DataTable<T>({
 }: DataTableProps<T>) {
     return (
         <div className="space-y-4">
-            <div className="rounded-md border bg-white">
+            <div className="rounded-xl border bg-white shadow-soft overflow-hidden">
                 <Table>
-                    <TableHeader>
+                    <TableHeader className="bg-surface-raised font-medium text-text-primary">
                         <TableRow>
                             {columns.map((col, index) => (
                                 <TableHead key={index}>{col.header}</TableHead>
