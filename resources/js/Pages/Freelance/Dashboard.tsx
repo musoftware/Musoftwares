@@ -2,7 +2,7 @@ import React from 'react';
 import FreelanceLayout from './Layout';
 import { Head } from '@inertiajs/react';
 
-export default function FreelanceDashboard({ auth }) {
+export default function FreelanceDashboard({ auth }: any) {
     return (
         <FreelanceLayout auth={auth}>
             <Head title="Freelance Dashboard" />
