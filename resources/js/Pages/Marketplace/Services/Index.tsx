@@ -1,9 +1,8 @@
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head } from '@inertiajs/react';
-import { formatMoney, formatDate } from '@/lib/utils';
 import Pagination from '@/Components/Pagination';
-import { useState, useEffect } from 'react';
-import { router } from '@inertiajs/react';
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import { formatDate, formatMoney } from '@/lib/utils';
+import { Head, router } from '@inertiajs/react';
+import { useEffect, useState } from 'react';
 
 export default function Index({ services }: any) {
     const [loading, setLoading] = useState(false);
@@ -21,7 +20,7 @@ export default function Index({ services }: any) {
     return (
         <AuthenticatedLayout
             header={
-                <h2 className="text-xl font-semibold leading-tight text-gray-800">
+                <h2 className="text-xl leading-tight font-semibold text-gray-800">
                     Marketplace Services
                 </h2>
             }
@@ -29,23 +28,37 @@ export default function Index({ services }: any) {
             <Head title="Services" />
             <div className="py-12">
                 <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
-                    <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6 relative">
+                    <div className="relative overflow-hidden bg-white p-6 shadow-sm sm:rounded-lg">
                         {loading && (
-                            <div className="absolute inset-0 bg-white/50 backdrop-blur-sm z-10 flex items-center justify-center">
-                                <div className="text-indigo-600 font-medium">Loading...</div>
+                            <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/50 backdrop-blur-sm">
+                                <div className="font-medium text-indigo-600">
+                                    Loading...
+                                </div>
                             </div>
                         )}
-                        <h3 className="text-lg font-bold mb-4">Services</h3>
+                        <h3 className="mb-4 text-lg font-bold">Services</h3>
 
                         {services.data.length > 0 ? (
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
                                 {services.data.map((service: any) => (
-                                    <div key={service.id} className="border rounded-lg p-4 shadow-sm">
-                                        <h4 className="font-semibold text-lg">{service.title}</h4>
-                                        <p className="text-gray-500 text-sm mt-1">by {service.seller?.name || 'Unknown'}</p>
-                                        <div className="mt-4 flex justify-between items-center">
+                                    <div
+                                        key={service.id}
+                                        className="rounded-lg border p-4 shadow-sm"
+                                    >
+                                        <h4 className="text-lg font-semibold">
+                                            {service.title}
+                                        </h4>
+                                        <p className="mt-1 text-sm text-gray-500">
+                                            by{' '}
+                                            {service.seller?.name || 'Unknown'}
+                                        </p>
+                                        <div className="mt-4 flex items-center justify-between">
                                             <span className="font-medium text-indigo-600">
-                                                {formatMoney(service.price, service.currency_code || 'USD')}
+                                                {formatMoney(
+                                                    service.price,
+                                                    service.currency_code ||
+                                                        'USD',
+                                                )}
                                             </span>
                                             <span className="text-xs text-gray-400">
                                                 {formatDate(service.created_at)}
@@ -55,8 +68,10 @@ export default function Index({ services }: any) {
                                 ))}
                             </div>
                         ) : (
-                            <div className="text-center py-12">
-                                <p className="text-gray-500">No services found.</p>
+                            <div className="py-12 text-center">
+                                <p className="text-gray-500">
+                                    No services found.
+                                </p>
                             </div>
                         )}
 

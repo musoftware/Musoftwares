@@ -3,8 +3,22 @@
 namespace Modules\ERP\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
 
-class TenantAwareModel extends Model
+abstract class TenantAwareModel extends Model
 {
-    // Implementation can be empty or have tenant specific logic
+    protected static function booted()
+    {
+        static::addGlobalScope('tenant', function (Builder $builder) {
+            if (auth()->check() && session()->has('tenant_id')) {
+                $builder->where('tenant_id', session('tenant_id'));
+            }
+        });
+
+        static::creating(function ($model) {
+            if (auth()->check() && session()->has('tenant_id') && empty($model->tenant_id)) {
+                $model->tenant_id = session('tenant_id');
+            }
+        });
+    }
 }
