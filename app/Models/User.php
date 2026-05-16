@@ -49,4 +49,22 @@ class User extends Authenticatable
     {
         return $this->hasMany(\Modules\Core\Models\Message::class, 'sender_id');
     }
+
+    public function freelanceSkills()
+    {
+        return $this->belongsToMany(\Modules\Freelance\Models\Skill::class, 'freelance_user_skills')
+            ->withTimestamps();
+    }
+
+    public function pointTransactions()
+    {
+        return $this->hasMany(\Modules\Freelance\Models\PointTransaction::class);
+    }
+
+    public function getPointsBalanceAttribute()
+    {
+        $earned = $this->pointTransactions()->where('type', 'earned')->sum('points');
+        $spent = $this->pointTransactions()->where('type', 'spent')->sum('points');
+        return $earned - $spent;
+    }
 }

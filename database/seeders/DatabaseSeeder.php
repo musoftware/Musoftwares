@@ -16,6 +16,7 @@ class DatabaseSeeder extends Seeder
             CurrenciesSeeder::class,
             SiteSettingsSeeder::class,
             AdminUserSeeder::class,
+            \Modules\Freelance\Database\Seeders\FreelanceDatabaseSeeder::class,
         ]);
 
         $client = \App\Models\User::firstOrCreate(

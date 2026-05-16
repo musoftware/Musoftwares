@@ -17,3 +17,5 @@ yarn-error.log
 /.idea
 /.vscode
 Modules/*/vite.config.js
+.pnpm-debug.log
+server.log
