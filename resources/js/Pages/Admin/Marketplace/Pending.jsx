@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { Head } from '@inertiajs/react';
 import AdminLayout from '@/Layouts/AdminLayout';
-import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Textarea } from '@/components/ui/textarea';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Card, CardContent } from '@/Components/ui/card';
+import { Button } from '@/Components/ui/button';
+import { Badge } from '@/Components/ui/badge';
+import { Avatar, AvatarFallback, AvatarImage } from '@/Components/ui/avatar';
+import { Textarea } from '@/Components/ui/textarea';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/Components/ui/dialog';
 import { Check, X, Tag } from 'lucide-react';
 
 export default function Pending({ auth }) {
