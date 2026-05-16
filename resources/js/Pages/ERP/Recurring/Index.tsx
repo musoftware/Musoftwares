@@ -1,20 +1,54 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head, Link, useForm } from '@inertiajs/react';
+import { Head, Link, useForm, router } from '@inertiajs/react';
+import { useState, useEffect } from 'react';
+import { useToast } from '@/Components/ui/use-toast';
 
 export default function Index({ income, expense }: { income: any[], expense: any[] }) {
-    const { post, delete: destroy } = useForm();
+    const { delete: destroy } = useForm();
+    const { toast } = useToast();
 
-    const handlePause = (id: number) => {
-        post(route('erp.recurring.pause', id));
+    // Use local state for optimistic updates
+    const [localIncome, setLocalIncome] = useState<any[]>([]);
+    const [localExpense, setLocalExpense] = useState<any[]>([]);
+
+    useEffect(() => {
+        setLocalIncome(income);
+        setLocalExpense(expense);
+    }, [income, expense]);
+
+    const updateEntryStatusLocally = (id: number, status: string) => {
+        const updateList = (list: any[]) => list.map(entry => entry.id === id ? { ...entry, status } : entry);
+        setLocalIncome(updateList(localIncome));
+        setLocalExpense(updateList(localExpense));
     };
 
-    const handleResume = (id: number) => {
-        post(route('erp.recurring.resume', id));
+    const handleToggleStatus = (id: number, currentStatus: string) => {
+        const newStatus = currentStatus === 'active' ? 'paused' : 'active';
+        const routeName = currentStatus === 'active' ? 'erp.recurring.pause' : 'erp.recurring.resume';
+
+        // 1. Optimistic Update
+        updateEntryStatusLocally(id, newStatus);
+
+        // 2. Background Request
+        router.post(route(routeName, id), {}, {
+            preserveScroll: true,
+            onError: () => {
+                // 3. Revert on error + toast
+                updateEntryStatusLocally(id, currentStatus);
+                toast({
+                    title: "Action failed",
+                    description: `Failed to ${currentStatus === 'active' ? 'pause' : 'resume'} the recurring entry.`,
+                    variant: "destructive",
+                });
+            }
+        });
     };
 
     const handleDelete = (id: number) => {
         if (confirm('Are you sure you want to delete this recurring entry?')) {
-            destroy(route('erp.recurring.destroy', id));
+            destroy(route('erp.recurring.destroy', id), {
+                preserveScroll: true,
+            });
         }
     };
 
@@ -48,11 +82,12 @@ export default function Index({ income, expense }: { income: any[], expense: any
                                     </span>
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
-                                    {entry.status === 'active' ? (
-                                        <button onClick={() => handlePause(entry.id)} className="text-yellow-600 hover:text-yellow-900">Pause</button>
-                                    ) : (
-                                        <button onClick={() => handleResume(entry.id)} className="text-green-600 hover:text-green-900">Resume</button>
-                                    )}
+                                    <button
+                                        onClick={() => handleToggleStatus(entry.id, entry.status)}
+                                        className={entry.status === 'active' ? "text-yellow-600 hover:text-yellow-900" : "text-green-600 hover:text-green-900"}
+                                    >
+                                        {entry.status === 'active' ? 'Pause' : 'Resume'}
+                                    </button>
                                     <Link href={route('erp.recurring.edit', entry.id)} className="text-indigo-600 hover:text-indigo-900">Edit</Link>
                                     <Link href={route('erp.recurring.logs', entry.id)} className="text-gray-600 hover:text-gray-900">Logs</Link>
                                     <button onClick={() => handleDelete(entry.id)} className="text-red-600 hover:text-red-900">Delete</button>
@@ -88,8 +123,8 @@ export default function Index({ income, expense }: { income: any[], expense: any
                             </Link>
                         </div>
 
-                        {renderTable(income, 'Income')}
-                        {renderTable(expense, 'Expense')}
+                        {renderTable(localIncome, 'Income')}
+                        {renderTable(localExpense, 'Expense')}
                     </div>
                 </div>
             </div>

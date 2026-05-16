@@ -65,11 +65,11 @@ export default function Login({
                                     value={data.email}
                                     autoComplete="username"
                                     autoFocus
+                                    error={errors.email}
                                     onChange={(e) =>
                                         setData('email', e.target.value)
                                     }
                                 />
-                                <InputError message={errors.email} />
                             </div>
 
                             <div className="space-y-2">
@@ -89,11 +89,11 @@ export default function Login({
                                     type="password"
                                     value={data.password}
                                     autoComplete="current-password"
+                                    error={errors.password}
                                     onChange={(e) =>
                                         setData('password', e.target.value)
                                     }
                                 />
-                                <InputError message={errors.password} />
                             </div>
 
                             <div className="flex items-center space-x-2">
