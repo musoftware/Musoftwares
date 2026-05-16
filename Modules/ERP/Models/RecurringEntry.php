@@ -5,7 +5,7 @@ namespace Modules\ERP\Models;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class RecurringEntry extends TenantAwareModel
+class RecurringEntry extends TenantModel
 {
     protected $fillable = [
         'tenant_id', 'type', 'title', 'description',

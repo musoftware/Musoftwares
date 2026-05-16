@@ -44,6 +44,20 @@ class HandleInertiaRequests extends Middleware
                 }
                 return null;
             },
+            'wallet' => function () use ($request) {
+                if ($request->user() && \Illuminate\Support\Facades\Schema::hasTable('wallets')) {
+                    $wallet = \Modules\Core\Models\Wallet::where('owner_type', \App\Models\User::class)
+                        ->where('owner_id', $request->user()->id)
+                        ->first();
+                    return [
+                        'balance' => $wallet ? $wallet->balance : 0,
+                    ];
+                }
+                return null;
+            },
+            'settings' => [
+                'base_currency' => 'USD'
+            ],
             'flash' => [
                 'message' => fn () => $request->session()->get('message')
             ],
