@@ -1,5 +1,5 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head, useNavigation } from '@inertiajs/react';
+import { Head } from '@inertiajs/react';
 import { formatMoney, formatDate } from '@/lib/utils';
 import Pagination from '@/Components/Pagination';
 import { useState, useEffect } from 'react';
