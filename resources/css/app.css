@@ -1,25 +1,51 @@
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
 @import "tailwindcss";
 
 @plugin "@tailwindcss/forms";
 
 @theme {
-    --font-sans: "Figtree", ui-sans-serif, system-ui, sans-serif,
+    --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif,
         "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol",
         "Noto Color Emoji";
+
+    --color-background: #f8f9fc;
+    --color-surface: #ffffff;
+    --color-surface-raised: #f1f4f9;
+    --color-border: #e2e8f0;
+    --color-border-strong: #cbd5e1;
+    --color-primary: #6366f1;
+    --color-primary-hover: #4f46e5;
+    --color-primary-light: #eef2ff;
+    --color-accent: #0ea5e9;
+    --color-success: #10b981;
+    --color-success-light: #ecfdf5;
+    --color-warning: #f59e0b;
+    --color-warning-light: #fffbeb;
+    --color-danger: #ef4444;
+    --color-danger-light: #fef2f2;
+    --color-text-primary: #0f172a;
+    --color-text-secondary: #475569;
+    --color-text-muted: #94a3b8;
+
+    --font-display: "Sora", sans-serif;
+    --font-body: "DM Sans", sans-serif;
+    --font-mono: "JetBrains Mono", monospace;
+
+    --shadow-soft: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
 }
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    --background: 228 33% 98%; /* #f8f9fc */
+    --foreground: 222.2 84% 4.9%; /* #0f172a / text-primary approx */
 
-    --card: 0 0% 100%;
+    --card: 0 0% 100%; /* #ffffff */
     --card-foreground: 222.2 84% 4.9%;
 
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
 
-    --primary: 222.2 47.4% 11.2%;
+    --primary: 239 84% 67%; /* #6366f1 */
     --primary-foreground: 210 40% 98%;
 
     --secondary: 210 40% 96.1%;
@@ -28,47 +54,17 @@
     --muted: 210 40% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
-
-    --radius: 0.5rem;
-  }
-
-  .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-
-    --accent: 217.2 32.6% 17.5%;
+    --accent: 199 89% 48%; /* #0ea5e9 */
     --accent-foreground: 210 40% 98%;
 
-    --destructive: 0 62.8% 30.6%;
+    --destructive: 0 84.2% 60.2%; /* #ef4444 */
     --destructive-foreground: 210 40% 98%;
 
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
+    --border: 214.3 31.8% 91.4%; /* #e2e8f0 approx */
+    --input: 214.3 31.8% 91.4%;
+    --ring: 239 84% 67%; /* #6366f1 */
+
+    --radius: 0.5rem;
   }
 }
 
@@ -79,5 +75,25 @@
   body {
     background-color: hsl(var(--background));
     color: hsl(var(--foreground));
+    font-family: var(--font-body);
   }
+}
+
+@keyframes skeleton {
+  0% { background-color: var(--color-surface-raised); }
+  50% { background-color: var(--color-border); }
+  100% { background-color: var(--color-surface-raised); }
+}
+
+.skeleton {
+  animation: skeleton 1.5s infinite ease-in-out;
+}
+
+input:focus {
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.backdrop-blur-glass {
+  backdrop-filter: blur(8px);
+  background-color: rgba(255, 255, 255, 0.8);
 }

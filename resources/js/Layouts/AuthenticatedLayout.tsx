@@ -30,7 +30,7 @@ export default function Authenticated({
     }, [flash]);
 
     return (
-        <div className="min-h-screen bg-gray-100">
+        <div className="min-h-screen bg-background text-foreground">
             {isImpersonating && (
                 <div className="bg-amber-500 text-white px-4 py-2 text-center text-sm font-medium">
                     Viewing as {user.name} —
@@ -44,7 +44,7 @@ export default function Authenticated({
                     </Link>
                 </div>
             )}
-            <nav className="border-b border-gray-100 bg-white">
+            <nav className="border-b border-border bg-surface">
                 <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                     <div className="flex h-16 justify-between">
                         <div className="flex">
