@@ -13,7 +13,15 @@ return new class extends Migration
     {
         Schema::create('freelance_jobs', function (Blueprint $table) {
             $table->id();
-
+            $table->foreignId('client_id')->nullable();
+            $table->string('title')->nullable();
+            $table->text('description')->nullable();
+            $table->decimal('budget', 15, 2)->nullable();
+            $table->string('currency_code', 3)->nullable();
+            $table->string('type')->nullable();
+            $table->string('duration')->nullable();
+            $table->string('status')->nullable();
+            $table->softDeletes();
             $table->timestamps();
         });
     }
