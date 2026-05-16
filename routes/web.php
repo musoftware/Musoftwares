@@ -65,3 +65,17 @@ Route::middleware(['auth', 'verified'])->prefix('marketplace')->name('marketplac
 });
 
 require __DIR__.'/auth.php';
+
+// Chat API Routes
+Route::middleware(['auth', 'verified'])->prefix('api')->group(function () {
+    Route::get('/conversations/{id}', [\Modules\Core\Http\Controllers\ConversationController::class, 'show']);
+    Route::get('/conversations/{id}/messages', [\Modules\Core\Http\Controllers\ConversationController::class, 'messages']);
+    Route::post('/conversations/{id}/read', [\Modules\Core\Http\Controllers\ConversationController::class, 'markAsRead']);
+    Route::post('/conversations/{id}/messages', [\Modules\Core\Http\Controllers\MessageController::class, 'store']);
+});
+
+// New API routes for polling
+Route::middleware(['auth', 'verified'])->prefix('api')->group(function () {
+    Route::get('/conversations', [\Modules\Core\Http\Controllers\ConversationController::class, 'index']);
+    Route::get('/timer/{id}', [\App\Http\Controllers\TimerController::class, 'show']);
+});
