@@ -86,7 +86,7 @@ return new class extends Migration
         });
 
         // Point Transactions (Immutable)
-        Schema::create('point_transactions', function (Blueprint $table) {
+        Schema::create('freelance_point_transactions', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->integer('points');
@@ -98,7 +98,7 @@ return new class extends Migration
 
     public function down()
     {
-        Schema::dropIfExists('point_transactions');
+        Schema::dropIfExists('freelance_point_transactions');
         Schema::dropIfExists('freelance_contracts');
         Schema::dropIfExists('freelance_proposals');
         Schema::dropIfExists('freelance_job_skills');

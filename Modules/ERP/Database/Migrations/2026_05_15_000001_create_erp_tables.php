@@ -152,8 +152,8 @@ return new class extends Migration
             $table->unique(['tenant_id', 'client_id']);
         });
 
-        // 10. wallet_transactions table
-        Schema::create('wallet_transactions', function (Blueprint $table) {
+        // 10. client_wallet_transactions table
+        Schema::create('client_wallet_transactions', function (Blueprint $table) {
             $table->id();
             $table->foreignId('tenant_id')->constrained()->cascadeOnDelete();
             $table->foreignId('wallet_id')->constrained('client_wallets')->cascadeOnDelete();
@@ -215,8 +215,8 @@ return new class extends Migration
             $table->timestamp('created_at')->nullable();
         });
 
-        // 12. referrals table
-        Schema::create('referrals', function (Blueprint $table) {
+        // 12. erp_referrals table
+        Schema::create('erp_referrals', function (Blueprint $table) {
             $table->id();
             $table->foreignId('tenant_id')->constrained()->cascadeOnDelete();
             $table->foreignId('referrer_id')->constrained('tenant_clients')->cascadeOnDelete();
@@ -226,8 +226,8 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        // 13. referral_earnings table
-        Schema::create('referral_earnings', function (Blueprint $table) {
+        // 13. erp_referral_earnings table
+        Schema::create('erp_referral_earnings', function (Blueprint $table) {
             $table->id();
             $table->foreignId('tenant_id')->constrained()->cascadeOnDelete();
             $table->foreignId('invoice_id')->constrained()->cascadeOnDelete();
@@ -365,10 +365,10 @@ return new class extends Migration
         Schema::dropIfExists('payment_methods');
         Schema::dropIfExists('recurring_execution_logs');
         Schema::dropIfExists('recurring_entries');
-        Schema::dropIfExists('referral_earnings');
-        Schema::dropIfExists('referrals');
+        Schema::dropIfExists('erp_referral_earnings');
+        Schema::dropIfExists('erp_referrals');
         Schema::dropIfExists('expense_transactions');
-        Schema::dropIfExists('wallet_transactions');
+        Schema::dropIfExists('client_wallet_transactions');
         Schema::dropIfExists('client_wallets');
         Schema::dropIfExists('invoice_costs');
         Schema::dropIfExists('timer_sessions');

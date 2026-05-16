@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Referral extends TenantModel
 {
+    protected $table = 'erp_referrals';
+
     protected $fillable = [
         'tenant_id', 'referrer_id', 'referee_id', 'level', 'status'
     ];

@@ -4,8 +4,9 @@ namespace Modules\ERP\Models;
 
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class Withdrawal extends TenantAwareModel
+class Withdrawal extends TenantModel
 {
+    protected $table = 'withdrawal_requests';
     protected $fillable = [
         'tenant_id', 'client_id', 'payment_method_id', 'amount', 'currency_code',
         'status', 'admin_notes', 'reference', 'proof_path'

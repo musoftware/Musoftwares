@@ -7,8 +7,11 @@ use App\Models\User;
 
 class PointTransaction extends Model
 {
-    protected $table = 'point_transactions';
-    protected $fillable = ['user_id', 'points', 'type', 'description'];
+    protected $table = 'freelance_point_transactions';
+
+    protected $fillable = [
+        'user_id', 'points', 'type', 'description'
+    ];
 
     public function user()
     {

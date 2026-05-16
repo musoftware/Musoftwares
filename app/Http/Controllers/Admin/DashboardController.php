@@ -17,7 +17,7 @@ class DashboardController extends Controller
     public function index()
     {
         $totalClients = User::where('role', 'client')->count();
-        $activeTenants = Tenant::where('is_active', true)->count();
+        $activeTenants = Tenant::where('status', 'active')->count();
 
         $revenueThisMonth = DB::table('journal_entry_lines')
             ->join('accounts', 'journal_entry_lines.account_id', '=', 'accounts.id')

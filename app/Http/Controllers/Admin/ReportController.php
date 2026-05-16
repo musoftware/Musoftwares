@@ -22,7 +22,7 @@ class ReportController extends Controller
             ->where('ledgers.type', 'revenue')
             ->whereBetween('journal_entries.date', [$from, $to])
             ->select('journal_entries.reference_type as source', DB::raw('SUM(journal_entry_lines.business_amount) as total'))
-            ->groupBy('source')
+            ->groupBy('journal_entries.reference_type')
             ->get();
 
         $incomeBreakdown = [
@@ -63,7 +63,7 @@ class ReportController extends Controller
             ->where('ledgers.type', 'expense')
             ->whereBetween('journal_entries.date', [$from, $to])
             ->select('journal_entries.reference_type as type', DB::raw('SUM(journal_entry_lines.business_amount) as total'))
-            ->groupBy('type')
+            ->groupBy('journal_entries.reference_type')
             ->get();
 
         $expenseBreakdown = [
@@ -104,7 +104,7 @@ class ReportController extends Controller
             ->join('invoices', 'journal_entries.reference_id', '=', 'invoices.id')
             ->where('journal_entries.reference_type', 'invoice')
             ->join('tenants', 'invoices.tenant_id', '=', 'tenants.id')
-            ->select('tenants.name as tenant_name', DB::raw('SUM(journal_entry_lines.business_amount) as revenue'))
+            ->select('tenants.id', 'tenants.name as tenant_name', DB::raw('SUM(journal_entry_lines.business_amount) as revenue'))
             ->groupBy('tenants.id', 'tenants.name')
             ->get();
 

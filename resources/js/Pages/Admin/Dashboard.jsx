@@ -1,9 +1,10 @@
 import React from 'react';
 import { Head, Link } from '@inertiajs/react';
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 
 export default function Dashboard({ stats, recentInvoices, recentOrders, recentWithdrawals }) {
     return (
-        <div className="p-6">
+        <AuthenticatedLayout>
             <Head title="Admin Dashboard" />
             <h1 className="text-3xl font-bold mb-6">Admin Dashboard</h1>
 
@@ -82,6 +83,6 @@ export default function Dashboard({ stats, recentInvoices, recentOrders, recentW
                     <Link href="/admin/clients" className="bg-green-500 text-white px-4 py-2 rounded">View Clients</Link>
                 </div>
             </div>
-        </div>
+        </AuthenticatedLayout>
     );
 }

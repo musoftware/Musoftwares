@@ -4,8 +4,10 @@ namespace Modules\ERP\Models;
 
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class ReferralEarning extends TenantAwareModel
+class ReferralEarning extends TenantModel
 {
+    protected $table = 'erp_referral_earnings';
+
     protected $fillable = [
         'tenant_id', 'client_id', 'invoice_id', 'referrer_id', 'referee_id', 'level',
         'amount', 'amount_currency', 'business_amount', 'business_currency',
