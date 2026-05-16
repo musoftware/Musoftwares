@@ -1,70 +1,86 @@
+import React, { useState, useEffect, useRef } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head } from '@inertiajs/react';
-import { formatMoney, formatDate } from '@/lib/utils';
-import Pagination from '@/Components/Pagination';
-import { useState, useEffect } from 'react';
-import { router } from '@inertiajs/react';
+import { Head, usePage } from '@inertiajs/react';
+import axios from 'axios';
 
 export default function Index({ invoices }: any) {
-    const [loading, setLoading] = useState(false);
+    const { auth } = usePage().props;
+    const [timer, setTimer] = useState(0);
+    const [timerState, setTimerState] = useState('stopped');
+    const intervalRef = useRef<any>(null);
+    const pollingIntervalRef = useRef<any>(null);
+
+    const fetchTimerState = async () => {
+        // Assume itemId = 1 for the scope of this invoice demo
+        const itemId = 1;
+        try {
+            const res = await axios.get(`/api/timer/${itemId}`);
+            setTimer(res.data.duration_seconds || 0);
+            setTimerState(res.data.stopped_at ? 'stopped' : 'running');
+        } catch (err) {
+            console.error("Failed to fetch timer state", err);
+        }
+    };
 
     useEffect(() => {
-        const removeStart = router.on('start', () => setLoading(true));
-        const removeFinish = router.on('finish', () => setLoading(false));
+        fetchTimerState();
+
+        // Sync with server every 30s using polling instead of WebSockets
+        pollingIntervalRef.current = setInterval(() => {
+            fetchTimerState();
+        }, 30000);
 
         return () => {
-            removeStart();
-            removeFinish();
+            if (pollingIntervalRef.current) clearInterval(pollingIntervalRef.current);
         };
     }, []);
+
+    useEffect(() => {
+        if (timerState === 'running') {
+            intervalRef.current = setInterval(() => {
+                setTimer((prev) => prev + 1);
+            }, 1000);
+        } else {
+            if (intervalRef.current) clearInterval(intervalRef.current);
+        }
+
+        return () => {
+            if (intervalRef.current) clearInterval(intervalRef.current);
+        };
+    }, [timerState]);
+
+    const formatTime = (seconds: number) => {
+        const h = Math.floor(seconds / 3600);
+        const m = Math.floor((seconds % 3600) / 60);
+        const s = seconds % 60;
+        return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+    };
 
     return (
         <AuthenticatedLayout header={<h2 className="text-xl font-semibold leading-tight text-gray-800">Invoices</h2>}>
             <Head title="Invoices" />
             <div className="py-12">
                 <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
-                    <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6 relative">
-                        {loading && (
-                            <div className="absolute inset-0 bg-white/50 backdrop-blur-sm z-10 flex items-center justify-center">
-                                <div className="text-indigo-600 font-medium">Loading...</div>
-                            </div>
-                        )}
+
+                    <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6 mb-6 flex justify-between items-center">
+                        <h3 className="text-lg font-bold">Active Timer</h3>
+                        <div className="flex items-center gap-4">
+                            <span className="text-sm text-gray-500">Status: {timerState}</span>
+                            <span className="text-2xl font-mono bg-gray-100 px-4 py-2 rounded-lg">
+                                {formatTime(timer)}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
                         <h3 className="text-lg font-bold mb-4">Invoices List</h3>
-
-                        {invoices.data.length > 0 ? (
-                            <div className="overflow-x-auto">
-                                <table className="min-w-full divide-y divide-gray-200">
-                                    <thead className="bg-gray-50">
-                                        <tr>
-                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Number</th>
-                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Client</th>
-                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
-                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody className="bg-white divide-y divide-gray-200">
-                                        {invoices.data.map((invoice: any) => (
-                                            <tr key={invoice.id}>
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">#{invoice.number}</td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{invoice.client?.name || 'N/A'}</td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                    {formatMoney(invoice.amount, invoice.currency_code || 'USD')}
-                                                </td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                    {formatDate(invoice.created_at)}
-                                                </td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
-                        ) : (
-                            <div className="text-center py-12">
-                                <p className="text-gray-500">No invoices found.</p>
-                            </div>
-                        )}
-
-                        <Pagination links={invoices.links} />
+                        <ul>
+                            {invoices?.data?.map((invoice: any) => (
+                                <li key={invoice.id} className="py-2 border-b">
+                                    Invoice #{invoice.number} - {invoice.client?.name}
+                                </li>
+                            )) || <li className="py-2 text-gray-500">No invoices available</li>}
+                        </ul>
                     </div>
                 </div>
             </div>
