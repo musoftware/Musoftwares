@@ -1,14 +1,14 @@
-import React, { useState } from 'react';
-import { Head, usePage, router } from '@inertiajs/react';
+import ChatWindow from '@/Components/Chat/ChatWindow';
 import DataTable from '@/Components/DataTable';
-import StatusBadge from '@/Components/StatusBadge';
+import InputError from '@/Components/InputError';
+import InputLabel from '@/Components/InputLabel';
+import Modal from '@/Components/Modal';
 import PrimaryButton from '@/Components/PrimaryButton';
 import SecondaryButton from '@/Components/SecondaryButton';
-import Modal from '@/Components/Modal';
+import StatusBadge from '@/Components/StatusBadge';
 import TextInput from '@/Components/TextInput';
-import InputLabel from '@/Components/InputLabel';
-import InputError from '@/Components/InputError';
-import ChatWindow from '@/Components/Chat/ChatWindow';
+import { Head, router, usePage } from '@inertiajs/react';
+import { useState } from 'react';
 
 export default function TicketsIndex({ tickets, isAdmin }) {
     const { auth, errors } = usePage().props;
@@ -29,41 +29,56 @@ export default function TicketsIndex({ tickets, isAdmin }) {
             onSuccess: () => {
                 setIsCreating(false);
                 setForm({ subject: '', priority: 'Medium', description: '' });
-            }
+            },
         });
     };
 
     const markResolved = (id) => {
-        router.post(route('tickets.resolve', id), {}, {
-            preserveScroll: true,
-            onSuccess: () => setSelectedTicket(prev => prev?.id === id ? { ...prev, status: 'Resolved' } : prev)
-        });
+        router.post(
+            route('tickets.resolve', id),
+            {},
+            {
+                preserveScroll: true,
+                onSuccess: () =>
+                    setSelectedTicket((prev) =>
+                        prev?.id === id
+                            ? { ...prev, status: 'Resolved' }
+                            : prev,
+                    ),
+            },
+        );
     };
 
     // Table columns configuration
     const columns = [
         { header: 'ID', accessor: (row) => `#${row.id}` },
         { header: 'Subject', accessor: 'subject' },
-        ...(isAdmin ? [{ header: 'Client', accessor: (row) => row.user?.name }] : []),
+        ...(isAdmin
+            ? [{ header: 'Client', accessor: (row) => row.user?.name }]
+            : []),
         {
             header: 'Status',
-            accessor: (row) => <StatusBadge status={row.status} />
+            accessor: (row) => <StatusBadge status={row.status} />,
         },
         {
             header: 'Priority',
             accessor: (row) => (
-                <span className={`px-2 py-1 rounded text-xs font-medium ${
-                    row.priority === 'High' ? 'bg-red-100 text-red-800' :
-                    row.priority === 'Medium' ? 'bg-yellow-100 text-yellow-800' :
-                    'bg-green-100 text-green-800'
-                }`}>
+                <span
+                    className={`rounded px-2 py-1 text-xs font-medium ${
+                        row.priority === 'High'
+                            ? 'bg-red-100 text-red-800'
+                            : row.priority === 'Medium'
+                              ? 'bg-yellow-100 text-yellow-800'
+                              : 'bg-green-100 text-green-800'
+                    }`}
+                >
                     {row.priority}
                 </span>
-            )
+            ),
         },
         {
             header: 'Last Reply',
-            accessor: (row) => new Date(row.updated_at).toLocaleDateString()
+            accessor: (row) => new Date(row.updated_at).toLocaleDateString(),
         },
         {
             header: 'Action',
@@ -71,26 +86,32 @@ export default function TicketsIndex({ tickets, isAdmin }) {
                 <SecondaryButton onClick={() => setSelectedTicket(row)}>
                     {isAdmin ? 'View / Respond' : 'View Ticket'}
                 </SecondaryButton>
-            )
-        }
+            ),
+        },
     ];
 
     // Filter tickets for admin view
-    const filteredTickets = tickets?.data?.filter(ticket => {
-        if (filterStatus && ticket.status !== filterStatus) return false;
-        if (filterPriority && ticket.priority !== filterPriority) return false;
-        return true;
-    }) || [];
+    const filteredTickets =
+        tickets?.data?.filter((ticket) => {
+            if (filterStatus && ticket.status !== filterStatus) return false;
+            if (filterPriority && ticket.priority !== filterPriority)
+                return false;
+            return true;
+        }) || [];
 
     return (
-        <div className="py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
             <Head title="Support Tickets" />
 
-            <div className="flex justify-between items-center mb-6">
+            <div className="mb-6 flex items-center justify-between">
                 <div>
-                    <h1 className="text-2xl font-semibold text-gray-900">Support Tickets</h1>
+                    <h1 className="text-2xl font-semibold text-gray-900">
+                        Support Tickets
+                    </h1>
                     <p className="mt-1 text-sm text-gray-500">
-                        {isAdmin ? 'Manage client support requests.' : 'View and manage your support tickets.'}
+                        {isAdmin
+                            ? 'Manage client support requests.'
+                            : 'View and manage your support tickets.'}
                     </p>
                 </div>
                 {!isAdmin && (
@@ -101,7 +122,7 @@ export default function TicketsIndex({ tickets, isAdmin }) {
             </div>
 
             {isAdmin && (
-                <div className="mb-6 flex gap-4 bg-white p-4 rounded-lg shadow-sm border">
+                <div className="mb-6 flex gap-4 rounded-lg border bg-white p-4 shadow-sm">
                     <div>
                         <InputLabel value="Filter Status" />
                         <select
@@ -131,10 +152,10 @@ export default function TicketsIndex({ tickets, isAdmin }) {
                 </div>
             )}
 
-            <div className="bg-white shadow-sm sm:rounded-lg overflow-hidden border">
+            <div className="overflow-hidden border bg-white shadow-sm sm:rounded-lg">
                 <DataTable
                     columns={columns}
-                    data={isAdmin ? filteredTickets : (tickets?.data || [])}
+                    data={isAdmin ? filteredTickets : tickets?.data || []}
                     emptyMessage="No tickets found."
                 />
             </div>
@@ -142,7 +163,9 @@ export default function TicketsIndex({ tickets, isAdmin }) {
             {/* Create Ticket Modal */}
             <Modal show={isCreating} onClose={() => setIsCreating(false)}>
                 <div className="p-6">
-                    <h2 className="text-lg font-medium text-gray-900 mb-4">Open New Ticket</h2>
+                    <h2 className="mb-4 text-lg font-medium text-gray-900">
+                        Open New Ticket
+                    </h2>
                     <form onSubmit={submitTicket} className="space-y-4">
                         <div>
                             <InputLabel htmlFor="subject" value="Subject" />
@@ -151,10 +174,18 @@ export default function TicketsIndex({ tickets, isAdmin }) {
                                 type="text"
                                 className="mt-1 block w-full"
                                 value={form.subject}
-                                onChange={e => setForm({ ...form, subject: e.target.value })}
+                                onChange={(e) =>
+                                    setForm({
+                                        ...form,
+                                        subject: e.target.value,
+                                    })
+                                }
                                 required
                             />
-                            <InputError message={errors.subject} className="mt-2" />
+                            <InputError
+                                message={errors.subject}
+                                className="mt-2"
+                            />
                         </div>
 
                         <div>
@@ -163,67 +194,116 @@ export default function TicketsIndex({ tickets, isAdmin }) {
                                 id="priority"
                                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                                 value={form.priority}
-                                onChange={e => setForm({ ...form, priority: e.target.value })}
+                                onChange={(e) =>
+                                    setForm({
+                                        ...form,
+                                        priority: e.target.value,
+                                    })
+                                }
                             >
                                 <option value="Low">Low</option>
                                 <option value="Medium">Medium</option>
                                 <option value="High">High</option>
                             </select>
-                            <InputError message={errors.priority} className="mt-2" />
+                            <InputError
+                                message={errors.priority}
+                                className="mt-2"
+                            />
                         </div>
 
                         <div>
-                            <InputLabel htmlFor="description" value="Description" />
+                            <InputLabel
+                                htmlFor="description"
+                                value="Description"
+                            />
                             <textarea
                                 id="description"
                                 rows="4"
                                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                                 value={form.description}
-                                onChange={e => setForm({ ...form, description: e.target.value })}
+                                onChange={(e) =>
+                                    setForm({
+                                        ...form,
+                                        description: e.target.value,
+                                    })
+                                }
                                 required
                             />
-                            <InputError message={errors.description} className="mt-2" />
+                            <InputError
+                                message={errors.description}
+                                className="mt-2"
+                            />
                         </div>
 
                         <div className="mt-6 flex justify-end gap-3">
-                            <SecondaryButton onClick={() => setIsCreating(false)}>Cancel</SecondaryButton>
-                            <PrimaryButton type="submit">Submit Ticket</PrimaryButton>
+                            <SecondaryButton
+                                onClick={() => setIsCreating(false)}
+                            >
+                                Cancel
+                            </SecondaryButton>
+                            <PrimaryButton type="submit">
+                                Submit Ticket
+                            </PrimaryButton>
                         </div>
                     </form>
                 </div>
             </Modal>
 
             {/* View Ticket Chat Modal */}
-            <Modal show={!!selectedTicket} onClose={() => setSelectedTicket(null)} maxWidth="4xl">
+            <Modal
+                show={!!selectedTicket}
+                onClose={() => setSelectedTicket(null)}
+                maxWidth="4xl"
+            >
                 {selectedTicket && (
-                    <div className="flex flex-col h-[80vh]">
-                        <div className="p-4 border-b flex justify-between items-center bg-gray-50">
+                    <div className="flex h-[80vh] flex-col">
+                        <div className="flex items-center justify-between border-b bg-gray-50 p-4">
                             <div>
-                                <h2 className="text-lg font-semibold flex items-center gap-2">
-                                    #{selectedTicket.id} - {selectedTicket.subject}
-                                    <StatusBadge status={selectedTicket.status} />
+                                <h2 className="flex items-center gap-2 text-lg font-semibold">
+                                    #{selectedTicket.id} -{' '}
+                                    {selectedTicket.subject}
+                                    <StatusBadge
+                                        status={selectedTicket.status}
+                                    />
                                 </h2>
                                 {isAdmin && selectedTicket.user && (
-                                    <p className="text-sm text-gray-500 mt-1">Client: {selectedTicket.user.name}</p>
+                                    <p className="mt-1 text-sm text-gray-500">
+                                        Client: {selectedTicket.user.name}
+                                    </p>
                                 )}
                             </div>
                             <div className="flex gap-2">
-                                {isAdmin && selectedTicket.status !== 'Resolved' && (
-                                    <PrimaryButton onClick={() => markResolved(selectedTicket.id)}>
-                                        Mark Resolved
-                                    </PrimaryButton>
-                                )}
-                                <SecondaryButton onClick={() => setSelectedTicket(null)}>
+                                {isAdmin &&
+                                    selectedTicket.status !== 'Resolved' && (
+                                        <PrimaryButton
+                                            onClick={() =>
+                                                markResolved(selectedTicket.id)
+                                            }
+                                        >
+                                            Mark Resolved
+                                        </PrimaryButton>
+                                    )}
+                                <SecondaryButton
+                                    onClick={() => setSelectedTicket(null)}
+                                >
                                     Close
                                 </SecondaryButton>
                             </div>
                         </div>
 
-                        <div className="flex-1 bg-white overflow-hidden p-0">
+                        <div className="flex-1 overflow-hidden bg-white p-0">
                             {/* Assuming conversation ID is tied to the ticket, or passed as ticket.conversation_id */}
                             <ChatWindow
-                                conversationId={selectedTicket.conversation_id || selectedTicket.id}
-                                participants={[{ id: selectedTicket.user_id, name: selectedTicket.user?.name }]}
+                                conversationId={
+                                    selectedTicket.conversation_id ||
+                                    selectedTicket.id
+                                }
+                                participants={[
+                                    {
+                                        id: selectedTicket.user_id,
+                                        name: selectedTicket.user?.name,
+                                    },
+                                ]}
                                 readOnly={selectedTicket.status === 'Resolved'}
                             />
                         </div>
