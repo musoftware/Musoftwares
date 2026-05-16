@@ -1,5 +1,5 @@
-import { Avatar, AvatarFallback, AvatarImage } from '@/Components/ui/avatar';
-import { Button } from '@/Components/ui/button';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -7,7 +7,7 @@ import {
     DropdownMenuLabel,
     DropdownMenuSeparator,
     DropdownMenuTrigger,
-} from '@/Components/ui/dropdown-menu';
+} from '@/components/ui/dropdown-menu';
 import { User } from '@/types';
 import { Link } from '@inertiajs/react';
 import {
