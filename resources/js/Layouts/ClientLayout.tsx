@@ -103,7 +103,7 @@ export default function ClientLayout({
                             className="relative"
                         >
                             <Bell className="h-5 w-5 text-gray-600" />
-                            <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-red-500"></span>
+                            <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-red-500"></span>
                             <span className="sr-only">View notifications</span>
                         </Button>
 
@@ -120,7 +120,7 @@ export default function ClientLayout({
                             <DropdownMenuContent className="w-56" align="end">
                                 <DropdownMenuLabel className="font-normal">
                                     <div className="flex flex-col space-y-1">
-                                        <p className="text-sm font-medium leading-none">
+                                        <p className="text-sm leading-none font-medium">
                                             {user?.name || 'Client User'}
                                         </p>
                                         <p className="text-muted-foreground text-xs leading-none">

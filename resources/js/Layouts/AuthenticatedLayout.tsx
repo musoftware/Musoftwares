@@ -1,13 +1,13 @@
 import ApplicationLogo from '@/Components/ApplicationLogo';
+import CommandPalette from '@/Components/CommandPalette';
 import Dropdown from '@/Components/Dropdown';
 import NavLink from '@/Components/NavLink';
 import ResponsiveNavLink from '@/Components/ResponsiveNavLink';
-import { Link, usePage } from '@inertiajs/react';
-import { PropsWithChildren, ReactNode, useEffect, useState } from 'react';
-import { Bell } from 'lucide-react';
-import CommandPalette from '@/Components/CommandPalette';
 import { Toaster } from '@/Components/ui/toaster';
 import { useToast } from '@/Components/ui/use-toast';
+import { Link, usePage } from '@inertiajs/react';
+import { Bell } from 'lucide-react';
+import { PropsWithChildren, ReactNode, useEffect, useState } from 'react';
 
 export default function Authenticated({
     header,
@@ -32,7 +32,7 @@ export default function Authenticated({
     return (
         <div className="min-h-screen bg-gray-100">
             {isImpersonating && (
-                <div className="bg-amber-500 text-white px-4 py-2 text-center text-sm font-medium">
+                <div className="bg-amber-500 px-4 py-2 text-center text-sm font-medium text-white">
                     Viewing as {user.name} —
                     <Link
                         href={route('stop-impersonating')}
@@ -64,16 +64,16 @@ export default function Authenticated({
                             </div>
                         </div>
 
-                        <div className="hidden sm:ms-6 sm:flex sm:items-center space-x-4">
-
+                        <div className="hidden space-x-4 sm:ms-6 sm:flex sm:items-center">
                             {/* Notifications Dropdown */}
                             <div className="relative">
                                 <Dropdown>
                                     <Dropdown.Trigger>
-                                        <button className="relative p-2 text-gray-400 hover:text-gray-500 focus:outline-none focus:text-gray-500 transition duration-150 ease-in-out">
-                                            <Bell className="w-6 h-6" />
-                                            {notifications?.unread_count > 0 && (
-                                                <span className="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-red-100 transform translate-x-1/4 -translate-y-1/4 bg-red-600 rounded-full">
+                                        <button className="relative p-2 text-gray-400 transition duration-150 ease-in-out hover:text-gray-500 focus:text-gray-500 focus:outline-none">
+                                            <Bell className="h-6 w-6" />
+                                            {notifications?.unread_count >
+                                                0 && (
+                                                <span className="absolute top-0 right-0 inline-flex translate-x-1/4 -translate-y-1/4 transform items-center justify-center rounded-full bg-red-600 px-2 py-1 text-xs leading-none font-bold text-red-100">
                                                     {notifications.unread_count}
                                                 </span>
                                             )}
@@ -81,26 +81,40 @@ export default function Authenticated({
                                     </Dropdown.Trigger>
 
                                     <Dropdown.Content align="right" width="48">
-                                        <div className="px-4 py-2 text-xs text-gray-500 border-b">
+                                        <div className="border-b px-4 py-2 text-xs text-gray-500">
                                             Recent Notifications
                                         </div>
                                         {notifications?.recent?.length > 0 ? (
-                                            notifications.recent.map((notification: any) => (
-                                                <Dropdown.Link
-                                                    key={notification.id}
-                                                    href={route('notifications.mark-read', { id: notification.id })}
-                                                    method="post"
-                                                    as="button"
-                                                    className="w-full text-left"
-                                                >
-                                                    {notification.data?.message || 'New notification'}
-                                                </Dropdown.Link>
-                                            ))
+                                            notifications.recent.map(
+                                                (notification: any) => (
+                                                    <Dropdown.Link
+                                                        key={notification.id}
+                                                        href={route(
+                                                            'notifications.mark-read',
+                                                            {
+                                                                id: notification.id,
+                                                            },
+                                                        )}
+                                                        method="post"
+                                                        as="button"
+                                                        className="w-full text-left"
+                                                    >
+                                                        {notification.data
+                                                            ?.message ||
+                                                            'New notification'}
+                                                    </Dropdown.Link>
+                                                ),
+                                            )
                                         ) : (
-                                            <div className="px-4 py-2 text-sm text-gray-500">No new notifications</div>
+                                            <div className="px-4 py-2 text-sm text-gray-500">
+                                                No new notifications
+                                            </div>
                                         )}
                                         <div className="border-t border-gray-100"></div>
-                                        <Dropdown.Link href={route('notifications.index')} className="text-center text-sm text-indigo-600 font-medium">
+                                        <Dropdown.Link
+                                            href={route('notifications.index')}
+                                            className="text-center text-sm font-medium text-indigo-600"
+                                        >
                                             View All
                                         </Dropdown.Link>
                                     </Dropdown.Content>
@@ -113,12 +127,12 @@ export default function Authenticated({
                                         <span className="inline-flex rounded-md">
                                             <button
                                                 type="button"
-                                                className="inline-flex items-center rounded-md border border-transparent bg-white px-3 py-2 text-sm font-medium leading-4 text-gray-500 transition duration-150 ease-in-out hover:text-gray-700 focus:outline-none"
+                                                className="inline-flex items-center rounded-md border border-transparent bg-white px-3 py-2 text-sm leading-4 font-medium text-gray-500 transition duration-150 ease-in-out hover:text-gray-700 focus:outline-none"
                                             >
                                                 {user.name}
 
                                                 <svg
-                                                    className="-me-0.5 ms-2 h-4 w-4"
+                                                    className="ms-2 -me-0.5 h-4 w-4"
                                                     xmlns="http://www.w3.org/2000/svg"
                                                     viewBox="0 0 20 20"
                                                     fill="currentColor"
@@ -200,7 +214,7 @@ export default function Authenticated({
                         ' sm:hidden'
                     }
                 >
-                    <div className="space-y-1 pb-3 pt-2">
+                    <div className="space-y-1 pt-2 pb-3">
                         <ResponsiveNavLink
                             href={route('dashboard')}
                             active={route().current('dashboard')}
@@ -209,7 +223,7 @@ export default function Authenticated({
                         </ResponsiveNavLink>
                     </div>
 
-                    <div className="border-t border-gray-200 pb-1 pt-4">
+                    <div className="border-t border-gray-200 pt-4 pb-1">
                         <div className="px-4">
                             <div className="text-base font-medium text-gray-800">
                                 {user.name}

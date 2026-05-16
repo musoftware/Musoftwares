@@ -1,7 +1,14 @@
-import React from 'react';
-import { Head, useForm, router } from '@inertiajs/react';
+import { Head, useForm } from '@inertiajs/react';
 
-export default function PnL({ filters, incomeBreakdown, totalIncome, expenseBreakdown, totalExpenses, netProfit, tenantStats }) {
+export default function PnL({
+    filters,
+    incomeBreakdown,
+    totalIncome,
+    expenseBreakdown,
+    totalExpenses,
+    netProfit,
+    tenantStats,
+}) {
     const { data, setData, get } = useForm({
         from: filters.from || '',
         to: filters.to || '',
@@ -13,51 +20,71 @@ export default function PnL({ filters, incomeBreakdown, totalIncome, expenseBrea
     };
 
     const formatCurrency = (amount) => {
-        return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount || 0);
+        return new Intl.NumberFormat('en-US', {
+            style: 'currency',
+            currency: 'USD',
+        }).format(amount || 0);
     };
 
     return (
-        <div className="p-6 max-w-4xl mx-auto">
+        <div className="mx-auto max-w-4xl p-6">
             <Head title="P&L Report" />
-            <h1 className="text-3xl font-bold mb-6">Profit & Loss Report</h1>
+            <h1 className="mb-6 text-3xl font-bold">Profit & Loss Report</h1>
 
             {/* Date Range Picker */}
-            <form onSubmit={handleFilter} className="mb-8 flex space-x-4 items-end">
+            <form
+                onSubmit={handleFilter}
+                className="mb-8 flex items-end space-x-4"
+            >
                 <div>
-                    <label className="block text-sm font-medium mb-1">From Date</label>
+                    <label className="mb-1 block text-sm font-medium">
+                        From Date
+                    </label>
                     <input
                         type="date"
                         value={data.from}
-                        onChange={e => setData('from', e.target.value)}
-                        className="border rounded px-3 py-2"
+                        onChange={(e) => setData('from', e.target.value)}
+                        className="rounded border px-3 py-2"
                     />
                 </div>
                 <div>
-                    <label className="block text-sm font-medium mb-1">To Date</label>
+                    <label className="mb-1 block text-sm font-medium">
+                        To Date
+                    </label>
                     <input
                         type="date"
                         value={data.to}
-                        onChange={e => setData('to', e.target.value)}
-                        className="border rounded px-3 py-2"
+                        onChange={(e) => setData('to', e.target.value)}
+                        className="rounded border px-3 py-2"
                     />
                 </div>
-                <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded h-[42px]">
+                <button
+                    type="submit"
+                    className="h-[42px] rounded bg-blue-600 px-4 py-2 text-white"
+                >
                     Filter
                 </button>
             </form>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+            <div className="mb-8 grid grid-cols-1 gap-8 md:grid-cols-2">
                 {/* Income Breakdown */}
-                <div className="bg-white p-6 rounded shadow">
-                    <h2 className="text-xl font-bold mb-4 border-b pb-2">Income Breakdown</h2>
+                <div className="rounded bg-white p-6 shadow">
+                    <h2 className="mb-4 border-b pb-2 text-xl font-bold">
+                        Income Breakdown
+                    </h2>
                     <ul className="space-y-2 font-mono">
-                        {Object.entries(incomeBreakdown).map(([source, amount]) => (
-                            <li key={source} className="flex justify-between">
-                                <span>{source.padEnd(20, '\u00A0')}</span>
-                                <span>{formatCurrency(amount)}</span>
-                            </li>
-                        ))}
-                        <li className="flex justify-between font-bold border-t pt-2 mt-2">
+                        {Object.entries(incomeBreakdown).map(
+                            ([source, amount]) => (
+                                <li
+                                    key={source}
+                                    className="flex justify-between"
+                                >
+                                    <span>{source.padEnd(20, '\u00A0')}</span>
+                                    <span>{formatCurrency(amount)}</span>
+                                </li>
+                            ),
+                        )}
+                        <li className="mt-2 flex justify-between border-t pt-2 font-bold">
                             <span>Total Income</span>
                             <span>{formatCurrency(totalIncome)}</span>
                         </li>
@@ -65,16 +92,20 @@ export default function PnL({ filters, incomeBreakdown, totalIncome, expenseBrea
                 </div>
 
                 {/* Expense Breakdown */}
-                <div className="bg-white p-6 rounded shadow">
-                    <h2 className="text-xl font-bold mb-4 border-b pb-2">Expense Breakdown</h2>
+                <div className="rounded bg-white p-6 shadow">
+                    <h2 className="mb-4 border-b pb-2 text-xl font-bold">
+                        Expense Breakdown
+                    </h2>
                     <ul className="space-y-2 font-mono">
-                        {Object.entries(expenseBreakdown).map(([type, amount]) => (
-                            <li key={type} className="flex justify-between">
-                                <span>{type.padEnd(20, '\u00A0')}</span>
-                                <span>{formatCurrency(amount)}</span>
-                            </li>
-                        ))}
-                        <li className="flex justify-between font-bold border-t pt-2 mt-2">
+                        {Object.entries(expenseBreakdown).map(
+                            ([type, amount]) => (
+                                <li key={type} className="flex justify-between">
+                                    <span>{type.padEnd(20, '\u00A0')}</span>
+                                    <span>{formatCurrency(amount)}</span>
+                                </li>
+                            ),
+                        )}
+                        <li className="mt-2 flex justify-between border-t pt-2 font-bold">
                             <span>Total Expenses</span>
                             <span>{formatCurrency(totalExpenses)}</span>
                         </li>
@@ -83,18 +114,24 @@ export default function PnL({ filters, incomeBreakdown, totalIncome, expenseBrea
             </div>
 
             {/* Net Profit */}
-            <div className="bg-white p-6 rounded shadow mb-8">
-                <div className="flex justify-between items-center text-2xl font-bold">
+            <div className="mb-8 rounded bg-white p-6 shadow">
+                <div className="flex items-center justify-between text-2xl font-bold">
                     <span>Net Profit</span>
-                    <span className={netProfit >= 0 ? 'text-green-600' : 'text-red-600'}>
+                    <span
+                        className={
+                            netProfit >= 0 ? 'text-green-600' : 'text-red-600'
+                        }
+                    >
                         {formatCurrency(netProfit)}
                     </span>
                 </div>
             </div>
 
             {/* Tenant Stats */}
-            <div className="bg-white p-6 rounded shadow">
-                <h2 className="text-xl font-bold mb-4 border-b pb-2">Tenant Revenue Stats</h2>
+            <div className="rounded bg-white p-6 shadow">
+                <h2 className="mb-4 border-b pb-2 text-xl font-bold">
+                    Tenant Revenue Stats
+                </h2>
                 <table className="w-full text-left">
                     <thead>
                         <tr>
@@ -106,12 +143,19 @@ export default function PnL({ filters, incomeBreakdown, totalIncome, expenseBrea
                         {tenantStats.map((tenant, idx) => (
                             <tr key={idx} className="border-t">
                                 <td className="py-2">{tenant.tenant_name}</td>
-                                <td className="py-2 text-right">{formatCurrency(tenant.revenue)}</td>
+                                <td className="py-2 text-right">
+                                    {formatCurrency(tenant.revenue)}
+                                </td>
                             </tr>
                         ))}
                         {tenantStats.length === 0 && (
                             <tr>
-                                <td colSpan="2" className="py-4 text-center text-gray-500">No tenant stats found for this period.</td>
+                                <td
+                                    colSpan="2"
+                                    className="py-4 text-center text-gray-500"
+                                >
+                                    No tenant stats found for this period.
+                                </td>
                             </tr>
                         )}
                     </tbody>
