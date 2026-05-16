@@ -1,38 +1,86 @@
 import React, { useState } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, useForm, router } from '@inertiajs/react';
+import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/Components/ui/card';
+import { Button } from '@/Components/ui/button';
+import {
+    Sheet,
+    SheetContent,
+    SheetDescription,
+    SheetHeader,
+    SheetTitle,
+    SheetFooter,
+    SheetTrigger,
+} from '@/Components/ui/sheet';
+import { Input } from '@/Components/ui/input';
+import { Label } from '@/Components/ui/label';
+import { Textarea } from '@/Components/ui/textarea';
+import StatusBadge from '@/Components/StatusBadge';
+import {
+    Plus,
+    Building,
+    User,
+    CreditCard,
+    Globe,
+    MoreVertical,
+    Trash2,
+    Check,
+    AlertCircle,
+    Banknote
+} from 'lucide-react';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger
+} from '@/Components/ui/dropdown-menu';
+import { useToast } from '@/Components/ui/use-toast';
 
 export default function Index({ auth, paymentMethods }) {
-    const { data, setData, post, processing, errors, reset } = useForm({
+    const { toast } = useToast();
+    const [isAddOpen, setIsAddOpen] = useState(false);
+
+    const { data, setData, post, processing, reset, errors } = useForm({
         bank_name: '',
+        account_holder_name: '',
         account_number: '',
-        account_name: '',
+        iban: '',
         swift_code: '',
+        bank_country: 'EG',
+        bank_currency: 'EGP',
+        branch_name: '',
+        notes: '',
         is_default: false,
     });
 
-    const [showForm, setShowForm] = useState(false);
-
-    const submitForm = (e) => {
+    const onSubmit = (e) => {
         e.preventDefault();
         post(route('erp.payment-methods.store'), {
             onSuccess: () => {
-                setShowForm(false);
+                setIsAddOpen(false);
                 reset();
-            },
+                toast({ title: "Submitted", description: "Bank account submitted for approval." });
+            }
         });
     };
 
-    const handleSetDefault = (id, currentDefault) => {
-        router.patch(route('erp.payment-methods.update', id), {
-            is_default: !currentDefault,
+    const setDefault = (pm) => {
+        router.patch(route('erp.payment-methods.update', pm.id), { is_default: true }, {
+            onSuccess: () => toast({ title: "Updated", description: "Default payment method changed." })
         });
     };
 
-    const handleDelete = (id) => {
-        if (confirm('Are you sure you want to delete this payment method?')) {
-            router.delete(route('erp.payment-methods.destroy', id));
+    const deletePM = (pm) => {
+        if (confirm('Are you sure you want to delete this bank account?')) {
+            router.delete(route('erp.payment-methods.destroy', pm.id), {
+                onSuccess: () => toast({ title: "Deleted", description: "Bank account removed." })
+            });
         }
+    };
+
+    const maskIBAN = (iban) => {
+        if (!iban) return '';
+        return iban.substring(0, 4) + ' .... ' + iban.substring(iban.length - 4);
     };
 
     return (
@@ -46,121 +94,188 @@ export default function Index({ auth, paymentMethods }) {
                 <div className="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
 
                     <div className="flex justify-between items-center">
-                        <h3 className="text-lg font-medium text-gray-900">Bank Accounts</h3>
-                        <button
-                            onClick={() => setShowForm(!showForm)}
-                            className="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 active:bg-indigo-900 focus:outline-none focus:border-indigo-900 focus:ring ring-indigo-300 disabled:opacity-25 transition ease-in-out duration-150"
-                        >
-                            {showForm ? 'Cancel' : 'Add New Account'}
-                        </button>
-                    </div>
-
-                    {showForm && (
-                        <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
-                            <form onSubmit={submitForm} className="space-y-4 max-w-lg">
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700">Bank Name</label>
-                                    <input
-                                        type="text"
-                                        className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                                        value={data.bank_name}
-                                        onChange={e => setData('bank_name', e.target.value)}
-                                    />
-                                    {errors.bank_name && <div className="text-red-600 mt-1 text-sm">{errors.bank_name}</div>}
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700">Account Name</label>
-                                    <input
-                                        type="text"
-                                        className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                                        value={data.account_name}
-                                        onChange={e => setData('account_name', e.target.value)}
-                                    />
-                                    {errors.account_name && <div className="text-red-600 mt-1 text-sm">{errors.account_name}</div>}
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700">Account Number</label>
-                                    <input
-                                        type="text"
-                                        className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                                        value={data.account_number}
-                                        onChange={e => setData('account_number', e.target.value)}
-                                    />
-                                    {errors.account_number && <div className="text-red-600 mt-1 text-sm">{errors.account_number}</div>}
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700">SWIFT/BIC Code (Optional)</label>
-                                    <input
-                                        type="text"
-                                        className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                                        value={data.swift_code}
-                                        onChange={e => setData('swift_code', e.target.value)}
-                                    />
-                                    {errors.swift_code && <div className="text-red-600 mt-1 text-sm">{errors.swift_code}</div>}
-                                </div>
-                                <div className="flex items-center">
-                                    <input
-                                        type="checkbox"
-                                        className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
-                                        checked={data.is_default}
-                                        onChange={e => setData('is_default', e.target.checked)}
-                                    />
-                                    <label className="ml-2 block text-sm text-gray-900">Set as default payment method</label>
-                                </div>
-                                <button type="submit" disabled={processing} className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                                    Save Account
-                                </button>
-                            </form>
+                        <div>
+                            <h3 className="text-lg font-bold text-slate-800">Bank Accounts</h3>
+                            <p className="text-sm text-slate-500">Manage where you receive your withdrawals.</p>
                         </div>
-                    )}
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {paymentMethods.map((method) => (
-                            <div key={method.id} className={`bg-white overflow-hidden shadow-sm sm:rounded-lg p-6 border-l-4 ${method.is_default ? 'border-green-500' : 'border-gray-200'}`}>
-                                <div className="flex justify-between items-start">
-                                    <div>
-                                        <h4 className="text-lg font-bold text-gray-900">{method.bank_name}</h4>
-                                        <p className="text-sm text-gray-600 mt-1">{method.account_name}</p>
-                                        <p className="text-sm font-mono text-gray-800 mt-2">{method.account_number}</p>
-                                        {method.swift_code && <p className="text-xs text-gray-500 mt-1">SWIFT: {method.swift_code}</p>}
+                        <Sheet open={isAddOpen} onOpenChange={setIsAddOpen}>
+                            <SheetTrigger asChild>
+                                <Button className="bg-slate-900">
+                                    <Plus className="w-4 h-4 mr-2" /> Add Bank Account
+                                </Button>
+                            </SheetTrigger>
+                            <SheetContent className="sm:max-w-lg overflow-y-auto">
+                                <SheetHeader>
+                                    <SheetTitle>Add Bank Account</SheetTitle>
+                                    <SheetDescription>
+                                        Enter your bank details accurately. Accounts require manual approval by our team.
+                                    </SheetDescription>
+                                </SheetHeader>
 
-                                        <div className="mt-4">
-                                            <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full
-                                                ${method.status === 'pending' ? 'bg-yellow-100 text-yellow-800' : ''}
-                                                ${method.status === 'approved' ? 'bg-green-100 text-green-800' : ''}
-                                                ${method.status === 'rejected' ? 'bg-red-100 text-red-800' : ''}
-                                            `}>
-                                                {method.status.charAt(0).toUpperCase() + method.status.slice(1)}
-                                            </span>
-                                            {method.is_default && (
-                                                <span className="ml-2 px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-indigo-100 text-indigo-800">
-                                                    Default
-                                                </span>
-                                            )}
+                                <form onSubmit={onSubmit} className="space-y-4 py-6">
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div className="grid gap-2 col-span-2">
+                                            <Label htmlFor="bank_name">Bank Name</Label>
+                                            <Input id="bank_name" value={data.bank_name} onChange={e => setData('bank_name', e.target.value)} required />
+                                            {errors.bank_name && <p className="text-xs text-red-500">{errors.bank_name}</p>}
+                                        </div>
+                                        <div className="grid gap-2 col-span-2">
+                                            <Label htmlFor="holder">Account Holder Name</Label>
+                                            <Input id="holder" value={data.account_holder_name} onChange={e => setData('account_holder_name', e.target.value)} required />
+                                            {errors.account_holder_name && <p className="text-xs text-red-500">{errors.account_holder_name}</p>}
+                                        </div>
+                                        <div className="grid gap-2">
+                                            <Label htmlFor="acc_num">Account Number</Label>
+                                            <Input id="acc_num" value={data.account_number} onChange={e => setData('account_number', e.target.value)} required />
+                                            {errors.account_number && <p className="text-xs text-red-500">{errors.account_number}</p>}
+                                        </div>
+                                        <div className="grid gap-2">
+                                            <Label htmlFor="iban">IBAN</Label>
+                                            <Input id="iban" value={data.iban} onChange={e => setData('iban', e.target.value)} required />
+                                            {errors.iban && <p className="text-xs text-red-500">{errors.iban}</p>}
+                                        </div>
+                                        <div className="grid gap-2">
+                                            <Label htmlFor="swift">SWIFT / BIC</Label>
+                                            <Input id="swift" value={data.swift_code} onChange={e => setData('swift_code', e.target.value)} />
+                                        </div>
+                                        <div className="grid gap-2">
+                                            <Label htmlFor="branch">Branch Name</Label>
+                                            <Input id="branch" value={data.branch_name} onChange={e => setData('branch_name', e.target.value)} />
+                                        </div>
+                                        <div className="grid gap-2">
+                                            <Label htmlFor="country">Bank Country</Label>
+                                            <select
+                                                id="country"
+                                                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                                                value={data.bank_country}
+                                                onChange={e => setData('bank_country', e.target.value)}
+                                            >
+                                                <option value="EG">Egypt</option>
+                                                <option value="US">United States</option>
+                                                <option value="GB">United Kingdom</option>
+                                                <option value="AE">UAE</option>
+                                                <option value="SA">Saudi Arabia</option>
+                                            </select>
+                                        </div>
+                                        <div className="grid gap-2">
+                                            <Label htmlFor="currency">Currency</Label>
+                                            <select
+                                                id="currency"
+                                                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                                                value={data.bank_currency}
+                                                onChange={e => setData('bank_currency', e.target.value)}
+                                            >
+                                                <option value="EGP">EGP</option>
+                                                <option value="USD">USD</option>
+                                                <option value="EUR">EUR</option>
+                                                <option value="SAR">SAR</option>
+                                                <option value="AED">AED</option>
+                                            </select>
                                         </div>
                                     </div>
-                                    <div className="flex flex-col space-y-2">
-                                        <button
-                                            onClick={() => handleSetDefault(method.id, method.is_default)}
-                                            className="text-xs text-indigo-600 hover:text-indigo-900 text-right"
-                                        >
-                                            {method.is_default ? 'Remove Default' : 'Set Default'}
-                                        </button>
-                                        <button
-                                            onClick={() => handleDelete(method.id)}
-                                            className="text-xs text-red-600 hover:text-red-900 text-right"
-                                        >
-                                            Delete
-                                        </button>
+
+                                    <div className="grid gap-2">
+                                        <Label htmlFor="notes">Additional Notes</Label>
+                                        <Textarea id="notes" value={data.notes} onChange={e => setData('notes', e.target.value)} />
                                     </div>
-                                </div>
-                            </div>
+
+                                    <div className="flex items-center space-x-2 pt-2">
+                                        <input
+                                            type="checkbox"
+                                            id="def"
+                                            checked={data.is_default}
+                                            onChange={e => setData('is_default', e.target.checked)}
+                                            className="rounded border-slate-300 text-slate-900 focus:ring-slate-900"
+                                        />
+                                        <Label htmlFor="def" className="text-sm font-medium">Set as default for withdrawals</Label>
+                                    </div>
+
+                                    <SheetFooter className="pt-4">
+                                        <Button type="submit" className="w-full bg-slate-900" disabled={processing}>Save Bank Account</Button>
+                                    </SheetFooter>
+                                </form>
+                            </SheetContent>
+                        </Sheet>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {paymentMethods.map((pm) => (
+                            <Card key={pm.id} className={`relative overflow-hidden border-2 transition-all ${pm.is_default ? 'border-slate-900 shadow-md' : 'border-slate-100'}`}>
+                                {pm.is_default && (
+                                    <div className="absolute top-0 right-0 bg-slate-900 text-white text-[10px] font-bold px-3 py-1 rounded-bl-lg flex items-center">
+                                        <Check className="w-3 h-3 mr-1" /> DEFAULT
+                                    </div>
+                                )}
+                                <CardHeader className="pb-2">
+                                    <div className="flex justify-between items-start">
+                                        <div className="p-2 bg-slate-100 rounded-lg">
+                                            <Building className="w-5 h-5 text-slate-600" />
+                                        </div>
+                                        <DropdownMenu>
+                                            <DropdownMenuTrigger asChild>
+                                                <Button variant="ghost" size="icon" className="h-8 w-8">
+                                                    <MoreVertical className="w-4 h-4" />
+                                                </Button>
+                                            </DropdownMenuTrigger>
+                                            <DropdownMenuContent align="end">
+                                                {!pm.is_default && pm.status === 'approved' && (
+                                                    <DropdownMenuItem onClick={() => setDefault(pm)}>
+                                                        <Check className="w-4 h-4 mr-2" /> Set Default
+                                                    </DropdownMenuItem>
+                                                )}
+                                                <DropdownMenuItem className="text-red-600" onClick={() => deletePM(pm)}>
+                                                    <Trash2 className="w-4 h-4 mr-2" /> Delete
+                                                </DropdownMenuItem>
+                                            </DropdownMenuContent>
+                                        </DropdownMenu>
+                                    </div>
+                                    <CardTitle className="text-lg mt-2">{pm.bank_name}</CardTitle>
+                                    <div className="flex items-center text-sm text-slate-500">
+                                        <User className="w-3 h-3 mr-1" /> {pm.account_holder_name}
+                                    </div>
+                                </CardHeader>
+                                <CardContent className="space-y-4">
+                                    <div className="space-y-1">
+                                        <p className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">IBAN</p>
+                                        <p className="font-mono text-sm tracking-tighter bg-slate-50 p-2 rounded border border-slate-100">
+                                            {maskIBAN(pm.iban)}
+                                        </p>
+                                    </div>
+
+                                    <div className="flex justify-between items-center">
+                                        <div className="flex items-center space-x-2">
+                                            <Globe className="w-3 h-3 text-slate-400" />
+                                            <span className="text-xs font-medium uppercase">{pm.bank_country} • {pm.bank_currency}</span>
+                                        </div>
+                                        <StatusBadge status={pm.status} />
+                                    </div>
+
+                                    {pm.status === 'rejected' && pm.rejection_note && (
+                                        <div className="p-3 bg-red-50 border border-red-100 rounded-lg flex items-start space-x-2">
+                                            <AlertCircle className="w-4 h-4 text-red-500 mt-0.5 shrink-0" />
+                                            <p className="text-xs text-red-700">{pm.rejection_note}</p>
+                                        </div>
+                                    )}
+                                </CardContent>
+                            </Card>
                         ))}
 
-                        {paymentMethods.length === 0 && !showForm && (
-                            <div className="col-span-full bg-white p-6 rounded-lg shadow-sm text-center text-gray-500">
-                                No payment methods added yet. Add one to receive withdrawals.
-                            </div>
+                        {paymentMethods.length === 0 && (
+                            <Card className="col-span-full border-dashed border-2 bg-slate-50/50">
+                                <CardContent className="flex flex-col items-center justify-center py-16 space-y-4">
+                                    <div className="p-4 bg-white rounded-full shadow-sm">
+                                        <Banknote className="w-8 h-8 text-slate-300" />
+                                    </div>
+                                    <div className="text-center">
+                                        <p className="font-bold text-slate-600">No bank accounts added</p>
+                                        <p className="text-sm text-slate-400">Add a bank account to start receiving withdrawals.</p>
+                                    </div>
+                                    <Button variant="outline" onClick={() => setIsAddOpen(true)}>
+                                        Add your first account
+                                    </Button>
+                                </CardContent>
+                            </Card>
                         )}
                     </div>
                 </div>
