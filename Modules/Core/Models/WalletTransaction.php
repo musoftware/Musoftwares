@@ -9,7 +9,7 @@ class WalletTransaction extends Model
 {
     protected $fillable = [
         'wallet_id', 'type', 'amount', 'balance_before', 'balance_after',
-        'reference_type', 'reference_id', 'description'
+        'reference_type', 'reference_id', 'description', 'business_amount', 'business_currency'
     ];
 
     // Immutable
