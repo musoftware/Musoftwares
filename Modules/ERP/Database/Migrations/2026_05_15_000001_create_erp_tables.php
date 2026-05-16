@@ -152,8 +152,8 @@ return new class extends Migration
             $table->unique(['tenant_id', 'client_id']);
         });
 
-        // 10. wallet_transactions table
-        Schema::create('wallet_transactions', function (Blueprint $table) {
+        // 10. client_wallet_transactions table
+        Schema::create('client_wallet_transactions', function (Blueprint $table) {
             $table->id();
             $table->foreignId('tenant_id')->constrained()->cascadeOnDelete();
             $table->foreignId('wallet_id')->constrained('client_wallets')->cascadeOnDelete();
@@ -187,6 +187,7 @@ return new class extends Migration
             $table->timestamp('created_at')->nullable();
         });
 
+
         // 11. expense_transactions table
         Schema::create('expense_transactions', function (Blueprint $table) {
             $table->id();
@@ -215,8 +216,8 @@ return new class extends Migration
             $table->timestamp('created_at')->nullable();
         });
 
-        // 12. referrals table
-        Schema::create('referrals', function (Blueprint $table) {
+        // 12. client_referrals table
+        Schema::create('client_referrals', function (Blueprint $table) {
             $table->id();
             $table->foreignId('tenant_id')->constrained()->cascadeOnDelete();
             $table->foreignId('referrer_id')->constrained('tenant_clients')->cascadeOnDelete();
@@ -226,8 +227,8 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        // 13. referral_earnings table
-        Schema::create('referral_earnings', function (Blueprint $table) {
+        // 13. client_referral_earnings table
+        Schema::create('client_referral_earnings', function (Blueprint $table) {
             $table->id();
             $table->foreignId('tenant_id')->constrained()->cascadeOnDelete();
             $table->foreignId('invoice_id')->constrained()->cascadeOnDelete();
@@ -326,23 +327,23 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        // 17. withdrawal_requests table
-        Schema::create('withdrawal_requests', function (Blueprint $table) {
+        // 17. withdrawals table
+        Schema::create('withdrawals', function (Blueprint $table) {
             $table->id();
             $table->foreignId('tenant_id')->constrained()->cascadeOnDelete();
             $table->foreignId('client_id')->constrained('tenant_clients')->cascadeOnDelete();
             $table->foreignId('payment_method_id')->constrained()->cascadeOnDelete();
 
-            $table->enum('status', ['pending', 'approved', 'paid', 'rejected', 'cancelled'])->default('pending');
+            $table->string('status')->default('pending'); // pending, approved, paid, rejected, cancelled
 
             $table->decimal('amount', 15, 2);
-            $table->string('amount_currency', 3);
-            $table->decimal('business_amount', 15, 2);
-            $table->string('business_currency', 3);
-            $table->decimal('exchange_rate', 15, 6);
-            $table->date('exchange_rate_date');
+            $table->string('currency_code', 3)->default('USD');
+            $table->decimal('business_amount', 15, 2)->nullable();
+            $table->string('business_currency', 3)->nullable();
+            $table->decimal('exchange_rate', 15, 6)->nullable();
+            $table->date('exchange_rate_date')->nullable();
 
-            $table->decimal('balance_at_request', 15, 2);
+            $table->decimal('balance_at_request', 15, 2)->nullable();
 
             $table->foreignId('reviewed_by')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamp('reviewed_at')->nullable();
@@ -350,10 +351,10 @@ return new class extends Migration
 
             $table->foreignId('paid_by')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamp('paid_at')->nullable();
-            $table->string('payment_reference')->nullable();
-            $table->string('payment_proof')->nullable();
+            $table->string('reference')->nullable();
+            $table->string('proof_path')->nullable();
 
-            $table->text('admin_note')->nullable();
+            $table->text('admin_notes')->nullable();
 
             $table->timestamps();
         });
@@ -365,10 +366,10 @@ return new class extends Migration
         Schema::dropIfExists('payment_methods');
         Schema::dropIfExists('recurring_execution_logs');
         Schema::dropIfExists('recurring_entries');
-        Schema::dropIfExists('referral_earnings');
-        Schema::dropIfExists('referrals');
+        Schema::dropIfExists('client_referral_earnings');
+        Schema::dropIfExists('client_referrals');
         Schema::dropIfExists('expense_transactions');
-        Schema::dropIfExists('wallet_transactions');
+        Schema::dropIfExists('client_wallet_transactions');
         Schema::dropIfExists('client_wallets');
         Schema::dropIfExists('invoice_costs');
         Schema::dropIfExists('timer_sessions');

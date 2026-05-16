@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Client extends TenantAwareModel
 {
+    protected $table = 'tenant_clients';
+
     protected $fillable = ['tenant_id', 'name', 'email', 'phone', 'address', 'referral_code', 'referred_by'];
 
     public function tenant(): BelongsTo
