@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Modules\ERP\Models\Invoice;
 use Modules\ERP\Models\InvoiceItem;
 use Modules\ERP\Models\InvoiceCost;
+use Modules\ERP\Models\WalletTransaction;
 use Modules\ERP\Models\TenantClient;
 use Modules\Core\Models\Currency;
 use Modules\Core\Services\ExchangeRateService;
@@ -281,22 +282,91 @@ class InvoiceController extends Controller
 
     public function send(Invoice $invoice)
     {
+        if ($invoice->status !== 'draft') {
+            return back()->withErrors(['status' => 'Only draft invoices can be sent.']);
+        }
+
         $invoice->update([
             'status' => 'sent',
             'issued_at' => now()
         ]);
-        // Trigger notification event here
+
+        // Create a wallet transaction record for the issued invoice
+        $client = $invoice->client;
+        if ($client) {
+            $wallet = $client->wallet;
+            if ($wallet) {
+                WalletTransaction::create([
+                    'tenant_id' => $invoice->tenant_id,
+                    'wallet_id' => $wallet->id,
+                    'type' => 'invoice_issued',
+                    'direction' => 'debit',
+                    'amount' => $invoice->amount,
+                    'amount_currency' => $invoice->amount_currency,
+                    'business_amount' => $invoice->business_amount,
+                    'business_currency' => $invoice->business_currency ?? 'USD',
+                    'exchange_rate' => $invoice->exchange_rate,
+                    'exchange_rate_date' => $invoice->exchange_rate_date ?? now()->toDateString(),
+                    'balance_before' => $wallet->balance,
+                    'balance_after' => $wallet->balance, // No actual balance change on issue
+                    'reference_type' => Invoice::class,
+                    'reference_id' => $invoice->id,
+                    'note' => 'Invoice #' . $invoice->invoice_number . ' issued',
+                    'created_by' => Auth::id(),
+                ]);
+            }
+        }
+
         return back()->with('success', 'Invoice sent to client.');
     }
 
+    /**
+     * Mark an invoice as fully paid from client wallet.
+     * Recovered from old project: Invoice::bill_invoice()
+     */
     public function markPaid(Invoice $invoice)
     {
-        $invoice->update([
-            'status' => 'paid',
-            'paid_at' => now()
+        $result = $invoice->billInvoice();
+
+        if (!$result['ok']) {
+            return back()->withErrors(['payment' => $result['message']]);
+        }
+
+        return back()->with('success', $result['message']);
+    }
+
+    /**
+     * Apply a partial payment to an invoice.
+     * Recovered from old project: Invoice::partially_bill_invoice()
+     */
+    public function partialPayment(Request $request, Invoice $invoice)
+    {
+        $request->validate([
+            'amount' => 'required|numeric|min:0.01',
         ]);
-        // Record ledger entries and wallet transactions here
-        return back()->with('success', 'Invoice marked as paid.');
+
+        $result = $invoice->partiallyBillInvoice((float) $request->input('amount'));
+
+        if (!$result['ok']) {
+            return back()->withErrors(['payment' => $result['message']]);
+        }
+
+        return back()->with('success', $result['message']);
+    }
+
+    /**
+     * Cancel an invoice and refund any paid amounts.
+     * Recovered from old project: Invoice::cancel_invoice()
+     */
+    public function cancel(Invoice $invoice)
+    {
+        $result = $invoice->cancelInvoice();
+
+        if (!$result['ok']) {
+            return back()->withErrors(['status' => $result['message']]);
+        }
+
+        return back()->with('success', $result['message']);
     }
 
     public function duplicate(Invoice $invoice)

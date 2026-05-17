@@ -1,151 +1,163 @@
 import React from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 import { Wallet, ArrowUpRight, ArrowDownLeft, Clock, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/Components/ui/card';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/Components/ui/table';
+import { Badge } from '@/Components/ui/badge';
+import { Button } from '@/Components/ui/button';
 
 export default function Transactions({ transactions, wallet }) {
     return (
         <AuthenticatedLayout header="Financial Transactions">
             <Head title="Transactions" />
 
-            <div className="max-w-7xl mx-auto space-y-8">
+            <div className="max-w-[1200px] mx-auto px-4 py-8 space-y-8">
+                
+                {/* Header */}
+                <div className="space-y-2">
+                    <h1 className="text-2xl font-semibold tracking-tight">Transactions</h1>
+                    <p className="text-sm text-muted-foreground">View your wallet transaction history and ledgers.</p>
+                </div>
+
                 {/* Balance Cards */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div className="bg-gradient-to-br from-slate-900 to-indigo-950 rounded-2xl p-6 text-white shadow-xl relative overflow-hidden">
-                        <div className="absolute -right-6 -bottom-6 w-32 h-32 bg-indigo-500/20 rounded-full blur-2xl"></div>
-                        <div className="flex items-center justify-between mb-4">
-                            <span className="text-sm font-medium text-slate-300">Total Balance</span>
-                            <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center backdrop-blur-md">
-                                <Wallet className="w-5 h-5 text-indigo-400" />
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <Card className="shadow-none border-primary/20 bg-muted/10">
+                        <CardHeader className="flex flex-row items-center justify-between pb-2">
+                            <CardTitle className="text-sm font-medium">Total Balance</CardTitle>
+                            <Wallet className="h-4 w-4 text-primary" />
+                        </CardHeader>
+                        <CardContent>
+                            <div className="text-2xl font-bold">
+                                {Number(wallet?.balance || 0).toFixed(2)} <span className="text-sm font-normal text-muted-foreground">{wallet?.currency || 'USD'}</span>
                             </div>
-                        </div>
-                        <div className="text-3xl font-bold tracking-tight">
-                            {Number(wallet?.balance || 0).toFixed(2)} <span className="text-lg font-normal text-slate-400">{wallet?.currency || 'USD'}</span>
-                        </div>
-                        <p className="mt-2 text-xs text-slate-400">Available across all platform workspaces</p>
-                    </div>
+                            <p className="mt-1 text-xs text-muted-foreground">Available across all platform workspaces</p>
+                        </CardContent>
+                    </Card>
 
-                    <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm flex flex-col justify-between">
-                        <div>
-                            <div className="flex items-center justify-between mb-4">
-                                <span className="text-sm font-medium text-slate-500">Earned Balance</span>
-                                <div className="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center">
-                                    <ArrowDownLeft className="w-5 h-5 text-emerald-600" />
-                                </div>
+                    <Card className="shadow-none">
+                        <CardHeader className="flex flex-row items-center justify-between pb-2">
+                            <CardTitle className="text-sm font-medium text-muted-foreground">Earned Balance</CardTitle>
+                            <ArrowDownLeft className="h-4 w-4 text-emerald-600" />
+                        </CardHeader>
+                        <CardContent>
+                            <div className="text-2xl font-bold">
+                                {Number(wallet?.earned_balance || 0).toFixed(2)} <span className="text-sm font-normal text-muted-foreground">{wallet?.currency || 'USD'}</span>
                             </div>
-                            <div className="text-3xl font-bold tracking-tight text-slate-900">
-                                {Number(wallet?.earned_balance || 0).toFixed(2)} <span className="text-lg font-normal text-slate-400">{wallet?.currency || 'USD'}</span>
-                            </div>
-                        </div>
-                        <p className="text-xs text-emerald-600 font-medium flex items-center gap-1 mt-2">
-                            <CheckCircle2 className="w-3.5 h-3.5" /> Eligible for withdrawal
-                        </p>
-                    </div>
+                            <p className="text-xs text-emerald-600 font-medium flex items-center gap-1 mt-1">
+                                <CheckCircle2 className="w-3 h-3" /> Eligible for withdrawal
+                            </p>
+                        </CardContent>
+                    </Card>
 
-                    <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm flex flex-col justify-between">
-                        <div>
-                            <div className="flex items-center justify-between mb-4">
-                                <span className="text-sm font-medium text-slate-500">Locked / Pending</span>
-                                <div className="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center">
-                                    <Clock className="w-5 h-5 text-amber-600" />
-                                </div>
+                    <Card className="shadow-none">
+                        <CardHeader className="flex flex-row items-center justify-between pb-2">
+                            <CardTitle className="text-sm font-medium text-muted-foreground">Locked / Pending</CardTitle>
+                            <Clock className="h-4 w-4 text-amber-600" />
+                        </CardHeader>
+                        <CardContent>
+                            <div className="text-2xl font-bold">
+                                {Number(wallet?.locked_balance || 0).toFixed(2)} <span className="text-sm font-normal text-muted-foreground">{wallet?.currency || 'USD'}</span>
                             </div>
-                            <div className="text-3xl font-bold tracking-tight text-slate-900">
-                                {Number(wallet?.locked_balance || 0).toFixed(2)} <span className="text-lg font-normal text-slate-400">{wallet?.currency || 'USD'}</span>
-                            </div>
-                        </div>
-                        <p className="text-xs text-amber-600 font-medium flex items-center gap-1 mt-2">
-                            <AlertCircle className="w-3.5 h-3.5" /> Pending in active contracts or requests
-                        </p>
-                    </div>
+                            <p className="text-xs text-amber-600 font-medium flex items-center gap-1 mt-1">
+                                <AlertCircle className="w-3 h-3" /> Pending in active contracts
+                            </p>
+                        </CardContent>
+                    </Card>
                 </div>
 
                 {/* Transactions Table */}
-                <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-                    <div className="p-6 border-b border-slate-100 flex items-center justify-between">
-                        <h2 className="text-lg font-semibold text-slate-900">Transaction History</h2>
-                        <span className="text-xs font-medium px-2.5 py-1 bg-slate-100 text-slate-700 rounded-full">
-                            {transactions?.total || 0} Total Records
-                        </span>
-                    </div>
-
-                    <div className="overflow-x-auto">
-                        <table className="w-full text-left border-collapse">
-                            <thead>
-                                <tr className="border-b border-slate-100 bg-slate-50/50 text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                                    <th className="py-3.5 px-6 font-medium">Type</th>
-                                    <th className="py-3.5 px-6 font-medium">Description</th>
-                                    <th className="py-3.5 px-6 font-medium">Amount</th>
-                                    <th className="py-3.5 px-6 font-medium">Balance Before</th>
-                                    <th className="py-3.5 px-6 font-medium">Balance After</th>
-                                    <th className="py-3.5 px-6 font-medium">Date</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-slate-100 text-sm">
+                <Card className="shadow-none">
+                    <CardHeader className="flex flex-row items-center justify-between">
+                        <div className="space-y-1">
+                            <CardTitle className="text-base font-semibold">Transaction History</CardTitle>
+                            <CardDescription>A list of your recent transactions.</CardDescription>
+                        </div>
+                        <Badge variant="secondary" className="font-normal">{transactions?.total || 0} Records</Badge>
+                    </CardHeader>
+                    <CardContent className="px-0 pt-0">
+                        <Table>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead className="pl-6">Type</TableHead>
+                                    <TableHead>Description</TableHead>
+                                    <TableHead>Amount</TableHead>
+                                    <TableHead>Balance Before</TableHead>
+                                    <TableHead>Balance After</TableHead>
+                                    <TableHead className="pr-6 text-right">Date</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
                                 {(!transactions?.data || transactions.data.length === 0) ? (
-                                    <tr>
-                                        <td colSpan={6} className="py-12 text-center text-slate-400">
+                                    <TableRow>
+                                        <TableCell colSpan={6} className="py-12 text-center text-muted-foreground">
                                             No transactions found.
-                                        </td>
-                                    </tr>
+                                        </TableCell>
+                                    </TableRow>
                                 ) : (
                                     transactions.data.map((tx) => (
-                                        <tr key={tx.id} className="hover:bg-slate-50/75 transition-colors">
-                                            <td className="py-4 px-6 font-medium">
-                                                {tx.type === 'credit' ? (
-                                                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-100">
-                                                        <ArrowDownLeft className="w-3.5 h-3.5" /> Credit
-                                                    </span>
-                                                ) : (
-                                                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-rose-50 text-rose-700 border border-rose-100">
-                                                        <ArrowUpRight className="w-3.5 h-3.5" /> Debit
-                                                    </span>
-                                                )}
-                                            </td>
-                                            <td className="py-4 px-6">
-                                                <p className="font-medium text-slate-900">{tx.description || 'System transaction'}</p>
+                                        <TableRow key={tx.id}>
+                                            <TableCell className="pl-6">
+                                                <Badge variant={tx.type === 'credit' ? 'outline' : 'secondary'} className={`font-normal tracking-wide bg-opacity-10 ${tx.type === 'credit' ? 'text-emerald-700 border-emerald-200 bg-emerald-50' : 'text-rose-700 border-rose-200 bg-rose-50'}`}>
+                                                    {tx.type === 'credit' ? <ArrowDownLeft className="w-3 h-3 mr-1" /> : <ArrowUpRight className="w-3 h-3 mr-1" />}
+                                                    {tx.type === 'credit' ? 'Credit' : 'Debit'}
+                                                </Badge>
+                                            </TableCell>
+                                            <TableCell>
+                                                <p className="font-medium">{tx.description || 'System transaction'}</p>
                                                 {tx.reference_type && (
-                                                    <span className="text-xs text-slate-400">Ref: {tx.reference_type}</span>
+                                                    <span className="text-xs text-muted-foreground">Ref: {tx.reference_type}</span>
                                                 )}
-                                            </td>
-                                            <td className={`py-4 px-6 font-semibold ${tx.type === 'credit' ? 'text-emerald-600' : 'text-rose-600'}`}>
+                                            </TableCell>
+                                            <TableCell className={`font-medium ${tx.type === 'credit' ? 'text-emerald-600' : 'text-rose-600'}`}>
                                                 {tx.type === 'credit' ? '+' : '-'}{Number(tx.amount).toFixed(2)} {wallet?.currency || 'USD'}
-                                            </td>
-                                            <td className="py-4 px-6 text-slate-600">
+                                            </TableCell>
+                                            <TableCell className="text-muted-foreground">
                                                 {Number(tx.balance_before).toFixed(2)}
-                                            </td>
-                                            <td className="py-4 px-6 font-medium text-slate-900">
+                                            </TableCell>
+                                            <TableCell className="font-medium">
                                                 {Number(tx.balance_after).toFixed(2)}
-                                            </td>
-                                            <td className="py-4 px-6 text-slate-500 text-xs">
+                                            </TableCell>
+                                            <TableCell className="pr-6 text-right text-muted-foreground text-xs">
                                                 {new Date(tx.created_at).toLocaleDateString(undefined, {
                                                     year: 'numeric', month: 'short', day: 'numeric',
                                                     hour: '2-digit', minute: '2-digit'
                                                 })}
-                                            </td>
-                                        </tr>
+                                            </TableCell>
+                                        </TableRow>
                                     ))
                                 )}
-                            </tbody>
-                        </table>
-                    </div>
-
+                            </TableBody>
+                        </Table>
+                    </CardContent>
+                    
                     {/* Pagination */}
                     {transactions?.links && transactions.links.length > 3 && (
-                        <div className="p-4 border-t border-slate-100 flex items-center justify-end gap-1 bg-slate-50/50">
-                            {transactions.links.map((link, idx) => (
-                                <a
-                                    key={idx}
-                                    href={link.url || '#'}
-                                    dangerouslySetInnerHTML={{ __html: link.label }}
-                                    className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-colors ${
-                                        link.active ? 'bg-indigo-600 text-white' : 'text-slate-600 hover:bg-slate-200 bg-white border border-slate-200'
-                                    } ${!link.url ? 'opacity-50 cursor-not-allowed' : ''}`}
-                                />
-                            ))}
+                        <div className="p-4 border-t flex items-center justify-end gap-1">
+                            {transactions.links.map((link, idx) => {
+                                const isCurrent = link.active;
+                                const isPrevious = link.label.includes('Previous');
+                                const isNext = link.label.includes('Next');
+                                
+                                return (
+                                    <Button
+                                        key={idx}
+                                        asChild={!!link.url}
+                                        variant={isCurrent ? 'default' : 'outline'}
+                                        size="sm"
+                                        className={`shadow-none ${!link.url ? 'opacity-50 cursor-not-allowed pointer-events-none' : ''}`}
+                                    >
+                                        {link.url ? (
+                                            <Link href={link.url} dangerouslySetInnerHTML={{ __html: link.label }} />
+                                        ) : (
+                                            <span dangerouslySetInnerHTML={{ __html: link.label }} />
+                                        )}
+                                    </Button>
+                                );
+                            })}
                         </div>
                     )}
-                </div>
+                </Card>
             </div>
         </AuthenticatedLayout>
     );

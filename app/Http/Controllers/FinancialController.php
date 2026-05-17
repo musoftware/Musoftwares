@@ -36,6 +36,11 @@ class FinancialController extends Controller
         ]);
     }
 
+    /**
+     * Request a withdrawal with proper validation.
+     * Recovered from old project: PayoutController::process_withdrawal()
+     * Enhanced with BalanceService validation for earned balance and minimum checks.
+     */
     public function requestWithdrawal(Request $request)
     {
         $user = $request->user();
@@ -46,11 +51,19 @@ class FinancialController extends Controller
             'payout_method_id' => 'required|exists:payout_methods,id',
         ]);
 
-        $payoutMethod = $user->payoutMethods()->where('id', $request->payout_method_id)->firstOrFail();
+        // Validate using BalanceService (recovered pattern from old BalancesHelper)
+        $balanceService = app(\App\Services\BalanceService::class);
+        $eligibility = $balanceService->validateWithdrawalEligibility(
+            $user,
+            (float) $request->amount,
+            (int) $request->payout_method_id
+        );
 
-        if ($request->amount > $wallet->earned_balance) {
-            return back()->withErrors(['amount' => 'Insufficient earned balance. You can only withdraw earned balance.']);
+        if (!$eligibility['eligible']) {
+            return back()->withErrors(['amount' => $eligibility['reason']]);
         }
+
+        $payoutMethod = $user->payoutMethods()->where('id', $request->payout_method_id)->firstOrFail();
 
         try {
             DB::transaction(function () use ($request, $user, $wallet, $payoutMethod) {
@@ -59,7 +72,7 @@ class FinancialController extends Controller
                 $balanceAfter = $balanceBefore - $amount;
 
                 $wallet->balance = $balanceAfter;
-                $wallet->earned_balance -= $amount;
+                $wallet->earned_balance = max(0, ($wallet->earned_balance ?? 0) - $amount);
                 $wallet->save();
 
                 WalletTransaction::create([

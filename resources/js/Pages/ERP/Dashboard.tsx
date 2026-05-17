@@ -10,13 +10,15 @@ import {
     CheckCircle2,
     Wallet,
     TrendingUp,
+    TrendingDown,
     Layers,
     Settings,
     FileSpreadsheet,
     Clock,
     ArrowUpRight,
     Search,
-    ShieldCheck
+    ShieldCheck,
+    Inbox,
 } from 'lucide-react';
 import { Button } from '@/Components/ui/button';
 import { formatMoney, formatDate } from '@/lib/utils';
@@ -26,39 +28,63 @@ import {
     CustomerQuickView
 } from '@/Components/ContextualPanels';
 
-export default function ERPDashboard({ stats }: { stats?: any }) {
-    // Default high-fidelity statistics fallback
-    const activeStats = stats || {
-        totalRevenue: 12450.00,
-        outstandingRevenue: 3400.00,
-        clientCount: 3,
-        recurringCount: 2
+interface ERPDashboardProps {
+    stats?: {
+        totalRevenue: number;
+        outstandingRevenue: number;
+        clientCount: number;
+        recurringCount: number;
+        growthPercent: number | null;
+        businessCurrency: string;
+    };
+    clients?: Array<{
+        id: number;
+        name: string;
+        company: string;
+        email: string;
+        phone: string;
+        address: string;
+        totalInvoiced: number;
+        totalPaid: number;
+    }>;
+    invoices?: Array<{
+        id: number;
+        invoiceNumber: string;
+        clientName: string;
+        amount: number;
+        currency: string;
+        issuedDate: string;
+        dueDate: string;
+        status: string;
+        project: string;
+    }>;
+    chartData?: Array<{
+        name: string;
+        Sales: number;
+        Costs: number;
+    }>;
+}
+
+export default function ERPDashboard({ stats: serverStats, clients: serverClients, invoices: serverInvoices, chartData: serverChartData }: ERPDashboardProps) {
+    // Real data from server, with safe zero-state fallbacks
+    const activeStats = serverStats || {
+        totalRevenue: 0,
+        outstandingRevenue: 0,
+        clientCount: 0,
+        recurringCount: 0,
+        growthPercent: null,
+        businessCurrency: 'USD',
     };
 
     const [selectedInvoice, setSelectedInvoice] = useState<any>(null);
     const [selectedCustomer, setSelectedCustomer] = useState<any>(null);
 
-    // Dynamic mock datasets to eliminate placeholder feeling
-    const clients = [
-        { id: 1, name: 'Acme Corp', company: 'Acme Enterprises', email: 'billing@acme.com', phone: '+1 (555) 902-1244', address: 'Chicago, IL', totalInvoiced: 4800, totalPaid: 3950 },
-        { id: 2, name: 'Stripe Labs', company: 'Stripe, Inc.', email: 'ops@stripe.com', phone: '+1 (555) 304-2000', address: 'San Francisco, CA', totalInvoiced: 1500, totalPaid: 0 },
-        { id: 3, name: 'Vercel Labs', company: 'Vercel, Inc.', email: 'dev@vercel.com', phone: '+1 (555) 100-2022', address: 'New York, NY', totalInvoiced: 2700, totalPaid: 2000 }
-    ];
+    // Real data from database
+    const clients = serverClients || [];
+    const invoices = serverInvoices || [];
+    const chartData = serverChartData || [{ name: new Date().toLocaleString('default', { month: 'short' }), Sales: 0, Costs: 0 }];
 
-    const invoices = [
-        { id: 1, invoiceNumber: 'INV-303', clientName: 'Acme Corp', amount: 1200.00, currency: 'USD', issuedDate: '2026-05-12', dueDate: '2026-05-25', status: 'pending', project: 'Design Framework Refactor' },
-        { id: 2, invoiceNumber: 'INV-304', clientName: 'Stripe Labs', amount: 1500.00, currency: 'USD', issuedDate: '2026-05-10', dueDate: '2026-05-29', status: 'pending', project: 'Webhook API integration' },
-        { id: 3, invoiceNumber: 'INV-305', clientName: 'Vercel LLC', amount: 700.00, currency: 'USD', issuedDate: '2026-05-16', dueDate: '2026-06-02', status: 'draft', project: 'Edge Routing Audit' },
-    ];
-
-    // Recharts revenue vs costs monthly data
-    const chartData = [
-        { name: 'Jan', Sales: 2400, Costs: 1200 },
-        { name: 'Feb', Sales: 3100, Costs: 1400 },
-        { name: 'Mar', Sales: 4500, Costs: 1800 },
-        { name: 'Apr', Sales: 5200, Costs: 2100 },
-        { name: 'May', Sales: 6450, Costs: 2300 }
-    ];
+    const currency = activeStats.businessCurrency || 'USD';
 
     return (
         <AuthenticatedLayout header="ERP Workspace Dashboard">
@@ -78,11 +104,16 @@ export default function ERPDashboard({ stats }: { stats?: any }) {
                         </div>
                         <div>
                             <span className="font-mono text-2xl font-bold text-text-primary block">
-                                {formatMoney(activeStats.totalRevenue, 'USD')}
+                                {formatMoney(activeStats.totalRevenue, currency)}
                             </span>
-                            <span className="text-[10px] text-emerald-600 font-semibold flex items-center gap-0.5 mt-1">
-                                <TrendingUp className="h-3 w-3" /> +14.2% growth
-                            </span>
+                            {activeStats.growthPercent !== null ? (
+                                <span className={`text-[10px] font-semibold flex items-center gap-0.5 mt-1 ${activeStats.growthPercent >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
+                                    {activeStats.growthPercent >= 0 ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
+                                    {activeStats.growthPercent >= 0 ? '+' : ''}{activeStats.growthPercent}% vs last month
+                                </span>
+                            ) : (
+                                <span className="text-[10px] text-text-secondary block mt-1">No comparison data yet</span>
+                            )}
                         </div>
                     </div>
 
@@ -94,10 +125,10 @@ export default function ERPDashboard({ stats }: { stats?: any }) {
                         </div>
                         <div>
                             <span className="font-mono text-2xl font-bold text-text-primary block">
-                                {formatMoney(activeStats.outstandingRevenue, 'USD')}
+                                {formatMoney(activeStats.outstandingRevenue, currency)}
                             </span>
                             <span className="text-[10px] text-text-secondary block mt-1">
-                                Across {invoices.filter(i => i.status === 'pending').length} active claims
+                                Across {invoices.filter(i => i.status === 'sent' || i.status === 'partial').length} active claims
                             </span>
                         </div>
                     </div>
@@ -110,10 +141,10 @@ export default function ERPDashboard({ stats }: { stats?: any }) {
                         </div>
                         <div>
                             <span className="font-mono text-2xl font-bold text-text-primary block">
-                                {activeStats.clientCount} Active
+                                {activeStats.clientCount} {activeStats.clientCount === 1 ? 'Client' : 'Clients'}
                             </span>
                             <span className="text-[10px] text-text-secondary block mt-1">
-                                100% contract retention rate
+                                {activeStats.clientCount > 0 ? 'Managed client database' : 'Add your first client'}
                             </span>
                         </div>
                     </div>
@@ -126,10 +157,10 @@ export default function ERPDashboard({ stats }: { stats?: any }) {
                         </div>
                         <div>
                             <span className="font-mono text-2xl font-bold text-text-primary block">
-                                {activeStats.recurringCount} Contracts
+                                {activeStats.recurringCount} {activeStats.recurringCount === 1 ? 'Contract' : 'Contracts'}
                             </span>
                             <span className="text-[10px] text-text-secondary block mt-1">
-                                Auto-invoicing models active
+                                {activeStats.recurringCount > 0 ? 'Auto-invoicing models active' : 'Setup recurring billing'}
                             </span>
                         </div>
                     </div>
@@ -151,7 +182,7 @@ export default function ERPDashboard({ stats }: { stats?: any }) {
                                     <p className="text-[11px] text-text-secondary">Comparing total billable revenue receipts against operational costs.</p>
                                 </div>
                                 <span className="bg-indigo-50 text-indigo-700 text-[10px] font-bold px-2 py-0.5 rounded border border-indigo-150">
-                                    FY2026 Live Ledger
+                                    Live Ledger
                                 </span>
                             </div>
                             
@@ -169,7 +200,7 @@ export default function ERPDashboard({ stats }: { stats?: any }) {
                             </div>
                         </div>
 
-                        {/* Recent Client Tenants List */}
+                        {/* Real Client Tenants List */}
                         <div className="bg-white border border-border/60 rounded-xl overflow-hidden shadow-sm">
                             <div className="px-5 py-4 border-b border-border/50 flex justify-between items-center bg-slate-50/20">
                                 <h3 className="font-sora text-xs font-bold uppercase tracking-wider text-text-muted flex items-center gap-2">
@@ -184,7 +215,15 @@ export default function ERPDashboard({ stats }: { stats?: any }) {
                             </div>
                             
                             <div className="divide-y divide-border/50">
-                                {clients.map(client => (
+                                {clients.length === 0 ? (
+                                    <div className="p-8 text-center">
+                                        <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center mx-auto mb-3">
+                                            <Users className="w-5 h-5 text-slate-400" />
+                                        </div>
+                                        <p className="text-xs font-medium text-text-primary">No clients yet</p>
+                                        <p className="text-[11px] text-text-secondary mt-1">Add your first client to start managing invoices.</p>
+                                    </div>
+                                ) : clients.map(client => (
                                     <div 
                                         key={client.id}
                                         onClick={() => setSelectedCustomer(client)}
@@ -195,15 +234,15 @@ export default function ERPDashboard({ stats }: { stats?: any }) {
                                             <span className="text-text-secondary text-[11px] block">{client.company} • {client.email}</span>
                                         </div>
                                         <div className="text-right font-mono">
-                                            <span className="text-text-primary font-bold block">Invoiced: {formatMoney(client.totalInvoiced, 'USD')}</span>
-                                            <span className="text-emerald-600 font-semibold block text-[10px]">Paid: {formatMoney(client.totalPaid, 'USD')}</span>
+                                            <span className="text-text-primary font-bold block">Invoiced: {formatMoney(client.totalInvoiced, currency)}</span>
+                                            <span className="text-emerald-600 font-semibold block text-[10px]">Paid: {formatMoney(client.totalPaid, currency)}</span>
                                         </div>
                                     </div>
                                 ))}
                             </div>
                         </div>
 
-                        {/* Active Claims table */}
+                        {/* Real Active Claims table */}
                         <div className="bg-white border border-border/60 rounded-xl overflow-hidden shadow-sm">
                             <div className="px-5 py-4 border-b border-border/50 flex justify-between items-center bg-slate-50/20">
                                 <h3 className="font-sora text-xs font-bold uppercase tracking-wider text-text-muted flex items-center gap-2">
@@ -217,44 +256,56 @@ export default function ERPDashboard({ stats }: { stats?: any }) {
                                 </Link>
                             </div>
                             
-                            <div className="overflow-x-auto">
-                                <table className="w-full text-left font-sans text-xs border-collapse">
-                                    <thead>
-                                        <tr className="bg-slate-50/80 text-[10px] uppercase font-bold text-text-muted border-b border-border/40">
-                                            <th className="px-4 py-2.5">Invoice</th>
-                                            <th className="px-4 py-2.5">Client</th>
-                                            <th className="px-4 py-2.5">Due Date</th>
-                                            <th className="px-4 py-2.5 text-right">Amount</th>
-                                            <th className="px-4 py-2.5 text-center">Status</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody className="divide-y divide-border/40">
-                                        {invoices.map((inv) => (
-                                            <tr
-                                                key={inv.id}
-                                                onClick={() => setSelectedInvoice(inv)}
-                                                className="hover:bg-slate-50/70 cursor-pointer transition"
-                                            >
-                                                <td className="px-4 py-3 font-mono font-semibold text-indigo-600">{inv.invoiceNumber}</td>
-                                                <td className="px-4 py-3 font-medium text-text-primary">{inv.clientName}</td>
-                                                <td className="px-4 py-3 text-text-muted">{formatDate(inv.dueDate)}</td>
-                                                <td className="px-4 py-3 text-right font-mono font-medium text-text-primary">
-                                                    {formatMoney(inv.amount, inv.currency)}
-                                                </td>
-                                                <td className="px-4 py-3 text-center">
-                                                    <span className={`text-[9px] font-bold uppercase px-2 py-0.5 rounded-full ${
-                                                        inv.status === 'pending'
-                                                            ? 'bg-amber-50 text-amber-700 border border-amber-200'
-                                                            : 'bg-slate-50 text-slate-700 border border-slate-200'
-                                                    }`}>
-                                                        {inv.status}
-                                                    </span>
-                                                </td>
+                            {invoices.length === 0 ? (
+                                <div className="p-8 text-center">
+                                    <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center mx-auto mb-3">
+                                        <Inbox className="w-5 h-5 text-slate-400" />
+                                    </div>
+                                    <p className="text-xs font-medium text-text-primary">No active invoices</p>
+                                    <p className="text-[11px] text-text-secondary mt-1">Create your first invoice to start billing clients.</p>
+                                </div>
+                            ) : (
+                                <div className="overflow-x-auto">
+                                    <table className="w-full text-left font-sans text-xs border-collapse">
+                                        <thead>
+                                            <tr className="bg-slate-50/80 text-[10px] uppercase font-bold text-text-muted border-b border-border/40">
+                                                <th className="px-4 py-2.5">Invoice</th>
+                                                <th className="px-4 py-2.5">Client</th>
+                                                <th className="px-4 py-2.5">Due Date</th>
+                                                <th className="px-4 py-2.5 text-right">Amount</th>
+                                                <th className="px-4 py-2.5 text-center">Status</th>
                                             </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
+                                        </thead>
+                                        <tbody className="divide-y divide-border/40">
+                                            {invoices.map((inv) => (
+                                                <tr
+                                                    key={inv.id}
+                                                    onClick={() => setSelectedInvoice(inv)}
+                                                    className="hover:bg-slate-50/70 cursor-pointer transition"
+                                                >
+                                                    <td className="px-4 py-3 font-mono font-semibold text-indigo-600">{inv.invoiceNumber}</td>
+                                                    <td className="px-4 py-3 font-medium text-text-primary">{inv.clientName}</td>
+                                                    <td className="px-4 py-3 text-text-muted">{inv.dueDate ? formatDate(inv.dueDate) : '-'}</td>
+                                                    <td className="px-4 py-3 text-right font-mono font-medium text-text-primary">
+                                                        {formatMoney(inv.amount, inv.currency)}
+                                                    </td>
+                                                    <td className="px-4 py-3 text-center">
+                                                        <span className={`text-[9px] font-bold uppercase px-2 py-0.5 rounded-full ${
+                                                            inv.status === 'sent'
+                                                                ? 'bg-amber-50 text-amber-700 border border-amber-200'
+                                                                : inv.status === 'partial'
+                                                                    ? 'bg-blue-50 text-blue-700 border border-blue-200'
+                                                                    : 'bg-slate-50 text-slate-700 border border-slate-200'
+                                                        }`}>
+                                                            {inv.status}
+                                                        </span>
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            )}
                         </div>
 
                     </div>
@@ -301,14 +352,18 @@ export default function ERPDashboard({ stats }: { stats?: any }) {
                             </h4>
                             <div className="space-y-3 text-xs leading-normal">
                                 <div className="flex gap-2 text-text-primary">
-                                    <CheckCircle2 className="h-4.5 w-4.5 text-emerald-500 shrink-0 mt-0.5" />
+                                    <CheckCircle2 className={`h-4.5 w-4.5 shrink-0 mt-0.5 ${activeStats.clientCount > 0 ? 'text-emerald-500' : 'text-slate-300'}`} />
                                     <div>
                                         <span className="font-semibold block">Create Customer Profiling</span>
-                                        <p className="text-[10px] text-text-secondary mt-0.5">Link business invoices directly to client tenant records.</p>
+                                        <p className="text-[10px] text-text-secondary mt-0.5">
+                                            {activeStats.clientCount > 0
+                                                ? `${activeStats.clientCount} client${activeStats.clientCount !== 1 ? 's' : ''} added`
+                                                : 'Link business invoices directly to client tenant records.'}
+                                        </p>
                                     </div>
                                 </div>
                                 <div className="flex gap-2 text-text-primary">
-                                    <CheckCircle2 className="h-4.5 w-4.5 text-emerald-500 shrink-0 mt-0.5" />
+                                    <CheckCircle2 className={`h-4.5 w-4.5 shrink-0 mt-0.5 ${activeStats.totalRevenue > 0 ? 'text-emerald-500' : 'text-slate-300'}`} />
                                     <div>
                                         <span className="font-semibold block">Setup Payout Ledger</span>
                                         <p className="text-[10px] text-text-secondary mt-0.5">Wire business earnings safely via verified bank checking.</p>

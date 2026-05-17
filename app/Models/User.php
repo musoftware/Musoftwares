@@ -33,6 +33,12 @@ class User extends Authenticatable
         'tour_completed',
         'tour_skipped',
         'current_tour_step',
+        'kyc_verified',
+        'kyc_verified_at',
+        'kyc_verified_by',
+        'kyc_provider',
+        'kyc_reference_id',
+        'kyc_notes',
     ];
 
     protected $hidden = [
@@ -50,6 +56,8 @@ class User extends Authenticatable
             'tour_completed' => 'boolean',
             'tour_skipped' => 'boolean',
             'current_tour_step' => 'integer',
+            'kyc_verified' => 'boolean',
+            'kyc_verified_at' => 'datetime',
         ];
     }
 
@@ -117,5 +125,15 @@ class User extends Authenticatable
     public function withdrawals(): HasMany
     {
         return $this->hasMany(\Modules\Core\Models\UserWithdrawal::class, 'user_id');
+    }
+
+    public function kycDocuments(): HasMany
+    {
+        return $this->hasMany(KycDocument::class, 'user_id');
+    }
+
+    public function kycVerifier()
+    {
+        return $this->belongsTo(User::class, 'kyc_verified_by');
     }
 }

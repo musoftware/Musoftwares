@@ -86,9 +86,9 @@ class WalletController extends Controller
                 'owner_type' => Client::class,
                 'owner_id' => $clientModel->id,
                 'context' => 'client',
-                'balance' => 12450.00, // Premium startup balance
-                'currency' => 'USD',
-                'locked_balance' => 1500.00,
+                'balance' => 0,
+                'currency' => $clientModel->currency ?? 'USD',
+                'locked_balance' => 0,
             ]);
         }
 
@@ -336,9 +336,9 @@ class WalletController extends Controller
                 'owner_type' => Client::class,
                 'owner_id' => $clientModel->id,
                 'context' => 'client',
-                'balance' => 12450.00,
-                'currency' => 'USD',
-                'locked_balance' => 1500.00,
+                'balance' => 0,
+                'currency' => $clientModel->currency ?? 'USD',
+                'locked_balance' => 0,
             ]);
         }
 

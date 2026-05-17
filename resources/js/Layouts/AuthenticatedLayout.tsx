@@ -331,6 +331,12 @@ export default function Authenticated({
                                         </DropdownMenuItem>
                                         <DropdownMenuItem 
                                             className="cursor-pointer rounded-lg text-sm"
+                                            render={<Link href={safeRoute('kyc.index')} className="flex items-center w-full" />}
+                                        >
+                                            <Shield className="mr-2 h-4 w-4 text-slate-400" /> Identity Verification
+                                        </DropdownMenuItem>
+                                        <DropdownMenuItem 
+                                            className="cursor-pointer rounded-lg text-sm"
                                             render={<Link href={safeRoute('financial.transactions')} className="flex items-center w-full" />}
                                         >
                                             <History className="mr-2 h-4 w-4 text-slate-400" /> Balance History

@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\DashboardController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -13,9 +14,8 @@ Route::get('/', function () {
     ]);
 });
 
-Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard');
-})->middleware(['auth', 'verified', 'onboarding'])->name('dashboard');
+Route::get('/dashboard', [DashboardController::class, 'index'])
+    ->middleware(['auth', 'verified', 'onboarding'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -36,9 +36,21 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 // ERP Routes
 Route::middleware(['auth', 'verified', 'onboarding'])->prefix('erp')->name('erp.')->group(function () {
-    Route::get('/dashboard', function () { return Inertia::render('ERP/Dashboard'); })->name('dashboard');
+    Route::get('/dashboard', [\Modules\ERP\Http\Controllers\ERPDashboardController::class, 'index'])->name('dashboard');
     Route::get('/onboarding', function () { return Inertia::render('ERP/Onboarding'); })->name('onboarding');
     Route::get('/invoices', [\Modules\ERP\Http\Controllers\InvoiceController::class, 'index'])->name('invoices.index');
+    Route::get('/invoices/create', [\Modules\ERP\Http\Controllers\InvoiceController::class, 'create'])->name('invoices.create');
+    Route::post('/invoices', [\Modules\ERP\Http\Controllers\InvoiceController::class, 'store'])->name('invoices.store');
+    Route::get('/invoices/{invoice}', [\Modules\ERP\Http\Controllers\InvoiceController::class, 'show'])->name('invoices.show');
+    Route::get('/invoices/{invoice}/edit', [\Modules\ERP\Http\Controllers\InvoiceController::class, 'edit'])->name('invoices.edit');
+    Route::put('/invoices/{invoice}', [\Modules\ERP\Http\Controllers\InvoiceController::class, 'update'])->name('invoices.update');
+    Route::delete('/invoices/{invoice}', [\Modules\ERP\Http\Controllers\InvoiceController::class, 'destroy'])->name('invoices.destroy');
+    Route::post('/invoices/{invoice}/send', [\Modules\ERP\Http\Controllers\InvoiceController::class, 'send'])->name('invoices.send');
+    Route::post('/invoices/{invoice}/mark-paid', [\Modules\ERP\Http\Controllers\InvoiceController::class, 'markPaid'])->name('invoices.markPaid');
+    Route::post('/invoices/{invoice}/partial-payment', [\Modules\ERP\Http\Controllers\InvoiceController::class, 'partialPayment'])->name('invoices.partialPayment');
+    Route::post('/invoices/{invoice}/cancel', [\Modules\ERP\Http\Controllers\InvoiceController::class, 'cancel'])->name('invoices.cancel');
+    Route::post('/invoices/{invoice}/duplicate', [\Modules\ERP\Http\Controllers\InvoiceController::class, 'duplicate'])->name('invoices.duplicate');
+    Route::get('/invoices/{invoice}/pdf', [\Modules\ERP\Http\Controllers\InvoiceController::class, 'downloadPdf'])->name('invoices.pdf');
 
     // Wallet
     Route::get('/wallet/add-balance', [\Modules\ERP\Http\Controllers\WalletController::class, 'addBalance'])->name('wallet.add-balance');
@@ -181,6 +193,11 @@ Route::middleware(['auth', 'verified', 'onboarding'])->prefix('admin')->name('ad
     // Clients
     Route::get('/clients', [\App\Http\Controllers\Admin\ClientController::class, 'index'])->name('clients.index');
     Route::get('/clients/{id}', [\App\Http\Controllers\Admin\ClientController::class, 'show'])->name('clients.show');
+
+    // KYC Review
+    Route::get('/kyc', [\App\Http\Controllers\Admin\KycController::class, 'index'])->name('kyc.index');
+    Route::post('/kyc/{id}/approve', [\App\Http\Controllers\Admin\KycController::class, 'approve'])->name('kyc.approve');
+    Route::post('/kyc/{id}/reject', [\App\Http\Controllers\Admin\KycController::class, 'reject'])->name('kyc.reject');
 });
 
 require __DIR__.'/auth.php';
@@ -190,6 +207,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/tickets', [\App\Http\Controllers\SupportTicketController::class, 'index'])->name('tickets.index');
     Route::post('/tickets', [\App\Http\Controllers\SupportTicketController::class, 'store'])->name('tickets.store');
     Route::post('/tickets/{id}/resolve', [\App\Http\Controllers\SupportTicketController::class, 'resolve'])->name('tickets.resolve');
+});
+
+// KYC Routes
+Route::middleware(['auth', 'verified'])->prefix('kyc')->name('kyc.')->group(function () {
+    Route::get('/', [\App\Http\Controllers\KycController::class, 'index'])->name('index');
+    Route::post('/upload', [\App\Http\Controllers\KycController::class, 'uploadDocument'])->name('upload');
+    Route::post('/submit', [\App\Http\Controllers\KycController::class, 'submit'])->name('submit');
+    Route::delete('/{id}', [\App\Http\Controllers\KycController::class, 'deleteDocument'])->name('delete');
+    Route::get('/{id}/download', [\App\Http\Controllers\KycController::class, 'downloadDocument'])->name('download');
 });
 
 // Core Financial Routes
