@@ -1,10 +1,10 @@
 import React from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link, router } from '@inertiajs/react';
-import PageHeader from '@/Components/PageHeader';
-import DataTable from '@/Components/DataTable';
-import StatusBadge from '@/Components/StatusBadge';
-import CurrencyDisplay from '@/Components/CurrencyDisplay';
+import { PageHeader } from '@/Components/ui/PageHeader';
+import { DataTable } from '@/Components/ui/DataTable';
+import { StatusBadge } from '@/Components/ui/StatusBadge';
+import { CurrencyDisplay } from '@/Components/ui/CurrencyDisplay';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';

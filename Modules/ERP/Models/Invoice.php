@@ -7,8 +7,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Laravel\Scout\Searchable;
 
 class Invoice extends TenantModel
-    use Searchable;
 {
+    use Searchable;
     protected $fillable = [
         'tenant_id', 'invoice_number', 'client_id', 'status',
         'amount', 'amount_currency', 'business_amount', 'business_currency',
