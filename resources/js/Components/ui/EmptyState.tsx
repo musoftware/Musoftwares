@@ -1,6 +1,17 @@
 import { cn } from '@/lib/utils';
 import { Link } from '@inertiajs/react';
 
+export interface EmptyStateProps {
+    icon?: any;
+    title: string;
+    description?: string;
+    action?: any;
+    actionLabel?: string;
+    actionIcon?: any;
+    onClick?: () => void;
+    className?: string;
+}
+
 export function EmptyState({
     icon: Icon,
     title,
@@ -8,8 +19,9 @@ export function EmptyState({
     action,
     actionLabel,
     actionIcon: ActionIcon,
+    onClick,
     className,
-}) {
+}: EmptyStateProps) {
     return (
         <div
             className={cn(
@@ -33,15 +45,25 @@ export function EmptyState({
                 </p>
             )}
 
-            {action && actionLabel && (
+            {actionLabel && (action || onClick) && (
                 <div className="mt-6">
-                    <Link
-                        href={action}
-                        className="bg-primary hover:bg-primary-hover inline-flex items-center justify-center rounded-lg px-4 py-2 text-[14px] font-medium text-white shadow-sm transition-colors"
-                    >
-                        {ActionIcon && <ActionIcon className="mr-2 h-4 w-4" />}
-                        {actionLabel}
-                    </Link>
+                    {onClick ? (
+                        <button
+                            onClick={onClick}
+                            className="bg-primary hover:bg-primary-hover inline-flex items-center justify-center rounded-lg px-4 py-2 text-[14px] font-medium text-white shadow-sm transition-colors"
+                        >
+                            {ActionIcon && <ActionIcon className="mr-2 h-4 w-4" />}
+                            {actionLabel}
+                        </button>
+                    ) : (
+                        <Link
+                            href={action}
+                            className="bg-primary hover:bg-primary-hover inline-flex items-center justify-center rounded-lg px-4 py-2 text-[14px] font-medium text-white shadow-sm transition-colors"
+                        >
+                            {ActionIcon && <ActionIcon className="mr-2 h-4 w-4" />}
+                            {actionLabel}
+                        </Link>
+                    )}
                 </div>
             )}
         </div>

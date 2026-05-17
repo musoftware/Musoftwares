@@ -13,10 +13,12 @@ import {
     Clock, DollarSign, CheckCircle2, AlertCircle, 
     Send, Paperclip, FileText, User, UploadCloud, FileCheck 
 } from 'lucide-react';
+import { CurrencyDisplay as FinancialAmount } from '@/Components/ui/CurrencyDisplay';
 
 export default function ShowContract({ auth, contract: initialContract }: any) {
     const { mode } = useFreelanceMode();
     const isClient = mode === 'client';
+    const globalCurrency = auth?.user?.preferred_currency || 'USD';
 
     // Mock contract data if not provided
     const contract = initialContract || {
@@ -92,7 +94,7 @@ export default function ShowContract({ auth, contract: initialContract }: any) {
                         <div className="text-right">
                             <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-0.5">Contract Value</p>
                             <p className="text-xl font-bold text-slate-900 font-mono">
-                                {formatMoney(contract.agreed_price, contract.currency_code)}
+                                <FinancialAmount amount={contract.agreed_price} currency={globalCurrency} />
                             </p>
                         </div>
                         <div className="h-10 w-px bg-slate-200 hidden sm:block"></div>

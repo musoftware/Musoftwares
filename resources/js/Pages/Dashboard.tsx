@@ -45,9 +45,15 @@ interface DashboardProps {
     stats?: DashboardStats;
     pendingInvoices?: PendingInvoice[];
     recentTransactions?: RecentTransaction[];
+    subscribedModules?: Record<string, boolean>;
 }
 
-export default function Dashboard({ stats: serverStats, pendingInvoices: serverInvoices, recentTransactions: serverTransactions }: DashboardProps) {
+export default function Dashboard({ 
+    stats: serverStats, 
+    pendingInvoices: serverInvoices, 
+    recentTransactions: serverTransactions,
+    subscribedModules = { erp: false, freelance: true, marketing: false }
+}: DashboardProps) {
     const { auth } = usePage().props as any;
     const user = auth?.user;
 
@@ -224,26 +230,55 @@ export default function Dashboard({ stats: serverStats, pendingInvoices: serverI
                         <Card className="shadow-none overflow-hidden">
                             <CardHeader className="border-b py-4">
                                 <CardTitle className="text-base font-semibold flex items-center gap-2 m-0">
-                                    <Sparkles className="w-4 h-4 text-primary" /> Subscribed Workspaces
+                                    <Sparkles className="w-4 h-4 text-indigo-500" /> Subscribed Workspaces
                                 </CardTitle>
                             </CardHeader>
-                            <CardContent className="p-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <Link href={safeRoute('erp.dashboard', undefined, '/erp/dashboard')} className="group p-5 rounded-xl border hover:border-primary/50 hover:shadow-sm transition-all bg-background relative overflow-hidden block">
-                                    <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                                        <Building2 className="w-5 h-5 text-primary" />
+                            <CardContent className="p-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+                                {/* ERP Module Workspace Card */}
+                                <Link 
+                                    href={subscribedModules.erp ? '/erp/dashboard' : '/subscriptions/plans?module=erp'} 
+                                    className="group p-5 rounded-xl border hover:border-indigo-500/50 hover:shadow-sm transition-all bg-background relative overflow-hidden block"
+                                >
+                                    <div className="w-10 h-10 rounded-lg bg-indigo-50 dark:bg-indigo-950/40 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                                        <Building2 className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
                                     </div>
-                                    <h4 className="font-semibold mb-1">Business OS (ERP)</h4>
-                                    <p className="text-sm text-muted-foreground leading-relaxed">Manage your clients, generate invoices, and log project timers.</p>
-                                    <div className="absolute top-4 right-4 text-emerald-600 text-[10px] uppercase font-bold bg-emerald-50 border border-emerald-100 px-2 py-0.5 rounded-full">Active</div>
+                                    <h4 className="font-bold text-sm mb-1">Business OS (ERP)</h4>
+                                    <p className="text-xs text-muted-foreground leading-relaxed">Manage your clients, generate invoices, and log project timers.</p>
+                                    {subscribedModules.erp ? (
+                                        <div className="absolute top-4 right-4 text-emerald-600 text-[9px] uppercase font-extrabold bg-emerald-50 dark:bg-emerald-950/30 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-900 px-2.5 py-0.5 rounded-full">Active</div>
+                                    ) : (
+                                        <div className="absolute top-4 right-4 text-amber-600 text-[9px] uppercase font-extrabold bg-amber-50 dark:bg-amber-950/30 dark:text-amber-400 border border-amber-100 dark:border-amber-900 px-2.5 py-0.5 rounded-full">Subscribe</div>
+                                    )}
                                 </Link>
 
-                                <Link href={safeRoute('freelance.dashboard', undefined, '/freelance/dashboard')} className="group p-5 rounded-xl border hover:border-primary/50 hover:shadow-sm transition-all bg-background relative overflow-hidden block">
-                                    <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                                        <Briefcase className="w-5 h-5 text-primary" />
+                                {/* Freelance Hub Workspace Card */}
+                                <Link 
+                                    href="/freelance/dashboard" 
+                                    className="group p-5 rounded-xl border hover:border-indigo-500/50 hover:shadow-sm transition-all bg-background relative overflow-hidden block"
+                                >
+                                    <div className="w-10 h-10 rounded-lg bg-indigo-50 dark:bg-indigo-950/40 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                                        <Briefcase className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
                                     </div>
-                                    <h4 className="font-semibold mb-1">Freelance Hub</h4>
-                                    <p className="text-sm text-muted-foreground leading-relaxed">Accept contracts, manage milestones, and submit deliverables.</p>
-                                    <div className="absolute top-4 right-4 text-emerald-600 text-[10px] uppercase font-bold bg-emerald-50 border border-emerald-100 px-2 py-0.5 rounded-full">Active</div>
+                                    <h4 className="font-bold text-sm mb-1">Freelance Hub</h4>
+                                    <p className="text-xs text-muted-foreground leading-relaxed">Accept contracts, manage milestones, and submit deliverables.</p>
+                                    <div className="absolute top-4 right-4 text-emerald-600 text-[9px] uppercase font-extrabold bg-emerald-50 dark:bg-emerald-950/30 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-900 px-2.5 py-0.5 rounded-full">Active (Free)</div>
+                                </Link>
+
+                                {/* Marketing Suite Workspace Card */}
+                                <Link 
+                                    href={subscribedModules.marketing ? '/marketing/dashboard' : '/subscriptions/plans?module=marketing'} 
+                                    className="group p-5 rounded-xl border hover:border-indigo-500/50 hover:shadow-sm transition-all bg-background relative overflow-hidden block"
+                                >
+                                    <div className="w-10 h-10 rounded-lg bg-indigo-50 dark:bg-indigo-950/40 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                                        <Sparkles className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+                                    </div>
+                                    <h4 className="font-bold text-sm mb-1">Marketing Suite</h4>
+                                    <p className="text-xs text-muted-foreground leading-relaxed">Automate targeted email campaigns and capture high-converting leads.</p>
+                                    {subscribedModules.marketing ? (
+                                        <div className="absolute top-4 right-4 text-emerald-600 text-[9px] uppercase font-extrabold bg-emerald-50 dark:bg-emerald-950/30 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-900 px-2.5 py-0.5 rounded-full">Active</div>
+                                    ) : (
+                                        <div className="absolute top-4 right-4 text-slate-500 text-[9px] uppercase font-extrabold bg-slate-50 dark:bg-slate-900/30 dark:text-slate-400 border border-slate-200 dark:border-slate-800 px-2.5 py-0.5 rounded-full">Discover</div>
+                                    )}
                                 </Link>
                             </CardContent>
                         </Card>

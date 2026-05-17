@@ -1,6 +1,7 @@
 import Pagination from '@/Components/Pagination';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { formatDate, formatMoney } from '@/lib/utils';
+import { formatDate } from '@/lib/utils';
+import { CurrencyDisplay as FinancialAmount } from '@/Components/ui/CurrencyDisplay';
 import { Head, router } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
 
@@ -61,11 +62,7 @@ export default function Index({ jobs }: any) {
                                                     {job.title}
                                                 </td>
                                                 <td className="px-6 py-4 text-sm whitespace-nowrap text-gray-500">
-                                                    {formatMoney(
-                                                        job.budget,
-                                                        job.currency_code ||
-                                                            'USD',
-                                                    )}
+                                                    <FinancialAmount amount={job.budget} currency={job.currency_code || 'USD'} />
                                                 </td>
                                                 <td className="px-6 py-4 text-sm whitespace-nowrap text-gray-500">
                                                     {formatDate(job.created_at)}

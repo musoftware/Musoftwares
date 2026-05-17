@@ -1,36 +1,120 @@
-import { Head, Link } from '@inertiajs/react';
-import FreelanceLayout from './Layout';
-import { useState } from 'react';
-import {
+import React, { useState } from 'react';
+import { Head, Link, usePage } from '@inertiajs/react';
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import { 
     Briefcase,
-    CheckCircle2,
     Clock,
     DollarSign,
     ChevronRight,
-    Star,
-    Coins,
-    ArrowUpRight,
-    ShieldCheck,
-    Search
+    Search,
+    Activity,
+    UserCheck,
+    CreditCard
 } from 'lucide-react';
-import { formatMoney, formatDate } from '@/lib/utils';
+import { Button } from '@/Components/ui/button';
+import { CurrencyDisplay as FinancialAmount } from '@/Components/ui/CurrencyDisplay';
+import { StatusBadge } from '@/Components/ui/StatusBadge';
 import { ContractQuickView } from '@/Components/ContextualPanels';
+import { formatDate } from '@/lib/utils';
 
-export default function FreelanceDashboard({ auth, stats: initialStats, activeProposals: initialProposals, activeContracts: initialContracts, recentActivities: initialActivities }: any) {
+const SleekStatCard = ({ label, value, icon: Icon, description }: any) => {
+    return (
+        <div className="group rounded-xl border border-gray-100 bg-white p-5 shadow-[0_1px_3px_rgba(0,0,0,0.01)] hover:border-gray-200/80 transition-all duration-200">
+            <div className="flex items-center justify-between gap-2">
+                <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">{label}</span>
+                {Icon && <Icon className="w-4 h-4 text-slate-400 stroke-[1.5] group-hover:text-slate-600 transition-colors" />}
+            </div>
+            <div className="mt-3">
+                <div className="text-2xl font-bold tracking-tight text-slate-900 font-sans">
+                    {value}
+                </div>
+            </div>
+            {description && (
+                <p className="mt-1 text-[11px] text-slate-400 font-normal">{description}</p>
+            )}
+        </div>
+    );
+};
+
+const MinimalEmptyState = ({ title, description, actionHref, actionLabel, icon: Icon }: any) => (
+    <div className="flex flex-col items-center justify-center py-8 px-4 text-center rounded-xl border border-dashed border-gray-200 bg-gray-50/20">
+        {Icon && <Icon className="w-5 h-5 text-gray-400 mb-2 stroke-[1.5]" />}
+        <h4 className="text-xs font-semibold text-gray-900 uppercase tracking-wider">{title}</h4>
+        <p className="text-xs text-gray-400 mt-1 max-w-[280px] leading-normal">{description}</p>
+        {actionHref && (
+            <Link 
+                href={actionHref} 
+                className="mt-4 inline-flex items-center justify-center px-3.5 py-1.5 text-xs font-medium text-white bg-slate-900 hover:bg-slate-800 rounded-lg transition-colors shadow-sm"
+            >
+                {actionLabel}
+            </Link>
+        )}
+    </div>
+);
+
+const SleekActivityTimeline = ({ activities }: { activities: any[] }) => (
+    <div className="space-y-5 relative before:absolute before:left-[11px] before:top-2 before:bottom-2 before:w-[1px] before:bg-slate-100">
+        {activities.map((act) => (
+            <div key={act.id} className="relative flex gap-4 pl-1">
+                <div className="w-[15px] h-[15px] rounded-full border-2 border-white bg-slate-200 mt-1 shrink-0 flex items-center justify-center shadow-sm z-10">
+                    <div className="w-[5px] h-[5px] rounded-full bg-slate-500" />
+                </div>
+                <div className="flex-1 min-w-0">
+                    <p className="text-xs text-slate-600 leading-relaxed font-normal">{act.text}</p>
+                    <span className="text-[10px] text-slate-400 mt-0.5 block">{act.time}</span>
+                </div>
+            </div>
+        ))}
+    </div>
+);
+
+const SleekSuggestedActions = () => (
+    <div className="space-y-3">
+        <div className="group flex items-start gap-3.5 rounded-xl p-3 border border-slate-100/60 bg-white hover:border-slate-200 hover:bg-slate-50/30 transition-all duration-200 shadow-[0_1px_2px_rgba(0,0,0,0.01)]">
+            <div className="w-8 h-8 rounded-lg bg-amber-50/80 flex items-center justify-center shrink-0">
+                <UserCheck className="w-4 h-4 text-amber-600 stroke-[1.5]" />
+            </div>
+            <div className="flex-1 space-y-0.5">
+                <Link href="/kyc" className="text-xs font-semibold text-slate-800 group-hover:text-indigo-600 transition-colors block">
+                    Submit KYC verification
+                </Link>
+                <p className="text-[11px] text-slate-400 leading-normal font-normal">
+                    Required to secure high-value smart contract payouts.
+                </p>
+            </div>
+        </div>
+        
+        <div className="group flex items-start gap-3.5 rounded-xl p-3 border border-slate-100/60 bg-white hover:border-slate-200 hover:bg-slate-50/30 transition-all duration-200 shadow-[0_1px_2px_rgba(0,0,0,0.01)]">
+            <div className="w-8 h-8 rounded-lg bg-emerald-50/80 flex items-center justify-center shrink-0">
+                <CreditCard className="w-4 h-4 text-emerald-600 stroke-[1.5]" />
+            </div>
+            <div className="flex-1 space-y-0.5">
+                <Link href="/financial/payout-methods" className="text-xs font-semibold text-slate-800 group-hover:text-indigo-600 transition-colors block">
+                    Link verified payout source
+                </Link>
+                <p className="text-[11px] text-slate-400 leading-normal font-normal">
+                    Set up Direct Debit for automated settlement clearance.
+                </p>
+            </div>
+        </div>
+    </div>
+);
+
+export default function FreelanceDashboard({ stats: initialStats, activeProposals: initialProposals, activeContracts: initialContracts, recentActivities: initialActivities }: any) {
+    const { auth } = usePage().props as any;
     const [selectedContract, setSelectedContract] = useState<any>(null);
 
-    // Dynamic state parameters from server
     const stats = initialStats || {
         pointsBalance: auth?.user?.points_balance || 0,
         activeProposals: 0,
         activeContracts: 0,
-        totalEarnings: 0
+        totalEarnings: 0,
+        currency: auth?.user?.preferred_currency || 'USD'
     };
 
     const activeProposals = initialProposals || [];
     const activeContracts = initialContracts || [];
 
-    // Operational recent activity items to make the dashboard feel "alive"
     const recentActivities = initialActivities && initialActivities.length > 0 ? initialActivities : [
         {
             id: 'mock_1',
@@ -42,325 +126,164 @@ export default function FreelanceDashboard({ auth, stats: initialStats, activePr
     ];
 
     return (
-        <FreelanceLayout auth={auth} clean={true}>
-            <Head title="Freelance Dashboard" />
+        <AuthenticatedLayout header={undefined}>
+            <Head title="Freelance Hub" />
 
-            <div className="space-y-8 font-sans pb-12">
-                
-                {/* ─────────────────────────────────────────
-                    1. HEADER / GREETING (Quiet & Calm)
-                    ───────────────────────────────────────── */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                    <div className="space-y-1">
-                        <h1 className="text-xl font-bold tracking-tight text-slate-900">
+            <div className="max-w-[1100px] mx-auto px-4 sm:px-6 py-10 space-y-10">
+                {/* 1. Welcome Area */}
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                    <div>
+                        <h1 className="text-3xl font-semibold tracking-tight text-slate-900">
                             Welcome back, {auth?.user?.name?.split(' ')[0] || 'Partner'}
                         </h1>
-                        <p className="text-xs text-slate-500">
+                        <p className="text-sm text-slate-400 mt-1 font-normal tracking-wide">
                             Monitor your active contracts, pending bids, and operational stats in real-time.
                         </p>
                     </div>
-                </div>
-
-                {/* ─────────────────────────────────────────
-                    2. KEY OPERATIONAL STATS (Borderless, Minimal)
-                    ───────────────────────────────────────── */}
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-6 p-6 bg-white border border-slate-200/70 rounded-xl shadow-sm">
-                    {/* Total Completed Earnings */}
-                    <div className="space-y-1">
-                        <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">
-                            Total Earnings
-                        </span>
-                        <div className="flex items-baseline gap-1.5">
-                            <span className="text-2xl font-bold tracking-tight text-slate-900 font-mono">
-                                {formatMoney(stats.totalEarnings, 'USD')}
-                            </span>
-                        </div>
-                        <span className="text-[10px] text-emerald-600 font-medium block">
-                            Payout cleared safely
-                        </span>
-                    </div>
-
-                    {/* Active Contracts */}
-                    <div className="space-y-1 border-l border-slate-100 pl-6">
-                        <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">
-                            Active Contracts
-                        </span>
-                        <div className="flex items-baseline gap-1.5">
-                            <span className="text-2xl font-bold tracking-tight text-slate-900 font-mono">
-                                {stats.activeContracts}
-                            </span>
-                        </div>
-                        <span className="text-[10px] text-slate-500 block">
-                            Contracts in progress
-                        </span>
-                    </div>
-
-                    {/* Pending Proposals */}
-                    <div className="space-y-1 border-l border-slate-100 pl-6">
-                        <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">
-                            Pending Proposals
-                        </span>
-                        <div className="flex items-baseline gap-1.5">
-                            <span className="text-2xl font-bold tracking-tight text-slate-900 font-mono">
-                                {stats.activeProposals}
-                            </span>
-                        </div>
-                        <span className="text-[10px] text-slate-500 block">
-                            Submitted active bids
-                        </span>
-                    </div>
-
-                    {/* Available Connects */}
-                    <div className="space-y-1 border-l border-slate-100 pl-6">
-                        <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block flex items-center gap-1">
-                            Available Connects
-                        </span>
-                        <div className="flex items-baseline gap-2">
-                            <span className="text-2xl font-bold tracking-tight text-slate-900 font-mono">
-                                {stats.pointsBalance}
-                            </span>
-                            <Link 
-                                href="/freelance/points" 
-                                className="text-[10px] text-indigo-600 font-semibold hover:text-indigo-800 transition-colors"
-                            >
-                                Buy Packages →
-                            </Link>
-                        </div>
-                        <span className="text-[10px] text-slate-500 block">
-                            Monthly quota refreshed
-                        </span>
+                    <div>
+                        <Link 
+                            href="/freelance/jobs/browse" 
+                            className="inline-flex items-center justify-center rounded-lg px-4 py-2 text-sm font-medium text-white bg-slate-900 hover:bg-slate-800 transition-colors shadow-sm"
+                        >
+                            <Search className="w-4 h-4 mr-2 stroke-[1.5]" /> Browse Jobs
+                        </Link>
                     </div>
                 </div>
 
-                {/* ─────────────────────────────────────────
-                    3. MAIN OPERATIONAL WORKSPACE GRID
-                    ───────────────────────────────────────── */}
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-                    
-                    {/* Left Column (8/12 - Active Work & Bids) */}
-                    <div className="lg:col-span-8 space-y-8">
-                        
-                        {/* Section 1: Active Contracts */}
-                        <div className="space-y-3">
-                            <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-2">
-                                    <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full" />
-                                    <h3 className="text-sm font-semibold text-slate-900 tracking-tight">
-                                        Active Contract Agreements
-                                    </h3>
-                                </div>
-                                <span className="text-xs text-slate-400 font-mono">
-                                    {activeContracts.length} Active
-                                </span>
-                            </div>
-
-                            <div className="bg-white border border-slate-200/70 rounded-xl divide-y divide-slate-100 overflow-hidden shadow-sm">
-                                {activeContracts.map((contract: any) => (
-                                    <div 
-                                        key={contract.id}
-                                        onClick={() => setSelectedContract(contract)}
-                                        className="p-4 sm:p-5 hover:bg-slate-50/60 cursor-pointer transition flex items-center justify-between group"
-                                    >
-                                        <div className="space-y-1 pr-4">
-                                            <span className="font-semibold text-slate-900 text-sm group-hover:text-indigo-600 transition-colors block">
-                                                {contract.title}
-                                            </span>
-                                            <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-slate-500">
-                                                <span>Client: <span className="font-medium text-slate-700">{contract.clientName}</span></span>
-                                                <span className="text-slate-300">•</span>
-                                                <span>Started: {formatDate(contract.startDate)}</span>
-                                            </div>
-                                        </div>
-                                        
-                                        <div className="flex items-center gap-6 shrink-0">
-                                            <div className="w-24 sm:w-28 space-y-1">
-                                                <div className="flex justify-between text-[10px]">
-                                                    <span className="text-slate-400">Milestone</span>
-                                                    <span className="font-mono font-semibold text-slate-700">{contract.progress}%</span>
-                                                </div>
-                                                <div className="h-1 w-full rounded-full bg-slate-100 overflow-hidden">
-                                                    <div className="h-full bg-emerald-500 rounded-full" style={{ width: `${contract.progress}%` }} />
-                                                </div>
-                                            </div>
-                                            <ChevronRight className="h-4 w-4 text-slate-400 group-hover:text-slate-600 transition-colors" />
-                                        </div>
-                                    </div>
-                                ))}
-
-                                {activeContracts.length === 0 && (
-                                    <div className="py-10 px-4 text-center">
-                                        <p className="text-xs text-slate-500">No active contracts at the moment.</p>
-                                        <Link 
-                                            href="/freelance/jobs/browse" 
-                                            className="inline-flex items-center gap-1 mt-2 text-xs font-semibold text-indigo-600 hover:text-indigo-800 transition-colors"
-                                        >
-                                            Explore open freelance contracts <ChevronRight className="h-3 w-3" />
-                                        </Link>
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-
-                        {/* Section 2: Submitted Proposals */}
-                        <div className="space-y-3">
-                            <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-2">
-                                    <div className="w-1.5 h-1.5 bg-indigo-500 rounded-full" />
-                                    <h3 className="text-sm font-semibold text-slate-900 tracking-tight">
-                                        Submitted Project Proposals
-                                    </h3>
-                                </div>
-                                <Link 
-                                    href="/freelance/jobs/browse"
-                                    className="text-xs text-indigo-600 font-semibold hover:text-indigo-800 transition-colors flex items-center gap-0.5"
-                                >
-                                    Browse Jobs <ChevronRight className="h-3 w-3" />
-                                </Link>
-                            </div>
-
-                            <div className="bg-white border border-slate-200/70 rounded-xl divide-y divide-slate-100 overflow-hidden shadow-sm">
-                                {activeProposals.map((proposal: any) => (
-                                    <div 
-                                        key={proposal.id}
-                                        className="p-4 sm:p-5 hover:bg-slate-50/40 transition flex items-center justify-between"
-                                    >
-                                        <div className="space-y-1 pr-4">
-                                            <span className="font-semibold text-slate-900 text-sm block">
-                                                {proposal.title}
-                                            </span>
-                                            <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-slate-500">
-                                                <span>Submitted {formatDate(proposal.submittedAt)}</span>
-                                                <span className="text-slate-300">•</span>
-                                                <span>{proposal.connectsUsed} Connects used</span>
-                                            </div>
-                                        </div>
-                                        <div className="text-right shrink-0">
-                                            <span className="font-semibold text-slate-900 text-sm block font-mono">
-                                                {formatMoney(proposal.budget, 'USD')}
-                                            </span>
-                                            <span className="text-[10px] font-semibold text-amber-700 bg-amber-50 border border-amber-250/20 px-2 py-0.5 rounded-full inline-block mt-1.5 uppercase tracking-wide">
-                                                {proposal.status}
-                                            </span>
-                                        </div>
-                                    </div>
-                                ))}
-
-                                {activeProposals.length === 0 && (
-                                    <div className="py-10 px-4 text-center">
-                                        <p className="text-xs text-slate-500 font-medium text-slate-600">No submitted proposals found.</p>
-                                        <p className="text-[11px] text-slate-400 mt-0.5">Start submitting bids to see active proposals here.</p>
-                                        <Link 
-                                            href="/freelance/jobs/browse" 
-                                            className="inline-flex items-center gap-1 mt-3 text-xs font-semibold text-indigo-600 hover:text-indigo-800 transition-colors"
-                                        >
-                                            Browse Jobs <ChevronRight className="h-3 w-3" />
-                                        </Link>
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-
-                    </div>
-
-                    {/* Right Column (4/12 - Compact operational sidebar context) */}
-                    <div className="lg:col-span-4 space-y-8">
-                        
-                        {/* A. Profile Strength (Sleek Inline Widget) */}
-                        <div className="bg-white border border-slate-200/70 rounded-xl p-5 shadow-sm space-y-4">
-                            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-                                <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
-                                    <Star className="h-3.5 w-3.5 text-indigo-500" /> Account Status
-                                </h4>
-                                <span className="text-[10px] bg-emerald-50 text-emerald-700 border border-emerald-200/50 px-1.5 py-0.5 rounded font-semibold uppercase">
-                                    Active
-                                </span>
-                            </div>
-                            
-                            <div className="space-y-3">
-                                <div className="space-y-1.5">
-                                    <div className="flex justify-between text-xs text-slate-700">
-                                        <span className="font-medium">Profile Completeness</span>
-                                        <span className="font-mono font-bold text-slate-900">85%</span>
-                                    </div>
-                                    <div className="h-1.5 w-full rounded-full bg-slate-100 overflow-hidden">
-                                        <div className="h-full bg-slate-900 rounded-full" style={{ width: '85%' }} />
-                                    </div>
-                                </div>
-                                <p className="text-[11px] text-slate-400 leading-normal">
-                                    Upload verified KYC documentation or add direct Wise settlement credentials to unlock 100% premium ranking.
-                                </p>
-                            </div>
-                        </div>
-
-                        {/* B. Recommended Actions (Pending Actions) */}
-                        <div className="space-y-3">
-                            <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-500 px-1">
-                                Recommended Actions
-                            </h4>
-                            
-                            <div className="space-y-2">
-                                {/* Action 1 */}
-                                <div className="flex items-start gap-3 p-3 bg-white border border-slate-200/50 rounded-xl shadow-xs hover:border-slate-300 transition-colors">
-                                    <div className="w-1.5 h-1.5 bg-indigo-500 rounded-full mt-1.5 shrink-0" />
-                                    <div className="space-y-0.5">
-                                        <Link href="/kyc" className="text-xs font-semibold text-slate-800 hover:text-indigo-600 block transition-colors">
-                                            Submit KYC documentation
-                                        </Link>
-                                        <p className="text-[10px] text-slate-400 leading-normal">
-                                            Required to secure high-value smart contract payouts.
-                                        </p>
-                                    </div>
-                                </div>
-
-                                {/* Action 2 */}
-                                <div className="flex items-start gap-3 p-3 bg-white border border-slate-200/50 rounded-xl shadow-xs hover:border-slate-300 transition-colors">
-                                    <div className="w-1.5 h-1.5 bg-indigo-500 rounded-full mt-1.5 shrink-0" />
-                                    <div className="space-y-0.5">
-                                        <Link href="/financial/payout-methods" className="text-xs font-semibold text-slate-800 hover:text-indigo-600 block transition-colors">
-                                            Link verified payout source
-                                        </Link>
-                                        <p className="text-[10px] text-slate-400 leading-normal">
-                                            Set up Wise or Direct Debit for automated settlement clearance.
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* C. Recent Activities (Operational Timeline) */}
-                        <div className="space-y-3">
-                            <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-500 px-1">
-                                Recent Events
-                            </h4>
-                            
-                            <div className="bg-white border border-slate-200/70 rounded-xl p-4 shadow-sm space-y-3">
-                                {recentActivities.map((act: any) => (
-                                    <div key={act.id} className="flex gap-3 text-xs">
-                                        <div className="w-1 bg-slate-100 rounded-full self-stretch shrink-0 relative">
-                                            <div className="absolute top-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-slate-400 rounded-full" />
-                                        </div>
-                                        <div className="space-y-0.5 flex-1">
-                                            <p className="text-slate-700 leading-tight">{act.text}</p>
-                                            <span className="text-[10px] text-slate-400 font-mono block">
-                                                {act.time}
-                                            </span>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-
-                    </div>
+                {/* 2. Compact Stats */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <SleekStatCard 
+                        label="Total Earnings"
+                        value={<FinancialAmount amount={stats.totalEarnings} currency={stats.currency} className="text-2xl font-semibold font-sans text-slate-900" />}
+                        icon={DollarSign}
+                    />
+                    <SleekStatCard 
+                        label="Active Contracts"
+                        value={stats.activeContracts}
+                        icon={Briefcase}
+                    />
+                    <SleekStatCard 
+                        label="Pending Proposals"
+                        value={stats.activeProposals}
+                        icon={Clock}
+                    />
+                    <SleekStatCard 
+                        label="Available Connects"
+                        value={stats.pointsBalance}
+                        icon={Activity}
+                        description="Connects balance"
+                    />
                 </div>
 
+                {/* 3. Main Workspace Layout */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
+                    {/* Left Column (2/3) - Current Work */}
+                    <div className="lg:col-span-2 space-y-8">
+                        {/* Active Contracts */}
+                        <div className="space-y-4">
+                            <div className="flex items-center justify-between pb-3 border-b border-gray-100">
+                                <div>
+                                    <h3 className="text-lg font-semibold text-slate-900 tracking-tight">Active Contracts</h3>
+                                    <p className="text-xs text-slate-400 mt-0.5">Your currently running client engagements.</p>
+                                </div>
+                            </div>
+
+                            {activeContracts.length === 0 ? (
+                                <MinimalEmptyState 
+                                    icon={Briefcase}
+                                    title="No active contracts yet"
+                                    description="Start submitting proposals to begin working with clients."
+                                    actionHref="/freelance/jobs/browse"
+                                    actionLabel="Browse Jobs"
+                                />
+                            ) : (
+                                <div className="divide-y divide-gray-100">
+                                    {activeContracts.map((contract: any) => (
+                                        <div key={contract.id} className="py-4 flex items-center justify-between gap-4 hover:bg-slate-50/30 px-2 rounded-lg transition-colors">
+                                            <div className="min-w-0">
+                                                <span className="text-sm font-semibold text-slate-900 block truncate">{contract.title}</span>
+                                                <span className="text-xs text-slate-400 mt-1 block">
+                                                    {contract.clientName} &bull; Started {formatDate(contract.startDate)}
+                                                </span>
+                                            </div>
+                                            <div className="flex items-center gap-4 shrink-0">
+                                                <StatusBadge status={contract.status} size="sm" />
+                                                <Button 
+                                                    variant="ghost" 
+                                                    size="sm" 
+                                                    onClick={() => setSelectedContract(contract)} 
+                                                    className="text-slate-400 hover:text-slate-900 hover:bg-slate-50 p-1.5 h-auto rounded-md shadow-none transition-colors"
+                                                >
+                                                    <ChevronRight className="h-4 w-4" />
+                                                </Button>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Submitted Proposals */}
+                        <div className="space-y-4 pt-4">
+                            <div className="flex items-center justify-between pb-3 border-b border-gray-100">
+                                <div>
+                                    <h3 className="text-lg font-semibold text-slate-900 tracking-tight">Submitted Proposals</h3>
+                                    <p className="text-xs text-slate-400 mt-0.5">Bids awaiting client review or response.</p>
+                                </div>
+                            </div>
+
+                            {activeProposals.length === 0 ? (
+                                <MinimalEmptyState 
+                                    icon={Clock}
+                                    title="No pending proposals"
+                                    description="Start submitting bids to see active proposals here."
+                                    actionHref="/freelance/jobs/browse"
+                                    actionLabel="Browse Jobs"
+                                />
+                            ) : (
+                                <div className="divide-y divide-gray-100">
+                                    {activeProposals.map((proposal: any) => (
+                                        <div key={proposal.id} className="py-4 flex items-center justify-between gap-4 hover:bg-slate-50/30 px-2 rounded-lg transition-colors">
+                                            <div className="min-w-0">
+                                                <span className="text-sm font-semibold text-slate-900 block truncate">{proposal.title}</span>
+                                                <span className="text-xs text-slate-400 mt-1 block">
+                                                    Bid: <FinancialAmount amount={proposal.budget} currency={stats.currency} className="text-xs font-mono font-medium text-slate-600" /> &bull; Submitted {formatDate(proposal.submittedAt)}
+                                                </span>
+                                            </div>
+                                            <div className="shrink-0">
+                                                <StatusBadge status={proposal.status} size="sm" />
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* Right Column (1/3) - Sidebar (Events & Actions) */}
+                    <div className="space-y-8 lg:pl-4">
+                        {/* Activity Feed */}
+                        <div className="space-y-4">
+                            <h4 className="text-[11px] uppercase font-bold text-slate-400 tracking-wider">Recent Events</h4>
+                            <div className="relative pl-1">
+                                <SleekActivityTimeline activities={recentActivities} />
+                            </div>
+                        </div>
+
+                        {/* Suggested Actions */}
+                        <div className="space-y-4 pt-2">
+                            <h4 className="text-[11px] uppercase font-bold text-slate-400 tracking-wider">Suggested Actions</h4>
+                            <SleekSuggestedActions />
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            {/* Contextual Side Panel */}
             <ContractQuickView
                 isOpen={selectedContract !== null}
                 onClose={() => setSelectedContract(null)}
                 data={selectedContract}
             />
-        </FreelanceLayout>
+        </AuthenticatedLayout>
     );
 }

@@ -3,6 +3,7 @@ import FreelanceLayout from '../Layout';
 import { useForm, router, usePage } from '@inertiajs/react';
 import { formatMoney, formatNumber, formatDate } from '../../../lib/utils';
 import { CreditCard, Wallet, ArrowRight, CheckCircle2, History, AlertCircle, Zap, TrendingUp, RefreshCcw } from 'lucide-react';
+import { CurrencyDisplay as FinancialAmount } from '@/Components/ui/CurrencyDisplay';
 
 export default function PointsIndex({ auth, packages, transactions }) {
     const { wallet, flash } = usePage().props;
@@ -10,6 +11,7 @@ export default function PointsIndex({ auth, packages, transactions }) {
     const { processing } = useForm();
     const [customPoints, setCustomPoints] = useState('');
     const [activeTab, setActiveTab] = useState('packages'); // packages, custom
+    const globalCurrency = auth?.user?.preferred_currency || 'USD';
 
     const displayPackages = packages?.length ? packages : [
         { id: 1, name: 'Starter', points: 100, price: 9.99, currency_code: '$' },
@@ -74,7 +76,7 @@ export default function PointsIndex({ auth, packages, transactions }) {
                                     </div>
                                     <div>
                                         <p className="text-xs text-slate-400 uppercase tracking-wider">Wallet Balance</p>
-                                        <p className="font-semibold text-white">{formatMoney(wallet_balance)}</p>
+                                        <div className="font-semibold text-white"><FinancialAmount amount={wallet_balance} currency={globalCurrency} /></div>
                                     </div>
                                 </div>
                             </div>
@@ -152,7 +154,7 @@ export default function PointsIndex({ auth, packages, transactions }) {
                                                     <span className="text-lg text-slate-400 font-medium">pts</span>
                                                 </div>
                                                 <div className="text-xl text-slate-600 font-medium mb-8">
-                                                    {formatMoney(pkg.price, pkg.currency_code === '$' ? 'USD' : pkg.currency_code)}
+                                                    <FinancialAmount amount={pkg.price} currency={globalCurrency} />
                                                 </div>
                                                 
                                                 <button
@@ -214,13 +216,13 @@ export default function PointsIndex({ auth, packages, transactions }) {
                                     <div className="bg-slate-50 rounded-xl p-6 border border-slate-100 flex items-center justify-between">
                                         <div>
                                             <p className="text-sm text-slate-500 font-medium">Total Cost</p>
-                                            <p className="text-3xl font-extrabold text-slate-900">{formatMoney(customCost)}</p>
+                                            <div className="text-3xl font-extrabold text-slate-900"><FinancialAmount amount={customCost} currency={globalCurrency} /></div>
                                         </div>
                                         <div className="text-right">
                                             <p className="text-sm text-slate-500 font-medium">Wallet Balance</p>
-                                            <p className={`text-lg font-bold ${wallet_balance >= customCost ? 'text-emerald-600' : 'text-slate-700'}`}>
-                                                {formatMoney(wallet_balance)}
-                                            </p>
+                                            <div className={`text-lg font-bold ${wallet_balance >= customCost ? 'text-emerald-600' : 'text-slate-700'}`}>
+                                                <FinancialAmount amount={wallet_balance} currency={globalCurrency} />
+                                            </div>
                                         </div>
                                     </div>
 

@@ -310,8 +310,8 @@ export default function OnboardingWizard({ user, currencies, countries }: Props)
                                                 value={formData.city}
                                                 onChange={(e) => setFormData(prev => ({ ...prev, city: e.target.value }))}
                                                 className="h-10 text-sm font-medium"
-                                                error={errors.city}
                                             />
+                                            {errors.city && <span className="text-xs text-destructive mt-1 block">{errors.city}</span>}
                                         </div>
                                     </div>
                                 </CardContent>
@@ -351,8 +351,8 @@ export default function OnboardingWizard({ user, currencies, countries }: Props)
                                                 value={formData.mobile_1}
                                                 onChange={(e) => setFormData(prev => ({ ...prev, mobile_1: e.target.value }))}
                                                 className="h-10 text-sm font-medium"
-                                                error={errors.mobile_1}
                                             />
+                                            {errors.mobile_1 && <span className="text-xs text-destructive mt-1 block">{errors.mobile_1}</span>}
                                         </div>
 
                                         {/* Mobile 2 */}

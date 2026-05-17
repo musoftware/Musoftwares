@@ -1,4 +1,15 @@
+import React from 'react';
 import { cn, formatMoney } from '@/lib/utils';
+
+export interface CurrencyDisplayProps {
+    amount: number | string;
+    currency?: string;
+    businessAmount?: number | string;
+    businessCurrency?: string;
+    size?: 'sm' | 'md' | 'lg';
+    colorize?: boolean;
+    className?: string;
+}
 
 export function CurrencyDisplay({
     amount,
@@ -8,7 +19,7 @@ export function CurrencyDisplay({
     size = 'md',
     colorize = false,
     className,
-}) {
+}: CurrencyDisplayProps) {
     const numericAmount =
         typeof amount === 'string' ? parseFloat(amount) : amount;
 
@@ -44,7 +55,7 @@ export function CurrencyDisplay({
                     colorClass,
                 )}
             >
-                {formatMoney(amount, currency)}
+                {formatMoney(numericAmount, currency)}
             </span>
             {hasSecondary && (
                 <span
@@ -53,7 +64,7 @@ export function CurrencyDisplay({
                         secondarySizeClasses[size] || secondarySizeClasses.md,
                     )}
                 >
-                    ≈ {formatMoney(businessAmount, businessCurrency)}
+                    ≈ {formatMoney(Number(businessAmount), businessCurrency)}
                 </span>
             )}
         </div>

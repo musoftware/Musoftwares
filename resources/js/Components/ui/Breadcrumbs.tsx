@@ -1,7 +1,17 @@
+import React from 'react';
 import { Link } from '@inertiajs/react';
 import { ChevronRight } from 'lucide-react';
 
-export function Breadcrumbs({ items = [] }) {
+export interface BreadcrumbItem {
+    label: string;
+    href?: string;
+}
+
+export interface BreadcrumbsProps {
+    items?: BreadcrumbItem[];
+}
+
+export function Breadcrumbs({ items = [] }: BreadcrumbsProps) {
     if (!items || items.length === 0) return null;
 
     return (
