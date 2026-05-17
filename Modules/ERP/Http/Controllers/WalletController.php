@@ -8,6 +8,7 @@ use Modules\Core\Models\Wallet;
 use Modules\Core\Models\WalletTransaction;
 use Modules\Core\Services\FinancialTransactionService;
 use Modules\ERP\Models\Client;
+use Modules\ERP\Models\Tenant;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 
@@ -141,38 +142,42 @@ class WalletController extends Controller
 
         $clientModel = $this->resolveClient($client);
 
-        DB::transaction(function () use ($request, $clientModel) {
-            $wallet = Wallet::firstOrCreate(
-                ['owner_type' => Client::class, 'owner_id' => $clientModel->id],
-                ['context' => 'client', 'balance' => 0, 'currency' => 'USD', 'locked_balance' => 0]
-            );
+        try {
+            DB::transaction(function () use ($request, $clientModel) {
+                $wallet = Wallet::firstOrCreate(
+                    ['owner_type' => Client::class, 'owner_id' => $clientModel->id],
+                    ['context' => 'client', 'balance' => 0, 'currency' => 'USD', 'locked_balance' => 0]
+                );
 
-            $wallet = Wallet::where('id', $wallet->id)->lockForUpdate()->first();
+                $wallet = Wallet::where('id', $wallet->id)->lockForUpdate()->first();
 
-            $amount = $request->input('amount');
-            $newBalance = $wallet->balance + $amount;
+                $amount = $request->input('amount');
+                $newBalance = $wallet->balance + $amount;
 
-            $exchangeRate = 1.0;
-            $businessCurrency = 'USD';
-            $businessAmount = $amount * $exchangeRate;
+                $exchangeRate = 1.0;
+                $businessCurrency = 'USD';
+                $businessAmount = $amount * $exchangeRate;
 
-            WalletTransaction::create([
-                'wallet_id' => $wallet->id,
-                'type' => 'credit',
-                'amount' => $amount,
-                'balance_before' => $wallet->balance,
-                'balance_after' => $newBalance,
-                'reference_type' => 'manual_credit',
-                'reference_id' => auth()->id(),
-                'description' => $request->input('note'),
-                'business_amount' => $businessAmount,
-                'business_currency' => $businessCurrency,
-            ]);
+                WalletTransaction::create([
+                    'wallet_id' => $wallet->id,
+                    'type' => 'credit',
+                    'amount' => $amount,
+                    'balance_before' => $wallet->balance,
+                    'balance_after' => $newBalance,
+                    'reference_type' => 'manual_credit',
+                    'reference_id' => auth()->id(),
+                    'description' => $request->input('note'),
+                    'business_amount' => $businessAmount,
+                    'business_currency' => $businessCurrency,
+                ]);
 
-            $wallet->update(['balance' => $newBalance]);
-        });
+                $wallet->update(['balance' => $newBalance]);
+            });
 
-        return back()->with('success', 'Wallet credited successfully.');
+            return back()->with('success', 'Wallet credited successfully.');
+        } catch (\Exception $e) {
+            return back()->withErrors(['amount' => $e->getMessage()]);
+        }
     }
 
     public function manualDebit(Request $request, $client)
@@ -184,41 +189,45 @@ class WalletController extends Controller
 
         $clientModel = $this->resolveClient($client);
 
-        DB::transaction(function () use ($request, $clientModel) {
-            $wallet = Wallet::where('owner_type', Client::class)
-                ->where('owner_id', $clientModel->id)
-                ->lockForUpdate()
-                ->firstOrFail();
+        try {
+            DB::transaction(function () use ($request, $clientModel) {
+                $wallet = Wallet::where('owner_type', Client::class)
+                    ->where('owner_id', $clientModel->id)
+                    ->lockForUpdate()
+                    ->firstOrFail();
 
-            $amount = $request->input('amount');
+                $amount = $request->input('amount');
 
-            if ($wallet->balance < $amount) {
-                throw new \Exception('Insufficient funds.');
-            }
+                if ($wallet->balance < $amount) {
+                    throw new \Exception('Insufficient funds.');
+                }
 
-            $newBalance = $wallet->balance - $amount;
+                $newBalance = $wallet->balance - $amount;
 
-            $exchangeRate = 1.0;
-            $businessCurrency = 'USD';
-            $businessAmount = $amount * $exchangeRate;
+                $exchangeRate = 1.0;
+                $businessCurrency = 'USD';
+                $businessAmount = $amount * $exchangeRate;
 
-            WalletTransaction::create([
-                'wallet_id' => $wallet->id,
-                'type' => 'debit',
-                'amount' => $amount,
-                'balance_before' => $wallet->balance,
-                'balance_after' => $newBalance,
-                'reference_type' => 'manual_debit',
-                'reference_id' => auth()->id(),
-                'description' => $request->input('note'),
-                'business_amount' => $businessAmount,
-                'business_currency' => $businessCurrency,
-            ]);
+                WalletTransaction::create([
+                    'wallet_id' => $wallet->id,
+                    'type' => 'debit',
+                    'amount' => $amount,
+                    'balance_before' => $wallet->balance,
+                    'balance_after' => $newBalance,
+                    'reference_type' => 'manual_debit',
+                    'reference_id' => auth()->id(),
+                    'description' => $request->input('note'),
+                    'business_amount' => $businessAmount,
+                    'business_currency' => $businessCurrency,
+                ]);
 
-            $wallet->update(['balance' => $newBalance]);
-        });
+                $wallet->update(['balance' => $newBalance]);
+            });
 
-        return back()->with('success', 'Wallet debited successfully.');
+            return back()->with('success', 'Wallet debited successfully.');
+        } catch (\Exception $e) {
+            return back()->withErrors(['amount' => $e->getMessage()]);
+        }
     }
 
     public function lockFunds(Request $request, $client)
