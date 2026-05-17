@@ -10,9 +10,9 @@ import { Button } from '@/Components/ui/button';
 
 export default function Dashboard() {
     const { auth } = usePage().props as any;
-    const user = auth.user;
+    const user = auth?.user;
 
-    const safeRoute = (name: string, params?: any) => {
+    const safeRoute = (name: string, params?: any, fallbackUrl?: string) => {
         try {
             // @ts-ignore
             if (typeof route !== 'undefined' && route().has(name)) {
@@ -20,7 +20,7 @@ export default function Dashboard() {
                 return route(name, params);
             }
         } catch (e) {}
-        return '#';
+        return fallbackUrl || '#';
     };
 
     // Simulated data for operational view
@@ -33,8 +33,8 @@ export default function Dashboard() {
     };
 
     const pendingInvoices = [
-        { id: 'INV-2024-001', date: 'Oct 12, 2024', amount: 2500.00, status: 'due', description: 'ERP Custom Implementation' },
-        { id: 'INV-2024-002', date: 'Oct 15, 2024', amount: 950.00, status: 'overdue', description: 'Monthly Retainer - Oct' },
+        { id: 'INV-2024-001', date: 'Oct 12, 2024', amount: 2500.00, status: 'due', description: 'ERP Custom Implementation', dbId: 1 },
+        { id: 'INV-2024-002', date: 'Oct 15, 2024', amount: 950.00, status: 'overdue', description: 'Monthly Retainer - Oct', dbId: 2 },
     ];
 
     const recentTransactions = [
@@ -56,8 +56,10 @@ export default function Dashboard() {
                         <p className="text-sm text-slate-500 mt-1">Here is what requires your attention today.</p>
                     </div>
                     <div className="flex gap-3">
-                        <Button className="bg-slate-900 hover:bg-slate-800 text-white rounded-full">
-                            <Plus className="w-4 h-4 mr-2" /> Add Balance
+                        <Button className="bg-slate-900 hover:bg-slate-800 text-white rounded-full" asChild>
+                            <Link href={safeRoute('erp.wallet.show', user?.id || 1, `/erp/clients/${user?.id || 1}/wallet`)}>
+                                <Plus className="w-4 h-4 mr-2" /> Add Balance
+                            </Link>
                         </Button>
                     </div>
                 </div>
@@ -128,7 +130,7 @@ export default function Dashboard() {
                                 <h3 className="text-base font-semibold text-slate-900 flex items-center gap-2">
                                     <FileText className="w-4 h-4 text-rose-500" /> Pending Invoices
                                 </h3>
-                                <Link href={safeRoute('erp.invoices.index')} className="text-sm font-medium text-indigo-600 hover:text-indigo-700">
+                                <Link href={safeRoute('erp.invoices.index', undefined, '/erp/invoices')} className="text-sm font-medium text-indigo-600 hover:text-indigo-700">
                                     View All
                                 </Link>
                             </div>
@@ -155,8 +157,10 @@ export default function Dashboard() {
                                                     {invoice.status === 'overdue' ? 'Overdue' : 'Due Soon'}
                                                 </p>
                                             </div>
-                                            <Button size="sm" className="bg-indigo-600 hover:bg-indigo-700 text-white rounded-full px-5">
-                                                Pay Now
+                                            <Button size="sm" className="bg-indigo-600 hover:bg-indigo-700 text-white rounded-full px-5" asChild>
+                                                <Link href={safeRoute('erp.invoices.show', invoice.dbId, `/erp/invoices/${invoice.dbId}`)}>
+                                                    Pay Now
+                                                </Link>
                                             </Button>
                                         </div>
                                     </div>
@@ -172,7 +176,7 @@ export default function Dashboard() {
                                 </h3>
                             </div>
                             <div className="p-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <Link href={safeRoute('erp.clients.index')} className="group p-5 rounded-xl border border-slate-200 hover:border-indigo-300 hover:shadow-md hover:shadow-indigo-50 transition-all bg-white relative overflow-hidden">
+                                <Link href={safeRoute('erp.dashboard', undefined, '/erp/dashboard')} className="group p-5 rounded-xl border border-slate-200 hover:border-indigo-300 hover:shadow-md hover:shadow-indigo-50 transition-all bg-white relative overflow-hidden block">
                                     <div className="w-10 h-10 rounded-lg bg-indigo-50 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                                         <Building2 className="w-5 h-5 text-indigo-600" />
                                     </div>
@@ -181,19 +185,14 @@ export default function Dashboard() {
                                     <div className="absolute top-4 right-4 text-emerald-600 text-xs font-medium bg-emerald-50 px-2 py-0.5 rounded-full">Active</div>
                                 </Link>
 
-                                <div className="p-5 rounded-xl border border-slate-200 bg-slate-50 relative overflow-hidden opacity-75">
-                                    <div className="w-10 h-10 rounded-lg bg-slate-200 flex items-center justify-center mb-4">
-                                        <Briefcase className="w-5 h-5 text-slate-500" />
+                                <Link href={safeRoute('freelance.dashboard', undefined, '/freelance/dashboard')} className="group p-5 rounded-xl border border-slate-200 hover:border-indigo-300 hover:shadow-md hover:shadow-indigo-50 transition-all bg-white relative overflow-hidden block">
+                                    <div className="w-10 h-10 rounded-lg bg-indigo-50 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                                        <Briefcase className="w-5 h-5 text-indigo-600" />
                                     </div>
                                     <h4 className="font-semibold text-slate-900 mb-1">Freelance Hub</h4>
                                     <p className="text-sm text-slate-500 leading-relaxed">Accept contracts, manage milestones, and submit deliverables.</p>
-                                    <div className="mt-4 flex items-center justify-between">
-                                        <span className="text-xs font-medium text-slate-500">Locked</span>
-                                        <Link href="#" className="text-xs font-medium text-indigo-600 hover:text-indigo-700 flex items-center gap-1">
-                                            Learn More <ArrowRight className="w-3 h-3" />
-                                        </Link>
-                                    </div>
-                                </div>
+                                    <div className="absolute top-4 right-4 text-emerald-600 text-xs font-medium bg-emerald-50 px-2 py-0.5 rounded-full">Active</div>
+                                </Link>
                             </div>
                         </div>
 
@@ -205,14 +204,20 @@ export default function Dashboard() {
                         {/* QUICK ACTIONS */}
                         <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-1">
                             <div className="flex flex-col gap-1 p-3">
-                                <Button variant="ghost" className="w-full justify-start text-slate-700 hover:text-slate-900 hover:bg-slate-50 font-medium h-11">
-                                    <Plus className="w-4 h-4 mr-3 text-slate-400" /> Add Funds to Wallet
+                                <Button variant="ghost" className="w-full justify-start text-slate-700 hover:text-slate-900 hover:bg-slate-50 font-medium h-11" asChild>
+                                    <Link href={safeRoute('erp.wallet.show', user?.id || 1, `/erp/clients/${user?.id || 1}/wallet`)}>
+                                        <Plus className="w-4 h-4 mr-3 text-slate-400" /> Add Funds to Wallet
+                                    </Link>
                                 </Button>
-                                <Button variant="ghost" className="w-full justify-start text-slate-700 hover:text-slate-900 hover:bg-slate-50 font-medium h-11">
-                                    <ArrowUpRight className="w-4 h-4 mr-3 text-slate-400" /> Request Withdrawal
+                                <Button variant="ghost" className="w-full justify-start text-slate-700 hover:text-slate-900 hover:bg-slate-50 font-medium h-11" asChild>
+                                    <Link href={safeRoute('erp.withdrawals.index', undefined, '/erp/withdrawals')}>
+                                        <ArrowUpRight className="w-4 h-4 mr-3 text-slate-400" /> Request Withdrawal
+                                    </Link>
                                 </Button>
-                                <Button variant="ghost" className="w-full justify-start text-slate-700 hover:text-slate-900 hover:bg-slate-50 font-medium h-11">
-                                    <CreditCard className="w-4 h-4 mr-3 text-slate-400" /> Manage Payment Methods
+                                <Button variant="ghost" className="w-full justify-start text-slate-700 hover:text-slate-900 hover:bg-slate-50 font-medium h-11" asChild>
+                                    <Link href={safeRoute('erp.payment-methods.index', undefined, '/erp/payment-methods')}>
+                                        <CreditCard className="w-4 h-4 mr-3 text-slate-400" /> Manage Payment Methods
+                                    </Link>
                                 </Button>
                             </div>
                         </div>
@@ -248,7 +253,7 @@ export default function Dashboard() {
                                 ))}
                             </div>
                             <div className="p-4 bg-slate-50 border-t border-slate-100 text-center">
-                                <Link href={safeRoute('erp.wallet.show', user?.id || 1)} className="text-xs font-medium text-indigo-600 hover:text-indigo-700">
+                                <Link href={safeRoute('erp.wallet.show', user?.id || 1, `/erp/clients/${user?.id || 1}/wallet`)} className="text-xs font-medium text-indigo-600 hover:text-indigo-700">
                                     View Full History
                                 </Link>
                             </div>

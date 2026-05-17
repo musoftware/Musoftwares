@@ -19,9 +19,11 @@ import {
     Bell, ChevronDown, Wallet, Menu, Plus, Coins, LogOut, 
     Settings, User, History, Shield, CreditCard, Box, 
     LayoutDashboard, FileText, ArrowRightLeft, ArrowUpRight,
-    MessageSquare, LifeBuoy, Bookmark, Activity, Sparkles, Building2, Briefcase, Megaphone
+    MessageSquare, LifeBuoy, Bookmark, Activity, Sparkles, Building2, Briefcase, Megaphone, Play
 } from 'lucide-react';
 import CommandPalette from '@/Components/CommandPalette';
+import ProductTourModal from '@/Components/ProductTourModal';
+import axios from 'axios';
 
 export default function Authenticated({
     header,
@@ -32,11 +34,28 @@ export default function Authenticated({
     const { toast } = useToast();
     const [isMobileOpen, setIsMobileOpen] = useState(false);
 
+    const [isTourOpen, setIsTourOpen] = useState(false);
+    const [tourStep, setTourStep] = useState(1);
+
     useEffect(() => {
         if (flash?.message) {
             toast({ description: flash.message });
         }
     }, [flash]);
+
+    // Check if product tour should auto-open for new users
+    useEffect(() => {
+        if (user && user.tour_completed === false && user.tour_skipped === false) {
+            setIsTourOpen(true);
+            setTourStep(user.current_tour_step || 1);
+        }
+    }, [user]);
+
+    const handleStartTour = () => {
+        setIsTourOpen(true);
+        setTourStep(1);
+        axios.post('/product-tour/status', { reset: true });
+    };
 
     // Safety checks for route existence
     const safeRoute = (name: string, params?: any) => {
@@ -100,7 +119,7 @@ export default function Authenticated({
                                             </Link>
                                         </div>
                                         <div className="flex-1 overflow-y-auto p-4 space-y-6">
-                                            {/* Mobile Nav Links - Keep it simple */}
+                                            {/* Mobile Nav Links */}
                                             <div className="space-y-1">
                                                 <Link href={safeRoute('dashboard')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-50 text-slate-700 font-medium">
                                                     <LayoutDashboard className="w-5 h-5 text-slate-400" /> Dashboard
@@ -108,6 +127,9 @@ export default function Authenticated({
                                                 <Link href={safeRoute('erp.invoices.index')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-50 text-slate-700 font-medium">
                                                     <FileText className="w-5 h-5 text-slate-400" /> Invoices
                                                 </Link>
+                                                <button onClick={() => { setIsMobileOpen(false); handleStartTour(); }} className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-indigo-50 text-indigo-600 font-medium text-left">
+                                                    <Sparkles className="w-5 h-5 text-amber-500" /> Product Tour
+                                                </button>
                                             </div>
                                         </div>
                                     </div>
@@ -122,18 +144,43 @@ export default function Authenticated({
                             </Link>
 
                             <nav className="hidden md:flex items-center gap-1">
-                                <NavLink href={safeRoute('dashboard')} active={isRouteActive('dashboard')}>
-                                    Dashboard
-                                </NavLink>
-                                <NavLink href={safeRoute('erp.invoices.index')} active={isRouteActive('erp.invoices.index')}>
-                                    Invoices
-                                </NavLink>
+                                <div className="relative">
+                                    <NavLink href={safeRoute('dashboard')} active={isRouteActive('dashboard')}>
+                                        Dashboard
+                                    </NavLink>
+                                    {isTourOpen && tourStep === 2 && (
+                                        <span className="absolute -top-1 right-0 flex h-3 w-3">
+                                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75" />
+                                            <span className="relative inline-flex rounded-full h-3 w-3 bg-indigo-500" />
+                                        </span>
+                                    )}
+                                </div>
+
+                                <div className="relative">
+                                    <NavLink href={safeRoute('erp.invoices.index')} active={isRouteActive('erp.invoices.index')}>
+                                        Invoices
+                                    </NavLink>
+                                    {isTourOpen && tourStep === 3 && (
+                                        <span className="absolute -top-1 right-0 flex h-3 w-3">
+                                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                                            <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500" />
+                                        </span>
+                                    )}
+                                </div>
                                 
                                 {/* MORE MEGA MENU */}
                                 <DropdownMenu>
-                                    <DropdownMenuTrigger className="inline-flex items-center px-3 py-2 text-sm font-medium text-slate-500 hover:bg-slate-50 hover:text-slate-900 rounded-md outline-none">
-                                        More <ChevronDown className="ml-1 h-3.5 w-3.5 opacity-50" />
-                                    </DropdownMenuTrigger>
+                                    <div className="relative inline-block">
+                                        <DropdownMenuTrigger className="inline-flex items-center px-3 py-2 text-sm font-medium text-slate-500 hover:bg-slate-50 hover:text-slate-900 rounded-md outline-none">
+                                            More <ChevronDown className="ml-1 h-3.5 w-3.5 opacity-50" />
+                                        </DropdownMenuTrigger>
+                                        {isTourOpen && tourStep === 5 && (
+                                            <span className="absolute top-1 right-1 flex h-3 w-3">
+                                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-purple-400 opacity-75" />
+                                                <span className="relative inline-flex rounded-full h-3 w-3 bg-purple-500" />
+                                            </span>
+                                        )}
+                                    </div>
                                     <DropdownMenuContent align="start" className="w-[450px] p-4 grid grid-cols-2 gap-4 rounded-xl shadow-xl border border-slate-200 bg-white isolate z-50">
                                         <div>
                                             <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2 px-2">Financial</h4>
@@ -168,9 +215,17 @@ export default function Authenticated({
 
                                 {/* iSAAS MEGA MENU */}
                                 <DropdownMenu>
-                                    <DropdownMenuTrigger className="inline-flex items-center px-3 py-2 text-sm font-medium text-indigo-600 hover:bg-indigo-50 rounded-md outline-none transition-colors">
-                                        <Sparkles className="mr-1.5 h-3.5 w-3.5" /> iSAAS <ChevronDown className="ml-1 h-3.5 w-3.5 opacity-50" />
-                                    </DropdownMenuTrigger>
+                                    <div className="relative inline-block">
+                                        <DropdownMenuTrigger className="inline-flex items-center px-3 py-2 text-sm font-medium text-indigo-600 hover:bg-indigo-50 rounded-md outline-none transition-colors">
+                                            <Sparkles className="mr-1.5 h-3.5 w-3.5" /> iSAAS <ChevronDown className="ml-1 h-3.5 w-3.5 opacity-50" />
+                                        </DropdownMenuTrigger>
+                                        {isTourOpen && tourStep === 4 && (
+                                            <span className="absolute top-1 right-1 flex h-3 w-3">
+                                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75" />
+                                                <span className="relative inline-flex rounded-full h-3 w-3 bg-blue-500" />
+                                            </span>
+                                        )}
+                                    </div>
                                     <DropdownMenuContent align="start" className="w-[300px] p-2 rounded-xl shadow-xl border border-slate-200 bg-white isolate z-50">
                                         <div className="px-2 py-2 mb-1 border-b border-slate-50">
                                             <p className="text-xs font-medium text-slate-500">Connected Workspaces</p>
@@ -207,11 +262,21 @@ export default function Authenticated({
                             </nav>
                         </div>
 
-                        {/* RIGHT: Financials & Profile */}
+                        {/* RIGHT: Financials, Tour Button & Profile */}
                         <div className="flex items-center gap-3">
                             <div className="hidden md:flex items-center gap-3 mr-2">
                                 <Button size="sm" variant="outline" className="rounded-full h-8 text-xs font-medium border-slate-200">
                                     <Plus className="w-3.5 h-3.5 mr-1" /> Add Balance
+                                </Button>
+
+                                <Button 
+                                    size="sm" 
+                                    variant="ghost" 
+                                    onClick={handleStartTour}
+                                    className="hidden lg:inline-flex items-center gap-1.5 text-xs font-medium text-slate-600 hover:text-indigo-600 hover:bg-indigo-50/50 rounded-full h-8 px-3"
+                                >
+                                    <Sparkles className="w-3.5 h-3.5 text-amber-500 animate-pulse" />
+                                    <span>Product Tour</span>
                                 </Button>
                                 
                                 <Link href={safeRoute('erp.wallet.show', user?.id || 1)} className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 rounded-full transition-colors text-sm font-medium text-slate-900">
@@ -225,12 +290,20 @@ export default function Authenticated({
 
                             {/* Notifications */}
                             <DropdownMenu>
-                                <DropdownMenuTrigger className="w-9 h-9 rounded-full flex items-center justify-center text-slate-500 hover:bg-slate-100 transition-colors relative outline-none">
-                                    <Bell className="w-5 h-5" />
-                                    {notifications?.unread_count > 0 && (
-                                        <span className="absolute top-2 right-2 w-2 h-2 bg-rose-500 rounded-full border-2 border-white"></span>
+                                <div className="relative inline-block">
+                                    <DropdownMenuTrigger className="w-9 h-9 rounded-full flex items-center justify-center text-slate-500 hover:bg-slate-100 transition-colors relative outline-none">
+                                        <Bell className="w-5 h-5" />
+                                        {notifications?.unread_count > 0 && (
+                                            <span className="absolute top-2 right-2 w-2 h-2 bg-rose-500 rounded-full border-2 border-white" />
+                                        )}
+                                    </DropdownMenuTrigger>
+                                    {isTourOpen && tourStep === 6 && (
+                                        <span className="absolute top-0 right-0 flex h-3 w-3">
+                                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75" />
+                                            <span className="relative inline-flex rounded-full h-3 w-3 bg-rose-500" />
+                                        </span>
                                     )}
-                                </DropdownMenuTrigger>
+                                </div>
                                 <DropdownMenuContent align="end" className="w-80 p-0 rounded-xl shadow-xl border border-slate-200 bg-white isolate z-50">
                                     <div className="px-4 py-3 border-b border-slate-100 flex justify-between items-center">
                                         <span className="font-semibold text-slate-900 text-sm">Notifications</span>
@@ -263,6 +336,12 @@ export default function Authenticated({
                                     </div>
                                     
                                     <DropdownMenuGroup>
+                                        <DropdownMenuItem 
+                                            className="cursor-pointer rounded-lg text-sm"
+                                            onClick={handleStartTour}
+                                        >
+                                            <Sparkles className="mr-2 h-4 w-4 text-amber-500" /> Replay Product Tour
+                                        </DropdownMenuItem>
                                         <DropdownMenuItem 
                                             className="cursor-pointer rounded-lg text-sm"
                                             render={<Link href={safeRoute('profile.edit')} className="flex items-center w-full" />}
@@ -317,6 +396,14 @@ export default function Authenticated({
             <main className="flex-1 max-w-[1600px] w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 relative">
                 {children}
             </main>
+
+            <ProductTourModal 
+                user={user}
+                isOpen={isTourOpen}
+                onClose={() => setIsTourOpen(false)}
+                currentStep={tourStep}
+                onStepChange={setTourStep}
+            />
 
             <CommandPalette />
             <Toaster />

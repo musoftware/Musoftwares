@@ -30,6 +30,9 @@ class User extends Authenticatable
         'whatsapp_number',
         'preferred_currency',
         'preferred_currency_locked_at',
+        'tour_completed',
+        'tour_skipped',
+        'current_tour_step',
     ];
 
     protected $hidden = [
@@ -44,6 +47,9 @@ class User extends Authenticatable
             'password' => 'hashed',
             'onboarding_completed' => 'boolean',
             'preferred_currency_locked_at' => 'datetime',
+            'tour_completed' => 'boolean',
+            'tour_skipped' => 'boolean',
+            'current_tour_step' => 'integer',
         ];
     }
 
