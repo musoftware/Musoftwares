@@ -43,6 +43,8 @@ import {
     Activity,
     Settings,
     User,
+    Building2,
+    Clock,
     CreditCard,
     Lock,
     Sliders,
@@ -164,6 +166,13 @@ export default function Authenticated({
                 { name: 'Invoices', icon: FileText, path: safeRoute('erp.invoices.index'), active: isRouteActive('erp.invoices.index'), badge: '3' },
                 { name: 'Wallet', icon: Wallet, path: safeRoute('erp.wallet.show', user?.id || 1), active: isRouteActive('erp.wallet.show') },
                 { name: 'Withdrawals', icon: ArrowUpRight, path: safeRoute('erp.withdrawals.index'), active: isRouteActive('erp.withdrawals.index') }
+            ]
+        },
+        {
+            label: 'Business OS (ERP)',
+            items: [
+                { name: 'My Clients', icon: Users, path: isErpSubscribed ? safeRoute('erp.clients.index') : '/erp/preview', active: isRouteActive('erp.clients.index'), isLocked: !isErpSubscribed },
+                { name: 'Time Tracking', icon: Clock, path: isErpSubscribed ? safeRoute('erp.timer.index') : '/erp/preview', active: isRouteActive('erp.timer.index'), isLocked: !isErpSubscribed }
             ]
         },
         {

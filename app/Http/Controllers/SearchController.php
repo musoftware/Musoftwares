@@ -8,9 +8,6 @@ class SearchController extends Controller
 {
     public function index(Request $request)
     {
-        if (!$request->user()->hasRole('admin')) {
-            abort(403, 'Only admins can use global search.');
-        }
 
         $query = $request->input('q');
 
