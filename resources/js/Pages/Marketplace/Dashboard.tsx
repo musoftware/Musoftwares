@@ -18,35 +18,19 @@ import { Button } from '@/Components/ui/button';
 import { formatMoney, formatDate } from '@/lib/utils';
 import { ServiceQuickView } from '@/Components/ContextualPanels';
 
-export default function MarketplaceDashboard() {
+export default function MarketplaceDashboard({ stats: initialStats, activePurchases: initialPurchases, listedGigs: initialGigs }: any) {
     const [selectedService, setSelectedService] = useState<any>(null);
 
-    // Core financial state for marketplace activities
-    const stats = {
-        lockedEscrow: 850.00,
-        activeOrders: 1,
-        servicesListed: 2,
-        totalSales: 4250.00
+    // Core financial state for marketplace activities from server
+    const stats = initialStats || {
+        lockedEscrow: 0,
+        activeOrders: 0,
+        servicesListed: 0,
+        totalSales: 0
     };
 
-    // Buyer side active purchases list
-    const activePurchases = [
-        {
-            id: 8901,
-            title: 'SaaS Figma UI Layout Conversion to React Code',
-            sellerName: 'Mahmoud (Senior Architect)',
-            description: 'Premium React conversion containing CSS variables, HSL Tailwind color tokens, fully optimized and clean markup.',
-            amount: 850.00,
-            status: 'Escrow Locked',
-            deliveryDate: '2026-05-19'
-        }
-    ];
-
-    // Seller side listed catalog items
-    const listedGigs = [
-        { id: 1, title: 'High-performance Laravel Modular Architecture Audit', price: 1250, reviews: 18, rating: 5.0 },
-        { id: 2, title: 'Tailwind CSS v4 Styling & Frame Motion Polish', price: 650, reviews: 24, rating: 4.9 }
-    ];
+    const activePurchases = initialPurchases || [];
+    const listedGigs = initialGigs || [];
 
     return (
         <AuthenticatedLayout header="Marketplace Operations Hub">
@@ -143,7 +127,7 @@ export default function MarketplaceDashboard() {
                             </div>
                             
                             <div className="divide-y divide-border/40 text-xs">
-                                {activePurchases.map(purchase => (
+                                {activePurchases.map((purchase: any) => (
                                     <div 
                                         key={purchase.id}
                                         onClick={() => setSelectedService(purchase)}
@@ -168,6 +152,15 @@ export default function MarketplaceDashboard() {
                                         </div>
                                     </div>
                                 ))}
+                                {activePurchases.length === 0 && (
+                                    <div className="p-6 text-center text-gray-500">
+                                        <p className="font-medium text-gray-700">No active purchases.</p>
+                                        <p className="text-xs mt-1">Browse the directory to purchase verified services safely using Escrow.</p>
+                                        <Link href="/marketplace/services" className="inline-block mt-3 text-xs font-semibold text-indigo-600 hover:text-indigo-800">
+                                            Explore Services →
+                                        </Link>
+                                    </div>
+                                )}
                             </div>
                         </div>
 
@@ -186,7 +179,7 @@ export default function MarketplaceDashboard() {
                             </div>
                             
                             <div className="divide-y divide-border/40 text-xs">
-                                {listedGigs.map(gig => (
+                                {listedGigs.map((gig: any) => (
                                     <div 
                                         key={gig.id}
                                         className="p-4 hover:bg-slate-50/40 transition flex items-center justify-between"
@@ -210,6 +203,15 @@ export default function MarketplaceDashboard() {
                                         </div>
                                     </div>
                                 ))}
+                                {listedGigs.length === 0 && (
+                                    <div className="p-6 text-center text-gray-500">
+                                        <p className="font-medium text-gray-700">No listed services.</p>
+                                        <p className="text-xs mt-1">Ready to sell? Create your first gig package and start receiving orders from clients.</p>
+                                        <Link href="#" className="inline-block mt-3 text-xs font-semibold text-indigo-600 hover:text-indigo-800">
+                                            Publish Your First Gig →
+                                        </Link>
+                                    </div>
+                                )}
                             </div>
                         </div>
 
