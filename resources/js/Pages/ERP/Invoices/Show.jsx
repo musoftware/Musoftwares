@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link, router, usePage } from '@inertiajs/react';
-import PageHeader from '@/Components/PageHeader';
+import { PageHeader } from '@/Components/ui/PageHeader';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import StatusBadge from '@/Components/StatusBadge';
-import CurrencyDisplay from '@/Components/CurrencyDisplay';
+import { StatusBadge } from '@/Components/ui/StatusBadge';
+import { CurrencyDisplay } from '@/Components/ui/CurrencyDisplay';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Edit, Send, CheckCircle, Copy, Download, MoreHorizontal, Clock, Wallet, Info, History, ArrowUpRight, ArrowDownLeft } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';

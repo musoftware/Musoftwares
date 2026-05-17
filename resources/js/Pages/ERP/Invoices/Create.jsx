@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, useForm, Link } from '@inertiajs/react';
-import PageHeader from '@/Components/PageHeader';
+import { PageHeader } from '@/Components/ui/PageHeader';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Plus, Trash2, GripVertical, Play, Clock, Save, Send, ChevronDown, ChevronUp, DollarSign } from 'lucide-react';
-import CurrencyDisplay from '@/Components/CurrencyDisplay';
+import { CurrencyDisplay } from '@/Components/ui/CurrencyDisplay';
 import { Badge } from '@/components/ui/badge';
 
 export default function CreateEdit({ invoice, clients, currencies, business_currency }) {
