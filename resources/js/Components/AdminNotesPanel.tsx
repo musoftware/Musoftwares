@@ -45,12 +45,8 @@ export default function AdminNotesPanel({ noteableType, noteableId, initialNotes
 
     const fetchNotes = async () => {
         try {
-            // Note: Replace with actual backend API route
-            // const res = await axios.get(`/api/admin-notes?type=${noteableType}&id=${noteableId}`);
-            // setNotes(res.data.data);
-
-            // Using placeholder logic since full API controller isn't built yet
-            setNotes(initialNotes);
+            const res = await axios.get(`/api/admin-notes?noteable_type=${noteableType}&noteable_id=${noteableId}`);
+            setNotes(res.data.data || []);
         } catch (err) {
             console.error("Failed to load notes", err);
         }
@@ -62,34 +58,21 @@ export default function AdminNotesPanel({ noteableType, noteableId, initialNotes
         setError(null);
 
         try {
-            // Optimistic update
-            const tempId = Date.now();
-            const newNote: AdminNote = {
-                id: tempId,
-                author_id: 1, // Placeholder
-                visibility: visibility as any,
-                type: type as any,
+            const res = await axios.post('/api/admin-notes', {
+                noteable_type: noteableType,
+                noteable_id: noteableId,
                 content,
-                is_pinned: false,
-                risk_level: riskLevel as any,
-                created_at: new Date().toISOString(),
-                author: { name: 'Current Admin' }
-            };
+                type,
+                visibility,
+                risk_level: riskLevel
+            });
 
-            setNotes(prev => [newNote, ...prev]);
-
-            // Actual API call would go here
-            // const res = await axios.post('/api/admin-notes', { noteable_type: noteableType, noteable_id: noteableId, content, type, visibility, risk_level: riskLevel });
-            // setNotes(prev => prev.map(n => n.id === tempId ? res.data.note : n));
-
+            if (res.data && res.data.note) {
+                setNotes(prev => [res.data.note, ...prev]);
+            }
             setContent('');
-
-            // Placeholder toast
-            // toast({ title: "Note added successfully" });
         } catch (err) {
             setError("Failed to add note.");
-            // Revert optimistic update
-            setNotes(prev => prev.filter(n => n.id !== Date.now())); // naive revert
         } finally {
             setLoading(false);
         }
@@ -99,7 +82,7 @@ export default function AdminNotesPanel({ noteableType, noteableId, initialNotes
         // Optimistic update
         setNotes(prev => prev.map(n => n.id === noteId ? { ...n, is_pinned: !n.is_pinned } : n));
         try {
-            // await axios.patch(`/api/admin-notes/${noteId}/pin`);
+            await axios.patch(`/api/admin-notes/${noteId}/pin`);
         } catch (err) {
             // Revert
             setNotes(prev => prev.map(n => n.id === noteId ? { ...n, is_pinned: !n.is_pinned } : n));
@@ -113,7 +96,7 @@ export default function AdminNotesPanel({ noteableType, noteableId, initialNotes
         setNotes(prev => prev.filter(n => n.id !== noteId));
 
         try {
-            // await axios.delete(`/api/admin-notes/${noteId}`);
+            await axios.delete(`/api/admin-notes/${noteId}`);
         } catch (err) {
             setNotes(previousNotes);
         }

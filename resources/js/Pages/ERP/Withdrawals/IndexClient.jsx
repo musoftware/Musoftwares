@@ -19,6 +19,23 @@ export default function IndexClient({
 
     const submitRequest = (e) => {
         e.preventDefault();
+
+        const reqAmount = parseFloat(data.amount);
+        if (isNaN(reqAmount) || reqAmount <= 0) {
+            alert('Please enter a valid withdrawal amount greater than 0.');
+            return;
+        }
+
+        if (reqAmount > availableBalance) {
+            alert('The requested amount exceeds your available cleared balance.');
+            return;
+        }
+
+        if (!data.payment_method_id || data.payment_method_id.trim() === '') {
+            alert('You must provide a valid Payout/Payment Method ID.');
+            return;
+        }
+
         post(route('erp.withdrawals.store'), {
             onSuccess: () => {
                 setShowRequestForm(false);
@@ -233,9 +250,12 @@ export default function IndexClient({
                                             <tr>
                                                 <td
                                                     colSpan="4"
-                                                    className="px-6 py-4 text-center text-sm text-gray-500"
+                                                    className="px-6 py-12 text-center text-sm"
                                                 >
-                                                    No withdrawals found.
+                                                    <div className="flex flex-col items-center justify-center space-y-2 text-gray-500">
+                                                        <span className="font-semibold text-gray-700">No withdrawal records found.</span>
+                                                        <span className="text-xs">Submit a new request to withdraw your cleared earnings to your designated payout account.</span>
+                                                    </div>
                                                 </td>
                                             </tr>
                                         )}

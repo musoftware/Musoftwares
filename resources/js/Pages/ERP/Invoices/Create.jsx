@@ -85,6 +85,29 @@ export default function CreateEdit({ invoice, clients, currencies, business_curr
 
     const handleSubmit = (e) => {
         e.preventDefault();
+
+        // Hardened Frontend Validation
+        if (!data.client_id) {
+            alert('Please select a client for this invoice.');
+            return;
+        }
+        
+        if (data.items.length === 0) {
+            alert('An invoice must contain at least one line item.');
+            return;
+        }
+
+        for (const item of data.items) {
+            if (!item.title || !item.title.trim()) {
+                alert('All line items must have a valid title.');
+                return;
+            }
+            if (item.unit_price < 0 || item.quantity <= 0) {
+                alert('Line items must have a positive quantity and valid price.');
+                return;
+            }
+        }
+
         if (isEdit) {
             put(route('erp.invoices.update', invoice.id));
         } else {

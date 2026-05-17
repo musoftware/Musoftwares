@@ -175,12 +175,21 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
 
 require __DIR__.'/auth.php';
 
+// Global Search
+Route::middleware(['auth', 'verified'])->get('/search', [\App\Http\Controllers\SearchController::class, 'index'])->name('search');
+
 // Chat API Routes
 Route::middleware(['auth', 'verified'])->prefix('api')->group(function () {
     Route::get('/conversations/{id}', [\Modules\Core\Http\Controllers\ConversationController::class, 'show']);
     Route::get('/conversations/{id}/messages', [\Modules\Core\Http\Controllers\ConversationController::class, 'messages']);
     Route::post('/conversations/{id}/read', [\Modules\Core\Http\Controllers\ConversationController::class, 'markAsRead']);
     Route::post('/conversations/{id}/messages', [\Modules\Core\Http\Controllers\MessageController::class, 'store']);
+
+    // Admin Notes
+    Route::get('/admin-notes', [\Modules\Core\Http\Controllers\AdminNoteController::class, 'index']);
+    Route::post('/admin-notes', [\Modules\Core\Http\Controllers\AdminNoteController::class, 'store']);
+    Route::patch('/admin-notes/{note}/pin', [\Modules\Core\Http\Controllers\AdminNoteController::class, 'togglePin']);
+    Route::delete('/admin-notes/{note}', [\Modules\Core\Http\Controllers\AdminNoteController::class, 'destroy']);
 });
 
 // New API routes for polling
