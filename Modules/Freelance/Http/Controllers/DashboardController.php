@@ -59,6 +59,7 @@ class DashboardController extends Controller
             'activeProposals' => Proposal::where('freelancer_id', $user->id)->whereIn('status', ['pending'])->count(),
             'activeContracts' => Contract::where('freelancer_id', $user->id)->where('status', 'active')->count(),
             'totalEarnings' => Contract::where('freelancer_id', $user->id)->where('status', 'completed')->sum('amount'),
+            'currency' => $user->preferred_currency ?? 'USD',
         ];
 
         // 4. Compute Real Recent Activities

@@ -35,9 +35,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
 });
 
 // ERP Routes
-Route::middleware(['auth', 'verified', 'onboarding'])->prefix('erp')->name('erp.')->group(function () {
+Route::middleware(['auth', 'verified', 'onboarding', 'subscription:erp'])->prefix('erp')->name('erp.')->group(function () {
     Route::get('/dashboard', [\Modules\ERP\Http\Controllers\ERPDashboardController::class, 'index'])->name('dashboard');
-    Route::get('/onboarding', function () { return Inertia::render('ERP/Onboarding'); })->name('onboarding');
+    Route::post('/clients', [\Modules\ERP\Http\Controllers\ERPDashboardController::class, 'storeClient'])->name('clients.store');
+    Route::put('/clients/{client}', [\Modules\ERP\Http\Controllers\ERPDashboardController::class, 'updateClient'])->name('clients.update');
+    Route::delete('/clients/{client}', [\Modules\ERP\Http\Controllers\ERPDashboardController::class, 'destroyClient'])->name('clients.destroy');
+    Route::get('/onboarding', [\Modules\ERP\Http\Controllers\ERPDashboardController::class, 'onboarding'])->name('onboarding');
+    Route::post('/onboarding', [\Modules\ERP\Http\Controllers\ERPDashboardController::class, 'completeOnboarding'])->name('onboarding.store');
     Route::get('/invoices', [\Modules\ERP\Http\Controllers\InvoiceController::class, 'index'])->name('invoices.index');
     Route::get('/invoices/create', [\Modules\ERP\Http\Controllers\InvoiceController::class, 'create'])->name('invoices.create');
     Route::post('/invoices', [\Modules\ERP\Http\Controllers\InvoiceController::class, 'store'])->name('invoices.store');
@@ -91,7 +95,7 @@ Route::middleware(['auth', 'verified', 'onboarding'])->prefix('erp')->name('erp.
 });
 
 // Freelance Routes
-Route::middleware(['auth', 'verified', 'onboarding'])->prefix('freelance')->name('freelance.')->group(function () {
+Route::middleware(['auth', 'verified', 'onboarding', 'subscription:freelance'])->prefix('freelance')->name('freelance.')->group(function () {
     Route::get('/dashboard', [\Modules\Freelance\Http\Controllers\DashboardController::class, 'index'])->name('dashboard');
 
     // Skills
@@ -203,6 +207,18 @@ Route::middleware(['auth', 'verified', 'onboarding'])->prefix('admin')->name('ad
     Route::post('/kyc/{id}/reject', [\App\Http\Controllers\Admin\KycController::class, 'reject'])->name('kyc.reject');
 });
 
+// SaaS Subscription & Billing Routes
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/subscriptions/plans', [\App\Http\Controllers\SubscriptionController::class, 'plans'])->name('subscriptions.plans');
+    Route::post('/subscriptions/subscribe', [\App\Http\Controllers\SubscriptionController::class, 'subscribe'])->name('subscriptions.subscribe');
+    Route::get('/subscriptions/manage', [\App\Http\Controllers\SubscriptionController::class, 'manage'])->name('subscriptions.manage');
+    Route::post('/subscriptions/cancel', [\App\Http\Controllers\SubscriptionController::class, 'cancel'])->name('subscriptions.cancel');
+    Route::post('/subscriptions/renew', [\App\Http\Controllers\SubscriptionController::class, 'renew'])->name('subscriptions.renew');
+    Route::post('/subscriptions/kashier/checkout', [\App\Http\Controllers\SubscriptionController::class, 'checkoutKashier'])->name('subscriptions.kashier.checkout');
+    Route::get('/subscriptions/kashier/success', [\App\Http\Controllers\SubscriptionController::class, 'kashierSuccess'])->name('subscriptions.kashier.success');
+    Route::get('/subscriptions/kashier/failure', [\App\Http\Controllers\SubscriptionController::class, 'kashierFailure'])->name('subscriptions.kashier.failure');
+});
+
 require __DIR__.'/auth.php';
 
 // Support Ticket Routes
@@ -235,11 +251,22 @@ Route::middleware(['auth', 'verified'])->prefix('financial')->name('financial.')
     Route::post('/add-balance/kashier', [\App\Http\Controllers\FinancialController::class, 'depositKashier'])->name('add-balance.kashier');
     Route::get('/add-balance/success', [\App\Http\Controllers\FinancialController::class, 'success'])->name('add-balance.success');
     Route::get('/add-balance/failure', [\App\Http\Controllers\FinancialController::class, 'failure'])->name('add-balance.failure');
+
+    // P2P Wallet Transfer Routes
+    Route::get('/transfer', [\App\Http\Controllers\WalletTransferController::class, 'create'])->name('transfer.create');
+    Route::post('/transfer', [\App\Http\Controllers\WalletTransferController::class, 'store'])->name('transfer.store');
+    Route::get('/transfer/history', [\App\Http\Controllers\WalletTransferController::class, 'history'])->name('transfer.history');
+    Route::get('/transfer/{id}', [\App\Http\Controllers\WalletTransferController::class, 'show'])->name('transfer.show');
+
+    // P2P Wallet Transfer Live APIs
+    Route::get('/transfer-api/calculate-fee', [\App\Http\Controllers\WalletTransferController::class, 'calculateFee'])->name('transfer.calculate-fee');
+    Route::get('/transfer-api/search-users', [\App\Http\Controllers\WalletTransferController::class, 'searchUsers'])->name('transfer.search-users');
 });
 
 // Kashier Webhook (No Auth required)
 Route::post('/financial/add-balance/webhook', [\App\Http\Controllers\FinancialController::class, 'webhook'])->name('financial.add-balance.webhook');
 Route::post('/freelance/point-purchases/webhook', [\Modules\Freelance\Http\Controllers\PointPurchaseController::class, 'webhook'])->name('freelance.point-purchases.webhook');
+Route::post('/subscriptions/kashier/webhook', [\App\Http\Controllers\SubscriptionController::class, 'webhook'])->name('subscriptions.kashier.webhook');
 
 // General Messages Route
 Route::middleware(['auth', 'verified'])->group(function () {

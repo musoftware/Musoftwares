@@ -1,14 +1,25 @@
+import React, { useState } from 'react';
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import { Head, router, usePage } from '@inertiajs/react';
+import { Plus, Ticket, MessageSquare, Inbox, Eye } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/Components/ui/card';
+import { DataTable } from '@/Components/ui/DataTable';
+import { Badge } from '@/Components/ui/badge';
+import { Button } from '@/Components/ui/button';
+import { EmptyState } from '@/Components/ui/EmptyState';
+import { PageHeader } from '@/Components/ui/PageHeader';
+import { StatusBadge } from '@/Components/ui/StatusBadge';
 import ChatWindow from '@/Components/Chat/ChatWindow';
 import InputError from '@/Components/InputError';
 import InputLabel from '@/Components/InputLabel';
 import Modal from '@/Components/Modal';
-import PrimaryButton from '@/Components/PrimaryButton';
-import SecondaryButton from '@/Components/SecondaryButton';
 import TextInput from '@/Components/TextInput';
-import { DataTable } from '@/Components/ui/DataTable';
-import { StatusBadge } from '@/Components/ui/StatusBadge';
-import { Head, router, usePage } from '@inertiajs/react';
-import { useState } from 'react';
+
+// Mock structural components to satisfy the unified layout design pattern
+const AppLayout = AuthenticatedLayout;
+const AppPage = ({ children }) => <div className="max-w-[1200px] mx-auto px-4 py-8 space-y-6">{children}</div>;
+const ActionBar = ({ children }) => <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-2">{children}</div>;
+const SectionCard = ({ children }) => <Card className="shadow-sm border-gray-200 overflow-hidden">{children}</Card>;
 
 export default function TicketsIndex({ tickets, isAdmin }) {
     const { auth, errors } = usePage().props;
@@ -49,130 +60,136 @@ export default function TicketsIndex({ tickets, isAdmin }) {
         );
     };
 
-    // Table columns configuration
     const columns = [
-        { header: 'ID', accessor: (row) => `#${row.id}` },
-        { header: 'Subject', accessor: 'subject' },
-        ...(isAdmin
-            ? [{ header: 'Client', accessor: (row) => row.user?.name }]
-            : []),
+        { key: 'id', label: 'ID', render: (row) => <span className="font-medium text-gray-900 font-mono">#{row.id}</span> },
+        { key: 'subject', label: 'Subject', render: (row) => <span className="font-medium">{row.subject}</span> },
+        ...(isAdmin ? [{ key: 'client', label: 'Client', render: (row) => <span className="text-gray-600">{row.user?.name}</span> }] : []),
+        { key: 'status', label: 'Status', render: (row) => <StatusBadge status={row.status} /> },
         {
-            header: 'Status',
-            accessor: (row) => <StatusBadge status={row.status} />,
-        },
-        {
-            header: 'Priority',
-            accessor: (row) => (
+            key: 'priority',
+            label: 'Priority',
+            render: (row) => (
                 <span
-                    className={`rounded px-2 py-1 text-xs font-medium ${
+                    className={`rounded px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${
                         row.priority === 'High'
-                            ? 'bg-red-100 text-red-800'
+                            ? 'bg-red-50 text-red-700 border border-red-200/50'
                             : row.priority === 'Medium'
-                              ? 'bg-yellow-100 text-yellow-800'
-                              : 'bg-green-100 text-green-800'
+                              ? 'bg-amber-50 text-amber-700 border border-amber-200/50'
+                              : 'bg-emerald-50 text-emerald-700 border border-emerald-200/50'
                     }`}
                 >
                     {row.priority}
                 </span>
             ),
         },
+        { key: 'updated_at', label: 'Last Reply', render: (row) => <span className="text-gray-500 text-[13px]">{new Date(row.updated_at).toLocaleDateString()}</span> },
         {
-            header: 'Last Reply',
-            accessor: (row) => new Date(row.updated_at).toLocaleDateString(),
-        },
-        {
-            header: 'Action',
-            accessor: (row) => (
-                <SecondaryButton onClick={() => setSelectedTicket(row)}>
-                    {isAdmin ? 'View / Respond' : 'View Ticket'}
-                </SecondaryButton>
+            key: 'action',
+            label: '',
+            render: (row) => (
+                <div className="text-right">
+                    <Button variant="ghost" size="sm" onClick={() => setSelectedTicket(row)} className="text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50 shadow-none h-8 px-3 text-xs">
+                        <Eye className="w-3.5 h-3.5 mr-1.5" />
+                        {isAdmin ? 'View / Respond' : 'View Ticket'}
+                    </Button>
+                </div>
             ),
         },
     ];
 
-    // Filter tickets for admin view
     const filteredTickets =
         tickets?.data?.filter((ticket) => {
             if (filterStatus && ticket.status !== filterStatus) return false;
             if (filterPriority && ticket.priority !== filterPriority)
                 return false;
             return true;
-        }) || [];
+        }) || tickets?.data || [];
+
+    const emptyStateContent = (
+        <EmptyState
+            icon={Ticket}
+            title="No support tickets yet."
+            description="Need help with billing, services, or your workspace? Open your first support ticket."
+            actionLabel="Open Ticket"
+            actionIcon={Plus}
+            onClick={() => setIsCreating(true)}
+        />
+    );
 
     return (
-        <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+        <AppLayout user={auth.user} header="Support Tickets">
             <Head title="Support Tickets" />
 
-            <div className="mb-6 flex items-center justify-between">
-                <div>
-                    <h1 className="text-2xl font-semibold text-gray-900">
-                        Support Tickets
-                    </h1>
-                    <p className="mt-1 text-sm text-gray-500">
-                        {isAdmin
-                            ? 'Manage client support requests.'
-                            : 'View and manage your support tickets.'}
-                    </p>
-                </div>
-                {!isAdmin && (
-                    <PrimaryButton onClick={() => setIsCreating(true)}>
-                        + Open New Ticket
-                    </PrimaryButton>
-                )}
-            </div>
-
-            {isAdmin && (
-                <div className="mb-6 flex gap-4 rounded-lg border bg-white p-4 shadow-sm">
-                    <div>
-                        <InputLabel value="Filter Status" />
-                        <select
-                            value={filterStatus}
-                            onChange={(e) => setFilterStatus(e.target.value)}
-                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                        >
-                            <option value="">All</option>
-                            <option value="Open">Open</option>
-                            <option value="In Progress">In Progress</option>
-                            <option value="Resolved">Resolved</option>
-                        </select>
-                    </div>
-                    <div>
-                        <InputLabel value="Filter Priority" />
-                        <select
-                            value={filterPriority}
-                            onChange={(e) => setFilterPriority(e.target.value)}
-                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                        >
-                            <option value="">All</option>
-                            <option value="High">High</option>
-                            <option value="Medium">Medium</option>
-                            <option value="Low">Low</option>
-                        </select>
-                    </div>
-                </div>
-            )}
-
-            <div className="overflow-hidden border bg-white shadow-sm sm:rounded-lg">
-                <DataTable
-                    columns={columns}
-                    data={isAdmin ? filteredTickets : tickets?.data || []}
-                    emptyMessage="No tickets found."
+            <AppPage>
+                <PageHeader
+                    title="Support Tickets"
+                    subtitle={isAdmin ? "Manage client support requests and communications." : "Manage conversations and requests with the support team."}
+                    icon={MessageSquare}
+                    actions={
+                        !isAdmin && (
+                            <Button onClick={() => setIsCreating(true)} className="bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm">
+                                <Plus className="w-4 h-4 mr-2" /> Open Ticket
+                            </Button>
+                        )
+                    }
                 />
-            </div>
+
+                {isAdmin && (
+                    <ActionBar>
+                        <div className="flex gap-3 w-full max-w-md">
+                            <select
+                                value={filterStatus}
+                                onChange={(e) => setFilterStatus(e.target.value)}
+                                className="h-9 w-full rounded-md border-gray-200 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm"
+                            >
+                                <option value="">All Statuses</option>
+                                <option value="Open">Open</option>
+                                <option value="In Progress">In Progress</option>
+                                <option value="Resolved">Resolved</option>
+                            </select>
+                            <select
+                                value={filterPriority}
+                                onChange={(e) => setFilterPriority(e.target.value)}
+                                className="h-9 w-full rounded-md border-gray-200 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm"
+                            >
+                                <option value="">All Priorities</option>
+                                <option value="High">High</option>
+                                <option value="Medium">Medium</option>
+                                <option value="Low">Low</option>
+                            </select>
+                        </div>
+                    </ActionBar>
+                )}
+
+                <SectionCard>
+                    <DataTable
+                        columns={columns}
+                        data={isAdmin ? filteredTickets : tickets?.data || []}
+                        emptyState={emptyStateContent}
+                        className="border-0 shadow-none rounded-none"
+                    />
+                </SectionCard>
+            </AppPage>
 
             {/* Create Ticket Modal */}
             <Modal show={isCreating} onClose={() => setIsCreating(false)}>
-                <div className="p-6">
-                    <h2 className="mb-4 text-lg font-medium text-gray-900">
-                        Open New Ticket
-                    </h2>
+                <div className="p-6 space-y-6">
+                    <div className="flex flex-col space-y-1">
+                        <h2 className="text-xl font-semibold tracking-tight text-gray-900">
+                            Open New Ticket
+                        </h2>
+                        <p className="text-sm text-gray-500">
+                            Please describe your issue below. We'll get back to you as soon as possible.
+                        </p>
+                    </div>
+                    
                     <form onSubmit={submitTicket} className="space-y-4">
-                        <div>
-                            <InputLabel htmlFor="subject" value="Subject" />
+                        <div className="space-y-2">
+                            <InputLabel htmlFor="subject" value="Subject" className="text-sm font-medium" />
                             <TextInput
                                 id="subject"
                                 type="text"
-                                className="mt-1 block w-full"
+                                className="block w-full border-gray-200 focus:ring-indigo-500 focus:border-indigo-500 rounded-lg shadow-sm"
                                 value={form.subject}
                                 onChange={(e) =>
                                     setForm({
@@ -181,18 +198,16 @@ export default function TicketsIndex({ tickets, isAdmin }) {
                                     })
                                 }
                                 required
+                                placeholder="E.g., Problem with billing invoice"
                             />
-                            <InputError
-                                message={errors.subject}
-                                className="mt-2"
-                            />
+                            <InputError message={errors.subject} />
                         </div>
 
-                        <div>
-                            <InputLabel htmlFor="priority" value="Priority" />
+                        <div className="space-y-2">
+                            <InputLabel htmlFor="priority" value="Priority" className="text-sm font-medium" />
                             <select
                                 id="priority"
-                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                className="block w-full rounded-lg border-gray-200 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm"
                                 value={form.priority}
                                 onChange={(e) =>
                                     setForm({
@@ -201,25 +216,19 @@ export default function TicketsIndex({ tickets, isAdmin }) {
                                     })
                                 }
                             >
-                                <option value="Low">Low</option>
-                                <option value="Medium">Medium</option>
-                                <option value="High">High</option>
+                                <option value="Low">Low - General Question</option>
+                                <option value="Medium">Medium - Issue / Bug</option>
+                                <option value="High">High - Urgent / Blocker</option>
                             </select>
-                            <InputError
-                                message={errors.priority}
-                                className="mt-2"
-                            />
+                            <InputError message={errors.priority} />
                         </div>
 
-                        <div>
-                            <InputLabel
-                                htmlFor="description"
-                                value="Description"
-                            />
+                        <div className="space-y-2">
+                            <InputLabel htmlFor="description" value="Description" className="text-sm font-medium" />
                             <textarea
                                 id="description"
-                                rows="4"
-                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                rows="5"
+                                className="block w-full rounded-lg border-gray-200 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm resize-none"
                                 value={form.description}
                                 onChange={(e) =>
                                     setForm({
@@ -228,22 +237,18 @@ export default function TicketsIndex({ tickets, isAdmin }) {
                                     })
                                 }
                                 required
+                                placeholder="Please provide detailed information about your request..."
                             />
-                            <InputError
-                                message={errors.description}
-                                className="mt-2"
-                            />
+                            <InputError message={errors.description} />
                         </div>
 
-                        <div className="mt-6 flex justify-end gap-3">
-                            <SecondaryButton
-                                onClick={() => setIsCreating(false)}
-                            >
+                        <div className="pt-4 flex justify-end gap-3 border-t border-gray-100">
+                            <Button type="button" variant="outline" onClick={() => setIsCreating(false)}>
                                 Cancel
-                            </SecondaryButton>
-                            <PrimaryButton type="submit">
+                            </Button>
+                            <Button type="submit" className="bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm">
                                 Submit Ticket
-                            </PrimaryButton>
+                            </Button>
                         </div>
                     </form>
                 </div>
@@ -256,48 +261,40 @@ export default function TicketsIndex({ tickets, isAdmin }) {
                 maxWidth="4xl"
             >
                 {selectedTicket && (
-                    <div className="flex h-[80vh] flex-col">
-                        <div className="flex items-center justify-between border-b bg-gray-50 p-4">
-                            <div>
-                                <h2 className="flex items-center gap-2 text-lg font-semibold">
-                                    #{selectedTicket.id} -{' '}
-                                    {selectedTicket.subject}
-                                    <StatusBadge
-                                        status={selectedTicket.status}
-                                    />
-                                </h2>
+                    <div className="flex h-[80vh] flex-col overflow-hidden bg-gray-50 rounded-lg">
+                        <div className="flex items-center justify-between border-b border-gray-200 bg-white px-6 py-4 shadow-sm z-10">
+                            <div className="space-y-1">
+                                <div className="flex items-center gap-3">
+                                    <h2 className="text-lg font-semibold tracking-tight text-gray-900">
+                                        #{selectedTicket.id} - {selectedTicket.subject}
+                                    </h2>
+                                    <StatusBadge status={selectedTicket.status} />
+                                </div>
                                 {isAdmin && selectedTicket.user && (
-                                    <p className="mt-1 text-sm text-gray-500">
-                                        Client: {selectedTicket.user.name}
+                                    <p className="text-sm text-gray-500 flex items-center gap-1">
+                                        Client: <span className="font-medium text-gray-700">{selectedTicket.user.name}</span>
                                     </p>
                                 )}
                             </div>
-                            <div className="flex gap-2">
-                                {isAdmin &&
-                                    selectedTicket.status !== 'Resolved' && (
-                                        <PrimaryButton
-                                            onClick={() =>
-                                                markResolved(selectedTicket.id)
-                                            }
-                                        >
-                                            Mark Resolved
-                                        </PrimaryButton>
-                                    )}
-                                <SecondaryButton
-                                    onClick={() => setSelectedTicket(null)}
-                                >
+                            <div className="flex items-center gap-3">
+                                {isAdmin && selectedTicket.status !== 'Resolved' && (
+                                    <Button
+                                        variant="outline"
+                                        className="border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
+                                        onClick={() => markResolved(selectedTicket.id)}
+                                    >
+                                        Mark as Resolved
+                                    </Button>
+                                )}
+                                <Button variant="secondary" onClick={() => setSelectedTicket(null)}>
                                     Close
-                                </SecondaryButton>
+                                </Button>
                             </div>
                         </div>
 
-                        <div className="flex-1 overflow-hidden bg-white p-0">
-                            {/* Assuming conversation ID is tied to the ticket, or passed as ticket.conversation_id */}
+                        <div className="flex-1 overflow-hidden bg-white/50 relative p-0">
                             <ChatWindow
-                                conversationId={
-                                    selectedTicket.conversation_id ||
-                                    selectedTicket.id
-                                }
+                                conversationId={selectedTicket.conversation_id || selectedTicket.id}
                                 participants={[
                                     {
                                         id: selectedTicket.user_id,
@@ -310,6 +307,6 @@ export default function TicketsIndex({ tickets, isAdmin }) {
                     </div>
                 )}
             </Modal>
-        </div>
+        </AppLayout>
     );
 }

@@ -54,11 +54,13 @@ export default function ResetPassword({
                             type="email"
                             value={data.email}
                             autoComplete="username"
-                            error={errors.email}
                             onChange={(e) => setData('email', e.target.value)}
                             required
                             className="h-10 px-3 py-2 text-sm rounded-lg border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/50 focus-visible:ring-2 focus-visible:ring-zinc-900 dark:focus-visible:ring-zinc-100 transition-all font-normal"
                         />
+                        {errors.email && (
+                            <p className="text-xs text-red-500 font-medium mt-1">{errors.email}</p>
+                        )}
                     </div>
 
                     <div className="space-y-2">
@@ -73,7 +75,6 @@ export default function ResetPassword({
                                 value={data.password}
                                 autoComplete="new-password"
                                 autoFocus
-                                error={errors.password}
                                 onChange={(e) => setData('password', e.target.value)}
                                 required
                                 className="h-10 px-3 py-2 pr-10 text-sm rounded-lg border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/50 focus-visible:ring-2 focus-visible:ring-zinc-900 dark:focus-visible:ring-zinc-100 transition-all font-normal"
@@ -87,6 +88,9 @@ export default function ResetPassword({
                                 {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                             </button>
                         </div>
+                        {errors.password && (
+                            <p className="text-xs text-red-500 font-medium mt-1">{errors.password}</p>
+                        )}
                     </div>
 
                     <div className="space-y-2">
@@ -99,11 +103,13 @@ export default function ResetPassword({
                             placeholder="••••••••"
                             value={data.password_confirmation}
                             autoComplete="new-password"
-                            error={errors.password_confirmation}
                             onChange={(e) => setData('password_confirmation', e.target.value)}
                             required
                             className="h-10 px-3 py-2 text-sm rounded-lg border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/50 focus-visible:ring-2 focus-visible:ring-zinc-900 dark:focus-visible:ring-zinc-100 transition-all font-normal"
                         />
+                        {errors.password_confirmation && (
+                            <p className="text-xs text-red-500 font-medium mt-1">{errors.password_confirmation}</p>
+                        )}
                     </div>
 
                     <div className="pt-2">

@@ -11,10 +11,12 @@ import { Textarea } from '@/Components/ui/textarea';
 import { formatMoney, formatDate } from '@/lib/utils';
 import { Clock, DollarSign, Briefcase, MapPin, CheckCircle2, AlertCircle, FileText, Send, User } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from "@/Components/ui/alert";
+import { CurrencyDisplay as FinancialAmount } from '@/Components/ui/CurrencyDisplay';
 
 export default function ShowJob({ auth, job: initialJob, pointsCost = 5 }: any) {
     const { mode } = useFreelanceMode();
     const isClient = mode === 'client';
+    const globalCurrency = auth?.user?.preferred_currency || 'USD';
 
     // Mock fallback if job is missing
     const job = initialJob || {
@@ -130,7 +132,7 @@ export default function ShowJob({ auth, job: initialJob, pointsCost = 5 }: any) 
                                                         </div>
                                                         <div className="text-right">
                                                             <div className="text-xl font-bold text-indigo-700 font-mono">
-                                                                {formatMoney(proposal.bid_amount, proposal.currency_code)}
+                                                                <FinancialAmount amount={proposal.bid_amount} currency={globalCurrency} />
                                                             </div>
                                                             <Badge variant="outline" className="mt-1 bg-amber-50 text-amber-700 border-amber-200">
                                                                 {proposal.status}
@@ -175,7 +177,7 @@ export default function ShowJob({ auth, job: initialJob, pointsCost = 5 }: any) 
                                         </div>
                                         <div>
                                             <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Budget</p>
-                                            <p className="font-bold text-slate-900">{formatMoney(job.budget, job.currency_code)}</p>
+                                            <div className="font-bold text-slate-900"><FinancialAmount amount={job.budget} currency={globalCurrency} /></div>
                                             <p className="text-xs text-slate-500 mt-0.5 capitalize">{job.type} Price</p>
                                         </div>
                                     </div>
@@ -240,7 +242,7 @@ export default function ShowJob({ auth, job: initialJob, pointsCost = 5 }: any) 
 
                                             <form onSubmit={submitProposal} className="space-y-4">
                                                 <div className="space-y-1.5">
-                                                    <Label htmlFor="bid_amount">Your Bid ({job.currency_code})</Label>
+                                                    <Label htmlFor="bid_amount">Your Bid ({globalCurrency})</Label>
                                                     <Input
                                                         id="bid_amount"
                                                         type="number"

@@ -1,12 +1,20 @@
 import { Breadcrumbs } from './Breadcrumbs';
 
+export interface PageHeaderProps {
+    title: string;
+    subtitle?: string;
+    icon?: any;
+    actions?: any;
+    breadcrumbs?: any[];
+}
+
 export function PageHeader({
     title,
     subtitle,
     icon: Icon,
     actions,
     breadcrumbs,
-}) {
+}: PageHeaderProps) {
     return (
         <div className="mb-6 flex flex-col space-y-4">
             {breadcrumbs && breadcrumbs.length > 0 && (

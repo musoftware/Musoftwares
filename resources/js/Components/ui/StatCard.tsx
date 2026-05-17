@@ -1,19 +1,31 @@
+import React from 'react';
 import { cn } from '@/lib/utils';
 import { ArrowDown, ArrowUp } from 'lucide-react';
 import { SkeletonStatCard } from './SkeletonLoaders';
+
+export interface StatCardProps {
+    label: string;
+    value: string | number | React.ReactNode;
+    change?: string | number;
+    changeType?: 'up' | 'down' | 'neutral';
+    icon?: any;
+    iconColor?: 'primary' | 'success' | 'warning' | 'danger' | 'info';
+    loading?: boolean;
+    isMoney?: boolean;
+}
 
 export function StatCard({
     label,
     value,
     change,
-    changeType,
+    changeType = 'neutral',
     icon: Icon,
     iconColor = 'primary',
     loading = false,
     isMoney = false,
-}) {
+}: StatCardProps) {
     if (loading) {
-        return <SkeletonStatCard />;
+        return <SkeletonStatCard className="" />;
     }
 
     const iconBgClasses = {

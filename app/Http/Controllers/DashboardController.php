@@ -109,6 +109,14 @@ class DashboardController extends Controller
             ->where('status', 'active')
             ->count();
 
+        // ── Active Modules List ──────────────────────────────────
+        $subscriptionService = app(\App\Services\SubscriptionService::class);
+        $subscribedModules = [
+            'erp' => $subscriptionService->hasActiveSubscription($user, 'erp'),
+            'freelance' => $subscriptionService->hasActiveSubscription($user, 'freelance'),
+            'marketing' => $subscriptionService->hasActiveSubscription($user, 'marketing'),
+        ];
+
         // ── Build stats ──────────────────────────────────────────
         $stats = [
             'walletBalance' => $walletBalance,
@@ -126,6 +134,7 @@ class DashboardController extends Controller
             'stats' => $stats,
             'pendingInvoices' => $pendingInvoices,
             'recentTransactions' => $recentTransactions,
+            'subscribedModules' => $subscribedModules,
         ]);
     }
 
