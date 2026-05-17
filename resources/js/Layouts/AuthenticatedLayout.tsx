@@ -134,7 +134,7 @@ export default function Authenticated({
                                     <DropdownMenuTrigger className="inline-flex items-center px-3 py-2 text-sm font-medium text-slate-500 hover:bg-slate-50 hover:text-slate-900 rounded-md outline-none">
                                         More <ChevronDown className="ml-1 h-3.5 w-3.5 opacity-50" />
                                     </DropdownMenuTrigger>
-                                    <DropdownMenuContent align="start" className="w-[450px] p-4 grid grid-cols-2 gap-4 rounded-xl shadow-xl border-slate-100">
+                                    <DropdownMenuContent align="start" className="w-[450px] p-4 grid grid-cols-2 gap-4 rounded-xl shadow-xl border border-slate-200 bg-white isolate z-50">
                                         <div>
                                             <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2 px-2">Financial</h4>
                                             <div className="space-y-0.5">
@@ -171,7 +171,7 @@ export default function Authenticated({
                                     <DropdownMenuTrigger className="inline-flex items-center px-3 py-2 text-sm font-medium text-indigo-600 hover:bg-indigo-50 rounded-md outline-none transition-colors">
                                         <Sparkles className="mr-1.5 h-3.5 w-3.5" /> iSAAS <ChevronDown className="ml-1 h-3.5 w-3.5 opacity-50" />
                                     </DropdownMenuTrigger>
-                                    <DropdownMenuContent align="start" className="w-[300px] p-2 rounded-xl shadow-xl border-slate-100">
+                                    <DropdownMenuContent align="start" className="w-[300px] p-2 rounded-xl shadow-xl border border-slate-200 bg-white isolate z-50">
                                         <div className="px-2 py-2 mb-1 border-b border-slate-50">
                                             <p className="text-xs font-medium text-slate-500">Connected Workspaces</p>
                                         </div>
@@ -231,7 +231,7 @@ export default function Authenticated({
                                         <span className="absolute top-2 right-2 w-2 h-2 bg-rose-500 rounded-full border-2 border-white"></span>
                                     )}
                                 </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end" className="w-80 p-0 rounded-xl shadow-xl border-slate-100">
+                                <DropdownMenuContent align="end" className="w-80 p-0 rounded-xl shadow-xl border border-slate-200 bg-white isolate z-50">
                                     <div className="px-4 py-3 border-b border-slate-100 flex justify-between items-center">
                                         <span className="font-semibold text-slate-900 text-sm">Notifications</span>
                                         <Link href="#" className="text-xs text-indigo-600 hover:text-indigo-700 font-medium">Mark all read</Link>
@@ -256,7 +256,7 @@ export default function Authenticated({
                                         </AvatarFallback>
                                     </Avatar>
                                 </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end" className="w-56 p-2 rounded-xl shadow-xl border-slate-100">
+                                <DropdownMenuContent align="end" className="w-56 p-2 rounded-xl shadow-xl border border-slate-200 bg-white isolate z-50">
                                     <div className="px-2 py-2 mb-2 border-b border-slate-50">
                                         <p className="text-sm font-medium text-slate-900 truncate">{user?.name || 'SaaS User'}</p>
                                         <p className="text-xs text-slate-500 truncate">{user?.email || 'user@example.com'}</p>
