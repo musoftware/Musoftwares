@@ -32,23 +32,42 @@ class WalletController extends Controller
         }
 
         $user = \App\Models\User::find($client);
-        if ($user) {
-            return Client::firstOrCreate(
-                ['email' => $user->email],
-                [
-                    'name' => $user->name, 
-                    'phone' => $user->phone ?? '+1 (555) 019-2834',
-                    'address' => '120 San Francisco, CA'
-                ]
-            );
+        $email = $user ? $user->email : 'billing@acme.corp';
+        $name = $user ? $user->name : 'Acme Corp Solutions';
+        $phone = ($user && !empty($user->phone)) ? $user->phone : '+1 (555) 019-2834';
+
+        // Dynamically resolve tenant_id
+        $tenantId = session('tenant_id');
+        if (!$tenantId) {
+            $tenant = Tenant::first();
+            if (!$tenant) {
+                $owner = \App\Models\User::where('role', 'admin')->first() ?: \App\Models\User::first();
+                if (!$owner) {
+                    $owner = \App\Models\User::create([
+                        'name' => 'System Owner',
+                        'email' => 'owner@app.com',
+                        'password' => bcrypt('password'),
+                        'role' => 'admin',
+                    ]);
+                }
+                $tenant = Tenant::create([
+                    'user_id' => $owner->id,
+                    'name' => 'Default Tenant',
+                    'status' => 'active',
+                ]);
+            }
+            $tenantId = $tenant->id;
+            session(['tenant_id' => $tenantId]);
         }
 
         return Client::firstOrCreate(
-            ['email' => 'billing@acme.corp'],
+            ['email' => $email],
             [
-                'name' => 'Acme Corp Solutions', 
-                'phone' => '+1 (555) 019-2834',
-                'address' => '120 San Francisco, CA'
+                'tenant_id' => $tenantId,
+                'name' => $name, 
+                'phone' => $phone,
+                'address' => '120 San Francisco, CA',
+                'currency' => 'USD',
             ]
         );
     }
