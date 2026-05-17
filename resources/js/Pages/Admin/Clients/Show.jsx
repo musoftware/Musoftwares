@@ -1,4 +1,4 @@
-import { Head } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 import { Copy, Mail, MessageCircle } from 'lucide-react';
 
 export default function Show({ client, wallets }) {
@@ -147,7 +147,15 @@ export default function Show({ client, wallets }) {
                     {wallets.map((wallet) => (
                         <div key={wallet.id} className="bg-white p-6 rounded-[12px] shadow-sm border border-gray-100">
                             <div className="flex justify-between items-end mb-4 border-b pb-2">
-                                <h2 className="text-xl font-bold font-sora">Wallet ({wallet.context})</h2>
+                                <div>
+                                    <h2 className="text-xl font-bold font-sora">Wallet ({wallet.context})</h2>
+                                    <Link 
+                                        href={`/erp/clients/${client.id}/wallet`}
+                                        className="text-xs font-semibold text-indigo-600 hover:underline mt-1 inline-block"
+                                    >
+                                        Manage Detailed Ledger &rarr;
+                                    </Link>
+                                </div>
                                 <span className="text-3xl font-bold text-green-600 font-jetbrains">
                                     {formatCurrency(wallet.balance, wallet.currency)}
                                 </span>

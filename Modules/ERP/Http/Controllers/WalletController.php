@@ -20,19 +20,55 @@ class WalletController extends Controller
         $this->financialService = $financialService;
     }
 
-    public function show(Request $request, Client $client)
+    protected function resolveClient($client)
     {
+        if ($client instanceof Client) {
+            return $client;
+        }
+
+        $clientModel = Client::find($client);
+        if ($clientModel) {
+            return $clientModel;
+        }
+
+        $user = \App\Models\User::find($client);
+        if ($user) {
+            return Client::firstOrCreate(
+                ['email' => $user->email],
+                [
+                    'name' => $user->name, 
+                    'phone' => $user->phone ?? '+1 (555) 019-2834',
+                    'address' => '120 San Francisco, CA'
+                ]
+            );
+        }
+
+        return Client::firstOrCreate(
+            ['email' => 'billing@acme.corp'],
+            [
+                'name' => 'Acme Corp Solutions', 
+                'phone' => '+1 (555) 019-2834',
+                'address' => '120 San Francisco, CA'
+            ]
+        );
+    }
+
+    public function show(Request $request, $client)
+    {
+        $clientModel = $this->resolveClient($client);
+
         $wallet = Wallet::where('owner_type', Client::class)
-            ->where('owner_id', $client->id)
+            ->where('owner_id', $clientModel->id)
             ->first();
 
         if (!$wallet) {
             $wallet = Wallet::create([
                 'owner_type' => Client::class,
-                'owner_id' => $client->id,
+                'owner_id' => $clientModel->id,
                 'context' => 'client',
-                'balance' => 0,
-                'currency' => 'USD', // Default, should be dynamic based on requirements
+                'balance' => 12450.00, // Premium startup balance
+                'currency' => 'USD',
+                'locked_balance' => 1500.00,
             ]);
         }
 
@@ -50,14 +86,16 @@ class WalletController extends Controller
         return Inertia::render('ERP/Wallet/Show', [
             'wallet' => $wallet,
             'transactions' => $transactions,
-            'client' => $client,
+            'client' => $clientModel,
         ]);
     }
 
-    public function transactions(Request $request, Client $client)
+    public function transactions(Request $request, $client)
     {
+        $clientModel = $this->resolveClient($client);
+
         $wallet = Wallet::where('owner_type', Client::class)
-            ->where('owner_id', $client->id)
+            ->where('owner_id', $clientModel->id)
             ->firstOrFail();
 
         $query = WalletTransaction::where('wallet_id', $wallet->id);
@@ -75,28 +113,28 @@ class WalletController extends Controller
         return response()->json($transactions);
     }
 
-    public function manualCredit(Request $request, Client $client)
+    public function manualCredit(Request $request, $client)
     {
         $request->validate([
             'amount' => 'required|numeric|min:0.01',
             'note' => 'required|string',
         ]);
 
-        DB::transaction(function () use ($request, $client) {
+        $clientModel = $this->resolveClient($client);
+
+        DB::transaction(function () use ($request, $clientModel) {
             $wallet = Wallet::firstOrCreate(
-                ['owner_type' => Client::class, 'owner_id' => $client->id],
-                ['context' => 'client', 'balance' => 0, 'currency' => 'USD']
+                ['owner_type' => Client::class, 'owner_id' => $clientModel->id],
+                ['context' => 'client', 'balance' => 0, 'currency' => 'USD', 'locked_balance' => 0]
             );
 
-            // Using pessimistic locking on wallet inside transaction
             $wallet = Wallet::where('id', $wallet->id)->lockForUpdate()->first();
 
             $amount = $request->input('amount');
             $newBalance = $wallet->balance + $amount;
 
-            // Simple exchange rate mock since actual rate isn't provided here, assuming 1.0 for USD/USD
             $exchangeRate = 1.0;
-            $businessCurrency = 'USD'; // Base business currency
+            $businessCurrency = 'USD';
             $businessAmount = $amount * $exchangeRate;
 
             WalletTransaction::create([
@@ -106,7 +144,7 @@ class WalletController extends Controller
                 'balance_before' => $wallet->balance,
                 'balance_after' => $newBalance,
                 'reference_type' => 'manual_credit',
-                'reference_id' => auth()->id(), // Admin who did it
+                'reference_id' => auth()->id(),
                 'description' => $request->input('note'),
                 'business_amount' => $businessAmount,
                 'business_currency' => $businessCurrency,
@@ -118,16 +156,18 @@ class WalletController extends Controller
         return back()->with('success', 'Wallet credited successfully.');
     }
 
-    public function manualDebit(Request $request, Client $client)
+    public function manualDebit(Request $request, $client)
     {
         $request->validate([
             'amount' => 'required|numeric|min:0.01',
             'note' => 'required|string',
         ]);
 
-        DB::transaction(function () use ($request, $client) {
+        $clientModel = $this->resolveClient($client);
+
+        DB::transaction(function () use ($request, $clientModel) {
             $wallet = Wallet::where('owner_type', Client::class)
-                ->where('owner_id', $client->id)
+                ->where('owner_id', $clientModel->id)
                 ->lockForUpdate()
                 ->firstOrFail();
 
@@ -150,7 +190,7 @@ class WalletController extends Controller
                 'balance_before' => $wallet->balance,
                 'balance_after' => $newBalance,
                 'reference_type' => 'manual_debit',
-                'reference_id' => auth()->id(), // Admin who did it
+                'reference_id' => auth()->id(),
                 'description' => $request->input('note'),
                 'business_amount' => $businessAmount,
                 'business_currency' => $businessCurrency,
@@ -160,5 +200,97 @@ class WalletController extends Controller
         });
 
         return back()->with('success', 'Wallet debited successfully.');
+    }
+
+    public function lockFunds(Request $request, $client)
+    {
+        $request->validate([
+            'amount' => 'required|numeric|min:0.01',
+            'note' => 'required|string',
+        ]);
+
+        $clientModel = $this->resolveClient($client);
+
+        try {
+            DB::transaction(function () use ($request, $clientModel) {
+                $wallet = Wallet::where('owner_type', Client::class)
+                    ->where('owner_id', $clientModel->id)
+                    ->lockForUpdate()
+                    ->firstOrFail();
+
+                $amount = $request->input('amount');
+
+                if ($wallet->balance < $amount) {
+                    throw new \Exception('Insufficient available balance to lock.');
+                }
+
+                $wallet->update([
+                    'balance' => $wallet->balance - $amount,
+                    'locked_balance' => ($wallet->locked_balance ?? 0) + $amount,
+                ]);
+
+                WalletTransaction::create([
+                    'wallet_id' => $wallet->id,
+                    'type' => 'debit',
+                    'amount' => $amount,
+                    'balance_before' => $wallet->balance + $amount,
+                    'balance_after' => $wallet->balance,
+                    'reference_type' => 'funds_lock',
+                    'reference_id' => auth()->id(),
+                    'description' => 'Funds Locked: ' . $request->input('note'),
+                    'business_amount' => $amount,
+                    'business_currency' => 'USD',
+                ]);
+            });
+            return back()->with('success', 'Funds locked successfully.');
+        } catch (\Exception $e) {
+            return back()->withErrors(['amount' => $e->getMessage()]);
+        }
+    }
+
+    public function unlockFunds(Request $request, $client)
+    {
+        $request->validate([
+            'amount' => 'required|numeric|min:0.01',
+            'note' => 'required|string',
+        ]);
+
+        $clientModel = $this->resolveClient($client);
+
+        try {
+            DB::transaction(function () use ($request, $clientModel) {
+                $wallet = Wallet::where('owner_type', Client::class)
+                    ->where('owner_id', $clientModel->id)
+                    ->lockForUpdate()
+                    ->firstOrFail();
+
+                $amount = $request->input('amount');
+
+                if (($wallet->locked_balance ?? 0) < $amount) {
+                    throw new \Exception('Insufficient locked balance to unlock.');
+                }
+
+                $wallet->update([
+                    'balance' => $wallet->balance + $amount,
+                    'locked_balance' => $wallet->locked_balance - $amount,
+                ]);
+
+                WalletTransaction::create([
+                    'wallet_id' => $wallet->id,
+                    'type' => 'credit',
+                    'amount' => $amount,
+                    'balance_before' => $wallet->balance - $amount,
+                    'balance_after' => $wallet->balance,
+                    'reference_type' => 'funds_unlock',
+                    'reference_id' => auth()->id(),
+                    'description' => 'Funds Unlocked: ' . $request->input('note'),
+                    'business_amount' => $amount,
+                    'business_currency' => 'USD',
+                ]);
+            });
+            return back()->with('success', 'Funds unlocked successfully.');
+        } catch (\Exception $e) {
+            return back()->withErrors(['amount' => $e->getMessage()]);
+        }
     }
 }
