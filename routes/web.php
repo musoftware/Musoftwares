@@ -109,6 +109,9 @@ Route::middleware(['auth', 'verified', 'onboarding'])->prefix('freelance')->name
     })->name('points.index');
     Route::resource('point-packages', \Modules\Freelance\Http\Controllers\PointPackageController::class)->except(['create', 'show', 'edit']);
     Route::post('/point-purchases', [\Modules\Freelance\Http\Controllers\PointPurchaseController::class, 'store'])->name('point-purchases.store');
+    Route::post('/point-purchases/wallet', [\Modules\Freelance\Http\Controllers\PointPurchaseController::class, 'storeWallet'])->name('point-purchases.store-wallet');
+    Route::get('/point-purchases/success', [\Modules\Freelance\Http\Controllers\PointPurchaseController::class, 'success'])->name('point-purchases.success');
+    Route::get('/point-purchases/failure', [\Modules\Freelance\Http\Controllers\PointPurchaseController::class, 'failure'])->name('point-purchases.failure');
 
     // Jobs
     Route::get('/jobs/browse', [\Modules\Freelance\Http\Controllers\FreelanceJobController::class, 'index'])->name('jobs.browse');
@@ -236,6 +239,7 @@ Route::middleware(['auth', 'verified'])->prefix('financial')->name('financial.')
 
 // Kashier Webhook (No Auth required)
 Route::post('/financial/add-balance/webhook', [\App\Http\Controllers\FinancialController::class, 'webhook'])->name('financial.add-balance.webhook');
+Route::post('/freelance/point-purchases/webhook', [\Modules\Freelance\Http\Controllers\PointPurchaseController::class, 'webhook'])->name('freelance.point-purchases.webhook');
 
 // General Messages Route
 Route::middleware(['auth', 'verified'])->group(function () {

@@ -2,6 +2,10 @@ import React, { useState } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link } from '@inertiajs/react';
 import confetti from 'canvas-confetti';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/Components/ui/card';
+import { Button } from '@/Components/ui/button';
+import { Input } from '@/Components/ui/input';
+import { Label } from '@/Components/ui/label';
 
 export default function Onboarding() {
     const [step, setStep] = useState(1);
@@ -15,22 +19,20 @@ export default function Onboarding() {
     };
 
     return (
-        <AuthenticatedLayout
-            header={<h2 className="font-semibold text-xl text-gray-800 leading-tight">ERP Setup Wizard</h2>}
-        >
+        <AuthenticatedLayout header="ERP Setup Wizard">
             <Head title="Onboarding" />
 
-            <div className="py-12">
-                <div className="max-w-3xl mx-auto sm:px-6 lg:px-8">
-                    <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg p-8">
+            <div className="py-12 px-4 max-w-2xl mx-auto">
+                <Card className="shadow-none border bg-card text-card-foreground">
+                    <CardContent className="p-8">
                         {/* Progress Bar */}
                         <div className="mb-8 text-center">
-                            <p className="text-sm text-gray-500 mb-2">Step {step} of 4</p>
+                            <p className="text-sm text-muted-foreground mb-3 font-medium">Step {step} of 4</p>
                             <div className="flex justify-center space-x-2">
                                 {[1, 2, 3, 4].map((s) => (
                                     <div
                                         key={s}
-                                        className={`h-2 w-8 rounded-full ${s <= step ? 'bg-indigo-600' : 'bg-gray-200'}`}
+                                        className={`h-2 w-10 rounded-full transition-colors ${s <= step ? 'bg-primary' : 'bg-muted'}`}
                                     />
                                 ))}
                             </div>
@@ -38,103 +40,116 @@ export default function Onboarding() {
 
                         {/* Step 1 */}
                         {step === 1 && (
-                            <div className="space-y-6">
-                                <h3 className="text-2xl font-bold font-sora">Business Setup</h3>
+                            <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2">
+                                <div className="space-y-1">
+                                    <h3 className="text-2xl font-bold tracking-tight">Business Setup</h3>
+                                    <p className="text-sm text-muted-foreground">Configure your foundational workspace settings.</p>
+                                </div>
                                 <div className="space-y-4">
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700">Business Name</label>
-                                        <input type="text" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" placeholder="Acme Inc" />
+                                    <div className="space-y-2">
+                                        <Label htmlFor="businessName">Business Name</Label>
+                                        <Input id="businessName" placeholder="Acme Inc" />
                                     </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700">Base Currency</label>
-                                        <select className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                                    <div className="space-y-2">
+                                        <Label htmlFor="baseCurrency">Base Currency</Label>
+                                        <select id="baseCurrency" className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
                                             <option>USD</option>
                                             <option>EUR</option>
                                             <option>GBP</option>
                                         </select>
                                     </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700">Timezone</label>
-                                        <select className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                                    <div className="space-y-2">
+                                        <Label htmlFor="timezone">Timezone</Label>
+                                        <select id="timezone" className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
                                             <option>UTC</option>
                                             <option>America/New_York</option>
                                         </select>
                                     </div>
                                 </div>
-                                <button onClick={() => setStep(2)} className="w-full bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition">Continue →</button>
+                                <Button onClick={() => setStep(2)} className="w-full h-11 shadow-none">Continue →</Button>
                             </div>
                         )}
 
                         {/* Step 2 */}
                         {step === 2 && (
-                            <div className="space-y-6">
-                                <h3 className="text-2xl font-bold font-sora">Add First Client</h3>
+                            <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2">
+                                <div className="space-y-1">
+                                    <h3 className="text-2xl font-bold tracking-tight">Add First Client</h3>
+                                    <p className="text-sm text-muted-foreground">Create a profile for your first tenant.</p>
+                                </div>
                                 <div className="space-y-4">
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700">Client Name</label>
-                                        <input type="text" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" placeholder="John Doe" />
+                                    <div className="space-y-2">
+                                        <Label htmlFor="clientName">Client Name</Label>
+                                        <Input id="clientName" placeholder="John Doe" />
                                     </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700">Email</label>
-                                        <input type="email" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" placeholder="john@example.com" />
+                                    <div className="space-y-2">
+                                        <Label htmlFor="clientEmail">Email</Label>
+                                        <Input id="clientEmail" type="email" placeholder="john@example.com" />
                                     </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700">Currency</label>
-                                        <select className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                                    <div className="space-y-2">
+                                        <Label htmlFor="clientCurrency">Currency</Label>
+                                        <select id="clientCurrency" className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
                                             <option>USD</option>
                                         </select>
                                     </div>
                                 </div>
-                                <div className="flex space-x-4">
-                                    <button onClick={() => setStep(3)} className="flex-1 bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition">Add Client</button>
-                                    <button onClick={() => setStep(3)} className="flex-1 bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition">Skip for now</button>
+                                <div className="flex gap-3">
+                                    <Button variant="outline" onClick={() => setStep(3)} className="w-1/3">Skip</Button>
+                                    <Button onClick={() => setStep(3)} className="w-2/3 shadow-none">Add Client</Button>
                                 </div>
                             </div>
                         )}
 
                         {/* Step 3 */}
                         {step === 3 && (
-                            <div className="space-y-6">
-                                <h3 className="text-2xl font-bold font-sora">Create First Invoice</h3>
+                            <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2">
+                                <div className="space-y-1">
+                                    <h3 className="text-2xl font-bold tracking-tight">Create First Invoice</h3>
+                                    <p className="text-sm text-muted-foreground">Draft your first billable invoice.</p>
+                                </div>
                                 <div className="space-y-4">
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700">Title / Description</label>
-                                        <input type="text" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" placeholder="Web Design Services" />
+                                    <div className="space-y-2">
+                                        <Label htmlFor="invoiceDesc">Title / Description</Label>
+                                        <Input id="invoiceDesc" placeholder="Web Design Services" />
                                     </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700">Amount</label>
-                                        <input type="number" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" placeholder="1000.00" />
+                                    <div className="space-y-2">
+                                        <Label htmlFor="invoiceAmount">Amount</Label>
+                                        <Input id="invoiceAmount" type="number" placeholder="1000.00" />
                                     </div>
                                 </div>
-                                <div className="flex space-x-4">
-                                    <button onClick={() => { setStep(4); handleComplete(); }} className="flex-1 bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition">Create Invoice</button>
-                                    <button onClick={() => { setStep(4); handleComplete(); }} className="flex-1 bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition">Skip for now</button>
+                                <div className="flex gap-3">
+                                    <Button variant="outline" onClick={() => { setStep(4); handleComplete(); }} className="w-1/3">Skip</Button>
+                                    <Button onClick={() => { setStep(4); handleComplete(); }} className="w-2/3 shadow-none">Create Invoice</Button>
                                 </div>
                             </div>
                         )}
 
                         {/* Step 4 */}
                         {step === 4 && (
-                            <div className="text-center space-y-6 py-8">
-                                <h3 className="text-3xl font-bold font-sora text-indigo-600">You're all set! 🎉</h3>
-                                <p className="text-gray-600">Your business has been successfully configured.</p>
-                                <div className="bg-gray-50 p-4 rounded-lg text-left inline-block w-full max-w-sm mx-auto">
-                                    <h4 className="font-semibold mb-2">Summary</h4>
-                                    <ul className="space-y-2 text-sm text-gray-600">
-                                        <li>✓ Business profile created</li>
-                                        <li>✓ Base currency configured</li>
-                                        <li>✓ Settings initialized</li>
+                            <div className="text-center space-y-6 py-8 animate-in zoom-in-95">
+                                <div className="space-y-2">
+                                    <h3 className="text-3xl font-bold tracking-tight text-primary">You're all set! 🎉</h3>
+                                    <p className="text-muted-foreground">Your business has been successfully configured.</p>
+                                </div>
+                                <div className="bg-muted p-5 rounded-xl text-left inline-block w-full max-w-sm mx-auto border border-border">
+                                    <h4 className="font-semibold text-foreground mb-3 text-sm">Summary</h4>
+                                    <ul className="space-y-2 text-sm text-muted-foreground font-medium">
+                                        <li className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-primary" /> Business profile created</li>
+                                        <li className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-primary" /> Base currency configured</li>
+                                        <li className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-primary" /> Settings initialized</li>
                                     </ul>
                                 </div>
-                                <div>
-                                    <Link href="/erp/dashboard" className="inline-block bg-indigo-600 text-white px-8 py-3 rounded-lg hover:bg-indigo-700 transition font-medium">
-                                        Go to Dashboard →
-                                    </Link>
+                                <div className="pt-4">
+                                    <Button asChild size="lg" className="px-8 shadow-none">
+                                        <Link href="/erp/dashboard">
+                                            Go to Dashboard →
+                                        </Link>
+                                    </Button>
                                 </div>
                             </div>
                         )}
-                    </div>
-                </div>
+                    </CardContent>
+                </Card>
             </div>
         </AuthenticatedLayout>
     );

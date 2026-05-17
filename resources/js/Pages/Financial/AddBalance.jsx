@@ -9,21 +9,21 @@ import { Button } from '@/Components/ui/button';
 import { Label } from '@/Components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/Components/ui/card';
 
-export default function AddBalance({ wallet }: { wallet: any }) {
-    const [selectedPreset, setSelectedPreset] = useState<number | null>(50);
+export default function AddBalance({ wallet }) {
+    const [selectedPreset, setSelectedPreset] = useState(50);
     const [customAmount, setCustomAmount] = useState('');
 
     const { data, setData, post, processing, errors } = useForm({
         amount: 50,
     });
 
-    const handlePresetClick = (val: number) => {
+    const handlePresetClick = (val) => {
         setSelectedPreset(val);
         setCustomAmount('');
         setData('amount', val);
     };
 
-    const handleCustomChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleCustomChange = (e) => {
         const val = e.target.value;
         setCustomAmount(val);
         setSelectedPreset(null);
@@ -36,14 +36,14 @@ export default function AddBalance({ wallet }: { wallet: any }) {
         }
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = (e) => {
         e.preventDefault();
         post(route('financial.add-balance.kashier'));
     };
 
     const presets = [10, 50, 100, 250, 500];
 
-    const safeRoute = (name: string, params?: any, fallbackUrl?: string) => {
+    const safeRoute = (name, params, fallbackUrl) => {
         try {
             // @ts-ignore
             if (typeof route !== 'undefined' && route().has(name)) {

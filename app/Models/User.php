@@ -46,6 +46,10 @@ class User extends Authenticatable
         'remember_token',
     ];
 
+    protected $appends = [
+        'points_balance',
+    ];
+
     protected function casts(): array
     {
         return [

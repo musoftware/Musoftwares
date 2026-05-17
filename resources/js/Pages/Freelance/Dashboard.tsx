@@ -6,17 +6,17 @@ import {
     CheckCircle2,
     Clock,
     DollarSign,
-    Lock,
-    Search,
-    TrendingUp,
-    ShieldAlert,
     ChevronRight,
-    Star
+    Star,
+    Coins,
+    ArrowUpRight,
+    ShieldCheck,
+    Search
 } from 'lucide-react';
 import { formatMoney, formatDate } from '@/lib/utils';
 import { ContractQuickView } from '@/Components/ContextualPanels';
 
-export default function FreelanceDashboard({ auth, stats: initialStats, activeProposals: initialProposals, activeContracts: initialContracts }: any) {
+export default function FreelanceDashboard({ auth, stats: initialStats, activeProposals: initialProposals, activeContracts: initialContracts, recentActivities: initialActivities }: any) {
     const [selectedContract, setSelectedContract] = useState<any>(null);
 
     // Dynamic state parameters from server
@@ -30,183 +30,231 @@ export default function FreelanceDashboard({ auth, stats: initialStats, activePr
     const activeProposals = initialProposals || [];
     const activeContracts = initialContracts || [];
 
+    // Operational recent activity items to make the dashboard feel "alive"
+    const recentActivities = initialActivities && initialActivities.length > 0 ? initialActivities : [
+        {
+            id: 'mock_1',
+            type: 'system',
+            text: 'Welcome to your new fully operational workspace.',
+            time: 'Just now',
+            color: 'text-indigo-500 bg-indigo-50'
+        }
+    ];
+
     return (
-        <FreelanceLayout auth={auth}>
+        <FreelanceLayout auth={auth} clean={true}>
             <Head title="Freelance Dashboard" />
 
-            <div className="space-y-6 font-sans text-sm pb-8">
+            <div className="space-y-8 font-sans pb-12">
                 
                 {/* ─────────────────────────────────────────
-                    FREELANCE KPI SUMMARY DECK
+                    1. HEADER / GREETING (Quiet & Calm)
                     ───────────────────────────────────────── */}
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                    {/* Points balance */}
-                    <div className="bg-slate-50/50 border border-slate-100 rounded-xl p-4 space-y-1">
-                        <div className="flex justify-between items-center text-text-muted text-[10px] font-bold uppercase tracking-wider">
-                            <span>Available Connects</span>
-                            <DollarSign className="h-4 w-4 text-indigo-500" />
-                        </div>
-                        <div>
-                            <span className="font-mono text-xl font-bold text-text-primary block">
-                                {stats.pointsBalance} Connects
-                            </span>
-                            <Link 
-                                href="/freelance/points" 
-                                className="text-[10px] text-indigo-600 font-semibold hover:underline block mt-0.5"
-                            >
-                                Buy point packages →
-                            </Link>
-                        </div>
-                    </div>
-
-                    {/* Active Bid Proposals */}
-                    <div className="bg-slate-50/50 border border-slate-100 rounded-xl p-4 space-y-1">
-                        <div className="flex justify-between items-center text-text-muted text-[10px] font-bold uppercase tracking-wider">
-                            <span>Active Bid Proposals</span>
-                            <Clock className="h-4 w-4 text-amber-500" />
-                        </div>
-                        <div>
-                            <span className="font-mono text-xl font-bold text-text-primary block">
-                                {stats.activeProposals} Active Bids
-                            </span>
-                            <span className="text-[10px] text-text-secondary block mt-0.5">
-                                1 under active review
-                            </span>
-                        </div>
-                    </div>
-
-                    {/* Active Contracts */}
-                    <div className="bg-slate-50/50 border border-slate-100 rounded-xl p-4 space-y-1">
-                        <div className="flex justify-between items-center text-text-muted text-[10px] font-bold uppercase tracking-wider">
-                            <span>Active Contracts</span>
-                            <Briefcase className="h-4 w-4 text-indigo-500" />
-                        </div>
-                        <div>
-                            <span className="font-mono text-xl font-bold text-text-primary block">
-                                {stats.activeContracts} Active
-                            </span>
-                            <span className="text-[10px] text-text-secondary block mt-0.5">
-                                Milestone progress 75%
-                            </span>
-                        </div>
-                    </div>
-
-                    {/* Lifetime Completed Earnings */}
-                    <div className="bg-slate-50/50 border border-slate-100 rounded-xl p-4 space-y-1">
-                        <div className="flex justify-between items-center text-text-muted text-[10px] font-bold uppercase tracking-wider">
-                            <span>Completed Revenue</span>
-                            <CheckCircle2 className="h-4 w-4 text-emerald-500" />
-                        </div>
-                        <div>
-                            <span className="font-mono text-xl font-bold text-text-primary block">
-                                {formatMoney(stats.totalEarnings, 'USD')}
-                            </span>
-                            <span className="text-[10px] text-emerald-600 font-semibold block mt-0.5">
-                                Payout cleared safely
-                            </span>
-                        </div>
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div className="space-y-1">
+                        <h1 className="text-xl font-bold tracking-tight text-slate-900">
+                            Welcome back, {auth?.user?.name?.split(' ')[0] || 'Partner'}
+                        </h1>
+                        <p className="text-xs text-slate-500">
+                            Monitor your active contracts, pending bids, and operational stats in real-time.
+                        </p>
                     </div>
                 </div>
 
                 {/* ─────────────────────────────────────────
-                    MAIN FREELANCE PANELS
+                    2. KEY OPERATIONAL STATS (Borderless, Minimal)
                     ───────────────────────────────────────── */}
-                <div className="grid grid-cols-1 lg:grid-cols-10 gap-6">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-6 p-6 bg-white border border-slate-200/70 rounded-xl shadow-sm">
+                    {/* Total Completed Earnings */}
+                    <div className="space-y-1">
+                        <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">
+                            Total Earnings
+                        </span>
+                        <div className="flex items-baseline gap-1.5">
+                            <span className="text-2xl font-bold tracking-tight text-slate-900 font-mono">
+                                {formatMoney(stats.totalEarnings, 'USD')}
+                            </span>
+                        </div>
+                        <span className="text-[10px] text-emerald-600 font-medium block">
+                            Payout cleared safely
+                        </span>
+                    </div>
+
+                    {/* Active Contracts */}
+                    <div className="space-y-1 border-l border-slate-100 pl-6">
+                        <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">
+                            Active Contracts
+                        </span>
+                        <div className="flex items-baseline gap-1.5">
+                            <span className="text-2xl font-bold tracking-tight text-slate-900 font-mono">
+                                {stats.activeContracts}
+                            </span>
+                        </div>
+                        <span className="text-[10px] text-slate-500 block">
+                            Contracts in progress
+                        </span>
+                    </div>
+
+                    {/* Pending Proposals */}
+                    <div className="space-y-1 border-l border-slate-100 pl-6">
+                        <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">
+                            Pending Proposals
+                        </span>
+                        <div className="flex items-baseline gap-1.5">
+                            <span className="text-2xl font-bold tracking-tight text-slate-900 font-mono">
+                                {stats.activeProposals}
+                            </span>
+                        </div>
+                        <span className="text-[10px] text-slate-500 block">
+                            Submitted active bids
+                        </span>
+                    </div>
+
+                    {/* Available Connects */}
+                    <div className="space-y-1 border-l border-slate-100 pl-6">
+                        <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block flex items-center gap-1">
+                            Available Connects
+                        </span>
+                        <div className="flex items-baseline gap-2">
+                            <span className="text-2xl font-bold tracking-tight text-slate-900 font-mono">
+                                {stats.pointsBalance}
+                            </span>
+                            <Link 
+                                href="/freelance/points" 
+                                className="text-[10px] text-indigo-600 font-semibold hover:text-indigo-800 transition-colors"
+                            >
+                                Buy Packages →
+                            </Link>
+                        </div>
+                        <span className="text-[10px] text-slate-500 block">
+                            Monthly quota refreshed
+                        </span>
+                    </div>
+                </div>
+
+                {/* ─────────────────────────────────────────
+                    3. MAIN OPERATIONAL WORKSPACE GRID
+                    ───────────────────────────────────────── */}
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
                     
-                    {/* Left Column (70%) */}
-                    <div className="lg:col-span-7 space-y-6">
+                    {/* Left Column (8/12 - Active Work & Bids) */}
+                    <div className="lg:col-span-8 space-y-8">
                         
-                        {/* Active Proposals Panel */}
-                        <div className="border border-border/60 rounded-xl overflow-hidden bg-white shadow-sm">
-                            <div className="px-5 py-3.5 border-b border-border/40 flex justify-between items-center bg-slate-50/20">
-                                <h3 className="font-sora text-xs font-bold uppercase tracking-wider text-text-muted flex items-center gap-1.5">
-                                    <Clock className="h-4 w-4 text-indigo-500" /> Current Submitted Proposals
-                                </h3>
-                                <Link 
-                                    href="/freelance/jobs/browse"
-                                    className="text-[11px] text-indigo-600 font-semibold hover:underline flex items-center gap-0.5"
-                                >
-                                    Browse Jobs <ChevronRight className="h-3 w-3" />
-                                </Link>
+                        {/* Section 1: Active Contracts */}
+                        <div className="space-y-3">
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-2">
+                                    <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full" />
+                                    <h3 className="text-sm font-semibold text-slate-900 tracking-tight">
+                                        Active Contract Agreements
+                                    </h3>
+                                </div>
+                                <span className="text-xs text-slate-400 font-mono">
+                                    {activeContracts.length} Active
+                                </span>
                             </div>
-                            
-                            <div className="divide-y divide-border/40 text-xs">
-                                {activeProposals.map((proposal: any) => (
+
+                            <div className="bg-white border border-slate-200/70 rounded-xl divide-y divide-slate-100 overflow-hidden shadow-sm">
+                                {activeContracts.map((contract: any) => (
                                     <div 
-                                        key={proposal.id}
-                                        className="p-4 hover:bg-slate-50/40 transition flex items-center justify-between"
+                                        key={contract.id}
+                                        onClick={() => setSelectedContract(contract)}
+                                        className="p-4 sm:p-5 hover:bg-slate-50/60 cursor-pointer transition flex items-center justify-between group"
                                     >
-                                        <div className="space-y-1">
-                                            <span className="font-semibold text-text-primary text-[13px] block">
-                                                {proposal.title}
+                                        <div className="space-y-1 pr-4">
+                                            <span className="font-semibold text-slate-900 text-sm group-hover:text-indigo-600 transition-colors block">
+                                                {contract.title}
                                             </span>
-                                            <div className="flex items-center gap-3 text-text-secondary text-[11px]">
-                                                <span>Submitted: {formatDate(proposal.submittedAt)}</span>
-                                                <span>•</span>
-                                                <span>Connects: {proposal.connectsUsed}</span>
+                                            <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-slate-500">
+                                                <span>Client: <span className="font-medium text-slate-700">{contract.clientName}</span></span>
+                                                <span className="text-slate-300">•</span>
+                                                <span>Started: {formatDate(contract.startDate)}</span>
                                             </div>
                                         </div>
-                                        <div className="text-right">
-                                            <span className="font-mono font-bold text-text-primary block">
-                                                {formatMoney(proposal.budget, 'USD')}
-                                            </span>
-                                            <span className="text-[10px] text-amber-600 font-bold uppercase bg-amber-50 px-1.5 py-0.2 rounded mt-1 border border-amber-200 inline-block">
-                                                {proposal.status}
-                                            </span>
+                                        
+                                        <div className="flex items-center gap-6 shrink-0">
+                                            <div className="w-24 sm:w-28 space-y-1">
+                                                <div className="flex justify-between text-[10px]">
+                                                    <span className="text-slate-400">Milestone</span>
+                                                    <span className="font-mono font-semibold text-slate-700">{contract.progress}%</span>
+                                                </div>
+                                                <div className="h-1 w-full rounded-full bg-slate-100 overflow-hidden">
+                                                    <div className="h-full bg-emerald-500 rounded-full" style={{ width: `${contract.progress}%` }} />
+                                                </div>
+                                            </div>
+                                            <ChevronRight className="h-4 w-4 text-slate-400 group-hover:text-slate-600 transition-colors" />
                                         </div>
                                     </div>
                                 ))}
-                                {activeProposals.length === 0 && (
-                                    <div className="p-6 text-center text-gray-500">
-                                        <p className="font-medium text-gray-700">No active proposals.</p>
-                                        <p className="text-xs mt-1">Browse available jobs and submit a proposal to secure your next project.</p>
-                                        <Link href="/freelance/jobs/browse" className="inline-block mt-3 text-xs font-semibold text-indigo-600 hover:text-indigo-800">
-                                            Search Jobs →
+
+                                {activeContracts.length === 0 && (
+                                    <div className="py-10 px-4 text-center">
+                                        <p className="text-xs text-slate-500">No active contracts at the moment.</p>
+                                        <Link 
+                                            href="/freelance/jobs/browse" 
+                                            className="inline-flex items-center gap-1 mt-2 text-xs font-semibold text-indigo-600 hover:text-indigo-800 transition-colors"
+                                        >
+                                            Explore open freelance contracts <ChevronRight className="h-3 w-3" />
                                         </Link>
                                     </div>
                                 )}
                             </div>
                         </div>
 
-                        {/* Active Contracts Milestone progression */}
-                        <div className="border border-border/60 rounded-xl overflow-hidden bg-white shadow-sm">
-                            <div className="px-5 py-3.5 border-b border-border/40 flex justify-between items-center bg-slate-50/20">
-                                <h3 className="font-sora text-xs font-bold uppercase tracking-wider text-text-muted flex items-center gap-1.5">
-                                    <Briefcase className="h-4 w-4 text-indigo-500" /> Active Project Contracts
-                                </h3>
+                        {/* Section 2: Submitted Proposals */}
+                        <div className="space-y-3">
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-2">
+                                    <div className="w-1.5 h-1.5 bg-indigo-500 rounded-full" />
+                                    <h3 className="text-sm font-semibold text-slate-900 tracking-tight">
+                                        Submitted Project Proposals
+                                    </h3>
+                                </div>
+                                <Link 
+                                    href="/freelance/jobs/browse"
+                                    className="text-xs text-indigo-600 font-semibold hover:text-indigo-800 transition-colors flex items-center gap-0.5"
+                                >
+                                    Browse Jobs <ChevronRight className="h-3 w-3" />
+                                </Link>
                             </div>
-                            
-                            <div className="divide-y divide-border/40 text-xs">
-                                {activeContracts.map((contract: any) => (
+
+                            <div className="bg-white border border-slate-200/70 rounded-xl divide-y divide-slate-100 overflow-hidden shadow-sm">
+                                {activeProposals.map((proposal: any) => (
                                     <div 
-                                        key={contract.id}
-                                        onClick={() => setSelectedContract(contract)}
-                                        className="p-4 hover:bg-slate-50/70 cursor-pointer transition flex items-center justify-between"
+                                        key={proposal.id}
+                                        className="p-4 sm:p-5 hover:bg-slate-50/40 transition flex items-center justify-between"
                                     >
-                                        <div className="space-y-1 flex-1">
-                                            <span className="font-semibold text-text-primary text-[13px] block">
-                                                {contract.title}
+                                        <div className="space-y-1 pr-4">
+                                            <span className="font-semibold text-slate-900 text-sm block">
+                                                {proposal.title}
                                             </span>
-                                            <span className="text-[11px] text-text-secondary block">
-                                                Client: {contract.clientName} • Started: {formatDate(contract.startDate)}
-                                            </span>
+                                            <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-slate-500">
+                                                <span>Submitted {formatDate(proposal.submittedAt)}</span>
+                                                <span className="text-slate-300">•</span>
+                                                <span>{proposal.connectsUsed} Connects used</span>
+                                            </div>
                                         </div>
-                                        
-                                        <div className="w-32 shrink-0 ml-4 space-y-1">
-                                            <div className="flex justify-between text-[10px]">
-                                                <span className="text-text-secondary">Progress</span>
-                                                <span className="font-mono font-bold text-text-primary">{contract.progress}%</span>
-                                            </div>
-                                            <div className="h-1.5 w-full rounded-full bg-slate-100 overflow-hidden">
-                                                <div className="h-full bg-indigo-600 rounded-full" style={{ width: `${contract.progress}%` }} />
-                                            </div>
+                                        <div className="text-right shrink-0">
+                                            <span className="font-semibold text-slate-900 text-sm block font-mono">
+                                                {formatMoney(proposal.budget, 'USD')}
+                                            </span>
+                                            <span className="text-[10px] font-semibold text-amber-700 bg-amber-50 border border-amber-250/20 px-2 py-0.5 rounded-full inline-block mt-1.5 uppercase tracking-wide">
+                                                {proposal.status}
+                                            </span>
                                         </div>
                                     </div>
                                 ))}
-                                {activeContracts.length === 0 && (
-                                    <div className="p-6 text-center text-gray-500">
-                                        <p className="font-medium text-gray-700">No active contracts.</p>
-                                        <p className="text-xs mt-1">Once a client accepts your proposal, your active project workflow will appear here.</p>
+
+                                {activeProposals.length === 0 && (
+                                    <div className="py-10 px-4 text-center">
+                                        <p className="text-xs text-slate-500 font-medium text-slate-600">No submitted proposals found.</p>
+                                        <p className="text-[11px] text-slate-400 mt-0.5">Start submitting bids to see active proposals here.</p>
+                                        <Link 
+                                            href="/freelance/jobs/browse" 
+                                            className="inline-flex items-center gap-1 mt-3 text-xs font-semibold text-indigo-600 hover:text-indigo-800 transition-colors"
+                                        >
+                                            Browse Jobs <ChevronRight className="h-3 w-3" />
+                                        </Link>
                                     </div>
                                 )}
                             </div>
@@ -214,32 +262,91 @@ export default function FreelanceDashboard({ auth, stats: initialStats, activePr
 
                     </div>
 
-                    {/* Right Column (30%) */}
-                    <div className="lg:col-span-3 space-y-6">
+                    {/* Right Column (4/12 - Compact operational sidebar context) */}
+                    <div className="lg:col-span-4 space-y-8">
                         
-                        {/* Profile Strength Meter */}
-                        <div className="bg-white border border-slate-100 rounded-xl p-4 shadow-sm space-y-3">
-                            <h4 className="text-[11px] font-bold uppercase tracking-wider text-text-muted border-b border-slate-100 pb-2 flex items-center gap-1.5">
-                                <Star className="h-3.5 w-3.5 text-indigo-500" /> Profile Strength
-                            </h4>
-                            <div className="space-y-2">
-                                <div className="flex justify-between text-xs font-semibold">
-                                    <span>Completeness</span>
-                                    <span className="font-mono">85%</span>
+                        {/* A. Profile Strength (Sleek Inline Widget) */}
+                        <div className="bg-white border border-slate-200/70 rounded-xl p-5 shadow-sm space-y-4">
+                            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                                <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
+                                    <Star className="h-3.5 w-3.5 text-indigo-500" /> Account Status
+                                </h4>
+                                <span className="text-[10px] bg-emerald-50 text-emerald-700 border border-emerald-200/50 px-1.5 py-0.5 rounded font-semibold uppercase">
+                                    Active
+                                </span>
+                            </div>
+                            
+                            <div className="space-y-3">
+                                <div className="space-y-1.5">
+                                    <div className="flex justify-between text-xs text-slate-700">
+                                        <span className="font-medium">Profile Completeness</span>
+                                        <span className="font-mono font-bold text-slate-900">85%</span>
+                                    </div>
+                                    <div className="h-1.5 w-full rounded-full bg-slate-100 overflow-hidden">
+                                        <div className="h-full bg-slate-900 rounded-full" style={{ width: '85%' }} />
+                                    </div>
                                 </div>
-                                <div className="h-1.5 w-full rounded-full bg-slate-100 overflow-hidden">
-                                    <div className="h-full bg-indigo-600" style={{ width: '85%' }} />
-                                </div>
-                                <p className="text-[10px] text-text-secondary leading-snug">Link your GitHub or verified Wise payout method to reach 100% and earn high-tier job invitations.</p>
+                                <p className="text-[11px] text-slate-400 leading-normal">
+                                    Upload verified KYC documentation or add direct Wise settlement credentials to unlock 100% premium ranking.
+                                </p>
                             </div>
                         </div>
 
-                        {/* Secure Payments Shield */}
-                        <div className="bg-indigo-50/40 border border-indigo-150/40 rounded-xl p-4 text-[11px] leading-relaxed text-indigo-900 flex gap-2.5">
-                            <Lock className="h-4.5 w-4.5 text-indigo-600 shrink-0 mt-0.5" />
-                            <div>
-                                <span className="font-bold block text-indigo-950 mb-0.5">Escrow Safe Protections</span>
-                                Pay out securely under smart contract locks. Funds are audited, verified, and settled immediately upon approval.
+                        {/* B. Recommended Actions (Pending Actions) */}
+                        <div className="space-y-3">
+                            <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-500 px-1">
+                                Recommended Actions
+                            </h4>
+                            
+                            <div className="space-y-2">
+                                {/* Action 1 */}
+                                <div className="flex items-start gap-3 p-3 bg-white border border-slate-200/50 rounded-xl shadow-xs hover:border-slate-300 transition-colors">
+                                    <div className="w-1.5 h-1.5 bg-indigo-500 rounded-full mt-1.5 shrink-0" />
+                                    <div className="space-y-0.5">
+                                        <Link href="/kyc" className="text-xs font-semibold text-slate-800 hover:text-indigo-600 block transition-colors">
+                                            Submit KYC documentation
+                                        </Link>
+                                        <p className="text-[10px] text-slate-400 leading-normal">
+                                            Required to secure high-value smart contract payouts.
+                                        </p>
+                                    </div>
+                                </div>
+
+                                {/* Action 2 */}
+                                <div className="flex items-start gap-3 p-3 bg-white border border-slate-200/50 rounded-xl shadow-xs hover:border-slate-300 transition-colors">
+                                    <div className="w-1.5 h-1.5 bg-indigo-500 rounded-full mt-1.5 shrink-0" />
+                                    <div className="space-y-0.5">
+                                        <Link href="/financial/payout-methods" className="text-xs font-semibold text-slate-800 hover:text-indigo-600 block transition-colors">
+                                            Link verified payout source
+                                        </Link>
+                                        <p className="text-[10px] text-slate-400 leading-normal">
+                                            Set up Wise or Direct Debit for automated settlement clearance.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* C. Recent Activities (Operational Timeline) */}
+                        <div className="space-y-3">
+                            <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-500 px-1">
+                                Recent Events
+                            </h4>
+                            
+                            <div className="bg-white border border-slate-200/70 rounded-xl p-4 shadow-sm space-y-3">
+                                {recentActivities.map((act: any) => (
+                                    <div key={act.id} className="flex gap-3 text-xs">
+                                        <div className="w-1 bg-slate-100 rounded-full self-stretch shrink-0 relative">
+                                            <div className="absolute top-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-slate-400 rounded-full" />
+                                        </div>
+                                        <div className="space-y-0.5 flex-1">
+                                            <p className="text-slate-700 leading-tight">{act.text}</p>
+                                            <span className="text-[10px] text-slate-400 font-mono block">
+                                                {act.time}
+                                            </span>
+                                        </div>
+                                    </div>
+                                ))}
                             </div>
                         </div>
 
