@@ -17,10 +17,10 @@ class RecurringService
         // Assuming we want to process all due entries globally.
         $dueEntries = RecurringEntry::withoutGlobalScopes()
             ->where('is_active', true)
-            ->where('next_date', '<=', $today)
+            ->where('next_run_at', '<=', $today)
             ->where(function ($query) use ($today) {
-                $query->whereNull('end_date')
-                      ->orWhere('end_date', '>=', $today);
+                $query->whereNull('ends_at')
+                      ->orWhere('ends_at', '>=', $today);
             })
             ->get();
 
@@ -30,9 +30,10 @@ class RecurringService
                     $this->executeEntry($entry);
 
                     $nextDate = $this->calculateNextRunAt($entry);
-                    $entry->next_date = $nextDate;
+                    $entry->next_run_at = $nextDate;
+                    $entry->last_run_at = now();
 
-                    if ($entry->end_date && $nextDate > $entry->end_date) {
+                    if ($entry->ends_at && $nextDate > $entry->ends_at) {
                         $entry->is_active = false;
                     }
 
@@ -46,7 +47,7 @@ class RecurringService
 
     public function calculateNextRunAt(RecurringEntry $entry): Carbon
     {
-        $currentDate = Carbon::parse($entry->next_date);
+        $currentDate = Carbon::parse($entry->next_run_at);
 
         switch ($entry->frequency) {
             case 'daily':
@@ -65,21 +66,18 @@ class RecurringService
 
     public function executeEntry(RecurringEntry $entry): void
     {
-        // Execute the recurring entry. E.g., create an expense transaction or income.
-        // Based on the migration, there's `expense_transactions`. We can log income somewhere too.
-        if ($entry->type === 'expense') {
-            DB::table('expense_transactions')->insert([
-                'tenant_id' => $entry->tenant_id,
-                'description' => $entry->description . ' (Recurring)',
-                'amount' => $entry->amount,
-                'currency_code' => $entry->currency_code,
-                'date' => $entry->next_date, // create it for the due date
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
-        } elseif ($entry->type === 'income') {
-            // Placeholder for income, e.g., create an invoice or ledger entry
-            Log::info("Recurring income entry executed for tenant {$entry->tenant_id}");
-        }
+        DB::table('recurring_execution_logs')->insert([
+            'recurring_entry_id' => $entry->id,
+            'executed_at' => now(),
+            'amount' => $entry->amount,
+            'amount_currency' => $entry->amount_currency,
+            'business_amount' => $entry->business_amount,
+            'business_currency' => $entry->business_currency,
+            'exchange_rate' => $entry->exchange_rate,
+            'exchange_rate_date' => $entry->exchange_rate_date,
+            'status' => 'success',
+            'note' => 'Executed successfully.',
+            'created_at' => now(),
+        ]);
     }
 }
