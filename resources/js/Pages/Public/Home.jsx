@@ -1,163 +1,252 @@
 import { Button } from '@/Components/ui/button';
 import PublicLayout from '@/Layouts/PublicLayout';
 import { Head, Link } from '@inertiajs/react';
-import { useEffect, useState, useRef } from 'react';
+import { useState } from 'react';
 import { 
     Wallet, ShieldCheck, Clock, Check, ChevronDown, Sparkles, 
     ArrowRight, DollarSign, Activity, FileText, Send, UserCheck, 
-    TrendingUp, Terminal, ShieldAlert, Layers, Laptop, Code2, 
-    Play, Pause, RefreshCw, Star, CheckCircle, BarChart3, HelpCircle 
+    Layers, Star, HelpCircle 
 } from 'lucide-react';
 
-export default function Home({ canLogin, canRegister }) {
-    // ----------------------------------------------------
-    // 1. Live Interactive States & Simulation Data
-    // ----------------------------------------------------
-    
-    // Sim 1: Billing & Wallet Integrator
-    const [invoiceStep, setInvoiceStep] = useState(0); // 0: Draft, 1: Sent, 2: Approved, 3: Paid
-    const [walletBalance, setWalletBalance] = useState(14820.00);
-    const [invoiceValue] = useState(2450.00);
-    const [recentTransactions, setRecentTransactions] = useState([
-        { id: 'TX-901', desc: 'Marketplace Service: Logo Brand Pack', amount: 450.00, type: 'credit', status: 'completed' },
-        { id: 'TX-902', desc: 'Contract Milestone 2: Escrow Released', amount: 1800.00, type: 'credit', status: 'completed' },
-        { id: 'TX-903', desc: 'System Fee Protection', amount: -22.50, type: 'debit', status: 'completed' }
-    ]);
+// ============================================================================
+// PURE VECTOR ILLUSTRATIONS: FLAT EDITORIAL, SIMPLIFIED HUMAN SHAPES, FLAT GEOMETRY
+// ============================================================================
 
-    const advanceInvoiceStep = () => {
-        if (invoiceStep < 3) {
-            const nextStep = invoiceStep + 1;
-            setInvoiceStep(nextStep);
+// 1. Financial Workflows Illustration (Vault, Coins, Transaction splits)
+function FinancialIllustration() {
+    return (
+        <svg viewBox="0 0 500 400" className="w-full h-full" fill="none" xmlns="http://www.w3.org/2000/svg">
+            {/* Background elements */}
+            <rect width="500" height="400" rx="16" fill="#f8fafc" />
+            <circle cx="250" cy="200" r="160" fill="#e0e7ff" opacity="0.4" />
             
-            // If transitioning to "Paid", credit the wallet and append to transactions!
-            if (nextStep === 3) {
-                setWalletBalance(prev => prev + invoiceValue);
-                setRecentTransactions(prev => [
-                    { id: `TX-${Math.floor(100 + Math.random() * 900)}`, desc: 'Invoice #INV-2026-88 Paid', amount: invoiceValue, type: 'credit', status: 'completed' },
-                    ...prev
-                ]);
-            }
-        }
-    };
+            {/* Flat Geometry: Vault and concentric circles */}
+            <circle cx="250" cy="200" r="110" fill="none" stroke="#6366f1" strokeWidth="6" />
+            <circle cx="250" cy="200" r="90" fill="none" stroke="#a855f7" strokeWidth="2" strokeDasharray="6 6" />
+            <circle cx="250" cy="200" r="40" fill="#ffffff" stroke="#6366f1" strokeWidth="4" />
+            
+            {/* Vault lock handle bars */}
+            <rect x="245" y="120" width="10" height="160" rx="5" fill="#6366f1" transform="rotate(45 250 200)" />
+            <rect x="245" y="120" width="10" height="160" rx="5" fill="#6366f1" transform="rotate(-45 250 200)" />
+            
+            {/* Floating Flat Geometric Coins */}
+            <g transform="translate(100, 110)">
+                <ellipse cx="20" cy="20" rx="25" ry="12" fill="#10b981" />
+                <ellipse cx="20" cy="15" rx="25" ry="12" fill="#34d399" />
+                <path d="M -5 15 L -5 20 A 25 12 0 0 0 45 20 L 45 15 Z" fill="#10b981" />
+            </g>
+            <g transform="translate(360, 240)">
+                <ellipse cx="20" cy="20" rx="25" ry="12" fill="#6366f1" />
+                <ellipse cx="20" cy="15" rx="25" ry="12" fill="#818cf8" />
+                <path d="M -5 15 L -5 20 A 25 12 0 0 0 45 20 L 45 15 Z" fill="#6366f1" />
+            </g>
+            
+            {/* Simplified Human Shape 1: Left */}
+            <g transform="translate(110, 200)">
+                {/* Body/Torso - simplified editorial geometry */}
+                <path d="M 20 80 Q 20 40 40 40 L 60 40 Q 80 40 80 80 Z" fill="#4f46e5" />
+                {/* Head */}
+                <circle cx="50" cy="20" r="16" fill="#fbcfe8" />
+                {/* Arm reaching for the vault */}
+                <path d="M 75 48 Q 110 40 130 55" stroke="#fbcfe8" strokeWidth="8" strokeLinecap="round" />
+            </g>
 
-    const resetInvoiceSimulator = () => {
-        setInvoiceStep(0);
-        setWalletBalance(14820.00);
-        setRecentTransactions([
-            { id: 'TX-901', desc: 'Marketplace Service: Logo Brand Pack', amount: 450.00, type: 'credit', status: 'completed' },
-            { id: 'TX-902', desc: 'Contract Milestone 2: Escrow Released', amount: 1800.00, type: 'credit', status: 'completed' },
-            { id: 'TX-903', desc: 'System Fee Protection', amount: -22.50, type: 'debit', status: 'completed' }
-        ]);
-    };
+            {/* Simplified Human Shape 2: Right */}
+            <g transform="translate(310, 100)">
+                {/* Body/Torso */}
+                <path d="M 20 80 Q 20 35 45 35 L 55 35 Q 80 35 80 80 Z" fill="#10b981" />
+                {/* Head */}
+                <circle cx="50" cy="15" r="15" fill="#fcd34d" />
+                {/* Arm holding a geometric coin */}
+                <path d="M 25 45 Q -10 60 -15 80" stroke="#fcd34d" strokeWidth="8" strokeLinecap="round" />
+            </g>
 
-    // Sim 2: Active Timed Billing Tracker
-    const [timerActive, setTimerActive] = useState(false);
-    const [timerSeconds, setTimerSeconds] = useState(144); // Start at 2m 24s for impact
-    const [billableAmount, setBillableAmount] = useState(180.00); // Start showing money earned
-    const ratePerHour = 75.00;
+            {/* Flow line connection arrows */}
+            <path d="M 120 180 C 120 140 170 120 210 125" stroke="#6366f1" strokeWidth="3" strokeLinecap="round" strokeDasharray="4 4" />
+            <polygon points="215,125 205,120 208,130" fill="#6366f1" />
+        </svg>
+    );
+}
 
-    useEffect(() => {
-        let interval = null;
-        if (timerActive) {
-            interval = setInterval(() => {
-                setTimerSeconds(sec => {
-                    const nextSec = sec + 1;
-                    // $75 / 3600 seconds = $0.0208 per second
-                    const earned = (nextSec * ratePerHour) / 3600;
-                    setBillableAmount(earned);
-                    return nextSec;
-                });
-            }, 1000);
-        } else {
-            clearInterval(interval);
-        }
-        return () => clearInterval(interval);
-    }, [timerActive]);
+// 2. Marketplace Illustration (Exchanging gears, gears represent services/contracts)
+function MarketplaceIllustration() {
+    return (
+        <svg viewBox="0 0 500 400" className="w-full h-full" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="500" height="400" rx="16" fill="#f8fafc" />
+            
+            {/* Background geometric connection grids */}
+            <path d="M 50 200 L 450 200" stroke="#cbd5e1" strokeWidth="2" strokeDasharray="8 8" />
+            <circle cx="250" cy="200" r="120" fill="none" stroke="#e2e8f0" strokeWidth="4" />
+            
+            {/* Central Flat Gear shapes (representing marketplace connections) */}
+            <g transform="translate(250, 180) rotate(15)">
+                <circle cx="0" cy="0" r="45" fill="#a855f7" />
+                <rect x="-10" y="-55" width="20" height="110" rx="4" fill="#a855f7" />
+                <rect x="-10" y="-55" width="20" height="110" rx="4" fill="#a855f7" transform="rotate(45)" />
+                <rect x="-10" y="-55" width="20" height="110" rx="4" fill="#a855f7" transform="rotate(90)" />
+                <rect x="-10" y="-55" width="20" height="110" rx="4" fill="#a855f7" transform="rotate(135)" />
+                <circle cx="0" cy="0" r="25" fill="#f8fafc" />
+            </g>
+            <g transform="translate(190, 240) rotate(-10)">
+                <circle cx="0" cy="0" r="30" fill="#6366f1" />
+                <rect x="-6" y="-38" width="12" height="76" rx="3" fill="#6366f1" />
+                <rect x="-6" y="-38" width="12" height="76" rx="3" fill="#6366f1" transform="rotate(45)" />
+                <rect x="-6" y="-38" width="12" height="76" rx="3" fill="#6366f1" transform="rotate(90)" />
+                <rect x="-6" y="-38" width="12" height="76" rx="3" fill="#6366f1" transform="rotate(135)" />
+                <circle cx="0" cy="0" r="15" fill="#f8fafc" />
+            </g>
 
-    const formatTimer = (totalSeconds) => {
-        const hrs = Math.floor(totalSeconds / 3600);
-        const mins = Math.floor((totalSeconds % 3600) / 60);
-        const secs = totalSeconds % 60;
-        return `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-    };
+            {/* Simplified Human Shape: Left (Freelancer offering services) */}
+            <g transform="translate(60, 160)">
+                {/* Body */}
+                <path d="M 10 90 L 30 40 L 50 40 L 70 90 Z" fill="#6366f1" />
+                {/* Head */}
+                <circle cx="40" cy="15" r="15" fill="#fed7aa" />
+                {/* Offering arm */}
+                <path d="M 55 45 Q 90 40 110 65" stroke="#fed7aa" strokeWidth="7" strokeLinecap="round" />
+            </g>
 
-    // Sim 3: Marketplace Escrow Simulator
-    const [escrowFunded, setEscrowFunded] = useState(false);
-    const [escrowStatus, setEscrowStatus] = useState('unfunded'); // unfunded -> holding -> released
+            {/* Simplified Human Shape: Right (Client buying services) */}
+            <g transform="translate(360, 160)">
+                {/* Body */}
+                <path d="M 10 90 L 30 35 L 50 35 L 70 90 Z" fill="#db2777" />
+                {/* Head */}
+                <circle cx="40" cy="10" r="15" fill="#fbcfe8" />
+                {/* Reaching arm */}
+                <path d="M 25 40 Q -10 35 -30 60" stroke="#fbcfe8" strokeWidth="7" strokeLinecap="round" />
+            </g>
 
-    const triggerEscrowFunding = () => {
-        if (!escrowFunded) {
-            setEscrowFunded(true);
-            setEscrowStatus('holding');
-        } else if (escrowStatus === 'holding') {
-            setEscrowStatus('released');
-            setWalletBalance(prev => prev + 3500.00);
-        }
-    };
+            {/* Contract shield overlay (Flat Geometry) */}
+            <g transform="translate(250, 70)">
+                <path d="M 0 -25 L 20 -15 L 20 10 C 20 25 0 35 0 35 C 0 35 -20 25 -20 10 L -20 -15 Z" fill="#10b981" />
+                <path d="M -8 2 L -2 8 L 8 -4" stroke="#ffffff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+            </g>
+        </svg>
+    );
+}
 
-    // Sim 4: API & Webhook Code Tabs
-    const [activeApiTab, setActiveApiTab] = useState('curl');
-    const apiSnippets = {
-        curl: `curl -X POST https://api.musoftware.com/v1/invoices \\
-  -H "Authorization: Bearer ms_live_88f921a9c" \\
-  -H "Content-Type: application/json" \\
-  -d '{
-    "client_id": "cli_9921820a",
-    "amount": 2450.00,
-    "currency": "USD",
-    "escrow_enabled": true,
-    "line_items": [
-      { "description": "SaaS Platform UX Architecture Refactor", "cost": 2450.00 }
-    ]
-  }'`,
-        nodejs: `const musoftware = require('@musoftware/node')('ms_live_88f921a9c');
+// 3. Workspace Illustration (Unified timeline and calendar widget collaboration)
+function WorkspaceIllustration() {
+    return (
+        <svg viewBox="0 0 500 400" className="w-full h-full" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="500" height="400" rx="16" fill="#f8fafc" />
+            
+            {/* Abstract connected timeline grid */}
+            <line x1="100" y1="120" x2="100" y2="300" stroke="#cbd5e1" strokeWidth="3" strokeDasharray="4 4" />
+            <circle cx="100" cy="150" r="8" fill="#6366f1" />
+            <circle cx="100" cy="220" r="8" fill="#a855f7" />
+            <circle cx="100" cy="290" r="8" fill="#10b981" />
 
-await musoftware.invoices.create({
-  client_id: 'cli_9921820a',
-  amount: 2450.00,
-  currency: 'USD',
-  escrow_enabled: true,
-  line_items: [{
-    description: 'SaaS Platform UX Architecture Refactor',
-    cost: 2450.00
-  }]
-});`,
-        python: `import musoftware
+            {/* Flat Geometry Widget Cards */}
+            <g transform="translate(130, 110)">
+                <rect width="180" height="50" rx="8" fill="#ffffff" stroke="#e2e8f0" strokeWidth="2" />
+                <rect x="15" y="15" width="20" height="20" rx="4" fill="#e0e7ff" />
+                <rect x="50" y="15" width="90" height="8" rx="2" fill="#cbd5e1" />
+                <rect x="50" y="27" width="60" height="6" rx="2" fill="#e2e8f0" />
+            </g>
+            <g transform="translate(130, 180)">
+                <rect width="180" height="50" rx="8" fill="#ffffff" stroke="#e2e8f0" strokeWidth="2" />
+                <rect x="15" y="15" width="20" height="20" rx="4" fill="#f3e8ff" />
+                <rect x="50" y="15" width="100" height="8" rx="2" fill="#cbd5e1" />
+                <rect x="50" y="27" width="50" height="6" rx="2" fill="#e2e8f0" />
+            </g>
+            <g transform="translate(130, 250)">
+                <rect width="180" height="50" rx="8" fill="#ffffff" stroke="#e2e8f0" strokeWidth="2" />
+                <rect x="15" y="15" width="20" height="20" rx="4" fill="#d1fae5" />
+                <rect x="50" y="15" width="80" height="8" rx="2" fill="#cbd5e1" />
+                <rect x="50" y="27" width="70" height="6" rx="2" fill="#e2e8f0" />
+            </g>
 
-musoftware.api_key = "ms_live_88f921a9c"
+            {/* Simplified Human Shape 1: Left */}
+            <g transform="translate(20, 200)">
+                <path d="M 15 90 L 30 35 L 50 35 L 65 90 Z" fill="#6366f1" />
+                <circle cx="40" cy="12" r="14" fill="#ffedd5" />
+                <path d="M 50 45 Q 85 45 95 65" stroke="#ffedd5" strokeWidth="6" strokeLinecap="round" />
+            </g>
 
-invoice = musoftware.Invoice.create(
-  client_id="cli_9921820a",
-  amount=2450.00,
-  currency="USD",
-  escrow_enabled=True,
-  line_items=[
-    { "description": "SaaS Platform UX Architecture Refactor", "cost": 2450.00 }
-  ]
-)`
-    };
+            {/* Simplified Human Shape 2: Right */}
+            <g transform="translate(360, 180)">
+                <path d="M 15 95 L 30 40 L 50 40 L 65 95 Z" fill="#a855f7" />
+                <circle cx="40" cy="15" r="14" fill="#fce7f3" />
+                <path d="M 25 45 Q -10 50 -25 70" stroke="#fce7f3" strokeWidth="6" strokeLinecap="round" />
+            </g>
 
-    // Sim 5: Analytics Toggles
-    const [activeChartTab, setActiveChartTab] = useState('revenue');
-    
-    // Sim 6: Admin Ops Console Simulator
-    const [adminRequests, setAdminRequests] = useState([
-        { id: 'WD-8812', user: 'David K. (Freelancer)', amount: 4850.00, type: 'Bank Wire', status: 'pending' },
-        { id: 'WD-8813', user: 'Sophia L. (Agency)', amount: 12500.00, type: 'Stripe Instant', status: 'pending' },
-        { id: 'WD-8814', user: 'Alex M. (Individual)', amount: 320.00, type: 'PayPal', status: 'pending' }
-    ]);
-    
-    const approveWithdrawal = (id, amount) => {
-        setAdminRequests(prev => prev.map(req => req.id === id ? { ...req, status: 'approved' } : req));
-    };
+            {/* Floating abstract checkmarks (Flat Editorial Geometry) */}
+            <circle cx="400" cy="100" r="22" fill="#10b981" />
+            <path d="M 392 100 L 397 105 L 408 94" stroke="#ffffff" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+    );
+}
 
-    // Sim 7: Client Dashboard vs Freelancer View Perspective
-    const [portalView, setPortalView] = useState('freelancer'); // 'freelancer' or 'client'
+// 4. Client Portal / Customer Experience Illustration
+function ClientPortalIllustration() {
+    return (
+        <svg viewBox="0 0 500 400" className="w-full h-full" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="500" height="400" rx="16" fill="#f8fafc" />
+            
+            {/* Huge Abstract Credit Card (Flat Geometry representing simplified billing checkout) */}
+            <g transform="translate(100, 100) rotate(-5)">
+                <rect width="280" height="170" rx="12" fill="#6366f1" />
+                <rect x="25" y="25" width="45" height="32" rx="6" fill="#fcd34d" />
+                <rect x="25" y="80" width="130" height="10" rx="2" fill="#818cf8" />
+                <rect x="25" y="105" width="200" height="12" rx="3" fill="#ffffff" />
+                <circle cx="220" cy="40" r="18" fill="#a855f7" opacity="0.8" />
+                <circle cx="240" cy="40" r="18" fill="#db2777" opacity="0.8" />
+            </g>
 
-    // Sim 8: Pricing Toggle
-    const [billingCycle, setBillingCycle] = useState('monthly'); // 'monthly' or 'yearly'
+            {/* Simplified Human Shape standing behind / paying */}
+            <g transform="translate(320, 170)">
+                <path d="M 20 110 L 40 45 L 60 45 L 80 110 Z" fill="#10b981" />
+                <circle cx="50" cy="18" r="16" fill="#fcd34d" />
+                {/* Arm typing / pushing key */}
+                <path d="M 35 55 Q -10 70 -30 90" stroke="#fcd34d" strokeWidth="8" strokeLinecap="round" />
+            </g>
 
-    // Sim 9: FAQ Accordions
+            {/* Glowing Shield Checkmark (Flat Geometry representing TLS security) */}
+            <g transform="translate(120, 260)">
+                <circle cx="25" cy="25" r="35" fill="#ffffff" stroke="#cbd5e1" strokeWidth="2" />
+                <path d="M 25 13 L 38 18 L 38 30 C 38 38 25 43 25 43 C 25 43 12 38 12 30 L 12 18 Z" fill="#10b981" />
+                <path d="M 20 28 L 24 32 L 31 23" stroke="#ffffff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+            </g>
+        </svg>
+    );
+}
+
+// 5. BI Analytics & Reporting Illustration
+function AnalyticsIllustration() {
+    return (
+        <svg viewBox="0 0 500 400" className="w-full h-full" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="500" height="400" rx="16" fill="#f8fafc" />
+            
+            {/* Flat Geometric rising bars representing metrics */}
+            <rect x="80" y="240" width="30" height="80" rx="4" fill="#cbd5e1" />
+            <rect x="140" y="200" width="30" height="120" rx="4" fill="#cbd5e1" />
+            <rect x="200" y="160" width="30" height="160" rx="4" fill="#818cf8" />
+            <rect x="260" y="100" width="30" height="220" rx="4" fill="#6366f1" />
+            <rect x="320" y="60" width="30" height="260" rx="4" fill="#10b981" />
+            
+            {/* Glowing editorial Trend Curve line */}
+            <path d="M 95 230 Q 155 180 215 150 T 335 50" fill="none" stroke="#4f46e5" strokeWidth="5" strokeLinecap="round" />
+            <circle cx="335" cy="50" r="8" fill="#4f46e5" />
+            <circle cx="335" cy="50" r="16" fill="none" stroke="#6366f1" strokeWidth="2" opacity="0.5" />
+
+            {/* Simplified Human Shape celebrating growth */}
+            <g transform="translate(380, 180)">
+                <path d="M 20 100 Q 20 40 45 40 L 55 40 Q 80 40 80 100 Z" fill="#6366f1" />
+                <circle cx="50" cy="15" r="16" fill="#ffedd5" />
+                {/* Arm pointing upward */}
+                <path d="M 30 50 Q -5 20 -20 0" stroke="#ffedd5" strokeWidth="7" strokeLinecap="round" />
+            </g>
+
+            {/* Decorative flat geometric abstract rings */}
+            <circle cx="440" cy="70" r="30" fill="none" stroke="#a855f7" strokeWidth="4" opacity="0.3" />
+            <circle cx="450" cy="70" r="15" fill="#f3e8ff" />
+        </svg>
+    );
+}
+
+export default function Home({ canLogin, canRegister }) {
+    // FAQ Accordions State
     const [faqExpanded, setFaqExpanded] = useState({
         0: true, // First open by default
         1: false,
@@ -170,92 +259,14 @@ invoice = musoftware.Invoice.create(
         setFaqExpanded(prev => ({ ...prev, [idx]: !prev[idx] }));
     };
 
-    // ----------------------------------------------------
-    // Ref-based scroll reveals / triggers
-    // ----------------------------------------------------
-    const statsRef = useRef(null);
-    const [statsVisible, setStatsVisible] = useState(false);
-
-    useEffect(() => {
-        const observer = new IntersectionObserver(
-            ([entry]) => {
-                if (entry.isIntersecting) {
-                    setStatsVisible(true);
-                    observer.disconnect();
-                }
-            },
-            { threshold: 0.1 }
-        );
-
-        if (statsRef.current) {
-            observer.observe(statsRef.current);
-        }
-        return () => observer.disconnect();
-    }, []);
-
-    // Animated counter sub-component
-    const DynamicStat = ({ value, label, isVisible, prefix = '', suffix = '' }) => {
-        const [num, setNum] = useState(0);
-
-        useEffect(() => {
-            if (!isVisible) return;
-            const target = parseFloat(value.replace(/[^0-9.]/g, ''));
-            let current = 0;
-            const duration = 1500;
-            const steps = 60;
-            const stepVal = target / steps;
-            const timer = setInterval(() => {
-                current += stepVal;
-                if (current >= target) {
-                    setNum(target);
-                    clearInterval(timer);
-                } else {
-                    setNum(current);
-                }
-            }, duration / steps);
-
-            return () => clearInterval(timer);
-        }, [isVisible, value]);
-
-        return (
-            <div className="flex flex-col items-center md:items-start p-6 bg-white border border-slate-200/80 rounded-xl shadow-sm">
-                <span className="text-3xl font-bold tracking-tight text-slate-900">
-                    {prefix}
-                    {value.includes('M') || value.includes('K')
-                        ? num.toFixed(1) + suffix
-                        : Math.floor(num).toLocaleString()}
-                </span>
-                <span className="text-xs text-slate-500 font-semibold uppercase tracking-wider mt-1.5">{label}</span>
-            </div>
-        );
-    };
-
     return (
         <PublicLayout>
             <Head title="musoftware — Unified Client Operations, ERP & Wallet Infrastructure" />
 
-            {/* Custom Light Mode Style Overrides */}
+            {/* Custom animations styling */}
             <style dangerouslySetInnerHTML={{__html: `
-                @keyframes grid-pulse {
-                    0%, 100% { opacity: 0.2; }
-                    50% { opacity: 0.4; }
-                }
-                .glow-card::before {
-                    content: '';
-                    position: absolute;
-                    inset: -1px;
-                    background: linear-gradient(35deg, rgba(99,102,241,0.2), rgba(168,85,247,0.2), transparent);
-                    border-radius: inherit;
-                    z-index: -1;
-                }
                 .mesh-circle {
                     background: radial-gradient(circle, rgba(99,102,241,0.05) 0%, transparent 70%);
-                }
-                .glow-green {
-                    box-shadow: 0 0 15px rgba(16,185,129,0.15);
-                }
-                .glow-indigo {
-                    box-shadow: 0 0 15px rgba(99,102,241,0.15);
                 }
             `}} />
 
@@ -272,11 +283,11 @@ invoice = musoftware.Invoice.create(
                     
                     {/* Left Column: Contextual Core Message */}
                     <div className="lg:col-span-6 flex flex-col space-y-8 text-left max-w-2xl mx-auto lg:mx-0">
-                        {/* Glow Platform Tag */}
+                        {/* Version Platform Tag */}
                         <div className="inline-flex items-center gap-2 w-fit rounded-full bg-indigo-50/50 border border-indigo-100 px-3.5 py-1.5 text-xs text-indigo-950 backdrop-blur-sm">
                             <span className="flex h-2 w-2 rounded-full bg-indigo-600 animate-pulse" />
                             <span className="font-bold text-indigo-900">Version 4.0 Live</span>
-                            <span className="text-indigo-200">|</span>
+                            <span className="text-indigo-205">|</span>
                             <span className="text-indigo-855 font-semibold">Unified Corporate Platform</span>
                         </div>
 
@@ -316,118 +327,16 @@ invoice = musoftware.Invoice.create(
                         </div>
                     </div>
 
-                    {/* Right Column: Dynamic Layered Visual Interactive Composition */}
+                    {/* Right Column: Premium Flat Geometry Hero Image Showcase */}
                     <div className="lg:col-span-6 relative w-full flex items-center justify-center">
-                        <div className="relative w-full max-w-md md:max-w-xl aspect-[1.1] flex flex-col justify-between">
-                            
-                            {/* Layer 1: Core Wallet Dashboard (Back layer) */}
-                            <div className="absolute top-0 right-4 w-[85%] bg-white border border-slate-200/80 rounded-xl p-5 shadow-xl z-10 transition-all hover:translate-y-[-2px] duration-300">
-                                <div className="flex items-center justify-between border-b border-slate-100 pb-3 mb-4">
-                                    <div className="flex items-center gap-2">
-                                        <div className="h-8 w-8 rounded bg-indigo-50 flex items-center justify-center">
-                                            <Wallet className="h-4 w-4 text-indigo-600" />
-                                        </div>
-                                        <div>
-                                            <div className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Wallet Ledger</div>
-                                            <div className="text-xs font-bold text-slate-900">Main Account balance</div>
-                                        </div>
-                                    </div>
-                                    <div className="text-right">
-                                        <div className="text-lg font-mono font-bold text-emerald-650">${walletBalance.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>
-                                        <div className="text-[10px] text-slate-400 font-bold">USD Available</div>
-                                    </div>
-                                </div>
-                                <div className="space-y-2">
-                                    <div className="text-[10px] font-bold text-slate-400 mb-2 uppercase tracking-wider">Live Transactions</div>
-                                    {recentTransactions.slice(0, 2).map((tx, idx) => (
-                                        <div key={tx.id} className="flex justify-between items-center text-xs p-2 bg-slate-50/50 border border-slate-100 rounded">
-                                            <span className="text-slate-600 truncate max-w-[150px] font-semibold">{tx.desc}</span>
-                                            <span className={`font-mono font-bold ${tx.amount > 0 ? 'text-emerald-650' : 'text-slate-500'}`}>
-                                                {tx.amount > 0 ? '+' : ''}${Math.abs(tx.amount).toFixed(2)}
-                                            </span>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-
-                            {/* Layer 2: Interactive Invoice Progression Simulator (Centerpiece layer) */}
-                            <div className="absolute bottom-6 left-0 w-[90%] bg-white border border-slate-250 rounded-xl p-5 shadow-2xl z-20 glow-card transform hover:scale-[1.01] transition-transform duration-300">
-                                <div className="flex justify-between items-start mb-4">
-                                    <div>
-                                        <span className="text-[10px] bg-indigo-50 border border-indigo-200 text-indigo-700 rounded px-2 py-0.5 font-bold uppercase tracking-wider">
-                                            Interactive Widget
-                                        </span>
-                                        <h4 className="text-sm font-bold text-slate-900 mt-1.5">Simulation: Automated Invoice Billing</h4>
-                                    </div>
-                                    <div className="text-right">
-                                        <div className="text-[10px] text-slate-400 font-bold">Value</div>
-                                        <div className="text-sm font-mono font-bold text-indigo-650">${invoiceValue.toFixed(2)}</div>
-                                    </div>
-                                </div>
-
-                                {/* Flow Progress Timeline */}
-                                <div className="grid grid-cols-4 gap-2 relative mb-6">
-                                    {['Draft', 'Sent', 'Approved', 'Paid'].map((stepName, stepIndex) => (
-                                        <div key={stepName} className="flex flex-col items-center">
-                                            <div className={`w-full h-1.5 rounded-full mb-2 transition-colors duration-500 ${
-                                                invoiceStep >= stepIndex ? 'bg-indigo-500 shadow-[0_0_8px_rgba(99,102,241,0.2)]' : 'bg-slate-200'
-                                            }`} />
-                                            <span className={`text-[10px] font-semibold tracking-tight ${
-                                                invoiceStep === stepIndex ? 'text-indigo-600 font-bold' : invoiceStep > stepIndex ? 'text-slate-800' : 'text-slate-400'
-                                            }`}>{stepName}</span>
-                                        </div>
-                                    ))}
-                                </div>
-
-                                {/* Simulator Control Button */}
-                                <div className="flex gap-2">
-                                    {invoiceStep < 3 ? (
-                                        <Button 
-                                            size="sm" 
-                                            onClick={advanceInvoiceStep}
-                                            className="flex-1 bg-indigo-600 hover:bg-indigo-500 text-white rounded text-xs py-2 font-semibold h-auto"
-                                        >
-                                            {invoiceStep === 0 && 'Send Invoice to Client'}
-                                            {invoiceStep === 1 && 'Approve Client Invoice'}
-                                            {invoiceStep === 2 && 'Process & Authorize Payment'}
-                                        </Button>
-                                    ) : (
-                                        <Button 
-                                            size="sm" 
-                                            onClick={resetInvoiceSimulator}
-                                            className="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded text-xs py-2 font-semibold h-auto border border-slate-250"
-                                        >
-                                            Reset Interactive Simulation
-                                        </Button>
-                                    )}
-                                </div>
-                            </div>
-
-                            {/* Layer 3: Dynamic Realtime Timer Widget (Floating front layer) */}
-                            <div className="absolute bottom-1/2 -right-8 w-[50%] bg-white border border-slate-200 shadow-xl z-30 transition-all hover:-translate-x-1 duration-300 flex flex-col gap-2">
-                                <div className="flex items-center justify-between border-b border-slate-100 pb-2">
-                                    <span className="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Active billing timer</span>
-                                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-ping" />
-                                </div>
-                                <div className="font-mono text-base font-bold text-slate-900 text-center leading-none mt-1">
-                                    {formatTimer(timerSeconds)}
-                                </div>
-                                <div className="text-[10px] text-slate-500 text-center leading-none">
-                                    Earned: <span className="text-emerald-650 font-bold">${billableAmount.toFixed(2)}</span>
-                                </div>
-                                <button
-                                    onClick={() => setTimerActive(!timerActive)}
-                                    className={`w-full py-1 rounded text-[10px] font-bold transition-all text-center flex items-center justify-center gap-1 ${
-                                        timerActive 
-                                            ? 'bg-rose-50 border border-rose-150 text-rose-600' 
-                                            : 'bg-emerald-50 border border-emerald-150 text-emerald-600'
-                                    }`}
-                                >
-                                    {timerActive ? <Pause className="h-2.5 w-2.5" /> : <Play className="h-2.5 w-2.5" />}
-                                    {timerActive ? 'Pause Tracker' : 'Resume Timer'}
-                                </button>
-                            </div>
-
+                        <div className="relative w-full max-w-lg aspect-square flex items-center justify-center bg-slate-50 border border-slate-200/80 rounded-2xl p-6 shadow-xl relative overflow-hidden group">
+                            {/* Decorative background glow rings */}
+                            <div className="absolute inset-0 bg-gradient-to-tr from-indigo-500/5 to-purple-500/5 pointer-events-none" />
+                            <img
+                                src="/images/hero_illustration.png"
+                                alt="musoftware Operations Collaboration Illustration"
+                                className="w-full h-full object-contain rounded-xl select-none pointer-events-none transform group-hover:scale-[1.02] transition-transform duration-500"
+                            />
                         </div>
                     </div>
 
@@ -437,13 +346,25 @@ invoice = musoftware.Invoice.create(
             {/* ====================================================
                 2. COMPACT SOCIAL PROOF SECTION
                ==================================================== */}
-            <section id="proof" className="bg-slate-50 py-10 border-b border-slate-200/80 relative z-10" ref={statsRef}>
+            <section id="proof" className="bg-slate-50 py-10 border-b border-slate-200/80 relative z-10">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
-                        <DynamicStat value="12,480" label="Active Corporate Entities" isVisible={statsVisible} />
-                        <DynamicStat value="$128.4M" label="Ledger Invoices Cleared" isVisible={statsVisible} prefix="$" suffix="M" />
-                        <DynamicStat value="94,200" label="Marketplace Orders Released" isVisible={statsVisible} />
-                        <DynamicStat value="$42.5M" label="Escrow System Locked Volume" isVisible={statsVisible} prefix="$" suffix="M" />
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8 text-center md:text-left">
+                        <div className="flex flex-col p-6 bg-white border border-slate-200/80 rounded-xl shadow-sm">
+                            <span className="text-3xl font-bold tracking-tight text-slate-900">12,480+</span>
+                            <span className="text-xs text-slate-500 font-semibold uppercase tracking-wider mt-1.5">Active Corporate Entities</span>
+                        </div>
+                        <div className="flex flex-col p-6 bg-white border border-slate-200/80 rounded-xl shadow-sm">
+                            <span className="text-3xl font-bold tracking-tight text-slate-900">$128.4M+</span>
+                            <span className="text-xs text-slate-500 font-semibold uppercase tracking-wider mt-1.5">Ledger Invoices Cleared</span>
+                        </div>
+                        <div className="flex flex-col p-6 bg-white border border-slate-200/80 rounded-xl shadow-sm">
+                            <span className="text-3xl font-bold tracking-tight text-slate-900">94,200+</span>
+                            <span className="text-xs text-slate-500 font-semibold uppercase tracking-wider mt-1.5">Marketplace Orders Released</span>
+                        </div>
+                        <div className="flex flex-col p-6 bg-white border border-slate-200/80 rounded-xl shadow-sm">
+                            <span className="text-3xl font-bold tracking-tight text-slate-900">$42.5M+</span>
+                            <span className="text-xs text-slate-500 font-semibold uppercase tracking-wider mt-1.5">Escrow System locked volume</span>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -458,7 +379,7 @@ invoice = musoftware.Invoice.create(
                         <p className="mt-2 text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-900">
                             The Four Pillars of the Unified Ecosystem
                         </p>
-                        <p className="mt-4 text-base text-slate-600">
+                        <p className="mt-4 text-base text-slate-655 font-normal">
                             Stop running multi-thousand dollar business operations across loosely joined apps. Unify core components under one database structure.
                         </p>
                     </div>
@@ -466,10 +387,10 @@ invoice = musoftware.Invoice.create(
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">
                         
                         {/* Pillar 1: Financial Operations */}
-                        <div className="bg-slate-50/50 border border-slate-200/80 rounded-xl p-8 flex flex-col justify-between hover:border-slate-350 transition-colors duration-300 shadow-sm">
+                        <div className="bg-slate-50/50 border border-slate-200/80 rounded-xl p-8 flex flex-col justify-between hover:border-slate-300 transition-colors duration-300 shadow-sm">
                             <div>
                                 <div className="h-12 w-12 rounded-lg bg-indigo-50 flex items-center justify-center mb-6">
-                                    <DollarSign className="h-6 w-6 text-indigo-600" />
+                                    <Wallet className="h-6 w-6 text-indigo-600" />
                                 </div>
                                 <h3 className="text-xl font-bold text-slate-900 mb-2">1. Financial Ledger & Wallet Operations</h3>
                                 <p className="text-slate-600 text-sm leading-relaxed mb-6 font-normal">
@@ -477,14 +398,6 @@ invoice = musoftware.Invoice.create(
                                 </p>
                             </div>
                             <div>
-                                {/* Mini UI Block */}
-                                <div className="bg-white p-4 border border-slate-200 rounded-lg mb-6 flex items-center justify-between text-xs shadow-sm">
-                                    <div>
-                                        <div className="text-slate-400 uppercase text-[9px] font-bold">Withdrawal Approval Queue</div>
-                                        <div className="text-slate-800 font-bold mt-1">Stripe Payout • David K.</div>
-                                    </div>
-                                    <span className="bg-emerald-50 border border-emerald-200 text-emerald-700 font-bold px-2 py-0.5 rounded text-[10px]">Approved</span>
-                                </div>
                                 <ul className="space-y-2.5">
                                     {['Multi-currency wallet ledger tracking', 'Escrow protection and automatic locks', 'Tax-split configurations'].map((item) => (
                                         <li key={item} className="flex items-center gap-2.5 text-xs text-slate-700">
@@ -497,7 +410,7 @@ invoice = musoftware.Invoice.create(
                         </div>
 
                         {/* Pillar 2: Customer Management */}
-                        <div className="bg-slate-50/50 border border-slate-200/80 rounded-xl p-8 flex flex-col justify-between hover:border-slate-350 transition-colors duration-300 shadow-sm">
+                        <div className="bg-slate-50/50 border border-slate-200/80 rounded-xl p-8 flex flex-col justify-between hover:border-slate-300 transition-colors duration-300 shadow-sm">
                             <div>
                                 <div className="h-12 w-12 rounded-lg bg-purple-50 flex items-center justify-center mb-6">
                                     <UserCheck className="h-6 w-6 text-purple-650" />
@@ -508,14 +421,6 @@ invoice = musoftware.Invoice.create(
                                 </p>
                             </div>
                             <div>
-                                {/* Mini UI Block */}
-                                <div className="bg-white p-4 border border-slate-200 rounded-lg mb-6 flex items-center justify-between text-xs shadow-sm">
-                                    <div className="flex items-center gap-2">
-                                        <div className="h-6 w-6 rounded-full bg-indigo-500 flex items-center justify-center font-bold text-[10px] text-white">AC</div>
-                                        <div className="font-bold text-slate-850">Acme Corp Portal</div>
-                                    </div>
-                                    <div className="text-[10px] text-slate-400 font-semibold">Balance: <span className="text-emerald-650 font-bold">$14,500</span></div>
-                                </div>
                                 <ul className="space-y-2.5">
                                     {['Shared project dashboards and milestones', 'White-labeled customer billing interfaces', 'Escrow and proposal reviews'].map((item) => (
                                         <li key={item} className="flex items-center gap-2.5 text-xs text-slate-700">
@@ -528,7 +433,7 @@ invoice = musoftware.Invoice.create(
                         </div>
 
                         {/* Pillar 3: Marketplace & Freelance */}
-                        <div className="bg-slate-50/50 border border-slate-200/80 rounded-xl p-8 flex flex-col justify-between hover:border-slate-350 transition-colors duration-300 shadow-sm">
+                        <div className="bg-slate-50/50 border border-slate-200/80 rounded-xl p-8 flex flex-col justify-between hover:border-slate-300 transition-colors duration-300 shadow-sm">
                             <div>
                                 <div className="h-12 w-12 rounded-lg bg-emerald-50 flex items-center justify-center mb-6">
                                     <Layers className="h-6 w-6 text-emerald-600" />
@@ -539,14 +444,6 @@ invoice = musoftware.Invoice.create(
                                 </p>
                             </div>
                             <div>
-                                {/* Mini UI Block */}
-                                <div className="bg-white p-4 border border-slate-200 rounded-lg mb-6 flex items-center justify-between text-xs shadow-sm">
-                                    <div>
-                                        <div className="font-bold text-slate-850">SaaS UI Refactor Proposal</div>
-                                        <div className="text-[10px] text-slate-400 mt-0.5">Freelancer: Sophia L.</div>
-                                    </div>
-                                    <span className="bg-indigo-50 border border-indigo-150 text-indigo-750 font-bold px-2 py-0.5 rounded text-[10px]">$3,500 Escrow Locked</span>
-                                </div>
                                 <ul className="space-y-2.5">
                                     {['Tiered productized services (Starter, Pro, Elite)', 'Contract RFP and proposal processing systems', 'Direct milestone payouts'].map((item) => (
                                         <li key={item} className="flex items-center gap-2.5 text-xs text-slate-700">
@@ -559,7 +456,7 @@ invoice = musoftware.Invoice.create(
                         </div>
 
                         {/* Pillar 4: Communication & Support */}
-                        <div className="bg-slate-50/50 border border-slate-200/80 rounded-xl p-8 flex flex-col justify-between hover:border-slate-350 transition-colors duration-300 shadow-sm">
+                        <div className="bg-slate-50/50 border border-slate-200/80 rounded-xl p-8 flex flex-col justify-between hover:border-slate-300 transition-colors duration-300 shadow-sm">
                             <div>
                                 <div className="h-12 w-12 rounded-lg bg-orange-50 flex items-center justify-center mb-6">
                                     <Activity className="h-6 w-6 text-orange-650" />
@@ -570,14 +467,6 @@ invoice = musoftware.Invoice.create(
                                 </p>
                             </div>
                             <div>
-                                {/* Mini UI Block */}
-                                <div className="bg-white p-4 border border-slate-200 rounded-lg mb-6 flex items-center gap-3 text-xs shadow-sm">
-                                    <div className="h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center font-bold">💬</div>
-                                    <div className="flex-1">
-                                        <div className="font-bold text-slate-850">Milestone 1 Complete</div>
-                                        <p className="text-[10px] text-slate-400 truncate mt-0.5">Automated release payload processed.</p>
-                                    </div>
-                                </div>
                                 <ul className="space-y-2.5">
                                     {['Contextual real-time chat with invoice linking', 'Precise timed-billing integration logs', 'Automatic system email and notification triggers'].map((item) => (
                                         <li key={item} className="flex items-center gap-2.5 text-xs text-slate-700">
@@ -594,7 +483,7 @@ invoice = musoftware.Invoice.create(
             </section>
 
             {/* ====================================================
-                4. FINANCIAL WORKFLOWS SECTION (Stripe-Like)
+                4. FINANCIAL WORKFLOWS SECTION (Editorial Showcase)
                ==================================================== */}
             <section id="financials" className="bg-slate-50/40 py-24 border-b border-slate-200/80 relative z-10">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-12 gap-16 items-center">
@@ -605,7 +494,7 @@ invoice = musoftware.Invoice.create(
                         <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 leading-tight">
                             Stripe-precision wallets, contract deposits, and recurring billing logs
                         </h2>
-                        <p className="text-slate-650 text-sm leading-relaxed font-normal">
+                        <p className="text-slate-655 text-sm leading-relaxed font-normal">
                             Stop exposing your enterprise billing to human error. Track financial pipelines with extreme precision. Establish automated multi-currency contracts, hold marketplace funds securely in integrated escrow chambers, and manage instantaneous bank withdrawals in a fully auditable double-entry accounting ledger.
                         </p>
                         
@@ -615,565 +504,107 @@ invoice = musoftware.Invoice.create(
                                 <div className="text-xs text-slate-500 mt-1 font-semibold">Escrow Fraud Guarantee</div>
                             </div>
                             <div className="p-4 bg-white rounded-lg border border-slate-200 shadow-sm">
-                                <div className="text-indigo-650 font-bold font-mono text-lg">&lt;3s</div>
+                                <div className="text-indigo-655 font-bold font-mono text-lg">&lt;3s</div>
                                 <div className="text-xs text-slate-500 mt-1 font-semibold">Wallet Payout Processing</div>
                             </div>
                         </div>
                     </div>
 
-                    {/* Right: Stacked accounting cards (Interactive) */}
-                    <div className="lg:col-span-7 space-y-4">
-                        
-                        {/* Financial Card 1: Invoice Action Card */}
-                        <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-lg relative overflow-hidden group">
-                            <div className="absolute top-0 right-0 h-16 w-16 bg-indigo-500/5 rounded-full blur-xl pointer-events-none" />
-                            <div className="flex justify-between items-start">
-                                <div className="flex items-center gap-3">
-                                    <div className="h-10 w-10 bg-indigo-50 rounded flex items-center justify-center">
-                                        <FileText className="h-5 w-5 text-indigo-600" />
-                                    </div>
-                                    <div>
-                                        <h4 className="text-sm font-bold text-slate-900">Invoice #INV-2026-904</h4>
-                                        <p className="text-xs text-slate-400 font-medium">Draft state. Waiting for payload.</p>
-                                    </div>
-                                </div>
-                                <div className="text-right">
-                                    <div className="text-xs text-slate-400 font-semibold">Total Billable</div>
-                                    <div className="text-sm font-mono font-bold text-slate-900">$4,850.00</div>
-                                </div>
-                            </div>
-                            <div className="mt-4 pt-4 border-t border-slate-100 flex items-center justify-between text-xs">
-                                <span className="text-slate-500 font-medium">Customer: Apex Corp Inc.</span>
-                                <Button 
-                                    size="sm" 
-                                    className="bg-indigo-600 hover:bg-indigo-500 text-white rounded text-[11px] px-3.5 py-1.5 h-auto font-semibold"
-                                    onClick={() => alert("Simulating Instant Invoice Deployment: API request sent to Acme Portal queue.")}
-                                >
-                                    Authorize & Send
-                                </Button>
-                            </div>
-                        </div>
-
-                        {/* Financial Card 2: Wallet Payout Card */}
-                        <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-lg relative overflow-hidden">
-                            <div className="flex justify-between items-start">
-                                <div className="flex items-center gap-3">
-                                    <div className="h-10 w-10 bg-emerald-50 rounded flex items-center justify-center">
-                                        <Wallet className="h-5 w-5 text-emerald-650" />
-                                    </div>
-                                    <div>
-                                        <h4 className="text-sm font-bold text-slate-900">Available Wallet Balance</h4>
-                                        <p className="text-xs text-slate-400 font-medium">Secured in transactional bank vault.</p>
-                                    </div>
-                                </div>
-                                <div className="text-right">
-                                    <div className="text-sm font-mono font-bold text-emerald-650">$14,820.00</div>
-                                    <div className="text-[10px] text-slate-400 font-bold">USD Available</div>
-                                </div>
-                            </div>
-                            <div className="mt-4 pt-4 border-t border-slate-100 flex items-center justify-between text-xs">
-                                <span className="text-slate-500 font-medium">Auto-split configured: 15% Tax Lock</span>
-                                <span className="text-[11px] text-slate-700 font-semibold bg-slate-100 border border-slate-200/60 px-2 py-1 rounded">
-                                    Multi-currency Enabled (USD / EUR / GBP)
-                                </span>
-                            </div>
-                        </div>
-
-                        {/* Financial Card 3: Recurring Ledger Stream */}
-                        <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-lg">
-                            <div className="flex items-center justify-between text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">
-                                <span>Recurring Subscription Ledger Logs</span>
-                                <span className="flex items-center gap-1.5 text-indigo-650 font-bold lowercase">
-                                    <span className="h-1.5 w-1.5 bg-indigo-500 rounded-full animate-ping" />
-                                    live log feed
-                                </span>
-                            </div>
-                            <div className="space-y-2 font-mono text-[10px] text-slate-650">
-                                <div className="flex justify-between p-1.5 bg-slate-50 rounded">
-                                    <span className="text-slate-400">[03:42:01]</span>
-                                    <span>Syncing Stripe API Payment Intents...</span>
-                                    <span className="text-emerald-600 font-bold">SUCCESS</span>
-                                </div>
-                                <div className="flex justify-between p-1.5 bg-slate-50 rounded">
-                                    <span className="text-slate-400">[03:42:15]</span>
-                                    <span>Triggering Wallet Commission Split for Client U-881</span>
-                                    <span className="text-indigo-600 font-bold">PROCESSED (+$42.50)</span>
-                                </div>
-                            </div>
-                        </div>
-
+                    {/* Right: Premium Flat Geometry Vector Illustration */}
+                    <div className="lg:col-span-7 bg-white border border-slate-200 rounded-2xl p-6 shadow-xl relative overflow-hidden group">
+                        <div className="absolute inset-0 bg-gradient-to-tr from-indigo-500/5 to-emerald-500/5 pointer-events-none" />
+                        <FinancialIllustration />
                     </div>
                 </div>
             </section>
 
             {/* ====================================================
-                5. MARKETPLACE & FREELANCE SECTION (Kanban Board)
+                5. MARKETPLACE & FREELANCE SECTION (Editorial Showcase)
                ==================================================== */}
             <section id="marketplace" className="bg-white py-24 border-b border-slate-100 relative z-10">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="flex flex-col md:flex-row md:items-end justify-between mb-16">
-                        <div className="max-w-2xl text-left">
-                            <span className="text-xs font-semibold uppercase tracking-wider text-purple-650">Ecosystem Workflows</span>
-                            <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 mt-2">
-                                Clean, operational freelance contracts and escrow trackers
-                            </h2>
-                            <p className="text-slate-600 text-sm leading-relaxed mt-4">
-                                Skip the basic marketing descriptions of freelance websites. We give you a fully functional project ecosystem showing exactly how proposals shift into active escrowed contracts.
-                            </p>
-                        </div>
-                        {/* Simulation trigger */}
-                        <div className="mt-6 md:mt-0 flex gap-2">
-                            <Button 
-                                size="sm" 
-                                onClick={triggerEscrowFunding}
-                                className={`rounded px-4 py-2 font-bold text-xs ${
-                                    escrowStatus === 'unfunded' 
-                                        ? 'bg-indigo-600 hover:bg-indigo-500 text-white' 
-                                        : escrowStatus === 'holding' 
-                                            ? 'bg-emerald-600 hover:bg-emerald-500 text-white' 
-                                            : 'bg-slate-100 text-slate-400 cursor-not-allowed border border-slate-200'
-                                }`}
-                                disabled={escrowStatus === 'released'}
-                            >
-                                {escrowStatus === 'unfunded' && 'Fund Milestones ($3,500)'}
-                                {escrowStatus === 'holding' && 'Authorize Milestone Release'}
-                                {escrowStatus === 'released' && 'Milestone Funds Released to Wallet'}
-                            </Button>
-                        </div>
-                    </div>
-
-                    {/* Operational Kanban Board Layout */}
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        
-                        {/* Column 1: Proposals Received */}
-                        <div className="bg-slate-50 border border-slate-200/80 rounded-xl p-4 flex flex-col gap-4">
-                            <div className="flex justify-between items-center border-b border-slate-200 pb-2">
-                                <span className="text-xs font-bold text-slate-800 uppercase tracking-wider">Proposals Received</span>
-                                <span className="bg-slate-200 text-slate-700 font-bold px-2 py-0.5 rounded text-[10px]">3 Active</span>
-                            </div>
-
-                            {/* Card 1 */}
-                            <div className="bg-white border border-slate-200 p-4 rounded-lg flex flex-col gap-3 shadow-sm hover:border-slate-300 transition-all">
-                                <div className="flex justify-between items-start">
-                                    <span className="text-[10px] bg-purple-50 border border-purple-200 text-purple-700 px-2 py-0.5 rounded font-bold uppercase">Web Refactor</span>
-                                    <span className="text-xs font-mono font-bold text-slate-900">$3,500.00</span>
-                                </div>
-                                <h4 className="text-xs font-bold text-slate-800">SaaS Landing Page Design Refactor</h4>
-                                <p className="text-[10px] text-slate-550 leading-relaxed line-clamp-2">Complete landing page overhaul matching Linear styling and high-density SaaS structures...</p>
-                                <div className="border-t border-slate-100 pt-2 flex items-center justify-between text-[10px] text-slate-400 font-semibold">
-                                    <span>Freelancer: Sophia L.</span>
-                                    <span className="text-emerald-600 font-semibold">★ 5.0 (42 reviews)</span>
-                                </div>
-                            </div>
-
-                            {/* Card 2 */}
-                            <div className="bg-white border border-slate-200 p-4 rounded-lg flex flex-col gap-3 shadow-sm opacity-60">
-                                <div className="flex justify-between items-start">
-                                    <span className="text-[10px] bg-slate-100 border border-slate-200 text-slate-600 px-2 py-0.5 rounded font-bold uppercase">Full Stack API</span>
-                                    <span className="text-xs font-mono font-bold text-slate-900">$6,800.00</span>
-                                </div>
-                                <h4 className="text-xs font-bold text-slate-800">Node API & Webhook Infrastructure</h4>
-                                <p className="text-[10px] text-slate-550 leading-relaxed line-clamp-2">Design real-time webhook endpoints, escrow locks, and wallet integration hooks...</p>
-                                <div className="border-t border-slate-100 pt-2 flex items-center justify-between text-[10px] text-slate-400 font-semibold">
-                                    <span>Freelancer: Alex K.</span>
-                                    <span className="text-slate-400">★ 4.9 (12 reviews)</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Column 2: Escrow System Locked (Milestones) */}
-                        <div className="bg-slate-50 border border-slate-200/80 rounded-xl p-4 flex flex-col gap-4">
-                            <div className="flex justify-between items-center border-b border-slate-200 pb-2">
-                                <span className="text-xs font-bold text-slate-800 uppercase tracking-wider">Escrow System Protected</span>
-                                <span className="bg-indigo-50 border border-indigo-150 text-indigo-650 font-bold px-2 py-0.5 rounded text-[10px]">1 Locked</span>
-                            </div>
-
-                            {/* Active Escrow Simulator Card */}
-                            <div className={`p-4 rounded-lg flex flex-col gap-4 transition-all duration-500 shadow-sm ${
-                                escrowStatus === 'unfunded' 
-                                    ? 'bg-white border border-slate-200' 
-                                    : escrowStatus === 'holding' 
-                                        ? 'bg-indigo-50/40 border-2 border-indigo-400 glow-indigo' 
-                                        : 'bg-emerald-50/30 border-2 border-emerald-450 glow-green'
-                            }`}>
-                                <div className="flex justify-between items-start">
-                                    <span className={`text-[10px] px-2 py-0.5 rounded font-bold uppercase tracking-wider border ${
-                                        escrowStatus === 'unfunded' 
-                                            ? 'bg-slate-100 text-slate-500 border-slate-200' 
-                                            : escrowStatus === 'holding' 
-                                                ? 'bg-indigo-50 border-indigo-200 text-indigo-700 animate-pulse' 
-                                                : 'bg-emerald-50 border-emerald-200 text-emerald-700'
-                                    }`}>
-                                        {escrowStatus === 'unfunded' && 'UNFUNDED'}
-                                        {escrowStatus === 'holding' && 'SECURED IN ESCROW'}
-                                        {escrowStatus === 'released' && 'RELEASED TO WALLET'}
-                                    </span>
-                                    <span className="text-xs font-mono font-bold text-slate-900">$3,500.00</span>
-                                </div>
-
-                                <div className="flex flex-col gap-1">
-                                    <h4 className="text-xs font-bold text-slate-800">SaaS Landing Page Refactor</h4>
-                                    <p className="text-[10px] text-slate-400 font-semibold">Contract ID: CON-2026-8812</p>
-                                </div>
-
-                                <div className="text-xs p-2.5 bg-slate-50 rounded border border-slate-150 space-y-1">
-                                    <div className="flex justify-between text-[10px] font-medium">
-                                        <span className="text-slate-450">Escrow Account:</span>
-                                        <span className="text-slate-700 font-mono">escrow_292a188f9</span>
-                                    </div>
-                                    <div className="flex justify-between text-[10px] font-medium">
-                                        <span className="text-slate-450">Payment Status:</span>
-                                        <span className={`font-bold ${
-                                            escrowStatus === 'unfunded' 
-                                                ? 'text-slate-400' 
-                                                : escrowStatus === 'holding' 
-                                                    ? 'text-indigo-600' 
-                                                    : 'text-emerald-600'
-                                        }`}>
-                                            {escrowStatus === 'unfunded' && 'Unfunded'}
-                                            {escrowStatus === 'holding' && 'Held & Secured'}
-                                            {escrowStatus === 'released' && 'Released'}
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Column 3: Completed & Transferred */}
-                        <div className="bg-slate-50 border border-slate-200/80 rounded-xl p-4 flex flex-col gap-4">
-                            <div className="flex justify-between items-center border-b border-slate-200 pb-2">
-                                <span className="text-xs font-bold text-slate-800 uppercase tracking-wider">Completed Transactions</span>
-                                <span className="bg-slate-200 text-slate-700 font-bold px-2 py-0.5 rounded text-[10px]">Archive</span>
-                            </div>
-
-                            {/* Static completed contracts */}
-                            <div className="bg-white border border-slate-200 p-4 rounded-lg flex flex-col gap-3 opacity-60 shadow-sm">
-                                <div className="flex justify-between items-start">
-                                    <span className="text-[10px] bg-emerald-50 border border-emerald-250 text-emerald-700 px-2 py-0.5 rounded font-bold uppercase">Brand Design</span>
-                                    <span className="text-xs font-mono font-bold text-slate-900">$450.00</span>
-                                </div>
-                                <h4 className="text-xs font-bold text-slate-800">Musoftware Brand Pack Logo</h4>
-                                <div className="text-[10px] p-2 bg-slate-50 rounded border border-slate-150 space-y-1 font-medium">
-                                    <div className="flex justify-between">
-                                        <span className="text-slate-450">Escrow ID:</span>
-                                        <span className="text-slate-700">escrow_292a188f1</span>
-                                    </div>
-                                    <div className="flex justify-between">
-                                        <span className="text-slate-450">Transferred On:</span>
-                                        <span className="text-slate-700">2026-05-16</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                    </div>
-                </div>
-            </section>
-
-            {/* ====================================================
-                6. UNIFIED WORKSPACE SECTION (Centered Epic Dashboard)
-               ==================================================== */}
-            <section id="workspace" className="bg-slate-50/40 py-24 border-b border-slate-200/80 relative z-10">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-                    <div className="max-w-3xl mx-auto mb-16">
-                        <span className="text-xs font-semibold uppercase tracking-wider text-indigo-650 font-bold">Unified Architecture</span>
-                        <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 mt-2">
-                            One Customer. One Operational Workspace.
-                        </h2>
-                        <p className="text-slate-600 text-sm leading-relaxed mt-4">
-                            Tear down the walls between client relations and operational tracking. Our unified customer dashboard combines transaction audits, invoices, escrow logs, and private internal admin notes under a single user session profile.
-                        </p>
-                    </div>
-
-                    {/* Centered Large Visual Dashboard Epic */}
-                    <div className="relative w-full max-w-5xl mx-auto rounded-xl border border-slate-205 bg-white overflow-hidden shadow-2xl shadow-slate-200/80">
-                        
-                        {/* Chrome bar */}
-                        <div className="h-10 bg-slate-50 border-b border-slate-200 flex items-center px-4 justify-between">
-                            <div className="flex space-x-1.5">
-                                <div className="w-3 h-3 rounded-full bg-rose-500" />
-                                <div className="w-3 h-3 rounded-full bg-amber-500" />
-                                <div className="w-3 h-3 rounded-full bg-emerald-500" />
-                            </div>
-                            <span className="text-xs text-slate-400 font-mono font-bold">dashboard.musoftware.com/admin/clients/acme-corp</span>
-                            <div className="w-12 h-2 rounded bg-slate-200" />
-                        </div>
-
-                        {/* Dashboard layout */}
-                        <div className="grid grid-cols-1 md:grid-cols-12 text-left h-[500px]">
-                            
-                            {/* Left panel: Customer Overview */}
-                            <div className="md:col-span-4 border-r border-slate-200 p-6 flex flex-col justify-between bg-slate-50/40">
-                                <div>
-                                    <div className="flex items-center gap-3 mb-6">
-                                        <div className="h-12 w-12 rounded-lg bg-indigo-600 flex items-center justify-center font-bold text-white text-lg shadow-md shadow-indigo-500/20">
-                                            AC
-                                        </div>
-                                        <div>
-                                            <h4 className="text-sm font-bold text-slate-900">Acme Corporation</h4>
-                                            <p className="text-xs text-indigo-600 font-bold">Verified Enterprise Client</p>
-                                        </div>
-                                    </div>
-
-                                    <div className="space-y-4">
-                                        <div>
-                                            <span className="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Total Invoice Billings</span>
-                                            <div className="text-lg font-mono font-bold text-slate-900">${(42950.00).toLocaleString(undefined, {minimumFractionDigits: 2})}</div>
-                                        </div>
-                                        <div>
-                                            <span className="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Active Escrows Locked</span>
-                                            <div className="text-sm font-mono font-bold text-indigo-600">$3,500.00</div>
-                                        </div>
-                                        <div>
-                                            <span className="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Client Wallet balance</span>
-                                            <div className="text-sm font-mono font-bold text-emerald-600">$1,450.00</div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className="pt-6 border-t border-slate-200 space-y-2">
-                                    <div className="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Workspace Core Actions</div>
-                                    <div className="flex gap-2">
-                                        <Button size="sm" className="flex-1 bg-indigo-600 hover:bg-indigo-500 text-white rounded text-[10px] py-2 h-auto font-semibold">
-                                            Deploy Invoice
-                                        </Button>
-                                        <Button size="sm" variant="outline" className="flex-1 bg-white hover:bg-slate-50 text-slate-700 border-slate-200 rounded text-[10px] py-2 h-auto">
-                                            Private Note
-                                        </Button>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Right panel: Active Client Log & Timeline */}
-                            <div className="md:col-span-8 p-6 flex flex-col justify-between overflow-y-auto bg-white">
-                                <div>
-                                    <div className="flex justify-between items-center border-b border-slate-100 pb-3 mb-6">
-                                        <h5 className="text-xs font-bold text-slate-800 uppercase tracking-wider">Client Timeline & Transaction Trail</h5>
-                                        <span className="bg-indigo-50 border border-indigo-150 text-indigo-700 font-bold px-2 py-0.5 rounded text-[10px]">Updated Live</span>
-                                    </div>
-
-                                    {/* Action Logs */}
-                                    <div className="space-y-4 relative before:absolute before:left-3 before:top-2 before:bottom-2 before:w-[1px] before:bg-slate-200">
-                                        
-                                        <div className="flex items-start gap-4 relative">
-                                            <div className="h-6 w-6 rounded-full bg-emerald-50 border border-emerald-200 flex items-center justify-center text-[10px] text-emerald-700 font-bold shrink-0 relative z-10 shadow-sm">✓</div>
-                                            <div>
-                                                <div className="text-xs font-bold text-slate-900">Milestone 2 payment released from Escrow</div>
-                                                <p className="text-[10px] text-slate-500 mt-0.5">Authorization ID: release_8812a. Main wallet balance credited (+$1,800.00).</p>
-                                                <span className="text-[9px] text-slate-400 font-semibold mt-1 block">12 hours ago • Automated</span>
-                                            </div>
-                                        </div>
-
-                                        <div className="flex items-start gap-4 relative">
-                                            <div className="h-6 w-6 rounded-full bg-indigo-50 border border-indigo-200 flex items-center justify-center text-[10px] text-indigo-700 font-bold shrink-0 relative z-10 shadow-sm">i</div>
-                                            <div>
-                                                <div className="text-xs font-bold text-slate-900">Invoice #INV-2026-88 Deploy Success</div>
-                                                <p className="text-[10px] text-slate-500 mt-0.5">Dispatched directly to Client Acme Corp Email Queue. Value: $2,450.00.</p>
-                                                <span className="text-[9px] text-slate-400 font-semibold mt-1 block">1 day ago • Dispatched</span>
-                                            </div>
-                                        </div>
-
-                                        <div className="flex items-start gap-4 relative opacity-60">
-                                            <div className="h-6 w-6 rounded-full bg-slate-100 border border-slate-250 flex items-center justify-center text-[10px] text-slate-500 font-bold shrink-0 relative z-10 shadow-sm">n</div>
-                                            <div>
-                                                <div className="text-xs font-bold text-slate-800">System Log: Private internal notes processed</div>
-                                                <p className="text-[10px] text-slate-500 mt-0.5">"Client requested advanced modular setup on API. Verify skills match on freelance board."</p>
-                                                <span className="text-[9px] text-slate-400 font-semibold mt-1 block">3 days ago • Admin: Mahmo</span>
-                                            </div>
-                                        </div>
-
-                                    </div>
-                                </div>
-
-                                <div className="border-t border-slate-100 pt-4 text-xs text-slate-400 flex justify-between items-center font-mono font-medium">
-                                    <span>Client Profile UUID: usr_99a8820a2e</span>
-                                    <span>Sync Status: SECURE CONFLICT PARITY</span>
-                                </div>
-                            </div>
-
-                        </div>
-                    </div>
-
-                </div>
-            </section>
-
-            {/* ====================================================
-                7. REALTIME COMMUNICATION SECTION
-               ==================================================== */}
-            <section id="realtime" className="bg-white py-24 border-b border-slate-100 relative z-10">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-12 gap-16 items-center">
                     
-                    {/* Left: Chat visualization card */}
-                    <div className="lg:col-span-7 bg-slate-50 border border-slate-200 rounded-xl p-5 shadow-lg relative">
-                        <div className="flex justify-between items-center border-b border-slate-200 pb-3 mb-4">
-                            <div className="flex items-center gap-2">
-                                <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-                                <span className="text-xs font-bold text-slate-800 uppercase tracking-wider">Live System Support Pipeline</span>
-                            </div>
-                            <span className="text-[10px] text-slate-400 font-mono font-bold">channel: #api-operations-refactor</span>
-                        </div>
-
-                        {/* Real-time Chats */}
-                        <div className="space-y-4 mb-6">
-                            
-                            <div className="flex gap-3">
-                                <div className="h-8 w-8 rounded-full bg-slate-200 flex items-center justify-center font-bold text-xs shrink-0 text-slate-650">SL</div>
-                                <div className="flex-1 bg-white p-3 rounded-lg border border-slate-200">
-                                    <div className="flex justify-between items-center mb-1 font-semibold">
-                                        <span className="text-xs font-bold text-slate-800">Sophia L. (Freelancer)</span>
-                                        <span className="text-[9px] text-slate-400">03:41 AM</span>
-                                    </div>
-                                    <p className="text-xs text-slate-600 leading-relaxed font-medium">I have successfully implemented the Webhook security verification. Can you check the transaction queue in the dashboard?</p>
-                                </div>
-                            </div>
-
-                            <div className="flex gap-3 justify-end">
-                                <div className="flex-1 bg-indigo-50/50 p-3 rounded-lg border border-indigo-150 max-w-md">
-                                    <div className="flex justify-between items-center mb-1 font-semibold">
-                                        <span className="text-xs font-bold text-indigo-900">David K. (Client Manager)</span>
-                                        <span className="text-[9px] text-indigo-650">03:42 AM</span>
-                                    </div>
-                                    <p className="text-xs text-indigo-850 leading-relaxed font-medium">Awesome! Yes, I see the milestone is fully funded in Escrow. Releasing payments now. Great work!</p>
-                                </div>
-                                <div className="h-8 w-8 rounded-full bg-indigo-600 flex items-center justify-center font-bold text-xs shrink-0 text-white shadow-sm">DK</div>
-                            </div>
-
-                        </div>
-
-                        {/* Interactive message bar */}
-                        <div className="flex gap-2">
-                            <input 
-                                type="text" 
-                                placeholder="Type real-time message to team..." 
-                                className="flex-1 bg-white border border-slate-250 rounded px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-indigo-500 font-medium shadow-inner"
-                                readOnly
-                            />
-                            <Button size="sm" className="bg-indigo-600 hover:bg-indigo-500 text-white rounded text-xs px-4 font-semibold h-auto">
-                                <Send className="h-3.5 w-3.5" />
-                            </Button>
-                        </div>
+                    {/* Left: Premium Flat Geometry Vector Illustration */}
+                    <div className="lg:col-span-7 bg-slate-50 border border-slate-200/80 rounded-2xl p-6 shadow-xl relative overflow-hidden order-last lg:order-first">
+                        <div className="absolute inset-0 bg-gradient-to-tr from-purple-500/5 to-indigo-500/5 pointer-events-none" />
+                        <MarketplaceIllustration />
                     </div>
 
-                    {/* Right: Realtime copy */}
+                    {/* Right: Marketplace copy */}
                     <div className="lg:col-span-5 flex flex-col space-y-6">
-                        <span className="text-xs font-semibold uppercase tracking-wider text-orange-655 font-bold">Live Infrastructure</span>
+                        <span className="text-xs font-semibold uppercase tracking-wider text-purple-650 font-bold">Ecosystem Workflows</span>
                         <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 leading-tight">
-                            Fast, reactive feedback streams with no latency
+                            Clean, operational freelance contracts and escrow trackers
                         </h2>
-                        <p className="text-slate-605 text-sm leading-relaxed font-normal">
-                            Stop guessing if tasks have progressed. Unify real-time chat platforms directly into operational logs. Freelancers and client managers receive instant chat updates, live system notifications, and running timer updates the second events happen.
+                        <p className="text-slate-655 text-sm leading-relaxed font-normal">
+                            Skip the basic marketing descriptions of freelance websites. We give you a fully functional project ecosystem showing exactly how proposals shift into active escrowed contracts. Work with absolute trust using unified milestone release structures and verified reviews.
                         </p>
                         
-                        <div className="space-y-4">
-                            <div className="flex items-center gap-3">
-                                <div className="h-8 w-8 bg-white border border-slate-200 rounded-lg flex items-center justify-center shadow-sm">
-                                    <Clock className="h-4.5 w-4.5 text-orange-600" />
-                                </div>
-                                <span className="text-slate-700 text-xs font-bold">Automatic billable timer synchronizers</span>
+                        <div className="space-y-3.5">
+                            <div className="flex items-center gap-2 text-xs text-slate-700 font-semibold">
+                                <Check className="h-4 w-4 text-purple-650 shrink-0" />
+                                <span>Tiered productized services (Starter, Pro, Elite)</span>
                             </div>
-                            <div className="flex items-center gap-3">
-                                <div className="h-8 w-8 bg-white border border-slate-200 rounded-lg flex items-center justify-center shadow-sm">
-                                    <Send className="h-4.5 w-4.5 text-indigo-600" />
-                                </div>
-                                <span className="text-slate-700 text-xs font-bold">Interactive direct chat contract bindings</span>
+                            <div className="flex items-center gap-2 text-xs text-slate-700 font-semibold">
+                                <Check className="h-4 w-4 text-purple-650 shrink-0" />
+                                <span>Contract RFP and proposal processing systems</span>
                             </div>
                         </div>
                     </div>
-
                 </div>
             </section>
 
             {/* ====================================================
-                8. ADMIN OPERATIONS SECTION
+                6. UNIFIED WORKSPACE SECTION (Editorial Showcase)
                ==================================================== */}
-            <section id="admin-ops" className="bg-slate-50/30 py-24 border-b border-slate-200/80 relative z-10">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="text-center max-w-3xl mx-auto mb-16">
-                        <span className="text-xs font-semibold uppercase tracking-wider text-rose-600 font-bold">Administrative Power</span>
-                        <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 mt-2">
-                            Admin Operations Control Center
+            <section id="workspace" className="bg-slate-50/40 py-24 border-b border-slate-200/80 relative z-10">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-12 gap-16 items-center">
+                    
+                    {/* Left: Workspace copy */}
+                    <div className="lg:col-span-5 flex flex-col space-y-6">
+                        <span className="text-xs font-semibold uppercase tracking-wider text-indigo-650 font-bold">Unified Architecture</span>
+                        <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 leading-tight">
+                            One Customer. One Operational Workspace.
                         </h2>
-                        <p className="text-slate-600 text-sm leading-relaxed mt-4">
-                            The difference between a basic SaaS landing page and an enterprise business engine is operational management. Leverage robust backend tools for dispute resolution, direct ledger moderation, fraud tracking, and bank transfer authorizations.
+                        <p className="text-slate-655 text-sm leading-relaxed font-normal">
+                            Tear down the walls between client relations and operational tracking. Our unified customer dashboard combines transaction audits, invoices, escrow logs, and private internal admin notes under a single user session profile.
                         </p>
+                        
+                        <div className="space-y-3.5">
+                            <div className="flex items-center gap-2 text-xs text-slate-700 font-semibold">
+                                <Check className="h-4 w-4 text-indigo-650 shrink-0" />
+                                <span>Shared project dashboards and milestones</span>
+                            </div>
+                            <div className="flex items-center gap-2 text-xs text-slate-700 font-semibold">
+                                <Check className="h-4 w-4 text-indigo-650 shrink-0" />
+                                <span>White-labeled customer billing interfaces</span>
+                            </div>
+                        </div>
                     </div>
 
-                    {/* Operations Console Table */}
-                    <div className="w-full rounded-xl border border-slate-200 bg-white overflow-hidden shadow-xl">
-                        
-                        {/* Chrome bar */}
-                        <div className="bg-slate-50 px-6 py-4 border-b border-slate-200 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                            <div>
-                                <h4 className="text-sm font-bold text-slate-900">System Withdrawal Approval Console</h4>
-                                <p className="text-xs text-slate-400 font-medium mt-0.5">Authorizations queue for outbound wallet transfers.</p>
-                            </div>
-                            <div className="inline-flex items-center gap-2 bg-rose-50 border border-rose-200 rounded-full px-3 py-1 text-xs text-rose-700 font-semibold">
-                                <ShieldAlert className="h-3.5 w-3.5" />
-                                High Security Authorization Mode Active
-                            </div>
-                        </div>
-
-                        {/* Interactive Admin Queue Table */}
-                        <div className="overflow-x-auto">
-                            <table className="w-full text-left text-xs border-collapse">
-                                <thead>
-                                    <tr className="bg-slate-50/40 border-b border-slate-200 text-slate-500 uppercase text-[10px] font-bold">
-                                        <th className="px-6 py-3.5">Request ID</th>
-                                        <th className="px-6 py-3.5">User</th>
-                                        <th className="px-6 py-3.5">Amount</th>
-                                        <th className="px-6 py-3.5">Method</th>
-                                        <th className="px-6 py-3.5">Status</th>
-                                        <th className="px-6 py-3.5 text-right">Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y divide-slate-200 font-medium text-slate-700">
-                                    {adminRequests.map((req) => (
-                                        <tr key={req.id} className="hover:bg-slate-50/40 transition-colors">
-                                            <td className="px-6 py-4 font-mono text-slate-400">{req.id}</td>
-                                            <td className="px-6 py-4 text-slate-950 font-bold">{req.user}</td>
-                                            <td className="px-6 py-4 font-mono font-bold text-slate-950">${req.amount.toLocaleString(undefined, {minimumFractionDigits: 2})}</td>
-                                            <td className="px-6 py-4 text-slate-500">{req.type}</td>
-                                            <td className="px-6 py-4">
-                                                <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase border ${
-                                                    req.status === 'pending' 
-                                                        ? 'bg-amber-50 border-amber-200 text-amber-700' 
-                                                        : 'bg-emerald-50 border-emerald-200 text-emerald-700'
-                                                }`}>
-                                                    {req.status}
-                                                </span>
-                                            </td>
-                                            <td className="px-6 py-4 text-right">
-                                                {req.status === 'pending' ? (
-                                                    <Button 
-                                                        size="sm" 
-                                                        onClick={() => approveWithdrawal(req.id, req.amount)}
-                                                        className="bg-emerald-600 hover:bg-emerald-500 text-white rounded text-[10px] px-3.5 py-1.5 h-auto font-semibold shadow-sm"
-                                                    >
-                                                        Authorize payout
-                                                    </Button>
-                                                ) : (
-                                                    <span className="text-slate-400 text-[10px] font-mono font-semibold">TX-SECURE-RELEASE</span>
-                                                )}
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
-
+                    {/* Right: Premium Flat Geometry Vector Illustration */}
+                    <div className="lg:col-span-7 bg-white border border-slate-200 rounded-2xl p-6 shadow-xl relative overflow-hidden group">
+                        <div className="absolute inset-0 bg-gradient-to-tr from-indigo-500/5 to-purple-500/5 pointer-events-none" />
+                        <WorkspaceIllustration />
                     </div>
                 </div>
             </section>
 
             {/* ====================================================
-                9. CUSTOMER EXPERIENCE SECTION
+                7. CUSTOMER EXPERIENCE PORTAL (Editorial Showcase)
                ==================================================== */}
             <section id="customer-exp" className="bg-white py-24 border-b border-slate-100 relative z-10">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-12 gap-16 items-center">
                     
-                    {/* Left: Copy */}
+                    {/* Left: Premium Flat Geometry Vector Illustration */}
+                    <div className="lg:col-span-7 bg-slate-50 border border-slate-200/80 rounded-2xl p-6 shadow-xl relative overflow-hidden order-last lg:order-first">
+                        <div className="absolute inset-0 bg-gradient-to-tr from-emerald-500/5 to-indigo-500/5 pointer-events-none" />
+                        <ClientPortalIllustration />
+                    </div>
+
+                    {/* Right: Copy */}
                     <div className="lg:col-span-5 flex flex-col space-y-6">
-                        <span className="text-xs font-semibold uppercase tracking-wider text-indigo-650 font-bold">Client Experience Portal</span>
+                        <span className="text-xs font-semibold uppercase tracking-wider text-indigo-655 font-bold">Client Experience Portal</span>
                         <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 leading-tight">
                             Stunningly simple for your clients, robust for you
                         </h2>
@@ -1181,308 +612,49 @@ invoice = musoftware.Invoice.create(
                             Stop training your clients to use confusing system frameworks. We separate complexity seamlessly. While you navigate dense ERP tables, contract pipelines, and audit trails, your client accesses a white-labeled dashboard designed for extreme clarity and fast payments.
                         </p>
                         
-                        {/* Selector tabs to toggle visual simulator */}
-                        <div className="flex gap-2 p-1 bg-slate-100 border border-slate-200 rounded-lg w-fit">
-                            <button
-                                onClick={() => setPortalView('freelancer')}
-                                className={`px-4 py-2 rounded text-xs font-bold transition-all ${
-                                    portalView === 'freelancer' 
-                                        ? 'bg-indigo-600 text-white shadow-sm' 
-                                        : 'text-slate-500 hover:text-slate-900'
-                                }`}
-                            >
-                                Manager View
-                            </button>
-                            <button
-                                onClick={() => setPortalView('client')}
-                                className={`px-4 py-2 rounded text-xs font-bold transition-all ${
-                                    portalView === 'client' 
-                                        ? 'bg-indigo-600 text-white shadow-sm' 
-                                        : 'text-slate-500 hover:text-slate-900'
-                                }`}
-                            >
-                                Client view
-                            </button>
-                        </div>
-                    </div>
-
-                    {/* Right: Dynamic Interface Previews */}
-                    <div className="lg:col-span-7">
-                        <div className="bg-slate-50 border border-slate-200 rounded-xl p-5 shadow-xl min-h-[300px] flex flex-col justify-between transition-all duration-300 transform">
-                            {portalView === 'freelancer' ? (
-                                <div className="space-y-6 animate-fade-in">
-                                    <div className="flex justify-between items-center border-b border-slate-200 pb-3">
-                                        <div>
-                                            <h4 className="text-sm font-bold text-slate-900">Corporate Management Workspace</h4>
-                                            <p className="text-[10px] text-slate-400 font-bold mt-0.5 uppercase tracking-wider">Advanced developer controls & ledger tracking</p>
-                                        </div>
-                                        <span className="bg-indigo-50 border border-indigo-200 text-indigo-750 font-bold px-2 py-0.5 rounded text-[10px]">Manager Access</span>
-                                    </div>
-                                    <div className="grid grid-cols-3 gap-4">
-                                        <div className="p-3 bg-white rounded border border-slate-200 shadow-sm">
-                                            <div className="text-[10px] text-slate-405 font-bold uppercase tracking-wider">Gross P&L Margin</div>
-                                            <div className="text-sm font-mono font-bold text-slate-900 mt-1">94.2%</div>
-                                        </div>
-                                        <div className="p-3 bg-white rounded border border-slate-200 shadow-sm">
-                                            <div className="text-[10px] text-slate-405 font-bold uppercase tracking-wider">Escrow Release rate</div>
-                                            <div className="text-sm font-mono font-bold text-indigo-600 mt-1">100.0%</div>
-                                        </div>
-                                        <div className="p-3 bg-white rounded border border-slate-200 shadow-sm">
-                                            <div className="text-[10px] text-slate-405 font-bold uppercase tracking-wider">System tax lock</div>
-                                            <div className="text-sm font-mono font-bold text-emerald-650 mt-1">15% Hold</div>
-                                        </div>
-                                    </div>
-                                    <div className="space-y-2">
-                                        <span className="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Active Ledger Invoices</span>
-                                        <div className="flex justify-between text-xs p-2 bg-white rounded border border-slate-200 font-mono font-medium shadow-sm">
-                                            <span className="text-slate-600">#INV-2026-881</span>
-                                            <span className="text-emerald-650 font-bold">$3,500.00 (Cleared)</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            ) : (
-                                <div className="space-y-6 animate-fade-in">
-                                    <div className="flex justify-between items-center border-b border-slate-200 pb-3">
-                                        <div>
-                                            <h4 className="text-sm font-bold text-slate-900">Client Billing Hub</h4>
-                                            <p className="text-[10px] text-slate-400 font-bold mt-0.5 uppercase tracking-wider">Minimalist portal designed for immediate approvals</p>
-                                        </div>
-                                        <span className="bg-emerald-50 border border-emerald-255 text-emerald-700 font-bold px-2 py-0.5 rounded text-[10px]">Client Access</span>
-                                    </div>
-                                    
-                                    <div className="p-4 bg-emerald-50 border-2 border-emerald-200 rounded-lg flex justify-between items-center glow-green">
-                                        <div>
-                                            <h5 className="text-xs font-bold text-slate-900">Invoice #INV-2026-904 Due</h5>
-                                            <p className="text-[10px] text-slate-500 font-medium mt-0.5">Milestone 2 Refactor. Balance: $2,450.00.</p>
-                                        </div>
-                                        <Button 
-                                            size="sm" 
-                                            onClick={() => alert("Simulating instantaneous secure client invoice payment via Stripe Gateway.")}
-                                            className="bg-emerald-600 hover:bg-emerald-500 text-white rounded text-[11px] px-4 py-2 font-bold h-auto border-0 shadow-sm"
-                                        >
-                                            Authorize Payment ($2,450)
-                                        </Button>
-                                    </div>
-
-                                    <div className="space-y-2">
-                                        <span className="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Recent Invoice Payments Cleared</span>
-                                        <div className="flex justify-between text-xs p-2.5 bg-white rounded border border-slate-200 shadow-sm">
-                                            <span className="text-slate-700 font-bold">#INV-2026-881 Brand Design Pack</span>
-                                            <span className="text-slate-400 font-mono font-bold">$450.00 • Paid</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            )}
-
-                            <div className="border-t border-slate-200 pt-4 text-xs text-slate-400 font-mono text-center font-semibold">
-                                White-label Domain Configured: portal.acme-corp.com
+                        <div className="flex gap-4">
+                            <div className="flex items-center gap-2">
+                                <span className="h-2 w-2 rounded-full bg-emerald-500" />
+                                <span className="text-xs text-slate-700 font-bold">White-label Domain Mapping</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <span className="h-2 w-2 rounded-full bg-indigo-500" />
+                                <span className="text-xs text-slate-700 font-bold">Instant Stripe Checkout integration</span>
                             </div>
                         </div>
                     </div>
-
                 </div>
             </section>
 
             {/* ====================================================
-                10. INTEGRATIONS / AUTOMATION
+                8. ANALYTICS & REPORTING (Editorial Showcase)
                ==================================================== */}
-            <section id="automation" className="bg-slate-50/30 py-24 border-b border-slate-200/80 relative z-10">
+            <section id="analytics" className="bg-slate-50/40 py-24 border-b border-slate-200/80 relative z-10">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-12 gap-16 items-center">
                     
-                    {/* Left: Code Sandbox Console (Dark themed inside light page for high contrast coding feel) */}
-                    <div className="lg:col-span-7 bg-zinc-900 border border-zinc-950 rounded-xl p-5 shadow-2xl flex flex-col justify-between min-h-[350px]">
-                        <div>
-                            <div className="flex justify-between items-center border-b border-zinc-800 pb-3 mb-4">
-                                <div className="flex items-center gap-2">
-                                    <Terminal className="h-4 w-4 text-indigo-400" />
-                                    <span className="text-xs font-bold text-white uppercase tracking-wider font-mono">Developer API Sandbox</span>
-                                </div>
-                                <div className="flex gap-1.5 bg-zinc-950 p-1 border border-zinc-850 rounded">
-                                    <button
-                                        onClick={() => setActiveApiTab('curl')}
-                                        className={`px-2.5 py-1 rounded text-[10px] font-mono font-bold transition-all ${
-                                            activeApiTab === 'curl' ? 'bg-indigo-600 text-white' : 'text-zinc-500 hover:text-zinc-300'
-                                        }`}
-                                    >
-                                        cURL
-                                    </button>
-                                    <button
-                                        onClick={() => setActiveApiTab('nodejs')}
-                                        className={`px-2.5 py-1 rounded text-[10px] font-mono font-bold transition-all ${
-                                            activeApiTab === 'nodejs' ? 'bg-indigo-600 text-white' : 'text-zinc-500 hover:text-zinc-300'
-                                        }`}
-                                    >
-                                        Node.js
-                                    </button>
-                                    <button
-                                        onClick={() => setActiveApiTab('python')}
-                                        className={`px-2.5 py-1 rounded text-[10px] font-mono font-bold transition-all ${
-                                            activeApiTab === 'python' ? 'bg-indigo-600 text-white' : 'text-zinc-500 hover:text-zinc-300'
-                                        }`}
-                                    >
-                                        Python
-                                    </button>
-                                </div>
-                            </div>
-
-                            {/* Fenced glowing code block */}
-                            <pre className="p-4 bg-zinc-950 rounded border border-zinc-900 overflow-x-auto text-[10px] font-mono text-zinc-300 leading-relaxed max-h-[220px]">
-                                {apiSnippets[activeApiTab]}
-                            </pre>
-                        </div>
-                        <div className="border-t border-zinc-800 pt-4 text-xs text-zinc-500 font-mono flex justify-between items-center font-semibold">
-                            <span>Request Rate Limit: 100 req/sec</span>
-                            <span>SDK V4.1 Stable</span>
-                        </div>
-                    </div>
-
-                    {/* Right: Integration copy */}
+                    {/* Left: Analytics copy */}
                     <div className="lg:col-span-5 flex flex-col space-y-6">
-                        <span className="text-xs font-semibold uppercase tracking-wider text-purple-650 font-bold">Developer Automation</span>
+                        <span className="text-xs font-semibold uppercase tracking-wider text-emerald-600 font-bold">Business Intelligence</span>
                         <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 leading-tight">
-                            Scale via raw API access, webhooks, and SaaS SDKs
-                        </h2>
-                        <p className="text-slate-605 text-sm leading-relaxed font-normal">
-                            Developer experience is key. Programmatically dispatch platform invoices, query escrows, split balances, check freelancer skills directories, and trigger webhook payloads the exact second invoice balances change.
-                        </p>
-                        
-                        <ul className="space-y-3">
-                            <li className="flex items-center gap-2 text-xs text-slate-700">
-                                <Check className="h-4 w-4 text-indigo-600 shrink-0" />
-                                <span className="font-semibold">Zero-latency webhook event streams</span>
-                            </li>
-                            <li className="flex items-center gap-2 text-xs text-slate-700">
-                                <Check className="h-4 w-4 text-indigo-600 shrink-0" />
-                                <span className="font-semibold">Full language SDK wrappers (JS, Python, Go)</span>
-                            </li>
-                        </ul>
-                    </div>
-
-                </div>
-            </section>
-
-            {/* ====================================================
-                11. ANALYTICS & REPORTING
-               ==================================================== */}
-            <section id="analytics" className="bg-white py-24 border-b border-slate-100 relative z-10">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="text-center max-w-3xl mx-auto mb-16">
-                        <span className="text-xs font-semibold uppercase tracking-wider text-emerald-600">Business Intelligence</span>
-                        <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 mt-2">
                             High-Fidelity BI Reporting & Wallet Analytics
                         </h2>
-                        <p className="text-slate-600 text-sm leading-relaxed mt-4">
-                            Monitor cash flow velocity with realistic corporate metrics. Swap perspectives instantly to audit earnings growth, locked escrow volumes, and client ledger activities.
+                        <p className="text-slate-655 text-sm leading-relaxed font-normal">
+                            Monitor cash flow velocity with realistic corporate metrics. Swap perspectives instantly to audit earnings growth, locked escrow volumes, and client ledger activities. Make decisions using robust financial projection maps.
                         </p>
                     </div>
 
-                    {/* BI Panel Dashboard Card */}
-                    <div className="relative w-full max-w-4xl mx-auto rounded-xl border border-slate-200 bg-white overflow-hidden shadow-2xl shadow-slate-100/60">
-                        
-                        {/* Chrome header with tab switcher */}
-                        <div className="bg-slate-50 px-6 py-4 border-b border-slate-200 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                            <div>
-                                <h4 className="text-sm font-bold text-slate-900">Earnings Analytics Engine</h4>
-                                <p className="text-xs text-slate-400 mt-0.5">Real-time ledger audit trends</p>
-                            </div>
-                            <div className="flex gap-1.5 p-1 bg-slate-100 border border-slate-200 rounded-lg">
-                                <button
-                                    onClick={() => setActiveChartTab('revenue')}
-                                    className={`px-3 py-1.5 rounded text-xs font-bold transition-all ${
-                                        activeChartTab === 'revenue' ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-500 hover:text-slate-900'
-                                    }`}
-                                >
-                                    Revenue Growth
-                                </button>
-                                <button
-                                    onClick={() => setActiveChartTab('wallet')}
-                                    className={`px-3 py-1.5 rounded text-xs font-bold transition-all ${
-                                        activeChartTab === 'wallet' ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-500 hover:text-slate-900'
-                                    }`}
-                                >
-                                    Wallet Trends
-                                </button>
-                            </div>
-                        </div>
-
-                        {/* Gorgeous vector SVG Chart block */}
-                        <div className="p-6 bg-white relative border-b border-slate-200">
-                            <div className="absolute top-4 right-6 flex items-center gap-4 text-xs font-bold">
-                                <div className="flex items-center gap-1.5">
-                                    <span className="h-2 w-2 rounded-full bg-indigo-500" />
-                                    <span className="text-slate-700">Earnings Current Year</span>
-                                </div>
-                                <div className="flex items-center gap-1.5">
-                                    <span className="h-2 w-2 rounded-full bg-slate-350" />
-                                    <span className="text-slate-400">Benchmark Target</span>
-                                </div>
-                            </div>
-
-                            {/* Responsive vector graph viewport */}
-                            <div className="w-full h-[240px] mt-4">
-                                <svg className="w-full h-full" viewBox="0 0 800 240" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    {/* Grid Lines */}
-                                    <line x1="0" y1="40" x2="800" y2="40" stroke="#e2e8f0" strokeWidth="1" strokeDasharray="4 4" />
-                                    <line x1="0" y1="100" x2="800" y2="100" stroke="#e2e8f0" strokeWidth="1" strokeDasharray="4 4" />
-                                    <line x1="0" y1="160" x2="800" y2="160" stroke="#e2e8f0" strokeWidth="1" strokeDasharray="4 4" />
-                                    <line x1="0" y1="220" x2="800" y2="220" stroke="#cbd5e1" strokeWidth="1" />
-
-                                    {/* Month Coordinates: Jan (40) Feb (160) Mar (280) Apr (400) May (520) Jun (640) Jul (760) */}
-                                    {/* Dynamic Path 1: Active Revenue Curve */}
-                                    {activeChartTab === 'revenue' ? (
-                                        <path 
-                                            d="M 40 200 Q 160 180 280 120 T 520 60 T 760 30" 
-                                            fill="none" 
-                                            stroke="url(#indigo-grad)" 
-                                            strokeWidth="3.5" 
-                                            strokeLinecap="round"
-                                            className="animate-chart-path"
-                                        />
-                                    ) : (
-                                        <path 
-                                            d="M 40 180 Q 160 140 280 160 T 520 100 T 760 60" 
-                                            fill="none" 
-                                            stroke="url(#emerald-grad)" 
-                                            strokeWidth="3.5" 
-                                            strokeLinecap="round"
-                                        />
-                                    )}
-
-                                    {/* Path 2: Target Benchmark Path */}
-                                    <path d="M 40 210 L 760 100" fill="none" stroke="#94a3b8" strokeWidth="1.5" strokeDasharray="6 6" />
-
-                                    {/* Dynamic path gradients */}
-                                    <defs>
-                                        <linearGradient id="indigo-grad" x1="0" y1="0" x2="1" y2="0">
-                                            <stop offset="0%" stopColor="#6366f1" />
-                                            <stop offset="100%" stopColor="#a855f7" />
-                                        </linearGradient>
-                                        <linearGradient id="emerald-grad" x1="0" y1="0" x2="1" y2="0">
-                                            <stop offset="0%" stopColor="#10b981" />
-                                            <stop offset="100%" stopColor="#06b6d4" />
-                                        </linearGradient>
-                                    </defs>
-
-                                    {/* Data Labels */}
-                                    <text x="40" y="235" fill="#64748b" fontSize="9" textAnchor="middle" fontWeight="bold">JAN</text>
-                                    <text x="160" y="235" fill="#64748b" fontSize="9" textAnchor="middle" fontWeight="bold">FEB</text>
-                                    <text x="280" y="235" fill="#64748b" fontSize="9" textAnchor="middle" fontWeight="bold">MAR</text>
-                                    <text x="400" y="235" fill="#64748b" fontSize="9" textAnchor="middle" fontWeight="bold">APR</text>
-                                    <text x="520" y="235" fill="#64748b" fontSize="9" textAnchor="middle" fontWeight="bold">MAY</text>
-                                    <text x="640" y="235" fill="#64748b" fontSize="9" textAnchor="middle" fontWeight="bold">JUN</text>
-                                    <text x="760" y="235" fill="#64748b" fontSize="9" textAnchor="middle" fontWeight="bold">JUL</text>
-                                </svg>
-                            </div>
-                        </div>
-
+                    {/* Right: Premium Flat Geometry Vector Illustration */}
+                    <div className="lg:col-span-7 bg-white border border-slate-200 rounded-2xl p-6 shadow-xl relative overflow-hidden group">
+                        <div className="absolute inset-0 bg-gradient-to-tr from-indigo-500/5 to-emerald-500/5 pointer-events-none" />
+                        <AnalyticsIllustration />
                     </div>
                 </div>
             </section>
 
             {/* ====================================================
-                12. PRICING SECTION
+                9. PRICING SECTION
                ==================================================== */}
-            <section id="pricing" className="bg-slate-50/40 py-24 border-b border-slate-200/80 relative z-10">
+            <section id="pricing" className="bg-white py-24 border-b border-slate-100 relative z-10">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="text-center max-w-3xl mx-auto mb-16">
                         <span className="text-xs font-semibold uppercase tracking-wider text-indigo-650 font-bold">Subscription Plans</span>
@@ -1492,40 +664,20 @@ invoice = musoftware.Invoice.create(
                         <p className="text-slate-600 text-sm leading-relaxed mt-4 font-normal">
                             Select the operational tier matching your transaction velocity. Every plan includes deep escrow system protection, client communication modules, and standard wallet ledgers.
                         </p>
-                        
-                        {/* Billing Switcher Toggle */}
-                        <div className="mt-8 flex items-center justify-center gap-4 font-bold">
-                            <span className={`text-sm ${billingCycle === 'monthly' ? 'text-slate-900 font-bold' : 'text-slate-400'}`}>Monthly Billing</span>
-                            <button
-                                onClick={() => setBillingCycle(billingCycle === 'monthly' ? 'yearly' : 'monthly')}
-                                className="relative h-6 w-11 rounded-full bg-slate-200 border border-slate-350 transition-colors focus:outline-none flex items-center p-0.5"
-                                aria-label="Toggle Billing Cycle"
-                            >
-                                <span className={`h-4.5 w-4.5 rounded-full bg-indigo-600 transition-transform ${
-                                    billingCycle === 'yearly' ? 'translate-x-5' : 'translate-x-0'
-                                }`} />
-                            </button>
-                            <span className={`text-sm flex items-center gap-1.5 ${billingCycle === 'yearly' ? 'text-slate-900 font-bold' : 'text-slate-400'}`}>
-                                Yearly Billing
-                                <span className="bg-emerald-50 border border-emerald-250 text-emerald-700 text-[10px] font-bold px-2 py-0.5 rounded">
-                                    Save 20%
-                                </span>
-                            </span>
-                        </div>
                     </div>
 
                     {/* Pricing Cards Grid */}
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch max-w-6xl mx-auto">
                         
                         {/* Plan 1: Starter Developer */}
-                        <div className="bg-white border border-slate-200 rounded-xl p-8 flex flex-col justify-between hover:border-slate-350 transition-all shadow-md">
+                        <div className="bg-slate-50/50 border border-slate-200 rounded-xl p-8 flex flex-col justify-between hover:border-slate-300 transition-all shadow-sm">
                             <div>
                                 <div className="text-xs font-bold text-indigo-650 uppercase tracking-widest">Starter Tier</div>
                                 <h3 className="text-xl font-extrabold text-slate-900 mt-1">Individual Freelancer</h3>
                                 <p className="text-slate-500 text-xs mt-2 font-medium">Deploy single projects and manage client wallets easily.</p>
                                 
                                 <div className="mt-6 flex items-baseline text-slate-900">
-                                    <span className="text-4xl font-extrabold font-mono">${billingCycle === 'monthly' ? '49' : '39'}</span>
+                                    <span className="text-4xl font-extrabold font-mono">$49</span>
                                     <span className="text-slate-400 text-sm ml-2">/ month</span>
                                 </div>
 
@@ -1557,12 +709,12 @@ invoice = musoftware.Invoice.create(
                                 Recommended Plan
                             </span>
                             <div>
-                                <div className="text-xs font-bold text-indigo-650 uppercase tracking-widest">Business Tier</div>
+                                <div className="text-xs font-bold text-indigo-655 uppercase tracking-widest">Business Tier</div>
                                 <h3 className="text-xl font-extrabold text-slate-900 mt-1">Agency & Studio</h3>
                                 <p className="text-slate-500 text-xs mt-2 font-medium">Unified operational workspace for team billing and escrows.</p>
                                 
                                 <div className="mt-6 flex items-baseline text-slate-900">
-                                    <span className="text-4xl font-extrabold font-mono">${billingCycle === 'monthly' ? '149' : '119'}</span>
+                                    <span className="text-4xl font-extrabold font-mono">$149</span>
                                     <span className="text-slate-400 text-sm ml-2">/ month</span>
                                 </div>
 
@@ -1581,7 +733,7 @@ invoice = musoftware.Invoice.create(
                                     </li>
                                     <li className="flex items-center gap-2.5">
                                         <Check className="h-4 w-4 text-indigo-655 shrink-0" />
-                                        <span>Priority Dispute Arbitration support</span>
+                                        <span>Priority Dispute Support</span>
                                     </li>
                                 </ul>
                             </div>
@@ -1593,9 +745,9 @@ invoice = musoftware.Invoice.create(
                         </div>
 
                         {/* Plan 3: Enterprise Scale */}
-                        <div className="bg-white border border-slate-200 rounded-xl p-8 flex flex-col justify-between hover:border-slate-355 transition-all shadow-md">
+                        <div className="bg-slate-50/50 border border-slate-200 rounded-xl p-8 flex flex-col justify-between hover:border-slate-300 transition-all shadow-sm">
                             <div>
-                                <div className="text-xs font-bold text-indigo-650 uppercase tracking-widest">Enterprise Tier</div>
+                                <div className="text-xs font-bold text-indigo-655 uppercase tracking-widest">Enterprise Tier</div>
                                 <h3 className="text-xl font-extrabold text-slate-900 mt-1">Custom Corporate</h3>
                                 <p className="text-slate-500 text-xs mt-2 font-medium">Enterprise-grade API limits, compliance, and custom ledgers.</p>
                                 
@@ -1610,7 +762,7 @@ invoice = musoftware.Invoice.create(
                                     </li>
                                     <li className="flex items-center gap-2.5">
                                         <Check className="h-4 w-4 text-indigo-600 shrink-0" />
-                                        <span>Dedicated Legal Account Representative</span>
+                                        <span>Dedicated Legal Account Support</span>
                                     </li>
                                     <li className="flex items-center gap-2.5">
                                         <Check className="h-4 w-4 text-indigo-600 shrink-0" />
@@ -1619,7 +771,7 @@ invoice = musoftware.Invoice.create(
                                 </ul>
                             </div>
                             <a href="mailto:hello@musoftwares.com?subject=Enterprise Query" className="mt-8">
-                                <Button variant="outline" className="w-full bg-white hover:bg-slate-50 text-slate-700 border-slate-200 rounded-lg py-2.5 font-bold">
+                                <Button variant="outline" className="w-full bg-white hover:bg-slate-50 text-slate-700 border-slate-250 rounded-lg py-2.5 font-bold shadow-sm">
                                     Contact Accounts Department
                                 </Button>
                             </a>
@@ -1630,9 +782,9 @@ invoice = musoftware.Invoice.create(
             </section>
 
             {/* ====================================================
-                13. FAQ SECTION (Accordion)
+                10. FAQ SECTION (Accordion)
                ==================================================== */}
-            <section id="faq" className="bg-white py-24 border-b border-slate-100 relative z-10">
+            <section id="faq" className="bg-slate-50/40 py-24 border-b border-slate-200/80 relative z-10">
                 <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="text-center mb-16">
                         <span className="text-xs font-semibold uppercase tracking-wider text-indigo-655 font-bold">Technical Details</span>
@@ -1665,10 +817,10 @@ invoice = musoftware.Invoice.create(
                                 a: "We run a robust transactional queue framework built directly on database isolation levels (serializable states). Parallel actions (timer logs, invoice payments, and escrow releases) resolve sequentially to maintain precise transaction safety."
                             }
                         ].map((faq, idx) => (
-                            <div key={idx} className="bg-slate-50 border border-slate-200 rounded-xl overflow-hidden transition-all shadow-sm">
+                            <div key={idx} className="bg-white border border-slate-200 rounded-xl overflow-hidden transition-all shadow-sm">
                                 <button
                                     onClick={() => toggleFaq(idx)}
-                                    className="w-full px-6 py-5 text-left flex justify-between items-center gap-4 hover:bg-slate-100/50 focus:outline-none transition-colors"
+                                    className="w-full px-6 py-5 text-left flex justify-between items-center gap-4 hover:bg-slate-50/50 focus:outline-none transition-colors"
                                 >
                                     <span className="text-sm font-bold text-slate-900">{faq.q}</span>
                                     <ChevronDown className={`h-4.5 w-4.5 text-slate-400 transition-transform duration-300 ${
@@ -1680,7 +832,7 @@ invoice = musoftware.Invoice.create(
                                 <div className={`transition-all duration-300 overflow-hidden ${
                                     faqExpanded[idx] ? 'max-h-[200px] border-t border-slate-200' : 'max-h-0'
                                 }`}>
-                                    <p className="px-6 py-5 text-xs text-slate-600 leading-relaxed bg-slate-100/20">
+                                    <p className="px-6 py-5 text-xs text-slate-655 leading-relaxed bg-slate-50/50">
                                         {faq.a}
                                     </p>
                                 </div>
@@ -1691,7 +843,7 @@ invoice = musoftware.Invoice.create(
             </section>
 
             {/* ====================================================
-                14. FINAL CTA SECTION
+                11. FINAL CTA SECTION
                ==================================================== */}
             <section id="cta" className="bg-white py-24 relative z-10">
                 <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
