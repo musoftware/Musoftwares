@@ -90,4 +90,32 @@ class User extends Authenticatable
         $spent = $this->pointTransactions()->whereIn('type', ['spent', 'debit'])->sum('points');
         return $earned - $spent;
     }
+
+    public function wallet()
+    {
+        return $this->morphOne(\Modules\Core\Models\Wallet::class, 'owner');
+    }
+
+    public function getWallet()
+    {
+        return $this->wallet()->firstOrCreate([
+            'owner_type' => self::class,
+            'owner_id' => $this->id,
+        ], [
+            'context' => 'default',
+            'balance' => 0,
+            'earned_balance' => 0,
+            'currency' => $this->preferred_currency ?? 'USD',
+        ]);
+    }
+
+    public function payoutMethods(): HasMany
+    {
+        return $this->hasMany(\Modules\Core\Models\PayoutMethod::class, 'user_id');
+    }
+
+    public function withdrawals(): HasMany
+    {
+        return $this->hasMany(\Modules\Core\Models\UserWithdrawal::class, 'user_id');
+    }
 }
