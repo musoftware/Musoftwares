@@ -19,7 +19,7 @@ export default function PublicLayout({ children, auth }: PublicLayoutProps) {
             setScrolled(window.scrollY > 20);
 
             // Scroll spy for active section highlight
-            const sections = ['hero', 'overview', 'financials', 'marketplace', 'freelance', 'workspace', 'pricing', 'faq'];
+            const sections = ['hero', 'overview', 'financials', 'marketplace', 'workspace', 'communication', 'pricing', 'faq'];
             const scrollPosition = window.scrollY + 120;
 
             for (const section of sections) {
@@ -41,9 +41,6 @@ export default function PublicLayout({ children, auth }: PublicLayoutProps) {
 
     const navItems = [
         { label: 'Features', href: '#overview', id: 'overview' },
-        { label: 'ERP & Wallet', href: '#financials', id: 'financials' },
-        { label: 'Marketplace', href: '#marketplace', id: 'marketplace' },
-        { label: 'Freelance', href: '#freelance', id: 'freelance' },
         { label: 'Pricing', href: '#pricing', id: 'pricing' },
     ];
 
@@ -237,22 +234,18 @@ export default function PublicLayout({ children, auth }: PublicLayoutProps) {
                         {/* Column 1: Brand Info (Spans 2 columns) */}
                         <div className="col-span-2 space-y-6">
                             <Link href="/" className="flex items-center gap-2 group">
-                                <div className="h-8.5 w-8.5 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-md shadow-indigo-500/10">
+                                <div className="h-8 w-8 rounded-lg bg-slate-900 flex items-center justify-center">
                                     <Sparkles className="h-4 w-4 text-white" />
                                 </div>
-                                <span className="text-lg font-bold text-slate-900 group-hover:text-slate-750 transition-colors">
+                                <span className="text-lg font-medium text-slate-900 transition-colors">
                                     musoftware
                                 </span>
                             </Link>
-                            <p className="text-sm leading-relaxed text-slate-550 max-w-xs font-normal">
-                                The unified operational ecosystem for scaling business entities, wallets, escrows, freelance hubs, and multi-currency billing infrastructure.
+                            <p className="text-sm leading-relaxed text-slate-500 max-w-xs font-light">
+                                One workspace for your clients, billing, services, and operations.
                             </p>
-                            {/* Real-time Status Indicator Badge */}
-                            <div className="inline-flex items-center gap-2 bg-emerald-50 border border-emerald-100 rounded-full px-3 py-1 text-xs text-emerald-700 font-medium">
-                                <span className="relative flex h-2 w-2">
-                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                                    <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                                </span>
+                            <div className="inline-flex items-center gap-2 px-3 py-1 text-xs text-slate-500 font-light border border-slate-200 rounded-full">
+                                <div className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
                                 All systems operational
                             </div>
                         </div>
@@ -264,16 +257,13 @@ export default function PublicLayout({ children, auth }: PublicLayoutProps) {
                             </h3>
                             <ul className="mt-4 space-y-3">
                                 <li>
-                                    <a href="#overview" onClick={(e) => handleNavClick(e, '#overview')} className="text-sm hover:text-slate-950 transition-colors">ERP Platform</a>
+                                    <a href="#overview" onClick={(e) => handleNavClick(e, '#overview')} className="text-sm hover:text-slate-950 transition-colors">Platform Features</a>
                                 </li>
                                 <li>
                                     <a href="#marketplace" onClick={(e) => handleNavClick(e, '#marketplace')} className="text-sm hover:text-slate-950 transition-colors">Marketplace</a>
                                 </li>
                                 <li>
-                                    <a href="#freelance" onClick={(e) => handleNavClick(e, '#freelance')} className="text-sm hover:text-slate-950 transition-colors">Freelance Hub</a>
-                                </li>
-                                <li>
-                                    <a href="#financials" onClick={(e) => handleNavClick(e, '#financials')} className="text-sm hover:text-slate-950 transition-colors">Wallet System</a>
+                                    <a href="#financials" onClick={(e) => handleNavClick(e, '#financials')} className="text-sm hover:text-slate-950 transition-colors">Financial Hub</a>
                                 </li>
                                 <li>
                                     <a href="#pricing" onClick={(e) => handleNavClick(e, '#pricing')} className="text-sm hover:text-slate-950 transition-colors">Pricing Plans</a>
@@ -291,16 +281,13 @@ export default function PublicLayout({ children, auth }: PublicLayoutProps) {
                                     <a href="#financials" onClick={(e) => handleNavClick(e, '#financials')} className="text-sm hover:text-slate-950 transition-colors">Invoices & Billing</a>
                                 </li>
                                 <li>
-                                    <a href="#customer-exp" onClick={(e) => handleNavClick(e, '#customer-exp')} className="text-sm hover:text-slate-950 transition-colors">Client Portal</a>
+                                    <a href="#overview" onClick={(e) => handleNavClick(e, '#overview')} className="text-sm hover:text-slate-950 transition-colors">Client Portal</a>
                                 </li>
                                 <li>
                                     <a href="#workspace" onClick={(e) => handleNavClick(e, '#workspace')} className="text-sm hover:text-slate-950 transition-colors">Unified Workspace</a>
                                 </li>
                                 <li>
-                                    <a href="#communication" onClick={(e) => handleNavClick(e, '#communication')} className="text-sm hover:text-slate-950 transition-colors">Live Chat & Timers</a>
-                                </li>
-                                <li>
-                                    <a href="#admin-ops" onClick={(e) => handleNavClick(e, '#admin-ops')} className="text-sm hover:text-slate-950 transition-colors">Admin Governance</a>
+                                    <a href="#communication" onClick={(e) => handleNavClick(e, '#communication')} className="text-sm hover:text-slate-950 transition-colors">Timers & Comm</a>
                                 </li>
                             </ul>
                         </div>
@@ -349,14 +336,12 @@ export default function PublicLayout({ children, auth }: PublicLayoutProps) {
                     </div>
 
                     {/* Bottom Divider & Footnotes */}
-                    <div className="mt-12 border-t border-slate-200 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
-                        <p className="text-xs text-slate-400">
-                            &copy; {new Date().getFullYear()} musoftware. Engineered for hyper-growth enterprises, modern freelancers, and client networks. All rights reserved.
+                    <div className="mt-16 border-t border-slate-100 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
+                        <p className="text-sm font-light text-slate-400">
+                            &copy; {new Date().getFullYear()} musoftware. All rights reserved.
                         </p>
-                        <div className="flex gap-4 text-xs text-slate-450 font-medium">
-                            <span>Vite • React • Inertia • Tailwind CSS</span>
-                            <span>•</span>
-                            <span>TLS Escrow Secured</span>
+                        <div className="flex gap-4 text-sm font-light text-slate-400">
+                            <span>Platform Secured</span>
                         </div>
                     </div>
                 </div>
