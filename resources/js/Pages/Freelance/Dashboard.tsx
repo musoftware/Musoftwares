@@ -16,41 +16,19 @@ import {
 import { formatMoney, formatDate } from '@/lib/utils';
 import { ContractQuickView } from '@/Components/ContextualPanels';
 
-export default function FreelanceDashboard({ auth }: any) {
+export default function FreelanceDashboard({ auth, stats: initialStats, activeProposals: initialProposals, activeContracts: initialContracts }: any) {
     const [selectedContract, setSelectedContract] = useState<any>(null);
 
-    // Dynamic state parameters
-    const stats = {
-        pointsBalance: auth?.user?.points_balance || 150,
-        activeProposals: 1,
-        activeContracts: 1,
-        totalEarnings: 3200.00
+    // Dynamic state parameters from server
+    const stats = initialStats || {
+        pointsBalance: auth?.user?.points_balance || 0,
+        activeProposals: 0,
+        activeContracts: 0,
+        totalEarnings: 0
     };
 
-    // Active bidding proposals list
-    const activeProposals = [
-        {
-            id: 1,
-            title: 'Freelance Proposal: Vercel Edge Cache Optimization Audit',
-            status: 'Under Review',
-            budget: 3200.00,
-            submittedAt: '2026-05-14',
-            connectsUsed: 6
-        }
-    ];
-
-    // Active contracts milestones progression
-    const activeContracts = [
-        {
-            id: 1,
-            title: 'SaaS Platform Development Architecture & Audit',
-            clientName: 'Vercel Labs',
-            startDate: '2026-05-12',
-            value: 3200.00,
-            progress: 75,
-            status: 'in-progress'
-        }
-    ];
+    const activeProposals = initialProposals || [];
+    const activeContracts = initialContracts || [];
 
     return (
         <FreelanceLayout auth={auth}>
@@ -153,7 +131,7 @@ export default function FreelanceDashboard({ auth }: any) {
                             </div>
                             
                             <div className="divide-y divide-border/40 text-xs">
-                                {activeProposals.map(proposal => (
+                                {activeProposals.map((proposal: any) => (
                                     <div 
                                         key={proposal.id}
                                         className="p-4 hover:bg-slate-50/40 transition flex items-center justify-between"
@@ -178,6 +156,15 @@ export default function FreelanceDashboard({ auth }: any) {
                                         </div>
                                     </div>
                                 ))}
+                                {activeProposals.length === 0 && (
+                                    <div className="p-6 text-center text-gray-500">
+                                        <p className="font-medium text-gray-700">No active proposals.</p>
+                                        <p className="text-xs mt-1">Browse available jobs and submit a proposal to secure your next project.</p>
+                                        <Link href="/freelance/jobs/browse" className="inline-block mt-3 text-xs font-semibold text-indigo-600 hover:text-indigo-800">
+                                            Search Jobs →
+                                        </Link>
+                                    </div>
+                                )}
                             </div>
                         </div>
 
@@ -190,7 +177,7 @@ export default function FreelanceDashboard({ auth }: any) {
                             </div>
                             
                             <div className="divide-y divide-border/40 text-xs">
-                                {activeContracts.map(contract => (
+                                {activeContracts.map((contract: any) => (
                                     <div 
                                         key={contract.id}
                                         onClick={() => setSelectedContract(contract)}
@@ -216,6 +203,12 @@ export default function FreelanceDashboard({ auth }: any) {
                                         </div>
                                     </div>
                                 ))}
+                                {activeContracts.length === 0 && (
+                                    <div className="p-6 text-center text-gray-500">
+                                        <p className="font-medium text-gray-700">No active contracts.</p>
+                                        <p className="text-xs mt-1">Once a client accepts your proposal, your active project workflow will appear here.</p>
+                                    </div>
+                                )}
                             </div>
                         </div>
 

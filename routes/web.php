@@ -70,7 +70,7 @@ Route::middleware(['auth', 'verified'])->prefix('erp')->name('erp.')->group(func
 
 // Freelance Routes
 Route::middleware(['auth', 'verified'])->prefix('freelance')->name('freelance.')->group(function () {
-    Route::get('/dashboard', function () { return Inertia::render('Freelance/Dashboard'); })->name('dashboard');
+    Route::get('/dashboard', [\Modules\Freelance\Http\Controllers\DashboardController::class, 'index'])->name('dashboard');
 
     // Skills
     Route::resource('skills', \Modules\Freelance\Http\Controllers\SkillController::class)->except(['create', 'show', 'edit']);
@@ -113,7 +113,7 @@ Route::prefix('marketplace')->name('marketplace.')->group(function () {
 
 // Marketplace Authenticated Routes
 Route::middleware(['auth', 'verified'])->prefix('marketplace')->name('marketplace.')->group(function () {
-    Route::get('/dashboard', function () { return Inertia::render('Marketplace/Dashboard'); })->name('dashboard');
+    Route::get('/dashboard', [\Modules\Marketplace\Http\Controllers\DashboardController::class, 'index'])->name('dashboard');
 
     Route::post('/services', [\Modules\Marketplace\Http\Controllers\ServiceController::class, 'store'])->name('services.store');
 
