@@ -1,18 +1,10 @@
-import InputError from '@/Components/InputError';
 import { Button } from '@/components/ui/button';
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardFooter,
-    CardHeader,
-    CardTitle,
-} from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import GuestLayout from '@/Layouts/GuestLayout';
 import { Head, Link, useForm } from '@inertiajs/react';
-import { FormEventHandler } from 'react';
+import { FormEventHandler, useState } from 'react';
+import { Eye, EyeOff, Loader2 } from 'lucide-react';
 
 export default function Register() {
     const { data, setData, post, processing, errors, reset } = useForm({
@@ -21,6 +13,8 @@ export default function Register() {
         password: '',
         password_confirmation: '',
     });
+
+    const [showPassword, setShowPassword] = useState(false);
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
@@ -34,112 +28,128 @@ export default function Register() {
         <GuestLayout>
             <Head title="Register" />
 
-            <div className="flex min-h-screen flex-col items-center justify-center px-4 py-12 sm:px-6 lg:px-8">
-                <Card className="w-full max-w-md">
-                    <CardHeader className="space-y-1">
-                        <CardTitle className="text-2xl font-bold tracking-tight">
-                            Create an account
-                        </CardTitle>
-                        <CardDescription>
-                            Enter your information below to register
-                        </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                        <form onSubmit={submit} className="space-y-4">
-                            <div className="space-y-2">
-                                <Label htmlFor="name">Name</Label>
-                                <Input
-                                    id="name"
-                                    name="name"
-                                    placeholder="John Doe"
-                                    value={data.name}
-                                    autoComplete="name"
-                                    autoFocus
-                                    onChange={(e) =>
-                                        setData('name', e.target.value)
-                                    }
-                                    required
-                                />
-                                <InputError message={errors.name} />
-                            </div>
+            <div className="space-y-6">
+                <div className="space-y-1.5">
+                    <h1 className="text-xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">
+                        Create your account
+                    </h1>
+                    <p className="text-xs text-zinc-500 dark:text-zinc-400 font-normal">
+                        Manage invoices, wallet, and services from one workspace.
+                    </p>
+                </div>
 
-                            <div className="space-y-2">
-                                <Label htmlFor="email">Email</Label>
-                                <Input
-                                    id="email"
-                                    type="email"
-                                    name="email"
-                                    placeholder="m@example.com"
-                                    value={data.email}
-                                    autoComplete="username"
-                                    onChange={(e) =>
-                                        setData('email', e.target.value)
-                                    }
-                                    required
-                                />
-                                <InputError message={errors.email} />
-                            </div>
+                <form onSubmit={submit} className="space-y-4">
+                    <div className="space-y-2">
+                        <Label htmlFor="name" className="text-xs font-medium text-zinc-600 dark:text-zinc-400">
+                            Full name
+                        </Label>
+                        <Input
+                            id="name"
+                            name="name"
+                            placeholder="John Doe"
+                            value={data.name}
+                            autoComplete="name"
+                            autoFocus
+                            error={errors.name}
+                            onChange={(e) => setData('name', e.target.value)}
+                            required
+                            className="h-10 px-3 py-2 text-sm rounded-lg border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/50 focus-visible:ring-2 focus-visible:ring-zinc-900 dark:focus-visible:ring-zinc-100 transition-all font-normal"
+                        />
+                    </div>
 
-                            <div className="space-y-2">
-                                <Label htmlFor="password">Password</Label>
-                                <Input
-                                    id="password"
-                                    type="password"
-                                    name="password"
-                                    value={data.password}
-                                    autoComplete="new-password"
-                                    onChange={(e) =>
-                                        setData('password', e.target.value)
-                                    }
-                                    required
-                                />
-                                <InputError message={errors.password} />
-                            </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="email" className="text-xs font-medium text-zinc-600 dark:text-zinc-400">
+                            Email address
+                        </Label>
+                        <Input
+                            id="email"
+                            type="email"
+                            name="email"
+                            placeholder="name@company.com"
+                            value={data.email}
+                            autoComplete="username"
+                            error={errors.email}
+                            onChange={(e) => setData('email', e.target.value)}
+                            required
+                            className="h-10 px-3 py-2 text-sm rounded-lg border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/50 focus-visible:ring-2 focus-visible:ring-zinc-900 dark:focus-visible:ring-zinc-100 transition-all font-normal"
+                        />
+                    </div>
 
-                            <div className="space-y-2">
-                                <Label htmlFor="password_confirmation">
-                                    Confirm Password
-                                </Label>
-                                <Input
-                                    id="password_confirmation"
-                                    type="password"
-                                    name="password_confirmation"
-                                    value={data.password_confirmation}
-                                    autoComplete="new-password"
-                                    onChange={(e) =>
-                                        setData(
-                                            'password_confirmation',
-                                            e.target.value,
-                                        )
-                                    }
-                                    required
-                                />
-                                <InputError
-                                    message={errors.password_confirmation}
-                                />
-                            </div>
-
-                            <Button
-                                className="w-full"
-                                type="submit"
-                                disabled={processing}
+                    <div className="space-y-2">
+                        <Label htmlFor="password" className="text-xs font-medium text-zinc-600 dark:text-zinc-400">
+                            Password
+                        </Label>
+                        <div className="relative">
+                            <Input
+                                id="password"
+                                type={showPassword ? 'text' : 'password'}
+                                name="password"
+                                placeholder="••••••••"
+                                value={data.password}
+                                autoComplete="new-password"
+                                error={errors.password}
+                                onChange={(e) => setData('password', e.target.value)}
+                                required
+                                className="h-10 px-3 py-2 pr-10 text-sm rounded-lg border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/50 focus-visible:ring-2 focus-visible:ring-zinc-900 dark:focus-visible:ring-zinc-100 transition-all font-normal"
+                            />
+                            <button
+                                type="button"
+                                onClick={() => setShowPassword(!showPassword)}
+                                className="absolute right-3 top-3 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 transition-colors"
+                                aria-label={showPassword ? 'Hide password' : 'Show password'}
                             >
-                                Register
-                            </Button>
-                        </form>
-                    </CardContent>
-                    <CardFooter className="flex justify-center">
-                        <p className="text-muted-foreground text-sm">
-                            Already registered?{' '}
-                            <Link
-                                href={route('login')}
-                                className="text-primary font-medium hover:underline"
-                            >
-                                Log in
-                            </Link>
-                        </p>
-                    </CardFooter>
-                </Card>
+                                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                            </button>
+                        </div>
+                    </div>
+
+                    <div className="space-y-2">
+                        <Label htmlFor="password_confirmation" className="text-xs font-medium text-zinc-600 dark:text-zinc-400">
+                            Confirm password
+                        </Label>
+                        <Input
+                            id="password_confirmation"
+                            type={showPassword ? 'text' : 'password'}
+                            name="password_confirmation"
+                            placeholder="••••••••"
+                            value={data.password_confirmation}
+                            autoComplete="new-password"
+                            error={errors.password_confirmation}
+                            onChange={(e) => setData('password_confirmation', e.target.value)}
+                            required
+                            className="h-10 px-3 py-2 text-sm rounded-lg border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/50 focus-visible:ring-2 focus-visible:ring-zinc-900 dark:focus-visible:ring-zinc-100 transition-all font-normal"
+                        />
+                    </div>
+
+                    <div className="pt-2">
+                        <Button
+                            className="w-full h-10 bg-zinc-900 hover:bg-zinc-800 text-white dark:bg-zinc-100 dark:hover:bg-zinc-200 dark:text-zinc-900 font-medium text-sm rounded-lg shadow-xs transition-all flex items-center justify-center space-x-2"
+                            type="submit"
+                            disabled={processing}
+                        >
+                            {processing ? (
+                                <>
+                                    <Loader2 className="w-4 h-4 animate-spin text-zinc-400 dark:text-zinc-600" />
+                                    <span>Creating account...</span>
+                                </>
+                            ) : (
+                                <span>Create account</span>
+                            )}
+                        </Button>
+                    </div>
+                </form>
+
+                <div className="text-center pt-4 border-t border-zinc-100 dark:border-zinc-800/80 mt-6">
+                    <p className="text-xs text-zinc-500 dark:text-zinc-400 font-normal">
+                        Already registered?{' '}
+                        <Link
+                            href={route('login')}
+                            className="font-medium text-zinc-900 hover:underline dark:text-zinc-100"
+                        >
+                            Log in
+                        </Link>
+                    </p>
+                </div>
             </div>
         </GuestLayout>
     );

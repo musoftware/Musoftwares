@@ -17,6 +17,7 @@ import {
 } from '@/Components/ui/tooltip';
 import { User } from '@/types';
 import { Link } from '@inertiajs/react';
+import ApplicationLogo from '@/Components/ApplicationLogo';
 import {
     Bell,
     Briefcase,
@@ -58,10 +59,17 @@ export default function AdminLayout({ user, children }: AdminLayoutProps) {
                 className={`fixed top-0 left-0 z-40 hidden h-screen flex-col border-r border-gray-200 bg-white transition-all duration-300 md:flex ${isCollapsed ? 'w-16' : 'w-[260px]'}`}
             >
                 <div className="flex h-16 flex-shrink-0 items-center border-b border-gray-200 px-4">
-                    {!isCollapsed && (
-                        <span className="overflow-hidden text-xl font-bold whitespace-nowrap text-gray-900">
-                            Admin Panel
-                        </span>
+                    {!isCollapsed ? (
+                        <Link href="/" className="flex items-center gap-2.5 overflow-hidden">
+                            <ApplicationLogo className="h-6 w-6 flex-shrink-0 text-indigo-600 fill-current" />
+                            <span className="text-xl font-bold whitespace-nowrap text-gray-900 tracking-tight">
+                                Admin Panel
+                            </span>
+                        </Link>
+                    ) : (
+                        <Link href="/" className="mx-auto flex items-center justify-center">
+                            <ApplicationLogo className="h-6 w-6 text-indigo-600 fill-current" />
+                        </Link>
                     )}
                 </div>
                 <nav className="flex-1 space-y-2 overflow-x-hidden overflow-y-auto px-2 py-6">
@@ -130,9 +138,12 @@ export default function AdminLayout({ user, children }: AdminLayoutProps) {
                             </SheetTrigger>
                             <SheetContent side="left" className="w-[260px] p-0">
                                 <div className="flex h-16 items-center border-b border-gray-200 px-6">
-                                    <span className="text-xl font-bold text-gray-900">
-                                        Admin Panel
-                                    </span>
+                                    <Link href="/" className="flex items-center gap-2.5">
+                                        <ApplicationLogo className="h-6 w-6 text-indigo-600 fill-current" />
+                                        <span className="text-xl font-bold text-gray-900 tracking-tight">
+                                            Admin Panel
+                                        </span>
+                                    </Link>
                                 </div>
                                 <nav className="flex-1 space-y-2 px-4 py-6">
                                     {modules.map((item) => (

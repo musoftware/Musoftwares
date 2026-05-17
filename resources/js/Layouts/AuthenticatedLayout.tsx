@@ -263,34 +263,39 @@ export default function Authenticated({
                                     </div>
                                     
                                     <DropdownMenuGroup>
-                                        <DropdownMenuItem asChild className="cursor-pointer rounded-lg text-sm">
-                                            <Link href={safeRoute('profile.edit')} className="flex items-center w-full">
-                                                <User className="mr-2 h-4 w-4 text-slate-400" /> My Profile
-                                            </Link>
+                                        <DropdownMenuItem 
+                                            className="cursor-pointer rounded-lg text-sm"
+                                            render={<Link href={safeRoute('profile.edit')} className="flex items-center w-full" />}
+                                        >
+                                            <User className="mr-2 h-4 w-4 text-slate-400" /> My Profile
                                         </DropdownMenuItem>
-                                        <DropdownMenuItem asChild className="cursor-pointer rounded-lg text-sm">
-                                            <Link href={safeRoute('erp.wallet.show', user?.id || 1)} className="flex items-center w-full">
-                                                <History className="mr-2 h-4 w-4 text-slate-400" /> Balance History
-                                            </Link>
+                                        <DropdownMenuItem 
+                                            className="cursor-pointer rounded-lg text-sm"
+                                            render={<Link href={safeRoute('erp.wallet.show', user?.id || 1)} className="flex items-center w-full" />}
+                                        >
+                                            <History className="mr-2 h-4 w-4 text-slate-400" /> Balance History
                                         </DropdownMenuItem>
-                                        <DropdownMenuItem asChild className="cursor-pointer rounded-lg text-sm">
-                                            <Link href={safeRoute('profile.edit')} className="flex items-center w-full">
-                                                <Shield className="mr-2 h-4 w-4 text-slate-400" /> Security Settings
-                                            </Link>
+                                        <DropdownMenuItem 
+                                            className="cursor-pointer rounded-lg text-sm"
+                                            render={<Link href={safeRoute('profile.edit')} className="flex items-center w-full" />}
+                                        >
+                                            <Shield className="mr-2 h-4 w-4 text-slate-400" /> Security Settings
                                         </DropdownMenuItem>
-                                        <DropdownMenuItem asChild className="cursor-pointer rounded-lg text-sm">
-                                            <Link href={safeRoute('profile.edit')} className="flex items-center w-full">
-                                                <Box className="mr-2 h-4 w-4 text-slate-400" /> Subscriptions
-                                            </Link>
+                                        <DropdownMenuItem 
+                                            className="cursor-pointer rounded-lg text-sm"
+                                            render={<Link href={safeRoute('profile.edit')} className="flex items-center w-full" />}
+                                        >
+                                            <Box className="mr-2 h-4 w-4 text-slate-400" /> Subscriptions
                                         </DropdownMenuItem>
                                     </DropdownMenuGroup>
                                     
                                     <DropdownMenuSeparator className="my-1 bg-slate-100" />
                                     
-                                    <DropdownMenuItem asChild className="cursor-pointer rounded-lg text-sm text-rose-600 focus:text-rose-600 focus:bg-rose-50">
-                                        <Link href={safeRoute('logout')} method="post" as="button" className="flex items-center w-full font-medium">
-                                            <LogOut className="mr-2 h-4 w-4" /> Logout
-                                        </Link>
+                                    <DropdownMenuItem 
+                                        className="cursor-pointer rounded-lg text-sm text-rose-600 focus:text-rose-600 focus:bg-rose-50"
+                                        render={<Link href={safeRoute('logout')} method="post" as="button" className="flex items-center w-full font-medium" />}
+                                    >
+                                        <LogOut className="mr-2 h-4 w-4" /> Logout
                                     </DropdownMenuItem>
                                 </DropdownMenuContent>
                             </DropdownMenu>

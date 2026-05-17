@@ -8,6 +8,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
 
     <title>Shared Module - {{ config('app.name', 'Laravel') }}</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 
     <meta name="description" content="{{ $description ?? '' }}">
     <meta name="keywords" content="{{ $keywords ?? '' }}">
