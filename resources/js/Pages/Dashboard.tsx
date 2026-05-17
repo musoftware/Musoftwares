@@ -6,7 +6,7 @@ import {
     AlertCircle, Sparkles, Building2, Briefcase, Megaphone, Plus, ArrowRightLeft,
     CreditCard
 } from 'lucide-react';
-import { Button } from '@/Components/ui/button';
+
 
 export default function Dashboard() {
     const { auth } = usePage().props as any;
@@ -56,11 +56,9 @@ export default function Dashboard() {
                         <p className="text-sm text-slate-500 mt-1">Here is what requires your attention today.</p>
                     </div>
                     <div className="flex gap-3">
-                        <Button className="bg-slate-900 hover:bg-slate-800 text-white rounded-full" asChild>
-                            <Link href={safeRoute('erp.wallet.show', user?.id || 1, `/erp/clients/${user?.id || 1}/wallet`)}>
-                                <Plus className="w-4 h-4 mr-2" /> Add Balance
-                            </Link>
-                        </Button>
+                        <Link href={safeRoute('financial.add-balance')} className="inline-flex items-center justify-center px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-medium text-sm rounded-full transition-colors shadow-sm">
+                            <Plus className="w-4 h-4 mr-2" /> Add Balance
+                        </Link>
                     </div>
                 </div>
 
@@ -157,11 +155,9 @@ export default function Dashboard() {
                                                     {invoice.status === 'overdue' ? 'Overdue' : 'Due Soon'}
                                                 </p>
                                             </div>
-                                            <Button size="sm" className="bg-indigo-600 hover:bg-indigo-700 text-white rounded-full px-5" asChild>
-                                                <Link href={safeRoute('erp.invoices.show', invoice.dbId, `/erp/invoices/${invoice.dbId}`)}>
-                                                    Pay Now
-                                                </Link>
-                                            </Button>
+                                            <Link href={safeRoute('erp.invoices.show', invoice.dbId, `/erp/invoices/${invoice.dbId}`)} className="inline-flex items-center justify-center px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-medium rounded-full transition-colors shadow-sm">
+                                                Pay Now
+                                            </Link>
                                         </div>
                                     </div>
                                 ))}
@@ -204,21 +200,15 @@ export default function Dashboard() {
                         {/* QUICK ACTIONS */}
                         <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-1">
                             <div className="flex flex-col gap-1 p-3">
-                                <Button variant="ghost" className="w-full justify-start text-slate-700 hover:text-slate-900 hover:bg-slate-50 font-medium h-11" asChild>
-                                    <Link href={safeRoute('erp.wallet.show', user?.id || 1, `/erp/clients/${user?.id || 1}/wallet`)}>
-                                        <Plus className="w-4 h-4 mr-3 text-slate-400" /> Add Funds to Wallet
-                                    </Link>
-                                </Button>
-                                <Button variant="ghost" className="w-full justify-start text-slate-700 hover:text-slate-900 hover:bg-slate-50 font-medium h-11" asChild>
-                                    <Link href={safeRoute('erp.withdrawals.index', undefined, '/erp/withdrawals')}>
-                                        <ArrowUpRight className="w-4 h-4 mr-3 text-slate-400" /> Request Withdrawal
-                                    </Link>
-                                </Button>
-                                <Button variant="ghost" className="w-full justify-start text-slate-700 hover:text-slate-900 hover:bg-slate-50 font-medium h-11" asChild>
-                                    <Link href={safeRoute('erp.payment-methods.index', undefined, '/erp/payment-methods')}>
-                                        <CreditCard className="w-4 h-4 mr-3 text-slate-400" /> Manage Payment Methods
-                                    </Link>
-                                </Button>
+                                <Link href={safeRoute('financial.add-balance')} className="flex items-center px-4 py-3 text-sm font-medium text-slate-700 hover:text-slate-900 hover:bg-slate-50 rounded-xl transition-colors">
+                                    <Plus className="w-4 h-4 mr-3 text-slate-400" /> Add Funds to Wallet
+                                </Link>
+                                <Link href={safeRoute('financial.withdrawals')} className="flex items-center px-4 py-3 text-sm font-medium text-slate-700 hover:text-slate-900 hover:bg-slate-50 rounded-xl transition-colors">
+                                    <ArrowUpRight className="w-4 h-4 mr-3 text-slate-400" /> Request Withdrawal
+                                </Link>
+                                <Link href={safeRoute('financial.payout-methods.index')} className="flex items-center px-4 py-3 text-sm font-medium text-slate-700 hover:text-slate-900 hover:bg-slate-50 rounded-xl transition-colors">
+                                    <CreditCard className="w-4 h-4 mr-3 text-slate-400" /> Manage Payment Methods
+                                </Link>
                             </div>
                         </div>
 

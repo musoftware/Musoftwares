@@ -41,6 +41,8 @@ Route::middleware(['auth', 'verified', 'onboarding'])->prefix('erp')->name('erp.
     Route::get('/invoices', [\Modules\ERP\Http\Controllers\InvoiceController::class, 'index'])->name('invoices.index');
 
     // Wallet
+    Route::get('/wallet/add-balance', [\Modules\ERP\Http\Controllers\WalletController::class, 'addBalance'])->name('wallet.add-balance');
+    Route::post('/wallet/deposit', [\Modules\ERP\Http\Controllers\WalletController::class, 'deposit'])->name('wallet.deposit');
     Route::get('/clients/{client}/wallet', [\Modules\ERP\Http\Controllers\WalletController::class, 'show'])->name('wallet.show');
     Route::get('/clients/{client}/wallet/transactions', [\Modules\ERP\Http\Controllers\WalletController::class, 'transactions'])->name('wallet.transactions');
     Route::post('/clients/{client}/wallet/credit', [\Modules\ERP\Http\Controllers\WalletController::class, 'manualCredit'])->name('wallet.credit');
@@ -188,6 +190,31 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/tickets', [\App\Http\Controllers\SupportTicketController::class, 'index'])->name('tickets.index');
     Route::post('/tickets', [\App\Http\Controllers\SupportTicketController::class, 'store'])->name('tickets.store');
     Route::post('/tickets/{id}/resolve', [\App\Http\Controllers\SupportTicketController::class, 'resolve'])->name('tickets.resolve');
+});
+
+// Core Financial Routes
+Route::middleware(['auth', 'verified'])->prefix('financial')->name('financial.')->group(function () {
+    Route::get('/transactions', [\App\Http\Controllers\FinancialController::class, 'transactions'])->name('transactions');
+    Route::get('/withdrawals', [\App\Http\Controllers\FinancialController::class, 'withdrawals'])->name('withdrawals');
+    Route::post('/withdrawals', [\App\Http\Controllers\FinancialController::class, 'requestWithdrawal'])->name('withdrawals.store');
+    Route::get('/payout-methods', [\App\Http\Controllers\PayoutMethodController::class, 'index'])->name('payout-methods.index');
+    Route::post('/payout-methods', [\App\Http\Controllers\PayoutMethodController::class, 'store'])->name('payout-methods.store');
+    Route::patch('/payout-methods/{payout_method}', [\App\Http\Controllers\PayoutMethodController::class, 'update'])->name('payout-methods.update');
+    Route::delete('/payout-methods/{payout_method}', [\App\Http\Controllers\PayoutMethodController::class, 'destroy'])->name('payout-methods.destroy');
+
+    Route::get('/add-balance', [\App\Http\Controllers\FinancialController::class, 'addBalance'])->name('add-balance');
+    Route::post('/add-balance/kashier', [\App\Http\Controllers\FinancialController::class, 'depositKashier'])->name('add-balance.kashier');
+    Route::get('/add-balance/success', [\App\Http\Controllers\FinancialController::class, 'success'])->name('add-balance.success');
+    Route::get('/add-balance/failure', [\App\Http\Controllers\FinancialController::class, 'failure'])->name('add-balance.failure');
+});
+
+// Kashier Webhook (No Auth required)
+Route::post('/financial/add-balance/webhook', [\App\Http\Controllers\FinancialController::class, 'webhook'])->name('financial.add-balance.webhook');
+
+// General Messages Route
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/messages', [\App\Http\Controllers\MessagesController::class, 'index'])->name('messages.index');
+    Route::post('/messages/direct', [\App\Http\Controllers\MessagesController::class, 'storeDirectMessage'])->name('messages.direct.store');
 });
 
 // Global Search

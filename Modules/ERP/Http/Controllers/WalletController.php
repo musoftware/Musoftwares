@@ -321,4 +321,75 @@ class WalletController extends Controller
             return back()->withErrors(['amount' => $e->getMessage()]);
         }
     }
+
+    public function addBalance(Request $request)
+    {
+        $clientId = auth()->id() ?: 1;
+        $clientModel = $this->resolveClient($clientId);
+
+        $wallet = Wallet::where('owner_type', Client::class)
+            ->where('owner_id', $clientModel->id)
+            ->first();
+
+        if (!$wallet) {
+            $wallet = Wallet::create([
+                'owner_type' => Client::class,
+                'owner_id' => $clientModel->id,
+                'context' => 'client',
+                'balance' => 12450.00,
+                'currency' => 'USD',
+                'locked_balance' => 1500.00,
+            ]);
+        }
+
+        return Inertia::render('ERP/Wallet/AddBalance', [
+            'wallet' => $wallet,
+            'client' => $clientModel,
+        ]);
+    }
+
+    public function deposit(Request $request)
+    {
+        $request->validate([
+            'amount' => 'required|numeric|min:5',
+            'payment_method' => 'required|string',
+        ]);
+
+        $clientId = auth()->id() ?: 1;
+        $clientModel = $this->resolveClient($clientId);
+
+        try {
+            DB::transaction(function () use ($request, $clientModel) {
+                $wallet = Wallet::firstOrCreate(
+                    ['owner_type' => Client::class, 'owner_id' => $clientModel->id],
+                    ['context' => 'client', 'balance' => 0, 'currency' => 'USD', 'locked_balance' => 0]
+                );
+
+                $wallet = Wallet::where('id', $wallet->id)->lockForUpdate()->first();
+
+                $amount = $request->input('amount');
+                $method = $request->input('payment_method');
+                $newBalance = $wallet->balance + $amount;
+
+                WalletTransaction::create([
+                    'wallet_id' => $wallet->id,
+                    'type' => 'credit',
+                    'amount' => $amount,
+                    'balance_before' => $wallet->balance,
+                    'balance_after' => $newBalance,
+                    'reference_type' => 'client_deposit',
+                    'reference_id' => auth()->id() ?: 1,
+                    'description' => "Deposit via " . ucfirst($method),
+                    'business_amount' => $amount,
+                    'business_currency' => 'USD',
+                ]);
+
+                $wallet->update(['balance' => $newBalance]);
+            });
+
+            return redirect()->route('erp.wallet.show', $clientModel->id)->with('success', 'Funds successfully deposited to your wallet.');
+        } catch (\Exception $e) {
+            return back()->withErrors(['amount' => $e->getMessage()]);
+        }
+    }
 }
