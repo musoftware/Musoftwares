@@ -21,23 +21,45 @@ class ContractController extends Controller
         return Inertia::render('Freelance/Contracts/Show', ['contract' => $contract]);
     }
 
-    public function complete(Request $request, Contract $contract)
+    public function complete(Request $request, Contract $contract, \Modules\Core\Services\FinancialTransactionService $financialService)
     {
         if ($contract->client_id !== $request->user()->id) {
             abort(403);
         }
 
-        DB::transaction(function () use ($contract) {
-            $contract->update([
-                'status' => 'completed',
-                'completed_at' => now(),
-            ]);
-            $contract->job->update(['status' => 'completed']);
+        try {
+            DB::transaction(function () use ($contract, $financialService) {
+                $contract->update([
+                    'status' => 'completed',
+                    'completed_at' => now(),
+                ]);
+                $contract->job->update(['status' => 'completed']);
 
-            // In a real application, handle transferring funds here.
-        });
+                // Retrieve or create wallets for double-entry ledger transactions
+                $clientWallet = \Modules\Core\Models\Wallet::firstOrCreate(
+                    ['owner_type' => \App\Models\User::class, 'owner_id' => $contract->client_id],
+                    ['context' => 'user', 'balance' => 10000.00, 'currency' => 'USD']
+                );
 
-        return back()->with('success', 'Contract marked as completed.');
+                $freelancerWallet = \Modules\Core\Models\Wallet::firstOrCreate(
+                    ['owner_type' => \App\Models\User::class, 'owner_id' => $contract->freelancer_id],
+                    ['context' => 'user', 'balance' => 0.00, 'currency' => 'USD']
+                );
+
+                $financialService->transferWalletFunds(
+                    $clientWallet->id,
+                    $freelancerWallet->id,
+                    $contract->amount,
+                    "Payout for contract #{$contract->id}: {$contract->job->title}",
+                    Contract::class,
+                    (string)$contract->id
+                );
+            });
+
+            return back()->with('success', 'Contract marked as completed and funds paid to freelancer.');
+        } catch (\Exception $e) {
+            return back()->withErrors(['error' => 'Payout failed: ' . $e->getMessage()]);
+        }
     }
 
     public function dispute(Request $request, Contract $contract)

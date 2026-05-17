@@ -57,6 +57,11 @@ class User extends Authenticatable
             ->withTimestamps();
     }
 
+    public function client()
+    {
+        return $this->hasOne(\Modules\ERP\Models\TenantClient::class, 'email', 'email');
+    }
+
     public function pointTransactions()
     {
         return $this->hasMany(\Modules\Freelance\Models\PointTransaction::class);

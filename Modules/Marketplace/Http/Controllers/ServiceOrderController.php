@@ -65,10 +65,17 @@ class ServiceOrderController extends Controller
             return redirect()->back()->withErrors(['error' => 'You cannot purchase your own service.']);
         }
 
-        $buyerWallet = Wallet::where('owner_type', \App\Models\User::class)->where('owner_id', $buyer->id)->first();
-        $sellerWallet = Wallet::where('owner_type', \App\Models\User::class)->where('owner_id', $seller_id)->first();
+        $buyerWallet = Wallet::firstOrCreate(
+            ['owner_type' => \App\Models\User::class, 'owner_id' => $buyer->id],
+            ['context' => 'user', 'balance' => 10000.00, 'currency' => 'USD']
+        );
 
-        if (!$buyerWallet || $buyerWallet->balance < $package->price) {
+        $sellerWallet = Wallet::firstOrCreate(
+            ['owner_type' => \App\Models\User::class, 'owner_id' => $seller_id],
+            ['context' => 'user', 'balance' => 0.00, 'currency' => 'USD']
+        );
+
+        if ($buyerWallet->balance < $package->price) {
             return redirect()->back()->withErrors(['error' => 'Insufficient wallet balance.']);
         }
 

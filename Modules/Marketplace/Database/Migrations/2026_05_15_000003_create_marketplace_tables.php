@@ -8,13 +8,24 @@ return new class extends Migration
 {
     public function up()
     {
+        // Service Categories
+        Schema::create('marketplace_service_categories', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->string('slug')->unique();
+            $table->text('description')->nullable();
+            $table->timestamps();
+        });
+
         // Services
         Schema::create('marketplace_services', function (Blueprint $table) {
             $table->id();
             $table->foreignId('seller_id')->constrained('users')->cascadeOnDelete();
+            $table->foreignId('category_id')->nullable()->constrained('marketplace_service_categories')->nullOnDelete();
             $table->string('title');
             $table->text('description');
             $table->string('status'); // draft, active, paused, banned
+            $table->boolean('is_featured')->default(false);
             $table->softDeletes();
             $table->timestamps();
         });
@@ -67,5 +78,6 @@ return new class extends Migration
         Schema::dropIfExists('marketplace_orders');
         Schema::dropIfExists('marketplace_packages');
         Schema::dropIfExists('marketplace_services');
+        Schema::dropIfExists('marketplace_service_categories');
     }
 };
