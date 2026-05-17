@@ -67,15 +67,15 @@ export default function PublicLayout({ children, auth }: PublicLayoutProps) {
     };
 
     return (
-        <div className="flex min-h-screen flex-col bg-zinc-950 text-zinc-100 selection:bg-indigo-500 selection:text-white antialiased font-sans">
-            {/* Global grid background pattern overlay */}
-            <div className="absolute inset-0 bg-[linear-gradient(to_right,#1f293710_1px,transparent_1px),linear-gradient(to_bottom,#1f293710_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] pointer-events-none z-0" />
+        <div className="flex min-h-screen flex-col bg-slate-50/50 text-zinc-800 selection:bg-indigo-500 selection:text-white antialiased font-sans">
+            {/* Global soft grid background pattern overlay */}
+            <div className="absolute inset-0 bg-[linear-gradient(to_right,#e2e8f080_1px,transparent_1px),linear-gradient(to_bottom,#e2e8f080_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] pointer-events-none z-0" />
 
             {/* Premium SaaS Sticky Navbar */}
             <header 
                 className={`sticky top-0 z-50 w-full transition-all duration-300 ${
                     scrolled 
-                        ? 'border-b border-zinc-800/80 bg-zinc-950/80 backdrop-blur-xl py-3 shadow-lg shadow-zinc-950/40' 
+                        ? 'border-b border-slate-200/80 bg-white/90 backdrop-blur-xl py-3 shadow-sm shadow-slate-100' 
                         : 'border-b border-transparent bg-transparent py-5'
                 }`}
             >
@@ -86,11 +86,11 @@ export default function PublicLayout({ children, auth }: PublicLayoutProps) {
                             href="/"
                             className="flex items-center gap-2 group focus:outline-none"
                         >
-                            <div className="relative flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 shadow-lg shadow-indigo-500/20 group-hover:scale-105 transition-transform duration-300">
+                            <div className="relative flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 shadow-md shadow-indigo-500/10 group-hover:scale-105 transition-transform duration-300">
                                 <Sparkles className="h-4.5 w-4.5 text-white" />
                                 <div className="absolute inset-0 rounded-lg bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity" />
                             </div>
-                            <span className="text-xl font-bold tracking-tight bg-gradient-to-r from-white via-zinc-100 to-zinc-400 bg-clip-text text-transparent">
+                            <span className="text-xl font-extrabold tracking-tight text-zinc-900">
                                 musoftware
                             </span>
                         </Link>
@@ -102,10 +102,10 @@ export default function PublicLayout({ children, auth }: PublicLayoutProps) {
                                     key={item.href}
                                     href={item.href}
                                     onClick={(e) => handleNavClick(e, item.href)}
-                                    className={`text-sm font-medium transition-colors hover:text-zinc-100 relative py-1 focus:outline-none ${
+                                    className={`text-sm font-medium transition-colors hover:text-zinc-900 relative py-1 focus:outline-none ${
                                         activeSection === item.id 
-                                            ? 'text-zinc-100 font-semibold' 
-                                            : 'text-zinc-400'
+                                            ? 'text-zinc-900 font-semibold' 
+                                            : 'text-zinc-500'
                                     }`}
                                 >
                                     {item.label}
@@ -118,7 +118,7 @@ export default function PublicLayout({ children, auth }: PublicLayoutProps) {
                                 href="https://laravel.com/docs" 
                                 target="_blank" 
                                 rel="noreferrer" 
-                                className="text-sm font-medium text-zinc-400 transition-colors hover:text-zinc-100 focus:outline-none"
+                                className="text-sm font-medium text-zinc-500 transition-colors hover:text-zinc-900 focus:outline-none"
                             >
                                 Docs
                             </a>
@@ -129,14 +129,14 @@ export default function PublicLayout({ children, auth }: PublicLayoutProps) {
                     <div className="hidden md:flex items-center gap-4">
                         <Link 
                             href="/login"
-                            className="text-sm font-medium text-zinc-300 hover:text-white px-3 py-2 transition-colors focus:outline-none"
+                            className="text-sm font-medium text-zinc-600 hover:text-zinc-900 px-3 py-2 transition-colors focus:outline-none"
                         >
                             Login
                         </Link>
                         <Link href="/register">
                             <Button 
                                 size="sm" 
-                                className="bg-zinc-800 hover:bg-zinc-700 text-zinc-100 border border-zinc-700/80 rounded-lg shadow-sm"
+                                className="bg-slate-100 hover:bg-slate-200 text-zinc-800 border border-slate-200 rounded-lg shadow-sm"
                             >
                                 Register
                             </Button>
@@ -155,7 +155,7 @@ export default function PublicLayout({ children, auth }: PublicLayoutProps) {
                     {/* Mobile Menu Button Trigger */}
                     <button
                         onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                        className="flex md:hidden p-2 rounded-lg text-zinc-400 hover:text-zinc-100 hover:bg-zinc-900 border border-transparent hover:border-zinc-800 transition-all focus:outline-none"
+                        className="flex md:hidden p-2 rounded-lg text-zinc-500 hover:text-zinc-900 hover:bg-slate-100 border border-transparent hover:border-slate-200 transition-all focus:outline-none"
                         aria-label="Toggle Menu"
                     >
                         {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
@@ -165,18 +165,18 @@ export default function PublicLayout({ children, auth }: PublicLayoutProps) {
 
             {/* Custom Mobile Menu Drawer Overlay */}
             {mobileMenuOpen && (
-                <div className="fixed inset-0 z-40 bg-zinc-950/98 backdrop-blur-xl flex flex-col md:hidden animate-fade-in">
+                <div className="fixed inset-0 z-40 bg-white/98 backdrop-blur-xl flex flex-col md:hidden animate-fade-in text-zinc-900">
                     {/* Header space alignment spacing */}
-                    <div className="h-16 flex items-center justify-between px-4 sm:px-6">
+                    <div className="h-16 flex items-center justify-between px-4 sm:px-6 border-b border-slate-100">
                         <div className="flex items-center gap-2">
                             <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
                                 <Sparkles className="h-4 w-4 text-white" />
                             </div>
-                            <span className="text-lg font-bold text-white">musoftware</span>
+                            <span className="text-lg font-bold text-zinc-900">musoftware</span>
                         </div>
                         <button
                             onClick={() => setMobileMenuOpen(false)}
-                            className="p-2 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-900 border border-zinc-800"
+                            className="p-2 rounded-lg text-zinc-500 hover:text-zinc-900 hover:bg-slate-100 border border-slate-200"
                         >
                             <X className="h-6 w-6" />
                         </button>
@@ -189,7 +189,7 @@ export default function PublicLayout({ children, auth }: PublicLayoutProps) {
                                 key={item.href}
                                 href={item.href}
                                 onClick={(e) => handleNavClick(e, item.href)}
-                                className="text-2xl font-bold text-zinc-300 hover:text-white transition-colors"
+                                className="text-2xl font-bold text-zinc-650 hover:text-zinc-900 transition-colors"
                                 style={{ animationDelay: `${idx * 75}ms` }}
                             >
                                 {item.label}
@@ -199,21 +199,21 @@ export default function PublicLayout({ children, auth }: PublicLayoutProps) {
                             href="https://laravel.com/docs" 
                             target="_blank" 
                             rel="noreferrer" 
-                            className="text-2xl font-bold text-zinc-400 hover:text-white transition-colors"
+                            className="text-2xl font-bold text-zinc-500 hover:text-zinc-900 transition-colors"
                         >
                             Docs
                         </a>
                     </div>
 
                     {/* Mobile CTAs */}
-                    <div className="p-6 border-t border-zinc-900 bg-zinc-900/30 space-y-4">
+                    <div className="p-6 border-t border-slate-100 bg-slate-50/50 space-y-4">
                         <Link href="/login" className="block w-full">
-                            <Button variant="ghost" className="w-full text-zinc-300 hover:text-white">
+                            <Button variant="ghost" className="w-full text-zinc-600 hover:text-zinc-900">
                                 Login
                             </Button>
                         </Link>
                         <Link href="/register" className="block w-full">
-                            <Button className="w-full bg-zinc-800 hover:bg-zinc-700 text-white">
+                            <Button className="w-full bg-slate-100 hover:bg-slate-200 text-zinc-800 border border-slate-200">
                                 Register
                             </Button>
                         </Link>
@@ -230,8 +230,7 @@ export default function PublicLayout({ children, auth }: PublicLayoutProps) {
             <main className="flex flex-1 flex-col relative z-10">{children}</main>
 
             {/* Enterprise Structured 5-Column Footer */}
-            <footer className="relative border-t border-zinc-900 bg-zinc-950 py-16 text-zinc-400 z-10">
-                <div className="absolute inset-0 bg-gradient-to-b from-transparent to-zinc-950 pointer-events-none" />
+            <footer className="relative border-t border-slate-200 bg-white py-16 text-zinc-500 z-10">
                 <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-10">
                     <div className="grid grid-cols-2 gap-8 md:grid-cols-5 lg:gap-12">
                         {/* Column 1: Brand Info */}
@@ -240,15 +239,15 @@ export default function PublicLayout({ children, auth }: PublicLayoutProps) {
                                 <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-md shadow-indigo-500/10">
                                     <Sparkles className="h-4 w-4 text-white" />
                                 </div>
-                                <span className="text-lg font-bold text-white group-hover:text-zinc-200 transition-colors">
+                                <span className="text-lg font-bold text-zinc-900 group-hover:text-zinc-700 transition-colors">
                                     musoftware
                                 </span>
                             </Link>
-                            <p className="text-sm leading-relaxed text-zinc-400 max-w-xs">
+                            <p className="text-sm leading-relaxed text-zinc-500 max-w-xs">
                                 The all-in-one business engine. Unifying deep ERP, freelance boards, contract billing, wallet automation, and service marketplaces into a single operational workspace.
                             </p>
                             {/* Real-time Status Indicator Badge */}
-                            <div className="inline-flex items-center gap-2 bg-emerald-950/40 border border-emerald-900/60 rounded-full px-3 py-1 text-xs text-emerald-400 font-medium">
+                            <div className="inline-flex items-center gap-2 bg-emerald-50 border border-emerald-250 rounded-full px-3 py-1 text-xs text-emerald-700 font-medium">
                                 <span className="relative flex h-2 w-2">
                                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                                     <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
@@ -259,83 +258,83 @@ export default function PublicLayout({ children, auth }: PublicLayoutProps) {
 
                         {/* Column 2: Product */}
                         <div>
-                            <h3 className="text-xs font-semibold uppercase tracking-wider text-white">
+                            <h3 className="text-xs font-semibold uppercase tracking-wider text-zinc-900">
                                 Product
                             </h3>
                             <ul className="mt-4 space-y-3">
                                 <li>
-                                    <a href="#overview" onClick={(e) => handleNavClick(e, '#overview')} className="text-sm hover:text-white transition-colors">Features</a>
+                                    <a href="#overview" onClick={(e) => handleNavClick(e, '#overview')} className="text-sm hover:text-zinc-900 transition-colors">Features</a>
                                 </li>
                                 <li>
-                                    <a href="#financials" onClick={(e) => handleNavClick(e, '#financials')} className="text-sm hover:text-white transition-colors">Financial Flow</a>
+                                    <a href="#financials" onClick={(e) => handleNavClick(e, '#financials')} className="text-sm hover:text-zinc-900 transition-colors">Financial Flow</a>
                                 </li>
                                 <li>
-                                    <a href="#marketplace" onClick={(e) => handleNavClick(e, '#marketplace')} className="text-sm hover:text-white transition-colors">Marketplace</a>
+                                    <a href="#marketplace" onClick={(e) => handleNavClick(e, '#marketplace')} className="text-sm hover:text-zinc-900 transition-colors">Marketplace</a>
                                 </li>
                                 <li>
-                                    <a href="#workspace" onClick={(e) => handleNavClick(e, '#workspace')} className="text-sm hover:text-white transition-colors">Workspace</a>
+                                    <a href="#workspace" onClick={(e) => handleNavClick(e, '#workspace')} className="text-sm hover:text-zinc-900 transition-colors">Workspace</a>
                                 </li>
                                 <li>
-                                    <a href="#pricing" onClick={(e) => handleNavClick(e, '#pricing')} className="text-sm hover:text-white transition-colors">Pricing Options</a>
+                                    <a href="#pricing" onClick={(e) => handleNavClick(e, '#pricing')} className="text-sm hover:text-zinc-900 transition-colors">Pricing Options</a>
                                 </li>
                             </ul>
                         </div>
 
                         {/* Column 3: Resources */}
                         <div>
-                            <h3 className="text-xs font-semibold uppercase tracking-wider text-white">
+                            <h3 className="text-xs font-semibold uppercase tracking-wider text-zinc-900">
                                 Resources
                             </h3>
                             <ul className="mt-4 space-y-3">
                                 <li>
-                                    <a href="https://laravel.com/docs" target="_blank" rel="noreferrer" className="text-sm hover:text-white transition-colors">Documentation</a>
+                                    <a href="https://laravel.com/docs" target="_blank" rel="noreferrer" className="text-sm hover:text-zinc-900 transition-colors">Documentation</a>
                                 </li>
                                 <li>
-                                    <a href="#" className="text-sm hover:text-white transition-colors">API Reference</a>
+                                    <a href="#" className="text-sm hover:text-zinc-900 transition-colors">API Reference</a>
                                 </li>
                                 <li>
-                                    <a href="#" className="text-sm hover:text-white transition-colors">Changelog</a>
+                                    <a href="#" className="text-sm hover:text-zinc-900 transition-colors">Changelog</a>
                                 </li>
                                 <li>
-                                    <a href="#" className="text-sm hover:text-white transition-colors">Community Forum</a>
+                                    <a href="#" className="text-sm hover:text-zinc-900 transition-colors">Community Forum</a>
                                 </li>
                                 <li>
-                                    <a href="#" className="text-sm hover:text-white transition-colors">Support Desk</a>
+                                    <a href="#" className="text-sm hover:text-zinc-900 transition-colors">Support Desk</a>
                                 </li>
                             </ul>
                         </div>
 
                         {/* Column 4: Legal & Safety */}
                         <div>
-                            <h3 className="text-xs font-semibold uppercase tracking-wider text-white">
+                            <h3 className="text-xs font-semibold uppercase tracking-wider text-zinc-900">
                                 Company & Legal
                             </h3>
                             <ul className="mt-4 space-y-3">
                                 <li>
-                                    <a href="#" className="text-sm hover:text-white transition-colors">About Us</a>
+                                    <a href="#" className="text-sm hover:text-zinc-900 transition-colors">About Us</a>
                                 </li>
                                 <li>
-                                    <a href="#" className="text-sm hover:text-white transition-colors">Privacy Policy</a>
+                                    <a href="#" className="text-sm hover:text-zinc-900 transition-colors">Privacy Policy</a>
                                 </li>
                                 <li>
-                                    <a href="#" className="text-sm hover:text-white transition-colors">Terms of Service</a>
+                                    <a href="#" className="text-sm hover:text-zinc-900 transition-colors">Terms of Service</a>
                                 </li>
                                 <li>
-                                    <a href="#" className="text-sm hover:text-white transition-colors">Escrow Protection</a>
+                                    <a href="#" className="text-sm hover:text-zinc-900 transition-colors">Escrow Protection</a>
                                 </li>
                                 <li>
-                                    <a href="#" className="text-sm hover:text-white transition-colors">Contact Relations</a>
+                                    <a href="#" className="text-sm hover:text-zinc-900 transition-colors">Contact Relations</a>
                                 </li>
                             </ul>
                         </div>
                     </div>
 
                     {/* Bottom: Divider & Copyright */}
-                    <div className="mt-12 border-t border-zinc-900 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
-                        <p className="text-xs text-zinc-500">
+                    <div className="mt-12 border-t border-slate-200 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
+                        <p className="text-xs text-zinc-400">
                             &copy; {new Date().getFullYear()} musoftware. Engineered for hyper-growth enterprises, modern freelancers, and client networks. All rights reserved.
                         </p>
-                        <div className="flex gap-4 text-xs text-zinc-500">
+                        <div className="flex gap-4 text-xs text-zinc-400">
                             <span>Vite React Inertia Laravel v11</span>
                             <span>•</span>
                             <span>TLS Escrow Secured</span>
