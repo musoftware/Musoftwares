@@ -1,366 +1,262 @@
+import React from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link, usePage } from '@inertiajs/react';
-import { useState } from 'react';
-import {
-    InvoiceQuickView,
-    WalletQuickView,
-    ContractQuickView,
-    CustomerQuickView,
-    ServiceQuickView
-} from '@/Components/ContextualPanels';
-import {
-    Wallet,
-    FileText,
-    Briefcase,
-    Gift,
-    Clock,
-    Plus,
-    CheckCircle2,
-    ArrowUpRight,
-    Search,
-    UserCheck,
-    Bell,
-    Lock,
-    ShieldCheck
+import { 
+    Wallet, FileText, ArrowUpRight, ArrowRight, Clock, CheckCircle2, 
+    AlertCircle, Sparkles, Building2, Briefcase, Megaphone, Plus, ArrowRightLeft,
+    CreditCard
 } from 'lucide-react';
-import { formatMoney, formatDate } from '@/lib/utils';
+import { Button } from '@/Components/ui/button';
 
 export default function Dashboard() {
     const { auth } = usePage().props as any;
-    const user = auth?.user;
+    const user = auth.user;
 
-    // Controls for contextual slide-over panels
-    const [selectedInvoice, setSelectedInvoice] = useState<any>(null);
-    const [selectedWallet, setSelectedWallet] = useState<any>(null);
-    const [selectedContract, setSelectedContract] = useState<any>(null);
-    const [selectedCustomer, setSelectedCustomer] = useState<any>(null);
-    const [selectedService, setSelectedService] = useState<any>(null);
+    const safeRoute = (name: string, params?: any) => {
+        try {
+            // @ts-ignore
+            if (typeof route !== 'undefined' && route().has(name)) {
+                // @ts-ignore
+                return route(name, params);
+            }
+        } catch (e) {}
+        return '#';
+    };
 
-    // Dynamic mock datasets matching workspace models
-    const invoices = [
-        { id: 1, invoiceNumber: 'INV-303', clientName: 'Acme Corp', amount: 1200.00, currency: 'USD', issuedDate: '2026-05-12', dueDate: '2026-05-25', status: 'pending', project: 'Design Framework Refactor' },
-        { id: 2, invoiceNumber: 'INV-304', clientName: 'Stripe Labs', amount: 1500.00, currency: 'USD', issuedDate: '2026-05-10', dueDate: '2026-05-29', status: 'pending', project: 'Webhook API integration' },
-        { id: 3, invoiceNumber: 'INV-305', clientName: 'Vercel LLC', amount: 700.00, currency: 'USD', issuedDate: '2026-05-16', dueDate: '2026-06-02', status: 'draft', project: 'Edge Routing Audit' },
+    // Simulated data for operational view
+    const stats = {
+        walletBalance: 1250.45,
+        pointsBalance: 1450,
+        unpaidInvoices: 2,
+        unpaidAmount: 3450.00,
+        activeSubscriptions: 1
+    };
+
+    const pendingInvoices = [
+        { id: 'INV-2024-001', date: 'Oct 12, 2024', amount: 2500.00, status: 'due', description: 'ERP Custom Implementation' },
+        { id: 'INV-2024-002', date: 'Oct 15, 2024', amount: 950.00, status: 'overdue', description: 'Monthly Retainer - Oct' },
     ];
 
-    const contracts = [
-        { id: 1, title: 'Modular SaaS Dashboard Refactor', clientName: 'Musoftware Inc', value: 4500.00, progress: 75, status: 'in progress', startDate: '2026-05-01' },
-        { id: 2, title: 'API Gateway Speed Optimization', clientName: 'Vercel Labs', value: 2000.00, progress: 40, status: 'in progress', startDate: '2026-05-10' },
-    ];
-
-    const transactions = [
-        { desc: 'Invoice payment credit INV-302', amount: 850.00, date: '2026-05-16', type: 'credit', category: 'Invoicing' },
-        { desc: 'Referral Bounty Credit', amount: 50.00, date: '2026-05-14', type: 'credit', category: 'Referrals' },
-        { desc: 'Withdrawal to Wise Account', amount: -200.00, date: '2026-05-10', type: 'debit', category: 'Settlement' },
+    const recentTransactions = [
+        { id: 'TXN-001', date: 'Oct 10, 2024', type: 'deposit', amount: 5000.00, method: 'Stripe' },
+        { id: 'TXN-002', date: 'Oct 08, 2024', type: 'payment', amount: -1500.00, method: 'Wallet Balance' },
+        { id: 'TXN-003', date: 'Oct 05, 2024', type: 'withdrawal', amount: -2000.00, method: 'Bank Transfer' },
     ];
 
     return (
-        <AuthenticatedLayout header="Workspace Operations">
-            <Head title="Client Dashboard" />
+        <AuthenticatedLayout header={undefined}>
+            <Head title="Customer Dashboard" />
 
-            <div className="max-w-5xl mx-auto space-y-6 pb-12 font-sans text-sm">
+            <div className="max-w-[1200px] mx-auto space-y-8 pb-12">
                 
-                {/* ─────────────────────────────────────────
-                    PART 3 — COMPACT WELCOME HEADER
-                    ───────────────────────────────────────── */}
-                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-2">
+                {/* Compact Welcome Header */}
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
                     <div>
-                        <h2 className="text-base font-bold text-text-primary tracking-tight font-sora">
-                            Welcome back, {user?.name || 'Administrator'}
-                        </h2>
-                        <p className="text-[11px] text-text-secondary">
-                            Your operational workspace is fully synced. Review pending items and clear invoice actions below.
-                        </p>
+                        <h1 className="text-2xl font-semibold text-slate-900 tracking-tight">Good morning, {user?.name || 'Customer'}</h1>
+                        <p className="text-sm text-slate-500 mt-1">Here is what requires your attention today.</p>
                     </div>
-                    <div className="flex items-center gap-2 font-mono text-[10px] text-text-secondary bg-slate-50 border border-slate-100 px-2 py-0.5 rounded">
-                        <span>Cleared: {formatDate(new Date(), 'MMM d, yyyy')}</span>
+                    <div className="flex gap-3">
+                        <Button className="bg-slate-900 hover:bg-slate-800 text-white rounded-full">
+                            <Plus className="w-4 h-4 mr-2" /> Add Balance
+                        </Button>
                     </div>
                 </div>
 
-                {/* ─────────────────────────────────────────
-                    PART 6 — MINIMAL KPI ROW
-                    ───────────────────────────────────────── */}
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                    {/* Wallet Balance */}
-                    <div 
-                        onClick={() => setSelectedWallet({ balance: 1250.45 })}
-                        className="bg-white border border-border/60 rounded-xl p-4 shadow-sm hover:border-indigo-150 transition cursor-pointer space-y-1.5"
-                    >
-                        <div className="flex justify-between items-center text-text-muted text-[10px] font-bold uppercase tracking-wider">
-                            <span>Wallet Balance</span>
-                            <Wallet className="h-3.5 w-3.5 text-indigo-500" />
+                {/* Financial Summary Row */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
+                        <div className="flex justify-between items-start mb-4">
+                            <div className="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center">
+                                <Wallet className="w-5 h-5 text-indigo-600" />
+                            </div>
+                            <span className="text-xs font-medium px-2 py-1 bg-emerald-50 text-emerald-700 rounded-full border border-emerald-100">
+                                Active
+                            </span>
                         </div>
                         <div>
-                            <span className="font-mono text-lg font-bold text-text-primary block">
-                                {formatMoney(1250.45, 'USD')}
-                            </span>
-                            <span className="text-[10px] text-emerald-600 font-semibold block mt-0.5">
-                                +8% this month
-                            </span>
+                            <p className="text-sm font-medium text-slate-500 mb-1">Wallet Balance</p>
+                            <div className="flex items-baseline gap-2">
+                                <h2 className="text-3xl font-semibold text-slate-900">${stats.walletBalance.toLocaleString(undefined, {minimumFractionDigits: 2})}</h2>
+                            </div>
                         </div>
                     </div>
 
-                    {/* Pending Invoices */}
-                    <div 
-                        onClick={() => setSelectedInvoice(invoices[0])}
-                        className="bg-white border border-border/60 rounded-xl p-4 shadow-sm hover:border-indigo-150 transition cursor-pointer space-y-1.5"
-                    >
-                        <div className="flex justify-between items-center text-text-muted text-[10px] font-bold uppercase tracking-wider">
-                            <span>Pending Invoices</span>
-                            <FileText className="h-3.5 w-3.5 text-indigo-500" />
-                        </div>
-                        <div>
-                            <span className="font-mono text-lg font-bold text-text-primary block">
-                                {invoices.filter(i => i.status === 'pending').length} Invoices
-                            </span>
-                            <span className="text-[10px] text-text-secondary block mt-0.5">
-                                Aggregate: {formatMoney(2700.00, 'USD')}
-                            </span>
-                        </div>
-                    </div>
-
-                    {/* Active Contracts */}
-                    <div 
-                        onClick={() => setSelectedContract(contracts[0])}
-                        className="bg-white border border-border/60 rounded-xl p-4 shadow-sm hover:border-indigo-150 transition cursor-pointer space-y-1.5"
-                    >
-                        <div className="flex justify-between items-center text-text-muted text-[10px] font-bold uppercase tracking-wider">
-                            <span>Active Projects</span>
-                            <Briefcase className="h-3.5 w-3.5 text-indigo-500" />
-                        </div>
-                        <div>
-                            <span className="font-mono text-lg font-bold text-text-primary block">
-                                {contracts.length} Contracts
-                            </span>
-                            <span className="text-[10px] text-text-secondary block mt-0.5">
-                                Next milestone: May 25
-                            </span>
+                    <div className="bg-white p-6 rounded-2xl border border-rose-200 shadow-sm flex flex-col justify-between relative overflow-hidden">
+                        <div className="absolute top-0 right-0 w-24 h-24 bg-rose-50 rounded-full blur-2xl -mr-10 -mt-10 pointer-events-none" />
+                        <div className="relative">
+                            <div className="flex justify-between items-start mb-4">
+                                <div className="w-10 h-10 rounded-xl bg-rose-50 flex items-center justify-center">
+                                    <FileText className="w-5 h-5 text-rose-600" />
+                                </div>
+                                {stats.unpaidInvoices > 0 && (
+                                    <span className="flex items-center gap-1.5 text-xs font-medium px-2 py-1 bg-rose-100 text-rose-700 rounded-full border border-rose-200">
+                                        <AlertCircle className="w-3.5 h-3.5" /> Action Required
+                                    </span>
+                                )}
+                            </div>
+                            <div>
+                                <p className="text-sm font-medium text-slate-500 mb-1">Unpaid Invoices ({stats.unpaidInvoices})</p>
+                                <div className="flex items-baseline gap-2">
+                                    <h2 className="text-3xl font-semibold text-rose-600">${stats.unpaidAmount.toLocaleString(undefined, {minimumFractionDigits: 2})}</h2>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
-                    {/* Recent Earnings */}
-                    <div className="bg-white border border-border/60 rounded-xl p-4 shadow-sm space-y-1.5 hover:border-indigo-100 transition">
-                        <div className="flex justify-between items-center text-text-muted text-[10px] font-bold uppercase tracking-wider">
-                            <span>Recent Earnings</span>
-                            <Gift className="h-3.5 w-3.5 text-emerald-500" />
+                    <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
+                        <div className="flex justify-between items-start mb-4">
+                            <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center">
+                                <Sparkles className="w-5 h-5 text-slate-600" />
+                            </div>
                         </div>
                         <div>
-                            <span className="font-mono text-lg font-bold text-text-primary block">
-                                {formatMoney(180.00, 'USD')}
-                            </span>
-                            <span className="text-[10px] text-indigo-600 font-semibold block mt-0.5">
-                                4 active invites
-                            </span>
+                            <p className="text-sm font-medium text-slate-500 mb-1">Subscribed Systems</p>
+                            <div className="flex items-baseline gap-2">
+                                <h2 className="text-3xl font-semibold text-slate-900">{stats.activeSubscriptions} Module</h2>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                {/* ─────────────────────────────────────────
-                    MAIN OPERATIONAL AREA (70% - 30%)
-                    ───────────────────────────────────────── */}
-                <div className="grid grid-cols-1 lg:grid-cols-10 gap-6">
-                    
-                    {/* 70% Left Section */}
-                    <div className="lg:col-span-7 space-y-6">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    {/* LEFT COLUMN: Urgent & Workflows */}
+                    <div className="lg:col-span-2 space-y-8">
                         
-                        {/* PART 7 — ACTIONABLE WORKFLOW FEED */}
-                        <div className="bg-white border border-border/60 rounded-xl overflow-hidden shadow-sm">
-                            <div className="px-5 py-3.5 border-b border-border/40 flex justify-between items-center bg-slate-50/20">
-                                <h3 className="font-sora text-xs font-bold uppercase tracking-wider text-text-muted flex items-center gap-1.5">
-                                    <Clock className="h-4 w-4 text-indigo-500" /> High-Priority Actions Required
+                        {/* PENDING INVOICES (Most Important) */}
+                        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                            <div className="px-6 py-5 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+                                <h3 className="text-base font-semibold text-slate-900 flex items-center gap-2">
+                                    <FileText className="w-4 h-4 text-rose-500" /> Pending Invoices
                                 </h3>
-                                <span className="bg-amber-50 text-amber-700 text-[10px] font-semibold px-2 py-0.5 rounded border border-amber-200">
-                                    Needs Review
-                                </span>
+                                <Link href={safeRoute('erp.invoices.index')} className="text-sm font-medium text-indigo-600 hover:text-indigo-700">
+                                    View All
+                                </Link>
                             </div>
-                            
-                            <div className="divide-y divide-border/40 text-xs">
-                                {/* Action Item 1 */}
-                                <div 
-                                    onClick={() => setSelectedInvoice(invoices[0])}
-                                    className="p-4 hover:bg-slate-50/60 transition cursor-pointer flex items-center justify-between"
-                                >
-                                    <div className="space-y-0.5">
-                                        <span className="font-semibold text-text-primary text-[13px] block">Invoice INV-303 Requires Payment</span>
-                                        <span className="text-[11px] text-text-secondary block">Client: Acme Corp • Due in 8 days</span>
+                            <div className="divide-y divide-slate-100">
+                                {pendingInvoices.map((invoice) => (
+                                    <div key={invoice.id} className="p-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 hover:bg-slate-50 transition-colors">
+                                        <div className="flex items-start gap-4">
+                                            <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center shrink-0">
+                                                <FileText className="w-5 h-5 text-slate-500" />
+                                            </div>
+                                            <div>
+                                                <p className="font-medium text-slate-900 text-sm">{invoice.description}</p>
+                                                <div className="flex items-center gap-3 mt-1 text-xs text-slate-500">
+                                                    <span className="font-mono">{invoice.id}</span>
+                                                    <span>•</span>
+                                                    <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> Due {invoice.date}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="flex items-center gap-6 w-full sm:w-auto justify-between sm:justify-end">
+                                            <div className="text-left sm:text-right">
+                                                <p className="font-semibold text-slate-900">${invoice.amount.toLocaleString(undefined, {minimumFractionDigits: 2})}</p>
+                                                <p className={`text-xs font-medium mt-0.5 ${invoice.status === 'overdue' ? 'text-rose-600' : 'text-amber-600'}`}>
+                                                    {invoice.status === 'overdue' ? 'Overdue' : 'Due Soon'}
+                                                </p>
+                                            </div>
+                                            <Button size="sm" className="bg-indigo-600 hover:bg-indigo-700 text-white rounded-full px-5">
+                                                Pay Now
+                                            </Button>
+                                        </div>
                                     </div>
-                                    <div className="text-right">
-                                        <span className="font-mono font-bold text-text-primary block">{formatMoney(1200.00, 'USD')}</span>
-                                        <span className="text-[9px] uppercase font-bold text-amber-700 bg-amber-50 border border-amber-200 px-1.5 py-0.2 rounded mt-0.5 inline-block">
-                                            Pay claim
-                                        </span>
-                                    </div>
-                                </div>
-
-                                {/* Action Item 2 */}
-                                <div 
-                                    onClick={() => setSelectedContract(contracts[0])}
-                                    className="p-4 hover:bg-slate-50/60 transition cursor-pointer flex items-center justify-between"
-                                >
-                                    <div className="space-y-0.5">
-                                        <span className="font-semibold text-text-primary text-[13px] block">SaaS Dashboard Refactor Milestone Approval</span>
-                                        <span className="text-[11px] text-text-secondary block">Milestone 2: High fidelity charts integration (75% completed)</span>
-                                    </div>
-                                    <div className="text-right">
-                                        <span className="font-mono font-bold text-text-primary block">{formatMoney(4500.00, 'USD')}</span>
-                                        <span className="text-[9px] uppercase font-bold text-indigo-700 bg-indigo-50 border border-indigo-200 px-1.5 py-0.2 rounded mt-0.5 inline-block">
-                                            Approve release
-                                        </span>
-                                    </div>
-                                </div>
+                                ))}
                             </div>
                         </div>
 
-                        {/* Recent Transactions Ledger */}
-                        <div className="bg-white border border-border/60 rounded-xl overflow-hidden shadow-sm">
-                            <div className="px-5 py-3.5 border-b border-border/40 flex justify-between items-center bg-slate-50/20">
-                                <h3 className="font-sora text-xs font-bold uppercase tracking-wider text-text-muted flex items-center gap-1.5">
-                                    <CheckCircle2 className="h-4 w-4 text-emerald-500" /> Recent Transactions Ledger
+                        {/* SUBSCRIPTION / MODULE ACCESS */}
+                        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                            <div className="px-6 py-5 border-b border-slate-100 flex justify-between items-center">
+                                <h3 className="text-base font-semibold text-slate-900 flex items-center gap-2">
+                                    <Sparkles className="w-4 h-4 text-indigo-500" /> Subscribed Workspaces
                                 </h3>
-                                <Link 
-                                    href="/erp/invoices"
-                                    className="text-[11px] text-indigo-600 font-semibold hover:underline flex items-center gap-0.5"
-                                >
-                                    All Ledger <ArrowUpRight className="h-3 w-3" />
-                                </Link>
                             </div>
-                            
-                            <div className="overflow-x-auto">
-                                <table className="w-full text-left font-sans text-xs border-collapse">
-                                    <thead>
-                                        <tr className="bg-slate-50/80 text-[10px] uppercase font-bold text-text-muted border-b border-border/40">
-                                            <th className="px-4 py-2">Details</th>
-                                            <th className="px-4 py-2">Category</th>
-                                            <th className="px-4 py-2">Cleared Date</th>
-                                            <th className="px-4 py-2 text-right">Settled Amount</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody className="divide-y divide-border/40">
-                                        {transactions.map((tx, idx) => (
-                                            <tr key={idx} className="hover:bg-slate-50/40 transition">
-                                                <td className="px-4 py-2.5 font-medium text-text-primary">{tx.desc}</td>
-                                                <td className="px-4 py-2.5 text-text-secondary">{tx.category}</td>
-                                                <td className="px-4 py-2.5 text-text-muted">{formatDate(tx.date)}</td>
-                                                <td className={`px-4 py-2.5 text-right font-mono font-medium ${
-                                                    tx.amount > 0 ? 'text-emerald-600' : 'text-text-primary'
-                                                }`}>
-                                                    {tx.amount > 0 ? '+' : ''}{formatMoney(tx.amount, 'USD')}
-                                                </td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-
-                    </div>
-
-                    {/* 30% Right Section (Contextual Side Widgets) */}
-                    <div className="lg:col-span-3 space-y-6">
-                        
-                        {/* PART 8 — QUICK ACTIONS */}
-                        <div className="bg-white border border-border/60 rounded-xl p-4 shadow-sm space-y-3">
-                            <h4 className="text-[10px] font-bold uppercase tracking-wider text-text-muted border-b border-border/40 pb-2">
-                                Operations Actions
-                            </h4>
-                            <div className="grid grid-cols-1 gap-2 text-xs">
-                                <Link
-                                    href="/erp/invoices"
-                                    className="flex items-center gap-2 p-2 rounded-lg border border-slate-100 hover:border-indigo-150 hover:bg-indigo-50/10 text-text-primary font-semibold transition"
-                                >
-                                    <Plus className="h-4 w-4 text-indigo-600 mr-2 shrink-0" />
-                                    <span>Create Billing Invoice</span>
-                                </Link>
-                                <Link
-                                    href="/erp/withdrawals"
-                                    className="flex items-center gap-2 p-2 rounded-lg border border-slate-100 hover:border-indigo-150 hover:bg-indigo-50/10 text-text-primary font-semibold transition"
-                                >
-                                    <ArrowUpRight className="h-4 w-4 text-indigo-600 mr-2 shrink-0" />
-                                    <span>Request Wallet Settlement</span>
-                                </Link>
-                                <Link
-                                    href="/freelance/jobs/browse"
-                                    className="flex items-center gap-2 p-2 rounded-lg border border-slate-100 hover:border-indigo-150 hover:bg-indigo-50/10 text-text-primary font-semibold transition"
-                                >
-                                    <Search className="h-4 w-4 text-indigo-600 mr-2 shrink-0" />
-                                    <span>Browse Jobs Directory</span>
-                                </Link>
-                            </div>
-                        </div>
-
-                        {/* PART 12 — SMART ONBOARDING CHECKLIST */}
-                        <div className="bg-white border border-border/60 rounded-xl p-4 shadow-sm space-y-3">
-                            <h4 className="text-[10px] font-bold uppercase tracking-wider text-text-muted border-b border-border/40 pb-2">
-                                Workspace Setup Checklist
-                            </h4>
-                            <div className="space-y-3 text-xs leading-normal">
-                                <div className="flex gap-2">
-                                    <CheckCircle2 className="h-4.5 w-4.5 text-emerald-500 shrink-0 mt-0.5" />
-                                    <div>
-                                        <span className="font-semibold block text-text-primary">Corporate Profile Setup</span>
-                                        <p className="text-[10px] text-text-secondary mt-0.5 font-medium">Verify credentials and email details.</p>
+                            <div className="p-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <Link href={safeRoute('erp.clients.index')} className="group p-5 rounded-xl border border-slate-200 hover:border-indigo-300 hover:shadow-md hover:shadow-indigo-50 transition-all bg-white relative overflow-hidden">
+                                    <div className="w-10 h-10 rounded-lg bg-indigo-50 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                                        <Building2 className="w-5 h-5 text-indigo-600" />
                                     </div>
-                                </div>
-                                <div className="flex gap-2">
-                                    <div className="h-4.5 w-4.5 rounded-full border border-slate-300 shrink-0 mt-0.5" />
-                                    <div>
-                                        <span className="font-semibold block text-text-primary">Link Wise Settlement</span>
-                                        <p className="text-[10px] text-text-secondary mt-0.5">Wire business withdrawals instantly.</p>
-                                        <Link 
-                                            href="/profile" 
-                                            className="text-[10px] text-indigo-600 font-bold hover:underline block mt-1"
-                                        >
-                                            Verify Wise Account →
+                                    <h4 className="font-semibold text-slate-900 mb-1">Business OS (ERP)</h4>
+                                    <p className="text-sm text-slate-500 leading-relaxed">Manage your clients, generate invoices, and log project timers.</p>
+                                    <div className="absolute top-4 right-4 text-emerald-600 text-xs font-medium bg-emerald-50 px-2 py-0.5 rounded-full">Active</div>
+                                </Link>
+
+                                <div className="p-5 rounded-xl border border-slate-200 bg-slate-50 relative overflow-hidden opacity-75">
+                                    <div className="w-10 h-10 rounded-lg bg-slate-200 flex items-center justify-center mb-4">
+                                        <Briefcase className="w-5 h-5 text-slate-500" />
+                                    </div>
+                                    <h4 className="font-semibold text-slate-900 mb-1">Freelance Hub</h4>
+                                    <p className="text-sm text-slate-500 leading-relaxed">Accept contracts, manage milestones, and submit deliverables.</p>
+                                    <div className="mt-4 flex items-center justify-between">
+                                        <span className="text-xs font-medium text-slate-500">Locked</span>
+                                        <Link href="#" className="text-xs font-medium text-indigo-600 hover:text-indigo-700 flex items-center gap-1">
+                                            Learn More <ArrowRight className="w-3 h-3" />
                                         </Link>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        {/* Standard Escrow Security Shield */}
-                        <div className="bg-indigo-50/30 border border-indigo-100/50 rounded-xl p-3.5 text-[11px] leading-relaxed text-indigo-900 flex gap-2">
-                            <Lock className="h-4.5 w-4.5 text-indigo-600 shrink-0 mt-0.5" />
-                            <div>
-                                <span className="font-bold text-indigo-950 block">Unified Escrow Safe Protection</span>
-                                Funds are locked securely inside integrated customer accounts. Settlements are processed safely on deliverable approvals.
+                    </div>
+
+                    {/* RIGHT COLUMN: Transactions & Wallet Actions */}
+                    <div className="space-y-8">
+                        
+                        {/* QUICK ACTIONS */}
+                        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-1">
+                            <div className="flex flex-col gap-1 p-3">
+                                <Button variant="ghost" className="w-full justify-start text-slate-700 hover:text-slate-900 hover:bg-slate-50 font-medium h-11">
+                                    <Plus className="w-4 h-4 mr-3 text-slate-400" /> Add Funds to Wallet
+                                </Button>
+                                <Button variant="ghost" className="w-full justify-start text-slate-700 hover:text-slate-900 hover:bg-slate-50 font-medium h-11">
+                                    <ArrowUpRight className="w-4 h-4 mr-3 text-slate-400" /> Request Withdrawal
+                                </Button>
+                                <Button variant="ghost" className="w-full justify-start text-slate-700 hover:text-slate-900 hover:bg-slate-50 font-medium h-11">
+                                    <CreditCard className="w-4 h-4 mr-3 text-slate-400" /> Manage Payment Methods
+                                </Button>
+                            </div>
+                        </div>
+
+                        {/* RECENT TRANSACTIONS */}
+                        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                            <div className="px-6 py-5 border-b border-slate-100 flex justify-between items-center">
+                                <h3 className="text-base font-semibold text-slate-900 flex items-center gap-2">
+                                    <ArrowRightLeft className="w-4 h-4 text-slate-500" /> Recent Transactions
+                                </h3>
+                            </div>
+                            <div className="divide-y divide-slate-100">
+                                {recentTransactions.map((txn) => (
+                                    <div key={txn.id} className="p-5 flex justify-between items-center hover:bg-slate-50 transition-colors">
+                                        <div className="flex items-center gap-3">
+                                            <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${
+                                                txn.type === 'deposit' ? 'bg-emerald-50' : 
+                                                txn.type === 'withdrawal' ? 'bg-amber-50' : 'bg-slate-100'
+                                            }`}>
+                                                {txn.type === 'deposit' && <ArrowRightLeft className="w-3.5 h-3.5 text-emerald-600" />}
+                                                {txn.type === 'withdrawal' && <ArrowUpRight className="w-3.5 h-3.5 text-amber-600" />}
+                                                {txn.type === 'payment' && <CreditCard className="w-3.5 h-3.5 text-slate-600" />}
+                                            </div>
+                                            <div>
+                                                <p className="font-medium text-slate-900 text-sm capitalize">{txn.type}</p>
+                                                <p className="text-xs text-slate-500">{txn.method} • {txn.date}</p>
+                                            </div>
+                                        </div>
+                                        <div className={`font-medium text-sm ${txn.amount > 0 ? 'text-emerald-600' : 'text-slate-900'}`}>
+                                            {txn.amount > 0 ? '+' : ''}{txn.amount.toLocaleString(undefined, {minimumFractionDigits: 2})}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                            <div className="p-4 bg-slate-50 border-t border-slate-100 text-center">
+                                <Link href={safeRoute('erp.wallet.show', user?.id || 1)} className="text-xs font-medium text-indigo-600 hover:text-indigo-700">
+                                    View Full History
+                                </Link>
                             </div>
                         </div>
 
                     </div>
                 </div>
-
             </div>
-
-            {/* Contextual Side slide-overs */}
-            <InvoiceQuickView
-                isOpen={selectedInvoice !== null}
-                onClose={() => setSelectedInvoice(null)}
-                data={selectedInvoice}
-            />
-
-            <WalletQuickView
-                isOpen={selectedWallet !== null}
-                onClose={() => setSelectedWallet(null)}
-                data={selectedWallet}
-            />
-
-            <ContractQuickView
-                isOpen={selectedContract !== null}
-                onClose={() => setSelectedContract(null)}
-                data={selectedContract}
-            />
-
-            <CustomerQuickView
-                isOpen={selectedCustomer !== null}
-                onClose={() => setSelectedCustomer(null)}
-                data={selectedCustomer}
-            />
-
-            <ServiceQuickView
-                isOpen={selectedService !== null}
-                onClose={() => setSelectedService(null)}
-                data={selectedService}
-            />
         </AuthenticatedLayout>
     );
 }
