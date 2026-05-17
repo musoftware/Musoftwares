@@ -21,7 +21,10 @@ return Application::configure(basePath: dirname(__DIR__))
             'admin' => \App\Http\Middleware\AdminMiddleware::class,
             'client' => \App\Http\Middleware\ClientMiddleware::class,
             'tenant' => \App\Http\Middleware\TenantMiddleware::class,
+            'tenant.active' => \App\Http\Middleware\TenantMiddleware::class,
             'subscription' => \App\Http\Middleware\SubscriptionMiddleware::class,
+            'role' => \Spatie\Permission\Middleware\RoleMiddleware::class,
+            'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

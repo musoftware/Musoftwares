@@ -177,6 +177,13 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
 
 require __DIR__.'/auth.php';
 
+// Support Ticket Routes
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/tickets', [\App\Http\Controllers\SupportTicketController::class, 'index'])->name('tickets.index');
+    Route::post('/tickets', [\App\Http\Controllers\SupportTicketController::class, 'store'])->name('tickets.store');
+    Route::post('/tickets/{id}/resolve', [\App\Http\Controllers\SupportTicketController::class, 'resolve'])->name('tickets.resolve');
+});
+
 // Global Search
 Route::middleware(['auth', 'verified'])->get('/search', [\App\Http\Controllers\SearchController::class, 'index'])->name('search');
 

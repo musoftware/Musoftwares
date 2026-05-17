@@ -148,14 +148,14 @@ class InvoiceWorkflowTest extends TestCase
         // Send invoice
         $response = $this->actingAs($this->user)
             ->withSession(['tenant_id' => $this->tenant->id])
-            ->post(route('erp.send', $invoice->id));
+            ->post(route('erp.invoices.send', $invoice->id));
 
         $this->assertEquals('sent', $invoice->fresh()->status);
 
         // Mark paid
         $response = $this->actingAs($this->user)
             ->withSession(['tenant_id' => $this->tenant->id])
-            ->post(route('erp.markPaid', $invoice->id));
+            ->post(route('erp.invoices.mark-paid', $invoice->id));
 
         $this->assertEquals('paid', $invoice->fresh()->status);
         $this->assertNotNull($invoice->fresh()->paid_at);
