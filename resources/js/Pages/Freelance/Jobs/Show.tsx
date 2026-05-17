@@ -230,11 +230,11 @@ export default function ShowJob({ auth, job: initialJob, pointsCost = 5 }: any) 
                                                 <p className="text-xs text-slate-500">Your balance: <span className="font-bold text-slate-700">{userPoints}</span></p>
                                             </div>
                                             
-                                            {errors.points && (
+                                            {(errors as any).points && (
                                                 <Alert variant="destructive">
                                                     <AlertCircle className="h-4 w-4" />
                                                     <AlertTitle>Error</AlertTitle>
-                                                    <AlertDescription>{errors.points}</AlertDescription>
+                                                    <AlertDescription>{(errors as any).points}</AlertDescription>
                                                 </Alert>
                                             )}
 

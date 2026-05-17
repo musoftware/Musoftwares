@@ -53,7 +53,7 @@ export default function BrowseJobs({ auth, jobs }: any) {
                             </div>
                             <div className="w-px bg-slate-200 hidden sm:block"></div>
                             <div className="w-full sm:w-48 bg-white shrink-0">
-                                <Select value={typeFilter} onValueChange={(val) => setTypeFilter(val)}>
+                                <Select value={typeFilter} onValueChange={(val) => setTypeFilter(val || 'all')}>
                                     <SelectTrigger className="border-0 focus:ring-0 shadow-none h-14 rounded-none bg-white w-full">
                                         <SelectValue placeholder="Job Type" />
                                     </SelectTrigger>
