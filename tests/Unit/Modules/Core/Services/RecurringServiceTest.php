@@ -19,38 +19,22 @@ class RecurringServiceTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-
-        // We create minimal tables to make eloquent work for this test
-        Schema::create('tenants', function ($table) {
-            $table->id();
-            $table->string('name');
-            $table->string('domain');
-            $table->timestamps();
-        });
-
-        Schema::create('recurring_entries', function ($table) {
-            $table->id();
-            $table->foreignId('tenant_id');
-            $table->string('type');
-            $table->string('title');
-            $table->string('description');
-            $table->decimal('amount', 15, 2);
-            $table->string('amount_currency');
-            $table->decimal('business_amount', 15, 2);
-            $table->string('business_currency');
-            $table->string('frequency');
-            $table->date('next_date');
-            $table->date('end_date')->nullable();
-            $table->boolean('is_active');
-            $table->timestamps();
-        });
     }
 
     public function test_exception_handling_during_entry_processing_logs_error()
     {
+        $userId = DB::table('users')->insertGetId([
+            'name' => 'User',
+            'email' => 'test@example.com',
+            'password' => bcrypt('password'),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
         $tenantId = DB::table('tenants')->insertGetId([
+            'user_id' => $userId,
             'name' => 'Test',
-            'domain' => 'test',
+            'status' => 'active',
             'created_at' => now(),
             'updated_at' => now(),
         ]);
@@ -64,8 +48,11 @@ class RecurringServiceTest extends TestCase
             'amount_currency' => 'USD',
             'business_amount' => 10,
             'business_currency' => 'USD',
+            'exchange_rate' => 1,
+            'exchange_rate_date' => now()->toDateString(),
             'frequency' => 'monthly',
-            'next_date' => now()->subDay()->toDateString(),
+            'starts_at' => now()->subMonth()->toDateString(),
+            'next_run_at' => now()->subDay()->toDateString(),
             'is_active' => true,
             'created_at' => now(),
             'updated_at' => now(),
