@@ -10,6 +10,7 @@ export default function ChatWindow({ conversationId, participants = [], readOnly
     const [attachment, setAttachment] = useState(null);
     const [preview, setPreview] = useState(null);
     const [typingUsers, setTypingUsers] = useState([]);
+    const [fetchError, setFetchError] = useState(null);
 
     const messagesEndRef = useRef(null);
     const fileInputRef = useRef(null);
@@ -33,9 +34,18 @@ export default function ChatWindow({ conversationId, participants = [], readOnly
         try {
             const res = await axios.get(`/api/conversations/${conversationId}/messages`);
             const newMessages = res.data.data.reverse();
-            setMessages(newMessages);
+            setMessages(prev => {
+                const prevLastId = prev.length > 0 ? prev[prev.length - 1].id : null;
+                const newLastId = newMessages.length > 0 ? newMessages[newMessages.length - 1].id : null;
+                if (prevLastId !== newLastId || prev.length !== newMessages.length) {
+                    return newMessages;
+                }
+                return prev;
+            });
+            setFetchError(null);
         } catch (err) {
             console.error("Error fetching messages:", err);
+            setFetchError("Failed to load messages. Please try again.");
         }
     };
 
@@ -190,33 +200,41 @@ export default function ChatWindow({ conversationId, participants = [], readOnly
 
             {/* Messages Area */}
             <div className="flex-1 overflow-y-auto p-4 bg-gray-50 flex flex-col">
-                {messages.map((msg, index) => {
-                    const showUnreadSeparator = firstUnreadIndex === index;
-
-                    return (
-                        <React.Fragment key={msg.id}>
-                            {showUnreadSeparator && (
-                                <div className="flex items-center my-4">
-                                    <div className="flex-1 border-t border-red-300"></div>
-                                    <span className="px-2 text-xs text-red-500 font-medium">── {unreadCount} new message{unreadCount !== 1 ? 's' : ''} ──</span>
-                                    <div className="flex-1 border-t border-red-300"></div>
-                                </div>
-                            )}
-                            <Message
-                                message={msg}
-                                isOwnMessage={msg.sender_id === auth.user.id}
-                            />
-                        </React.Fragment>
-                    );
-                })}
-
-                {typingUsers.length > 0 && (
-                    <div className="flex items-center gap-2 text-gray-500 text-sm mt-2 ml-10">
-                        <span className="italic">{typingUsers.join(', ')} is typing...</span>
+                {fetchError ? (
+                    <div className="flex-1 flex items-center justify-center text-red-500 font-medium" data-testid="error-message">
+                        {fetchError}
                     </div>
-                )}
+                ) : (
+                    <>
+                        {messages.map((msg, index) => {
+                            const showUnreadSeparator = firstUnreadIndex === index;
 
-                <div ref={messagesEndRef} />
+                            return (
+                                <React.Fragment key={msg.id}>
+                                    {showUnreadSeparator && (
+                                        <div className="flex items-center my-4">
+                                            <div className="flex-1 border-t border-red-300"></div>
+                                            <span className="px-2 text-xs text-red-500 font-medium">── {unreadCount} new message{unreadCount !== 1 ? 's' : ''} ──</span>
+                                            <div className="flex-1 border-t border-red-300"></div>
+                                        </div>
+                                    )}
+                                    <Message
+                                        message={msg}
+                                        isOwnMessage={msg.sender_id === auth.user.id}
+                                    />
+                                </React.Fragment>
+                            );
+                        })}
+
+                        {typingUsers.length > 0 && (
+                            <div className="flex items-center gap-2 text-gray-500 text-sm mt-2 ml-10">
+                                <span className="italic">{typingUsers.join(', ')} is typing...</span>
+                            </div>
+                        )}
+
+                        <div ref={messagesEndRef} />
+                    </>
+                )}
             </div>
 
             {/* Input Area */}
