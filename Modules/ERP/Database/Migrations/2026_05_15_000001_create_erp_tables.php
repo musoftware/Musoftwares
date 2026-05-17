@@ -50,6 +50,7 @@ return new class extends Migration
             $table->string('name');
             $table->string('email')->nullable();
             $table->string('phone')->nullable();
+            $table->string('address')->nullable();
             $table->string('currency', 3);
             $table->string('country_code', 2)->nullable();
             $table->string('referral_code')->unique()->nullable();
