@@ -15,7 +15,7 @@ Route::get('/', function () {
 
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+})->middleware(['auth', 'verified', 'onboarding'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -28,8 +28,13 @@ Route::middleware('auth')->group(function () {
     Route::post('/notifications/mark-all-read', [NotificationController::class, 'markAllRead'])->name('notifications.mark-all-read');
 });
 
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/onboarding-wizard', [\App\Http\Controllers\OnboardingController::class, 'show'])->name('onboarding.wizard');
+    Route::post('/onboarding-wizard', [\App\Http\Controllers\OnboardingController::class, 'store'])->name('onboarding.store');
+});
+
 // ERP Routes
-Route::middleware(['auth', 'verified'])->prefix('erp')->name('erp.')->group(function () {
+Route::middleware(['auth', 'verified', 'onboarding'])->prefix('erp')->name('erp.')->group(function () {
     Route::get('/dashboard', function () { return Inertia::render('ERP/Dashboard'); })->name('dashboard');
     Route::get('/onboarding', function () { return Inertia::render('ERP/Onboarding'); })->name('onboarding');
     Route::get('/invoices', [\Modules\ERP\Http\Controllers\InvoiceController::class, 'index'])->name('invoices.index');
@@ -71,7 +76,7 @@ Route::middleware(['auth', 'verified'])->prefix('erp')->name('erp.')->group(func
 });
 
 // Freelance Routes
-Route::middleware(['auth', 'verified'])->prefix('freelance')->name('freelance.')->group(function () {
+Route::middleware(['auth', 'verified', 'onboarding'])->prefix('freelance')->name('freelance.')->group(function () {
     Route::get('/dashboard', [\Modules\Freelance\Http\Controllers\DashboardController::class, 'index'])->name('dashboard');
 
     // Skills
@@ -114,7 +119,7 @@ Route::prefix('marketplace')->name('marketplace.')->group(function () {
 });
 
 // Marketplace Authenticated Routes
-Route::middleware(['auth', 'verified'])->prefix('marketplace')->name('marketplace.')->group(function () {
+Route::middleware(['auth', 'verified', 'onboarding'])->prefix('marketplace')->name('marketplace.')->group(function () {
     Route::get('/dashboard', [\Modules\Marketplace\Http\Controllers\DashboardController::class, 'index'])->name('dashboard');
 
     Route::post('/services', [\Modules\Marketplace\Http\Controllers\ServiceController::class, 'store'])->name('services.store');
@@ -137,7 +142,7 @@ Route::middleware(['auth', 'verified'])->prefix('marketplace')->name('marketplac
 });
 
 // Marketplace Admin Routes
-Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin/marketplace')->name('admin.marketplace.')->group(function () {
+Route::middleware(['auth', 'verified', 'onboarding', 'role:admin'])->prefix('admin/marketplace')->name('admin.marketplace.')->group(function () {
     // Categories
     Route::get('/categories', [\Modules\Marketplace\Http\Controllers\ServiceCategoryController::class, 'index'])->name('categories.index');
     Route::post('/categories', [\Modules\Marketplace\Http\Controllers\ServiceCategoryController::class, 'store'])->name('categories.store');
@@ -164,7 +169,7 @@ Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin/marketplace
 });
 
 // Admin Routes
-Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(function () {
+Route::middleware(['auth', 'verified', 'onboarding'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [\App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard');
 
     // Reports

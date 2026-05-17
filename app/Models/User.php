@@ -21,6 +21,15 @@ class User extends Authenticatable
         'role',
         'avatar',
         'phone',
+        'onboarding_completed',
+        'country',
+        'city',
+        'mobile_1',
+        'mobile_2',
+        'telegram_username',
+        'whatsapp_number',
+        'preferred_currency',
+        'preferred_currency_locked_at',
     ];
 
     protected $hidden = [
@@ -33,6 +42,8 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'onboarding_completed' => 'boolean',
+            'preferred_currency_locked_at' => 'datetime',
         ];
     }
 
