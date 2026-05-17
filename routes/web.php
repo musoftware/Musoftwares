@@ -33,6 +33,7 @@ Route::middleware('auth')->group(function () {
 // ERP Routes
 Route::middleware(['auth', 'verified'])->prefix('erp')->name('erp.')->group(function () {
     Route::get('/dashboard', function () { return Inertia::render('ERP/Dashboard'); })->name('dashboard');
+    Route::get('/onboarding', function () { return Inertia::render('ERP/Onboarding'); })->name('onboarding');
     Route::get('/invoices', [\Modules\ERP\Http\Controllers\InvoiceController::class, 'index'])->name('invoices.index');
 
     // Wallet
