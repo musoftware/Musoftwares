@@ -3,58 +3,77 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link } from '@inertiajs/react';
 import { FreelanceModeProvider, useFreelanceMode } from '@/Components/Freelance/FreelanceModeContext';
 import FreelanceModeToggle from '@/Components/Freelance/FreelanceModeToggle';
+import { Search, Plus } from 'lucide-react';
 
-function LayoutContent({ auth, children }) {
+function LayoutContent({ auth, children, clean = false }) {
     const { mode } = useFreelanceMode();
 
     return (
         <AuthenticatedLayout user={auth.user}>
             <Head title="Freelance" />
 
-            <div className="py-12">
-                <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                    <FreelanceModeToggle />
-
-                    {/* Nav */}
-                    <div className="mb-6 flex justify-end items-center bg-white p-4 rounded-lg shadow">
-
-                        <div className="flex space-x-4 items-center">
-                            <Link href={route('freelance.points.index')} className="text-gray-600 hover:text-gray-900">
-                                💰 Points: {auth.user.points_balance || 0}
-                            </Link>
-
-                            {mode === 'client' && (
-                                <>
-                                    <Link href={route('freelance.my-jobs')} className="text-blue-600 hover:underline">My Jobs</Link>
-                                    <Link href={route('freelance.jobs.create')} className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Post a Job</Link>
-                                </>
-                            )}
-
-                            {mode === 'freelancer' && (
-                                <>
-                                    <Link href={route('freelance.jobs.browse')} className="text-green-600 hover:underline">Browse Jobs</Link>
-                                </>
-                            )}
-                        </div>
+            <div className="max-w-[1600px] mx-auto">
+                {/* Modern Sleek Workspace Header */}
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 mb-6 border-b border-slate-200/60">
+                    <div className="flex items-center gap-3">
+                        <span className="text-sm font-semibold text-slate-800 tracking-tight">Freelance Hub</span>
+                        <span className="text-slate-300">/</span>
+                        <FreelanceModeToggle />
                     </div>
 
-                    {/* Main Content Area */}
-                    <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
+                    <div className="flex items-center gap-2">
+                        {mode === 'client' && (
+                            <>
+                                <Link 
+                                    href={route('freelance.my-jobs')} 
+                                    className="text-xs font-medium text-slate-600 hover:text-slate-900 px-3 py-1.5 rounded-md hover:bg-slate-100 transition-colors"
+                                >
+                                    My Jobs
+                                </Link>
+                                <Link 
+                                    href={route('freelance.jobs.create')} 
+                                    className="text-xs font-semibold bg-slate-900 hover:bg-slate-800 text-white px-3 py-1.5 rounded-md shadow-sm transition-colors flex items-center gap-1"
+                                >
+                                    <Plus className="h-3.5 w-3.5" /> Post a Job
+                                </Link>
+                            </>
+                        )}
+
+                        {mode === 'freelancer' && (
+                            <>
+                                <Link 
+                                    href={route('freelance.jobs.browse')} 
+                                    className="text-xs font-semibold bg-slate-950 hover:bg-slate-900 text-white px-3 py-1.5 rounded-md shadow-sm transition-colors flex items-center gap-1.5"
+                                >
+                                    <Search className="h-3.5 w-3.5 text-slate-300" /> Browse Jobs
+                                </Link>
+                            </>
+                        )}
+                    </div>
+                </div>
+
+                {/* Main Content Area */}
+                {clean ? (
+                    <div>
                         {children}
                     </div>
-
-                </div>
+                ) : (
+                    <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
+                        {children}
+                    </div>
+                )}
             </div>
         </AuthenticatedLayout>
     );
 }
 
-export default function FreelanceLayout({ auth, children }) {
+export default function FreelanceLayout({ auth, children, clean = false }) {
     return (
         <FreelanceModeProvider>
-            <LayoutContent auth={auth}>
+            <LayoutContent auth={auth} clean={clean}>
                 {children}
             </LayoutContent>
         </FreelanceModeProvider>
     );
 }
+

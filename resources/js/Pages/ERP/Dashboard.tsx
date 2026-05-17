@@ -1,12 +1,10 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link } from '@inertiajs/react';
 import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import {
     Users,
     FileText,
     Sparkles,
-    Plus,
     CheckCircle2,
     Wallet,
     TrendingUp,
@@ -16,11 +14,12 @@ import {
     FileSpreadsheet,
     Clock,
     ArrowUpRight,
-    Search,
     ShieldCheck,
     Inbox,
 } from 'lucide-react';
 import { Button } from '@/Components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/Components/ui/card';
+import { Badge } from '@/Components/ui/badge';
 import { formatMoney, formatDate } from '@/lib/utils';
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
 import {
@@ -90,80 +89,88 @@ export default function ERPDashboard({ stats: serverStats, clients: serverClient
         <AuthenticatedLayout header="ERP Workspace Dashboard">
             <Head title="ERP Workspace Dashboard" />
 
-            <div className="max-w-5xl mx-auto space-y-6 pb-12 font-sans text-sm">
+            <div className="max-w-6xl mx-auto space-y-6 pb-12 font-sans">
                 
                 {/* ─────────────────────────────────────────
                     ERP KPI METRICS DECK
                     ───────────────────────────────────────── */}
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                     {/* Paid Revenue */}
-                    <div className="bg-white border border-border/60 rounded-xl p-5 shadow-sm space-y-2 hover:border-indigo-100 transition">
-                        <div className="flex justify-between items-center text-text-muted text-[11px] font-bold uppercase tracking-wider">
-                            <span>Paid Revenue</span>
+                    <Card className="shadow-none">
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                            <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
+                                Paid Revenue
+                            </CardTitle>
                             <CheckCircle2 className="h-4 w-4 text-emerald-500" />
-                        </div>
-                        <div>
-                            <span className="font-mono text-2xl font-bold text-text-primary block">
+                        </CardHeader>
+                        <CardContent>
+                            <div className="text-2xl font-bold tracking-tight">
                                 {formatMoney(activeStats.totalRevenue, currency)}
-                            </span>
+                            </div>
                             {activeStats.growthPercent !== null ? (
-                                <span className={`text-[10px] font-semibold flex items-center gap-0.5 mt-1 ${activeStats.growthPercent >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
+                                <p className={`text-xs flex items-center gap-1 mt-1 ${activeStats.growthPercent >= 0 ? 'text-emerald-600' : 'text-destructive'}`}>
                                     {activeStats.growthPercent >= 0 ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
                                     {activeStats.growthPercent >= 0 ? '+' : ''}{activeStats.growthPercent}% vs last month
-                                </span>
+                                </p>
                             ) : (
-                                <span className="text-[10px] text-text-secondary block mt-1">No comparison data yet</span>
+                                <p className="text-xs text-muted-foreground mt-1">No comparison data yet</p>
                             )}
-                        </div>
-                    </div>
+                        </CardContent>
+                    </Card>
 
                     {/* Outstanding Invoices */}
-                    <div className="bg-white border border-border/60 rounded-xl p-5 shadow-sm space-y-2 hover:border-indigo-100 transition">
-                        <div className="flex justify-between items-center text-text-muted text-[11px] font-bold uppercase tracking-wider">
-                            <span>Outstanding Bills</span>
+                    <Card className="shadow-none">
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                            <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
+                                Outstanding Bills
+                            </CardTitle>
                             <Clock className="h-4 w-4 text-amber-500" />
-                        </div>
-                        <div>
-                            <span className="font-mono text-2xl font-bold text-text-primary block">
+                        </CardHeader>
+                        <CardContent>
+                            <div className="text-2xl font-bold tracking-tight">
                                 {formatMoney(activeStats.outstandingRevenue, currency)}
-                            </span>
-                            <span className="text-[10px] text-text-secondary block mt-1">
+                            </div>
+                            <p className="text-xs text-muted-foreground mt-1">
                                 Across {invoices.filter(i => i.status === 'sent' || i.status === 'partial').length} active claims
-                            </span>
-                        </div>
-                    </div>
+                            </p>
+                        </CardContent>
+                    </Card>
 
                     {/* Active Client Tenants */}
-                    <div className="bg-white border border-border/60 rounded-xl p-5 shadow-sm space-y-2 hover:border-indigo-100 transition">
-                        <div className="flex justify-between items-center text-text-muted text-[11px] font-bold uppercase tracking-wider">
-                            <span>Client Tenants</span>
-                            <Users className="h-4 w-4 text-indigo-500" />
-                        </div>
-                        <div>
-                            <span className="font-mono text-2xl font-bold text-text-primary block">
-                                {activeStats.clientCount} {activeStats.clientCount === 1 ? 'Client' : 'Clients'}
-                            </span>
-                            <span className="text-[10px] text-text-secondary block mt-1">
+                    <Card className="shadow-none">
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                            <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
+                                Client Tenants
+                            </CardTitle>
+                            <Users className="h-4 w-4 text-primary" />
+                        </CardHeader>
+                        <CardContent>
+                            <div className="text-2xl font-bold tracking-tight">
+                                {activeStats.clientCount}
+                            </div>
+                            <p className="text-xs text-muted-foreground mt-1">
                                 {activeStats.clientCount > 0 ? 'Managed client database' : 'Add your first client'}
-                            </span>
-                        </div>
-                    </div>
+                            </p>
+                        </CardContent>
+                    </Card>
 
                     {/* Recurring Contracts */}
-                    <div className="bg-white border border-border/60 rounded-xl p-5 shadow-sm space-y-2 hover:border-indigo-100 transition">
-                        <div className="flex justify-between items-center text-text-muted text-[11px] font-bold uppercase tracking-wider">
-                            <span>Recurring Models</span>
-                            <Layers className="h-4 w-4 text-indigo-500" />
-                        </div>
-                        <div>
-                            <span className="font-mono text-2xl font-bold text-text-primary block">
-                                {activeStats.recurringCount} {activeStats.recurringCount === 1 ? 'Contract' : 'Contracts'}
-                            </span>
-                            <span className="text-[10px] text-text-secondary block mt-1">
+                    <Card className="shadow-none">
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                            <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
+                                Recurring Models
+                            </CardTitle>
+                            <Layers className="h-4 w-4 text-primary" />
+                        </CardHeader>
+                        <CardContent>
+                            <div className="text-2xl font-bold tracking-tight">
+                                {activeStats.recurringCount}
+                            </div>
+                            <p className="text-xs text-muted-foreground mt-1">
                                 {activeStats.recurringCount > 0 ? 'Auto-invoicing models active' : 'Setup recurring billing'}
-                            </span>
-                        </div>
-                    </div>
+                            </p>
+                        </CardContent>
+                    </Card>
                 </div>
 
                 {/* ─────────────────────────────────────────
@@ -175,130 +182,125 @@ export default function ERPDashboard({ stats: serverStats, clients: serverClient
                     <div className="lg:col-span-7 space-y-6">
                         
                         {/* Analytical P&L Chart */}
-                        <div className="bg-white border border-border/60 rounded-xl p-5 shadow-sm space-y-4">
-                            <div className="flex justify-between items-center border-b border-border/40 pb-3">
-                                <div>
-                                    <h3 className="font-sora text-xs font-bold uppercase tracking-wider text-text-muted">Enterprise Revenue Progression</h3>
-                                    <p className="text-[11px] text-text-secondary">Comparing total billable revenue receipts against operational costs.</p>
+                        <Card className="shadow-none">
+                            <CardHeader className="flex flex-row items-center justify-between pb-4 border-b">
+                                <div className="space-y-1">
+                                    <CardTitle className="text-base font-semibold">Enterprise Revenue Progression</CardTitle>
+                                    <CardDescription>Comparing total billable revenue receipts against operational costs.</CardDescription>
                                 </div>
-                                <span className="bg-indigo-50 text-indigo-700 text-[10px] font-bold px-2 py-0.5 rounded border border-indigo-150">
-                                    Live Ledger
-                                </span>
-                            </div>
-                            
-                            <div className="h-48 font-mono text-[9px] w-full">
-                                <ResponsiveContainer width="100%" height="100%">
-                                    <BarChart data={chartData} margin={{ top: 5, right: 5, left: -25, bottom: 5 }}>
-                                        <CartesianGrid strokeDasharray="3 3" opacity={0.3} />
-                                        <XAxis dataKey="name" stroke="#94a3b8" />
-                                        <YAxis stroke="#94a3b8" />
-                                        <Tooltip formatter={(value) => [`$${value}`, '']} />
-                                        <Bar dataKey="Sales" fill="#4f46e5" radius={[4, 4, 0, 0]} />
-                                        <Bar dataKey="Costs" fill="#f43f5e" radius={[4, 4, 0, 0]} />
-                                    </BarChart>
-                                </ResponsiveContainer>
-                            </div>
-                        </div>
+                                <Badge variant="secondary" className="font-semibold">Live Ledger</Badge>
+                            </CardHeader>
+                            <CardContent className="pt-6">
+                                <div className="h-64 font-mono text-xs w-full">
+                                    <ResponsiveContainer width="100%" height="100%">
+                                        <BarChart data={chartData} margin={{ top: 5, right: 5, left: -25, bottom: 5 }}>
+                                            <CartesianGrid strokeDasharray="3 3" opacity={0.3} vertical={false} />
+                                            <XAxis dataKey="name" stroke="currentColor" fontSize={12} tickLine={false} axisLine={false} className="text-muted-foreground" />
+                                            <YAxis stroke="currentColor" fontSize={12} tickLine={false} axisLine={false} className="text-muted-foreground" tickFormatter={(value) => `$${value}`} />
+                                            <Tooltip formatter={(value) => [`$${value}`, '']} cursor={{fill: 'var(--muted)'}} contentStyle={{ borderRadius: '8px', border: '1px solid var(--border)' }} />
+                                            <Bar dataKey="Sales" fill="var(--primary)" radius={[4, 4, 0, 0]} />
+                                            <Bar dataKey="Costs" fill="var(--destructive)" radius={[4, 4, 0, 0]} />
+                                        </BarChart>
+                                    </ResponsiveContainer>
+                                </div>
+                            </CardContent>
+                        </Card>
 
                         {/* Real Client Tenants List */}
-                        <div className="bg-white border border-border/60 rounded-xl overflow-hidden shadow-sm">
-                            <div className="px-5 py-4 border-b border-border/50 flex justify-between items-center bg-slate-50/20">
-                                <h3 className="font-sora text-xs font-bold uppercase tracking-wider text-text-muted flex items-center gap-2">
-                                    <Users className="h-4 w-4 text-indigo-500" /> Managed Client Tenants
-                                </h3>
+                        <Card className="shadow-none overflow-hidden">
+                            <CardHeader className="px-5 py-4 border-b bg-muted/30 flex flex-row justify-between items-center space-y-0">
+                                <div className="flex items-center gap-2">
+                                    <Users className="h-4 w-4 text-primary" />
+                                    <CardTitle className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">Managed Client Tenants</CardTitle>
+                                </div>
                                 <Link 
                                     href={route().has('admin.clients.index') ? route('admin.clients.index') : '#'}
-                                    className="text-[11px] text-indigo-600 font-semibold hover:underline flex items-center gap-0.5"
+                                    className="text-xs text-primary font-medium hover:underline flex items-center gap-1"
                                 >
                                     Manage Database <ArrowUpRight className="h-3 w-3" />
                                 </Link>
-                            </div>
+                            </CardHeader>
                             
-                            <div className="divide-y divide-border/50">
+                            <div className="divide-y">
                                 {clients.length === 0 ? (
                                     <div className="p-8 text-center">
-                                        <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center mx-auto mb-3">
-                                            <Users className="w-5 h-5 text-slate-400" />
+                                        <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center mx-auto mb-3">
+                                            <Users className="w-5 h-5 text-muted-foreground" />
                                         </div>
-                                        <p className="text-xs font-medium text-text-primary">No clients yet</p>
-                                        <p className="text-[11px] text-text-secondary mt-1">Add your first client to start managing invoices.</p>
+                                        <p className="text-sm font-medium text-foreground">No clients yet</p>
+                                        <p className="text-xs text-muted-foreground mt-1">Add your first client to start managing invoices.</p>
                                     </div>
                                 ) : clients.map(client => (
                                     <div 
                                         key={client.id}
                                         onClick={() => setSelectedCustomer(client)}
-                                        className="p-4 hover:bg-slate-50/60 cursor-pointer transition flex items-center justify-between text-xs"
+                                        className="p-4 hover:bg-muted/50 cursor-pointer transition flex items-center justify-between"
                                     >
-                                        <div className="space-y-0.5">
-                                            <span className="font-bold text-text-primary text-[13px] block">{client.name}</span>
-                                            <span className="text-text-secondary text-[11px] block">{client.company} • {client.email}</span>
+                                        <div className="space-y-1">
+                                            <span className="font-semibold text-foreground text-sm block">{client.name}</span>
+                                            <span className="text-muted-foreground text-xs block">{client.company} • {client.email}</span>
                                         </div>
                                         <div className="text-right font-mono">
-                                            <span className="text-text-primary font-bold block">Invoiced: {formatMoney(client.totalInvoiced, currency)}</span>
-                                            <span className="text-emerald-600 font-semibold block text-[10px]">Paid: {formatMoney(client.totalPaid, currency)}</span>
+                                            <span className="text-foreground font-semibold text-sm block">Invoiced: {formatMoney(client.totalInvoiced, currency)}</span>
+                                            <span className="text-emerald-600 font-medium block text-xs">Paid: {formatMoney(client.totalPaid, currency)}</span>
                                         </div>
                                     </div>
                                 ))}
                             </div>
-                        </div>
+                        </Card>
 
                         {/* Real Active Claims table */}
-                        <div className="bg-white border border-border/60 rounded-xl overflow-hidden shadow-sm">
-                            <div className="px-5 py-4 border-b border-border/50 flex justify-between items-center bg-slate-50/20">
-                                <h3 className="font-sora text-xs font-bold uppercase tracking-wider text-text-muted flex items-center gap-2">
-                                    <FileText className="h-4 w-4 text-indigo-500" /> Recent Active Billing Invoices
-                                </h3>
+                        <Card className="shadow-none overflow-hidden">
+                            <CardHeader className="px-5 py-4 border-b bg-muted/30 flex flex-row justify-between items-center space-y-0">
+                                <div className="flex items-center gap-2">
+                                    <FileText className="h-4 w-4 text-primary" />
+                                    <CardTitle className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">Recent Active Billing Invoices</CardTitle>
+                                </div>
                                 <Link 
                                     href={route().has('erp.invoices.index') ? route('erp.invoices.index') : '#'}
-                                    className="text-[11px] text-indigo-600 font-semibold hover:underline flex items-center gap-0.5"
+                                    className="text-xs text-primary font-medium hover:underline flex items-center gap-1"
                                 >
                                     Invoices Ledger <ArrowUpRight className="h-3 w-3" />
                                 </Link>
-                            </div>
+                            </CardHeader>
                             
                             {invoices.length === 0 ? (
                                 <div className="p-8 text-center">
-                                    <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center mx-auto mb-3">
-                                        <Inbox className="w-5 h-5 text-slate-400" />
+                                    <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center mx-auto mb-3">
+                                        <Inbox className="w-5 h-5 text-muted-foreground" />
                                     </div>
-                                    <p className="text-xs font-medium text-text-primary">No active invoices</p>
-                                    <p className="text-[11px] text-text-secondary mt-1">Create your first invoice to start billing clients.</p>
+                                    <p className="text-sm font-medium text-foreground">No active invoices</p>
+                                    <p className="text-xs text-muted-foreground mt-1">Create your first invoice to start billing clients.</p>
                                 </div>
                             ) : (
                                 <div className="overflow-x-auto">
-                                    <table className="w-full text-left font-sans text-xs border-collapse">
+                                    <table className="w-full text-left text-sm border-collapse">
                                         <thead>
-                                            <tr className="bg-slate-50/80 text-[10px] uppercase font-bold text-text-muted border-b border-border/40">
-                                                <th className="px-4 py-2.5">Invoice</th>
-                                                <th className="px-4 py-2.5">Client</th>
-                                                <th className="px-4 py-2.5">Due Date</th>
-                                                <th className="px-4 py-2.5 text-right">Amount</th>
-                                                <th className="px-4 py-2.5 text-center">Status</th>
+                                            <tr className="bg-muted/20 text-xs font-semibold text-muted-foreground border-b">
+                                                <th className="px-4 py-3">Invoice</th>
+                                                <th className="px-4 py-3">Client</th>
+                                                <th className="px-4 py-3">Due Date</th>
+                                                <th className="px-4 py-3 text-right">Amount</th>
+                                                <th className="px-4 py-3 text-center">Status</th>
                                             </tr>
                                         </thead>
-                                        <tbody className="divide-y divide-border/40">
+                                        <tbody className="divide-y">
                                             {invoices.map((inv) => (
                                                 <tr
                                                     key={inv.id}
                                                     onClick={() => setSelectedInvoice(inv)}
-                                                    className="hover:bg-slate-50/70 cursor-pointer transition"
+                                                    className="hover:bg-muted/50 cursor-pointer transition text-sm"
                                                 >
-                                                    <td className="px-4 py-3 font-mono font-semibold text-indigo-600">{inv.invoiceNumber}</td>
-                                                    <td className="px-4 py-3 font-medium text-text-primary">{inv.clientName}</td>
-                                                    <td className="px-4 py-3 text-text-muted">{inv.dueDate ? formatDate(inv.dueDate) : '-'}</td>
-                                                    <td className="px-4 py-3 text-right font-mono font-medium text-text-primary">
+                                                    <td className="px-4 py-3 font-mono font-medium text-primary">{inv.invoiceNumber}</td>
+                                                    <td className="px-4 py-3 font-medium text-foreground">{inv.clientName}</td>
+                                                    <td className="px-4 py-3 text-muted-foreground text-xs">{inv.dueDate ? formatDate(inv.dueDate) : '-'}</td>
+                                                    <td className="px-4 py-3 text-right font-mono font-medium text-foreground">
                                                         {formatMoney(inv.amount, inv.currency)}
                                                     </td>
                                                     <td className="px-4 py-3 text-center">
-                                                        <span className={`text-[9px] font-bold uppercase px-2 py-0.5 rounded-full ${
-                                                            inv.status === 'sent'
-                                                                ? 'bg-amber-50 text-amber-700 border border-amber-200'
-                                                                : inv.status === 'partial'
-                                                                    ? 'bg-blue-50 text-blue-700 border border-blue-200'
-                                                                    : 'bg-slate-50 text-slate-700 border border-slate-200'
-                                                        }`}>
+                                                        <Badge variant={inv.status === 'sent' ? 'outline' : inv.status === 'partial' ? 'secondary' : 'default'} className={`text-[10px] uppercase font-bold tracking-wider ${inv.status === 'sent' ? 'text-amber-600 border-amber-200 bg-amber-50' : inv.status === 'partial' ? 'bg-blue-50 text-blue-700 hover:bg-blue-100' : ''}`}>
                                                             {inv.status}
-                                                        </span>
+                                                        </Badge>
                                                     </td>
                                                 </tr>
                                             ))}
@@ -306,7 +308,7 @@ export default function ERPDashboard({ stats: serverStats, clients: serverClient
                                     </table>
                                 </div>
                             )}
-                        </div>
+                        </Card>
 
                     </div>
 
@@ -314,71 +316,75 @@ export default function ERPDashboard({ stats: serverStats, clients: serverClient
                     <div className="lg:col-span-3 space-y-6">
                         
                         {/* Quick Shortcuts */}
-                        <div className="bg-white border border-border/60 rounded-xl p-4 shadow-sm space-y-3">
-                            <h4 className="text-[11px] font-bold uppercase tracking-wider text-text-muted flex items-center gap-1.5 border-b border-border/40 pb-2">
-                                <Settings className="h-3.5 w-3.5 text-indigo-500" /> ERP Core Actions
-                            </h4>
-                            <div className="grid grid-cols-1 gap-2 text-xs">
+                        <Card className="shadow-none">
+                            <CardHeader className="p-4 border-b pb-3">
+                                <CardTitle className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
+                                    <Settings className="h-4 w-4 text-primary" /> ERP Core Actions
+                                </CardTitle>
+                            </CardHeader>
+                            <CardContent className="p-4 space-y-2">
                                 <Link
                                     href={route().has('admin.clients.index') ? route('admin.clients.index') : '#'}
-                                    className="flex items-center gap-2.5 p-3 rounded-lg border border-slate-100 hover:border-indigo-150 hover:bg-indigo-50/20 text-text-primary transition group"
+                                    className="flex items-center gap-3 p-3 rounded-xl border bg-card hover:bg-muted/50 text-foreground transition group"
                                 >
-                                    <Users className="h-4 w-4 text-indigo-600 shrink-0" />
-                                    <span className="font-semibold block text-[11px]">Manage Client Database</span>
+                                    <Users className="h-4 w-4 text-primary shrink-0" />
+                                    <span className="font-medium text-sm">Manage Client Database</span>
                                 </Link>
 
                                 <Link
                                     href={route().has('erp.invoices.index') ? route('erp.invoices.index') : '#'}
-                                    className="flex items-center gap-2.5 p-3 rounded-lg border border-slate-100 hover:border-indigo-150 hover:bg-indigo-50/20 text-text-primary transition group"
+                                    className="flex items-center gap-3 p-3 rounded-xl border bg-card hover:bg-muted/50 text-foreground transition group"
                                 >
-                                    <FileSpreadsheet className="h-4 w-4 text-indigo-600 shrink-0" />
-                                    <span className="font-semibold block text-[11px]">Create Billing Invoice</span>
+                                    <FileSpreadsheet className="h-4 w-4 text-primary shrink-0" />
+                                    <span className="font-medium text-sm">Create Billing Invoice</span>
                                 </Link>
 
                                 <Link
                                     href={route().has('erp.withdrawals.index') ? route('erp.withdrawals.index') : '#'}
-                                    className="flex items-center gap-2.5 p-3 rounded-lg border border-slate-100 hover:border-indigo-150 hover:bg-indigo-50/20 text-text-primary transition group"
+                                    className="flex items-center gap-3 p-3 rounded-xl border bg-card hover:bg-muted/50 text-foreground transition group"
                                 >
-                                    <Wallet className="h-4 w-4 text-indigo-600 shrink-0" />
-                                    <span className="font-semibold block text-[11px]">Withdrawals Settlement</span>
+                                    <Wallet className="h-4 w-4 text-primary shrink-0" />
+                                    <span className="font-medium text-sm">Withdrawals Settlement</span>
                                 </Link>
-                            </div>
-                        </div>
+                            </CardContent>
+                        </Card>
 
                         {/* Onboarding Smart Checklist */}
-                        <div className="bg-white border border-border/60 rounded-xl p-4 shadow-sm space-y-3">
-                            <h4 className="text-[11px] font-bold uppercase tracking-wider text-text-muted flex items-center gap-1.5 border-b border-border/40 pb-2">
-                                <Sparkles className="h-3.5 w-3.5 text-indigo-500 animate-pulse" /> Workspace Onboarding
-                            </h4>
-                            <div className="space-y-3 text-xs leading-normal">
-                                <div className="flex gap-2 text-text-primary">
-                                    <CheckCircle2 className={`h-4.5 w-4.5 shrink-0 mt-0.5 ${activeStats.clientCount > 0 ? 'text-emerald-500' : 'text-slate-300'}`} />
+                        <Card className="shadow-none">
+                            <CardHeader className="p-4 border-b pb-3">
+                                <CardTitle className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
+                                    <Sparkles className="h-4 w-4 text-primary animate-pulse" /> Workspace Onboarding
+                                </CardTitle>
+                            </CardHeader>
+                            <CardContent className="p-4 space-y-4">
+                                <div className="flex gap-3 text-foreground">
+                                    <CheckCircle2 className={`h-5 w-5 shrink-0 mt-0.5 ${activeStats.clientCount > 0 ? 'text-emerald-500' : 'text-muted'}`} />
                                     <div>
-                                        <span className="font-semibold block">Create Customer Profiling</span>
-                                        <p className="text-[10px] text-text-secondary mt-0.5">
+                                        <span className="font-semibold text-sm block">Create Customer Profiling</span>
+                                        <p className="text-xs text-muted-foreground mt-1">
                                             {activeStats.clientCount > 0
                                                 ? `${activeStats.clientCount} client${activeStats.clientCount !== 1 ? 's' : ''} added`
                                                 : 'Link business invoices directly to client tenant records.'}
                                         </p>
                                     </div>
                                 </div>
-                                <div className="flex gap-2 text-text-primary">
-                                    <CheckCircle2 className={`h-4.5 w-4.5 shrink-0 mt-0.5 ${activeStats.totalRevenue > 0 ? 'text-emerald-500' : 'text-slate-300'}`} />
+                                <div className="flex gap-3 text-foreground">
+                                    <CheckCircle2 className={`h-5 w-5 shrink-0 mt-0.5 ${activeStats.totalRevenue > 0 ? 'text-emerald-500' : 'text-muted'}`} />
                                     <div>
-                                        <span className="font-semibold block">Setup Payout Ledger</span>
-                                        <p className="text-[10px] text-text-secondary mt-0.5">Wire business earnings safely via verified bank checking.</p>
+                                        <span className="font-semibold text-sm block">Setup Payout Ledger</span>
+                                        <p className="text-xs text-muted-foreground mt-1">Wire business earnings safely via verified bank checking.</p>
                                     </div>
                                 </div>
-                            </div>
-                        </div>
+                            </CardContent>
+                        </Card>
 
                         {/* Immutable Security Notice */}
-                        <div className="bg-indigo-50/30 border border-indigo-100/50 rounded-xl p-3.5 text-[11px] leading-relaxed text-indigo-900">
-                            <div className="flex items-center gap-1.5 font-bold mb-1">
-                                <ShieldCheck className="h-4 w-4 text-indigo-600" />
+                        <div className="bg-primary/5 border border-primary/20 rounded-xl p-4 text-xs leading-relaxed text-foreground">
+                            <div className="flex items-center gap-2 font-bold mb-2">
+                                <ShieldCheck className="h-4 w-4 text-primary" />
                                 Corporate ERP Security Policy
                             </div>
-                            Musoftware Business ERP enforces PCI-DSS and automated secure ledger auditing protocols across multi-tenant clients. Transactions are captured securely on completion.
+                            <span className="text-muted-foreground">Musoftware Business ERP enforces PCI-DSS and automated secure ledger auditing protocols across multi-tenant clients. Transactions are captured securely on completion.</span>
                         </div>
 
                     </div>

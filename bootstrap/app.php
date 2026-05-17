@@ -19,6 +19,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->validateCsrfTokens(except: [
             'financial/add-balance/webhook',
+            'freelance/point-purchases/webhook',
         ]);
 
         $middleware->alias([

@@ -3,7 +3,8 @@ import { Link, usePage } from '@inertiajs/react';
 import ApplicationLogo from '@/Components/ApplicationLogo';
 import { Toaster } from '@/Components/ui/toaster';
 import { useToast } from '@/Components/ui/use-toast';
-import { Button } from '@/Components/ui/button';
+import { Button, buttonVariants } from '@/Components/ui/button';
+import { cn } from '@/lib/utils';
 import { Sheet, SheetContent, SheetTrigger } from '@/Components/ui/sheet';
 import {
     DropdownMenu,
@@ -266,13 +267,13 @@ export default function Authenticated({
                                     <Plus className="w-3.5 h-3.5 mr-1" /> Add Balance
                                 </Link>
                                 
-                                <Link href={safeRoute('financial.transactions')} className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 rounded-full transition-colors text-sm font-medium text-slate-900">
+                                <Link href={safeRoute('financial.transactions')} className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 rounded-full transition-colors text-sm font-medium text-slate-900" title="Wallet Balance">
                                     <Wallet className="w-4 h-4 text-slate-500" /> {wallet ? `${Number(wallet.balance).toFixed(2)} ${wallet.currency}` : '$0.00'}
                                 </Link>
                                 
-                                <div className="flex items-center gap-1.5 px-3 py-1.5 bg-amber-50 hover:bg-amber-100 border border-amber-100 rounded-full transition-colors text-sm font-medium text-amber-700">
-                                    <Coins className="w-4 h-4 text-amber-500" /> 1,450
-                                </div>
+                                <Link href={safeRoute('freelance.points.index')} className="flex items-center gap-1.5 px-3 py-1.5 bg-amber-50 hover:bg-amber-100 border border-amber-100 rounded-full transition-colors text-sm font-medium text-amber-700" title="Points/Connects Balance">
+                                    <Coins className="w-4 h-4 text-amber-500" /> {user?.points_balance !== undefined ? Number(user.points_balance).toLocaleString() : '0'}
+                                </Link>
                             </div>
 
                             {/* Notifications */}
@@ -294,15 +295,48 @@ export default function Authenticated({
                                 <DropdownMenuContent align="end" className="w-80 p-0 rounded-xl shadow-xl border border-slate-200 bg-white isolate z-50">
                                     <div className="px-4 py-3 border-b border-slate-100 flex justify-between items-center">
                                         <span className="font-semibold text-slate-900 text-sm">Notifications</span>
-                                        <Link href="#" className="text-xs text-indigo-600 hover:text-indigo-700 font-medium">Mark all read</Link>
+                                        {notifications?.unread_count > 0 && (
+                                            <Link 
+                                                href={safeRoute('notifications.mark-all-read')} 
+                                                method="post" 
+                                                as="button" 
+                                                className="text-xs text-indigo-600 hover:text-indigo-700 font-medium bg-transparent border-0 cursor-pointer p-0"
+                                            >
+                                                Mark all read
+                                            </Link>
+                                        )}
                                     </div>
                                     <div className="max-h-[300px] overflow-y-auto p-2">
-                                        <div className="px-2 py-6 text-center text-sm text-slate-500 font-light">
-                                            No new notifications
-                                        </div>
+                                        {notifications?.recent && notifications.recent.length > 0 ? (
+                                            notifications.recent.map((n: any) => (
+                                                <div key={n.id} className="p-2 hover:bg-slate-50 rounded-lg text-xs flex justify-between items-start gap-2 border-b border-slate-50 last:border-0">
+                                                    <div className="flex-1">
+                                                        <p className="text-slate-800 font-medium">{n.data?.message || n.data?.title || 'New Notification'}</p>
+                                                        <span className="text-[10px] text-slate-400">{n.created_at ? new Date(n.created_at).toLocaleDateString() : ''}</span>
+                                                    </div>
+                                                    <Link 
+                                                        href={safeRoute('notifications.mark-read', { id: n.id })} 
+                                                        method="post" 
+                                                        as="button" 
+                                                        className="text-[10px] text-indigo-600 hover:underline shrink-0 bg-transparent border-0 cursor-pointer"
+                                                    >
+                                                        Mark read
+                                                    </Link>
+                                                </div>
+                                            ))
+                                        ) : (
+                                            <div className="px-2 py-6 text-center text-sm text-slate-500 font-light">
+                                                No new notifications
+                                            </div>
+                                        )}
                                     </div>
                                     <div className="p-2 border-t border-slate-100">
-                                        <Button variant="ghost" className="w-full text-xs text-slate-600">View All</Button>
+                                        <Link 
+                                            href={safeRoute('notifications.index')} 
+                                            className={cn(buttonVariants({ variant: 'ghost', size: 'sm' }), "w-full text-xs text-slate-600 justify-center")}
+                                        >
+                                            View All
+                                        </Link>
                                     </div>
                                 </DropdownMenuContent>
                             </DropdownMenu>

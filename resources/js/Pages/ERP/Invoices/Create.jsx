@@ -116,21 +116,21 @@ export default function CreateEdit({ invoice, clients, currencies, business_curr
     };
 
     return (
-        <AuthenticatedLayout>
+        <AuthenticatedLayout header={isEdit ? 'Edit Invoice' : 'New Invoice'}>
             <Head title={isEdit ? 'Edit Invoice' : 'New Invoice'} />
-            <form onSubmit={handleSubmit} className="p-6">
+            <form onSubmit={handleSubmit} className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 space-y-6">
                 <PageHeader title={isEdit ? `Edit Invoice ${invoice.invoice_number}` : 'Create New Invoice'}>
-                    <Button type="button" variant="outline" asChild>
+                    <Button type="button" variant="outline" asChild className="shadow-none">
                         <Link href={route('erp.invoices.index')}>Cancel</Link>
                     </Button>
-                    <Button type="submit" disabled={processing}>
+                    <Button type="submit" disabled={processing} className="shadow-none">
                         <Save className="mr-2 h-4 w-4" /> {isEdit ? 'Update Invoice' : 'Save Draft'}
                     </Button>
                 </PageHeader>
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     <div className="lg:col-span-2 space-y-6">
-                        <Card>
+                        <Card className="shadow-none">
                             <CardHeader>
                                 <CardTitle>Invoice Details</CardTitle>
                             </CardHeader>
@@ -138,7 +138,7 @@ export default function CreateEdit({ invoice, clients, currencies, business_curr
                                 <div className="space-y-2">
                                     <Label>Client</Label>
                                     <select
-                                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 shadow-none"
                                         value={data.client_id}
                                         onChange={(e) => setData('client_id', e.target.value)}
                                     >
@@ -147,11 +147,12 @@ export default function CreateEdit({ invoice, clients, currencies, business_curr
                                             <option key={c.id} value={c.id}>{c.name} ({c.currency})</option>
                                         ))}
                                     </select>
-                                    {errors.client_id && <div className="text-sm text-red-500">{errors.client_id}</div>}
+                                    {errors.client_id && <div className="text-sm text-destructive font-medium">{errors.client_id}</div>}
                                 </div>
                                 <div className="space-y-2">
                                     <Label>Invoice Number</Label>
                                     <Input
+                                        className="shadow-none"
                                         value={data.invoice_number}
                                         onChange={e => setData('invoice_number', e.target.value)}
                                         placeholder="INV-001"
@@ -160,6 +161,7 @@ export default function CreateEdit({ invoice, clients, currencies, business_curr
                                 <div className="space-y-2">
                                     <Label>Issue Date</Label>
                                     <Input
+                                        className="shadow-none"
                                         type="date"
                                         value={data.issued_at}
                                         onChange={e => setData('issued_at', e.target.value)}
@@ -168,6 +170,7 @@ export default function CreateEdit({ invoice, clients, currencies, business_curr
                                 <div className="space-y-2">
                                     <Label>Due Date</Label>
                                     <Input
+                                        className="shadow-none"
                                         type="date"
                                         value={data.due_date}
                                         onChange={e => setData('due_date', e.target.value)}
@@ -176,7 +179,7 @@ export default function CreateEdit({ invoice, clients, currencies, business_curr
                                 <div className="space-y-2">
                                     <Label>Currency</Label>
                                     <select
-                                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 shadow-none"
                                         value={data.amount_currency}
                                         onChange={(e) => setData('amount_currency', e.target.value)}
                                     >
@@ -185,23 +188,23 @@ export default function CreateEdit({ invoice, clients, currencies, business_curr
                                         ))}
                                     </select>
                                 </div>
-                                <div className="md:col-span-2 p-3 bg-gray-50 rounded border text-sm text-gray-600">
+                                <div className="md:col-span-2 p-3 bg-muted/50 rounded-xl border text-sm text-muted-foreground">
                                     Rate: 1 {data.amount_currency} = {exchangeRate} {business_currency} (Auto-fetched)
                                 </div>
                             </CardContent>
                         </Card>
 
-                        <Card>
-                            <CardHeader className="flex flex-row items-center justify-between">
+                        <Card className="shadow-none">
+                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
                                 <CardTitle>Line Items</CardTitle>
                                 <div className="flex gap-2">
-                                    <Button type="button" variant="outline" size="sm" onClick={() => addItem('simple')}>
+                                    <Button type="button" variant="outline" size="sm" onClick={() => addItem('simple')} className="shadow-none">
                                         + Simple
                                     </Button>
-                                    <Button type="button" variant="outline" size="sm" onClick={() => addItem('quantity')}>
+                                    <Button type="button" variant="outline" size="sm" onClick={() => addItem('quantity')} className="shadow-none">
                                         + Quantity
                                     </Button>
-                                    <Button type="button" variant="outline" size="sm" onClick={() => addItem('timer')}>
+                                    <Button type="button" variant="outline" size="sm" onClick={() => addItem('timer')} className="shadow-none">
                                         + Timer
                                     </Button>
                                 </div>
@@ -209,20 +212,21 @@ export default function CreateEdit({ invoice, clients, currencies, business_curr
                             <CardContent>
                                 <div className="space-y-4">
                                     {data.items.map((item, index) => (
-                                        <div key={index} className="flex gap-4 items-start p-4 border rounded-lg bg-white">
-                                            <div className="mt-2 cursor-grab text-gray-400">
+                                        <div key={index} className="flex gap-4 items-start p-4 border rounded-xl bg-card transition-colors hover:bg-muted/10">
+                                            <div className="mt-2 cursor-grab text-muted-foreground/50 hover:text-muted-foreground">
                                                 <GripVertical className="h-5 w-5" />
                                             </div>
                                             <div className="flex-1 grid grid-cols-12 gap-4">
                                                 <div className="col-span-12 md:col-span-6 space-y-2">
                                                     <div className="flex items-center gap-2">
                                                         <Badge variant="secondary" className={
-                                                            item.type === 'quantity' ? 'bg-blue-100 text-blue-700' :
-                                                            item.type === 'timer' ? 'bg-purple-100 text-purple-700' : ''
+                                                            item.type === 'quantity' ? 'bg-primary/10 text-primary hover:bg-primary/20' :
+                                                            item.type === 'timer' ? 'bg-indigo-500/10 text-indigo-600 hover:bg-indigo-500/20' : ''
                                                         }>
                                                             {item.type}
                                                         </Badge>
                                                         <Input
+                                                            className="shadow-none"
                                                             placeholder="Item title"
                                                             value={item.title}
                                                             onChange={e => updateItem(index, 'title', e.target.value)}
@@ -238,6 +242,7 @@ export default function CreateEdit({ invoice, clients, currencies, business_curr
                                                 <div className="col-span-4 md:col-span-2 space-y-2">
                                                     <Label className="text-xs">Qty</Label>
                                                     <Input
+                                                        className="shadow-none"
                                                         type="number"
                                                         value={item.quantity}
                                                         onChange={e => updateItem(index, 'quantity', parseFloat(e.target.value))}
@@ -246,6 +251,7 @@ export default function CreateEdit({ invoice, clients, currencies, business_curr
                                                 <div className="col-span-4 md:col-span-2 space-y-2">
                                                     <Label className="text-xs">Price</Label>
                                                     <Input
+                                                        className="shadow-none"
                                                         type="number"
                                                         value={item.unit_price}
                                                         onChange={e => updateItem(index, 'unit_price', parseFloat(e.target.value))}
@@ -253,21 +259,21 @@ export default function CreateEdit({ invoice, clients, currencies, business_curr
                                                 </div>
                                                 <div className="col-span-4 md:col-span-2 space-y-2">
                                                     <Label className="text-xs">Total</Label>
-                                                    <div className="h-10 flex items-center font-bold px-3 bg-gray-50 rounded border">
+                                                    <div className="h-10 flex items-center font-bold px-3 bg-muted/50 rounded-md border text-foreground">
                                                         {(item.unit_price * item.quantity).toFixed(2)}
                                                     </div>
                                                 </div>
                                                 {item.type === 'timer' && (
-                                                    <div className="col-span-12 flex items-center gap-4 p-2 bg-purple-50 rounded border border-purple-100 text-purple-700 text-sm">
+                                                    <div className="col-span-12 flex items-center gap-4 p-3 bg-indigo-500/5 rounded-lg border border-indigo-500/20 text-indigo-700 text-sm">
                                                         <Clock className="h-4 w-4" />
-                                                        <span>Timer Item: Rates are per unit of time (e.g. per hour).</span>
-                                                        <Button type="button" size="sm" variant="ghost" className="ml-auto text-purple-700">
+                                                        <span className="font-medium">Timer Item: Rates are per unit of time (e.g. per hour).</span>
+                                                        <Button type="button" size="sm" variant="ghost" className="ml-auto text-indigo-700 hover:text-indigo-800 hover:bg-indigo-500/10">
                                                             <Play className="mr-2 h-3 w-3" /> Start Session
                                                         </Button>
                                                     </div>
                                                 )}
                                             </div>
-                                            <Button type="button" variant="ghost" size="icon" className="text-red-500" onClick={() => removeItem(index)}>
+                                            <Button type="button" variant="ghost" size="icon" className="text-destructive hover:bg-destructive/10 hover:text-destructive" onClick={() => removeItem(index)}>
                                                 <Trash2 className="h-4 w-4" />
                                             </Button>
                                         </div>
@@ -276,26 +282,27 @@ export default function CreateEdit({ invoice, clients, currencies, business_curr
                             </CardContent>
                         </Card>
 
-                        <Card className="border-red-100 bg-red-50/10">
+                        <Card className="shadow-none border-destructive/20 bg-destructive/5">
                             <CardHeader
-                                className="flex flex-row items-center justify-between cursor-pointer select-none"
+                                className="flex flex-row items-center justify-between cursor-pointer select-none space-y-0"
                                 onClick={() => setShowCosts(!showCosts)}
                             >
-                                <CardTitle className="text-sm font-bold flex items-center gap-2 text-red-900">
-                                    <DollarSign className="h-4 w-4 text-red-600" />
+                                <CardTitle className="text-sm font-bold flex items-center gap-2 text-destructive">
+                                    <DollarSign className="h-4 w-4" />
                                     Internal Costs (Admin Only)
                                 </CardTitle>
-                                <Button type="button" variant="ghost" size="sm">
+                                <Button type="button" variant="ghost" size="sm" className="h-8 w-8 p-0 text-destructive hover:text-destructive hover:bg-destructive/10">
                                     {showCosts ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
                                 </Button>
                             </CardHeader>
                             {showCosts && (
                                 <CardContent className="space-y-4">
                                     {data.costs.map((cost, index) => (
-                                        <div key={index} className="flex gap-4 items-center bg-white p-3 border rounded-lg">
+                                        <div key={index} className="flex gap-4 items-center bg-card p-3 border rounded-xl shadow-sm">
                                             <div className="flex-1 grid grid-cols-12 gap-4">
                                                 <div className="col-span-7">
                                                     <Input
+                                                        className="shadow-none"
                                                         placeholder="Cost title (e.g. Outsourcing)"
                                                         value={cost.title}
                                                         onChange={e => updateCost(index, 'title', e.target.value)}
@@ -303,6 +310,7 @@ export default function CreateEdit({ invoice, clients, currencies, business_curr
                                                 </div>
                                                 <div className="col-span-3">
                                                     <Input
+                                                        className="shadow-none"
                                                         type="number"
                                                         placeholder="Amount"
                                                         value={cost.amount}
@@ -311,7 +319,7 @@ export default function CreateEdit({ invoice, clients, currencies, business_curr
                                                 </div>
                                                 <div className="col-span-2">
                                                     <select
-                                                        className="flex h-10 w-full rounded-md border border-input bg-background px-2 py-1 text-xs ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                                                        className="flex h-10 w-full rounded-md border border-input bg-background px-2 py-1 text-xs ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 shadow-none"
                                                         value={cost.payment_status}
                                                         onChange={e => updateCost(index, 'payment_status', e.target.value)}
                                                     >
@@ -320,19 +328,19 @@ export default function CreateEdit({ invoice, clients, currencies, business_curr
                                                     </select>
                                                 </div>
                                             </div>
-                                            <Button type="button" variant="ghost" size="icon" className="text-red-500" onClick={() => removeCost(index)}>
+                                            <Button type="button" variant="ghost" size="icon" className="text-destructive hover:bg-destructive/10 hover:text-destructive" onClick={() => removeCost(index)}>
                                                 <Trash2 className="h-4 w-4" />
                                             </Button>
                                         </div>
                                     ))}
-                                    <Button type="button" variant="outline" size="sm" className="w-full text-red-700 border-red-200 hover:bg-red-50" onClick={addCost}>
+                                    <Button type="button" variant="outline" size="sm" className="w-full text-destructive border-destructive/20 hover:bg-destructive/10 shadow-none" onClick={addCost}>
                                         + Add Cost Row
                                     </Button>
                                 </CardContent>
                             )}
                         </Card>
 
-                        <Card>
+                        <Card className="shadow-none">
                             <CardHeader>
                                 <CardTitle>Notes</CardTitle>
                             </CardHeader>
@@ -348,22 +356,22 @@ export default function CreateEdit({ invoice, clients, currencies, business_curr
                     </div>
 
                     <div className="space-y-6">
-                        <Card className="sticky top-6">
+                        <Card className="sticky top-6 shadow-none">
                             <CardHeader>
                                 <CardTitle>Summary</CardTitle>
                             </CardHeader>
                             <CardContent className="space-y-4">
                                 <div className="flex justify-between text-sm">
-                                    <span className="text-gray-500">Subtotal</span>
-                                    <span><CurrencyDisplay amount={subtotal} currency={data.amount_currency} /></span>
+                                    <span className="text-muted-foreground font-medium">Subtotal</span>
+                                    <span className="font-semibold text-foreground"><CurrencyDisplay amount={subtotal} currency={data.amount_currency} /></span>
                                 </div>
                                 <div className="space-y-2">
-                                    <div className="flex justify-between text-sm">
-                                        <span className="text-gray-500">Discount</span>
+                                    <div className="flex justify-between text-sm items-center">
+                                        <span className="text-muted-foreground font-medium">Discount</span>
                                         <div className="flex items-center gap-2">
                                             <Input
                                                 type="number"
-                                                className="w-20 h-8"
+                                                className="w-20 h-8 shadow-none"
                                                 value={data.discount_amount}
                                                 onChange={e => setData('discount_amount', parseFloat(e.target.value))}
                                             />
@@ -371,33 +379,33 @@ export default function CreateEdit({ invoice, clients, currencies, business_curr
                                     </div>
                                 </div>
                                 <div className="space-y-2">
-                                    <div className="flex justify-between text-sm">
-                                        <span className="text-gray-500">Tax (%)</span>
+                                    <div className="flex justify-between text-sm items-center">
+                                        <span className="text-muted-foreground font-medium">Tax (%)</span>
                                         <Input
                                             type="number"
-                                            className="w-20 h-8"
+                                            className="w-20 h-8 shadow-none"
                                             value={data.tax_rate}
                                             onChange={e => setData('tax_rate', parseFloat(e.target.value))}
                                         />
                                     </div>
                                 </div>
                                 <div className="pt-4 border-t flex justify-between items-center">
-                                    <span className="font-bold">Total</span>
+                                    <span className="font-bold text-base">Total</span>
                                     <div className="text-right">
-                                        <div className="text-2xl font-bold text-indigo-600">
+                                        <div className="text-2xl font-bold tracking-tight text-primary">
                                             <CurrencyDisplay amount={total} currency={data.amount_currency} />
                                         </div>
-                                        <div className="text-xs text-gray-500">
+                                        <div className="text-xs font-medium text-muted-foreground">
                                             ≈ <CurrencyDisplay amount={total * exchangeRate} currency={business_currency} />
                                         </div>
                                     </div>
                                 </div>
-                                <div className="pt-6 space-y-2">
-                                    <Button className="w-full" disabled={processing} type="submit">
+                                <div className="pt-6 space-y-3">
+                                    <Button className="w-full shadow-none" disabled={processing} type="submit">
                                         {isEdit ? 'Save Changes' : 'Create Invoice'}
                                     </Button>
                                     {!isEdit && (
-                                        <Button variant="outline" className="w-full" type="button">
+                                        <Button variant="outline" className="w-full shadow-none" type="button">
                                             <Send className="mr-2 h-4 w-4" /> Save & Send
                                         </Button>
                                     )}

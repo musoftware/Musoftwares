@@ -1,27 +1,43 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, useForm } from '@inertiajs/react';
 import { useState } from 'react';
 import {
     ShoppingCart,
     Layers,
     Plus,
-    CheckCircle2,
     Lock,
     DollarSign,
     Clock,
     ArrowUpRight,
     Search,
-    BadgeAlert,
-    Star
+    Briefcase,
+    AlertCircle,
+    Wallet
 } from 'lucide-react';
-import { Button } from '@/Components/ui/button';
+import { Button, buttonVariants } from '@/Components/ui/button';
+import { cn } from '@/lib/utils';
 import { formatMoney, formatDate } from '@/lib/utils';
 import { ServiceQuickView } from '@/Components/ContextualPanels';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from '@/Components/ui/dialog';
 
-export default function MarketplaceDashboard({ stats: initialStats, activePurchases: initialPurchases, listedGigs: initialGigs }: any) {
+export default function MarketplaceDashboard({
+    stats: initialStats,
+    activePurchases: initialPurchases,
+    activeSales: initialSales,
+    listedGigs: initialGigs,
+    categories = []
+}: any) {
     const [selectedService, setSelectedService] = useState<any>(null);
+    const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
-    // Core financial state for marketplace activities from server
+    // Compute marketplace statistics
     const stats = initialStats || {
         lockedEscrow: 0,
         activeOrders: 0,
@@ -30,74 +46,119 @@ export default function MarketplaceDashboard({ stats: initialStats, activePurcha
     };
 
     const activePurchases = initialPurchases || [];
+    const activeSales = initialSales || [];
     const listedGigs = initialGigs || [];
 
-    return (
-        <AuthenticatedLayout header="Marketplace Operations Hub">
-            <Head title="Marketplace Hub" />
+    // Inertia form submission for creating a new service gig
+    const { data, setData, post, processing, errors, reset } = useForm({
+        title: '',
+        description: '',
+        category_id: categories?.[0]?.id || '',
+    });
 
-            <div className="max-w-5xl mx-auto space-y-6 pb-12 font-sans text-sm">
+    const handlePublish = (e: React.FormEvent) => {
+        e.preventDefault();
+        post('/marketplace/services', {
+            onSuccess: () => {
+                setIsCreateModalOpen(false);
+                reset();
+            }
+        });
+    };
+
+    return (
+        <AuthenticatedLayout
+            header={
+                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 w-full">
+                    <div>
+                        <h1 className="text-xl font-semibold tracking-tight text-slate-900 font-sans">
+                            Service Workspace
+                        </h1>
+                        <p className="text-xs text-slate-500 mt-0.5">
+                            Manage your active service orders, listed gigs, and client sales in one place.
+                        </p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <Link
+                            href="/marketplace/services"
+                            className="inline-flex items-center justify-center px-3.5 h-9 text-xs font-semibold border border-slate-200 bg-white rounded-lg hover:bg-slate-50 hover:text-slate-900 transition-colors text-slate-700"
+                        >
+                            <Search className="w-3.5 h-3.5 mr-1.5 text-slate-400" /> Browse Services
+                        </Link>
+                        <Button
+                            onClick={() => setIsCreateModalOpen(true)}
+                            className="bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs h-9 px-3.5 rounded-lg flex items-center justify-center transition-colors"
+                        >
+                            <Plus className="w-3.5 h-3.5 mr-1.5" /> Publish Service
+                        </Button>
+                    </div>
+                </div>
+            }
+        >
+            <Head title="Service Workspace" />
+
+            <div className="max-w-[1200px] mx-auto space-y-8 pb-16 font-sans text-sm">
                 
                 {/* ─────────────────────────────────────────
-                    MARKETPLACE KPI DECK
+                    COMPACT STATS STRIP
                     ───────────────────────────────────────── */}
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                    {/* Escrow Locked Hold */}
-                    <div className="bg-white border border-border/60 rounded-xl p-5 shadow-sm space-y-2 hover:border-indigo-100 transition">
-                        <div className="flex justify-between items-center text-text-muted text-[11px] font-bold uppercase tracking-wider">
-                            <span>Escrow Protected Balance</span>
-                            <Lock className="h-4 w-4 text-indigo-500 animate-pulse" />
+                    {/* Escrow Protected */}
+                    <div className="bg-white border border-slate-200/80 rounded-xl p-4 shadow-sm hover:border-slate-300 transition-colors">
+                        <div className="flex justify-between items-center text-slate-500 text-xs font-medium">
+                            <span>Protected Escrow</span>
+                            <Lock className="h-4 w-4 text-slate-400" />
                         </div>
-                        <div>
-                            <span className="font-mono text-2xl font-bold text-text-primary block">
+                        <div className="mt-2">
+                            <span className="font-mono text-2xl font-bold text-slate-900 block">
                                 {formatMoney(stats.lockedEscrow, 'USD')}
                             </span>
-                            <span className="text-[10px] text-indigo-600 font-semibold block mt-1">
-                                Secure holding active
+                            <span className="text-[10px] text-emerald-600 font-semibold block mt-1">
+                                Secure client funds active
                             </span>
                         </div>
                     </div>
 
-                    {/* Active Gig Orders */}
-                    <div className="bg-white border border-border/60 rounded-xl p-5 shadow-sm space-y-2 hover:border-indigo-100 transition">
-                        <div className="flex justify-between items-center text-text-muted text-[11px] font-bold uppercase tracking-wider">
+                    {/* Active Gigs/Orders */}
+                    <div className="bg-white border border-slate-200/80 rounded-xl p-4 shadow-sm hover:border-slate-300 transition-colors">
+                        <div className="flex justify-between items-center text-slate-500 text-xs font-medium">
                             <span>Active Orders</span>
-                            <Clock className="h-4 w-4 text-amber-500" />
+                            <Clock className="h-4 w-4 text-slate-400" />
                         </div>
-                        <div>
-                            <span className="font-mono text-2xl font-bold text-text-primary block">
-                                {stats.activeOrders} Order
+                        <div className="mt-2">
+                            <span className="font-mono text-2xl font-bold text-slate-900 block">
+                                {stats.activeOrders}
                             </span>
-                            <span className="text-[10px] text-text-secondary block mt-1">
-                                Delivery expected in 2 days
-                            </span>
-                        </div>
-                    </div>
-
-                    {/* Active Services Listed */}
-                    <div className="bg-white border border-border/60 rounded-xl p-5 shadow-sm space-y-2 hover:border-indigo-100 transition">
-                        <div className="flex justify-between items-center text-text-muted text-[11px] font-bold uppercase tracking-wider">
-                            <span>Services Catalog</span>
-                            <Layers className="h-4 w-4 text-indigo-500" />
-                        </div>
-                        <div>
-                            <span className="font-mono text-2xl font-bold text-text-primary block">
-                                {stats.servicesListed} Catalog Gigs
-                            </span>
-                            <span className="text-[10px] text-text-secondary block mt-1">
-                                Publicly listed on marketplace
+                            <span className="text-[10px] text-slate-500 block mt-1">
+                                In progress as seller
                             </span>
                         </div>
                     </div>
 
-                    {/* Completed Sales Earnings */}
-                    <div className="bg-white border border-border/60 rounded-xl p-5 shadow-sm space-y-2 hover:border-indigo-100 transition">
-                        <div className="flex justify-between items-center text-text-muted text-[11px] font-bold uppercase tracking-wider">
-                            <span>Completed Earnings</span>
-                            <DollarSign className="h-4 w-4 text-emerald-500" />
+                    {/* Listed Services */}
+                    <div className="bg-white border border-slate-200/80 rounded-xl p-4 shadow-sm hover:border-slate-300 transition-colors">
+                        <div className="flex justify-between items-center text-slate-500 text-xs font-medium">
+                            <span>Catalog Gigs</span>
+                            <Layers className="h-4 w-4 text-slate-400" />
                         </div>
-                        <div>
-                            <span className="font-mono text-2xl font-bold text-text-primary block">
+                        <div className="mt-2">
+                            <span className="font-mono text-2xl font-bold text-slate-900 block">
+                                {stats.servicesListed}
+                            </span>
+                            <span className="text-[10px] text-slate-500 block mt-1">
+                                Publicly visible catalog
+                            </span>
+                        </div>
+                    </div>
+
+                    {/* Completed Earnings */}
+                    <div className="bg-white border border-slate-200/80 rounded-xl p-4 shadow-sm hover:border-slate-300 transition-colors">
+                        <div className="flex justify-between items-center text-slate-500 text-xs font-medium">
+                            <span>Total Sales</span>
+                            <DollarSign className="h-4 w-4 text-slate-400" />
+                        </div>
+                        <div className="mt-2">
+                            <span className="font-mono text-2xl font-bold text-slate-900 block">
                                 {formatMoney(stats.totalSales, 'USD')}
                             </span>
                             <span className="text-[10px] text-emerald-600 font-semibold block mt-1">
@@ -108,108 +169,209 @@ export default function MarketplaceDashboard({ stats: initialStats, activePurcha
                 </div>
 
                 {/* ─────────────────────────────────────────
-                    DUAL PURCHASES & CATALOG SECTIONS
+                    TWO COLUMN LIGHT WORKSPACE
                     ───────────────────────────────────────── */}
-                <div className="grid grid-cols-1 lg:grid-cols-10 gap-6">
+                <div className="grid grid-cols-1 lg:grid-cols-10 gap-8">
                     
-                    {/* 70% Primary Area */}
-                    <div className="lg:col-span-7 space-y-6">
+                    {/* Primary Operations (Left 7 Columns) */}
+                    <div className="lg:col-span-7 space-y-8">
                         
-                        {/* Section 1: Purchases (As Buyer) */}
-                        <div className="bg-white border border-border/60 rounded-xl overflow-hidden shadow-sm">
-                            <div className="px-5 py-4 border-b border-border/50 flex justify-between items-center bg-slate-50/20">
-                                <h3 className="font-sora text-xs font-bold uppercase tracking-wider text-text-muted flex items-center gap-2">
-                                    <ShoppingCart className="h-4 w-4 text-indigo-500" /> Active Service Purchases (As Buyer)
-                                </h3>
-                                <span className="bg-emerald-50 text-emerald-700 border border-emerald-100 rounded text-[10px] font-bold px-2 py-0.5">
-                                    Escrow Protection Guaranteed
-                                </span>
+                        {/* SECTION 1: Active Sales (As Seller) */}
+                        <div className="bg-white border border-slate-200/60 rounded-xl shadow-xs overflow-hidden">
+                            <div className="px-5 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/[0.15]">
+                                <div>
+                                    <h3 className="font-semibold text-sm text-slate-900 flex items-center gap-2">
+                                        <Briefcase className="h-4 w-4 text-slate-500" /> Active Orders (As Seller)
+                                    </h3>
+                                    <p className="text-[11px] text-slate-400 mt-0.5">
+                                        Manage deliverables and track milestones for your clients.
+                                    </p>
+                                </div>
                             </div>
                             
-                            <div className="divide-y divide-border/40 text-xs">
-                                {activePurchases.map((purchase: any) => (
+                            <div className="divide-y divide-slate-100">
+                                {activeSales.map((sale: any) => (
                                     <div 
-                                        key={purchase.id}
-                                        onClick={() => setSelectedService(purchase)}
-                                        className="p-4 hover:bg-slate-50/70 cursor-pointer transition flex items-center justify-between"
+                                        key={sale.id}
+                                        className="p-4 hover:bg-slate-50/30 transition flex items-center justify-between"
                                     >
                                         <div className="space-y-1">
-                                            <div className="font-semibold text-text-primary text-[13px] flex items-center gap-2">
-                                                Order #{purchase.id}: {purchase.title}
-                                            </div>
-                                            <p className="text-[11px] text-text-secondary">Expected delivery scheduled for: {formatDate(purchase.deliveryDate)}</p>
-                                            <div className="flex items-center gap-2 mt-1.5">
-                                                <span className="text-[10px] font-bold uppercase bg-indigo-50 text-indigo-700 px-1.5 py-0.2 rounded border border-indigo-200">
-                                                    {purchase.status}
-                                                </span>
+                                            <Link 
+                                                href={`/marketplace/orders/${sale.id}`}
+                                                className="font-medium text-slate-900 text-sm hover:text-slate-800 transition flex items-center gap-2"
+                                            >
+                                                Order #{sale.id}: {sale.title}
+                                            </Link>
+                                            <div className="flex items-center gap-2 text-xs text-slate-500">
+                                                <span>Client: {sale.buyerName}</span>
+                                                <span>•</span>
+                                                <span>Due: {formatDate(sale.deliveryDate)}</span>
                                             </div>
                                         </div>
-                                        <div className="text-right">
-                                            <span className="font-mono font-bold text-text-primary block text-[13px]">
-                                                {formatMoney(purchase.amount, 'USD')}
+                                        <div className="flex items-center gap-3">
+                                            <span className="text-xs font-mono font-semibold text-slate-950">
+                                                {formatMoney(sale.amount, 'USD')}
                                             </span>
-                                            <span className="text-[9px] text-emerald-600 font-semibold block mt-0.5">Escrow Active</span>
+                                            <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full border ${
+                                                sale.status === 'processing' 
+                                                ? 'bg-indigo-50 border-indigo-150 text-indigo-700' 
+                                                : 'bg-amber-50 border-amber-150 text-amber-700'
+                                            }`}>
+                                                {sale.status}
+                                            </span>
                                         </div>
                                     </div>
                                 ))}
-                                {activePurchases.length === 0 && (
-                                    <div className="p-6 text-center text-gray-500">
-                                        <p className="font-medium text-gray-700">No active purchases.</p>
-                                        <p className="text-xs mt-1">Browse the directory to purchase verified services safely using Escrow.</p>
-                                        <Link href="/marketplace/services" className="inline-block mt-3 text-xs font-semibold text-indigo-600 hover:text-indigo-800">
-                                            Explore Services →
-                                        </Link>
+                                {activeSales.length === 0 && (
+                                    <div className="p-8 text-center bg-slate-50/10 border border-dashed border-slate-200/80 rounded-xl m-4">
+                                        <div className="mx-auto w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center mb-3">
+                                            <Briefcase className="h-4 w-4 text-slate-400" />
+                                        </div>
+                                        <p className="text-xs font-medium text-slate-700">No active client orders yet.</p>
+                                        <p className="text-[11px] text-slate-400 mt-1 max-w-[280px] mx-auto">
+                                            Publish your packages or share your catalog to start receiving orders.
+                                        </p>
+                                        <div className="mt-4">
+                                            <Button 
+                                                onClick={() => setIsCreateModalOpen(true)}
+                                                size="sm" 
+                                                variant="outline"
+                                                className="text-xs border-slate-200 hover:border-slate-350 hover:bg-slate-50 h-8"
+                                            >
+                                                Publish Service Gig
+                                            </Button>
+                                        </div>
                                     </div>
                                 )}
                             </div>
                         </div>
 
-                        {/* Section 2: Catalog Gigs (As Seller) */}
-                        <div className="bg-white border border-border/60 rounded-xl overflow-hidden shadow-sm">
-                            <div className="px-5 py-4 border-b border-border/50 flex justify-between items-center bg-slate-50/20">
-                                <h3 className="font-sora text-xs font-bold uppercase tracking-wider text-text-muted flex items-center gap-2">
-                                    <Layers className="h-4 w-4 text-indigo-500" /> Public Service Catalog (As Seller)
-                                </h3>
-                                <Link 
-                                    href="#" 
-                                    className="text-[11px] text-indigo-600 font-semibold hover:underline flex items-center gap-0.5"
-                                >
-                                    Publish New Service <Plus className="h-3.5 w-3.5" />
-                                </Link>
+                        {/* SECTION 2: Active Purchases (As Buyer) */}
+                        <div className="bg-white border border-slate-200/60 rounded-xl shadow-xs overflow-hidden">
+                            <div className="px-5 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/[0.15]">
+                                <div>
+                                    <h3 className="font-semibold text-sm text-slate-900 flex items-center gap-2">
+                                        <ShoppingCart className="h-4 w-4 text-slate-500" /> My Purchases (As Buyer)
+                                    </h3>
+                                    <p className="text-[11px] text-slate-400 mt-0.5">
+                                        Track deliverables, files, and review services you bought.
+                                    </p>
+                                </div>
                             </div>
                             
-                            <div className="divide-y divide-border/40 text-xs">
+                            <div className="divide-y divide-slate-100">
+                                {activePurchases.map((purchase: any) => (
+                                    <div 
+                                        key={purchase.id}
+                                        onClick={() => setSelectedService(purchase)}
+                                        className="p-4 hover:bg-slate-50/30 cursor-pointer transition flex items-center justify-between"
+                                    >
+                                        <div className="space-y-1">
+                                            <div className="font-medium text-slate-900 text-sm flex items-center gap-2">
+                                                Order #{purchase.id}: {purchase.title}
+                                            </div>
+                                            <div className="flex items-center gap-2 text-xs text-slate-500">
+                                                <span>Provider: {purchase.sellerName}</span>
+                                                <span>•</span>
+                                                <span>Est. Delivery: {formatDate(purchase.deliveryDate)}</span>
+                                            </div>
+                                        </div>
+                                        <div className="flex items-center gap-3">
+                                            <span className="text-xs font-mono font-semibold text-slate-955">
+                                                {formatMoney(purchase.amount, 'USD')}
+                                            </span>
+                                            <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full border ${
+                                                purchase.status === 'processing' 
+                                                ? 'bg-indigo-50 border-indigo-150 text-indigo-700' 
+                                                : 'bg-amber-50 border-amber-150 text-amber-700'
+                                            }`}>
+                                                {purchase.status}
+                                            </span>
+                                        </div>
+                                    </div>
+                                ))}
+                                {activePurchases.length === 0 && (
+                                    <div className="p-8 text-center bg-slate-50/10 border border-dashed border-slate-200/80 rounded-xl m-4">
+                                        <div className="mx-auto w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center mb-3">
+                                            <ShoppingCart className="h-4 w-4 text-slate-400" />
+                                        </div>
+                                        <p className="text-xs font-medium text-slate-700">No active orders yet.</p>
+                                        <p className="text-[11px] text-slate-400 mt-1 max-w-[280px] mx-auto">
+                                            Explore verified, escrow-guaranteed services from top professionals.
+                                        </p>
+                                        <div className="mt-4">
+                                            <Link
+                                                href="/marketplace/services"
+                                                className="inline-flex items-center justify-center rounded-lg border border-slate-200 bg-white px-3.5 h-8 text-xs font-semibold text-slate-700 hover:border-slate-300 hover:bg-slate-50 transition-colors"
+                                            >
+                                                Browse Services
+                                            </Link>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* SECTION 3: My Service Catalog (As Seller) */}
+                        <div className="bg-white border border-slate-200/60 rounded-xl shadow-xs overflow-hidden">
+                            <div className="px-5 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/[0.15]">
+                                <div>
+                                    <h3 className="font-semibold text-sm text-slate-900 flex items-center gap-2">
+                                        <Layers className="h-4 w-4 text-slate-500" /> My Service Catalog
+                                    </h3>
+                                    <p className="text-[11px] text-slate-400 mt-0.5">
+                                        Your publicly visible services and customized package offerings.
+                                    </p>
+                                </div>
+                            </div>
+                            
+                            <div className="divide-y divide-slate-100">
                                 {listedGigs.map((gig: any) => (
                                     <div 
                                         key={gig.id}
-                                        className="p-4 hover:bg-slate-50/40 transition flex items-center justify-between"
+                                        className="p-4 hover:bg-slate-50/30 transition flex items-center justify-between"
                                     >
                                         <div className="space-y-1">
-                                            <div className="font-semibold text-text-primary text-[13px]">
+                                            <Link
+                                                href={`/marketplace/services/${gig.id}`}
+                                                className="font-medium text-slate-900 text-sm hover:text-slate-800 transition"
+                                            >
                                                 {gig.title}
-                                            </div>
-                                            <div className="flex items-center gap-1 text-[10px] text-text-secondary mt-0.5">
-                                                <span className="flex items-center text-amber-500 font-bold gap-0.5">
-                                                    ★ {gig.rating}
+                                            </Link>
+                                            <div className="flex items-center gap-2 text-xs text-slate-500">
+                                                <span className="flex items-center text-amber-500 font-semibold gap-0.5">
+                                                    ★ {gig.rating.toFixed(1)}
                                                 </span>
-                                                <span>({gig.reviews} verified reviews)</span>
+                                                <span>({gig.reviews} reviews)</span>
                                             </div>
                                         </div>
                                         <div className="text-right">
-                                            <span className="font-mono font-bold text-text-primary block text-[13px]">
+                                            <span className="font-mono font-bold text-slate-900 block text-sm">
                                                 {formatMoney(gig.price, 'USD')}
                                             </span>
-                                            <span className="text-[9px] text-text-secondary block mt-0.5">Base Price Tier</span>
+                                            <span className="text-[10px] text-slate-400 block">Starting at</span>
                                         </div>
                                     </div>
                                 ))}
                                 {listedGigs.length === 0 && (
-                                    <div className="p-6 text-center text-gray-500">
-                                        <p className="font-medium text-gray-700">No listed services.</p>
-                                        <p className="text-xs mt-1">Ready to sell? Create your first gig package and start receiving orders from clients.</p>
-                                        <Link href="#" className="inline-block mt-3 text-xs font-semibold text-indigo-600 hover:text-indigo-800">
-                                            Publish Your First Gig →
-                                        </Link>
+                                    <div className="p-8 text-center bg-slate-50/10 border border-dashed border-slate-200/80 rounded-xl m-4">
+                                        <div className="mx-auto w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center mb-3">
+                                            <Layers className="h-4 w-4 text-slate-400" />
+                                        </div>
+                                        <p className="text-xs font-medium text-slate-700">No services listed yet.</p>
+                                        <p className="text-[11px] text-slate-400 mt-1 max-w-[280px] mx-auto">
+                                            Create your professional services list to let clients purchase pricing packages.
+                                        </p>
+                                        <div className="mt-4">
+                                            <Button 
+                                                onClick={() => setIsCreateModalOpen(true)}
+                                                size="sm" 
+                                                variant="outline"
+                                                className="text-xs border-slate-200 hover:border-slate-350 hover:bg-slate-50 h-8"
+                                            >
+                                                Create Service Listing
+                                            </Button>
+                                        </div>
                                     </div>
                                 )}
                             </div>
@@ -217,69 +379,168 @@ export default function MarketplaceDashboard({ stats: initialStats, activePurcha
 
                     </div>
 
-                    {/* 30% Context & Shortcuts Deck */}
+                    {/* Secondary Navigation & Guides (Right 3 Columns) */}
                     <div className="lg:col-span-3 space-y-6">
                         
-                        {/* Marketplace Core Actions */}
-                        <div className="bg-white border border-border/60 rounded-xl p-4 shadow-sm space-y-3">
-                            <h4 className="text-[11px] font-bold uppercase tracking-wider text-text-muted flex items-center gap-1.5 border-b border-border/40 pb-2">
-                                <Search className="h-3.5 w-3.5 text-indigo-500" /> Discovery Navigation
+                        {/* Quick Actions Panel */}
+                        <div className="bg-white border border-slate-200/60 rounded-xl p-4 shadow-xs space-y-3">
+                            <h4 className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                                Workspace Actions
                             </h4>
-                            <div className="grid grid-cols-1 gap-2 text-xs">
+                            <div className="space-y-1.5">
                                 <Link
                                     href="/marketplace/services"
-                                    className="flex items-center gap-2.5 p-3 rounded-lg border border-slate-100 hover:border-indigo-150 hover:bg-indigo-50/20 text-text-primary transition group"
+                                    className="flex items-center justify-between p-2.5 rounded-lg border border-slate-100 hover:border-slate-200 hover:bg-slate-50 text-slate-700 transition group text-xs font-medium bg-white"
                                 >
-                                    <ShoppingCart className="h-4 w-4 text-indigo-600 shrink-0 animate-pulse" />
-                                    <span className="font-semibold block text-[11px]">Browse Gigs Directory</span>
+                                    <span className="flex items-center gap-2">
+                                        <ShoppingCart className="h-3.5 w-3.5 text-slate-400 group-hover:text-slate-600" /> Browse Gigs Catalog
+                                    </span>
+                                    <ArrowUpRight className="h-3.5 w-3.5 text-slate-400 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
                                 </Link>
+
+                                <button
+                                    onClick={() => setIsCreateModalOpen(true)}
+                                    className="w-full flex items-center justify-between p-2.5 rounded-lg border border-slate-100 hover:border-slate-200 hover:bg-slate-50 text-slate-700 transition group text-xs font-medium bg-white"
+                                >
+                                    <span className="flex items-center gap-2">
+                                        <Plus className="h-3.5 w-3.5 text-slate-400 group-hover:text-slate-600" /> Publish Service Gig
+                                    </span>
+                                    <ArrowUpRight className="h-3.5 w-3.5 text-slate-400 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                                </button>
 
                                 <Link
                                     href="/marketplace/orders"
-                                    className="flex items-center gap-2.5 p-3 rounded-lg border border-slate-100 hover:border-indigo-150 hover:bg-indigo-50/20 text-text-primary transition group"
+                                    className="flex items-center justify-between p-2.5 rounded-lg border border-slate-100 hover:border-slate-200 hover:bg-slate-50 text-slate-700 transition group text-xs font-medium bg-white"
                                 >
-                                    <Clock className="h-4 w-4 text-indigo-600 shrink-0" />
-                                    <span className="font-semibold block text-[11px]">All Purchases Ledger</span>
+                                    <span className="flex items-center gap-2">
+                                        <Clock className="h-3.5 w-3.5 text-slate-400 group-hover:text-slate-600" /> Order History
+                                    </span>
+                                    <ArrowUpRight className="h-3.5 w-3.5 text-slate-400 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                                </Link>
+
+                                <Link
+                                    href="/financial/withdrawals"
+                                    className="flex items-center justify-between p-2.5 rounded-lg border border-slate-100 hover:border-slate-200 hover:bg-slate-50 text-slate-700 transition group text-xs font-medium bg-white"
+                                >
+                                    <span className="flex items-center gap-2">
+                                        <Wallet className="h-3.5 w-3.5 text-slate-400 group-hover:text-slate-600" /> Withdraw Earnings
+                                    </span>
+                                    <ArrowUpRight className="h-3.5 w-3.5 text-slate-400 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
                                 </Link>
                             </div>
                         </div>
 
-                        {/* Onboarding Checklist for Marketplace Selling */}
-                        <div className="bg-white border border-border/60 rounded-xl p-4 shadow-sm space-y-3">
-                            <h4 className="text-[11px] font-bold uppercase tracking-wider text-text-muted flex items-center gap-1.5 border-b border-border/40 pb-2">
-                                <ShoppingCart className="h-3.5 w-3.5 text-indigo-500" /> Seller Checklist
-                            </h4>
-                            <div className="space-y-3 text-xs leading-normal">
-                                <div className="flex gap-2 text-text-primary">
-                                    <CheckCircle2 className="h-4.5 w-4.5 text-emerald-500 shrink-0 mt-0.5" />
-                                    <div>
-                                        <span className="font-semibold block">Create Service Gigs</span>
-                                        <p className="text-[10px] text-text-secondary mt-0.5">Describe your capabilities and setup pricing tiers.</p>
-                                    </div>
-                                </div>
-                                <div className="flex gap-2 text-text-primary">
-                                    <CheckCircle2 className="h-4.5 w-4.5 text-emerald-500 shrink-0 mt-0.5" />
-                                    <div>
-                                        <span className="font-semibold block">Verify Payout Account</span>
-                                        <p className="text-[10px] text-text-secondary mt-0.5">Ensure Wise or Bank accounts are fully linked.</p>
-                                    </div>
-                                </div>
+                        {/* Onboarding checklist details */}
+                        <div className="bg-slate-50/50 border border-slate-200/50 rounded-xl p-4 text-[11px] leading-relaxed text-slate-600 space-y-2.5">
+                            <div className="flex items-center gap-1.5 font-semibold text-slate-800">
+                                <Lock className="h-3.5 w-3.5 text-slate-500" /> Escrow Protection
                             </div>
+                            <p>
+                                Every transaction runs under secure financial escrow. Client payments are protected securely on purchase and only unlocked upon client deliverable approvals.
+                            </p>
                         </div>
 
-                        {/* Escrow Guarantee Banner */}
-                        <div className="bg-indigo-50/40 border border-indigo-100/50 rounded-xl p-3.5 text-[11px] leading-relaxed text-indigo-900">
-                            <div className="flex items-center gap-1.5 font-bold mb-1">
-                                <Lock className="h-4 w-4 text-indigo-600" />
-                                Unified Escrow Guarantee
+                        <div className="bg-slate-50/50 border border-slate-200/50 rounded-xl p-4 text-[11px] leading-relaxed text-slate-600 space-y-2.5">
+                            <div className="flex items-center gap-1.5 font-semibold text-slate-800">
+                                <AlertCircle className="h-3.5 w-3.5 text-slate-500" /> Getting Started
                             </div>
-                            Musoftware Marketplace runs under full financial escrow custody protections. Client payments are protected securely on purchase and only unlocked upon client deliverable approvals.
+                            <p>
+                                Create and publish your gig listings. Clients can purchase standard tiered packages directly, escrow funds are protected, and payouts clear immediately once work is approved.
+                            </p>
                         </div>
 
                     </div>
                 </div>
 
             </div>
+
+            {/* Publish Service Dialog */}
+            <Dialog open={isCreateModalOpen} onOpenChange={setIsCreateModalOpen}>
+                <DialogContent className="sm:max-w-md bg-white border border-slate-200 shadow-xl rounded-xl">
+                    <DialogHeader>
+                        <DialogTitle className="text-slate-900 font-semibold text-base font-sans">
+                            Publish a Service
+                        </DialogTitle>
+                        <DialogDescription className="text-xs text-slate-500 mt-1">
+                            Create a public service catalog listing. You can define tiered packages and delivery times in the next step.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <form onSubmit={handlePublish} className="space-y-4 py-2">
+                        <div className="space-y-1.5">
+                            <label className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">
+                                Service Title
+                            </label>
+                            <input
+                                type="text"
+                                value={data.title}
+                                onChange={e => setData('title', e.target.value)}
+                                placeholder="e.g. Design a Premium Figma Landing Page"
+                                className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-slate-400 focus:ring-0 transition-colors placeholder:text-slate-400"
+                                required
+                            />
+                            {errors.title && (
+                                <span className="text-xs text-rose-600 mt-1 block">{errors.title}</span>
+                            )}
+                        </div>
+
+                        <div className="space-y-1.5">
+                            <label className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">
+                                Category
+                            </label>
+                            <select
+                                value={data.category_id}
+                                onChange={e => setData('category_id', e.target.value)}
+                                className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-slate-400 focus:ring-0 transition-colors"
+                                required
+                            >
+                                <option value="" disabled>Select category...</option>
+                                {categories.map((cat: any) => (
+                                    <option key={cat.id} value={cat.id}>
+                                        {cat.name}
+                                    </option>
+                                ))}
+                            </select>
+                            {errors.category_id && (
+                                <span className="text-xs text-rose-600 mt-1 block">{errors.category_id}</span>
+                            )}
+                        </div>
+
+                        <div className="space-y-1.5">
+                            <label className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">
+                                Description
+                            </label>
+                            <textarea
+                                value={data.description}
+                                onChange={e => setData('description', e.target.value)}
+                                placeholder="Describe what capabilities and scope this service offers..."
+                                className="w-full min-h-[100px] rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-slate-400 focus:ring-0 transition-colors resize-none placeholder:text-slate-400"
+                                required
+                            />
+                            {errors.description && (
+                                <span className="text-xs text-rose-600 mt-1 block">{errors.description}</span>
+                            )}
+                        </div>
+
+                        <DialogFooter className="mt-6 flex flex-row justify-end gap-2 border-t border-slate-100 pt-4 -mx-4 -mb-4 bg-slate-50/50 rounded-b-xl px-4">
+                            <Button 
+                                type="button" 
+                                variant="outline" 
+                                onClick={() => setIsCreateModalOpen(false)}
+                                className="text-xs font-semibold h-9 rounded-lg border-slate-200 hover:border-slate-300 hover:bg-slate-50 bg-white"
+                            >
+                                Cancel
+                            </Button>
+                            <Button 
+                                type="submit" 
+                                disabled={processing}
+                                className="bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs h-9 rounded-lg px-4 disabled:opacity-50 transition-colors"
+                            >
+                                {processing ? 'Publishing...' : 'Publish Draft'}
+                            </Button>
+                        </DialogFooter>
+                    </form>
+                </DialogContent>
+            </Dialog>
 
             {/* Contextual Side Panel */}
             <ServiceQuickView

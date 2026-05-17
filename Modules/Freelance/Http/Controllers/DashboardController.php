@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Modules\Freelance\Models\Contract;
 use Modules\Freelance\Models\Proposal;
+use Modules\Freelance\Models\PointTransaction;
+use Carbon\Carbon;
 
 class DashboardController extends Controller
 {
@@ -16,7 +18,7 @@ class DashboardController extends Controller
 
         // 1. Fetch Real Active Proposals
         $activeProposals = Proposal::where('freelancer_id', $user->id)
-            ->whereIn('status', ['submitted', 'under_review', 'shortlisted'])
+            ->whereIn('status', ['pending'])
             ->with('job:id,title')
             ->latest()
             ->take(5)
@@ -28,24 +30,24 @@ class DashboardController extends Controller
                     'status' => $proposal->status,
                     'budget' => $proposal->bid_amount ?? 0,
                     'submittedAt' => $proposal->created_at->format('Y-m-d'),
-                    'connectsUsed' => $proposal->connects_used ?? 0,
+                    'connectsUsed' => 2, // Default or fetch from transaction if linked
                 ];
             });
 
         // 2. Fetch Real Active Contracts
         $activeContracts = Contract::where('freelancer_id', $user->id)
-            ->where('status', 'in-progress')
-            ->with('client:id,name')
+            ->where('status', 'active')
+            ->with(['client:id,name', 'job:id,title'])
             ->latest()
             ->take(5)
             ->get()
             ->map(function($contract) {
                 return [
                     'id' => $contract->id,
-                    'title' => $contract->title,
+                    'title' => $contract->job->title ?? 'Unknown Job',
                     'clientName' => $contract->client->name ?? 'Unknown Client',
                     'startDate' => $contract->created_at->format('Y-m-d'),
-                    'value' => $contract->total_amount ?? 0,
+                    'value' => $contract->amount ?? 0,
                     'progress' => $this->calculateContractProgress($contract),
                     'status' => $contract->status,
                 ];
@@ -53,16 +55,64 @@ class DashboardController extends Controller
 
         // 3. Compute Real Stats
         $stats = [
-            'pointsBalance' => collect($user->wallet)->sum('balance') ?? 0, // Using user's wallet logic
-            'activeProposals' => Proposal::where('freelancer_id', $user->id)->whereIn('status', ['submitted', 'under_review'])->count(),
-            'activeContracts' => Contract::where('freelancer_id', $user->id)->where('status', 'in-progress')->count(),
-            'totalEarnings' => Contract::where('freelancer_id', $user->id)->where('status', 'completed')->sum('total_amount'),
+            'pointsBalance' => $user->points_balance ?? 0,
+            'activeProposals' => Proposal::where('freelancer_id', $user->id)->whereIn('status', ['pending'])->count(),
+            'activeContracts' => Contract::where('freelancer_id', $user->id)->where('status', 'active')->count(),
+            'totalEarnings' => Contract::where('freelancer_id', $user->id)->where('status', 'completed')->sum('amount'),
         ];
+
+        // 4. Compute Real Recent Activities
+        $activities = [];
+
+        $recentProposals = Proposal::where('freelancer_id', $user->id)->with('job')->latest()->take(3)->get();
+        foreach ($recentProposals as $prop) {
+            $activities[] = [
+                'id' => 'p_'.$prop->id,
+                'type' => 'proposal',
+                'text' => 'Submitted bid for "' . ($prop->job->title ?? 'Unknown') . '"',
+                'time' => $prop->created_at->diffForHumans(),
+                'timestamp' => $prop->created_at->timestamp,
+                'color' => 'text-blue-500 bg-blue-50'
+            ];
+        }
+
+        $recentContracts = Contract::where('freelancer_id', $user->id)->with('job')->latest()->take(3)->get();
+        foreach ($recentContracts as $contract) {
+            $statusText = $contract->status === 'active' ? 'Started contract for' : 'Contract update for';
+            $activities[] = [
+                'id' => 'c_'.$contract->id,
+                'type' => 'contract',
+                'text' => $statusText . ' "' . ($contract->job->title ?? 'Unknown') . '"',
+                'time' => $contract->updated_at->diffForHumans(),
+                'timestamp' => $contract->updated_at->timestamp,
+                'color' => 'text-emerald-500 bg-emerald-50'
+            ];
+        }
+
+        $recentPoints = PointTransaction::where('user_id', $user->id)->latest()->take(3)->get();
+        foreach ($recentPoints as $pt) {
+            $activities[] = [
+                'id' => 'pt_'.$pt->id,
+                'type' => 'connects',
+                'text' => $pt->description ?? 'Connects transaction',
+                'time' => $pt->created_at->diffForHumans(),
+                'timestamp' => $pt->created_at->timestamp,
+                'color' => 'text-amber-500 bg-amber-50'
+            ];
+        }
+
+        // Sort activities by timestamp descending
+        usort($activities, function($a, $b) {
+            return $b['timestamp'] <=> $a['timestamp'];
+        });
+
+        $recentActivities = array_slice($activities, 0, 5);
 
         return Inertia::render('Freelance/Dashboard', [
             'activeProposals' => $activeProposals,
             'activeContracts' => $activeContracts,
-            'stats' => $stats
+            'stats' => $stats,
+            'recentActivities' => $recentActivities
         ]);
     }
 

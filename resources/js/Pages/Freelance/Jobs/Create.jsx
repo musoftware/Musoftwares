@@ -26,7 +26,7 @@ export default function CreateJob({ auth }) {
     const [skillSearch, setSkillSearch] = useState('');
 
     const pointsCost = 10;
-    const currentPoints = auth.user.points_balance || 340;
+    const currentPoints = auth.user.points_balance !== undefined ? auth.user.points_balance : 0;
 
     useEffect(() => {
         // Fallback for when API doesn't exist

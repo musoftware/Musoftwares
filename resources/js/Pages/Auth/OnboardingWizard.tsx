@@ -160,23 +160,23 @@ export default function OnboardingWizard({ user, currencies, countries }: Props)
     );
 
     return (
-        <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 flex flex-col font-sans selection:bg-zinc-900 selection:text-white dark:selection:bg-white dark:selection:text-zinc-900">
+        <div className="min-h-screen bg-muted/20 text-foreground flex flex-col font-sans">
             {/* Top Minimal Header */}
-            <header className="border-b border-zinc-200/80 dark:border-zinc-800/80 bg-white/50 dark:bg-zinc-900/50 backdrop-blur-md px-6 py-4 flex items-center justify-between sticky top-0 z-50">
+            <header className="border-b bg-background/50 backdrop-blur-md px-6 py-4 flex items-center justify-between sticky top-0 z-50">
                 <div className="flex items-center space-x-3">
-                    <div className="w-8 h-8 rounded-lg bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 flex items-center justify-center shadow-xs">
+                    <div className="w-8 h-8 rounded-lg bg-primary text-primary-foreground flex items-center justify-center shadow-sm">
                         <ApplicationLogo className="w-4 h-4 fill-current" />
                     </div>
                     <span className="font-semibold text-sm tracking-tight">Workspace Onboarding</span>
                 </div>
 
-                <div className="flex items-center space-x-4 text-xs text-zinc-500 dark:text-zinc-400">
-                    <span className="hidden sm:inline-block">Logged in as <strong className="text-zinc-900 dark:text-zinc-100">{user.email}</strong></span>
+                <div className="flex items-center space-x-4 text-xs text-muted-foreground">
+                    <span className="hidden sm:inline-block">Logged in as <strong className="text-foreground">{user.email}</strong></span>
                     <Link 
                         href={route('logout')} 
                         method="post" 
                         as="button" 
-                        className="text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 transition"
+                        className="text-muted-foreground hover:text-foreground transition-colors"
                     >
                         Save & Exit
                     </Link>
@@ -195,34 +195,34 @@ export default function OnboardingWizard({ user, currencies, countries }: Props)
                         {[1, 2, 3].map((s) => (
                             <div key={s} className="flex items-center space-x-2">
                                 <div className={`w-7 h-7 rounded-full flex items-center justify-center transition-all duration-300 font-semibold ${
-                                    s === step ? 'bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 shadow-sm ring-4 ring-zinc-900/10 dark:ring-white/10' :
-                                    s < step ? 'bg-zinc-200 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300' :
-                                    'bg-zinc-100 dark:bg-zinc-900 text-zinc-400 dark:text-zinc-600 border border-zinc-200 dark:border-zinc-800'
+                                    s === step ? 'bg-primary text-primary-foreground shadow-sm ring-4 ring-primary/10' :
+                                    s < step ? 'bg-muted text-muted-foreground' :
+                                    'bg-background text-muted-foreground border border-border'
                                 }`}>
                                     {s < step ? <Check className="w-3.5 h-3.5" /> : s}
                                 </div>
-                                <span className={`hidden sm:inline-block text-xs font-medium ${s === step ? 'text-zinc-900 dark:text-zinc-100 font-semibold' : 'text-zinc-400 dark:text-zinc-500'}`}>
+                                <span className={`hidden sm:inline-block text-xs font-medium ${s === step ? 'text-foreground font-semibold' : 'text-muted-foreground'}`}>
                                     {s === 1 && 'Location'}
                                     {s === 2 && 'Contact'}
                                     {s === 3 && 'Currency'}
                                 </span>
-                                {s < 3 && <ChevronRight className="w-3.5 h-3.5 text-zinc-300 dark:text-zinc-700 mx-1" />}
+                                {s < 3 && <ChevronRight className="w-3.5 h-3.5 text-muted-foreground mx-1" />}
                             </div>
                         ))}
                     </div>
 
                     {/* Autosave Status */}
-                    <div className="flex items-center space-x-2 text-xs text-zinc-400 bg-white dark:bg-zinc-900 px-3 py-1.5 rounded-full border border-zinc-200/60 dark:border-zinc-800/60 shadow-2xs">
+                    <div className="flex items-center space-x-2 text-xs text-muted-foreground bg-background px-3 py-1.5 rounded-full border shadow-sm">
                         <div className={`w-2 h-2 rounded-full ${
                             saveStatus === 'saving' ? 'bg-amber-500 animate-pulse' :
-                            saveStatus === 'saved' ? 'bg-emerald-500' : 'bg-zinc-300 dark:bg-zinc-700'
+                            saveStatus === 'saved' ? 'bg-emerald-500' : 'bg-muted-foreground'
                         }`} />
                         <span>{saveStatus === 'saving' ? 'Saving progress...' : saveStatus === 'saved' ? 'Saved' : 'Ready'}</span>
                     </div>
                 </div>
 
                 {/* Compact Wizard Card */}
-                <Card className="w-full max-w-xl bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800/80 shadow-lg rounded-2xl z-10 overflow-visible">
+                <Card className="w-full max-w-xl shadow-lg z-10 overflow-visible">
                     <AnimatePresence mode="wait">
                         {step === 1 && (
                             <motion.div
@@ -232,38 +232,38 @@ export default function OnboardingWizard({ user, currencies, countries }: Props)
                                 exit={{ opacity: 0, x: 10 }}
                                 transition={{ duration: 0.2 }}
                             >
-                                <CardHeader className="pb-6 border-b border-zinc-100 dark:border-zinc-800/60 px-8 pt-8">
-                                    <div className="w-10 h-10 rounded-xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center mb-4 text-zinc-900 dark:text-zinc-100">
+                                <CardHeader className="pb-6 border-b px-8 pt-8">
+                                    <div className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center mb-4 text-foreground">
                                         <Globe className="w-5 h-5" />
                                     </div>
-                                    <CardTitle className="text-xl sm:text-2xl font-semibold tracking-tight">Where is your workspace based?</CardTitle>
-                                    <CardDescription className="text-zinc-500 dark:text-zinc-400 mt-1.5 leading-relaxed">
+                                    <CardTitle className="text-xl sm:text-2xl">Where is your workspace based?</CardTitle>
+                                    <CardDescription className="mt-1.5 leading-relaxed">
                                         Setting your primary operational location helps us optimize server routing, localized formatting, and legal compliance.
                                     </CardDescription>
                                 </CardHeader>
                                 <CardContent className="space-y-6 px-8 py-6">
                                     {/* Country Combobox Selector */}
                                     <div className="space-y-2">
-                                        <label className="text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">Country</label>
+                                        <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Country</label>
                                         <div className="relative">
                                             <div 
                                                 onClick={() => setIsCountryOpen(!isCountryOpen)}
-                                                className="w-full min-h-11 px-3.5 py-2.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/50 hover:bg-zinc-100/50 dark:hover:bg-zinc-800/50 transition cursor-pointer flex items-center justify-between text-sm shadow-2xs font-medium"
+                                                className="w-full min-h-11 px-3.5 py-2.5 rounded-xl border bg-background hover:bg-muted/50 transition cursor-pointer flex items-center justify-between text-sm shadow-sm font-medium"
                                             >
                                                 <span>{formData.country || 'Select a country...'}</span>
-                                                <ChevronRight className={`w-4 h-4 text-zinc-400 transition-transform ${isCountryOpen ? 'rotate-90' : ''}`} />
+                                                <ChevronRight className={`w-4 h-4 text-muted-foreground transition-transform ${isCountryOpen ? 'rotate-90' : ''}`} />
                                             </div>
                                             
                                             {isCountryOpen && (
-                                                <div className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl shadow-xl z-50 p-2 max-h-60 overflow-y-auto">
+                                                <div className="absolute top-full left-0 right-0 mt-2 bg-background border rounded-xl shadow-xl z-50 p-2 max-h-60 overflow-y-auto">
                                                     <div className="relative mb-2">
-                                                        <Search className="absolute left-3 top-2.5 w-4 h-4 text-zinc-400" />
+                                                        <Search className="absolute left-3 top-2.5 w-4 h-4 text-muted-foreground" />
                                                         <input 
                                                             type="text" 
                                                             placeholder="Search country..." 
                                                             value={countrySearch}
                                                             onChange={(e) => setCountrySearch(e.target.value)}
-                                                            className="w-full bg-zinc-100 dark:bg-zinc-800 rounded-lg pl-9 pr-3 py-1.5 text-xs border-none outline-none focus:ring-2 focus:ring-zinc-900"
+                                                            className="w-full bg-muted rounded-lg pl-9 pr-3 py-1.5 text-xs border-none outline-none focus:ring-2 focus:ring-primary/20"
                                                         />
                                                     </div>
                                                     {filteredCountries.map(c => (
@@ -274,7 +274,7 @@ export default function OnboardingWizard({ user, currencies, countries }: Props)
                                                                 setIsCountryOpen(false);
                                                                 setCountrySearch('');
                                                             }}
-                                                            className={`px-3 py-2 rounded-lg text-xs font-medium cursor-pointer transition ${c === formData.country ? 'bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 font-semibold' : 'hover:bg-zinc-100 dark:hover:bg-zinc-800'}`}
+                                                            className={`px-3 py-2 rounded-lg text-xs font-medium cursor-pointer transition ${c === formData.country ? 'bg-primary text-primary-foreground font-semibold' : 'hover:bg-muted'}`}
                                                         >
                                                             {c}
                                                         </div>
@@ -282,12 +282,12 @@ export default function OnboardingWizard({ user, currencies, countries }: Props)
                                                 </div>
                                             )}
                                         </div>
-                                        {errors.country && <span className="text-xs text-red-500 mt-1 block">{errors.country}</span>}
+                                        {errors.country && <span className="text-xs text-destructive mt-1 block">{errors.country}</span>}
                                     </div>
 
                                     {/* City Selector / Input */}
                                     <div className="space-y-2">
-                                        <label className="text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">City / Operational Node</label>
+                                        <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">City / Operational Node</label>
                                         <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                                             {currentCities.map(city => (
                                                 <div 
@@ -295,8 +295,8 @@ export default function OnboardingWizard({ user, currencies, countries }: Props)
                                                     onClick={() => setFormData(prev => ({ ...prev, city }))}
                                                     className={`px-3.5 py-2.5 rounded-xl border text-xs font-medium cursor-pointer flex items-center space-x-2 transition ${
                                                         city === formData.city ? 
-                                                        'border-zinc-900 bg-zinc-900 text-white dark:border-white dark:bg-white dark:text-zinc-900 shadow-xs' : 
-                                                        'border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 bg-zinc-50/50 dark:bg-zinc-900/50'
+                                                        'border-primary bg-primary text-primary-foreground shadow-sm' : 
+                                                        'border-border hover:border-border/80 bg-background'
                                                     }`}
                                                 >
                                                     <MapPin className="w-3.5 h-3.5 shrink-0 opacity-70" />
@@ -315,8 +315,8 @@ export default function OnboardingWizard({ user, currencies, countries }: Props)
                                         </div>
                                     </div>
                                 </CardContent>
-                                <CardFooter className="border-t border-zinc-100 dark:border-zinc-800/60 px-8 py-4 flex justify-end bg-zinc-50/30 dark:bg-zinc-900/30">
-                                    <Button onClick={nextStep} size="lg" className="h-11 px-6 rounded-xl font-medium shadow-xs">
+                                <CardFooter className="border-t px-8 py-4 flex justify-end bg-muted/30">
+                                    <Button onClick={nextStep} size="lg" className="h-11 px-6 rounded-xl font-medium shadow-sm">
                                         Continue to Contact
                                         <ArrowRight className="w-4 h-4 ml-2" />
                                     </Button>
@@ -332,12 +332,12 @@ export default function OnboardingWizard({ user, currencies, countries }: Props)
                                 exit={{ opacity: 0, x: 10 }}
                                 transition={{ duration: 0.2 }}
                             >
-                                <CardHeader className="pb-6 border-b border-zinc-100 dark:border-zinc-800/60 px-8 pt-8">
-                                    <div className="w-10 h-10 rounded-xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center mb-4 text-zinc-900 dark:text-zinc-100">
+                                <CardHeader className="pb-6 border-b px-8 pt-8">
+                                    <div className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center mb-4 text-foreground">
                                         <Phone className="w-5 h-5" />
                                     </div>
-                                    <CardTitle className="text-xl sm:text-2xl font-semibold tracking-tight">Communication Channels</CardTitle>
-                                    <CardDescription className="text-zinc-500 dark:text-zinc-400 mt-1.5 leading-relaxed">
+                                    <CardTitle className="text-xl sm:text-2xl">Communication Channels</CardTitle>
+                                    <CardDescription className="mt-1.5 leading-relaxed">
                                         Secure operational communication lines for transaction notifications, 2FA alerts, and VIP dispatch.
                                     </CardDescription>
                                 </CardHeader>
@@ -345,7 +345,7 @@ export default function OnboardingWizard({ user, currencies, countries }: Props)
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                         {/* Mobile 1 */}
                                         <div className="space-y-2">
-                                            <label className="text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">Primary Mobile <span className="text-red-500">*</span></label>
+                                            <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Primary Mobile <span className="text-destructive">*</span></label>
                                             <Input 
                                                 placeholder="+1 (555) 000-0000"
                                                 value={formData.mobile_1}
@@ -357,7 +357,7 @@ export default function OnboardingWizard({ user, currencies, countries }: Props)
 
                                         {/* Mobile 2 */}
                                         <div className="space-y-2">
-                                            <label className="text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">Secondary Mobile <span className="text-zinc-400 font-normal lowercase">(optional)</span></label>
+                                            <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Secondary Mobile <span className="text-muted-foreground/70 font-normal lowercase">(optional)</span></label>
                                             <Input 
                                                 placeholder="+1 (555) 999-9999"
                                                 value={formData.mobile_2}
@@ -370,12 +370,12 @@ export default function OnboardingWizard({ user, currencies, countries }: Props)
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
                                         {/* Telegram */}
                                         <div className="space-y-2">
-                                            <label className="text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 flex items-center space-x-1.5">
+                                            <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center space-x-1.5">
                                                 <Send className="w-3.5 h-3.5 text-blue-500" />
                                                 <span>Telegram Username</span>
                                             </label>
                                             <div className="relative flex items-center">
-                                                <span className="absolute left-3 text-sm font-medium text-zinc-400">@</span>
+                                                <span className="absolute left-3 text-sm font-medium text-muted-foreground">@</span>
                                                 <Input 
                                                     placeholder="username"
                                                     value={formData.telegram_username}
@@ -387,7 +387,7 @@ export default function OnboardingWizard({ user, currencies, countries }: Props)
 
                                         {/* WhatsApp */}
                                         <div className="space-y-2">
-                                            <label className="text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 flex items-center space-x-1.5">
+                                            <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center space-x-1.5">
                                                 <MessageSquare className="w-3.5 h-3.5 text-emerald-500" />
                                                 <span>WhatsApp Number</span>
                                             </label>
@@ -400,12 +400,12 @@ export default function OnboardingWizard({ user, currencies, countries }: Props)
                                         </div>
                                     </div>
                                 </CardContent>
-                                <CardFooter className="border-t border-zinc-100 dark:border-zinc-800/60 px-8 py-4 flex items-center justify-between bg-zinc-50/30 dark:bg-zinc-900/30">
+                                <CardFooter className="border-t px-8 py-4 flex items-center justify-between bg-muted/30">
                                     <Button onClick={prevStep} variant="outline" size="lg" className="h-11 px-5 rounded-xl font-medium">
                                         <ArrowLeft className="w-4 h-4 mr-2" />
                                         Back
                                     </Button>
-                                    <Button onClick={nextStep} size="lg" className="h-11 px-6 rounded-xl font-medium shadow-xs">
+                                    <Button onClick={nextStep} size="lg" className="h-11 px-6 rounded-xl font-medium shadow-sm">
                                         Continue to Currency
                                         <ArrowRight className="w-4 h-4 ml-2" />
                                     </Button>
@@ -421,18 +421,18 @@ export default function OnboardingWizard({ user, currencies, countries }: Props)
                                 exit={{ opacity: 0, x: 10 }}
                                 transition={{ duration: 0.2 }}
                             >
-                                <CardHeader className="pb-6 border-b border-zinc-100 dark:border-zinc-800/60 px-8 pt-8">
-                                    <div className="w-10 h-10 rounded-xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center mb-4 text-zinc-900 dark:text-zinc-100">
+                                <CardHeader className="pb-6 border-b px-8 pt-8">
+                                    <div className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center mb-4 text-foreground">
                                         <DollarSign className="w-5 h-5 text-amber-500" />
                                     </div>
-                                    <CardTitle className="text-xl sm:text-2xl font-semibold tracking-tight">Preferred Account Currency</CardTitle>
-                                    <CardDescription className="text-zinc-500 dark:text-zinc-400 mt-1.5 leading-relaxed">
+                                    <CardTitle className="text-xl sm:text-2xl">Preferred Account Currency</CardTitle>
+                                    <CardDescription className="mt-1.5 leading-relaxed">
                                         Select the primary base currency for your billing, client invoices, and internal wallet balances.
                                     </CardDescription>
                                 </CardHeader>
                                 <CardContent className="space-y-6 px-8 py-6">
                                     {/* Warning Banner */}
-                                    <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-700 dark:text-amber-400 flex items-start space-x-3 text-xs sm:text-sm leading-relaxed">
+                                    <div className="p-4 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 flex items-start space-x-3 text-xs sm:text-sm leading-relaxed">
                                         <AlertTriangle className="w-5 h-5 shrink-0 mt-0.5 text-amber-500" />
                                         <div>
                                             <strong className="font-semibold block mb-0.5 tracking-tight">Permanent Operational Selection</strong>
@@ -443,7 +443,7 @@ export default function OnboardingWizard({ user, currencies, countries }: Props)
                                     {/* Currency Fintech Selector */}
                                     <div className="space-y-3">
                                         <div className="flex items-center justify-between">
-                                            <label className="text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">Select Currency</label>
+                                            <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Select Currency</label>
                                             {isCurrencyLocked && (
                                                 <span className="inline-flex items-center space-x-1 text-xs text-amber-600 font-medium">
                                                     <Lock className="w-3 h-3" />
@@ -461,19 +461,19 @@ export default function OnboardingWizard({ user, currencies, countries }: Props)
                                                         isCurrencyLocked ? 'opacity-70 cursor-not-allowed' : 'cursor-pointer'
                                                     } ${
                                                         formData.preferred_currency === curr.code ?
-                                                        'border-zinc-900 bg-zinc-900 text-white dark:border-white dark:bg-white dark:text-zinc-900 shadow-md ring-2 ring-zinc-900/20 dark:ring-white/20 font-semibold' :
-                                                        'border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 bg-zinc-50/50 dark:bg-zinc-900/50'
+                                                        'border-primary bg-primary text-primary-foreground shadow-sm ring-2 ring-primary/20 font-semibold' :
+                                                        'border-border hover:border-border/80 bg-background'
                                                     }`}
                                                 >
                                                     <div className="flex items-center justify-between mb-1">
                                                         <span className="text-sm font-bold tracking-tight">{curr.code}</span>
                                                         <span className={`w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold ${
-                                                            formData.preferred_currency === curr.code ? 'bg-white/20 dark:bg-zinc-900/20 text-current' : 'bg-zinc-200 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400'
+                                                            formData.preferred_currency === curr.code ? 'bg-primary-foreground/20 text-current' : 'bg-muted text-muted-foreground'
                                                         }`}>
                                                             {curr.symbol}
                                                         </span>
                                                     </div>
-                                                    <span className={`text-xs block truncate ${formData.preferred_currency === curr.code ? 'text-zinc-300 dark:text-zinc-600 font-medium' : 'text-zinc-500 dark:text-zinc-400'}`}>
+                                                    <span className={`text-xs block truncate ${formData.preferred_currency === curr.code ? 'text-primary-foreground/80 font-medium' : 'text-muted-foreground'}`}>
                                                         {curr.name}
                                                     </span>
                                                     
@@ -483,15 +483,15 @@ export default function OnboardingWizard({ user, currencies, countries }: Props)
                                                 </div>
                                             ))}
                                         </div>
-                                        {errors.preferred_currency && <span className="text-xs text-red-500 block">{errors.preferred_currency}</span>}
+                                        {errors.preferred_currency && <span className="text-xs text-destructive block">{errors.preferred_currency}</span>}
                                     </div>
                                 </CardContent>
-                                <CardFooter className="border-t border-zinc-100 dark:border-zinc-800/60 px-8 py-4 flex items-center justify-between bg-zinc-50/30 dark:bg-zinc-900/30">
+                                <CardFooter className="border-t px-8 py-4 flex items-center justify-between bg-muted/30">
                                     <Button onClick={prevStep} variant="outline" size="lg" className="h-11 px-5 rounded-xl font-medium" disabled={saving}>
                                         <ArrowLeft className="w-4 h-4 mr-2" />
                                         Back
                                     </Button>
-                                    <Button onClick={handleComplete} size="lg" className="h-11 px-8 rounded-xl font-medium shadow-md bg-zinc-900 text-white hover:bg-zinc-800 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-100" disabled={saving}>
+                                    <Button onClick={handleComplete} size="lg" className="h-11 px-8 rounded-xl font-medium shadow-md" disabled={saving}>
                                         {saving ? (
                                             <>
                                                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />
@@ -511,7 +511,7 @@ export default function OnboardingWizard({ user, currencies, countries }: Props)
                 </Card>
 
                 {/* Minimalist Trust & Encryption Badge */}
-                <div className="mt-8 text-center text-xs text-zinc-400 dark:text-zinc-500 flex items-center justify-center space-x-2 z-10 font-normal tracking-tight">
+                <div className="mt-8 text-center text-xs text-muted-foreground flex items-center justify-center space-x-2 z-10 font-normal tracking-tight">
                     <Lock className="w-3.5 h-3.5 opacity-70" />
                     <span>256-bit SSL Operational Workspace Security</span>
                 </div>
