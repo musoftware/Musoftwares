@@ -69,34 +69,38 @@ class WithdrawalController extends Controller
             ->where('status', 'approved')
             ->firstOrFail();
 
-        DB::transaction(function () use ($request, $client) {
-            $wallet = Wallet::where('owner_type', \Modules\ERP\Models\Client::class)
-                ->where('owner_id', $client->id)
-                ->lockForUpdate()
-                ->firstOrFail();
+        try {
+            DB::transaction(function () use ($request, $client) {
+                $wallet = Wallet::where('owner_type', \Modules\ERP\Models\Client::class)
+                    ->where('owner_id', $client->id)
+                    ->lockForUpdate()
+                    ->firstOrFail();
 
-            $amount = $request->amount;
+                $amount = $request->amount;
 
-            // Check if available balance (balance - pending/approved withdrawals) is enough
-            $lockedAmount = Withdrawal::where('client_id', $client->id)
-                ->whereIn('status', ['pending', 'approved'])
-                ->sum('amount');
+                // Check if available balance (balance - pending/approved withdrawals) is enough
+                $lockedAmount = Withdrawal::where('client_id', $client->id)
+                    ->whereIn('status', ['pending', 'approved'])
+                    ->sum('amount');
 
-            if ($wallet->balance - $lockedAmount < $amount) {
-                throw new \Exception('Insufficient available balance.');
-            }
+                if ($wallet->balance - $lockedAmount < $amount) {
+                    throw new \Exception('Insufficient available balance.');
+                }
 
-            Withdrawal::create([
-                'tenant_id' => $client->tenant_id,
-                'client_id' => $client->id,
-                'payment_method_id' => $request->payment_method_id,
-                'amount' => $amount,
-                'currency_code' => $wallet->currency,
-                'status' => 'pending',
-            ]);
-        });
+                Withdrawal::create([
+                    'tenant_id' => $client->tenant_id,
+                    'client_id' => $client->id,
+                    'payment_method_id' => $request->payment_method_id,
+                    'amount' => $amount,
+                    'currency_code' => $wallet->currency,
+                    'status' => 'pending',
+                ]);
+            });
 
-        return back()->with('success', 'Withdrawal request submitted.');
+            return back()->with('success', 'Withdrawal request submitted.');
+        } catch (\Exception $e) {
+            return back()->withErrors(['amount' => $e->getMessage()]);
+        }
     }
 
     public function approve(Request $request, Withdrawal $withdrawal)

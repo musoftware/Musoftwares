@@ -66,8 +66,12 @@ class WithdrawalWorkflowTest extends TestCase
             'tenant_id' => $this->tenant->id,
             'client_id' => $this->client->id,
             'type' => 'bank_transfer',
-            'name' => 'My Bank',
-            'details' => ['iban' => 'US1234567890'],
+            'bank_name' => 'Chase Bank',
+            'account_holder_name' => 'John Doe',
+            'account_number' => '1234567890',
+            'bank_country' => 'US',
+            'bank_currency' => 'USD',
+            'iban' => 'US1234567890',
             'status' => 'approved',
         ]);
     }
@@ -149,7 +153,7 @@ class WithdrawalWorkflowTest extends TestCase
 
         $response = $this->actingAs($this->admin)
             ->withSession(['tenant_id' => $this->tenant->id])
-            ->post(route('erp.withdrawals.mark-paid', $withdrawal->id), [
+            ->post(route('erp.withdrawals.markPaid', $withdrawal->id), [
                 'reference' => 'TXN-BANK-1002',
                 'proof' => $proofFile,
             ]);

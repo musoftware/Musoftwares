@@ -32,4 +32,9 @@ abstract class TenantModel extends Model
             }
         });
     }
+
+    public function notes(): \Illuminate\Database\Eloquent\Relations\MorphMany
+    {
+        return $this->morphMany(\Modules\Core\Models\AdminNote::class, 'noteable');
+    }
 }
