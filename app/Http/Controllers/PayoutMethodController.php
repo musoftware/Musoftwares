@@ -6,6 +6,11 @@ use Illuminate\Http\Request;
 use Modules\Core\Models\PayoutMethod;
 use Inertia\Inertia;
 
+/**
+ * Payout method management with type-specific validation.
+ * Recovered from old project: Client/PayoutController::store_payment_method()
+ * Modernized: JSON details field, expanded payment type support.
+ */
 class PayoutMethodController extends Controller
 {
     public function index(Request $request)
@@ -17,16 +22,75 @@ class PayoutMethodController extends Controller
         ]);
     }
 
+    /**
+     * Store a new payout method with type-specific validation.
+     * Recovered from old project: PayoutController::store_payment_method()
+     * 
+     * Old project validated per type: bank needs account_number, wallet needs mobile, etc.
+     * This version uses a JSON `details` field but applies the same strict validation rules.
+     */
     public function store(Request $request)
     {
-        $request->validate([
-            'type' => 'required|string|in:bank_transfer,paypal,crypto_wallet',
-            'details' => 'required|array',
+        $type = $request->input('type');
+
+        // Base validation rules
+        $rules = [
+            'type' => 'required|string|in:bank_transfer,paypal,mobile_wallet,instapay,crypto_wallet',
             'is_default' => 'boolean',
+        ];
+
+        // Type-specific validation rules
+        // Recovered from old project: PayoutController::store_payment_method() conditional rules
+        switch ($type) {
+            case 'bank_transfer':
+                $rules['details.full_name'] = 'required|string|max:255';
+                $rules['details.bank_name'] = 'required|string|max:255';
+                $rules['details.account_number'] = 'required|string|max:50';
+                $rules['details.account_name'] = 'required|string|max:255';
+                $rules['details.iban'] = 'nullable|string|max:34';
+                $rules['details.swift_code'] = 'nullable|string|max:11';
+                $rules['details.bank_country'] = 'nullable|string|max:2';
+                $rules['details.currency'] = 'required|string|in:USD,EUR,GBP,EGP,TRY,CAD,AUD';
+                break;
+
+            case 'mobile_wallet':
+                // Recovered from old project: wallet type requires 11-digit mobile number
+                $rules['details.full_name'] = 'required|string|max:255';
+                $rules['details.mobile_number'] = 'required|string|regex:/^[0-9]{10,15}$/';
+                $rules['details.provider'] = 'nullable|string|max:50';
+                $rules['details.currency'] = 'required|string|in:EGP,USD';
+                break;
+
+            case 'paypal':
+                // Recovered from old project: paypal type requires valid email
+                $rules['details.full_name'] = 'required|string|max:255';
+                $rules['details.paypal_email'] = 'required|email|max:255';
+                $rules['details.currency'] = 'required|string|in:USD,EUR,GBP';
+                break;
+
+            case 'instapay':
+                // Recovered from old project: instapay type requires mobile + username
+                $rules['details.full_name'] = 'required|string|max:255';
+                $rules['details.mobile_number'] = 'required|string|regex:/^[0-9]{10,15}$/';
+                $rules['details.instapay_username'] = 'required|string|max:255';
+                $rules['details.currency'] = 'required|string|in:EGP';
+                break;
+
+            case 'crypto_wallet':
+                $rules['details.wallet_address'] = 'required|string|min:20|max:100';
+                $rules['details.network'] = 'required|string|in:BTC,ETH,USDT_TRC20,USDT_ERC20';
+                $rules['details.currency'] = 'required|string|in:BTC,ETH,USDT';
+                break;
+        }
+
+        $request->validate($rules, [
+            'details.mobile_number.regex' => 'Mobile number must be 10-15 digits.',
+            'details.wallet_address.min' => 'Wallet address appears invalid.',
         ]);
 
         $user = $request->user();
 
+        // Unset all other defaults if this is being set as default
         if ($request->is_default) {
             $user->payoutMethods()->update(['is_default' => false]);
         }
@@ -35,7 +99,7 @@ class PayoutMethodController extends Controller
             'type' => $request->type,
             'details' => $request->details,
             'is_default' => $request->is_default ?? false,
-            'status' => 'approved', // Auto approved
+            'status' => 'approved', // Auto approved for now; can be changed to 'pending' for admin review
         ]);
 
         return back()->with('success', 'Payout method added successfully.');
@@ -47,11 +111,47 @@ class PayoutMethodController extends Controller
             abort(403);
         }
 
-        $request->validate([
-            'type' => 'required|string|in:bank_transfer,paypal,crypto_wallet',
+        $type = $request->input('type', $payoutMethod->type);
+
+        // Apply same type-specific validation as store()
+        $rules = [
+            'type' => 'required|string|in:bank_transfer,paypal,mobile_wallet,instapay,crypto_wallet',
             'details' => 'required|array',
             'is_default' => 'boolean',
-        ]);
+        ];
+
+        switch ($type) {
+            case 'bank_transfer':
+                $rules['details.full_name'] = 'required|string|max:255';
+                $rules['details.bank_name'] = 'required|string|max:255';
+                $rules['details.account_number'] = 'required|string|max:50';
+                $rules['details.account_name'] = 'required|string|max:255';
+                $rules['details.currency'] = 'required|string|in:USD,EUR,GBP,EGP,TRY,CAD,AUD';
+                break;
+            case 'mobile_wallet':
+                $rules['details.full_name'] = 'required|string|max:255';
+                $rules['details.mobile_number'] = 'required|string|regex:/^[0-9]{10,15}$/';
+                $rules['details.currency'] = 'required|string|in:EGP,USD';
+                break;
+            case 'paypal':
+                $rules['details.full_name'] = 'required|string|max:255';
+                $rules['details.paypal_email'] = 'required|email|max:255';
+                $rules['details.currency'] = 'required|string|in:USD,EUR,GBP';
+                break;
+            case 'instapay':
+                $rules['details.full_name'] = 'required|string|max:255';
+                $rules['details.mobile_number'] = 'required|string|regex:/^[0-9]{10,15}$/';
+                $rules['details.instapay_username'] = 'required|string|max:255';
+                $rules['details.currency'] = 'required|string|in:EGP';
+                break;
+            case 'crypto_wallet':
+                $rules['details.wallet_address'] = 'required|string|min:20|max:100';
+                $rules['details.network'] = 'required|string|in:BTC,ETH,USDT_TRC20,USDT_ERC20';
+                $rules['details.currency'] = 'required|string|in:BTC,ETH,USDT';
+                break;
+        }
+
+        $request->validate($rules);
 
         if ($request->is_default) {
             $request->user()->payoutMethods()->where('id', '!=', $payoutMethod->id)->update(['is_default' => false]);
@@ -70,6 +170,16 @@ class PayoutMethodController extends Controller
     {
         if ($payoutMethod->user_id !== $request->user()->id) {
             abort(403);
+        }
+
+        // Check if this method has pending withdrawals
+        $hasPending = $payoutMethod->user_id === $request->user()->id
+            && \Modules\Core\Models\UserWithdrawal::where('payout_method_id', $payoutMethod->id)
+                ->whereIn('status', ['pending', 'approved'])
+                ->exists();
+
+        if ($hasPending) {
+            return back()->withErrors(['delete' => 'Cannot delete a payout method with pending withdrawals.']);
         }
 
         $payoutMethod->delete();

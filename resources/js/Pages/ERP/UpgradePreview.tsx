@@ -3,19 +3,19 @@ import { Head, router } from '@inertiajs/react';
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-    ShieldAlert,
     Sparkles,
     CheckCircle2,
     Lock,
     ArrowRight,
     TrendingUp,
-    FileText,
     Calculator,
     PieChart,
-    ChevronRight,
-    Play
+    Loader2
 } from 'lucide-react';
 import { Button } from '@/Components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/Components/ui/card';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/Components/ui/table';
+import { Badge } from '@/Components/ui/badge';
 import { useToast } from '@/Components/ui/use-toast';
 
 export default function UpgradePreview() {
@@ -44,166 +44,172 @@ export default function UpgradePreview() {
         <AuthenticatedLayout header="ERP Expansion Preview">
             <Head title="ERP Workspace Premium Upgrade" />
 
-            <div className="max-w-5xl mx-auto space-y-8 pb-12 font-sans text-sm">
+            <div className="max-w-[1000px] mx-auto px-4 py-8 space-y-8 font-sans text-sm">
                 
                 {/* Visual upgrade hero card */}
-                <div className="relative rounded-2xl bg-slate-900 text-white p-6 md:p-8 shadow-xl overflow-hidden">
-                    <div className="absolute top-0 right-0 translate-x-12 -translate-y-12 opacity-10">
-                        <Calculator className="h-64 w-64" />
+                <Card className="border-primary/20 bg-muted/10 shadow-none overflow-hidden relative">
+                    <div className="absolute top-0 right-0 translate-x-12 -translate-y-12 opacity-5 pointer-events-none">
+                        <Calculator className="h-64 w-64 text-primary" />
                     </div>
 
-                    <div className="max-w-2xl space-y-4 relative z-10">
-                        <div className="inline-flex items-center gap-1.5 bg-indigo-500/20 text-indigo-300 px-3 py-1 rounded-full text-xs font-semibold">
+                    <CardContent className="p-8 md:p-10 relative z-10 max-w-2xl space-y-6">
+                        <Badge variant="secondary" className="bg-primary/10 text-primary border-primary/20 font-semibold gap-1.5 px-3 py-1">
                             <Sparkles className="h-3.5 w-3.5" />
                             Premium ERP Extension Module
+                        </Badge>
+                        <div className="space-y-2">
+                            <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-foreground leading-tight">
+                                Consolidate Invoicing, Estimations, & Profit Ledger Into One Operational Workspace
+                            </h1>
+                            <p className="text-muted-foreground leading-relaxed">
+                                Upgrade your client account to unlock professional estimates, automated recurring business invoices, employee expense reporting, and active ledger profit distribution charts.
+                            </p>
                         </div>
-                        <h1 className="font-sora text-xl md:text-2xl font-bold tracking-tight text-white leading-tight">
-                            Consolidate Invoicing, Estimations, & Profit Ledger Into One Operational Workspace
-                        </h1>
-                        <p className="text-xs text-slate-300 leading-relaxed max-w-lg">
-                            Upgrade your client account to unlock professional estimates, automated recurring business invoices, employee expense reporting, and active ledger profit distribution charts.
-                        </p>
                         
-                        <div className="pt-3">
+                        <div className="pt-2">
                             <Button 
                                 onClick={handleUpgradeSimulate}
                                 disabled={isUpgrading}
-                                className="bg-white hover:bg-slate-100 text-slate-950 font-bold px-6 py-2.5 rounded-lg text-xs flex items-center gap-2 group transition"
+                                className="shadow-none flex items-center gap-2 group h-11 px-8 transition-all"
                             >
-                                {isUpgrading ? "Clearing payment checkout..." : "Activate ERP Capability"}
-                                <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition" />
+                                {isUpgrading ? "Checking License..." : "Activate ERP Capability"}
+                                {!isUpgrading && <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />}
                             </Button>
                         </div>
-                    </div>
-                </div>
+                    </CardContent>
+                </Card>
 
                 {/* Capabilities grid with locked screen visual mockups */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {/* Capability 1: Advanced Estimations */}
-                    <div className="bg-white border border-border/60 rounded-xl p-5 shadow-sm space-y-4 relative overflow-hidden group">
-                        <div className="absolute top-3 right-3 text-text-muted opacity-30 group-hover:opacity-60 transition">
-                            <Lock className="h-4.5 w-4.5" />
-                        </div>
-                        
-                        <div className="space-y-1">
-                            <h3 className="font-sora font-semibold text-text-primary text-sm flex items-center gap-2">
-                                <Calculator className="h-4 w-4 text-indigo-500" /> Dynamic Estimations Engine
-                            </h3>
-                            <p className="text-text-secondary text-xs leading-normal">
+                    <Card className="shadow-none border-border group overflow-hidden">
+                        <CardHeader className="pb-3 relative">
+                            <div className="absolute top-6 right-6 text-muted-foreground opacity-30 group-hover:opacity-60 transition-opacity">
+                                <Lock className="h-5 w-5" />
+                            </div>
+                            <CardTitle className="text-base flex items-center gap-2">
+                                <Calculator className="h-4 w-4 text-primary" /> Dynamic Estimations Engine
+                            </CardTitle>
+                            <CardDescription className="text-xs leading-normal pt-1">
                                 Build interactive itemized estimates and automatically convert them into billing invoices upon client signature approval.
-                            </p>
-                        </div>
-
-                        {/* Blurred Mockup Visual */}
-                        <div className="rounded-lg border border-slate-100 bg-slate-50/50 p-3 select-none filter blur-[1.5px] opacity-70 pointer-events-none font-mono text-[10px] space-y-2">
-                            <div className="flex justify-between border-b pb-1.5">
-                                <span>Estimate #EST-021</span>
-                                <span className="bg-amber-100 px-1 rounded">Draft</span>
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            {/* Blurred Mockup Visual */}
+                            <div className="rounded-lg border border-border bg-muted/30 p-4 select-none filter blur-[1.5px] opacity-70 pointer-events-none font-mono text-[10px] space-y-3">
+                                <div className="flex justify-between border-b border-border pb-2">
+                                    <span className="font-semibold text-foreground">Estimate #EST-021</span>
+                                    <span className="bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded font-medium">Draft</span>
+                                </div>
+                                <div className="space-y-1.5 text-muted-foreground">
+                                    <div className="flex justify-between"><span>Core Refactoring</span><span>$1,200.00</span></div>
+                                    <div className="flex justify-between"><span>Database Migration</span><span>$650.00</span></div>
+                                </div>
+                                <div className="text-right font-bold pt-2 border-t border-border text-foreground">Total: $1,850.00</div>
                             </div>
-                            <div className="space-y-1">
-                                <div className="flex justify-between"><span>Core Refactoring</span><span>$1,200.00</span></div>
-                                <div className="flex justify-between"><span>Database Migration</span><span>$650.00</span></div>
-                            </div>
-                            <div className="text-right font-bold pt-1.5 border-t">Total: $1,850.00</div>
-                        </div>
-                    </div>
+                        </CardContent>
+                    </Card>
 
                     {/* Capability 2: Ledger Expenses & Cash Flow Reports */}
-                    <div className="bg-white border border-border/60 rounded-xl p-5 shadow-sm space-y-4 relative overflow-hidden group">
-                        <div className="absolute top-3 right-3 text-text-muted opacity-30 group-hover:opacity-60 transition">
-                            <Lock className="h-4.5 w-4.5" />
-                        </div>
-
-                        <div className="space-y-1">
-                            <h3 className="font-sora font-semibold text-text-primary text-sm flex items-center gap-2">
-                                <PieChart className="h-4 w-4 text-indigo-500" /> Automated Expense Tracker
-                            </h3>
-                            <p className="text-text-secondary text-xs leading-normal">
+                    <Card className="shadow-none border-border group overflow-hidden">
+                        <CardHeader className="pb-3 relative">
+                            <div className="absolute top-6 right-6 text-muted-foreground opacity-30 group-hover:opacity-60 transition-opacity">
+                                <Lock className="h-5 w-5" />
+                            </div>
+                            <CardTitle className="text-base flex items-center gap-2">
+                                <PieChart className="h-4 w-4 text-primary" /> Automated Expense Tracker
+                            </CardTitle>
+                            <CardDescription className="text-xs leading-normal pt-1">
                                 Log operational costs, vendor receipts, server costs, and compile automatic Profit & Loss charts for annual tax schedules.
-                            </p>
-                        </div>
-
-                        {/* Blurred chart visual */}
-                        <div className="rounded-lg border border-slate-100 bg-slate-50/50 p-3 select-none filter blur-[1.5px] opacity-70 pointer-events-none font-mono text-[10px] space-y-2">
-                            <div className="flex justify-between items-center">
-                                <span>Profit & Loss Ledger</span>
-                                <span className="text-emerald-600 font-bold flex items-center"><TrendingUp className="h-3 w-3 mr-0.5" /> +14.5%</span>
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            {/* Blurred chart visual */}
+                            <div className="rounded-lg border border-border bg-muted/30 p-4 select-none filter blur-[1.5px] opacity-70 pointer-events-none font-mono text-[10px] space-y-3">
+                                <div className="flex justify-between items-center">
+                                    <span className="font-semibold text-foreground">Profit & Loss Ledger</span>
+                                    <span className="text-emerald-600 font-bold flex items-center"><TrendingUp className="h-3 w-3 mr-1" /> +14.5%</span>
+                                </div>
+                                <div className="flex justify-between text-muted-foreground">
+                                    <span>Net Sales: $12,450.00</span>
+                                    <span>Expenses: $3,210.00</span>
+                                </div>
+                                <div className="h-2 w-full bg-border rounded-full overflow-hidden flex">
+                                    <div className="h-full bg-emerald-500 w-2/3" />
+                                    <div className="h-full bg-rose-400 w-1/3" />
+                                </div>
                             </div>
-                            <div className="flex justify-between text-text-secondary">
-                                <span>Net Sales: $12,450.00</span>
-                                <span>Expenses: $3,210.00</span>
-                            </div>
-                            <div className="h-2 w-full bg-slate-200 rounded overflow-hidden flex">
-                                <div className="h-full bg-emerald-500 w-2/3" />
-                                <div className="h-full bg-rose-400 w-1/3" />
-                            </div>
-                        </div>
-                    </div>
+                        </CardContent>
+                    </Card>
                 </div>
 
                 {/* Feature Comparison Capability Table */}
-                <div className="bg-white border border-border/60 rounded-xl overflow-hidden shadow-sm">
-                    <div className="px-5 py-4 border-b border-border/50 bg-slate-50/50">
-                        <h3 className="font-sora text-xs font-bold uppercase tracking-wider text-text-muted">
-                            Capability Mapping comparison
-                        </h3>
-                    </div>
-                    <div className="overflow-x-auto text-xs">
-                        <table className="w-full text-left border-collapse">
-                            <thead>
-                                <tr className="border-b border-border font-bold text-text-muted bg-slate-50/30">
-                                    <th className="p-4">Feature</th>
-                                    <th className="p-4 text-center">Standard Client Account</th>
-                                    <th className="p-4 text-center text-indigo-700 bg-indigo-50/10">Premium ERP Workspace</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-border/60">
-                                <tr>
-                                    <td className="p-4 font-semibold text-text-primary">Receive Invoices & Pay</td>
-                                    <td className="p-4 text-center"><CheckCircle2 className="h-4.5 w-4.5 text-emerald-500 mx-auto" /></td>
-                                    <td className="p-4 text-center bg-indigo-50/10"><CheckCircle2 className="h-4.5 w-4.5 text-emerald-500 mx-auto" /></td>
-                                </tr>
-                                <tr>
-                                    <td className="p-4 font-semibold text-text-primary">Estimates Creation & Signatures</td>
-                                    <td className="p-4 text-center text-text-muted">Locked</td>
-                                    <td className="p-4 text-center bg-indigo-50/10"><CheckCircle2 className="h-4.5 w-4.5 text-emerald-500 mx-auto" /></td>
-                                </tr>
-                                <tr>
-                                    <td className="p-4 font-semibold text-text-primary">Client Expense Ledger Tracking</td>
-                                    <td className="p-4 text-center text-text-muted">Locked</td>
-                                    <td className="p-4 text-center bg-indigo-50/10"><CheckCircle2 className="h-4.5 w-4.5 text-emerald-500 mx-auto" /></td>
-                                </tr>
-                                <tr>
-                                    <td className="p-4 font-semibold text-text-primary">Annual Profit & Loss Reports</td>
-                                    <td className="p-4 text-center text-text-muted">Locked</td>
-                                    <td className="p-4 text-center bg-indigo-50/10"><CheckCircle2 className="h-4.5 w-4.5 text-emerald-500 mx-auto" /></td>
-                                </tr>
-                                <tr>
-                                    <td className="p-4 font-semibold text-text-primary">Recurring Auto-Invoicing Automation</td>
-                                    <td className="p-4 text-center text-text-muted">Locked</td>
-                                    <td className="p-4 text-center bg-indigo-50/10"><CheckCircle2 className="h-4.5 w-4.5 text-emerald-500 mx-auto" /></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+                <Card className="shadow-none overflow-hidden">
+                    <CardHeader className="bg-muted/30 border-b pb-4">
+                        <CardTitle className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                            Capability Mapping Comparison
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent className="p-0">
+                        <div className="overflow-x-auto">
+                            <Table>
+                                <TableHeader>
+                                    <TableRow className="bg-muted/10">
+                                        <TableHead className="pl-6 w-[40%]">Feature</TableHead>
+                                        <TableHead className="text-center w-[30%]">Standard Client Account</TableHead>
+                                        <TableHead className="text-center w-[30%] bg-primary/5 text-primary font-semibold">Premium ERP Workspace</TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                    <TableRow>
+                                        <TableCell className="pl-6 font-medium">Receive Invoices & Pay</TableCell>
+                                        <TableCell className="text-center"><CheckCircle2 className="h-4 w-4 text-emerald-500 mx-auto" /></TableCell>
+                                        <TableCell className="text-center bg-primary/5"><CheckCircle2 className="h-4 w-4 text-emerald-500 mx-auto" /></TableCell>
+                                    </TableRow>
+                                    <TableRow>
+                                        <TableCell className="pl-6 font-medium">Estimates Creation & Signatures</TableCell>
+                                        <TableCell className="text-center text-muted-foreground"><Lock className="h-4 w-4 mx-auto opacity-50" /></TableCell>
+                                        <TableCell className="text-center bg-primary/5"><CheckCircle2 className="h-4 w-4 text-emerald-500 mx-auto" /></TableCell>
+                                    </TableRow>
+                                    <TableRow>
+                                        <TableCell className="pl-6 font-medium">Client Expense Ledger Tracking</TableCell>
+                                        <TableCell className="text-center text-muted-foreground"><Lock className="h-4 w-4 mx-auto opacity-50" /></TableCell>
+                                        <TableCell className="text-center bg-primary/5"><CheckCircle2 className="h-4 w-4 text-emerald-500 mx-auto" /></TableCell>
+                                    </TableRow>
+                                    <TableRow>
+                                        <TableCell className="pl-6 font-medium">Annual Profit & Loss Reports</TableCell>
+                                        <TableCell className="text-center text-muted-foreground"><Lock className="h-4 w-4 mx-auto opacity-50" /></TableCell>
+                                        <TableCell className="text-center bg-primary/5"><CheckCircle2 className="h-4 w-4 text-emerald-500 mx-auto" /></TableCell>
+                                    </TableRow>
+                                    <TableRow>
+                                        <TableCell className="pl-6 font-medium">Recurring Auto-Invoicing Automation</TableCell>
+                                        <TableCell className="text-center text-muted-foreground"><Lock className="h-4 w-4 mx-auto opacity-50" /></TableCell>
+                                        <TableCell className="text-center bg-primary/5"><CheckCircle2 className="h-4 w-4 text-emerald-500 mx-auto" /></TableCell>
+                                    </TableRow>
+                                </TableBody>
+                            </Table>
+                        </div>
+                    </CardContent>
+                </Card>
 
                 {/* Bottom interactive Upgrade CTA banner */}
-                <div className="rounded-xl border border-indigo-100 bg-indigo-50/20 p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                    <div className="space-y-1">
-                        <span className="font-bold text-indigo-950 block">Ready to unlock fully unified operations?</span>
-                        <p className="text-[11px] text-indigo-800 leading-snug">
-                            Activate your Premium ERP workspace license today. Simulates check clearance instantly in sandbox mode.
-                        </p>
-                    </div>
-                    <Button 
-                        onClick={handleUpgradeSimulate}
-                        disabled={isUpgrading}
-                        className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-5 rounded-lg text-xs"
-                    >
-                        {isUpgrading ? "Checking..." : "Upgrade Now"}
-                    </Button>
-                </div>
+                <Card className="shadow-none border-primary/20 bg-primary/5">
+                    <CardContent className="p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                        <div className="space-y-1">
+                            <span className="font-semibold text-foreground block">Ready to unlock fully unified operations?</span>
+                            <p className="text-xs text-muted-foreground leading-snug">
+                                Activate your Premium ERP workspace license today. Simulates check clearance instantly in sandbox mode.
+                            </p>
+                        </div>
+                        <Button 
+                            onClick={handleUpgradeSimulate}
+                            disabled={isUpgrading}
+                            className="shadow-none whitespace-nowrap"
+                        >
+                            {isUpgrading ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Checking...</> : "Upgrade Now"}
+                        </Button>
+                    </CardContent>
+                </Card>
             </div>
             
             {/* Simulated progress overlay */}
@@ -213,21 +219,23 @@ export default function UpgradePreview() {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center"
+                        className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center p-4"
                     >
                         <motion.div 
-                            initial={{ scale: 0.95 }}
-                            animate={{ scale: 1 }}
-                            exit={{ scale: 0.95 }}
-                            className="bg-white rounded-2xl p-6 max-w-sm w-full border border-border shadow-2xl text-center space-y-4"
+                            initial={{ scale: 0.95, y: 20 }}
+                            animate={{ scale: 1, y: 0 }}
+                            exit={{ scale: 0.95, y: 20 }}
+                            className="bg-card rounded-xl p-8 max-w-sm w-full border shadow-lg text-center space-y-4"
                         >
-                            <div className="h-10 w-10 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center mx-auto animate-spin">
-                                <Sparkles className="h-5 w-5" />
+                            <div className="h-12 w-12 rounded-full bg-primary/10 text-primary flex items-center justify-center mx-auto animate-spin">
+                                <Loader2 className="h-6 w-6" />
                             </div>
-                            <h3 className="font-sora font-bold text-text-primary text-sm">Processing License Setup</h3>
-                            <p className="text-text-secondary text-xs leading-normal">
-                                Provisioning estimates tables, recurring models, and dashboard metrics trackers...
-                            </p>
+                            <div className="space-y-1">
+                                <h3 className="font-semibold text-card-foreground text-base">Processing License Setup</h3>
+                                <p className="text-muted-foreground text-xs leading-normal">
+                                    Provisioning estimates tables, recurring models, and dashboard metrics trackers...
+                                </p>
+                            </div>
                         </motion.div>
                     </motion.div>
                 )}

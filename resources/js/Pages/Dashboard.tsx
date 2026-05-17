@@ -4,11 +4,46 @@ import { Head, Link, usePage } from '@inertiajs/react';
 import { 
     Wallet, FileText, ArrowUpRight, ArrowRight, Clock, CheckCircle2, 
     AlertCircle, Sparkles, Building2, Briefcase, Megaphone, Plus, ArrowRightLeft,
-    CreditCard
+    CreditCard, Inbox
 } from 'lucide-react';
 
+interface DashboardStats {
+    walletBalance: number;
+    earnedBalance: number;
+    pointsBalance: number;
+    unpaidInvoices: number;
+    unpaidAmount: number;
+    activeSubscriptions: number;
+    openTickets: number;
+    pendingWithdrawals: number;
+    currency: string;
+}
 
-export default function Dashboard() {
+interface PendingInvoice {
+    id: string;
+    dbId: number;
+    date: string;
+    amount: number;
+    status: string;
+    description: string;
+    currency: string;
+}
+
+interface RecentTransaction {
+    id: string;
+    date: string;
+    type: string;
+    amount: number;
+    method: string;
+}
+
+interface DashboardProps {
+    stats?: DashboardStats;
+    pendingInvoices?: PendingInvoice[];
+    recentTransactions?: RecentTransaction[];
+}
+
+export default function Dashboard({ stats: serverStats, pendingInvoices: serverInvoices, recentTransactions: serverTransactions }: DashboardProps) {
     const { auth } = usePage().props as any;
     const user = auth?.user;
 
@@ -23,25 +58,22 @@ export default function Dashboard() {
         return fallbackUrl || '#';
     };
 
-    // Simulated data for operational view
-    const stats = {
-        walletBalance: 1250.45,
-        pointsBalance: 1450,
-        unpaidInvoices: 2,
-        unpaidAmount: 3450.00,
-        activeSubscriptions: 1
+    // Use server-passed data (real DB queries), with safe fallbacks for zero-state
+    const stats = serverStats || {
+        walletBalance: 0,
+        earnedBalance: 0,
+        pointsBalance: 0,
+        unpaidInvoices: 0,
+        unpaidAmount: 0,
+        activeSubscriptions: 0,
+        openTickets: 0,
+        pendingWithdrawals: 0,
+        currency: 'USD',
     };
 
-    const pendingInvoices = [
-        { id: 'INV-2024-001', date: 'Oct 12, 2024', amount: 2500.00, status: 'due', description: 'ERP Custom Implementation', dbId: 1 },
-        { id: 'INV-2024-002', date: 'Oct 15, 2024', amount: 950.00, status: 'overdue', description: 'Monthly Retainer - Oct', dbId: 2 },
-    ];
-
-    const recentTransactions = [
-        { id: 'TXN-001', date: 'Oct 10, 2024', type: 'deposit', amount: 5000.00, method: 'Stripe' },
-        { id: 'TXN-002', date: 'Oct 08, 2024', type: 'payment', amount: -1500.00, method: 'Wallet Balance' },
-        { id: 'TXN-003', date: 'Oct 05, 2024', type: 'withdrawal', amount: -2000.00, method: 'Bank Transfer' },
-    ];
+    const pendingInvoices = serverInvoices || [];
+    const recentTransactions = serverTransactions || [];
+    const currencySymbol = stats.currency === 'EGP' ? 'EGP ' : '$';
 
     return (
         <AuthenticatedLayout header={undefined}>
@@ -76,7 +108,7 @@ export default function Dashboard() {
                         <div>
                             <p className="text-sm font-medium text-slate-500 mb-1">Wallet Balance</p>
                             <div className="flex items-baseline gap-2">
-                                <h2 className="text-3xl font-semibold text-slate-900">${stats.walletBalance.toLocaleString(undefined, {minimumFractionDigits: 2})}</h2>
+                                <h2 className="text-3xl font-semibold text-slate-900">{currencySymbol}{stats.walletBalance.toLocaleString(undefined, {minimumFractionDigits: 2})}</h2>
                             </div>
                         </div>
                     </div>
@@ -97,7 +129,7 @@ export default function Dashboard() {
                             <div>
                                 <p className="text-sm font-medium text-slate-500 mb-1">Unpaid Invoices ({stats.unpaidInvoices})</p>
                                 <div className="flex items-baseline gap-2">
-                                    <h2 className="text-3xl font-semibold text-rose-600">${stats.unpaidAmount.toLocaleString(undefined, {minimumFractionDigits: 2})}</h2>
+                                    <h2 className="text-3xl font-semibold text-rose-600">{currencySymbol}{stats.unpaidAmount.toLocaleString(undefined, {minimumFractionDigits: 2})}</h2>
                                 </div>
                             </div>
                         </div>
@@ -112,7 +144,7 @@ export default function Dashboard() {
                         <div>
                             <p className="text-sm font-medium text-slate-500 mb-1">Subscribed Systems</p>
                             <div className="flex items-baseline gap-2">
-                                <h2 className="text-3xl font-semibold text-slate-900">{stats.activeSubscriptions} Module</h2>
+                                <h2 className="text-3xl font-semibold text-slate-900">{stats.activeSubscriptions} Module{stats.activeSubscriptions !== 1 ? 's' : ''}</h2>
                             </div>
                         </div>
                     </div>
@@ -133,7 +165,15 @@ export default function Dashboard() {
                                 </Link>
                             </div>
                             <div className="divide-y divide-slate-100">
-                                {pendingInvoices.map((invoice) => (
+                                {pendingInvoices.length === 0 ? (
+                                    <div className="p-8 text-center">
+                                        <div className="w-12 h-12 rounded-full bg-emerald-50 flex items-center justify-center mx-auto mb-3">
+                                            <CheckCircle2 className="w-6 h-6 text-emerald-500" />
+                                        </div>
+                                        <p className="text-sm font-medium text-slate-700">All caught up!</p>
+                                        <p className="text-xs text-slate-500 mt-1">You have no pending invoices at this time.</p>
+                                    </div>
+                                ) : pendingInvoices.map((invoice) => (
                                     <div key={invoice.id} className="p-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 hover:bg-slate-50 transition-colors">
                                         <div className="flex items-start gap-4">
                                             <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center shrink-0">
@@ -150,7 +190,7 @@ export default function Dashboard() {
                                         </div>
                                         <div className="flex items-center gap-6 w-full sm:w-auto justify-between sm:justify-end">
                                             <div className="text-left sm:text-right">
-                                                <p className="font-semibold text-slate-900">${invoice.amount.toLocaleString(undefined, {minimumFractionDigits: 2})}</p>
+                                                <p className="font-semibold text-slate-900">{currencySymbol}{invoice.amount.toLocaleString(undefined, {minimumFractionDigits: 2})}</p>
                                                 <p className={`text-xs font-medium mt-0.5 ${invoice.status === 'overdue' ? 'text-rose-600' : 'text-amber-600'}`}>
                                                     {invoice.status === 'overdue' ? 'Overdue' : 'Due Soon'}
                                                 </p>
@@ -220,7 +260,15 @@ export default function Dashboard() {
                                 </h3>
                             </div>
                             <div className="divide-y divide-slate-100">
-                                {recentTransactions.map((txn) => (
+                                {recentTransactions.length === 0 ? (
+                                    <div className="p-8 text-center">
+                                        <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center mx-auto mb-3">
+                                            <Inbox className="w-5 h-5 text-slate-400" />
+                                        </div>
+                                        <p className="text-sm text-slate-500">No transactions yet.</p>
+                                        <p className="text-xs text-slate-400 mt-1">Transactions will appear here when you add funds or pay invoices.</p>
+                                    </div>
+                                ) : recentTransactions.map((txn) => (
                                     <div key={txn.id} className="p-5 flex justify-between items-center hover:bg-slate-50 transition-colors">
                                         <div className="flex items-center gap-3">
                                             <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${

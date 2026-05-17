@@ -29,6 +29,7 @@ import {
     Menu,
     Moon,
     ShoppingCart,
+    ShieldCheck,
 } from 'lucide-react';
 import { PropsWithChildren, useState } from 'react';
 
@@ -49,6 +50,7 @@ export default function AdminLayout({ user, children }: AdminLayoutProps) {
             icon: ShoppingCart,
             route: 'marketplace.dashboard',
         },
+        { name: 'KYC Approvals', icon: ShieldCheck, route: 'admin.kyc.index' },
     ];
 
     return (

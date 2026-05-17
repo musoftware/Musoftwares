@@ -2,7 +2,7 @@ import React from 'react';
 import { Head, Link } from '@inertiajs/react';
 import AdminLayout from "@/Layouts/AdminLayout";
 import { StatCard } from '@/Components/StatCard';
-import { DollarSign, Building2, Users, ArrowDownCircle } from 'lucide-react';
+import { DollarSign, Building2, Users, ArrowDownCircle, TrendingUp, TrendingDown, Inbox } from 'lucide-react';
 import { LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer } from 'recharts';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/Components/ui/table';
 import { Badge } from '@/Components/ui/badge';
@@ -10,31 +10,40 @@ import { Button } from '@/Components/ui/button';
 import { Avatar, AvatarFallback } from '@/Components/ui/avatar';
 import { Card, CardContent, CardHeader, CardTitle } from '@/Components/ui/card';
 
-// Mock data for charts
-const revenueData = [
-  { name: 'Jan', income: 4000, expenses: 2400 },
-  { name: 'Feb', income: 3000, expenses: 1398 },
-  { name: 'Mar', income: 2000, expenses: 9800 },
-  { name: 'Apr', income: 2780, expenses: 3908 },
-  { name: 'May', income: 1890, expenses: 4800 },
-  { name: 'Jun', income: 2390, expenses: 3800 },
-  { name: 'Jul', income: 3490, expenses: 4300 },
-  { name: 'Aug', income: 4490, expenses: 4300 },
-  { name: 'Sep', income: 5490, expenses: 4300 },
-  { name: 'Oct', income: 6490, expenses: 4300 },
-  { name: 'Nov', income: 7490, expenses: 4300 },
-  { name: 'Dec', income: 8490, expenses: 4300 },
-];
+function formatCurrency(amount, currency = 'USD') {
+    return new Intl.NumberFormat('en-US', { style: 'currency', currency }).format(amount || 0);
+}
 
-const moduleData = [
-  { name: 'ERP Invoices', value: 400, color: '#4f46e5' }, // indigo
-  { name: 'Marketplace', value: 300, color: '#06b6d4' }, // cyan
-  { name: 'Subscriptions', value: 300, color: '#22c55e' }, // green
-  { name: 'Points', value: 200, color: '#eab308' }, // yellow
-];
+function GrowthBadge({ value }) {
+    if (value === null || value === undefined) return <span className="text-xs text-muted-foreground">No prior data</span>;
+    const isUp = value >= 0;
+    return (
+        <span className={`text-xs font-medium flex items-center gap-0.5 ${isUp ? 'text-emerald-600' : 'text-rose-600'}`}>
+            {isUp ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
+            {isUp ? '+' : ''}{value}%
+        </span>
+    );
+}
 
-export default function Dashboard({ stats, recentInvoices, recentOrders, recentWithdrawals, auth }) {
+const statusVariant = (status) => {
+    switch (status) {
+        case 'paid': return 'default';
+        case 'sent': case 'partial': return 'secondary';
+        case 'draft': return 'outline';
+        case 'pending': return 'secondary';
+        case 'approved': return 'default';
+        case 'cancelled': case 'rejected': return 'destructive';
+        default: return 'outline';
+    }
+};
+
+export default function Dashboard({ stats, revenueChartData, moduleBreakdown, recentInvoices, recentWithdrawals, newTenants, auth }) {
     const hasData = stats && (stats.totalClients > 0 || stats.activeTenants > 0 || (stats.revenueThisMonth || 0) > 0);
+
+    // Use server data for charts (no more hardcoded mock data)
+    const chartData = revenueChartData || [];
+    const pieData = moduleBreakdown || [{ name: 'No data', value: 0, color: '#94a3b8' }];
+    const tenants = newTenants || [];
 
     return (
         <AdminLayout user={auth?.user}>
@@ -69,65 +78,71 @@ export default function Dashboard({ stats, recentInvoices, recentOrders, recentW
                             <Link href="/admin/clients" className="bg-indigo-600 text-white px-6 py-2 rounded-[8px] hover:bg-indigo-700 transition font-medium shadow-sm">
                                 Add Client
                             </Link>
-                            <Link href="#" className="bg-white border border-gray-300 text-gray-700 px-6 py-2 rounded-[8px] hover:bg-gray-50 transition font-medium">
+                            <Link href={route().has('erp.invoices.create') ? route('erp.invoices.create') : '#'} className="bg-white border border-gray-300 text-gray-700 px-6 py-2 rounded-[8px] hover:bg-gray-50 transition font-medium">
                                 Create Invoice
                             </Link>
                         </div>
                     </div>
                 ) : (
                     <>
-                        {/* TOP STATS ROW (4 cards) */}
+                        {/* TOP STATS ROW (4 cards) — all real data */}
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                             <StatCard
-                                title="Total Revenue"
-                                value={new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(stats?.revenueThisMonth || 48250)}
-                                subtitle="↑ 12% this month"
+                                title="Revenue This Month"
+                                value={formatCurrency(stats.revenueThisMonth)}
+                                subtitle={<GrowthBadge value={stats.revenueGrowth} />}
                                 icon={DollarSign}
-                                trend="up"
+                                trend={stats.revenueGrowth >= 0 ? 'up' : 'down'}
                             />
                             <StatCard
                                 title="Active Tenants"
-                                value={`${stats?.activeTenants || 24} tenants`}
-                                subtitle="↑ 3 new"
+                                value={`${stats.activeTenants} tenant${stats.activeTenants !== 1 ? 's' : ''}`}
+                                subtitle={`${stats.activeTenants} active workspace${stats.activeTenants !== 1 ? 's' : ''}`}
                                 icon={Building2}
-                                trend="up"
+                                trend="neutral"
                             />
                             <StatCard
                                 title="Active Clients"
-                                value={`${stats?.totalClients || 312} clients`}
-                                subtitle="↑ 18 new"
+                                value={`${stats.totalClients} client${stats.totalClients !== 1 ? 's' : ''}`}
+                                subtitle={stats.recentClients > 0 ? <span className="text-emerald-600">+{stats.recentClients} last 30d</span> : 'No new clients'}
                                 icon={Users}
-                                trend="up"
+                                trend={stats.recentClients > 0 ? 'up' : 'neutral'}
                             />
                             <StatCard
                                 title="Pending Withdrawals"
-                                value="5 requests"
-                                subtitle="$2,400 pending"
+                                value={`${stats.pendingWithdrawals} request${stats.pendingWithdrawals !== 1 ? 's' : ''}`}
+                                subtitle={stats.pendingWithdrawalAmount > 0 ? formatCurrency(stats.pendingWithdrawalAmount) + ' pending' : 'All clear'}
                                 icon={ArrowDownCircle}
-                                trend="neutral"
+                                trend={stats.pendingWithdrawals > 0 ? 'neutral' : 'up'}
                             />
                         </div>
 
-                        {/* SECOND ROW — Charts */}
+                        {/* SECOND ROW — Charts (real data from server) */}
                         <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
                             {/* Revenue Chart (60% -> 3/5 cols) */}
                             <Card className="lg:col-span-3">
                                 <CardHeader>
-                                    <CardTitle>Revenue Chart</CardTitle>
+                                    <CardTitle>Revenue Chart (12 months)</CardTitle>
                                 </CardHeader>
                                 <CardContent className="pl-0">
                                     <div className="h-[300px] w-full">
-                                        <ResponsiveContainer width="100%" height="100%">
-                                            <LineChart data={revenueData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
-                                                <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                                                <XAxis dataKey="name" axisLine={false} tickLine={false} />
-                                                <YAxis axisLine={false} tickLine={false} tickFormatter={(value) => `$${value}`} />
-                                                <RechartsTooltip formatter={(value) => [`$${value}`, undefined]} />
-                                                <Legend />
-                                                <Line type="monotone" dataKey="income" name="Income" stroke="#4f46e5" strokeWidth={2} activeDot={{ r: 8 }} />
-                                                <Line type="monotone" dataKey="expenses" name="Expenses" stroke="#ef4444" strokeWidth={2} />
-                                            </LineChart>
-                                        </ResponsiveContainer>
+                                        {chartData.length > 0 ? (
+                                            <ResponsiveContainer width="100%" height="100%">
+                                                <LineChart data={chartData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+                                                    <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                                                    <XAxis dataKey="name" axisLine={false} tickLine={false} />
+                                                    <YAxis axisLine={false} tickLine={false} tickFormatter={(value) => `$${value}`} />
+                                                    <RechartsTooltip formatter={(value) => [`$${value}`, undefined]} />
+                                                    <Legend />
+                                                    <Line type="monotone" dataKey="income" name="Income" stroke="#4f46e5" strokeWidth={2} activeDot={{ r: 8 }} />
+                                                    <Line type="monotone" dataKey="expenses" name="Expenses" stroke="#ef4444" strokeWidth={2} />
+                                                </LineChart>
+                                            </ResponsiveContainer>
+                                        ) : (
+                                            <div className="flex items-center justify-center h-full text-muted-foreground">
+                                                <Inbox className="w-6 h-6 mr-2" /> No revenue data yet
+                                            </div>
+                                        )}
                                     </div>
                                 </CardContent>
                             </Card>
@@ -139,31 +154,37 @@ export default function Dashboard({ stats, recentInvoices, recentOrders, recentW
                                 </CardHeader>
                                 <CardContent>
                                     <div className="h-[300px] w-full">
-                                        <ResponsiveContainer width="100%" height="100%">
-                                            <PieChart>
-                                                <Pie
-                                                    data={moduleData}
-                                                    cx="50%"
-                                                    cy="50%"
-                                                    innerRadius={60}
-                                                    outerRadius={80}
-                                                    paddingAngle={5}
-                                                    dataKey="value"
-                                                >
-                                                    {moduleData.map((entry, index) => (
-                                                        <Cell key={`cell-${index}`} fill={entry.color} />
-                                                    ))}
-                                                </Pie>
-                                                <RechartsTooltip />
-                                                <Legend verticalAlign="bottom" height={36} formatter={(value, entry) => <span className="text-sm text-gray-700">{value} ({entry.payload.value})</span>}/>
-                                            </PieChart>
-                                        </ResponsiveContainer>
+                                        {pieData.some(d => d.value > 0) ? (
+                                            <ResponsiveContainer width="100%" height="100%">
+                                                <PieChart>
+                                                    <Pie
+                                                        data={pieData}
+                                                        cx="50%"
+                                                        cy="50%"
+                                                        innerRadius={60}
+                                                        outerRadius={80}
+                                                        paddingAngle={5}
+                                                        dataKey="value"
+                                                    >
+                                                        {pieData.map((entry, index) => (
+                                                            <Cell key={`cell-${index}`} fill={entry.color} />
+                                                        ))}
+                                                    </Pie>
+                                                    <RechartsTooltip formatter={(value) => [formatCurrency(value), undefined]} />
+                                                    <Legend verticalAlign="bottom" height={36} formatter={(value, entry) => <span className="text-sm text-gray-700">{value} ({formatCurrency(entry.payload.value)})</span>}/>
+                                                </PieChart>
+                                            </ResponsiveContainer>
+                                        ) : (
+                                            <div className="flex items-center justify-center h-full text-muted-foreground">
+                                                <Inbox className="w-6 h-6 mr-2" /> No module revenue yet
+                                            </div>
+                                        )}
                                     </div>
                                 </CardContent>
                             </Card>
                         </div>
 
-                        {/* THIRD ROW — 3 columns */}
+                        {/* THIRD ROW — 3 columns (all real data) */}
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                             {/* Col 1: Recent Invoices */}
                             <Card>
@@ -180,14 +201,14 @@ export default function Dashboard({ stats, recentInvoices, recentOrders, recentW
                                             </TableRow>
                                         </TableHeader>
                                         <TableBody>
-                                            {(recentInvoices || []).slice(0, 5).map((invoice) => (
+                                            {(recentInvoices || []).map((invoice) => (
                                                 <TableRow key={invoice.id}>
-                                                    <TableCell className="font-medium">{invoice.client?.name || 'Unknown'}</TableCell>
+                                                    <TableCell className="font-medium">{invoice.client_name}</TableCell>
                                                     <TableCell className="font-jetbrains">
-                                                        {new Intl.NumberFormat('en-US', { style: 'currency', currency: invoice.currency_code || 'USD' }).format(invoice.total)}
+                                                        {formatCurrency(invoice.amount, invoice.currency)}
                                                     </TableCell>
                                                     <TableCell>
-                                                        <Badge variant={invoice.status === 'Paid' ? 'default' : 'secondary'}>
+                                                        <Badge variant={statusVariant(invoice.status)}>
                                                             {invoice.status}
                                                         </Badge>
                                                     </TableCell>
@@ -201,7 +222,7 @@ export default function Dashboard({ stats, recentInvoices, recentOrders, recentW
                                         </TableBody>
                                     </Table>
                                     <div className="mt-4">
-                                        <Link href="#" className="text-sm text-indigo-600 hover:underline font-medium">View all →</Link>
+                                        <Link href={route().has('erp.invoices.index') ? route('erp.invoices.index') : '#'} className="text-sm text-indigo-600 hover:underline font-medium">View all →</Link>
                                     </div>
                                 </CardContent>
                             </Card>
@@ -215,24 +236,24 @@ export default function Dashboard({ stats, recentInvoices, recentOrders, recentW
                                     <Table>
                                         <TableHeader>
                                             <TableRow>
-                                                <TableHead>Client</TableHead>
+                                                <TableHead>User</TableHead>
                                                 <TableHead>Amount</TableHead>
                                                 <TableHead>Status</TableHead>
                                             </TableRow>
                                         </TableHeader>
                                         <TableBody>
-                                            {(recentWithdrawals || []).slice(0, 5).map((withdrawal) => (
+                                            {(recentWithdrawals || []).map((withdrawal) => (
                                                 <TableRow key={withdrawal.id}>
-                                                    <TableCell className="font-medium">Wallet {withdrawal.wallet_id}</TableCell>
+                                                    <TableCell className="font-medium">{withdrawal.user_name}</TableCell>
                                                     <TableCell className="font-jetbrains">
-                                                        {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(withdrawal.amount)}
+                                                        {formatCurrency(withdrawal.amount, withdrawal.currency)}
                                                     </TableCell>
                                                     <TableCell>
                                                         <div className="flex items-center gap-2">
-                                                            <Badge variant={withdrawal.status === 'Pending' ? 'secondary' : 'default'}>
-                                                                {withdrawal.status || 'Pending'}
+                                                            <Badge variant={statusVariant(withdrawal.status)}>
+                                                                {withdrawal.status}
                                                             </Badge>
-                                                            {(!withdrawal.status || withdrawal.status === 'Pending') && (
+                                                            {withdrawal.status === 'pending' && (
                                                                 <Button variant="outline" size="sm" className="h-6 text-xs px-2" asChild>
                                                                     <Link href="#">Review →</Link>
                                                                 </Button>
@@ -251,18 +272,14 @@ export default function Dashboard({ stats, recentInvoices, recentOrders, recentW
                                 </CardContent>
                             </Card>
 
-                            {/* Col 3: New Tenants */}
+                            {/* Col 3: New Tenants (real data from server) */}
                             <Card>
                                 <CardHeader>
                                     <CardTitle className="text-lg font-sora">New Tenants</CardTitle>
                                 </CardHeader>
                                 <CardContent>
                                     <div className="space-y-4">
-                                        {[
-                                            { id: 1, name: 'Acme Corp', plan: 'Pro', date: '2 days ago', initials: 'AC' },
-                                            { id: 2, name: 'Globex Inc', plan: 'Basic', date: '3 days ago', initials: 'GI' },
-                                            { id: 3, name: 'Initech', plan: 'Enterprise', date: '1 week ago', initials: 'IN' },
-                                        ].map((tenant) => (
+                                        {tenants.length > 0 ? tenants.map((tenant) => (
                                             <div key={tenant.id} className="flex items-center justify-between">
                                                 <div className="flex items-center gap-3">
                                                     <Avatar>
@@ -270,15 +287,20 @@ export default function Dashboard({ stats, recentInvoices, recentOrders, recentW
                                                     </Avatar>
                                                     <div>
                                                         <p className="text-sm font-medium leading-none">{tenant.name}</p>
-                                                        <p className="text-xs text-muted-foreground">{tenant.date}</p>
+                                                        <p className="text-xs text-muted-foreground">{tenant.created_at}</p>
                                                     </div>
                                                 </div>
                                                 <div className="flex items-center gap-3">
-                                                    <Badge variant="outline">{tenant.plan}</Badge>
-                                                    <Link href="#" className="text-sm text-indigo-600 hover:underline font-medium">View →</Link>
+                                                    <Badge variant={tenant.status === 'active' ? 'default' : 'outline'}>{tenant.status}</Badge>
+                                                    <Link href={`/admin/clients/${tenant.id}`} className="text-sm text-indigo-600 hover:underline font-medium">View →</Link>
                                                 </div>
                                             </div>
-                                        ))}
+                                        )) : (
+                                            <div className="text-center text-muted-foreground py-4">
+                                                <Inbox className="w-5 h-5 mx-auto mb-2" />
+                                                <p className="text-sm">No tenants yet</p>
+                                            </div>
+                                        )}
                                     </div>
                                 </CardContent>
                             </Card>
@@ -291,10 +313,10 @@ export default function Dashboard({ stats, recentInvoices, recentOrders, recentW
             <div className="fixed bottom-0 left-0 right-0 md:left-64 bg-white/80 backdrop-blur-md border-t border-gray-200 p-4 z-10 flex justify-center shadow-lg">
                 <div className="flex space-x-4">
                     <Button variant="default" asChild>
-                        <Link href="#">+ New Invoice</Link>
+                        <Link href={route().has('erp.invoices.create') ? route('erp.invoices.create') : '#'}>+ New Invoice</Link>
                     </Button>
                     <Button variant="secondary" asChild>
-                        <Link href="#">+ New Client</Link>
+                        <Link href="/admin/clients">+ New Client</Link>
                     </Button>
                     <Button variant="outline" asChild>
                         <Link href="/admin/reports/pnl">📊 Run Report</Link>

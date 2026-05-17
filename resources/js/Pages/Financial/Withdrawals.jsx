@@ -1,15 +1,16 @@
 import React, { useState } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, useForm, Link } from '@inertiajs/react';
-import { Wallet, ArrowUpRight, CheckCircle2, AlertCircle, Plus, CreditCard } from 'lucide-react';
-import PrimaryButton from '@/Components/PrimaryButton';
-import SecondaryButton from '@/Components/SecondaryButton';
+import { Wallet, ArrowUpRight, ShieldAlert, CreditCard } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/Components/ui/card';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/Components/ui/table';
+import { Badge } from '@/Components/ui/badge';
+import { Button } from '@/Components/ui/button';
+import { Label } from '@/Components/ui/label';
+import { Input } from '@/Components/ui/input';
 import Modal from '@/Components/Modal';
-import TextInput from '@/Components/TextInput';
-import InputLabel from '@/Components/InputLabel';
-import InputError from '@/Components/InputError';
 
-export default function Withdrawals({ withdrawals, payoutMethods, wallet }) {
+export default function Withdrawals({ auth, withdrawals, payoutMethods, wallet }) {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const { data, setData, post, processing, errors, reset } = useForm({
         amount: '',
@@ -32,103 +33,116 @@ export default function Withdrawals({ withdrawals, payoutMethods, wallet }) {
         <AuthenticatedLayout header="Request Withdrawal">
             <Head title="Withdrawals" />
 
-            <div className="max-w-7xl mx-auto space-y-8">
+            <div className="max-w-[1200px] mx-auto px-4 py-8 space-y-8">
+                
                 {/* Header Summary Card */}
-                <div className="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 rounded-2xl p-8 text-white shadow-xl flex flex-col md:flex-row items-center justify-between gap-6">
-                    <div className="space-y-2 text-center md:text-left">
-                        <span className="text-xs uppercase tracking-wider font-semibold text-indigo-400">Available Earned Funds</span>
-                        <div className="text-4xl sm:text-5xl font-extrabold tracking-tight">
-                            {maxAvailable.toFixed(2)} <span className="text-xl sm:text-2xl font-normal text-slate-400">{wallet?.currency || 'USD'}</span>
+                <Card className="shadow-none border-primary/20 bg-muted/10">
+                    <CardContent className="p-8 flex flex-col md:flex-row items-center justify-between gap-6">
+                        <div className="space-y-2 text-center md:text-left">
+                            <span className="text-sm font-semibold text-primary uppercase tracking-wider">Available Earned Funds</span>
+                            <div className="text-4xl sm:text-5xl font-bold tracking-tight">
+                                {maxAvailable.toFixed(2)} <span className="text-xl sm:text-2xl font-normal text-muted-foreground">{wallet?.currency || 'USD'}</span>
+                            </div>
+                            <p className="text-sm text-muted-foreground">You can only withdraw funds that have been earned on the platform.</p>
                         </div>
-                        <p className="text-xs text-slate-300">You can only withdraw funds that have been earned on the platform.</p>
-                    </div>
 
-                    <div className="flex flex-col sm:flex-row items-center gap-3">
-                        {(!payoutMethods || payoutMethods.length === 0) ? (
-                            <Link href={route('financial.payout-methods.index')} className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-semibold transition-all shadow-md">
-                                <CreditCard className="w-5 h-5" /> Setup Payout Method First
-                            </Link>
-                        ) : (
-                            <button
-                                onClick={() => setIsModalOpen(true)}
-                                disabled={maxAvailable <= 0}
-                                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-indigo-500 hover:bg-indigo-600 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold transition-all shadow-md"
-                            >
-                                <ArrowUpRight className="w-5 h-5" /> Request Payout
-                            </button>
-                        )}
-                    </div>
-                </div>
+                        <div className="flex flex-col sm:flex-row items-center gap-3">
+                            {!auth.user.kyc_verified ? (
+                                <Button asChild variant="secondary" className="h-12 px-6 shadow-none">
+                                    <Link href={route('kyc.index')}>
+                                        <ShieldAlert className="mr-2 h-5 w-5 text-amber-600" /> Verify Identity (KYC)
+                                    </Link>
+                                </Button>
+                            ) : (!payoutMethods || payoutMethods.length === 0) ? (
+                                <Button asChild variant="secondary" className="h-12 px-6 shadow-none">
+                                    <Link href={route('financial.payout-methods.index')}>
+                                        <CreditCard className="mr-2 h-5 w-5" /> Setup Payout Method
+                                    </Link>
+                                </Button>
+                            ) : (
+                                <Button
+                                    onClick={() => setIsModalOpen(true)}
+                                    disabled={maxAvailable <= 0}
+                                    className="h-12 px-6 shadow-none"
+                                >
+                                    <ArrowUpRight className="mr-2 h-5 w-5" /> Request Payout
+                                </Button>
+                            )}
+                        </div>
+                    </CardContent>
+                </Card>
 
                 {/* Withdrawals Table */}
-                <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-                    <div className="p-6 border-b border-slate-100 flex items-center justify-between">
-                        <h2 className="text-lg font-semibold text-slate-900">Withdrawal History</h2>
-                        <span className="text-xs font-medium px-2.5 py-1 bg-slate-100 text-slate-700 rounded-full">
-                            {withdrawals?.total || 0} Total Requests
-                        </span>
-                    </div>
+                <Card className="shadow-none">
+                    <CardHeader className="flex flex-row items-center justify-between">
+                        <div className="space-y-1">
+                            <CardTitle className="text-base font-semibold">Withdrawal History</CardTitle>
+                            <CardDescription>View your past withdrawal requests and their statuses.</CardDescription>
+                        </div>
+                        <Badge variant="secondary" className="font-normal">{withdrawals?.total || 0} Requests</Badge>
+                    </CardHeader>
 
-                    <div className="overflow-x-auto">
-                        <table className="w-full text-left border-collapse">
-                            <thead>
-                                <tr className="border-b border-slate-100 bg-slate-50/50 text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                                    <th className="py-3.5 px-6 font-medium">ID #</th>
-                                    <th className="py-3.5 px-6 font-medium">Payout Method</th>
-                                    <th className="py-3.5 px-6 font-medium">Amount</th>
-                                    <th className="py-3.5 px-6 font-medium">Status</th>
-                                    <th className="py-3.5 px-6 font-medium">Date</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-slate-100 text-sm">
+                    <CardContent className="px-0 pt-0">
+                        <Table>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead className="pl-6">ID #</TableHead>
+                                    <TableHead>Payout Method</TableHead>
+                                    <TableHead>Amount</TableHead>
+                                    <TableHead>Status</TableHead>
+                                    <TableHead className="pr-6 text-right">Date</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
                                 {(!withdrawals?.data || withdrawals.data.length === 0) ? (
-                                    <tr>
-                                        <td colSpan={5} className="py-12 text-center text-slate-400 font-light">
+                                    <TableRow>
+                                        <TableCell colSpan={5} className="py-12 text-center text-muted-foreground">
                                             No withdrawal requests found.
-                                        </td>
-                                    </tr>
+                                        </TableCell>
+                                    </TableRow>
                                 ) : (
                                     withdrawals.data.map((w) => (
-                                        <tr key={w.id} className="hover:bg-slate-50/75 transition-colors">
-                                            <td className="py-4 px-6 font-medium text-slate-900">#{w.id}</td>
-                                            <td className="py-4 px-6 font-medium text-slate-700 capitalize">
+                                        <TableRow key={w.id}>
+                                            <TableCell className="pl-6 font-medium">#{w.id}</TableCell>
+                                            <TableCell className="capitalize">
                                                 {w.payout_method ? w.payout_method.type.replace('_', ' ') : 'Standard Method'}
-                                            </td>
-                                            <td className="py-4 px-6 font-semibold text-slate-900">
+                                            </TableCell>
+                                            <TableCell className="font-semibold">
                                                 {Number(w.amount).toFixed(2)} {w.currency || 'USD'}
-                                            </td>
-                                            <td className="py-4 px-6">
-                                                <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium capitalize ${
-                                                    w.status === 'paid' ? 'bg-emerald-50 text-emerald-700 border border-emerald-100' :
-                                                    w.status === 'approved' ? 'bg-blue-50 text-blue-700 border border-blue-100' :
-                                                    w.status === 'rejected' ? 'bg-rose-50 text-rose-700 border border-rose-100' :
-                                                    'bg-amber-50 text-amber-700 border border-amber-100'
-                                                }`}>
+                                            </TableCell>
+                                            <TableCell>
+                                                <Badge variant={
+                                                    w.status === 'paid' ? 'default' :
+                                                    w.status === 'approved' ? 'secondary' :
+                                                    w.status === 'rejected' ? 'destructive' : 'outline'
+                                                } className="capitalize font-normal tracking-wide">
                                                     {w.status}
-                                                </span>
-                                            </td>
-                                            <td className="py-4 px-6 text-slate-500 text-xs">
+                                                </Badge>
+                                            </TableCell>
+                                            <TableCell className="pr-6 text-right text-muted-foreground text-xs">
                                                 {new Date(w.created_at).toLocaleDateString()}
-                                            </td>
-                                        </tr>
+                                            </TableCell>
+                                        </TableRow>
                                     ))
                                 )}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+                            </TableBody>
+                        </Table>
+                    </CardContent>
+                </Card>
 
                 {/* Request Payout Modal */}
-                <Modal show={isModalOpen} onClose={() => setIsModalOpen(false)}>
-                    <div className="p-6">
-                        <h2 className="text-xl font-bold text-slate-900 mb-4 flex items-center gap-2">
-                            <Wallet className="w-5 h-5 text-indigo-600" /> Request Withdrawal
-                        </h2>
+                <Modal show={isModalOpen} onClose={() => setIsModalOpen(false)} maxWidth="md">
+                    <div className="p-6 space-y-6">
+                        <div className="flex items-center gap-2">
+                            <Wallet className="h-5 w-5 text-primary" />
+                            <h2 className="text-xl font-semibold tracking-tight">Request Withdrawal</h2>
+                        </div>
+                        
                         <form onSubmit={handleSubmit} className="space-y-6">
-                            <div>
-                                <InputLabel htmlFor="amount" value={`Amount to Withdraw (Max: ${maxAvailable.toFixed(2)} ${wallet?.currency || 'USD'})`} />
-                                <div className="relative mt-1">
-                                    <TextInput
+                            <div className="space-y-2">
+                                <Label htmlFor="amount">Amount to Withdraw (Max: {maxAvailable.toFixed(2)} {wallet?.currency || 'USD'})</Label>
+                                <div className="relative">
+                                    <Input
                                         id="amount"
                                         type="number"
                                         step="0.01"
@@ -136,28 +150,30 @@ export default function Withdrawals({ withdrawals, payoutMethods, wallet }) {
                                         max={maxAvailable}
                                         value={data.amount}
                                         onChange={(e) => setData('amount', e.target.value)}
-                                        className="w-full pr-16 text-lg font-semibold"
+                                        className="pr-16 shadow-none font-medium"
                                         placeholder="0.00"
                                         required
                                     />
-                                    <button
+                                    <Button
                                         type="button"
+                                        variant="secondary"
+                                        size="sm"
                                         onClick={() => setData('amount', maxAvailable.toString())}
-                                        className="absolute right-2 top-1/2 -translate-y-1/2 px-2.5 py-1 text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-md transition-colors"
+                                        className="absolute right-1 top-1/2 -translate-y-1/2 h-7 px-2 text-xs shadow-none"
                                     >
                                         MAX
-                                    </button>
+                                    </Button>
                                 </div>
-                                <InputError message={errors.amount} className="mt-2" />
+                                {errors.amount && <p className="text-sm text-destructive">{errors.amount}</p>}
                             </div>
 
-                            <div>
-                                <InputLabel htmlFor="payout_method" value="Destination Payout Method" />
+                            <div className="space-y-2">
+                                <Label htmlFor="payout_method">Destination Payout Method</Label>
                                 <select
                                     id="payout_method"
                                     value={data.payout_method_id}
                                     onChange={(e) => setData('payout_method_id', e.target.value)}
-                                    className="mt-1 block w-full rounded-xl border-slate-200 font-medium text-slate-900 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                                     required
                                 >
                                     {payoutMethods?.map((pm) => (
@@ -166,14 +182,14 @@ export default function Withdrawals({ withdrawals, payoutMethods, wallet }) {
                                         </option>
                                     ))}
                                 </select>
-                                <InputError message={errors.payout_method_id} className="mt-2" />
+                                {errors.payout_method_id && <p className="text-sm text-destructive">{errors.payout_method_id}</p>}
                             </div>
 
-                            <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
-                                <SecondaryButton onClick={() => setIsModalOpen(false)}>Cancel</SecondaryButton>
-                                <PrimaryButton type="submit" disabled={processing}>
+                            <div className="flex items-center justify-end gap-3 pt-4 border-t">
+                                <Button type="button" variant="ghost" onClick={() => setIsModalOpen(false)}>Cancel</Button>
+                                <Button type="submit" disabled={processing} className="shadow-none">
                                     Confirm Withdrawal
-                                </PrimaryButton>
+                                </Button>
                             </div>
                         </form>
                     </div>
