@@ -108,4 +108,41 @@ class OnboardingController extends Controller
 
         return back()->with('status', 'Progress saved');
     }
+
+    public function updateTourStatus(Request $request)
+    {
+        $user = $request->user();
+
+        $validated = $request->validate([
+            'step' => 'nullable|integer|min:1|max:7',
+            'skipped' => 'nullable|boolean',
+            'completed' => 'nullable|boolean',
+            'reset' => 'nullable|boolean',
+        ]);
+
+        if (isset($validated['reset']) && $validated['reset']) {
+            $user->tour_completed = false;
+            $user->tour_skipped = false;
+            $user->current_tour_step = 1;
+            $user->save();
+            return response()->json(['status' => 'tour_reset', 'user' => $user]);
+        }
+
+        if (isset($validated['step'])) {
+            $user->current_tour_step = $validated['step'];
+        }
+
+        if (isset($validated['skipped']) && $validated['skipped']) {
+            $user->tour_skipped = true;
+        }
+
+        if (isset($validated['completed']) && $validated['completed']) {
+            $user->tour_completed = true;
+            $user->current_tour_step = 7;
+        }
+
+        $user->save();
+
+        return response()->json(['status' => 'success', 'user' => $user]);
+    }
 }
