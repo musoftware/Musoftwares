@@ -75,15 +75,39 @@ class GlobalSearchService
         return Cache::get("recent_searches_{$userId}", []);
     }
 
-    /**
-     * Apply weighted ranking if necessary.
-     * Meilisearch handles primary ranking, but we can adjust logic here if we need
-     * cross-index weighting in PHP.
-     */
     protected function applyWeightedRanking(array $results, string $query): array
     {
-        // Placeholder for cross-index weighting logic.
-        // e.g., prioritize Exact Match in Title over Description across all results.
+        $lowercaseQuery = strtolower($query);
+
+        foreach ($results as $type => $collection) {
+            $sorted = $collection->sortByDesc(function ($item) use ($lowercaseQuery) {
+                $primaryField = 'title';
+                if (isset($item->name)) {
+                    $primaryField = 'name';
+                } elseif (isset($item->invoice_number)) {
+                    $primaryField = 'invoice_number';
+                }
+
+                $value = strtolower($item->{$primaryField} ?? '');
+
+                if ($value === $lowercaseQuery) {
+                    return 100; // Perfect exact match
+                }
+
+                if (str_starts_with($value, $lowercaseQuery)) {
+                    return 50; // Starts with query
+                }
+
+                if (str_contains($value, $lowercaseQuery)) {
+                    return 25; // Contains query
+                }
+
+                return 0; // Description or fuzzy match
+            });
+
+            $results[$type] = $sorted->values();
+        }
+
         return $results;
     }
 }

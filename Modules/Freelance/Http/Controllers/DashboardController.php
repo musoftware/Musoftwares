@@ -68,7 +68,12 @@ class DashboardController extends Controller
 
     private function calculateContractProgress($contract)
     {
-        // Fallback progress mechanism; could count completed milestones
-        return 25; // Placeholder algorithm until milestone system is fully hydrated
+        if ($contract->status === 'completed') {
+            return 100;
+        }
+        if (in_array($contract->status, ['terminated', 'canceled'])) {
+            return 0;
+        }
+        return 25; // Default for in-progress contract
     }
 }
