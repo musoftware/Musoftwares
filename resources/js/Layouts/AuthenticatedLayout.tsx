@@ -90,14 +90,19 @@ export default function Authenticated({
     };
 
 
+    // Stable NavItem: identical padding/height/font-weight in ALL states — only color changes
     const NavLink = ({ href, active, children }: any) => (
         <Link
             href={href}
-            className={`inline-flex items-center px-3 py-2 text-sm font-medium transition-colors rounded-md ${
-                active 
-                ? 'bg-slate-100 text-slate-900' 
-                : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'
-            }`}
+            className={cn(
+                // Fixed geometry — never changes on hover/active
+                'inline-flex items-center gap-1.5 h-8 px-3 rounded-lg text-sm font-medium leading-none',
+                // Color-only transition
+                'transition-colors duration-150',
+                active
+                    ? 'bg-slate-100 text-slate-900'
+                    : 'text-slate-500 hover:bg-slate-100/60 hover:text-slate-800'
+            )}
         >
             {children}
         </Link>
@@ -106,9 +111,9 @@ export default function Authenticated({
     return (
         <div className="min-h-screen bg-slate-50 font-sans text-slate-900 flex flex-col">
             {/* Top Navigation */}
-            <header className="sticky top-0 z-40 w-full bg-white border-b border-slate-200">
-                <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="flex h-16 items-center justify-between">
+            <header className="sticky top-0 z-40 w-full bg-white border-b border-slate-200" style={{ height: '68px' }}>
+                <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 h-full">
+                    <div className="flex h-full items-center justify-between">
                         {/* LEFT: Logo & Nav */}
                         <div className="flex items-center gap-6">
                             {/* Mobile Menu Trigger */}
@@ -181,7 +186,7 @@ export default function Authenticated({
                                 {/* MORE MEGA MENU */}
                                 <DropdownMenu>
                                     <div className="relative inline-block">
-                                        <DropdownMenuTrigger className="inline-flex items-center px-3 py-2 text-sm font-medium text-slate-500 hover:bg-slate-50 hover:text-slate-900 rounded-md outline-none">
+                                        <DropdownMenuTrigger className="inline-flex items-center gap-1.5 h-8 px-3 rounded-lg text-sm font-medium leading-none text-slate-500 hover:bg-slate-100/60 hover:text-slate-800 transition-colors duration-150 outline-none select-none">
                                             More <ChevronDown className="ml-1 h-3.5 w-3.5 opacity-50" />
                                         </DropdownMenuTrigger>
                                         {isTourOpen && tourStep === 5 && (
@@ -223,7 +228,7 @@ export default function Authenticated({
                                 {/* iSAAS MEGA MENU */}
                                 <DropdownMenu>
                                     <div className="relative inline-block">
-                                        <DropdownMenuTrigger className="inline-flex items-center px-3 py-2 text-sm font-medium text-indigo-600 hover:bg-indigo-50 rounded-md outline-none transition-colors">
+                                        <DropdownMenuTrigger className="inline-flex items-center gap-1.5 h-8 px-3 rounded-lg text-sm font-medium leading-none text-indigo-600 hover:bg-indigo-50 hover:text-indigo-700 transition-colors duration-150 outline-none select-none">
                                             <Sparkles className="mr-1.5 h-3.5 w-3.5" /> iSAAS <ChevronDown className="ml-1 h-3.5 w-3.5 opacity-50" />
                                         </DropdownMenuTrigger>
                                         {isTourOpen && tourStep === 4 && (
@@ -240,7 +245,7 @@ export default function Authenticated({
                                         
                                         <DropdownMenuItem 
                                             className={cn(
-                                                "p-0 mb-1 outline-none border transition-all cursor-pointer",
+                                                "p-0 mb-1 outline-none border transition-colors duration-150 cursor-pointer",
                                                 isErpActive ? "bg-indigo-50/80 border-indigo-100" : "hover:bg-slate-50 border-transparent"
                                             )}
                                             render={<Link href={activeModules.erp ? safeRoute('erp.dashboard') : safeRoute('subscriptions.plans', { module: 'erp' })} className="flex items-start gap-3 p-2.5 rounded-lg w-full" />}
@@ -265,7 +270,7 @@ export default function Authenticated({
 
                                         <DropdownMenuItem 
                                             className={cn(
-                                                "p-0 mb-1 outline-none border transition-all cursor-pointer",
+                                                "p-0 mb-1 outline-none border transition-colors duration-150 cursor-pointer",
                                                 isFreelanceActive ? "bg-emerald-50/80 border-emerald-100" : "hover:bg-slate-50 border-transparent"
                                             )}
                                             render={<Link href={safeRoute('freelance.dashboard')} className="flex items-start gap-3 p-2.5 rounded-lg w-full" />}
@@ -289,7 +294,7 @@ export default function Authenticated({
 
                                         <DropdownMenuItem 
                                             className={cn(
-                                                "p-0 mb-1 outline-none border transition-all cursor-pointer",
+                                                "p-0 mb-1 outline-none border transition-colors duration-150 cursor-pointer",
                                                 isMarketplaceActive ? "bg-violet-50/80 border-violet-100" : "hover:bg-slate-50 border-transparent"
                                             )}
                                             render={<Link href={safeRoute('marketplace.dashboard')} className="flex items-start gap-3 p-2.5 rounded-lg w-full" />}
@@ -313,7 +318,7 @@ export default function Authenticated({
 
                                         <DropdownMenuItem 
                                             className={cn(
-                                                "p-0 mb-1 outline-none border transition-all cursor-pointer",
+                                                "p-0 mb-1 outline-none border transition-colors duration-150 cursor-pointer",
                                                 isBookingActive ? "bg-amber-50/80 border-amber-100" : "hover:bg-slate-50 border-transparent"
                                             )}
                                             render={<Link href={activeModules.booking ? safeRoute('booking.index') : safeRoute('subscriptions.plans', { module: 'booking' })} className="flex items-start gap-3 p-2.5 rounded-lg w-full" />}
@@ -339,7 +344,7 @@ export default function Authenticated({
 
                                         <DropdownMenuItem 
                                             className={cn(
-                                                "p-0 mb-1 outline-none border transition-all cursor-pointer",
+                                                "p-0 mb-1 outline-none border transition-colors duration-150 cursor-pointer",
                                                 isIntelligenceActive ? "bg-cyan-50/80 border-cyan-100" : "hover:bg-slate-50 border-transparent"
                                             )}
                                             render={<Link href={activeModules.intelligence ? safeRoute('intelligence.index') : safeRoute('subscriptions.plans', { module: 'intelligence' })} className="flex items-start gap-3 p-2.5 rounded-lg w-full" />}
@@ -365,7 +370,7 @@ export default function Authenticated({
 
                                         <DropdownMenuItem 
                                             className={cn(
-                                                "p-0 outline-none border transition-all cursor-pointer",
+                                                "p-0 outline-none border transition-colors duration-150 cursor-pointer",
                                                 isToolsActive ? "bg-fuchsia-50/80 border-fuchsia-100" : "hover:bg-slate-50 border-transparent"
                                             )}
                                             render={<Link href={safeRoute('tools.explore')} className="flex items-start gap-3 p-2.5 rounded-lg w-full" />}
@@ -394,24 +399,41 @@ export default function Authenticated({
 
                         {/* RIGHT: Financials, Tour Button & Profile */}
                         <div className="flex items-center gap-3">
-                            <div className="hidden md:flex items-center gap-3 mr-2">
-                                <Link href={safeRoute('financial.add-balance')} className="inline-flex items-center justify-center px-3 h-8 text-xs font-medium border border-slate-200 rounded-full hover:bg-slate-100 transition-colors text-slate-700">
-                                    <Plus className="w-3.5 h-3.5 mr-1" /> Add Balance
+                            <div className="hidden md:flex items-center gap-2 mr-2">
+                                {/* Add Balance pill — locked geometry */}
+                                <Link
+                                    href={safeRoute('financial.add-balance')}
+                                    className="inline-flex items-center gap-1 h-8 min-w-[105px] justify-center px-3 text-xs font-medium border border-slate-200 rounded-full text-slate-700 hover:bg-slate-50 hover:border-slate-300 transition-colors duration-150"
+                                >
+                                    <Plus className="w-3.5 h-3.5 shrink-0" />
+                                    <span>Add Balance</span>
                                 </Link>
-                                
-                                <Link href={safeRoute('financial.transactions')} className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 rounded-full transition-colors text-sm font-medium text-slate-900" title="Wallet Balance">
-                                    <Wallet className="w-4 h-4 text-slate-500" /> {wallet ? `${Number(wallet.balance).toFixed(2)} ${wallet.currency}` : '$0.00'}
+
+                                {/* Wallet pill — locked geometry */}
+                                <Link
+                                    href={safeRoute('financial.transactions')}
+                                    className="inline-flex items-center gap-1.5 h-8 min-w-[90px] justify-center px-3 bg-slate-100 hover:bg-slate-200 rounded-full transition-colors duration-150 text-xs font-medium text-slate-900"
+                                    title="Wallet Balance"
+                                >
+                                    <Wallet className="w-3.5 h-3.5 text-slate-500 shrink-0" />
+                                    <span>{wallet ? `${Number(wallet.balance).toFixed(2)} ${wallet.currency}` : '$0.00'}</span>
                                 </Link>
-                                
-                                <Link href={safeRoute('freelance.points.index')} className="flex items-center gap-1.5 px-3 py-1.5 bg-amber-50 hover:bg-amber-100 border border-amber-100 rounded-full transition-colors text-sm font-medium text-amber-700" title="Points/Connects Balance">
-                                    <Coins className="w-4 h-4 text-amber-500" /> {user?.points_balance !== undefined ? Number(user.points_balance).toLocaleString() : '0'}
+
+                                {/* Points pill — locked geometry */}
+                                <Link
+                                    href={safeRoute('freelance.points.index')}
+                                    className="inline-flex items-center gap-1.5 h-8 min-w-[60px] justify-center px-3 bg-amber-50 hover:bg-amber-100 border border-amber-100/80 rounded-full transition-colors duration-150 text-xs font-medium text-amber-700"
+                                    title="Points/Connects Balance"
+                                >
+                                    <Coins className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+                                    <span>{user?.points_balance !== undefined ? Number(user.points_balance).toLocaleString() : '0'}</span>
                                 </Link>
                             </div>
 
                             {/* Notifications */}
                             <DropdownMenu>
                                 <div className="relative inline-block">
-                                    <DropdownMenuTrigger className="w-9 h-9 rounded-full flex items-center justify-center text-slate-500 hover:bg-slate-100 transition-colors relative outline-none">
+                                    <DropdownMenuTrigger className="w-9 h-9 rounded-full inline-flex items-center justify-center text-slate-500 hover:bg-slate-100 transition-colors duration-150 relative outline-none shrink-0">
                                         <Bell className="w-5 h-5" />
                                         {notifications?.unread_count > 0 && (
                                             <span className="absolute top-2 right-2 w-2 h-2 bg-rose-500 rounded-full border-2 border-white" />
@@ -475,8 +497,8 @@ export default function Authenticated({
 
                             {/* Profile */}
                             <DropdownMenu>
-                                <DropdownMenuTrigger className="outline-none relative">
-                                    <Avatar className="h-9 w-9 border border-slate-200 cursor-pointer hover:opacity-80 transition-opacity">
+                                <DropdownMenuTrigger className="outline-none relative shrink-0">
+                                    <Avatar className="h-9 w-9 border border-slate-200 cursor-pointer hover:opacity-80 transition-opacity duration-150">
                                         <AvatarFallback className="bg-slate-900 text-white font-medium text-xs">
                                             {user?.name?.substring(0, 2).toUpperCase() || 'US'}
                                         </AvatarFallback>

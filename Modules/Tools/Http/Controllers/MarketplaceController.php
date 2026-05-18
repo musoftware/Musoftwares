@@ -118,7 +118,7 @@ class MarketplaceController extends Controller
             'icon_url'          => $tool->icon_url,
             'category'          => $tool->category,
             'category_label'    => Tool::$categories[$tool->category] ?? $tool->category,
-            'supported_os'      => (array) ($tool->supported_os ?? []),
+            'supported_os'      => $this->safeArray($tool->supported_os),
             'current_version'   => $tool->current_version,
             'download_count'    => $tool->downloads_count,
             'is_featured'       => $tool->is_featured,
@@ -138,12 +138,12 @@ class MarketplaceController extends Controller
             'icon_url'          => $tool->icon_url,
             'category'          => $tool->category,
             'category_label'    => Tool::$categories[$tool->category] ?? $tool->category,
-            'supported_os'      => (array) ($tool->supported_os ?? []),
+            'supported_os'      => $this->safeArray($tool->supported_os),
             'current_version'   => $tool->current_version,
             'download_count'    => $tool->download_count,
             'is_featured'       => $tool->is_featured,
-            'features'          => (array) ($tool->features ?? []),
-            'requirements'      => (array) ($tool->requirements ?? []),
+            'features'          => $this->safeArray($tool->features),
+            'requirements'      => $this->safeArray($tool->requirements),
             'screenshots'       => $tool->screenshots->map(fn($s) => [
                 'id'      => $s->id,
                 'url'     => $s->url,
@@ -155,7 +155,7 @@ class MarketplaceController extends Controller
                 'price_monthly'   => $p->price_monthly,
                 'price_yearly'    => $p->price_yearly,
                 'max_devices'     => $p->max_devices,
-                'features'        => (array) ($p->features ?? []),
+                'features'        => $this->safeArray($p->features),
                 'is_popular'      => $p->is_popular,
                 'yearly_savings'  => $p->yearly_savings,
             ])->values()->toArray(),
@@ -169,5 +169,32 @@ class MarketplaceController extends Controller
                 'released_at'  => $v->released_at?->toDateString(),
             ])->values()->toArray(),
         ];
+    }
+
+    /**
+     * Safely convert a value to a plain PHP array.
+     * Handles: null, plain array, JSON string, and double-encoded JSON string.
+     */
+    private function safeArray(mixed $value): array
+    {
+        if (is_array($value)) {
+            return $value;
+        }
+
+        if (is_string($value) && str_starts_with(trim($value), '[')) {
+            $decoded = json_decode($value, true);
+            if (json_last_error() === JSON_ERROR_NONE) {
+                // Handle double-encoded: decoded value might still be a JSON string
+                if (is_array($decoded)) {
+                    return $decoded;
+                }
+                if (is_string($decoded)) {
+                    $decoded2 = json_decode($decoded, true);
+                    return is_array($decoded2) ? $decoded2 : [$decoded];
+                }
+            }
+        }
+
+        return [];
     }
 }

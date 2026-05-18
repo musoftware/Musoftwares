@@ -2,10 +2,11 @@ import React, { useState } from 'react';
 import { Head, router } from '@inertiajs/react';
 import ToolsPublicLayout from '@/Layouts/ToolsPublicLayout';
 import { Input } from '@/Components/ui/input';
-import { Badge } from '@/Components/ui/badge';
-import { 
-    Search, Download, ShoppingBag, Zap, 
-    Globe, Eye, Database, Bot, Monitor, Activity
+import { ToolCard } from '@/Components/Tools/ToolCard';
+import { PlatformBadges } from '@/Components/Tools/PlatformBadge';
+import {
+    Search, ShoppingBag, Zap,
+    Globe, Eye, Database, Bot, Monitor, Activity, Package
 } from 'lucide-react';
 
 const CATEGORY_ICONS: Record<string, React.ElementType> = {
@@ -65,36 +66,54 @@ export default function Explore({ tools, categories, subscribedSlugs, filters }:
         applyFilter({ search, category: next });
     };
 
+    const featuredTools = tools.data.filter(t => t.is_featured);
+    const regularTools  = tools.data.filter(t => !t.is_featured);
+
     return (
         <ToolsPublicLayout title="Tools Marketplace" activeNav="explore">
             <Head title="Tools Marketplace" />
 
-            <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8 space-y-8">
-                {/* Header */}
-                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                    <div>
-                        <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Tools Marketplace</h1>
-                        <p className="text-sm text-slate-500 mt-1">Download powerful desktop tools. Subscribe to unlock.</p>
+            {/* Hero section */}
+            <div className="bg-white border-b border-slate-200/80">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-14">
+                    <div className="max-w-2xl">
+                        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 text-slate-600 text-xs font-medium mb-4">
+                            <Package className="h-3 w-3" />
+                            {tools.data.length} tools available
+                        </div>
+                        <h1 className="text-3xl md:text-4xl font-bold text-slate-900 tracking-tight leading-tight mb-3">
+                            Professional Desktop Tools
+                            <br />
+                            <span className="text-slate-400 font-normal">for power users.</span>
+                        </h1>
+                        <p className="text-slate-500 text-base leading-relaxed max-w-xl">
+                            Scraping, automation, AI-powered workflows — download and activate with a single subscription.
+                        </p>
                     </div>
-                    <div className="relative w-full sm:w-72">
+
+                    {/* Search */}
+                    <div className="mt-6 relative max-w-sm">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                         <Input
                             placeholder="Search tools..."
                             value={search}
                             onChange={e => handleSearch(e.target.value)}
-                            className="pl-9 bg-white"
+                            className="pl-9 h-10 bg-white border-slate-200 text-sm placeholder:text-slate-400 focus-visible:ring-slate-900 focus-visible:ring-1"
                         />
                     </div>
                 </div>
+            </div>
 
-                {/* Category Pills */}
-                <div className="flex flex-wrap gap-2">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+
+                {/* Category filter strip */}
+                <div className="flex flex-wrap gap-1.5">
                     <button
                         onClick={() => handleCategory('')}
-                        className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all border ${
+                        className={`px-3.5 py-1.5 rounded-lg text-xs font-medium transition-all border ${
                             activeCategory === ''
                                 ? 'bg-slate-900 text-white border-slate-900'
-                                : 'bg-white text-slate-600 border-slate-200 hover:border-slate-300'
+                                : 'bg-white text-slate-600 border-slate-200 hover:border-slate-300 hover:bg-slate-50'
                         }`}
                     >
                         All Tools
@@ -105,102 +124,83 @@ export default function Explore({ tools, categories, subscribedSlugs, filters }:
                             <button
                                 key={key}
                                 onClick={() => handleCategory(key)}
-                                className={`flex items-center gap-1.5 px-4 py-1.5 rounded-full text-sm font-medium transition-all border ${
+                                className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-medium transition-all border ${
                                     activeCategory === key
                                         ? 'bg-slate-900 text-white border-slate-900'
-                                        : 'bg-white text-slate-600 border-slate-200 hover:border-slate-300'
+                                        : 'bg-white text-slate-600 border-slate-200 hover:border-slate-300 hover:bg-slate-50'
                                 }`}
                             >
-                                <Icon className="h-3.5 w-3.5" />
+                                <Icon className="h-3 w-3" />
                                 {label}
                             </button>
                         );
                     })}
                 </div>
 
-                {/* Tool Grid */}
+                {/* Tool grid */}
                 {tools.data.length === 0 ? (
-                    <div className="text-center py-20 text-slate-400">
-                        <ShoppingBag className="h-12 w-12 mx-auto mb-4 opacity-30" />
-                        <p className="text-lg font-medium text-slate-600">No tools found</p>
-                        <p className="text-sm mt-1">Try adjusting your search or category filter.</p>
+                    <div className="text-center py-20">
+                        <div className="w-14 h-14 rounded-2xl bg-slate-100 flex items-center justify-center mx-auto mb-4">
+                            <ShoppingBag className="h-7 w-7 text-slate-300" />
+                        </div>
+                        <p className="text-base font-semibold text-slate-700 mb-1">No tools found</p>
+                        <p className="text-sm text-slate-400">Try adjusting your search or category.</p>
                     </div>
                 ) : (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                        {tools.data.map(tool => {
-                            const Icon = CATEGORY_ICONS[tool.category] ?? Zap;
-                            const isSubscribed = subscribedSlugs.includes(tool.slug);
-                            return (
-                                <div
-                                    key={tool.id}
-                                    onClick={() => router.visit(route('tools.show', tool.slug))}
-                                    className="group relative bg-white border border-slate-200/80 rounded-2xl p-6 cursor-pointer hover:shadow-lg hover:border-slate-300 hover:-translate-y-0.5 transition-all duration-200"
-                                >
-                                    {/* Featured ribbon */}
-                                    {tool.is_featured && (
-                                        <div className="absolute top-3 right-3">
-                                            <Badge className="bg-amber-100 text-amber-700 hover:bg-amber-100 text-xs">Featured</Badge>
-                                        </div>
-                                    )}
-                                    {isSubscribed && (
-                                        <div className="absolute top-3 left-3">
-                                            <Badge className="bg-emerald-100 text-emerald-700 hover:bg-emerald-100 text-xs">Active</Badge>
-                                        </div>
-                                    )}
-
-                                    {/* Icon */}
-                                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-4 bg-slate-100 group-hover:bg-slate-900 transition-colors duration-200`}>
-                                        {tool.icon_url
-                                            ? <img src={tool.icon_url} alt={tool.title} className="w-8 h-8 object-contain" />
-                                            : <Icon className="h-6 w-6 text-slate-500 group-hover:text-white transition-colors" />
-                                        }
-                                    </div>
-
-                                    <h3 className="font-semibold text-slate-900 mb-1 text-sm leading-tight">{tool.title}</h3>
-                                    <p className="text-xs text-slate-500 mb-4 line-clamp-2 leading-relaxed">{tool.short_description}</p>
-
-                                    {/* Footer */}
-                                    <div className="flex items-center justify-between">
-                                        <span className="text-xs text-slate-400 font-medium">
-                                            {tool.is_free
-                                                ? 'Free'
-                                                : `From $${tool.starting_price}/mo`
-                                            }
-                                        </span>
-                                        <div className="flex items-center gap-1 text-xs text-slate-400">
-                                            <Download className="h-3 w-3" />
-                                            {tool.download_count.toLocaleString()}
-                                        </div>
-                                    </div>
-
-                                    {/* OS badges */}
-                                    <div className="flex gap-1 mt-3">
-                                        {(Array.isArray(tool.supported_os)
-                                            ? tool.supported_os
-                                            : typeof tool.supported_os === 'string'
-                                                ? JSON.parse(tool.supported_os)
-                                                : []
-                                        ).map((os: string) => (
-                                            <span key={os} className="text-[10px] bg-slate-100 text-slate-500 px-2 py-0.5 rounded capitalize font-medium">
-                                                {os}
-                                            </span>
-                                        ))}
-                                    </div>
+                    <>
+                        {/* Featured section */}
+                        {featuredTools.length > 0 && activeCategory === '' && !filters.search && (
+                            <div className="space-y-3">
+                                <h2 className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Featured</h2>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                                    {featuredTools.map(tool => (
+                                        <ToolCard
+                                            key={tool.id}
+                                            tool={tool}
+                                            isSubscribed={subscribedSlugs.includes(tool.slug)}
+                                        />
+                                    ))}
                                 </div>
-                            );
-                        })}
-                    </div>
+                            </div>
+                        )}
+
+                        {/* All tools */}
+                        {(activeCategory !== '' || !!filters.search || featuredTools.length === 0) ? (
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                                {tools.data.map(tool => (
+                                    <ToolCard
+                                        key={tool.id}
+                                        tool={tool}
+                                        isSubscribed={subscribedSlugs.includes(tool.slug)}
+                                    />
+                                ))}
+                            </div>
+                        ) : regularTools.length > 0 ? (
+                            <div className="space-y-3">
+                                <h2 className="text-xs font-semibold text-slate-400 uppercase tracking-wider">All Tools</h2>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                                    {regularTools.map(tool => (
+                                        <ToolCard
+                                            key={tool.id}
+                                            tool={tool}
+                                            isSubscribed={subscribedSlugs.includes(tool.slug)}
+                                        />
+                                    ))}
+                                </div>
+                            </div>
+                        ) : null}
+                    </>
                 )}
 
                 {/* Pagination */}
                 {tools.links.length > 3 && (
                     <div className="flex justify-center gap-1 pt-4">
-                        {tools.links.map((link, i) => (
+                        {tools.links.map((link: any, i: number) => (
                             <button
                                 key={i}
                                 disabled={!link.url || link.active}
                                 onClick={() => link.url && router.visit(link.url)}
-                                className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
                                     link.active
                                         ? 'bg-slate-900 text-white'
                                         : link.url
