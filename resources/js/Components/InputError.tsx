@@ -1,3 +1,7 @@
+/**
+ * InputError — inline error message.
+ * Aligned with shadcn design tokens (text-destructive).
+ */
 import { HTMLAttributes } from 'react';
 
 export default function InputError({
@@ -6,7 +10,7 @@ export default function InputError({
     ...props
 }: HTMLAttributes<HTMLParagraphElement> & { message?: string }) {
     return message ? (
-        <p {...props} className={'text-sm text-red-600 ' + className}>
+        <p {...props} className={`text-sm text-destructive ${className}`}>
             {message}
         </p>
     ) : null;

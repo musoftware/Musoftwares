@@ -184,6 +184,7 @@ Route::prefix('marketplace')->name('marketplace.')->group(function () {
 Route::middleware(['auth', 'verified', 'onboarding'])->prefix('marketplace')->name('marketplace.')->group(function () {
     Route::get('/dashboard', [\Modules\Marketplace\Http\Controllers\DashboardController::class, 'index'])->name('dashboard');
 
+    Route::get('/services/create', [\Modules\Marketplace\Http\Controllers\ServiceController::class, 'create'])->name('services.create');
     Route::post('/services', [\Modules\Marketplace\Http\Controllers\ServiceController::class, 'store'])->name('services.store');
 
     // Packages
