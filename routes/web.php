@@ -94,7 +94,45 @@ Route::middleware(['auth', 'verified', 'onboarding', 'subscription:erp'])->prefi
     Route::post('/recurring/{recurring}/pause', [\Modules\ERP\Http\Controllers\RecurringController::class, 'pause'])->name('recurring.pause');
     Route::post('/recurring/{recurring}/resume', [\Modules\ERP\Http\Controllers\RecurringController::class, 'resume'])->name('recurring.resume');
     Route::get('/recurring/{recurring}/logs', [\Modules\ERP\Http\Controllers\RecurringController::class, 'logs'])->name('recurring.logs');
+
+    // ── ERP Task System ──────────────────────────────────────────────
+    // Recovered from old project: Admin/TaskController + Admin/TodoController
+    // Admin/tenant creates tasks for TenantClients and manages todo items.
+    Route::get('/tasks', [\Modules\ERP\Http\Controllers\TaskController::class, 'index'])->name('tasks.index');
+    Route::post('/tasks', [\Modules\ERP\Http\Controllers\TaskController::class, 'store'])->name('tasks.store');
+    Route::get('/tasks/{task}', [\Modules\ERP\Http\Controllers\TaskController::class, 'show'])->name('tasks.show');
+    Route::put('/tasks/{task}', [\Modules\ERP\Http\Controllers\TaskController::class, 'update'])->name('tasks.update');
+    Route::delete('/tasks/{task}', [\Modules\ERP\Http\Controllers\TaskController::class, 'destroy'])->name('tasks.destroy');
+    Route::post('/tasks/{task}/archive', [\Modules\ERP\Http\Controllers\TaskController::class, 'archive'])->name('tasks.archive');
+    Route::post('/tasks/{task}/unarchive', [\Modules\ERP\Http\Controllers\TaskController::class, 'unarchive'])->name('tasks.unarchive');
+    // Todo items
+    Route::post('/tasks/{task}/items', [\Modules\ERP\Http\Controllers\TaskController::class, 'storeItem'])->name('tasks.items.store');
+    Route::put('/tasks/{task}/items/{item}', [\Modules\ERP\Http\Controllers\TaskController::class, 'updateItem'])->name('tasks.items.update');
+    Route::post('/tasks/{task}/items/{item}/complete', [\Modules\ERP\Http\Controllers\TaskController::class, 'completeItem'])->name('tasks.items.complete');
+    Route::post('/tasks/{task}/items/sort', [\Modules\ERP\Http\Controllers\TaskController::class, 'sortItems'])->name('tasks.items.sort');
+    Route::post('/tasks/{task}/items/{item}/pause', [\Modules\ERP\Http\Controllers\TaskController::class, 'pauseItem'])->name('tasks.items.pause');
+    Route::post('/tasks/{task}/items/{item}/resume', [\Modules\ERP\Http\Controllers\TaskController::class, 'resumeItem'])->name('tasks.items.resume');
+    Route::delete('/tasks/{task}/items/{item}', [\Modules\ERP\Http\Controllers\TaskController::class, 'destroyItem'])->name('tasks.items.destroy');
+
+    // ── ERP Client Notes ─────────────────────────────────────────────
+    // Recovered from old project: Admin/UserNotesController (per-user notes)
+    // Parallel system: tenant manages notes on their TenantClients.
+    Route::post('/clients/{client}/notes', [\Modules\ERP\Http\Controllers\ClientNoteController::class, 'store'])->name('clients.notes.store');
+    Route::delete('/clients/{client}/notes/{note}', [\Modules\ERP\Http\Controllers\ClientNoteController::class, 'destroy'])->name('clients.notes.destroy');
+    Route::post('/clients/{client}/notes/{note}/archive', [\Modules\ERP\Http\Controllers\ClientNoteController::class, 'archive'])->name('clients.notes.archive');
+    Route::post('/clients/{client}/notes/{note}/unarchive', [\Modules\ERP\Http\Controllers\ClientNoteController::class, 'unarchive'])->name('clients.notes.unarchive');
 });
+
+// ── Client-Facing ERP Routes ─────────────────────────────────────────
+// Platform users (subscribers) view their invoices and tasks created by admin/tenants.
+// Recovered from old project: Client/InvoicesController + Client/TaskController
+Route::middleware(['auth', 'verified', 'onboarding'])->prefix('my')->name('erp.client-')->group(function () {
+    // Client Invoice List + Payment
+    Route::get('/invoices', [\Modules\ERP\Http\Controllers\InvoicePaymentController::class, 'clientIndex'])->name('invoices.index');
+    Route::get('/invoices/{uuid}/pay', [\Modules\ERP\Http\Controllers\InvoicePaymentController::class, 'show'])->name('invoices.pay');
+    Route::post('/invoices/{uuid}/pay/wallet', [\Modules\ERP\Http\Controllers\InvoicePaymentController::class, 'processWalletPayment'])->name('invoices.pay.wallet');
+});
+
 
 // Freelance Routes
 Route::middleware(['auth', 'verified', 'onboarding', 'subscription:freelance'])->prefix('freelance')->name('freelance.')->group(function () {
@@ -199,7 +237,7 @@ Route::middleware(['auth', 'verified', 'onboarding'])->prefix('admin')->name('ad
     // Reports
     Route::get('/reports/pnl', [\App\Http\Controllers\Admin\ReportController::class, 'pnl'])->name('reports.pnl');
 
-    // Clients
+    // Clients (thin ERP-linked view)
     Route::get('/clients', [\App\Http\Controllers\Admin\ClientController::class, 'index'])->name('clients.index');
     Route::get('/clients/{id}', [\App\Http\Controllers\Admin\ClientController::class, 'show'])->name('clients.show');
 
@@ -207,7 +245,46 @@ Route::middleware(['auth', 'verified', 'onboarding'])->prefix('admin')->name('ad
     Route::get('/kyc', [\App\Http\Controllers\Admin\KycController::class, 'index'])->name('kyc.index');
     Route::post('/kyc/{id}/approve', [\App\Http\Controllers\Admin\KycController::class, 'approve'])->name('kyc.approve');
     Route::post('/kyc/{id}/reject', [\App\Http\Controllers\Admin\KycController::class, 'reject'])->name('kyc.reject');
+
+    // ── User Management (Full Admin Control) ────────────────────────
+    // Recovered from old project: Admin/UsersController
+    Route::get('/users', [\App\Http\Controllers\Admin\UsersController::class, 'index'])->name('users.index');
+    Route::get('/users/create', [\App\Http\Controllers\Admin\UsersController::class, 'create'])->name('users.create');
+    Route::post('/users', [\App\Http\Controllers\Admin\UsersController::class, 'store'])->name('users.store');
+    Route::get('/users/problematic', [\App\Http\Controllers\Admin\UsersController::class, 'problematic'])->name('users.problematic');
+    Route::get('/users/{id}', [\App\Http\Controllers\Admin\UsersController::class, 'show'])->name('users.show');
+    Route::get('/users/{id}/edit', [\App\Http\Controllers\Admin\UsersController::class, 'edit'])->name('users.edit');
+    Route::put('/users/{id}', [\App\Http\Controllers\Admin\UsersController::class, 'update'])->name('users.update');
+    Route::delete('/users/{id}', [\App\Http\Controllers\Admin\UsersController::class, 'destroy'])->name('users.destroy');
+    Route::post('/users/{id}/toggle-block', [\App\Http\Controllers\Admin\UsersController::class, 'toggleBlock'])->name('users.toggleBlock');
+    Route::get('/users/{id}/login-as', [\App\Http\Controllers\Admin\UsersController::class, 'loginAs'])->name('users.loginAs');
+
+    // ── User Notes ───────────────────────────────────────────────────
+    // Recovered from old project: Admin/UserNotesController
+    Route::get('/users/{userId}/notes', [\App\Http\Controllers\Admin\UserNoteController::class, 'index'])->name('users.notes.index');
+    Route::post('/users/{userId}/notes', [\App\Http\Controllers\Admin\UserNoteController::class, 'store'])->name('users.notes.store');
+    Route::delete('/users/{userId}/notes/{noteId}', [\App\Http\Controllers\Admin\UserNoteController::class, 'destroy'])->name('users.notes.destroy');
+    Route::post('/users/{userId}/notes/{noteId}/archive', [\App\Http\Controllers\Admin\UserNoteController::class, 'archive'])->name('users.notes.archive');
+    Route::post('/users/{userId}/notes/{noteId}/unarchive', [\App\Http\Controllers\Admin\UserNoteController::class, 'unarchive'])->name('users.notes.unarchive');
+
+    // ── User Files ───────────────────────────────────────────────────
+    // Recovered from old project: Admin/FileController
+    Route::get('/users/{userId}/files', [\App\Http\Controllers\Admin\UserFileController::class, 'index'])->name('users.files.index');
+    Route::post('/users/{userId}/files/upload', [\App\Http\Controllers\Admin\UserFileController::class, 'upload'])->name('users.files.upload');
+    Route::post('/users/{userId}/files/folder', [\App\Http\Controllers\Admin\UserFileController::class, 'newFolder'])->name('users.files.folder');
+    Route::get('/users/{userId}/files/download', [\App\Http\Controllers\Admin\UserFileController::class, 'download'])->name('users.files.download');
+    Route::post('/users/{userId}/files/rename', [\App\Http\Controllers\Admin\UserFileController::class, 'rename'])->name('users.files.rename');
+    Route::post('/users/{userId}/files/move', [\App\Http\Controllers\Admin\UserFileController::class, 'move'])->name('users.files.move');
+    Route::delete('/users/{userId}/files', [\App\Http\Controllers\Admin\UserFileController::class, 'delete'])->name('users.files.delete');
+
+    // ARCHITECTURE NOTE:
+    // Admin does NOT have separate invoice or task panels.
+    // The ERP system IS the admin's tool for managing platform users (their "clients").
+    // Admin uses Login-As (/admin/users/{id}/login-as) to enter a user's ERP context
+    // and access their invoices, tasks, projects, etc. from within the ERP workspace.
+    // ERP routes live at /erp/* and are available to any authenticated+subscribed user.
 });
+
 
 // SaaS Subscription & Billing Routes
 Route::middleware(['auth', 'verified'])->group(function () {

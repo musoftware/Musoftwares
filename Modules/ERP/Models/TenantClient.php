@@ -45,4 +45,24 @@ class TenantClient extends TenantModel
     {
         return $this->hasMany(Activity::class, 'client_id')->latest();
     }
+
+    /**
+     * Admin notes on this client.
+     * Parallel to platform-level UserNote (admin notes on platform users).
+     * Recovered from old project: UserCredential model.
+     */
+    public function notes(): HasMany
+    {
+        return $this->hasMany(ClientNote::class, 'client_id');
+    }
+
+    /**
+     * Task boards created for this client.
+     * Recovered from old project: Task model (user_id → client_id).
+     */
+    public function tasks(): HasMany
+    {
+        return $this->hasMany(ERPTask::class, 'client_id');
+    }
 }
+
