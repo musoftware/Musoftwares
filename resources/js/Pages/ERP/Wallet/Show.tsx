@@ -50,9 +50,23 @@ export default function Show({ auth, wallet, transactions, client, errors }: Wal
     const lockForm = useForm({ amount: '', note: '' });
     const unlockForm = useForm({ amount: '', note: '' });
 
+    // Super Admin check
+    const isSuperAdmin = auth?.user?.role === 'admin';
+    const [confirmEmergency, setConfirmEmergency] = useState(false);
+
     const handleActionSubmit = (e: React.FormEvent, type: 'credit' | 'debit' | 'lock' | 'unlock') => {
         e.preventDefault();
         
+        if (!isSuperAdmin) {
+            toast({ title: "Unauthorized", description: "Only super-admins can perform manual adjustments.", variant: "destructive" });
+            return;
+        }
+
+        if (!confirmEmergency) {
+            toast({ title: "Confirmation Required", description: "You must confirm this is an emergency audit adjustment.", variant: "destructive" });
+            return;
+        }
+
         let form: any;
         let routeName: string = '';
 
@@ -85,10 +99,11 @@ export default function Show({ auth, wallet, transactions, client, errors }: Wal
             onSuccess: () => {
                 toast({
                     title: `Success!`,
-                    description: `Successfully executed wallet ${type} transaction.`,
+                    description: `Successfully executed audit ${type} transaction.`,
                 });
                 form.reset();
                 setActionType(null);
+                setConfirmEmergency(false);
             },
             onError: (err: any) => {
                 toast({
@@ -111,7 +126,7 @@ export default function Show({ auth, wallet, transactions, client, errors }: Wal
 
     return (
         <AuthenticatedLayout header={undefined}>
-            <Head title={`Wallet - ${activeClient.name}`} />
+            <Head title={`Wallet Ledger - ${activeClient.name}`} />
 
             <div className="max-w-[1200px] mx-auto px-4 py-8 space-y-8">
                 {/* Header */}
@@ -121,8 +136,8 @@ export default function Show({ auth, wallet, transactions, client, errors }: Wal
                     </Link>
                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                         <div>
-                            <h1 className="text-2xl font-semibold tracking-tight">{activeClient.name}'s Wallet</h1>
-                            <p className="text-sm text-muted-foreground">{activeClient.email}</p>
+                            <h1 className="text-2xl font-semibold tracking-tight">{activeClient.name}'s Financial Ledger</h1>
+                            <p className="text-sm text-muted-foreground">Immutable record of all client platform transactions.</p>
                         </div>
                     </div>
                 </div>
@@ -137,18 +152,20 @@ export default function Show({ auth, wallet, transactions, client, errors }: Wal
                             <div className="text-2xl font-bold">
                                 ${activeWallet.balance.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                             </div>
+                            <p className="text-xs text-muted-foreground mt-1">Ready for purchases</p>
                         </CardContent>
                     </Card>
                     <Card className="shadow-none">
                         <CardHeader className="pb-2">
                             <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                                Locked Escrow <Lock className="h-3 w-3" />
+                                System Escrow <Lock className="h-3 w-3" />
                             </CardTitle>
                         </CardHeader>
                         <CardContent>
                             <div className="text-2xl font-bold">
                                 ${(activeWallet.locked_balance ?? 0.00).toLocaleString(undefined, { minimumFractionDigits: 2 })}
                             </div>
+                            <p className="text-xs text-muted-foreground mt-1">Held securely in active contracts</p>
                         </CardContent>
                     </Card>
                     <Card className="shadow-none bg-muted/30">
@@ -159,114 +176,141 @@ export default function Show({ auth, wallet, transactions, client, errors }: Wal
                             <div className="text-2xl font-bold">
                                 ${(activeWallet.balance + (activeWallet.locked_balance ?? 0)).toLocaleString(undefined, { minimumFractionDigits: 2 })}
                             </div>
+                            <p className="text-xs text-muted-foreground mt-1">Calculated from immutable events</p>
                         </CardContent>
                     </Card>
                 </div>
 
-                {/* Actions */}
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <Button variant={actionType === 'credit' ? 'default' : 'outline'} onClick={() => setActionType(actionType === 'credit' ? null : 'credit')} className="h-12 shadow-none">
-                        <Plus className="mr-2 h-4 w-4" /> Add Balance
-                    </Button>
-                    <Button variant={actionType === 'debit' ? 'default' : 'outline'} onClick={() => setActionType(actionType === 'debit' ? null : 'debit')} className="h-12 shadow-none">
-                        <Minus className="mr-2 h-4 w-4" /> Deduct Balance
-                    </Button>
-                    <Button variant={actionType === 'lock' ? 'default' : 'outline'} onClick={() => setActionType(actionType === 'lock' ? null : 'lock')} className="h-12 shadow-none">
-                        <Lock className="mr-2 h-4 w-4" /> Lock Funds
-                    </Button>
-                    <Button variant={actionType === 'unlock' ? 'default' : 'outline'} onClick={() => setActionType(actionType === 'unlock' ? null : 'unlock')} className="h-12 shadow-none">
-                        <Unlock className="mr-2 h-4 w-4" /> Unlock Funds
-                    </Button>
-                </div>
+                {/* Super Admin Actions - Hidden from regular users */}
+                {isSuperAdmin && (
+                    <div className="border border-destructive/20 bg-destructive/5 rounded-xl p-4 space-y-4">
+                        <div className="flex items-center gap-2 text-destructive font-semibold text-sm">
+                            <AlertCircle className="w-4 h-4" /> SUPER ADMIN INTERNAL RECOVERY TOOLS
+                        </div>
+                        <p className="text-xs text-muted-foreground mb-4">
+                            WARNING: Do not use these tools for normal operations. Balance should only be updated via system events (deposits, invoices, payouts).
+                        </p>
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            <Button variant={actionType === 'credit' ? 'destructive' : 'outline'} onClick={() => setActionType(actionType === 'credit' ? null : 'credit')} className="h-10 shadow-none text-xs border-destructive/20">
+                                <Plus className="mr-2 h-3 w-3" /> Force Credit
+                            </Button>
+                            <Button variant={actionType === 'debit' ? 'destructive' : 'outline'} onClick={() => setActionType(actionType === 'debit' ? null : 'debit')} className="h-10 shadow-none text-xs border-destructive/20">
+                                <Minus className="mr-2 h-3 w-3" /> Force Debit
+                            </Button>
+                            <Button variant={actionType === 'lock' ? 'destructive' : 'outline'} onClick={() => setActionType(actionType === 'lock' ? null : 'lock')} className="h-10 shadow-none text-xs border-destructive/20">
+                                <Lock className="mr-2 h-3 w-3" /> Force Lock
+                            </Button>
+                            <Button variant={actionType === 'unlock' ? 'destructive' : 'outline'} onClick={() => setActionType(actionType === 'unlock' ? null : 'unlock')} className="h-10 shadow-none text-xs border-destructive/20">
+                                <Unlock className="mr-2 h-3 w-3" /> Force Unlock
+                            </Button>
+                        </div>
 
-                {/* Inline Action Panel */}
-                <AnimatePresence mode="wait">
-                    {actionType && (
-                        <motion.div
-                            initial={{ opacity: 0, height: 0 }}
-                            animate={{ opacity: 1, height: 'auto' }}
-                            exit={{ opacity: 0, height: 0 }}
-                            transition={{ duration: 0.2 }}
-                            className="overflow-hidden"
-                        >
-                            <Card className="shadow-none border-primary/20 bg-muted/10">
-                                <CardHeader className="flex flex-row items-center justify-between pb-2">
-                                    <CardTitle className="text-base font-semibold capitalize flex items-center gap-2">
-                                        {actionType} Funds
-                                    </CardTitle>
-                                    <Button variant="ghost" size="icon" onClick={() => setActionType(null)} className="h-8 w-8 text-muted-foreground">
-                                        <X className="h-4 w-4" />
-                                    </Button>
-                                </CardHeader>
-                                <CardContent>
-                                    <form onSubmit={(e) => handleActionSubmit(e, actionType)} className="grid grid-cols-1 md:grid-cols-3 gap-6 items-end">
-                                        <div className="space-y-2">
-                                            <Label>Amount (USD)</Label>
-                                            <div className="relative">
-                                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                                    <span className="text-muted-foreground font-medium">$</span>
-                                                </div>
-                                                <Input
-                                                    type="number"
-                                                    step="0.01"
-                                                    placeholder="0.00"
-                                                    value={
-                                                        actionType === 'credit' ? creditForm.data.amount :
-                                                        actionType === 'debit' ? debitForm.data.amount :
-                                                        actionType === 'lock' ? lockForm.data.amount : unlockForm.data.amount
-                                                    }
-                                                    onChange={(e) => {
-                                                        const val = e.target.value;
-                                                        if (actionType === 'credit') creditForm.setData('amount', val);
-                                                        else if (actionType === 'debit') debitForm.setData('amount', val);
-                                                        else if (actionType === 'lock') lockForm.setData('amount', val);
-                                                        else unlockForm.setData('amount', val);
-                                                    }}
-                                                    className="pl-8 shadow-none"
-                                                    required
-                                                />
-                                            </div>
-                                        </div>
-                                        <div className="space-y-2">
-                                            <Label>Transaction Memo</Label>
-                                            <Input
-                                                type="text"
-                                                placeholder="e.g. Manual adjustment"
-                                                value={
-                                                    actionType === 'credit' ? creditForm.data.note :
-                                                    actionType === 'debit' ? debitForm.data.note :
-                                                    actionType === 'lock' ? lockForm.data.note : unlockForm.data.note
-                                                }
-                                                onChange={(e) => {
-                                                    const val = e.target.value;
-                                                    if (actionType === 'credit') creditForm.setData('note', val);
-                                                    else if (actionType === 'debit') debitForm.setData('note', val);
-                                                    else if (actionType === 'lock') lockForm.setData('note', val);
-                                                    else unlockForm.setData('note', val);
-                                                }}
-                                                className="shadow-none"
-                                                required
-                                            />
-                                        </div>
-                                        <div>
-                                            <Button
-                                                type="submit"
-                                                disabled={
-                                                    actionType === 'credit' ? creditForm.processing :
-                                                    actionType === 'debit' ? debitForm.processing :
-                                                    actionType === 'lock' ? lockForm.processing : unlockForm.processing
-                                                }
-                                                className="w-full shadow-none"
-                                            >
-                                                Execute Transaction
+                        {/* Inline Action Panel */}
+                        <AnimatePresence mode="wait">
+                            {actionType && (
+                                <motion.div
+                                    initial={{ opacity: 0, height: 0 }}
+                                    animate={{ opacity: 1, height: 'auto' }}
+                                    exit={{ opacity: 0, height: 0 }}
+                                    transition={{ duration: 0.2 }}
+                                    className="overflow-hidden"
+                                >
+                                    <Card className="shadow-none border-destructive/20 bg-background mt-4">
+                                        <CardHeader className="flex flex-row items-center justify-between pb-2 border-b border-border/50">
+                                            <CardTitle className="text-sm font-semibold text-destructive capitalize flex items-center gap-2">
+                                                Audit Emergency: {actionType} Funds
+                                            </CardTitle>
+                                            <Button variant="ghost" size="icon" onClick={() => setActionType(null)} className="h-6 w-6 text-muted-foreground hover:text-foreground">
+                                                <X className="h-4 w-4" />
                                             </Button>
-                                        </div>
-                                    </form>
-                                </CardContent>
-                            </Card>
-                        </motion.div>
-                    )}
-                </AnimatePresence>
+                                        </CardHeader>
+                                        <CardContent className="pt-4">
+                                            <form onSubmit={(e) => handleActionSubmit(e, actionType)} className="space-y-4">
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
+                                                    <div className="space-y-2">
+                                                        <Label className="text-xs font-semibold">Amount (USD)</Label>
+                                                        <div className="relative">
+                                                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                                                <span className="text-muted-foreground font-medium text-xs">$</span>
+                                                            </div>
+                                                            <Input
+                                                                type="number"
+                                                                step="0.01"
+                                                                placeholder="0.00"
+                                                                value={
+                                                                    actionType === 'credit' ? creditForm.data.amount :
+                                                                    actionType === 'debit' ? debitForm.data.amount :
+                                                                    actionType === 'lock' ? lockForm.data.amount : unlockForm.data.amount
+                                                                }
+                                                                onChange={(e) => {
+                                                                    const val = e.target.value;
+                                                                    if (actionType === 'credit') creditForm.setData('amount', val);
+                                                                    else if (actionType === 'debit') debitForm.setData('amount', val);
+                                                                    else if (actionType === 'lock') lockForm.setData('amount', val);
+                                                                    else unlockForm.setData('amount', val);
+                                                                }}
+                                                                className="pl-8 shadow-none h-9 text-sm"
+                                                                required
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                    <div className="space-y-2">
+                                                        <Label className="text-xs font-semibold">Audit Admin Note (Required)</Label>
+                                                        <Input
+                                                            type="text"
+                                                            placeholder="Detailed reason for manual adjustment..."
+                                                            value={
+                                                                actionType === 'credit' ? creditForm.data.note :
+                                                                actionType === 'debit' ? debitForm.data.note :
+                                                                actionType === 'lock' ? lockForm.data.note : unlockForm.data.note
+                                                            }
+                                                            onChange={(e) => {
+                                                                const val = e.target.value;
+                                                                if (actionType === 'credit') creditForm.setData('note', val);
+                                                                else if (actionType === 'debit') debitForm.setData('note', val);
+                                                                else if (actionType === 'lock') lockForm.setData('note', val);
+                                                                else unlockForm.setData('note', val);
+                                                            }}
+                                                            className="shadow-none h-9 text-sm"
+                                                            required
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div className="flex items-center gap-2 pt-2 pb-2">
+                                                    <input 
+                                                        type="checkbox" 
+                                                        id="confirmEmergency" 
+                                                        checked={confirmEmergency} 
+                                                        onChange={(e) => setConfirmEmergency(e.target.checked)}
+                                                        className="rounded border-destructive/50 text-destructive focus:ring-destructive"
+                                                    />
+                                                    <label htmlFor="confirmEmergency" className="text-xs font-medium text-destructive">
+                                                        I confirm this is an emergency internal accounting adjustment and will be permanently logged.
+                                                    </label>
+                                                </div>
+                                                <div>
+                                                    <Button
+                                                        type="submit"
+                                                        disabled={
+                                                            !confirmEmergency || (
+                                                            actionType === 'credit' ? creditForm.processing :
+                                                            actionType === 'debit' ? debitForm.processing :
+                                                            actionType === 'lock' ? lockForm.processing : unlockForm.processing
+                                                        )}
+                                                        variant="destructive"
+                                                        className="w-full shadow-none"
+                                                    >
+                                                        Execute Permanent Ledger Adjustment
+                                                    </Button>
+                                                </div>
+                                            </form>
+                                        </CardContent>
+                                    </Card>
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+                    </div>
+                )}
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     {/* Left Column */}
