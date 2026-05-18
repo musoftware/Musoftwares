@@ -283,7 +283,33 @@ Route::middleware(['auth', 'verified', 'onboarding'])->prefix('admin')->name('ad
     // Admin uses Login-As (/admin/users/{id}/login-as) to enter a user's ERP context
     // and access their invoices, tasks, projects, etc. from within the ERP workspace.
     // ERP routes live at /erp/* and are available to any authenticated+subscribed user.
+
+    // ── Serial License System ─────────────────────────────────────────
+    // Copied from old project. Fully internal — admin only.
+    // API check-in lives in routes/api.php (no auth, throttled).
+
+    // Software registry (auto-created by API, admin manages default_status)
+    Route::get('/serial-softwares', [\App\Http\Controllers\Admin\SerialSoftwareController::class, 'index'])->name('serial-softwares.index');
+    Route::post('/serial-softwares', [\App\Http\Controllers\Admin\SerialSoftwareController::class, 'store'])->name('serial-softwares.store');
+    Route::patch('/serial-softwares/{serialSoftware}/status', [\App\Http\Controllers\Admin\SerialSoftwareController::class, 'updateStatus'])->name('serial-softwares.status');
+    Route::delete('/serial-softwares/{serialSoftware}', [\App\Http\Controllers\Admin\SerialSoftwareController::class, 'destroy'])->name('serial-softwares.destroy');
+
+    // Device registry (auto-created by API check-in, admin manages status)
+    Route::get('/serial-devices', [\App\Http\Controllers\Admin\SerialDeviceController::class, 'index'])->name('serial-devices.index');
+    Route::patch('/serial-devices/{serialDevice}/status', [\App\Http\Controllers\Admin\SerialDeviceController::class, 'updateStatus'])->name('serial-devices.status');
+    Route::delete('/serial-devices/{serialDevice}', [\App\Http\Controllers\Admin\SerialDeviceController::class, 'destroy'])->name('serial-devices.destroy');
+
+    // User-Device assignments (admin maps device → user)
+    Route::get('/serial-user-devices', [\App\Http\Controllers\Admin\SerialUserDeviceController::class, 'index'])->name('serial-user-devices.index');
+    Route::get('/serial-user-devices/by-user', [\App\Http\Controllers\Admin\SerialUserDeviceController::class, 'byUser'])->name('serial-user-devices.by-user');
+    Route::get('/serial-user-devices/assign', [\App\Http\Controllers\Admin\SerialUserDeviceController::class, 'assign'])->name('serial-user-devices.assign');
+    Route::post('/serial-user-devices', [\App\Http\Controllers\Admin\SerialUserDeviceController::class, 'store'])->name('serial-user-devices.store');
+    Route::patch('/serial-user-devices/{serialUserDevice}/status', [\App\Http\Controllers\Admin\SerialUserDeviceController::class, 'updateStatus'])->name('serial-user-devices.status');
+    Route::patch('/serial-user-devices/users/{user}/status', [\App\Http\Controllers\Admin\SerialUserDeviceController::class, 'updateUserStatus'])->name('serial-user-devices.update-user-status');
+    Route::patch('/serial-user-devices/users/{user}/temp-valid', [\App\Http\Controllers\Admin\SerialUserDeviceController::class, 'updateUserTempValid'])->name('serial-user-devices.update-user-temp-valid');
+    Route::delete('/serial-user-devices/{serialUserDevice}', [\App\Http\Controllers\Admin\SerialUserDeviceController::class, 'destroy'])->name('serial-user-devices.destroy');
 });
+
 
 
 // SaaS Subscription & Billing Routes
