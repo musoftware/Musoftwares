@@ -174,34 +174,37 @@ Route::middleware(['auth', 'verified', 'onboarding', 'subscription:freelance'])-
     Route::post('/contracts/{contract}/dispute', [\Modules\Freelance\Http\Controllers\ContractController::class, 'dispute'])->name('contracts.dispute');
 });
 
-// Marketplace Routes (Public/Logged in)
+// Marketplace Routes — literal routes BEFORE wildcards
 Route::prefix('marketplace')->name('marketplace.')->group(function () {
+    // Public: browse list
     Route::get('/services', [\Modules\Marketplace\Http\Controllers\ServiceController::class, 'index'])->name('services.index');
+
+    // Auth-only: dashboard + create wizard (MUST be before /{id} wildcard)
+    Route::middleware(['auth', 'verified', 'onboarding'])->group(function () {
+        Route::get('/dashboard', [\Modules\Marketplace\Http\Controllers\DashboardController::class, 'index'])->name('dashboard');
+
+        Route::get('/services/create', [\Modules\Marketplace\Http\Controllers\ServiceController::class, 'create'])->name('services.create');
+        Route::post('/services', [\Modules\Marketplace\Http\Controllers\ServiceController::class, 'store'])->name('services.store');
+
+        // Packages
+        Route::post('/services/{service}/packages', [\Modules\Marketplace\Http\Controllers\ServicePackageController::class, 'store'])->name('packages.store');
+        Route::put('/services/{service}/packages/{package}', [\Modules\Marketplace\Http\Controllers\ServicePackageController::class, 'update'])->name('packages.update')->scopeBindings();
+        Route::delete('/services/{service}/packages/{package}', [\Modules\Marketplace\Http\Controllers\ServicePackageController::class, 'destroy'])->name('packages.destroy')->scopeBindings();
+
+        // Orders
+        Route::get('/orders', [\Modules\Marketplace\Http\Controllers\ServiceOrderController::class, 'index'])->name('orders.index');
+        Route::get('/orders/{order}', [\Modules\Marketplace\Http\Controllers\ServiceOrderController::class, 'show'])->name('orders.show');
+        Route::post('/orders', [\Modules\Marketplace\Http\Controllers\ServiceOrderController::class, 'store'])->name('orders.store');
+        Route::post('/orders/{order}/deliver', [\Modules\Marketplace\Http\Controllers\ServiceOrderController::class, 'deliver'])->name('orders.deliver');
+        Route::post('/orders/{order}/complete', [\Modules\Marketplace\Http\Controllers\ServiceOrderController::class, 'complete'])->name('orders.complete');
+        Route::post('/orders/{order}/dispute', [\Modules\Marketplace\Http\Controllers\ServiceOrderController::class, 'dispute'])->name('orders.dispute');
+
+        // Messages
+        Route::post('/orders/{order}/messages', [\Modules\Marketplace\Http\Controllers\OrderMessageController::class, 'store'])->name('orders.messages.store');
+    });
+
+    // Public: show single service — wildcard LAST
     Route::get('/services/{id}', [\Modules\Marketplace\Http\Controllers\ServiceController::class, 'show'])->name('services.show');
-});
-
-// Marketplace Authenticated Routes
-Route::middleware(['auth', 'verified', 'onboarding'])->prefix('marketplace')->name('marketplace.')->group(function () {
-    Route::get('/dashboard', [\Modules\Marketplace\Http\Controllers\DashboardController::class, 'index'])->name('dashboard');
-
-    Route::get('/services/create', [\Modules\Marketplace\Http\Controllers\ServiceController::class, 'create'])->name('services.create');
-    Route::post('/services', [\Modules\Marketplace\Http\Controllers\ServiceController::class, 'store'])->name('services.store');
-
-    // Packages
-    Route::post('/services/{service}/packages', [\Modules\Marketplace\Http\Controllers\ServicePackageController::class, 'store'])->name('packages.store');
-    Route::put('/services/{service}/packages/{package}', [\Modules\Marketplace\Http\Controllers\ServicePackageController::class, 'update'])->name('packages.update')->scopeBindings();
-    Route::delete('/services/{service}/packages/{package}', [\Modules\Marketplace\Http\Controllers\ServicePackageController::class, 'destroy'])->name('packages.destroy')->scopeBindings();
-
-    // Orders
-    Route::get('/orders', [\Modules\Marketplace\Http\Controllers\ServiceOrderController::class, 'index'])->name('orders.index');
-    Route::get('/orders/{order}', [\Modules\Marketplace\Http\Controllers\ServiceOrderController::class, 'show'])->name('orders.show');
-    Route::post('/orders', [\Modules\Marketplace\Http\Controllers\ServiceOrderController::class, 'store'])->name('orders.store');
-    Route::post('/orders/{order}/deliver', [\Modules\Marketplace\Http\Controllers\ServiceOrderController::class, 'deliver'])->name('orders.deliver');
-    Route::post('/orders/{order}/complete', [\Modules\Marketplace\Http\Controllers\ServiceOrderController::class, 'complete'])->name('orders.complete');
-    Route::post('/orders/{order}/dispute', [\Modules\Marketplace\Http\Controllers\ServiceOrderController::class, 'dispute'])->name('orders.dispute');
-
-    // Messages
-    Route::post('/orders/{order}/messages', [\Modules\Marketplace\Http\Controllers\OrderMessageController::class, 'store'])->name('orders.messages.store');
 });
 
 // Marketplace Admin Routes
@@ -401,4 +404,14 @@ Route::middleware(['auth', 'verified'])->prefix('api')->group(function () {
 Route::middleware(['auth', 'verified'])->prefix('api')->group(function () {
     Route::get('/conversations', [\Modules\Core\Http\Controllers\ConversationController::class, 'index']);
     Route::get('/timer/{id}', [\App\Http\Controllers\TimerController::class, 'show']);
+
+    // Activity Engine — widget API for dashboard feeds
+    Route::get('/activity', [\Modules\Core\Http\Controllers\ActivityController::class, 'feed'])->name('api.activity.feed');
 });
+
+// ── Activity Engine ───────────────────────────────────────────────────────────
+// The heartbeat of the iSAAS ecosystem. Full-page operational activity log.
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/activity', [\Modules\Core\Http\Controllers\ActivityController::class, 'index'])->name('activity.index');
+});
+
