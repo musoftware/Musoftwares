@@ -1,5 +1,5 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head, Link, useForm } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 import { useState } from 'react';
 import {
     ShoppingCart,
@@ -14,17 +14,9 @@ import {
     AlertCircle,
     Wallet
 } from 'lucide-react';
-import { Button } from '@/Components/ui/button';
-import { cn, formatMoney, formatDate } from '@/lib/utils';
+
+import { formatMoney, formatDate } from '@/lib/utils';
 import { ServiceQuickView } from '@/Components/ContextualPanels';
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-} from '@/Components/ui/dialog';
 import { AppPage } from '@/Components/ui/AppPage';
 import { PageHeader } from '@/Components/ui/PageHeader';
 import { StatCard } from '@/Components/ui/StatCard';
@@ -40,7 +32,6 @@ export default function MarketplaceDashboard({
     categories = []
 }: any) {
     const [selectedService, setSelectedService] = useState<any>(null);
-    const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
     const stats = initialStats || {
         lockedEscrow: 0,
@@ -52,22 +43,6 @@ export default function MarketplaceDashboard({
     const activePurchases = initialPurchases || [];
     const activeSales = initialSales || [];
     const listedGigs = initialGigs || [];
-
-    const { data, setData, post, processing, errors, reset } = useForm({
-        title: '',
-        description: '',
-        category_id: categories?.[0]?.id || '',
-    });
-
-    const handlePublish = (e: React.FormEvent) => {
-        e.preventDefault();
-        post('/marketplace/services', {
-            onSuccess: () => {
-                setIsCreateModalOpen(false);
-                reset();
-            }
-        });
-    };
 
     return (
         <AuthenticatedLayout header={undefined}>
@@ -85,12 +60,12 @@ export default function MarketplaceDashboard({
                             >
                                 <Search className="w-3.5 h-3.5 mr-1.5 text-slate-500" /> Browse Services
                             </Link>
-                            <Button
-                                onClick={() => setIsCreateModalOpen(true)}
-                                className="bg-slate-900 hover:bg-slate-800 text-white font-medium text-xs h-9 px-3.5 rounded-lg flex items-center justify-center transition-colors shadow-sm"
+                            <Link
+                                href="/marketplace/services/create"
+                                className="inline-flex items-center justify-center bg-slate-900 hover:bg-slate-800 text-white font-medium text-xs h-9 px-3.5 rounded-lg transition-colors shadow-sm"
                             >
                                 <Plus className="w-3.5 h-3.5 mr-1.5" /> Publish Service
-                            </Button>
+                            </Link>
                         </div>
                     }
                 />
@@ -151,8 +126,8 @@ export default function MarketplaceDashboard({
                                         icon={Briefcase}
                                         title="No active client orders yet."
                                         description="Publish your packages or share your catalog to start receiving orders."
+                                        action="/marketplace/services/create"
                                         actionLabel="Publish Service Gig"
-                                        onClick={() => setIsCreateModalOpen(true)}
                                     />
                                 )}
                             </div>
@@ -220,8 +195,8 @@ export default function MarketplaceDashboard({
                                         icon={Layers}
                                         title="No services listed yet."
                                         description="Create your professional services list to let clients purchase pricing packages."
+                                        action="/marketplace/services/create"
                                         actionLabel="Create Service Listing"
-                                        onClick={() => setIsCreateModalOpen(true)}
                                     />
                                 )}
                             </div>
@@ -241,12 +216,12 @@ export default function MarketplaceDashboard({
                                     <ArrowUpRight className="h-3.5 w-3.5 text-slate-400 group-hover:text-slate-600 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
                                 </Link>
 
-                                <button onClick={() => setIsCreateModalOpen(true)} className="w-full flex items-center justify-between p-2.5 rounded-lg border border-slate-200 hover:border-slate-300 hover:bg-slate-50 text-slate-900 transition group text-sm font-medium bg-white">
+                                <Link href="/marketplace/services/create" className="flex items-center justify-between p-2.5 rounded-lg border border-slate-200 hover:border-slate-300 hover:bg-slate-50 text-slate-900 transition group text-sm font-medium bg-white">
                                     <span className="flex items-center gap-2">
                                         <Plus className="h-4 w-4 text-slate-400 group-hover:text-slate-600" /> Publish Service Gig
                                     </span>
                                     <ArrowUpRight className="h-3.5 w-3.5 text-slate-400 group-hover:text-slate-600 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
-                                </button>
+                                </Link>
 
                                 <Link href="/marketplace/orders" className="flex items-center justify-between p-2.5 rounded-lg border border-slate-200 hover:border-slate-300 hover:bg-slate-50 text-slate-900 transition group text-sm font-medium bg-white">
                                     <span className="flex items-center gap-2">
@@ -285,77 +260,7 @@ export default function MarketplaceDashboard({
                 </div>
             </AppPage>
 
-            <Dialog open={isCreateModalOpen} onOpenChange={setIsCreateModalOpen}>
-                <DialogContent className="sm:max-w-md bg-white border border-slate-100 shadow-xl rounded-2xl">
-                    <DialogHeader>
-                        <DialogTitle className="text-slate-900 font-semibold text-xl font-sans tracking-tight">
-                            Publish a Service
-                        </DialogTitle>
-                        <DialogDescription className="text-sm text-slate-500 mt-1">
-                            Create a public service catalog listing. You can define tiered packages and delivery times in the next step.
-                        </DialogDescription>
-                    </DialogHeader>
-                    <form onSubmit={handlePublish} className="space-y-4 py-2">
-                        <div className="space-y-1.5">
-                            <label className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">
-                                Service Title
-                            </label>
-                            <input
-                                type="text"
-                                value={data.title}
-                                onChange={e => setData('title', e.target.value)}
-                                placeholder="e.g. Design a Premium Figma Landing Page"
-                                className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-colors placeholder:text-slate-400 shadow-sm"
-                                required
-                            />
-                            {errors.title && <span className="text-xs text-rose-500 mt-1 block">{errors.title}</span>}
-                        </div>
 
-                        <div className="space-y-1.5">
-                            <label className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">
-                                Category
-                            </label>
-                            <select
-                                value={data.category_id}
-                                onChange={e => setData('category_id', e.target.value)}
-                                className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-colors shadow-sm"
-                                required
-                            >
-                                <option value="" disabled>Select category...</option>
-                                {categories.map((cat: any) => (
-                                    <option key={cat.id} value={cat.id}>
-                                        {cat.name}
-                                    </option>
-                                ))}
-                            </select>
-                            {errors.category_id && <span className="text-xs text-rose-500 mt-1 block">{errors.category_id}</span>}
-                        </div>
-
-                        <div className="space-y-1.5">
-                            <label className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">
-                                Description
-                            </label>
-                            <textarea
-                                value={data.description}
-                                onChange={e => setData('description', e.target.value)}
-                                placeholder="Describe what capabilities and scope this service offers..."
-                                className="w-full min-h-[100px] rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-colors resize-none placeholder:text-slate-400 shadow-sm"
-                                required
-                            />
-                            {errors.description && <span className="text-xs text-rose-500 mt-1 block">{errors.description}</span>}
-                        </div>
-
-                        <DialogFooter className="mt-6 flex flex-row justify-end gap-2 border-t border-slate-100 pt-4 -mx-4 -mb-4 bg-slate-50/50 rounded-b-2xl px-4">
-                            <Button type="button" variant="outline" onClick={() => setIsCreateModalOpen(false)} className="text-sm font-medium h-10 rounded-lg border-slate-200 hover:border-slate-300 hover:bg-slate-50 bg-white shadow-sm">
-                                Cancel
-                            </Button>
-                            <Button type="submit" disabled={processing} className="bg-slate-900 hover:bg-slate-800 text-white font-medium text-sm h-10 rounded-lg px-6 disabled:opacity-50 transition-colors shadow-sm">
-                                {processing ? 'Publishing...' : 'Publish Draft'}
-                            </Button>
-                        </DialogFooter>
-                    </form>
-                </DialogContent>
-            </Dialog>
 
             <ServiceQuickView
                 isOpen={selectedService !== null}
