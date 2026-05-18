@@ -7,6 +7,7 @@ use Modules\Freelance\Models\Contract;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\DB;
+use Modules\Core\Services\ActivityService;
 
 class ContractController extends Controller
 {
@@ -55,6 +56,13 @@ class ContractController extends Controller
                     (string)$contract->id
                 );
             });
+
+            ActivityService::log(
+                event: 'contract.completed',
+                description: "Contract completed for job: {$contract->job->title}",
+                subject: $contract,
+                workspace: 'freelance'
+            );
 
             return back()->with('success', 'Contract marked as completed and funds paid to freelancer.');
         } catch (\Exception $e) {

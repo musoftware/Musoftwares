@@ -10,6 +10,7 @@ use Modules\Freelance\Models\PointTransaction;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\DB;
+use App\Events\ProposalAccepted;
 
 class ProposalController extends Controller
 {
@@ -77,6 +78,8 @@ class ProposalController extends Controller
                 'started_at' => now(),
             ]);
         });
+
+        event(new ProposalAccepted($proposal));
 
         return back()->with('success', 'Proposal accepted and contract created.');
     }

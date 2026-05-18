@@ -87,7 +87,7 @@ class WithdrawalController extends Controller
                     throw new \Exception('Insufficient available balance.');
                 }
 
-                Withdrawal::create([
+                $withdrawal = Withdrawal::create([
                     'tenant_id' => $client->tenant_id,
                     'client_id' => $client->id,
                     'payment_method_id' => $request->payment_method_id,
@@ -95,6 +95,8 @@ class WithdrawalController extends Controller
                     'currency_code' => $wallet->currency,
                     'status' => 'pending',
                 ]);
+
+                event(new \App\Events\WithdrawalRequested($withdrawal));
             });
 
             return back()->with('success', 'Withdrawal request submitted.');
@@ -107,6 +109,7 @@ class WithdrawalController extends Controller
     {
         // Admin only
         $withdrawal->update(['status' => 'approved']);
+        event(new \App\Events\WithdrawalApproved($withdrawal));
         return back()->with('success', 'Withdrawal approved.');
     }
 

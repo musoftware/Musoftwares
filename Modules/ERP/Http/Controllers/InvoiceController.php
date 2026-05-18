@@ -15,6 +15,8 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Modules\Core\Services\ActivityService;
+use App\Events\InvoicePaid;
 
 class InvoiceController extends Controller
 {
@@ -150,6 +152,13 @@ class InvoiceController extends Controller
                     ]);
                 }
             }
+
+            ActivityService::log(
+                event: 'invoice.created',
+                description: "Created invoice #{$invoice->invoice_number}",
+                subject: $invoice,
+                workspace: 'erp'
+            );
 
             return redirect()->route('erp.invoices.show', $invoice->id)
                 ->with('success', 'Invoice created successfully.');
@@ -331,6 +340,8 @@ class InvoiceController extends Controller
         if (!$result['ok']) {
             return back()->withErrors(['payment' => $result['message']]);
         }
+
+        event(new InvoicePaid($invoice));
 
         return back()->with('success', $result['message']);
     }

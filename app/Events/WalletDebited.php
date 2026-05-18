@@ -5,5 +5,11 @@ use Illuminate\Queue\SerializesModels;
 class WalletDebited {
     use Dispatchable, SerializesModels;
     public $transaction;
-    public function __construct($transaction) { $this->transaction = $transaction; }
+    public $amount;
+    public $currency;
+    public function __construct($transaction, $amount = null, $currency = null) { 
+        $this->transaction = $transaction; 
+        $this->amount = $amount ?? ($transaction->amount ?? null);
+        $this->currency = $currency ?? ($transaction->amount_currency ?? 'USD');
+    }
 }

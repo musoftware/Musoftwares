@@ -10,6 +10,7 @@ use Modules\ERP\Models\Project;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
+use Modules\Core\Services\ActivityService;
 
 /**
  * ERP Task Controller — admin/tenant manages task boards for clients.
@@ -86,6 +87,13 @@ class TaskController extends Controller
             'created_by' => Auth::id(),
             'status'     => 'open',
         ]));
+
+        ActivityService::log(
+            event: 'task.created',
+            description: "Created task board: {$task->task_name}",
+            subject: $task,
+            workspace: 'erp'
+        );
 
         return redirect()->route('erp.tasks.show', $task->id)
             ->with('success', 'Task created.');
@@ -190,6 +198,12 @@ class TaskController extends Controller
     {
         if ($request->boolean('completed')) {
             $item->markComplete();
+            ActivityService::log(
+                event: 'task.completed',
+                description: "Completed todo item: {$item->title}",
+                subject: $item,
+                workspace: 'erp'
+            );
         } else {
             $item->markIncomplete();
         }
