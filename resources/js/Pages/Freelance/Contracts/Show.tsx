@@ -20,21 +20,17 @@ export default function ShowContract({ auth, contract: initialContract }: any) {
     const isClient = mode === 'client';
     const globalCurrency = auth?.user?.preferred_currency || 'USD';
 
-    // Mock contract data if not provided
-    const contract = initialContract || {
-        id: 1,
-        title: 'Full Stack Developer for SaaS',
-        status: 'active', // active, completed, disputed
-        agreed_price: '1200.00',
-        currency_code: '$',
-        deadline: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString(), // 5 days from now
-        client: { name: 'Acme Corp', avatar: 'C' },
-        freelancer: { name: 'Alice Smith', avatar: 'A' },
-        chat_messages: [
-            { id: 1, sender_id: 999, sender_name: 'Acme Corp', text: 'Hi Alice, excited to start working with you!', time: '10:00 AM' },
-            { id: 2, sender_id: auth.user.id, sender_name: 'Alice Smith', text: 'Thanks! I will get started on the initial setup today.', time: '10:05 AM' }
-        ]
-    };
+    const contract = initialContract;
+    
+    if (!contract) {
+        return (
+            <FreelanceLayout auth={auth} clean={true}>
+                <div className="max-w-6xl mx-auto py-12 text-center text-slate-500">
+                    Contract not found.
+                </div>
+            </FreelanceLayout>
+        );
+    }
 
     const [messageInput, setMessageInput] = useState('');
     const [deliveryDescription, setDeliveryDescription] = useState('');

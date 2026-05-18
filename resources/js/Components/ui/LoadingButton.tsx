@@ -1,6 +1,13 @@
 import { cn } from '@/lib/utils';
 import { Check, Loader2 } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
+
+export interface LoadingButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+    loading?: boolean;
+    success?: boolean;
+    loadingText?: string;
+    successText?: string;
+}
 
 export function LoadingButton({
     loading = false,
@@ -11,7 +18,7 @@ export function LoadingButton({
     className,
     disabled,
     ...props
-}) {
+}: LoadingButtonProps) {
     const [showSuccess, setShowSuccess] = useState(false);
 
     useEffect(() => {

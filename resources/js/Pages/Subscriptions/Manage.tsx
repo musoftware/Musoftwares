@@ -1,12 +1,11 @@
 import React from 'react';
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import WorkspaceLayout from '@/Layouts/WorkspaceLayout';
 import { Head, router, Link } from '@inertiajs/react';
 import { Button } from '@/Components/ui/button';
-import { RefreshCw, Ban, Calendar, Clock, Receipt, Wallet, Layers } from 'lucide-react';
-import { AppPage } from '@/Components/ui/AppPage';
-import { PageHeader } from '@/Components/ui/PageHeader';
-import { StatCard } from '@/Components/ui/StatCard';
-import { SectionCard } from '@/Components/ui/SectionCard';
+import { RefreshCw, Ban, Calendar, Clock, Receipt, Wallet, Layers, Sparkles, Building2, Settings } from 'lucide-react';
+import { ModulePageHeader } from '@/Components/ui/ModulePageHeader';
+import { MetricCard } from '@/Components/ui/MetricCard';
+import { OperationalCard } from '@/Components/ui/OperationalCard';
 import { EmptyState } from '@/Components/ui/EmptyState';
 import { DataTable } from '@/Components/ui/DataTable';
 import { CurrencyDisplay } from '@/Components/ui/CurrencyDisplay';
@@ -79,14 +78,24 @@ export default function Manage({ subscriptions, invoices, walletBalance, currenc
         { key: 'status', label: 'Status', render: (row: any) => <StatusBadge status={row.status} size="sm" /> }
     ];
 
-    return (
-        <AuthenticatedLayout header={undefined}>
-            <Head title="My Subscriptions" />
+    const menuItems = [
+        { id: 'dashboard', label: 'Overview', icon: Building2, href: '/dashboard', isActive: false },
+        { id: 'wallet', label: 'Wallet', icon: Wallet, href: route().has('financial.add-balance') ? route('financial.add-balance') : '#', isActive: false },
+        { id: 'subscriptions', label: 'Subscriptions', icon: Sparkles, href: '/subscriptions/plans', isActive: true },
+        { id: 'settings', label: 'Settings', icon: Settings, href: '/profile', isActive: false },
+    ];
 
-            <AppPage>
-                <PageHeader 
+    return (
+        <WorkspaceLayout 
+            title="My Subscriptions"
+            workspaceName="Musoftware Portal"
+            tenantId="CUST-PORTAL"
+            menuItems={menuItems}
+        >
+            <div className="space-y-8">
+                <ModulePageHeader 
                     title="My Subscriptions"
-                    subtitle="Manage renewals, cycles, billing, and platform module access."
+                    description="Manage renewals, cycles, billing, and platform module access."
                     actions={
                         <Link href={route('subscriptions.plans')}>
                             <Button className="shadow-sm bg-primary hover:bg-primary-hover text-white font-semibold h-9 text-xs">
@@ -97,19 +106,19 @@ export default function Manage({ subscriptions, invoices, walletBalance, currenc
                 />
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <StatCard 
+                    <MetricCard 
                         label="Active Modules"
                         value={subscriptions.filter(s => s.status === 'active').length}
                         icon={Layers}
                     />
-                    <StatCard 
+                    <MetricCard 
                         label="Wallet Balance"
-                        value={<CurrencyDisplay amount={walletBalance} currency={currency} className="font-sans text-2xl font-bold" />}
+                        value={walletBalance}
                         icon={Wallet}
                     />
-                    <StatCard 
+                    <MetricCard 
                         label="Invoices Paid"
-                        value={`${invoices.filter(i => i.status === 'paid').length} Invoices`}
+                        value={invoices.filter(i => i.status === 'paid').length}
                         icon={Receipt}
                     />
                 </div>
@@ -120,15 +129,14 @@ export default function Manage({ subscriptions, invoices, walletBalance, currenc
                     </h3>
                     
                     {subscriptions.length === 0 ? (
-                        <SectionCard>
+                        <OperationalCard>
                             <EmptyState 
                                 icon={Clock}
                                 title="No active subscriptions found"
                                 description="You do not currently have any paid SaaS module subscriptions enabled. Unlock features in a single click."
-                                action={route('subscriptions.plans')}
-                                actionLabel="Explore pricing plans"
+                                action={{ label: "Explore pricing plans", href: route('subscriptions.plans') }}
                             />
-                        </SectionCard>
+                        </OperationalCard>
                     ) : (
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                             {subscriptions.map((sub) => {
@@ -208,10 +216,10 @@ export default function Manage({ subscriptions, invoices, walletBalance, currenc
                         <Receipt className="h-4 w-4" /> Platform Billing History
                     </h3>
 
-                    <SectionCard noPadding>
+                    <OperationalCard noPadding>
                         <DataTable 
-                            columns={invoiceColumns}
-                            data={invoices}
+                            columns={invoiceColumns as any}
+                            data={invoices as any}
                             emptyState={
                                 <EmptyState 
                                     icon={Receipt}
@@ -220,9 +228,9 @@ export default function Manage({ subscriptions, invoices, walletBalance, currenc
                             }
                             className="border-0 shadow-none rounded-none"
                         />
-                    </SectionCard>
+                    </OperationalCard>
                 </div>
-            </AppPage>
-        </AuthenticatedLayout>
+            </div>
+        </WorkspaceLayout>
     );
 }

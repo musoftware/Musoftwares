@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Head, Link, usePage } from '@inertiajs/react';
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import WorkspaceLayout from '@/Layouts/WorkspaceLayout';
 import { 
     Briefcase,
     Clock,
@@ -16,10 +16,9 @@ import { CurrencyDisplay as FinancialAmount } from '@/Components/ui/CurrencyDisp
 import { StatusBadge } from '@/Components/ui/StatusBadge';
 import { ContractQuickView } from '@/Components/ContextualPanels';
 import { formatDate } from '@/lib/utils';
-import { AppPage } from '@/Components/ui/AppPage';
-import { PageHeader } from '@/Components/ui/PageHeader';
-import { StatCard } from '@/Components/ui/StatCard';
-import { SectionCard } from '@/Components/ui/SectionCard';
+import { ModulePageHeader } from '@/Components/ui/ModulePageHeader';
+import { MetricCard } from '@/Components/ui/MetricCard';
+import { OperationalCard } from '@/Components/ui/OperationalCard';
 import { EmptyState } from '@/Components/ui/EmptyState';
 import { ActivityFeed } from '@/Components/ui/ActivityFeed';
 
@@ -68,14 +67,23 @@ export default function FreelanceDashboard({ stats: initialStats, activeProposal
         }
     ];
 
-    return (
-        <AuthenticatedLayout header={undefined}>
-            <Head title="Freelance Hub" />
+    const menuItems = [
+        { id: 'dashboard', label: 'Dashboard', icon: Briefcase, href: '/freelance', isActive: true },
+        { id: 'jobs', label: 'Find Work', icon: Search, href: '/freelance/jobs/browse', isActive: false },
+        { id: 'contracts', label: 'My Contracts', icon: Clock, href: '/freelance/contracts', isActive: false },
+    ];
 
-            <AppPage>
-                <PageHeader 
+    return (
+        <WorkspaceLayout 
+            title="Freelance Hub"
+            workspaceName="Freelance Hub"
+            tenantId="FR-DRAFT"
+            menuItems={menuItems}
+        >
+            <div className="space-y-8">
+                <ModulePageHeader 
                     title={`Welcome back, ${auth?.user?.name?.split(' ')[0] || 'Partner'}`}
-                    subtitle="Monitor your active contracts, pending bids, and operational stats in real-time."
+                    description="Monitor your active contracts, pending bids, and operational stats in real-time."
                     actions={
                         <Link 
                             href="/freelance/jobs/browse" 
@@ -87,32 +95,31 @@ export default function FreelanceDashboard({ stats: initialStats, activeProposal
                 />
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <StatCard 
+                    <MetricCard 
                         label="Total Earnings"
-                        value={<FinancialAmount amount={stats.totalEarnings} currency={stats.currency} className="text-2xl font-semibold font-sans text-slate-900" />}
+                        value={stats.totalEarnings}
                         icon={DollarSign}
                     />
-                    <StatCard 
+                    <MetricCard 
                         label="Active Contracts"
                         value={stats.activeContracts}
                         icon={Briefcase}
                     />
-                    <StatCard 
+                    <MetricCard 
                         label="Pending Proposals"
                         value={stats.activeProposals}
                         icon={Clock}
                     />
-                    <StatCard 
+                    <MetricCard 
                         label="Available Connects"
                         value={stats.pointsBalance}
                         icon={Activity}
-                        description="Connects balance"
                     />
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     <div className="lg:col-span-2 space-y-8">
-                        <SectionCard title="Upcoming Appointments" description="Your scheduled consultations and client meetings.">
+                        <OperationalCard title="Upcoming Appointments" description="Your scheduled consultations and client meetings.">
                             {upcomingBookings.length === 0 ? (
                                 <EmptyState 
                                     icon={Clock}
@@ -150,9 +157,9 @@ export default function FreelanceDashboard({ stats: initialStats, activeProposal
                                     ))}
                                 </div>
                             )}
-                        </SectionCard>
+                        </OperationalCard>
 
-                        <SectionCard title="Active Contracts" description="Your currently running client engagements.">
+                        <OperationalCard title="Active Contracts" description="Your currently running client engagements.">
                             {activeContracts.length === 0 ? (
                                 <EmptyState 
                                     icon={Briefcase}
@@ -186,9 +193,9 @@ export default function FreelanceDashboard({ stats: initialStats, activeProposal
                                     ))}
                                 </div>
                             )}
-                        </SectionCard>
+                        </OperationalCard>
 
-                        <SectionCard title="Submitted Proposals" description="Bids awaiting client review or response.">
+                        <OperationalCard title="Submitted Proposals" description="Bids awaiting client review or response.">
                             {activeProposals.length === 0 ? (
                                 <EmptyState 
                                     icon={Clock}
@@ -214,7 +221,7 @@ export default function FreelanceDashboard({ stats: initialStats, activeProposal
                                     ))}
                                 </div>
                             )}
-                        </SectionCard>
+                        </OperationalCard>
                     </div>
 
                     <div className="space-y-8">
@@ -245,13 +252,13 @@ export default function FreelanceDashboard({ stats: initialStats, activeProposal
                         </div>
                     </div>
                 </div>
-            </AppPage>
+            </div>
 
             <ContractQuickView
                 isOpen={selectedContract !== null}
                 onClose={() => setSelectedContract(null)}
                 data={selectedContract}
             />
-        </AuthenticatedLayout>
+        </WorkspaceLayout>
     );
 }

@@ -321,16 +321,16 @@ export default function PublicLayout({ children, auth }: PublicLayoutProps) {
                             </h3>
                             <ul className="mt-4 space-y-3">
                                 <li>
-                                    <a href="#" className="text-sm hover:text-slate-950 transition-colors">Privacy Policy</a>
+                                    <Link href="/legal/privacy" className="text-sm hover:text-slate-950 transition-colors">Privacy Policy</Link>
                                 </li>
                                 <li>
-                                    <a href="#" className="text-sm hover:text-slate-950 transition-colors">Terms of Service</a>
+                                    <Link href="/legal/terms" className="text-sm hover:text-slate-950 transition-colors">Terms of Service</Link>
                                 </li>
                                 <li>
-                                    <a href="#" className="text-sm hover:text-slate-950 transition-colors">Escrow Protection</a>
+                                    <Link href="/legal/escrow" className="text-sm hover:text-slate-950 transition-colors">Escrow Protection</Link>
                                 </li>
                                 <li>
-                                    <a href="#" className="text-sm hover:text-slate-950 transition-colors">Security Audit</a>
+                                    <Link href="/legal/security" className="text-sm hover:text-slate-950 transition-colors">Security Audit</Link>
                                 </li>
                             </ul>
                         </div>

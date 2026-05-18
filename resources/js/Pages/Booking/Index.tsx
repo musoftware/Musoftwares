@@ -1,10 +1,9 @@
 import React from 'react';
 import { Head, Link } from '@inertiajs/react';
-import { AppPage } from '@/Components/ui/AppPage';
-import { PageHeader } from '@/Components/ui/PageHeader';
-import { SectionCard } from '@/Components/ui/SectionCard';
+import WorkspaceLayout from '@/Layouts/WorkspaceLayout';
+import { ModulePageHeader } from '@/Components/ui/ModulePageHeader';
+import { OperationalCard } from '@/Components/ui/OperationalCard';
 import { EmptyState } from '@/Components/ui/EmptyState';
-import { Button } from '@/Components/ui/button';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/Components/ui/card';
 import { Badge } from '@/Components/ui/badge';
 import { Calendar, Clock, Copy, Plus, MoreHorizontal } from 'lucide-react';
@@ -30,21 +29,31 @@ export default function Index({ events }: { events: EventType[] }) {
     };
 
     return (
-        <AppPage>
+        <WorkspaceLayout
+            title="Booking Events"
+            workspaceName="Booking Settings"
+            tenantId="SYS-BOOKING"
+            menuItems={[
+                { id: 'appointments', label: 'Appointments', icon: Clock, href: '/booking/appointments', isActive: false },
+                { id: 'availability', label: 'Availability', icon: Calendar, href: '/booking', isActive: true },
+            ]}
+        >
             <Head title="Booking Events" />
             
-            <PageHeader
-                title="Event Types"
-                description="Create and manage your booking event types."
-                actions={
-                    <Button asChild>
-                        <Link href={route('booking.events.create')}>
+            <div className="space-y-8">
+                <ModulePageHeader
+                    title="Event Types"
+                    description="Create and manage your booking event types."
+                    actions={
+                        <Link 
+                            href={route('booking.events.create')} 
+                            className="inline-flex items-center justify-center rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800 transition-colors shadow-sm"
+                        >
                             <Plus className="w-4 h-4 mr-2" />
                             New Event Type
                         </Link>
-                    </Button>
-                }
-            />
+                    }
+                />
 
             <div className="mt-6">
                 {events.length === 0 ? (
@@ -65,18 +74,14 @@ export default function Index({ events }: { events: EventType[] }) {
                                     <div className="flex justify-between items-start">
                                         <CardTitle className="text-lg">{event.title}</CardTitle>
                                         <DropdownMenu>
-                                            <DropdownMenuTrigger asChild>
-                                                <Button variant="ghost" className="h-8 w-8 p-0">
-                                                    <MoreHorizontal className="h-4 w-4" />
-                                                </Button>
+                                            <DropdownMenuTrigger className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 hover:bg-slate-100 hover:text-slate-900 h-8 w-8 p-0">
+                                                <MoreHorizontal className="h-4 w-4 text-slate-500" />
                                             </DropdownMenuTrigger>
                                             <DropdownMenuContent align="end">
-                                                <DropdownMenuItem asChild>
-                                                    <Link href={route('booking.events.edit', event.slug)}>
-                                                        Edit
-                                                    </Link>
+                                                <DropdownMenuItem className="cursor-pointer" onClick={() => window.location.href = route('booking.events.edit', event.slug)}>
+                                                    Edit
                                                 </DropdownMenuItem>
-                                                <DropdownMenuItem onClick={() => copyLink(event.slug)}>
+                                                <DropdownMenuItem className="cursor-pointer" onClick={() => copyLink(event.slug)}>
                                                     Copy Link
                                                 </DropdownMenuItem>
                                             </DropdownMenuContent>
@@ -104,16 +109,17 @@ export default function Index({ events }: { events: EventType[] }) {
                                         {event.is_active ? 'Active' : 'Draft'}
                                     </Badge>
                                     
-                                    <Button variant="ghost" size="sm" onClick={() => copyLink(event.slug)} className="text-slate-500 hover:text-slate-900">
+                                    <button onClick={() => copyLink(event.slug)} className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 hover:bg-slate-100 h-8 px-3 text-slate-500 hover:text-slate-900">
                                         <Copy className="w-4 h-4 mr-2" />
                                         Copy link
-                                    </Button>
+                                    </button>
                                 </CardFooter>
                             </Card>
                         ))}
                     </div>
                 )}
             </div>
-        </AppPage>
+            </div>
+        </WorkspaceLayout>
     );
 }

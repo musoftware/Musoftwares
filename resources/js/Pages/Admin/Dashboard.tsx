@@ -1,14 +1,13 @@
 import React from 'react';
 import { Head, Link } from '@inertiajs/react';
-import AdminLayout from "@/Layouts/AdminLayout";
+import WorkspaceLayout from '@/Layouts/WorkspaceLayout';
 import { DollarSign, Building2, Users, ArrowDownCircle, Inbox, Plus, BarChart3, Settings } from 'lucide-react';
 import { LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer } from 'recharts';
 import { Button } from '@/Components/ui/button';
 import { Avatar, AvatarFallback } from '@/Components/ui/avatar';
-import { AppPage } from '@/Components/ui/AppPage';
-import { PageHeader } from '@/Components/ui/PageHeader';
-import { StatCard } from '@/Components/ui/StatCard';
-import { SectionCard } from '@/Components/ui/SectionCard';
+import { ModulePageHeader } from '@/Components/ui/ModulePageHeader';
+import { MetricCard } from '@/Components/ui/MetricCard';
+import { OperationalCard } from '@/Components/ui/OperationalCard';
 import { DataTable } from '@/Components/ui/DataTable';
 import { StatusBadge } from '@/Components/ui/StatusBadge';
 import { EmptyState } from '@/Components/ui/EmptyState';
@@ -48,22 +47,33 @@ export default function Dashboard({ stats, revenueChartData, moduleBreakdown, re
             <div className="flex items-center gap-2">
                 <StatusBadge status={statusMap[row.status] || 'neutral'} label={row.status} size="sm" />
                 {row.status === 'pending' && (
-                    <Button variant="ghost" size="sm" className="h-6 text-[10px] px-2" asChild>
-                        <Link href="#">Review</Link>
-                    </Button>
+                    <Link href="/admin/withdrawals" className="inline-flex items-center justify-center rounded-lg hover:bg-slate-100 text-slate-900 h-6 text-[10px] px-2 font-medium transition-colors">
+                        Review
+                    </Link>
                 )}
             </div>
         ) },
     ];
 
+    const menuItems = [
+        { id: 'dashboard', label: 'Dashboard', icon: BarChart3, href: '/admin', isActive: true },
+        { id: 'clients', label: 'Clients', icon: Users, href: '/admin/clients', isActive: false },
+        { id: 'marketplace', label: 'Marketplace', icon: Building2, href: '/admin/marketplace', isActive: false },
+        { id: 'reports', label: 'Reports', icon: DollarSign, href: '/admin/reports', isActive: false },
+        { id: 'settings', label: 'Settings', icon: Settings, href: '/admin/settings', isActive: false },
+    ];
+
     return (
-        <AdminLayout user={auth?.user}>
-            <Head title="Admin Platform" />
-            
-            <AppPage>
-                <PageHeader 
+        <WorkspaceLayout 
+            title="Admin Platform"
+            workspaceName="Musoftware Admin"
+            tenantId="SYS-ADMIN"
+            menuItems={menuItems}
+        >
+            <div className="space-y-8">
+                <ModulePageHeader 
                     title="Platform Administration"
-                    subtitle="Monitor global platform revenue, tenants, and infrastructure."
+                    description="Monitor global platform revenue, tenants, and infrastructure."
                     actions={
                         <div className="flex items-center gap-2">
                             <Link 
@@ -83,7 +93,7 @@ export default function Dashboard({ stats, revenueChartData, moduleBreakdown, re
                 />
 
                 {!hasData ? (
-                    <SectionCard>
+                    <OperationalCard>
                         <EmptyState 
                             icon={Building2}
                             title="Welcome to your ERP, Admin!"
@@ -91,40 +101,34 @@ export default function Dashboard({ stats, revenueChartData, moduleBreakdown, re
                             action="/admin/clients"
                             actionLabel="Add First Client"
                         />
-                    </SectionCard>
+                    </OperationalCard>
                 ) : (
                     <>
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                            <StatCard
+                            <MetricCard
                                 label="Revenue This Month"
                                 value={formatCurrency(stats.revenueThisMonth)}
-                                change={stats.revenueGrowth ? `${Math.abs(stats.revenueGrowth)}%` : undefined}
-                                changeType={stats.revenueGrowth > 0 ? 'up' : stats.revenueGrowth < 0 ? 'down' : 'neutral'}
                                 icon={DollarSign}
                             />
-                            <StatCard
+                            <MetricCard
                                 label="Active Tenants"
                                 value={stats.activeTenants}
-                                description="Live Workspaces"
                                 icon={Building2}
                             />
-                            <StatCard
+                            <MetricCard
                                 label="Active Clients"
                                 value={stats.totalClients}
-                                change={stats.recentClients > 0 ? `+${stats.recentClients}` : undefined}
-                                changeType={stats.recentClients > 0 ? 'up' : 'neutral'}
                                 icon={Users}
                             />
-                            <StatCard
+                            <MetricCard
                                 label="Pending Withdrawals"
                                 value={stats.pendingWithdrawals}
-                                description={stats.pendingWithdrawalAmount > 0 ? `${formatCurrency(stats.pendingWithdrawalAmount)} pending` : 'All clear'}
                                 icon={ArrowDownCircle}
                             />
                         </div>
 
                         <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
-                            <SectionCard title="Revenue Trajectory (12 Months)" className="lg:col-span-3">
+                            <OperationalCard title="Revenue Trajectory (12 Months)" className="lg:col-span-3">
                                 <div className="h-[300px] w-full">
                                     {chartData.length > 0 ? (
                                         <ResponsiveContainer width="100%" height="100%">
@@ -142,9 +146,9 @@ export default function Dashboard({ stats, revenueChartData, moduleBreakdown, re
                                         <EmptyState icon={BarChart3} title="No revenue data yet" />
                                     )}
                                 </div>
-                            </SectionCard>
+                            </OperationalCard>
 
-                            <SectionCard title="Module Breakdown" className="lg:col-span-2">
+                            <OperationalCard title="Module Breakdown" className="lg:col-span-2">
                                 <div className="h-[300px] w-full">
                                     {pieData.some((d: any) => d.value > 0) ? (
                                         <ResponsiveContainer width="100%" height="100%">
@@ -171,11 +175,11 @@ export default function Dashboard({ stats, revenueChartData, moduleBreakdown, re
                                         <EmptyState icon={BarChart3} title="No module revenue yet" />
                                     )}
                                 </div>
-                            </SectionCard>
+                            </OperationalCard>
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            <SectionCard 
+                            <OperationalCard 
                                 title="Recent Invoices" 
                                 action={<Link href={route().has('erp.invoices.index') ? route('erp.invoices.index') : '#'} className="text-[11px] font-bold uppercase tracking-wider text-primary hover:underline transition-colors">View All</Link>}
                                 noPadding
@@ -186,9 +190,9 @@ export default function Dashboard({ stats, revenueChartData, moduleBreakdown, re
                                     emptyState={<EmptyState icon={Inbox} title="No recent invoices" />}
                                     className="border-0 shadow-none rounded-none"
                                 />
-                            </SectionCard>
+                            </OperationalCard>
 
-                            <SectionCard 
+                            <OperationalCard 
                                 title="Recent Withdrawals" 
                                 noPadding
                             >
@@ -198,9 +202,9 @@ export default function Dashboard({ stats, revenueChartData, moduleBreakdown, re
                                     emptyState={<EmptyState icon={ArrowDownCircle} title="No recent withdrawals" />}
                                     className="border-0 shadow-none rounded-none"
                                 />
-                            </SectionCard>
+                            </OperationalCard>
 
-                            <SectionCard title="New Tenants" noPadding>
+                            <OperationalCard title="New Tenants" noPadding>
                                 <div className="divide-y divide-border/40">
                                     {tenants.length > 0 ? tenants.map((tenant: any) => (
                                         <div key={tenant.id} className="p-4 flex items-center justify-between hover:bg-surface-raised transition-colors">
@@ -222,29 +226,11 @@ export default function Dashboard({ stats, revenueChartData, moduleBreakdown, re
                                         <EmptyState icon={Building2} title="No tenants yet" />
                                     )}
                                 </div>
-                            </SectionCard>
+                            </OperationalCard>
                         </div>
                     </>
                 )}
-            </AppPage>
-
-            {/* QUICK ACTIONS */}
-            <div className="fixed bottom-0 left-0 right-0 md:left-64 bg-surface/80 backdrop-blur-md border-t border-border p-4 z-50 flex justify-center shadow-lg">
-                <div className="flex items-center space-x-3">
-                    <Button className="h-9 text-xs font-semibold shadow-sm" asChild>
-                        <Link href={route().has('erp.invoices.create') ? route('erp.invoices.create') : '#'}><Plus className="w-3.5 h-3.5 mr-1.5" /> New Invoice</Link>
-                    </Button>
-                    <Button variant="secondary" className="h-9 text-xs font-semibold shadow-sm bg-surface hover:bg-surface-raised border border-border" asChild>
-                        <Link href="/admin/clients"><Plus className="w-3.5 h-3.5 mr-1.5" /> New Client</Link>
-                    </Button>
-                    <Button variant="outline" className="h-9 text-xs font-semibold shadow-sm border border-border bg-surface hover:bg-surface-raised" asChild>
-                        <Link href="/admin/reports/pnl"><BarChart3 className="w-3.5 h-3.5 mr-1.5" /> Run Report</Link>
-                    </Button>
-                    <Button variant="ghost" className="h-9 text-xs font-semibold" asChild>
-                        <Link href="#"><Settings className="w-3.5 h-3.5 mr-1.5" /> Settings</Link>
-                    </Button>
-                </div>
             </div>
-        </AdminLayout>
+        </WorkspaceLayout>
     );
 }

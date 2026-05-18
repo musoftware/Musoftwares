@@ -51,11 +51,12 @@ export default function Success({ booking }: any) {
                             </div>
                         </div>
                         
-                        <Button asChild className="w-full rounded-xl h-12 text-base shadow-sm">
-                            <a href="/">
-                                Return Home
-                            </a>
-                        </Button>
+                        <a 
+                            href="/"
+                            className="inline-flex items-center justify-center rounded-xl bg-slate-900 px-4 py-2 text-base font-medium text-white hover:bg-slate-800 transition-colors h-12 w-full shadow-sm"
+                        >
+                            Return Home
+                        </a>
                     </CardContent>
                 </Card>
             </div>

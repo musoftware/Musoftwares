@@ -57,10 +57,9 @@ export default function Show({ order, conversation }: any) {
         order.status !== 'completed' &&
         order.status !== 'delivered';
 
-    // Dummy logic for calculating commissions
-    const commissionRate = 0.1; // 10%
-    const sellerEarnings = order.amount * (1 - commissionRate);
-    const fee = order.amount * commissionRate;
+    // Use actual commission from the backend
+    const fee = parseFloat(order.commission_amount) || 0;
+    const sellerEarnings = parseFloat(order.amount) - fee;
 
     return (
         <AuthenticatedLayout
