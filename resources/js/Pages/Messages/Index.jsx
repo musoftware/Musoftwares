@@ -208,7 +208,8 @@ export default function MessagesIndex({ conversations, users }) {
                         </h2>
                         <form onSubmit={startDirectMessage} className="space-y-6">
                             <div>
-                                <InputLabel htmlFor="recipient" value="Select Platform User" />
+                                <InputLabel htmlFor="recipient" value="Contact Support Team" />
+                                <p className="text-xs text-slate-400 mb-1">Direct chats can only be initiated with support or admin staff.</p>
                                 <select
                                     id="recipient"
                                     value={data.recipient_id}
@@ -216,10 +217,10 @@ export default function MessagesIndex({ conversations, users }) {
                                     className="mt-1 block w-full rounded-xl border-slate-200 font-medium text-slate-900 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                                     required
                                 >
-                                    <option value="">-- Choose User --</option>
+                                    <option value="">-- Choose Support Agent --</option>
                                     {users?.map((u) => (
                                         <option key={u.id} value={u.id}>
-                                            {u.name} ({u.email})
+                                            {u.name} ({u.role})
                                         </option>
                                     ))}
                                 </select>

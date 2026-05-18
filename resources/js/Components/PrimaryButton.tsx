@@ -1,3 +1,10 @@
+/**
+ * PrimaryButton — compatibility shim.
+ * Delegates to the shadcn/ui Button (default variant).
+ * All existing usage remains identical; just swap the import to
+ * `import { Button } from '@/Components/ui/button'` when you refactor each page.
+ */
+import { Button } from '@/Components/ui/button';
 import { ButtonHTMLAttributes } from 'react';
 
 export default function PrimaryButton({
@@ -7,16 +14,12 @@ export default function PrimaryButton({
     ...props
 }: ButtonHTMLAttributes<HTMLButtonElement>) {
     return (
-        <button
+        <Button
             {...props}
-            className={
-                `inline-flex items-center rounded-md border border-transparent bg-primary px-4 py-2 text-xs font-semibold uppercase tracking-widest text-white shadow-soft transition duration-200 ease-in-out hover:bg-primary-hover focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 active:bg-primary ${
-                    disabled && 'opacity-25'
-                } ` + className
-            }
+            className={className}
             disabled={disabled}
         >
             {children}
-        </button>
+        </Button>
     );
 }

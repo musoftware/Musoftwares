@@ -34,9 +34,12 @@ class MessagesController extends Controller
                 return $conv;
             });
 
-        // Also fetch list of users so they can start new direct message
+        // Security: only expose admin/support accounts for direct chat.
+        // Regular users must NOT see the full member directory.
         $users = User::where('id', '!=', $user->id)
+            ->whereIn('role', ['admin', 'support', 'super_admin'])
             ->select('id', 'name', 'email', 'avatar', 'role')
+            ->orderBy('name')
             ->get();
 
         return Inertia::render('Messages/Index', [
@@ -48,7 +51,17 @@ class MessagesController extends Controller
     public function storeDirectMessage(Request $request)
     {
         $request->validate([
-            'recipient_id' => 'required|exists:users,id',
+            'recipient_id' => [
+                'required',
+                'exists:users,id',
+                // Server-side guard: users can only direct-message admins/support
+                function ($attribute, $value, $fail) use ($request) {
+                    $recipient = User::find($value);
+                    if ($recipient && !in_array($recipient->role, ['admin', 'support', 'super_admin'])) {
+                        $fail('Direct messages can only be sent to support or admin accounts.');
+                    }
+                },
+            ],
             'message' => 'required|string',
         ]);
 
