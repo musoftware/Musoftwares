@@ -15,7 +15,13 @@ class ServicePackage extends Model
         'description',
         'price',
         'currency_code',
-        'delivery_days'
+        'delivery_days',
+        'revisions',
+        'features',
+    ];
+
+    protected $casts = [
+        'features' => 'array',
     ];
 
     public function service(): BelongsTo

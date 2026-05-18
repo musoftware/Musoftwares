@@ -13,10 +13,17 @@ class Service extends Model
 
     protected $table = 'marketplace_services';
 
-    protected $fillable = ['seller_id', 'category_id', 'title', 'description', 'status', 'is_featured'];
+    protected $fillable = [
+        'seller_id', 'category_id', 'title', 'description', 'status', 'is_featured',
+        'tags', 'faq', 'requirements', 'gallery', 'video_url',
+    ];
 
     protected $casts = [
-        'is_featured' => 'boolean',
+        'is_featured'  => 'boolean',
+        'tags'         => 'array',
+        'faq'          => 'array',
+        'requirements' => 'array',
+        'gallery'      => 'array',
     ];
 
     public function seller()
