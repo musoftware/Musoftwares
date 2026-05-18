@@ -34,6 +34,20 @@ class HandleInertiaRequests extends Middleware
             'auth' => [
                 'user' => $request->user(),
                 'is_impersonating' => session()->has('impersonator_id'),
+                'active_modules' => function () use ($request) {
+                    $user = $request->user();
+                    if (!$user) return [];
+                    try {
+                        $service = app(\App\Services\SubscriptionService::class);
+                        return [
+                            'erp' => $service->hasActiveSubscription($user, 'erp'),
+                            'freelance' => $service->hasActiveSubscription($user, 'freelance'),
+                            'marketplace' => true,
+                        ];
+                    } catch (\Throwable $e) {
+                        return ['erp' => true, 'freelance' => true, 'marketplace' => true];
+                    }
+                }
             ],
             'notifications' => function () use ($request) {
                 if ($request->user()) {

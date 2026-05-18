@@ -1,5 +1,7 @@
 import { Breadcrumbs } from './Breadcrumbs';
 
+// Force Vite recompile
+
 export interface PageHeaderProps {
     title: string;
     subtitle?: string;

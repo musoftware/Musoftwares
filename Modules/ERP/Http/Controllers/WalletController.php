@@ -135,6 +135,10 @@ class WalletController extends Controller
 
     public function manualCredit(Request $request, $client)
     {
+        if (auth()->user()->role !== 'admin') {
+            abort(403, 'Unauthorized. Only super-admins can perform manual adjustments.');
+        }
+
         $request->validate([
             'amount' => 'required|numeric|min:0.01',
             'note' => 'required|string',
@@ -164,9 +168,9 @@ class WalletController extends Controller
                     'amount' => $amount,
                     'balance_before' => $wallet->balance,
                     'balance_after' => $newBalance,
-                    'reference_type' => 'manual_credit',
+                    'reference_type' => 'manual_credit_audit',
                     'reference_id' => auth()->id(),
-                    'description' => $request->input('note'),
+                    'description' => 'AUDIT CREDIT: ' . $request->input('note'),
                     'business_amount' => $businessAmount,
                     'business_currency' => $businessCurrency,
                 ]);
@@ -174,7 +178,7 @@ class WalletController extends Controller
                 $wallet->update(['balance' => $newBalance]);
             });
 
-            return back()->with('success', 'Wallet credited successfully.');
+            return back()->with('success', 'Wallet audited credited successfully.');
         } catch (\Exception $e) {
             return back()->withErrors(['amount' => $e->getMessage()]);
         }
@@ -182,6 +186,10 @@ class WalletController extends Controller
 
     public function manualDebit(Request $request, $client)
     {
+        if (auth()->user()->role !== 'admin') {
+            abort(403, 'Unauthorized. Only super-admins can perform manual adjustments.');
+        }
+
         $request->validate([
             'amount' => 'required|numeric|min:0.01',
             'note' => 'required|string',
@@ -214,9 +222,9 @@ class WalletController extends Controller
                     'amount' => $amount,
                     'balance_before' => $wallet->balance,
                     'balance_after' => $newBalance,
-                    'reference_type' => 'manual_debit',
+                    'reference_type' => 'manual_debit_audit',
                     'reference_id' => auth()->id(),
-                    'description' => $request->input('note'),
+                    'description' => 'AUDIT DEBIT: ' . $request->input('note'),
                     'business_amount' => $businessAmount,
                     'business_currency' => $businessCurrency,
                 ]);
@@ -224,7 +232,7 @@ class WalletController extends Controller
                 $wallet->update(['balance' => $newBalance]);
             });
 
-            return back()->with('success', 'Wallet debited successfully.');
+            return back()->with('success', 'Wallet audited debited successfully.');
         } catch (\Exception $e) {
             return back()->withErrors(['amount' => $e->getMessage()]);
         }
@@ -232,6 +240,10 @@ class WalletController extends Controller
 
     public function lockFunds(Request $request, $client)
     {
+        if (auth()->user()->role !== 'admin') {
+            abort(403, 'Unauthorized. Only super-admins can perform manual adjustments.');
+        }
+
         $request->validate([
             'amount' => 'required|numeric|min:0.01',
             'note' => 'required|string',
@@ -263,14 +275,14 @@ class WalletController extends Controller
                     'amount' => $amount,
                     'balance_before' => $wallet->balance + $amount,
                     'balance_after' => $wallet->balance,
-                    'reference_type' => 'funds_lock',
+                    'reference_type' => 'funds_lock_audit',
                     'reference_id' => auth()->id(),
-                    'description' => 'Funds Locked: ' . $request->input('note'),
+                    'description' => 'AUDIT LOCK: ' . $request->input('note'),
                     'business_amount' => $amount,
                     'business_currency' => 'USD',
                 ]);
             });
-            return back()->with('success', 'Funds locked successfully.');
+            return back()->with('success', 'Funds audited locked successfully.');
         } catch (\Exception $e) {
             return back()->withErrors(['amount' => $e->getMessage()]);
         }
@@ -278,6 +290,10 @@ class WalletController extends Controller
 
     public function unlockFunds(Request $request, $client)
     {
+        if (auth()->user()->role !== 'admin') {
+            abort(403, 'Unauthorized. Only super-admins can perform manual adjustments.');
+        }
+
         $request->validate([
             'amount' => 'required|numeric|min:0.01',
             'note' => 'required|string',
@@ -309,14 +325,14 @@ class WalletController extends Controller
                     'amount' => $amount,
                     'balance_before' => $wallet->balance - $amount,
                     'balance_after' => $wallet->balance,
-                    'reference_type' => 'funds_unlock',
+                    'reference_type' => 'funds_unlock_audit',
                     'reference_id' => auth()->id(),
-                    'description' => 'Funds Unlocked: ' . $request->input('note'),
+                    'description' => 'AUDIT UNLOCK: ' . $request->input('note'),
                     'business_amount' => $amount,
                     'business_currency' => 'USD',
                 ]);
             });
-            return back()->with('success', 'Funds unlocked successfully.');
+            return back()->with('success', 'Funds audited unlocked successfully.');
         } catch (\Exception $e) {
             return back()->withErrors(['amount' => $e->getMessage()]);
         }

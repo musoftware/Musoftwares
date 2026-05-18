@@ -118,68 +118,74 @@ export default function CreateEdit({ invoice, clients, currencies, business_curr
     return (
         <AuthenticatedLayout header={isEdit ? 'Edit Invoice' : 'New Invoice'}>
             <Head title={isEdit ? 'Edit Invoice' : 'New Invoice'} />
-            <form onSubmit={handleSubmit} className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 space-y-6">
-                <PageHeader title={isEdit ? `Edit Invoice ${invoice.invoice_number}` : 'Create New Invoice'}>
-                    <Button type="button" variant="outline" asChild className="shadow-none">
-                        <Link href={route('erp.invoices.index')}>Cancel</Link>
-                    </Button>
-                    <Button type="submit" disabled={processing} className="shadow-none">
-                        <Save className="mr-2 h-4 w-4" /> {isEdit ? 'Update Invoice' : 'Save Draft'}
-                    </Button>
-                </PageHeader>
+            
+            <form onSubmit={handleSubmit} className="max-w-[900px] mx-auto px-4 sm:px-6 lg:px-8 py-10 font-sans">
+                
+                {/* ──────────────────────────────────────────────────────── */}
+                {/* PAGE HEADER */}
+                {/* ──────────────────────────────────────────────────────── */}
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-12">
+                    <div>
+                        <h1 className="text-2xl font-semibold text-slate-900 tracking-tight">
+                            {isEdit ? `Edit Invoice ${invoice.invoice_number}` : 'New Invoice'}
+                        </h1>
+                        <p className="text-sm text-slate-500 mt-1">Draft a new invoice to bill your client directly.</p>
+                    </div>
+                    <div className="flex items-center gap-3">
+                        <Button type="button" variant="ghost" asChild className="hover:bg-slate-100 text-slate-600 transition-colors">
+                            <Link href={route('erp.invoices.index')}>Cancel</Link>
+                        </Button>
+                        <Button type="submit" disabled={processing} className="shadow-sm bg-slate-900 text-white hover:bg-slate-800 transition-colors">
+                            {isEdit ? 'Update Invoice' : 'Save Draft'}
+                        </Button>
+                        {!isEdit && (
+                            <Button type="button" disabled={processing} className="shadow-sm bg-indigo-600 text-white hover:bg-indigo-700 transition-colors">
+                                <Send className="mr-2 h-4 w-4" /> Save & Send
+                            </Button>
+                        )}
+                    </div>
+                </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <div className="lg:col-span-2 space-y-6">
-                        <Card className="shadow-none">
-                            <CardHeader>
-                                <CardTitle>Invoice Details</CardTitle>
-                            </CardHeader>
-                            <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-12">
+                    
+                    {/* ──────────────────────────────────────────────────────── */}
+                    {/* 1. CLIENT & DETAILS */}
+                    {/* ──────────────────────────────────────────────────────── */}
+                    <section className="grid grid-cols-1 md:grid-cols-12 gap-8">
+                        <div className="md:col-span-4">
+                            <h2 className="text-sm font-semibold text-slate-900 uppercase tracking-wider">1. Client Details</h2>
+                            <p className="text-sm text-slate-500 mt-2 leading-relaxed">Select the client, adjust billing dates, and choose the correct currency.</p>
+                        </div>
+                        <div className="md:col-span-8 bg-white p-6 rounded-2xl border border-slate-100 shadow-sm space-y-6">
+                            <div className="space-y-2">
+                                <Label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Client</Label>
+                                <select
+                                    className="flex h-11 w-full rounded-lg border-slate-200 bg-slate-50/50 px-3 py-2 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-colors"
+                                    value={data.client_id}
+                                    onChange={(e) => setData('client_id', e.target.value)}
+                                >
+                                    <option value="">Select a client...</option>
+                                    {clients.map((c) => (
+                                        <option key={c.id} value={c.id}>{c.name} ({c.currency})</option>
+                                    ))}
+                                </select>
+                                {errors.client_id && <div className="text-xs text-rose-500 font-medium mt-1">{errors.client_id}</div>}
+                            </div>
+                            
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                                 <div className="space-y-2">
-                                    <Label>Client</Label>
-                                    <select
-                                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 shadow-none"
-                                        value={data.client_id}
-                                        onChange={(e) => setData('client_id', e.target.value)}
-                                    >
-                                        <option value="">Search/Select Client</option>
-                                        {clients.map((c) => (
-                                            <option key={c.id} value={c.id}>{c.name} ({c.currency})</option>
-                                        ))}
-                                    </select>
-                                    {errors.client_id && <div className="text-sm text-destructive font-medium">{errors.client_id}</div>}
-                                </div>
-                                <div className="space-y-2">
-                                    <Label>Invoice Number</Label>
+                                    <Label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Invoice Number</Label>
                                     <Input
-                                        className="shadow-none"
+                                        className="h-11 rounded-lg border-slate-200 bg-slate-50/50 focus:bg-white transition-colors"
                                         value={data.invoice_number}
                                         onChange={e => setData('invoice_number', e.target.value)}
                                         placeholder="INV-001"
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <Label>Issue Date</Label>
-                                    <Input
-                                        className="shadow-none"
-                                        type="date"
-                                        value={data.issued_at}
-                                        onChange={e => setData('issued_at', e.target.value)}
-                                    />
-                                </div>
-                                <div className="space-y-2">
-                                    <Label>Due Date</Label>
-                                    <Input
-                                        className="shadow-none"
-                                        type="date"
-                                        value={data.due_date}
-                                        onChange={e => setData('due_date', e.target.value)}
-                                    />
-                                </div>
-                                <div className="space-y-2">
-                                    <Label>Currency</Label>
+                                    <Label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Currency</Label>
                                     <select
-                                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 shadow-none"
+                                        className="flex h-11 w-full rounded-lg border-slate-200 bg-slate-50/50 px-3 py-2 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-colors"
                                         value={data.amount_currency}
                                         onChange={(e) => setData('amount_currency', e.target.value)}
                                     >
@@ -188,231 +194,231 @@ export default function CreateEdit({ invoice, clients, currencies, business_curr
                                         ))}
                                     </select>
                                 </div>
-                                <div className="md:col-span-2 p-3 bg-muted/50 rounded-xl border text-sm text-muted-foreground">
-                                    Rate: 1 {data.amount_currency} = {exchangeRate} {business_currency} (Auto-fetched)
-                                </div>
-                            </CardContent>
-                        </Card>
+                            </div>
 
-                        <Card className="shadow-none">
-                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
-                                <CardTitle>Line Items</CardTitle>
-                                <div className="flex gap-2">
-                                    <Button type="button" variant="outline" size="sm" onClick={() => addItem('simple')} className="shadow-none">
-                                        + Simple
-                                    </Button>
-                                    <Button type="button" variant="outline" size="sm" onClick={() => addItem('quantity')} className="shadow-none">
-                                        + Quantity
-                                    </Button>
-                                    <Button type="button" variant="outline" size="sm" onClick={() => addItem('timer')} className="shadow-none">
-                                        + Timer
-                                    </Button>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                <div className="space-y-2">
+                                    <Label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Issue Date</Label>
+                                    <Input
+                                        className="h-11 rounded-lg border-slate-200 bg-slate-50/50 focus:bg-white transition-colors"
+                                        type="date"
+                                        value={data.issued_at}
+                                        onChange={e => setData('issued_at', e.target.value)}
+                                    />
                                 </div>
-                            </CardHeader>
-                            <CardContent>
-                                <div className="space-y-4">
-                                    {data.items.map((item, index) => (
-                                        <div key={index} className="flex gap-4 items-start p-4 border rounded-xl bg-card transition-colors hover:bg-muted/10">
-                                            <div className="mt-2 cursor-grab text-muted-foreground/50 hover:text-muted-foreground">
-                                                <GripVertical className="h-5 w-5" />
-                                            </div>
-                                            <div className="flex-1 grid grid-cols-12 gap-4">
-                                                <div className="col-span-12 md:col-span-6 space-y-2">
-                                                    <div className="flex items-center gap-2">
-                                                        <Badge variant="secondary" className={
-                                                            item.type === 'quantity' ? 'bg-primary/10 text-primary hover:bg-primary/20' :
-                                                            item.type === 'timer' ? 'bg-indigo-500/10 text-indigo-600 hover:bg-indigo-500/20' : ''
-                                                        }>
-                                                            {item.type}
-                                                        </Badge>
-                                                        <Input
-                                                            className="shadow-none"
-                                                            placeholder="Item title"
-                                                            value={item.title}
-                                                            onChange={e => updateItem(index, 'title', e.target.value)}
-                                                        />
-                                                    </div>
-                                                    <textarea
-                                                        placeholder="Description (optional)"
-                                                        className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                                                        value={item.description}
-                                                        onChange={e => updateItem(index, 'description', e.target.value)}
-                                                    />
-                                                </div>
-                                                <div className="col-span-4 md:col-span-2 space-y-2">
-                                                    <Label className="text-xs">Qty</Label>
-                                                    <Input
-                                                        className="shadow-none"
-                                                        type="number"
-                                                        value={item.quantity}
-                                                        onChange={e => updateItem(index, 'quantity', parseFloat(e.target.value))}
-                                                    />
-                                                </div>
-                                                <div className="col-span-4 md:col-span-2 space-y-2">
-                                                    <Label className="text-xs">Price</Label>
-                                                    <Input
-                                                        className="shadow-none"
-                                                        type="number"
-                                                        value={item.unit_price}
-                                                        onChange={e => updateItem(index, 'unit_price', parseFloat(e.target.value))}
-                                                    />
-                                                </div>
-                                                <div className="col-span-4 md:col-span-2 space-y-2">
-                                                    <Label className="text-xs">Total</Label>
-                                                    <div className="h-10 flex items-center font-bold px-3 bg-muted/50 rounded-md border text-foreground">
-                                                        {(item.unit_price * item.quantity).toFixed(2)}
-                                                    </div>
-                                                </div>
-                                                {item.type === 'timer' && (
-                                                    <div className="col-span-12 flex items-center gap-4 p-3 bg-indigo-500/5 rounded-lg border border-indigo-500/20 text-indigo-700 text-sm">
-                                                        <Clock className="h-4 w-4" />
-                                                        <span className="font-medium">Timer Item: Rates are per unit of time (e.g. per hour).</span>
-                                                        <Button type="button" size="sm" variant="ghost" className="ml-auto text-indigo-700 hover:text-indigo-800 hover:bg-indigo-500/10">
-                                                            <Play className="mr-2 h-3 w-3" /> Start Session
-                                                        </Button>
-                                                    </div>
-                                                )}
-                                            </div>
-                                            <Button type="button" variant="ghost" size="icon" className="text-destructive hover:bg-destructive/10 hover:text-destructive" onClick={() => removeItem(index)}>
-                                                <Trash2 className="h-4 w-4" />
-                                            </Button>
-                                        </div>
-                                    ))}
+                                <div className="space-y-2">
+                                    <Label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Due Date</Label>
+                                    <Input
+                                        className="h-11 rounded-lg border-slate-200 bg-slate-50/50 focus:bg-white transition-colors"
+                                        type="date"
+                                        value={data.due_date}
+                                        onChange={e => setData('due_date', e.target.value)}
+                                    />
                                 </div>
-                            </CardContent>
-                        </Card>
-
-                        <Card className="shadow-none border-destructive/20 bg-destructive/5">
-                            <CardHeader
-                                className="flex flex-row items-center justify-between cursor-pointer select-none space-y-0"
-                                onClick={() => setShowCosts(!showCosts)}
-                            >
-                                <CardTitle className="text-sm font-bold flex items-center gap-2 text-destructive">
-                                    <DollarSign className="h-4 w-4" />
-                                    Internal Costs (Admin Only)
-                                </CardTitle>
-                                <Button type="button" variant="ghost" size="sm" className="h-8 w-8 p-0 text-destructive hover:text-destructive hover:bg-destructive/10">
-                                    {showCosts ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-                                </Button>
-                            </CardHeader>
-                            {showCosts && (
-                                <CardContent className="space-y-4">
-                                    {data.costs.map((cost, index) => (
-                                        <div key={index} className="flex gap-4 items-center bg-card p-3 border rounded-xl shadow-sm">
-                                            <div className="flex-1 grid grid-cols-12 gap-4">
-                                                <div className="col-span-7">
-                                                    <Input
-                                                        className="shadow-none"
-                                                        placeholder="Cost title (e.g. Outsourcing)"
-                                                        value={cost.title}
-                                                        onChange={e => updateCost(index, 'title', e.target.value)}
-                                                    />
-                                                </div>
-                                                <div className="col-span-3">
-                                                    <Input
-                                                        className="shadow-none"
-                                                        type="number"
-                                                        placeholder="Amount"
-                                                        value={cost.amount}
-                                                        onChange={e => updateCost(index, 'amount', parseFloat(e.target.value))}
-                                                    />
-                                                </div>
-                                                <div className="col-span-2">
-                                                    <select
-                                                        className="flex h-10 w-full rounded-md border border-input bg-background px-2 py-1 text-xs ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 shadow-none"
-                                                        value={cost.payment_status}
-                                                        onChange={e => updateCost(index, 'payment_status', e.target.value)}
-                                                    >
-                                                        <option value="unpaid">Unpaid</option>
-                                                        <option value="paid">Paid</option>
-                                                    </select>
-                                                </div>
-                                            </div>
-                                            <Button type="button" variant="ghost" size="icon" className="text-destructive hover:bg-destructive/10 hover:text-destructive" onClick={() => removeCost(index)}>
-                                                <Trash2 className="h-4 w-4" />
-                                            </Button>
-                                        </div>
-                                    ))}
-                                    <Button type="button" variant="outline" size="sm" className="w-full text-destructive border-destructive/20 hover:bg-destructive/10 shadow-none" onClick={addCost}>
-                                        + Add Cost Row
-                                    </Button>
-                                </CardContent>
+                            </div>
+                            
+                            {data.amount_currency !== business_currency && (
+                                <div className="p-3 bg-slate-50 rounded-lg border border-slate-100 text-xs text-slate-500 flex items-center gap-2">
+                                    <Clock className="h-3.5 w-3.5 text-slate-400" />
+                                    <span>Exchange Rate: 1 {data.amount_currency} = {exchangeRate} {business_currency}</span>
+                                </div>
                             )}
-                        </Card>
+                        </div>
+                    </section>
 
-                        <Card className="shadow-none">
-                            <CardHeader>
-                                <CardTitle>Notes</CardTitle>
-                            </CardHeader>
-                            <CardContent>
+                    <hr className="border-slate-100" />
+
+                    {/* ──────────────────────────────────────────────────────── */}
+                    {/* 2. LINE ITEMS (FAST INLINE EDITING) */}
+                    {/* ──────────────────────────────────────────────────────── */}
+                    <section className="space-y-4">
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <h2 className="text-sm font-semibold text-slate-900 uppercase tracking-wider">2. Line Items</h2>
+                                <p className="text-sm text-slate-500 mt-1">Add the products or services provided. Use Tab to navigate quickly.</p>
+                            </div>
+                        </div>
+
+                        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+                            {/* Table Header */}
+                            <div className="flex items-center px-6 py-3 border-b border-slate-100 bg-slate-50/50 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                                <div className="flex-1">Item Description</div>
+                                <div className="w-24 text-right">Qty</div>
+                                <div className="w-32 text-right">Price</div>
+                                <div className="w-32 text-right">Total</div>
+                                <div className="w-10"></div>
+                            </div>
+
+                            {/* Table Rows */}
+                            <div className="divide-y divide-slate-50">
+                                {data.items.map((item, index) => (
+                                    <div key={index} className="flex items-start gap-4 p-4 group hover:bg-slate-50/50 transition-colors">
+                                        <div className="flex-1 space-y-1">
+                                            <Input
+                                                className="h-9 font-medium text-slate-900 shadow-none border-transparent bg-transparent hover:border-slate-200 focus:border-indigo-500 focus:bg-white transition-all px-2 placeholder:text-slate-300"
+                                                placeholder="Service or product name..."
+                                                value={item.title}
+                                                onChange={e => updateItem(index, 'title', e.target.value)}
+                                            />
+                                            <Input
+                                                className="h-8 text-sm text-slate-500 shadow-none border-transparent bg-transparent hover:border-slate-200 focus:border-indigo-500 focus:bg-white transition-all px-2 placeholder:text-slate-300"
+                                                placeholder="Optional description..."
+                                                value={item.description}
+                                                onChange={e => updateItem(index, 'description', e.target.value)}
+                                            />
+                                        </div>
+                                        <div className="w-24 pt-0.5">
+                                            <Input
+                                                className="h-8 text-right shadow-none border-transparent bg-transparent hover:border-slate-200 focus:border-indigo-500 focus:bg-white transition-all px-2"
+                                                type="number"
+                                                min="0.01"
+                                                step="0.01"
+                                                placeholder="0"
+                                                value={item.quantity || ''}
+                                                onChange={e => updateItem(index, 'quantity', parseFloat(e.target.value) || 0)}
+                                            />
+                                        </div>
+                                        <div className="w-32 pt-0.5">
+                                            <Input
+                                                className="h-8 text-right shadow-none border-transparent bg-transparent hover:border-slate-200 focus:border-indigo-500 focus:bg-white transition-all px-2"
+                                                type="number"
+                                                min="0"
+                                                step="0.01"
+                                                placeholder="0.00"
+                                                value={item.unit_price || ''}
+                                                onChange={e => updateItem(index, 'unit_price', parseFloat(e.target.value) || 0)}
+                                            />
+                                        </div>
+                                        <div className="w-32 text-right pt-2 font-medium text-slate-700 px-2">
+                                            {new Intl.NumberFormat('en-US', { style: 'currency', currency: data.amount_currency }).format(item.unit_price * item.quantity)}
+                                        </div>
+                                        <div className="w-10 pt-1.5 opacity-0 group-hover:opacity-100 transition-opacity flex justify-end">
+                                            <button 
+                                                type="button" 
+                                                onClick={() => removeItem(index)}
+                                                className="text-slate-400 hover:text-rose-500 p-1 rounded hover:bg-rose-50 transition-colors"
+                                            >
+                                                <Trash2 className="w-4 h-4" />
+                                            </button>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                            
+                            {/* Add Item Actions */}
+                            <div className="p-4 border-t border-slate-100 bg-slate-50/30">
+                                <Button type="button" variant="ghost" size="sm" onClick={() => addItem('simple')} className="text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50 font-medium">
+                                    <Plus className="mr-1.5 h-4 w-4" /> Add Line Item
+                                </Button>
+                            </div>
+                        </div>
+                    </section>
+
+                    <hr className="border-slate-100" />
+
+                    {/* ──────────────────────────────────────────────────────── */}
+                    {/* 3. PAYMENT DETAILS & SUMMARY */}
+                    {/* ──────────────────────────────────────────────────────── */}
+                    <section className="grid grid-cols-1 md:grid-cols-12 gap-8">
+                        <div className="md:col-span-6 space-y-6">
+                            <div className="space-y-2">
+                                <Label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Invoice Notes</Label>
                                 <textarea
-                                    placeholder="Additional notes for the client..."
-                                    className="flex min-h-[128px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                                    placeholder="Payment instructions, thank you message, or additional details..."
+                                    className="flex min-h-[120px] w-full rounded-xl border-slate-200 bg-white px-4 py-3 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-colors resize-none placeholder:text-slate-400"
                                     value={data.notes}
                                     onChange={e => setData('notes', e.target.value)}
                                 />
-                            </CardContent>
-                        </Card>
-                    </div>
+                            </div>
 
-                    <div className="space-y-6">
-                        <Card className="sticky top-6 shadow-none">
-                            <CardHeader>
-                                <CardTitle>Summary</CardTitle>
-                            </CardHeader>
-                            <CardContent className="space-y-4">
-                                <div className="flex justify-between text-sm">
-                                    <span className="text-muted-foreground font-medium">Subtotal</span>
-                                    <span className="font-semibold text-foreground"><CurrencyDisplay amount={subtotal} currency={data.amount_currency} /></span>
-                                </div>
-                                <div className="space-y-2">
-                                    <div className="flex justify-between text-sm items-center">
-                                        <span className="text-muted-foreground font-medium">Discount</span>
-                                        <div className="flex items-center gap-2">
-                                            <Input
-                                                type="number"
-                                                className="w-20 h-8 shadow-none"
-                                                value={data.discount_amount}
-                                                onChange={e => setData('discount_amount', parseFloat(e.target.value))}
-                                            />
-                                        </div>
+                            {/* Collapsible Advanced Settings (Internal Costs) */}
+                            <div className="border border-slate-100 rounded-xl overflow-hidden bg-white">
+                                <button
+                                    type="button"
+                                    className="w-full px-4 py-3 flex items-center justify-between text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors"
+                                    onClick={() => setShowCosts(!showCosts)}
+                                >
+                                    <div className="flex items-center gap-2">
+                                        <DollarSign className="h-4 w-4 text-slate-400" />
+                                        Advanced: Internal Costs
                                     </div>
+                                    {showCosts ? <ChevronUp className="h-4 w-4 text-slate-400" /> : <ChevronDown className="h-4 w-4 text-slate-400" />}
+                                </button>
+                                {showCosts && (
+                                    <div className="p-4 border-t border-slate-100 bg-slate-50 space-y-3">
+                                        <p className="text-xs text-slate-500 mb-3">Track internal expenses (e.g. outsourcing, software) associated with this invoice.</p>
+                                        {data.costs.map((cost, index) => (
+                                            <div key={index} className="flex gap-3 items-center">
+                                                <Input
+                                                    className="h-8 bg-white"
+                                                    placeholder="Cost description..."
+                                                    value={cost.title}
+                                                    onChange={e => updateCost(index, 'title', e.target.value)}
+                                                />
+                                                <Input
+                                                    className="h-8 w-24 bg-white"
+                                                    type="number"
+                                                    placeholder="0.00"
+                                                    value={cost.amount}
+                                                    onChange={e => updateCost(index, 'amount', parseFloat(e.target.value))}
+                                                />
+                                                <button type="button" onClick={() => removeCost(index)} className="text-slate-400 hover:text-rose-500">
+                                                    <Trash2 className="h-4 w-4" />
+                                                </button>
+                                            </div>
+                                        ))}
+                                        <Button type="button" variant="outline" size="sm" className="w-full h-8 text-xs bg-white shadow-sm" onClick={addCost}>
+                                            <Plus className="mr-1.5 h-3 w-3" /> Add Cost
+                                        </Button>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+
+                        <div className="md:col-span-6 md:pl-12">
+                            <div className="bg-slate-50 rounded-2xl p-6 border border-slate-100 space-y-4">
+                                <div className="flex justify-between items-center text-sm">
+                                    <span className="text-slate-500 font-medium">Subtotal</span>
+                                    <span className="font-semibold text-slate-900">
+                                        {new Intl.NumberFormat('en-US', { style: 'currency', currency: data.amount_currency }).format(subtotal)}
+                                    </span>
                                 </div>
-                                <div className="space-y-2">
-                                    <div className="flex justify-between text-sm items-center">
-                                        <span className="text-muted-foreground font-medium">Tax (%)</span>
+                                <div className="flex justify-between items-center text-sm">
+                                    <span className="text-slate-500 font-medium">Discount Amount</span>
+                                    <div className="w-24">
                                         <Input
                                             type="number"
-                                            className="w-20 h-8 shadow-none"
-                                            value={data.tax_rate}
-                                            onChange={e => setData('tax_rate', parseFloat(e.target.value))}
+                                            className="h-8 text-right bg-white shadow-sm border-slate-200"
+                                            value={data.discount_amount || ''}
+                                            placeholder="0.00"
+                                            onChange={e => setData('discount_amount', parseFloat(e.target.value) || 0)}
                                         />
                                     </div>
                                 </div>
-                                <div className="pt-4 border-t flex justify-between items-center">
-                                    <span className="font-bold text-base">Total</span>
+                                <div className="flex justify-between items-center text-sm">
+                                    <span className="text-slate-500 font-medium">Tax Rate (%)</span>
+                                    <div className="w-24">
+                                        <Input
+                                            type="number"
+                                            className="h-8 text-right bg-white shadow-sm border-slate-200"
+                                            value={data.tax_rate || ''}
+                                            placeholder="0%"
+                                            onChange={e => setData('tax_rate', parseFloat(e.target.value) || 0)}
+                                        />
+                                    </div>
+                                </div>
+                                <div className="pt-4 mt-2 border-t border-slate-200 flex justify-between items-end">
+                                    <span className="font-semibold text-slate-900">Total Due</span>
                                     <div className="text-right">
-                                        <div className="text-2xl font-bold tracking-tight text-primary">
-                                            <CurrencyDisplay amount={total} currency={data.amount_currency} />
-                                        </div>
-                                        <div className="text-xs font-medium text-muted-foreground">
-                                            ≈ <CurrencyDisplay amount={total * exchangeRate} currency={business_currency} />
+                                        <div className="text-3xl font-bold tracking-tight text-indigo-600">
+                                            {new Intl.NumberFormat('en-US', { style: 'currency', currency: data.amount_currency }).format(total)}
                                         </div>
                                     </div>
                                 </div>
-                                <div className="pt-6 space-y-3">
-                                    <Button className="w-full shadow-none" disabled={processing} type="submit">
-                                        {isEdit ? 'Save Changes' : 'Create Invoice'}
-                                    </Button>
-                                    {!isEdit && (
-                                        <Button variant="outline" className="w-full shadow-none" type="button">
-                                            <Send className="mr-2 h-4 w-4" /> Save & Send
-                                        </Button>
-                                    )}
-                                </div>
-                            </CardContent>
-                        </Card>
-                    </div>
+                            </div>
+                        </div>
+                    </section>
+
                 </div>
             </form>
         </AuthenticatedLayout>
