@@ -1,4 +1,4 @@
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import WorkspaceLayout from '@/Layouts/WorkspaceLayout';
 import { Head, Link } from '@inertiajs/react';
 import { useState } from 'react';
 import {
@@ -12,15 +12,15 @@ import {
     Search,
     Briefcase,
     AlertCircle,
-    Wallet
+    Wallet,
+    LayoutDashboard
 } from 'lucide-react';
 
 import { formatMoney, formatDate } from '@/lib/utils';
 import { ServiceQuickView } from '@/Components/ContextualPanels';
-import { AppPage } from '@/Components/ui/AppPage';
-import { PageHeader } from '@/Components/ui/PageHeader';
-import { StatCard } from '@/Components/ui/StatCard';
-import { SectionCard } from '@/Components/ui/SectionCard';
+import { ModulePageHeader } from '@/Components/ui/ModulePageHeader';
+import { MetricCard } from '@/Components/ui/MetricCard';
+import { OperationalCard } from '@/Components/ui/OperationalCard';
 import { EmptyState } from '@/Components/ui/EmptyState';
 import { StatusBadge } from '@/Components/ui/StatusBadge';
 
@@ -44,14 +44,23 @@ export default function MarketplaceDashboard({
     const activeSales = initialSales || [];
     const listedGigs = initialGigs || [];
 
-    return (
-        <AuthenticatedLayout header={undefined}>
-            <Head title="Service Workspace" />
+    const menuItems = [
+        { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, href: '/marketplace', isActive: true },
+        { id: 'services', label: 'Services', icon: Layers, href: '/marketplace/services', isActive: false },
+        { id: 'orders', label: 'Orders', icon: Clock, href: '/marketplace/orders', isActive: false },
+    ];
 
-            <AppPage>
-                <PageHeader 
+    return (
+        <WorkspaceLayout 
+            title="Service Workspace"
+            workspaceName="Marketplace"
+            tenantId="MKT-DRAFT"
+            menuItems={menuItems}
+        >
+            <div className="space-y-8">
+                <ModulePageHeader 
                     title="Service Workspace"
-                    subtitle="Manage your active service orders, listed gigs, and client sales in one place."
+                    description="Manage your active service orders, listed gigs, and client sales in one place."
                     actions={
                         <div className="flex items-center gap-2">
                             <Link
@@ -71,35 +80,31 @@ export default function MarketplaceDashboard({
                 />
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <StatCard 
+                    <MetricCard 
                         label="Protected Escrow"
-                        value={<span className="font-mono text-2xl font-bold">{formatMoney(stats.lockedEscrow, 'USD')}</span>}
+                        value={formatMoney(stats.lockedEscrow, 'USD')}
                         icon={Lock}
-                        description={<span className="text-emerald-600 font-medium text-[10px]">Secure client funds active</span>}
                     />
-                    <StatCard 
+                    <MetricCard 
                         label="Active Orders"
                         value={stats.activeOrders}
                         icon={Clock}
-                        description={<span className="text-slate-500 text-[10px]">In progress as seller</span>}
                     />
-                    <StatCard 
+                    <MetricCard 
                         label="Catalog Gigs"
                         value={stats.servicesListed}
                         icon={Layers}
-                        description={<span className="text-slate-500 text-[10px]">Publicly visible catalog</span>}
                     />
-                    <StatCard 
+                    <MetricCard 
                         label="Total Sales"
-                        value={<span className="font-mono text-2xl font-bold">{formatMoney(stats.totalSales, 'USD')}</span>}
+                        value={formatMoney(stats.totalSales, 'USD')}
                         icon={DollarSign}
-                        description={<span className="text-emerald-600 font-medium text-[10px]">100% payout cleared</span>}
                     />
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     <div className="lg:col-span-2 space-y-8">
-                        <SectionCard title="Active Orders (As Seller)" description="Manage deliverables and track milestones for your clients." noPadding>
+                        <OperationalCard title="Active Orders (As Seller)" description="Manage deliverables and track milestones for your clients." noPadding>
                             <div className="divide-y divide-slate-100">
                                 {activeSales.map((sale: any) => (
                                     <div key={sale.id} className="p-4 hover:bg-slate-50/50 transition flex items-center justify-between">
@@ -131,9 +136,9 @@ export default function MarketplaceDashboard({
                                     />
                                 )}
                             </div>
-                        </SectionCard>
+                        </OperationalCard>
 
-                        <SectionCard title="My Purchases (As Buyer)" description="Track deliverables, files, and review services you bought." noPadding>
+                        <OperationalCard title="My Purchases (As Buyer)" description="Track deliverables, files, and review services you bought." noPadding>
                             <div className="divide-y divide-slate-100">
                                 {activePurchases.map((purchase: any) => (
                                     <div key={purchase.id} onClick={() => setSelectedService(purchase)} className="p-4 hover:bg-slate-50/50 cursor-pointer transition flex items-center justify-between">
@@ -165,9 +170,9 @@ export default function MarketplaceDashboard({
                                     />
                                 )}
                             </div>
-                        </SectionCard>
+                        </OperationalCard>
 
-                        <SectionCard title="My Service Catalog" description="Your publicly visible services and customized package offerings." noPadding>
+                        <OperationalCard title="My Service Catalog" description="Your publicly visible services and customized package offerings." noPadding>
                             <div className="divide-y divide-slate-100">
                                 {listedGigs.map((gig: any) => (
                                     <div key={gig.id} className="p-4 hover:bg-slate-50/50 transition flex items-center justify-between">
@@ -200,11 +205,11 @@ export default function MarketplaceDashboard({
                                     />
                                 )}
                             </div>
-                        </SectionCard>
+                        </OperationalCard>
                     </div>
 
                     <div className="space-y-6">
-                        <SectionCard>
+                        <OperationalCard>
                             <h4 className="text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-3">
                                 Workspace Actions
                             </h4>
@@ -237,7 +242,7 @@ export default function MarketplaceDashboard({
                                     <ArrowUpRight className="h-3.5 w-3.5 text-slate-400 group-hover:text-slate-600 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
                                 </Link>
                             </div>
-                        </SectionCard>
+                        </OperationalCard>
 
                         <div className="bg-slate-50 border border-slate-100 rounded-2xl p-5 text-sm leading-relaxed text-slate-600 space-y-2">
                             <div className="flex items-center gap-1.5 font-semibold text-slate-900">
@@ -258,15 +263,14 @@ export default function MarketplaceDashboard({
                         </div>
                     </div>
                 </div>
-            </AppPage>
 
-
-
+            
+            </div>
             <ServiceQuickView
                 isOpen={selectedService !== null}
                 onClose={() => setSelectedService(null)}
                 data={selectedService}
             />
-        </AuthenticatedLayout>
+        </WorkspaceLayout>
     );
 }

@@ -1,8 +1,8 @@
 import React from 'react';
 import { Head, Link, useForm } from '@inertiajs/react';
-import { AppPage } from '@/Components/ui/AppPage';
-import { PageHeader } from '@/Components/ui/PageHeader';
-import { SectionCard } from '@/Components/ui/SectionCard';
+import WorkspaceLayout from '@/Layouts/WorkspaceLayout';
+import { ModulePageHeader } from '@/Components/ui/ModulePageHeader';
+import { OperationalCard } from '@/Components/ui/OperationalCard';
 import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
@@ -34,18 +34,29 @@ export default function Create() {
     };
 
     return (
-        <AppPage>
+        <WorkspaceLayout
+            title="Create Event Type"
+            workspaceName="Booking Settings"
+            tenantId="SYS-BOOKING"
+            menuItems={[
+                { id: 'availability', label: 'Availability', icon: null, href: '/booking', isActive: true },
+            ]}
+        >
             <Head title="Create Event Type" />
             
-            <div className="max-w-2xl mx-auto">
-                <PageHeader
+            <div className="max-w-2xl mx-auto space-y-8">
+                <ModulePageHeader
                     title="New Event Type"
                     description="Set up a new type of booking event for your clients."
-                    backLink={route('booking.index')}
+                    actions={
+                        <Link href={route('booking.index')} className="text-sm font-medium text-slate-500 hover:text-slate-900">
+                            Back
+                        </Link>
+                    }
                 />
 
                 <form onSubmit={submit} className="mt-6 space-y-6">
-                    <SectionCard title="Basic Details">
+                    <OperationalCard title="Basic Details">
                         <div className="space-y-4">
                             <div className="space-y-2">
                                 <Label htmlFor="title">Event Name</Label>
@@ -88,9 +99,9 @@ export default function Create() {
                                 {errors.description && <p className="text-sm text-red-500">{errors.description}</p>}
                             </div>
                         </div>
-                    </SectionCard>
+                    </OperationalCard>
 
-                    <SectionCard title="Scheduling Settings">
+                    <OperationalCard title="Scheduling Settings">
                         <div className="space-y-4">
                             <div className="space-y-2">
                                 <Label htmlFor="duration_minutes">Duration (Minutes)</Label>
@@ -107,9 +118,9 @@ export default function Create() {
                                 {errors.duration_minutes && <p className="text-sm text-red-500">{errors.duration_minutes}</p>}
                             </div>
                         </div>
-                    </SectionCard>
+                    </OperationalCard>
 
-                    <SectionCard title="Payment Options">
+                    <OperationalCard title="Payment Options">
                         <div className="space-y-4">
                             <div className="flex items-center justify-between p-4 border rounded-lg bg-slate-50/50">
                                 <div className="space-y-0.5">
@@ -151,18 +162,21 @@ export default function Create() {
                                 </div>
                             )}
                         </div>
-                    </SectionCard>
+                    </OperationalCard>
 
                     <div className="flex justify-end gap-3">
-                        <Button variant="outline" type="button" asChild>
-                            <Link href={route('booking.index')}>Cancel</Link>
-                        </Button>
+                        <Link 
+                            href={route('booking.index')} 
+                            className="inline-flex items-center justify-center rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-900 hover:bg-slate-100 transition-colors"
+                        >
+                            Cancel
+                        </Link>
                         <LoadingButton loading={processing} type="submit">
                             Create Event Type
                         </LoadingButton>
                     </div>
                 </form>
             </div>
-        </AppPage>
+        </WorkspaceLayout>
     );
 }

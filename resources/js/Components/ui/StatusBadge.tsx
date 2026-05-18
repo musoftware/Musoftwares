@@ -1,11 +1,19 @@
+import React from 'react';
 import { cn, statusColor } from '@/lib/utils';
 
-export function StatusBadge({ status, size = 'md', className = '' }) {
+export interface StatusBadgeProps {
+    status: string;
+    label?: React.ReactNode;
+    size?: 'sm' | 'md';
+    className?: string;
+}
+
+export function StatusBadge({ status, label, size = 'md', className = '' }: StatusBadgeProps) {
     if (!status) return null;
 
     const color = statusColor(status);
 
-    const colorClasses = {
+    const colorClasses: Record<string, string> = {
         gray: 'bg-slate-100 text-slate-600 border-slate-200',
         blue: 'bg-blue-50 text-blue-700 border-blue-100',
         green: 'bg-success-light text-success border-green-100',
@@ -14,7 +22,7 @@ export function StatusBadge({ status, size = 'md', className = '' }) {
         purple: 'bg-purple-50 text-purple-700 border-purple-100',
     };
 
-    const dotClasses = {
+    const dotClasses: Record<string, string> = {
         gray: 'bg-slate-500',
         blue: 'bg-blue-600',
         green: 'bg-success',
@@ -43,7 +51,7 @@ export function StatusBadge({ status, size = 'md', className = '' }) {
                     dotClasses[color] || dotClasses.gray,
                 )}
             />
-            {status.replace(/_/g, ' ')}
+            {label || status.replace(/_/g, ' ')}
         </span>
     );
 }

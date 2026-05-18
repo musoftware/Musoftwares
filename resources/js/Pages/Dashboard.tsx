@@ -1,17 +1,16 @@
 import React from 'react';
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import WorkspaceLayout from '@/Layouts/WorkspaceLayout';
 import { Head, Link, usePage } from '@inertiajs/react';
 import { 
     Wallet, FileText, ArrowUpRight, Clock, CheckCircle2, 
     AlertCircle, Sparkles, Building2, Briefcase, Plus, ArrowRightLeft,
-    CreditCard, Inbox
+    CreditCard, Inbox, Settings
 } from 'lucide-react';
 import { Button } from '@/Components/ui/button';
 import { cn } from '@/lib/utils';
-import { AppPage } from '@/Components/ui/AppPage';
-import { PageHeader } from '@/Components/ui/PageHeader';
-import { StatCard } from '@/Components/ui/StatCard';
-import { SectionCard } from '@/Components/ui/SectionCard';
+import { ModulePageHeader } from '@/Components/ui/ModulePageHeader';
+import { MetricCard } from '@/Components/ui/MetricCard';
+import { OperationalCard } from '@/Components/ui/OperationalCard';
 import { EmptyState } from '@/Components/ui/EmptyState';
 import { ActivityFeed } from '@/Components/ui/ActivityFeed';
 import { CurrencyDisplay } from '@/Components/ui/CurrencyDisplay';
@@ -89,23 +88,39 @@ export default function Dashboard({
     const pendingInvoices = serverInvoices || [];
     const recentTransactions = serverTransactions || [];
 
-    // Map recent transactions to ActivityFeed format
     const activityFeedItems = recentTransactions.map((txn, index) => ({
-        id: txn.id,
-        text: `${txn.type.charAt(0).toUpperCase() + txn.type.slice(1)} of ${stats.currency} ${txn.amount.toLocaleString(undefined, {minimumFractionDigits: 2})} via ${txn.method}`,
-        time: txn.date,
-        color: txn.type === 'deposit' ? 'bg-emerald-100' : txn.type === 'withdrawal' ? 'bg-amber-100' : 'bg-slate-100',
-        icon: txn.type === 'deposit' ? ArrowRightLeft : txn.type === 'withdrawal' ? ArrowUpRight : CreditCard
+        id: Number(txn.id),
+        user_id: null,
+        subject_type: 'transaction',
+        subject_id: Number(txn.id),
+        event: txn.type,
+        description: `${txn.type.charAt(0).toUpperCase() + txn.type.slice(1)} of ${stats.currency} ${txn.amount.toLocaleString(undefined, {minimumFractionDigits: 2})} via ${txn.method}`,
+        properties: null,
+        workspace: 'system',
+        created_at: txn.date,
+        icon: txn.type === 'deposit' ? 'wallet' : 'receipt',
+        color: txn.type === 'deposit' ? 'emerald' : txn.type === 'withdrawal' ? 'amber' : 'slate',
+        user: null
     }));
 
-    return (
-        <AuthenticatedLayout header={undefined}>
-            <Head title="Customer Dashboard" />
+    const menuItems = [
+        { id: 'dashboard', label: 'Overview', icon: Building2, href: '/dashboard', isActive: true },
+        { id: 'wallet', label: 'Wallet', icon: Wallet, href: safeRoute('financial.add-balance'), isActive: false },
+        { id: 'subscriptions', label: 'Subscriptions', icon: Sparkles, href: '/subscriptions/plans', isActive: false },
+        { id: 'settings', label: 'Settings', icon: Settings, href: '/profile', isActive: false },
+    ];
 
-            <AppPage>
-                <PageHeader 
+    return (
+        <WorkspaceLayout 
+            title="Customer Dashboard"
+            workspaceName="Musoftware Portal"
+            tenantId="CUST-PORTAL"
+            menuItems={menuItems}
+        >
+            <div className="space-y-8">
+                <ModulePageHeader 
                     title={`Good morning, ${user?.name || 'Customer'}`}
-                    subtitle="Here is what requires your attention today across all your workspaces."
+                    description="Here is what requires your attention today across all your workspaces."
                     actions={
                         <Link 
                             href={safeRoute('financial.add-balance')} 
@@ -117,21 +132,19 @@ export default function Dashboard({
                 />
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                    <StatCard 
+                    <MetricCard 
                         label="Wallet Balance"
-                        value={<CurrencyDisplay amount={stats.walletBalance} currency={stats.currency} className="text-3xl font-semibold font-sans text-slate-900" />}
+                        value={stats.walletBalance}
                         icon={Wallet}
-                        description={<span className="text-emerald-600 font-medium">Active Funds</span>}
                     />
-                    <StatCard 
+                    <MetricCard 
                         label={`Unpaid Invoices (${stats.unpaidInvoices})`}
-                        value={<CurrencyDisplay amount={stats.unpaidAmount} currency={stats.currency} className={stats.unpaidInvoices > 0 ? "text-3xl font-semibold font-sans text-danger" : "text-3xl font-semibold font-sans text-slate-900"} />}
+                        value={stats.unpaidAmount}
                         icon={FileText}
-                        description={stats.unpaidInvoices > 0 ? <span className="text-danger flex items-center gap-1 font-medium"><AlertCircle className="w-3 h-3" /> Action Required</span> : undefined}
                     />
-                    <StatCard 
+                    <MetricCard 
                         label="Subscribed Systems"
-                        value={`${stats.activeSubscriptions} Module${stats.activeSubscriptions !== 1 ? 's' : ''}`}
+                        value={stats.activeSubscriptions}
                         icon={Sparkles}
                     />
                 </div>
@@ -139,10 +152,10 @@ export default function Dashboard({
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     <div className="lg:col-span-2 space-y-8">
                         
-                        <SectionCard 
+                        <OperationalCard 
                             title="Pending Invoices" 
                             action={
-                                <Link href={safeRoute('erp.invoices.index', undefined, '/erp/invoices')} className="text-sm font-medium text-primary hover:underline transition-colors">
+                                <Link href={safeRoute('erp.invoices.index', undefined, '/erp/invoices')} className="text-[11px] font-bold uppercase tracking-wider text-primary hover:underline transition-colors">
                                     View All
                                 </Link>
                             }
@@ -187,9 +200,9 @@ export default function Dashboard({
                                     </div>
                                 ))}
                             </div>
-                        </SectionCard>
+                        </OperationalCard>
 
-                        <SectionCard title="Your Workspaces">
+                        <OperationalCard title="Your Workspaces">
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                 <Link 
                                     href={subscribedModules.erp ? '/erp/dashboard' : '/subscriptions/plans?module=erp'} 
@@ -231,13 +244,13 @@ export default function Dashboard({
                                     <div className="absolute top-4 right-4 text-violet-600 text-[9px] uppercase font-bold bg-violet-50 border border-violet-100 px-2.5 py-0.5 rounded-full">Free</div>
                                 </Link>
                             </div>
-                        </SectionCard>
+                        </OperationalCard>
 
                     </div>
 
                     <div className="space-y-6">
                         
-                        <SectionCard noPadding>
+                        <OperationalCard noPadding>
                             <h4 className="px-4 pt-5 pb-2 text-[11px] font-bold uppercase tracking-wider text-text-muted">
                                 Quick Actions
                             </h4>
@@ -252,9 +265,9 @@ export default function Dashboard({
                                     <CreditCard className="w-4 h-4 mr-3 text-text-muted" /> Manage Payment Methods
                                 </Link>
                             </div>
-                        </SectionCard>
+                        </OperationalCard>
 
-                        <SectionCard 
+                        <OperationalCard 
                             title="Recent Transactions" 
                             action={
                                 <Link href={safeRoute('erp.wallet.show', user?.id || 1, `/erp/clients/${user?.id || 1}/wallet`)} className="text-[11px] font-bold uppercase tracking-wider text-primary hover:underline transition-colors">
@@ -271,11 +284,11 @@ export default function Dashboard({
                             ) : (
                                 <ActivityFeed items={activityFeedItems} />
                             )}
-                        </SectionCard>
+                        </OperationalCard>
 
                     </div>
                 </div>
-            </AppPage>
-        </AuthenticatedLayout>
+            </div>
+        </WorkspaceLayout>
     );
 }

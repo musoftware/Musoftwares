@@ -18,17 +18,16 @@ export default function ShowJob({ auth, job: initialJob, pointsCost = 5 }: any) 
     const isClient = mode === 'client';
     const globalCurrency = auth?.user?.preferred_currency || 'USD';
 
-    // Mock fallback if job is missing
-    const job = initialJob || {
-        id: 1, title: 'Full Stack Developer', budget: '500 - 1,500', currency_code: '$', type: 'fixed', duration: '2 weeks',
-        client: { name: 'Acme Corp' }, description: '<h2>Project Overview</h2><p>Need an experienced developer to build a SaaS dashboard using Laravel and React.</p><ul><li>User auth</li><li>Stripe integration</li><li>Admin panel</li></ul>',
-        skills: [{id: 1, name: 'Laravel'}, {id: 2, name: 'React'}, {id: 3, name: 'MySQL'}],
-        status: 'open', client_id: isClient ? auth.user.id : 999,
-        proposals: isClient ? [
-            { id: 1, freelancer: { name: 'Alice Smith' }, bid_amount: '1200.00', delivery_days: 14, cover_letter: "I can build this fast.", status: 'pending', currency_code: '$' },
-            { id: 2, freelancer: { name: 'Bob Jones' }, bid_amount: '800.00', delivery_days: 20, cover_letter: "I have 5 years experience.", status: 'pending', currency_code: '$' }
-        ] : []
-    };
+    const job = initialJob;
+    if (!job) {
+        return (
+            <FreelanceLayout auth={auth} clean={true}>
+                <div className="max-w-6xl mx-auto py-12 text-center text-slate-500">
+                    Job not found.
+                </div>
+            </FreelanceLayout>
+        );
+    }
 
     const hasSubmitted = !isClient && job.proposals?.some((p: any) => p.freelancer_id === auth.user.id);
     const userPoints = auth.user.points_balance || 0;

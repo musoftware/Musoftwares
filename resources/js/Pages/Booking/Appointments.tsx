@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import AppLayout from '@/Layouts/AppLayout';
+import WorkspaceLayout from '@/Layouts/WorkspaceLayout';
 import { Head, useForm, router } from '@inertiajs/react';
-import { PageHeader } from '@/Components/ui/PageHeader';
+import { ModulePageHeader } from '@/Components/ui/ModulePageHeader';
 import { Card, CardContent } from '@/Components/ui/card';
 import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
@@ -23,7 +23,7 @@ import {
     DialogHeader,
     DialogTitle,
 } from "@/Components/ui/dialog";
-import EmptyState from '@/Components/ui/EmptyState';
+import { EmptyState } from '@/Components/ui/EmptyState';
 import { format } from 'date-fns';
 import { Calendar, Clock, CreditCard, ExternalLink, MoreVertical, Search, UserCircle2, Briefcase, FileText, CheckCircle, XCircle } from 'lucide-react';
 
@@ -87,12 +87,20 @@ export default function Appointments({ bookings }: any) {
     };
 
     return (
-        <AppLayout>
+        <WorkspaceLayout
+            title="Appointments"
+            workspaceName="Booking Settings"
+            tenantId="SYS-BOOKING"
+            menuItems={[
+                { id: 'appointments', label: 'Appointments', icon: Clock, href: '/booking/appointments', isActive: true },
+                { id: 'availability', label: 'Availability', icon: Calendar, href: '/booking', isActive: false },
+            ]}
+        >
             <Head title="Appointments" />
 
             <div className="max-w-6xl mx-auto py-8 px-4 sm:px-6 lg:px-8 space-y-8">
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                    <PageHeader 
+                    <ModulePageHeader 
                         title="Appointments" 
                         description="Manage your bookings, consultations, and operational pipeline."
                     />
@@ -180,10 +188,8 @@ export default function Appointments({ bookings }: any) {
                                     {/* Right Actions */}
                                     <div className="p-4 md:p-6 bg-white border-t md:border-t-0 md:border-l border-slate-100 flex md:flex-col items-center justify-end gap-2 md:w-16">
                                         <DropdownMenu>
-                                            <DropdownMenuTrigger asChild>
-                                                <Button variant="ghost" size="icon" className="h-8 w-8">
-                                                    <MoreVertical className="h-4 w-4 text-slate-500" />
-                                                </Button>
+                                            <DropdownMenuTrigger className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 hover:bg-slate-100 hover:text-slate-900 h-8 w-8">
+                                                <MoreVertical className="h-4 w-4 text-slate-500" />
                                             </DropdownMenuTrigger>
                                             <DropdownMenuContent align="end" className="w-56">
                                                 <DropdownMenuLabel>Manage Appointment</DropdownMenuLabel>
@@ -259,6 +265,6 @@ export default function Appointments({ bookings }: any) {
                     </form>
                 </DialogContent>
             </Dialog>
-        </AppLayout>
+        </WorkspaceLayout>
     );
 }
