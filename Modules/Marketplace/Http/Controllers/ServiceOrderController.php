@@ -11,6 +11,8 @@ use Modules\Core\Models\Wallet;
 use Modules\Core\Models\Conversation;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
+use App\Events\MarketplaceOrderPlaced;
+use App\Events\MarketplaceOrderCompleted;
 
 class ServiceOrderController extends Controller
 {
@@ -147,6 +149,8 @@ class ServiceOrderController extends Controller
 
             DB::commit();
 
+            event(new MarketplaceOrderPlaced($order));
+
             return redirect()->route('marketplace.orders.show', $order->id)->with('success', 'Order placed successfully.');
         } catch (\Exception $e) {
             DB::rollBack();
@@ -178,6 +182,8 @@ class ServiceOrderController extends Controller
             'status' => 'completed',
             'completed_at' => now(),
         ]);
+
+        event(new MarketplaceOrderCompleted($order));
 
         return redirect()->back()->with('success', 'Order completed.');
     }

@@ -162,7 +162,7 @@ class WalletController extends Controller
                 $businessCurrency = 'USD';
                 $businessAmount = $amount * $exchangeRate;
 
-                WalletTransaction::create([
+                $transaction = WalletTransaction::create([
                     'wallet_id' => $wallet->id,
                     'type' => 'credit',
                     'amount' => $amount,
@@ -177,12 +177,7 @@ class WalletController extends Controller
 
                 $wallet->update(['balance' => $newBalance]);
 
-                \Modules\ERP\Services\ActivityLogger::log(
-                    'wallet_credited',
-                    "Wallet credited by " . \Modules\Core\Services\CurrencyFormatter::format($amount, $businessCurrency) . " for: " . $request->input('note'),
-                    null,
-                    $clientModel->id
-                );
+                event(new \App\Events\WalletCredited($transaction));
             });
 
             return back()->with('success', 'Wallet audited credited successfully.');
@@ -223,7 +218,7 @@ class WalletController extends Controller
                 $businessCurrency = 'USD';
                 $businessAmount = $amount * $exchangeRate;
 
-                WalletTransaction::create([
+                $transaction = WalletTransaction::create([
                     'wallet_id' => $wallet->id,
                     'type' => 'debit',
                     'amount' => $amount,
@@ -238,12 +233,7 @@ class WalletController extends Controller
 
                 $wallet->update(['balance' => $newBalance]);
 
-                \Modules\ERP\Services\ActivityLogger::log(
-                    'wallet_debited',
-                    "Wallet debited by " . \Modules\Core\Services\CurrencyFormatter::format($amount, $businessCurrency) . " for: " . $request->input('note'),
-                    null,
-                    $clientModel->id
-                );
+                event(new \App\Events\WalletDebited($transaction));
             });
 
             return back()->with('success', 'Wallet audited debited successfully.');
@@ -401,7 +391,7 @@ class WalletController extends Controller
                 $method = $request->input('payment_method');
                 $newBalance = $wallet->balance + $amount;
 
-                WalletTransaction::create([
+                $transaction = WalletTransaction::create([
                     'wallet_id' => $wallet->id,
                     'type' => 'credit',
                     'amount' => $amount,
@@ -415,6 +405,7 @@ class WalletController extends Controller
                 ]);
 
                 $wallet->update(['balance' => $newBalance]);
+                event(new \App\Events\WalletCredited($transaction));
             });
 
             return redirect()->route('erp.wallet.show', $clientModel->id)->with('success', 'Funds successfully deposited to your wallet.');
