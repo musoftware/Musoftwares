@@ -22,24 +22,24 @@ export function SectionCard({
     ...props
 }: SectionCardProps) {
     return (
-        <Card className={cn('bg-surface shadow-sm border-border rounded-xl', className)} {...props}>
+        <div className={cn('bg-white shadow-sm border border-slate-100 rounded-2xl overflow-hidden', className)} {...props}>
             {(title || description || action) && (
-                <CardHeader className="flex flex-row items-center justify-between border-b border-border/40 space-y-0 pb-4">
+                <div className={cn('flex flex-row items-center justify-between border-b border-slate-100 p-6', noPadding && 'pb-4')}>
                     <div className="space-y-1">
-                        {title && <CardTitle className="text-base font-semibold">{title}</CardTitle>}
-                        {description && <CardDescription className="text-sm">{description}</CardDescription>}
+                        {title && <h3 className="text-lg font-semibold text-slate-900">{title}</h3>}
+                        {description && <p className="text-sm text-slate-500">{description}</p>}
                     </div>
                     {action && <div className="shrink-0 ml-4">{action}</div>}
-                </CardHeader>
+                </div>
             )}
-            <CardContent className={cn('pt-6', noPadding && 'p-0 pt-0')}>
+            <div className={cn('p-6', noPadding && 'p-0')}>
                 {children}
-            </CardContent>
+            </div>
             {footer && (
-                <CardFooter className="border-t border-border/40 bg-surface-raised/30 px-6 py-4">
+                <div className="border-t border-slate-100 bg-slate-50/50 px-6 py-4">
                     {footer}
-                </CardFooter>
+                </div>
             )}
-        </Card>
+        </div>
     );
 }

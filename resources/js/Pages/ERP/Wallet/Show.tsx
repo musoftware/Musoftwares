@@ -144,63 +144,51 @@ export default function Show({ auth, wallet, transactions, client, errors }: Wal
 
                 {/* Financial Summary */}
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <Card className="shadow-none">
-                        <CardHeader className="pb-2">
-                            <CardTitle className="text-sm font-medium text-muted-foreground">Available Balance</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="text-2xl font-bold">
-                                ${activeWallet.balance.toLocaleString(undefined, { minimumFractionDigits: 2 })}
-                            </div>
-                            <p className="text-xs text-muted-foreground mt-1">Ready for purchases</p>
-                        </CardContent>
-                    </Card>
-                    <Card className="shadow-none">
-                        <CardHeader className="pb-2">
-                            <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                                System Escrow <Lock className="h-3 w-3" />
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="text-2xl font-bold">
-                                ${(activeWallet.locked_balance ?? 0.00).toLocaleString(undefined, { minimumFractionDigits: 2 })}
-                            </div>
-                            <p className="text-xs text-muted-foreground mt-1">Held securely in active contracts</p>
-                        </CardContent>
-                    </Card>
-                    <Card className="shadow-none bg-muted/30">
-                        <CardHeader className="pb-2">
-                            <CardTitle className="text-sm font-medium text-muted-foreground">Total Ledger</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="text-2xl font-bold">
-                                ${(activeWallet.balance + (activeWallet.locked_balance ?? 0)).toLocaleString(undefined, { minimumFractionDigits: 2 })}
-                            </div>
-                            <p className="text-xs text-muted-foreground mt-1">Calculated from immutable events</p>
-                        </CardContent>
-                    </Card>
+                    <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm flex flex-col justify-center">
+                        <div className="text-sm font-medium text-slate-500 mb-1">Available Balance</div>
+                        <div className="text-3xl font-bold tracking-tight text-slate-900">
+                            ${activeWallet.balance.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                        </div>
+                        <p className="text-xs text-slate-400 mt-2">Ready for purchases</p>
+                    </div>
+                    <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm flex flex-col justify-center">
+                        <div className="text-sm font-medium text-slate-500 mb-1 flex items-center gap-1.5">
+                            System Escrow <Lock className="h-3 w-3" />
+                        </div>
+                        <div className="text-3xl font-bold tracking-tight text-slate-900">
+                            ${(activeWallet.locked_balance ?? 0.00).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                        </div>
+                        <p className="text-xs text-slate-400 mt-2">Held securely in active contracts</p>
+                    </div>
+                    <div className="bg-slate-50 p-6 rounded-2xl border border-slate-100 shadow-sm flex flex-col justify-center">
+                        <div className="text-sm font-medium text-slate-500 mb-1">Total Ledger</div>
+                        <div className="text-3xl font-bold tracking-tight text-slate-900">
+                            ${(activeWallet.balance + (activeWallet.locked_balance ?? 0)).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                        </div>
+                        <p className="text-xs text-slate-400 mt-2">Calculated from immutable events</p>
+                    </div>
                 </div>
 
                 {/* Super Admin Actions - Hidden from regular users */}
                 {isSuperAdmin && (
-                    <div className="border border-destructive/20 bg-destructive/5 rounded-xl p-4 space-y-4">
-                        <div className="flex items-center gap-2 text-destructive font-semibold text-sm">
+                    <div className="bg-rose-50 border border-rose-100 rounded-2xl p-6 space-y-4">
+                        <div className="flex items-center gap-2 text-rose-700 font-semibold text-sm">
                             <AlertCircle className="w-4 h-4" /> SUPER ADMIN INTERNAL RECOVERY TOOLS
                         </div>
-                        <p className="text-xs text-muted-foreground mb-4">
+                        <p className="text-xs text-rose-600/80 mb-4 max-w-3xl">
                             WARNING: Do not use these tools for normal operations. Balance should only be updated via system events (deposits, invoices, payouts).
                         </p>
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                            <Button variant={actionType === 'credit' ? 'destructive' : 'outline'} onClick={() => setActionType(actionType === 'credit' ? null : 'credit')} className="h-10 shadow-none text-xs border-destructive/20">
+                            <Button variant={actionType === 'credit' ? 'destructive' : 'outline'} onClick={() => setActionType(actionType === 'credit' ? null : 'credit')} className={`h-10 text-xs shadow-sm ${actionType === 'credit' ? '' : 'border-rose-200 text-rose-700 hover:bg-rose-100'}`}>
                                 <Plus className="mr-2 h-3 w-3" /> Force Credit
                             </Button>
-                            <Button variant={actionType === 'debit' ? 'destructive' : 'outline'} onClick={() => setActionType(actionType === 'debit' ? null : 'debit')} className="h-10 shadow-none text-xs border-destructive/20">
+                            <Button variant={actionType === 'debit' ? 'destructive' : 'outline'} onClick={() => setActionType(actionType === 'debit' ? null : 'debit')} className={`h-10 text-xs shadow-sm ${actionType === 'debit' ? '' : 'border-rose-200 text-rose-700 hover:bg-rose-100'}`}>
                                 <Minus className="mr-2 h-3 w-3" /> Force Debit
                             </Button>
-                            <Button variant={actionType === 'lock' ? 'destructive' : 'outline'} onClick={() => setActionType(actionType === 'lock' ? null : 'lock')} className="h-10 shadow-none text-xs border-destructive/20">
+                            <Button variant={actionType === 'lock' ? 'destructive' : 'outline'} onClick={() => setActionType(actionType === 'lock' ? null : 'lock')} className={`h-10 text-xs shadow-sm ${actionType === 'lock' ? '' : 'border-rose-200 text-rose-700 hover:bg-rose-100'}`}>
                                 <Lock className="mr-2 h-3 w-3" /> Force Lock
                             </Button>
-                            <Button variant={actionType === 'unlock' ? 'destructive' : 'outline'} onClick={() => setActionType(actionType === 'unlock' ? null : 'unlock')} className="h-10 shadow-none text-xs border-destructive/20">
+                            <Button variant={actionType === 'unlock' ? 'destructive' : 'outline'} onClick={() => setActionType(actionType === 'unlock' ? null : 'unlock')} className={`h-10 text-xs shadow-sm ${actionType === 'unlock' ? '' : 'border-rose-200 text-rose-700 hover:bg-rose-100'}`}>
                                 <Unlock className="mr-2 h-3 w-3" /> Force Unlock
                             </Button>
                         </div>
@@ -312,72 +300,70 @@ export default function Show({ auth, wallet, transactions, client, errors }: Wal
                     </div>
                 )}
 
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
                     {/* Left Column */}
-                    <div className="lg:col-span-2 space-y-8">
+                    <div className="lg:col-span-8 space-y-8">
                         
                         {/* Chart */}
-                        <Card className="shadow-none">
-                            <CardHeader className="flex flex-row items-center justify-between pb-2">
-                                <div className="space-y-1">
-                                    <CardTitle className="text-base font-semibold">Ledger Progression</CardTitle>
-                                    <CardDescription>Historical balance progression</CardDescription>
+                        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
+                            <div className="flex flex-row items-center justify-between pb-6">
+                                <div>
+                                    <h3 className="text-lg font-semibold text-slate-900">Ledger Progression</h3>
+                                    <p className="text-sm text-slate-500 mt-1">Historical balance progression</p>
                                 </div>
-                                <Badge variant="secondary" className="font-normal"><TrendingUp className="mr-1 h-3 w-3" /> Growth</Badge>
-                            </CardHeader>
-                            <CardContent>
-                                <div className="h-[200px] w-full">
-                                    <ResponsiveContainer width="100%" height="100%">
-                                        <AreaChart data={chartData} margin={{ top: 5, right: 0, left: -25, bottom: 0 }}>
-                                            <XAxis dataKey="date" stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} axisLine={false} />
-                                            <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(val) => `$${val}`} />
-                                            <Tooltip formatter={(value: any) => [`$${value}`, 'Balance']} labelStyle={{ color: 'hsl(var(--foreground))' }} contentStyle={{ borderRadius: '8px', border: '1px solid hsl(var(--border))' }} />
-                                            <Area type="monotone" dataKey="balance" stroke="hsl(var(--primary))" strokeWidth={2} fill="hsl(var(--primary))" fillOpacity={0.1} />
-                                        </AreaChart>
-                                    </ResponsiveContainer>
-                                </div>
-                            </CardContent>
-                        </Card>
+                                <Badge variant="secondary" className="font-normal bg-indigo-50 text-indigo-700 hover:bg-indigo-100 border-transparent"><TrendingUp className="mr-1.5 h-3.5 w-3.5" /> Growth</Badge>
+                            </div>
+                            <div className="h-[250px] w-full">
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <AreaChart data={chartData} margin={{ top: 5, right: 0, left: -25, bottom: 0 }}>
+                                        <XAxis dataKey="date" stroke="#94a3b8" fontSize={12} tickLine={false} axisLine={false} />
+                                        <YAxis stroke="#94a3b8" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(val) => `$${val}`} />
+                                        <Tooltip formatter={(value: any) => [`$${value}`, 'Balance']} labelStyle={{ color: '#0f172a' }} contentStyle={{ borderRadius: '12px', border: '1px solid #f1f5f9', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} />
+                                        <Area type="monotone" dataKey="balance" stroke="#4f46e5" strokeWidth={2} fill="#4f46e5" fillOpacity={0.05} />
+                                    </AreaChart>
+                                </ResponsiveContainer>
+                            </div>
+                        </div>
 
                         {/* Transactions Table */}
-                        <Card className="shadow-none">
-                            <CardHeader className="flex flex-row items-center justify-between">
-                                <div className="space-y-1">
-                                    <CardTitle className="text-base font-semibold">Transaction Ledger</CardTitle>
-                                    <CardDescription>Immutable record of all wallet activity</CardDescription>
+                        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+                            <div className="p-6 flex flex-row items-center justify-between border-b border-slate-100">
+                                <div>
+                                    <h3 className="text-lg font-semibold text-slate-900">Transaction Ledger</h3>
+                                    <p className="text-sm text-slate-500 mt-1">Immutable record of all wallet activity</p>
                                 </div>
-                                <Button variant="outline" size="sm" className="shadow-none"><FileSpreadsheet className="mr-2 w-4 h-4" /> Export</Button>
-                            </CardHeader>
-                            <CardContent className="px-0 pt-0">
+                                <Button variant="outline" size="sm" className="shadow-sm border-slate-200"><FileSpreadsheet className="mr-2 w-4 h-4" /> Export</Button>
+                            </div>
+                            <div className="px-0">
                                 {activeTransactions.length > 0 ? (
                                     <Table>
                                         <TableHeader>
-                                            <TableRow>
-                                                <TableHead className="pl-6">Type</TableHead>
-                                                <TableHead>Amount</TableHead>
-                                                <TableHead>Before / After</TableHead>
-                                                <TableHead>Description</TableHead>
-                                                <TableHead className="pr-6 text-right">Date</TableHead>
+                                            <TableRow className="hover:bg-transparent border-slate-100">
+                                                <TableHead className="pl-6 text-xs font-semibold uppercase text-slate-500 tracking-wider">Type</TableHead>
+                                                <TableHead className="text-xs font-semibold uppercase text-slate-500 tracking-wider">Amount</TableHead>
+                                                <TableHead className="text-xs font-semibold uppercase text-slate-500 tracking-wider">Before / After</TableHead>
+                                                <TableHead className="text-xs font-semibold uppercase text-slate-500 tracking-wider">Description</TableHead>
+                                                <TableHead className="pr-6 text-right text-xs font-semibold uppercase text-slate-500 tracking-wider">Date</TableHead>
                                             </TableRow>
                                         </TableHeader>
                                         <TableBody>
                                             {activeTransactions.map((tx) => (
-                                                <TableRow key={tx.id}>
-                                                    <TableCell className="pl-6">
-                                                        <Badge variant={tx.type === 'credit' ? 'default' : 'secondary'} className="font-normal uppercase tracking-wider text-[10px]">
+                                                <TableRow key={tx.id} className="hover:bg-slate-50/50 border-slate-50">
+                                                    <TableCell className="pl-6 py-4">
+                                                        <Badge variant={tx.type === 'credit' ? 'default' : 'secondary'} className={`font-medium tracking-wide text-[10px] ${tx.type === 'credit' ? 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200' : 'bg-rose-100 text-rose-700 hover:bg-rose-200'}`}>
                                                             {tx.type}
                                                         </Badge>
                                                     </TableCell>
-                                                    <TableCell className="font-medium">
+                                                    <TableCell className="font-semibold text-slate-900 py-4">
                                                         {tx.type === 'credit' ? '+' : '-'}${tx.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                                                     </TableCell>
-                                                    <TableCell className="text-muted-foreground">
+                                                    <TableCell className="text-slate-500 text-sm py-4">
                                                         ${tx.balance_before.toLocaleString()} &rarr; ${tx.balance_after.toLocaleString()}
                                                     </TableCell>
-                                                    <TableCell className="max-w-[200px] truncate" title={tx.description}>
+                                                    <TableCell className="max-w-[200px] truncate text-sm text-slate-700 py-4" title={tx.description}>
                                                         {tx.description}
                                                     </TableCell>
-                                                    <TableCell className="pr-6 text-right text-muted-foreground text-xs">
+                                                    <TableCell className="pr-6 text-right text-slate-400 text-xs py-4">
                                                         {tx.created_at}
                                                     </TableCell>
                                                 </TableRow>
@@ -385,71 +371,74 @@ export default function Show({ auth, wallet, transactions, client, errors }: Wal
                                         </TableBody>
                                     </Table>
                                 ) : (
-                                    <div className="py-12 text-center text-muted-foreground">
-                                        <AlertCircle className="w-8 h-8 mx-auto text-muted mb-2" />
-                                        No ledger activity found.
+                                    <div className="py-16 text-center text-slate-500">
+                                        <AlertCircle className="w-8 h-8 mx-auto text-slate-300 mb-3" />
+                                        <p className="font-medium text-slate-900">No ledger activity found</p>
+                                        <p className="text-sm mt-1">This wallet hasn't had any transactions yet.</p>
                                     </div>
                                 )}
-                            </CardContent>
-                        </Card>
+                            </div>
+                        </div>
                     </div>
 
                     {/* Right Column */}
-                    <div className="space-y-6">
+                    <div className="lg:col-span-4 space-y-8">
                         
                         {/* Client Overview */}
-                        <Card className="shadow-none">
-                            <CardHeader>
-                                <CardTitle className="text-base font-semibold flex items-center gap-2"><User className="h-4 w-4" /> Client Overview</CardTitle>
-                            </CardHeader>
-                            <CardContent className="space-y-4 text-sm">
-                                <div className="flex justify-between items-start border-b border-border pb-3">
-                                    <span className="text-muted-foreground">Entity</span>
-                                    <span className="font-medium text-right">{activeClient.name}</span>
+                        <div>
+                            <h3 className="text-sm font-semibold text-slate-900 uppercase tracking-wider mb-4 flex items-center gap-2">
+                                <User className="h-4 w-4 text-slate-400" /> Client Overview
+                            </h3>
+                            <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 space-y-5 text-sm">
+                                <div className="flex justify-between items-start">
+                                    <span className="text-slate-500">Entity</span>
+                                    <span className="font-semibold text-slate-900 text-right">{activeClient.name}</span>
                                 </div>
-                                <div className="flex justify-between items-start border-b border-border pb-3">
-                                    <span className="text-muted-foreground">Contact</span>
-                                    <span className="font-medium text-right">{activeClient.phone || 'N/A'}</span>
+                                <div className="flex justify-between items-start">
+                                    <span className="text-slate-500">Contact</span>
+                                    <span className="font-medium text-slate-700 text-right">{activeClient.phone || 'N/A'}</span>
                                 </div>
-                                <div className="flex justify-between items-start border-b border-border pb-3">
-                                    <span className="text-muted-foreground">Address</span>
-                                    <span className="font-medium text-right max-w-[150px] truncate" title={activeClient.address}>{activeClient.address || 'N/A'}</span>
+                                <div className="flex justify-between items-start">
+                                    <span className="text-slate-500">Address</span>
+                                    <span className="font-medium text-slate-700 text-right max-w-[150px] truncate" title={activeClient.address}>{activeClient.address || 'N/A'}</span>
                                 </div>
-                                <div className="flex justify-between items-center pt-1">
-                                    <span className="text-muted-foreground">Status</span>
-                                    <Badge variant="outline" className="font-normal border-primary/20 bg-primary/5 text-primary flex items-center gap-1">
-                                        <ShieldCheck className="w-3 h-3" /> Verified
+                                <div className="flex justify-between items-center pt-2 border-t border-slate-100">
+                                    <span className="text-slate-500">Status</span>
+                                    <Badge variant="outline" className="font-medium border-emerald-200 bg-emerald-50 text-emerald-700 flex items-center gap-1.5">
+                                        <ShieldCheck className="w-3.5 h-3.5" /> Verified
                                     </Badge>
                                 </div>
-                            </CardContent>
-                        </Card>
+                            </div>
+                        </div>
 
                         {/* Recent Invoices */}
-                        <Card className="shadow-none">
-                            <CardHeader>
-                                <CardTitle className="text-base font-semibold flex items-center gap-2"><FileText className="h-4 w-4" /> Invoices</CardTitle>
-                            </CardHeader>
-                            <CardContent>
+                        <div>
+                            <h3 className="text-sm font-semibold text-slate-900 uppercase tracking-wider mb-4 flex items-center gap-2">
+                                <FileText className="h-4 w-4 text-slate-400" /> Recent Invoices
+                            </h3>
+                            <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
                                 {clientInvoices.length > 0 ? (
                                     <div className="space-y-4 text-sm">
                                         {clientInvoices.map((inv) => (
-                                            <div key={inv.id} className="flex justify-between items-center">
+                                            <div key={inv.id} className="flex justify-between items-center pb-4 last:pb-0 border-b last:border-0 border-slate-50">
                                                 <div>
-                                                    <span className="font-medium block">{inv.id}</span>
-                                                    <span className="text-muted-foreground text-xs">{inv.date}</span>
+                                                    <span className="font-semibold text-slate-900 block">{inv.id}</span>
+                                                    <span className="text-slate-400 text-xs mt-0.5">{inv.date}</span>
                                                 </div>
                                                 <div className="text-right">
-                                                    <span className="font-medium block">${inv.amount.toLocaleString()}</span>
-                                                    <span className="text-muted-foreground text-xs capitalize">{inv.status}</span>
+                                                    <span className="font-semibold text-slate-900 block">${inv.amount.toLocaleString()}</span>
+                                                    <span className={`text-xs capitalize mt-0.5 ${inv.status === 'paid' ? 'text-emerald-600' : 'text-amber-600'}`}>{inv.status}</span>
                                                 </div>
                                             </div>
                                         ))}
                                     </div>
                                 ) : (
-                                    <div className="text-sm text-muted-foreground">No recent invoices.</div>
+                                    <div className="text-center py-6">
+                                        <p className="text-sm text-slate-500 font-medium">No recent invoices.</p>
+                                    </div>
                                 )}
-                            </CardContent>
-                        </Card>
+                            </div>
+                        </div>
 
                     </div>
                 </div>

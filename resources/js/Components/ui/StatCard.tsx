@@ -29,20 +29,20 @@ export function StatCard({
     }
 
     const badgeClasses = {
-        up: 'text-success',
-        down: 'text-danger',
+        up: 'text-emerald-600',
+        down: 'text-rose-600',
         neutral: 'text-slate-500',
     };
 
     return (
-        <div className={cn("bg-surface border border-border/60 flex flex-col rounded-xl p-5 shadow-sm transition-all hover:border-border hover:shadow", className)}>
+        <div className={cn("bg-white border border-slate-100 flex flex-col rounded-2xl p-6 shadow-sm transition-all hover:border-slate-200", className)}>
             <div className="flex items-center justify-between gap-2 mb-3">
-                <span className="text-[11px] font-semibold text-text-muted uppercase tracking-wider">{label}</span>
-                {Icon && <Icon className="w-4 h-4 text-text-muted stroke-[1.5]" />}
+                <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">{label}</span>
+                {Icon && <Icon className="w-4 h-4 text-slate-400 stroke-[1.5]" />}
             </div>
             
             <div className="flex items-baseline gap-2">
-                <div className="text-2xl font-bold tracking-tight text-text-primary font-sans">
+                <div className="text-2xl font-bold tracking-tight text-slate-900 font-sans">
                     {value}
                 </div>
                 {change && (
@@ -55,7 +55,7 @@ export function StatCard({
             </div>
 
             {description && (
-                <p className="mt-1 text-[11px] text-text-muted">{description}</p>
+                <p className="mt-1 text-[11px] text-slate-500">{description}</p>
             )}
         </div>
     );

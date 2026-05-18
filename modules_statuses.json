@@ -3,5 +3,6 @@
     "ERP": true,
     "Freelance": true,
     "Marketplace": true,
-    "Shared": false
+    "Shared": false,
+    "Booking": true
 }

@@ -178,6 +178,61 @@ class KashierHelper
         return 'https://payments.kashier.io/?' . http_build_query($params);
     }
 
+    public static function buildBookingPaymentUrl(
+        float $amount,
+        int $userId,
+        string $userName,
+        string $userEmail,
+        int $bookingId,
+        string $currency = 'USD'
+    ): string {
+        $orderId = 'book_' . uniqid() . '-' . $userId;
+        $merchantId = config('services.kashier.merchant_id', 'MID-12345');
+        $mode = config('services.kashier.mode', 'live');
+        $successUrl = urlencode(route('booking.success', $bookingId));
+        // Using the same checkout page for failure so user can retry
+        $failureUrl = urlencode(route('booking.checkout', $bookingId));
+        $webhookUrl = urlencode(route('booking.webhook.kashier'));
+
+        $hash = self::generateHash($merchantId, $orderId, $amount, $currency, 'user_' . $userId);
+
+        $customer = [
+            'firstName' => $userName,
+            'email' => $userEmail,
+            'reference' => 'user_' . $userId,
+        ];
+
+        $params = [
+            'merchantId' => $merchantId,
+            'orderId' => $orderId,
+            'amount' => $amount,
+            'currency' => $currency,
+            'hash' => $hash,
+            'mode' => $mode,
+            'merchantRedirect' => $successUrl,
+            'serverWebhook' => $webhookUrl,
+            'failureRedirect' => $failureUrl,
+            'redirectMethod' => 'get',
+            'type' => 'external',
+            'brandColor' => '#4f46e5',
+            'display' => app()->getLocale() ?: 'en',
+            'manualCapture' => 'false',
+            'customer' => json_encode($customer),
+            'saveCard' => 'optional',
+            'interactionSource' => 'Ecommerce',
+            'enable3DS' => 'true',
+            'allowedMethods' => 'card,wallet',
+            'CustomerReference' => $userId,
+            'metaData' => json_encode([
+                'user_id' => $userId,
+                'source' => 'booking-purchase',
+                'booking_id' => $bookingId,
+            ]),
+        ];
+
+        return 'https://payments.kashier.io/?' . http_build_query($params);
+    }
+
     public static function validatePayload(): bool
     {
         $paymentApiKey = config('services.kashier.secret_key');

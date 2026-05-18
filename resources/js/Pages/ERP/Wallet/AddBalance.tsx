@@ -114,99 +114,93 @@ export default function AddBalance({ wallet, client }: AddBalanceProps) {
                 </div>
 
                 {/* Compact Wallet Summary Card */}
-                <Card className="shadow-none">
-                    <CardContent className="p-6">
-                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                            <div className="space-y-1">
-                                <p className="text-sm font-medium text-muted-foreground">Wallet Balance</p>
-                                <div className="text-3xl font-bold tracking-tight text-foreground">
-                                    ${activeWallet.balance.toLocaleString(undefined, {minimumFractionDigits: 2})} <span className="text-lg font-normal text-muted-foreground">{activeWallet.currency}</span>
-                                </div>
-                            </div>
-                            <div className="text-sm text-muted-foreground max-w-[200px]">
-                                Available for invoices, subscriptions, and services.
+                <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div className="space-y-1">
+                            <p className="text-sm font-medium text-slate-500">Wallet Balance</p>
+                            <div className="text-3xl font-bold tracking-tight text-slate-900">
+                                ${activeWallet.balance.toLocaleString(undefined, {minimumFractionDigits: 2})} <span className="text-lg font-normal text-slate-400">{activeWallet.currency}</span>
                             </div>
                         </div>
-                    </CardContent>
-                </Card>
+                        <div className="text-sm text-slate-500 max-w-[200px]">
+                            Available for invoices, subscriptions, and services.
+                        </div>
+                    </div>
+                </div>
 
                 {/* Deposit Flow Form */}
                 <form onSubmit={handleSubmit} className="space-y-6">
                     
                     {/* Amount Selection */}
-                    <Card className="shadow-none">
-                        <CardHeader>
-                            <CardTitle className="text-lg">1. Deposit Amount</CardTitle>
-                            <CardDescription>Select a preset or enter a custom amount to deposit.</CardDescription>
-                        </CardHeader>
-                        <CardContent className="space-y-6">
-                            <div className="grid grid-cols-3 sm:grid-cols-5 gap-3">
-                                {presets.map((amt) => (
-                                    <Button
-                                        type="button"
-                                        key={amt}
-                                        variant={selectedPreset === amt ? "default" : "outline"}
-                                        onClick={() => handlePresetSelect(amt)}
-                                        className="h-12 text-base font-medium"
-                                    >
-                                        ${amt}
-                                    </Button>
-                                ))}
-                            </div>
+                    <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 space-y-6">
+                        <div>
+                            <h2 className="text-lg font-semibold text-slate-900">1. Deposit Amount</h2>
+                            <p className="text-sm text-slate-500 mt-1">Select a preset or enter a custom amount to deposit.</p>
+                        </div>
+                        <div className="grid grid-cols-3 sm:grid-cols-5 gap-3">
+                            {presets.map((amt) => (
+                                <Button
+                                    type="button"
+                                    key={amt}
+                                    variant={selectedPreset === amt ? "default" : "outline"}
+                                    onClick={() => handlePresetSelect(amt)}
+                                    className={`h-12 text-base font-medium transition-colors shadow-sm ${selectedPreset === amt ? 'bg-slate-900 text-white hover:bg-slate-800' : 'border-slate-200 text-slate-700 hover:bg-slate-50'}`}
+                                >
+                                    ${amt}
+                                </Button>
+                            ))}
+                        </div>
 
-                            <div className="space-y-2 max-w-xs">
-                                <Label htmlFor="custom-amount">Custom Amount</Label>
-                                <div className="relative">
-                                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                        <span className="text-muted-foreground font-medium">$</span>
-                                    </div>
-                                    <Input
-                                        id="custom-amount"
-                                        type="number"
-                                        step="0.01"
-                                        min="5.00"
-                                        placeholder="0.00"
-                                        value={customAmount}
-                                        onChange={(e) => handleCustomChange(e.target.value)}
-                                        className={`pl-8 shadow-none ${customAmount && !selectedPreset ? "border-primary ring-1 ring-primary" : ""}`}
-                                    />
+                        <div className="space-y-2 max-w-xs">
+                            <Label htmlFor="custom-amount" className="text-slate-700 font-medium">Custom Amount</Label>
+                            <div className="relative">
+                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <span className="text-slate-500 font-medium">$</span>
                                 </div>
+                                <Input
+                                    id="custom-amount"
+                                    type="number"
+                                    step="0.01"
+                                    min="5.00"
+                                    placeholder="0.00"
+                                    value={customAmount}
+                                    onChange={(e) => handleCustomChange(e.target.value)}
+                                    className={`pl-8 shadow-none border-slate-200 ${customAmount && !selectedPreset ? "border-indigo-500 ring-1 ring-indigo-500 focus:border-indigo-500 focus:ring-indigo-500" : ""}`}
+                                />
                             </div>
-                        </CardContent>
-                    </Card>
+                        </div>
+                    </div>
 
                     {/* Payment Method */}
-                    <Card className="shadow-none">
-                        <CardHeader>
-                            <CardTitle className="text-lg">2. Payment Method</CardTitle>
-                            <CardDescription>Choose how you would like to fund your wallet.</CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                {paymentMethods.map((method) => {
-                                    const IconComponent = method.icon;
-                                    const isSelected = selectedMethod === method.id;
-                                    return (
-                                        <div
-                                            key={method.id}
-                                            onClick={() => handleMethodSelect(method.id as any)}
-                                            className={`relative flex cursor-pointer items-start gap-4 rounded-lg border p-4 transition-colors hover:bg-muted/50 ${
-                                                isSelected 
-                                                ? 'border-primary ring-1 ring-primary bg-primary/5' 
-                                                : 'border-border bg-background'
-                                            }`}
-                                        >
-                                            <IconComponent className={`mt-0.5 h-5 w-5 shrink-0 ${isSelected ? 'text-primary' : 'text-muted-foreground'}`} />
-                                            <div className="flex-1 space-y-1">
-                                                <p className="text-sm font-medium leading-none text-foreground">{method.name}</p>
-                                                <p className="text-sm text-muted-foreground">{method.desc}</p>
-                                            </div>
+                    <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 space-y-6">
+                        <div>
+                            <h2 className="text-lg font-semibold text-slate-900">2. Payment Method</h2>
+                            <p className="text-sm text-slate-500 mt-1">Choose how you would like to fund your wallet.</p>
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            {paymentMethods.map((method) => {
+                                const IconComponent = method.icon;
+                                const isSelected = selectedMethod === method.id;
+                                return (
+                                    <div
+                                        key={method.id}
+                                        onClick={() => handleMethodSelect(method.id as any)}
+                                        className={`relative flex cursor-pointer items-start gap-4 rounded-xl border p-5 transition-all duration-200 shadow-sm ${
+                                            isSelected 
+                                            ? 'border-indigo-500 ring-1 ring-indigo-500 bg-indigo-50/50' 
+                                            : 'border-slate-200 bg-white hover:bg-slate-50 hover:border-slate-300'
+                                        }`}
+                                    >
+                                        <IconComponent className={`mt-0.5 h-6 w-6 shrink-0 ${isSelected ? 'text-indigo-600' : 'text-slate-400'}`} />
+                                        <div className="flex-1 space-y-1">
+                                            <p className={`text-sm font-semibold leading-none ${isSelected ? 'text-indigo-900' : 'text-slate-900'}`}>{method.name}</p>
+                                            <p className={`text-sm ${isSelected ? 'text-indigo-700/80' : 'text-slate-500'}`}>{method.desc}</p>
                                         </div>
-                                    );
-                                })}
-                            </div>
-                        </CardContent>
-                    </Card>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </div>
 
                     {/* Confirmation & Action */}
                     <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-2">

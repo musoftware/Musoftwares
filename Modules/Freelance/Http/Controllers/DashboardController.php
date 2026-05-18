@@ -109,11 +109,23 @@ class DashboardController extends Controller
 
         $recentActivities = array_slice($activities, 0, 5);
 
+        // 5. Fetch upcoming bookings for Dashboard widgets
+        $upcomingBookings = \Modules\Booking\Models\Booking::with('eventType')
+            ->whereHas('eventType', function($q) use ($user) {
+                $q->where('user_id', $user->id);
+            })
+            ->where('starts_at', '>=', now())
+            ->whereIn('status', ['confirmed', 'paid'])
+            ->orderBy('starts_at', 'asc')
+            ->take(5)
+            ->get();
+
         return Inertia::render('Freelance/Dashboard', [
             'activeProposals' => $activeProposals,
             'activeContracts' => $activeContracts,
             'stats' => $stats,
-            'recentActivities' => $recentActivities
+            'recentActivities' => $recentActivities,
+            'upcomingBookings' => $upcomingBookings
         ]);
     }
 

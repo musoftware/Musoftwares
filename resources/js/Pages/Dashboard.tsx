@@ -6,10 +6,16 @@ import {
     AlertCircle, Sparkles, Building2, Briefcase, Plus, ArrowRightLeft,
     CreditCard, Inbox
 } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/Components/ui/card';
-import { Badge } from '@/Components/ui/badge';
-import { Button, buttonVariants } from '@/Components/ui/button';
+import { Button } from '@/Components/ui/button';
 import { cn } from '@/lib/utils';
+import { AppPage } from '@/Components/ui/AppPage';
+import { PageHeader } from '@/Components/ui/PageHeader';
+import { StatCard } from '@/Components/ui/StatCard';
+import { SectionCard } from '@/Components/ui/SectionCard';
+import { EmptyState } from '@/Components/ui/EmptyState';
+import { ActivityFeed } from '@/Components/ui/ActivityFeed';
+import { CurrencyDisplay } from '@/Components/ui/CurrencyDisplay';
+import { StatusBadge } from '@/Components/ui/StatusBadge';
 
 interface DashboardStats {
     walletBalance: number;
@@ -68,7 +74,6 @@ export default function Dashboard({
         return fallbackUrl || '#';
     };
 
-    // Use server-passed data (real DB queries), with safe fallbacks for zero-state
     const stats = serverStats || {
         walletBalance: 0,
         earnedBalance: 0,
@@ -83,124 +88,82 @@ export default function Dashboard({
 
     const pendingInvoices = serverInvoices || [];
     const recentTransactions = serverTransactions || [];
-    const currencySymbol = stats.currency === 'EGP' ? 'EGP ' : '$';
+
+    // Map recent transactions to ActivityFeed format
+    const activityFeedItems = recentTransactions.map((txn, index) => ({
+        id: txn.id,
+        text: `${txn.type.charAt(0).toUpperCase() + txn.type.slice(1)} of ${stats.currency} ${txn.amount.toLocaleString(undefined, {minimumFractionDigits: 2})} via ${txn.method}`,
+        time: txn.date,
+        color: txn.type === 'deposit' ? 'bg-emerald-100' : txn.type === 'withdrawal' ? 'bg-amber-100' : 'bg-slate-100',
+        icon: txn.type === 'deposit' ? ArrowRightLeft : txn.type === 'withdrawal' ? ArrowUpRight : CreditCard
+    }));
 
     return (
         <AuthenticatedLayout header={undefined}>
             <Head title="Customer Dashboard" />
 
-            <div className="max-w-[1200px] mx-auto px-4 py-8 space-y-8">
-                
-                {/* Compact Welcome Header */}
-                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-background p-6 rounded-2xl border shadow-none">
-                    <div>
-                        <h1 className="text-2xl font-semibold tracking-tight">Good morning, {user?.name || 'Customer'}</h1>
-                        <p className="text-sm text-muted-foreground mt-1">Here is what requires your attention today.</p>
-                    </div>
-                    <div className="flex gap-3">
+            <AppPage>
+                <PageHeader 
+                    title={`Good morning, ${user?.name || 'Customer'}`}
+                    subtitle="Here is what requires your attention today across all your workspaces."
+                    actions={
                         <Link 
                             href={safeRoute('financial.add-balance')} 
-                            className={cn(buttonVariants({ variant: 'default', size: 'default' }), "shadow-none rounded-full px-5")}
+                            className="inline-flex items-center justify-center rounded-lg px-4 py-2 text-sm font-medium text-white bg-slate-900 hover:bg-slate-800 transition-colors shadow-sm"
                         >
-                            <Plus className="w-4 h-4 mr-2" /> Add Balance
+                            <Plus className="w-4 h-4 mr-2 stroke-[1.5]" /> Add Balance
                         </Link>
-                    </div>
+                    }
+                />
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <StatCard 
+                        label="Wallet Balance"
+                        value={<CurrencyDisplay amount={stats.walletBalance} currency={stats.currency} className="text-3xl font-semibold font-sans text-slate-900" />}
+                        icon={Wallet}
+                        description={<span className="text-emerald-600 font-medium">Active Funds</span>}
+                    />
+                    <StatCard 
+                        label={`Unpaid Invoices (${stats.unpaidInvoices})`}
+                        value={<CurrencyDisplay amount={stats.unpaidAmount} currency={stats.currency} className={stats.unpaidInvoices > 0 ? "text-3xl font-semibold font-sans text-danger" : "text-3xl font-semibold font-sans text-slate-900"} />}
+                        icon={FileText}
+                        description={stats.unpaidInvoices > 0 ? <span className="text-danger flex items-center gap-1 font-medium"><AlertCircle className="w-3 h-3" /> Action Required</span> : undefined}
+                    />
+                    <StatCard 
+                        label="Subscribed Systems"
+                        value={`${stats.activeSubscriptions} Module${stats.activeSubscriptions !== 1 ? 's' : ''}`}
+                        icon={Sparkles}
+                    />
                 </div>
 
-                {/* Financial Summary Row */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <Card className="shadow-none flex flex-col justify-between">
-                        <CardHeader className="pb-2">
-                            <div className="flex justify-between items-start">
-                                <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
-                                    <Wallet className="w-5 h-5 text-primary" />
-                                </div>
-                                <Badge variant="secondary" className="bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-50 font-normal">
-                                    Active
-                                </Badge>
-                            </div>
-                        </CardHeader>
-                        <CardContent>
-                            <p className="text-sm font-medium text-muted-foreground mb-1">Wallet Balance</p>
-                            <div className="flex items-baseline gap-2">
-                                <h2 className="text-3xl font-semibold">{currencySymbol}{stats.walletBalance.toLocaleString(undefined, {minimumFractionDigits: 2})}</h2>
-                            </div>
-                        </CardContent>
-                    </Card>
-
-                    <Card className="shadow-none border-destructive/20 flex flex-col justify-between relative overflow-hidden bg-destructive/5">
-                        <CardHeader className="pb-2 relative z-10">
-                            <div className="flex justify-between items-start">
-                                <div className="w-10 h-10 rounded-xl bg-destructive/10 flex items-center justify-center">
-                                    <FileText className="w-5 h-5 text-destructive" />
-                                </div>
-                                {stats.unpaidInvoices > 0 && (
-                                    <Badge variant="destructive" className="font-normal gap-1">
-                                        <AlertCircle className="w-3.5 h-3.5" /> Action Required
-                                    </Badge>
-                                )}
-                            </div>
-                        </CardHeader>
-                        <CardContent className="relative z-10">
-                            <p className="text-sm font-medium text-muted-foreground mb-1">Unpaid Invoices ({stats.unpaidInvoices})</p>
-                            <div className="flex items-baseline gap-2">
-                                <h2 className="text-3xl font-semibold text-destructive">{currencySymbol}{stats.unpaidAmount.toLocaleString(undefined, {minimumFractionDigits: 2})}</h2>
-                            </div>
-                        </CardContent>
-                    </Card>
-
-                    <Card className="shadow-none flex flex-col justify-between">
-                        <CardHeader className="pb-2">
-                            <div className="flex justify-between items-start">
-                                <div className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center">
-                                    <Sparkles className="w-5 h-5 text-muted-foreground" />
-                                </div>
-                            </div>
-                        </CardHeader>
-                        <CardContent>
-                            <p className="text-sm font-medium text-muted-foreground mb-1">Subscribed Systems</p>
-                            <div className="flex items-baseline gap-2">
-                                <h2 className="text-3xl font-semibold">{stats.activeSubscriptions} Module{stats.activeSubscriptions !== 1 ? 's' : ''}</h2>
-                            </div>
-                        </CardContent>
-                    </Card>
-                </div>
-
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    {/* LEFT COLUMN: Urgent & Workflows */}
-                    <div className="lg:col-span-2 space-y-6">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <div className="lg:col-span-2 space-y-8">
                         
-                        {/* PENDING INVOICES (Most Important) */}
-                        <Card className="shadow-none overflow-hidden">
-                            <CardHeader className="bg-muted/30 border-b flex flex-row items-center justify-between py-4">
-                                <CardTitle className="text-base font-semibold flex items-center gap-2 m-0">
-                                    <FileText className="w-4 h-4 text-destructive" /> Pending Invoices
-                                </CardTitle>
-                                <Link 
-                                    href={safeRoute('erp.invoices.index', undefined, '/erp/invoices')}
-                                    className={cn(buttonVariants({ variant: 'link', size: 'sm' }), "h-auto p-0")}
-                                >
+                        <SectionCard 
+                            title="Pending Invoices" 
+                            action={
+                                <Link href={safeRoute('erp.invoices.index', undefined, '/erp/invoices')} className="text-sm font-medium text-primary hover:underline transition-colors">
                                     View All
                                 </Link>
-                            </CardHeader>
-                            <div className="divide-y divide-border">
+                            }
+                            noPadding
+                        >
+                            <div className="divide-y divide-border/40">
                                 {pendingInvoices.length === 0 ? (
-                                    <div className="p-8 text-center">
-                                        <div className="w-12 h-12 rounded-full bg-emerald-50 flex items-center justify-center mx-auto mb-3">
-                                            <CheckCircle2 className="w-6 h-6 text-emerald-500" />
-                                        </div>
-                                        <p className="text-sm font-medium">All caught up!</p>
-                                        <p className="text-xs text-muted-foreground mt-1">You have no pending invoices at this time.</p>
-                                    </div>
+                                    <EmptyState 
+                                        icon={CheckCircle2}
+                                        title="All caught up!"
+                                        description="You have no pending invoices at this time."
+                                    />
                                 ) : pendingInvoices.map((invoice) => (
-                                    <div key={invoice.id} className="p-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 hover:bg-muted/30 transition-colors">
+                                    <div key={invoice.id} className="p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 hover:bg-surface-raised transition-colors">
                                         <div className="flex items-start gap-4">
-                                            <div className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center shrink-0">
-                                                <FileText className="w-5 h-5 text-muted-foreground" />
+                                            <div className="w-10 h-10 rounded-xl bg-surface-raised flex items-center justify-center shrink-0">
+                                                <FileText className="w-5 h-5 text-text-muted" />
                                             </div>
                                             <div>
-                                                <p className="font-medium text-sm">{invoice.description}</p>
-                                                <div className="flex items-center gap-3 mt-1 text-xs text-muted-foreground">
+                                                <p className="font-medium text-sm text-text-primary">{invoice.description}</p>
+                                                <div className="flex items-center gap-3 mt-1 text-xs text-text-muted">
                                                     <span className="font-mono">{invoice.id}</span>
                                                     <span>•</span>
                                                     <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> Due {invoice.date}</span>
@@ -209,14 +172,14 @@ export default function Dashboard({
                                         </div>
                                         <div className="flex items-center gap-6 w-full sm:w-auto justify-between sm:justify-end">
                                             <div className="text-left sm:text-right">
-                                                <p className="font-semibold">{currencySymbol}{invoice.amount.toLocaleString(undefined, {minimumFractionDigits: 2})}</p>
-                                                <p className={`text-xs font-medium mt-0.5 ${invoice.status === 'overdue' ? 'text-destructive' : 'text-amber-600'}`}>
+                                                <CurrencyDisplay amount={invoice.amount} currency={invoice.currency || stats.currency} className="font-semibold block" />
+                                                <span className={cn('text-[10px] font-bold uppercase tracking-wider', invoice.status === 'overdue' ? 'text-danger' : 'text-amber-600')}>
                                                     {invoice.status === 'overdue' ? 'Overdue' : 'Due Soon'}
-                                                </p>
+                                                </span>
                                             </div>
                                             <Link 
                                                 href={safeRoute('erp.invoices.show', invoice.dbId, `/erp/invoices/${invoice.dbId}`)}
-                                                className={cn(buttonVariants({ variant: 'default', size: 'sm' }), "shadow-none rounded-full px-5")}
+                                                className="inline-flex items-center justify-center h-8 px-4 rounded-lg bg-primary text-white text-xs font-medium hover:bg-primary-hover transition-colors"
                                             >
                                                 Pay Now
                                             </Link>
@@ -224,136 +187,99 @@ export default function Dashboard({
                                     </div>
                                 ))}
                             </div>
-                        </Card>
+                        </SectionCard>
 
-                        {/* SUBSCRIPTION / MODULE ACCESS */}
-                        <Card className="shadow-none overflow-hidden">
-                            <CardHeader className="border-b py-4">
-                                <CardTitle className="text-base font-semibold flex items-center gap-2 m-0">
-                                    <Sparkles className="w-4 h-4 text-indigo-500" /> Subscribed Workspaces
-                                </CardTitle>
-                            </CardHeader>
-                            <CardContent className="p-6 grid grid-cols-1 md:grid-cols-3 gap-4">
-                                {/* ERP Module Workspace Card */}
+                        <SectionCard title="Subscribed Workspaces">
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                 <Link 
                                     href={subscribedModules.erp ? '/erp/dashboard' : '/subscriptions/plans?module=erp'} 
-                                    className="group p-5 rounded-xl border hover:border-indigo-500/50 hover:shadow-sm transition-all bg-background relative overflow-hidden block"
+                                    className="group p-5 rounded-xl border border-border hover:border-primary/50 hover:shadow-sm transition-all bg-surface relative overflow-hidden block"
                                 >
-                                    <div className="w-10 h-10 rounded-lg bg-indigo-50 dark:bg-indigo-950/40 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                                        <Building2 className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+                                    <div className="w-10 h-10 rounded-lg bg-indigo-50 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                                        <Building2 className="w-5 h-5 text-indigo-600" />
                                     </div>
-                                    <h4 className="font-bold text-sm mb-1">Business OS (ERP)</h4>
-                                    <p className="text-xs text-muted-foreground leading-relaxed">Manage your clients, generate invoices, and log project timers.</p>
+                                    <h4 className="font-bold text-sm mb-1 text-text-primary">Business OS (ERP)</h4>
+                                    <p className="text-xs text-text-muted leading-relaxed">Manage your clients, generate invoices, and log project timers.</p>
                                     {subscribedModules.erp ? (
-                                        <div className="absolute top-4 right-4 text-emerald-600 text-[9px] uppercase font-extrabold bg-emerald-50 dark:bg-emerald-950/30 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-900 px-2.5 py-0.5 rounded-full">Active</div>
+                                        <div className="absolute top-4 right-4 text-emerald-600 text-[9px] uppercase font-bold bg-emerald-50 border border-emerald-100 px-2.5 py-0.5 rounded-full">Active</div>
                                     ) : (
-                                        <div className="absolute top-4 right-4 text-amber-600 text-[9px] uppercase font-extrabold bg-amber-50 dark:bg-amber-950/30 dark:text-amber-400 border border-amber-100 dark:border-amber-900 px-2.5 py-0.5 rounded-full">Subscribe</div>
+                                        <div className="absolute top-4 right-4 text-amber-600 text-[9px] uppercase font-bold bg-amber-50 border border-amber-100 px-2.5 py-0.5 rounded-full">Subscribe</div>
                                     )}
                                 </Link>
 
-                                {/* Freelance Hub Workspace Card */}
                                 <Link 
                                     href="/freelance/dashboard" 
-                                    className="group p-5 rounded-xl border hover:border-indigo-500/50 hover:shadow-sm transition-all bg-background relative overflow-hidden block"
+                                    className="group p-5 rounded-xl border border-border hover:border-primary/50 hover:shadow-sm transition-all bg-surface relative overflow-hidden block"
                                 >
-                                    <div className="w-10 h-10 rounded-lg bg-indigo-50 dark:bg-indigo-950/40 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                                        <Briefcase className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+                                    <div className="w-10 h-10 rounded-lg bg-indigo-50 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                                        <Briefcase className="w-5 h-5 text-indigo-600" />
                                     </div>
-                                    <h4 className="font-bold text-sm mb-1">Freelance Hub</h4>
-                                    <p className="text-xs text-muted-foreground leading-relaxed">Accept contracts, manage milestones, and submit deliverables.</p>
-                                    <div className="absolute top-4 right-4 text-emerald-600 text-[9px] uppercase font-extrabold bg-emerald-50 dark:bg-emerald-950/30 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-900 px-2.5 py-0.5 rounded-full">Active (Free)</div>
+                                    <h4 className="font-bold text-sm mb-1 text-text-primary">Freelance Hub</h4>
+                                    <p className="text-xs text-text-muted leading-relaxed">Accept contracts, manage milestones, and submit deliverables.</p>
+                                    <div className="absolute top-4 right-4 text-emerald-600 text-[9px] uppercase font-bold bg-emerald-50 border border-emerald-100 px-2.5 py-0.5 rounded-full">Active (Free)</div>
                                 </Link>
 
-                                {/* Marketing Suite Workspace Card */}
                                 <Link 
                                     href={subscribedModules.marketing ? '/marketing/dashboard' : '/subscriptions/plans?module=marketing'} 
-                                    className="group p-5 rounded-xl border hover:border-indigo-500/50 hover:shadow-sm transition-all bg-background relative overflow-hidden block"
+                                    className="group p-5 rounded-xl border border-border hover:border-primary/50 hover:shadow-sm transition-all bg-surface relative overflow-hidden block"
                                 >
-                                    <div className="w-10 h-10 rounded-lg bg-indigo-50 dark:bg-indigo-950/40 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                                        <Sparkles className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+                                    <div className="w-10 h-10 rounded-lg bg-indigo-50 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                                        <Sparkles className="w-5 h-5 text-indigo-600" />
                                     </div>
-                                    <h4 className="font-bold text-sm mb-1">Marketing Suite</h4>
-                                    <p className="text-xs text-muted-foreground leading-relaxed">Automate targeted email campaigns and capture high-converting leads.</p>
+                                    <h4 className="font-bold text-sm mb-1 text-text-primary">Marketing Suite</h4>
+                                    <p className="text-xs text-text-muted leading-relaxed">Automate targeted email campaigns and capture high-converting leads.</p>
                                     {subscribedModules.marketing ? (
-                                        <div className="absolute top-4 right-4 text-emerald-600 text-[9px] uppercase font-extrabold bg-emerald-50 dark:bg-emerald-950/30 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-900 px-2.5 py-0.5 rounded-full">Active</div>
+                                        <div className="absolute top-4 right-4 text-emerald-600 text-[9px] uppercase font-bold bg-emerald-50 border border-emerald-100 px-2.5 py-0.5 rounded-full">Active</div>
                                     ) : (
-                                        <div className="absolute top-4 right-4 text-slate-500 text-[9px] uppercase font-extrabold bg-slate-50 dark:bg-slate-900/30 dark:text-slate-400 border border-slate-200 dark:border-slate-800 px-2.5 py-0.5 rounded-full">Discover</div>
+                                        <div className="absolute top-4 right-4 text-slate-500 text-[9px] uppercase font-bold bg-slate-50 border border-slate-200 px-2.5 py-0.5 rounded-full">Discover</div>
                                     )}
                                 </Link>
-                            </CardContent>
-                        </Card>
+                            </div>
+                        </SectionCard>
 
                     </div>
 
-                    {/* RIGHT COLUMN: Transactions & Wallet Actions */}
                     <div className="space-y-6">
                         
-                        {/* QUICK ACTIONS */}
-                        <Card className="shadow-none p-1">
-                            <div className="flex flex-col gap-1 p-3">
-                                <Link href={safeRoute('financial.add-balance')} className="flex items-center px-4 py-3 text-sm font-medium text-foreground hover:bg-muted/50 rounded-xl transition-colors">
-                                    <Plus className="w-4 h-4 mr-3 text-muted-foreground" /> Add Funds to Wallet
+                        <SectionCard noPadding>
+                            <h4 className="px-4 pt-5 pb-2 text-[11px] font-bold uppercase tracking-wider text-text-muted">
+                                Quick Actions
+                            </h4>
+                            <div className="flex flex-col p-2">
+                                <Link href={safeRoute('financial.add-balance')} className="flex items-center px-3 py-2.5 text-sm font-medium text-text-primary hover:bg-surface-raised rounded-lg transition-colors">
+                                    <Plus className="w-4 h-4 mr-3 text-text-muted" /> Add Funds to Wallet
                                 </Link>
-                                <Link href={safeRoute('financial.withdrawals')} className="flex items-center px-4 py-3 text-sm font-medium text-foreground hover:bg-muted/50 rounded-xl transition-colors">
-                                    <ArrowUpRight className="w-4 h-4 mr-3 text-muted-foreground" /> Request Withdrawal
+                                <Link href={safeRoute('financial.withdrawals')} className="flex items-center px-3 py-2.5 text-sm font-medium text-text-primary hover:bg-surface-raised rounded-lg transition-colors">
+                                    <ArrowUpRight className="w-4 h-4 mr-3 text-text-muted" /> Request Withdrawal
                                 </Link>
-                                <Link href={safeRoute('financial.payout-methods.index')} className="flex items-center px-4 py-3 text-sm font-medium text-foreground hover:bg-muted/50 rounded-xl transition-colors">
-                                    <CreditCard className="w-4 h-4 mr-3 text-muted-foreground" /> Manage Payment Methods
+                                <Link href={safeRoute('financial.payout-methods.index')} className="flex items-center px-3 py-2.5 text-sm font-medium text-text-primary hover:bg-surface-raised rounded-lg transition-colors">
+                                    <CreditCard className="w-4 h-4 mr-3 text-text-muted" /> Manage Payment Methods
                                 </Link>
                             </div>
-                        </Card>
+                        </SectionCard>
 
-                        {/* RECENT TRANSACTIONS */}
-                        <Card className="shadow-none overflow-hidden">
-                            <CardHeader className="py-4 border-b">
-                                <CardTitle className="text-base font-semibold flex items-center gap-2 m-0">
-                                    <ArrowRightLeft className="w-4 h-4 text-muted-foreground" /> Recent Transactions
-                                </CardTitle>
-                            </CardHeader>
-                            <div className="divide-y divide-border">
-                                {recentTransactions.length === 0 ? (
-                                    <div className="p-8 text-center">
-                                        <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center mx-auto mb-3">
-                                            <Inbox className="w-5 h-5 text-muted-foreground" />
-                                        </div>
-                                        <p className="text-sm text-muted-foreground">No transactions yet.</p>
-                                        <p className="text-xs text-muted-foreground/70 mt-1">Transactions will appear here when you add funds or pay invoices.</p>
-                                    </div>
-                                ) : recentTransactions.map((txn) => (
-                                    <div key={txn.id} className="p-5 flex justify-between items-center hover:bg-muted/30 transition-colors">
-                                        <div className="flex items-center gap-3">
-                                            <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${
-                                                txn.type === 'deposit' ? 'bg-emerald-50' : 
-                                                txn.type === 'withdrawal' ? 'bg-amber-50' : 'bg-muted'
-                                            }`}>
-                                                {txn.type === 'deposit' && <ArrowRightLeft className="w-3.5 h-3.5 text-emerald-600" />}
-                                                {txn.type === 'withdrawal' && <ArrowUpRight className="w-3.5 h-3.5 text-amber-600" />}
-                                                {txn.type === 'payment' && <CreditCard className="w-3.5 h-3.5 text-muted-foreground" />}
-                                            </div>
-                                            <div>
-                                                <p className="font-medium text-sm capitalize">{txn.type}</p>
-                                                <p className="text-xs text-muted-foreground">{txn.method} • {txn.date}</p>
-                                            </div>
-                                        </div>
-                                        <div className={`font-medium text-sm ${txn.amount > 0 ? 'text-emerald-600' : 'text-foreground'}`}>
-                                            {txn.amount > 0 ? '+' : ''}{txn.amount.toLocaleString(undefined, {minimumFractionDigits: 2})}
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                            <div className="p-4 bg-muted/30 border-t text-center">
-                                <Link 
-                                    href={safeRoute('erp.wallet.show', user?.id || 1, `/erp/clients/${user?.id || 1}/wallet`)}
-                                    className={cn(buttonVariants({ variant: 'link', size: 'sm' }), "h-auto p-0")}
-                                >
-                                    View Full History
+                        <SectionCard 
+                            title="Recent Transactions" 
+                            action={
+                                <Link href={safeRoute('erp.wallet.show', user?.id || 1, `/erp/clients/${user?.id || 1}/wallet`)} className="text-[11px] font-bold uppercase tracking-wider text-primary hover:underline transition-colors">
+                                    History
                                 </Link>
-                            </div>
-                        </Card>
+                            }
+                        >
+                            {activityFeedItems.length === 0 ? (
+                                <EmptyState 
+                                    icon={Inbox}
+                                    title="No transactions"
+                                    description="Transactions will appear here when you add funds or pay invoices."
+                                />
+                            ) : (
+                                <ActivityFeed items={activityFeedItems} />
+                            )}
+                        </SectionCard>
 
                     </div>
                 </div>
-            </div>
+            </AppPage>
         </AuthenticatedLayout>
     );
 }
