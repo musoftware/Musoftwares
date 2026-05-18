@@ -104,7 +104,11 @@ class FinancialController extends Controller
     {
         $wallet = $request->user()->getWallet();
         return Inertia::render('Financial/AddBalance', [
-            'wallet' => $wallet,
+            'wallet' => [
+                'id'       => $wallet->id,
+                'balance'  => (float) $wallet->balance,
+                'currency' => $wallet->currency ?? 'USD',
+            ],
         ]);
     }
 

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, useForm, Link } from '@inertiajs/react';
 import {
-    ArrowLeft, ShieldCheck
+    ArrowLeft, ShieldCheck, CreditCard, AlertCircle, Wallet
 } from 'lucide-react';
 import { Input } from '@/Components/ui/input';
 import { Button } from '@/Components/ui/button';
@@ -17,6 +17,15 @@ export default function AddBalance({ wallet }) {
         amount: 50,
     });
 
+    const safeRoute = (name, params, fallbackUrl) => {
+        try {
+            if (typeof route !== 'undefined' && route().has(name)) {
+                return route(name, params);
+            }
+        } catch (e) {}
+        return fallbackUrl || '#';
+    };
+
     const handlePresetClick = (val) => {
         setSelectedPreset(val);
         setCustomAmount('');
@@ -27,7 +36,6 @@ export default function AddBalance({ wallet }) {
         const val = e.target.value;
         setCustomAmount(val);
         setSelectedPreset(null);
-        
         const num = parseFloat(val);
         if (!isNaN(num) && num > 0) {
             setData('amount', num);
@@ -38,83 +46,95 @@ export default function AddBalance({ wallet }) {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        post(route('financial.add-balance.kashier'));
+        post(safeRoute('financial.add-balance.kashier', undefined, '/financial/add-balance/kashier'));
     };
 
-    const presets = [10, 50, 100, 250, 500];
-
-    const safeRoute = (name, params, fallbackUrl) => {
-        try {
-            // @ts-ignore
-            if (typeof route !== 'undefined' && route().has(name)) {
-                // @ts-ignore
-                return route(name, params);
-            }
-        } catch (e) {}
-        return fallbackUrl || '#';
-    };
+    const presets = [10, 25, 50, 100, 250, 500];
+    const walletBalance = Number(wallet?.balance || 0);
+    const walletCurrency = wallet?.currency || 'USD';
 
     return (
         <AuthenticatedLayout header={undefined}>
-            <Head title="Deposit Funds" />
+            <Head title="Add Balance" />
 
             <div className="max-w-2xl mx-auto px-4 py-8 space-y-6">
                 {/* Header */}
-                <div className="space-y-2">
-                    <Link href={safeRoute('client.wallet.index', undefined, '/wallet')} className="inline-flex items-center text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-                        <ArrowLeft className="mr-2 h-4 w-4" /> Back to Wallet
+                <div className="space-y-1">
+                    <Link
+                        href={safeRoute('dashboard', undefined, '/dashboard')}
+                        className="inline-flex items-center text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                        <ArrowLeft className="mr-2 h-4 w-4" /> Back to Dashboard
                     </Link>
-                    <h1 className="text-2xl font-semibold tracking-tight">Deposit Funds</h1>
-                    <p className="text-sm text-muted-foreground">Add balance to your wallet for seamless platform transactions.</p>
+                    <h1 className="text-2xl font-semibold tracking-tight">Add Balance</h1>
+                    <p className="text-sm text-muted-foreground">
+                        Top up your wallet to pay for subscriptions and platform services.
+                    </p>
                 </div>
 
-                {/* Compact Wallet Summary Card */}
-                <Card className="shadow-none">
-                    <CardContent className="p-6">
-                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                            <div className="space-y-1">
-                                <p className="text-sm font-medium text-muted-foreground">Wallet Balance</p>
-                                <div className="text-3xl font-bold tracking-tight text-foreground">
-                                    ${Number(wallet?.balance || 0).toLocaleString(undefined, {minimumFractionDigits: 2})} <span className="text-lg font-normal text-muted-foreground">{wallet?.currency || 'USD'}</span>
-                                </div>
+                {/* Current Wallet Balance */}
+                <Card className="shadow-none border-slate-200 bg-gradient-to-r from-slate-900 to-slate-800 text-white">
+                    <CardContent className="p-6 flex items-center justify-between">
+                        <div>
+                            <p className="text-sm font-medium text-slate-400 mb-1">Current Wallet Balance</p>
+                            <div className="text-3xl font-bold tracking-tight">
+                                {walletBalance.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                                <span className="text-xl font-normal text-slate-400 ml-2">{walletCurrency}</span>
                             </div>
-                            <div className="text-sm text-muted-foreground max-w-[200px]">
-                                Available for invoices, subscriptions, and platform services.
-                            </div>
+                        </div>
+                        <div className="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center">
+                            <Wallet className="w-6 h-6 text-white" />
                         </div>
                     </CardContent>
                 </Card>
 
-                {/* Deposit Flow Form */}
+                {/* Global error display */}
+                {errors && Object.keys(errors).length > 0 && (
+                    <div className="flex items-start gap-3 p-4 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm">
+                        <AlertCircle className="w-5 h-5 shrink-0 mt-0.5 text-red-500" />
+                        <div>
+                            <strong className="font-semibold block mb-1">Payment Error</strong>
+                            {Object.values(errors).map((err, i) => (
+                                <p key={i}>{err}</p>
+                            ))}
+                        </div>
+                    </div>
+                )}
+
+                {/* Deposit Form */}
                 <form onSubmit={handleSubmit} className="space-y-6">
-                    
+
                     {/* Amount Selection */}
-                    <Card className="shadow-none">
-                        <CardHeader>
-                            <CardTitle className="text-lg">1. Deposit Amount</CardTitle>
-                            <CardDescription>Select a preset or enter a custom amount to deposit.</CardDescription>
+                    <Card className="shadow-none border-slate-200">
+                        <CardHeader className="pb-4">
+                            <CardTitle className="text-base font-semibold">Select Amount</CardTitle>
+                            <CardDescription>Choose a preset or enter a custom amount to deposit.</CardDescription>
                         </CardHeader>
-                        <CardContent className="space-y-6">
-                            <div className="grid grid-cols-3 sm:grid-cols-5 gap-3">
+                        <CardContent className="space-y-4">
+                            <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
                                 {presets.map((amount) => (
                                     <Button
                                         type="button"
                                         key={amount}
-                                        variant={selectedPreset === amount ? "default" : "outline"}
+                                        variant={selectedPreset === amount ? 'default' : 'outline'}
                                         onClick={() => handlePresetClick(amount)}
-                                        className="h-12 text-base font-medium"
+                                        className={`h-11 text-sm font-semibold transition-all ${
+                                            selectedPreset === amount
+                                                ? 'bg-slate-900 text-white hover:bg-slate-800 border-slate-900'
+                                                : 'border-slate-200 text-slate-700 hover:bg-slate-50'
+                                        }`}
                                     >
-                                        ${amount}
+                                        {amount}
                                     </Button>
                                 ))}
                             </div>
 
-                            <div className="space-y-2 max-w-xs">
-                                <Label htmlFor="custom-amount">Custom Amount</Label>
+                            <div className="space-y-1.5 max-w-xs">
+                                <Label htmlFor="custom-amount" className="text-sm font-medium">Custom Amount</Label>
                                 <div className="relative">
-                                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                        <span className="text-muted-foreground font-medium">$</span>
-                                    </div>
+                                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 font-medium text-sm pointer-events-none">
+                                        {walletCurrency}
+                                    </span>
                                     <Input
                                         id="custom-amount"
                                         type="number"
@@ -123,31 +143,72 @@ export default function AddBalance({ wallet }) {
                                         placeholder="0.00"
                                         value={customAmount}
                                         onChange={handleCustomChange}
-                                        className={`pl-8 shadow-none ${customAmount && !selectedPreset ? "border-primary ring-1 ring-primary" : ""}`}
+                                        className={`pl-12 shadow-none ${
+                                            customAmount && !selectedPreset
+                                                ? 'border-primary ring-1 ring-primary'
+                                                : 'border-slate-200'
+                                        }`}
                                     />
                                 </div>
                                 {errors.amount && (
-                                    <p className="text-sm font-medium text-destructive mt-2">{errors.amount}</p>
+                                    <p className="text-sm font-medium text-destructive">{errors.amount}</p>
                                 )}
+                            </div>
+
+                            {/* Amount summary */}
+                            {data.amount >= 5 && (
+                                <div className="bg-slate-50 border border-slate-200 rounded-lg p-3 flex items-center justify-between">
+                                    <span className="text-sm text-slate-600">You will deposit:</span>
+                                    <span className="font-bold text-slate-900">
+                                        {Number(data.amount).toLocaleString(undefined, { minimumFractionDigits: 2 })} {walletCurrency}
+                                    </span>
+                                </div>
+                            )}
+                        </CardContent>
+                    </Card>
+
+                    {/* Payment Method — Kashier only */}
+                    <Card className="shadow-none border-slate-200">
+                        <CardHeader className="pb-4">
+                            <CardTitle className="text-base font-semibold">Payment Method</CardTitle>
+                            <CardDescription>Payments are processed securely via Kashier.</CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="flex items-center gap-4 p-4 rounded-xl border-2 border-primary bg-primary/5">
+                                <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center shrink-0">
+                                    <CreditCard className="w-5 h-5 text-white" />
+                                </div>
+                                <div>
+                                    <p className="text-sm font-semibold text-slate-900">Kashier — Card &amp; Wallet</p>
+                                    <p className="text-xs text-slate-500">Visa, Mastercard, and digital wallets accepted</p>
+                                </div>
+                                <div className="ml-auto w-2 h-2 rounded-full bg-emerald-500" />
                             </div>
                         </CardContent>
                     </Card>
 
-                    {/* Confirmation & Action */}
-                    <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-2">
+                    {/* Submit */}
+                    <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-1">
                         <Button
                             type="submit"
                             size="lg"
                             disabled={processing || !data.amount || data.amount < 5}
-                            className="w-full sm:w-auto h-12 px-8 text-base shadow-none"
+                            className="w-full sm:w-auto h-12 px-8 text-base bg-slate-900 hover:bg-slate-800 text-white font-semibold shadow-sm"
                         >
-                            {processing ? 'Processing...' : `Deposit $${Number(data.amount || 0).toFixed(2)} via Kashier`}
+                            {processing
+                                ? 'Redirecting to payment...'
+                                : `Pay ${Number(data.amount || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })} ${walletCurrency} via Kashier`
+                            }
                         </Button>
-                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                            <ShieldCheck className="h-4 w-4" />
-                            <span>Secure encrypted payment.</span>
+                        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                            <ShieldCheck className="h-4 w-4 text-emerald-500" />
+                            <span>256-bit SSL secured. Funds credited instantly after payment.</span>
                         </div>
                     </div>
+
+                    <p className="text-xs text-slate-400 text-center">
+                        Minimum deposit: 5 {walletCurrency}. You will be redirected to Kashier's secure payment page to complete the transaction.
+                    </p>
                 </form>
             </div>
         </AuthenticatedLayout>
