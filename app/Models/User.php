@@ -140,4 +140,14 @@ class User extends Authenticatable
     {
         return $this->belongsTo(User::class, 'kyc_verified_by');
     }
+
+    /**
+     * Serial license assignments for this user.
+     * Used by SerialUserDeviceController::updateUserStatus() (bulk status change).
+     * temp_valid_until is a field on users table for temporary license override.
+     */
+    public function serialUserDevices(): HasMany
+    {
+        return $this->hasMany(SerialUserDevice::class, 'user_id');
+    }
 }

@@ -7,8 +7,10 @@ use App\Models\User;
 
 class SupportTicket extends TenantModel
 {
+    protected $table = 'erp_support_tickets';
+
     protected $fillable = [
-        'tenant_id', 'client_id', 'project_id', 'subject', 'description', 
+        'tenant_id', 'client_id', 'project_id', 'subject', 'description',
         'status', 'priority', 'assigned_to', 'created_by'
     ];
 
