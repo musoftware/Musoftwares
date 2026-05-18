@@ -14,6 +14,7 @@ export interface ColumnDef {
     key: string;
     label: string;
     sortable?: boolean;
+    className?: string;
     render?: (row: any) => React.ReactNode;
 }
 
@@ -24,8 +25,8 @@ export interface DataTableProps {
     loading?: boolean;
     filters?: any;
     onSearch?: (search: string) => void;
-    onSort?: (key: string, direction: string) => void;
-    onPageChange?: (url: string) => void;
+    onSort?: (key: string, direction?: string) => void;
+    onPageChange?: (page: string | number) => void;
     onPerPageChange?: (perPage: number) => void;
     emptyState?: React.ReactNode;
     className?: string;
@@ -45,7 +46,7 @@ export function DataTable({
     className,
 }: DataTableProps) {
     if (loading && !data.length) {
-        return <SkeletonTable cols={columns.length} rows={5} />;
+        return <SkeletonTable cols={columns.length} rows={5} className="" />;
     }
 
     return (
@@ -64,6 +65,7 @@ export function DataTable({
                                 value={filters?.search || ''}
                                 onChange={onSearch}
                                 placeholder="Search..."
+                                className=""
                             />
                         </div>
                     )}
@@ -176,7 +178,7 @@ export function DataTable({
                     <div className="flex items-center gap-1">
                         {pagination.links ? (
                             <div className="flex items-center flex-wrap gap-1">
-                                {pagination.links.map((link, idx) => (
+                                {pagination.links.map((link: any, idx: number) => (
                                     link.url ? (
                                         <Link
                                             key={idx}

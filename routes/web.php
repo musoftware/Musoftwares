@@ -312,6 +312,18 @@ Route::middleware(['auth', 'verified', 'onboarding'])->prefix('admin')->name('ad
     Route::patch('/serial-user-devices/users/{user}/status', [\App\Http\Controllers\Admin\SerialUserDeviceController::class, 'updateUserStatus'])->name('serial-user-devices.update-user-status');
     Route::patch('/serial-user-devices/users/{user}/temp-valid', [\App\Http\Controllers\Admin\SerialUserDeviceController::class, 'updateUserTempValid'])->name('serial-user-devices.update-user-temp-valid');
     Route::delete('/serial-user-devices/{serialUserDevice}', [\App\Http\Controllers\Admin\SerialUserDeviceController::class, 'destroy'])->name('serial-user-devices.destroy');
+
+    // ── Tools Marketplace Admin ───────────────────────────────────────
+    // Admin manages the tool catalog, releases, and pricing plans.
+    Route::prefix('tools')->name('tools.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\Tools\AdminToolController::class, 'index'])->name('index');
+        Route::get('/create', [\App\Http\Controllers\Admin\Tools\AdminToolController::class, 'create'])->name('create');
+        Route::post('/', [\App\Http\Controllers\Admin\Tools\AdminToolController::class, 'store'])->name('store');
+        Route::get('/{tool}/edit', [\App\Http\Controllers\Admin\Tools\AdminToolController::class, 'edit'])->name('edit');
+        Route::put('/{tool}', [\App\Http\Controllers\Admin\Tools\AdminToolController::class, 'update'])->name('update');
+        Route::delete('/{tool}', [\App\Http\Controllers\Admin\Tools\AdminToolController::class, 'destroy'])->name('destroy');
+        Route::post('/{tool}/upload-version', [\App\Http\Controllers\Admin\Tools\AdminToolController::class, 'uploadVersion'])->name('upload-version');
+    });
 });
 
 

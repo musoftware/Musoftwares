@@ -4,9 +4,10 @@ import { Head, Link, usePage } from '@inertiajs/react';
 import { 
     Wallet, FileText, ArrowUpRight, Clock, CheckCircle2, 
     AlertCircle, Sparkles, Building2, Briefcase, Plus, ArrowRightLeft,
-    CreditCard, Inbox, Settings
+    CreditCard, Inbox, Settings, Wrench, Download, Key, ShoppingBag
 } from 'lucide-react';
 import { Button } from '@/Components/ui/button';
+import { Badge } from '@/Components/ui/badge';
 import { cn } from '@/lib/utils';
 import { ModulePageHeader } from '@/Components/ui/ModulePageHeader';
 import { MetricCard } from '@/Components/ui/MetricCard';
@@ -46,18 +47,28 @@ interface RecentTransaction {
     method: string;
 }
 
+interface ActiveToolLicense {
+    license_key: string;
+    tool: { slug: string; title: string; icon_url: string | null };
+    active_devices: number;
+    max_devices: number;
+    expires_at: string | null;
+}
+
 interface DashboardProps {
     stats?: DashboardStats;
     pendingInvoices?: PendingInvoice[];
     recentTransactions?: RecentTransaction[];
     subscribedModules?: Record<string, boolean>;
+    activeToolLicenses?: ActiveToolLicense[];
 }
 
 export default function Dashboard({ 
     stats: serverStats, 
     pendingInvoices: serverInvoices, 
     recentTransactions: serverTransactions,
-    subscribedModules = { erp: false, freelance: true, marketing: false }
+    subscribedModules = { erp: false, freelance: true, marketing: false },
+    activeToolLicenses = []
 }: DashboardProps) {
     const { auth } = usePage().props as any;
     const user = auth?.user;
@@ -203,7 +214,7 @@ export default function Dashboard({
                         </OperationalCard>
 
                         <OperationalCard title="Your Workspaces">
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                                 <Link 
                                     href={subscribedModules.erp ? '/erp/dashboard' : '/subscriptions/plans?module=erp'} 
                                     className="group p-5 rounded-xl border border-border hover:border-primary/50 hover:shadow-sm transition-all bg-surface relative overflow-hidden block"
@@ -243,6 +254,32 @@ export default function Dashboard({
                                     <p className="text-xs text-text-muted leading-relaxed">List services, reach clients, and grow your business on the marketplace.</p>
                                     <div className="absolute top-4 right-4 text-violet-600 text-[9px] uppercase font-bold bg-violet-50 border border-violet-100 px-2.5 py-0.5 rounded-full">Free</div>
                                 </Link>
+
+                                <Link 
+                                    href="/intelligence"
+                                    className="group p-5 rounded-xl border border-border hover:border-rose-200 hover:shadow-sm transition-all bg-surface relative overflow-hidden block"
+                                >
+                                    <div className="w-10 h-10 rounded-lg bg-rose-50 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                                        <AlertCircle className="w-5 h-5 text-rose-600" />
+                                    </div>
+                                    <h4 className="font-bold text-sm mb-1 text-text-primary">Intelligence</h4>
+                                    <p className="text-xs text-text-muted leading-relaxed">Track competitors, monitor ad feeds, and save winning creatives.</p>
+                                    <div className="absolute top-4 right-4 text-rose-600 text-[9px] uppercase font-bold bg-rose-50 border border-rose-100 px-2.5 py-0.5 rounded-full">Beta</div>
+                                </Link>
+
+                                <Link 
+                                    href="/tools"
+                                    className="group p-5 rounded-xl border border-border hover:border-fuchsia-200 hover:shadow-sm transition-all bg-surface relative overflow-hidden block"
+                                >
+                                    <div className="w-10 h-10 rounded-lg bg-fuchsia-50 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                                        <Wrench className="w-5 h-5 text-fuchsia-600" />
+                                    </div>
+                                    <h4 className="font-bold text-sm mb-1 text-text-primary">Tools Marketplace</h4>
+                                    <p className="text-xs text-text-muted leading-relaxed">Download desktop tools, activate licenses, and receive auto-updates.</p>
+                                    <div className="absolute top-4 right-4 text-fuchsia-600 text-[9px] uppercase font-bold bg-fuchsia-50 border border-fuchsia-100 px-2.5 py-0.5 rounded-full">
+                                        {activeToolLicenses.length > 0 ? `${activeToolLicenses.length} Active` : 'Explore'}
+                                    </div>
+                                </Link>
                             </div>
                         </OperationalCard>
 
@@ -264,7 +301,58 @@ export default function Dashboard({
                                 <Link href={safeRoute('financial.payout-methods.index')} className="flex items-center px-3 py-2.5 text-sm font-medium text-text-primary hover:bg-surface-raised rounded-lg transition-colors">
                                     <CreditCard className="w-4 h-4 mr-3 text-text-muted" /> Manage Payment Methods
                                 </Link>
+                                <Link href={safeRoute('tools.my-licenses')} className="flex items-center px-3 py-2.5 text-sm font-medium text-text-primary hover:bg-surface-raised rounded-lg transition-colors">
+                                    <Key className="w-4 h-4 mr-3 text-text-muted" /> My Tool Licenses
+                                </Link>
                             </div>
+                        </OperationalCard>
+
+                        {/* My Tools Widget */}
+                        <OperationalCard
+                            title="My Tools"
+                            action={
+                                <Link href={safeRoute('tools.explore')} className="text-[11px] font-bold uppercase tracking-wider text-primary hover:underline transition-colors">
+                                    Browse All
+                                </Link>
+                            }
+                            noPadding
+                        >
+                            {activeToolLicenses.length === 0 ? (
+                                <div className="px-4 py-6 text-center">
+                                    <Wrench className="w-8 h-8 text-slate-300 mx-auto mb-2" />
+                                    <p className="text-xs text-text-muted font-medium">No tools yet</p>
+                                    <Link
+                                        href={safeRoute('tools.explore')}
+                                        className="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-fuchsia-600 hover:text-fuchsia-700"
+                                    >
+                                        <ShoppingBag className="w-3.5 h-3.5" /> Explore Marketplace
+                                    </Link>
+                                </div>
+                            ) : (
+                                <div className="divide-y divide-border/40">
+                                    {activeToolLicenses.slice(0, 4).map((lic) => (
+                                        <div key={lic.license_key} className="flex items-center gap-3 px-4 py-3 hover:bg-surface-raised transition-colors">
+                                            <div className="w-8 h-8 rounded-lg bg-fuchsia-50 flex items-center justify-center flex-shrink-0">
+                                                {lic.tool.icon_url
+                                                    ? <img src={lic.tool.icon_url} alt="" className="w-5 h-5 object-contain" />
+                                                    : <Wrench className="w-4 h-4 text-fuchsia-500" />
+                                                }
+                                            </div>
+                                            <div className="flex-1 min-w-0">
+                                                <p className="text-sm font-medium text-text-primary truncate">{lic.tool.title}</p>
+                                                <p className="text-[10px] text-text-muted">{lic.active_devices}/{lic.max_devices} devices</p>
+                                            </div>
+                                            <Link
+                                                href={safeRoute('tools.download.generate', lic.tool.slug)}
+                                                className="flex-shrink-0 w-7 h-7 rounded-lg bg-slate-100 hover:bg-fuchsia-100 flex items-center justify-center transition-colors"
+                                                title="Download"
+                                            >
+                                                <Download className="w-3.5 h-3.5 text-slate-500 hover:text-fuchsia-600" />
+                                            </Link>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
                         </OperationalCard>
 
                         <OperationalCard 

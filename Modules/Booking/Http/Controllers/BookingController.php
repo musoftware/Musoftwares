@@ -239,18 +239,28 @@ class BookingController extends Controller
     /**
      * Host appointments management view.
      */
-    public function appointments()
+    public function appointments(Request $request)
     {
         $user = Auth::user();
+        $search = $request->input('search');
+
         $bookings = Booking::with(['eventType', 'clientUser'])
             ->whereHas('eventType', function($q) use ($user) {
                 $q->where('user_id', $user->id);
             })
+            ->when($search, function ($q, $search) {
+                $q->where(function ($q2) use ($search) {
+                    $q2->where('guest_name', 'like', "%{$search}%")
+                       ->orWhere('guest_email', 'like', "%{$search}%");
+                });
+            })
             ->latest('starts_at')
-            ->paginate(20);
+            ->paginate(20)
+            ->withQueryString();
             
         return Inertia::render('Booking/Appointments', [
-            'bookings' => $bookings
+            'bookings' => $bookings,
+            'filters' => $request->only(['search'])
         ]);
     }
 

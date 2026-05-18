@@ -20,7 +20,7 @@ import {
     Bell, ChevronDown, Wallet, Menu, Plus, Coins, LogOut, 
     Settings, User, History, Shield, CreditCard, Box, 
     LayoutDashboard, FileText, ArrowRightLeft, ArrowUpRight,
-    MessageSquare, LifeBuoy, Bookmark, Activity, Sparkles, Building2, Briefcase, Megaphone, Play, Lock
+    MessageSquare, LifeBuoy, Bookmark, Activity, Sparkles, Building2, Briefcase, Megaphone, Play, Lock, Calendar, Radar, Wrench
 } from 'lucide-react';
 import CommandPalette from '@/Components/CommandPalette';
 import ProductTourModal from '@/Components/ProductTourModal';
@@ -61,7 +61,10 @@ export default function Authenticated({
     const isErpActive = isRouteActive('erp');
     const isFreelanceActive = isRouteActive('freelance');
     const isMarketplaceActive = isRouteActive('marketplace');
-    const activeModules = auth?.active_modules || { erp: true, freelance: true, marketplace: true };
+    const isBookingActive = isRouteActive('booking');
+    const isIntelligenceActive = isRouteActive('intelligence');
+    const isToolsActive = isRouteActive('tools');
+    const activeModules = auth?.active_modules || { erp: true, freelance: true, marketplace: true, booking: true, intelligence: true, tools: true };
 
     const [isTourOpen, setIsTourOpen] = useState(false);
     const [tourStep, setTourStep] = useState(1);
@@ -286,7 +289,7 @@ export default function Authenticated({
 
                                         <DropdownMenuItem 
                                             className={cn(
-                                                "p-0 outline-none border transition-all cursor-pointer",
+                                                "p-0 mb-1 outline-none border transition-all cursor-pointer",
                                                 isMarketplaceActive ? "bg-violet-50/80 border-violet-100" : "hover:bg-slate-50 border-transparent"
                                             )}
                                             render={<Link href={safeRoute('marketplace.dashboard')} className="flex items-start gap-3 p-2.5 rounded-lg w-full" />}
@@ -304,6 +307,83 @@ export default function Authenticated({
                                                 </div>
                                                 <p className={cn("text-xs truncate", isMarketplaceActive ? "text-violet-700/70" : "text-slate-500")}>
                                                     Services, clients &amp; campaigns
+                                                </p>
+                                            </div>
+                                        </DropdownMenuItem>
+
+                                        <DropdownMenuItem 
+                                            className={cn(
+                                                "p-0 mb-1 outline-none border transition-all cursor-pointer",
+                                                isBookingActive ? "bg-amber-50/80 border-amber-100" : "hover:bg-slate-50 border-transparent"
+                                            )}
+                                            render={<Link href={activeModules.booking ? safeRoute('booking.index') : safeRoute('subscriptions.plans', { module: 'booking' })} className="flex items-start gap-3 p-2.5 rounded-lg w-full" />}
+                                        >
+                                            <div className={cn(
+                                                "w-8 h-8 rounded-md flex items-center justify-center shrink-0 transition-colors",
+                                                isBookingActive ? "bg-amber-100" : "bg-slate-100 group-hover/dropdown-menu-item:bg-amber-50"
+                                            )}>
+                                                <Calendar className={cn("w-4 h-4", isBookingActive ? "text-amber-700" : "text-slate-500 group-hover/dropdown-menu-item:text-amber-600")} />
+                                            </div>
+                                            <div className="flex-1 min-w-0">
+                                                <div className="flex items-center justify-between">
+                                                    <p className={cn("text-sm font-medium", isBookingActive ? "text-amber-900" : "text-slate-900")}>Booking</p>
+                                                    {isBookingActive && <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-amber-100 text-amber-700">Active</span>}
+                                                    {!activeModules.booking && <Lock className="w-3.5 h-3.5 text-slate-400" />}
+                                                    {activeModules.booking && !isBookingActive && <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-amber-100 text-amber-700">Add-on</span>}
+                                                </div>
+                                                <p className={cn("text-xs truncate", isBookingActive ? "text-amber-700/70" : "text-slate-500")}>
+                                                    {!activeModules.booking ? 'Subscribe to access' : 'Appointments & Availability'}
+                                                </p>
+                                            </div>
+                                        </DropdownMenuItem>
+
+                                        <DropdownMenuItem 
+                                            className={cn(
+                                                "p-0 mb-1 outline-none border transition-all cursor-pointer",
+                                                isIntelligenceActive ? "bg-cyan-50/80 border-cyan-100" : "hover:bg-slate-50 border-transparent"
+                                            )}
+                                            render={<Link href={activeModules.intelligence ? safeRoute('intelligence.index') : safeRoute('subscriptions.plans', { module: 'intelligence' })} className="flex items-start gap-3 p-2.5 rounded-lg w-full" />}
+                                        >
+                                            <div className={cn(
+                                                "w-8 h-8 rounded-md flex items-center justify-center shrink-0 transition-colors",
+                                                isIntelligenceActive ? "bg-cyan-100" : "bg-slate-100 group-hover/dropdown-menu-item:bg-cyan-50"
+                                            )}>
+                                                <Radar className={cn("w-4 h-4", isIntelligenceActive ? "text-cyan-700" : "text-slate-500 group-hover/dropdown-menu-item:text-cyan-600")} />
+                                            </div>
+                                            <div className="flex-1 min-w-0">
+                                                <div className="flex items-center justify-between">
+                                                    <p className={cn("text-sm font-medium", isIntelligenceActive ? "text-cyan-900" : "text-slate-900")}>Intelligence</p>
+                                                    {isIntelligenceActive && <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-cyan-100 text-cyan-700">Active</span>}
+                                                    {!activeModules.intelligence && <Lock className="w-3.5 h-3.5 text-slate-400" />}
+                                                    {activeModules.intelligence && !isIntelligenceActive && <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-cyan-100 text-cyan-700">Pro</span>}
+                                                </div>
+                                                <p className={cn("text-xs truncate", isIntelligenceActive ? "text-cyan-700/70" : "text-slate-500")}>
+                                                    {!activeModules.intelligence ? 'Subscribe to access' : 'Market & Ad Tracking'}
+                                                </p>
+                                            </div>
+                                        </DropdownMenuItem>
+
+                                        <DropdownMenuItem 
+                                            className={cn(
+                                                "p-0 outline-none border transition-all cursor-pointer",
+                                                isToolsActive ? "bg-fuchsia-50/80 border-fuchsia-100" : "hover:bg-slate-50 border-transparent"
+                                            )}
+                                            render={<Link href={safeRoute('tools.explore')} className="flex items-start gap-3 p-2.5 rounded-lg w-full" />}
+                                        >
+                                            <div className={cn(
+                                                "w-8 h-8 rounded-md flex items-center justify-center shrink-0 transition-colors",
+                                                isToolsActive ? "bg-fuchsia-100" : "bg-slate-100 group-hover/dropdown-menu-item:bg-fuchsia-50"
+                                            )}>
+                                                <Wrench className={cn("w-4 h-4", isToolsActive ? "text-fuchsia-700" : "text-slate-500 group-hover/dropdown-menu-item:text-fuchsia-600")} />
+                                            </div>
+                                            <div className="flex-1 min-w-0">
+                                                <div className="flex items-center justify-between">
+                                                    <p className={cn("text-sm font-medium", isToolsActive ? "text-fuchsia-900" : "text-slate-900")}>Tools &amp; Plugins</p>
+                                                    {isToolsActive && <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-fuchsia-100 text-fuchsia-700">Active</span>}
+                                                    {!isToolsActive && <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-slate-100 text-slate-500">Free Browse</span>}
+                                                </div>
+                                                <p className={cn("text-xs truncate", isToolsActive ? "text-fuchsia-700/70" : "text-slate-500")}>
+                                                    Extensions &amp; Licensing
                                                 </p>
                                             </div>
                                         </DropdownMenuItem>

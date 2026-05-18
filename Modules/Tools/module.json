@@ -1,0 +1,11 @@
+{
+    "name": "Tools",
+    "alias": "tools",
+    "description": "Downloadable Python Tools Marketplace — subscribe, license, download, activate.",
+    "keywords": ["marketplace", "tools", "downloads", "licenses"],
+    "priority": 0,
+    "providers": [
+        "Modules\\Tools\\Providers\\ToolsServiceProvider"
+    ],
+    "files": []
+}
