@@ -1,0 +1,264 @@
+import React, { useState } from 'react';
+import AppLayout from '@/Layouts/AppLayout';
+import { Head, useForm, router } from '@inertiajs/react';
+import { PageHeader } from '@/Components/ui/PageHeader';
+import { Card, CardContent } from '@/Components/ui/card';
+import { Button } from '@/Components/ui/button';
+import { Input } from '@/Components/ui/input';
+import { Badge } from '@/Components/ui/badge';
+import { Textarea } from '@/Components/ui/textarea';
+import { 
+    DropdownMenu, 
+    DropdownMenuContent, 
+    DropdownMenuItem, 
+    DropdownMenuLabel, 
+    DropdownMenuSeparator, 
+    DropdownMenuTrigger 
+} from '@/Components/ui/dropdown-menu';
+import { 
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from "@/Components/ui/dialog";
+import EmptyState from '@/Components/ui/EmptyState';
+import { format } from 'date-fns';
+import { Calendar, Clock, CreditCard, ExternalLink, MoreVertical, Search, UserCircle2, Briefcase, FileText, CheckCircle, XCircle } from 'lucide-react';
+
+export default function Appointments({ bookings }: any) {
+    const [search, setSearch] = useState('');
+    const [selectedBooking, setSelectedBooking] = useState<any>(null);
+    const [isNotesModalOpen, setIsNotesModalOpen] = useState(false);
+    const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
+    
+    const { data: notesData, setData: setNotesData, post: postNotes, processing: processingNotes } = useForm({
+        internal_notes: ''
+    });
+
+    const openNotesModal = (booking: any) => {
+        setSelectedBooking(booking);
+        setNotesData('internal_notes', booking.internal_notes || '');
+        setIsNotesModalOpen(true);
+    };
+
+    const handleSaveNotes = (e: React.FormEvent) => {
+        e.preventDefault();
+        postNotes(route('booking.appointments.notes', selectedBooking.id), {
+            onSuccess: () => setIsNotesModalOpen(false)
+        });
+    };
+
+    const handleUpdateStatus = (id: number, status: string) => {
+        router.post(route('booking.appointments.status', id), { status }, {
+            preserveScroll: true
+        });
+    };
+
+    const handleCreateProject = (id: number) => {
+        router.post(route('booking.appointments.create-project', id), {}, {
+            preserveScroll: true,
+            onSuccess: () => setIsProjectModalOpen(false)
+        });
+    };
+    
+    const handleCreateInvoice = (id: number) => {
+        router.post(route('booking.appointments.create-invoice', id), {}, {
+            preserveScroll: true
+        });
+    };
+
+    const getStatusBadge = (status: string) => {
+        const variants: Record<string, string> = {
+            pending: 'bg-amber-100 text-amber-800 hover:bg-amber-100',
+            confirmed: 'bg-blue-100 text-blue-800 hover:bg-blue-100',
+            completed: 'bg-emerald-100 text-emerald-800 hover:bg-emerald-100',
+            cancelled: 'bg-slate-100 text-slate-800 hover:bg-slate-100',
+        };
+        return <Badge className={`font-medium ${variants[status] || 'bg-slate-100'}`}>{status.charAt(0).toUpperCase() + status.slice(1)}</Badge>;
+    };
+
+    const getPaymentBadge = (status: string, method?: string) => {
+        if (status === 'free') return <Badge variant="outline" className="text-slate-500">Free</Badge>;
+        if (status === 'pending') return <Badge variant="outline" className="text-amber-600 border-amber-200">Payment Pending</Badge>;
+        if (status === 'paid') return <Badge variant="outline" className="text-emerald-600 border-emerald-200 bg-emerald-50">Paid via {method}</Badge>;
+        return null;
+    };
+
+    return (
+        <AppLayout>
+            <Head title="Appointments" />
+
+            <div className="max-w-6xl mx-auto py-8 px-4 sm:px-6 lg:px-8 space-y-8">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                    <PageHeader 
+                        title="Appointments" 
+                        description="Manage your bookings, consultations, and operational pipeline."
+                    />
+                    
+                    <div className="relative w-full sm:w-72">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                        <Input 
+                            placeholder="Search by guest name or email..." 
+                            value={search}
+                            onChange={e => setSearch(e.target.value)}
+                            className="pl-9 bg-white"
+                        />
+                    </div>
+                </div>
+
+                {bookings.data.length === 0 ? (
+                    <EmptyState 
+                        icon={Calendar}
+                        title="No appointments yet"
+                        description="Share your booking links to start receiving appointments from clients."
+                        action={{
+                            label: "View Event Types",
+                            href: route('booking.index')
+                        }}
+                    />
+                ) : (
+                    <div className="space-y-4">
+                        {bookings.data.map((booking: any) => (
+                            <Card key={booking.id} className="overflow-hidden border-slate-200/60 shadow-sm transition-shadow hover:shadow-md">
+                                <div className="flex flex-col md:flex-row">
+                                    {/* Left Status Bar */}
+                                    <div className="w-full md:w-48 bg-slate-50 p-6 flex flex-col justify-center border-b md:border-b-0 md:border-r border-slate-100">
+                                        <div className="text-sm text-slate-500 font-medium mb-1">
+                                            {format(new Date(booking.starts_at), 'MMM d, yyyy')}
+                                        </div>
+                                        <div className="text-lg font-semibold text-slate-900 mb-4">
+                                            {format(new Date(booking.starts_at), 'h:mm a')}
+                                        </div>
+                                        <div className="flex flex-col items-start gap-2">
+                                            {getStatusBadge(booking.status)}
+                                            {getPaymentBadge(booking.payment_status, booking.payment_method)}
+                                        </div>
+                                    </div>
+                                    
+                                    {/* Center Content */}
+                                    <div className="flex-1 p-6">
+                                        <div className="flex justify-between items-start">
+                                            <div>
+                                                <h3 className="text-lg font-medium text-slate-900 mb-1">{booking.eventType.title}</h3>
+                                                
+                                                <div className="flex items-center text-slate-600 mb-4">
+                                                    <UserCircle2 className="h-4 w-4 mr-2 text-slate-400" />
+                                                    <span className="font-medium mr-2">{booking.guest_name}</span>
+                                                    <span className="text-sm text-slate-500">({booking.guest_email})</span>
+                                                </div>
+                                                
+                                                {booking.notes && (
+                                                    <div className="bg-slate-50 rounded-lg p-3 text-sm text-slate-600 border border-slate-100 mt-2">
+                                                        <span className="font-medium block text-slate-700 mb-1">Guest Notes:</span>
+                                                        {booking.notes}
+                                                    </div>
+                                                )}
+                                                
+                                                {booking.internal_notes && (
+                                                    <div className="bg-amber-50 rounded-lg p-3 text-sm text-amber-800 border border-amber-100 mt-2">
+                                                        <span className="font-medium block mb-1">Internal Notes:</span>
+                                                        {booking.internal_notes}
+                                                    </div>
+                                                )}
+                                            </div>
+                                            
+                                            <div className="flex flex-col items-end gap-2 text-sm text-slate-500">
+                                                <div className="flex items-center">
+                                                    <Clock className="h-4 w-4 mr-1.5" /> {booking.eventType.duration_minutes}m
+                                                </div>
+                                                {booking.price && (
+                                                    <div className="flex items-center">
+                                                        <CreditCard className="h-4 w-4 mr-1.5" /> {booking.price} {booking.currency}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    {/* Right Actions */}
+                                    <div className="p-4 md:p-6 bg-white border-t md:border-t-0 md:border-l border-slate-100 flex md:flex-col items-center justify-end gap-2 md:w-16">
+                                        <DropdownMenu>
+                                            <DropdownMenuTrigger asChild>
+                                                <Button variant="ghost" size="icon" className="h-8 w-8">
+                                                    <MoreVertical className="h-4 w-4 text-slate-500" />
+                                                </Button>
+                                            </DropdownMenuTrigger>
+                                            <DropdownMenuContent align="end" className="w-56">
+                                                <DropdownMenuLabel>Manage Appointment</DropdownMenuLabel>
+                                                <DropdownMenuSeparator />
+                                                
+                                                {/* Status Actions */}
+                                                {booking.status === 'pending' && (
+                                                    <DropdownMenuItem onClick={() => handleUpdateStatus(booking.id, 'confirmed')}>
+                                                        <CheckCircle className="h-4 w-4 mr-2 text-slate-500" /> Confirm Booking
+                                                    </DropdownMenuItem>
+                                                )}
+                                                {(booking.status === 'confirmed' || booking.status === 'pending') && (
+                                                    <DropdownMenuItem onClick={() => handleUpdateStatus(booking.id, 'cancelled')}>
+                                                        <XCircle className="h-4 w-4 mr-2 text-slate-500" /> Cancel Booking
+                                                    </DropdownMenuItem>
+                                                )}
+                                                {booking.status === 'confirmed' && (
+                                                    <DropdownMenuItem onClick={() => handleUpdateStatus(booking.id, 'completed')}>
+                                                        <CheckCircle className="h-4 w-4 mr-2 text-slate-500" /> Mark Completed
+                                                    </DropdownMenuItem>
+                                                )}
+
+                                                <DropdownMenuSeparator />
+                                                
+                                                <DropdownMenuItem onClick={() => openNotesModal(booking)}>
+                                                    <FileText className="h-4 w-4 mr-2 text-slate-500" /> Internal Notes
+                                                </DropdownMenuItem>
+
+                                                <DropdownMenuSeparator />
+                                                <DropdownMenuLabel className="text-xs text-slate-500">Pipeline Workflow</DropdownMenuLabel>
+                                                
+                                                <DropdownMenuItem onClick={() => handleCreateProject(booking.id)}>
+                                                    <Briefcase className="h-4 w-4 mr-2 text-slate-500" /> Convert to Project
+                                                </DropdownMenuItem>
+                                                <DropdownMenuItem onClick={() => handleCreateInvoice(booking.id)}>
+                                                    <CreditCard className="h-4 w-4 mr-2 text-slate-500" /> Generate Invoice
+                                                </DropdownMenuItem>
+                                            </DropdownMenuContent>
+                                        </DropdownMenu>
+                                    </div>
+                                </div>
+                            </Card>
+                        ))}
+                    </div>
+                )}
+            </div>
+
+            {/* Notes Modal */}
+            <Dialog open={isNotesModalOpen} onOpenChange={setIsNotesModalOpen}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Internal Notes</DialogTitle>
+                        <DialogDescription>
+                            Add private notes for this appointment. The guest will not see this.
+                        </DialogDescription>
+                    </DialogHeader>
+                    
+                    <form onSubmit={handleSaveNotes} className="space-y-4 py-4">
+                        <Textarea 
+                            value={notesData.internal_notes}
+                            onChange={e => setNotesData('internal_notes', e.target.value)}
+                            placeholder="Add your notes here..."
+                            rows={5}
+                        />
+                        <DialogFooter>
+                            <Button type="button" variant="outline" onClick={() => setIsNotesModalOpen(false)}>
+                                Cancel
+                            </Button>
+                            <Button type="submit" disabled={processingNotes}>
+                                Save Notes
+                            </Button>
+                        </DialogFooter>
+                    </form>
+                </DialogContent>
+            </Dialog>
+        </AppLayout>
+    );
+}

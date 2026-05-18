@@ -22,19 +22,19 @@ export function PageHeader({
             {breadcrumbs && breadcrumbs.length > 0 && (
                 <Breadcrumbs items={breadcrumbs} />
             )}
-            <div className="flex items-start justify-between">
+            <div className="flex items-start justify-between border-b border-slate-100 pb-6">
                 <div className="flex items-center space-x-4">
                     {Icon && (
-                        <div className="bg-primary-light flex h-10 w-10 shrink-0 items-center justify-center rounded-full">
-                            <Icon className="text-primary h-5 w-5" />
+                        <div className="bg-indigo-50 flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-indigo-100">
+                            <Icon className="text-indigo-600 h-5 w-5" />
                         </div>
                     )}
                     <div>
-                        <h1 className="font-sora text-text-primary text-[18px] font-semibold">
+                        <h1 className="font-sans text-slate-900 text-2xl font-semibold tracking-tight">
                             {title}
                         </h1>
                         {subtitle && (
-                            <p className="text-text-muted mt-1 font-sans text-[13px]">
+                            <p className="text-slate-500 mt-1 font-sans text-sm">
                                 {subtitle}
                             </p>
                         )}

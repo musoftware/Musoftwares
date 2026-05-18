@@ -176,6 +176,13 @@ class WalletController extends Controller
                 ]);
 
                 $wallet->update(['balance' => $newBalance]);
+
+                \Modules\ERP\Services\ActivityLogger::log(
+                    'wallet_credited',
+                    "Wallet credited by " . \Modules\Core\Services\CurrencyFormatter::format($amount, $businessCurrency) . " for: " . $request->input('note'),
+                    null,
+                    $clientModel->id
+                );
             });
 
             return back()->with('success', 'Wallet audited credited successfully.');
@@ -230,6 +237,13 @@ class WalletController extends Controller
                 ]);
 
                 $wallet->update(['balance' => $newBalance]);
+
+                \Modules\ERP\Services\ActivityLogger::log(
+                    'wallet_debited',
+                    "Wallet debited by " . \Modules\Core\Services\CurrencyFormatter::format($amount, $businessCurrency) . " for: " . $request->input('note'),
+                    null,
+                    $clientModel->id
+                );
             });
 
             return back()->with('success', 'Wallet audited debited successfully.');

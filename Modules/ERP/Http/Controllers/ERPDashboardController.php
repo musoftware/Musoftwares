@@ -9,6 +9,9 @@ use Modules\ERP\Models\Invoice;
 use Modules\ERP\Models\TenantClient;
 use Modules\ERP\Models\RecurringEntry;
 use Modules\ERP\Models\Tenant;
+use Modules\ERP\Models\Project;
+use Modules\ERP\Models\SupportTicket;
+use Modules\ERP\Models\Activity;
 use Modules\Core\Services\ExchangeRateService;
 use Inertia\Inertia;
 use Carbon\Carbon;
@@ -152,6 +155,66 @@ class ERPDashboardController extends Controller
             }
         }
 
+        // ── Real Projects List ─────────────────────────────────────
+        $projects = collect();
+        if ($tenantId) {
+            $projects = Project::with('client')
+                ->where('tenant_id', $tenantId)
+                ->latest()
+                ->limit(10)
+                ->get()
+                ->map(function ($project) {
+                    return [
+                        'id' => $project->id,
+                        'name' => $project->name,
+                        'client' => $project->client?->name ?? 'Unknown',
+                        'status' => $project->status,
+                        'budget' => round($project->budget, 2),
+                        'deadline' => $project->due_date?->format('Y-m-d') ?? '-',
+                        'progress' => $project->status === 'completed' ? 100 : ($project->status === 'in_progress' ? 50 : 0),
+                        'leader' => $project->creator?->name ?? '-',
+                    ];
+                });
+        }
+
+        // ── Real Support Tickets ──────────────────────────────────
+        $supportTickets = collect();
+        if ($tenantId) {
+            $supportTickets = SupportTicket::with('client')
+                ->where('tenant_id', $tenantId)
+                ->latest()
+                ->limit(10)
+                ->get()
+                ->map(function ($ticket) {
+                    return [
+                        'id' => $ticket->id,
+                        'title' => $ticket->subject,
+                        'client' => $ticket->client?->name ?? 'Unknown',
+                        'priority' => ucfirst($ticket->priority),
+                        'status' => ucfirst($ticket->status),
+                        'date' => $ticket->created_at?->format('Y-m-d'),
+                    ];
+                });
+        }
+
+        // ── Real Activity Logs ────────────────────────────────────
+        $activityLogs = collect();
+        if ($tenantId) {
+            $activityLogs = Activity::with('causer')
+                ->where('tenant_id', $tenantId)
+                ->latest()
+                ->limit(15)
+                ->get()
+                ->map(function ($activity) {
+                    return [
+                        'title' => $activity->action,
+                        'time' => $activity->created_at?->diffForHumans(),
+                        'description' => $activity->description,
+                        'user' => $activity->causer?->name ?? 'System',
+                    ];
+                });
+        }
+
         $stats = [
             'totalRevenue' => round($totalPaidRevenue, 2),
             'outstandingRevenue' => round($outstandingRevenue, 2),
@@ -161,11 +224,29 @@ class ERPDashboardController extends Controller
             'businessCurrency' => $businessCurrency,
         ];
 
+        // ── Upcoming Bookings ─────────────────────────────────────
+        $upcomingBookings = collect();
+        if ($tenantId) {
+            $upcomingBookings = \Modules\Booking\Models\Booking::with('eventType')
+                ->whereHas('eventType', function($q) use ($user) {
+                    $q->where('user_id', $user->id);
+                })
+                ->where('starts_at', '>=', now())
+                ->whereIn('status', ['confirmed', 'paid'])
+                ->orderBy('starts_at', 'asc')
+                ->take(5)
+                ->get();
+        }
+
         return Inertia::render('ERP/Dashboard', [
             'stats' => $stats,
             'clients' => $clients,
             'invoices' => $invoices,
             'chartData' => $chartData,
+            'projects' => $projects,
+            'supportTickets' => $supportTickets,
+            'activityLogs' => $activityLogs,
+            'upcomingBookings' => $upcomingBookings,
         ]);
     }
 
@@ -200,6 +281,13 @@ class ERPDashboardController extends Controller
             ['balance' => 0, 'currency' => $client->currency]
         );
 
+        \Modules\ERP\Services\ActivityLogger::log(
+            'client_created',
+            "Client '{$client->name}' was added.",
+            $client,
+            $client->id
+        );
+
         return back()->with('success', 'Client created successfully.');
     }
 
@@ -214,6 +302,13 @@ class ERPDashboardController extends Controller
         ]);
 
         $client->update($validated);
+
+        \Modules\ERP\Services\ActivityLogger::log(
+            'client_updated',
+            "Client '{$client->name}' profile was updated.",
+            $client,
+            $client->id
+        );
 
         return back()->with('success', 'Client updated successfully.');
     }

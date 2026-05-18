@@ -46,7 +46,8 @@ import {
     X,
     UserPlus,
     Sliders,
-    AlertCircle
+    AlertCircle,
+    Cloud, Database, Link as LinkIcon, HardDrive, Key, CheckCircle, SearchCode, Lock
 } from 'lucide-react';
 import { Button, buttonVariants } from '@/Components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/Components/ui/card';
@@ -63,12 +64,8 @@ import { StatCard } from '@/Components/ui/StatCard';
 import { PageHeader } from '@/Components/ui/PageHeader';
 import { CurrencyDisplay } from '@/Components/ui/CurrencyDisplay';
 
-// Inline premium helpers for the workspace styling
-const SectionCard = ({ children, className }: { children: React.ReactNode; className?: string }) => (
-    <Card className={`shadow-sm border border-slate-100 overflow-hidden bg-white rounded-xl ${className}`}>
-        {children}
-    </Card>
-);
+import { SectionCard } from '@/Components/ui/SectionCard';
+import { StatusBadge } from '@/Components/ui/StatusBadge';
 
 // High-fidelity Financial Amount display using standard font-mono
 export function FinancialAmount({ amount, currency = 'USD', colorize = false }: { amount: number; currency?: string; colorize?: boolean }) {
@@ -91,16 +88,29 @@ export function FinancialAmount({ amount, currency = 'USD', colorize = false }: 
 
 // Activity Timeline with sleek vertical indicator
 export function ActivityTimeline({ items }: { items: Array<any> }) {
+    const getIconForAction = (action: string) => {
+        if (!action) return <Activity className="h-3.5 w-3.5 text-slate-400" />;
+        const a = action.toLowerCase();
+        if (a.includes('invoice_paid')) return <DollarSign className="h-3.5 w-3.5 text-emerald-500" />;
+        if (a.includes('invoice')) return <FileText className="h-3.5 w-3.5 text-indigo-500" />;
+        if (a.includes('client')) return <Users className="h-3.5 w-3.5 text-blue-500" />;
+        if (a.includes('project')) return <Briefcase className="h-3.5 w-3.5 text-amber-500" />;
+        if (a.includes('ticket')) return <LifeBuoy className="h-3.5 w-3.5 text-rose-500" />;
+        if (a.includes('wallet_credit')) return <ArrowUpRight className="h-3.5 w-3.5 text-emerald-500" />;
+        if (a.includes('wallet_debit')) return <CornerDownRight className="h-3.5 w-3.5 text-rose-500" />;
+        return <Activity className="h-3.5 w-3.5 text-slate-400" />;
+    };
+
     return (
         <div className="relative border-l border-slate-200 pl-6 ml-3 space-y-6 py-2">
             {items.map((item, idx) => (
                 <div key={idx} className="relative">
                     <span className="absolute -left-[31px] top-1 bg-white border border-slate-200 rounded-full p-1 flex items-center justify-center shadow-sm">
-                        {item.icon || <Activity className="h-3.5 w-3.5 text-slate-400" />}
+                        {item.icon || getIconForAction(item.title)}
                     </span>
                     <div>
                         <div className="flex items-center justify-between text-xs mb-1">
-                            <span className="font-semibold text-slate-700">{item.title}</span>
+                            <span className="font-semibold text-slate-700 capitalize">{item.title?.replace(/_/g, ' ')}</span>
                             <span className="text-slate-400 font-mono">{item.time}</span>
                         </div>
                         <p className="text-[13px] text-slate-500 leading-relaxed">{item.description}</p>
@@ -152,9 +162,13 @@ interface ERPDashboardProps {
         Sales: number;
         Costs: number;
     }>;
+    projects?: Array<any>;
+    supportTickets?: Array<any>;
+    activityLogs?: Array<any>;
+    upcomingBookings?: Array<any>;
 }
 
-export default function ERPDashboard({ stats: serverStats, clients: serverClients, invoices: serverInvoices, chartData: serverChartData }: ERPDashboardProps) {
+export default function ERPDashboard({ stats: serverStats, clients: serverClients, invoices: serverInvoices, chartData: serverChartData, projects: serverProjects, supportTickets: serverTickets, activityLogs: serverActivityLogs, upcomingBookings: serverBookings }: ERPDashboardProps) {
     const { toast } = useToast();
     const [currentSection, setCurrentSection] = useState('overview');
 
@@ -197,7 +211,7 @@ export default function ERPDashboard({ stats: serverStats, clients: serverClient
     // ────────────────────────────────────────────────────────
     // WORKSPACE SIMULATED DB SEEDS (High fidelity interactive fallbacks)
     // ────────────────────────────────────────────────────────
-    const [projects, setProjects] = useState<Array<any>>([
+    const [projects, setProjects] = useState<Array<any>>(serverProjects && serverProjects.length > 0 ? serverProjects : [
         { id: 1, name: 'Acme Corporate Redesign', client: 'Acme Corp Solutions', status: 'Active', budget: 15000, deadline: '2026-08-30', progress: 65, leader: 'Sarah Lin' },
         { id: 2, name: 'Mobile Banking App SOW', client: 'Globex Financials', status: 'Planning', budget: 28000, deadline: '2026-10-15', progress: 15, leader: 'Alex Rivera' },
         { id: 3, name: 'SEO & Growth Campaign', client: 'Nexus Tech Inc', status: 'Completed', budget: 4500, deadline: '2026-05-10', progress: 100, leader: 'John Doe' },
@@ -226,14 +240,21 @@ export default function ERPDashboard({ stats: serverStats, clients: serverClient
     const [expenseForm, setExpenseForm] = useState({ title: '', category: 'Software', amount: '', date: '', status: 'Pending' });
     const [showAddExpenseModal, setShowAddExpenseModal] = useState(false);
 
+    const [storageProviders, setStorageProviders] = useState<Array<any>>([
+        { id: 1, name: 'AWS S3 Core', driver: 's3', bucket: 'musoftware-erp-prod', status: 'Connected', isDefault: true },
+        { id: 2, name: 'Cloudflare R2 Backup', driver: 's3', bucket: 'erp-archive-r2', status: 'Connected', isDefault: false }
+    ]);
+    const [showAddProviderModal, setShowAddProviderModal] = useState(false);
+    const [providerForm, setProviderForm] = useState({ name: '', driver: 's3', bucket: '', key: '', secret: '', endpoint: '', region: '' });
+
     const [documents, setDocuments] = useState<Array<any>>([
-        { id: 1, name: 'MSA_Acme_Corp_Signed.pdf', size: '2.4 MB', type: 'Contract', date: '2026-05-01', uploadedBy: 'Sarah Lin' },
-        { id: 2, name: 'Receipt_Vercel_Hosting.pdf', size: '142 KB', type: 'Receipt', date: '2026-05-03', uploadedBy: 'Jane Doe' },
-        { id: 3, name: 'Globex_App_SOW_Draft.docx', size: '890 KB', type: 'Proposal', date: '2026-05-08', uploadedBy: 'Alex Rivera' },
-        { id: 4, name: 'W9_Tax_Document.pdf', size: '1.1 MB', type: 'Tax', date: '2026-04-12', uploadedBy: 'John Doe' }
+        { id: 1, name: 'MSA_Acme_Corp_Signed.pdf', size: '2.4 MB', type: 'Contract', date: '2026-05-01', uploadedBy: 'Sarah Lin', provider: 'AWS S3 Core', tags: ['Legal', 'Client'] },
+        { id: 2, name: 'Receipt_Vercel_Hosting.pdf', size: '142 KB', type: 'Receipt', date: '2026-05-03', uploadedBy: 'Jane Doe', provider: 'Cloudflare R2 Backup', tags: ['Expense'] },
+        { id: 3, name: 'Globex_App_SOW_Draft.docx', size: '890 KB', type: 'Proposal', date: '2026-05-08', uploadedBy: 'Alex Rivera', provider: 'AWS S3 Core', tags: ['Draft'] },
+        { id: 4, name: 'W9_Tax_Document.pdf', size: '1.1 MB', type: 'Tax', date: '2026-04-12', uploadedBy: 'John Doe', provider: 'AWS S3 Core', tags: ['Tax', 'Internal'] }
     ]);
     const [showAddDocModal, setShowAddDocModal] = useState(false);
-    const [docForm, setDocForm] = useState({ name: '', type: 'Contract' });
+    const [docForm, setDocForm] = useState({ name: '', type: 'Contract', provider: 'AWS S3 Core' });
 
     const [contracts, setContracts] = useState<Array<any>>([
         { id: 1, title: 'Master Services Agreement (MSA)', client: 'Acme Corp Solutions', status: 'Signed', date: '2026-05-01', value: 15000 },
@@ -251,7 +272,7 @@ export default function ERPDashboard({ stats: serverStats, clients: serverClient
     const [selectedNote, setSelectedNote] = useState<any>(notes[0]);
     const [noteEditor, setNoteEditor] = useState({ title: notes[0]?.title || '', content: notes[0]?.content || '', category: notes[0]?.category || 'Internal' });
 
-    const [supportTickets, setSupportTickets] = useState<Array<any>>([
+    const [supportTickets, setSupportTickets] = useState<Array<any>>(serverTickets && serverTickets.length > 0 ? serverTickets : [
         { id: 101, title: 'Invoice #INV-2900 double charged', client: 'Acme Corp Solutions', priority: 'High', status: 'Open', date: '2026-05-17' },
         { id: 102, title: 'Unable to upload receipts in panel', client: 'Globex Financials', priority: 'Medium', status: 'In Progress', date: '2026-05-16' },
         { id: 103, title: 'Need multi-currency billing enabled', client: 'Nexus Tech Inc', priority: 'Low', status: 'Resolved', date: '2026-05-12' }
@@ -266,7 +287,7 @@ export default function ERPDashboard({ stats: serverStats, clients: serverClient
         { id: 4, name: 'Alex Rivera', email: 'alex@musoftware.com', role: 'Staff', status: 'Away', activities: 9 }
     ]);
 
-    const [activityLogs, setActivityLogs] = useState<Array<any>>([
+    const [activityLogs, setActivityLogs] = useState<Array<any>>(serverActivityLogs && serverActivityLogs.length > 0 ? serverActivityLogs : [
         { title: 'Invoice #INV-4929 Issued', time: '10 mins ago', description: 'Simulated Invoice #INV-4929 sent directly to Globex Financials', user: 'Jane Doe' },
         { title: 'New Client created', time: '1 hour ago', description: 'Acme Corp Solutions client record established with active USD currency', user: 'Sarah Lin' },
         { title: 'Project milestone finalized', time: '3 hours ago', description: 'Sleek design system completed for Acme Corporate Redesign', user: 'Alex Rivera' },
@@ -430,6 +451,24 @@ export default function ERPDashboard({ stats: serverStats, clients: serverClient
         toast({ description: 'Expense recorded successfully.' });
     };
 
+    // Add Storage Provider
+    const handleAddProvider = (e: React.FormEvent) => {
+        e.preventDefault();
+        const newProv = {
+            id: storageProviders.length + 1,
+            name: providerForm.name,
+            driver: providerForm.driver,
+            bucket: providerForm.bucket,
+            status: 'Connected',
+            isDefault: storageProviders.length === 0
+        };
+        setStorageProviders(prev => [...prev, newProv]);
+        setShowAddProviderModal(false);
+        setProviderForm({ name: '', driver: 's3', bucket: '', key: '', secret: '', endpoint: '', region: '' });
+        prependActivity('Storage Integration', `Connected ${newProv.name} (${newProv.driver}) bucket ${newProv.bucket} to Workspace.`);
+        toast({ description: 'Storage Provider connected successfully.' });
+    };
+
     // Add Document
     const handleAddDoc = (e: React.FormEvent) => {
         e.preventDefault();
@@ -439,13 +478,15 @@ export default function ERPDashboard({ stats: serverStats, clients: serverClient
             size: '412 KB',
             type: docForm.type,
             date: new Date().toISOString().split('T')[0],
-            uploadedBy: 'You'
+            uploadedBy: 'You',
+            provider: docForm.provider,
+            tags: [docForm.type]
         };
         setDocuments(prev => [...prev, newDoc]);
         setShowAddDocModal(false);
-        setDocForm({ name: '', type: 'Contract' });
-        prependActivity('Document Vault Upload', `Securely stored contract asset: ${newDoc.name}`);
-        toast({ description: 'Asset committed to Document Vault.' });
+        setDocForm({ name: '', type: 'Contract', provider: storageProviders[0]?.name || 'Local' });
+        prependActivity('Direct Cloud Upload', `Stored asset: ${newDoc.name} directly to ${newDoc.provider}`);
+        toast({ description: 'Asset securely transmitted to cloud storage.' });
     };
 
     // Add Project
@@ -645,42 +686,26 @@ export default function ERPDashboard({ stats: serverStats, clients: serverClient
                                 </div>
 
                                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                                    <div className="bg-white p-5 rounded-xl border border-slate-100 shadow-sm flex flex-col gap-3">
-                                        <div className="text-sm font-medium text-slate-500 flex items-center gap-2">
-                                            <DollarSign className="h-4 w-4 text-slate-400" />
-                                            Total Revenue
-                                        </div>
-                                        <div className="text-2xl font-semibold text-slate-900">
-                                            {new Intl.NumberFormat('en-US', { style: 'currency', currency }).format(stats.totalRevenue)}
-                                        </div>
-                                    </div>
-                                    <div className="bg-white p-5 rounded-xl border border-slate-100 shadow-sm flex flex-col gap-3">
-                                        <div className="text-sm font-medium text-slate-500 flex items-center gap-2">
-                                            <Clock className="h-4 w-4 text-slate-400" />
-                                            Outstanding
-                                        </div>
-                                        <div className="text-2xl font-semibold text-slate-900">
-                                            {new Intl.NumberFormat('en-US', { style: 'currency', currency }).format(stats.outstandingRevenue)}
-                                        </div>
-                                    </div>
-                                    <div className="bg-white p-5 rounded-xl border border-slate-100 shadow-sm flex flex-col gap-3">
-                                        <div className="text-sm font-medium text-slate-500 flex items-center gap-2">
-                                            <Users className="h-4 w-4 text-slate-400" />
-                                            Active Clients
-                                        </div>
-                                        <div className="text-2xl font-semibold text-slate-900">
-                                            {activeClients.length}
-                                        </div>
-                                    </div>
-                                    <div className="bg-white p-5 rounded-xl border border-slate-100 shadow-sm flex flex-col gap-3">
-                                        <div className="text-sm font-medium text-slate-500 flex items-center gap-2">
-                                            <Layers className="h-4 w-4 text-slate-400" />
-                                            Subscriptions
-                                        </div>
-                                        <div className="text-2xl font-semibold text-slate-900">
-                                            {stats.recurringCount}
-                                        </div>
-                                    </div>
+                                    <StatCard 
+                                        label="Total Revenue"
+                                        value={new Intl.NumberFormat('en-US', { style: 'currency', currency }).format(stats.totalRevenue)}
+                                        icon={DollarSign}
+                                    />
+                                    <StatCard 
+                                        label="Outstanding"
+                                        value={new Intl.NumberFormat('en-US', { style: 'currency', currency }).format(stats.outstandingRevenue)}
+                                        icon={Clock}
+                                    />
+                                    <StatCard 
+                                        label="Active Clients"
+                                        value={activeClients.length}
+                                        icon={Users}
+                                    />
+                                    <StatCard 
+                                        label="Subscriptions"
+                                        value={stats.recurringCount}
+                                        icon={Layers}
+                                    />
                                 </div>
 
                                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -688,68 +713,55 @@ export default function ERPDashboard({ stats: serverStats, clients: serverClient
                                     {/* Main Content Column */}
                                     <div className="lg:col-span-2 space-y-8">
                                         
-                                        {/* Active Projects */}
-                                        <div>
-                                            <div className="flex items-center justify-between mb-4">
-                                                <h3 className="text-sm font-semibold text-slate-900">Active Projects</h3>
-                                                <button onClick={() => setCurrentSection('projects')} className="text-sm text-slate-500 hover:text-slate-900 transition-colors">View all</button>
-                                            </div>
+                                        <SectionCard title="Active Projects" action={<button onClick={() => setCurrentSection('projects')} className="text-sm text-primary hover:underline transition-colors">View all</button>}>
                                             <div className="space-y-3">
                                                 {projects.filter(p => p.status === 'Active' || p.status === 'Planning').slice(0, 3).map((proj) => (
-                                                    <div key={proj.id} className="group bg-white border border-slate-100 p-4 rounded-xl shadow-sm hover:border-slate-200 transition-all cursor-pointer" onClick={() => setCurrentSection('projects')}>
+                                                    <div key={proj.id} className="group border border-border p-4 rounded-xl hover:bg-surface-raised transition-all cursor-pointer" onClick={() => setCurrentSection('projects')}>
                                                         <div className="flex items-start justify-between">
                                                             <div>
-                                                                <h4 className="font-medium text-slate-900 text-sm group-hover:text-indigo-600 transition-colors">{proj.name}</h4>
-                                                                <p className="text-sm text-slate-500 mt-1">{proj.client}</p>
+                                                                <h4 className="font-medium text-text-primary text-sm group-hover:text-primary transition-colors">{proj.name}</h4>
+                                                                <p className="text-sm text-text-muted mt-1">{proj.client}</p>
                                                             </div>
                                                             <div className="text-right">
-                                                                <span className="text-sm font-medium text-slate-900">{proj.progress}%</span>
+                                                                <span className="text-sm font-medium text-text-primary">{proj.progress}%</span>
                                                             </div>
                                                         </div>
-                                                        <div className="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden mt-4">
-                                                            <div className="bg-slate-900 h-full rounded-full transition-all" style={{ width: `${proj.progress}%` }} />
+                                                        <div className="w-full bg-border/40 h-1.5 rounded-full overflow-hidden mt-4">
+                                                            <div className="bg-primary h-full rounded-full transition-all" style={{ width: `${proj.progress}%` }} />
                                                         </div>
                                                     </div>
                                                 ))}
                                             </div>
-                                        </div>
+                                        </SectionCard>
 
-                                        {/* Recent Invoices */}
-                                        <div>
-                                            <div className="flex items-center justify-between mb-4">
-                                                <h3 className="text-sm font-semibold text-slate-900">Recent Invoices</h3>
-                                                <button onClick={() => setCurrentSection('invoices')} className="text-sm text-slate-500 hover:text-slate-900 transition-colors">View all</button>
-                                            </div>
-                                            <div className="bg-white border border-slate-100 rounded-xl shadow-sm overflow-hidden">
-                                                <div className="divide-y divide-slate-100">
-                                                    {activeInvoices.length === 0 ? (
-                                                        <div className="p-8 text-center text-slate-500 text-sm">No recent invoices found.</div>
-                                                    ) : (
-                                                        activeInvoices.slice(0, 4).map((inv) => (
-                                                            <div key={inv.id} className="p-4 hover:bg-slate-50 transition-colors flex items-center justify-between">
-                                                                <div className="flex items-center gap-4">
-                                                                    <div className="h-10 w-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-600">
-                                                                        <FileText className="h-4 w-4" />
-                                                                    </div>
-                                                                    <div>
-                                                                        <span className="font-medium text-slate-900 text-sm block">{inv.clientName}</span>
-                                                                        <span className="text-slate-500 block text-xs mt-0.5">{inv.invoiceNumber} • Due {formatDate(inv.dueDate)}</span>
-                                                                    </div>
+                                        <SectionCard title="Recent Invoices" noPadding action={<button onClick={() => setCurrentSection('invoices')} className="text-sm text-primary hover:underline transition-colors">View all</button>}>
+                                            <div className="divide-y divide-border/40">
+                                                {activeInvoices.length === 0 ? (
+                                                    <EmptyState 
+                                                        icon={FileText}
+                                                        title="No recent invoices"
+                                                    />
+                                                ) : (
+                                                    activeInvoices.slice(0, 4).map((inv) => (
+                                                        <div key={inv.id} className="p-4 hover:bg-surface-raised transition-colors flex items-center justify-between">
+                                                            <div className="flex items-center gap-4">
+                                                                <div className="h-10 w-10 rounded-full bg-surface-raised flex items-center justify-center text-text-secondary">
+                                                                    <FileText className="h-4 w-4" />
                                                                 </div>
-                                                                <div className="text-right flex flex-col items-end gap-1">
-                                                                    <FinancialAmount amount={inv.amount} currency={inv.currency} />
-                                                                    <span className={`text-[11px] font-medium px-2 py-0.5 rounded-full ${
-                                                                        inv.status === 'paid' ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700'
-                                                                    }`}>
-                                                                        {inv.status.charAt(0).toUpperCase() + inv.status.slice(1)}
-                                                                    </span>
+                                                                <div>
+                                                                    <span className="font-medium text-text-primary text-sm block">{inv.clientName}</span>
+                                                                    <span className="text-text-muted block text-xs mt-0.5">{inv.invoiceNumber} • Due {formatDate(inv.dueDate)}</span>
                                                                 </div>
                                                             </div>
-                                                        ))
-                                                    )}
-                                                </div>
+                                                            <div className="text-right flex flex-col items-end gap-1">
+                                                                <FinancialAmount amount={inv.amount} currency={inv.currency} />
+                                                                <StatusBadge status={inv.status} size="sm" />
+                                                            </div>
+                                                        </div>
+                                                    ))
+                                                )}
                                             </div>
-                                        </div>
+                                        </SectionCard>
                                     </div>
 
                                     {/* Sidebar Column */}
@@ -1237,23 +1249,46 @@ export default function ERPDashboard({ stats: serverStats, clients: serverClient
                                             <thead>
                                                 <tr className="bg-slate-50 border-b border-slate-100 text-xs font-semibold text-slate-500 uppercase tracking-wider">
                                                     <th className="px-6 py-3.5">Filename</th>
-                                                    <th className="px-6 py-3.5">Type</th>
+                                                    <th className="px-6 py-3.5">Storage Provider</th>
+                                                    <th className="px-6 py-3.5">Tags</th>
                                                     <th className="px-6 py-3.5">File size</th>
-                                                    <th className="px-6 py-3.5">Date committed</th>
-                                                    <th className="px-6 py-3.5 text-right">Uploader</th>
+                                                    <th className="px-6 py-3.5 text-right">Access</th>
                                                 </tr>
                                             </thead>
                                             <tbody className="divide-y divide-slate-100">
                                                 {documents.map((doc) => (
                                                     <tr key={doc.id} className="hover:bg-slate-50 transition text-[13px] text-slate-700">
-                                                        <td className="px-6 py-4 flex items-center gap-2">
-                                                            <FileText className="h-4 w-4 text-slate-400" />
-                                                            <span className="font-semibold text-slate-900">{doc.name}</span>
+                                                        <td className="px-6 py-4 flex items-center gap-3">
+                                                            <div className="h-8 w-8 rounded-lg bg-slate-100 flex items-center justify-center shrink-0">
+                                                                <FileText className="h-4 w-4 text-slate-400" />
+                                                            </div>
+                                                            <div>
+                                                                <span className="font-semibold text-slate-900 block">{doc.name}</span>
+                                                                <span className="text-[11px] text-slate-400">Uploaded by {doc.uploadedBy} • {formatDate(doc.date)}</span>
+                                                            </div>
                                                         </td>
-                                                        <td className="px-6 py-4 text-slate-500">{doc.type}</td>
+                                                        <td className="px-6 py-4">
+                                                            <div className="flex items-center gap-1.5">
+                                                                <Cloud className="h-3.5 w-3.5 text-indigo-500" />
+                                                                <span className="text-slate-600 font-medium">{doc.provider}</span>
+                                                            </div>
+                                                        </td>
+                                                        <td className="px-6 py-4">
+                                                            <div className="flex gap-1.5 flex-wrap">
+                                                                {doc.tags?.map((t: string) => (
+                                                                    <Badge key={t} variant="outline" className="text-[10px] font-medium text-slate-500 bg-white shadow-none rounded-md">
+                                                                        {t}
+                                                                    </Badge>
+                                                                ))}
+                                                            </div>
+                                                        </td>
                                                         <td className="px-6 py-4 font-mono text-xs text-slate-400">{doc.size}</td>
-                                                        <td className="px-6 py-4 text-slate-400 font-mono text-xs">{formatDate(doc.date)}</td>
-                                                        <td className="px-6 py-4 text-right font-medium text-slate-600">{doc.uploadedBy}</td>
+                                                        <td className="px-6 py-4 text-right">
+                                                            <div className="flex items-center justify-end gap-2 text-slate-400">
+                                                                <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-indigo-600"><LinkIcon className="h-4 w-4" /></Button>
+                                                                <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-indigo-600"><Eye className="h-4 w-4" /></Button>
+                                                            </div>
+                                                        </td>
                                                     </tr>
                                                 ))}
                                             </tbody>
@@ -1741,6 +1776,44 @@ export default function ERPDashboard({ stats: serverStats, clients: serverClient
                                         </div>
                                     </div>
                                 </SectionCard>
+
+                                <SectionCard>
+                                    <div className="p-6 border-b border-slate-100 flex items-center justify-between">
+                                        <div>
+                                            <h3 className="font-semibold text-slate-900 text-sm">Storage Integrations</h3>
+                                            <p className="text-xs text-slate-500 mt-1">Connect your workspace directly to external cloud storage (S3 compatible).</p>
+                                        </div>
+                                        <Button size="sm" variant="outline" className="shadow-sm" onClick={() => setShowAddProviderModal(true)}>
+                                            <Plus className="h-3.5 w-3.5 mr-1.5" /> Add Provider
+                                        </Button>
+                                    </div>
+                                    <div className="divide-y divide-slate-100">
+                                        {storageProviders.map(provider => (
+                                            <div key={provider.id} className="p-5 flex items-center justify-between hover:bg-slate-50 transition-colors">
+                                                <div className="flex items-center gap-4">
+                                                    <div className="h-10 w-10 bg-white border border-slate-200 rounded-lg shadow-sm flex items-center justify-center shrink-0">
+                                                        <Database className="h-5 w-5 text-indigo-600" />
+                                                    </div>
+                                                    <div>
+                                                        <div className="flex items-center gap-2">
+                                                            <span className="font-semibold text-slate-900 text-sm">{provider.name}</span>
+                                                            {provider.isDefault && <Badge variant="secondary" className="text-[9px] uppercase tracking-wider bg-indigo-50 text-indigo-700">Default</Badge>}
+                                                        </div>
+                                                        <span className="text-xs text-slate-500 flex items-center gap-1.5 mt-1">
+                                                            <HardDrive className="h-3 w-3" /> {provider.bucket} ({provider.driver})
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                                <div className="flex items-center gap-3">
+                                                    <Badge variant="outline" className="text-[10px] text-emerald-600 border-emerald-200 bg-emerald-50"><CheckCircle className="h-3 w-3 mr-1" /> {provider.status}</Badge>
+                                                    <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-rose-600">
+                                                        <Trash2 className="h-4 w-4" />
+                                                    </Button>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </SectionCard>
                             </div>
                         )}
 
@@ -1993,9 +2066,12 @@ export default function ERPDashboard({ stats: serverStats, clients: serverClient
             {showAddDocModal && (
                 <div className="fixed inset-0 bg-slate-950/20 backdrop-blur-sm flex items-center justify-center p-4 z-50">
                     <SectionCard className="w-full max-w-md shadow-2xl">
-                        <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
-                            <h3 className="font-semibold text-slate-800 text-[14px]">Commit Document Asset</h3>
-                            <button onClick={() => setShowAddDocModal(false)} className="p-1 hover:bg-slate-100 rounded text-slate-400">
+                        <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50">
+                            <div>
+                                <h3 className="font-semibold text-slate-800 text-[14px]">Direct Cloud Upload</h3>
+                                <p className="text-[10px] text-slate-500 font-mono mt-0.5">Secure transmission to external bucket</p>
+                            </div>
+                            <button onClick={() => setShowAddDocModal(false)} className="p-1 hover:bg-slate-200 rounded text-slate-400">
                                 <X className="h-4 w-4" />
                             </button>
                         </div>
@@ -2007,7 +2083,7 @@ export default function ERPDashboard({ stats: serverStats, clients: serverClient
                             <div className="space-y-1">
                                 <label className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Classification</label>
                                 <select 
-                                    className="flex h-10 w-full rounded-md border border-slate-200 bg-background px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-slate-950 shadow-none"
+                                    className="flex h-10 w-full rounded-md border border-slate-200 bg-background px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500 shadow-none"
                                     value={docForm.type}
                                     onChange={e => setDocForm(prev => ({ ...prev, type: e.target.value }))}
                                 >
@@ -2017,9 +2093,86 @@ export default function ERPDashboard({ stats: serverStats, clients: serverClient
                                     <option value="Tax">Corporate Tax Sheet</option>
                                 </select>
                             </div>
+                            <div className="space-y-1">
+                                <label className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 flex items-center gap-1.5"><Cloud className="h-3 w-3" /> Storage Provider</label>
+                                <select 
+                                    className="flex h-10 w-full rounded-md border border-slate-200 bg-background px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500 shadow-none font-medium"
+                                    value={docForm.provider}
+                                    onChange={e => setDocForm(prev => ({ ...prev, provider: e.target.value }))}
+                                >
+                                    {storageProviders.map(p => (
+                                        <option key={p.id} value={p.name}>{p.name} ({p.driver})</option>
+                                    ))}
+                                </select>
+                            </div>
                             <div className="pt-4 border-t flex justify-end gap-2">
                                 <Button type="button" variant="outline" size="sm" className="shadow-none" onClick={() => setShowAddDocModal(false)}>Cancel</Button>
-                                <Button type="submit" size="sm" className="shadow-none bg-indigo-600 hover:bg-indigo-700 text-white font-semibold">Store Asset</Button>
+                                <Button type="submit" size="sm" className="shadow-none bg-indigo-600 hover:bg-indigo-700 text-white font-semibold"><Cloud className="h-4 w-4 mr-1.5" /> Upload to Bucket</Button>
+                            </div>
+                        </form>
+                    </SectionCard>
+                </div>
+            )}
+
+            {/* ADD STORAGE PROVIDER MODAL */}
+            {showAddProviderModal && (
+                <div className="fixed inset-0 bg-slate-950/20 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+                    <SectionCard className="w-full max-w-md shadow-2xl">
+                        <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+                            <div>
+                                <h3 className="font-semibold text-slate-800 text-[14px]">Connect Cloud Storage</h3>
+                                <p className="text-[10px] text-slate-500 font-mono mt-0.5">S3-Compatible Integration</p>
+                            </div>
+                            <button onClick={() => setShowAddProviderModal(false)} className="p-1 hover:bg-slate-100 rounded text-slate-400">
+                                <X className="h-4 w-4" />
+                            </button>
+                        </div>
+                        <form onSubmit={handleAddProvider} className="p-6 space-y-4">
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="space-y-1 col-span-2">
+                                    <label className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Integration Name</label>
+                                    <Input required placeholder="e.g. AWS S3 Frankfurt" value={providerForm.name} onChange={e => setProviderForm(prev => ({ ...prev, name: e.target.value }))} className="shadow-none" />
+                                </div>
+                                <div className="space-y-1">
+                                    <label className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Driver</label>
+                                    <select 
+                                        className="flex h-10 w-full rounded-md border border-slate-200 bg-background px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-slate-950 shadow-none"
+                                        value={providerForm.driver}
+                                        onChange={e => setProviderForm(prev => ({ ...prev, driver: e.target.value }))}
+                                    >
+                                        <option value="s3">AWS S3 (Native)</option>
+                                        <option value="s3-cloudflare">Cloudflare R2</option>
+                                        <option value="s3-digitalocean">DigitalOcean Spaces</option>
+                                        <option value="s3-wasabi">Wasabi</option>
+                                    </select>
+                                </div>
+                                <div className="space-y-1">
+                                    <label className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Region</label>
+                                    <Input placeholder="eu-central-1" value={providerForm.region} onChange={e => setProviderForm(prev => ({ ...prev, region: e.target.value }))} className="shadow-none font-mono" />
+                                </div>
+                                <div className="space-y-1 col-span-2">
+                                    <label className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Bucket Name</label>
+                                    <Input required placeholder="my-erp-files" value={providerForm.bucket} onChange={e => setProviderForm(prev => ({ ...prev, bucket: e.target.value }))} className="shadow-none font-mono" />
+                                </div>
+                                <div className="space-y-1 col-span-2">
+                                    <label className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Endpoint URL (Optional)</label>
+                                    <Input placeholder="https://<account_id>.r2.cloudflarestorage.com" value={providerForm.endpoint} onChange={e => setProviderForm(prev => ({ ...prev, endpoint: e.target.value }))} className="shadow-none font-mono text-xs" />
+                                </div>
+                                <div className="space-y-1 col-span-2">
+                                    <label className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 flex items-center gap-1.5"><Key className="h-3 w-3" /> Access Credentials</label>
+                                    <div className="flex gap-2">
+                                        <Input type="password" placeholder="Access Key" required className="shadow-none font-mono text-xs" />
+                                        <Input type="password" placeholder="Secret Key" required className="shadow-none font-mono text-xs" />
+                                    </div>
+                                    <p className="text-[9px] text-slate-400 mt-1">Keys are encrypted at rest using platform APP_KEY.</p>
+                                </div>
+                            </div>
+                            <div className="pt-4 border-t flex justify-between items-center mt-2">
+                                <Button type="button" variant="ghost" size="sm" className="text-slate-500">Test Connection</Button>
+                                <div className="flex gap-2">
+                                    <Button type="button" variant="outline" size="sm" className="shadow-none" onClick={() => setShowAddProviderModal(false)}>Cancel</Button>
+                                    <Button type="submit" size="sm" className="shadow-none bg-slate-900 text-white font-medium">Connect Bucket</Button>
+                                </div>
                             </div>
                         </form>
                     </SectionCard>

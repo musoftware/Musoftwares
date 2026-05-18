@@ -64,6 +64,11 @@ class Invoice extends TenantModel
         return $this->hasMany(ReferralEarning::class);
     }
 
+    public function activities()
+    {
+        return $this->morphMany(Activity::class, 'subject')->latest();
+    }
+
     // ── Computed Attributes ──────────────────────────────────────
 
     /**
@@ -211,6 +216,13 @@ class Invoice extends TenantModel
                 event(new \App\Events\InvoicePaid($this));
             }
 
+            \Modules\ERP\Services\ActivityLogger::log(
+                'invoice_paid',
+                "Invoice #{$this->invoice_number} was paid in full ($amountDue).",
+                $this,
+                $client->id
+            );
+
             return ['ok' => true, 'message' => 'Invoice paid successfully.'];
         });
     }
@@ -281,6 +293,13 @@ class Invoice extends TenantModel
                 'paid_amount' => $newPaid,
             ]);
 
+            \Modules\ERP\Services\ActivityLogger::log(
+                'invoice_partially_paid',
+                "Invoice #{$this->invoice_number} received a partial payment of {$amount}.",
+                $this,
+                $wallet->client_id
+            );
+
             return ['ok' => true, 'message' => 'Partial payment of ' . $amount . ' recorded.'];
         });
     }
@@ -343,6 +362,13 @@ class Invoice extends TenantModel
                 'status' => 'cancelled',
                 'paid_amount' => 0,
             ]);
+
+            \Modules\ERP\Services\ActivityLogger::log(
+                'invoice_cancelled',
+                "Invoice #{$this->invoice_number} was cancelled" . ($paidAmount > 0 ? " and {$paidAmount} refunded." : "."),
+                $this,
+                $this->client_id
+            );
 
             return ['ok' => true, 'message' => 'Invoice cancelled' . ($paidAmount > 0 ? ' and ' . $paidAmount . ' refunded.' : '.')];
         });

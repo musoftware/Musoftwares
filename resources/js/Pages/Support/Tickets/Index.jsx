@@ -15,11 +15,9 @@ import InputLabel from '@/Components/InputLabel';
 import Modal from '@/Components/Modal';
 import TextInput from '@/Components/TextInput';
 
-// Mock structural components to satisfy the unified layout design pattern
-const AppLayout = AuthenticatedLayout;
-const AppPage = ({ children }) => <div className="max-w-[1200px] mx-auto px-4 py-8 space-y-6">{children}</div>;
-const ActionBar = ({ children }) => <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-2">{children}</div>;
-const SectionCard = ({ children }) => <Card className="shadow-sm border-gray-200 overflow-hidden">{children}</Card>;
+import { AppPage } from '@/Components/ui/AppPage';
+import { SectionCard } from '@/Components/ui/SectionCard';
+import { ActionBar } from '@/Components/ui/ActionBar';
 
 export default function TicketsIndex({ tickets, isAdmin }) {
     const { auth, errors } = usePage().props;
@@ -117,7 +115,7 @@ export default function TicketsIndex({ tickets, isAdmin }) {
     );
 
     return (
-        <AppLayout user={auth.user} header="Support Tickets">
+        <AuthenticatedLayout header="Support Tickets">
             <Head title="Support Tickets" />
 
             <AppPage>
@@ -161,7 +159,7 @@ export default function TicketsIndex({ tickets, isAdmin }) {
                     </ActionBar>
                 )}
 
-                <SectionCard>
+                <SectionCard noPadding>
                     <DataTable
                         columns={columns}
                         data={isAdmin ? filteredTickets : tickets?.data || []}
@@ -307,6 +305,6 @@ export default function TicketsIndex({ tickets, isAdmin }) {
                     </div>
                 )}
             </Modal>
-        </AppLayout>
+        </AuthenticatedLayout>
     );
 }

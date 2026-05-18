@@ -103,119 +103,101 @@ export default function Index({ invoices, stats, filters }) {
     return (
         <AuthenticatedLayout header="Invoices">
             <Head title="Invoices" />
-            <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 space-y-6">
-                <PageHeader title="Invoices">
-                    <Button asChild className="shadow-none">
-                        <Link href={route('erp.invoices.create')}>
-                            <Plus className="mr-2 h-4 w-4" /> New Invoice
-                        </Link>
-                    </Button>
-                </PageHeader>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <Card className="shadow-none">
-                        <CardContent className="pt-6">
-                            <div className="text-sm font-medium text-muted-foreground">Total</div>
-                            <div className="text-2xl font-bold tracking-tight text-foreground">
-                                <CurrencyDisplay amount={stats.total} currency={stats.business_currency} />
-                            </div>
-                        </CardContent>
-                    </Card>
-                    <Card className="shadow-none border-primary/20 bg-primary/5">
-                        <CardContent className="pt-6">
-                            <div className="text-sm font-semibold text-primary">Paid</div>
-                            <div className="text-2xl font-bold tracking-tight text-primary">
-                                <CurrencyDisplay amount={stats.paid} currency={stats.business_currency} />
-                            </div>
-                        </CardContent>
-                    </Card>
-                    <Card className="shadow-none border-amber-500/20 bg-amber-500/5">
-                        <CardContent className="pt-6">
-                            <div className="text-sm font-semibold text-amber-600">Pending</div>
-                            <div className="text-2xl font-bold tracking-tight text-amber-600">
-                                <CurrencyDisplay amount={stats.pending} currency={stats.business_currency} />
-                            </div>
-                        </CardContent>
-                    </Card>
-                    <Card className="shadow-none border-destructive/20 bg-destructive/5">
-                        <CardContent className="pt-6">
-                            <div className="text-sm font-semibold text-destructive">Overdue</div>
-                            <div className="text-2xl font-bold tracking-tight text-destructive">
-                                <CurrencyDisplay amount={stats.overdue} currency={stats.business_currency} />
-                            </div>
-                        </CardContent>
-                    </Card>
+            <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 py-10 font-sans space-y-8">
+                
+                {/* ──────────────────────────────────────────────────────── */}
+                {/* HEADER & QUICK ACTIONS */}
+                {/* ──────────────────────────────────────────────────────── */}
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div>
+                        <h1 className="text-2xl font-semibold text-slate-900 tracking-tight">Invoices</h1>
+                        <p className="text-sm text-slate-500 mt-1">Manage billing, track payments, and follow up on overdues.</p>
+                    </div>
+                    <div className="flex items-center gap-3">
+                        <Button variant="outline" size="sm" className="shadow-sm border-slate-200">
+                            <FileText className="mr-2 h-4 w-4" /> Export
+                        </Button>
+                        <Button asChild size="sm" className="shadow-sm bg-slate-900 text-white hover:bg-slate-800 transition-colors">
+                            <Link href={route('erp.invoices.create')}>
+                                <Plus className="mr-2 h-4 w-4" /> New Invoice
+                            </Link>
+                        </Button>
+                    </div>
                 </div>
 
-                <Card className="shadow-none">
-                    <CardContent className="p-4 flex flex-col gap-4">
-                        <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
-                            <div className="flex flex-1 items-center gap-4 w-full md:w-auto">
-                                <div className="relative flex-1 md:max-w-xs">
-                                    <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-                                    <Input
-                                        placeholder="Search by number/client..."
-                                        className="pl-9 h-10 shadow-none"
-                                        defaultValue={filters.search}
-                                        onBlur={(e) => handleFilterChange('search', e.target.value)}
-                                    />
-                                </div>
-                                <select
-                                    className="flex h-10 w-[150px] rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 shadow-none"
-                                    defaultValue={filters.status}
-                                    onChange={(e) => handleFilterChange('status', e.target.value)}
-                                >
-                                    <option value="">All Statuses</option>
-                                    <option value="draft">Draft</option>
-                                    <option value="sent">Sent</option>
-                                    <option value="paid">Paid</option>
-                                    <option value="cancelled">Cancelled</option>
-                                </select>
-                            </div>
-                            <div className="flex items-center gap-2">
-                                <Button variant="outline" size="sm" className="shadow-none">
-                                    <FileText className="mr-2 h-4 w-4" /> Export CSV
-                                </Button>
-                                <Button variant="outline" size="sm" className="shadow-none">
-                                    <Download className="mr-2 h-4 w-4" /> Export PDF
-                                </Button>
-                            </div>
+                {/* ──────────────────────────────────────────────────────── */}
+                {/* STATS ROW */}
+                {/* ──────────────────────────────────────────────────────── */}
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div className="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm flex flex-col justify-center">
+                        <div className="text-sm font-medium text-slate-500 mb-1">Total Billed</div>
+                        <div className="text-2xl font-bold tracking-tight text-slate-900">
+                            <CurrencyDisplay amount={stats.total} currency={stats.business_currency} />
                         </div>
-                        <div className="flex flex-wrap items-center gap-4 pt-4 border-t">
-                            <div className="flex items-center gap-2 text-sm text-muted-foreground font-medium">
-                                <Filter className="h-4 w-4" />
-                                <span>Filters:</span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                                <CalendarIcon className="h-4 w-4 text-muted-foreground" />
-                                <Input
-                                    type="date"
-                                    className="h-8 w-auto text-xs shadow-none"
-                                    onChange={(e) => handleFilterChange('start_date', e.target.value)}
-                                />
-                                <span className="text-muted-foreground text-xs font-medium">to</span>
-                                <Input
-                                    type="date"
-                                    className="h-8 w-auto text-xs shadow-none"
-                                    onChange={(e) => handleFilterChange('end_date', e.target.value)}
-                                />
-                            </div>
-                            <div className="flex items-center gap-2">
-                                <select
-                                    className="flex h-8 w-[100px] rounded-md border border-input bg-background px-2 py-1 text-xs shadow-none"
-                                    onChange={(e) => handleFilterChange('currency', e.target.value)}
-                                >
-                                    <option value="">Currency</option>
-                                    <option value="USD">USD</option>
-                                    <option value="EGP">EGP</option>
-                                    <option value="EUR">EUR</option>
-                                </select>
-                            </div>
+                    </div>
+                    <div className="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm flex flex-col justify-center">
+                        <div className="text-sm font-medium text-emerald-600 mb-1">Paid</div>
+                        <div className="text-2xl font-bold tracking-tight text-slate-900">
+                            <CurrencyDisplay amount={stats.paid} currency={stats.business_currency} />
                         </div>
-                    </CardContent>
-                </Card>
+                    </div>
+                    <div className="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm flex flex-col justify-center">
+                        <div className="text-sm font-medium text-amber-600 mb-1">Pending</div>
+                        <div className="text-2xl font-bold tracking-tight text-slate-900">
+                            <CurrencyDisplay amount={stats.pending} currency={stats.business_currency} />
+                        </div>
+                    </div>
+                    <div className="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm flex flex-col justify-center">
+                        <div className="text-sm font-medium text-rose-600 mb-1">Overdue</div>
+                        <div className="text-2xl font-bold tracking-tight text-slate-900">
+                            <CurrencyDisplay amount={stats.overdue} currency={stats.business_currency} />
+                        </div>
+                    </div>
+                </div>
 
-                <div className="bg-card border rounded-xl shadow-none overflow-hidden">
+                {/* ──────────────────────────────────────────────────────── */}
+                {/* FILTERS & SEARCH */}
+                {/* ──────────────────────────────────────────────────────── */}
+                <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-2 flex flex-col md:flex-row gap-2">
+                    <div className="relative flex-1">
+                        <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
+                        <Input
+                            placeholder="Search invoice number or client..."
+                            className="pl-9 h-10 shadow-none border-transparent bg-slate-50 focus:bg-white transition-colors"
+                            defaultValue={filters.search}
+                            onBlur={(e) => handleFilterChange('search', e.target.value)}
+                        />
+                    </div>
+                    <div className="flex items-center gap-2 overflow-x-auto pb-1 md:pb-0">
+                        <select
+                            className="h-10 w-[140px] rounded-lg border-transparent bg-slate-50 px-3 py-2 text-sm focus:bg-white focus:border-slate-300 focus:ring-1 focus:ring-slate-300 transition-colors shadow-none"
+                            defaultValue={filters.status}
+                            onChange={(e) => handleFilterChange('status', e.target.value)}
+                        >
+                            <option value="">All Statuses</option>
+                            <option value="draft">Draft</option>
+                            <option value="sent">Sent</option>
+                            <option value="paid">Paid</option>
+                            <option value="cancelled">Cancelled</option>
+                        </select>
+                        <Input
+                            type="date"
+                            className="h-10 w-auto text-sm shadow-none border-transparent bg-slate-50 focus:bg-white transition-colors"
+                            onChange={(e) => handleFilterChange('start_date', e.target.value)}
+                        />
+                        <span className="text-slate-400 text-sm font-medium px-1">-</span>
+                        <Input
+                            type="date"
+                            className="h-10 w-auto text-sm shadow-none border-transparent bg-slate-50 focus:bg-white transition-colors"
+                            onChange={(e) => handleFilterChange('end_date', e.target.value)}
+                        />
+                    </div>
+                </div>
+
+                {/* ──────────────────────────────────────────────────────── */}
+                {/* DATA TABLE */}
+                {/* ──────────────────────────────────────────────────────── */}
+                <div className="bg-white border border-slate-100 rounded-2xl shadow-sm overflow-hidden">
                     <DataTable
                         columns={columns}
                         data={invoices.data}

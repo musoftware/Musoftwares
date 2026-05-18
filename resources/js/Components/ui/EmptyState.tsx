@@ -25,22 +25,22 @@ export function EmptyState({
     return (
         <div
             className={cn(
-                'flex flex-col items-center justify-center px-4 py-16 text-center',
+                'flex flex-col items-center justify-center px-4 py-16 text-center border border-dashed border-slate-200 bg-slate-50/50 rounded-2xl',
                 className,
             )}
         >
             {Icon && (
-                <div className="bg-primary-light mb-4 flex h-16 w-16 items-center justify-center rounded-full">
-                    <Icon className="text-primary h-7 w-7" />
+                <div className="bg-white border border-slate-100 shadow-sm mb-4 flex h-16 w-16 items-center justify-center rounded-full">
+                    <Icon className="text-slate-400 h-7 w-7" />
                 </div>
             )}
 
-            <h3 className="font-sora text-text-primary mt-4 text-[16px] font-semibold">
+            <h3 className="font-sans text-slate-900 mt-4 text-lg font-semibold">
                 {title}
             </h3>
 
             {description && (
-                <p className="text-text-muted mt-2 max-w-sm font-sans text-[14px]">
+                <p className="text-slate-500 mt-2 max-w-sm font-sans text-sm">
                     {description}
                 </p>
             )}
@@ -50,7 +50,7 @@ export function EmptyState({
                     {onClick ? (
                         <button
                             onClick={onClick}
-                            className="bg-primary hover:bg-primary-hover inline-flex items-center justify-center rounded-lg px-4 py-2 text-[14px] font-medium text-white shadow-sm transition-colors"
+                            className="bg-slate-900 hover:bg-slate-800 border border-slate-900 inline-flex items-center justify-center rounded-lg px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors"
                         >
                             {ActionIcon && <ActionIcon className="mr-2 h-4 w-4" />}
                             {actionLabel}
@@ -58,7 +58,7 @@ export function EmptyState({
                     ) : (
                         <Link
                             href={action}
-                            className="bg-primary hover:bg-primary-hover inline-flex items-center justify-center rounded-lg px-4 py-2 text-[14px] font-medium text-white shadow-sm transition-colors"
+                            className="bg-slate-900 hover:bg-slate-800 border border-slate-900 inline-flex items-center justify-center rounded-lg px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors"
                         >
                             {ActionIcon && <ActionIcon className="mr-2 h-4 w-4" />}
                             {actionLabel}
