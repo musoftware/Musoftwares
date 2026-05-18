@@ -4,5 +4,7 @@
     "Freelance": true,
     "Marketplace": true,
     "Shared": false,
-    "Booking": true
+    "Booking": true,
+    "Intelligence": true,
+    "Tools": true
 }

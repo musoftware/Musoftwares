@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import WorkspaceLayout from '@/Layouts/WorkspaceLayout';
 import { Head, useForm, router } from '@inertiajs/react';
 import { ModulePageHeader } from '@/Components/ui/ModulePageHeader';
@@ -27,11 +27,23 @@ import { EmptyState } from '@/Components/ui/EmptyState';
 import { format } from 'date-fns';
 import { Calendar, Clock, CreditCard, ExternalLink, MoreVertical, Search, UserCircle2, Briefcase, FileText, CheckCircle, XCircle } from 'lucide-react';
 
-export default function Appointments({ bookings }: any) {
-    const [search, setSearch] = useState('');
+export default function Appointments({ bookings, filters }: any) {
+    const [search, setSearch] = useState(filters?.search || '');
     const [selectedBooking, setSelectedBooking] = useState<any>(null);
     const [isNotesModalOpen, setIsNotesModalOpen] = useState(false);
-    const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
+    
+    useEffect(() => {
+        const debounce = setTimeout(() => {
+            if (search !== (filters?.search || '')) {
+                router.get(
+                    route('booking.appointments'),
+                    { search },
+                    { preserveState: true, replace: true }
+                );
+            }
+        }, 300);
+        return () => clearTimeout(debounce);
+    }, [search, filters?.search]);
     
     const { data: notesData, setData: setNotesData, post: postNotes, processing: processingNotes } = useForm({
         internal_notes: ''
@@ -58,8 +70,7 @@ export default function Appointments({ bookings }: any) {
 
     const handleCreateProject = (id: number) => {
         router.post(route('booking.appointments.create-project', id), {}, {
-            preserveScroll: true,
-            onSuccess: () => setIsProjectModalOpen(false)
+            preserveScroll: true
         });
     };
     

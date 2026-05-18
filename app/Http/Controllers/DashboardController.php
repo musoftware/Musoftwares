@@ -119,22 +119,47 @@ class DashboardController extends Controller
 
         // ── Build stats ──────────────────────────────────────────
         $stats = [
-            'walletBalance' => $walletBalance,
-            'earnedBalance' => $earnedBalance,
-            'pointsBalance' => $pointsBalance,
-            'unpaidInvoices' => $unpaidCount,
-            'unpaidAmount' => $unpaidAmount,
+            'walletBalance'       => $walletBalance,
+            'earnedBalance'       => $earnedBalance,
+            'pointsBalance'       => $pointsBalance,
+            'unpaidInvoices'      => $unpaidCount,
+            'unpaidAmount'        => $unpaidAmount,
             'activeSubscriptions' => max($activeSubscriptions, 0),
-            'openTickets' => $openTicketsCount,
-            'pendingWithdrawals' => $pendingWithdrawals,
-            'currency' => $wallet->currency ?? 'USD',
+            'openTickets'         => $openTicketsCount,
+            'pendingWithdrawals'  => $pendingWithdrawals,
+            'currency'            => $wallet->currency ?? 'USD',
         ];
 
+        // ── Active Tool Licenses (Marketplace) ──────────────────
+        $activeToolLicenses = [];
+        try {
+            $activeToolLicenses = \Modules\Tools\Models\ToolLicense::where('user_id', $user->id)
+                ->where('status', 'active')
+                ->with(['tool:id,slug,title,icon'])
+                ->limit(4)
+                ->get()
+                ->map(fn ($lic) => [
+                    'license_key'    => $lic->license_key,
+                    'active_devices' => $lic->activeDevices()->count(),
+                    'max_devices'    => $lic->max_devices,
+                    'expires_at'     => $lic->expires_at?->format('M d, Y'),
+                    'tool'           => [
+                        'slug'     => $lic->tool?->slug ?? '',
+                        'title'    => $lic->tool?->title ?? 'Unknown Tool',
+                        'icon_url' => $lic->tool?->icon_url,
+                    ],
+                ])
+                ->toArray();
+        } catch (\Throwable $e) {
+            // Table may not exist in all environments — fail gracefully
+        }
+
         return Inertia::render('Dashboard', [
-            'stats' => $stats,
-            'pendingInvoices' => $pendingInvoices,
-            'recentTransactions' => $recentTransactions,
-            'subscribedModules' => $subscribedModules,
+            'stats'               => $stats,
+            'pendingInvoices'     => $pendingInvoices,
+            'recentTransactions'  => $recentTransactions,
+            'subscribedModules'   => $subscribedModules,
+            'activeToolLicenses'  => $activeToolLicenses,
         ]);
     }
 
