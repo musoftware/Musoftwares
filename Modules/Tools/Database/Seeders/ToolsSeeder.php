@@ -187,9 +187,6 @@ class ToolsSeeder extends Seeder
                 ['slug' => $entry['tool']['slug']],
                 array_merge($entry['tool'], [
                     'current_version' => $entry['version'],
-                    'features'        => json_encode($entry['tool']['features'] ?? []),
-                    'requirements'    => json_encode($entry['tool']['requirements'] ?? []),
-                    'supported_os'    => json_encode($entry['tool']['supported_os']),
                     'download_count'  => rand(100, 5000),
                 ])
             );
@@ -198,8 +195,7 @@ class ToolsSeeder extends Seeder
                 ToolPricingPlan::firstOrCreate(
                     ['tool_id' => $tool->id, 'name' => $planData['name']],
                     array_merge($planData, [
-                        'tool_id'  => $tool->id,
-                        'features' => json_encode($planData['features']),
+                        'tool_id' => $tool->id,
                     ])
                 );
             }
