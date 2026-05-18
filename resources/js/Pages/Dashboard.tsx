@@ -189,7 +189,7 @@ export default function Dashboard({
                             </div>
                         </SectionCard>
 
-                        <SectionCard title="Subscribed Workspaces">
+                        <SectionCard title="Your Workspaces">
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                 <Link 
                                     href={subscribedModules.erp ? '/erp/dashboard' : '/subscriptions/plans?module=erp'} 
@@ -209,30 +209,26 @@ export default function Dashboard({
 
                                 <Link 
                                     href="/freelance/dashboard" 
-                                    className="group p-5 rounded-xl border border-border hover:border-primary/50 hover:shadow-sm transition-all bg-surface relative overflow-hidden block"
+                                    className="group p-5 rounded-xl border border-border hover:border-emerald-200 hover:shadow-sm transition-all bg-surface relative overflow-hidden block"
                                 >
-                                    <div className="w-10 h-10 rounded-lg bg-indigo-50 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                                        <Briefcase className="w-5 h-5 text-indigo-600" />
+                                    <div className="w-10 h-10 rounded-lg bg-emerald-50 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                                        <Briefcase className="w-5 h-5 text-emerald-600" />
                                     </div>
                                     <h4 className="font-bold text-sm mb-1 text-text-primary">Freelance Hub</h4>
-                                    <p className="text-xs text-text-muted leading-relaxed">Accept contracts, manage milestones, and submit deliverables.</p>
-                                    <div className="absolute top-4 right-4 text-emerald-600 text-[9px] uppercase font-bold bg-emerald-50 border border-emerald-100 px-2.5 py-0.5 rounded-full">Active (Free)</div>
+                                    <p className="text-xs text-text-muted leading-relaxed">Browse jobs, submit proposals, manage contracts and earn real money.</p>
+                                    <div className="absolute top-4 right-4 text-emerald-600 text-[9px] uppercase font-bold bg-emerald-50 border border-emerald-100 px-2.5 py-0.5 rounded-full">Free</div>
                                 </Link>
 
                                 <Link 
-                                    href={subscribedModules.marketing ? '/marketing/dashboard' : '/subscriptions/plans?module=marketing'} 
-                                    className="group p-5 rounded-xl border border-border hover:border-primary/50 hover:shadow-sm transition-all bg-surface relative overflow-hidden block"
+                                    href="/marketplace/dashboard"
+                                    className="group p-5 rounded-xl border border-border hover:border-violet-200 hover:shadow-sm transition-all bg-surface relative overflow-hidden block"
                                 >
-                                    <div className="w-10 h-10 rounded-lg bg-indigo-50 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                                        <Sparkles className="w-5 h-5 text-indigo-600" />
+                                    <div className="w-10 h-10 rounded-lg bg-violet-50 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                                        <Sparkles className="w-5 h-5 text-violet-600" />
                                     </div>
                                     <h4 className="font-bold text-sm mb-1 text-text-primary">Marketing Suite</h4>
-                                    <p className="text-xs text-text-muted leading-relaxed">Automate targeted email campaigns and capture high-converting leads.</p>
-                                    {subscribedModules.marketing ? (
-                                        <div className="absolute top-4 right-4 text-emerald-600 text-[9px] uppercase font-bold bg-emerald-50 border border-emerald-100 px-2.5 py-0.5 rounded-full">Active</div>
-                                    ) : (
-                                        <div className="absolute top-4 right-4 text-slate-500 text-[9px] uppercase font-bold bg-slate-50 border border-slate-200 px-2.5 py-0.5 rounded-full">Discover</div>
-                                    )}
+                                    <p className="text-xs text-text-muted leading-relaxed">List services, reach clients, and grow your business on the marketplace.</p>
+                                    <div className="absolute top-4 right-4 text-violet-600 text-[9px] uppercase font-bold bg-violet-50 border border-violet-100 px-2.5 py-0.5 rounded-full">Free</div>
                                 </Link>
                             </div>
                         </SectionCard>

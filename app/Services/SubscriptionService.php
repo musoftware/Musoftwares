@@ -20,8 +20,10 @@ class SubscriptionService
             return true;
         }
 
-        // 2. Freelancer module has a free tier by default
-        if ($module === 'freelance') {
+        // 2. Freelancer Hub and Marketing Suite are free modules — no subscription needed.
+        //    Freelancers monetize via points (connects) and service earnings go to wallet.
+        //    Marketing Suite is free-to-use; advanced AI features may be gated separately.
+        if ($module === 'freelance' || $module === 'marketing' || $module === 'marketplace') {
             return true;
         }
 

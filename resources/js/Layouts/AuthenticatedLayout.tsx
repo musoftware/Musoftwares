@@ -250,12 +250,12 @@ export default function Authenticated({
                                             </div>
                                             <div className="flex-1 min-w-0">
                                                 <div className="flex items-center justify-between">
-                                                    <p className={cn("text-sm font-medium", isErpActive ? "text-indigo-900" : "text-slate-900")}>Workspace</p>
+                                                    <p className={cn("text-sm font-medium", isErpActive ? "text-indigo-900" : "text-slate-900")}>Business OS</p>
                                                     {isErpActive && <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-indigo-100 text-indigo-700">Active</span>}
                                                     {!activeModules.erp && <Lock className="w-3.5 h-3.5 text-slate-400" />}
                                                 </div>
                                                 <p className={cn("text-xs truncate", isErpActive ? "text-indigo-700/70" : "text-slate-500")}>
-                                                    {!activeModules.erp ? 'Subscribe to access' : 'Manage clients, timers, and ledger'}
+                                                    {!activeModules.erp ? 'Subscribe to access' : 'Clients, invoices, timers'}
                                                 </p>
                                             </div>
                                         </DropdownMenuItem>
@@ -265,7 +265,7 @@ export default function Authenticated({
                                                 "p-0 mb-1 outline-none border transition-all cursor-pointer",
                                                 isFreelanceActive ? "bg-emerald-50/80 border-emerald-100" : "hover:bg-slate-50 border-transparent"
                                             )}
-                                            render={<Link href={activeModules.freelance ? safeRoute('freelance.dashboard') : safeRoute('subscriptions.plans', { module: 'freelance' })} className="flex items-start gap-3 p-2.5 rounded-lg w-full" />}
+                                            render={<Link href={safeRoute('freelance.dashboard')} className="flex items-start gap-3 p-2.5 rounded-lg w-full" />}
                                         >
                                             <div className={cn(
                                                 "w-8 h-8 rounded-md flex items-center justify-center shrink-0 transition-colors",
@@ -276,11 +276,10 @@ export default function Authenticated({
                                             <div className="flex-1 min-w-0">
                                                 <div className="flex items-center justify-between">
                                                     <p className={cn("text-sm font-medium", isFreelanceActive ? "text-emerald-900" : "text-slate-900")}>Freelance Hub</p>
-                                                    {isFreelanceActive && <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-emerald-100 text-emerald-700">Active</span>}
-                                                    {!activeModules.freelance && <Lock className="w-3.5 h-3.5 text-slate-400" />}
+                                                    <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-emerald-100 text-emerald-700">Free</span>
                                                 </div>
                                                 <p className={cn("text-xs truncate", isFreelanceActive ? "text-emerald-700/70" : "text-slate-500")}>
-                                                    {!activeModules.freelance ? 'Subscribe to access' : 'Contracts, jobs, and deliverables'}
+                                                    Jobs, proposals &amp; earnings
                                                 </p>
                                             </div>
                                         </DropdownMenuItem>
@@ -288,24 +287,23 @@ export default function Authenticated({
                                         <DropdownMenuItem 
                                             className={cn(
                                                 "p-0 outline-none border transition-all cursor-pointer",
-                                                isMarketplaceActive ? "bg-rose-50/80 border-rose-100" : "hover:bg-slate-50 border-transparent"
+                                                isMarketplaceActive ? "bg-violet-50/80 border-violet-100" : "hover:bg-slate-50 border-transparent"
                                             )}
-                                            render={<Link href={activeModules.marketplace ? safeRoute('marketplace.dashboard') : safeRoute('subscriptions.plans', { module: 'marketplace' })} className="flex items-start gap-3 p-2.5 rounded-lg w-full" />}
+                                            render={<Link href={safeRoute('marketplace.dashboard')} className="flex items-start gap-3 p-2.5 rounded-lg w-full" />}
                                         >
                                             <div className={cn(
                                                 "w-8 h-8 rounded-md flex items-center justify-center shrink-0 transition-colors",
-                                                isMarketplaceActive ? "bg-rose-100" : "bg-slate-100 group-hover/dropdown-menu-item:bg-rose-50"
+                                                isMarketplaceActive ? "bg-violet-100" : "bg-slate-100 group-hover/dropdown-menu-item:bg-violet-50"
                                             )}>
-                                                <Megaphone className={cn("w-4 h-4", isMarketplaceActive ? "text-rose-700" : "text-slate-500 group-hover/dropdown-menu-item:text-rose-600")} />
+                                                <Megaphone className={cn("w-4 h-4", isMarketplaceActive ? "text-violet-700" : "text-slate-500 group-hover/dropdown-menu-item:text-violet-600")} />
                                             </div>
                                             <div className="flex-1 min-w-0">
                                                 <div className="flex items-center justify-between">
-                                                    <p className={cn("text-sm font-medium", isMarketplaceActive ? "text-rose-900" : "text-slate-900")}>Marketing</p>
-                                                    {isMarketplaceActive && <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-rose-100 text-rose-700">Active</span>}
-                                                    {!activeModules.marketplace && <Lock className="w-3.5 h-3.5 text-slate-400" />}
+                                                    <p className={cn("text-sm font-medium", isMarketplaceActive ? "text-violet-900" : "text-slate-900")}>Marketing Suite</p>
+                                                    <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-violet-100 text-violet-700">Free</span>
                                                 </div>
-                                                <p className={cn("text-xs truncate", isMarketplaceActive ? "text-rose-700/70" : "text-slate-500")}>
-                                                    {!activeModules.marketplace ? 'Subscribe to access' : 'Campaigns and CRM pipelines'}
+                                                <p className={cn("text-xs truncate", isMarketplaceActive ? "text-violet-700/70" : "text-slate-500")}>
+                                                    Services, clients &amp; campaigns
                                                 </p>
                                             </div>
                                         </DropdownMenuItem>

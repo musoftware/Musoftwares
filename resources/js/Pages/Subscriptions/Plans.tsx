@@ -2,7 +2,7 @@ import React from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, router, Link } from '@inertiajs/react';
 import { Button } from '@/Components/ui/button';
-import { Check, Wallet, CreditCard, ArrowRight, ShieldCheck, HelpCircle } from 'lucide-react';
+import { Check, Wallet, CreditCard, ArrowRight, ShieldCheck, HelpCircle, Building2 } from 'lucide-react';
 import { AppPage } from '@/Components/ui/AppPage';
 import { PageHeader } from '@/Components/ui/PageHeader';
 import { SectionCard } from '@/Components/ui/SectionCard';
@@ -85,59 +85,174 @@ export default function Plans({ plans, activeSubscription, walletBalance, curren
                     </div>
                 </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-                    <SectionCard className="lg:col-span-2 relative overflow-hidden bg-surface">
-                        <div className="absolute right-0 top-0 translate-x-6 -translate-y-6 w-32 h-32 bg-primary/5 rounded-full blur-2xl pointer-events-none" />
-                        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 relative z-10">
-                            <div className="space-y-1">
-                                <h3 className="font-bold text-sm flex items-center gap-2 text-text-primary uppercase tracking-wider">
-                                    <ShieldCheck className="h-4 w-4 text-primary" />
-                                    Current Module Status
-                                </h3>
-                                {activeSubscription ? (
-                                    <div className="space-y-1 mt-2">
-                                        <p className="text-sm font-medium text-text-secondary">
-                                            You are currently subscribed to <span className="text-primary font-semibold">{activeSubscription.plan_name}</span>.
-                                        </p>
-                                        <p className="text-xs text-text-muted">
-                                            Active • Renews on {activeSubscription.expires_at}
-                                        </p>
-                                    </div>
-                                ) : (
-                                    <p className="text-sm text-text-muted mt-2">
-                                        No active subscription for {module.toUpperCase()} module. Subscribing will unlock full access.
-                                    </p>
-                                )}
+
+                {/* === Module Status / CTA Hero === */}
+                {!activeSubscription ? (
+                    /* ── Unsubscribed: compelling upgrade card ── */
+                    <div className="relative overflow-hidden rounded-2xl border border-indigo-100 bg-gradient-to-br from-indigo-50 via-white to-slate-50 p-8 mb-8 shadow-sm">
+                        <div className="absolute right-0 top-0 w-64 h-64 bg-indigo-500/5 rounded-full blur-3xl pointer-events-none" />
+                        <div className="absolute -bottom-8 -left-8 w-48 h-48 bg-primary/5 rounded-full blur-2xl pointer-events-none" />
+
+                        <div className="relative z-10 flex flex-col lg:flex-row gap-8 items-start lg:items-center justify-between">
+                            <div className="space-y-4 flex-1">
+                                <div className="inline-flex items-center gap-2 bg-indigo-100 text-indigo-700 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">
+                                    <Building2 className="h-3.5 w-3.5" /> Business OS — ERP
+                                </div>
+                                <h2 className="text-2xl font-bold tracking-tight text-slate-900">
+                                    Run your entire business from one workspace
+                                </h2>
+                                <p className="text-sm text-slate-600 max-w-lg leading-relaxed">
+                                    Manage clients, generate professional invoices, track time on projects, and keep a full financial ledger — all in one place. Subscribe to unlock full access instantly.
+                                </p>
+
+                                {/* Key benefit bullets */}
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
+                                    {[
+                                        'Unlimited client management',
+                                        'Professional invoice generation',
+                                        'Project & task time tracking',
+                                        'Full financial ledger & wallet',
+                                        'Team collaboration tools',
+                                        'Recurring billing automation',
+                                    ].map((b) => (
+                                        <div key={b} className="flex items-center gap-2 text-sm text-slate-700">
+                                            <Check className="h-4 w-4 text-emerald-500 shrink-0" />
+                                            <span>{b}</span>
+                                        </div>
+                                    ))}
+                                </div>
+
+                                <p className="text-xs text-slate-400 pt-1 flex items-center gap-1.5">
+                                    <ShieldCheck className="h-3.5 w-3.5 text-emerald-400" />
+                                    Cancel anytime · Instant access after payment · 7-day money-back guarantee
+                                </p>
                             </div>
 
-                            {activeSubscription && (
+                            {/* CTA Panel */}
+                            {plans.length > 0 && (() => {
+                                const cheapest = [...plans].sort((a, b) => a.price - b.price)[0];
+                                const canAfford = walletBalance >= cheapest.price;
+                                return (
+                                    <div className="w-full lg:w-72 shrink-0 bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-4">
+                                        <div className="text-center space-y-1">
+                                            <p className="text-xs font-bold uppercase tracking-wider text-slate-400">Starting from</p>
+                                            <div className="flex items-baseline justify-center gap-1">
+                                                <span className="text-4xl font-extrabold text-slate-900">
+                                                    <CurrencyDisplay amount={cheapest.price} currency={currency} />
+                                                </span>
+                                                <span className="text-sm text-slate-400">/{cheapest.billing === 'yearly' ? 'yr' : 'mo'}</span>
+                                            </div>
+                                            <p className="text-xs text-slate-500">Per month, cancel anytime</p>
+                                        </div>
+
+                                        <div className="space-y-2 pt-2">
+                                            <Button
+                                                onClick={() => handleSubscribeWallet(cheapest.id)}
+                                                disabled={!canAfford}
+                                                className={cn(
+                                                    'w-full h-10 font-semibold text-sm gap-2',
+                                                    canAfford
+                                                        ? 'bg-indigo-600 hover:bg-indigo-700 text-white'
+                                                        : 'opacity-50 cursor-not-allowed bg-slate-100 text-slate-400'
+                                                )}
+                                            >
+                                                <Wallet className="h-4 w-4" />
+                                                {canAfford ? 'Subscribe via Wallet' : `Need ${currency} ${cheapest.price} in wallet`}
+                                            </Button>
+
+                                            <Button
+                                                onClick={() => handleSubscribeKashier(cheapest.id)}
+                                                variant="outline"
+                                                className="w-full h-10 font-semibold text-sm gap-2 border-slate-200 hover:bg-slate-50"
+                                            >
+                                                <CreditCard className="h-4 w-4 text-slate-500" />
+                                                Pay via Card (Kashier)
+                                            </Button>
+                                        </div>
+
+                                        {!canAfford && (
+                                            <Link href={route('financial.add-balance')} className="flex items-center justify-center gap-1 text-xs text-indigo-600 hover:underline font-medium pt-1">
+                                                <ArrowRight className="h-3.5 w-3.5" /> Add funds to your wallet
+                                            </Link>
+                                        )}
+
+                                        <p className="text-[10px] text-center text-slate-400 pt-1">
+                                            Scroll down to see all plans &amp; features →
+                                        </p>
+                                    </div>
+                                );
+                            })()}
+                        </div>
+                    </div>
+                ) : (
+                    /* ── Subscribed: status + wallet row ── */
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+                        <SectionCard className="lg:col-span-2 relative overflow-hidden bg-surface">
+                            <div className="absolute right-0 top-0 translate-x-6 -translate-y-6 w-32 h-32 bg-primary/5 rounded-full blur-2xl pointer-events-none" />
+                            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 relative z-10">
+                                <div className="space-y-1">
+                                    <div className="inline-flex items-center gap-2 text-emerald-700 text-[10px] font-bold px-3 py-1 rounded-full bg-emerald-50 border border-emerald-100 uppercase tracking-wider mb-2">
+                                        <ShieldCheck className="h-3.5 w-3.5" /> Active Subscription
+                                    </div>
+                                    <p className="text-sm font-medium text-text-secondary">
+                                        Subscribed to <span className="text-primary font-semibold">{activeSubscription.plan_name}</span>
+                                    </p>
+                                    <p className="text-xs text-text-muted">
+                                        Renews on {activeSubscription.expires_at}
+                                    </p>
+                                </div>
                                 <Link href={route('subscriptions.manage')}>
                                     <Button variant="outline" className="shadow-none gap-2 text-xs h-9 bg-surface hover:bg-surface-raised border-border">
                                         Manage Subscriptions <ArrowRight className="h-3.5 w-3.5" />
                                     </Button>
                                 </Link>
-                            )}
-                        </div>
-                    </SectionCard>
+                            </div>
+                        </SectionCard>
 
-                    <SectionCard className="relative overflow-hidden bg-surface">
-                        <div className="flex justify-between items-start mb-6">
-                            <div className="space-y-1">
-                                <span className="text-[11px] font-bold uppercase tracking-wider text-text-muted">Wallet Balance</span>
-                                <h3 className="text-2xl font-bold tracking-tight text-primary font-sans">
-                                    <CurrencyDisplay amount={walletBalance} currency={currency} />
-                                </h3>
+                        <SectionCard className="relative overflow-hidden bg-surface">
+                            <div className="flex justify-between items-start mb-6">
+                                <div className="space-y-1">
+                                    <span className="text-[11px] font-bold uppercase tracking-wider text-text-muted">Wallet Balance</span>
+                                    <h3 className="text-2xl font-bold tracking-tight text-primary font-sans">
+                                        <CurrencyDisplay amount={walletBalance} currency={currency} />
+                                    </h3>
+                                </div>
+                                <div className="p-2.5 bg-surface-raised rounded-xl">
+                                    <Wallet className="h-5 w-5 text-primary" />
+                                </div>
                             </div>
-                            <div className="p-2.5 bg-surface-raised rounded-xl">
-                                <Wallet className="h-5 w-5 text-primary" />
-                            </div>
+                            <Link href={route('financial.add-balance')}>
+                                <Button size="sm" className="w-full shadow-none bg-primary hover:bg-primary-hover text-white font-medium h-9 text-xs">
+                                    + Add Funds
+                                </Button>
+                            </Link>
+                        </SectionCard>
+                    </div>
+                )}
+
+                {/* Wallet card shown separately when NOT subscribed (since CTA hero is shown above) */}
+                {!activeSubscription && (
+                    <div className="flex justify-end mb-4">
+                        <div className="flex items-center gap-3 bg-white border border-slate-200 rounded-xl px-4 py-2.5 shadow-sm">
+                            <Wallet className="h-4 w-4 text-primary" />
+                            <span className="text-sm font-medium text-slate-700">
+                                Wallet: <span className="font-bold text-slate-900"><CurrencyDisplay amount={walletBalance} currency={currency} /></span>
+                            </span>
+                            <Link href={route('financial.add-balance')} className="text-xs text-indigo-600 hover:underline font-semibold">+ Add Funds</Link>
                         </div>
-                        <Link href={route('financial.add-balance')}>
-                            <Button size="sm" className="w-full shadow-none bg-primary hover:bg-primary-hover text-white font-medium h-9 text-xs">
-                                + Add Funds
-                            </Button>
-                        </Link>
-                    </SectionCard>
+                    </div>
+                )}
+
+                {/* Divider + plan cards heading */}
+                <div className="mb-6">
+                    <h3 className="text-lg font-bold text-text-primary">
+                        {activeSubscription ? 'Compare Plans' : 'Choose a Plan'}
+                    </h3>
+                    <p className="text-sm text-text-muted mt-0.5">
+                        {activeSubscription
+                            ? 'Upgrade or switch your plan at any time.'
+                            : 'All plans include instant activation and full feature access.'}
+                    </p>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
