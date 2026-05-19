@@ -201,6 +201,10 @@ Route::prefix('marketplace')->name('marketplace.')->group(function () {
 
         // Messages
         Route::post('/orders/{order}/messages', [\Modules\Marketplace\Http\Controllers\OrderMessageController::class, 'store'])->name('orders.messages.store');
+
+        // Reviews
+        Route::post('/orders/{order}/review', [\Modules\Marketplace\Http\Controllers\ServiceReviewController::class, 'store'])->name('orders.review.store');
+        Route::delete('/reviews/{review}', [\Modules\Marketplace\Http\Controllers\ServiceReviewController::class, 'destroy'])->name('reviews.destroy');
     });
 
     // Public: show single service — wildcard LAST

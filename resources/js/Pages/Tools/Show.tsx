@@ -12,7 +12,7 @@ import { Cpu } from 'lucide-react';
 
 interface PricingPlan {
     id: number; name: string; price_monthly: number; price_yearly: number;
-    max_devices: number; features: string[] | string; is_popular: boolean; yearly_savings: number;
+    max_devices: number; features: string[]; is_popular: boolean; yearly_savings: number;
 }
 interface ToolVersion {
     version: string; changelog: string; is_latest: boolean;
@@ -23,8 +23,8 @@ interface Props {
         id: number; slug: string; title: string; description: string;
         short_description: string; icon_url: string | null; category: string;
         category_label: string; supported_os: string[]; current_version: string;
-        download_count: number; is_featured: boolean; features: string[] | string;
-        requirements: string[] | string;
+        download_count: number; is_featured: boolean; features: string[];
+        requirements: string[];
         screenshots: { id: number; url: string; caption: string | null }[];
         pricing_plans: PricingPlan[];
         versions: ToolVersion[];
@@ -43,17 +43,8 @@ export default function Show({ tool, userSubscription, userLicense }: Props) {
     const isAuthed = !!auth?.user;
     const isSubscribed = !!userSubscription && userSubscription.status === 'active';
 
-    const safeFeatures = Array.isArray(tool.features)
-        ? tool.features
-        : typeof tool.features === 'string'
-            ? (() => { try { return JSON.parse(tool.features); } catch { return []; } })()
-            : [];
-
-    const safeRequirements = Array.isArray(tool.requirements)
-        ? tool.requirements
-        : typeof tool.requirements === 'string'
-            ? (() => { try { return JSON.parse(tool.requirements); } catch { return []; } })()
-            : [];
+    const safeFeatures = tool.features ?? [];
+    const safeRequirements = tool.requirements ?? [];
 
     const latestVersion = (tool.versions ?? []).find(v => v.is_latest) ?? tool.versions?.[0] ?? null;
 

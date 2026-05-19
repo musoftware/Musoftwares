@@ -15,6 +15,8 @@ use App\Events\MarketplaceOrderPlaced;
 use App\Events\MarketplaceOrderCompleted;
 use App\Events\ProposalAccepted;
 use App\Events\ReferralCommissionEarned;
+use App\Events\MessageSent;
+use App\Events\TimerUpdated;
 
 /**
  * EventServiceProvider — wires all domain events to the Activity Engine listener.
@@ -39,6 +41,10 @@ class EventServiceProvider extends ServiceProvider
 
         // Freelance
         ProposalAccepted::class        => [ActivityEventListener::class],
+
+        // Messaging & Timer
+        MessageSent::class             => [ActivityEventListener::class],
+        TimerUpdated::class            => [ActivityEventListener::class],
     ];
 
     public function boot(): void
