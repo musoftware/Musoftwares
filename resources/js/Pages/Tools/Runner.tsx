@@ -53,9 +53,11 @@ export default function Runner({ tool, subscription, runtimePort, pluginSlug }: 
     const [rtStatus,  setRtStatus]  = useState<'checking'|'ok'|'offline'>('checking');
     const [expandedId, setExpandedId] = useState<string | null>(null);
     const [copied,    setCopied]    = useState(false);
-    const wsRef   = useRef<WebSocket | null>(null);
-    const pollRef = useRef<any>(null);
-    const logsEnd = useRef<HTMLDivElement>(null);
+    const [elapsed,   setElapsed]   = useState(0);
+    const wsRef    = useRef<WebSocket | null>(null);
+    const pollRef  = useRef<any>(null);
+    const timerRef = useRef<any>(null);
+    const logsEnd  = useRef<HTMLDivElement>(null);
 
     // ── Check runtime on mount ──────────────────────────────────────────────
     useEffect(() => {
@@ -83,10 +85,12 @@ export default function Runner({ tool, subscription, runtimePort, pluginSlug }: 
                     setResults(vids);
                     setStatus('done');
                     setProgress(100);
+                    clearInterval(timerRef.current);
                 }
                 if (msg.event === 'task.error') {
                     setErrMsg(msg.data?.message ?? 'Unknown error');
                     setStatus('error');
+                    clearInterval(timerRef.current);
                 }
             } catch {}
         };
@@ -108,11 +112,13 @@ export default function Runner({ tool, subscription, runtimePort, pluginSlug }: 
                     setStatus('done');
                     setProgress(100);
                     clearInterval(pollRef.current);
+                    clearInterval(timerRef.current);
                 }
                 if (d.status === 'error') {
                     setErrMsg(d.error ?? 'Error');
                     setStatus('error');
                     clearInterval(pollRef.current);
+                    clearInterval(timerRef.current);
                 }
             } catch {}
         }, 1500);
@@ -124,7 +130,13 @@ export default function Runner({ tool, subscription, runtimePort, pluginSlug }: 
         if (act.needsQuery && !query.trim()) return;
 
         setStatus('running'); setLogs([]); setResults([]);
-        setErrMsg(''); setProgress(0); setTaskId(null);
+        setErrMsg(''); setProgress(0); setTaskId(null); setElapsed(0);
+
+        // Start elapsed timer
+        const startTime = Date.now();
+        timerRef.current = setInterval(() => {
+            setElapsed(Math.floor((Date.now() - startTime) / 1000));
+        }, 1000);
 
         try {
             const res = await fetch(`${base}/plugins/${pluginSlug}/run`, {
@@ -145,12 +157,14 @@ export default function Runner({ tool, subscription, runtimePort, pluginSlug }: 
         } catch (e: any) {
             setErrMsg('Cannot reach runtime at ' + base + '. Is it running?');
             setStatus('error');
+            clearInterval(timerRef.current);
         }
     };
 
     const handleStop = async () => {
         if (taskId) await fetch(`${base}/tasks/${taskId}/stop`, { method: 'POST' });
         clearInterval(pollRef.current);
+        clearInterval(timerRef.current);
         wsRef.current?.close();
         setStatus('idle');
     };
@@ -303,7 +317,8 @@ export default function Runner({ tool, subscription, runtimePort, pluginSlug }: 
                                     <div className="space-y-1.5">
                                         <div className="flex justify-between text-xs text-slate-400">
                                             <span className="flex items-center gap-1.5">
-                                                <Loader2 className="h-3 w-3 animate-spin" /> Running...
+                                                <Loader2 className="h-3 w-3 animate-spin" />
+                                                Running... {elapsed}s
                                             </span>
                                             <span>{progress}%</span>
                                         </div>

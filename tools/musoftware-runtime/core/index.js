@@ -204,16 +204,9 @@ async function main() {
         }
 
         // ── LICENSE CHECK ────────────────────────────────────────────────────
-        // Rule 1: token required
-        if (!config.token) {
-            return res.status(401).json({
-                error:     'runtime_not_configured',
-                message:   'Configure your API token at /setup before running plugins.',
-                setup_url: `http://127.0.0.1:${config.port}/setup`,
-            });
-        }
-
-        // Rule 2: check local license cache (fast path — no network)
+        // Fast path: check local license cache first.
+        // An 'active' cache hit runs immediately — no token or network needed.
+        // Token is only required when we need to call the platform for verification.
         const licenseState = storage.checkLicense(slug);
 
         if (licenseState === 'expired') {
@@ -231,7 +224,16 @@ async function main() {
         }
 
         if (licenseState !== 'active') {
-            // 'not_found' or 'cache_stale' — must verify with platform
+            // 'not_found' or 'cache_stale' — must verify with platform.
+            // Requires a valid token.
+            if (!config.token) {
+                return res.status(401).json({
+                    error:     'runtime_not_configured',
+                    message:   'Log in at /setup first — the runtime needs to verify your subscription.',
+                    setup_url: `http://127.0.0.1:${config.port}/setup`,
+                });
+            }
+
             logger.info(`[license] Cache '${licenseState}' for '${slug}' — verifying with platform...`);
             try {
                 const axios     = require('axios');
