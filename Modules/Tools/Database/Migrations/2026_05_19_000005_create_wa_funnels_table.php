@@ -43,7 +43,6 @@ return new class extends Migration
             'category'          => 'whatsapp',
             'supported_os'      => json_encode(['windows', 'mac', 'linux']),
             'current_version'   => '1.0.0',
-            'max_devices'       => 3,
             'is_active'         => true,
             'is_featured'       => true,
             'is_free'           => false,
@@ -56,16 +55,13 @@ return new class extends Migration
                 'A/B testing optimizer',
                 'Persistent state machine',
                 'Integration with AI Agent nodes',
-                'Humanized typing simulation',
-            ]),
+                'Humanized typing simulation']),
             'requirements'      => json_encode([
                 'Node.js runtime (auto-managed)',
                 'Chrome/Chromium browser',
-                'Active WhatsApp account',
-            ]),
+                'Active WhatsApp account']),
             'created_at'        => now(),
-            'updated_at'        => now(),
-        ]);
+            'updated_at'        => now()]);
 
         // Pricing plans
         DB::table('tool_pricing_plans')->insert([
@@ -74,38 +70,31 @@ return new class extends Migration
                 'name'           => 'Growth',
                 'price_monthly'  => 99.00,
                 'price_yearly'   => 990.00,
-                'max_devices'    => 1,
                 'features'       => json_encode(['3 Active Funnels', 'Basic Nodes', '1,000 active contacts']),
                 'is_popular'     => false,
                 'sort_order'     => 0,
                 'created_at'     => now(),
-                'updated_at'     => now(),
-            ],
+                'updated_at'     => now()],
             [
                 'tool_id'        => $engineId,
                 'name'           => 'Agency',
                 'price_monthly'  => 249.00,
                 'price_yearly'   => 2490.00,
-                'max_devices'    => 3,
                 'features'       => json_encode(['Unlimited Funnels', 'Advanced A/B Testing', '10,000 active contacts', 'API Webhooks']),
                 'is_popular'     => true,
                 'sort_order'     => 1,
                 'created_at'     => now(),
-                'updated_at'     => now(),
-            ],
+                'updated_at'     => now()],
             [
                 'tool_id'        => $engineId,
                 'name'           => 'Enterprise',
                 'price_monthly'  => 499.00,
                 'price_yearly'   => 4990.00,
-                'max_devices'    => 10,
                 'features'       => json_encode(['Unlimited Everything', 'Custom Nodes', 'Dedicated IP Proxy', 'Priority Support']),
                 'is_popular'     => false,
                 'sort_order'     => 2,
                 'created_at'     => now(),
-                'updated_at'     => now(),
-            ],
-        ]);
+                'updated_at'     => now()]]);
     }
 
     public function down(): void

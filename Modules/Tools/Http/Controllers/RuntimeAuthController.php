@@ -83,6 +83,10 @@ class RuntimeAuthController extends Controller
             ]);
 
             if (! $response->successful()) {
+                \Illuminate\Support\Facades\Log::error('Runtime connection failed', [
+                    'status' => $response->status(),
+                    'body' => $response->body(),
+                ]);
                 // Token was created — revoke it since callback failed
                 $token->accessToken->delete();
 

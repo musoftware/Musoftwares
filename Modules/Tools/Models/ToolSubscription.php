@@ -65,7 +65,6 @@ class ToolSubscription extends Model
             'user_id'               => $this->user_id,
             'tool_id'               => $this->tool_id,
             'tool_subscription_id'  => $this->id,
-            'max_devices'           => $this->plan->max_devices ?? 3,
             'status'                => 'active',
             'expires_at'            => $this->expires_at,
         ]);

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Head, router, usePage, Link } from '@inertiajs/react';
 import { Monitor, Wifi, CheckCircle2, AlertCircle, Loader2, Shield, Terminal, ArrowRight, Download, ExternalLink } from 'lucide-react';
 
@@ -33,6 +33,12 @@ export default function RuntimeConnect({ code, port, userName, userEmail, succes
         // Fallback if window.close() is blocked
         router.visit('/');
     }
+
+    useEffect(() => {
+        if (callbackError) {
+            window.location.assign('musoftware://open');
+        }
+    }, [callbackError]);
 
     if (missingCode) {
         return (
@@ -205,9 +211,21 @@ export default function RuntimeConnect({ code, port, userName, userEmail, succes
 
                 {/* Error */}
                 {callbackError && (
-                    <div className="flex items-start gap-2.5 rounded-lg border border-red-500/20 bg-red-500/10 p-3 text-sm text-red-400">
-                        <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
-                        <span>{callbackError}</span>
+                    <div className="flex flex-col gap-3 rounded-xl border border-red-500/20 bg-red-500/10 p-4">
+                        <div className="flex items-start gap-2.5 text-sm text-red-400">
+                            <AlertCircle className="w-5 h-5 shrink-0 mt-0.5" />
+                            <div className="space-y-1">
+                                <p className="font-semibold">Runtime not responding</p>
+                                <p className="text-xs text-red-400/80">Make sure the Musoftware Runtime is open on your computer.</p>
+                            </div>
+                        </div>
+                        <a
+                            href="musoftware://open"
+                            className="inline-flex items-center justify-center gap-2 rounded-lg bg-red-500/20 px-4 py-2.5 text-sm font-medium text-red-400 hover:bg-red-500/30 transition-colors"
+                        >
+                            <Terminal className="w-4 h-4" />
+                            Launch Runtime App
+                        </a>
                     </div>
                 )}
 

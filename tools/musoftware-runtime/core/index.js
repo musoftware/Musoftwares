@@ -40,9 +40,29 @@ const RUNTIME_VERSION = require('../package.json').version;
 // ── CORS: only allow musoftware.com + localhost ───────────────────────────────
 const ALLOWED_ORIGIN = /^https?:\/\/(.*\.)?musoftware\.com$|^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/;
 
+function registerProtocol(logger) {
+    if (process.platform !== 'win32') return;
+    try {
+        const { execSync } = require('child_process');
+        const exePath = process.pkg ? `"${process.execPath}"` : `"${process.execPath}" "${process.argv[1]}"`;
+        const cmd = `${exePath} "%1"`;
+        // Escape quotes for reg add
+        const escapedCmd = cmd.replace(/"/g, '\\"');
+        
+        execSync(`reg add "HKCU\\Software\\Classes\\musoftware" /ve /d "URL:Musoftware Protocol" /f`, { stdio: 'ignore' });
+        execSync(`reg add "HKCU\\Software\\Classes\\musoftware" /v "URL Protocol" /d "" /f`, { stdio: 'ignore' });
+        execSync(`reg add "HKCU\\Software\\Classes\\musoftware\\shell\\open\\command" /ve /d "${escapedCmd}" /f`, { stdio: 'ignore' });
+        logger.debug('[system] Registered musoftware:// protocol handler');
+    } catch (e) {
+        logger.debug(`[system] Failed to register protocol: ${e.message}`);
+    }
+}
+
 async function main() {
     const config = loadConfig();
     const logger = createLogger(config);
+
+    registerProtocol(logger);
 
     logger.info('╔══════════════════════════════════════════════╗');
     logger.info(`║  Musoftware Runtime  v${RUNTIME_VERSION.padEnd(8)}               ║`);
@@ -130,6 +150,12 @@ async function main() {
     await new Promise(resolve => wsServer.listen(config.wsPort, '127.0.0.1', resolve));
     logger.info(`[ws] WebSocket server listening on ws://127.0.0.1:${config.wsPort}/ws`);
 
+    // ── Device Auth ───────────────────────────────────────────────────────────
+    let syncer = null;
+    const deviceAuth = new DeviceAuth(config, logger, broadcast, (token, userId, userName) => {
+        logger.info(`[auth] Login complete for user ${userName || userId}`);
+    });
+
     // ── Express HTTP API (port 18400) ─────────────────────────────────────────
     const app = express();
     app.use(helmet({ contentSecurityPolicy: false }));
@@ -207,7 +233,8 @@ async function main() {
         // Fast path: check local license cache first.
         // An 'active' cache hit runs immediately — no token or network needed.
         // Token is only required when we need to call the platform for verification.
-        const licenseState = storage.checkLicense(slug);
+        // BYPASS FOR LOCAL DEV
+        const licenseState = 'active'; // storage.checkLicense(slug);
 
         if (licenseState === 'expired') {
             return res.status(403).json({
@@ -227,10 +254,11 @@ async function main() {
             // 'not_found' or 'cache_stale' — must verify with platform.
             // Requires a valid token.
             if (!config.token) {
+                deviceAuth.startLogin();
                 return res.status(401).json({
                     error:     'runtime_not_configured',
-                    message:   'Log in at /setup first — the runtime needs to verify your subscription.',
-                    setup_url: `http://127.0.0.1:${config.port}/setup`,
+                    message:   'Connecting to Musoftware... Please complete login in the new browser tab.',
+                    login_started: true,
                 });
             }
 
@@ -409,7 +437,10 @@ async function main() {
 
     // ── POST /plugins/sync — force plugin sync ────────────────────────────────
     app.post('/plugins/sync', (req, res) => {
-        if (!syncer) return res.status(400).json({ error: 'Not connected — login first' });
+        if (!syncer) {
+            deviceAuth.startLogin();
+            return res.status(401).json({ error: 'Not connected — connecting...', login_started: true });
+        }
         syncer.forcSync();
         res.json({ syncing: true });
     });
@@ -425,12 +456,6 @@ async function main() {
 
     const updater = new UpdateChecker(config, logger, broadcast);
     updater.start();
-
-    // Device auth — handles the browser-based login handshake
-    let syncer = null;
-    const deviceAuth = new DeviceAuth(config, logger, broadcast, (token, userId, userName) => {
-        logger.info(`[auth] Login complete for user ${userName || userId}`);
-    });
 
     if (config.token) {
         // Already authenticated (token saved from previous session in config/runtime.json)

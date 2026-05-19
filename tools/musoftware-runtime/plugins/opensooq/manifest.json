@@ -1,0 +1,15 @@
+{
+  "slug": "opensooq",
+  "name": "Opensooq Extractor",
+  "version": "1.0.0",
+  "description": "Extracts leads from opensooq",
+  "author": "Musoftware",
+  "capabilities": [
+    "prospecting-worker"
+  ],
+  "entry": "worker.js",
+  "timeoutSeconds": 3600,
+  "config": {
+    "headless": true
+  }
+}

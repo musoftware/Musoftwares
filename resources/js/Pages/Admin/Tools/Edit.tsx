@@ -20,7 +20,6 @@ interface Tool {
     short_description: string;
     category: string;
     supported_os: string[];
-    max_devices: number;
     icon_url: string | null;
     features: string[];
     requirements: string[];
@@ -50,7 +49,7 @@ export default function AdminToolEdit({ tool, categories }: Props) {
         description: tool.description ?? '',
         category: tool.category,
         supported_os: tool.supported_os ?? ['windows'],
-        max_devices: tool.max_devices,
+        
         is_active: tool.is_active,
         is_featured: tool.is_featured,
         features: tool.features ?? [],
@@ -184,8 +183,6 @@ export default function AdminToolEdit({ tool, categories }: Props) {
                                 <Label className="text-xs font-semibold">Max Devices</Label>
                                 <Input
                                     type="number"
-                                    value={data.max_devices}
-                                    onChange={e => setData('max_devices', parseInt(e.target.value))}
                                     min={1} max={100}
                                     className="h-9 text-sm"
                                 />

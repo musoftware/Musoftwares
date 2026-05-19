@@ -14,7 +14,7 @@ class Tool extends Model
     protected $fillable = [
         'title', 'slug', 'description', 'short_description',
         'icon', 'category', 'supported_os', 'current_version',
-        'max_devices', 'is_active', 'is_featured', 'is_free', 'download_count',
+        'is_active', 'is_featured', 'is_free', 'download_count',
         'features', 'requirements', 'runner_component',
     ];
 

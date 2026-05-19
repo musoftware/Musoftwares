@@ -18,6 +18,7 @@ describe('DeviceAuth', () => {
     let onConnected;
 
     beforeEach(() => {
+        jest.useFakeTimers();
         config = { platformUrl: 'http://localhost:8000', port: 18400 };
         logger = { info: jest.fn(), warn: jest.fn(), debug: jest.fn() };
         broadcast = jest.fn();
@@ -25,6 +26,10 @@ describe('DeviceAuth', () => {
         deviceAuth = new DeviceAuth(config, logger, broadcast, onConnected);
 
         crypto.randomBytes.mockReturnValue(Buffer.from('test_code_buffer'));
+    });
+
+    afterEach(() => {
+        jest.useRealTimers();
     });
 
     test('startLogin generates a code and opens browser', () => {

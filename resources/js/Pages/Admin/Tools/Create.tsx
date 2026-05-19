@@ -32,7 +32,7 @@ export default function AdminToolCreate({ categories }: Props) {
         description: '',
         category: Object.keys(categories)[0] ?? 'scraper',
         supported_os: ['windows'] as string[],
-        max_devices: 3,
+        
         is_active: true,
         is_featured: false,
         features: [] as string[],
@@ -176,8 +176,6 @@ export default function AdminToolCreate({ categories }: Props) {
                                 <Label className="text-xs font-semibold">Max Devices *</Label>
                                 <Input
                                     type="number"
-                                    value={data.max_devices}
-                                    onChange={e => setData('max_devices', parseInt(e.target.value))}
                                     min={1}
                                     max={100}
                                     className="h-9 text-sm"

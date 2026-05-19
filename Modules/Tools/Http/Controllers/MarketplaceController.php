@@ -81,7 +81,6 @@ class MarketplaceController extends Controller
             $userLicense = ToolLicense::where('user_id', auth()->id())
                 ->where('tool_id', $tool->id)
                 ->where('status', 'active')
-                ->with('activeDevices')
                 ->latest()
                 ->first();
         }
@@ -98,9 +97,7 @@ class MarketplaceController extends Controller
             'userLicense'      => $userLicense ? [
                 'id'             => $userLicense->id,
                 'license_key'    => $userLicense->license_key,
-                'max_devices'    => $userLicense->max_devices,
-                'active_devices' => $userLicense->activeDevices->count(),
-            ] : null,
+                ] : null,
         ]);
     }
 
@@ -193,7 +190,6 @@ class MarketplaceController extends Controller
                 'name'            => $p->name,
                 'price_monthly'   => $p->price_monthly,
                 'price_yearly'    => $p->price_yearly,
-                'max_devices'     => $p->max_devices,
                 'features'        => $this->safeArray($p->features),
                 'is_popular'      => $p->is_popular,
                 'yearly_savings'  => $p->yearly_savings,

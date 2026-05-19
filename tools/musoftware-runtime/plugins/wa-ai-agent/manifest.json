@@ -1,10 +1,12 @@
 {
+  "id": "wa-ai-agent",
   "slug": "wa-ai-agent",
   "name": "WhatsApp AI Sales Agent",
   "version": "1.0.0",
   "description": "Arabic-first AI sales agent that converses with leads, qualifies them, and drives them to conversion.",
   "author": "Musoftware",
   "capabilities": ["whatsapp", "ai", "conversation", "arabic"],
+  "runtime": "nodejs",
   "entry": "worker.js",
   "timeoutSeconds": 86400,
   "config": {

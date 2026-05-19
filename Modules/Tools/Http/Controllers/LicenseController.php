@@ -30,8 +30,6 @@ class LicenseController extends Controller
                 'license_key'     => $lic->license_key,
                 'status'          => $lic->status,
                 'is_valid'        => $lic->isValid(),
-                'max_devices'     => $lic->max_devices,
-                'active_devices'  => $lic->activeDevices->count(),
                 'expires_at'      => $lic->expires_at?->toDateString(),
                 'last_validated'  => $lic->last_validated_at?->diffForHumans(),
                 'tool'            => [
@@ -72,7 +70,6 @@ class LicenseController extends Controller
             'license' => [
                 'id'           => $license->id,
                 'license_key'  => $license->license_key,
-                'max_devices'  => $license->max_devices,
                 'tool'         => [
                     'slug'  => $license->tool->slug,
                     'title' => $license->tool->title,

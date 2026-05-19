@@ -6,7 +6,7 @@ import { CheckCircle2, CreditCard, Wallet, AlertCircle, ArrowLeft, Shield } from
 
 interface Props {
     tool: { slug: string; title: string; icon_url: string | null };
-    plan: { id: number; name: string; price_monthly: number; price_yearly: number; max_devices: number; features: string[] };
+    plan: { id: number; name: string; price_monthly: number; price_yearly: number; features: string[] };
     walletBalance: number;
     hasExisting: boolean;
 }
@@ -66,7 +66,7 @@ export default function Subscribe({ tool, plan, walletBalance, hasExisting }: Pr
                 {/* Header */}
                 <div>
                     <h1 className="text-xl font-bold text-slate-900">Subscribe to {tool.title}</h1>
-                    <p className="text-sm text-slate-500 mt-1">Get access to the {plan.name} plan and use it on your devices.</p>
+                    <p className="text-sm text-slate-500 mt-1">Get access to the {plan.name} plan and unlock its full potential.</p>
                 </div>
 
                 <form onSubmit={handleSubmit} className="space-y-5">
@@ -75,7 +75,7 @@ export default function Subscribe({ tool, plan, walletBalance, hasExisting }: Pr
                         <div className="px-5 py-4 flex items-center justify-between border-b border-slate-700">
                             <div>
                                 <p className="font-semibold text-white">{plan.name} Plan</p>
-                                <p className="text-xs text-slate-400 mt-0.5">Up to {plan.max_devices} device{plan.max_devices > 1 ? 's' : ''}</p>
+                                
                             </div>
                             {/* Billing toggle */}
                             <div className="flex items-center bg-slate-800 rounded-lg p-0.5 gap-0.5">

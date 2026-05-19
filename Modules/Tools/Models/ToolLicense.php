@@ -10,14 +10,13 @@ class ToolLicense extends Model
 {
     protected $fillable = [
         'license_key', 'user_id', 'tool_id', 'tool_subscription_id',
-        'max_devices', 'status', 'expires_at', 'last_validated_at',
+        'status', 'expires_at', 'last_validated_at',
     ];
 
     protected $casts = [
         'expires_at'        => 'datetime',
         'last_validated_at' => 'datetime',
-        'max_devices'       => 'integer',
-    ];
+        ];
 
     public static array $statuses = ['active', 'suspended', 'revoked'];
 
@@ -41,11 +40,6 @@ class ToolLicense extends Model
         return $this->hasMany(ActivatedDevice::class);
     }
 
-    public function activeDevices(): HasMany
-    {
-        return $this->hasMany(ActivatedDevice::class)->where('status', 'active');
-    }
-
     public function isValid(): bool
     {
         return $this->status === 'active'
@@ -54,8 +48,7 @@ class ToolLicense extends Model
 
     public function canActivateDevice(): bool
     {
-        return $this->isValid()
-            && $this->activeDevices()->count() < $this->max_devices;
+        return $this->isValid();
     }
 
     public function touchValidation(): void

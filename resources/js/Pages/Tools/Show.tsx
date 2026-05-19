@@ -12,7 +12,7 @@ import { Cpu } from 'lucide-react';
 
 interface PricingPlan {
     id: number; name: string; price_monthly: number; price_yearly: number;
-    max_devices: number; features: string[]; is_popular: boolean; yearly_savings: number;
+    features: string[]; is_popular: boolean; yearly_savings: number;
 }
 interface ToolVersion {
     version: string; changelog: string; is_latest: boolean;
@@ -34,8 +34,7 @@ interface Props {
         status: string; expires_at: string;
     } | null;
     userLicense: {
-        id: number; license_key: string; max_devices: number; active_devices: number;
-    } | null;
+        id: number; license_key: string; } | null;
 }
 
 export default function Show({ tool, userSubscription, userLicense }: Props) {

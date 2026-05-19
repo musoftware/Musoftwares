@@ -1,0 +1,15 @@
+{
+  "slug": "snapchat",
+  "name": "Snapchat Extractor",
+  "version": "1.0.0",
+  "description": "Extracts leads from snapchat",
+  "author": "Musoftware",
+  "capabilities": [
+    "prospecting-worker"
+  ],
+  "entry": "worker.js",
+  "timeoutSeconds": 3600,
+  "config": {
+    "headless": true
+  }
+}
