@@ -1,0 +1,9 @@
+{
+  "name": "google_maps",
+  "version": "1.0.0",
+  "description": "Google Maps Worker Plugin",
+  "main": "worker.js",
+  "dependencies": {
+    "puppeteer-core": "^22.0.0"
+  }
+}

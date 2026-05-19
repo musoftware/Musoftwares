@@ -70,6 +70,7 @@
         "lucide-react": "^1.16.0",
         "marked": "^18.0.3",
         "react-dropzone": "^15.0.0",
+        "reactflow": "^11.11.4",
         "recharts": "^3.8.1",
         "tailwind-merge": "^3.6.0"
     }
