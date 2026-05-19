@@ -7,9 +7,12 @@ import {
     Search, Loader2, CheckCircle2, AlertCircle, Wifi, WifiOff,
     ChevronDown, ChevronUp, Copy, Check
 } from 'lucide-react';
+import ViralAutopsyRunner from '@/Pages/Tools/ViralAutopsyRunner';
+import HookAnalyzerRunner from '@/Pages/Tools/HookAnalyzerRunner';
+import FormatExtractorRunner from '@/Pages/Tools/FormatExtractorRunner';
 
 interface Props {
-    tool:         { slug: string; title: string; icon_url: string | null; short_description: string };
+    tool:         { slug: string; title: string; icon_url: string | null; short_description: string; category?: string; runner_component?: string };
     subscription: { plan_name: string; expires_at: string | null };
     runtimePort:  number;
     pluginSlug:   string;
@@ -38,6 +41,13 @@ function fmt(n: number): string {
 }
 
 export default function Runner({ tool, subscription, runtimePort, pluginSlug }: Props) {
+    // ── Route to tool-specific runner if available ──────────────────────────
+    const component = tool.runner_component || pluginSlug;
+    if (component === 'viral-autopsy')    return <ViralAutopsyRunner tool={tool} subscription={subscription} runtimePort={runtimePort} pluginSlug={pluginSlug} />;
+    if (component === 'hook-analyzer')    return <HookAnalyzerRunner tool={tool} subscription={subscription} runtimePort={runtimePort} pluginSlug={pluginSlug} />;
+    if (component === 'format-extractor') return <FormatExtractorRunner tool={tool} subscription={subscription} runtimePort={runtimePort} pluginSlug={pluginSlug} />;
+
+    // ── Default: TikTok Scraper runner (original) ──────────────────────────
     const base = `http://127.0.0.1:${runtimePort}`;
 
     const [action,    setAction]    = useState<Action>('keyword');

@@ -77,6 +77,7 @@ class TaskRunner extends EventEmitter {
             status:   'running',
             logs,
             startedAt: Date.now(),
+            hasResult: false,   // tracks whether a JSON "result" line was received
         });
 
         this.storage?.createTask(taskId, plugin.id, runtime, params);
@@ -125,14 +126,18 @@ class TaskRunner extends EventEmitter {
             const task = this._tasks.get(taskId);
             if (!task) return;
 
-            const status = code === 0 ? 'done' : 'failed';
-            task.status  = status;
-            this.storage?.updateTask(taskId, status);
-
             if (code === 0) {
-                this.emit('task.done', { taskId, pluginId: plugin.id, runtime });
+                // Only emit task.done if no JSON "result" line was already received.
+                // Otherwise the duplicate event (without result data) would clobber
+                // the frontend's results.
+                if (!task.hasResult) {
+                    task.status = 'done';
+                    this.storage?.updateTask(taskId, 'done');
+                    this.emit('task.done', { taskId, pluginId: plugin.id, runtime });
+                }
                 this.logger.info(`[runner] Task done: ${taskId}`);
             } else {
+                task.status = 'failed';
                 const err = `Process exited with code ${code}`;
                 this.storage?.updateTask(taskId, 'failed', null, err);
                 this.emit('task.error', { taskId, pluginId: plugin.id, runtime, error: err });
@@ -172,10 +177,13 @@ class TaskRunner extends EventEmitter {
                     });
                     break;
 
-                case 'result':
+                case 'result': {
+                    const task = this._tasks.get(taskId);
+                    if (task) { task.status = 'done'; task.hasResult = true; }
                     this.storage?.updateTask(taskId, 'done', msg.data);
                     this.emit('task.done', { taskId, pluginId: plugin.id, result: msg.data });
                     break;
+                }
 
                 case 'error':
                     this.storage?.updateTask(taskId, 'failed', null, msg.message);

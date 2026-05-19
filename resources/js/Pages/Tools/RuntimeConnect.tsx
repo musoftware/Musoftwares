@@ -1,17 +1,18 @@
 import React, { useState } from 'react';
-import { Head, router, usePage } from '@inertiajs/react';
-import { Monitor, Wifi, CheckCircle2, AlertCircle, Loader2, Shield } from 'lucide-react';
+import { Head, router, usePage, Link } from '@inertiajs/react';
+import { Monitor, Wifi, CheckCircle2, AlertCircle, Loader2, Shield, Terminal, ArrowRight, Download, ExternalLink } from 'lucide-react';
 
 interface Props {
-    code:      string;
-    port:      number;
-    userName:  string;
-    userEmail: string;
-    success?:  boolean;
-    errors?:   Record<string, string>;
+    code:        string;
+    port:        number;
+    userName:    string;
+    userEmail:   string;
+    success?:    boolean;
+    missingCode?: boolean;
+    errors?:     Record<string, string>;
 }
 
-export default function RuntimeConnect({ code, port, userName, userEmail, success, errors }: Props) {
+export default function RuntimeConnect({ code, port, userName, userEmail, success, missingCode, errors }: Props) {
     const [loading, setLoading] = useState(false);
     const [localError, setLocalError] = useState<string | null>(null);
 
@@ -31,6 +32,72 @@ export default function RuntimeConnect({ code, port, userName, userEmail, succes
         window.close();
         // Fallback if window.close() is blocked
         router.visit('/');
+    }
+
+    if (missingCode) {
+        return (
+            <div className="min-h-screen bg-slate-950 flex items-center justify-center p-6">
+                <Head title="Runtime Connection Required — musoftware" />
+                <div className="w-full max-w-md space-y-6">
+                    {/* Icon */}
+                    <div className="text-center space-y-4">
+                        <div className="mx-auto w-16 h-16 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center">
+                            <Terminal className="w-8 h-8 text-amber-400" />
+                        </div>
+                        <div>
+                            <h1 className="text-2xl font-semibold text-white">Device Code Required</h1>
+                            <p className="mt-2 text-slate-400 text-sm">
+                                This page needs to be opened from the Musoftware Runtime<br />
+                                running on your computer.
+                            </p>
+                        </div>
+                    </div>
+
+                    {/* Steps card */}
+                    <div className="rounded-xl border border-slate-800 bg-slate-900/60 p-5 space-y-4">
+                        <p className="text-xs text-slate-500 uppercase tracking-wider">How to connect</p>
+                        {[
+                            { step: '1', text: 'Open the Musoftware Runtime on your desktop' },
+                            { step: '2', text: 'Right-click the tray icon and select "Connect Account"' },
+                            { step: '3', text: 'A browser window will open with the correct link' },
+                        ].map(({ step, text }) => (
+                            <div key={step} className="flex items-start gap-3">
+                                <div className="w-6 h-6 rounded-full bg-indigo-500/20 border border-indigo-500/30 flex items-center justify-center shrink-0">
+                                    <span className="text-xs font-semibold text-indigo-300">{step}</span>
+                                </div>
+                                <p className="text-sm text-slate-300 pt-0.5">{text}</p>
+                            </div>
+                        ))}
+                    </div>
+
+                    {/* Info */}
+                    <div className="flex items-start gap-2.5 text-xs text-slate-500">
+                        <AlertCircle className="w-3.5 h-3.5 shrink-0 mt-0.5 text-slate-600" />
+                        <span>
+                            The device code is a one-time token that securely links your runtime to your account.
+                            It cannot be entered manually.
+                        </span>
+                    </div>
+
+                    {/* Actions */}
+                    <div className="flex gap-3">
+                        <Link
+                            href={route('tools.explore')}
+                            className="flex-1 rounded-lg border border-slate-700 bg-transparent px-4 py-2.5 text-sm font-medium text-slate-400 hover:bg-slate-800 hover:text-white transition-colors text-center"
+                        >
+                            Browse Tools
+                        </Link>
+                        <Link
+                            href={route('tools.download.agent', { type: 'windows' })}
+                            className="flex-1 rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-indigo-500 transition-colors flex items-center justify-center gap-2"
+                        >
+                            <Download className="w-4 h-4" />
+                            Get Runtime
+                        </Link>
+                    </div>
+                </div>
+            </div>
+        );
     }
 
     if (success) {

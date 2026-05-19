@@ -32,7 +32,13 @@ class RuntimeAuthController extends Controller
         $port = (int) $request->query('port', 18400);
 
         if (! $code) {
-            abort(400, 'Missing device code. Open from the Musoftware Runtime tray.');
+            return Inertia::render('Tools/RuntimeConnect', [
+                'missingCode' => true,
+                'code'        => '',
+                'port'        => $port,
+                'userName'    => auth()->user()->name,
+                'userEmail'   => auth()->user()->email,
+            ]);
         }
 
         return Inertia::render('Tools/RuntimeConnect', [

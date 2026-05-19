@@ -6,12 +6,13 @@ import { ToolCard } from '@/Components/Tools/ToolCard';
 import { PlatformBadges } from '@/Components/Tools/PlatformBadge';
 import {
     Search, ShoppingBag, Zap,
-    Globe, Eye, Database, Bot, Monitor, Activity, Package
+    Globe, Eye, Database, Bot, Monitor, Activity, Package, MessageCircle
 } from 'lucide-react';
 
 const CATEGORY_ICONS: Record<string, React.ElementType> = {
     scraper:    Globe,
     automation: Zap,
+    whatsapp:   MessageCircle,
     ocr:        Eye,
     ai:         Bot,
     data:       Database,
