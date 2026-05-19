@@ -14,7 +14,7 @@ class Tool extends Model
     protected $fillable = [
         'title', 'slug', 'description', 'short_description',
         'icon', 'category', 'supported_os', 'current_version',
-        'max_devices', 'is_active', 'is_featured', 'download_count',
+        'max_devices', 'is_active', 'is_featured', 'is_free', 'download_count',
         'features', 'requirements',
     ];
 
@@ -24,6 +24,7 @@ class Tool extends Model
         'requirements'   => 'array',
         'is_active'      => 'boolean',
         'is_featured'    => 'boolean',
+        'is_free'        => 'boolean',
         'download_count' => 'integer',
     ];
 

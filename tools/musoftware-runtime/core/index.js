@@ -297,12 +297,13 @@ async function main() {
         res.json({ stopped: true });
     });
 
-    // ── GET /tasks/:taskId — task info + logs ─────────────────────────────────
     app.get('/tasks/:taskId', (req, res) => {
         const task = runner.getTask(req.params.taskId);
         if (!task) return res.status(404).json({ error: 'Task not found' });
-        const logs = runner.getLogs(req.params.taskId);
-        res.json({ ...task, logs });
+        const logs    = runner.getLogs(req.params.taskId);
+        // Include result from SQLite (runner.getTask only has status, not result)
+        const stored  = storage.getTask(req.params.taskId);
+        res.json({ ...task, logs, result: stored?.result ?? null });
     });
 
     // ── GET /tasks — recent task history (from SQLite) ────────────────────────

@@ -49,10 +49,13 @@ export default function Runner({ tool, subscription, runtimePort, pluginSlug }: 
     const [logs,      setLogs]      = useState<string[]>([]);
     const [progress,  setProgress]  = useState(0);
     const [results,   setResults]   = useState<VideoResult[]>([]);
+    const [profileData, setProfileData] = useState<any>(null);
     const [errMsg,    setErrMsg]    = useState('');
     const [rtStatus,  setRtStatus]  = useState<'checking'|'ok'|'offline'>('checking');
     const [expandedId, setExpandedId] = useState<string | null>(null);
     const [copied,    setCopied]    = useState(false);
+    const [copiedUrl, setCopiedUrl] = useState<string|null>(null);
+    const [sortBy,    setSortBy]    = useState<'default'|'likes'|'plays'|'comments'|'shares'>('default');
     const [elapsed,   setElapsed]   = useState(0);
     const wsRef    = useRef<WebSocket | null>(null);
     const pollRef  = useRef<any>(null);
@@ -74,21 +77,30 @@ export default function Runner({ tool, subscription, runtimePort, pluginSlug }: 
         const ws = new WebSocket(`ws://127.0.0.1:${runtimePort}/ws`);
         ws.onmessage = (ev) => {
             try {
+                // Payload shape: { event: string, data: { taskId, ... }, ts: number }
                 const msg = JSON.parse(ev.data);
-                if (msg.taskId !== tid) return;
-                if (msg.event === 'task.log')      setLogs(l => [...l, msg.data?.message ?? '']);
-                if (msg.event === 'task.progress') setProgress(msg.data?.percent ?? 0);
-                if (msg.event === 'task.result') {
-                    const d = msg.data?.data ?? {};
-                    const vids = Array.isArray(d.videos) ? d.videos
-                        : (d.profile?.videos ?? []);
+                const d   = msg.data ?? {};
+
+                // Filter to events for THIS task only
+                if (d.taskId && d.taskId !== tid) return;
+
+                if (msg.event === 'task.log')      setLogs(l => [...l, d.message ?? '']);
+                if (msg.event === 'task.progress') setProgress(d.percent ?? 0);
+
+                if (msg.event === 'task.done') {
+                    const result = d.result ?? {};
+                    const vids = Array.isArray(result.videos)
+                        ? result.videos
+                        : (result.profile?.videos ?? []);
                     setResults(vids);
+                    setProfileData(result.profile ?? null);
                     setStatus('done');
                     setProgress(100);
                     clearInterval(timerRef.current);
                 }
+
                 if (msg.event === 'task.error') {
-                    setErrMsg(msg.data?.message ?? 'Unknown error');
+                    setErrMsg(d.error ?? d.message ?? 'Unknown error');
                     setStatus('error');
                     clearInterval(timerRef.current);
                 }
@@ -105,17 +117,19 @@ export default function Runner({ tool, subscription, runtimePort, pluginSlug }: 
                 const d = await r.json();
                 setLogs(d.logs?.map((l: any) => l.message ?? l) ?? []);
                 if (d.status === 'done') {
-                    const vids = Array.isArray(d.result?.data?.videos)
-                        ? d.result.data.videos
-                        : (d.result?.data?.profile?.videos ?? []);
+                    const result = d.result ?? {};
+                    const vids = Array.isArray(result.videos)
+                        ? result.videos
+                        : (result.profile?.videos ?? []);
                     setResults(vids);
+                    setProfileData(result.profile ?? null);
                     setStatus('done');
                     setProgress(100);
                     clearInterval(pollRef.current);
                     clearInterval(timerRef.current);
                 }
-                if (d.status === 'error') {
-                    setErrMsg(d.error ?? 'Error');
+                if (d.status === 'error' || d.status === 'failed') {
+                    setErrMsg(d.error ?? d.result?.error ?? 'Task failed');
                     setStatus('error');
                     clearInterval(pollRef.current);
                     clearInterval(timerRef.current);
@@ -129,8 +143,8 @@ export default function Runner({ tool, subscription, runtimePort, pluginSlug }: 
         const act = ACTIONS.find(a => a.value === action)!;
         if (act.needsQuery && !query.trim()) return;
 
-        setStatus('running'); setLogs([]); setResults([]);
-        setErrMsg(''); setProgress(0); setTaskId(null); setElapsed(0);
+        setStatus('running'); setLogs([]); setResults([]); setProfileData(null);
+        setErrMsg(''); setProgress(0); setTaskId(null); setElapsed(0); setSortBy('default');
 
         // Start elapsed timer
         const startTime = Date.now();
@@ -182,6 +196,24 @@ export default function Runner({ tool, subscription, runtimePort, pluginSlug }: 
         navigator.clipboard.writeText(JSON.stringify(results, null, 2));
         setCopied(true); setTimeout(() => setCopied(false), 2000);
     };
+
+    const copyUrl = (url: string) => {
+        navigator.clipboard.writeText(url);
+        setCopiedUrl(url); setTimeout(() => setCopiedUrl(null), 2000);
+    };
+
+    const sortedResults = [...results].sort((a, b) => {
+        if (sortBy === 'likes')    return b.likes    - a.likes;
+        if (sortBy === 'plays')    return b.plays    - a.plays;
+        if (sortBy === 'comments') return b.comments - a.comments;
+        if (sortBy === 'shares')   return b.shares   - a.shares;
+        return 0;
+    });
+
+    const totalStats = results.reduce((acc, v) => ({
+        likes: acc.likes + v.likes, plays: acc.plays + v.plays,
+        comments: acc.comments + v.comments, shares: acc.shares + v.shares,
+    }), { likes: 0, plays: 0, comments: 0, shares: 0 });
 
     const currentAction = ACTIONS.find(a => a.value === action)!;
 
@@ -347,13 +379,56 @@ export default function Runner({ tool, subscription, runtimePort, pluginSlug }: 
 
                     {/* ── RIGHT: Results ────────────────────────────────────── */}
                     <div>
+
+                        {/* Profile card */}
+                        {profileData && (
+                            <div className="bg-white border border-slate-200 rounded-xl p-4 mb-4 flex items-center gap-4">
+                                {profileData.avatar && <img src={profileData.avatar} className="w-12 h-12 rounded-full object-cover" alt="" />}
+                                <div className="flex-1 min-w-0">
+                                    <p className="font-bold text-slate-900">@{profileData.username}</p>
+                                    <p className="text-xs text-slate-500 truncate">{profileData.bio}</p>
+                                </div>
+                                <div className="flex gap-4 text-center shrink-0">
+                                    {[['Followers', profileData.followers],['Videos', profileData.videos],['Likes', profileData.likes]].map(([l,v]) => (
+                                        <div key={String(l)}>
+                                            <p className="text-xs font-bold text-slate-900">{fmt(Number(v ?? 0))}</p>
+                                            <p className="text-[10px] text-slate-400">{l}</p>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Summary stats */}
+                        {results.length > 0 && (
+                            <div className="grid grid-cols-4 gap-2 mb-4">
+                                {[['❤️ Likes', totalStats.likes],['▶️ Plays', totalStats.plays],['💬 Comments', totalStats.comments],['🔁 Shares', totalStats.shares]].map(([l,v]) => (
+                                    <div key={String(l)} className="bg-white border border-slate-200 rounded-lg p-2.5 text-center">
+                                        <p className="text-sm font-bold text-slate-900">{fmt(Number(v))}</p>
+                                        <p className="text-[10px] text-slate-400">{l}</p>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+
                         {/* Toolbar */}
                         {results.length > 0 && (
                             <div className="flex items-center justify-between mb-4">
                                 <div className="flex items-center gap-2">
                                     <CheckCircle2 className="h-4 w-4 text-emerald-500" />
-                                    <span className="text-sm font-semibold text-slate-900">{results.length} results</span>
-                                    <span className="text-xs text-slate-400">for "{query || 'trending'}"</span>
+                                    <span className="text-sm font-semibold text-slate-900">{results.length} videos</span>
+                                    {/* Sort */}
+                                    <select
+                                        value={sortBy}
+                                        onChange={e => setSortBy(e.target.value as any)}
+                                        className="ml-2 text-xs border border-slate-200 rounded-lg px-2 py-1 bg-white text-slate-600 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                                    >
+                                        <option value="default">Sort: Default</option>
+                                        <option value="plays">Most Played</option>
+                                        <option value="likes">Most Liked</option>
+                                        <option value="comments">Most Comments</option>
+                                        <option value="shares">Most Shared</option>
+                                    </select>
                                 </div>
                                 <div className="flex gap-2">
                                     <Button variant="outline" size="sm" onClick={copyResults} className="gap-1.5 h-8 text-xs">
@@ -395,50 +470,72 @@ export default function Runner({ tool, subscription, runtimePort, pluginSlug }: 
                         )}
 
                         {/* Results grid */}
-                        {results.length > 0 && (
+                        {sortedResults.length > 0 && (
                             <div className="space-y-3">
-                                {results.map((v, i) => (
+                                {sortedResults.map((v, i) => (
                                     <div key={v.id || i} className="bg-white border border-slate-200 rounded-xl overflow-hidden hover:border-slate-300 transition-all">
-                                        <div className="flex items-start gap-4 p-4">
-                                            {/* Cover */}
-                                            <div className="w-16 h-16 rounded-lg bg-slate-100 overflow-hidden shrink-0">
+                                        <div className="flex items-start gap-3 p-4">
+                                            {/* Cover thumbnail */}
+                                            <div className="w-16 h-20 rounded-lg bg-slate-100 overflow-hidden shrink-0 relative group">
                                                 {v.cover_url
                                                     ? <img src={v.cover_url} alt="" className="w-full h-full object-cover" onError={e => { (e.target as any).style.display='none'; }} />
                                                     : <div className="w-full h-full flex items-center justify-center text-2xl">🎵</div>
                                                 }
+                                                {v.duration_sec > 0 && (
+                                                    <span className="absolute bottom-1 right-1 text-[9px] bg-black/70 text-white px-1 rounded">{v.duration_sec}s</span>
+                                                )}
                                             </div>
 
                                             {/* Info */}
                                             <div className="flex-1 min-w-0">
-                                                <p className="text-xs font-semibold text-indigo-600">@{v.author}</p>
+                                                <p className="text-xs font-semibold text-indigo-600">@{v.author} {v.author_name && v.author_name !== v.author && <span className="text-slate-400 font-normal">· {v.author_name}</span>}</p>
                                                 <p className="text-sm text-slate-700 mt-0.5 line-clamp-2 leading-snug">{v.description || '—'}</p>
 
-                                                {/* Stats row */}
+                                                {/* Stats */}
                                                 <div className="flex items-center gap-3 mt-2 flex-wrap">
-                                                    {[
-                                                        { label: '❤️', value: fmt(v.likes) },
-                                                        { label: '💬', value: fmt(v.comments) },
-                                                        { label: '🔁', value: fmt(v.shares) },
-                                                        { label: '▶️', value: fmt(v.plays) },
-                                                        { label: 'ER', value: v.engagement_rate },
-                                                    ].map(s => (
-                                                        <span key={s.label} className="flex items-center gap-0.5 text-[11px] text-slate-500">
-                                                            <span>{s.label}</span>
-                                                            <span className="font-semibold text-slate-700">{s.value}</span>
+                                                    {[['❤️', fmt(v.likes)],['▶️', fmt(v.plays)],['💬', fmt(v.comments)],['🔁', fmt(v.shares)]].map(([lbl,val]) => (
+                                                        <span key={String(lbl)} className="flex items-center gap-0.5 text-[11px] text-slate-500">
+                                                            <span>{lbl}</span><span className="font-semibold text-slate-700">{val}</span>
                                                         </span>
                                                     ))}
-                                                    {v.duration_sec > 0 && (
-                                                        <span className="text-[11px] text-slate-400">{v.duration_sec}s</span>
-                                                    )}
+                                                    <span className="text-[10px] bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded-full">ER {v.engagement_rate}</span>
                                                 </div>
 
-                                                {/* Hashtags */}
-                                                {v.hashtags && (
-                                                    <p className="text-[10px] text-slate-400 mt-1 truncate">{v.hashtags}</p>
-                                                )}
+                                                {v.hashtags && <p className="text-[10px] text-slate-400 mt-1 truncate">{v.hashtags}</p>}
+
+                                                {/* Action buttons */}
+                                                <div className="flex items-center gap-2 mt-2.5">
+                                                    {v.download_url && (
+                                                        <a
+                                                            href={v.download_url}
+                                                            target="_blank"
+                                                            rel="noreferrer"
+                                                            download
+                                                            className="flex items-center gap-1 text-[11px] font-medium px-2.5 py-1 rounded-lg bg-indigo-600 text-white hover:bg-indigo-500 transition-colors"
+                                                        >
+                                                            <Download className="h-3 w-3" /> Download
+                                                        </a>
+                                                    )}
+                                                    {v.download_url && (
+                                                        <button
+                                                            onClick={() => copyUrl(v.download_url)}
+                                                            className="flex items-center gap-1 text-[11px] font-medium px-2.5 py-1 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 transition-colors"
+                                                        >
+                                                            {copiedUrl === v.download_url ? <Check className="h-3 w-3 text-emerald-500" /> : <Copy className="h-3 w-3" />}
+                                                            {copiedUrl === v.download_url ? 'Copied' : 'Copy URL'}
+                                                        </button>
+                                                    )}
+                                                    <a
+                                                        href={`https://tiktok.com/@${v.author}/video/${v.id}`}
+                                                        target="_blank" rel="noreferrer"
+                                                        className="flex items-center gap-1 text-[11px] text-slate-400 hover:text-slate-600 transition-colors ml-auto"
+                                                    >
+                                                        View on TikTok ↗
+                                                    </a>
+                                                </div>
                                             </div>
 
-                                            {/* Expand */}
+                                            {/* Expand raw */}
                                             <button
                                                 onClick={() => setExpandedId(expandedId === v.id ? null : v.id)}
                                                 className="shrink-0 p-1 rounded hover:bg-slate-50 text-slate-400"
@@ -447,12 +544,9 @@ export default function Runner({ tool, subscription, runtimePort, pluginSlug }: 
                                             </button>
                                         </div>
 
-                                        {/* Expanded raw */}
                                         {expandedId === v.id && (
                                             <div className="border-t border-slate-100 bg-slate-50 p-4">
-                                                <pre className="text-[10px] text-slate-600 overflow-x-auto">
-                                                    {JSON.stringify(v, null, 2)}
-                                                </pre>
+                                                <pre className="text-[10px] text-slate-600 overflow-x-auto">{JSON.stringify(v, null, 2)}</pre>
                                             </div>
                                         )}
                                     </div>
