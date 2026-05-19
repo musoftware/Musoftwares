@@ -1,0 +1,8 @@
+{
+  "name": "wa-funnel-engine",
+  "version": "1.0.0",
+  "main": "worker.js",
+  "dependencies": {
+    "node-fetch": "^2.7.0"
+  }
+}

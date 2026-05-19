@@ -10,6 +10,11 @@ import {
 import ViralAutopsyRunner from '@/Pages/Tools/ViralAutopsyRunner';
 import HookAnalyzerRunner from '@/Pages/Tools/HookAnalyzerRunner';
 import FormatExtractorRunner from '@/Pages/Tools/FormatExtractorRunner';
+import WhatsAppSenderRunner from '@/Pages/Tools/WhatsAppSenderRunner';
+import WaWarmupRunner from '@/Pages/Tools/WaWarmupRunner';
+import WaAiAgentRunner from '@/Pages/Tools/WaAiAgentRunner';
+import WaFunnelBuilderRunner from '@/Pages/Tools/WaFunnelBuilderRunner';
+import LeadIntelligenceRunner from '@/Pages/Tools/LeadIntelligenceRunner';
 
 interface Props {
     tool:         { slug: string; title: string; icon_url: string | null; short_description: string; category?: string; runner_component?: string };
@@ -46,6 +51,11 @@ export default function Runner({ tool, subscription, runtimePort, pluginSlug }: 
     if (component === 'viral-autopsy')    return <ViralAutopsyRunner tool={tool} subscription={subscription} runtimePort={runtimePort} pluginSlug={pluginSlug} />;
     if (component === 'hook-analyzer')    return <HookAnalyzerRunner tool={tool} subscription={subscription} runtimePort={runtimePort} pluginSlug={pluginSlug} />;
     if (component === 'format-extractor') return <FormatExtractorRunner tool={tool} subscription={subscription} runtimePort={runtimePort} pluginSlug={pluginSlug} />;
+    if (component === 'whatsapp-sender')  return <WhatsAppSenderRunner tool={tool} subscription={subscription} runtimePort={runtimePort} pluginSlug={pluginSlug} />;
+    if (component === 'wa-warmup')        return <WaWarmupRunner tool={tool} subscription={subscription} runtimePort={runtimePort} pluginSlug={pluginSlug} />;
+    if (component === 'wa-ai-agent')      return <WaAiAgentRunner tool={tool} subscription={subscription} runtimePort={runtimePort} pluginSlug={pluginSlug} />;
+    if (component === 'wa-funnel-engine') return <WaFunnelBuilderRunner tool={tool} subscription={subscription} runtimePort={runtimePort} pluginSlug={pluginSlug} />;
+    if (component === 'lead-intelligence') return <LeadIntelligenceRunner tool={tool} subscription={subscription} runtimePort={runtimePort} pluginSlug={pluginSlug} />;
 
     // ── Default: TikTok Scraper runner (original) ──────────────────────────
     const base = `http://127.0.0.1:${runtimePort}`;

@@ -1,0 +1,13 @@
+{
+  "name": "lead-intelligence",
+  "version": "1.0.0",
+  "description": "Local prospecting engine",
+  "main": "worker.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "better-sqlite3": "^11.0.0",
+    "uuid": "^9.0.1"
+  }
+}

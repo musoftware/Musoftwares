@@ -1,0 +1,13 @@
+{
+  "slug": "lead-intelligence",
+  "name": "Lead Intelligence Engine",
+  "version": "1.0.0",
+  "description": "Local prospecting engine that scrapes, validates, and exports leads autonomously.",
+  "author": "Musoftware",
+  "capabilities": ["prospecting", "scraping", "validation", "export"],
+  "entry": "worker.js",
+  "timeoutSeconds": 86400,
+  "config": {
+    "headless": true
+  }
+}

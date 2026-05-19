@@ -1,0 +1,130 @@
+version: '3.8'
+
+services:
+  laravel.test:
+    build:
+      context: ./tests/TestingDockerEnvironment
+      dockerfile: Dockerfile.laravel.test
+    container_name: musoftware_backend_test
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
+    ports:
+      - '8001:80'
+      - '8081:8080' # Reverb Websocket testing port
+    environment:
+      APP_ENV: testing
+      APP_URL: http://laravel.test:8001
+      DB_CONNECTION: mysql
+      DB_HOST: mysql.test
+      DB_PORT: 3306
+      DB_DATABASE: musoftware_testing
+      DB_USERNAME: root
+      DB_PASSWORD: testing_password
+      REDIS_HOST: redis.test
+      CACHE_STORE: redis
+      QUEUE_CONNECTION: redis
+      SESSION_DRIVER: redis
+      BROADCAST_CONNECTION: reverb
+      REVERB_APP_ID: testing_app_id
+      REVERB_APP_KEY: testing_app_key
+      REVERB_APP_SECRET: testing_app_secret
+      REVERB_HOST: laravel.test
+      REVERB_PORT: 8081
+      REVERB_SCHEME: http
+    depends_on:
+      mysql.test:
+        condition: service_healthy
+      redis.test:
+        condition: service_healthy
+    networks:
+      - testing_network
+
+  queue.test:
+    build:
+      context: ./tests/TestingDockerEnvironment
+      dockerfile: Dockerfile.laravel.test
+    container_name: musoftware_queue_test
+    command: php artisan queue:work redis --sleep=3 --tries=3
+    environment:
+      APP_ENV: testing
+      DB_CONNECTION: mysql
+      DB_HOST: mysql.test
+      DB_PORT: 3306
+      DB_DATABASE: musoftware_testing
+      DB_USERNAME: root
+      DB_PASSWORD: testing_password
+      REDIS_HOST: redis.test
+      QUEUE_CONNECTION: redis
+    depends_on:
+      - laravel.test
+    networks:
+      - testing_network
+
+  agent.test:
+    build:
+      context: .
+      dockerfile: tests/TestingDockerEnvironment/Dockerfile.agent.test
+    container_name: musoftware_agent_test
+    environment:
+      MUSOFTWARE_PORT: 18400
+      MUSOFTWARE_WS_PORT: 18401
+      MUSOFTWARE_PLATFORM: http://laravel.test:8001
+      MUSOFTWARE_LOG_LEVEL: debug
+      PYTHONUNBUFFERED: 1
+    ports:
+      - '18400:18400'
+      - '18401:18401'
+    depends_on:
+      - laravel.test
+    networks:
+      - testing_network
+    volumes:
+      - ./tools/musoftware-runtime:/app/runtime
+
+  mysql.test:
+    image: 'mysql/mysql-server:8.0'
+    container_name: musoftware_mysql_test
+    environment:
+      MYSQL_ROOT_PASSWORD: 'testing_password'
+      MYSQL_ROOT_HOST: '%'
+      MYSQL_DATABASE: 'musoftware_testing'
+    ports:
+      - '33061:3306'
+    networks:
+      - testing_network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-ptesting_password"]
+      retries: 3
+      timeout: 5s
+
+  redis.test:
+    image: 'redis:alpine'
+    container_name: musoftware_redis_test
+    ports:
+      - '63791:6379'
+    networks:
+      - testing_network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      retries: 3
+      timeout: 5s
+
+  e2e-runner:
+    build:
+      context: ./tests/E2E/runner
+    container_name: musoftware_e2e_runner
+    environment:
+      BACKEND_URL: http://laravel.test:8001
+      AGENT_URL: http://agent.test:18400
+      AGENT_WS_URL: ws://agent.test:18401/ws
+    depends_on:
+      - laravel.test
+      - agent.test
+    networks:
+      - testing_network
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock # For chaos testing
+
+networks:
+  testing_network:
+    driver: bridge

@@ -1,0 +1,38 @@
+FROM php:8.2-cli
+
+RUN apt-get update && apt-get install -y \
+    git \
+    curl \
+    libpng-dev \
+    libonig-dev \
+    libxml2-dev \
+    zip \
+    unzip
+
+RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd
+
+# Install composer
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
+# Install Node.js
+RUN curl -sL https://deb.nodesource.com/setup_20.x | bash - \
+    && apt-get install -y nodejs
+
+WORKDIR /var/www/html
+
+COPY composer.json composer.lock package.json package-lock.json* ./
+
+RUN composer install --no-scripts --no-autoloader
+RUN npm install
+
+COPY . .
+
+RUN composer dump-autoload --optimize
+
+# Provide entrypoint to setup DB and start octane/serve
+COPY tests/TestingDockerEnvironment/setup.sh /usr/local/bin/setup.sh
+RUN chmod +x /usr/local/bin/setup.sh
+
+EXPOSE 80 8080
+
+CMD ["/usr/local/bin/setup.sh"]
