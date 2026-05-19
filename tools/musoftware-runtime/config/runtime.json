@@ -1,0 +1,11 @@
+{
+  "port": 18400,
+  "wsPort": 18401,
+  "platformUrl": "http://127.0.0.1:8000",
+  "token": "test-token-from-sanctum",
+  "userId": "1",
+  "logLevel": "debug",
+  "autoUpdate": true,
+  "updateChannel": "stable",
+  "pythonBin": null
+}

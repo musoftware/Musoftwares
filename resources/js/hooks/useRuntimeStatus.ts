@@ -1,203 +1,181 @@
 /**
  * useRuntimeStatus — React hook
  *
- * Detects whether the local agent is running and subscribes to its
- * WebSocket for real-time events (task logs, progress, plugin updates).
+ * Connects to the unified Musoftware Runtime Agent via the SDK.
+ * Uses HTTP :18400 for API and WS :18401 for real-time events.
  *
  * Usage:
- *   const { status, plugins, send, lastEvent } = useRuntimeStatus('nodejs');
+ *   const { status, plugins, runPlugin, stopTask, lastEvent } = useRuntimeStatus();
  *
- * Status:
- *   'detecting'    → initial probe in progress
- *   'not_installed'→ agent not running / not installed
- *   'online'       → agent connected and ready
- *   'offline'      → was connected, now lost connection
+ * Status values:
+ *   'detecting'     → initial probe
+ *   'not_installed' → runtime not running
+ *   'online'        → connected and ready
+ *   'offline'       → was connected, lost connection
  */
 
 import { useEffect, useRef, useState, useCallback } from 'react';
+import { runtimeSDK } from '@/lib/runtime-sdk';
+import type { RuntimePlugin, RuntimeEvent, RuntimeStatus } from '@/lib/runtime-sdk';
 
-export type AgentType = 'nodejs' | 'python';
+export type { RuntimePlugin, RuntimeEvent };
 
-export interface AgentPlugin {
-    id:      string;
-    name:    string;
-    slug:    string;
-    version: string;
-}
+export type ConnectionStatus = 'detecting' | 'not_installed' | 'online' | 'offline';
 
-export interface ActiveTask {
-    taskId:   string;
-    pluginId: string;
-}
-
-export interface AgentStatus {
-    status:      'detecting' | 'not_installed' | 'online' | 'offline';
+export interface UseRuntimeStatusReturn {
+    status:      ConnectionStatus;
     version:     string | null;
-    plugins:     AgentPlugin[];
-    activeTasks: ActiveTask[];
+    plugins:     RuntimePlugin[];
+    activeTasks: { taskId: string; pluginId: string; runtime: string }[];
     error:       string | null;
+    lastEvent:   RuntimeEvent | null;
+    runPlugin:   (slug: string, params?: Record<string, unknown>) => Promise<string | null>;
+    stopTask:    (taskId: string) => void;
+    send:        (type: string, payload?: Record<string, unknown>) => void;
+    connected:   boolean;
 }
 
-export interface RuntimeEvent {
-    event: string;
-    data:  Record<string, unknown>;
-    ts:    number;
-}
+const PROBE_INTERVAL_MS   = 10_000; // when offline — re-probe every 10s
+const REFRESH_INTERVAL_MS = 30_000; // when online — refresh status every 30s
 
-const AGENT_PORTS: Record<AgentType, number> = {
-    nodejs: 18400,
-    python: 18401,
-};
-
-const POLL_INTERVAL_MS    = 10_000; // re-check every 10s when offline
-const WS_RECONNECT_MS     = 5_000;
-
-interface UseRuntimeStatusReturn extends AgentStatus {
-    /** Send a command to the agent via WebSocket */
-    send: (type: string, payload?: Record<string, unknown>) => void;
-    /** Run a plugin on the agent */
-    runPlugin: (slug: string, params?: Record<string, unknown>) => Promise<string | null>;
-    /** Stop a task */
-    stopTask: (taskId: string) => void;
-    /** Last received WS event */
-    lastEvent: RuntimeEvent | null;
-}
-
-export function useRuntimeStatus(agentType: AgentType = 'nodejs'): UseRuntimeStatusReturn {
-    const port    = AGENT_PORTS[agentType];
-    const baseUrl = `http://127.0.0.1:${port}`;
-    const wsUrl   = `ws://127.0.0.1:${port}/ws`;
-
-    const [state, setState] = useState<AgentStatus>({
-        status:      'detecting',
-        version:     null,
-        plugins:     [],
-        activeTasks: [],
-        error:       null,
-    });
+export function useRuntimeStatus(): UseRuntimeStatusReturn {
+    const [status, setStatus]       = useState<ConnectionStatus>('detecting');
+    const [version, setVersion]     = useState<string | null>(null);
+    const [plugins, setPlugins]     = useState<RuntimePlugin[]>([]);
+    const [activeTasks, setTasks]   = useState<{ taskId: string; pluginId: string; runtime: string }[]>([]);
+    const [error, setError]         = useState<string | null>(null);
     const [lastEvent, setLastEvent] = useState<RuntimeEvent | null>(null);
 
-    const wsRef      = useRef<WebSocket | null>(null);
-    const pollRef    = useRef<ReturnType<typeof setInterval> | null>(null);
-    const mountedRef = useRef(true);
+    const mountedRef   = useRef(true);
+    const probeRef     = useRef<ReturnType<typeof setInterval> | null>(null);
+    const refreshRef   = useRef<ReturnType<typeof setInterval> | null>(null);
 
-    // ── HTTP probe ─────────────────────────────────────────────────────────
-    const probe = useCallback(async () => {
-        try {
-            const res = await fetch(`${baseUrl}/status`, {
-                signal: AbortSignal.timeout(2000),
-            });
-            if (!res.ok) throw new Error(`HTTP ${res.status}`);
-            const data = await res.json();
-            if (!mountedRef.current) return;
+    const applyStatus = useCallback((s: RuntimeStatus) => {
+        if (!mountedRef.current) return;
+        setStatus('online');
+        setVersion(s.version ?? null);
+        setPlugins(s.plugins ?? []);
+        setTasks(s.activeTasks ?? []);
+        setError(null);
+    }, []);
 
-            setState({
-                status:      'online',
-                version:     data.version ?? null,
-                plugins:     data.plugins ?? [],
-                activeTasks: data.activeTasks ?? [],
-                error:       null,
-            });
+    const probe = useCallback(async (): Promise<boolean> => {
+        const s = await runtimeSDK.getStatus();
+        if (!mountedRef.current) return false;
+        if (s) {
+            applyStatus(s);
             return true;
-        } catch {
-            if (!mountedRef.current) return false;
-            setState(prev => ({
-                ...prev,
-                status: prev.status === 'online' ? 'offline' : 'not_installed',
-                error:  'Agent not reachable',
-            }));
+        } else {
+            setStatus(prev => prev === 'online' ? 'offline' : 'not_installed');
+            setError('Runtime agent not reachable at 127.0.0.1:18400');
             return false;
         }
-    }, [baseUrl]);
+    }, [applyStatus]);
 
-    // ── WebSocket connection ────────────────────────────────────────────────
-    const connectWs = useCallback(() => {
-        if (wsRef.current?.readyState === WebSocket.OPEN) return;
+    // Handle all WS events
+    const handleEvent = useCallback((event: RuntimeEvent) => {
+        if (!mountedRef.current) return;
+        setLastEvent(event);
 
-        const ws = new WebSocket(wsUrl);
-        wsRef.current = ws;
+        switch (event.event) {
+            case 'runtime.ready':
+                setStatus('online');
+                setPlugins((event.data as any).plugins ?? []);
+                setVersion((event.data as any).version ?? null);
+                break;
 
-        ws.onopen = () => {
-            if (!mountedRef.current) return;
-            setState(prev => ({ ...prev, status: 'online', error: null }));
-        };
+            case 'plugin.installed':
+            case 'plugin.installing':
+                // Refresh plugin list
+                probe();
+                break;
 
-        ws.onmessage = (e) => {
-            if (!mountedRef.current) return;
-            try {
-                const msg: RuntimeEvent = JSON.parse(e.data);
-                setLastEvent(msg);
+            case 'worker.crashed':
+                setError(`Worker crashed: ${(event.data as any).pluginId}`);
+                break;
 
-                // Update plugin list when plugin is installed
-                if (msg.event === 'plugin.installed' || msg.event === 'agent.ready') {
-                    probe();
-                }
-            } catch (_) {}
-        };
+            case 'sdk.disconnected':
+                if (mountedRef.current) setStatus('offline');
+                break;
 
-        ws.onclose = () => {
-            if (!mountedRef.current) return;
-            setState(prev => ({ ...prev, status: 'offline' }));
-            // Reconnect after delay
-            setTimeout(() => {
-                if (mountedRef.current) connectWs();
-            }, WS_RECONNECT_MS);
-        };
+            case 'sdk.connected':
+                if (mountedRef.current) setStatus('online');
+                break;
 
-        ws.onerror = () => {
-            ws.close();
-        };
-    }, [wsUrl, probe]);
+            case 'task.done':
+            case 'task.error':
+                // Refresh active tasks
+                setTasks(prev => prev.filter(t => t.taskId !== (event.data as any).taskId));
+                break;
 
-    // ── Bootstrap ──────────────────────────────────────────────────────────
+            case 'worker.started':
+                setTasks(prev => [
+                    ...prev,
+                    {
+                        taskId:   (event.data as any).taskId as string,
+                        pluginId: (event.data as any).pluginId as string,
+                        runtime:  (event.data as any).runtime as string,
+                    },
+                ]);
+                break;
+        }
+    }, [probe]);
+
     useEffect(() => {
         mountedRef.current = true;
+        const unsub = runtimeSDK.onEvent(handleEvent);
 
+        // Initial probe
         probe().then(online => {
-            if (online) connectWs();
-            else {
-                // Poll until agent comes online
-                pollRef.current = setInterval(async () => {
+            if (online) {
+                // Connect WS
+                runtimeSDK.connect();
+                // Periodic status refresh
+                refreshRef.current = setInterval(probe, REFRESH_INTERVAL_MS);
+            } else {
+                // Poll until runtime comes online
+                probeRef.current = setInterval(async () => {
                     const ok = await probe();
-                    if (ok) {
-                        clearInterval(pollRef.current!);
-                        connectWs();
+                    if (ok && mountedRef.current) {
+                        clearInterval(probeRef.current!);
+                        runtimeSDK.connect();
+                        refreshRef.current = setInterval(probe, REFRESH_INTERVAL_MS);
                     }
-                }, POLL_INTERVAL_MS);
+                }, PROBE_INTERVAL_MS);
             }
         });
 
         return () => {
             mountedRef.current = false;
-            clearInterval(pollRef.current!);
-            wsRef.current?.close();
+            unsub();
+            clearInterval(probeRef.current!);
+            clearInterval(refreshRef.current!);
         };
-    }, [agentType]); // eslint-disable-line react-hooks/exhaustive-deps
+    }, []);  // eslint-disable-line react-hooks/exhaustive-deps
 
-    // ── Public API ─────────────────────────────────────────────────────────
-    const send = useCallback((type: string, payload?: Record<string, unknown>) => {
-        if (wsRef.current?.readyState === WebSocket.OPEN) {
-            wsRef.current.send(JSON.stringify({ type, payload }));
-        }
+    const runPlugin = useCallback(async (slug: string, params?: Record<string, unknown>) => {
+        return runtimeSDK.runPlugin(slug, params);
     }, []);
 
-    const runPlugin = useCallback(async (slug: string, params?: Record<string, unknown>): Promise<string | null> => {
-        try {
-            const res = await fetch(`${baseUrl}/plugins/${slug}/run`, {
-                method:  'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body:    JSON.stringify({ params }),
-            });
-            const data = await res.json();
-            return data.taskId ?? null;
-        } catch {
-            return null;
-        }
-    }, [baseUrl]);
-
     const stopTask = useCallback((taskId: string) => {
-        send('stop', { taskId });
-    }, [send]);
+        runtimeSDK.stopTask(taskId);
+        setTasks(prev => prev.filter(t => t.taskId !== taskId));
+    }, []);
 
-    return { ...state, send, runPlugin, stopTask, lastEvent };
+    const send = useCallback((type: string, payload?: Record<string, unknown>) => {
+        runtimeSDK.send(type, payload);
+    }, []);
+
+    return {
+        status,
+        version,
+        plugins,
+        activeTasks,
+        error,
+        lastEvent,
+        runPlugin,
+        stopTask,
+        send,
+        connected: status === 'online',
+    };
 }

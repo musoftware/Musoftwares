@@ -1,9 +1,0 @@
-{
-  "id": "tiktok-scraper",
-  "name": "TikTok Scraper Pro",
-  "version": "1.0.0",
-  "entry": "worker.js",
-  "tool_slug": "tiktok-scraper",
-  "description": "Scrape TikTok videos, hashtags, profiles, and keywords via Playwright.",
-  "capabilities": ["keyword_scrape", "hashtag_scrape", "profile_scrape", "csv_export", "proxy_rotation"]
-}
