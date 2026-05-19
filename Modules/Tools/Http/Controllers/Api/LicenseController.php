@@ -69,7 +69,6 @@ class LicenseController extends Controller
             return response()->json([
                 'success' => false,
                 'error'   => 'device_limit_reached',
-                'max'     => $license->max_devices,
                 'current' => $license->activeDevices()->count(),
             ], 403);
         }
@@ -168,7 +167,6 @@ class LicenseController extends Controller
             'success'    => true,
             'device_id'  => $device->id,
             'expires_at' => $license->expires_at?->toIso8601String(),
-            'max_devices' => $license->max_devices,
-        ]);
+            ]);
     }
 }

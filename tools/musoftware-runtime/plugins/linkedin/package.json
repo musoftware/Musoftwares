@@ -1,0 +1,10 @@
+{
+  "name": "linkedin",
+  "version": "1.0.0",
+  "description": "LinkedIn Worker Plugin",
+  "main": "worker.js",
+  "dependencies": {
+    "puppeteer-core": "^22.0.0",
+    "uuid": "^9.0.1"
+  }
+}

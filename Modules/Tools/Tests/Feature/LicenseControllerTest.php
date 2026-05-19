@@ -15,7 +15,6 @@ beforeEach(function () {
         'user_id' => $this->user->id,
         'tool_id' => $this->tool->id,
         'license_key' => Str::uuid(),
-        'max_devices' => 2,
         'status' => 'active',
         'expires_at' => now()->addDays(30),
     ]);
@@ -35,7 +34,6 @@ it('can activate a new device', function () {
     $response->assertStatus(200)
              ->assertJson([
                  'success' => true,
-                 'max_devices' => 2,
              ]);
 
     $this->assertDatabaseHas('tools_activated_devices', [

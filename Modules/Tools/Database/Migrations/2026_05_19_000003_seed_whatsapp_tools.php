@@ -17,7 +17,6 @@ return new class extends Migration
             'category'          => 'whatsapp',
             'supported_os'      => json_encode(['windows', 'mac', 'linux']),
             'current_version'   => '2.0.0',
-            'max_devices'       => 3,
             'is_active'         => true,
             'is_featured'       => true,
             'is_free'           => false,
@@ -35,16 +34,13 @@ return new class extends Migration
                 'Proxy support for number isolation',
                 'Arabic & English support',
                 'Personalization ({name}, {phone}, {company})',
-                'Media attachment support',
-            ]),
+                'Media attachment support']),
             'requirements'      => json_encode([
                 'Node.js runtime (auto-managed)',
                 'Chrome/Chromium browser',
-                'Active WhatsApp account',
-            ]),
+                'Active WhatsApp account']),
             'created_at'        => now(),
-            'updated_at'        => now(),
-        ]);
+            'updated_at'        => now()]);
 
         // Sender pricing plans
         DB::table('tool_pricing_plans')->insert([
@@ -53,38 +49,31 @@ return new class extends Migration
                 'name'           => 'Starter',
                 'price_monthly'  => 29.00,
                 'price_yearly'   => 290.00,
-                'max_devices'    => 1,
                 'features'       => json_encode(['1 WhatsApp number', '500 msgs/day', 'Basic humanization', 'Session persistence']),
                 'is_popular'     => false,
                 'sort_order'     => 0,
                 'created_at'     => now(),
-                'updated_at'     => now(),
-            ],
+                'updated_at'     => now()],
             [
                 'tool_id'        => $senderId,
                 'name'           => 'Growth',
                 'price_monthly'  => 79.00,
                 'price_yearly'   => 790.00,
-                'max_devices'    => 3,
                 'features'       => json_encode(['5 WhatsApp numbers', '2000 msgs/day', 'Full humanization', 'Deliverability tracking', 'Block rate monitoring']),
                 'is_popular'     => true,
                 'sort_order'     => 1,
                 'created_at'     => now(),
-                'updated_at'     => now(),
-            ],
+                'updated_at'     => now()],
             [
                 'tool_id'        => $senderId,
                 'name'           => 'Agency',
                 'price_monthly'  => 199.00,
                 'price_yearly'   => 1990.00,
-                'max_devices'    => 5,
                 'features'       => json_encode(['20 WhatsApp numbers', 'Unlimited msgs/day', 'Full humanization', 'Deliverability tracking', 'Proxy support', 'Priority support']),
                 'is_popular'     => false,
                 'sort_order'     => 2,
                 'created_at'     => now(),
-                'updated_at'     => now(),
-            ],
-        ]);
+                'updated_at'     => now()]]);
 
         // ── WhatsApp Number Warmup ───────────────────────────────────────────
         $warmupId = DB::table('tools')->insertGetId([
@@ -96,7 +85,6 @@ return new class extends Migration
             'category'          => 'whatsapp',
             'supported_os'      => json_encode(['windows', 'mac', 'linux']),
             'current_version'   => '1.0.0',
-            'max_devices'       => 3,
             'is_active'         => true,
             'is_featured'       => true,
             'is_free'           => false,
@@ -114,17 +102,14 @@ return new class extends Migration
                 'Session persistence & restore',
                 'Proxy support for number isolation',
                 'Post-session health reports',
-                'Campaign-readiness detection',
-            ]),
+                'Campaign-readiness detection']),
             'requirements'      => json_encode([
                 'Node.js runtime (auto-managed)',
                 'Chrome/Chromium browser',
                 'Active WhatsApp account',
-                '2+ pool numbers for warmup conversations',
-            ]),
+                '2+ pool numbers for warmup conversations']),
             'created_at'        => now(),
-            'updated_at'        => now(),
-        ]);
+            'updated_at'        => now()]);
 
         // Warmup pricing plans
         DB::table('tool_pricing_plans')->insert([
@@ -133,38 +118,31 @@ return new class extends Migration
                 'name'           => 'Starter',
                 'price_monthly'  => 19.00,
                 'price_yearly'   => 190.00,
-                'max_devices'    => 1,
                 'features'       => json_encode(['Warm up 1 number', 'Basic health scoring', '14-day schedule', 'English conversations']),
                 'is_popular'     => false,
                 'sort_order'     => 0,
                 'created_at'     => now(),
-                'updated_at'     => now(),
-            ],
+                'updated_at'     => now()],
             [
                 'tool_id'        => $warmupId,
                 'name'           => 'Growth',
                 'price_monthly'  => 49.00,
                 'price_yearly'   => 490.00,
-                'max_devices'    => 3,
                 'features'       => json_encode(['Warm up 5 numbers', 'Full health scoring', 'Ban prediction', 'Arabic + English', 'Proxy support']),
                 'is_popular'     => true,
                 'sort_order'     => 1,
                 'created_at'     => now(),
-                'updated_at'     => now(),
-            ],
+                'updated_at'     => now()],
             [
                 'tool_id'        => $warmupId,
                 'name'           => 'Agency',
                 'price_monthly'  => 99.00,
                 'price_yearly'   => 990.00,
-                'max_devices'    => 5,
                 'features'       => json_encode(['Warm up 50 numbers', 'Full health scoring', 'Ban prediction', 'All languages', 'Proxy support', 'Priority support']),
                 'is_popular'     => false,
                 'sort_order'     => 2,
                 'created_at'     => now(),
-                'updated_at'     => now(),
-            ],
-        ]);
+                'updated_at'     => now()]]);
     }
 
     public function down(): void

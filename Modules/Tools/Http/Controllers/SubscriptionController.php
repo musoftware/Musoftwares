@@ -26,7 +26,7 @@ class SubscriptionController extends Controller
     public function billing(): Response
     {
         $subscriptions = ToolSubscription::where('user_id', auth()->id())
-            ->with(['tool:id,slug,title,icon,category', 'plan:id,name,max_devices'])
+            ->with(['tool:id,slug,title,icon,category', 'plan:id,name'])
             ->latest()
             ->get()
             ->map(fn($sub) => [
@@ -79,7 +79,6 @@ class SubscriptionController extends Controller
                 'name'          => $plan->name,
                 'price_monthly' => $plan->price_monthly,
                 'price_yearly'  => $plan->price_yearly,
-                'max_devices'   => $plan->max_devices,
                 'features'      => $plan->features ?? [],
             ],
             'walletBalance' => $walletBalance,

@@ -7,7 +7,7 @@ import { ExternalLink, Key, Copy, Check, Monitor, Smartphone, ShoppingBag } from
 
 interface License {
     id: number; license_key: string; status: string; is_valid: boolean;
-    max_devices: number; active_devices: number; expires_at: string | null;
+    expires_at: string | null;
     last_validated: string | null;
     tool: { slug: string; title: string; icon_url: string | null; category: string };
 }
@@ -47,92 +47,38 @@ export default function MyLicenses({ licenses }: Props) {
                         </div>
                         <p className="text-sm font-semibold text-slate-700">No licenses yet</p>
                         <p className="text-xs text-slate-400 mt-1 mb-4">Subscribe to a tool to receive your license key.</p>
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => router.visit(route('tools.explore'))}
-                        >
-                            <ShoppingBag className="h-3.5 w-3.5 mr-1.5" />
-                            Browse Tools
-                        </Button>
+                        
+                        <Link href={route('tools.marketplace.index')}>
+                            <Button className="bg-slate-900 text-white hover:bg-slate-800 gap-2 h-9 text-xs">
+                                <ShoppingBag className="h-4 w-4" /> Browse Tools
+                            </Button>
+                        </Link>
                     </div>
                 ) : (
-                    <div className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {licenses.map(lic => {
-                            const devicePct = Math.min((lic.active_devices / lic.max_devices) * 100, 100);
                             return (
-                                <div key={lic.id} className="bg-white border border-slate-200 rounded-xl overflow-hidden hover:border-slate-300 transition-colors">
-                                    {/* Card header */}
-                                    <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
-                                        <div className="flex items-center gap-3">
-                                            <div className="w-9 h-9 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center flex-shrink-0">
-                                                {lic.tool.icon_url
-                                                    ? <img src={lic.tool.icon_url} alt="" className="w-6 h-6 object-contain" />
-                                                    : <Monitor className="h-4 w-4 text-slate-300" />
-                                                }
+                                <div key={lic.id} className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow relative group">
+                                    <div className="p-5">
+                                        <div className="flex justify-between items-start mb-4">
+                                            <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center shrink-0">
+                                                {lic.tool.icon_url ? <img src={lic.tool.icon_url} className="w-6 h-6 object-contain" alt="" /> : <Key className="h-5 w-5 text-slate-400" />}
                                             </div>
-                                            <div>
-                                                <p className="text-sm font-semibold text-slate-900">{lic.tool.title}</p>
-                                                <p className="text-xs text-slate-400 capitalize">{lic.tool.category}</p>
-                                            </div>
+                                            <Badge variant="secondary" className={STATUS_STYLE[lic.status] || ''}>
+                                                {lic.status}
+                                            </Badge>
                                         </div>
-                                        <Badge className={`${STATUS_STYLE[lic.status] ?? 'bg-slate-50 text-slate-600 border-slate-200'} border hover:bg-transparent text-[11px] px-2 py-0.5`}>
-                                            {lic.status}
-                                        </Badge>
-                                    </div>
-
-                                    <div className="px-5 py-4 space-y-4">
-                                        {/* License key */}
-                                        <div className="flex items-center gap-2 bg-slate-50 border border-slate-100 rounded-lg px-3 py-2.5">
-                                            <Key className="h-3.5 w-3.5 text-slate-400 flex-shrink-0" />
-                                            <code className="text-xs font-mono text-slate-700 flex-1 break-all select-all">{lic.license_key}</code>
-                                            <button
-                                                onClick={() => copyKey(lic.id, lic.license_key)}
-                                                className="flex-shrink-0 p-1.5 rounded-md hover:bg-slate-200 transition-colors text-slate-400 hover:text-slate-600"
-                                            >
-                                                {copiedId === lic.id
-                                                    ? <Check className="h-3.5 w-3.5 text-emerald-500" />
-                                                    : <Copy className="h-3.5 w-3.5" />
-                                                }
-                                            </button>
-                                        </div>
-
-                                        {/* Device usage */}
-                                        <div className="space-y-1.5">
-                                            <div className="flex items-center justify-between text-xs">
-                                                <span className="text-slate-500">Devices</span>
-                                                <span className="font-semibold text-slate-800">{lic.active_devices} / {lic.max_devices}</span>
-                                            </div>
-                                            <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden">
-                                                <div
-                                                    className={`h-full rounded-full transition-all ${devicePct >= 100 ? 'bg-red-400' : devicePct >= 80 ? 'bg-amber-400' : 'bg-emerald-400'}`}
-                                                    style={{ width: `${devicePct}%` }}
-                                                />
-                                            </div>
-                                        </div>
-
-                                        {/* Meta grid */}
-                                        <div className="grid grid-cols-2 gap-3">
-                                            <div className="bg-slate-50 rounded-lg p-3 text-center">
-                                                <p className="text-xs font-semibold text-slate-800">{lic.expires_at ?? 'Lifetime'}</p>
-                                                <p className="text-[10px] text-slate-400 mt-0.5">Expires</p>
-                                            </div>
-                                            <div className="bg-slate-50 rounded-lg p-3 text-center">
-                                                <p className="text-xs font-semibold text-slate-800 truncate">{lic.last_validated ?? 'Never'}</p>
-                                                <p className="text-[10px] text-slate-400 mt-0.5">Last used</p>
-                                            </div>
-                                        </div>
-
-                                        {/* Actions */}
-                                        <div className="flex gap-2 pt-1">
+                                        <h3 className="font-bold text-slate-900 mb-1">{lic.tool.title}</h3>
+                                        <p className="text-xs text-slate-500 mb-4 font-mono truncate">{lic.license_key}</p>
+                                        <div className="flex gap-2">
                                             <Button
                                                 variant="outline"
                                                 size="sm"
-                                                className="flex-1 gap-2 text-xs border-slate-200 text-slate-600 hover:bg-slate-50 h-8"
-                                                onClick={() => router.visit(route('tools.devices', lic.id))}
+                                                onClick={() => copyKey(lic.id, lic.license_key)}
+                                                className="flex-1 gap-2 text-xs h-8"
                                             >
-                                                <Smartphone className="h-3.5 w-3.5" />
-                                                Devices ({lic.active_devices})
+                                                {copiedId === lic.id ? <Check className="h-3.5 w-3.5 text-emerald-500" /> : <Copy className="h-3.5 w-3.5" />}
+                                                {copiedId === lic.id ? 'Copied' : 'Copy Key'}
                                             </Button>
                                             <Link href={route('tools.run', lic.tool.slug)} className="flex-1">
                                                 <Button

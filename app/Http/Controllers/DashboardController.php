@@ -140,8 +140,6 @@ class DashboardController extends Controller
                 ->get()
                 ->map(fn ($lic) => [
                     'license_key'    => $lic->license_key,
-                    'active_devices' => $lic->activeDevices()->count(),
-                    'max_devices'    => $lic->max_devices,
                     'expires_at'     => $lic->expires_at?->format('M d, Y'),
                     'tool'           => [
                         'slug'     => $lic->tool?->slug ?? '',

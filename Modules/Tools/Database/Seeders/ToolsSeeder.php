@@ -14,75 +14,47 @@ class ToolsSeeder extends Seeder
         $tools = [
             [
                 'tool' => [
-                    'title'             => 'TikTok Scraper Pro',
-                    'slug'              => 'tiktok-scraper-pro',
-                    'short_description' => 'Extract TikTok videos, profiles, hashtags, and analytics at scale.',
-                    'description'       => "TikTok Scraper Pro is a powerful desktop automation tool that lets you extract TikTok data at scale.\n\n- Scrape profiles, videos, and hashtag feeds\n- Export to CSV, Excel, or JSON\n- Bypass rate limits with built-in proxy rotation\n- Schedule scraping jobs\n- Filter by date range, engagement, and more",
-                    'category'          => 'scraper',
-                    'supported_os'      => ['windows', 'mac'],
+                    'title'             => 'TikTok Intelligence Engine',
+                    'slug'              => 'tiktok-intelligence',
+                    'short_description' => 'Discover viral creators, monitor competitors, track UGC trends, and build actionable market intelligence pipelines.',
+                    'description'       => "The TikTok Intelligence Engine is a production-grade intelligence platform that runs entirely locally on your machine.\n\n- Discover viral creators by niche and engagement\n- Track competitors and hashtag trends automatically\n- Build a local UGC vault of top-performing content\n- Extract leads and contact data\n- Ensure privacy with 100% local SQLite storage",
+                    'category'          => 'intelligence',
+                    'supported_os'      => ['windows', 'mac', 'linux'],
                     'is_featured'       => true,
                     'is_active'         => true,
+                    'runner_component'  => 'tiktok-intelligence',
                     'features'          => [
-                        'Multi-account support',
-                        'Proxy rotation built-in',
-                        'CSV, JSON, Excel export',
-                        'Scheduled scraping jobs',
-                        'Video downloader included',
-                        'Hashtag trend tracker',
-                    ],
+                        'Creator Discovery Engine',
+                        'Competitor Monitoring Jobs',
+                        'UGC Vault & Analytics',
+                        'Lead Intelligence Pipeline',
+                        'Anti-detection Stealth Mode',
+                        'Local Execution Environment'],
                     'requirements'      => [
-                        'Windows 10 / macOS 12+ or later',
-                        '4 GB RAM minimum (8 GB recommended)',
-                        'Internet connection required for scraping',
-                        'No Python installation required',
-                    ],
-                ],
+                        'Musoftware Runtime Agent running locally',
+                        'Internet connection required for execution']],
                 'plans' =>[
                     [
-                        'name'           => 'Starter',
-                        'price_monthly'  => 0.99,
-                        'price_yearly'   => 5.00,
-                        'max_devices'    => 1,
+                        'name'           => 'Creator Intelligence',
+                        'price_monthly'  => 19.99,
+                        'price_yearly'   => 190.00,
                         'is_popular'     => false,
                         'features'       => [
-                            '5,000 records/day',
-                            '1 active device',
-                            'CSV export',
-                            'Email support',
-                        ],
-                    ],
+                            'Creator Discovery Engine',
+                            '10 Active Monitoring Jobs',
+                            'UGC Vault Access',
+                            'Email support']],
                     [
-                        'name'           => 'Pro',
-                        'price_monthly'  => 1.99,
-                        'price_yearly'   => 15.00,
-                        'max_devices'    => 3,
+                        'name'           => 'Market Intelligence',
+                        'price_monthly'  => 49.99,
+                        'price_yearly'   => 490.00,
                         'is_popular'     => true,
                         'features'       => [
-                            '50,000 records/day',
-                            '3 active devices',
-                            'All export formats',
-                            'Proxy rotation',
-                            'Scheduled jobs',
-                            'Priority support',
-                        ],
-                    ],
-                    [
-                        'name'           => 'Agency',
-                        'price_monthly'  => 3.99,
-                        'price_yearly'   => 29.00,
-                        'max_devices'    => 10,
-                        'is_popular'     => false,
-                        'features'       => [
-                            'Unlimited records',
-                            '10 active devices',
-                            'API access',
-                            'Dedicated support',
-                            'White-label export',
-                        ],
-                    ],
-                ],
-                'version' => '2.1.4',
-            ],
+                            'Lead Enrichment Pipeline',
+                            'Unlimited Monitoring Jobs',
+                            'Competitor Timeline Feed',
+                            'Priority support']]],
+                'version' => '3.0.0'],
             [
                 'tool' => [
                     'title'             => 'Email Prospector',
@@ -99,43 +71,30 @@ class ToolsSeeder extends Seeder
                         'LinkedIn integration',
                         'CRM-ready CSV export',
                         'Duplicate removal',
-                        'Domain blacklist filter',
-                    ],
+                        'Domain blacklist filter'],
                     'requirements'      => [
                         'Windows 10 or later',
                         '2 GB RAM minimum',
-                        'Active internet connection',
-                    ],
-                ],
+                        'Active internet connection']],
                 'plans' => [
                     [
                         'name'           => 'Solo',
                         'price_monthly'  => 0.99,
                         'price_yearly'   => 5.00,
-                        'max_devices'    => 1,
                         'is_popular'     => false,
                         'features'       => [
                             '1,000 emails/day',
-                            '1 device',
-                            'CSV export',
-                        ],
-                    ],
+                            'CSV export']],
                     [
                         'name'           => 'Growth',
                         'price_monthly'  => 1.99,
                         'price_yearly'   => 15.00,
-                        'max_devices'    => 2,
                         'is_popular'     => true,
                         'features'       => [
                             '10,000 emails/day',
-                            '2 devices',
                             'Verification included',
-                            'CRM export',
-                        ],
-                    ],
-                ],
-                'version' => '1.3.0',
-            ],
+                            'CRM export']]],
+                'version' => '1.3.0'],
             [
                 'tool' => [
                     'title'             => 'Competitor Intelligence',
@@ -152,34 +111,25 @@ class ToolsSeeder extends Seeder
                         'Website change detection',
                         'Competitor keyword tracking',
                         'Automated weekly reports',
-                        'Slack / Email notifications',
-                    ],
+                        'Slack / Email notifications'],
                     'requirements'      => [
                         'Windows 10 / macOS 12 / Ubuntu 20+',
                         '4 GB RAM',
-                        'Internet connection',
-                    ],
-                ],
+                        'Internet connection']],
                 'plans' => [
                     [
                         'name'           => 'Watcher',
                         'price_monthly'  => 0.99,
                         'price_yearly'   => 5.00,
-                        'max_devices'    => 1,
                         'is_popular'     => false,
-                        'features'       => ['5 competitors', '1 device', 'Weekly reports'],
-                    ],
+                        'features'       => ['5 competitors', 'Weekly reports']],
                     [
                         'name'           => 'Hunter',
                         'price_monthly'  => 1.99,
                         'price_yearly'   => 15.00,
-                        'max_devices'    => 3,
                         'is_popular'     => true,
-                        'features'       => ['Unlimited competitors', '3 devices', 'Daily reports', 'Slack alerts', 'API access'],
-                    ],
-                ],
-                'version' => '3.0.1',
-            ],
+                        'features'       => ['Unlimited competitors', 'Daily reports', 'Slack alerts', 'API access']]],
+                'version' => '3.0.1'],
 
             // ── TikTok Intelligence Suite ────────────────────────────────────
             [
@@ -200,33 +150,24 @@ class ToolsSeeder extends Seeder
                         'Caption psychology breakdown',
                         'Engagement benchmarking',
                         'Sound strategy evaluation',
-                        'Improvement suggestions',
-                    ],
+                        'Improvement suggestions'],
                     'requirements'       => [
                         'Musoftware Runtime Agent running locally',
-                        'Internet connection',
-                    ],
-                ],
+                        'Internet connection']],
                 'plans' => [
                     [
                         'name'           => 'Free',
                         'price_monthly'  => 0,
                         'price_yearly'   => 0,
-                        'max_devices'    => 1,
                         'is_popular'     => false,
-                        'features'       => ['3 analyses/day', '1 device', 'Basic report'],
-                    ],
+                        'features'       => ['3 analyses/day', 'Basic report']],
                     [
                         'name'           => 'Pro',
                         'price_monthly'  => 1.99,
                         'price_yearly'   => 15.00,
-                        'max_devices'    => 3,
                         'is_popular'     => true,
-                        'features'       => ['Unlimited analyses', '3 devices', 'Full report + JSON export', 'Priority support'],
-                    ],
-                ],
-                'version' => '1.0.0',
-            ],
+                        'features'       => ['Unlimited analyses', 'Full report + JSON export', 'Priority support']]],
+                'version' => '1.0.0'],
             [
                 'tool' => [
                     'title'              => 'Hook Analyzer',
@@ -245,33 +186,24 @@ class ToolsSeeder extends Seeder
                         'Batch analysis mode',
                         'Power word analysis',
                         'Alternative hook generator',
-                        'Retention prediction',
-                    ],
+                        'Retention prediction'],
                     'requirements'       => [
                         'Musoftware Runtime Agent running locally',
-                        'Internet connection',
-                    ],
-                ],
+                        'Internet connection']],
                 'plans' => [
                     [
                         'name'           => 'Free',
                         'price_monthly'  => 0,
                         'price_yearly'   => 0,
-                        'max_devices'    => 1,
                         'is_popular'     => false,
-                        'features'       => ['5 analyses/day', '1 device', 'Single URL mode'],
-                    ],
+                        'features'       => ['5 analyses/day', 'Single URL mode']],
                     [
                         'name'           => 'Pro',
                         'price_monthly'  => 1.99,
                         'price_yearly'   => 15.00,
-                        'max_devices'    => 3,
                         'is_popular'     => true,
-                        'features'       => ['Unlimited analyses', 'Batch mode (10 URLs)', '3 devices', 'JSON export'],
-                    ],
-                ],
-                'version' => '1.0.0',
-            ],
+                        'features'       => ['Unlimited analyses', 'Batch mode (10 URLs)', 'JSON export']]],
+                'version' => '1.0.0'],
             [
                 'tool' => [
                     'title'              => 'Format DNA Extractor',
@@ -290,50 +222,38 @@ class ToolsSeeder extends Seeder
                         'Sound strategy analysis',
                         'Caption format template',
                         'Copyable text blueprint',
-                        'Niche-aware recommendations',
-                    ],
+                        'Niche-aware recommendations'],
                     'requirements'       => [
                         'Musoftware Runtime Agent running locally',
-                        'Internet connection',
-                    ],
-                ],
+                        'Internet connection']],
                 'plans' => [
                     [
                         'name'           => 'Free',
                         'price_monthly'  => 0,
                         'price_yearly'   => 0,
-                        'max_devices'    => 1,
                         'is_popular'     => false,
-                        'features'       => ['3 extractions/day', '1 device'],
-                    ],
+                        'features'       => ['3 extractions/day']],
                     [
                         'name'           => 'Pro',
                         'price_monthly'  => 1.99,
                         'price_yearly'   => 15.00,
-                        'max_devices'    => 3,
                         'is_popular'     => true,
-                        'features'       => ['Unlimited extractions', '3 devices', 'Blueprint library (coming soon)'],
-                    ],
-                ],
-                'version' => '1.0.0',
-            ],
-        ];
+                        'features'       => ['Unlimited extractions', 'Blueprint library (coming soon)']]],
+                'version' => '1.0.0']];
 
         foreach ($tools as $entry) {
             $tool = Tool::firstOrCreate(
                 ['slug' => $entry['tool']['slug']],
                 array_merge($entry['tool'], [
                     'current_version' => $entry['version'],
-                    'download_count'  => rand(100, 5000),
-                ])
+                    'download_count'  => rand(100, 5000)])
             );
 
             foreach ($entry['plans'] as $planData) {
                 ToolPricingPlan::firstOrCreate(
                     ['tool_id' => $tool->id, 'name' => $planData['name']],
                     array_merge($planData, [
-                        'tool_id' => $tool->id,
-                    ])
+                        'tool_id' => $tool->id])
                 );
             }
 
@@ -345,8 +265,7 @@ class ToolsSeeder extends Seeder
                     'is_latest'   => true,
                     'is_beta'     => false,
                     'changelog'   => "Initial release of {$entry['tool']['title']}.",
-                    'released_at' => now(),
-                ]
+                    'released_at' => now()]
             );
         }
 

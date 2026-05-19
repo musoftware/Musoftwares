@@ -10,7 +10,7 @@ class ToolPricingPlan extends Model
 {
     protected $fillable = [
         'tool_id', 'name', 'price_monthly', 'price_yearly',
-        'max_devices', 'features', 'is_popular', 'sort_order',
+        'features', 'is_popular', 'sort_order',
     ];
 
     protected $casts = [
@@ -18,7 +18,6 @@ class ToolPricingPlan extends Model
         'price_yearly'  => 'float',
         'features'      => 'array',
         'is_popular'    => 'boolean',
-        'max_devices'   => 'integer',
         'sort_order'    => 'integer',
     ];
 

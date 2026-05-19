@@ -180,3 +180,6 @@ ehthumbs.db
 *~
 \#*\#
 .#*
+tools/musoftware-runtime/plugins/tiktok-intelligence/test_tmp/tiktok_intelligence.sqlite
+tools/musoftware-runtime/plugins/tiktok-intelligence/test_tmp/tiktok_intelligence.sqlite-shm
+tools/musoftware-runtime/plugins/tiktok-intelligence/test_tmp/tiktok_intelligence.sqlite-wal

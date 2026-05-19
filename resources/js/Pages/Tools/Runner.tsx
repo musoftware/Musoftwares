@@ -15,6 +15,7 @@ import WaWarmupRunner from '@/Pages/Tools/WaWarmupRunner';
 import WaAiAgentRunner from '@/Pages/Tools/WaAiAgentRunner';
 import WaFunnelBuilderRunner from '@/Pages/Tools/WaFunnelBuilderRunner';
 import LeadIntelligenceRunner from '@/Pages/Tools/LeadIntelligenceRunner';
+import TikTokIntelligenceRunner from '@/Pages/Tools/TikTokIntelligenceRunner';
 
 interface Props {
     tool:         { slug: string; title: string; icon_url: string | null; short_description: string; category?: string; runner_component?: string };
@@ -27,7 +28,7 @@ interface VideoResult {
     id: string; description: string; author: string; author_name: string;
     likes: number; comments: number; shares: number; plays: number;
     duration_sec: number; hashtags: string; engagement_rate: string;
-    cover_url: string; created_at: number;
+    cover_url: string; created_at: number; download_url?: string;
 }
 
 type Action = 'keyword' | 'hashtag' | 'profile' | 'trending';
@@ -56,6 +57,7 @@ export default function Runner({ tool, subscription, runtimePort, pluginSlug }: 
     if (component === 'wa-ai-agent')      return <WaAiAgentRunner tool={tool} subscription={subscription} runtimePort={runtimePort} pluginSlug={pluginSlug} />;
     if (component === 'wa-funnel-engine') return <WaFunnelBuilderRunner tool={tool} subscription={subscription} runtimePort={runtimePort} pluginSlug={pluginSlug} />;
     if (component === 'lead-intelligence') return <LeadIntelligenceRunner tool={tool} subscription={subscription} runtimePort={runtimePort} pluginSlug={pluginSlug} />;
+    if (component === 'tiktok-intelligence') return <TikTokIntelligenceRunner tool={tool} subscription={subscription} runtimePort={runtimePort} pluginSlug={pluginSlug} />;
 
     // ── Default: TikTok Scraper runner (original) ──────────────────────────
     const base = `http://127.0.0.1:${runtimePort}`;

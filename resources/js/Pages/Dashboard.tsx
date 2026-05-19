@@ -50,8 +50,6 @@ interface RecentTransaction {
 interface ActiveToolLicense {
     license_key: string;
     tool: { slug: string; title: string; icon_url: string | null };
-    active_devices: number;
-    max_devices: number;
     expires_at: string | null;
 }
 
@@ -340,7 +338,7 @@ export default function Dashboard({
                                             </div>
                                             <div className="flex-1 min-w-0">
                                                 <p className="text-sm font-medium text-text-primary truncate">{lic.tool.title}</p>
-                                                <p className="text-[10px] text-text-muted">{lic.active_devices}/{lic.max_devices} devices</p>
+                                                
                                             </div>
                                             <Link
                                                 href={safeRoute('tools.download.generate', lic.tool.slug)}
