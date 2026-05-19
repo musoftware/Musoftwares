@@ -35,21 +35,21 @@ Route::prefix('tools')->name('api.tools.')->group(function () {
         Route::get('/{slug}/releases', [UpdateController::class, 'releases'])->name('releases');
 
         // ─── Agent Plugin Sync ──────────────────────────────────────────────
-        // Polled by local agents to get list of subscribed plugins to auto-download
+        // Polled by local agents to get list of subscribed plugins to auto-download.
+        // Free tools (is_free=true) are automatically included for every authenticated user.
         Route::get('/agent/plugins', function (\Illuminate\Http\Request $request) {
             $agentType = $request->query('agent', 'nodejs'); // 'nodejs' or 'python'
 
-            // Get user's active subscriptions with their tools
+            // ── 1. Subscription-based plugins ──────────────────────────────
             $subscriptions = \Modules\Tools\Models\ToolSubscription::where('user_id', auth()->id())
                 ->where('status', 'active')
                 ->where(fn($q) => $q->whereNull('expires_at')->orWhere('expires_at', '>', now()))
                 ->with(['tool.latestVersion'])
                 ->get();
 
-            $plugins = $subscriptions
+            $paidPlugins = $subscriptions
                 ->filter(fn($s) => $s->tool && $s->tool->latestVersion)
                 ->filter(function ($s) use ($agentType) {
-                    // Filter by agent type (tools declare their runtime in metadata)
                     $runtime = $s->tool->metadata['runtime'] ?? 'nodejs';
                     return $runtime === $agentType;
                 })
@@ -61,11 +61,36 @@ Route::prefix('tools')->name('api.tools.')->group(function () {
                         ? url()->temporarySignedRoute('api.tools.plugin.download', now()->addHour(), ['slug' => $s->tool->slug])
                         : null,
                     'is_subscribed'  => true,
-                    // License gate fields — consumed by runtime to populate local license cache
                     'license_status' => $s->status,  // 'active' | 'expired' | 'suspended'
                     'expires_at'     => $s->expires_at?->toIso8601String(),
-                ])
-                ->values();
+                ]);
+
+            // Slugs already covered by a paid subscription (avoid duplicates)
+            $subscribedSlugs = $paidPlugins->pluck('tool_slug')->all();
+
+            // ── 2. Free tools — no subscription needed ──────────────────────
+            $freePlugins = \Modules\Tools\Models\Tool::where('is_active', true)
+                ->where('is_free', true)
+                ->whereNotIn('slug', $subscribedSlugs)
+                ->with('latestVersion')
+                ->get()
+                ->filter(function ($tool) use ($agentType) {
+                    $runtime = $tool->metadata['runtime'] ?? 'nodejs';
+                    return $runtime === $agentType && $tool->latestVersion !== null;
+                })
+                ->map(fn($tool) => [
+                    'tool_slug'      => $tool->slug,
+                    'name'           => $tool->title,
+                    'version'        => $tool->latestVersion->version,
+                    'download_url'   => $tool->latestVersion->file_path
+                        ? url()->temporarySignedRoute('api.tools.plugin.download', now()->addHour(), ['slug' => $tool->slug])
+                        : null,
+                    'is_subscribed'  => false,
+                    'license_status' => 'active', // free tools are always active
+                    'expires_at'     => null,
+                ]);
+
+            $plugins = $paidPlugins->merge($freePlugins)->values();
 
             return response()->json(['plugins' => $plugins]);
         })->name('agent.plugins');
