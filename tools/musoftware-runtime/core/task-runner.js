@@ -82,6 +82,23 @@ class TaskRunner extends EventEmitter {
         this.storage?.createTask(taskId, plugin.id, runtime, params);
         this.emit('worker.started', { taskId, pluginId: plugin.id, runtime });
 
+        // ── Global task timeout (default 3 min for scrapers) ──────────────────
+        const TASK_TIMEOUT_MS = (plugin.timeoutSeconds ?? 180) * 1000;
+        const timeoutHandle = setTimeout(() => {
+            const task = this._tasks.get(taskId);
+            if (task?.status === 'running') {
+                this.logger.warn(`[runner] Task timeout (${TASK_TIMEOUT_MS / 1000}s): ${taskId}`);
+                try { child.kill('SIGTERM'); } catch (_) {}
+                task.status = 'failed';
+                const errMsg = `Task timed out after ${TASK_TIMEOUT_MS / 1000} seconds`;
+                this.storage?.updateTask(taskId, 'failed', null, errMsg);
+                this.emit('task.error', { taskId, pluginId: plugin.id, runtime, error: errMsg });
+            }
+        }, TASK_TIMEOUT_MS);
+
+        // Clear timeout when task finishes naturally
+        child.on('exit', () => clearTimeout(timeoutHandle));
+
         // ── stdout → JSON line protocol ────────────────────────────────────────
         let buf = '';
         child.stdout.on('data', chunk => {

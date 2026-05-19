@@ -55,7 +55,20 @@ async function main() {
 
     log('info', `Action=${action} | Query="${query}" | Max=${max_count} | Headless=${headless}`);
 
-    // ── Launch browser ───────────────────────────────────────────────────────
+    // ── Heartbeat — emits "still working" progress every 5s so UI doesn't freeze
+    let heartbeatTick = 0;
+    const HEARTBEAT_MSGS = [
+        'Launching browser...', 'Waiting for TikTok...', 'Loading content...',
+        'Processing data...', 'Scrolling feed...', 'Almost there...',
+    ];
+    const heartbeat = setInterval(() => {
+        heartbeatTick++;
+        const msg = HEARTBEAT_MSGS[heartbeatTick % HEARTBEAT_MSGS.length];
+        progress(Math.min(heartbeatTick * 3, 15), msg);
+    }, 5000);
+
+    const clearHeartbeat = () => clearInterval(heartbeat);
+
     progress(5, 'Launching browser...');
     const launchOpts = { headless };
     if (proxy_url) launchOpts.proxy = { server: proxy_url };
@@ -95,6 +108,7 @@ async function main() {
             log('info', `CSV exported: ${csvPath}`);
         }
 
+        clearHeartbeat();
         progress(100, 'Done');
         log('info', `Scraped ${videos.length} videos`);
         emit('result', { data: { action, query, count: videos.length, videos, csvPath } });
