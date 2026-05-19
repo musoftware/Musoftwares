@@ -4,6 +4,10 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Badge } from '@/Components/ui/badge';
 import { Button } from '@/Components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/Components/ui/card';
+import { StatusBadge } from '@/Components/ui/StatusBadge';
+import { CurrencyDisplay } from '@/Components/ui/CurrencyDisplay';
+import { DateDisplay } from '@/Components/ui/DateDisplay';
+import { EmptyState } from '@/Components/ui/EmptyState';
 import {
     ArrowLeft, User, FileText, CheckCircle, Clock, DollarSign,
     MessageSquare, FolderOpen, Activity, ChevronRight
@@ -39,20 +43,7 @@ interface Props {
     activities: ActivityItem[];
 }
 
-const statusColor: Record<string, string> = {
-    lead:     'bg-blue-500/15 text-blue-400 border-blue-500/30',
-    active:   'bg-emerald-500/15 text-emerald-400 border-emerald-500/30',
-    paying:   'bg-violet-500/15 text-violet-400 border-violet-500/30',
-    retained: 'bg-teal-500/15 text-teal-400 border-teal-500/30',
-    archived: 'bg-zinc-700/50 text-zinc-400 border-zinc-600',
-};
 
-const invoiceStatusColor: Record<string, string> = {
-    paid:    'bg-emerald-500/15 text-emerald-400 border-emerald-500/30',
-    unpaid:  'bg-amber-500/15 text-amber-400 border-amber-500/30',
-    overdue: 'bg-red-500/15 text-red-400 border-red-500/30',
-    draft:   'bg-zinc-700/50 text-zinc-400 border-zinc-600',
-};
 
 export default function ClientShow({ client, projects, tickets, invoices, activities }: Props) {
     const totalRevenue = invoices
@@ -72,9 +63,7 @@ export default function ClientShow({ client, projects, tickets, invoices, activi
                     <div className="flex-1">
                         <div className="flex items-center gap-3">
                             <h1 className="text-2xl font-bold text-white">{client.name}</h1>
-                            <Badge className={`text-xs border capitalize ${statusColor[client.status] ?? 'bg-zinc-700/50 text-zinc-400'}`}>
-                                {client.status}
-                            </Badge>
+                            <StatusBadge status={client.status} />
                         </div>
                         <p className="text-zinc-400 text-sm mt-0.5">{client.email}{client.company ? ` · ${client.company}` : ''}</p>
                     </div>
@@ -88,7 +77,7 @@ export default function ClientShow({ client, projects, tickets, invoices, activi
                 {/* Stats */}
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                     {[
-                        { label: 'Total Revenue', value: `$${totalRevenue.toFixed(2)}`, icon: DollarSign, color: 'text-emerald-400' },
+                        { label: 'Total Revenue', value: <CurrencyDisplay amount={totalRevenue} currency="USD" />, icon: DollarSign, color: 'text-emerald-400' },
                         { label: 'Invoices', value: invoices.length, icon: FileText, color: 'text-blue-400' },
                         { label: 'Projects', value: projects.length, icon: FolderOpen, color: 'text-violet-400' },
                         { label: 'Tickets', value: tickets.length, icon: MessageSquare, color: 'text-amber-400' },
@@ -117,7 +106,7 @@ export default function ClientShow({ client, projects, tickets, invoices, activi
                             </CardHeader>
                             <CardContent className="p-0">
                                 {invoices.length === 0 ? (
-                                    <p className="px-4 pb-4 text-zinc-500 text-sm">No invoices yet.</p>
+                                    <EmptyState icon={FileText} title="No invoices yet" description="Create the first invoice for this client." className="rounded-none border-0 py-6" />
                                 ) : (
                                     <div className="divide-y divide-zinc-800">
                                         {invoices.slice(0, 6).map(inv => (
@@ -127,14 +116,12 @@ export default function ClientShow({ client, projects, tickets, invoices, activi
                                                     <FileText className="w-4 h-4 text-zinc-500 group-hover:text-zinc-300 transition-colors" />
                                                     <div>
                                                         <p className="text-sm text-white font-medium">{inv.invoice_number}</p>
-                                                        <p className="text-xs text-zinc-500">{inv.created_at}</p>
+                                                        <p className="text-xs text-zinc-500"><DateDisplay date={inv.created_at} /></p>
                                                     </div>
                                                 </div>
                                                 <div className="flex items-center gap-3">
-                                                    <span className="text-white font-medium text-sm">${Number(inv.total).toFixed(2)}</span>
-                                                    <Badge className={`text-xs border capitalize ${invoiceStatusColor[inv.status] ?? 'bg-zinc-700/50 text-zinc-400'}`}>
-                                                        {inv.status}
-                                                    </Badge>
+                                                    <span className="text-white font-medium text-sm"><CurrencyDisplay amount={inv.total} currency="USD" /></span>
+                                                    <StatusBadge status={inv.status} size="sm" />
                                                 </div>
                                             </Link>
                                         ))}
@@ -150,7 +137,7 @@ export default function ClientShow({ client, projects, tickets, invoices, activi
                             </CardHeader>
                             <CardContent className="p-0">
                                 {projects.length === 0 ? (
-                                    <p className="px-4 pb-4 text-zinc-500 text-sm">No projects yet.</p>
+                                    <EmptyState icon={FolderOpen} title="No projects yet" description="No projects have been linked to this client." className="rounded-none border-0 py-6" />
                                 ) : (
                                     <div className="divide-y divide-zinc-800">
                                         {projects.map(proj => (
@@ -159,7 +146,7 @@ export default function ClientShow({ client, projects, tickets, invoices, activi
                                                     <FolderOpen className="w-4 h-4 text-violet-400" />
                                                     <span className="text-sm text-white">{proj.title}</span>
                                                 </div>
-                                                <Badge variant="outline" className="text-xs border-zinc-700 text-zinc-400 capitalize">{proj.status}</Badge>
+                                                <StatusBadge status={proj.status} size="sm" />
                                             </div>
                                         ))}
                                     </div>
@@ -179,7 +166,7 @@ export default function ClientShow({ client, projects, tickets, invoices, activi
                             </CardHeader>
                             <CardContent className="p-0">
                                 {activities.length === 0 ? (
-                                    <p className="px-4 pb-4 text-zinc-500 text-sm">No activity yet.</p>
+                                    <EmptyState icon={Activity} title="No activity yet" className="rounded-none border-0 py-6" />
                                 ) : (
                                     <div className="px-4 pb-4 space-y-4">
                                         {activities.slice(0, 6).map((act, i) => (
@@ -208,13 +195,13 @@ export default function ClientShow({ client, projects, tickets, invoices, activi
                             </CardHeader>
                             <CardContent className="p-0">
                                 {tickets.length === 0 ? (
-                                    <p className="px-4 pb-4 text-zinc-500 text-sm">No tickets.</p>
+                                    <EmptyState icon={MessageSquare} title="No tickets" description="No support tickets from this client yet." className="rounded-none border-0 py-6" />
                                 ) : (
                                     <div className="divide-y divide-zinc-800">
                                         {tickets.slice(0, 4).map(ticket => (
                                             <div key={ticket.id} className="px-4 py-2.5 flex items-start justify-between gap-2">
                                                 <p className="text-sm text-zinc-300 leading-tight">{ticket.subject}</p>
-                                                <Badge variant="outline" className="text-xs border-zinc-700 text-zinc-500 shrink-0 capitalize">{ticket.status}</Badge>
+                                                <StatusBadge status={ticket.status} size="sm" />
                                             </div>
                                         ))}
                                     </div>

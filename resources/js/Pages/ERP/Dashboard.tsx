@@ -57,72 +57,29 @@ import { Textarea } from '@/Components/ui/textarea';
 import { useToast } from '@/Components/ui/use-toast';
 import { cn, formatDate, formatMoney } from '@/lib/utils';
 
-// Shared UI components from existing design system
 import { DataTable } from '@/Components/ui/DataTable';
 import { EmptyState } from '@/Components/ui/EmptyState';
 import { MetricCard } from '@/Components/ui/MetricCard';
 import { ModulePageHeader } from '@/Components/ui/ModulePageHeader';
 import { CurrencyDisplay } from '@/Components/ui/CurrencyDisplay';
-
+import { ActivityTimeline } from '@/Components/ui/ActivityTimeline';
+import { ConfirmModal } from '@/Components/ui/ConfirmModal';
 import { OperationalCard } from '@/Components/ui/OperationalCard';
 import { StatusBadge } from '@/Components/ui/StatusBadge';
 
-// High-fidelity Financial Amount display using standard font-mono
+// FinancialAmount now uses CurrencyDisplay from the component library
 export function FinancialAmount({ amount, currency = 'USD', colorize = false }: { amount: number; currency?: string; colorize?: boolean }) {
     const numericAmount = typeof amount === 'string' ? parseFloat(amount) : amount;
-    const isPositive = numericAmount > 0;
-    
     let colorClass = 'text-slate-900';
     if (colorize) {
         if (numericAmount > 0) colorClass = 'text-emerald-600';
         else if (numericAmount < 0) colorClass = 'text-rose-600';
     }
-
     return (
         <span className={`font-mono font-semibold text-[13px] tracking-tight ${colorClass}`}>
-            {colorize && isPositive ? '+' : ''}
-            {new Intl.NumberFormat('en-US', { style: 'currency', currency }).format(numericAmount)}
+            {colorize && numericAmount > 0 ? '+' : ''}
+            <CurrencyDisplay amount={numericAmount} currency={currency} />
         </span>
-    );
-}
-
-// Activity Timeline with sleek vertical indicator
-export function ActivityTimeline({ items }: { items: Array<any> }) {
-    const getIconForAction = (action: string) => {
-        if (!action) return <Activity className="h-3.5 w-3.5 text-slate-400" />;
-        const a = action.toLowerCase();
-        if (a.includes('invoice_paid')) return <DollarSign className="h-3.5 w-3.5 text-emerald-500" />;
-        if (a.includes('invoice')) return <FileText className="h-3.5 w-3.5 text-indigo-500" />;
-        if (a.includes('client')) return <Users className="h-3.5 w-3.5 text-blue-500" />;
-        if (a.includes('project')) return <Briefcase className="h-3.5 w-3.5 text-amber-500" />;
-        if (a.includes('ticket')) return <LifeBuoy className="h-3.5 w-3.5 text-rose-500" />;
-        if (a.includes('wallet_credit')) return <ArrowUpRight className="h-3.5 w-3.5 text-emerald-500" />;
-        if (a.includes('wallet_debit')) return <CornerDownRight className="h-3.5 w-3.5 text-rose-500" />;
-        return <Activity className="h-3.5 w-3.5 text-slate-400" />;
-    };
-
-    return (
-        <div className="relative border-l border-slate-200 pl-6 ml-3 space-y-6 py-2">
-            {items.map((item, idx) => (
-                <div key={idx} className="relative">
-                    <span className="absolute -left-[31px] top-1 bg-white border border-slate-200 rounded-full p-1 flex items-center justify-center shadow-sm">
-                        {item.icon || getIconForAction(item.title)}
-                    </span>
-                    <div>
-                        <div className="flex items-center justify-between text-xs mb-1">
-                            <span className="font-semibold text-slate-700 capitalize">{item.title?.replace(/_/g, ' ')}</span>
-                            <span className="text-slate-400 font-mono">{item.time}</span>
-                        </div>
-                        <p className="text-[13px] text-slate-500 leading-relaxed">{item.description}</p>
-                        {item.user && (
-                            <span className="text-[11px] bg-slate-100 text-slate-600 px-2.5 py-0.5 rounded-full mt-1.5 inline-block font-medium">
-                                By {item.user}
-                            </span>
-                        )}
-                    </div>
-                </div>
-            ))}
-        </div>
     );
 }
 
@@ -171,6 +128,7 @@ interface ERPDashboardProps {
 export default function ERPDashboard({ stats: serverStats, clients: serverClients, invoices: serverInvoices, chartData: serverChartData, projects: serverProjects, supportTickets: serverTickets, activityLogs: serverActivityLogs, upcomingBookings: serverBookings }: ERPDashboardProps) {
     const { toast } = useToast();
     const [currentSection, setCurrentSection] = useState('overview');
+    const [deleteConfirm, setDeleteConfirm] = useState<{ open: boolean; client: any }>({ open: false, client: null });
 
     // ────────────────────────────────────────────────────────
     // BACKEND HYDRATION & CORE STATES
@@ -295,14 +253,18 @@ export default function ERPDashboard({ stats: serverStats, clients: serverClient
     };
 
     const handleDeleteClient = (client: any) => {
-        if (confirm(`Are you sure you want to delete client ${client.name}? This will remove all linked wallets.`)) {
-            router.delete(route('erp.clients.destroy', client.id), {
-                onSuccess: () => {
-                    toast({ description: 'Client deleted successfully.' });
-                    prependActivity('Client Deleted', `Deleted client record ${client.name} permanently.`);
-                }
-            });
-        }
+        setDeleteConfirm({ open: true, client });
+    };
+
+    const confirmDeleteClient = () => {
+        if (!deleteConfirm.client) return;
+        router.delete(route('erp.clients.destroy', deleteConfirm.client.id), {
+            onSuccess: () => {
+                toast({ description: `Client ${deleteConfirm.client.name} deleted.` });
+                prependActivity('Client Deleted', `Deleted client record ${deleteConfirm.client.name} permanently.`);
+                setDeleteConfirm({ open: false, client: null });
+            }
+        });
     };
 
     const handleWalletAdjustment = (e: React.FormEvent) => {
@@ -393,7 +355,7 @@ export default function ERPDashboard({ stats: serverStats, clients: serverClient
         e.preventDefault();
         // Fallback to fake state if route doesn't exist yet, but in a real operational 
         // system this should be router.post(route('erp.expenses.store'), expenseForm)
-        toast({ description: 'Expense recorded successfully (mocked for UI completion).' });
+        toast({ description: 'Expense logging is coming soon.' });
         setShowAddExpenseModal(false);
         setExpenseForm({ title: '', category: 'Software', amount: '', date: '', status: 'Pending' });
     };
@@ -401,7 +363,7 @@ export default function ERPDashboard({ stats: serverStats, clients: serverClient
     // Add Storage Provider
     const handleAddProvider = (e: React.FormEvent) => {
         e.preventDefault();
-        toast({ description: 'Storage Provider connected (mocked for UI completion).' });
+        toast({ description: 'Storage provider integration is coming soon.' });
         setShowAddProviderModal(false);
         setProviderForm({ name: '', driver: 's3', bucket: '', key: '', secret: '', endpoint: '', region: '' });
     };
@@ -409,7 +371,7 @@ export default function ERPDashboard({ stats: serverStats, clients: serverClient
     // Add Document
     const handleAddDoc = (e: React.FormEvent) => {
         e.preventDefault();
-        toast({ description: 'Document uploaded successfully (mocked for UI completion).' });
+        toast({ description: 'Document management is coming soon.' });
         setShowAddDocModal(false);
         setDocForm({ name: '', type: 'Contract', provider: 'Local' });
     };
@@ -418,7 +380,7 @@ export default function ERPDashboard({ stats: serverStats, clients: serverClient
     const handleAddProject = (e: React.FormEvent) => {
         e.preventDefault();
         // Should hit erp.projects.store when backend is fully implemented
-        toast({ description: 'Project established (mocked for UI completion).' });
+        toast({ description: 'Project management is coming soon.' });
         setShowAddProjectModal(false);
         setNewProjectForm({ name: '', client: '', budget: '', deadline: '', leader: '', status: 'Planning' });
     };
@@ -426,7 +388,7 @@ export default function ERPDashboard({ stats: serverStats, clients: serverClient
     // Draft Contract
     const handleAddContract = (e: React.FormEvent) => {
         e.preventDefault();
-        toast({ description: 'Agreement generated (mocked for UI completion).' });
+        toast({ description: 'Contract management is coming soon.' });
         setShowAddContractModal(false);
         setContractForm({ title: '', client: '', value: '', status: 'Draft' });
     };
@@ -504,6 +466,17 @@ export default function ERPDashboard({ stats: serverStats, clients: serverClient
             }))}
         >
             <div className="flex-1 w-full min-w-0">
+
+            {/* ConfirmModal for client deletion */}
+            <ConfirmModal
+                isOpen={deleteConfirm.open}
+                title="Delete Client"
+                description={`Are you sure you want to delete ${deleteConfirm.client?.name}? This will remove all linked wallets and data. This cannot be undone.`}
+                confirmLabel="Delete Client"
+                variant="danger"
+                onConfirm={confirmDeleteClient}
+                onCancel={() => setDeleteConfirm({ open: false, client: null })}
+            />
                         
                         {/* 1. OVERVIEW (DASHBOARD) */}
                         {currentSection === 'overview' && (

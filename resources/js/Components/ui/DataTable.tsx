@@ -8,14 +8,55 @@ import {
 } from 'lucide-react';
 import { SearchInput } from './SearchInput';
 import { SkeletonTable } from './SkeletonLoaders';
+import { EmptyState } from './EmptyState';
 import { Link } from '@inertiajs/react';
 
-export interface ColumnDef {
+// ── Column format A: legacy {key, label, render?, sortable?}
+export interface ColumnDefKey {
     key: string;
     label: string;
     sortable?: boolean;
     className?: string;
     render?: (row: any) => React.ReactNode;
+}
+
+// ── Column format B: TanStack-style {header, cell, accessorKey?}
+export interface ColumnDefHeader {
+    header: string;
+    accessorKey?: string;
+    sortable?: boolean;
+    className?: string;
+    cell?: (row: any) => React.ReactNode;
+}
+
+export type ColumnDef = ColumnDefKey | ColumnDefHeader;
+
+/** Normalizes both column formats into a unified internal shape */
+function normalizeColumn(col: ColumnDef): {
+    key: string;
+    label: string;
+    sortable: boolean;
+    className?: string;
+    render: (row: any) => React.ReactNode;
+} {
+    if ('key' in col) {
+        return {
+            key: col.key,
+            label: col.label,
+            sortable: col.sortable ?? false,
+            className: col.className,
+            render: col.render ?? ((row) => row[col.key] ?? '—'),
+        };
+    }
+    // ColumnDefHeader format
+    const key = col.accessorKey ?? col.header.toLowerCase().replace(/\s+/g, '_');
+    return {
+        key,
+        label: col.header,
+        sortable: col.sortable ?? false,
+        className: col.className,
+        render: col.cell ?? ((row) => row[key] ?? '—'),
+    };
 }
 
 export interface DataTableProps {
@@ -29,6 +70,9 @@ export interface DataTableProps {
     onPageChange?: (page: string | number) => void;
     onPerPageChange?: (perPage: number) => void;
     emptyState?: React.ReactNode;
+    emptyIcon?: React.ElementType;
+    emptyTitle?: string;
+    emptyDescription?: string;
     className?: string;
 }
 
@@ -43,10 +87,15 @@ export function DataTable({
     onPageChange,
     onPerPageChange,
     emptyState,
+    emptyIcon,
+    emptyTitle = 'No results found',
+    emptyDescription,
     className,
 }: DataTableProps) {
+    const normalized = columns.map(normalizeColumn);
+
     if (loading && !data.length) {
-        return <SkeletonTable cols={columns.length} rows={5} className="" />;
+        return <SkeletonTable cols={normalized.length || 4} rows={5} className="" />;
     }
 
     return (
@@ -57,7 +106,7 @@ export function DataTable({
             )}
         >
             {/* Top Bar: Search & Filters */}
-            {(onSearch || filters) && (
+            {(onSearch || filters?.extra) && (
                 <div className="flex items-center justify-between gap-4 border-b border-slate-100 p-4">
                     {onSearch && (
                         <div className="w-full max-w-sm">
@@ -69,7 +118,7 @@ export function DataTable({
                             />
                         </div>
                     )}
-                    {filters && (
+                    {filters?.extra && (
                         <div className="flex items-center gap-2">
                             {filters.extra}
                         </div>
@@ -82,11 +131,11 @@ export function DataTable({
                 <table className="w-full border-collapse text-left font-sans text-[13px]">
                     <thead className="sticky top-0 z-10 border-b border-slate-200 bg-slate-50">
                         <tr>
-                            {columns.map((col, idx) => (
+                            {normalized.map((col, idx) => (
                                 <th
                                     key={idx}
                                     className={cn(
-                                        'px-4 py-3 text-[12px] font-medium uppercase text-slate-500 whitespace-nowrap',
+                                        'px-4 py-3 text-[11px] font-semibold uppercase tracking-wider text-slate-500 whitespace-nowrap',
                                         col.sortable
                                             ? 'cursor-pointer select-none transition-colors hover:text-slate-900'
                                             : '',
@@ -110,24 +159,22 @@ export function DataTable({
                             ))}
                         </tr>
                     </thead>
-                    <tbody className="bg-white">
+                    <tbody className="bg-white divide-y divide-slate-100">
                         {data.length > 0 ? (
                             data.map((row, rowIndex) => (
                                 <tr
-                                    key={rowIndex}
-                                    className="border-b border-slate-100 transition-colors duration-150 hover:bg-slate-50/50 last:border-0"
+                                    key={row.id ?? rowIndex}
+                                    className="transition-colors duration-100 hover:bg-slate-50/70"
                                 >
-                                    {columns.map((col, colIndex) => (
+                                    {normalized.map((col, colIndex) => (
                                         <td
                                             key={colIndex}
                                             className={cn(
-                                                'px-4 py-3.5 text-slate-700',
+                                                'px-4 py-3 text-slate-700',
                                                 col.className,
                                             )}
                                         >
-                                            {col.render
-                                                ? col.render(row)
-                                                : row[col.key]}
+                                            {col.render(row)}
                                         </td>
                                     ))}
                                 </tr>
@@ -135,13 +182,16 @@ export function DataTable({
                         ) : (
                             <tr>
                                 <td
-                                    colSpan={columns.length}
-                                    className="px-4 py-16 text-center"
+                                    colSpan={normalized.length || 1}
+                                    className="p-0"
                                 >
                                     {emptyState || (
-                                        <div className="text-slate-500">
-                                            No data available
-                                        </div>
+                                        <EmptyState
+                                            icon={emptyIcon}
+                                            title={emptyTitle}
+                                            description={emptyDescription}
+                                            className="rounded-none border-0 bg-white py-12"
+                                        />
                                     )}
                                 </td>
                             </tr>
@@ -154,9 +204,9 @@ export function DataTable({
             {pagination && pagination.total > 0 && (
                 <div className="flex items-center justify-between gap-4 border-t border-slate-200 bg-white px-4 py-3 text-[13px] text-slate-600">
                     <div className="flex items-center gap-2">
-                        <span>Show</span>
+                        <span className="text-slate-400 text-xs">Show</span>
                         <select
-                            className="h-8 rounded-lg border border-slate-200 bg-white pl-2 pr-6 text-[13px] focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                            className="h-7 rounded-md border border-slate-200 bg-white pl-2 pr-6 text-[12px] focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
                             value={pagination.per_page}
                             onChange={(e) =>
                                 onPerPageChange?.(Number(e.target.value))
@@ -170,9 +220,9 @@ export function DataTable({
                         </select>
                     </div>
 
-                    <div className="flex-1 text-center text-slate-500">
-                        Showing {pagination.from || 0}–{pagination.to || 0} of{' '}
-                        <span className="font-medium text-slate-700">{pagination.total}</span> results
+                    <div className="flex-1 text-center text-slate-400 text-xs">
+                        {pagination.from || 0}–{pagination.to || 0} of{' '}
+                        <span className="font-medium text-slate-700">{pagination.total}</span>
                     </div>
 
                     <div className="flex items-center gap-1">
@@ -184,17 +234,17 @@ export function DataTable({
                                             key={idx}
                                             href={link.url}
                                             className={cn(
-                                                "rounded-lg px-3 py-1.5 text-[13px] transition-colors",
-                                                link.active 
-                                                    ? "bg-indigo-600 font-medium text-white shadow-sm" 
-                                                    : "text-slate-500 hover:bg-slate-100 hover:text-slate-900"
+                                                'rounded-md px-2.5 py-1 text-[12px] transition-colors min-w-[28px] text-center',
+                                                link.active
+                                                    ? 'bg-slate-900 font-medium text-white shadow-sm'
+                                                    : 'text-slate-500 hover:bg-slate-100 hover:text-slate-900'
                                             )}
                                             dangerouslySetInnerHTML={{ __html: link.label }}
                                         />
                                     ) : (
-                                        <span 
-                                            key={idx} 
-                                            className="rounded-lg px-3 py-1.5 text-[13px] text-slate-400 opacity-50 cursor-not-allowed"
+                                        <span
+                                            key={idx}
+                                            className="rounded-md px-2.5 py-1 text-[12px] text-slate-300 cursor-not-allowed min-w-[28px] text-center"
                                             dangerouslySetInnerHTML={{ __html: link.label }}
                                         />
                                     )
@@ -207,13 +257,13 @@ export function DataTable({
                                         onPageChange?.(pagination.current_page - 1)
                                     }
                                     disabled={pagination.current_page === 1}
-                                    className="rounded-lg p-1.5 text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-900 disabled:cursor-not-allowed disabled:opacity-50"
+                                    className="rounded-md p-1.5 text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-900 disabled:cursor-not-allowed disabled:opacity-40"
                                 >
                                     <ChevronLeft className="h-4 w-4" />
                                 </button>
 
                                 <div className="flex items-center gap-1 px-2">
-                                    <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-indigo-600 font-medium text-white">
+                                    <span className="flex h-7 w-7 items-center justify-center rounded-md bg-slate-900 font-medium text-white text-[12px]">
                                         {pagination.current_page}
                                     </span>
                                 </div>
@@ -225,7 +275,7 @@ export function DataTable({
                                     disabled={
                                         pagination.current_page === pagination.last_page
                                     }
-                                    className="rounded-lg p-1.5 text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-900 disabled:cursor-not-allowed disabled:opacity-50"
+                                    className="rounded-md p-1.5 text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-900 disabled:cursor-not-allowed disabled:opacity-40"
                                 >
                                     <ChevronRight className="h-4 w-4" />
                                 </button>
@@ -237,4 +287,3 @@ export function DataTable({
         </div>
     );
 }
-

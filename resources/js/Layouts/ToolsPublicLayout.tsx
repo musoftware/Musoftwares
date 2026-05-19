@@ -2,17 +2,24 @@ import React, { PropsWithChildren } from 'react';
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import ApplicationLogo from '@/Components/ApplicationLogo';
 import { Button } from '@/Components/ui/button';
+import { RuntimeStatusBanner } from '@/Components/Tools/RuntimeStatusBanner';
 import { Download, Key, CreditCard, LayoutGrid, LogIn, UserPlus, ArrowUpRight } from 'lucide-react';
 
 interface ToolsPublicLayoutProps extends PropsWithChildren {
     title: string;
     activeNav?: 'explore' | 'downloads' | 'licenses' | 'billing';
+    /** Which agent this tool requires — shown in the runtime banner */
+    agentType?: 'nodejs' | 'python';
+    /** Tool slug for plugin install tracking */
+    toolSlug?: string;
 }
 
 export default function ToolsPublicLayout({
     children,
     title,
     activeNav = 'explore',
+    agentType = 'nodejs',
+    toolSlug,
 }: ToolsPublicLayoutProps) {
     const { auth } = usePage().props as any;
     const isAuthed = !!auth?.user;
@@ -30,7 +37,12 @@ export default function ToolsPublicLayout({
         <div className="min-h-screen bg-[#FAFAFA] font-['Inter',sans-serif] text-slate-900 flex flex-col">
             <Head title={`${title} — musoftware Tools`} />
 
-            {/* Announcement bar */}
+            {/* Runtime status banner (authenticated users only) */}
+            {isAuthed && (
+                <RuntimeStatusBanner agentType={agentType} toolSlug={toolSlug} />
+            )}
+
+            {/* Announcement bar (guests only) */}
             {!isAuthed && (
                 <div className="bg-slate-900 text-slate-300 text-center py-2 px-4 text-xs font-medium flex items-center justify-center gap-2">
                     <span className="text-slate-400">🚀</span>

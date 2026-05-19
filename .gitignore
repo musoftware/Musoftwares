@@ -1,3 +1,6 @@
+###############################################################################
+# LARAVEL / PHP
+###############################################################################
 /node_modules
 /public/build
 /public/hot
@@ -19,3 +22,51 @@ yarn-error.log
 Modules/*/vite.config.js
 .pnpm-debug.log
 server.log
+
+###############################################################################
+# NODE.JS AGENT — tools/musoftware-agent-node
+###############################################################################
+
+# Dependencies
+tools/musoftware-agent-node/node_modules/
+tools/musoftware-agent-node/plugins/*/node_modules/
+
+# Environment & secrets
+tools/musoftware-agent-node/.env
+tools/musoftware-agent-node/.env.local
+
+# Runtime logs
+tools/musoftware-agent-node/logs/
+tools/musoftware-agent-node/*.log
+
+# Build / distribution output
+tools/musoftware-agent-node/dist/
+tools/musoftware-agent-node/build/
+tools/musoftware-agent-node/out/
+
+# Packaged desktop installers (electron-builder, pkg, etc.)
+tools/musoftware-agent-node/release/
+tools/musoftware-agent-node/*.exe
+tools/musoftware-agent-node/*.dmg
+tools/musoftware-agent-node/*.AppImage
+tools/musoftware-agent-node/*.deb
+tools/musoftware-agent-node/*.rpm
+tools/musoftware-agent-node/*.snap
+
+# Lock files (keep package-lock.json; ignore yarn/pnpm alternatives)
+tools/musoftware-agent-node/yarn.lock
+tools/musoftware-agent-node/pnpm-lock.yaml
+
+# Misc
+tools/musoftware-agent-node/.pnpm-debug.log
+tools/musoftware-agent-node/npm-debug.log
+
+###############################################################################
+# OS / EDITOR ARTIFACTS
+###############################################################################
+.DS_Store
+Thumbs.db
+desktop.ini
+*.swp
+*.swo
+*~

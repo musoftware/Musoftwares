@@ -2,15 +2,17 @@ import React, { useState, useEffect } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import { PageHeader } from '@/Components/ui/PageHeader';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { Button } from '@/Components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/Components/ui/card';
+import { Badge } from '@/Components/ui/badge';
 import { StatusBadge } from '@/Components/ui/StatusBadge';
 import { CurrencyDisplay } from '@/Components/ui/CurrencyDisplay';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { DateDisplay } from '@/Components/ui/DateDisplay';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/Components/ui/table';
 import { Edit, Send, CheckCircle, Copy, Download, MoreHorizontal, Clock, Wallet, Info, History, ArrowUpRight, ArrowDownLeft } from 'lucide-react';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/Components/ui/dropdown-menu';
+import { Avatar, AvatarFallback } from '@/Components/ui/avatar';
+import { PromptModal } from '@/Components/ui/ConfirmModal';
 
 const Separator = () => <div className="h-px bg-gray-200 w-full my-4" />;
 
@@ -19,7 +21,10 @@ export default function Show({ invoice, timeline, referral_earnings }) {
     const isClientView = !auth.user.roles?.includes('admin') && auth.user.id !== invoice.created_by;
 
     const [timerValue, setTimerValue] = useState(0);
+    const [walletModal, setWalletModal] = useState({ open: false, type: '' });
     const activeTimerItem = invoice.items.find((i) => i.type === 'timer' && i.timer_sessions?.some((s) => !s.stopped_at));
+
+    const workspaceName = auth.user?.workspace_name || auth.user?.name || 'Your Business';
 
     useEffect(() => {
         let interval;
@@ -43,10 +48,14 @@ export default function Show({ invoice, timeline, referral_earnings }) {
     };
 
     const handleWalletAction = (type) => {
-        const amount = prompt(`Enter amount to ${type}:`);
+        setWalletModal({ open: true, type });
+    };
+
+    const handleWalletConfirm = (amount) => {
         if (amount && !isNaN(amount)) {
-            router.post(route(`erp.wallet.${type}`, invoice.client_id), { amount });
+            router.post(route(`erp.wallet.${walletModal.type}`, invoice.client_id), { amount });
         }
+        setWalletModal({ open: false, type: '' });
     };
 
     if (isClientView) {
@@ -56,26 +65,28 @@ export default function Show({ invoice, timeline, referral_earnings }) {
                 <div className="max-w-4xl mx-auto bg-card text-card-foreground shadow-sm rounded-xl overflow-hidden border">
                     {invoice.status === 'paid' ? (
                         <div className="bg-primary/10 text-primary p-4 text-center font-bold flex items-center justify-center gap-2 border-b">
-                            <CheckCircle className="h-5 w-5" /> PAID ON {new Date(invoice.paid_at).toLocaleDateString()}
+                            <CheckCircle className="h-5 w-5" /> PAID ON <DateDisplay date={invoice.paid_at} />
                         </div>
                     ) : (
                         <div className="bg-amber-500/10 text-amber-600 p-4 text-center font-bold border-b">
-                            PAYMENT PENDING - DUE BY {new Date(invoice.due_date).toLocaleDateString()}
+                            PAYMENT PENDING — DUE BY <DateDisplay date={invoice.due_date} />
                         </div>
                     )}
 
                     <div className="p-8 md:p-12">
                         <div className="flex flex-col md:flex-row justify-between mb-12 gap-8">
                             <div>
-                                <div className="h-16 w-16 bg-primary rounded-lg flex items-center justify-center text-primary-foreground font-bold text-2xl mb-4">LOGO</div>
-                                <h2 className="text-xl font-bold">Business Name</h2>
-                                <p className="text-muted-foreground">123 Business St, City, Country</p>
+                                <div className="h-12 w-12 bg-slate-900 rounded-lg flex items-center justify-center text-white font-bold text-lg mb-4">
+                                    {workspaceName.charAt(0).toUpperCase()}
+                                </div>
+                                <h2 className="text-xl font-bold">{workspaceName}</h2>
+                                <p className="text-muted-foreground">{auth.user?.email}</p>
                             </div>
                             <div className="text-md-right">
                                 <h1 className="text-3xl font-bold tracking-tight mb-2">INVOICE</h1>
                                 <p className="font-mono text-muted-foreground">{invoice.invoice_number}</p>
-                                <p className="text-muted-foreground mt-4">Issued: {new Date(invoice.issued_at).toLocaleDateString()}</p>
-                                <p className="text-muted-foreground">Due: {new Date(invoice.due_date).toLocaleDateString()}</p>
+                                <p className="text-muted-foreground mt-4">Issued: <DateDisplay date={invoice.issued_at} /></p>
+                                <p className="text-muted-foreground">Due: <DateDisplay date={invoice.due_date} /></p>
                             </div>
                         </div>
 
@@ -245,11 +256,11 @@ export default function Show({ invoice, timeline, referral_earnings }) {
                             <div className="grid grid-cols-3 gap-6 py-5 border-y border-slate-100 mb-10">
                                 <div>
                                     <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Issued Date</p>
-                                    <p className="font-medium text-sm text-slate-900">{new Date(invoice.issued_at).toLocaleDateString()}</p>
+                                <p className="font-medium text-sm text-slate-900"><DateDisplay date={invoice.issued_at} /></p>
                                 </div>
                                 <div>
                                     <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Due Date</p>
-                                    <p className="font-medium text-sm text-slate-900">{new Date(invoice.due_date).toLocaleDateString()}</p>
+                                <p className="font-medium text-sm text-slate-900"><DateDisplay date={invoice.due_date} /></p>
                                 </div>
                                 <div className="text-right">
                                     <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Amount Due</p>
@@ -375,7 +386,7 @@ export default function Show({ invoice, timeline, referral_earnings }) {
                                     </div>
                                     <div>
                                         <p className="font-semibold text-emerald-900">Paid in Full</p>
-                                        <p className="text-xs text-emerald-700/80 mt-0.5">{new Date(invoice.paid_at).toLocaleString()}</p>
+                                        <p className="text-xs text-emerald-700/80 mt-0.5"><DateDisplay date={invoice.paid_at} format="datetime" /></p>
                                     </div>
                                 </div>
                             ) : (
@@ -416,7 +427,7 @@ export default function Show({ invoice, timeline, referral_earnings }) {
                             </div>
                             <div className="flex justify-between items-center text-sm">
                                 <span className="text-slate-500 font-medium">Rate Date</span>
-                                <span className="font-medium text-slate-700">{new Date(invoice.exchange_rate_date).toLocaleDateString()}</span>
+                                <span className="font-medium text-slate-700"><DateDisplay date={invoice.exchange_rate_date} /></span>
                             </div>
                         </div>
 
@@ -455,7 +466,7 @@ export default function Show({ invoice, timeline, referral_earnings }) {
                                             </div>
                                             <div className="pb-1">
                                                 <p className="text-sm font-medium text-slate-900">{item.event}</p>
-                                                <p className="text-xs text-slate-400 mt-1">{new Date(item.time).toLocaleString()}</p>
+                                                <p className="text-xs text-slate-400 mt-1"><DateDisplay date={item.time} format="datetime" /></p>
                                             </div>
                                         </div>
                                     ))}
@@ -466,6 +477,35 @@ export default function Show({ invoice, timeline, referral_earnings }) {
                     </div>
                 </div>
             </div>
+
+            <PromptModal
+                isOpen={walletModal.open}
+                title={walletModal.type === 'credit' ? 'Credit Client Wallet' : 'Debit Client Wallet'}
+                description={`Enter the amount to ${walletModal.type} for ${invoice.client?.name}.`}
+                label="Amount"
+                placeholder="0.00"
+                inputType="number"
+                confirmLabel={walletModal.type === 'credit' ? 'Credit' : 'Debit'}
+                onConfirm={handleWalletConfirm}
+                onCancel={() => setWalletModal({ open: false, type: '' })}
+            />
         </AuthenticatedLayout>
+    );
+}
+
+// PromptModal rendered at root so it appears above everything
+function WalletPromptModal({ walletModal, setWalletModal, onConfirm }) {
+    return (
+        <PromptModal
+            isOpen={walletModal.open}
+            title={walletModal.type === 'credit' ? 'Credit Client Wallet' : 'Debit Client Wallet'}
+            description={`Enter the amount to ${walletModal.type} from the client's wallet.`}
+            label="Amount"
+            placeholder="0.00"
+            inputType="number"
+            confirmLabel={walletModal.type === 'credit' ? 'Credit' : 'Debit'}
+            onConfirm={onConfirm}
+            onCancel={() => setWalletModal({ open: false, type: '' })}
+        />
     );
 }

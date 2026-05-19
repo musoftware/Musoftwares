@@ -1,0 +1,10 @@
+{
+  "port": 18400,
+  "platformUrl": "http://127.0.0.1:8000",
+  "token": "dev-local-token-12345",
+  "userId": "1",
+  "logLevel": "debug",
+  "pluginsDir": "D:\\Projects\\1AOrganized\\PhpProject\\MusoftwareBusiness\\newmusoftware\\tools\\musoftware-agent-node\\plugins",
+  "autoUpdate": true,
+  "updateChannel": "stable"
+}
