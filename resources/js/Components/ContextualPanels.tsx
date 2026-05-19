@@ -2,22 +2,22 @@ import { Button } from '@/Components/ui/button';
 import { Badge } from '@/Components/ui/badge';
 import { formatMoney, formatDate } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-    X, 
-    FileText, 
-    CheckCircle2, 
-    Wallet, 
-    History, 
-    User, 
-    Phone, 
-    Mail, 
-    MessageSquare, 
-    MapPin, 
-    CreditCard, 
-    ArrowUpRight, 
-    Calendar, 
-    DollarSign, 
-    Activity, 
+import {
+    X,
+    FileText,
+    CheckCircle2,
+    Wallet,
+    History,
+    User,
+    Phone,
+    Mail,
+    MessageSquare,
+    MapPin,
+    CreditCard,
+    ArrowUpRight,
+    Calendar,
+    DollarSign,
+    Activity,
     Briefcase,
     Clock,
     FileCheck2,
@@ -33,12 +33,12 @@ interface QuickViewProps {
     data: any;
 }
 
-export function SlideOver({ isOpen, onClose, title, icon: Icon, children }: { 
-    isOpen: boolean; 
-    onClose: () => void; 
-    title: string; 
-    icon: any; 
-    children: React.ReactNode 
+export function SlideOver({ isOpen, onClose, title, icon: Icon, children }: {
+    isOpen: boolean;
+    onClose: () => void;
+    title: string;
+    icon: any;
+    children: React.ReactNode
 }) {
     return (
         <AnimatePresence>
@@ -73,9 +73,9 @@ export function SlideOver({ isOpen, onClose, title, icon: Icon, children }: {
                                     {title}
                                 </h3>
                             </div>
-                            <Button 
-                                variant="ghost" 
-                                size="icon" 
+                            <Button
+                                variant="ghost"
+                                size="icon"
                                 className="h-8 w-8 rounded-full text-text-muted hover:bg-gray-100 hover:text-text-primary"
                                 onClick={onClose}
                             >
@@ -307,7 +307,7 @@ export function ContractQuickView({ isOpen, onClose, data }: QuickViewProps) {
                             {data.status || 'Active'}
                         </Badge>
                     </div>
-                    
+
                     {/* Contract price */}
                     <div className="mt-4 grid grid-cols-2 gap-4 border-t border-border/60 pt-3 text-xs">
                         <div>
@@ -332,8 +332,8 @@ export function ContractQuickView({ isOpen, onClose, data }: QuickViewProps) {
                         <span className="font-mono font-semibold text-text-primary">{progressValue}%</span>
                     </div>
                     <div className="h-2 w-full rounded-full bg-slate-100 overflow-hidden">
-                        <div 
-                            className="h-full rounded-full bg-primary transition-all duration-500" 
+                        <div
+                            className="h-full rounded-full bg-primary transition-all duration-500"
                             style={{ width: `${progressValue}%` }}
                         />
                     </div>
@@ -418,7 +418,7 @@ export function CustomerQuickView({ isOpen, onClose, data }: QuickViewProps) {
                     <div className="space-y-3 text-xs">
                         <div className="flex items-center gap-3 text-text-secondary">
                             <Mail className="h-4 w-4 text-text-muted" />
-                            <span>{data.email || 'client@musoftware.com'}</span>
+                            <span>{data.email || 'client@musoftwares.com'}</span>
                         </div>
                         <div className="flex items-center gap-3 text-text-secondary">
                             <Phone className="h-4 w-4 text-text-muted" />

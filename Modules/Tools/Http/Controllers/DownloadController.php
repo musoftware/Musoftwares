@@ -20,7 +20,8 @@ class DownloadController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth');
+        // downloadAgent is public — anyone can download the installer
+        $this->middleware('auth')->except('downloadAgent');
     }
 
     /**
@@ -130,4 +131,57 @@ class DownloadController extends Controller
 
         return Storage::download($version->file_path, $fileName);
     }
+
+    /**
+     * Download the local runtime agent installer.
+     * Agents are stored at: storage/app/agents/{type}/musoftware-agent-{type}-setup.exe
+     *
+     * GET /tools/agent/download/{type}
+     * Requires auth.
+     */
+    public function downloadAgent(Request $request, string $type): StreamedResponse|RedirectResponse|\Illuminate\Http\JsonResponse|\Illuminate\Http\Response
+    {
+        abort_unless(in_array($type, ['node', 'python']), 404);
+
+        $platform = match(true) {
+            str_contains($request->userAgent() ?? '', 'Windows') => 'win',
+            str_contains($request->userAgent() ?? '', 'Mac')     => 'mac',
+            default                                               => 'linux',
+        };
+
+        $fileName = "musoftware-agent-{$type}-{$platform}";
+        $fileName .= $platform === 'win' ? '.exe' : '';
+        $filePath = "agents/{$type}/{$fileName}";
+
+        if (!Storage::exists($filePath)) {
+            // Fallback: return the generic zip build
+            $filePath = "agents/{$type}/musoftware-agent-{$type}.zip";
+        }
+
+        if (!Storage::exists($filePath)) {
+            // Installer not yet uploaded — friendly response
+            if ($request->expectsJson() || $request->hasHeader('X-Inertia')) {
+                return response()->json([
+                    'error'   => 'coming_soon',
+                    'message' => "The {$type} agent installer is being prepared. Check back soon.",
+                    'type'    => $type,
+                ], 503);
+            }
+
+            // Plain browser request — return simple HTML
+            return response(
+                "<!DOCTYPE html><html><head><title>Coming Soon — Musoftware Agent</title>
+                <style>*{margin:0;padding:0;box-sizing:border-box}body{min-height:100vh;background:#0f0f11;color:#e2e8f0;font-family:system-ui,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1rem;padding:2rem}h1{font-size:1.5rem;color:#f1f5f9}p{color:#64748b;text-align:center;max-width:360px;line-height:1.6}a{color:#60a5fa;text-decoration:none}</style></head>
+                <body>
+                    <h1>🚀 Agent Installer Coming Soon</h1>
+                    <p>The <strong>{$type}</strong> agent installer is being prepared for your platform (<strong>{$platform}</strong>).</p>
+                    <p style='margin-top:.5rem'>Check back soon or <a href='/tools'>browse tools</a> in the meantime.</p>
+                </body></html>",
+                200
+            )->header('Content-Type', 'text/html');
+        }
+
+        return Storage::download($filePath, $fileName);
+    }
 }
+

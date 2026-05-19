@@ -2,8 +2,8 @@ import * as React from 'react';
 
 import type { ToastActionElement, ToastProps } from '@/Components/ui/toast';
 
-const TOAST_LIMIT = 1;
-const TOAST_REMOVE_DELAY = 1000000;
+const TOAST_LIMIT = 3;
+const TOAST_REMOVE_DELAY = 5000;
 
 type ToasterToast = ToastProps & {
     id: string;
@@ -183,5 +183,15 @@ function useToast() {
             dispatch({ type: 'DISMISS_TOAST', toastId }),
     };
 }
+
+// ── Typed toast helpers for consistent feedback ──────────────────
+export const toastSuccess = (message: string, title?: string) =>
+    toast({ title: title ?? 'Success', description: message });
+
+export const toastError = (message: string, title?: string) =>
+    toast({ variant: 'destructive', title: title ?? 'Something went wrong', description: message });
+
+export const toastInfo = (message: string, title?: string) =>
+    toast({ title: title ?? 'Info', description: message });
 
 export { toast, useToast };

@@ -12,6 +12,9 @@ Route::prefix('tools')->name('tools.')->group(function () {
     // Browse — public
     Route::get('/', [MarketplaceController::class, 'index'])->name('explore');
 
+    // Agent installer — public download (no auth needed, it's just an installer)
+    Route::get('/agent/download/{type}', [DownloadController::class, 'downloadAgent'])->name('download.agent');
+
     // Auth-required routes — MUST be before /{slug} wildcard
     Route::middleware('auth')->group(function () {
 

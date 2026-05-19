@@ -1,0 +1,15 @@
+{
+  "id": "tiktok-scraper",
+  "name": "TikTok Scraper Pro",
+  "version": "1.0.0",
+  "runtime": "python",
+  "entry": "worker.py",
+  "tool_slug": "tiktok-scraper",
+  "description": "High-performance TikTok scraping via Playwright — keywords, hashtags, profiles, competitor analytics.",
+  "ui": "ui/index.html",
+  "permissions": ["browser", "network", "filesystem"],
+  "requires_subscription": true,
+  "min_agent_version": "1.0.0",
+  "python_min_version": "3.10",
+  "capabilities": ["keyword_scrape", "hashtag_scrape", "profile_scrape", "csv_export", "proxy_rotation"]
+}

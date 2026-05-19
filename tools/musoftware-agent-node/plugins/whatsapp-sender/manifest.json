@@ -1,0 +1,9 @@
+{
+  "id": "whatsapp-sender",
+  "name": "WhatsApp Bulk Sender",
+  "version": "1.0.0",
+  "entry": "worker.js",
+  "tool_slug": "whatsapp-sender",
+  "description": "Automated WhatsApp messaging via Puppeteer — bulk campaigns, media, contacts.",
+  "capabilities": ["send_text", "send_media", "bulk_campaign", "session_persistence"]
+}
