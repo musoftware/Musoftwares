@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { Head, router } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 import ToolsPublicLayout from '@/Layouts/ToolsPublicLayout';
 import { Button } from '@/Components/ui/button';
 import { Badge } from '@/Components/ui/badge';
-import { Download, Key, Copy, Check, Monitor, Smartphone, ShoppingBag } from 'lucide-react';
+import { ExternalLink, Key, Copy, Check, Monitor, Smartphone, ShoppingBag } from 'lucide-react';
 
 interface License {
     id: number; license_key: string; status: string; is_valid: boolean;
@@ -37,7 +37,7 @@ export default function MyLicenses({ licenses }: Props) {
                 {/* Page header */}
                 <div>
                     <h1 className="text-2xl font-bold text-slate-900 tracking-tight">My Licenses</h1>
-                    <p className="text-sm text-slate-500 mt-1">Your license keys. Paste into the desktop app on first launch.</p>
+                    <p className="text-sm text-slate-500 mt-1">Your license keys — used by the runtime to verify your subscriptions locally.</p>
                 </div>
 
                 {licenses.length === 0 ? (
@@ -134,15 +134,16 @@ export default function MyLicenses({ licenses }: Props) {
                                                 <Smartphone className="h-3.5 w-3.5" />
                                                 Devices ({lic.active_devices})
                                             </Button>
-                                            <Button
-                                                variant="outline"
-                                                size="sm"
-                                                className="flex-1 gap-2 text-xs border-slate-200 text-slate-600 hover:bg-slate-50 h-8"
-                                                onClick={() => router.visit(route('tools.download.generate', lic.tool.slug))}
-                                            >
-                                                <Download className="h-3.5 w-3.5" />
-                                                Download
-                                            </Button>
+                                            <Link href={route('tools.show', lic.tool.slug)} className="flex-1">
+                                                <Button
+                                                    variant="outline"
+                                                    size="sm"
+                                                    className="w-full gap-2 text-xs border-indigo-200 text-indigo-600 hover:bg-indigo-50 h-8"
+                                                >
+                                                    <ExternalLink className="h-3.5 w-3.5" />
+                                                    Open Tool
+                                                </Button>
+                                            </Link>
                                         </div>
                                     </div>
                                 </div>

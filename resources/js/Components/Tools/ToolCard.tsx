@@ -1,6 +1,6 @@
 import React from 'react';
 import { router } from '@inertiajs/react';
-import { Download, Zap } from 'lucide-react';
+import { Users, Zap } from 'lucide-react';
 import { Badge } from '@/Components/ui/badge';
 import { PlatformBadges } from './PlatformBadge';
 
@@ -92,7 +92,7 @@ export function ToolCard({ tool, isSubscribed = false }: ToolCardProps) {
                         {tool.is_free ? 'Free' : `From $${tool.starting_price}/mo`}
                     </span>
                     <span className="flex items-center gap-1 text-[11px] text-slate-400">
-                        <Download className="h-3 w-3" />
+                        <Users className="h-3 w-3" />
                         {tool.download_count.toLocaleString()}
                     </span>
                 </div>
