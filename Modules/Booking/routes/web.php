@@ -2,15 +2,19 @@
 
 use Illuminate\Support\Facades\Route;
 use Modules\Booking\Http\Controllers\BookingController;
+use Modules\Booking\Http\Controllers\BookingEventController;
 
 // Authenticated Routes
 Route::middleware(['auth', 'verified'])->prefix('booking')->name('booking.')->group(function () {
-    Route::get('/', [BookingController::class, 'index'])->name('index'); // Events list
-    Route::get('/events/create', [BookingController::class, 'create'])->name('events.create');
-    Route::post('/events', [BookingController::class, 'store'])->name('events.store');
-    Route::get('/events/{slug}', [BookingController::class, 'edit'])->name('events.edit');
-    Route::put('/events/{slug}', [BookingController::class, 'update'])->name('events.update');
 
+    // ── Event Types (Booking types the host creates) ─────────────────
+    Route::get('/', [BookingEventController::class, 'index'])->name('events.index');
+    Route::get('/events/create', [BookingEventController::class, 'create'])->name('events.create');
+    Route::post('/events', [BookingEventController::class, 'store'])->name('events.store');
+    Route::get('/events/{slug}/edit', [BookingEventController::class, 'edit'])->name('events.edit');
+    Route::put('/events/{slug}', [BookingEventController::class, 'update'])->name('events.update');
+
+    // ── Appointments (Bookings made by visitors) ──────────────────────
     Route::get('/appointments', [BookingController::class, 'appointments'])->name('appointments');
     Route::post('/appointments/{id}/status', [BookingController::class, 'updateStatus'])->name('appointments.status');
     Route::post('/appointments/{id}/notes', [BookingController::class, 'updateNotes'])->name('appointments.notes');

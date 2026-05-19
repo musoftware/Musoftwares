@@ -4,7 +4,14 @@ namespace Modules\ERP\Models;
 
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class WalletTransaction extends TenantModel
+/**
+ * ClientWalletTransaction — represents a ledger entry on a TenantClient's wallet.
+ *
+ * ⚠️  DO NOT confuse with Modules\Core\Models\WalletTransaction, which tracks
+ *     platform-level user wallet transactions (table: wallet_transactions).
+ *     This model uses the ERP-specific table: client_wallet_transactions.
+ */
+class ClientWalletTransaction extends TenantModel
 {
     protected $table = 'client_wallet_transactions';
 
