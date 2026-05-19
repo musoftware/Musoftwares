@@ -82,12 +82,12 @@ export default function Explore({ tools, categories, subscribedSlugs, filters }:
                             {tools.data.length} tools available
                         </div>
                         <h1 className="text-3xl md:text-4xl font-bold text-slate-900 tracking-tight leading-tight mb-3">
-                            Professional Desktop Tools
-                            <br />
-                            <span className="text-slate-400 font-normal">for power users.</span>
-                        </h1>
+                        Professional Automation Tools
+                        <br />
+                        <span className="text-slate-400 font-normal">for power users.</span>
+                    </h1>
                         <p className="text-slate-500 text-base leading-relaxed max-w-xl">
-                            Scraping, automation, AI-powered workflows — download and activate with a single subscription.
+                            Scraping, automation, AI-powered workflows — run directly in your browser with a single subscription.
                         </p>
                     </div>
 

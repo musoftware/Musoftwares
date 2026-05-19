@@ -44,25 +44,28 @@ class DownloadController extends Controller
                 'downloaded_at' => $d->downloaded_at?->diffForHumans() ?? $d->created_at?->diffForHumans() ?? '-',
             ]);
 
-        // Available downloads (tools user is subscribed to)
+        // Available tools (subscribed and active)
         $availableTools = ToolSubscription::where('user_id', auth()->id())
             ->where('status', 'active')
             ->with(['tool.latestVersion'])
             ->get()
-            ->filter(fn($s) => $s->tool?->latestVersion)
+            ->filter(fn($s) => $s->tool)
             ->map(fn($s) => [
                 'tool_slug'       => $s->tool->slug,
                 'tool_title'      => $s->tool->title,
                 'tool_icon_url'   => $s->tool->icon_url,
-                'version'         => $s->tool->latestVersion->version,
-                'file_size'       => $s->tool->latestVersion->formatted_size,
-                'released_at'     => $s->tool->latestVersion->released_at?->toDateString(),
+                'version'         => $s->tool->latestVersion?->version ?? 'N/A',
+                'file_size'       => $s->tool->latestVersion?->formatted_size ?? '',
+                'released_at'     => $s->tool->latestVersion?->released_at?->toDateString() ?? '',
+                // All tools run via the runtime — UI is on the website
+                'is_web_tool'     => true,
             ]);
 
         return Inertia::render('Tools/Downloads', [
             'downloads'      => $downloads,
             'availableTools' => $availableTools->values(),
         ]);
+
     }
 
     /**

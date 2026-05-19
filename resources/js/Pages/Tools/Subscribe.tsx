@@ -40,10 +40,10 @@ export default function Subscribe({ tool, plan, walletBalance, hasExisting }: Pr
                         <CheckCircle2 className="h-8 w-8 text-emerald-500" />
                     </div>
                     <h1 className="text-xl font-bold text-slate-900 mb-2">Already subscribed</h1>
-                    <p className="text-slate-500 mb-6 text-sm">You can download the tool from your Downloads page.</p>
+                    <p className="text-slate-500 mb-6 text-sm">You can open the tool from your My Tools page.</p>
                     <div className="flex gap-3 justify-center">
-                        <Button onClick={() => router.visit(route('tools.downloads'))}>Go to Downloads</Button>
-                        <Button variant="outline" onClick={() => router.visit(route('tools.show', tool.slug))}>View Tool</Button>
+                        <Button onClick={() => router.visit(route('tools.downloads'))}>My Tools</Button>
+                        <Button variant="outline" onClick={() => router.visit(route('tools.show', tool.slug))}>Open Tool</Button>
                     </div>
                 </div>
             </ToolsPublicLayout>
@@ -66,7 +66,7 @@ export default function Subscribe({ tool, plan, walletBalance, hasExisting }: Pr
                 {/* Header */}
                 <div>
                     <h1 className="text-xl font-bold text-slate-900">Subscribe to {tool.title}</h1>
-                    <p className="text-sm text-slate-500 mt-1">Get access to {plan.name} plan and download on your devices.</p>
+                    <p className="text-sm text-slate-500 mt-1">Get access to the {plan.name} plan and use it on your devices.</p>
                 </div>
 
                 <form onSubmit={handleSubmit} className="space-y-5">
@@ -98,8 +98,12 @@ export default function Subscribe({ tool, plan, walletBalance, hasExisting }: Pr
 
                         <div className="px-5 py-4">
                             <div className="flex items-end gap-1 mb-4">
-                                <span className="text-3xl font-bold text-white">${price.toFixed(2)}</span>
-                                <span className="text-slate-400 text-sm mb-1">/{billingCycle === 'monthly' ? 'month' : 'year'}</span>
+                                <span className="text-3xl font-bold text-white">
+                                    {price <= 0 ? 'Free' : `$${price.toFixed(2)}`}
+                                </span>
+                                {price > 0 && (
+                                    <span className="text-slate-400 text-sm mb-1">/{billingCycle === 'monthly' ? 'month' : 'year'}</span>
+                                )}
                             </div>
                             <ul className="space-y-2">
                                 {plan.features.map((f, i) => (
@@ -168,7 +172,7 @@ export default function Subscribe({ tool, plan, walletBalance, hasExisting }: Pr
                         className="w-full bg-slate-900 hover:bg-slate-800 text-white h-11"
                         disabled={processing || (data.payment_method === 'wallet' && !canPayByWallet)}
                     >
-                        {processing ? 'Processing...' : `Subscribe — $${price.toFixed(2)}`}
+                        {processing ? 'Processing...' : price <= 0 ? 'Get Free Access' : `Subscribe — $${price.toFixed(2)}`}
                     </Button>
 
                     <p className="text-xs text-slate-400 text-center flex items-center justify-center gap-1">
