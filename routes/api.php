@@ -18,3 +18,40 @@ use Illuminate\Support\Facades\Route;
 Route::post('serial/device', [\App\Http\Controllers\Api\SerialDeviceController::class, 'register'])
     ->middleware('throttle:60,1')
     ->name('api.serial.register');
+
+// ── Runtime Version Manifest (public) ─────────────────────────────────────────
+// Polled by local runtime agents to check for updates.
+// Served from public/downloads/runtime/latest.json
+Route::get('runtime/version', function () {
+    $manifest = public_path('downloads/runtime/latest.json');
+    if (!file_exists($manifest)) {
+        return response()->json([
+            'version'           => '1.0.0',
+            'minimum_supported' => '1.0.0',
+            'channel'           => 'stable',
+            'downloads'         => [],
+            'changelog'         => [],
+        ]);
+    }
+    return response()->file($manifest, ['Content-Type' => 'application/json']);
+})->name('api.runtime.version');
+
+// ── Runtime Plugin Manifest (public) ─────────────────────────────────────────
+// Lists all available plugins (no auth — only returns public metadata).
+Route::get('runtime/plugins', function (\Illuminate\Http\Request $request) {
+    $tools = \Modules\Tools\Models\Tool::where('is_active', true)
+        ->whereNotNull('metadata->runtime')
+        ->select(['id', 'title', 'slug', 'metadata'])
+        ->get()
+        ->map(fn($t) => [
+            'id'          => $t->slug,
+            'name'        => $t->title,
+            'slug'        => $t->slug,
+            'runtime'     => $t->metadata['runtime'] ?? 'nodejs',
+            'description' => $t->metadata['description'] ?? '',
+            'version'     => $t->latestVersion?->version ?? '1.0.0',
+        ]);
+
+    return response()->json(['plugins' => $tools]);
+})->name('api.runtime.plugins');
+

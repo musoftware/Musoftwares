@@ -34,6 +34,8 @@ class ToolPricingPlan extends Model
 
     public function getYearlySavingsAttribute(): float
     {
-        return round((($this->price_monthly * 12) - $this->price_yearly) / ($this->price_monthly * 12) * 100);
+        $annual = $this->price_monthly * 12;
+        if ($annual <= 0) return 0;
+        return round(($annual - $this->price_yearly) / $annual * 100);
     }
 }

@@ -5,8 +5,17 @@ use Modules\Tools\Http\Controllers\DownloadController;
 use Modules\Tools\Http\Controllers\LicenseController;
 use Modules\Tools\Http\Controllers\MarketplaceController;
 use Modules\Tools\Http\Controllers\SubscriptionController;
+use Modules\Tools\Http\Controllers\RuntimeAuthController;
 
-// ─── Public Marketplace (auth optional for browsing) ───────────────────────────
+// ─── Runtime Device Login Handshake ────────────────────────────────────────────
+// The local runtime opens the user's browser to this URL.
+// After login, this page POSTs the Sanctum token back to the runtime.
+Route::middleware('auth')->group(function () {
+    Route::get('/runtime/connect', [RuntimeAuthController::class, 'connect'])->name('runtime.connect');
+    Route::post('/runtime/connect', [RuntimeAuthController::class, 'authorize'])->name('runtime.authorize');
+});
+
+
 Route::prefix('tools')->name('tools.')->group(function () {
 
     // Browse — public

@@ -8,8 +8,6 @@ import { Download, Key, CreditCard, LayoutGrid, LogIn, UserPlus, ArrowUpRight } 
 interface ToolsPublicLayoutProps extends PropsWithChildren {
     title: string;
     activeNav?: 'explore' | 'downloads' | 'licenses' | 'billing';
-    /** Which agent this tool requires — shown in the runtime banner */
-    agentType?: 'nodejs' | 'python';
     /** Tool slug for plugin install tracking */
     toolSlug?: string;
 }
@@ -18,7 +16,6 @@ export default function ToolsPublicLayout({
     children,
     title,
     activeNav = 'explore',
-    agentType = 'nodejs',
     toolSlug,
 }: ToolsPublicLayoutProps) {
     const { auth } = usePage().props as any;
@@ -39,7 +36,7 @@ export default function ToolsPublicLayout({
 
             {/* Runtime status banner (authenticated users only) */}
             {isAuthed && (
-                <RuntimeStatusBanner agentType={agentType} toolSlug={toolSlug} />
+                <RuntimeStatusBanner toolSlug={toolSlug} />
             )}
 
             {/* Announcement bar (guests only) */}

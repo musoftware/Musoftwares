@@ -54,13 +54,16 @@ Route::prefix('tools')->name('api.tools.')->group(function () {
                     return $runtime === $agentType;
                 })
                 ->map(fn($s) => [
-                    'tool_slug'     => $s->tool->slug,
-                    'name'          => $s->tool->title,
-                    'version'       => $s->tool->latestVersion->version,
-                    'download_url'  => $s->tool->latestVersion->file_path
+                    'tool_slug'      => $s->tool->slug,
+                    'name'           => $s->tool->title,
+                    'version'        => $s->tool->latestVersion->version,
+                    'download_url'   => $s->tool->latestVersion->file_path
                         ? url()->temporarySignedRoute('api.tools.plugin.download', now()->addHour(), ['slug' => $s->tool->slug])
                         : null,
-                    'is_subscribed' => true,
+                    'is_subscribed'  => true,
+                    // License gate fields — consumed by runtime to populate local license cache
+                    'license_status' => $s->status,  // 'active' | 'expired' | 'suspended'
+                    'expires_at'     => $s->expires_at?->toIso8601String(),
                 ])
                 ->values();
 

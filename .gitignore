@@ -1,50 +1,121 @@
 ###############################################################################
 # LARAVEL / PHP
 ###############################################################################
+
+# Dependencies & build output
 /node_modules
 /public/build
 /public/hot
 /public/storage
-/storage/*.key
 /vendor
+
+# Environment & secrets
 .env
 .env.backup
 .env.production
+.env.staging
+.env.*.local
+
+# Laravel storage (logs, framework cache, uploaded files)
+/storage/logs/*.log
+/storage/framework/cache/data/
+/storage/framework/sessions/
+/storage/framework/testing/
+/storage/framework/views/
+/storage/app/public/
+
+# Keys & auth
+/storage/*.key
+auth.json
+
+# PHPUnit / test cache
 .phpunit.result.cache
+.phpunit.cache/
+
+# Homestead / Sail
 Homestead.json
 Homestead.yaml
-auth.json
+docker-compose.override.yml
+
+# Compiled assets / lock files (non-root)
+Modules/*/vite.config.js
+
+# Misc debug logs (root level)
 npm-debug.log
 yarn-error.log
-/.fleet
-/.idea
-/.vscode
-Modules/*/vite.config.js
 .pnpm-debug.log
 server.log
+server*.log
+
+# Scratch / temp
+/scratch/
+/routes.txt
 
 ###############################################################################
-# NODE.JS AGENT — tools/musoftware-agent-node
+# MUSOFTWARE RUNTIME — tools/musoftware-runtime
 ###############################################################################
 
 # Dependencies
-tools/musoftware-agent-node/node_modules/
-tools/musoftware-agent-node/plugins/*/node_modules/
+tools/musoftware-runtime/node_modules/
+tools/musoftware-runtime/plugins/*/node_modules/
 
 # Environment & secrets
-tools/musoftware-agent-node/.env
-tools/musoftware-agent-node/.env.local
+tools/musoftware-runtime/.env
+tools/musoftware-runtime/.env.local
+tools/musoftware-runtime/.env.*.local
 
 # Runtime logs
-tools/musoftware-agent-node/logs/
-tools/musoftware-agent-node/*.log
+tools/musoftware-runtime/logs/
+tools/musoftware-runtime/*.log
+
+# SQLite runtime database (runtime state — not source)
+tools/musoftware-runtime/storage/*.db
+tools/musoftware-runtime/storage/*.db-shm
+tools/musoftware-runtime/storage/*.db-wal
+
+# Downloaded / cached runtime binaries (Node.js, Python, etc.)
+# These are fetched on first run; never commit large binaries.
+tools/musoftware-runtime/runtimes/downloads/
+tools/musoftware-runtime/runtimes/*.zip
+tools/musoftware-runtime/runtimes/*.tar.gz
+tools/musoftware-runtime/runtimes/*.tar.xz
 
 # Build / distribution output
+tools/musoftware-runtime/dist/
+tools/musoftware-runtime/build/
+tools/musoftware-runtime/out/
+
+# Packaged desktop installers (electron-builder, pkg, etc.)
+tools/musoftware-runtime/release/
+tools/musoftware-runtime/*.exe
+tools/musoftware-runtime/*.dmg
+tools/musoftware-runtime/*.AppImage
+tools/musoftware-runtime/*.deb
+tools/musoftware-runtime/*.rpm
+tools/musoftware-runtime/*.snap
+
+# Lock files (keep package-lock.json; ignore yarn/pnpm alternatives)
+tools/musoftware-runtime/yarn.lock
+tools/musoftware-runtime/pnpm-lock.yaml
+
+# Misc debug logs
+tools/musoftware-runtime/.pnpm-debug.log
+tools/musoftware-runtime/npm-debug.log
+
+###############################################################################
+# MUSOFTWARE AGENT NODE — tools/musoftware-agent-node (if present)
+###############################################################################
+
+tools/musoftware-agent-node/node_modules/
+tools/musoftware-agent-node/plugins/*/node_modules/
+tools/musoftware-agent-node/.env
+tools/musoftware-agent-node/.env.local
+tools/musoftware-agent-node/.env.*.local
+tools/musoftware-agent-node/logs/
+tools/musoftware-agent-node/*.log
 tools/musoftware-agent-node/dist/
 tools/musoftware-agent-node/build/
 tools/musoftware-agent-node/out/
-
-# Packaged desktop installers (electron-builder, pkg, etc.)
 tools/musoftware-agent-node/release/
 tools/musoftware-agent-node/*.exe
 tools/musoftware-agent-node/*.dmg
@@ -52,21 +123,60 @@ tools/musoftware-agent-node/*.AppImage
 tools/musoftware-agent-node/*.deb
 tools/musoftware-agent-node/*.rpm
 tools/musoftware-agent-node/*.snap
-
-# Lock files (keep package-lock.json; ignore yarn/pnpm alternatives)
 tools/musoftware-agent-node/yarn.lock
 tools/musoftware-agent-node/pnpm-lock.yaml
-
-# Misc
 tools/musoftware-agent-node/.pnpm-debug.log
 tools/musoftware-agent-node/npm-debug.log
 
 ###############################################################################
-# OS / EDITOR ARTIFACTS
+# TOOLS GLOBAL LOGS — tools/logs
 ###############################################################################
+
+tools/logs/
+
+###############################################################################
+# PUBLIC DOWNLOADS — runtime bundles served to end-users
+# These are large binary assets managed separately (S3 / CDN / CI pipeline).
+# The latest.json manifest IS committed; the binaries themselves are not.
+###############################################################################
+
+public/downloads/runtime/*.exe
+public/downloads/runtime/*.dmg
+public/downloads/runtime/*.AppImage
+public/downloads/runtime/*.deb
+public/downloads/runtime/*.rpm
+public/downloads/runtime/*.snap
+public/downloads/runtime/*.zip
+public/downloads/runtime/*.tar.gz
+
+###############################################################################
+# IDE / EDITOR
+###############################################################################
+
+/.fleet
+/.idea
+/.vscode
+*.code-workspace
+
+###############################################################################
+# OS ARTIFACTS
+###############################################################################
+
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
 Thumbs.db
 desktop.ini
+ehthumbs.db
+
+###############################################################################
+# VIM / EMACS SWAP & BACKUP FILES
+###############################################################################
+
 *.swp
 *.swo
 *~
+\#*\#
+.#*

@@ -88,17 +88,23 @@ class SubscriptionController extends Controller
     }
 
     /**
-     * Process subscription — deduct from wallet and issue license.
+     * Process subscription — free plans activate instantly, paid plans use wallet/kashier.
      */
     public function subscribe(Request $request, string $slug, int $planId): RedirectResponse
     {
-        $request->validate([
-            'billing_cycle'  => ['required', 'in:monthly,yearly'],
-            'payment_method' => ['required', 'in:wallet,kashier'],
-        ]);
-
         $tool = Tool::where('slug', $slug)->where('is_active', true)->firstOrFail();
         $plan = ToolPricingPlan::where('tool_id', $tool->id)->findOrFail($planId);
+
+        $price = $request->input('billing_cycle') === 'yearly'
+            ? $plan->price_yearly
+            : $plan->price_monthly;
+
+        $isFree = $price <= 0;
+
+        $request->validate([
+            'billing_cycle'  => ['required', 'in:monthly,yearly'],
+            'payment_method' => $isFree ? [] : ['required', 'in:wallet,kashier'],
+        ]);
 
         // Prevent duplicate active subscription
         $existing = ToolSubscription::where('user_id', auth()->id())
@@ -110,32 +116,31 @@ class SubscriptionController extends Controller
             return back()->with('error', 'You already have an active subscription to this tool.');
         }
 
-        $price    = $request->billing_cycle === 'yearly' ? $plan->price_yearly : $plan->price_monthly;
         $expiresAt = now()->addMonth($request->billing_cycle === 'yearly' ? 12 : 1);
 
-        DB::transaction(function () use ($tool, $plan, $request, $price, $expiresAt) {
-            if ($request->payment_method === 'wallet') {
-                $user = auth()->user();
-                // Wallet deduction — uses the same pattern as ERP WalletController
+        DB::transaction(function () use ($tool, $plan, $request, $price, $expiresAt, $isFree) {
+            if (!$isFree && $request->payment_method === 'wallet') {
+                $user   = auth()->user();
                 $wallet = $user->wallet ?? $user->createWallet();
                 if ($wallet->balance < $price) {
                     abort(422, 'Insufficient wallet balance.');
                 }
                 $wallet->decrement('balance', $price);
             }
-            // Kashier flow: handled client-side with webhook — not deducted here.
+            // Kashier: handled client-side with webhook — not deducted here.
 
             $sub = ToolSubscription::create([
-                'user_id'             => auth()->id(),
-                'tool_id'             => $tool->id,
+                'user_id'              => auth()->id(),
+                'tool_id'              => $tool->id,
                 'tool_pricing_plan_id' => $plan->id,
-                'billing_cycle'       => $request->billing_cycle,
-                'amount_paid'         => $price,
-                'currency'            => 'USD',
-                'status'              => $request->payment_method === 'wallet' ? 'active' : 'pending',
-                'payment_method'      => $request->payment_method,
-                'starts_at'           => now(),
-                'expires_at'          => $expiresAt,
+                'billing_cycle'        => $request->billing_cycle,
+                'amount_paid'          => $price,
+                'currency'             => 'USD',
+                // Free plans + wallet plans activate immediately; kashier waits for webhook
+                'status'               => ($isFree || $request->payment_method === 'wallet') ? 'active' : 'pending',
+                'payment_method'       => $isFree ? 'free' : $request->payment_method,
+                'starts_at'            => now(),
+                'expires_at'           => $expiresAt,
             ]);
 
             if ($sub->status === 'active') {
@@ -143,9 +148,12 @@ class SubscriptionController extends Controller
             }
         });
 
-        return redirect()->route('tools.my-licenses')
-            ->with('success', 'Subscription activated! Your license key is ready.');
+        return redirect()->route('tools.show', $slug)
+            ->with('success', $isFree
+                ? '✓ Access granted! The runtime will sync this tool automatically.'
+                : '✓ Subscription activated! Your license key is ready.');
     }
+
 
     /**
      * Cancel a subscription.

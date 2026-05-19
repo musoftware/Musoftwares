@@ -48,6 +48,11 @@ self.addEventListener('activate', event => {
 self.addEventListener('fetch', event => {
     const url = new URL(event.request.url);
 
+    // 0. Skip non-cacheable schemes (chrome-extension://, data:, blob:, etc.)
+    if (url.protocol !== 'http:' && url.protocol !== 'https:') {
+        return;
+    }
+
     // 1. Local agent calls → ALWAYS network only (never cache)
     if (url.hostname === '127.0.0.1') {
         return; // let browser handle it natively
