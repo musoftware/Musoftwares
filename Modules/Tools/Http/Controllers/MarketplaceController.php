@@ -130,14 +130,15 @@ class MarketplaceController extends Controller
                 'title'            => $tool->title,
                 'icon_url'         => $tool->icon_url,
                 'short_description' => $tool->short_description,
-                'capabilities'     => ['keyword_scrape', 'hashtag_scrape', 'profile_scrape', 'csv_export'],
+                'category'         => $tool->category,
+                'runner_component' => $tool->runner_component ?? 'default',
             ],
             'subscription' => [
                 'plan_name'    => $subscription->plan->name ?? 'N/A',
                 'expires_at'   => $subscription->expires_at?->toDateString(),
             ],
             'runtimePort'  => 18400,
-            'pluginSlug'   => 'tiktok-scraper',
+            'pluginSlug'   => $tool->slug,
         ]);
     }
 

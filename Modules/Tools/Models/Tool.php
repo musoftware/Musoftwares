@@ -15,7 +15,7 @@ class Tool extends Model
         'title', 'slug', 'description', 'short_description',
         'icon', 'category', 'supported_os', 'current_version',
         'max_devices', 'is_active', 'is_featured', 'is_free', 'download_count',
-        'features', 'requirements',
+        'features', 'requirements', 'runner_component',
     ];
 
     protected $casts = [
@@ -29,13 +29,16 @@ class Tool extends Model
     ];
 
     public static array $categories = [
-        'scraper'    => 'Scraper',
-        'automation' => 'Automation',
-        'ocr'        => 'OCR',
-        'ai'         => 'AI & Processing',
-        'data'       => 'Data Extraction',
-        'browser'    => 'Browser Tools',
-        'monitoring' => 'Monitoring',
+        'scraper'       => 'Scraper',
+        'automation'    => 'Automation',
+        'whatsapp'      => 'WhatsApp',
+        'ocr'           => 'OCR',
+        'ai'            => 'AI & Processing',
+        'intelligence'  => 'Intelligence',
+        'analytics'     => 'Analytics',
+        'data'          => 'Data Extraction',
+        'browser'       => 'Browser Tools',
+        'monitoring'    => 'Monitoring',
     ];
 
     public function versions(): HasMany

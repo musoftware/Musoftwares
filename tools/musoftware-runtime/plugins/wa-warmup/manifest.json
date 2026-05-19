@@ -1,0 +1,20 @@
+{
+  "id": "wa-warmup",
+  "name": "WhatsApp Number Warmup",
+  "version": "1.0.0",
+  "runtime": "nodejs",
+  "entry": "worker.js",
+  "tool_slug": "wa-warmup",
+  "description": "Automatically warm up WhatsApp numbers to avoid bans — gradual activity simulation, reply pools, trust scoring, and health monitoring.",
+  "permissions": ["browser", "network", "filesystem"],
+  "autoStart": false,
+  "capabilities": [
+    "warmup_start",
+    "warmup_status",
+    "warmup_schedule",
+    "health_check",
+    "trust_score"
+  ],
+  "requires_runtime": ">=1.0.0",
+  "timeoutSeconds": 600
+}
