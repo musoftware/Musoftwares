@@ -104,6 +104,44 @@ class MarketplaceController extends Controller
         ]);
     }
 
+    /**
+     * Tool runner page — the actual web UI to run a subscribed tool.
+     * Requires active subscription.
+     */
+    public function run(string $slug): Response|\Illuminate\Http\RedirectResponse
+    {
+        $tool = Tool::where('slug', $slug)->where('is_active', true)->firstOrFail();
+
+        $subscription = ToolSubscription::where('user_id', auth()->id())
+            ->where('tool_id', $tool->id)
+            ->where('status', 'active')
+            ->with('plan')
+            ->latest()
+            ->first();
+
+        if (!$subscription) {
+            return redirect()->route('tools.show', $slug)
+                ->with('error', 'You need an active subscription to use this tool.');
+        }
+
+        return Inertia::render('Tools/Runner', [
+            'tool'         => [
+                'slug'             => $tool->slug,
+                'title'            => $tool->title,
+                'icon_url'         => $tool->icon_url,
+                'short_description' => $tool->short_description,
+                'capabilities'     => ['keyword_scrape', 'hashtag_scrape', 'profile_scrape', 'csv_export'],
+            ],
+            'subscription' => [
+                'plan_name'    => $subscription->plan->name ?? 'N/A',
+                'expires_at'   => $subscription->expires_at?->toDateString(),
+            ],
+            'runtimePort'  => 18400,
+            'pluginSlug'   => 'tiktok-scraper',
+        ]);
+    }
+
+
     // ─── Serializers ────────────────────────────────────────────────────────────
 
     private function serializeTool(Tool $tool, ?int $userId): array

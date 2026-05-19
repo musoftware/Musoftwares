@@ -134,7 +134,7 @@ export default function MyLicenses({ licenses }: Props) {
                                                 <Smartphone className="h-3.5 w-3.5" />
                                                 Devices ({lic.active_devices})
                                             </Button>
-                                            <Link href={route('tools.show', lic.tool.slug)} className="flex-1">
+                                            <Link href={route('tools.run', lic.tool.slug)} className="flex-1">
                                                 <Button
                                                     variant="outline"
                                                     size="sm"
