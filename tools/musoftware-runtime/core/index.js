@@ -159,6 +159,9 @@ async function main() {
         });
     });
 
+    // ── GET /health — simple liveness check (alias for /status) ─────────────────
+    app.get('/health', (req, res) => res.json({ ok: true, version: RUNTIME_VERSION }));
+
     // ── GET /system — machine info ─────────────────────────────────────────────
     app.get('/system', (req, res) => {
         res.json({

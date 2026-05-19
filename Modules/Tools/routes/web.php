@@ -41,6 +41,9 @@ Route::prefix('tools')->name('tools.')->group(function () {
         // Cancel subscription (static prefix — before wildcard)
         Route::post('/subscriptions/{id}/cancel', [SubscriptionController::class, 'cancel'])->name('subscriptions.cancel');
 
+        // Tool runner — web UI to run a subscribed tool
+        Route::get('/{slug}/run', [MarketplaceController::class, 'run'])->name('run');
+
         // Slug-based routes — AFTER all static routes
         Route::get('/{slug}/subscribe/{planId}', [SubscriptionController::class, 'checkout'])->name('checkout');
         Route::post('/{slug}/subscribe/{planId}', [SubscriptionController::class, 'subscribe'])->name('subscribe');

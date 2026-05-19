@@ -105,7 +105,7 @@ export function DownloadPanel({
 
                 {/* Primary CTA — Open the tool runner page */}
                 <div className="space-y-2 pt-1">
-                    <Link href={route('tools.show', toolSlug)} className="block">
+                    <Link href={route('tools.run', toolSlug)} className="block">
                         <Button className="w-full gap-2 bg-indigo-600 hover:bg-indigo-500 text-white">
                             <ExternalLink className="h-4 w-4" />
                             Open {toolTitle}
