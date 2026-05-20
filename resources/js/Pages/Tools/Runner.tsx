@@ -14,6 +14,7 @@ const components: Record<string, React.ElementType> = {
     'IPTVDownloaderRunner':     lazy(() => import('./IPTVDownloaderRunner')),
     'iptv-downloader':          lazy(() => import('./IPTVDownloaderRunner')),
     'opensooq':                 lazy(() => import('./OpensooqRunner')),
+    'SnapDownloaderRunner':     lazy(() => import('./SnapDownloaderRunner')),
 };
 
 export default function Runner({ tool, subscription, runtimePort, pluginSlug }: any) {

@@ -172,3 +172,11 @@ module.exports.handleRPC = async (action, data) => {
 };
 ```
 
+### Python Plugin Packaging & Execution Architecture
+To guarantee absolute invisibility and eliminate user dependencies, Python scripts are NEVER run directly via the `python` command in production. 
+
+1. **Standalone Compilation:** During the `.msp` build process (`node scripts/build-plugins.js`), any plugin containing a `python/` directory is automatically compiled using **Nuitka**.
+2. **C Executable:** The Python source is compiled into a high-performance, standalone Windows C Executable (`.exe`) and output to a `win/` folder inside the plugin.
+3. **Execution:** The NodeJS worker (`worker.js`) MUST be programmed to spawn the compiled `win/wrapper.exe` rather than executing the raw `.py` file.
+4. **Source Protection:** To protect intellectual property, the `python/` source folder is automatically excluded from the packed `.msp` payload. Only the compiled `.exe` and the NodeJS bridge are shipped to the user.
+
