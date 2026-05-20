@@ -44,3 +44,7 @@ The backend serves as the source of truth for the **Tools Marketplace**.
 - [ ] Are long-running tasks dispatched to the Queue?
 - [ ] Are runtime interactions managed via asynchronous events and WebSocket broadcasts?
 - [ ] Does the implementation support a workflow rather than just raw database row manipulation?
+
+**Laravel Backend Strict Rule**: 
+For any Tool/Plugin, its ONLY connection to the Laravel backend is checking if the user is subscribed to the service or not.
+EVERYTHING ELSE related to the tools (data, configurations, campaigns, logs, operational entities, processing) MUST be handled by the Local Runtime Agent and stored locally in the client's local SQLite database. The Laravel backend must NEVER be used to store or process tool-specific data.
