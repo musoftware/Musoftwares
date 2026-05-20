@@ -64,6 +64,8 @@ export default function ScreenshotFeedbackRunner({ tool, subscription, runtimePo
     const [screenshots, setScreenshots] = useState<any[]>([]);
     const [activities, setActivities] = useState<any[]>([]);
     const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
+    const [selectedScreenshotId, setSelectedScreenshotId] = useState<string | null>(null);
+    const [pins, setPins] = useState<any[]>([]);
 
     // Initial load
     useEffect(() => {
@@ -78,6 +80,19 @@ export default function ScreenshotFeedbackRunner({ tool, subscription, runtimePo
             fetchActivities();
         }
     }, [selectedProjectId, connected]);
+
+    useEffect(() => {
+        if (activeTab === 'review' && selectedScreenshotId && connected) {
+            fetchPins();
+        }
+    }, [activeTab, selectedScreenshotId, connected]);
+
+    const fetchPins = async () => {
+        try {
+            const res: any = await callRPC('list_pins', { screenshotId: selectedScreenshotId });
+            setPins(res.pins);
+        } catch (err) { console.error(err); }
+    };
 
     const fetchProjects = async () => {
         try {
@@ -147,6 +162,36 @@ export default function ScreenshotFeedbackRunner({ tool, subscription, runtimePo
         input.click();
     };
 
+    const handleReviewClick = (screenshotId: string) => {
+        setSelectedScreenshotId(screenshotId);
+        setActiveTab('review');
+    };
+
+    const handleImageClick = async (e: React.MouseEvent<HTMLImageElement>) => {
+        const rect = e.currentTarget.getBoundingClientRect();
+        const x = ((e.clientX - rect.left) / rect.width) * 100;
+        const y = ((e.clientY - rect.top) / rect.height) * 100;
+        
+        const comment = prompt('Enter your comment for this pin:');
+        if (!comment) return;
+        
+        try {
+            await callRPC('add_pin', { screenshotId: selectedScreenshotId, x, y, comment });
+            fetchPins();
+        } catch (err) {
+            alert('Failed to add pin');
+        }
+    };
+
+    const handleResolvePin = async (pinId: string) => {
+        try {
+            await callRPC('resolve_pin', { pinId });
+            fetchPins();
+        } catch (err) {
+            alert('Failed to resolve pin');
+        }
+    };
+
     if (!connected) {
         return (
             <div className="min-h-screen bg-[#FDFDFD] flex items-center justify-center font-sans">
@@ -183,7 +228,7 @@ export default function ScreenshotFeedbackRunner({ tool, subscription, runtimePo
                             <>
                                 <button 
                                     onClick={() => setActiveTab('screenshots')}
-                                    className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${activeTab === 'screenshots' ? 'bg-slate-100 text-slate-900' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'}`}
+                                    className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${(activeTab === 'screenshots' || activeTab === 'review') ? 'bg-slate-100 text-slate-900' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'}`}
                                 >
                                     Screenshots
                                 </button>
@@ -298,7 +343,10 @@ export default function ScreenshotFeedbackRunner({ tool, subscription, runtimePo
                                                 <h4 className="font-medium text-sm text-slate-900 truncate">{s.filename}</h4>
                                                 <p className="text-xs text-slate-500 mt-0.5">{new Date(s.created_at * 1000).toLocaleDateString()}</p>
                                             </div>
-                                            <button className="px-3 py-1.5 bg-slate-50 hover:bg-slate-100 text-slate-700 rounded-md text-xs font-medium transition-colors border border-slate-200">
+                                            <button 
+                                                onClick={() => handleReviewClick(s.id)}
+                                                className="px-3 py-1.5 bg-slate-50 hover:bg-slate-100 text-slate-700 rounded-md text-xs font-medium transition-colors border border-slate-200"
+                                            >
                                                 Review
                                             </button>
                                         </div>
