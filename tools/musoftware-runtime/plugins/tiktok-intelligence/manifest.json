@@ -1,7 +1,0 @@
-{
-  "name": "TikTok Intelligence Engine",
-  "slug": "tiktok-intelligence",
-  "version": "1.0.0",
-  "description": "Production-grade TikTok intelligence, creator discovery, and competitor monitoring.",
-  "main": "index.js"
-}

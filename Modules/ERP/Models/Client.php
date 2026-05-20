@@ -25,4 +25,9 @@ class Client extends TenantModel
     {
         return $this->hasMany(Client::class, 'referred_by');
     }
+
+    public function notes(): \Illuminate\Database\Eloquent\Relations\MorphMany
+    {
+        return $this->morphMany(\Modules\Core\Models\AdminNote::class, 'noteable');
+    }
 }

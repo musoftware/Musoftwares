@@ -36,8 +36,8 @@ class ToolsSeeder extends Seeder
                 'plans' =>[
                     [
                         'name'           => 'Creator Intelligence',
-                        'price_monthly'  => 19.99,
-                        'price_yearly'   => 190.00,
+                        'price_monthly'  => 0,
+                        'price_yearly'   => 0,
                         'is_popular'     => false,
                         'features'       => [
                             'Creator Discovery Engine',
@@ -46,8 +46,8 @@ class ToolsSeeder extends Seeder
                             'Email support']],
                     [
                         'name'           => 'Market Intelligence',
-                        'price_monthly'  => 49.99,
-                        'price_yearly'   => 490.00,
+                        'price_monthly'  => 0,
+                        'price_yearly'   => 0,
                         'is_popular'     => true,
                         'features'       => [
                             'Lead Enrichment Pipeline',
@@ -57,44 +57,48 @@ class ToolsSeeder extends Seeder
                 'version' => '3.0.0'],
             [
                 'tool' => [
-                    'title'             => 'Email Prospector',
-                    'slug'              => 'email-prospector',
-                    'short_description' => 'Find and verify professional emails from LinkedIn, websites, and directories.',
-                    'description'       => "Email Prospector automates lead generation by extracting and verifying email addresses from multiple sources.\n\n- Scrape emails from any website\n- LinkedIn integration (bring your own account)\n- Real-time email verification\n- CRM export formats",
-                    'category'          => 'scraper',
-                    'supported_os'      => ['windows'],
-                    'is_featured'       => false,
+                    'title'             => 'Lead Intelligence Engine',
+                    'slug'              => 'lead-intelligence',
+                    'short_description' => 'Enterprise-grade lead discovery, enrichment, and cold email outreach built directly into your local runtime.',
+                    'description'       => "The Lead Intelligence Engine is a complete B2B prospecting ecosystem designed to rival Apollo.io and Instantly.ai, but running 100% locally to ensure data privacy and maximum deliverability.\n\n- Find verified decision-maker emails across LinkedIn and millions of websites\n- AI Lead Enrichment using local pipelines\n- Built-in multi-source scraper (LinkedIn, Google Maps, Web)\n- Unlimited local email verification (SMTP/MX checks without cloud costs)\n- AI-generated cold outreach sequences\n- Connect unlimited IMAP/SMTP inboxes with local IP sending",
+                    'category'          => 'intelligence',
+                    'supported_os'      => ['windows', 'mac', 'linux'],
+                    'is_featured'       => true,
                     'is_active'         => true,
+                    'runner_component'  => 'lead-intelligence',
                     'features'          => [
-                        'Multi-source scraping',
-                        'Real-time email verification',
-                        'LinkedIn integration',
-                        'CRM-ready CSV export',
-                        'Duplicate removal',
-                        'Domain blacklist filter'],
+                        'Multi-source scraping (LinkedIn/Maps/Web)',
+                        'Unlimited local email verification',
+                        'AI Lead Enrichment & Scoring',
+                        'AI Outreach Sequence Generator',
+                        'Unlimited Inbox Connections',
+                        'Local SQLite Privacy'],
                     'requirements'      => [
-                        'Windows 10 or later',
-                        '2 GB RAM minimum',
-                        'Active internet connection']],
+                        'Musoftware Runtime Agent running locally',
+                        'Internet connection required']],
                 'plans' => [
                     [
-                        'name'           => 'Solo',
-                        'price_monthly'  => 0.99,
-                        'price_yearly'   => 5.00,
+                        'name'           => 'Prospector',
+                        'price_monthly'  => 0,
+                        'price_yearly'   => 0,
                         'is_popular'     => false,
                         'features'       => [
-                            '1,000 emails/day',
+                            '10,000 scrapes/day',
+                            'Basic email verification',
+                            '3 Connected Inboxes',
                             'CSV export']],
                     [
-                        'name'           => 'Growth',
-                        'price_monthly'  => 1.99,
-                        'price_yearly'   => 15.00,
+                        'name'           => 'Enterprise Intelligence',
+                        'price_monthly'  => 0,
+                        'price_yearly'   => 0,
                         'is_popular'     => true,
                         'features'       => [
-                            '10,000 emails/day',
-                            'Verification included',
-                            'CRM export']]],
-                'version' => '1.3.0'],
+                            'Unlimited scraping limits',
+                            'Advanced AI Enrichment',
+                            'AI Sequence Generation',
+                            'Unlimited Inboxes',
+                            'API Access']]],
+                'version' => '2.0.0'],
             [
                 'tool' => [
                     'title'             => 'Competitor Intelligence',
@@ -119,17 +123,61 @@ class ToolsSeeder extends Seeder
                 'plans' => [
                     [
                         'name'           => 'Watcher',
-                        'price_monthly'  => 0.99,
-                        'price_yearly'   => 5.00,
+                        'price_monthly'  => 0,
+                        'price_yearly'   => 0,
                         'is_popular'     => false,
                         'features'       => ['5 competitors', 'Weekly reports']],
                     [
                         'name'           => 'Hunter',
-                        'price_monthly'  => 1.99,
-                        'price_yearly'   => 15.00,
+                        'price_monthly'  => 0,
+                        'price_yearly'   => 0,
                         'is_popular'     => true,
                         'features'       => ['Unlimited competitors', 'Daily reports', 'Slack alerts', 'API access']]],
                 'version' => '3.0.1'],
+
+            // ── WhatsApp Automation Suite ────────────────────────────────────
+            [
+                'tool' => [
+                    'title'             => 'WhatsApp Sender Pro',
+                    'slug'              => 'whatsapp-sender-pro',
+                    'short_description' => 'Enterprise-grade WhatsApp Operations tool supporting multi-session automation, bulk campaigns, and AI auto-replies.',
+                    'description'       => "WhatsApp Sender Pro is a complete enterprise operations platform running as a local runtime plugin.\n\n- Multi-session WhatsApp automation with Playwright\n- Bulk messaging and campaign scheduling\n- AI-powered auto-replies using ChatGPT\n- Robust anti-ban logic with human typing simulation and pacing\n- Local SQLite privacy for all contacts and chat logs",
+                    'category'          => 'automation',
+                    'supported_os'      => ['windows', 'mac', 'linux'],
+                    'is_featured'       => true,
+                    'is_active'         => true,
+                    'runner_component'  => 'whatsapp-sender-pro',
+                    'features'          => [
+                        'Multi-session management',
+                        'Bulk Campaign Engine',
+                        'AI Auto-Replies (GPT-4)',
+                        'Anti-Ban pacing & stealth mode',
+                        'Local DB storage'],
+                    'requirements'      => [
+                        'Musoftware Runtime Agent running locally',
+                        'Active WhatsApp account on a mobile device',
+                        'Internet connection']],
+                'plans' => [
+                    [
+                        'name'           => 'Starter',
+                        'price_monthly'  => 0,
+                        'price_yearly'   => 0,
+                        'is_popular'     => false,
+                        'features'       => [
+                            '1 Connected Number',
+                            '1,000 messages/day',
+                            'Basic campaigns']],
+                    [
+                        'name'           => 'Enterprise',
+                        'price_monthly'  => 0,
+                        'price_yearly'   => 0,
+                        'is_popular'     => true,
+                        'features'       => [
+                            'Unlimited Numbers',
+                            'Unlimited sending limits',
+                            'AI Auto-Reply Engine',
+                            'API Access']]],
+                'version' => '1.0.0'],
 
             // ── TikTok Intelligence Suite ────────────────────────────────────
             [
@@ -163,8 +211,8 @@ class ToolsSeeder extends Seeder
                         'features'       => ['3 analyses/day', 'Basic report']],
                     [
                         'name'           => 'Pro',
-                        'price_monthly'  => 1.99,
-                        'price_yearly'   => 15.00,
+                        'price_monthly'  => 0,
+                        'price_yearly'   => 0,
                         'is_popular'     => true,
                         'features'       => ['Unlimited analyses', 'Full report + JSON export', 'Priority support']]],
                 'version' => '1.0.0'],
@@ -199,8 +247,8 @@ class ToolsSeeder extends Seeder
                         'features'       => ['5 analyses/day', 'Single URL mode']],
                     [
                         'name'           => 'Pro',
-                        'price_monthly'  => 1.99,
-                        'price_yearly'   => 15.00,
+                        'price_monthly'  => 0,
+                        'price_yearly'   => 0,
                         'is_popular'     => true,
                         'features'       => ['Unlimited analyses', 'Batch mode (10 URLs)', 'JSON export']]],
                 'version' => '1.0.0'],
@@ -235,8 +283,8 @@ class ToolsSeeder extends Seeder
                         'features'       => ['3 extractions/day']],
                     [
                         'name'           => 'Pro',
-                        'price_monthly'  => 1.99,
-                        'price_yearly'   => 15.00,
+                        'price_monthly'  => 0,
+                        'price_yearly'   => 0,
                         'is_popular'     => true,
                         'features'       => ['Unlimited extractions', 'Blueprint library (coming soon)']]],
                 'version' => '1.0.0']];
@@ -272,3 +320,4 @@ class ToolsSeeder extends Seeder
         $this->command->info('✅  Tools Marketplace seeded: ' . count($tools) . ' tools');
     }
 }
+

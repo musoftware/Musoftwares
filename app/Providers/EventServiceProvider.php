@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 use App\Listeners\ActivityEventListener;
+use App\Listeners\NotificationEventListener;
 
 // Domain Events
 use App\Events\InvoicePaid;
@@ -28,11 +29,11 @@ class EventServiceProvider extends ServiceProvider
 {
     protected $listen = [
         // ERP / Financial
-        InvoicePaid::class             => [ActivityEventListener::class],
+        InvoicePaid::class             => [ActivityEventListener::class, NotificationEventListener::class],
         WalletCredited::class          => [ActivityEventListener::class],
         WalletDebited::class           => [ActivityEventListener::class],
         WithdrawalRequested::class     => [ActivityEventListener::class],
-        WithdrawalApproved::class      => [ActivityEventListener::class],
+        WithdrawalApproved::class      => [ActivityEventListener::class, NotificationEventListener::class],
         ReferralCommissionEarned::class => [ActivityEventListener::class],
 
         // Marketplace

@@ -6,8 +6,6 @@ import { ExternalLink, Shield, Smartphone, RefreshCw, CheckCircle2, Monitor } fr
 interface UserLicense {
     id: number;
     license_key: string;
-    max_devices: number;
-    active_devices: number;
 }
 
 interface UserSubscription {
@@ -65,26 +63,7 @@ export function DownloadPanel({
                     </div>
                 )}
 
-                {/* Device usage */}
-                {userLicense && (
-                    <div className="space-y-2">
-                        <div className="flex items-center justify-between text-sm">
-                            <span className="text-slate-500 flex items-center gap-1.5">
-                                <Shield className="h-3.5 w-3.5" />
-                                Devices
-                            </span>
-                            <span className="font-semibold text-slate-800">
-                                {userLicense.active_devices} / {userLicense.max_devices}
-                            </span>
-                        </div>
-                        <div className="h-1.5 bg-slate-200 rounded-full overflow-hidden">
-                            <div
-                                className="h-full bg-emerald-500 rounded-full transition-all"
-                                style={{ width: `${Math.min((userLicense.active_devices / userLicense.max_devices) * 100, 100)}%` }}
-                            />
-                        </div>
-                    </div>
-                )}
+
 
                 {/* Runtime notice */}
                 <div className="flex items-start gap-2 rounded-lg bg-slate-50 border border-slate-100 p-3 text-xs text-slate-500">
@@ -111,17 +90,7 @@ export function DownloadPanel({
                             Open {toolTitle}
                         </Button>
                     </Link>
-                    {userLicense && (
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            className="w-full gap-2 border-slate-200 text-slate-600 hover:bg-slate-50"
-                            onClick={() => router.visit(route('tools.devices', userLicense.id))}
-                        >
-                            <Smartphone className="h-3.5 w-3.5" />
-                            Manage Devices ({userLicense.active_devices})
-                        </Button>
-                    )}
+
                 </div>
 
                 {/* Expiry */}

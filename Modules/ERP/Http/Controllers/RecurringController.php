@@ -6,8 +6,10 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Modules\ERP\Models\RecurringEntry;
+use Modules\ERP\Models\Tenant;
 use Modules\Core\Services\ExchangeRateService;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class RecurringController extends Controller
@@ -21,27 +23,33 @@ class RecurringController extends Controller
 
     public function index()
     {
-        $entries = RecurringEntry::latest()->get();
+        $tenant = Tenant::where('user_id', Auth::id())->firstOrFail();
 
-        $income = $entries->where('type', 'income');
+        // H3 fix: scope to current tenant only
+        $entries = RecurringEntry::where('tenant_id', $tenant->id)->latest()->get();
+
+        $income  = $entries->where('type', 'income');
         $expense = $entries->where('type', 'expense');
+
+        // H4 fix: resolve business currency from user preference, not session
+        $businessCurrency = Auth::user()->preferred_currency ?? config('app.business_currency', 'USD');
 
         $stats = [
             'income' => [
                 'total_monthly' => $this->calculateMonthlyTotal($income),
-                'next_7_days' => $income->whereBetween('next_run_at', [now(), now()->addDays(7)])->count(),
+                'next_7_days'   => $income->whereBetween('next_run_at', [now(), now()->addDays(7)])->count(),
             ],
             'expense' => [
                 'total_monthly' => $this->calculateMonthlyTotal($expense),
-                'next_7_days' => $expense->whereBetween('next_run_at', [now(), now()->addDays(7)])->count(),
+                'next_7_days'   => $expense->whereBetween('next_run_at', [now(), now()->addDays(7)])->count(),
             ],
-            'business_currency' => session('business_currency', 'USD'),
+            'business_currency' => $businessCurrency,
         ];
 
         return Inertia::render('ERP/Recurring/Index', [
-            'income' => $income->values(),
+            'income'  => $income->values(),
             'expense' => $expense->values(),
-            'stats' => $stats,
+            'stats'   => $stats,
         ]);
     }
 
@@ -72,8 +80,10 @@ class RecurringController extends Controller
 
     public function create()
     {
+        // H4 fix: business currency from user preference
+        $businessCurrency = Auth::user()->preferred_currency ?? config('app.business_currency', 'USD');
         return Inertia::render('ERP/Recurring/Create', [
-            'business_currency' => session('business_currency', 'USD'),
+            'business_currency' => $businessCurrency,
         ]);
     }
 
@@ -92,7 +102,8 @@ class RecurringController extends Controller
             'ends_at' => 'nullable|date|after_or_equal:starts_at',
         ]);
 
-        $businessCurrency = session('business_currency', 'USD');
+        // H4 fix: resolve business currency from user preference
+        $businessCurrency = Auth::user()->preferred_currency ?? config('app.business_currency', 'USD');
         $conversion = $this->exchangeRateService->convertAmount(
             (float)$validated['amount'],
             $validated['amount_currency'],
@@ -100,12 +111,13 @@ class RecurringController extends Controller
             now()
         );
 
-        $validated['business_amount'] = $conversion[2];
-        $validated['business_currency'] = $conversion[3];
-        $validated['exchange_rate'] = $conversion[4];
+        $validated['business_amount']    = $conversion[2];
+        $validated['business_currency']  = $conversion[3];
+        $validated['exchange_rate']      = $conversion[4];
         $validated['exchange_rate_date'] = $conversion[5];
-        $validated['status'] = 'active';
-        $validated['created_by'] = auth()->id();
+        $validated['status']             = 'active';
+        $validated['tenant_id']          = Tenant::where('user_id', Auth::id())->firstOrFail()->id;
+        $validated['created_by']         = Auth::id();
 
         $validated['next_run_at'] = $this->calculateFirstRun(
             $validated['frequency'],
@@ -150,16 +162,29 @@ class RecurringController extends Controller
         return $target->toDateString();
     }
 
+    private function authorizeTenantRecurringEntry(RecurringEntry $entry)
+    {
+        $tenant = Tenant::where('user_id', Auth::id())->firstOrFail();
+        if ($entry->tenant_id !== $tenant->id) {
+            abort(403, 'Unauthorized access to recurring entry.');
+        }
+    }
+
     public function edit(RecurringEntry $recurring)
     {
+        $this->authorizeTenantRecurringEntry($recurring);
+
+        $businessCurrency = Auth::user()->preferred_currency ?? config('app.business_currency', 'USD');
         return Inertia::render('ERP/Recurring/Edit', [
             'entry' => $recurring,
-            'business_currency' => session('business_currency', 'USD'),
+            'business_currency' => $businessCurrency,
         ]);
     }
 
     public function update(Request $request, RecurringEntry $recurring)
     {
+        $this->authorizeTenantRecurringEntry($recurring);
+
         $validated = $request->validate([
             'type' => 'required|in:income,expense',
             'title' => 'required|string|max:255',
@@ -174,7 +199,7 @@ class RecurringController extends Controller
             'status' => 'required|in:active,paused,cancelled',
         ]);
 
-        $businessCurrency = session('business_currency', 'USD');
+        $businessCurrency = Auth::user()->preferred_currency ?? config('app.business_currency', 'USD');
         $conversion = $this->exchangeRateService->convertAmount(
             (float)$validated['amount'],
             $validated['amount_currency'],
@@ -190,7 +215,7 @@ class RecurringController extends Controller
         if ($recurring->frequency !== $validated['frequency'] ||
             $recurring->frequency_day != $validated['frequency_day'] ||
             $recurring->frequency_month != $validated['frequency_month'] ||
-            $recurring->starts_at->toDateString() !== $validated['starts_at']) {
+            (method_exists($recurring->starts_at, 'toDateString') ? $recurring->starts_at->toDateString() : Carbon::parse($recurring->starts_at)->toDateString()) !== $validated['starts_at']) {
 
             $validated['next_run_at'] = $this->calculateFirstRun(
                 $validated['frequency'],
@@ -207,24 +232,32 @@ class RecurringController extends Controller
 
     public function destroy(RecurringEntry $recurring)
     {
+        $this->authorizeTenantRecurringEntry($recurring);
+
         $recurring->delete();
         return redirect()->route('erp.recurring.index')->with('success', 'Recurring entry deleted.');
     }
 
     public function pause(RecurringEntry $recurring)
     {
+        $this->authorizeTenantRecurringEntry($recurring);
+
         $recurring->update(['status' => 'paused']);
         return redirect()->back();
     }
 
     public function resume(RecurringEntry $recurring)
     {
+        $this->authorizeTenantRecurringEntry($recurring);
+
         $recurring->update(['status' => 'active']);
         return redirect()->back();
     }
 
     public function logs(RecurringEntry $recurring)
     {
+        $this->authorizeTenantRecurringEntry($recurring);
+
         $logs = $recurring->executionLogs()->latest()->paginate(15);
         return Inertia::render('ERP/Recurring/Logs', [
             'entry' => $recurring,

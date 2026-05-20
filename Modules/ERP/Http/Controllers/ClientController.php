@@ -9,18 +9,27 @@ use Modules\ERP\Models\Invoice;
 use Modules\ERP\Models\Project;
 use Modules\ERP\Models\SupportTicket;
 use Modules\ERP\Models\Activity;
+use Modules\ERP\Models\Tenant;
 use Modules\ERP\Services\ActivityLogger;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
 class ClientController extends Controller
 {
+    private function resolveTenantId(): int
+    {
+        return Tenant::where('user_id', Auth::id())->firstOrFail()->id;
+    }
+
     /**
      * Show the complete operational workflow for a specific client.
      */
     public function show(TenantClient $client)
     {
+        $tenantId = $this->resolveTenantId();
+
         // Ensure the client belongs to the active tenant
-        if ($client->tenant_id !== session('tenant_id')) {
+        if ($client->tenant_id !== $tenantId) {
             abort(403, 'Unauthorized access to client.');
         }
 
@@ -57,7 +66,9 @@ class ClientController extends Controller
      */
     public function updateStatus(Request $request, TenantClient $client)
     {
-        if ($client->tenant_id !== session('tenant_id')) {
+        $tenantId = $this->resolveTenantId();
+
+        if ($client->tenant_id !== $tenantId) {
             abort(403);
         }
 

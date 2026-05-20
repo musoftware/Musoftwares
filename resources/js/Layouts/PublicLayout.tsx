@@ -1,5 +1,5 @@
 import { Button } from '@/Components/ui/button';
-import { Link } from '@inertiajs/react';
+import { Link, usePage } from '@inertiajs/react';
 import { PropsWithChildren, useEffect, useState } from 'react';
 import { Menu, X, ArrowRight, Sparkles, CheckCircle2 } from 'lucide-react';
 import ApplicationLogo from '@/Components/ApplicationLogo';
@@ -10,7 +10,9 @@ interface PublicLayoutProps extends PropsWithChildren {
     };
 }
 
-export default function PublicLayout({ children, auth }: PublicLayoutProps) {
+export default function PublicLayout({ children, auth: propAuth }: PublicLayoutProps) {
+    const { auth: pageAuth } = usePage().props as any;
+    const auth = propAuth || pageAuth;
     const [scrolled, setScrolled] = useState(false);
     const [activeSection, setActiveSection] = useState('hero');
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -125,30 +127,42 @@ export default function PublicLayout({ children, auth }: PublicLayoutProps) {
 
                     {/* Right-Side Authentication CTAs */}
                     <div className="hidden md:flex items-center gap-4">
-                        <Link 
-                            href="/login"
-                            className="text-sm font-medium text-slate-650 hover:text-slate-955 px-3 py-2 transition-all focus:outline-none"
-                        >
-                            Login
-                        </Link>
-                        <Link href="/register">
-                            <Button 
-                                variant="outline"
-                                size="sm" 
-                                className="bg-white hover:bg-slate-50 text-slate-700 border-slate-200 rounded-lg shadow-sm font-semibold h-9 px-4 cursor-pointer"
-                            >
-                                Register
-                            </Button>
-                        </Link>
-                        <Link href="/register?trial=true">
-                            <Button 
-                                size="sm"
-                                className="bg-gradient-to-r from-indigo-500 via-indigo-650 to-purple-600 hover:opacity-95 text-white rounded-lg shadow-md shadow-indigo-500/10 border-0 flex items-center gap-1 group font-semibold h-9 px-4 cursor-pointer"
-                            >
-                                Start Free Trial
-                                <ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-1 transition-transform" />
-                            </Button>
-                        </Link>
+                        {auth?.user ? (
+                            <Link href="/dashboard">
+                                <Button 
+                                    className="bg-slate-900 hover:bg-slate-800 text-white rounded-lg shadow-sm font-semibold h-9 px-4 cursor-pointer"
+                                >
+                                    Dashboard
+                                </Button>
+                            </Link>
+                        ) : (
+                            <>
+                                <Link 
+                                    href="/login"
+                                    className="text-sm font-medium text-slate-650 hover:text-slate-955 px-3 py-2 transition-all focus:outline-none"
+                                >
+                                    Login
+                                </Link>
+                                <Link href="/register">
+                                    <Button 
+                                        variant="outline"
+                                        size="sm" 
+                                        className="bg-white hover:bg-slate-50 text-slate-700 border-slate-200 rounded-lg shadow-sm font-semibold h-9 px-4 cursor-pointer"
+                                    >
+                                        Register
+                                    </Button>
+                                </Link>
+                                <Link href="/register?trial=true">
+                                    <Button 
+                                        size="sm"
+                                        className="bg-gradient-to-r from-indigo-500 via-indigo-650 to-purple-600 hover:opacity-95 text-white rounded-lg shadow-md shadow-indigo-500/10 border-0 flex items-center gap-1 group font-semibold h-9 px-4 cursor-pointer"
+                                    >
+                                        Start Free Trial
+                                        <ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-1 transition-transform" />
+                                    </Button>
+                                </Link>
+                            </>
+                        )}
                     </div>
 
                     {/* Mobile Menu Button Trigger */}
@@ -206,21 +220,31 @@ export default function PublicLayout({ children, auth }: PublicLayoutProps) {
 
                     {/* Mobile CTAs */}
                     <div className="p-6 border-t border-slate-100 bg-slate-50/50 space-y-4">
-                        <Link href="/login" className="block w-full">
-                            <Button variant="ghost" className="w-full text-slate-650 hover:text-slate-950 cursor-pointer">
-                                Login
-                            </Button>
-                        </Link>
-                        <Link href="/register" className="block w-full">
-                            <Button className="w-full bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 cursor-pointer">
-                                Register
-                            </Button>
-                        </Link>
-                        <Link href="/register?trial=true" className="block w-full">
-                            <Button className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-lg cursor-pointer">
-                                Start Free Trial
-                            </Button>
-                        </Link>
+                        {auth?.user ? (
+                            <Link href="/dashboard" className="block w-full">
+                                <Button className="w-full bg-slate-900 hover:bg-slate-800 text-white cursor-pointer">
+                                    Go to Dashboard
+                                </Button>
+                            </Link>
+                        ) : (
+                            <>
+                                <Link href="/login" className="block w-full">
+                                    <Button variant="ghost" className="w-full text-slate-650 hover:text-slate-950 cursor-pointer">
+                                        Login
+                                    </Button>
+                                </Link>
+                                <Link href="/register" className="block w-full">
+                                    <Button className="w-full bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 cursor-pointer">
+                                        Register
+                                    </Button>
+                                </Link>
+                                <Link href="/register?trial=true" className="block w-full">
+                                    <Button className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-lg cursor-pointer">
+                                        Start Free Trial
+                                    </Button>
+                                </Link>
+                            </>
+                        )}
                     </div>
                 </div>
             )}

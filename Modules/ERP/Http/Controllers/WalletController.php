@@ -4,411 +4,319 @@ namespace Modules\ERP\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Modules\Core\Models\Wallet;
-use Modules\Core\Models\WalletTransaction;
-use Modules\Core\Services\FinancialTransactionService;
-use Modules\ERP\Models\Client;
-use Modules\ERP\Models\Tenant;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Modules\ERP\Models\ClientWallet;
+use Modules\ERP\Models\WalletTransaction as ClientWalletTransaction;
+use Modules\ERP\Models\TenantClient;
+use Modules\ERP\Models\Tenant;
 use Inertia\Inertia;
 
+/**
+ * ERP Client Wallet Controller.
+ *
+ * ╔══════════════════════════════════════════════════════════════════╗
+ * ║  FINANCIAL ISOLATION BOUNDARY                                    ║
+ * ║                                                                  ║
+ * ║  This controller ONLY operates on ERP-internal client wallets    ║
+ * ║  (table: client_wallets / client_wallet_transactions).           ║
+ * ║                                                                  ║
+ * ║  It MUST NEVER touch:                                            ║
+ * ║    • Modules\Core\Models\Wallet          (table: wallets)        ║
+ * ║    • Modules\Core\Models\WalletTransaction (wallet_transactions) ║
+ * ║    • App\Http\Controllers\FinancialController (real money)       ║
+ * ║                                                                  ║
+ * ║  ERP client wallets are tenant-managed bookkeeping ledgers,      ║
+ * ║  NOT real platform money. They represent credit that the tenant  ║
+ * ║  grants to their clients for invoice payment purposes only.      ║
+ * ╚══════════════════════════════════════════════════════════════════╝
+ */
 class WalletController extends Controller
 {
-    protected FinancialTransactionService $financialService;
+    // ── Tenant resolution helper ─────────────────────────────────────
 
-    public function __construct(FinancialTransactionService $financialService)
+    /**
+     * Resolve the current tenant and ensure the given client belongs to it.
+     * Aborts with 403 if ownership cannot be confirmed.
+     */
+    private function resolveTenantAndClient(int|string $clientId): array
     {
-        $this->financialService = $financialService;
+        $user   = Auth::user();
+        $tenant = Tenant::where('user_id', $user->id)->firstOrFail();
+
+        $client = TenantClient::where('tenant_id', $tenant->id)
+            ->findOrFail($clientId);
+
+        return [$tenant, $client];
     }
 
-    protected function resolveClient($client)
+    // ── Show wallet ──────────────────────────────────────────────────
+
+    public function show(Request $request, int $client)
     {
-        if ($client instanceof Client) {
-            return $client;
-        }
+        [$tenant, $clientModel] = $this->resolveTenantAndClient($client);
 
-        $clientModel = Client::find($client);
-        if ($clientModel) {
-            return $clientModel;
-        }
-
-        $user = \App\Models\User::find($client);
-        $email = $user ? $user->email : 'billing@acme.corp';
-        $name = $user ? $user->name : 'Acme Corp Solutions';
-        $phone = ($user && !empty($user->phone)) ? $user->phone : '+1 (555) 019-2834';
-
-        // Dynamically resolve tenant_id
-        $tenantId = session('tenant_id');
-        if (!$tenantId) {
-            $tenant = Tenant::first();
-            if (!$tenant) {
-                $owner = \App\Models\User::where('role', 'admin')->first() ?: \App\Models\User::first();
-                if (!$owner) {
-                    $owner = \App\Models\User::create([
-                        'name' => 'System Owner',
-                        'email' => 'owner@app.com',
-                        'password' => bcrypt('password'),
-                        'role' => 'admin',
-                    ]);
-                }
-                $tenant = Tenant::create([
-                    'user_id' => $owner->id,
-                    'name' => 'Default Tenant',
-                    'status' => 'active',
-                ]);
-            }
-            $tenantId = $tenant->id;
-            session(['tenant_id' => $tenantId]);
-        }
-
-        return Client::firstOrCreate(
-            ['email' => $email],
-            [
-                'tenant_id' => $tenantId,
-                'name' => $name, 
-                'phone' => $phone,
-                'address' => '120 San Francisco, CA',
-                'currency' => 'USD',
-            ]
+        $wallet = ClientWallet::firstOrCreate(
+            ['tenant_id' => $tenant->id, 'client_id' => $clientModel->id],
+            ['balance' => 0, 'currency' => $clientModel->currency ?? 'USD']
         );
-    }
 
-    public function show(Request $request, $client)
-    {
-        $clientModel = $this->resolveClient($client);
-
-        $wallet = Wallet::where('owner_type', Client::class)
-            ->where('owner_id', $clientModel->id)
-            ->first();
-
-        if (!$wallet) {
-            $wallet = Wallet::create([
-                'owner_type' => Client::class,
-                'owner_id' => $clientModel->id,
-                'context' => 'client',
-                'balance' => 0,
-                'currency' => $clientModel->currency ?? 'USD',
-                'locked_balance' => 0,
-            ]);
-        }
-
-        $transactions = WalletTransaction::where('wallet_id', $wallet->id)
+        $transactions = ClientWalletTransaction::where('wallet_id', $wallet->id)
             ->latest()
-            ->paginate(15);
-
-        if ($request->wantsJson()) {
-            return response()->json([
-                'wallet' => $wallet,
-                'transactions' => $transactions,
-            ]);
-        }
+            ->paginate(20);
 
         return Inertia::render('ERP/Wallet/Show', [
-            'wallet' => $wallet,
+            'wallet'       => $wallet,
             'transactions' => $transactions,
-            'client' => $clientModel,
+            'client'       => $clientModel,
         ]);
     }
 
-    public function transactions(Request $request, $client)
-    {
-        $clientModel = $this->resolveClient($client);
+    // ── Transaction history (JSON) ────────────────────────────────────
 
-        $wallet = Wallet::where('owner_type', Client::class)
-            ->where('owner_id', $clientModel->id)
+    public function transactions(Request $request, int $client)
+    {
+        [$tenant, $clientModel] = $this->resolveTenantAndClient($client);
+
+        $wallet = ClientWallet::where('tenant_id', $tenant->id)
+            ->where('client_id', $clientModel->id)
             ->firstOrFail();
 
-        $query = WalletTransaction::where('wallet_id', $wallet->id);
+        $query = ClientWalletTransaction::where('wallet_id', $wallet->id);
 
-        if ($request->has('type')) {
+        if ($request->filled('type')) {
             $query->where('type', $request->input('type'));
         }
-
-        if ($request->has('start_date') && $request->has('end_date')) {
-            $query->whereBetween('created_at', [$request->input('start_date'), $request->input('end_date')]);
+        if ($request->filled('start_date') && $request->filled('end_date')) {
+            $query->whereBetween('created_at', [
+                $request->input('start_date'),
+                $request->input('end_date'),
+            ]);
         }
 
-        $transactions = $query->latest()->paginate(15);
-
-        return response()->json($transactions);
+        return response()->json($query->latest()->paginate(20));
     }
 
-    public function manualCredit(Request $request, $client)
-    {
-        if (auth()->user()->role !== 'admin') {
-            abort(403, 'Unauthorized. Only super-admins can perform manual adjustments.');
-        }
+    // ── Manual credit (tenant adds credit to client's ERP wallet) ────
 
+    public function manualCredit(Request $request, int $client)
+    {
         $request->validate([
             'amount' => 'required|numeric|min:0.01',
-            'note' => 'required|string',
+            'note'   => 'required|string|max:500',
         ]);
 
-        $clientModel = $this->resolveClient($client);
+        [$tenant, $clientModel] = $this->resolveTenantAndClient($client);
 
         try {
-            DB::transaction(function () use ($request, $clientModel) {
-                $wallet = Wallet::firstOrCreate(
-                    ['owner_type' => Client::class, 'owner_id' => $clientModel->id],
-                    ['context' => 'client', 'balance' => 0, 'currency' => 'USD', 'locked_balance' => 0]
-                );
+            DB::transaction(function () use ($request, $tenant, $clientModel) {
+                $wallet = ClientWallet::where('tenant_id', $tenant->id)
+                    ->where('client_id', $clientModel->id)
+                    ->lockForUpdate()
+                    ->firstOrFail();
 
-                $wallet = Wallet::where('id', $wallet->id)->lockForUpdate()->first();
+                $amount      = (float) $request->input('amount');
+                $balBefore   = (float) $wallet->balance;
+                $balAfter    = $balBefore + $amount;
 
-                $amount = $request->input('amount');
-                $newBalance = $wallet->balance + $amount;
-
-                $exchangeRate = 1.0;
-                $businessCurrency = 'USD';
-                $businessAmount = $amount * $exchangeRate;
-
-                $transaction = WalletTransaction::create([
-                    'wallet_id' => $wallet->id,
-                    'type' => 'credit',
-                    'amount' => $amount,
-                    'balance_before' => $wallet->balance,
-                    'balance_after' => $newBalance,
-                    'reference_type' => 'manual_credit_audit',
-                    'reference_id' => auth()->id(),
-                    'description' => 'AUDIT CREDIT: ' . $request->input('note'),
-                    'business_amount' => $businessAmount,
-                    'business_currency' => $businessCurrency,
+                ClientWalletTransaction::create([
+                    'tenant_id'        => $tenant->id,
+                    'wallet_id'        => $wallet->id,
+                    'type'             => 'manual_credit',
+                    'direction'        => 'credit',
+                    'amount'           => $amount,
+                    'amount_currency'  => $wallet->currency,
+                    'business_amount'  => $amount,
+                    'business_currency'=> $wallet->currency,
+                    'exchange_rate'    => 1.0,
+                    'exchange_rate_date'=> now()->toDateString(),
+                    'balance_before'   => $balBefore,
+                    'balance_after'    => $balAfter,
+                    'reference_type'   => 'manual_credit',
+                    'reference_id'     => Auth::id(),
+                    'note'             => 'Credit: ' . $request->input('note'),
+                    'created_by'       => Auth::id(),
                 ]);
 
-                $wallet->update(['balance' => $newBalance]);
-
-                event(new \App\Events\WalletCredited($transaction));
+                $wallet->update(['balance' => $balAfter]);
             });
 
-            return back()->with('success', 'Wallet audited credited successfully.');
+            return back()->with('success', 'Client credit added successfully.');
         } catch (\Exception $e) {
             return back()->withErrors(['amount' => $e->getMessage()]);
         }
     }
 
-    public function manualDebit(Request $request, $client)
-    {
-        if (auth()->user()->role !== 'admin') {
-            abort(403, 'Unauthorized. Only super-admins can perform manual adjustments.');
-        }
+    // ── Manual debit (tenant removes credit from client's ERP wallet) ─
 
+    public function manualDebit(Request $request, int $client)
+    {
         $request->validate([
             'amount' => 'required|numeric|min:0.01',
-            'note' => 'required|string',
+            'note'   => 'required|string|max:500',
         ]);
 
-        $clientModel = $this->resolveClient($client);
+        [$tenant, $clientModel] = $this->resolveTenantAndClient($client);
 
         try {
-            DB::transaction(function () use ($request, $clientModel) {
-                $wallet = Wallet::where('owner_type', Client::class)
-                    ->where('owner_id', $clientModel->id)
+            DB::transaction(function () use ($request, $tenant, $clientModel) {
+                $wallet = ClientWallet::where('tenant_id', $tenant->id)
+                    ->where('client_id', $clientModel->id)
                     ->lockForUpdate()
                     ->firstOrFail();
 
-                $amount = $request->input('amount');
+                $amount = (float) $request->input('amount');
 
-                if ($wallet->balance < $amount) {
-                    throw new \Exception('Insufficient funds.');
+                if ((float) $wallet->balance < $amount) {
+                    throw new \Exception('Insufficient client wallet balance.');
                 }
 
-                $newBalance = $wallet->balance - $amount;
+                $balBefore = (float) $wallet->balance;
+                $balAfter  = $balBefore - $amount;
 
-                $exchangeRate = 1.0;
-                $businessCurrency = 'USD';
-                $businessAmount = $amount * $exchangeRate;
-
-                $transaction = WalletTransaction::create([
-                    'wallet_id' => $wallet->id,
-                    'type' => 'debit',
-                    'amount' => $amount,
-                    'balance_before' => $wallet->balance,
-                    'balance_after' => $newBalance,
-                    'reference_type' => 'manual_debit_audit',
-                    'reference_id' => auth()->id(),
-                    'description' => 'AUDIT DEBIT: ' . $request->input('note'),
-                    'business_amount' => $businessAmount,
-                    'business_currency' => $businessCurrency,
+                ClientWalletTransaction::create([
+                    'tenant_id'        => $tenant->id,
+                    'wallet_id'        => $wallet->id,
+                    'type'             => 'manual_debit',
+                    'direction'        => 'debit',
+                    'amount'           => $amount,
+                    'amount_currency'  => $wallet->currency,
+                    'business_amount'  => $amount,
+                    'business_currency'=> $wallet->currency,
+                    'exchange_rate'    => 1.0,
+                    'exchange_rate_date'=> now()->toDateString(),
+                    'balance_before'   => $balBefore,
+                    'balance_after'    => $balAfter,
+                    'reference_type'   => 'manual_debit',
+                    'reference_id'     => Auth::id(),
+                    'note'             => 'Debit: ' . $request->input('note'),
+                    'created_by'       => Auth::id(),
                 ]);
 
-                $wallet->update(['balance' => $newBalance]);
-
-                event(new \App\Events\WalletDebited($transaction));
+                $wallet->update(['balance' => $balAfter]);
             });
 
-            return back()->with('success', 'Wallet audited debited successfully.');
+            return back()->with('success', 'Client debit recorded successfully.');
         } catch (\Exception $e) {
             return back()->withErrors(['amount' => $e->getMessage()]);
         }
     }
 
-    public function lockFunds(Request $request, $client)
-    {
-        if (auth()->user()->role !== 'admin') {
-            abort(403, 'Unauthorized. Only super-admins can perform manual adjustments.');
-        }
+    // ── Lock funds (holds a portion so it can't be spent on invoices) ─
 
+    public function lockFunds(Request $request, int $client)
+    {
         $request->validate([
             'amount' => 'required|numeric|min:0.01',
-            'note' => 'required|string',
+            'note'   => 'required|string|max:500',
         ]);
 
-        $clientModel = $this->resolveClient($client);
+        [$tenant, $clientModel] = $this->resolveTenantAndClient($client);
 
         try {
-            DB::transaction(function () use ($request, $clientModel) {
-                $wallet = Wallet::where('owner_type', Client::class)
-                    ->where('owner_id', $clientModel->id)
+            DB::transaction(function () use ($request, $tenant, $clientModel) {
+                $wallet = ClientWallet::where('tenant_id', $tenant->id)
+                    ->where('client_id', $clientModel->id)
                     ->lockForUpdate()
                     ->firstOrFail();
 
-                $amount = $request->input('amount');
+                $amount = (float) $request->input('amount');
 
-                if ($wallet->balance < $amount) {
+                if ((float) $wallet->balance < $amount) {
                     throw new \Exception('Insufficient available balance to lock.');
                 }
 
-                $wallet->update([
-                    'balance' => $wallet->balance - $amount,
-                    'locked_balance' => ($wallet->locked_balance ?? 0) + $amount,
+                $balBefore   = (float) $wallet->balance;
+                $lockedBefore= (float) ($wallet->locked_balance ?? 0);
+                $balAfter    = $balBefore - $amount;
+                $lockedAfter = $lockedBefore + $amount;
+
+                ClientWalletTransaction::create([
+                    'tenant_id'        => $tenant->id,
+                    'wallet_id'        => $wallet->id,
+                    'type'             => 'manual_debit',
+                    'direction'        => 'debit',
+                    'amount'           => $amount,
+                    'amount_currency'  => $wallet->currency,
+                    'business_amount'  => $amount,
+                    'business_currency'=> $wallet->currency,
+                    'exchange_rate'    => 1.0,
+                    'exchange_rate_date'=> now()->toDateString(),
+                    'balance_before'   => $balBefore,
+                    'balance_after'    => $balAfter,
+                    'reference_type'   => 'funds_lock',
+                    'reference_id'     => Auth::id(),
+                    'note'             => 'Funds locked: ' . $request->input('note'),
+                    'created_by'       => Auth::id(),
                 ]);
 
-                WalletTransaction::create([
-                    'wallet_id' => $wallet->id,
-                    'type' => 'debit',
-                    'amount' => $amount,
-                    'balance_before' => $wallet->balance + $amount,
-                    'balance_after' => $wallet->balance,
-                    'reference_type' => 'funds_lock_audit',
-                    'reference_id' => auth()->id(),
-                    'description' => 'AUDIT LOCK: ' . $request->input('note'),
-                    'business_amount' => $amount,
-                    'business_currency' => 'USD',
+                $wallet->update([
+                    'balance'        => $balAfter,
+                    'locked_balance' => $lockedAfter,
                 ]);
             });
-            return back()->with('success', 'Funds audited locked successfully.');
+
+            return back()->with('success', 'Funds locked successfully.');
         } catch (\Exception $e) {
             return back()->withErrors(['amount' => $e->getMessage()]);
         }
     }
 
-    public function unlockFunds(Request $request, $client)
-    {
-        if (auth()->user()->role !== 'admin') {
-            abort(403, 'Unauthorized. Only super-admins can perform manual adjustments.');
-        }
+    // ── Unlock funds ──────────────────────────────────────────────────
 
+    public function unlockFunds(Request $request, int $client)
+    {
         $request->validate([
             'amount' => 'required|numeric|min:0.01',
-            'note' => 'required|string',
+            'note'   => 'required|string|max:500',
         ]);
 
-        $clientModel = $this->resolveClient($client);
+        [$tenant, $clientModel] = $this->resolveTenantAndClient($client);
 
         try {
-            DB::transaction(function () use ($request, $clientModel) {
-                $wallet = Wallet::where('owner_type', Client::class)
-                    ->where('owner_id', $clientModel->id)
+            DB::transaction(function () use ($request, $tenant, $clientModel) {
+                $wallet = ClientWallet::where('tenant_id', $tenant->id)
+                    ->where('client_id', $clientModel->id)
                     ->lockForUpdate()
                     ->firstOrFail();
 
-                $amount = $request->input('amount');
+                $amount = (float) $request->input('amount');
 
-                if (($wallet->locked_balance ?? 0) < $amount) {
+                if ((float) ($wallet->locked_balance ?? 0) < $amount) {
                     throw new \Exception('Insufficient locked balance to unlock.');
                 }
 
+                $balBefore   = (float) $wallet->balance;
+                $lockedBefore= (float) $wallet->locked_balance;
+                $balAfter    = $balBefore + $amount;
+                $lockedAfter = $lockedBefore - $amount;
+
+                ClientWalletTransaction::create([
+                    'tenant_id'        => $tenant->id,
+                    'wallet_id'        => $wallet->id,
+                    'type'             => 'manual_credit',
+                    'direction'        => 'credit',
+                    'amount'           => $amount,
+                    'amount_currency'  => $wallet->currency,
+                    'business_amount'  => $amount,
+                    'business_currency'=> $wallet->currency,
+                    'exchange_rate'    => 1.0,
+                    'exchange_rate_date'=> now()->toDateString(),
+                    'balance_before'   => $balBefore,
+                    'balance_after'    => $balAfter,
+                    'reference_type'   => 'funds_unlock',
+                    'reference_id'     => Auth::id(),
+                    'note'             => 'Funds unlocked: ' . $request->input('note'),
+                    'created_by'       => Auth::id(),
+                ]);
+
                 $wallet->update([
-                    'balance' => $wallet->balance + $amount,
-                    'locked_balance' => $wallet->locked_balance - $amount,
-                ]);
-
-                WalletTransaction::create([
-                    'wallet_id' => $wallet->id,
-                    'type' => 'credit',
-                    'amount' => $amount,
-                    'balance_before' => $wallet->balance - $amount,
-                    'balance_after' => $wallet->balance,
-                    'reference_type' => 'funds_unlock_audit',
-                    'reference_id' => auth()->id(),
-                    'description' => 'AUDIT UNLOCK: ' . $request->input('note'),
-                    'business_amount' => $amount,
-                    'business_currency' => 'USD',
+                    'balance'        => $balAfter,
+                    'locked_balance' => $lockedAfter,
                 ]);
             });
-            return back()->with('success', 'Funds audited unlocked successfully.');
-        } catch (\Exception $e) {
-            return back()->withErrors(['amount' => $e->getMessage()]);
-        }
-    }
 
-    public function addBalance(Request $request)
-    {
-        $clientId = auth()->id() ?: 1;
-        $clientModel = $this->resolveClient($clientId);
-
-        $wallet = Wallet::where('owner_type', Client::class)
-            ->where('owner_id', $clientModel->id)
-            ->first();
-
-        if (!$wallet) {
-            $wallet = Wallet::create([
-                'owner_type' => Client::class,
-                'owner_id' => $clientModel->id,
-                'context' => 'client',
-                'balance' => 0,
-                'currency' => $clientModel->currency ?? 'USD',
-                'locked_balance' => 0,
-            ]);
-        }
-
-        return Inertia::render('ERP/Wallet/AddBalance', [
-            'wallet' => $wallet,
-            'client' => $clientModel,
-        ]);
-    }
-
-    public function deposit(Request $request)
-    {
-        $request->validate([
-            'amount' => 'required|numeric|min:5',
-            'payment_method' => 'required|string',
-        ]);
-
-        $clientId = auth()->id() ?: 1;
-        $clientModel = $this->resolveClient($clientId);
-
-        try {
-            DB::transaction(function () use ($request, $clientModel) {
-                $wallet = Wallet::firstOrCreate(
-                    ['owner_type' => Client::class, 'owner_id' => $clientModel->id],
-                    ['context' => 'client', 'balance' => 0, 'currency' => 'USD', 'locked_balance' => 0]
-                );
-
-                $wallet = Wallet::where('id', $wallet->id)->lockForUpdate()->first();
-
-                $amount = $request->input('amount');
-                $method = $request->input('payment_method');
-                $newBalance = $wallet->balance + $amount;
-
-                $transaction = WalletTransaction::create([
-                    'wallet_id' => $wallet->id,
-                    'type' => 'credit',
-                    'amount' => $amount,
-                    'balance_before' => $wallet->balance,
-                    'balance_after' => $newBalance,
-                    'reference_type' => 'client_deposit',
-                    'reference_id' => auth()->id() ?: 1,
-                    'description' => "Deposit via " . ucfirst($method),
-                    'business_amount' => $amount,
-                    'business_currency' => 'USD',
-                ]);
-
-                $wallet->update(['balance' => $newBalance]);
-                event(new \App\Events\WalletCredited($transaction));
-            });
-
-            return redirect()->route('erp.wallet.show', $clientModel->id)->with('success', 'Funds successfully deposited to your wallet.');
+            return back()->with('success', 'Funds unlocked successfully.');
         } catch (\Exception $e) {
             return back()->withErrors(['amount' => $e->getMessage()]);
         }

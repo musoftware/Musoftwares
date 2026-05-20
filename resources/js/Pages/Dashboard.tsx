@@ -238,7 +238,7 @@ export default function Dashboard({
                                     </div>
                                     <h4 className="font-bold text-sm mb-1 text-text-primary">Freelance Hub</h4>
                                     <p className="text-xs text-text-muted leading-relaxed">Browse jobs, submit proposals, manage contracts and earn real money.</p>
-                                    <div className="absolute top-4 right-4 text-emerald-600 text-[9px] uppercase font-bold bg-emerald-50 border border-emerald-100 px-2.5 py-0.5 rounded-full">Free</div>
+                                    <div className="absolute top-4 right-4 text-emerald-600 text-[9px] uppercase font-bold bg-emerald-50 border border-emerald-100 px-2.5 py-0.5 rounded-full">Points-Based</div>
                                 </Link>
 
                                 <Link 

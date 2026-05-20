@@ -10,6 +10,10 @@ class EnsureOnboardingCompleted
 {
     public function handle(Request $request, Closure $next): Response
     {
+        if (auth('erp_team')->check()) {
+            return $next($request);
+        }
+
         $user = $request->user();
 
         if ($user && !$user->onboarding_completed) {

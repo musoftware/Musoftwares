@@ -18,6 +18,7 @@ class InvoiceWorkflowTest extends TestCase
     protected Tenant $tenant;
     protected TenantClient $client;
     protected Currency $currency;
+    protected \Modules\ERP\Models\Project $project;
 
     protected function setUp(): void
     {
@@ -27,7 +28,7 @@ class InvoiceWorkflowTest extends TestCase
         $this->seed(\Database\Seeders\RolesAndPermissionsSeeder::class);
         $this->seed(\Database\Seeders\CurrenciesSeeder::class);
 
-        $this->user = User::factory()->create();
+        $this->user = User::factory()->create(['onboarding_completed' => true]);
         $this->user->assignRole('client');
 
         $this->tenant = Tenant::create([
@@ -48,6 +49,16 @@ class InvoiceWorkflowTest extends TestCase
         ]);
 
         $this->currency = Currency::firstOrCreate(['code' => 'USD'], ['name' => 'US Dollar', 'symbol' => '$']);
+
+        $this->project = \Modules\ERP\Models\Project::create([
+            'tenant_id' => $this->tenant->id,
+            'client_id' => $this->client->id,
+            'name' => 'Acme Website Redesign',
+            'status' => 'Active',
+            'budget' => 5000.00,
+            'due_date' => now()->addDays(60)->toDateString(),
+            'created_by' => $this->user->id,
+        ]);
     }
 
     public function test_can_view_invoices_index(): void
@@ -63,6 +74,7 @@ class InvoiceWorkflowTest extends TestCase
     {
         $postData = [
             'client_id' => $this->client->id,
+            'project_id' => $this->project->id,
             'invoice_number' => 'INV-2026-001',
             'issued_at' => now()->toDateString(),
             'due_date' => now()->addDays(30)->toDateString(),
@@ -105,6 +117,8 @@ class InvoiceWorkflowTest extends TestCase
 
         $this->assertDatabaseHas('invoices', [
             'tenant_id' => $this->tenant->id,
+            'client_id' => $this->client->id,
+            'project_id' => $this->project->id,
             'invoice_number' => 'INV-2026-001',
             'amount' => 1705.00,
             'amount_currency' => 'USD',
@@ -130,6 +144,13 @@ class InvoiceWorkflowTest extends TestCase
 
     public function test_can_send_and_mark_paid_invoice(): void
     {
+        \Modules\ERP\Models\ClientWallet::create([
+            'tenant_id' => $this->tenant->id,
+            'client_id' => $this->client->id,
+            'balance' => 1000.00,
+            'currency' => 'USD',
+        ]);
+
         $invoice = Invoice::create([
             'tenant_id' => $this->tenant->id,
             'invoice_number' => 'INV-2026-002',
@@ -155,8 +176,9 @@ class InvoiceWorkflowTest extends TestCase
         // Mark paid
         $response = $this->actingAs($this->user)
             ->withSession(['tenant_id' => $this->tenant->id])
-            ->post(route('erp.invoices.mark-paid', $invoice->id));
+            ->post(route('erp.invoices.markPaid', $invoice->id));
 
+        $response->assertSessionHasNoErrors();
         $this->assertEquals('paid', $invoice->fresh()->status);
         $this->assertNotNull($invoice->fresh()->paid_at);
     }

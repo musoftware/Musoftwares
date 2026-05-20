@@ -8,7 +8,6 @@ interface PricingPlan {
     name: string;
     price_monthly: number;
     price_yearly: number;
-    max_devices: number;
     features: string[];
     is_popular: boolean;
     yearly_savings: number;
@@ -96,9 +95,6 @@ export function PricingPanel({ plans, toolSlug, isAuthed }: PricingPanelProps) {
                                     <div>
                                         <p className={`font-semibold text-sm ${isPopular ? 'text-white' : 'text-slate-900'}`}>
                                             {plan.name}
-                                        </p>
-                                        <p className={`text-xs mt-0.5 ${isPopular ? 'text-slate-400' : 'text-slate-500'}`}>
-                                            Up to {plan.max_devices} device{plan.max_devices > 1 ? 's' : ''}
                                         </p>
                                     </div>
                                     {isPopular && (

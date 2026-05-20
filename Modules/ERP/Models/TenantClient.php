@@ -8,12 +8,18 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class TenantClient extends TenantModel
 {
     protected $fillable = [
-        'tenant_id', 'name', 'email', 'phone', 'address', 'currency', 'country_code', 'referral_code', 'referred_by', 'status'
+        'tenant_id', 'user_id', 'name', 'email', 'phone', 'address', 'currency',
+        'country_code', 'referral_code', 'referred_by', 'status'
     ];
 
     public function tenant(): BelongsTo
     {
         return $this->belongsTo(Tenant::class);
+    }
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(\App\Models\User::class, 'user_id');
     }
 
     public function referrer(): BelongsTo

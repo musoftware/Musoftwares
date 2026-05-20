@@ -1,5 +1,5 @@
 import React from 'react';
-import { Head, Link, router } from '@inertiajs/react';
+import { Head, Link, router, usePage } from '@inertiajs/react';
 import AdminLayout from '@/Layouts/AdminLayout';
 import { Badge } from '@/Components/ui/badge';
 import { Button } from '@/Components/ui/button';
@@ -41,9 +41,10 @@ const statusColor: Record<string, string> = {
 };
 
 export default function SerialDevicesIndex({ devices, filters, statuses, softwares, stats, perPageOptions }: Props) {
+    const { auth } = usePage().props as any;
     const [search, setSearch] = useState(filters.search ?? '');
 
-    const applyFilter = (key: string, value: string) => {
+    const applyFilter = (key: string, value: string | null) => {
         router.get(route('admin.serial-devices.index'), { ...filters, [key]: value || undefined }, { preserveState: true, replace: true });
     };
 
@@ -57,7 +58,7 @@ export default function SerialDevicesIndex({ devices, filters, statuses, softwar
     };
 
     return (
-        <AdminLayout>
+        <AdminLayout user={auth.user}>
             <Head title="Serial Devices" />
             <div className="min-h-screen bg-zinc-950 p-6 space-y-6">
                 {/* Header */}

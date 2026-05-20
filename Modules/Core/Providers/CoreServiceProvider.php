@@ -16,6 +16,9 @@ class CoreServiceProvider extends ServiceProvider
             \Modules\Core\Services\ExchangeRateService::class
         );
         $this->app->singleton(
+            \Modules\Core\Services\LedgerService::class
+        );
+        $this->app->singleton(
             \Modules\Core\Services\WalletService::class
         );
     }

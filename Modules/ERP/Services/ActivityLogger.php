@@ -30,7 +30,13 @@ class ActivityLogger
         
         // Fallback to active tenant if possible
         if (!$tenantId) {
-            $tenantId = session('tenant_id') ?? Auth::user()?->tenant_id;
+            $tenantId = session('tenant_id');
+            if (!$tenantId && Auth::check()) {
+                $tenant = \Modules\ERP\Models\Tenant::where('user_id', Auth::id())->first();
+                if ($tenant) {
+                    $tenantId = $tenant->id;
+                }
+            }
         }
 
         if (!$tenantId) {

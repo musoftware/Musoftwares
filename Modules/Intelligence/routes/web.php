@@ -7,7 +7,7 @@ use Modules\Intelligence\Http\Controllers\AdFeedController;
 use Modules\Intelligence\Http\Controllers\UgcController;
 use Modules\Intelligence\Http\Controllers\SwipeVaultController;
 
-Route::middleware(['web', 'auth'])->prefix('intelligence')->name('intelligence.')->group(function () {
+Route::middleware(['web', 'auth', 'verified', 'onboarding', 'subscription:intelligence'])->prefix('intelligence')->name('intelligence.')->group(function () {
 
     // ── Dashboard ──────────────────────────────────────────────────────────
     Route::get('/', [DashboardController::class, 'index'])->name('index');

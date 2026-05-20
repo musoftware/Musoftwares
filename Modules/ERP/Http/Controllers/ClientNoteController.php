@@ -15,11 +15,34 @@ use Illuminate\Support\Facades\Auth;
  */
 class ClientNoteController extends Controller
 {
+    private function resolveTenant(): \Modules\ERP\Models\Tenant
+    {
+        return \Modules\ERP\Models\Tenant::where('user_id', Auth::id())->firstOrFail();
+    }
+
+    private function validateTenantClient(TenantClient $client)
+    {
+        $tenant = $this->resolveTenant();
+        if ($client->tenant_id !== $tenant->id) {
+            abort(403, 'Unauthorized access.');
+        }
+    }
+
+    private function validateClientAndNote(TenantClient $client, ClientNote $note)
+    {
+        $tenant = $this->resolveTenant();
+        if ($client->tenant_id !== $tenant->id || $note->client_id !== $client->id || $note->tenant_id !== $tenant->id) {
+            abort(403, 'Unauthorized access.');
+        }
+    }
+
     /**
      * Create a note on a client.
      */
     public function store(Request $request, TenantClient $client)
     {
+        $this->validateTenantClient($client);
+
         $request->validate([
             'title'    => 'required|string|max:255',
             'content'  => 'required|string',
@@ -47,6 +70,7 @@ class ClientNoteController extends Controller
      */
     public function destroy(TenantClient $client, ClientNote $note)
     {
+        $this->validateClientAndNote($client, $note);
         $this->authorize('delete', $note);
         $note->delete();
 
@@ -62,6 +86,7 @@ class ClientNoteController extends Controller
      */
     public function archive(TenantClient $client, ClientNote $note)
     {
+        $this->validateClientAndNote($client, $note);
         $note->archive();
 
         return response()->json([
@@ -77,6 +102,7 @@ class ClientNoteController extends Controller
      */
     public function unarchive(TenantClient $client, ClientNote $note)
     {
+        $this->validateClientAndNote($client, $note);
         $note->unarchive();
 
         return response()->json([

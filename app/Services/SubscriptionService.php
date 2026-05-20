@@ -20,13 +20,8 @@ class SubscriptionService
             return true;
         }
 
-        // 2. Free modules — no subscription required.
-        //    Freelance/Marketplace: monetized via connects & commissions, not subscriptions.
-        //    Booking: included free with any account (core workflow).
-        //    Intelligence: early-access free tier.
-        if (in_array($module, ['freelance', 'marketing', 'marketplace', 'booking', 'intelligence'])) {
-            return true;
-        }
+        // Free bypass removed: All modules now strictly require a valid UserSubscription.
+        // We will seed "Free Trial" ModulePlans in the database so users can subscribe for $0 to test the platform.
 
         // 3. Check for active subscription in user_subscriptions
         $activeSub = UserSubscription::where('client_id', $user->id)
@@ -85,6 +80,14 @@ class SubscriptionService
                 return [
                     'connects' => 20,
                     'commission_rate' => 10.0,
+                ];
+            }
+            if ($module === 'erp') {
+                return [
+                    'projects' => -1, // Unlimited
+                    'invoices' => -1, // Unlimited
+                    'tasks' => -1, // Unlimited
+                    'team_members' => -1, // Unlimited
                 ];
             }
             return [

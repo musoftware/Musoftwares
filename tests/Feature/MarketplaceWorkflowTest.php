@@ -26,13 +26,13 @@ class MarketplaceWorkflowTest extends TestCase
 
         $this->seed(\Database\Seeders\RolesAndPermissionsSeeder::class);
 
-        $this->buyer = User::factory()->create();
+        $this->buyer = User::factory()->create(['onboarding_completed' => true]);
         $this->buyer->assignRole('client');
 
-        $this->seller = User::factory()->create();
+        $this->seller = User::factory()->create(['onboarding_completed' => true]);
         $this->seller->assignRole('client');
 
-        $this->admin = User::factory()->create();
+        $this->admin = User::factory()->create(['onboarding_completed' => true]);
         $this->admin->assignRole('admin');
 
         $this->category = ServiceCategory::create([
@@ -54,8 +54,17 @@ class MarketplaceWorkflowTest extends TestCase
         $response = $this->actingAs($this->seller)
             ->post(route('marketplace.services.store'), [
                 'title' => 'Stunning NextJS App development',
-                'description' => 'I will build a high quality landing page using React & Next.js.',
+                'description' => 'I will build a high quality landing page using React & Next.js. This description is very long to satisfy the 100 character minimum requirement of the ServiceController store validation rules.',
                 'category_id' => $this->category->id,
+                'packages' => [
+                    [
+                        'name' => 'Basic Package',
+                        'description' => 'Basic web development services',
+                        'price' => 100.00,
+                        'currency_code' => 'USD',
+                        'delivery_days' => 5,
+                    ]
+                ]
             ]);
 
         $this->assertDatabaseHas('marketplace_services', [

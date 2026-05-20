@@ -1,0 +1,33 @@
+{
+  "id": "com.musoftware.example-scraper",
+  "name": "Example Web Scraper",
+  "version": "1.0.5",
+  "author": "Musoftware Core Team",
+  "runtime": "python3",
+  "entrypoint": "scraper.py",
+  "description": "Extracts lead information from public directories and pushes them to the CRM.",
+  "dependencies": {
+    "beautifulsoup4": "^4.12.0",
+    "requests": "^2.31.0"
+  },
+  "permissions": [
+    "network"
+  ],
+  "commands": {
+    "start": "Run the scraping job",
+    "stop": "Gracefully abort the job",
+    "pause": "Pause execution to avoid rate limits"
+  },
+  "ui_schema": {
+    "target_url": {
+      "type": "string",
+      "label": "Target URL",
+      "required": true
+    },
+    "max_pages": {
+      "type": "number",
+      "label": "Max Pages to Scrape",
+      "default": 5
+    }
+  }
+}

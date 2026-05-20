@@ -33,6 +33,11 @@ export default function Authenticated({
     const { auth, notifications, flash, wallet } = usePage().props as any;
     const user = auth.user;
     const { toast } = useToast();
+
+    const isImpersonating = auth?.is_impersonating;
+    const activeUser = auth?.team_member || user;
+    const displayName = activeUser?.name || 'SaaS User';
+    const displayEmail = activeUser?.email || 'user@example.com';
     const [isMobileOpen, setIsMobileOpen] = useState(false);
 
     // Safety checks for route existence
@@ -110,9 +115,26 @@ export default function Authenticated({
 
     return (
         <div className="min-h-screen bg-slate-50 font-sans text-slate-900 flex flex-col">
+            {isImpersonating && (
+                <div className="bg-gradient-to-r from-amber-500 via-orange-600 to-rose-600 text-white text-xs font-semibold px-4 shadow-md flex items-center justify-between z-[50] sticky top-0" style={{ height: '36px' }}>
+                    <div className="flex items-center gap-2">
+                        <Shield className="h-4 w-4 text-amber-100 animate-pulse shrink-0" />
+                        <span className="truncate">
+                            You are currently impersonating <strong className="underline">{user?.name}</strong> ({user?.email}). All actions performed will be under this account's scope.
+                        </span>
+                    </div>
+                    <Link
+                        href={route('admin.stop-impersonate')}
+                        className="bg-white/20 hover:bg-white/30 text-white font-bold py-1 px-3 rounded-full border border-white/20 hover:border-white/40 transition-all text-[11px] shrink-0"
+                    >
+                        Stop Impersonation
+                    </Link>
+                </div>
+            )}
+
             {/* Top Navigation */}
-            <header className="sticky top-0 z-40 w-full bg-white border-b border-slate-200" style={{ height: '68px' }}>
-                <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 h-full">
+            <header className={cn("sticky z-40 w-full bg-white border-b border-slate-200", isImpersonating ? "top-[36px]" : "top-0")} style={{ height: '68px' }}>
+                <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8 h-full">
                     <div className="flex h-full items-center justify-between">
                         {/* LEFT: Logo & Nav */}
                         <div className="flex items-center gap-6">
@@ -136,15 +158,26 @@ export default function Authenticated({
                                         <div className="flex-1 overflow-y-auto p-4 space-y-6">
                                             {/* Mobile Nav Links */}
                                             <div className="space-y-1">
-                                                <Link href={safeRoute('dashboard')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-50 text-slate-700 font-medium">
-                                                    <LayoutDashboard className="w-5 h-5 text-slate-400" /> Dashboard
-                                                </Link>
-                                                <Link href={safeRoute('erp.invoices.index')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-50 text-slate-700 font-medium">
-                                                    <FileText className="w-5 h-5 text-slate-400" /> Invoices
-                                                </Link>
-                                                <Link href={safeRoute('financial.add-balance')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-emerald-50 text-emerald-700 font-medium">
-                                                    <Plus className="w-5 h-5 text-emerald-500" /> Add Balance
-                                                </Link>
+                                                {auth?.team_member ? (
+                                                    <Link href={safeRoute('erp.dashboard')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-50 text-slate-700 font-medium">
+                                                        <LayoutDashboard className="w-5 h-5 text-slate-400" /> Dashboard
+                                                    </Link>
+                                                ) : (
+                                                    <>
+                                                        <Link href={safeRoute('dashboard')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-50 text-slate-700 font-medium">
+                                                            <LayoutDashboard className="w-5 h-5 text-slate-400" /> Dashboard
+                                                        </Link>
+                                                        <Link href={activeModules.erp ? safeRoute('erp.dashboard') : safeRoute('subscriptions.plans', { module: 'erp' })} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-50 text-slate-700 font-medium">
+                                                            <Building2 className="w-5 h-5 text-slate-400" /> ERP
+                                                        </Link>
+                                                        <Link href={safeRoute('erp.client-invoices.index')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-50 text-slate-700 font-medium">
+                                                            <FileText className="w-5 h-5 text-slate-400" /> My Invoices
+                                                        </Link>
+                                                        <Link href={safeRoute('financial.add-balance')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-emerald-50 text-emerald-700 font-medium">
+                                                            <Plus className="w-5 h-5 text-emerald-500" /> Add Balance
+                                                        </Link>
+                                                    </>
+                                                )}
                                             </div>
                                         </div>
                                     </div>
@@ -160,10 +193,13 @@ export default function Authenticated({
 
                             <nav className="hidden md:flex items-center gap-1">
                                 <div className="relative">
-                                    <NavLink href={safeRoute('dashboard')} active={isRouteActive('dashboard')}>
+                                    <NavLink 
+                                        href={auth?.team_member ? safeRoute('erp.dashboard') : safeRoute('dashboard')} 
+                                        active={auth?.team_member ? isRouteActive('erp') : isRouteActive('dashboard')}
+                                    >
                                         Dashboard
                                     </NavLink>
-                                    {isTourOpen && tourStep === 2 && (
+                                    {(!auth?.team_member && isTourOpen && tourStep === 2) && (
                                         <span className="absolute -top-1 right-0 flex h-3 w-3">
                                             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75" />
                                             <span className="relative inline-flex rounded-full h-3 w-3 bg-indigo-500" />
@@ -171,20 +207,24 @@ export default function Authenticated({
                                     )}
                                 </div>
 
-                                <div className="relative">
-                                    <NavLink href={safeRoute('erp.invoices.index')} active={isRouteActive('erp.invoices.index')}>
-                                        Invoices
-                                    </NavLink>
-                                    {isTourOpen && tourStep === 3 && (
-                                        <span className="absolute -top-1 right-0 flex h-3 w-3">
-                                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-                                            <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500" />
-                                        </span>
-                                    )}
-                                </div>
+                                {!auth?.team_member && (
+                                    <div className="relative">
+                                        <NavLink href={activeModules.erp ? safeRoute('erp.dashboard') : safeRoute('subscriptions.plans', { module: 'erp' })} active={isRouteActive('erp')}>
+                                            ERP
+                                        </NavLink>
+                                        {isTourOpen && tourStep === 3 && (
+                                            <span className="absolute -top-1 right-0 flex h-3 w-3">
+                                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                                                <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500" />
+                                            </span>
+                                        )}
+                                    </div>
+                                )}
                                 
-                                {/* MORE MEGA MENU */}
-                                <DropdownMenu>
+                                {!auth?.team_member && (
+                                    <>
+                                        {/* MORE MEGA MENU */}
+                                        <DropdownMenu>
                                     <div className="relative inline-block">
                                         <DropdownMenuTrigger className="inline-flex items-center gap-1.5 h-8 px-3 rounded-lg text-sm font-medium leading-none text-slate-500 hover:bg-slate-100/60 hover:text-slate-800 transition-colors duration-150 outline-none select-none">
                                             More <ChevronDown className="ml-1 h-3.5 w-3.5 opacity-50" />
@@ -208,6 +248,9 @@ export default function Authenticated({
                                                 </Link>
                                                 <Link href={safeRoute('financial.payout-methods.index')} className="flex items-center gap-3 px-2 py-1.5 rounded-md hover:bg-slate-50 text-sm font-medium text-slate-700">
                                                     <CreditCard className="w-4 h-4 text-slate-400" /> Payout Methods
+                                                </Link>
+                                                <Link href={safeRoute('erp.client-invoices.index')} className="flex items-center gap-3 px-2 py-1.5 rounded-md hover:bg-slate-50 text-sm font-medium text-slate-700">
+                                                    <FileText className="w-4 h-4 text-slate-400" /> My Invoices
                                                 </Link>
                                             </div>
                                         </div>
@@ -284,7 +327,7 @@ export default function Authenticated({
                                             <div className="flex-1 min-w-0">
                                                 <div className="flex items-center justify-between">
                                                     <p className={cn("text-sm font-medium", isFreelanceActive ? "text-emerald-900" : "text-slate-900")}>Freelance Hub</p>
-                                                    <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-emerald-100 text-emerald-700">Free</span>
+                                                    <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-emerald-100 text-emerald-700">Points-Based</span>
                                                 </div>
                                                 <p className={cn("text-xs truncate", isFreelanceActive ? "text-emerald-700/70" : "text-slate-500")}>
                                                     Jobs, proposals &amp; earnings
@@ -394,41 +437,45 @@ export default function Authenticated({
                                         </DropdownMenuItem>
                                     </DropdownMenuContent>
                                 </DropdownMenu>
+                                    </>
+                                )}
                             </nav>
                         </div>
 
                         {/* RIGHT: Financials, Tour Button & Profile */}
                         <div className="flex items-center gap-3">
-                            <div className="hidden md:flex items-center gap-2 mr-2">
-                                {/* Add Balance pill — locked geometry */}
-                                <Link
-                                    href={safeRoute('financial.add-balance')}
-                                    className="inline-flex items-center gap-1 h-8 min-w-[105px] justify-center px-3 text-xs font-medium border border-slate-200 rounded-full text-slate-700 hover:bg-slate-50 hover:border-slate-300 transition-colors duration-150"
-                                >
-                                    <Plus className="w-3.5 h-3.5 shrink-0" />
-                                    <span>Add Balance</span>
-                                </Link>
+                            {!auth?.team_member && (
+                                <div className="hidden md:flex items-center gap-2 mr-2">
+                                    {/* Add Balance pill — locked geometry */}
+                                    <Link
+                                        href={safeRoute('financial.add-balance')}
+                                        className="inline-flex items-center gap-1 h-8 min-w-[105px] justify-center px-3 text-xs font-medium border border-slate-200 rounded-full text-slate-700 hover:bg-slate-50 hover:border-slate-300 transition-colors duration-150"
+                                    >
+                                        <Plus className="w-3.5 h-3.5 shrink-0" />
+                                        <span>Add Balance</span>
+                                    </Link>
 
-                                {/* Wallet pill — locked geometry */}
-                                <Link
-                                    href={safeRoute('financial.transactions')}
-                                    className="inline-flex items-center gap-1.5 h-8 min-w-[90px] justify-center px-3 bg-slate-100 hover:bg-slate-200 rounded-full transition-colors duration-150 text-xs font-medium text-slate-900"
-                                    title="Wallet Balance"
-                                >
-                                    <Wallet className="w-3.5 h-3.5 text-slate-500 shrink-0" />
-                                    <span>{wallet ? `${Number(wallet.balance).toFixed(2)} ${wallet.currency}` : '$0.00'}</span>
-                                </Link>
+                                    {/* Wallet pill — locked geometry */}
+                                    <Link
+                                        href={safeRoute('financial.transactions')}
+                                        className="inline-flex items-center gap-1.5 h-8 min-w-[90px] justify-center px-3 bg-slate-100 hover:bg-slate-200 rounded-full transition-colors duration-150 text-xs font-medium text-slate-900"
+                                        title="Wallet Balance"
+                                    >
+                                        <Wallet className="w-3.5 h-3.5 text-slate-500 shrink-0" />
+                                        <span>{wallet ? `${Number(wallet.balance).toFixed(2)} ${wallet.currency}` : '$0.00'}</span>
+                                    </Link>
 
-                                {/* Points pill — locked geometry */}
-                                <Link
-                                    href={safeRoute('freelance.points.index')}
-                                    className="inline-flex items-center gap-1.5 h-8 min-w-[60px] justify-center px-3 bg-amber-50 hover:bg-amber-100 border border-amber-100/80 rounded-full transition-colors duration-150 text-xs font-medium text-amber-700"
-                                    title="Points/Connects Balance"
-                                >
-                                    <Coins className="w-3.5 h-3.5 text-amber-500 shrink-0" />
-                                    <span>{user?.points_balance !== undefined ? Number(user.points_balance).toLocaleString() : '0'}</span>
-                                </Link>
-                            </div>
+                                    {/* Points pill — locked geometry */}
+                                    <Link
+                                        href={safeRoute('freelance.points.index')}
+                                        className="inline-flex items-center gap-1.5 h-8 min-w-[60px] justify-center px-3 bg-amber-50 hover:bg-amber-100 border border-amber-100/80 rounded-full transition-colors duration-150 text-xs font-medium text-amber-700"
+                                        title="Points/Connects Balance"
+                                    >
+                                        <Coins className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+                                        <span>{user?.points_balance !== undefined ? Number(user.points_balance).toLocaleString() : '0'}</span>
+                                    </Link>
+                                </div>
+                            )}
 
                             {/* Notifications */}
                             <DropdownMenu>
@@ -500,57 +547,68 @@ export default function Authenticated({
                                 <DropdownMenuTrigger className="outline-none relative shrink-0">
                                     <Avatar className="h-9 w-9 border border-slate-200 cursor-pointer hover:opacity-80 transition-opacity duration-150">
                                         <AvatarFallback className="bg-slate-900 text-white font-medium text-xs">
-                                            {user?.name?.substring(0, 2).toUpperCase() || 'US'}
+                                            {displayName.substring(0, 2).toUpperCase() || 'US'}
                                         </AvatarFallback>
                                     </Avatar>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end" className="w-56 p-2 rounded-xl shadow-xl border border-slate-200 bg-white isolate z-50">
                                     <div className="px-2 py-2 mb-2 border-b border-slate-50">
-                                        <p className="text-sm font-medium text-slate-900 truncate">{user?.name || 'SaaS User'}</p>
-                                        <p className="text-xs text-slate-500 truncate">{user?.email || 'user@example.com'}</p>
+                                        <p className="text-sm font-medium text-slate-900 truncate">{displayName}</p>
+                                        <p className="text-xs text-slate-500 truncate">{displayEmail}</p>
                                     </div>
                                     
-                                    <DropdownMenuGroup>
+                                    {!auth?.team_member ? (
+                                        <>
+                                            <DropdownMenuGroup>
+                                                <DropdownMenuItem 
+                                                    className="cursor-pointer rounded-lg text-sm"
+                                                    render={<Link href={safeRoute('profile.edit')} className="flex items-center w-full" />}
+                                                >
+                                                    <User className="mr-2 h-4 w-4 text-slate-400" /> My Profile
+                                                </DropdownMenuItem>
+                                                <DropdownMenuItem 
+                                                    className="cursor-pointer rounded-lg text-sm"
+                                                    render={<Link href={safeRoute('kyc.index')} className="flex items-center w-full" />}
+                                                >
+                                                    <Shield className="mr-2 h-4 w-4 text-slate-400" /> Identity Verification
+                                                </DropdownMenuItem>
+                                                <DropdownMenuItem 
+                                                    className="cursor-pointer rounded-lg text-sm"
+                                                    render={<Link href={safeRoute('financial.transactions')} className="flex items-center w-full" />}
+                                                >
+                                                    <History className="mr-2 h-4 w-4 text-slate-400" /> Balance History
+                                                </DropdownMenuItem>
+                                                <DropdownMenuItem 
+                                                    className="cursor-pointer rounded-lg text-sm"
+                                                    render={<Link href={safeRoute('profile.edit')} className="flex items-center w-full" />}
+                                                >
+                                                    <Shield className="mr-2 h-4 w-4 text-slate-400" /> Security Settings
+                                                </DropdownMenuItem>
+                                                <DropdownMenuItem 
+                                                    className="cursor-pointer rounded-lg text-sm"
+                                                    render={<Link href={safeRoute('profile.edit')} className="flex items-center w-full" />}
+                                                >
+                                                    <Box className="mr-2 h-4 w-4 text-slate-400" /> Subscriptions
+                                                </DropdownMenuItem>
+                                            </DropdownMenuGroup>
+                                            
+                                            <DropdownMenuSeparator className="my-1 bg-slate-100" />
+                                            
+                                            <DropdownMenuItem 
+                                                className="cursor-pointer rounded-lg text-sm text-rose-600 focus:text-rose-600 focus:bg-rose-50"
+                                                render={<Link href={safeRoute('logout')} method="post" as="button" className="flex items-center w-full font-medium" />}
+                                            >
+                                                <LogOut className="mr-2 h-4 w-4" /> Logout
+                                            </DropdownMenuItem>
+                                        </>
+                                    ) : (
                                         <DropdownMenuItem 
-                                            className="cursor-pointer rounded-lg text-sm"
-                                            render={<Link href={safeRoute('profile.edit')} className="flex items-center w-full" />}
+                                            className="cursor-pointer rounded-lg text-sm text-rose-600 focus:text-rose-600 focus:bg-rose-50"
+                                            render={<Link href={route('erp.team.logout')} method="post" as="button" className="flex items-center w-full font-medium" />}
                                         >
-                                            <User className="mr-2 h-4 w-4 text-slate-400" /> My Profile
+                                            <LogOut className="mr-2 h-4 w-4" /> Logout Team Member
                                         </DropdownMenuItem>
-                                        <DropdownMenuItem 
-                                            className="cursor-pointer rounded-lg text-sm"
-                                            render={<Link href={safeRoute('kyc.index')} className="flex items-center w-full" />}
-                                        >
-                                            <Shield className="mr-2 h-4 w-4 text-slate-400" /> Identity Verification
-                                        </DropdownMenuItem>
-                                        <DropdownMenuItem 
-                                            className="cursor-pointer rounded-lg text-sm"
-                                            render={<Link href={safeRoute('financial.transactions')} className="flex items-center w-full" />}
-                                        >
-                                            <History className="mr-2 h-4 w-4 text-slate-400" /> Balance History
-                                        </DropdownMenuItem>
-                                        <DropdownMenuItem 
-                                            className="cursor-pointer rounded-lg text-sm"
-                                            render={<Link href={safeRoute('profile.edit')} className="flex items-center w-full" />}
-                                        >
-                                            <Shield className="mr-2 h-4 w-4 text-slate-400" /> Security Settings
-                                        </DropdownMenuItem>
-                                        <DropdownMenuItem 
-                                            className="cursor-pointer rounded-lg text-sm"
-                                            render={<Link href={safeRoute('profile.edit')} className="flex items-center w-full" />}
-                                        >
-                                            <Box className="mr-2 h-4 w-4 text-slate-400" /> Subscriptions
-                                        </DropdownMenuItem>
-                                    </DropdownMenuGroup>
-                                    
-                                    <DropdownMenuSeparator className="my-1 bg-slate-100" />
-                                    
-                                    <DropdownMenuItem 
-                                        className="cursor-pointer rounded-lg text-sm text-rose-600 focus:text-rose-600 focus:bg-rose-50"
-                                        render={<Link href={safeRoute('logout')} method="post" as="button" className="flex items-center w-full font-medium" />}
-                                    >
-                                        <LogOut className="mr-2 h-4 w-4" /> Logout
-                                    </DropdownMenuItem>
+                                    )}
                                 </DropdownMenuContent>
                             </DropdownMenu>
                         </div>
@@ -561,7 +619,7 @@ export default function Authenticated({
             {/* Optional Header for context */}
             {header && (
                 <div className="bg-white border-b border-slate-200 py-4 px-4 sm:px-6 lg:px-8">
-                    <div className="max-w-[1600px] mx-auto">
+                    <div className="max-w-full mx-auto">
                         <h1 className="text-xl font-semibold tracking-tight text-slate-900">{header}</h1>
                     </div>
                 </div>

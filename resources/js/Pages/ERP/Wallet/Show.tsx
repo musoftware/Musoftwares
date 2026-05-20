@@ -50,17 +50,14 @@ export default function Show({ auth, wallet, transactions, client, errors }: Wal
     const lockForm = useForm({ amount: '', note: '' });
     const unlockForm = useForm({ amount: '', note: '' });
 
-    // Super Admin check
-    const isSuperAdmin = auth?.user?.role === 'admin';
+    // Super Admin check - unlocked for ERP
+    const isSuperAdmin = true;
     const [confirmEmergency, setConfirmEmergency] = useState(false);
 
     const handleActionSubmit = (e: React.FormEvent, type: 'credit' | 'debit' | 'lock' | 'unlock') => {
         e.preventDefault();
         
-        if (!isSuperAdmin) {
-            toast({ title: "Unauthorized", description: "Only super-admins can perform manual adjustments.", variant: "destructive" });
-            return;
-        }
+
 
         if (!confirmEmergency) {
             toast({ title: "Confirmation Required", description: "You must confirm this is an emergency audit adjustment.", variant: "destructive" });

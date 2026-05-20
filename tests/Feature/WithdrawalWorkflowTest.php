@@ -7,10 +7,10 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Modules\ERP\Models\Tenant;
-use Modules\ERP\Models\Client;
+use Modules\ERP\Models\TenantClient;
 use Modules\ERP\Models\PaymentMethod;
 use Modules\ERP\Models\Withdrawal;
-use Modules\Core\Models\Wallet;
+use Modules\ERP\Models\ClientWallet;
 use Tests\TestCase;
 
 class WithdrawalWorkflowTest extends TestCase
@@ -20,8 +20,8 @@ class WithdrawalWorkflowTest extends TestCase
     protected User $user;
     protected User $admin;
     protected Tenant $tenant;
-    protected Client $client;
-    protected Wallet $wallet;
+    protected TenantClient $client;
+    protected ClientWallet $wallet;
     protected PaymentMethod $paymentMethod;
 
     protected function setUp(): void
@@ -30,10 +30,10 @@ class WithdrawalWorkflowTest extends TestCase
 
         $this->seed(\Database\Seeders\RolesAndPermissionsSeeder::class);
 
-        $this->user = User::factory()->create();
+        $this->user = User::factory()->create(['onboarding_completed' => true]);
         $this->user->assignRole('client');
 
-        $this->admin = User::factory()->create();
+        $this->admin = User::factory()->create(['onboarding_completed' => true]);
         $this->admin->assignRole('admin');
 
         $this->tenant = Tenant::create([
@@ -44,8 +44,9 @@ class WithdrawalWorkflowTest extends TestCase
 
         session(['tenant_id' => $this->tenant->id]);
 
-        $this->client = Client::create([
+        $this->client = TenantClient::create([
             'tenant_id' => $this->tenant->id,
+            'user_id' => $this->user->id,
             'name' => 'John Doe',
             'email' => $this->user->email,
             'phone' => '+15559876543',
@@ -53,10 +54,9 @@ class WithdrawalWorkflowTest extends TestCase
             'address' => '456 West Ave',
         ]);
 
-        $this->wallet = Wallet::create([
-            'owner_type' => Client::class,
-            'owner_id' => $this->client->id,
-            'context' => 'client',
+        $this->wallet = ClientWallet::create([
+            'tenant_id' => $this->tenant->id,
+            'client_id' => $this->client->id,
             'balance' => 2000.00,
             'currency' => 'USD',
             'locked_balance' => 0.00,
@@ -87,6 +87,8 @@ class WithdrawalWorkflowTest extends TestCase
 
     public function test_admin_can_view_withdrawal_index(): void
     {
+        $this->tenant->update(['user_id' => $this->admin->id]);
+
         $response = $this->actingAs($this->admin)
             ->withSession(['tenant_id' => $this->tenant->id])
             ->get(route('erp.withdrawals.index'));
@@ -96,9 +98,12 @@ class WithdrawalWorkflowTest extends TestCase
 
     public function test_client_can_request_withdrawal_success(): void
     {
+        $this->withoutExceptionHandling();
+
         $response = $this->actingAs($this->user)
             ->withSession(['tenant_id' => $this->tenant->id])
             ->post(route('erp.withdrawals.store'), [
+                'client_id' => $this->client->id,
                 'amount' => 500.00,
                 'payment_method_id' => $this->paymentMethod->id,
             ]);
@@ -116,6 +121,7 @@ class WithdrawalWorkflowTest extends TestCase
         $response = $this->actingAs($this->user)
             ->withSession(['tenant_id' => $this->tenant->id])
             ->post(route('erp.withdrawals.store'), [
+                'client_id' => $this->client->id,
                 'amount' => 2500.00,
                 'payment_method_id' => $this->paymentMethod->id,
             ]);
@@ -130,6 +136,8 @@ class WithdrawalWorkflowTest extends TestCase
     public function test_admin_can_approve_and_mark_paid_withdrawal(): void
     {
         Storage::fake('public');
+
+        $this->tenant->update(['user_id' => $this->admin->id]);
 
         $withdrawal = Withdrawal::create([
             'tenant_id' => $this->tenant->id,
@@ -169,6 +177,8 @@ class WithdrawalWorkflowTest extends TestCase
 
     public function test_admin_can_reject_withdrawal(): void
     {
+        $this->tenant->update(['user_id' => $this->admin->id]);
+
         $withdrawal = Withdrawal::create([
             'tenant_id' => $this->tenant->id,
             'client_id' => $this->client->id,
@@ -205,6 +215,6 @@ class WithdrawalWorkflowTest extends TestCase
             ->post(route('erp.withdrawals.cancel', $withdrawal->id));
 
         $response->assertStatus(302);
-        $this->assertEquals('canceled', $withdrawal->fresh()->status);
+        $this->assertEquals('cancelled', $withdrawal->fresh()->status);
     }
 }

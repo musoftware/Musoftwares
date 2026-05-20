@@ -68,9 +68,10 @@ export default function FreelanceDashboard({ stats: initialStats, activeProposal
     ];
 
     const menuItems = [
-        { id: 'dashboard', label: 'Dashboard', icon: Briefcase, href: '/freelance', isActive: true },
-        { id: 'jobs', label: 'Find Work', icon: Search, href: '/freelance/jobs/browse', isActive: false },
-        { id: 'contracts', label: 'My Contracts', icon: Clock, href: '/freelance/contracts', isActive: false },
+        { id: 'dashboard',  label: 'Dashboard',    icon: Briefcase, href: '/freelance',              isActive: true  },
+        { id: 'jobs',       label: 'Find Work',     icon: Search,    href: '/freelance/jobs/browse',  isActive: false },
+        { id: 'proposals',  label: 'My Proposals',  icon: Clock,     href: '/freelance/proposals',    isActive: false },
+        { id: 'contracts',  label: 'My Contracts',  icon: Clock,     href: '/freelance/contracts',    isActive: false },
     ];
 
     return (

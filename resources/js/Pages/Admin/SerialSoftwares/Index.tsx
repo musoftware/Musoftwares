@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Head, router } from '@inertiajs/react';
+import { Head, router, usePage } from '@inertiajs/react';
 import AdminLayout from '@/Layouts/AdminLayout';
 import { Badge } from '@/Components/ui/badge';
 import { Button } from '@/Components/ui/button';
@@ -25,6 +25,7 @@ interface Props {
 }
 
 export default function SerialSoftwaresIndex({ softwares, filters }: Props) {
+    const { auth } = usePage().props as any;
     const [form, setForm] = useState({ name: '', default_status: 'active' });
 
     const store = (e: React.FormEvent) => {
@@ -42,7 +43,7 @@ export default function SerialSoftwaresIndex({ softwares, filters }: Props) {
     };
 
     return (
-        <AdminLayout>
+        <AdminLayout user={auth.user}>
             <Head title="Serial Softwares" />
             <div className="min-h-screen bg-zinc-950 p-6 space-y-6">
                 <div>
@@ -67,7 +68,7 @@ export default function SerialSoftwaresIndex({ softwares, filters }: Props) {
                             </div>
                             <div className="w-40">
                                 <Label className="text-zinc-400 text-xs mb-1 block">Default Status</Label>
-                                <Select value={form.default_status} onValueChange={v => setForm(f => ({ ...f, default_status: v }))}>
+                                <Select value={form.default_status} onValueChange={v => setForm(f => ({ ...f, default_status: v || 'active' }))}>
                                     <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white">
                                         <SelectValue />
                                     </SelectTrigger>
@@ -116,7 +117,7 @@ export default function SerialSoftwaresIndex({ softwares, filters }: Props) {
                                             <td className="px-4 py-3 text-center text-emerald-400">{sw.active_count}</td>
                                             <td className="px-4 py-3 text-center text-zinc-500">{sw.inactive_count}</td>
                                             <td className="px-4 py-3">
-                                                <Select value={sw.default_status} onValueChange={v => updateStatus(sw, v)}>
+                                                <Select value={sw.default_status} onValueChange={v => updateStatus(sw, v || 'active')}>
                                                     <SelectTrigger className="w-28 h-7 text-xs bg-zinc-800 border-zinc-700 text-white">
                                                         <SelectValue />
                                                     </SelectTrigger>

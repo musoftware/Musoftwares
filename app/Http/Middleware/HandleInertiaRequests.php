@@ -29,13 +29,18 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
+        $user = $request->user();
+        if (auth('erp_team')->check()) {
+            $user = auth('erp_team')->user()?->tenant?->user;
+        }
+
         return [
             ...parent::share($request),
             'auth' => [
-                'user' => $request->user(),
+                'user' => $user,
+                'team_member' => \Illuminate\Support\Facades\Auth::guard('erp_team')->user(),
                 'is_impersonating' => session()->has('impersonator_id'),
-                'active_modules' => function () use ($request) {
-                    $user = $request->user();
+                'active_modules' => function () use ($user) {
                     if (!$user) return [];
                     try {
                         $service = app(\App\Services\SubscriptionService::class);
@@ -49,18 +54,18 @@ class HandleInertiaRequests extends Middleware
                     }
                 }
             ],
-            'notifications' => function () use ($request) {
-                if ($request->user()) {
+            'notifications' => function () use ($user) {
+                if ($user) {
                     return [
-                        'unread_count' => $request->user()->unreadNotifications()->count(),
-                        'recent' => $request->user()->unreadNotifications()->take(5)->get(),
+                        'unread_count' => $user->unreadNotifications()->count(),
+                        'recent' => $user->unreadNotifications()->take(5)->get(),
                     ];
                 }
                 return null;
             },
-            'wallet' => function () use ($request) {
-                if ($request->user() && \Illuminate\Support\Facades\Schema::hasTable('wallets')) {
-                    $wallet = $request->user()->getWallet();
+            'wallet' => function () use ($user) {
+                if ($user && \Illuminate\Support\Facades\Schema::hasTable('wallets')) {
+                    $wallet = $user->getWallet();
                     return [
                         'id' => $wallet->id,
                         'balance' => $wallet->balance,

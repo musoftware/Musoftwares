@@ -12,7 +12,7 @@ class Invoice extends TenantModel
 {
     use Searchable;
     protected $fillable = [
-        'tenant_id', 'invoice_number', 'client_id', 'status',
+        'tenant_id', 'invoice_number', 'client_id', 'project_id', 'status',
         'amount', 'amount_currency', 'business_amount', 'business_currency',
         'exchange_rate', 'exchange_rate_date', 'discount_amount', 'tax_rate', 'tax_amount',
         'paid_amount', 'due_date', 'issued_at', 'paid_at', 'notes', 'created_by'
@@ -42,6 +42,11 @@ class Invoice extends TenantModel
     public function client(): BelongsTo
     {
         return $this->belongsTo(TenantClient::class, 'client_id');
+    }
+
+    public function project(): BelongsTo
+    {
+        return $this->belongsTo(Project::class);
     }
 
     public function creator(): BelongsTo
@@ -172,7 +177,7 @@ class Invoice extends TenantModel
             return ['ok' => false, 'message' => 'Insufficient client wallet balance. Required: ' . $amountDue . ', Available: ' . $wallet->balance];
         }
 
-        return DB::transaction(function () use ($wallet, $amountDue) {
+        return DB::transaction(function () use ($wallet, $amountDue, $client) {
             // Lock the wallet row for update
             $wallet = ClientWallet::where('id', $wallet->id)->lockForUpdate()->first();
 

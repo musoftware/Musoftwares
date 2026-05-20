@@ -1,6 +1,0 @@
-[12:44:19] INFO  ╔══════════════════════════════════════════╗
-[12:44:19] INFO  ║  Musoftware Node.js Agent  v1.0.0          ║
-[12:44:19] INFO  ║  Listening → http://127.0.0.1:18400         ║
-[12:44:19] INFO  ╚══════════════════════════════════════════╝
-[12:44:19] WARN  No auth token — agent waiting for setup. Open musoftwares.com to connect.
-[12:44:19] INFO  Agent ready — http://127.0.0.1:18400

@@ -19,7 +19,7 @@ function FieldError({ message }) {
     );
 }
 
-export default function CreateEdit({ invoice, clients, currencies, business_currency }) {
+export default function CreateEdit({ invoice, clients, projects = [], currencies, business_currency }) {
     const isEdit = !!invoice;
     const [showCosts, setShowCosts] = useState(false);
     const [clientError, setClientError] = useState('');
@@ -28,6 +28,7 @@ export default function CreateEdit({ invoice, clients, currencies, business_curr
 
     const { data, setData, post, put, processing, errors } = useForm({
         client_id: invoice?.client_id || '',
+        project_id: invoice?.project_id || '',
         invoice_number: invoice?.invoice_number || `INV-${Date.now()}`,
         issued_at: invoice?.issued_at?.split('T')[0] || new Date().toISOString().split('T')[0],
         due_date: invoice?.due_date?.split('T')[0] || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
@@ -49,8 +50,21 @@ export default function CreateEdit({ invoice, clients, currencies, business_curr
             if (client && client.currency && !isEdit) {
                 setData('amount_currency', client.currency);
             }
+
+            if (data.project_id) {
+                const project = projects.find(p => String(p.id) === String(data.project_id));
+                if (project && String(project.client_id) !== String(data.client_id)) {
+                    setData('project_id', '');
+                }
+            }
+        } else {
+            setData('project_id', '');
         }
     }, [data.client_id]);
+
+    const filteredProjects = data.client_id
+        ? projects.filter(p => String(p.client_id) === String(data.client_id))
+        : [];
 
     const addItem = (type = 'simple') => {
         setData('items', [
@@ -224,6 +238,27 @@ export default function CreateEdit({ invoice, clients, currencies, business_curr
                                 </select>
                                 <FieldError message={clientError || errors.client_id} />
                             </div>
+
+                            {data.client_id && filteredProjects.length > 0 && (
+                                <div className="space-y-1.5">
+                                    <Label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                                        Associated Project (Optional)
+                                    </Label>
+                                    <select
+                                        className="flex h-11 w-full rounded-lg border border-slate-200 bg-slate-50/50 px-3 py-2 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:bg-white transition-colors"
+                                        value={data.project_id}
+                                        onChange={(e) => setData('project_id', e.target.value)}
+                                    >
+                                        <option value="">None (Independent Invoice)</option>
+                                        {filteredProjects.map((p) => (
+                                            <option key={p.id} value={p.id}>
+                                                {p.name}
+                                            </option>
+                                        ))}
+                                    </select>
+                                    <FieldError message={errors.project_id} />
+                                </div>
+                            )}
 
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                                 <div className="space-y-1.5">

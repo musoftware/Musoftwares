@@ -1,8 +1,0 @@
-{
-  "name": "wa-ai-agent",
-  "version": "1.0.0",
-  "main": "worker.js",
-  "dependencies": {
-    "openai": "^4.0.0"
-  }
-}

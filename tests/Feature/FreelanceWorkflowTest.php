@@ -26,10 +26,10 @@ class FreelanceWorkflowTest extends TestCase
 
         $this->seed(\Database\Seeders\RolesAndPermissionsSeeder::class);
 
-        $this->clientUser = User::factory()->create();
+        $this->clientUser = User::factory()->create(['onboarding_completed' => true]);
         $this->clientUser->assignRole('client');
 
-        $this->freelancerUser = User::factory()->create();
+        $this->freelancerUser = User::factory()->create(['onboarding_completed' => true]);
         $this->freelancerUser->assignRole('client');
 
         $this->skill = Skill::create([
