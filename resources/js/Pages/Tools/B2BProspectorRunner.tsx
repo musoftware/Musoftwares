@@ -63,7 +63,7 @@ function useRuntimeWS(pluginSlug: string, onBroadcast?: ((event: string, data: a
     return { connected, callRPC };
 }
 
-export default function LeadIntelligenceRunner({ tool, subscription, runtimePort, pluginSlug }: any) {
+export default function B2BProspectorRunner({ tool, subscription, runtimePort, pluginSlug }: any) {
     const [activeTab, setActiveTab] = useState<'campaigns' | 'leads' | 'inboxes' | 'outreach' | 'linked-profiles'>('campaigns');
 
     // State Variables
@@ -201,7 +201,7 @@ export default function LeadIntelligenceRunner({ tool, subscription, runtimePort
         setRealtimeLogs(prev => [{ id: Math.random().toString(), message, time: new Date().toLocaleTimeString() }, ...prev].slice(0, 50));
     };
 
-    const { connected: agentConnected, callRPC } = useRuntimeWS('lead-intelligence', onBroadcast);
+    const { connected: agentConnected, callRPC } = useRuntimeWS('b2b-prospector', onBroadcast);
 
     // Initial Fetching
     useEffect(() => {
@@ -528,7 +528,7 @@ export default function LeadIntelligenceRunner({ tool, subscription, runtimePort
                         <div className="w-6.5 h-6.5 bg-gradient-to-tr from-teal-500 to-indigo-600 rounded-lg flex items-center justify-center shadow-md shadow-teal-500/20">
                             <Layers className="w-3.5 h-3.5 text-white" />
                         </div>
-                        <span className="font-bold text-sm tracking-tight bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">Lead Intelligence</span>
+                        <span className="font-bold text-sm tracking-tight bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">B2B Prospector</span>
                     </div>
                     
                     <div className="h-5 w-px bg-slate-200" />

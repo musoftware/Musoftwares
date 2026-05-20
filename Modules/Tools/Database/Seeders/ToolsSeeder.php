@@ -57,15 +57,15 @@ class ToolsSeeder extends Seeder
                 'version' => '3.0.0'],
             [
                 'tool' => [
-                    'title'             => 'Lead Intelligence Engine',
-                    'slug'              => 'lead-intelligence',
+                    'title'             => 'B2B Prospector',
+                    'slug'              => 'b2b-prospector',
                     'short_description' => 'Enterprise-grade lead discovery, enrichment, and cold email outreach built directly into your local runtime.',
-                    'description'       => "The Lead Intelligence Engine is a complete B2B prospecting ecosystem designed to rival Apollo.io and Instantly.ai, but running 100% locally to ensure data privacy and maximum deliverability.\n\n- Find verified decision-maker emails across LinkedIn and millions of websites\n- AI Lead Enrichment using local pipelines\n- Built-in multi-source scraper (LinkedIn, Google Maps, Web)\n- Unlimited local email verification (SMTP/MX checks without cloud costs)\n- AI-generated cold outreach sequences\n- Connect unlimited IMAP/SMTP inboxes with local IP sending",
+                    'description'       => "The B2B Prospector is a complete B2B prospecting ecosystem designed to rival Apollo.io and Instantly.ai, but running 100% locally to ensure data privacy and maximum deliverability.\n\n- Find verified decision-maker emails across LinkedIn and millions of websites\n- AI Lead Enrichment using local pipelines\n- Built-in multi-source scraper (LinkedIn, Google Maps, Web)\n- Unlimited local email verification (SMTP/MX checks without cloud costs)\n- AI-generated cold outreach sequences\n- Connect unlimited IMAP/SMTP inboxes with local IP sending",
                     'category'          => 'intelligence',
                     'supported_os'      => ['windows', 'mac', 'linux'],
                     'is_featured'       => true,
                     'is_active'         => true,
-                    'runner_component'  => 'lead-intelligence',
+                    'runner_component'  => 'b2b-prospector',
                     'features'          => [
                         'Multi-source scraping (LinkedIn/Maps/Web)',
                         'Unlimited local email verification',

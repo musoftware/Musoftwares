@@ -109,9 +109,17 @@ class FreelanceJobController extends Controller
         return redirect()->route('freelance.my-jobs')->with('success', 'Job posted successfully.');
     }
 
-    public function create()
+    public function create(Request $request)
     {
-        return Inertia::render('Freelance/Jobs/Create');
+        $user = $request->user();
+        $preferredCurrency = $user->preferred_currency ?: 'USD';
+        
+        $financeService = app(\App\Services\FinanceService::class);
+        $egpToPreferredRate = $financeService->getExchangeRate('EGP', $preferredCurrency);
+
+        return Inertia::render('Freelance/Jobs/Create', [
+            'egpToPreferredRate' => $egpToPreferredRate,
+        ]);
     }
 
     public function show(Job $job)

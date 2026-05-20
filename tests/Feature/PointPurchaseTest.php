@@ -36,11 +36,21 @@ class PointPurchaseTest extends TestCase
             'currency' => 'USD',
         ]);
 
+        // Seed EGP to USD exchange rate (1 EGP = 0.02 USD)
+        \Modules\Core\Models\ExchangeRate::create([
+            'from_currency' => 'EGP',
+            'to_currency' => 'USD',
+            'rate' => 0.02,
+            'effective_date' => '2020-01-01',
+            'source' => 'manual',
+        ]);
+
+        // Points package: Starter Pack (100 points, 100 EGP price)
         $this->package = PointPackage::create([
             'name' => 'Starter Pack',
             'points' => 100,
-            'price' => 10.00,
-            'currency_code' => 'USD',
+            'price' => 100.00,
+            'currency_code' => 'EGP',
         ]);
     }
 
@@ -55,8 +65,8 @@ class PointPurchaseTest extends TestCase
         $response->assertStatus(302);
         $response->assertSessionHas('success');
 
-        // Check wallet balance deducted
-        $this->assertEquals(90.00, $this->wallet->fresh()->balance);
+        // Check wallet balance deducted: 100.00 - (100.00 EGP * 0.02) = 98.00 USD
+        $this->assertEquals(98.00, $this->wallet->fresh()->balance);
 
         // Check Point Transaction created
         $this->assertDatabaseHas('point_transactions', [
@@ -73,12 +83,12 @@ class PointPurchaseTest extends TestCase
     {
         $this->actingAs($this->user);
 
-        // Set wallet balance below package price
-        $this->wallet->update(['balance' => 5.00]);
+        // Set wallet balance below package price ($2.00 USD cost)
+        $this->wallet->update(['balance' => 1.50]);
 
         $response = $this->post(route('freelance.point-purchases.store'), [
             'package_id' => $this->package->id,
-        ]);
+        ], ['X-Inertia' => 'true']);
 
         // It should perform an Inertia external redirect
         $response->assertStatus(409); // Conflict status code for Inertia::location
@@ -88,7 +98,7 @@ class PointPurchaseTest extends TestCase
         $this->assertStringContainsString('payments.kashier.io', $location);
 
         // Wallet balance must not change
-        $this->assertEquals(5.00, $this->wallet->fresh()->balance);
+        $this->assertEquals(1.50, $this->wallet->fresh()->balance);
     }
 
     public function test_purchase_custom_points_via_wallet_success(): void
@@ -96,14 +106,14 @@ class PointPurchaseTest extends TestCase
         $this->actingAs($this->user);
 
         $response = $this->post(route('freelance.point-purchases.store-wallet'), [
-            'points' => 50, // Cost should be 50 * 0.10 = $5.00
+            'points' => 50, // Cost should be 50 EGP * 0.02 = $1.00 USD
         ]);
 
         $response->assertStatus(302);
         $response->assertSessionHas('success');
 
-        // Check wallet balance deducted
-        $this->assertEquals(95.00, $this->wallet->fresh()->balance);
+        // Check wallet balance deducted: 100.00 - 1.00 = 99.00 USD
+        $this->assertEquals(99.00, $this->wallet->fresh()->balance);
 
         // Check Point Transaction created
         $this->assertDatabaseHas('point_transactions', [
@@ -120,12 +130,12 @@ class PointPurchaseTest extends TestCase
     {
         $this->actingAs($this->user);
 
-        // Set wallet balance below cost
-        $this->wallet->update(['balance' => 2.00]);
+        // Set wallet balance below cost ($1.00 USD)
+        $this->wallet->update(['balance' => 0.50]);
 
         $response = $this->post(route('freelance.point-purchases.store-wallet'), [
-            'points' => 50, // Cost is $5.00
-        ]);
+            'points' => 50, // Cost is $1.00 USD
+        ], ['X-Inertia' => 'true']);
 
         $response->assertStatus(409);
         $response->assertHeader('X-Inertia-Location');
@@ -134,6 +144,6 @@ class PointPurchaseTest extends TestCase
         $this->assertStringContainsString('payments.kashier.io', $location);
 
         // Wallet balance must not change
-        $this->assertEquals(2.00, $this->wallet->fresh()->balance);
+        $this->assertEquals(0.50, $this->wallet->fresh()->balance);
     }
 }

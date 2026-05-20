@@ -25,23 +25,27 @@ class PointPurchaseController extends Controller
         $user = $request->user();
         $wallet = $user->getWallet();
 
-        // IF wallet balance >= package price: deduct balance
-        if ($wallet->balance >= $package->price) {
-            DB::transaction(function () use ($user, $wallet, $package) {
+        // Convert the package price from EGP to the user's wallet currency
+        $financeService = app(\App\Services\FinanceService::class);
+        $cost = $financeService->convertAmount((float) $package->price, $package->currency_code ?? 'EGP', $wallet->currency ?? 'USD');
+
+        // IF wallet balance >= cost: deduct balance
+        if ($wallet->balance >= $cost) {
+            DB::transaction(function () use ($user, $wallet, $package, $cost) {
                 $balanceBefore = $wallet->balance;
-                $wallet->balance -= $package->price;
+                $wallet->balance -= $cost;
                 $wallet->save();
 
                 WalletTransaction::create([
                     'wallet_id' => $wallet->id,
                     'type' => 'debit',
-                    'amount' => $package->price,
+                    'amount' => $cost,
                     'balance_before' => $balanceBefore,
                     'balance_after' => $wallet->balance,
                     'reference_type' => 'point_package_purchase',
                     'reference_id' => $package->id,
                     'description' => "Purchased {$package->name} package using wallet balance",
-                    'business_amount' => $package->price,
+                    'business_amount' => $cost,
                     'business_currency' => $wallet->currency ?? 'USD',
                 ]);
 
@@ -56,16 +60,15 @@ class PointPurchaseController extends Controller
             return back()->with('success', "Successfully purchased {$package->points} points from your wallet.");
         }
 
-        // ELSE: redirect to Kashier checkout
-        $currency = $package->currency_code === '$' ? 'USD' : ($package->currency_code ?: 'USD');
+        // ELSE: redirect to Kashier checkout using the converted cost and wallet currency
         $paymentUrl = KashierHelper::buildPointPurchasePaymentUrl(
-            (float) $package->price,
+            (float) $cost,
             $user->id,
             $user->name,
             $user->email,
             $package->id,
             $package->points,
-            $currency
+            $wallet->currency ?? 'USD'
         );
 
         return Inertia::location($paymentUrl);
@@ -78,15 +81,16 @@ class PointPurchaseController extends Controller
         ]);
 
         $points = (int) $validated['points'];
-        $cost = round($points * 0.10, 2); // $0.10 per point
-
+        
         $user = $request->user();
         $wallet = $user->getWallet();
 
+        // Calculate the EGP base cost (1 Point = 1 EGP) converted to the user's wallet currency
+        $financeService = app(\App\Services\FinanceService::class);
+        $cost = $financeService->convertAmount((float) $points, 'EGP', $wallet->currency ?? 'USD');
+
         if ($wallet->balance < $cost) {
-            // Also redirect to Kashier if insufficient balance?
-            // The prompt says "IF wallet balance >= package price ... ELSE ... redirect to Kashier".
-            // Let's implement it for custom points too.
+            // Redirect to Kashier if insufficient balance
             $paymentUrl = KashierHelper::buildPointPurchasePaymentUrl(
                 (float) $cost,
                 $user->id,
@@ -94,7 +98,7 @@ class PointPurchaseController extends Controller
                 $user->email,
                 null,
                 $points,
-                'USD'
+                $wallet->currency ?? 'USD'
             );
             return Inertia::location($paymentUrl);
         }

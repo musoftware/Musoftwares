@@ -6,7 +6,7 @@ import { useFreelanceMode } from '@/Components/Freelance/FreelanceModeContext';
 import { cn } from '@/lib/utils';
 import { Zap } from 'lucide-react';
 
-export default function CreateJob({ auth }) {
+export default function CreateJob({ auth, egpToPreferredRate = 0.10 }) {
     const freelanceModeContext = useFreelanceMode();
 
     useEffect(() => {
@@ -57,11 +57,12 @@ export default function CreateJob({ auth }) {
 
     const handleBuyPointsToPublish = () => {
         const neededPoints = pointsCost - currentPoints;
-        const cost = neededPoints * 0.10;
+        const cost = neededPoints * egpToPreferredRate;
         
+        const preferredCurrency = auth?.user?.preferred_currency || 'USD';
         const costFormatted = new Intl.NumberFormat('en-US', {
             style: 'currency',
-            currency: 'USD'
+            currency: preferredCurrency
         }).format(cost);
 
         const msg = `You need ${neededPoints} more points to publish this job. Charge ${neededPoints} points for ${costFormatted}?`;

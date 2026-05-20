@@ -17,8 +17,27 @@ Route::middleware(['auth', 'verified', 'onboarding', 'subscription:freelance'])-
     // Points
     Route::get('/points', function(Request $request) {
         $packages = \Modules\Freelance\Models\PointPackage::all();
-        $transactions = \Modules\Freelance\Models\PointTransaction::where('user_id', $request->user()->id)->latest()->paginate(10);
-        return Inertia::render('Freelance/Points/Index', ['packages' => $packages, 'transactions' => $transactions]);
+        
+        $user = $request->user();
+        $preferredCurrency = $user->preferred_currency ?: 'USD';
+        
+        $financeService = app(\App\Services\FinanceService::class);
+        $egpToPreferredRate = $financeService->getExchangeRate('EGP', $preferredCurrency);
+
+        // Pre-convert package prices to user's preferred currency
+        $packages = $packages->map(function ($pkg) use ($financeService, $preferredCurrency) {
+            $pkg->price = $financeService->convertAmount((float) $pkg->price, $pkg->currency_code ?: 'EGP', $preferredCurrency);
+            $pkg->currency_code = $preferredCurrency;
+            return $pkg;
+        });
+
+        $transactions = \Modules\Freelance\Models\PointTransaction::where('user_id', $user->id)->latest()->paginate(10);
+        
+        return Inertia::render('Freelance/Points/Index', [
+            'packages' => $packages, 
+            'transactions' => $transactions,
+            'egpToPreferredRate' => $egpToPreferredRate,
+        ]);
     })->name('points.index');
     Route::resource('point-packages', \Modules\Freelance\Http\Controllers\PointPackageController::class)->except(['create', 'show', 'edit']);
     Route::post('/point-purchases', [\Modules\Freelance\Http\Controllers\PointPurchaseController::class, 'store'])->name('point-purchases.store');

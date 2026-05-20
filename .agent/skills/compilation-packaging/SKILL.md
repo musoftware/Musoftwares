@@ -132,6 +132,8 @@ begin
 end;
 ```
 
+3. **Installer Distribution Constraint**: The distributed executable in the platform's public download folder (e.g., `musoftware-runtime-win.exe` at `/downloads/runtime/windows/`) **MUST ALWAYS** be the compiled Inno Setup installer bundle, never the raw standalone runtime executable. The build/publish script must compile the raw EXE, and then invoke Inno Setup Compiler (`ISCC.exe`) to package the raw EXE, Node bindings, and default configuration templates into the final distributed setup executable.
+
 ---
 
 ## 3. Strict SemVer Versioning & Updates
@@ -217,3 +219,4 @@ sequenceDiagram
 - [ ] Does the uninstaller clean up dynamic databases, logs, and downloaded plugins on full purge?
 - [ ] Are dynamic DLL files loaded relative to the plugin folder (`__dirname`) and matched strictly to host architecture?
 - [ ] Are dynamic libraries called inside try-catch bounds or safe Node-API wrappers to prevent crashing the runtime?
+- [ ] Is the deployed Windows asset in the platform's downloads folder the full Inno Setup installer package instead of the raw standalone EXE?

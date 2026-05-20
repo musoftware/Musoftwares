@@ -5,13 +5,13 @@ import { formatMoney, formatNumber, formatDate } from '../../../lib/utils';
 import { CreditCard, Wallet, ArrowRight, CheckCircle2, History, AlertCircle, Zap, TrendingUp, RefreshCcw } from 'lucide-react';
 import { CurrencyDisplay as FinancialAmount } from '@/Components/ui/CurrencyDisplay';
 
-export default function PointsIndex({ auth, packages, transactions }) {
+export default function PointsIndex({ auth, packages, transactions, egpToPreferredRate = 0.10 }) {
     const { wallet, flash } = usePage().props;
     const wallet_balance = wallet ? Number(wallet.balance) : 0;
     const { processing } = useForm();
     const [customPoints, setCustomPoints] = useState('');
     const [activeTab, setActiveTab] = useState('packages'); // packages, custom
-    const globalCurrency = auth?.user?.preferred_currency || 'USD';
+    const globalCurrency = wallet?.currency || auth?.user?.preferred_currency || 'USD';
 
     const displayPackages = packages?.length ? packages : [
         { id: 1, name: 'Starter', points: 100, price: 9.99, currency_code: '$' },
@@ -22,8 +22,8 @@ export default function PointsIndex({ auth, packages, transactions }) {
     const handlePurchase = (pkg) => {
         const canUseWallet = wallet_balance >= pkg.price;
         const msg = canUseWallet 
-            ? `Pay ${formatMoney(pkg.price)} from your wallet balance to buy ${pkg.points} points?`
-            : `You'll be redirected to Kashier to securely pay ${formatMoney(pkg.price)}. Continue?`;
+            ? `Pay ${formatMoney(pkg.price, globalCurrency)} from your wallet balance to buy ${pkg.points} points?`
+            : `You'll be redirected to Kashier to securely pay ${formatMoney(pkg.price, globalCurrency)}. Continue?`;
             
         if (confirm(msg)) {
             router.post(route('freelance.point-purchases.store'), { package_id: pkg.id });
@@ -32,18 +32,18 @@ export default function PointsIndex({ auth, packages, transactions }) {
 
     const handleWalletPurchase = () => {
         if (!customPoints || isNaN(customPoints) || Number(customPoints) <= 0) return;
-        const cost = Number(customPoints) * 0.10;
+        const cost = Number(customPoints) * egpToPreferredRate;
         const canUseWallet = wallet_balance >= cost;
         const msg = canUseWallet 
-            ? `Pay ${formatMoney(cost)} from your wallet balance to buy ${customPoints} points?`
-            : `You'll be redirected to Kashier to securely pay ${formatMoney(cost)}. Continue?`;
+            ? `Pay ${formatMoney(cost, globalCurrency)} from your wallet balance to buy ${customPoints} points?`
+            : `You'll be redirected to Kashier to securely pay ${formatMoney(cost, globalCurrency)}. Continue?`;
 
         if (confirm(msg)) {
             router.post(route('freelance.point-purchases.store-wallet'), { points: customPoints });
         }
     };
 
-    const customCost = customPoints && !isNaN(customPoints) ? (Number(customPoints) * 0.10) : 0;
+    const customCost = customPoints && !isNaN(customPoints) ? (Number(customPoints) * egpToPreferredRate) : 0;
 
     return (
         <FreelanceLayout>
