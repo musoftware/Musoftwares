@@ -108,7 +108,7 @@ class ToolsSeeder extends Seeder
                     'category'          => 'monitoring',
                     'supported_os'      => ['windows', 'mac', 'linux'],
                     'is_featured'       => true,
-                    'is_active'         => true,
+                    'is_active'         => false,
                     'features'          => [
                         'Facebook & TikTok Ad spy',
                         'Price tracking with alerts',
@@ -287,7 +287,89 @@ class ToolsSeeder extends Seeder
                         'price_yearly'   => 0,
                         'is_popular'     => true,
                         'features'       => ['Unlimited extractions', 'Blueprint library (coming soon)']]],
-                'version' => '1.0.0']];
+                'version' => '1.0.0'],
+            [
+                'tool' => [
+                    'title'             => 'IPTV Downloader & Recorder',
+                    'slug'              => 'iptv-downloader',
+                    'short_description' => 'A professional-grade operational workspace for loading IPTV playlists, category-browsing channels, and recording live streams or downloading VOD assets locally.',
+                    'description'       => "IPTV Downloader & Recorder is a complete live stream capture and playlist management ecosystem running entirely inside your local runtime.\n\n- Load playlists via M3U URL or local file upload\n- Search and filter channels by category or group-title\n- Native, segment-by-segment HLS stream recorder\n- Preset and custom recording duration clocks\n- Live download terminal console and statistics tracking\n- 100% private data kept inside a local SQLite database",
+                    'category'          => 'Media',
+                    'supported_os'      => ['windows', 'mac', 'linux'],
+                    'is_featured'       => true,
+                    'is_active'         => true,
+                    'is_free'           => true,
+                    'runner_component'  => 'IPTVDownloaderRunner',
+                    'features'          => [
+                        'M3U/M3U8 Playlist Indexer',
+                        'Category-based Channel Browser',
+                        'Native Segment-by-segment HLS Recorder',
+                        'Direct VOD Asset Downloader',
+                        'Real-time Download Console & Speedometer',
+                        'Private SQLite Storage Layer'
+                    ],
+                    'requirements'      => [
+                        'Musoftware Runtime Agent running locally',
+                        'Internet connection'
+                    ]
+                ],
+                'plans' => [
+                    [
+                        'name'           => 'Free Live Stream Capture',
+                        'price_monthly'  => 0,
+                        'price_yearly'   => 0,
+                        'is_popular'     => true,
+                        'features'       => [
+                            'Unlimited Playlist Indexing',
+                            'Channel Browsing & Bookmarks',
+                            'Standard HLS Stream Recording',
+                            'Local Download Archive'
+                        ]
+                    ]
+                ],
+                'version' => '1.0.0'
+            ],
+            [
+                'tool' => [
+                    'title'             => 'Screenshot Feedback Workspace',
+                    'slug'              => 'screenshot-feedback',
+                    'short_description' => 'A clean, operational workspace for UI review, feedback pins, and screenshot organization.',
+                    'description'       => "Screenshot Feedback Workspace is a visual review tool that lets you drop pin-based comments directly on design screenshots.\n\n- Upload and organize screenshots by project\n- Place precise feedback pins on visual assets\n- Filter comment threads by Open, Resolved, or All\n- Sync issues in real time with local SQLite storage",
+                    'category'          => 'Productivity',
+                    'supported_os'      => ['windows', 'mac', 'linux'],
+                    'is_featured'       => true,
+                    'is_active'         => true,
+                    'is_free'           => true,
+                    'runner_component'  => 'ScreenshotFeedbackRunner',
+                    'features'          => [
+                        'Interactive Annotator Canvas',
+                        'Precision coordinate pinning',
+                        'Comment thread status filtering (Open/Resolved)',
+                        'Synced workspace timelines',
+                        'Local private SQLite storage'
+                    ],
+                    'requirements'      => [
+                        'Musoftware Runtime Agent running locally',
+                        'Internet connection'
+                    ]
+                ],
+                'plans' => [
+                    [
+                        'name'           => 'Free Reviewer',
+                        'price_monthly'  => 0,
+                        'price_yearly'   => 0,
+                        'is_popular'     => true,
+                        'features'       => [
+                            'Unlimited Pins',
+                            'Interactive Canvas popovers',
+                            'Sidebar Status filters',
+                            'Offline-first SQLite DB'
+                        ]
+                    ]
+                ],
+                'version' => '1.0.0'
+            ]
+        ];
 
         foreach ($tools as $entry) {
             $tool = Tool::firstOrCreate(
@@ -312,6 +394,8 @@ class ToolsSeeder extends Seeder
                     'version'     => $entry['version'],
                     'is_latest'   => true,
                     'is_beta'     => false,
+                    'file_path'   => "plugins/{$tool->slug}.zip",
+                    'file_name'   => "{$tool->slug}.zip",
                     'changelog'   => "Initial release of {$entry['tool']['title']}.",
                     'released_at' => now()]
             );

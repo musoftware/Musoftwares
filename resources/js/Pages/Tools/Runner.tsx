@@ -11,6 +11,8 @@ const components: Record<string, React.ElementType> = {
     'viral-autopsy':            lazy(() => import('./ViralAutopsyRunner')),
     'hook-analyzer':            lazy(() => import('./HookAnalyzerRunner')),
     'format-extractor':         lazy(() => import('./FormatExtractorRunner')),
+    'IPTVDownloaderRunner':     lazy(() => import('./IPTVDownloaderRunner')),
+    'iptv-downloader':          lazy(() => import('./IPTVDownloaderRunner')),
 };
 
 export default function Runner({ tool, subscription, runtimePort, pluginSlug }: any) {

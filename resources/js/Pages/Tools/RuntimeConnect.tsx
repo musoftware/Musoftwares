@@ -95,13 +95,13 @@ export default function RuntimeConnect({ code, port, userName, userEmail, succes
                         >
                             Browse Tools
                         </Link>
-                        <Link
-                            href={route('tools.download.agent', { type: 'windows' })}
+                        <a
+                            href={route('tools.download.agent', 'node')}
                             className="flex-1 rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-indigo-500 transition-colors flex items-center justify-center gap-2"
                         >
                             <Download className="w-4 h-4" />
                             Get Runtime
-                        </Link>
+                        </a>
                     </div>
                 </div>
             </div>

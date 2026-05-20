@@ -40,6 +40,20 @@ Route::prefix('tools')->name('api.tools.')->group(function () {
         Route::get('/agent/plugins', function (\Illuminate\Http\Request $request) {
             $agentType = $request->query('agent', 'nodejs'); // 'nodejs' or 'python'
 
+            // Helper to check if a physical plugin file exists on the server
+            $pluginFileExists = function (string $slug, $latestVersion) {
+                if (file_exists(public_path("plugins/{$slug}.msp"))) {
+                    return true;
+                }
+                if (file_exists(public_path("plugins/{$slug}.zip"))) {
+                    return true;
+                }
+                if ($latestVersion && $latestVersion->file_path && \Illuminate\Support\Facades\Storage::exists($latestVersion->file_path)) {
+                    return true;
+                }
+                return false;
+            };
+
             // ── 1. Subscription-based plugins ──────────────────────────────
             $subscriptions = \Modules\Tools\Models\ToolSubscription::where('user_id', auth()->id())
                 ->where('status', 'active')
@@ -49,9 +63,9 @@ Route::prefix('tools')->name('api.tools.')->group(function () {
 
             $paidPlugins = $subscriptions
                 ->filter(fn($s) => $s->tool && $s->tool->latestVersion)
-                ->filter(function ($s) use ($agentType) {
+                ->filter(function ($s) use ($agentType, $pluginFileExists) {
                     $runtime = $s->tool->metadata['runtime'] ?? 'nodejs';
-                    return $runtime === $agentType;
+                    return $runtime === $agentType && $pluginFileExists($s->tool->slug, $s->tool->latestVersion);
                 })
                 ->map(fn($s) => [
                     'tool_slug'      => $s->tool->slug,
@@ -74,9 +88,9 @@ Route::prefix('tools')->name('api.tools.')->group(function () {
                 ->whereNotIn('slug', $subscribedSlugs)
                 ->with('latestVersion')
                 ->get()
-                ->filter(function ($tool) use ($agentType) {
+                ->filter(function ($tool) use ($agentType, $pluginFileExists) {
                     $runtime = $tool->metadata['runtime'] ?? 'nodejs';
-                    return $runtime === $agentType && $tool->latestVersion !== null;
+                    return $runtime === $agentType && $tool->latestVersion !== null && $pluginFileExists($tool->slug, $tool->latestVersion);
                 })
                 ->map(fn($tool) => [
                     'tool_slug'      => $tool->slug,
@@ -90,22 +104,35 @@ Route::prefix('tools')->name('api.tools.')->group(function () {
                     'expires_at'     => null,
                 ]);
 
-            $plugins = $paidPlugins->merge($freePlugins)->values();
+            $plugins = collect($paidPlugins->all())->merge($freePlugins->all())->values();
 
             return response()->json(['plugins' => $plugins]);
         })->name('agent.plugins');
 
-        // Signed plugin download (called by agent syncer)
-        Route::get('/agent/plugins/{slug}/download', function (\Illuminate\Http\Request $request, string $slug) {
-            if (!$request->hasValidSignature()) {
-                abort(403, 'Invalid or expired download link.');
-            }
-            $tool    = \Modules\Tools\Models\Tool::where('slug', $slug)->firstOrFail();
-            $version = $tool->latestVersion;
-            if (!$version || !$version->file_path || !\Illuminate\Support\Facades\Storage::exists($version->file_path)) {
-                abort(404, 'Plugin file not found.');
-            }
-            return \Illuminate\Support\Facades\Storage::download($version->file_path);
-        })->name('plugin.download');
     });
+
+    // Signed plugin download (called by agent syncer)
+    Route::get('/agent/plugins/{slug}/download', function (\Illuminate\Http\Request $request, string $slug) {
+        if (!$request->hasValidSignature()) {
+            abort(403, 'Invalid or expired download link.');
+        }
+
+        // Try downloading from the public/plugins folder first if it exists (.msp custom secure plugin first)
+        $publicFilePathMsp = public_path("plugins/{$slug}.msp");
+        if (file_exists($publicFilePathMsp)) {
+            return response()->download($publicFilePathMsp, "{$slug}.msp");
+        }
+
+        $publicFilePathZip = public_path("plugins/{$slug}.zip");
+        if (file_exists($publicFilePathZip)) {
+            return response()->download($publicFilePathZip, "{$slug}.zip");
+        }
+
+        $tool    = \Modules\Tools\Models\Tool::where('slug', $slug)->firstOrFail();
+        $version = $tool->latestVersion;
+        if (!$version || !$version->file_path || !\Illuminate\Support\Facades\Storage::exists($version->file_path)) {
+            abort(404, 'Plugin file not found.');
+        }
+        return \Illuminate\Support\Facades\Storage::download($version->file_path);
+    })->name('plugin.download');
 });
