@@ -361,7 +361,8 @@ export default function Runner({ tool, subscription, runtimePort, pluginSlug }: 
         setStatus('checking');
         const host = typeof window !== 'undefined' ? (window.localStorage.getItem('musoftware_runtime_host') || '127.0.0.1') : '127.0.0.1';
         
-        if (host === '127.0.0.1') {
+        const isLocalDeveloper = typeof window !== 'undefined' && (window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost');
+        if (host === '127.0.0.1' && !isLocalDeveloper) {
             setStatus('offline');
             return;
         }
