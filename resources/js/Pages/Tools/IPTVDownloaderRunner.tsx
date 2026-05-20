@@ -123,13 +123,18 @@ export default function IPTVDownloaderRunner() {
     
     // Playlists & Parsing
     const [playlists, setPlaylists] = useState<any[]>([]);
+    const [playlistType, setPlaylistType] = useState<'m3u' | 'xtream'>('m3u');
     const [playlistName, setPlaylistName] = useState('');
     const [playlistUrl, setPlaylistUrl] = useState('');
+    const [xtreamHost, setXtreamHost] = useState('');
+    const [xtreamUser, setXtreamUser] = useState('');
+    const [xtreamPass, setXtreamPass] = useState('');
     const [isParsing, setIsParsing] = useState(false);
     const [parseError, setParseError] = useState('');
 
     // Browser State
     const [selectedPlaylistId, setSelectedPlaylistId] = useState<string>('');
+    const [streamType, setStreamType] = useState<'live' | 'vod' | 'series'>('live');
     const [groups, setGroups] = useState<any[]>([]);
     const [selectedGroup, setSelectedGroup] = useState<string>('');
     const [searchQuery, setSearchQuery] = useState('');
@@ -235,7 +240,7 @@ export default function IPTVDownloaderRunner() {
             setCurrentPage(1);
             fetchChannels(1);
         }
-    }, [selectedPlaylistId, selectedGroup, searchQuery, bookmarkedOnly, connected]);
+    }, [selectedPlaylistId, selectedGroup, searchQuery, bookmarkedOnly, streamType, connected]);
 
     const fetchGroups = async () => {
         try {
@@ -252,6 +257,7 @@ export default function IPTVDownloaderRunner() {
                 groupTitle: selectedGroup,
                 searchQuery: searchQuery,
                 bookmarkedOnly: bookmarkedOnly,
+                streamType: streamType,
                 limit: itemsPerPage,
                 offset: offset
             });
@@ -281,6 +287,28 @@ export default function IPTVDownloaderRunner() {
             setActiveWorkspace('browser');
         } catch (err: any) {
             setParseError(err.message || 'Failed to parse playlist URL');
+        } finally {
+            setIsParsing(false);
+        }
+    };
+
+    const handleAddXtreamPlaylist = async () => {
+        if (!playlistName || !xtreamHost || !xtreamUser || !xtreamPass) {
+            setParseError('Please fill all Xtream fields');
+            return;
+        }
+        setIsParsing(true);
+        setParseError('');
+        try {
+            await callRPC('add_xtream_playlist', { name: playlistName, host: xtreamHost, username: xtreamUser, password: xtreamPass });
+            setPlaylistName('');
+            setXtreamHost('');
+            setXtreamUser('');
+            setXtreamPass('');
+            fetchPlaylists();
+            setActiveWorkspace('browser');
+        } catch (err: any) {
+            setParseError(err.message || 'Failed to parse Xtream playlist');
         } finally {
             setIsParsing(false);
         }
@@ -583,28 +611,40 @@ export default function IPTVDownloaderRunner() {
                                     <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm space-y-5">
                                         <h3 className="font-extrabold text-slate-800 text-sm">Add New Playlist</h3>
 
+                                        <div className="flex bg-slate-100 p-1 rounded-xl">
+                                            <button onClick={() => setPlaylistType('m3u')} className={`flex-1 py-1.5 text-[10px] font-bold uppercase rounded-lg transition-all ${playlistType === 'm3u' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-500'}`}>M3U URL / File</button>
+                                            <button onClick={() => setPlaylistType('xtream')} className={`flex-1 py-1.5 text-[10px] font-bold uppercase rounded-lg transition-all ${playlistType === 'xtream' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-500'}`}>Xtream API</button>
+                                        </div>
+
                                         <div className="space-y-4">
                                             <div className="space-y-1.5">
                                                 <label className="text-[10px] font-black text-slate-400 uppercase">Playlist Name</label>
-                                                <input
-                                                    type="text"
-                                                    value={playlistName}
-                                                    onChange={e => setPlaylistName(e.target.value)}
-                                                    placeholder="e.g. Premium HD US"
-                                                    className="w-full px-4 py-2.5 text-xs font-semibold border border-slate-200 focus:border-indigo-400 rounded-xl outline-none transition-all bg-slate-50"
-                                                />
+                                                <input type="text" value={playlistName} onChange={e => setPlaylistName(e.target.value)} placeholder="e.g. Premium HD US" className="w-full px-4 py-2.5 text-xs font-semibold border border-slate-200 focus:border-indigo-400 rounded-xl outline-none transition-all bg-slate-50" />
                                             </div>
 
-                                            <div className="space-y-1.5">
-                                                <label className="text-[10px] font-black text-slate-400 uppercase">M3U Playlist URL</label>
-                                                <input
-                                                    type="url"
-                                                    value={playlistUrl}
-                                                    onChange={e => setPlaylistUrl(e.target.value)}
-                                                    placeholder="http://example.com/get.php?auth=..."
-                                                    className="w-full px-4 py-2.5 text-xs font-mono font-semibold border border-slate-200 focus:border-indigo-400 rounded-xl outline-none transition-all bg-slate-50"
-                                                />
-                                            </div>
+                                            {playlistType === 'm3u' ? (
+                                                <div className="space-y-1.5">
+                                                    <label className="text-[10px] font-black text-slate-400 uppercase">M3U Playlist URL</label>
+                                                    <input type="url" value={playlistUrl} onChange={e => setPlaylistUrl(e.target.value)} placeholder="http://example.com/get.php?auth=..." className="w-full px-4 py-2.5 text-xs font-mono font-semibold border border-slate-200 focus:border-indigo-400 rounded-xl outline-none transition-all bg-slate-50" />
+                                                </div>
+                                            ) : (
+                                                <>
+                                                    <div className="space-y-1.5">
+                                                        <label className="text-[10px] font-black text-slate-400 uppercase">Server Host URL</label>
+                                                        <input type="url" value={xtreamHost} onChange={e => setXtreamHost(e.target.value)} placeholder="http://example.com:8080" className="w-full px-4 py-2.5 text-xs font-mono font-semibold border border-slate-200 focus:border-indigo-400 rounded-xl outline-none transition-all bg-slate-50" />
+                                                    </div>
+                                                    <div className="grid grid-cols-2 gap-4">
+                                                        <div className="space-y-1.5">
+                                                            <label className="text-[10px] font-black text-slate-400 uppercase">Username</label>
+                                                            <input type="text" value={xtreamUser} onChange={e => setXtreamUser(e.target.value)} className="w-full px-4 py-2.5 text-xs font-mono font-semibold border border-slate-200 focus:border-indigo-400 rounded-xl outline-none transition-all bg-slate-50" />
+                                                        </div>
+                                                        <div className="space-y-1.5">
+                                                            <label className="text-[10px] font-black text-slate-400 uppercase">Password</label>
+                                                            <input type="password" value={xtreamPass} onChange={e => setXtreamPass(e.target.value)} className="w-full px-4 py-2.5 text-xs font-mono font-semibold border border-slate-200 focus:border-indigo-400 rounded-xl outline-none transition-all bg-slate-50" />
+                                                        </div>
+                                                    </div>
+                                                </>
+                                            )}
                                         </div>
 
                                         {parseError && (
@@ -614,26 +654,29 @@ export default function IPTVDownloaderRunner() {
                                             </div>
                                         )}
 
-                                        <button
-                                            onClick={handleAddPlaylist}
-                                            disabled={isParsing || !playlistName.trim() || !playlistUrl.trim()}
-                                            className="w-full py-3 bg-indigo-600 text-white rounded-xl text-xs font-black uppercase hover:bg-indigo-700 transition-all shadow-md active:scale-95 disabled:opacity-40 flex items-center justify-center gap-2"
-                                        >
-                                            {isParsing ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
-                                            {isParsing ? 'Parsing Playlist...' : 'Import Playlist URL'}
-                                        </button>
-
-                                        <div className="relative flex items-center justify-center my-4">
-                                            <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-slate-100" /></div>
-                                            <span className="relative px-3 bg-white text-[9px] font-bold text-slate-400 uppercase">Or Upload File</span>
-                                        </div>
-
-                                        <label className="w-full flex flex-col items-center justify-center py-5 border border-dashed border-slate-200 rounded-2xl hover:bg-slate-50/50 transition-all cursor-pointer">
-                                            <Folder className="w-6 h-6 text-slate-400 mb-1.5" />
-                                            <span className="text-[10px] font-bold text-slate-700">Choose .m3u playlist file</span>
-                                            <span className="text-[9px] text-slate-400 mt-0.5">Loads directly to local database</span>
-                                            <input type="file" accept=".m3u,.m3u8,.txt" onChange={handleFileUpload} className="hidden" />
-                                        </label>
+                                        {playlistType === 'm3u' ? (
+                                            <>
+                                                <button onClick={handleAddPlaylist} disabled={isParsing || !playlistName.trim() || !playlistUrl.trim()} className="w-full py-3 bg-indigo-600 text-white rounded-xl text-xs font-black uppercase hover:bg-indigo-700 transition-all shadow-md active:scale-95 disabled:opacity-40 flex items-center justify-center gap-2">
+                                                    {isParsing ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
+                                                    {isParsing ? 'Parsing Playlist...' : 'Import Playlist URL'}
+                                                </button>
+                                                <div className="relative flex items-center justify-center my-4">
+                                                    <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-slate-100" /></div>
+                                                    <span className="relative px-3 bg-white text-[9px] font-bold text-slate-400 uppercase">Or Upload File</span>
+                                                </div>
+                                                <label className="w-full flex flex-col items-center justify-center py-5 border border-dashed border-slate-200 rounded-2xl hover:bg-slate-50/50 transition-all cursor-pointer">
+                                                    <Folder className="w-6 h-6 text-slate-400 mb-1.5" />
+                                                    <span className="text-[10px] font-bold text-slate-700">Choose .m3u playlist file</span>
+                                                    <span className="text-[9px] text-slate-400 mt-0.5">Loads directly to local database</span>
+                                                    <input type="file" accept=".m3u,.m3u8,.txt" onChange={handleFileUpload} className="hidden" />
+                                                </label>
+                                            </>
+                                        ) : (
+                                            <button onClick={handleAddXtreamPlaylist} disabled={isParsing || !playlistName.trim() || !xtreamHost.trim() || !xtreamUser.trim() || !xtreamPass.trim()} className="w-full py-3 bg-indigo-600 text-white rounded-xl text-xs font-black uppercase hover:bg-indigo-700 transition-all shadow-md active:scale-95 disabled:opacity-40 flex items-center justify-center gap-2">
+                                                {isParsing ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
+                                                {isParsing ? 'Authenticating...' : 'Add Xtream Playlist'}
+                                            </button>
+                                        )}
                                     </div>
                                 </div>
 
@@ -717,6 +760,15 @@ export default function IPTVDownloaderRunner() {
                                     </button>
                                 </div>
                             </div>
+
+                            {/* Stream Type Tabs */}
+                            {playlists.length > 0 && selectedPlaylistId && (
+                                <div className="flex border-b border-slate-200">
+                                    <button onClick={() => { setStreamType('live'); setSelectedGroup(''); }} className={`px-6 py-3 text-xs font-bold uppercase transition-all border-b-2 ${streamType === 'live' ? 'text-indigo-600 border-indigo-600' : 'text-slate-400 border-transparent hover:text-slate-700'}`}>Live TV</button>
+                                    <button onClick={() => { setStreamType('vod'); setSelectedGroup(''); }} className={`px-6 py-3 text-xs font-bold uppercase transition-all border-b-2 ${streamType === 'vod' ? 'text-indigo-600 border-indigo-600' : 'text-slate-400 border-transparent hover:text-slate-700'}`}>Movies (VOD)</button>
+                                    <button onClick={() => { setStreamType('series'); setSelectedGroup(''); }} className={`px-6 py-3 text-xs font-bold uppercase transition-all border-b-2 ${streamType === 'series' ? 'text-indigo-600 border-indigo-600' : 'text-slate-400 border-transparent hover:text-slate-700'}`}>Series</button>
+                                </div>
+                            )}
 
                             {playlists.length === 0 ? (
                                 <div className="py-20 text-center border border-dashed border-slate-200 rounded-3xl bg-white">

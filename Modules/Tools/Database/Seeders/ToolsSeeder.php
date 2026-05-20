@@ -368,6 +368,46 @@ class ToolsSeeder extends Seeder
                     ]
                 ],
                 'version' => '1.0.0'
+            ],
+            [
+                'tool' => [
+                    'title'             => 'OpenSooq Lead Extractor',
+                    'slug'              => 'opensooq',
+                    'short_description' => 'Extract real buyer and seller leads from OpenSooq listings — by keyword, category, and country.',
+                    'description'       => "OpenSooq Lead Extractor mines verified leads from OpenSooq.com, the largest classifieds marketplace in the Arab world.\n\n- Search any category, keyword, or country\n- Extract contact details, listing data, and phone numbers\n- Enrich leads with source, title, and region\n- Export to CSV or push directly into your CRM\n- 100% local execution — no cloud API costs",
+                    'category'          => 'intelligence',
+                    'supported_os'      => ['windows', 'mac', 'linux'],
+                    'is_featured'       => true,
+                    'is_active'         => true,
+                    'is_free'           => true,
+                    'runner_component'  => 'opensooq',
+                    'features'          => [
+                        'Keyword & category search',
+                        'Phone number extraction',
+                        'Multi-country targeting',
+                        'CRM-ready CSV export',
+                        'Local SQLite storage',
+                        'Anti-detection pacing',
+                    ],
+                    'requirements'      => [
+                        'Musoftware Runtime Agent running locally',
+                        'Internet connection',
+                    ],
+                ],
+                'plans' => [
+                    [
+                        'name'          => 'Free',
+                        'price_monthly' => 0,
+                        'price_yearly'  => 0,
+                        'is_popular'    => true,
+                        'features'      => [
+                            'Unlimited extractions',
+                            'CSV export',
+                            'Multi-country support',
+                        ],
+                    ],
+                ],
+                'version' => '1.0.0',
             ]
         ];
 
