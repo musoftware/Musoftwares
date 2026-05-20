@@ -33,7 +33,22 @@ Do **NOT** emphasize:
 - **Workspace Integration**: Once installed, plugins appear naturally in the workspace navigation sidebar as premium operational tools, not hidden away in a secondary UI.
 - **Invisible Infrastructure**: The user just clicks "Install" and the runtime handles downloading, extracting, and verifying the payload behind the scenes.
 
-## 3. Update & Versioning System
+## 3. No "My Licenses" — Runtime Owns Access (PERMANENT DECISION)
+There is **no "My Licenses" page, section, nav item, or concept** anywhere in the Musoftware UI.
+
+**Why**: If a user owns a tool (i.e., has an active subscription), the Runtime Agent automatically detects it and activates the plugin. Access is runtime-enforced, not key-managed. There is nothing for the user to "manage" manually.
+
+**What this means for agents**:
+- NEVER create a `MyLicenses.tsx` page, a `/my/licenses` route, a `LicenseController`, or any license-key management UI.
+- NEVER add a "My Licenses" item to any nav, sidebar, or quick-action list.
+- NEVER show license keys to the user.
+- The only user-facing concept is: **subscribed → runtime runs it. Unsubscribed → runtime blocks it.**
+- The `tools.billing` route (subscription management) is the ONLY financial management surface a user ever sees.
+
+**Correct pattern**: User subscribes → backend marks subscription → runtime polls subscription status → runtime activates plugin automatically.
+**Wrong pattern**: User subscribes → user copies license key → user pastes key into app to activate.
+
+## 4. Update & Versioning System
 - **Update Channels**: The Runtime Orchestrator periodically polls the Marketplace API for updates.
 - **Changelogs**: The UI fetches and displays human-readable changelogs from the marketplace. Keep changelogs focused on user value, avoiding excessive developer jargon.
 

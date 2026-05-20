@@ -5,7 +5,7 @@ import { ModulePageHeader } from '@/Components/ui/ModulePageHeader';
 import { Button } from '@/Components/ui/button';
 import { Badge } from '@/Components/ui/badge';
 import { EmptyState } from '@/Components/ui/EmptyState';
-import { Download, ShoppingBag, Star, Activity, Receipt, XCircle, CheckCircle2 } from 'lucide-react';
+import { Download, ShoppingBag, Activity, Receipt, XCircle, CheckCircle2 } from 'lucide-react';
 
 interface Subscription {
     id: number; plan_name: string; billing_cycle: string; amount_paid: number;
@@ -31,10 +31,9 @@ export default function Billing({ subscriptions }: Props) {
     return (
         <WorkspaceLayout title="Tool Billing" workspaceName="Tools" tenantId="SYS-TOOLS"
             menuItems={[
-                { id: 'explore',   label: 'Explore',     icon: ShoppingBag, href: route('tools.explore'),     isActive: false },
-                { id: 'downloads', label: 'Downloads',   icon: Download,    href: route('tools.downloads'),   isActive: false },
-                { id: 'licenses',  label: 'My Licenses', icon: Star,        href: route('tools.my-licenses'), isActive: false },
-                { id: 'billing',   label: 'Billing',     icon: Activity,    href: route('tools.billing'),     isActive: true  },
+                { id: 'explore',   label: 'Explore',   icon: ShoppingBag, href: route('tools.explore'),   isActive: false },
+                { id: 'downloads', label: 'Downloads', icon: Download,    href: route('tools.downloads'), isActive: false },
+                { id: 'billing',   label: 'Billing',   icon: Activity,    href: route('tools.billing'),   isActive: true  },
             ]}>
             <Head title="Tool Billing" />
             <div className="max-w-4xl mx-auto py-8 px-4 sm:px-6 lg:px-8 space-y-6">

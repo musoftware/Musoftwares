@@ -20,7 +20,8 @@ The Runtime must be **invisible infrastructure**.
 - While the runtime handles incredibly complex distributed multi-session orchestration, to the user, it just looks like they pressed "Start Campaign".
 
 ## 2. Unified Runtime Execution
-- **NodeJS Orchestration Layer**: Manages WebSockets, handles marketplace downloads, verifies licenses, controls updates, and acts as the commander. It handles all the complex failure logic so the UI doesn't have to.
+- **NodeJS Orchestration Layer**: Manages WebSockets, handles marketplace downloads, verifies subscription status internally, controls updates, and acts as the commander. It handles all the complex failure logic so the UI doesn't have to.
+- **Access Enforcement**: The Runtime polls the Laravel backend to check if the user has an active subscription for a plugin. If subscribed, the plugin is activated automatically. **This is entirely invisible to the user — there are no license keys, no activation screens, and no "My Licenses" page.** See the Marketplace skill for the full rule.
 - **Worker Execution**: Heavy computational tasks and automation scripts run in isolated worker processes (NodeJS, Python, etc.).
 
 ## 3. Smart Defaults & Auto-Recovery

@@ -27,9 +27,15 @@ class MarketplaceController extends Controller
         }
 
         if ($request->filled('search')) {
-            $query->where(function ($q) use ($request) {
-                $q->where('title', 'like', "%{$request->search}%")
-                  ->orWhere('short_description', 'like', "%{$request->search}%");
+            $terms = array_filter(explode(' ', $request->search));
+            $query->where(function ($q) use ($terms) {
+                foreach ($terms as $term) {
+                    $q->where(function ($subQ) use ($term) {
+                        $subQ->where('title', 'like', "%{$term}%")
+                             ->orWhere('short_description', 'like', "%{$term}%")
+                             ->orWhere('description', 'like', "%{$term}%");
+                    });
+                }
             });
         }
 
