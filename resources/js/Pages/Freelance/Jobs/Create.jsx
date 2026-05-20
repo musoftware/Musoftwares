@@ -1,9 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import FreelanceLayout from '../Layout';
-import { useForm } from '@inertiajs/react';
+import { useForm, router } from '@inertiajs/react';
 import axios from 'axios';
+import { useFreelanceMode } from '@/Components/Freelance/FreelanceModeContext';
+import { cn } from '@/lib/utils';
+import { Zap } from 'lucide-react';
 
 export default function CreateJob({ auth }) {
+    const freelanceModeContext = useFreelanceMode();
+
+    useEffect(() => {
+        if (freelanceModeContext && freelanceModeContext.setMode) {
+            freelanceModeContext.setMode('client');
+        }
+    }, [freelanceModeContext]);
+
     const { data, setData, post, processing, errors } = useForm({
         title: '',
         description: '',
@@ -44,6 +55,21 @@ export default function CreateJob({ auth }) {
         post(route('freelance.jobs.store'));
     };
 
+    const handleBuyPointsToPublish = () => {
+        const neededPoints = pointsCost - currentPoints;
+        const cost = neededPoints * 0.10;
+        
+        const costFormatted = new Intl.NumberFormat('en-US', {
+            style: 'currency',
+            currency: 'USD'
+        }).format(cost);
+
+        const msg = `You need ${neededPoints} more points to publish this job. Charge ${neededPoints} points for ${costFormatted}?`;
+        if (confirm(msg)) {
+            router.post(route('freelance.point-purchases.store-wallet'), { points: neededPoints });
+        }
+    };
+
     const handleSkillToggle = (skill) => {
         const existingIndex = data.skills.findIndex(s => s.id === skill.id);
         if (existingIndex >= 0) {
@@ -71,7 +97,7 @@ export default function CreateJob({ auth }) {
     );
 
     return (
-        <FreelanceLayout auth={auth}>
+        <FreelanceLayout>
             <div className="max-w-3xl mx-auto">
                 <div className="mb-8">
                     <h2 className="text-3xl font-bold text-gray-900">Post a New Job</h2>
@@ -245,23 +271,49 @@ export default function CreateJob({ auth }) {
                     </div>
 
                     {/* Submit & Points Preview */}
-                    <div className="bg-indigo-50 p-6 rounded-xl border border-indigo-100 flex flex-col items-center">
+                    <div className={cn(
+                        "p-6 rounded-xl border flex flex-col items-center",
+                        currentPoints < pointsCost 
+                            ? "bg-amber-50 border-amber-200" 
+                            : "bg-indigo-50 border-indigo-100"
+                    )}>
                         <div className="text-center mb-4">
-                            <p className="text-lg font-medium text-indigo-900 mb-1">Publishing this job costs <strong>{pointsCost} points</strong></p>
-                            <p className="text-sm text-indigo-700 flex items-center justify-center gap-2">
-                                Your balance: {currentPoints} pts <span className="text-xl">&rarr;</span> after: <span className="font-bold">{currentPoints - pointsCost} pts</span>
+                            <p className={cn(
+                                "text-lg font-medium mb-1",
+                                currentPoints < pointsCost ? "text-amber-900" : "text-indigo-900"
+                            )}>
+                                Publishing this job costs <strong>{pointsCost} points</strong>
                             </p>
+                            {currentPoints < pointsCost ? (
+                                <p className="text-sm text-amber-700 font-semibold bg-amber-100/60 px-3 py-1 rounded-full inline-flex items-center gap-1.5 border border-amber-200/50">
+                                    Insufficient balance: {currentPoints} pts (Need {pointsCost - currentPoints} pts more)
+                                </p>
+                            ) : (
+                                <p className="text-sm text-indigo-700 flex items-center justify-center gap-2">
+                                    Your balance: {currentPoints} pts <span className="text-xl">&rarr;</span> after: <span className="font-bold">{currentPoints - pointsCost} pts</span>
+                                </p>
+                            )}
                         </div>
 
                         {errors.points && <div className="text-red-500 mb-4 bg-red-50 p-3 rounded-lg border border-red-200 w-full text-center">{errors.points}</div>}
 
-                        <button
-                            type="submit"
-                            disabled={processing || currentPoints < pointsCost}
-                            className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-8 rounded-lg shadow-sm transition disabled:opacity-50 text-lg w-full md:w-auto"
-                        >
-                            Publish Job — {pointsCost} pts
-                        </button>
+                        {currentPoints < pointsCost ? (
+                            <button
+                                type="button"
+                                onClick={handleBuyPointsToPublish}
+                                className="bg-amber-600 hover:bg-amber-700 text-white font-bold py-3 px-8 rounded-lg shadow-md transition text-lg w-full md:w-auto flex items-center justify-center gap-2 hover:scale-[1.02] transform duration-150"
+                            >
+                                <Zap className="h-5 w-5 fill-amber-300 stroke-amber-100 animate-pulse" /> Buy {pointsCost - currentPoints} Points to Publish
+                            </button>
+                        ) : (
+                            <button
+                                type="submit"
+                                disabled={processing}
+                                className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-8 rounded-lg shadow-sm transition text-lg w-full md:w-auto"
+                            >
+                                Publish Job — {pointsCost} pts
+                            </button>
+                        )}
                     </div>
                 </form>
             </div>

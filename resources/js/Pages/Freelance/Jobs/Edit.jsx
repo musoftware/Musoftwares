@@ -16,7 +16,7 @@ export default function EditJob({ auth, job }) {
     };
 
     return (
-        <FreelanceLayout auth={auth}>
+        <FreelanceLayout>
             <div className="mx-auto max-w-2xl">
                 <h2 className="mb-6 text-2xl font-bold">
                     Edit Job: {job.title}

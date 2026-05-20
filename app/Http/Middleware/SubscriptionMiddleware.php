@@ -39,6 +39,11 @@ class SubscriptionMiddleware
             abort(401, 'Unauthorized access.');
         }
 
+        // Bypass subscription check for freelance module as it's point-based
+        if ($module === 'freelance') {
+            return $next($request);
+        }
+
         // 1. Verify active subscription or admin status
         $hasModuleAccess = $this->subscriptionService->hasActiveSubscription($user, $module);
 

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Head, Link, router, usePage } from '@inertiajs/react';
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import FreelanceLayout from '../Layout';
 import { Card } from '@/Components/ui/card';
 import { Badge } from '@/Components/ui/badge';
 import { Button } from '@/Components/ui/button';
@@ -14,9 +14,9 @@ import {
     Briefcase, AlertCircle, DollarSign, ShieldAlert, Activity,
 } from 'lucide-react';
 
-const AppLayout   = AuthenticatedLayout;
+const AppLayout   = FreelanceLayout;
 const AppPage     = ({ children }: { children: React.ReactNode }) =>
-    <div className="max-w-[1100px] mx-auto px-4 py-8 space-y-6">{children}</div>;
+    <div className="w-full space-y-6">{children}</div>;
 const SectionCard = ({ children, className, ...props }: { children: React.ReactNode; className?: string; [x: string]: any }) =>
     <Card className={cn('shadow-sm border-gray-200 overflow-hidden', className)} {...props}>{children}</Card>;
 
@@ -73,7 +73,7 @@ export default function ContractsIndex({ contracts, stats }: any) {
     ];
 
     return (
-        <AppLayout header="My Contracts">
+        <AppLayout>
             <Head title="My Contracts – Freelance" />
             <AppPage>
                 <PageHeader

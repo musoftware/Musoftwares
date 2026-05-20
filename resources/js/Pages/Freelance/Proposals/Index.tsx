@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Head, Link, router, usePage } from '@inertiajs/react';
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import FreelanceLayout from '../Layout';
 import { Card } from '@/Components/ui/card';
 import { Badge } from '@/Components/ui/badge';
 import { Button } from '@/Components/ui/button';
@@ -13,10 +13,11 @@ import {
     FileText, Clock, CheckCircle2, XCircle, ChevronRight,
     Search, Briefcase, Loader2, AlertCircle, Trash2,
 } from 'lucide-react';
+import { useFreelanceMode } from '@/Components/Freelance/FreelanceModeContext';
 
-const AppLayout   = AuthenticatedLayout;
+const AppLayout   = FreelanceLayout;
 const AppPage     = ({ children }: { children: React.ReactNode }) =>
-    <div className="max-w-[1100px] mx-auto px-4 py-8 space-y-6">{children}</div>;
+    <div className="w-full space-y-6">{children}</div>;
 const SectionCard = ({ children, className, ...props }: { children: React.ReactNode; className?: string; [x: string]: any }) =>
     <Card className={cn('shadow-sm border-gray-200 overflow-hidden', className)} {...props}>{children}</Card>;
 
@@ -44,6 +45,14 @@ export default function ProposalsIndex({ proposals, stats }: any) {
     const { auth } = usePage().props as any;
     const globalCurrency = auth?.user?.preferred_currency || 'USD';
 
+    const freelanceModeContext = useFreelanceMode();
+
+    useEffect(() => {
+        if (freelanceModeContext && freelanceModeContext.setMode) {
+            freelanceModeContext.setMode('freelancer');
+        }
+    }, [freelanceModeContext]);
+
     const [filter, setFilter]       = useState<Filter>('all');
     const [withdrawing, setWithd]   = useState<number | null>(null);
 
@@ -69,7 +78,7 @@ export default function ProposalsIndex({ proposals, stats }: any) {
     ];
 
     return (
-        <AppLayout header="My Proposals">
+        <AppLayout>
             <Head title="My Proposals – Freelance" />
             <AppPage>
                 <PageHeader
