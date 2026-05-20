@@ -2,7 +2,6 @@
 
 use Illuminate\Support\Facades\Route;
 use Modules\Tools\Http\Controllers\DownloadController;
-use Modules\Tools\Http\Controllers\LicenseController;
 use Modules\Tools\Http\Controllers\MarketplaceController;
 use Modules\Tools\Http\Controllers\SubscriptionController;
 use Modules\Tools\Http\Controllers\RuntimeAuthController;
@@ -34,10 +33,6 @@ Route::prefix('tools')->name('tools.')->group(function () {
         // My Downloads (static path — before wildcard)
         Route::get('/my/downloads', [DownloadController::class, 'index'])->name('downloads');
 
-        // My Licenses (static path — before wildcard)
-        Route::get('/my/licenses', [LicenseController::class, 'index'])->name('my-licenses');
-        Route::get('/my/licenses/{licenseId}/devices', [LicenseController::class, 'devices'])->name('devices');
-        Route::delete('/my/licenses/{licenseId}/devices/{deviceId}', [LicenseController::class, 'revokeDevice'])->name('devices.revoke');
 
         // Cancel subscription (static prefix — before wildcard)
         Route::post('/subscriptions/{id}/cancel', [SubscriptionController::class, 'cancel'])->name('subscriptions.cancel');

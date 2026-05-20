@@ -3,11 +3,11 @@ import { Head, Link, router, usePage } from '@inertiajs/react';
 import ApplicationLogo from '@/Components/ApplicationLogo';
 import { Button } from '@/Components/ui/button';
 import { RuntimeStatusBanner } from '@/Components/Tools/RuntimeStatusBanner';
-import { Download, Key, CreditCard, LayoutGrid, LogIn, UserPlus, ArrowUpRight } from 'lucide-react';
+import { Download, CreditCard, LayoutGrid, LogIn, UserPlus, ArrowUpRight } from 'lucide-react';
 
 interface ToolsPublicLayoutProps extends PropsWithChildren {
     title: string;
-    activeNav?: 'explore' | 'downloads' | 'licenses' | 'billing';
+    activeNav?: 'explore' | 'downloads' | 'billing';
     /** Tool slug for plugin install tracking */
     toolSlug?: string;
 }
@@ -22,10 +22,9 @@ export default function ToolsPublicLayout({
     const isAuthed = !!auth?.user;
 
     const navItems = [
-        { id: 'explore',   label: 'Browse',      icon: LayoutGrid,   href: route('tools.explore'),     public: true  },
-        { id: 'downloads', label: 'Downloads',    icon: Download,     href: route('tools.downloads'),   public: false },
-        { id: 'licenses',  label: 'My Licenses',  icon: Key,          href: route('tools.my-licenses'), public: false },
-        { id: 'billing',   label: 'Billing',      icon: CreditCard,   href: route('tools.billing'),     public: false },
+        { id: 'explore',   label: 'Browse',      icon: LayoutGrid,   href: route('tools.explore'),   public: true  },
+        { id: 'downloads', label: 'Downloads',    icon: Download,     href: route('tools.downloads'), public: false },
+        { id: 'billing',   label: 'Billing',      icon: CreditCard,   href: route('tools.billing'),   public: false },
     ];
 
     const visibleItems = navItems.filter(item => item.public || isAuthed);

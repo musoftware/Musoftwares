@@ -4,7 +4,13 @@ import { Head } from '@inertiajs/react';
 // Dynamic import for tool runner components based on the DB field `runner_component`
 const components: Record<string, React.ElementType> = {
     'ScreenshotFeedbackRunner': lazy(() => import('./ScreenshotFeedbackRunner')),
-    'WhatsAppSenderRunner': lazy(() => import('./WhatsAppSenderRunner')),
+    'WhatsAppSenderRunner':     lazy(() => import('./WhatsAppSenderRunner')),
+    'whatsapp-sender-pro':      lazy(() => import('./WhatsAppSenderRunner')),
+    'whatsapp-sender':          lazy(() => import('./WhatsAppSenderRunner')),
+    'lead-intelligence':        lazy(() => import('./LeadIntelligenceRunner')),
+    'viral-autopsy':            lazy(() => import('./ViralAutopsyRunner')),
+    'hook-analyzer':            lazy(() => import('./HookAnalyzerRunner')),
+    'format-extractor':         lazy(() => import('./FormatExtractorRunner')),
 };
 
 export default function Runner({ tool, subscription, runtimePort, pluginSlug }: any) {
