@@ -16,13 +16,37 @@ class FreelanceJobController extends Controller
     {
         $query = Job::with(['client', 'skills'])->where('status', 'open');
 
-        if ($request->has('skill_id')) {
+        if ($request->filled('skill_id')) {
             $query->whereHas('skills', function ($q) use ($request) {
                 $q->where('freelance_skills.id', $request->skill_id);
             });
         }
 
-        $jobs = $query->latest()->paginate(15);
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                  ->orWhere('description', 'like', "%{$search}%")
+                  ->orWhereHas('skills', function ($sq) use ($search) {
+                      $sq->where('name', 'like', "%{$search}%");
+                  });
+            });
+        }
+
+        if ($request->filled('type') && in_array($request->type, ['fixed', 'hourly'])) {
+            $query->where('type', $request->type);
+        }
+
+        $sort = $request->input('sort', 'newest');
+        if ($sort === 'budget_high') {
+            $query->orderBy('budget', 'desc');
+        } elseif ($sort === 'budget_low') {
+            $query->orderBy('budget', 'asc');
+        } else {
+            $query->latest();
+        }
+
+        $jobs = $query->paginate(15)->withQueryString();
         return Inertia::render('Freelance/Jobs/Browse', ['jobs' => $jobs]);
     }
 

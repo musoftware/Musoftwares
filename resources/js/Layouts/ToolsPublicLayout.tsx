@@ -7,7 +7,7 @@ import { Download, CreditCard, LayoutGrid, LogIn, UserPlus, ArrowUpRight } from 
 
 interface ToolsPublicLayoutProps extends PropsWithChildren {
     title: string;
-    activeNav?: 'explore' | 'downloads' | 'billing';
+    activeNav?: 'explore' | 'downloads' | 'billing' | 'licenses';
     /** Tool slug for plugin install tracking */
     toolSlug?: string;
 }

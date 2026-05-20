@@ -1,18 +1,76 @@
-import React from 'react';
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head } from '@inertiajs/react';
-import { FreelanceModeProvider } from '@/Components/Freelance/FreelanceModeContext';
+import React, { useEffect } from 'react';
+import WorkspaceLayout from '@/Layouts/WorkspaceLayout';
+import { useFreelanceMode } from '@/Components/Freelance/FreelanceModeContext';
+import { usePage, router } from '@inertiajs/react';
+import { 
+    Briefcase,
+    Clock,
+    Search,
+    Plus,
+    Coins
+} from 'lucide-react';
 
-export default function FreelanceLayout({ auth, children, clean = false }) {
+export default function FreelanceLayout({ children, clean = false }) {
+    const freelanceModeContext = useFreelanceMode();
+    const mode = freelanceModeContext?.mode || 'client';
+    const isClient = mode === 'client';
+    
+    // Get the current path to match active item
+    const currentPath = typeof window !== 'undefined' ? window.location.pathname : '';
+
+    // Automated role-based redirects
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            const clientOnlyPrefixes = [
+                '/freelance/jobs/create',
+                '/freelance/jobs/my-jobs'
+            ];
+            const freelancerOnlyPrefixes = [
+                '/freelance/jobs/browse',
+                '/freelance/proposals',
+                '/freelance/points'
+            ];
+
+            const isClientOnlyPath = 
+                clientOnlyPrefixes.some(path => currentPath.startsWith(path)) ||
+                (currentPath.startsWith('/freelance/jobs/') && currentPath.includes('/edit'));
+
+            const isFreelancerOnlyPath = 
+                freelancerOnlyPrefixes.some(path => currentPath.startsWith(path));
+
+            if (!isClient && isClientOnlyPath) {
+                router.visit('/freelance/dashboard');
+            } else if (isClient && isFreelancerOnlyPath) {
+                router.visit('/freelance/dashboard');
+            }
+        }
+    }, [isClient, currentPath]);
+
+    const freelancerMenuItems = [
+        { id: 'dashboard',  label: 'Dashboard',    icon: Briefcase, href: '/freelance/dashboard',              isActive: currentPath === '/freelance/dashboard' || currentPath === '/freelance/dashboard/' },
+        { id: 'jobs',       label: 'Find Work',     icon: Search,    href: '/freelance/jobs/browse',  isActive: currentPath.startsWith('/freelance/jobs/browse') || currentPath.startsWith('/freelance/jobs/') && !currentPath.includes('/my-jobs') && !currentPath.includes('/create') },
+        { id: 'proposals',  label: 'My Proposals',  icon: Clock,     href: '/freelance/proposals',    isActive: currentPath.startsWith('/freelance/proposals') },
+        { id: 'contracts',  label: 'My Contracts',  icon: Clock,     href: '/freelance/contracts',    isActive: currentPath.startsWith('/freelance/contracts') },
+        { id: 'points',     label: 'Buy Connects',  icon: Coins,     href: '/freelance/points',       isActive: currentPath.startsWith('/freelance/points') },
+    ];
+
+    const clientMenuItems = [
+        { id: 'dashboard',  label: 'Dashboard',       icon: Briefcase, href: '/freelance/dashboard',              isActive: currentPath === '/freelance/dashboard' || currentPath === '/freelance/dashboard/' },
+        { id: 'post-job',   label: 'Post a Job',      icon: Plus,      href: '/freelance/jobs/create',  isActive: currentPath.startsWith('/freelance/jobs/create') },
+        { id: 'my-jobs',    label: 'My Posted Jobs',  icon: Briefcase, href: '/freelance/jobs/my-jobs', isActive: currentPath.startsWith('/freelance/jobs/my-jobs') },
+        { id: 'contracts',  label: 'My Contracts',    icon: Clock,     href: '/freelance/contracts',    isActive: currentPath.startsWith('/freelance/contracts') },
+    ];
+
+    const menuItems = isClient ? clientMenuItems : freelancerMenuItems;
+
     return (
-        <FreelanceModeProvider>
-            <AuthenticatedLayout user={auth.user}>
-                <Head title="Marketplace" />
-                <div className="max-w-[1200px] mx-auto px-4 py-8 space-y-6">
-                    {children}
-                </div>
-            </AuthenticatedLayout>
-        </FreelanceModeProvider>
+        <WorkspaceLayout 
+            title="Freelance Hub"
+            workspaceName="Freelance Hub"
+            tenantId="FR-DRAFT"
+            menuItems={menuItems}
+        >
+            {children}
+        </WorkspaceLayout>
     );
 }
-

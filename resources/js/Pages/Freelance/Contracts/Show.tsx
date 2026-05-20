@@ -15,22 +15,10 @@ import {
 } from 'lucide-react';
 import { CurrencyDisplay as FinancialAmount } from '@/Components/ui/CurrencyDisplay';
 
-export default function ShowContract({ auth, contract: initialContract }: any) {
+function ShowContractContent({ auth, contract }: any) {
     const { mode } = useFreelanceMode();
     const isClient = mode === 'client';
     const globalCurrency = auth?.user?.preferred_currency || 'USD';
-
-    const contract = initialContract;
-    
-    if (!contract) {
-        return (
-            <FreelanceLayout auth={auth} clean={true}>
-                <div className="max-w-6xl mx-auto py-12 text-center text-slate-500">
-                    Contract not found.
-                </div>
-            </FreelanceLayout>
-        );
-    }
 
     const [messageInput, setMessageInput] = useState('');
     const [deliveryDescription, setDeliveryDescription] = useState('');
@@ -65,10 +53,10 @@ export default function ShowContract({ auth, contract: initialContract }: any) {
     };
 
     return (
-        <FreelanceLayout auth={auth} clean={true}>
+        <>
             <Head title={`Contract: ${contract.title}`} />
 
-            <div className="max-w-6xl mx-auto space-y-6 pb-12">
+            <div className="w-full space-y-6 pb-12">
                 
                 {/* Header Banner */}
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white p-6 rounded-xl border border-slate-200/60 shadow-sm">
@@ -292,6 +280,24 @@ export default function ShowContract({ auth, contract: initialContract }: any) {
                     </div>
                 </div>
             </div>
+        </>
+    );
+}
+
+export default function ShowContract({ auth, contract }: any) {
+    if (!contract) {
+        return (
+            <FreelanceLayout clean={true}>
+                <div className="w-full py-12 text-center text-slate-500">
+                    Contract not found.
+                </div>
+            </FreelanceLayout>
+        );
+    }
+
+    return (
+        <FreelanceLayout clean={true}>
+            <ShowContractContent auth={auth} contract={contract} />
         </FreelanceLayout>
     );
 }

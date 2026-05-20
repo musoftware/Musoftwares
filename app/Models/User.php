@@ -114,7 +114,7 @@ class User extends Authenticatable
 
     public function getPointsBalanceAttribute()
     {
-        $earned = $this->pointTransactions()->whereIn('type', ['earned', 'credit'])->sum('points');
+        $earned = $this->pointTransactions()->whereIn('type', ['earned', 'credit', 'purchased'])->sum('points');
         $spent = $this->pointTransactions()->whereIn('type', ['spent', 'debit'])->sum('points');
         return $earned - $spent;
     }

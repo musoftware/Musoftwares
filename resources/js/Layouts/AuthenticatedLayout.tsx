@@ -25,8 +25,15 @@ import {
 import CommandPalette from '@/Components/CommandPalette';
 import ProductTourModal from '@/Components/ProductTourModal';
 import axios from 'axios';
+import FreelanceModeToggle from '@/Components/Freelance/FreelanceModeToggle';
 
-export default function Authenticated({
+export default function Authenticated(props: PropsWithChildren<{ header?: ReactNode }>) {
+    return (
+        <AuthenticatedContent {...props} />
+    );
+}
+
+function AuthenticatedContent({
     header,
     children,
 }: PropsWithChildren<{ header?: ReactNode }>) {
@@ -444,6 +451,11 @@ export default function Authenticated({
 
                         {/* RIGHT: Financials, Tour Button & Profile */}
                         <div className="flex items-center gap-3">
+                            {isFreelanceActive && (
+                                <div className="mr-1 sm:mr-2">
+                                    <FreelanceModeToggle />
+                                </div>
+                            )}
                             {!auth?.team_member && (
                                 <div className="hidden md:flex items-center gap-2 mr-2">
                                     {/* Add Balance pill — locked geometry */}

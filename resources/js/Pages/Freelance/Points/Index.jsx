@@ -46,8 +46,8 @@ export default function PointsIndex({ auth, packages, transactions }) {
     const customCost = customPoints && !isNaN(customPoints) ? (Number(customPoints) * 0.10) : 0;
 
     return (
-        <FreelanceLayout auth={auth}>
-            <div className="max-w-6xl mx-auto pb-20 space-y-8">
+        <FreelanceLayout>
+            <div className="w-full pb-20 space-y-8">
                 
                 {/* Header & Balance Card */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

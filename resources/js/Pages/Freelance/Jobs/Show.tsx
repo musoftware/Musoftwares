@@ -13,21 +13,10 @@ import { Clock, DollarSign, Briefcase, MapPin, CheckCircle2, AlertCircle, FileTe
 import { Alert, AlertDescription, AlertTitle } from "@/Components/ui/alert";
 import { CurrencyDisplay as FinancialAmount } from '@/Components/ui/CurrencyDisplay';
 
-export default function ShowJob({ auth, job: initialJob, pointsCost = 5 }: any) {
+function ShowJobContent({ auth, job, pointsCost }: any) {
     const { mode } = useFreelanceMode();
     const isClient = mode === 'client';
     const globalCurrency = auth?.user?.preferred_currency || 'USD';
-
-    const job = initialJob;
-    if (!job) {
-        return (
-            <FreelanceLayout auth={auth} clean={true}>
-                <div className="max-w-6xl mx-auto py-12 text-center text-slate-500">
-                    Job not found.
-                </div>
-            </FreelanceLayout>
-        );
-    }
 
     const hasSubmitted = !isClient && job.proposals?.some((p: any) => p.freelancer_id === auth.user.id);
     const userPoints = auth.user.points_balance || 0;
@@ -54,10 +43,10 @@ export default function ShowJob({ auth, job: initialJob, pointsCost = 5 }: any) 
     };
 
     return (
-        <FreelanceLayout auth={auth} clean={true}>
+        <>
             <Head title={`${job.title} | Jobs`} />
             
-            <div className="max-w-6xl mx-auto space-y-8 pb-12">
+            <div className="w-full space-y-8 pb-12">
                 <div className="flex flex-col gap-2">
                     <Link href="/freelance/jobs/browse" className="text-sm font-medium text-slate-500 hover:text-indigo-600 transition-colors w-fit">
                         &larr; Back to job search
@@ -287,6 +276,24 @@ export default function ShowJob({ auth, job: initialJob, pointsCost = 5 }: any) 
                     </div>
                 </div>
             </div>
+        </>
+    );
+}
+
+export default function ShowJob({ auth, job, pointsCost = 5 }: any) {
+    if (!job) {
+        return (
+            <FreelanceLayout clean={true}>
+                <div className="w-full py-12 text-center text-slate-500">
+                    Job not found.
+                </div>
+            </FreelanceLayout>
+        );
+    }
+
+    return (
+        <FreelanceLayout clean={true}>
+            <ShowJobContent auth={auth} job={job} pointsCost={pointsCost} />
         </FreelanceLayout>
     );
 }
