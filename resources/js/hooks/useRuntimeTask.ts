@@ -6,7 +6,8 @@ interface UseRuntimeTaskOptions {
 
 export function useRuntimeTask(pluginSlug: string, options: UseRuntimeTaskOptions) {
     const { runtimePort } = options;
-    const base = `http://127.0.0.1:${runtimePort}`;
+    const host = typeof window !== 'undefined' ? (window.localStorage.getItem('musoftware_runtime_host') || '127.0.0.1') : '127.0.0.1';
+    const base = `http://${host}:${runtimePort}`;
 
     const [status, setStatus] = useState<'idle' | 'running' | 'done' | 'error'>('idle');
     const [logs, setLogs] = useState<string[]>([]);
@@ -56,7 +57,8 @@ export function useRuntimeTask(pluginSlug: string, options: UseRuntimeTaskOption
             setTaskId(tid);
 
             // Connect WebSocket (using runtimePort + 1 for ws)
-            const ws = new WebSocket(`ws://127.0.0.1:${runtimePort + 1}/ws`);
+            const activeHost = typeof window !== 'undefined' ? (window.localStorage.getItem('musoftware_runtime_host') || '127.0.0.1') : '127.0.0.1';
+            const ws = new WebSocket(`ws://${activeHost}:${runtimePort + 1}/ws`);
             ws.onmessage = (ev) => {
                 try {
                     const msg = JSON.parse(ev.data);

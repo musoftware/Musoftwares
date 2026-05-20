@@ -5,7 +5,8 @@ import {
     Phone, Mail, Tag, Building, ChevronDown, Clipboard
 } from 'lucide-react';
 
-const WS_URL = 'ws://127.0.0.1:18401/ws';
+const getRuntimeHost = () => typeof window !== 'undefined' ? (window.localStorage.getItem('musoftware_runtime_host') || '127.0.0.1') : '127.0.0.1';
+const getWsUrl       = () => `ws://${getRuntimeHost()}:18401/ws`;
 
 // ── Countries list ────────────────────────────────────────────────────────────
 const COUNTRIES = [
@@ -120,7 +121,7 @@ export default function OpensooqRunner({ tool }: any) {
         let retry: ReturnType<typeof setTimeout>;
 
         const connect = () => {
-            ws = new WebSocket(WS_URL);
+            ws = new WebSocket(getWsUrl());
             wsRef.current = ws;
 
             ws.onopen  = () => setConnected(true);

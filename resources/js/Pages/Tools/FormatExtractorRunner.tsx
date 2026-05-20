@@ -4,8 +4,9 @@ import {
     CheckCircle, AlertCircle, RefreshCw, TrendingUp, Sparkles
 } from 'lucide-react';
 
-const RUNTIME_HTTP = 'http://127.0.0.1:18400';
-const WS_URL       = 'ws://127.0.0.1:18401/ws';
+const getRuntimeHost = () => typeof window !== 'undefined' ? (window.localStorage.getItem('musoftware_runtime_host') || '127.0.0.1') : '127.0.0.1';
+const getRuntimeHttp = () => `http://${getRuntimeHost()}:18400`;
+const getWsUrl       = () => `ws://${getRuntimeHost()}:18401/ws`;
 
 // ── Copy-to-clipboard button ──────────────────────────────────────────────────
 function CopyButton({ text }: { text: string }) {
@@ -84,7 +85,7 @@ export default function FormatExtractorRunner({ tool }: any) {
     const [taskId, setTaskId]     = useState<string | null>(null);
 
     useEffect(() => {
-        const ws = new WebSocket(WS_URL);
+        const ws = new WebSocket(getWsUrl());
         ws.onmessage = (e) => {
             try {
                 const msg = JSON.parse(e.data);
@@ -108,7 +109,7 @@ export default function FormatExtractorRunner({ tool }: any) {
         if (!taskId || status !== 'running') return;
         const iv = setInterval(async () => {
             try {
-                const r = await fetch(`${RUNTIME_HTTP}/tasks/${taskId}`);
+                const r = await fetch(`${getRuntimeHttp()}/tasks/${taskId}`);
                 const d = await r.json();
                 if (d.result) { setResult(d.result); setStatus('done'); clearInterval(iv); }
                 if (d.status === 'failed') { setError(d.error ?? 'Failed'); setStatus('error'); clearInterval(iv); }
@@ -122,7 +123,7 @@ export default function FormatExtractorRunner({ tool }: any) {
         if (!url.trim()) return;
         setStatus('running'); setProgress(5); setProgressMsg('Fetching video...'); setResult(null); setError('');
         try {
-            const res = await fetch(`${RUNTIME_HTTP}/plugins/format-extractor/run`, {
+            const res = await fetch(`${getRuntimeHttp()}/plugins/format-extractor/run`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ params: { url: url.trim(), niche: niche.trim() } }),

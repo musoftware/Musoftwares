@@ -15,9 +15,6 @@
  *   window.musoftware.runtime.connect()
  */
 
-const RUNTIME_HTTP = 'http://127.0.0.1:18400';
-const RUNTIME_WS   = 'ws://127.0.0.1:18401/ws';
-
 type RuntimeEvent = {
     event: string;
     data:  Record<string, unknown>;
@@ -48,6 +45,32 @@ class MusoftwareRuntimeSDK {
     private _connected = false;
     private _reconnectTimer: ReturnType<typeof setTimeout> | null = null;
 
+    // ── Dynamic Host Resolution ─────────────────────────────────────────────
+
+    get runtimeHost(): string {
+        if (typeof window !== 'undefined') {
+            return window.localStorage.getItem('musoftware_runtime_host') || '127.0.0.1';
+        }
+        return '127.0.0.1';
+    }
+
+    get runtimeHttp(): string {
+        return `http://${this.runtimeHost}:18400`;
+    }
+
+    get runtimeWs(): string {
+        return `ws://${this.runtimeHost}:18401/ws`;
+    }
+
+    setHost(host: string) {
+        if (typeof window !== 'undefined') {
+            const cleanHost = host.trim().replace(/^https?:\/\//i, '').replace(/:1840[0-9]/, '');
+            window.localStorage.setItem('musoftware_runtime_host', cleanHost);
+            this.disconnect();
+            this.connect();
+        }
+    }
+
     // ── Connection ─────────────────────────────────────────────────────────
 
     async connect(): Promise<boolean> {
@@ -67,7 +90,7 @@ class MusoftwareRuntimeSDK {
     private _openWs() {
         if (this.ws?.readyState === WebSocket.OPEN) return;
 
-        this.ws = new WebSocket(RUNTIME_WS);
+        this.ws = new WebSocket(this.runtimeWs);
 
         this.ws.onopen = () => {
             this._connected = true;
@@ -95,7 +118,7 @@ class MusoftwareRuntimeSDK {
 
     async ping(): Promise<boolean> {
         try {
-            const res = await fetch(`${RUNTIME_HTTP}/status`, {
+            const res = await fetch(`${this.runtimeHttp}/status`, {
                 signal: AbortSignal.timeout(2000),
             });
             return res.ok;
@@ -106,7 +129,7 @@ class MusoftwareRuntimeSDK {
 
     async getStatus(): Promise<RuntimeStatus | null> {
         try {
-            const res = await fetch(`${RUNTIME_HTTP}/status`, {
+            const res = await fetch(`${this.runtimeHttp}/status`, {
                 signal: AbortSignal.timeout(3000),
             });
             if (!res.ok) return null;
@@ -119,8 +142,8 @@ class MusoftwareRuntimeSDK {
     async getPlugins(runtime?: 'nodejs' | 'python'): Promise<RuntimePlugin[]> {
         try {
             const url = runtime
-                ? `${RUNTIME_HTTP}/plugins?runtime=${runtime}`
-                : `${RUNTIME_HTTP}/plugins`;
+                ? `${this.runtimeHttp}/plugins?runtime=${runtime}`
+                : `${this.runtimeHttp}/plugins`;
             const res  = await fetch(url, { signal: AbortSignal.timeout(3000) });
             const data = await res.json();
             return data.plugins ?? [];
@@ -131,7 +154,7 @@ class MusoftwareRuntimeSDK {
 
     async getSystem(): Promise<Record<string, unknown> | null> {
         try {
-            const res = await fetch(`${RUNTIME_HTTP}/system`, { signal: AbortSignal.timeout(3000) });
+            const res = await fetch(`${this.runtimeHttp}/system`, { signal: AbortSignal.timeout(3000) });
             return res.ok ? res.json() : null;
         } catch { return null; }
     }
@@ -140,7 +163,7 @@ class MusoftwareRuntimeSDK {
 
     async runPlugin(slug: string, params: Record<string, unknown> = {}): Promise<string | null> {
         try {
-            const res  = await fetch(`${RUNTIME_HTTP}/plugins/${slug}/run`, {
+            const res  = await fetch(`${this.runtimeHttp}/plugins/${slug}/run`, {
                 method:  'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body:    JSON.stringify({ params }),
@@ -154,13 +177,13 @@ class MusoftwareRuntimeSDK {
 
     async stopTask(taskId: string): Promise<void> {
         try {
-            await fetch(`${RUNTIME_HTTP}/tasks/${taskId}/stop`, { method: 'POST' });
+            await fetch(`${this.runtimeHttp}/tasks/${taskId}/stop`, { method: 'POST' });
         } catch (_) {}
     }
 
     async getTask(taskId: string): Promise<Record<string, unknown> | null> {
         try {
-            const res = await fetch(`${RUNTIME_HTTP}/tasks/${taskId}`, {
+            const res = await fetch(`${this.runtimeHttp}/tasks/${taskId}`, {
                 signal: AbortSignal.timeout(3000),
             });
             return res.ok ? res.json() : null;
@@ -171,7 +194,7 @@ class MusoftwareRuntimeSDK {
 
     async setToken(token: string, userId: string | number): Promise<boolean> {
         try {
-            const res = await fetch(`${RUNTIME_HTTP}/auth`, {
+            const res = await fetch(`${this.runtimeHttp}/auth`, {
                 method:  'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body:    JSON.stringify({ token, userId: String(userId) }),
