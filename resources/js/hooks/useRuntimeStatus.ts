@@ -67,7 +67,8 @@ export function useRuntimeStatus(): UseRuntimeStatusReturn {
             return true;
         } else {
             setStatus(prev => prev === 'online' ? 'offline' : 'not_installed');
-            setError('Runtime agent not reachable at 127.0.0.1:18400');
+            const host = typeof window !== 'undefined' ? (window.localStorage.getItem('musoftware_runtime_host') || '127.0.0.1') : '127.0.0.1';
+            setError(`Runtime agent not reachable at ${host}:18400`);
             return false;
         }
     }, [applyStatus]);

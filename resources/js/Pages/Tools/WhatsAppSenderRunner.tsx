@@ -205,7 +205,8 @@ function useRuntimeWS(pluginSlug: string, onBroadcast?: ((event: string, data: a
     onBroadcastRef.current = onBroadcast || null;
 
     useEffect(() => {
-        const socket = new WebSocket('ws://127.0.0.1:18401/ws');
+        const host = typeof window !== 'undefined' ? (window.localStorage.getItem('musoftware_runtime_host') || '127.0.0.1') : '127.0.0.1';
+        const socket = new WebSocket(`ws://${host}:18401/ws`);
         
         socket.onopen = () => setConnected(true);
         socket.onclose = () => setConnected(false);
@@ -459,7 +460,8 @@ export default function WhatsAppSenderRunner({ tool, subscription, runtimePort, 
         setActiveTab('deliverability');
 
         try {
-            const response = await fetch(`http://127.0.0.1:${runtimePort || 18400}/plugins/whatsapp-sender/run`, {
+            const host = typeof window !== 'undefined' ? (window.localStorage.getItem('musoftware_runtime_host') || '127.0.0.1') : '127.0.0.1';
+            const response = await fetch(`http://${host}:${runtimePort || 18400}/plugins/whatsapp-sender/run`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -505,7 +507,8 @@ export default function WhatsAppSenderRunner({ tool, subscription, runtimePort, 
     const handleStopCampaign = async () => {
         if (!runningTaskId) return;
         try {
-            await fetch(`http://127.0.0.1:${runtimePort || 18400}/tasks/${runningTaskId}/stop`, { method: 'POST' });
+            const host = typeof window !== 'undefined' ? (window.localStorage.getItem('musoftware_runtime_host') || '127.0.0.1') : '127.0.0.1';
+            await fetch(`http://${host}:${runtimePort || 18400}/tasks/${runningTaskId}/stop`, { method: 'POST' });
             setIsCampaignRunning(false);
         } catch (err) {
             console.error('Failed to stop task:', err);

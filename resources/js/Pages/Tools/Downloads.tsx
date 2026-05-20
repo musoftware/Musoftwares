@@ -26,6 +26,8 @@ interface Props {
 }
 
 export default function Downloads({ availableTools, downloads }: Props) {
+    const host = typeof window !== 'undefined' ? (window.localStorage.getItem('musoftware_runtime_host') || '127.0.0.1') : '127.0.0.1';
+
     return (
         <ToolsPublicLayout title="My Tools" activeNav="downloads">
             <Head title="My Tools — Musoftware" />
@@ -41,7 +43,7 @@ export default function Downloads({ availableTools, downloads }: Props) {
                         Tools run directly in your browser — no download needed.
                         Make sure the{' '}
                         <Link
-                            href="http://127.0.0.1:18400/setup"
+                            href={`http://${host}:18400/setup`}
                             className="text-indigo-600 hover:underline"
                             target="_blank"
                         >
@@ -128,7 +130,7 @@ export default function Downloads({ availableTools, downloads }: Props) {
                         <strong>How it works:</strong> Tools run locally on your computer via the Musoftware Runtime.
                         The website is your control panel — no separate app needed.{' '}
                         <Link
-                            href="http://127.0.0.1:18400/setup"
+                            href={`http://${host}:18400/setup`}
                             target="_blank"
                             className="underline underline-offset-2"
                         >

@@ -5,8 +5,9 @@ import {
     Folder, HardDrive, ShieldCheck, CheckCircle2, Terminal, ChevronRight
 } from 'lucide-react';
 
-const RUNTIME_HTTP = 'http://127.0.0.1:18400';
-const WS_URL       = 'ws://127.0.0.1:18401/ws';
+const getRuntimeHost = () => typeof window !== 'undefined' ? (window.localStorage.getItem('musoftware_runtime_host') || '127.0.0.1') : '127.0.0.1';
+const getRuntimeHttp = () => `http://${getRuntimeHost()}:18400`;
+const getWsUrl       = () => `ws://${getRuntimeHost()}:18401/ws`;
 
 // ── Custom WebSocket Hook for Generic RPC + Broadcasts ────────────────────────
 function useRuntimeRPC(pluginSlug: string) {
@@ -20,7 +21,7 @@ function useRuntimeRPC(pluginSlug: string) {
         let reconnectTimer: NodeJS.Timeout;
 
         const connect = () => {
-            socket = new WebSocket(WS_URL);
+            socket = new WebSocket(getWsUrl());
 
             socket.onopen = () => {
                 setConnected(true);
@@ -166,7 +167,7 @@ export default function SnapDownloaderRunner() {
         setActiveWorkspace('extraction');
 
         try {
-            const response = await fetch(`${RUNTIME_HTTP}/plugins/snapdownloader/run`, {
+            const response = await fetch(`${getRuntimeHttp()}/plugins/snapdownloader/run`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
