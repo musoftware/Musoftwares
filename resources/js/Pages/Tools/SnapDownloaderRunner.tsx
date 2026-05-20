@@ -348,7 +348,7 @@ export default function SnapDownloaderRunner() {
                                     </div>
                                     <h2 className="text-xl font-bold tracking-tight">Zero-Cloud Media Processing</h2>
                                     <p className="text-sm text-amber-50/90 leading-relaxed">
-                                        Your downloads bypass the cloud completely. Our Python extraction engine runs directly inside your local Musoftware Runtime, saving high-quality MP4 files straight to your hard drive securely and anonymously.
+                                        Your downloads bypass the cloud completely. Our Node.js extraction engine runs directly inside your local Musoftware Runtime, saving high-quality MP4 files straight to your hard drive securely and anonymously.
                                     </p>
                                 </div>
                             </div>

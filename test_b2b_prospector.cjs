@@ -2,9 +2,9 @@ const path = require('path');
 const fs = require('fs');
 
 async function runE2ETests() {
-    console.log('🚀 Starting Lead Intelligence Engine E2E Tests...');
+    console.log('🚀 Starting B2B Prospector E2E Tests...');
     
-    const pluginPath = path.join(__dirname, 'tools', 'musoftware-runtime', 'plugins', 'lead-intelligence');
+    const pluginPath = path.join(__dirname, 'tools', 'musoftware-runtime', 'plugins', 'b2b-prospector');
     const workerModule = require(path.join(pluginPath, 'worker.js'));
     const DatabaseManager = require(path.join(pluginPath, 'database.js'));
 

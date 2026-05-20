@@ -32,12 +32,12 @@ class FreelanceDatabaseSeeder extends Seeder
             Skill::firstOrCreate(['name' => $skill['name']], $skill);
         }
 
-        // Default Point Packages
+        // Default Point Packages (1 Point = 1 EGP)
         $packages = [
-            ['name' => 'Basic Pack', 'points' => 50, 'price' => 5.00, 'currency_code' => 'USD'],
-            ['name' => 'Standard Pack', 'points' => 120, 'price' => 10.00, 'currency_code' => 'USD'],
-            ['name' => 'Pro Pack', 'points' => 300, 'price' => 20.00, 'currency_code' => 'USD'],
-            ['name' => 'Enterprise Pack', 'points' => 1000, 'price' => 50.00, 'currency_code' => 'USD'],
+            ['name' => 'Basic Pack', 'points' => 50, 'price' => 50.00, 'currency_code' => 'EGP'],
+            ['name' => 'Standard Pack', 'points' => 120, 'price' => 120.00, 'currency_code' => 'EGP'],
+            ['name' => 'Pro Pack', 'points' => 300, 'price' => 300.00, 'currency_code' => 'EGP'],
+            ['name' => 'Enterprise Pack', 'points' => 1000, 'price' => 1000.00, 'currency_code' => 'EGP'],
         ];
 
         foreach ($packages as $package) {
