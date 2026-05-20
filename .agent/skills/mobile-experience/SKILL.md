@@ -35,7 +35,7 @@ Mobile interfaces must NOT feel like scaled-down desktop pages. They must feel l
 
 ## 3. High-Fidelity App Aesthetics & Interactions
 The user should feel like they are interacting with a premium native application:
-- **Calm, Premium Colors**: Use curated dark-mode backgrounds (e.g. deep slate `slate-950` with glassmorphic semi-transparent overlays) combined with neon state colors (emerald for online, amber for pending, indigo for active tasks).
+- **Clean, Premium Light Mode**: DO NOT use dark mode. Use curated, crisp light-mode backgrounds (e.g., pure white or `slate-50` with subtle glassmorphic semi-transparent overlays) combined with bright, clear state colors (emerald for online, amber for pending, indigo for active tasks).
 - **Glassmorphism**: Utilize backdrop blur filters (`backdrop-blur-md`) on cards, modals, and navigation bars to create spatial depth.
 - **Micro-Animations & Physics**: Implement smooth spring-physics scale effects on button presses, fading transitions on tab switches, and pulsing glowing indicators for active network sockets.
 - **Haptic Visuals**: Provide immediate, delightful visual feedback for actions (e.g., a checkmark icon scaling up with a bounce animation upon successful network linkage).
