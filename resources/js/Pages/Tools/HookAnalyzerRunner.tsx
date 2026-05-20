@@ -212,6 +212,27 @@ export default function HookAnalyzerRunner({ tool, subscription, runtimePort, pl
                                     <span className="text-[10px] text-slate-400">Retention: {a.retention_estimate}</span>
                                 </div>
 
+                                {a.engagement && a.engagement.plays > 0 && (
+                                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 py-2.5 px-3 bg-slate-50 border border-slate-100 rounded-lg text-center text-xs text-slate-500 mb-3.5">
+                                        <div>
+                                            <span className="font-bold text-slate-800 block text-sm">{(a.engagement.plays).toLocaleString()}</span>
+                                            <span className="text-[10px] text-slate-400">Plays</span>
+                                        </div>
+                                        <div>
+                                            <span className="font-bold text-slate-800 block text-sm">{(a.engagement.likes).toLocaleString()}</span>
+                                            <span className="text-[10px] text-slate-400">Likes ({a.engagement.like_rate})</span>
+                                        </div>
+                                        <div>
+                                            <span className="font-bold text-slate-800 block text-sm">{(a.engagement.comments).toLocaleString()}</span>
+                                            <span className="text-[10px] text-slate-400">Comments ({a.engagement.comment_rate})</span>
+                                        </div>
+                                        <div>
+                                            <span className="font-bold text-indigo-600 block text-sm">{(a.engagement.shares).toLocaleString()}</span>
+                                            <span className="text-[10px] text-indigo-400">Shares</span>
+                                        </div>
+                                    </div>
+                                )}
+
                                 {a.suggestions?.length > 0 && (
                                     <div className="space-y-1 mt-2">
                                         {a.suggestions.map((s: any, j: number) => (

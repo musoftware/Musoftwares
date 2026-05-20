@@ -31,7 +31,7 @@ class ERPTask extends TenantModel
         'completed_at' => 'datetime',
     ];
 
-    public const STATUSES   = ['open', 'in_progress', 'completed', 'archived'];
+    public const STATUSES   = ['open', 'in_progress', 'review', 'completed', 'archived'];
     public const PRIORITIES = ['low', 'normal', 'high', 'urgent'];
 
     // ── Relationships ────────────────────────────────────────────────

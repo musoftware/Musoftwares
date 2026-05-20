@@ -14,6 +14,7 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->web(append: [
+            \Modules\ERP\Http\Middleware\ShareTeamMemberSession::class,
             \App\Http\Middleware\HandleInertiaRequests::class,
             \Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets::class,
         ]);
@@ -35,6 +36,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'role' => \Spatie\Permission\Middleware\RoleMiddleware::class,
             'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
             'onboarding' => \App\Http\Middleware\EnsureOnboardingCompleted::class,
+            'erp.team.permissions' => \Modules\ERP\Http\Middleware\EnforceTeamMemberPermissions::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

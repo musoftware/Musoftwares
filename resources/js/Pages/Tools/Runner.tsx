@@ -11,6 +11,7 @@ import ViralAutopsyRunner from '@/Pages/Tools/ViralAutopsyRunner';
 import HookAnalyzerRunner from '@/Pages/Tools/HookAnalyzerRunner';
 import FormatExtractorRunner from '@/Pages/Tools/FormatExtractorRunner';
 import WhatsAppSenderRunner from '@/Pages/Tools/WhatsAppSenderRunner';
+import WhatsAppSenderProRunner from '@/Pages/Tools/WhatsAppSenderProRunner';
 import WaWarmupRunner from '@/Pages/Tools/WaWarmupRunner';
 import WaAiAgentRunner from '@/Pages/Tools/WaAiAgentRunner';
 import WaFunnelBuilderRunner from '@/Pages/Tools/WaFunnelBuilderRunner';
@@ -18,7 +19,7 @@ import LeadIntelligenceRunner from '@/Pages/Tools/LeadIntelligenceRunner';
 import TikTokIntelligenceRunner from '@/Pages/Tools/TikTokIntelligenceRunner';
 
 interface Props {
-    tool:         { slug: string; title: string; icon_url: string | null; short_description: string; category?: string; runner_component?: string };
+    tool:         { slug: string; title: string; icon_url: string | null; short_description: string; category: string; runner_component?: string };
     subscription: { plan_name: string; expires_at: string | null };
     runtimePort:  number;
     pluginSlug:   string;
@@ -53,10 +54,12 @@ export default function Runner({ tool, subscription, runtimePort, pluginSlug }: 
     if (component === 'hook-analyzer')    return <HookAnalyzerRunner tool={tool} subscription={subscription} runtimePort={runtimePort} pluginSlug={pluginSlug} />;
     if (component === 'format-extractor') return <FormatExtractorRunner tool={tool} subscription={subscription} runtimePort={runtimePort} pluginSlug={pluginSlug} />;
     if (component === 'whatsapp-sender')  return <WhatsAppSenderRunner tool={tool} subscription={subscription} runtimePort={runtimePort} pluginSlug={pluginSlug} />;
+    if (component === 'whatsapp-sender-pro') return <WhatsAppSenderProRunner tool={tool} subscription={subscription} runtimePort={runtimePort} pluginSlug={pluginSlug} />;
     if (component === 'wa-warmup')        return <WaWarmupRunner tool={tool} subscription={subscription} runtimePort={runtimePort} pluginSlug={pluginSlug} />;
     if (component === 'wa-ai-agent')      return <WaAiAgentRunner tool={tool} subscription={subscription} runtimePort={runtimePort} pluginSlug={pluginSlug} />;
     if (component === 'wa-funnel-engine') return <WaFunnelBuilderRunner tool={tool} subscription={subscription} runtimePort={runtimePort} pluginSlug={pluginSlug} />;
     if (component === 'lead-intelligence') return <LeadIntelligenceRunner tool={tool} subscription={subscription} runtimePort={runtimePort} pluginSlug={pluginSlug} />;
+    if (component === 'email-prospector' || pluginSlug === 'email-prospector') return <LeadIntelligenceRunner tool={tool} subscription={subscription} runtimePort={runtimePort} pluginSlug="lead-intelligence" />;
     if (component === 'tiktok-intelligence') return <TikTokIntelligenceRunner tool={tool} subscription={subscription} runtimePort={runtimePort} pluginSlug={pluginSlug} />;
 
     // ── Default: TikTok Scraper runner (original) ──────────────────────────
@@ -540,7 +543,7 @@ export default function Runner({ tool, subscription, runtimePort, pluginSlug }: 
                                                     )}
                                                     {v.download_url && (
                                                         <button
-                                                            onClick={() => copyUrl(v.download_url)}
+                                                            onClick={() => copyUrl(v.download_url as string)}
                                                             className="flex items-center gap-1 text-[11px] font-medium px-2.5 py-1 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 transition-colors"
                                                         >
                                                             {copiedUrl === v.download_url ? <Check className="h-3 w-3 text-emerald-500" /> : <Copy className="h-3 w-3" />}

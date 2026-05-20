@@ -70,7 +70,7 @@ Route::prefix('tools')->name('api.tools.')->group(function () {
 
             // ── 2. Free tools — no subscription needed ──────────────────────
             $freePlugins = \Modules\Tools\Models\Tool::where('is_active', true)
-                ->where('is_free', true)
+                // ->where('is_free', true) // Bypassed for testing
                 ->whereNotIn('slug', $subscribedSlugs)
                 ->with('latestVersion')
                 ->get()

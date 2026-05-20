@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Head, Link, router } from '@inertiajs/react';
+import { Head, Link, router, usePage } from '@inertiajs/react';
 import AdminLayout from '@/Layouts/AdminLayout';
 import { Button } from '@/Components/ui/button';
 import { Card, CardContent } from '@/Components/ui/card';
@@ -24,6 +24,7 @@ interface Props {
 }
 
 export default function SerialUserDevicesAssign({ users, availableDevices }: Props) {
+    const { auth } = usePage().props as any;
     const [form, setForm] = useState({ user_id: '', device_id: '', status: 'active', notes: '' });
     const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -37,7 +38,7 @@ export default function SerialUserDevicesAssign({ users, availableDevices }: Pro
     const selectedDevice = availableDevices.find(d => d.device_id === form.device_id);
 
     return (
-        <AdminLayout>
+        <AdminLayout user={auth.user}>
             <Head title="Assign Device" />
             <div className="max-w-2xl mx-auto px-4 py-8 space-y-6">
                 <div className="flex items-center gap-3">
@@ -56,7 +57,7 @@ export default function SerialUserDevicesAssign({ users, availableDevices }: Pro
                             {/* Device Selection */}
                             <div className="space-y-2">
                                 <Label className="text-zinc-300 font-medium">Device</Label>
-                                <Select value={form.device_id} onValueChange={v => setForm(f => ({ ...f, device_id: v }))}>
+                                <Select value={form.device_id} onValueChange={v => setForm(f => ({ ...f, device_id: v || '' }))}>
                                     <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white">
                                         <SelectValue placeholder="Select a device..." />
                                     </SelectTrigger>
@@ -86,7 +87,7 @@ export default function SerialUserDevicesAssign({ users, availableDevices }: Pro
                             {/* User Selection */}
                             <div className="space-y-2">
                                 <Label className="text-zinc-300 font-medium">Assign To User</Label>
-                                <Select value={form.user_id} onValueChange={v => setForm(f => ({ ...f, user_id: v }))}>
+                                <Select value={form.user_id} onValueChange={v => setForm(f => ({ ...f, user_id: v || '' }))}>
                                     <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white">
                                         <SelectValue placeholder="Select a user..." />
                                     </SelectTrigger>
@@ -105,7 +106,7 @@ export default function SerialUserDevicesAssign({ users, availableDevices }: Pro
                             {/* Status */}
                             <div className="space-y-2">
                                 <Label className="text-zinc-300 font-medium">Initial Status</Label>
-                                <Select value={form.status} onValueChange={v => setForm(f => ({ ...f, status: v }))}>
+                                <Select value={form.status} onValueChange={v => setForm(f => ({ ...f, status: v || 'active' }))}>
                                     <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white">
                                         <SelectValue />
                                     </SelectTrigger>

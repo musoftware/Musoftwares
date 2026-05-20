@@ -42,6 +42,11 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
+
+        'erp_team' => [
+            'driver' => 'session',
+            'provider' => 'erp_team_members',
+        ],
     ],
 
     /*
@@ -65,6 +70,11 @@ return [
         'users' => [
             'driver' => 'eloquent',
             'model' => env('AUTH_MODEL', User::class),
+        ],
+
+        'erp_team_members' => [
+            'driver' => 'eloquent',
+            'model' => Modules\ERP\Models\TeamMember::class,
         ],
 
         // 'users' => [

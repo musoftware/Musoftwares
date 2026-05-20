@@ -113,7 +113,7 @@ export default function Plans({ plans, activeSubscription, walletBalance, curren
                             className="inline-flex items-center gap-1.5 text-xs font-medium text-emerald-700 bg-emerald-50 border border-emerald-100 px-3 py-1 rounded-full"
                         >
                             <Check className="h-3 w-3" />
-                            {m.label} — Included Free
+                            {m.label} — {m.id === 'freelance' ? 'Points-Based' : 'Included Free'}
                         </span>
                     ))}
                 </div>

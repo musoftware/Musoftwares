@@ -34,6 +34,8 @@ export default function RuntimeConnect({ code, port, userName, userEmail, succes
         router.visit('/');
     }
 
+    const callbackError = errors?.callback || localError;
+
     useEffect(() => {
         if (callbackError) {
             window.location.assign('musoftware://open');
@@ -136,8 +138,6 @@ export default function RuntimeConnect({ code, port, userName, userEmail, succes
             </div>
         );
     }
-
-    const callbackError = errors?.callback || localError;
 
     return (
         <div className="min-h-screen bg-slate-950 flex items-center justify-center p-6">

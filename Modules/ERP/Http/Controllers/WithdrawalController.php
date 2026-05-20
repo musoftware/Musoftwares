@@ -4,196 +4,264 @@ namespace Modules\ERP\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Modules\ERP\Models\Withdrawal;
 use Modules\ERP\Models\PaymentMethod;
-use Modules\Core\Models\Wallet;
-use Modules\Core\Models\WalletTransaction;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
+use Modules\ERP\Models\ClientWallet;
+use Modules\ERP\Models\WalletTransaction as ClientWalletTransaction;
+use Modules\ERP\Models\Tenant;
+use Modules\ERP\Models\TenantClient;
 use Inertia\Inertia;
 
+/**
+ * ERP Withdrawal Controller.
+ *
+ * ╔══════════════════════════════════════════════════════════════════╗
+ * ║  FINANCIAL ISOLATION BOUNDARY                                    ║
+ * ║                                                                  ║
+ * ║  Withdrawals here represent a tenant paying out real money to    ║
+ * ║  their clients (e.g. referral commissions, refunds).             ║
+ * ║                                                                  ║
+ * ║  This ONLY touches ERP models:                                   ║
+ * ║    • Modules\ERP\Models\ClientWallet      (client_wallets)       ║
+ * ║    • Modules\ERP\Models\WalletTransaction (client_wallet_txns)   ║
+ * ║    • Modules\ERP\Models\Withdrawal        (withdrawals)          ║
+ * ║                                                                  ║
+ * ║  It NEVER touches Core\Wallet or Core\WalletTransaction.        ║
+ * ╚══════════════════════════════════════════════════════════════════╝
+ *
+ * Access model:
+ *   - Tenant (admin of their workspace) → sees all withdrawals for their clients
+ *   - The ERP is a tenant tool; there is no separate "client portal" role here
+ */
 class WithdrawalController extends Controller
 {
+    // ── Tenant resolution helper ─────────────────────────────────────
+
+    private function resolveTenant(): Tenant
+    {
+        return Tenant::where('user_id', Auth::id())->firstOrFail();
+    }
+
+    // ── Index — tenant sees all withdrawal requests ───────────────────
+
     public function index(Request $request)
     {
-        // Admin view
-        if ($request->user()->can('manage withdrawals')) {
-            $withdrawals = Withdrawal::with(['client', 'paymentMethod'])->latest()->paginate(15);
-            return Inertia::render('ERP/Withdrawals/IndexAdmin', [
-                'withdrawals' => $withdrawals,
-            ]);
-        }
-
-        // Client view
-        // Assuming the client logic is tied to the logged-in user somehow (e.g., via a client portal)
-        // For now, if no permission to manage, assume client
-        $client = $request->user()->client; // Assuming User has a client relation, or handled differently based on context
-        if (!$client) {
-            abort(403);
-        }
-
-        $withdrawals = Withdrawal::where('client_id', $client->id)
-            ->with('paymentMethod')
+        $tenant      = $this->resolveTenant();
+        $withdrawals = Withdrawal::with(['client', 'paymentMethod'])
+            ->where('tenant_id', $tenant->id)
             ->latest()
             ->paginate(15);
 
-        $wallet = Wallet::where('owner_type', \Modules\ERP\Models\Client::class)
-            ->where('owner_id', $client->id)
-            ->first();
-
-        // Calculate locked amount (pending and approved withdrawals)
-        $lockedAmount = Withdrawal::where('client_id', $client->id)
-            ->whereIn('status', ['pending', 'approved'])
-            ->sum('amount');
-
-        return Inertia::render('ERP/Withdrawals/IndexClient', [
+        return Inertia::render('ERP/Withdrawals/Index', [
             'withdrawals' => $withdrawals,
-            'wallet' => $wallet,
-            'lockedAmount' => $lockedAmount,
         ]);
     }
 
+    // ── Store — tenant creates a withdrawal on behalf of a client ────
+
     public function store(Request $request)
     {
-        $client = $request->user()->client;
-        if (!$client) abort(403);
+        $tenant = $this->resolveTenant();
 
         $request->validate([
-            'amount' => 'required|numeric|min:0.01',
+            'client_id'         => 'required|exists:tenant_clients,id',
+            'amount'            => 'required|numeric|min:0.01',
             'payment_method_id' => 'required|exists:payment_methods,id',
         ]);
 
-        // Verify payment method belongs to client
+        // Verify client belongs to this tenant
+        $client = TenantClient::where('tenant_id', $tenant->id)
+            ->findOrFail($request->client_id);
+
+        // Verify payment method belongs to this client and is approved
         $paymentMethod = PaymentMethod::where('id', $request->payment_method_id)
             ->where('client_id', $client->id)
             ->where('status', 'approved')
             ->firstOrFail();
 
         try {
-            DB::transaction(function () use ($request, $client) {
-                $wallet = Wallet::where('owner_type', \Modules\ERP\Models\Client::class)
-                    ->where('owner_id', $client->id)
+            DB::transaction(function () use ($request, $tenant, $client) {
+                $wallet = ClientWallet::where('tenant_id', $tenant->id)
+                    ->where('client_id', $client->id)
                     ->lockForUpdate()
                     ->firstOrFail();
 
-                $amount = $request->amount;
+                $amount = (float) $request->amount;
 
-                // Check if available balance (balance - pending/approved withdrawals) is enough
-                $lockedAmount = Withdrawal::where('client_id', $client->id)
+                // Check available balance (subtract already-pending withdrawals)
+                $pendingLocked = Withdrawal::where('tenant_id', $tenant->id)
+                    ->where('client_id', $client->id)
                     ->whereIn('status', ['pending', 'approved'])
                     ->sum('amount');
 
-                if ($wallet->balance - $lockedAmount < $amount) {
-                    throw new \Exception('Insufficient available balance.');
+                $available = (float) $wallet->balance - (float) $pendingLocked;
+
+                if ($available < $amount) {
+                    throw new \Exception("Insufficient available balance. Available: {$available}, Requested: {$amount}");
                 }
 
-                $withdrawal = Withdrawal::create([
-                    'tenant_id' => $client->tenant_id,
-                    'client_id' => $client->id,
+                Withdrawal::create([
+                    'tenant_id'         => $tenant->id,
+                    'client_id'         => $client->id,
                     'payment_method_id' => $request->payment_method_id,
-                    'amount' => $amount,
-                    'currency_code' => $wallet->currency,
-                    'status' => 'pending',
+                    'amount'            => $amount,
+                    'currency_code'     => $wallet->currency,
+                    'status'            => 'pending',
+                    'balance_at_request'=> $wallet->balance,
                 ]);
-
-                event(new \App\Events\WithdrawalRequested($withdrawal));
             });
 
-            return back()->with('success', 'Withdrawal request submitted.');
+            return back()->with('success', 'Withdrawal request created.');
         } catch (\Exception $e) {
             return back()->withErrors(['amount' => $e->getMessage()]);
         }
     }
 
+    // ── Approve ───────────────────────────────────────────────────────
+
     public function approve(Request $request, Withdrawal $withdrawal)
     {
-        // Admin only
-        $withdrawal->update(['status' => 'approved']);
-        event(new \App\Events\WithdrawalApproved($withdrawal));
+        $this->authorizeTenantWithdrawal($withdrawal);
+
+        if ($withdrawal->status !== 'pending') {
+            return back()->withErrors(['status' => 'Only pending withdrawals can be approved.']);
+        }
+
+        $withdrawal->update([
+            'status'      => 'approved',
+            'reviewed_by' => Auth::id(),
+            'reviewed_at' => now(),
+        ]);
+
         return back()->with('success', 'Withdrawal approved.');
     }
 
+    // ── Mark Paid — deducts from ERP ClientWallet ────────────────────
+
     public function markPaid(Request $request, Withdrawal $withdrawal)
     {
-        // Admin only
+        $this->authorizeTenantWithdrawal($withdrawal);
+
         $request->validate([
             'reference' => 'required|string|max:255',
-            'proof' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
+            'proof'     => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
         ]);
 
-        DB::transaction(function () use ($request, $withdrawal) {
-            if ($withdrawal->status !== 'approved') {
-                throw new \Exception('Withdrawal must be approved first.');
-            }
+        if ($withdrawal->status !== 'approved') {
+            return back()->withErrors(['status' => 'Withdrawal must be approved before marking as paid.']);
+        }
 
-            $wallet = Wallet::where('owner_type', \Modules\ERP\Models\Client::class)
-                ->where('owner_id', $withdrawal->client_id)
-                ->lockForUpdate()
-                ->firstOrFail();
+        try {
+            DB::transaction(function () use ($request, $withdrawal) {
+                // Lock and deduct from ERP ClientWallet (NOT platform wallet)
+                $wallet = ClientWallet::where('tenant_id', $withdrawal->tenant_id)
+                    ->where('client_id', $withdrawal->client_id)
+                    ->lockForUpdate()
+                    ->firstOrFail();
 
-            // Actually deduct from wallet
-            $newBalance = $wallet->balance - $withdrawal->amount;
+                $amount    = (float) $withdrawal->amount;
+                $balBefore = (float) $wallet->balance;
+                $balAfter  = $balBefore - $amount;
 
-            $exchangeRate = 1.0;
-            $businessCurrency = 'USD';
-            $businessAmount = $withdrawal->amount * $exchangeRate;
+                if ($balBefore < $amount) {
+                    throw new \Exception('Client wallet balance is insufficient to complete this withdrawal.');
+                }
 
-            WalletTransaction::create([
-                'wallet_id' => $wallet->id,
-                'type' => 'debit',
-                'amount' => $withdrawal->amount,
-                'balance_before' => $wallet->balance,
-                'balance_after' => $newBalance,
-                'reference_type' => 'withdrawal',
-                'reference_id' => $withdrawal->id,
-                'description' => 'Withdrawal paid',
-                'business_amount' => $businessAmount,
-                'business_currency' => $businessCurrency,
-            ]);
+                // Create an immutable ledger entry in ERP wallet transactions
+                ClientWalletTransaction::create([
+                    'tenant_id'         => $withdrawal->tenant_id,
+                    'wallet_id'         => $wallet->id,
+                    'type'              => 'manual_debit',
+                    'direction'         => 'debit',
+                    'amount'            => $amount,
+                    'amount_currency'   => $wallet->currency,
+                    'business_amount'   => $amount,
+                    'business_currency' => $wallet->currency,
+                    'exchange_rate'     => 1.0,
+                    'exchange_rate_date'=> now()->toDateString(),
+                    'balance_before'    => $balBefore,
+                    'balance_after'     => $balAfter,
+                    'reference_type'    => Withdrawal::class,
+                    'reference_id'      => $withdrawal->id,
+                    'note'              => 'Withdrawal paid — ref: ' . $request->reference,
+                    'created_by'        => Auth::id(),
+                ]);
 
-            $wallet->update(['balance' => $newBalance]);
+                $wallet->update(['balance' => $balAfter]);
 
-            $proofPath = null;
-            if ($request->hasFile('proof')) {
-                $proofPath = $request->file('proof')->store('withdrawal_proofs', 'public');
-            }
+                // Handle proof upload
+                $proofPath = null;
+                if ($request->hasFile('proof')) {
+                    $proofPath = $request->file('proof')->store('withdrawal_proofs', 'public');
+                }
 
-            $withdrawal->update([
-                'status' => 'paid',
-                'reference' => $request->reference,
-                'proof_path' => $proofPath,
-            ]);
-        });
+                $withdrawal->update([
+                    'status'      => 'paid',
+                    'reference'   => $request->reference,
+                    'proof_path'  => $proofPath,
+                    'paid_by'     => Auth::id(),
+                    'paid_at'     => now(),
+                ]);
+            });
 
-        return back()->with('success', 'Withdrawal marked as paid.');
+            return back()->with('success', 'Withdrawal marked as paid and client balance deducted.');
+        } catch (\Exception $e) {
+            return back()->withErrors(['amount' => $e->getMessage()]);
+        }
     }
+
+    // ── Reject ────────────────────────────────────────────────────────
 
     public function reject(Request $request, Withdrawal $withdrawal)
     {
-        // Admin only
+        $this->authorizeTenantWithdrawal($withdrawal);
+
         $request->validate([
-            'admin_notes' => 'required|string',
+            'admin_notes' => 'required|string|max:1000',
         ]);
 
+        if (!in_array($withdrawal->status, ['pending', 'approved'])) {
+            return back()->withErrors(['status' => 'This withdrawal cannot be rejected in its current state.']);
+        }
+
         $withdrawal->update([
-            'status' => 'rejected',
-            'admin_notes' => $request->admin_notes,
+            'status'       => 'rejected',
+            'admin_notes'  => $request->admin_notes,
+            'reviewed_by'  => Auth::id(),
+            'reviewed_at'  => now(),
         ]);
 
         return back()->with('success', 'Withdrawal rejected.');
     }
 
+    // ── Cancel ────────────────────────────────────────────────────────
+
     public function cancel(Request $request, Withdrawal $withdrawal)
     {
-        // Client only
-        $client = $request->user()->client;
-        if (!$client || $withdrawal->client_id !== $client->id) abort(403);
+        $this->authorizeTenantWithdrawal($withdrawal);
 
         if ($withdrawal->status !== 'pending') {
-            return back()->with('error', 'Only pending requests can be canceled.');
+            return back()->withErrors(['status' => 'Only pending withdrawals can be cancelled.']);
         }
 
-        $withdrawal->update(['status' => 'canceled']);
-        return back()->with('success', 'Withdrawal canceled.');
+        $withdrawal->update(['status' => 'cancelled']);
+
+        return back()->with('success', 'Withdrawal cancelled.');
+    }
+
+    // ── Auth guard helper ─────────────────────────────────────────────
+
+    /**
+     * Ensure the withdrawal belongs to the current user's tenant.
+     * Aborts 403 if not.
+     */
+    private function authorizeTenantWithdrawal(Withdrawal $withdrawal): void
+    {
+        $tenant = $this->resolveTenant();
+        if ($withdrawal->tenant_id !== $tenant->id) {
+            abort(403, 'Unauthorized access to this withdrawal.');
+        }
     }
 }

@@ -96,6 +96,12 @@ export default function Show({ invoice, timeline, referral_earnings }) {
                             <h3 className="text-xs font-bold uppercase text-muted-foreground mb-4 tracking-widest">Bill To</h3>
                             <p className="text-xl font-bold">{invoice.client?.name}</p>
                             <p className="text-muted-foreground">{invoice.client?.email}</p>
+                            {invoice.project && (
+                                <div className="mt-4">
+                                    <h4 className="text-xs font-bold uppercase text-muted-foreground mb-1 tracking-widest">Project</h4>
+                                    <p className="text-md font-semibold text-primary">{invoice.project.name}</p>
+                                </div>
+                            )}
                         </div>
 
                         {activeTimerItem && (
@@ -250,6 +256,12 @@ export default function Show({ invoice, timeline, referral_earnings }) {
                                     <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Billed To</p>
                                     <h3 className="text-base font-semibold text-slate-900">{invoice.client?.name}</h3>
                                     <p className="text-sm text-slate-500">{invoice.client?.email}</p>
+                                    {invoice.project && (
+                                        <div className="mt-3">
+                                            <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-0.5">Project</p>
+                                            <p className="text-sm font-medium text-indigo-600">{invoice.project.name}</p>
+                                        </div>
+                                    )}
                                 </div>
                             </div>
 

@@ -22,7 +22,7 @@ class SubscriptionMiddleware
      */
     public function handle(Request $request, Closure $next, string $module): Response
     {
-        if (!auth()->check()) {
+        if (!auth()->check() && !auth('erp_team')->check()) {
             if ($request->expectsJson() || $request->is('api/*')) {
                 abort(401, 'Unauthorized access.');
             }
@@ -30,6 +30,14 @@ class SubscriptionMiddleware
         }
 
         $user = $request->user();
+        if (auth('erp_team')->check()) {
+            $member = auth('erp_team')->user();
+            $user = $member?->tenant?->user;
+        }
+
+        if (!$user) {
+            abort(401, 'Unauthorized access.');
+        }
 
         // 1. Verify active subscription or admin status
         $hasModuleAccess = $this->subscriptionService->hasActiveSubscription($user, $module);

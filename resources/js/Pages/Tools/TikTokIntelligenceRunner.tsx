@@ -166,19 +166,29 @@ function DiscoverTab({ base, pluginSlug }: { base: string, pluginSlug: string })
             // For now, simulate WS/polling by waiting and fetching result
             // Normally we would connect to WS here
             const tid = data.taskId;
+
+            if (!tid) {
+                setStatus('error');
+                setLogs(['Runtime returned no task ID. Check that the runtime is running.']);
+                return;
+            }
             
             timerRef.current = setInterval(async () => {
-                const r = await fetch(`${base}/tasks/${tid}`);
-                const d = await r.json();
-                setLogs(d.logs?.map((l:any) => l.message) || []);
-                if (d.status === 'done') {
-                    setProfile(d.result?.profile);
-                    setResults(d.result?.videos || []);
-                    setStatus('done');
-                    clearInterval(timerRef.current);
-                } else if (d.status === 'error') {
-                    setStatus('error');
-                    clearInterval(timerRef.current);
+                try {
+                    const r = await fetch(`${base}/tasks/${tid}`);
+                    const d = await r.json();
+                    setLogs(d.logs?.map((l:any) => l.message) || []);
+                    if (d.status === 'done') {
+                        setProfile(d.result?.profile);
+                        setResults(d.result?.videos || []);
+                        setStatus('done');
+                        clearInterval(timerRef.current);
+                    } else if (d.status === 'error' || d.status === 'failed') {
+                        setStatus('error');
+                        clearInterval(timerRef.current);
+                    }
+                } catch {
+                    // network hiccup — keep polling
                 }
             }, 1000);
 

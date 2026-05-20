@@ -7,6 +7,7 @@ import { Card, CardContent } from '@/Components/ui/card';
 import { Input } from '@/Components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/Components/ui/select';
 import { ArrowLeft, Monitor, User, Clock } from 'lucide-react';
+import { usePage } from '@inertiajs/react';
 import { useState } from 'react';
 
 interface UserRow {
@@ -24,6 +25,7 @@ interface Props {
 }
 
 export default function SerialUserDevicesByUser({ users, filters }: Props) {
+    const { auth } = usePage().props as any;
     const [search, setSearch] = useState(filters.search ?? '');
 
     const applyFilter = (key: string, value: string) => {
@@ -36,7 +38,7 @@ export default function SerialUserDevicesByUser({ users, filters }: Props) {
     };
 
     return (
-        <AdminLayout>
+        <AdminLayout user={auth.user}>
             <Head title="Devices By User" />
             <div className="min-h-screen bg-zinc-950 p-6 space-y-6">
                 <div className="flex items-center gap-4">

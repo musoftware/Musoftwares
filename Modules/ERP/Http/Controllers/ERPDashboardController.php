@@ -12,6 +12,9 @@ use Modules\ERP\Models\Tenant;
 use Modules\ERP\Models\Project;
 use Modules\ERP\Models\SupportTicket;
 use Modules\ERP\Models\Activity;
+use Modules\ERP\Models\TenantFile;
+use Modules\ERP\Models\TenantNote;
+use Modules\ERP\Models\TenantStorageProvider;
 use Modules\Core\Services\ExchangeRateService;
 use Inertia\Inertia;
 use Carbon\Carbon;
@@ -138,17 +141,46 @@ class ERPDashboardController extends Controller
             ];
         }
 
+        // ── Real Tasks ─────────────────────────────────────────────
+        $tasks = collect();
+        if ($tenantId) {
+            $tasks = \Modules\ERP\Models\ERPTask::with(['creator', 'assignee'])
+                ->where('tenant_id', $tenantId)
+                ->where('archived', false)
+                ->latest()
+                ->get()
+                ->map(function ($task) {
+                    $category = 'Todo';
+                    if ($task->status === 'in_progress') $category = 'In Progress';
+                    if ($task->status === 'review') $category = 'In Review';
+                    if ($task->status === 'completed') $category = 'Done';
+                    
+                    return [
+                        'id' => $task->id,
+                        'title' => $task->task_name,
+                        'due' => $task->due_date ? $task->due_date->format('M j, Y') : 'No due date',
+                        'assignee' => $task->assignee ? $task->assignee->name : ($task->creator ? $task->creator->name : 'Unassigned'),
+                        'priority' => ucfirst($task->priority ?? 'Normal'),
+                        'category' => $category,
+                    ];
+                });
+        }
+
         // ── Growth Metrics ────────────────────────────────────────
         $growthPercent = null;
         if ($tenantId) {
+            // M6 fix: capture subMonth once to avoid calling now() twice
+            $lastMonthDate = Carbon::now()->subMonth();
+
             $thisMonth = Invoice::where('tenant_id', $tenantId)
                 ->where('status', 'paid')
                 ->whereMonth('paid_at', Carbon::now()->month)
+                ->whereYear('paid_at', Carbon::now()->year)
                 ->sum('business_amount');
             $lastMonth = Invoice::where('tenant_id', $tenantId)
                 ->where('status', 'paid')
-                ->whereMonth('paid_at', Carbon::now()->subMonth()->month)
-                ->whereYear('paid_at', Carbon::now()->subMonth()->year)
+                ->whereMonth('paid_at', $lastMonthDate->month)
+                ->whereYear('paid_at', $lastMonthDate->year)
                 ->sum('business_amount');
             if ($lastMonth > 0) {
                 $growthPercent = round((($thisMonth - $lastMonth) / $lastMonth) * 100, 1);
@@ -168,10 +200,11 @@ class ERPDashboardController extends Controller
                         'id' => $project->id,
                         'name' => $project->name,
                         'client' => $project->client?->name ?? 'Unknown',
+                        'client_id' => $project->client_id,
                         'status' => $project->status,
                         'budget' => round($project->budget, 2),
-                        'deadline' => $project->due_date?->format('Y-m-d') ?? '-',
-                        'progress' => $project->status === 'completed' ? 100 : ($project->status === 'in_progress' ? 50 : 0),
+                        'deadline' => $project->due_date?->format('Y-m-d') ?? null,
+                        'progress' => strtolower($project->status) === 'completed' ? 100 : (strtolower($project->status) === 'active' ? 50 : 0),
                         'leader' => $project->creator?->name ?? '-',
                     ];
                 });
@@ -215,6 +248,47 @@ class ERPDashboardController extends Controller
                 });
         }
 
+        // ── Storage Providers & Documents ────────────────────────────
+        $storageProviders = collect();
+        $documents = collect();
+        if ($tenantId) {
+            $storageProviders = TenantStorageProvider::where('tenant_id', $tenantId)->get();
+            $documents = TenantFile::with(['uploader', 'storageProvider'])
+                ->where('tenant_id', $tenantId)
+                ->latest()
+                ->get()
+                ->map(function ($doc) {
+                    return [
+                        'id' => $doc->id,
+                        'name' => $doc->name,
+                        'provider' => $doc->storageProvider?->name ?? 'Local',
+                        'size' => round($doc->size / 1024, 2) . ' KB',
+                        'tags' => [$doc->folder],
+                        'uploadedBy' => $doc->uploader?->name ?? 'Unknown',
+                        'date' => $doc->created_at?->format('Y-m-d'),
+                    ];
+                });
+        }
+
+        // ── Workspace Notes ───────────────────────────────────────
+        $notes = collect();
+        if ($tenantId) {
+            $notes = TenantNote::where('tenant_id', $tenantId)
+                ->orderByDesc('pinned')
+                ->latest()
+                ->get()
+                ->map(function ($note) {
+                    return [
+                        'id'       => $note->id,
+                        'title'    => $note->title,
+                        'content'  => $note->content ?? '',
+                        'category' => $note->category,
+                        'pinned'   => (bool) $note->pinned,
+                        'date'     => $note->updated_at?->format('Y-m-d'),
+                    ];
+                });
+        }
+
         $stats = [
             'totalRevenue' => round($totalPaidRevenue, 2),
             'outstandingRevenue' => round($outstandingRevenue, 2),
@@ -247,6 +321,10 @@ class ERPDashboardController extends Controller
             'supportTickets' => $supportTickets,
             'activityLogs' => $activityLogs,
             'upcomingBookings' => $upcomingBookings,
+            'storageProviders' => $storageProviders ?? [],
+            'documents' => $documents ?? [],
+            'tasks' => $tasks,
+            'notes' => $notes,
         ]);
     }
 
@@ -259,20 +337,22 @@ class ERPDashboardController extends Controller
         );
 
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'nullable|email|max:255',
-            'phone' => 'nullable|string|max:20',
-            'address' => 'nullable|string|max:255',
+            'name'     => 'required|string|max:255',
+            'email'    => 'nullable|email|max:255',
+            'phone'    => 'nullable|string|max:20',
+            'address'  => 'nullable|string|max:255',
             'currency' => 'required|string|size:3',
+            'status'   => 'nullable|in:lead,active,paying,retained,archived',  // H9 fix
         ]);
 
         $client = TenantClient::create([
             'tenant_id' => $tenant->id,
-            'name' => $validated['name'],
-            'email' => $validated['email'],
-            'phone' => $validated['phone'],
-            'address' => $validated['address'],
-            'currency' => $validated['currency'] ?? 'USD',
+            'name'      => $validated['name'],
+            'email'     => $validated['email'] ?? null,
+            'phone'     => $validated['phone'] ?? null,
+            'address'   => $validated['address'] ?? null,
+            'currency'  => $validated['currency'],
+            'status'    => $validated['status'] ?? 'lead',  // H9 fix: default to lead
         ]);
 
         // Auto-create client wallet
@@ -315,7 +395,32 @@ class ERPDashboardController extends Controller
 
     public function destroyClient(TenantClient $client)
     {
+        // M4 fix: verify tenant ownership
+        $user   = Auth::user();
+        $tenant = Tenant::where('user_id', $user->id)->firstOrFail();
+
+        if ($client->tenant_id !== $tenant->id) {
+            abort(403, 'Unauthorized access to client.');
+        }
+
+        // M4 fix: guard against deleting clients with active invoices or projects
+        $hasOpenInvoices = $client->invoices()->whereNotIn('status', ['cancelled', 'paid'])->exists();
+        if ($hasOpenInvoices) {
+            return back()->withErrors(['client' => 'Cannot delete a client with open invoices. Cancel or pay them first.']);
+        }
+
+        $clientName = $client->name;
         $client->delete();
+
+        // M4 fix: activity log after deletion
+        \Modules\ERP\Services\ActivityLogger::log(
+            'client_deleted',
+            "Client '{$clientName}' was deleted.",
+            null,
+            null,
+            ['tenant_id' => $tenant->id]
+        );
+
         return back()->with('success', 'Client deleted successfully.');
     }
 

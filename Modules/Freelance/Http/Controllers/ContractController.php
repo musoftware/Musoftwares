@@ -11,6 +11,41 @@ use Modules\Core\Services\ActivityService;
 
 class ContractController extends Controller
 {
+    public function index(Request $request)
+    {
+        $user = $request->user();
+
+        $contracts = Contract::where(function ($q) use ($user) {
+                $q->where('client_id', $user->id)
+                  ->orWhere('freelancer_id', $user->id);
+            })
+            ->with(['job:id,title,type,budget,currency_code', 'client:id,name', 'freelancer:id,name'])
+            ->latest()
+            ->paginate(15);
+
+        $stats = [
+            'total'     => Contract::where('client_id', $user->id)->orWhere('freelancer_id', $user->id)->count(),
+            'active'    => Contract::where(function ($q) use ($user) {
+                $q->where('client_id', $user->id)->orWhere('freelancer_id', $user->id);
+            })->where('status', 'active')->count(),
+            'completed' => Contract::where(function ($q) use ($user) {
+                $q->where('client_id', $user->id)->orWhere('freelancer_id', $user->id);
+            })->where('status', 'completed')->count(),
+            'disputed'  => Contract::where(function ($q) use ($user) {
+                $q->where('client_id', $user->id)->orWhere('freelancer_id', $user->id);
+            })->where('status', 'disputed')->count(),
+            'total_value' => Contract::where('client_id', $user->id)
+                ->orWhere('freelancer_id', $user->id)
+                ->where('status', 'completed')
+                ->sum('amount'),
+        ];
+
+        return Inertia::render('Freelance/Contracts/Index', [
+            'contracts' => $contracts,
+            'stats'     => $stats,
+        ]);
+    }
+
     public function show(Request $request, Contract $contract)
     {
         $user = $request->user();

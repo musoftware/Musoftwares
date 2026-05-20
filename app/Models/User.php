@@ -89,7 +89,22 @@ class User extends Authenticatable
 
     public function client()
     {
-        return $this->hasOne(\Modules\ERP\Models\TenantClient::class, 'email', 'email');
+        // Uses user_id FK (added in fix migration 2026_05_20_000001).
+        // Falls back to email match for legacy records that pre-date the FK.
+        return $this->hasOne(\Modules\ERP\Models\TenantClient::class, 'user_id');
+    }
+
+    /**
+     * Resolve the TenantClient for this user.
+     * Tries user_id FK first, then falls back to email match for legacy data.
+     */
+    public function resolveClient(): ?\Modules\ERP\Models\TenantClient
+    {
+        $client = $this->client()->first();
+        if (!$client && $this->email) {
+            $client = \Modules\ERP\Models\TenantClient::where('email', $this->email)->first();
+        }
+        return $client;
     }
 
     public function pointTransactions()

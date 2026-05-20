@@ -6,7 +6,7 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Modules\ERP\Models\Tenant;
 use Modules\ERP\Models\Client;
-use Modules\Core\Models\Wallet;
+use Modules\ERP\Models\ClientWallet;
 use Tests\TestCase;
 
 class WalletWorkflowTest extends TestCase
@@ -16,7 +16,7 @@ class WalletWorkflowTest extends TestCase
     protected User $user;
     protected Tenant $tenant;
     protected Client $client;
-    protected Wallet $wallet;
+    protected ClientWallet $wallet;
 
     protected function setUp(): void
     {
@@ -24,7 +24,7 @@ class WalletWorkflowTest extends TestCase
 
         $this->seed(\Database\Seeders\RolesAndPermissionsSeeder::class);
 
-        $this->user = User::factory()->create();
+        $this->user = User::factory()->create(['onboarding_completed' => true]);
         $this->user->assignRole('client');
 
         $this->tenant = Tenant::create([
@@ -44,10 +44,9 @@ class WalletWorkflowTest extends TestCase
             'address' => '456 West Ave',
         ]);
 
-        $this->wallet = Wallet::create([
-            'owner_type' => Client::class,
-            'owner_id' => $this->client->id,
-            'context' => 'client',
+        $this->wallet = ClientWallet::create([
+            'tenant_id' => $this->tenant->id,
+            'client_id' => $this->client->id,
             'balance' => 1000.00,
             'currency' => 'USD',
             'locked_balance' => 100.00,
@@ -74,11 +73,11 @@ class WalletWorkflowTest extends TestCase
 
         $response->assertStatus(302);
         $this->assertEquals(1250.00, $this->wallet->fresh()->balance);
-        $this->assertDatabaseHas('wallet_transactions', [
+        $this->assertDatabaseHas('client_wallet_transactions', [
             'wallet_id' => $this->wallet->id,
-            'type' => 'credit',
+            'type' => 'manual_credit',
             'amount' => 250.00,
-            'description' => 'Bonus payout credit',
+            'note' => 'Credit: Bonus payout credit',
         ]);
     }
 
@@ -93,11 +92,11 @@ class WalletWorkflowTest extends TestCase
 
         $response->assertStatus(302);
         $this->assertEquals(600.00, $this->wallet->fresh()->balance);
-        $this->assertDatabaseHas('wallet_transactions', [
+        $this->assertDatabaseHas('client_wallet_transactions', [
             'wallet_id' => $this->wallet->id,
-            'type' => 'debit',
+            'type' => 'manual_debit',
             'amount' => 400.00,
-            'description' => 'Hosting services deduction',
+            'note' => 'Debit: Hosting services deduction',
         ]);
     }
 
@@ -113,11 +112,11 @@ class WalletWorkflowTest extends TestCase
         $response->assertStatus(302);
         $this->assertEquals(800.00, $this->wallet->fresh()->balance);
         $this->assertEquals(300.00, $this->wallet->fresh()->locked_balance);
-        $this->assertDatabaseHas('wallet_transactions', [
+        $this->assertDatabaseHas('client_wallet_transactions', [
             'wallet_id' => $this->wallet->id,
-            'type' => 'debit',
+            'type' => 'manual_debit',
             'amount' => 200.00,
-            'description' => 'Funds Locked: Escrow reservation',
+            'note' => 'Funds locked: Escrow reservation',
         ]);
     }
 
@@ -133,11 +132,11 @@ class WalletWorkflowTest extends TestCase
         $response->assertStatus(302);
         $this->assertEquals(1050.00, $this->wallet->fresh()->balance);
         $this->assertEquals(50.00, $this->wallet->fresh()->locked_balance);
-        $this->assertDatabaseHas('wallet_transactions', [
+        $this->assertDatabaseHas('client_wallet_transactions', [
             'wallet_id' => $this->wallet->id,
-            'type' => 'credit',
+            'type' => 'manual_credit',
             'amount' => 50.00,
-            'description' => 'Funds Unlocked: Release partial reservation',
+            'note' => 'Funds unlocked: Release partial reservation',
         ]);
     }
 }

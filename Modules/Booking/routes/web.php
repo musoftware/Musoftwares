@@ -5,7 +5,7 @@ use Modules\Booking\Http\Controllers\BookingController;
 use Modules\Booking\Http\Controllers\BookingEventController;
 
 // Authenticated Routes
-Route::middleware(['auth', 'verified'])->prefix('booking')->name('booking.')->group(function () {
+Route::middleware(['auth', 'verified', 'onboarding', 'subscription:booking'])->prefix('booking')->name('booking.')->group(function () {
 
     // ── Event Types (Booking types the host creates) ─────────────────
     Route::get('/', [BookingEventController::class, 'index'])->name('events.index');

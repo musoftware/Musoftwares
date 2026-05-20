@@ -7,10 +7,11 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class ClientWallet extends TenantModel
 {
-    protected $fillable = ['tenant_id', 'client_id', 'balance', 'currency'];
+    protected $fillable = ['tenant_id', 'client_id', 'balance', 'currency', 'locked_balance'];
 
     protected $casts = [
         'balance' => 'decimal:2',
+        'locked_balance' => 'decimal:2',
     ];
 
     public function tenant(): BelongsTo

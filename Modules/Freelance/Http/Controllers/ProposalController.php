@@ -14,6 +14,28 @@ use App\Events\ProposalAccepted;
 
 class ProposalController extends Controller
 {
+    public function index(Request $request)
+    {
+        $user = $request->user();
+
+        $proposals = Proposal::where('freelancer_id', $user->id)
+            ->with('job:id,title,budget,currency_code,type,status')
+            ->latest()
+            ->paginate(20);
+
+        $stats = [
+            'total'    => Proposal::where('freelancer_id', $user->id)->count(),
+            'pending'  => Proposal::where('freelancer_id', $user->id)->where('status', 'pending')->count(),
+            'accepted' => Proposal::where('freelancer_id', $user->id)->where('status', 'accepted')->count(),
+            'rejected' => Proposal::where('freelancer_id', $user->id)->where('status', 'rejected')->count(),
+        ];
+
+        return Inertia::render('Freelance/Proposals/Index', [
+            'proposals' => $proposals,
+            'stats'     => $stats,
+        ]);
+    }
+
     public function store(Request $request, Job $job)
     {
         $validated = $request->validate([

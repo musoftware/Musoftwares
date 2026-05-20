@@ -34,8 +34,21 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/product-tour/status', [\App\Http\Controllers\OnboardingController::class, 'updateTourStatus'])->name('product-tour.status');
 });
 
+// Team Auth Routes
+Route::middleware(['web'])->group(function () {
+    Route::get('erp/team/login', [\Modules\ERP\Http\Controllers\Team\TeamAuthController::class, 'showLogin'])->name('erp.team.login');
+    Route::post('erp/team/login', [\Modules\ERP\Http\Controllers\Team\TeamAuthController::class, 'login'])->name('erp.team.login.store');
+    Route::post('erp/team/logout', [\Modules\ERP\Http\Controllers\Team\TeamAuthController::class, 'logout'])->name('erp.team.logout');
+});
+
 // ERP Routes
-Route::middleware(['auth', 'verified', 'onboarding', 'subscription:erp'])->prefix('erp')->name('erp.')->group(function () {
+Route::middleware(['auth', 'verified', 'onboarding', 'subscription:erp', 'erp.team.permissions'])->prefix('erp')->name('erp.')->group(function () {
+    // Team Member Management (Tenant Owner Only)
+    Route::get('/team-members', [\Modules\ERP\Http\Controllers\Team\TeamMemberController::class, 'index'])->name('team-members.index');
+    Route::post('/team-members', [\Modules\ERP\Http\Controllers\Team\TeamMemberController::class, 'store'])->name('team-members.store');
+    Route::put('/team-members/{id}', [\Modules\ERP\Http\Controllers\Team\TeamMemberController::class, 'update'])->name('team-members.update');
+    Route::delete('/team-members/{id}', [\Modules\ERP\Http\Controllers\Team\TeamMemberController::class, 'destroy'])->name('team-members.destroy');
+
     Route::get('/dashboard', [\Modules\ERP\Http\Controllers\ERPDashboardController::class, 'index'])->name('dashboard');
     Route::post('/clients', [\Modules\ERP\Http\Controllers\ERPDashboardController::class, 'storeClient'])->name('clients.store');
     Route::put('/clients/{client}', [\Modules\ERP\Http\Controllers\ERPDashboardController::class, 'updateClient'])->name('clients.update');
@@ -59,8 +72,6 @@ Route::middleware(['auth', 'verified', 'onboarding', 'subscription:erp'])->prefi
     Route::get('/invoices/{invoice}/pdf', [\Modules\ERP\Http\Controllers\InvoiceController::class, 'downloadPdf'])->name('invoices.pdf');
 
     // Wallet
-    Route::get('/wallet/add-balance', [\Modules\ERP\Http\Controllers\WalletController::class, 'addBalance'])->name('wallet.add-balance');
-    Route::post('/wallet/deposit', [\Modules\ERP\Http\Controllers\WalletController::class, 'deposit'])->name('wallet.deposit');
     Route::get('/clients/{client}/wallet', [\Modules\ERP\Http\Controllers\WalletController::class, 'show'])->name('wallet.show');
     Route::get('/clients/{client}/wallet/transactions', [\Modules\ERP\Http\Controllers\WalletController::class, 'transactions'])->name('wallet.transactions');
     Route::post('/clients/{client}/wallet/credit', [\Modules\ERP\Http\Controllers\WalletController::class, 'manualCredit'])->name('wallet.credit');
@@ -121,6 +132,19 @@ Route::middleware(['auth', 'verified', 'onboarding', 'subscription:erp'])->prefi
     Route::delete('/clients/{client}/notes/{note}', [\Modules\ERP\Http\Controllers\ClientNoteController::class, 'destroy'])->name('clients.notes.destroy');
     Route::post('/clients/{client}/notes/{note}/archive', [\Modules\ERP\Http\Controllers\ClientNoteController::class, 'archive'])->name('clients.notes.archive');
     Route::post('/clients/{client}/notes/{note}/unarchive', [\Modules\ERP\Http\Controllers\ClientNoteController::class, 'unarchive'])->name('clients.notes.unarchive');
+
+    // ── ERP Support Tickets ───────────────────────────────────────────
+    Route::post('/tickets', [\Modules\ERP\Http\Controllers\SupportTicketController::class, 'store'])->name('tickets.store');
+    Route::post('/tickets/{ticket}/resolve', [\Modules\ERP\Http\Controllers\SupportTicketController::class, 'resolve'])->name('tickets.resolve');
+    Route::post('/tickets/{ticket}/close', [\Modules\ERP\Http\Controllers\SupportTicketController::class, 'close'])->name('tickets.close');
+    Route::delete('/tickets/{ticket}', [\Modules\ERP\Http\Controllers\SupportTicketController::class, 'destroy'])->name('tickets.destroy');
+
+    // ── ERP Workspace Notes ───────────────────────────────────────────
+    // Tenant-scoped scratchpad notes for the ERP dashboard.
+    Route::post('/notes', [\Modules\ERP\Http\Controllers\TenantNoteController::class, 'store'])->name('notes.store');
+    Route::put('/notes/{note}', [\Modules\ERP\Http\Controllers\TenantNoteController::class, 'update'])->name('notes.update');
+    Route::post('/notes/{note}/toggle-pin', [\Modules\ERP\Http\Controllers\TenantNoteController::class, 'togglePin'])->name('notes.togglePin');
+    Route::delete('/notes/{note}', [\Modules\ERP\Http\Controllers\TenantNoteController::class, 'destroy'])->name('notes.destroy');
 });
 
 // ── Client-Facing ERP Routes ─────────────────────────────────────────
@@ -134,45 +158,6 @@ Route::middleware(['auth', 'verified', 'onboarding'])->prefix('my')->name('erp.c
 });
 
 
-// Freelance Routes
-Route::middleware(['auth', 'verified', 'onboarding', 'subscription:freelance'])->prefix('freelance')->name('freelance.')->group(function () {
-    Route::get('/dashboard', [\Modules\Freelance\Http\Controllers\DashboardController::class, 'index'])->name('dashboard');
-
-    // Skills
-    Route::resource('skills', \Modules\Freelance\Http\Controllers\SkillController::class)->except(['create', 'show', 'edit']);
-
-    // User Skills
-    Route::post('/user-skills', [\Modules\Freelance\Http\Controllers\UserSkillController::class, 'store'])->name('user-skills.store');
-    Route::delete('/user-skills/{skill_id}', [\Modules\Freelance\Http\Controllers\UserSkillController::class, 'destroy'])->name('user-skills.destroy');
-
-    // Points
-    Route::get('/points', function(Illuminate\Http\Request $request) {
-        $packages = \Modules\Freelance\Models\PointPackage::all();
-        $transactions = \Modules\Freelance\Models\PointTransaction::where('user_id', $request->user()->id)->latest()->paginate(10);
-        return Inertia::render('Freelance/Points/Index', ['packages' => $packages, 'transactions' => $transactions]);
-    })->name('points.index');
-    Route::resource('point-packages', \Modules\Freelance\Http\Controllers\PointPackageController::class)->except(['create', 'show', 'edit']);
-    Route::post('/point-purchases', [\Modules\Freelance\Http\Controllers\PointPurchaseController::class, 'store'])->name('point-purchases.store');
-    Route::post('/point-purchases/wallet', [\Modules\Freelance\Http\Controllers\PointPurchaseController::class, 'storeWallet'])->name('point-purchases.store-wallet');
-    Route::get('/point-purchases/success', [\Modules\Freelance\Http\Controllers\PointPurchaseController::class, 'success'])->name('point-purchases.success');
-    Route::get('/point-purchases/failure', [\Modules\Freelance\Http\Controllers\PointPurchaseController::class, 'failure'])->name('point-purchases.failure');
-
-    // Jobs
-    Route::get('/jobs/browse', [\Modules\Freelance\Http\Controllers\FreelanceJobController::class, 'index'])->name('jobs.browse');
-    Route::get('/jobs/my-jobs', [\Modules\Freelance\Http\Controllers\FreelanceJobController::class, 'myJobs'])->name('my-jobs');
-    Route::resource('jobs', \Modules\Freelance\Http\Controllers\FreelanceJobController::class)->except(['index']);
-
-    // Proposals
-    Route::post('/jobs/{job}/proposals', [\Modules\Freelance\Http\Controllers\ProposalController::class, 'store'])->name('proposals.store');
-    Route::post('/proposals/{proposal}/accept', [\Modules\Freelance\Http\Controllers\ProposalController::class, 'accept'])->name('proposals.accept');
-    Route::post('/proposals/{proposal}/reject', [\Modules\Freelance\Http\Controllers\ProposalController::class, 'reject'])->name('proposals.reject');
-    Route::delete('/proposals/{proposal}/withdraw', [\Modules\Freelance\Http\Controllers\ProposalController::class, 'withdraw'])->name('proposals.withdraw');
-
-    // Contracts
-    Route::get('/contracts/{contract}', [\Modules\Freelance\Http\Controllers\ContractController::class, 'show'])->name('contracts.show');
-    Route::post('/contracts/{contract}/complete', [\Modules\Freelance\Http\Controllers\ContractController::class, 'complete'])->name('contracts.complete');
-    Route::post('/contracts/{contract}/dispute', [\Modules\Freelance\Http\Controllers\ContractController::class, 'dispute'])->name('contracts.dispute');
-});
 
 // Marketplace Routes — literal routes BEFORE wildcards
 Route::prefix('marketplace')->name('marketplace.')->group(function () {
@@ -180,7 +165,7 @@ Route::prefix('marketplace')->name('marketplace.')->group(function () {
     Route::get('/services', [\Modules\Marketplace\Http\Controllers\ServiceController::class, 'index'])->name('services.index');
 
     // Auth-only: dashboard + create wizard (MUST be before /{id} wildcard)
-    Route::middleware(['auth', 'verified', 'onboarding'])->group(function () {
+    Route::middleware(['auth', 'verified', 'onboarding', 'subscription:marketplace'])->group(function () {
         Route::get('/dashboard', [\Modules\Marketplace\Http\Controllers\DashboardController::class, 'index'])->name('dashboard');
 
         Route::get('/services/create', [\Modules\Marketplace\Http\Controllers\ServiceController::class, 'create'])->name('services.create');
@@ -239,7 +224,7 @@ Route::middleware(['auth', 'verified', 'onboarding', 'role:admin'])->prefix('adm
 });
 
 // Admin Routes
-Route::middleware(['auth', 'verified', 'onboarding'])->prefix('admin')->name('admin.')->group(function () {
+Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [\App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard');
 
     // Reports
@@ -328,6 +313,18 @@ Route::middleware(['auth', 'verified', 'onboarding'])->prefix('admin')->name('ad
         Route::delete('/{tool}', [\App\Http\Controllers\Admin\Tools\AdminToolController::class, 'destroy'])->name('destroy');
         Route::post('/{tool}/upload-version', [\App\Http\Controllers\Admin\Tools\AdminToolController::class, 'uploadVersion'])->name('upload-version');
     });
+
+    // ERP Oversight Admin Routes
+    Route::prefix('erp')->name('erp.')->group(function () {
+        Route::get('/', [\Modules\ERP\Http\Controllers\Admin\ERPAdminController::class, 'index'])->name('index');
+        Route::get('/{id}', [\Modules\ERP\Http\Controllers\Admin\ERPAdminController::class, 'show'])->name('show');
+    });
+
+    Route::get('/erp/{id}/impersonate', [\App\Http\Controllers\ImpersonateController::class, 'impersonate'])->name('erp.impersonate');
+});
+
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/admin/stop-impersonating', [\App\Http\Controllers\ImpersonateController::class, 'stopImpersonating'])->name('admin.stop-impersonate');
 });
 
 

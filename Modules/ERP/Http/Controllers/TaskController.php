@@ -7,6 +7,7 @@ use Modules\ERP\Models\ERPTask;
 use Modules\ERP\Models\ERPTodoItem;
 use Modules\ERP\Models\TenantClient;
 use Modules\ERP\Models\Project;
+use Modules\ERP\Models\Tenant;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -25,11 +26,24 @@ use Modules\Core\Services\ActivityService;
  */
 class TaskController extends Controller
 {
+    // ── Tenant resolution ─────────────────────────────────────────
+
+    private function resolveTenant(): Tenant
+    {
+        if (Auth::guard('erp_team')->check()) {
+            return Auth::guard('erp_team')->user()->tenant;
+        }
+        return Tenant::where('user_id', Auth::id())->firstOrFail();
+    }
+
     // ── Task Board CRUD ──────────────────────────────────────────────
 
     public function index(Request $request)
     {
-        $query = ERPTask::with(['client', 'project', 'creator'])
+        $tenant = $this->resolveTenant();
+
+        $query = ERPTask::where('tenant_id', $tenant->id)
+            ->with(['client', 'project', 'creator'])
             ->withCount(['items', 'items as completed_items_count' => fn($q) => $q->where('completed', true)]);
 
         if ($request->filled('client_id')) {
@@ -47,13 +61,18 @@ class TaskController extends Controller
 
         return Inertia::render('ERP/Tasks/Index', [
             'tasks'   => $tasks,
-            'clients' => TenantClient::select('id', 'name')->get(),
+            'clients' => TenantClient::where('tenant_id', $tenant->id)->select('id', 'name')->get(),
             'filters' => $request->only(['client_id', 'status', 'show_archived']),
         ]);
     }
 
     public function show(ERPTask $task)
     {
+        $tenant = $this->resolveTenant();
+        if ($task->tenant_id !== $tenant->id) {
+            abort(403, 'Unauthorized access to task.');
+        }
+
         $task->load([
             'client',
             'project',
@@ -75,17 +94,33 @@ class TaskController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'task_name'       => 'required|string|max:255',
+            'task_name'       => 'sometimes|required|string|max:255',
+            'title'           => 'sometimes|required|string|max:255',
             'task_description'=> 'nullable|string',
             'client_id'       => 'nullable|exists:tenant_clients,id',
             'project_id'      => 'nullable|exists:erp_projects,id',
             'priority'        => 'nullable|in:low,normal,high,urgent',
+            'status'          => 'nullable|in:open,in_progress,review,completed,archived',
             'due_date'        => 'nullable|date',
         ]);
+        
+        $tenant = $this->resolveTenant();
+
+        // Ensure the client and project belong to the tenant
+        if (!empty($validated['client_id'])) {
+            TenantClient::where('tenant_id', $tenant->id)->findOrFail($validated['client_id']);
+        }
+        if (!empty($validated['project_id'])) {
+            Project::where('tenant_id', $tenant->id)->findOrFail($validated['project_id']);
+        }
+
+        $taskName = $request->input('task_name') ?? $request->input('title');
 
         $task = ERPTask::create(array_merge($validated, [
+            'tenant_id'  => $tenant->id,
+            'task_name'  => $taskName,
             'created_by' => Auth::id(),
-            'status'     => 'open',
+            'status'     => $request->input('status', 'open'),
         ]));
 
         ActivityService::log(
@@ -95,21 +130,37 @@ class TaskController extends Controller
             workspace: 'erp'
         );
 
+        if ($request->input('quick_add') || $request->ajax() || $request->has('redirect_back')) {
+            return redirect()->back()->with('success', 'Task created.');
+        }
+
         return redirect()->route('erp.tasks.show', $task->id)
             ->with('success', 'Task created.');
     }
 
     public function update(Request $request, ERPTask $task)
     {
+        $tenant = $this->resolveTenant();
+        if ($task->tenant_id !== $tenant->id) {
+            abort(403, 'Unauthorized access to task.');
+        }
+
         $validated = $request->validate([
-            'task_name'       => 'required|string|max:255',
+            'task_name'       => 'sometimes|required|string|max:255',
             'task_description'=> 'nullable|string',
             'client_id'       => 'nullable|exists:tenant_clients,id',
             'project_id'      => 'nullable|exists:erp_projects,id',
             'priority'        => 'nullable|in:low,normal,high,urgent',
-            'status'          => 'nullable|in:open,in_progress,completed,archived',
+            'status'          => 'nullable|in:open,in_progress,review,completed,archived',
             'due_date'        => 'nullable|date',
         ]);
+
+        if (!empty($validated['client_id'])) {
+            TenantClient::where('tenant_id', $tenant->id)->findOrFail($validated['client_id']);
+        }
+        if (!empty($validated['project_id'])) {
+            Project::where('tenant_id', $tenant->id)->findOrFail($validated['project_id']);
+        }
 
         $task->update($validated);
 
@@ -118,18 +169,33 @@ class TaskController extends Controller
 
     public function archive(ERPTask $task)
     {
+        $tenant = $this->resolveTenant();
+        if ($task->tenant_id !== $tenant->id) {
+            abort(403, 'Unauthorized access to task.');
+        }
+
         $task->update(['archived' => true]);
         return back()->with('success', 'Task archived.');
     }
 
     public function unarchive(ERPTask $task)
     {
+        $tenant = $this->resolveTenant();
+        if ($task->tenant_id !== $tenant->id) {
+            abort(403, 'Unauthorized access to task.');
+        }
+
         $task->update(['archived' => false]);
         return back()->with('success', 'Task restored.');
     }
 
     public function destroy(ERPTask $task)
     {
+        $tenant = $this->resolveTenant();
+        if ($task->tenant_id !== $tenant->id) {
+            abort(403, 'Unauthorized access to task.');
+        }
+
         $task->delete();
         return redirect()->route('erp.tasks.index')->with('success', 'Task deleted.');
     }
@@ -142,6 +208,11 @@ class TaskController extends Controller
      */
     public function storeItem(Request $request, ERPTask $task)
     {
+        $tenant = $this->resolveTenant();
+        if ($task->tenant_id !== $tenant->id) {
+            abort(403, 'Unauthorized access to task.');
+        }
+
         $validated = $request->validate([
             'title'          => 'required|string|max:255',
             'description'    => 'nullable|string',
@@ -154,6 +225,11 @@ class TaskController extends Controller
             'end_at'         => 'nullable|date',
             'parent_id'      => 'nullable|exists:erp_todo_items,id',
         ]);
+
+        if (!empty($validated['parent_id'])) {
+            // Ensure parent item belongs to the same task
+            ERPTodoItem::where('task_id', $task->id)->findOrFail($validated['parent_id']);
+        }
 
         $item = ERPTodoItem::create(array_merge($validated, [
             'tenant_id'  => $task->tenant_id,
@@ -173,6 +249,11 @@ class TaskController extends Controller
      */
     public function updateItem(Request $request, ERPTask $task, ERPTodoItem $item)
     {
+        $tenant = $this->resolveTenant();
+        if ($task->tenant_id !== $tenant->id || $item->task_id !== $task->id) {
+            abort(403, 'Unauthorized access.');
+        }
+
         $validated = $request->validate([
             'title'          => 'nullable|string|max:255',
             'description'    => 'nullable|string',
@@ -196,6 +277,11 @@ class TaskController extends Controller
      */
     public function completeItem(Request $request, ERPTask $task, ERPTodoItem $item)
     {
+        $tenant = $this->resolveTenant();
+        if ($task->tenant_id !== $tenant->id || $item->task_id !== $task->id) {
+            abort(403, 'Unauthorized access.');
+        }
+
         if ($request->boolean('completed')) {
             $item->markComplete();
             ActivityService::log(
@@ -217,6 +303,11 @@ class TaskController extends Controller
      */
     public function sortItems(Request $request, ERPTask $task)
     {
+        $tenant = $this->resolveTenant();
+        if ($task->tenant_id !== $tenant->id) {
+            abort(403, 'Unauthorized access.');
+        }
+
         $request->validate(['sort' => 'required|array']);
 
         foreach ($request->input('sort') as $index => $itemId) {
@@ -235,6 +326,11 @@ class TaskController extends Controller
      */
     public function pauseItem(ERPTask $task, ERPTodoItem $item)
     {
+        $tenant = $this->resolveTenant();
+        if ($task->tenant_id !== $tenant->id || $item->task_id !== $task->id) {
+            abort(403, 'Unauthorized access.');
+        }
+
         $item->pause();
         return response()->json(['success' => true]);
     }
@@ -245,6 +341,11 @@ class TaskController extends Controller
      */
     public function resumeItem(ERPTask $task, ERPTodoItem $item)
     {
+        $tenant = $this->resolveTenant();
+        if ($task->tenant_id !== $tenant->id || $item->task_id !== $task->id) {
+            abort(403, 'Unauthorized access.');
+        }
+
         $item->resume();
         return response()->json(['success' => true]);
     }
@@ -255,6 +356,11 @@ class TaskController extends Controller
      */
     public function destroyItem(ERPTask $task, ERPTodoItem $item)
     {
+        $tenant = $this->resolveTenant();
+        if ($task->tenant_id !== $tenant->id || $item->task_id !== $task->id) {
+            abort(403, 'Unauthorized access.');
+        }
+
         if (!$item->canBeDeleted()) {
             return response()->json([
                 'success' => false,

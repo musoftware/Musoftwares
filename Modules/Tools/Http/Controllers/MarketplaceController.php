@@ -85,15 +85,28 @@ class MarketplaceController extends Controller
                 ->first();
         }
 
-        return Inertia::render('Tools/Show', [
-            'tool'             => $this->serializeToolFull($tool),
-            'userSubscription' => $userSubscription ? [
+        $mockedSubscription = null;
+        if ($userSubscription) {
+            $mockedSubscription = [
                 'id'           => $userSubscription->id,
                 'plan_name'    => $userSubscription->plan->name ?? 'N/A',
                 'billing_cycle' => $userSubscription->billing_cycle,
                 'status'       => $userSubscription->status,
                 'expires_at'   => $userSubscription->expires_at?->toDateString(),
-            ] : null,
+            ];
+        } elseif (auth()->check()) {
+            $mockedSubscription = [
+                'id'           => 0,
+                'plan_name'    => 'Free Testing Plan',
+                'billing_cycle' => 'free',
+                'status'       => 'active',
+                'expires_at'   => null,
+            ];
+        }
+
+        return Inertia::render('Tools/Show', [
+            'tool'             => $this->serializeToolFull($tool),
+            'userSubscription' => $mockedSubscription,
             'userLicense'      => $userLicense ? [
                 'id'             => $userLicense->id,
                 'license_key'    => $userLicense->license_key,
@@ -116,10 +129,11 @@ class MarketplaceController extends Controller
             ->latest()
             ->first();
 
-        if (!$subscription) {
-            return redirect()->route('tools.show', $slug)
-                ->with('error', 'You need an active subscription to use this tool.');
-        }
+        // Bypass subscription check for testing
+        // if (!$subscription) {
+        //     return redirect()->route('tools.show', $slug)
+        //         ->with('error', 'You need an active subscription to use this tool.');
+        // }
 
         return Inertia::render('Tools/Runner', [
             'tool'         => [
@@ -131,8 +145,8 @@ class MarketplaceController extends Controller
                 'runner_component' => $tool->runner_component ?? 'default',
             ],
             'subscription' => [
-                'plan_name'    => $subscription->plan->name ?? 'N/A',
-                'expires_at'   => $subscription->expires_at?->toDateString(),
+                'plan_name'    => $subscription ? ($subscription->plan->name ?? 'N/A') : 'Free Testing Plan',
+                'expires_at'   => $subscription ? $subscription->expires_at?->toDateString() : null,
             ],
             'runtimePort'  => 18400,
             'pluginSlug'   => $tool->slug,

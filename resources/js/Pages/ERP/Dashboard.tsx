@@ -1,5 +1,5 @@
 import WorkspaceLayout from '@/Layouts/WorkspaceLayout';
-import { Head, Link, router } from '@inertiajs/react';
+import { Head, Link, router, usePage } from '@inertiajs/react';
 import React, { useState, useMemo, useEffect } from 'react';
 import {
     LayoutDashboard,
@@ -123,11 +123,45 @@ interface ERPDashboardProps {
     supportTickets?: Array<any>;
     activityLogs?: Array<any>;
     upcomingBookings?: Array<any>;
+    storageProviders?: Array<any>;
+    documents?: Array<any>;
+    tasks?: Array<any>;
+    notes?: Array<{
+        id: number;
+        title: string;
+        content: string;
+        category: string;
+        pinned: boolean;
+        date: string;
+    }>;
 }
 
-export default function ERPDashboard({ stats: serverStats, clients: serverClients, invoices: serverInvoices, chartData: serverChartData, projects: serverProjects, supportTickets: serverTickets, activityLogs: serverActivityLogs, upcomingBookings: serverBookings }: ERPDashboardProps) {
+export default function ERPDashboard({ stats: serverStats, clients: serverClients, invoices: serverInvoices, chartData: serverChartData, projects: serverProjects, supportTickets: serverTickets, activityLogs: serverActivityLogs, upcomingBookings: serverBookings, storageProviders: serverStorageProviders, documents: serverDocuments, tasks: serverTasks, notes: serverNotes }: ERPDashboardProps) {
     const { toast } = useToast();
-    const [currentSection, setCurrentSection] = useState('overview');
+    const { auth } = usePage().props as any;
+    const isTeamMember = !!auth?.team_member;
+    const isReadOnlyMember = auth?.team_member && auth.team_member.role === 'member';
+
+    const sectionMatch = typeof window !== 'undefined' ? window.location.search.match(/section=([^&]+)/) : null;
+    const initialSection = sectionMatch ? sectionMatch[1] : 'overview';
+    const [currentSection, setCurrentSection] = useState(initialSection);
+
+    const handleSetSection = (section: string) => {
+        setCurrentSection(section);
+        if (typeof window !== 'undefined') {
+            window.history.pushState({}, '', route('erp.dashboard', { section }));
+        }
+    };
+
+    useEffect(() => {
+        const handlePopState = () => {
+            const match = window?.location?.search?.match(/section=([^&]+)/);
+            setCurrentSection(match ? match[1] : 'overview');
+        };
+        window.addEventListener('popstate', handlePopState);
+        return () => window.removeEventListener('popstate', handlePopState);
+    }, []);
+
     const [deleteConfirm, setDeleteConfirm] = useState<{ open: boolean; client: any }>({ open: false, client: null });
 
     // ────────────────────────────────────────────────────────
@@ -171,36 +205,44 @@ export default function ERPDashboard({ stats: serverStats, clients: serverClient
     // ────────────────────────────────────────────────────────
     const [projects, setProjects] = useState<Array<any>>(serverProjects || []);
     const [newProjectForm, setNewProjectForm] = useState({
-        name: '', client: '', budget: '', deadline: '', leader: '', status: 'Planning'
+        name: '', client_id: '', budget: '', due_date: '', status: 'Planning'
     });
     const [showAddProjectModal, setShowAddProjectModal] = useState(false);
 
+    const [editProjectForm, setEditProjectForm] = useState({
+        id: null as number | null, name: '', client_id: '', budget: '', due_date: '', status: 'Planning'
+    });
+    const [showEditProjectModal, setShowEditProjectModal] = useState(false);
+    const [deleteProjectConfirm, setDeleteProjectConfirm] = useState<{ open: boolean; project: any }>({ open: false, project: null });
+
     // Using real server tasks if available, fallback to empty
-    const [tasks, setTasks] = useState<Array<any>>([]);
+    const [tasks, setTasks] = useState<Array<any>>(serverTasks || []);
     const [quickTaskTitle, setQuickTaskTitle] = useState('');
 
     const [expenses, setExpenses] = useState<Array<any>>([]);
     const [expenseForm, setExpenseForm] = useState({ title: '', category: 'Software', amount: '', date: '', status: 'Pending' });
     const [showAddExpenseModal, setShowAddExpenseModal] = useState(false);
 
-    const [storageProviders, setStorageProviders] = useState<Array<any>>([]);
+    const [storageProviders, setStorageProviders] = useState<Array<any>>(serverStorageProviders || []);
     const [showAddProviderModal, setShowAddProviderModal] = useState(false);
     const [providerForm, setProviderForm] = useState({ name: '', driver: 's3', bucket: '', key: '', secret: '', endpoint: '', region: '' });
 
-    const [documents, setDocuments] = useState<Array<any>>([]);
+    const [documents, setDocuments] = useState<Array<any>>(serverDocuments || []);
     const [showAddDocModal, setShowAddDocModal] = useState(false);
-    const [docForm, setDocForm] = useState({ name: '', type: 'Contract', provider: 'Local' });
+    const [docFile, setDocFile] = useState<File | null>(null);
+    const [docForm, setDocForm] = useState({ type: 'Document' });
 
     const [contracts, setContracts] = useState<Array<any>>([]);
     const [showAddContractModal, setShowAddContractModal] = useState(false);
     const [contractForm, setContractForm] = useState({ title: '', client: '', value: '', status: 'Draft' });
 
-    const [notes, setNotes] = useState<Array<any>>([]);
+    const [notes, setNotes] = useState<Array<any>>(serverNotes || []);
     const [selectedNote, setSelectedNote] = useState<any>(null);
     const [noteEditor, setNoteEditor] = useState({ title: '', content: '', category: 'Internal' });
+    const [isSavingNote, setIsSavingNote] = useState(false);
 
     const [supportTickets, setSupportTickets] = useState<Array<any>>(serverTickets || []);
-    const [newTicketForm, setNewTicketForm] = useState({ title: '', client: '', priority: 'Medium' });
+    const [newTicketForm, setNewTicketForm] = useState({ title: '', client_id: '', client_name: '', priority: 'medium', description: '' });
     const [showAddTicketModal, setShowAddTicketModal] = useState(false);
 
     const [teamMembers] = useState<Array<any>>([
@@ -302,7 +344,7 @@ export default function ERPDashboard({ stats: serverStats, clients: serverClient
         ]);
     };
 
-    // Sync selected note content changes back to list
+    // Sync selected note content changes back to list (local preview only)
     useEffect(() => {
         if (!selectedNote) return;
         setNotes(prev => prev.map(n => n.id === selectedNote.id ? { ...n, ...noteEditor } : n));
@@ -317,15 +359,20 @@ export default function ERPDashboard({ stats: serverStats, clients: serverClient
     // Tasks Quick Add
     const handleQuickAddTask = (category: string) => {
         if (!quickTaskTitle.trim()) return;
+        
+        let status = 'open';
+        if (category === 'In Progress') status = 'in_progress';
+        if (category === 'In Review') status = 'review';
+        if (category === 'Done') status = 'completed';
+        
         router.post(route('erp.tasks.store'), {
             title: quickTaskTitle,
-            status: category === 'Done' ? 'completed' : 'pending',
+            status: status,
         }, {
             preserveScroll: true,
             onSuccess: () => {
                 setQuickTaskTitle('');
                 toast({ description: 'Task created successfully.' });
-                // We could append to state or rely on server hydration if page reloads
             }
         });
     };
@@ -333,6 +380,10 @@ export default function ERPDashboard({ stats: serverStats, clients: serverClient
     // Move task category
     const moveTask = (taskId: number, direction: 'forward' | 'backward') => {
         const lanes = ['Todo', 'In Progress', 'In Review', 'Done'];
+        const statuses = ['open', 'in_progress', 'review', 'completed'];
+        
+        let updatedTask: any = null;
+        
         setTasks(prev => prev.map(t => {
             if (t.id === taskId) {
                 const currentIdx = lanes.indexOf(t.category);
@@ -342,12 +393,23 @@ export default function ERPDashboard({ stats: serverStats, clients: serverClient
                 
                 const newLane = lanes[newIdx];
                 if (newLane !== t.category) {
+                    updatedTask = { ...t, category: newLane, _newIdx: newIdx };
                     prependActivity('Task Progressed', `Moved task "${t.title}" from "${t.category}" to "${newLane}"`);
                 }
-                return { ...t, category: newLane };
+                return updatedTask ? { ...t, category: newLane } : t;
             }
             return t;
         }));
+        
+        if (updatedTask) {
+            router.put(route('erp.tasks.update', taskId), {
+                status: statuses[(updatedTask as any)._newIdx],
+                task_name: updatedTask.title // Need to satisfy validation if required
+            }, {
+                preserveScroll: true,
+                preserveState: true
+            });
+        }
     };
 
     // Log Expense
@@ -363,26 +425,94 @@ export default function ERPDashboard({ stats: serverStats, clients: serverClient
     // Add Storage Provider
     const handleAddProvider = (e: React.FormEvent) => {
         e.preventDefault();
-        toast({ description: 'Storage provider integration is coming soon.' });
-        setShowAddProviderModal(false);
-        setProviderForm({ name: '', driver: 's3', bucket: '', key: '', secret: '', endpoint: '', region: '' });
+        router.post(route('erp.storage-providers.store'), providerForm, {
+            onSuccess: () => {
+                setShowAddProviderModal(false);
+                setProviderForm({ name: '', driver: 's3', bucket: '', key: '', secret: '', endpoint: '', region: '' });
+                toast({ description: 'Storage provider configured successfully.' });
+                prependActivity('Storage Configured', `Configured AWS S3 storage provider.`);
+            },
+            onError: (errors) => {
+                toast({ variant: 'destructive', description: Object.values(errors)[0] as string });
+            }
+        });
     };
 
     // Add Document
     const handleAddDoc = (e: React.FormEvent) => {
         e.preventDefault();
-        toast({ description: 'Document management is coming soon.' });
-        setShowAddDocModal(false);
-        setDocForm({ name: '', type: 'Contract', provider: 'Local' });
+        if (!docFile) return toast({ variant: 'destructive', description: 'Please select a file to upload.' });
+        
+        const formData = new FormData();
+        formData.append('file', docFile);
+        formData.append('type', docForm.type);
+
+        router.post(route('erp.files.store'), formData, {
+            forceFormData: true,
+            onSuccess: () => {
+                setShowAddDocModal(false);
+                setDocFile(null);
+                setDocForm({ type: 'Document' });
+                toast({ description: 'File uploaded successfully.' });
+            },
+            onError: (errors) => {
+                toast({ variant: 'destructive', description: Object.values(errors)[0] as string });
+            }
+        });
+    };
+
+    const handleDeleteDoc = (docId: number) => {
+        if (!confirm('Are you sure you want to delete this file?')) return;
+        router.delete(route('erp.files.destroy', docId), {
+            onSuccess: () => {
+                toast({ description: 'File deleted successfully.' });
+            }
+        });
     };
 
     // Add Project
     const handleAddProject = (e: React.FormEvent) => {
         e.preventDefault();
-        // Should hit erp.projects.store when backend is fully implemented
-        toast({ description: 'Project management is coming soon.' });
-        setShowAddProjectModal(false);
-        setNewProjectForm({ name: '', client: '', budget: '', deadline: '', leader: '', status: 'Planning' });
+        router.post(route('erp.projects.store'), newProjectForm, {
+            onSuccess: () => {
+                setShowAddProjectModal(false);
+                setNewProjectForm({ name: '', client_id: '', budget: '', due_date: '', status: 'Planning' });
+                toast({ description: 'Project created successfully.' });
+                prependActivity('Project Created', `Created project ${newProjectForm.name}.`);
+            },
+            onError: (errors) => {
+                toast({ variant: 'destructive', description: Object.values(errors)[0] as string });
+            }
+        });
+    };
+
+    // Edit Project
+    const handleEditProject = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!editProjectForm.id) return;
+        router.put(route('erp.projects.update', editProjectForm.id), editProjectForm, {
+            onSuccess: () => {
+                setShowEditProjectModal(false);
+                setEditProjectForm({ id: null, name: '', client_id: '', budget: '', due_date: '', status: 'Planning' });
+                toast({ description: 'Project updated successfully.' });
+                prependActivity('Project Updated', `Updated project ${editProjectForm.name}.`);
+            },
+            onError: (errors) => {
+                toast({ variant: 'destructive', description: Object.values(errors)[0] as string });
+            }
+        });
+    };
+
+    // Confirm Delete Project
+    const confirmDeleteProject = () => {
+        if (!deleteProjectConfirm.project) return;
+        router.delete(route('erp.projects.destroy', deleteProjectConfirm.project.id), {
+            onSuccess: () => {
+                toast({ description: `Project deleted successfully.` });
+                prependActivity('Project Deleted', `Deleted project ${deleteProjectConfirm.project.name}.`);
+                setDeleteProjectConfirm({ open: false, project: null });
+            }
+        });
     };
 
     // Draft Contract
@@ -396,41 +526,112 @@ export default function ERPDashboard({ stats: serverStats, clients: serverClient
     // Add Support Ticket
     const handleAddTicket = (e: React.FormEvent) => {
         e.preventDefault();
-        router.post(route('tickets.store'), {
+        
+        const payload = {
             subject: newTicketForm.title,
-            priority: newTicketForm.priority,
-            description: `Auto-generated from ERP quick add for client ${newTicketForm.client}`
-        }, {
+            description: newTicketForm.description || `Support request for client`,
+            priority: newTicketForm.priority.toLowerCase(),
+            client_id: newTicketForm.client_id || null,
+            client_name: newTicketForm.client_name || null,
+        };
+
+        router.post(route('erp.tickets.store'), payload, {
             onSuccess: () => {
                 setShowAddTicketModal(false);
-                setNewTicketForm({ title: '', client: '', priority: 'Medium' });
-                toast({ description: 'Support request recorded.' });
+                setNewTicketForm({ title: '', client_id: '', client_name: '', priority: 'medium', description: '' });
+                toast({ description: 'Support ticket opened successfully.' });
+            },
+            onError: (errors) => {
+                toast({ variant: 'destructive', description: Object.values(errors)[0] as string });
             }
         });
     };
 
-    // Pin/Unpin Note
-    const togglePinNote = (noteId: number) => {
-        setNotes(prev => prev.map(n => n.id === noteId ? { ...n, pinned: !n.pinned } : n));
-        if (selectedNote && selectedNote.id === noteId) {
-            setSelectedNote((prev: any) => ({ ...prev, pinned: !prev.pinned }));
-        }
+    const handleResolveTicket = (ticketId: number) => {
+        router.post(route('erp.tickets.resolve', ticketId), {}, {
+            preserveScroll: true,
+            onSuccess: () => {
+                toast({ description: 'Support ticket resolved.' });
+            }
+        });
     };
 
-    // Add empty Note
+    const handleCloseTicket = (ticketId: number) => {
+        router.post(route('erp.tickets.close', ticketId), {}, {
+            preserveScroll: true,
+            onSuccess: () => {
+                toast({ description: 'Support ticket closed.' });
+            }
+        });
+    };
+
+    const handleDeleteTicket = (ticketId: number) => {
+        if (!confirm('Are you sure you want to delete this ticket?')) return;
+        router.delete(route('erp.tickets.destroy', ticketId), {
+            preserveScroll: true,
+            onSuccess: () => {
+                toast({ description: 'Support ticket deleted.' });
+            }
+        });
+    };
+
+    // Pin/Unpin Note — persisted to backend
+    const togglePinNote = (noteId: number) => {
+        router.post(route('erp.notes.togglePin', noteId), {}, {
+            preserveScroll: true,
+            preserveState: false,
+            onSuccess: () => {
+                prependActivity('Note Pinned', 'Note pin status updated.');
+            }
+        });
+    };
+
+    // Add empty Note — creates a stub in the database then selects it
     const handleCreateNote = () => {
-        const newN = {
-            id: notes.length + 1,
+        router.post(route('erp.notes.store'), {
             title: 'Untitled Draft Note',
-            category: 'Internal',
             content: 'Write something here...',
-            pinned: false,
-            date: new Date().toISOString().split('T')[0]
-        };
-        setNotes(prev => [newN, ...prev]);
-        setSelectedNote(newN);
-        setNoteEditor({ title: newN.title, content: newN.content, category: newN.category });
-        prependActivity('Note Created', `Created empty workspace scratchpad note.`);
+            category: 'Internal',
+        }, {
+            preserveScroll: true,
+            preserveState: false,
+            onSuccess: () => {
+                prependActivity('Note Created', 'Created a new workspace scratchpad note.');
+            }
+        });
+    };
+
+    // Save Note — persist current editor state to backend
+    const handleSaveNote = () => {
+        if (!selectedNote) return;
+        setIsSavingNote(true);
+        router.put(route('erp.notes.update', selectedNote.id), noteEditor, {
+            preserveScroll: true,
+            preserveState: false,
+            onSuccess: () => {
+                toast({ description: 'Note saved successfully.' });
+                prependActivity('Note Saved', `Updated note "${noteEditor.title}".`);
+            },
+            onError: (errors) => {
+                toast({ variant: 'destructive', description: Object.values(errors)[0] as string });
+            },
+            onFinish: () => setIsSavingNote(false),
+        });
+    };
+
+    // Delete Note — remove from backend and deselect
+    const handleDeleteNote = (noteId: number) => {
+        if (!confirm('Are you sure you want to delete this note?')) return;
+        router.delete(route('erp.notes.destroy', noteId), {
+            preserveScroll: true,
+            preserveState: false,
+            onSuccess: () => {
+                setSelectedNote(null);
+                setNoteEditor({ title: '', content: '', category: 'Internal' });
+                toast({ description: 'Note deleted.' });
+                prependActivity('Note Deleted', 'A workspace note was deleted.');
+            }
+        });
     };
 
     // ────────────────────────────────────────────────────────
@@ -448,11 +649,16 @@ export default function ERPDashboard({ stats: serverStats, clients: serverClient
         { id: 'calendar', label: 'Calendar', icon: CalendarIcon },
         { id: 'team', label: 'Team', icon: UserCheck },
         { id: 'settings', label: 'Settings', icon: Settings },
-    ];
+    ].filter(item => {
+        if (isTeamMember && (item.id === 'team' || item.id === 'settings')) {
+            return false;
+        }
+        return true;
+    });
 
     const activeMenuLabel = useMemo(() => {
         return menuItems.find(item => item.id === currentSection)?.label || 'Workspace';
-    }, [currentSection]);
+    }, [currentSection, menuItems]);
 
     return (
         <WorkspaceLayout 
@@ -462,7 +668,11 @@ export default function ERPDashboard({ stats: serverStats, clients: serverClient
             menuItems={menuItems.map(m => ({
                 ...m,
                 isActive: currentSection === m.id,
-                onClick: () => setCurrentSection(m.id)
+                href: m.id === 'team' ? route('erp.team-members.index') : route('erp.dashboard', { section: m.id }),
+                onClick: m.id === 'team' ? undefined : (e: any) => {
+                    e.preventDefault();
+                    handleSetSection(m.id);
+                }
             }))}
         >
             <div className="flex-1 w-full min-w-0">
@@ -477,6 +687,17 @@ export default function ERPDashboard({ stats: serverStats, clients: serverClient
                 onConfirm={confirmDeleteClient}
                 onCancel={() => setDeleteConfirm({ open: false, client: null })}
             />
+
+            {/* ConfirmModal for project deletion */}
+            <ConfirmModal
+                isOpen={deleteProjectConfirm.open}
+                title="Delete Project"
+                description={`Are you sure you want to delete ${deleteProjectConfirm.project?.name}? This cannot be undone.`}
+                confirmLabel="Delete Project"
+                variant="danger"
+                onConfirm={confirmDeleteProject}
+                onCancel={() => setDeleteProjectConfirm({ open: false, project: null })}
+            />
                         
                         {/* 1. OVERVIEW (DASHBOARD) */}
                         {currentSection === 'overview' && (
@@ -487,17 +708,19 @@ export default function ERPDashboard({ stats: serverStats, clients: serverClient
                                         <h2 className="text-2xl font-semibold text-slate-900 tracking-tight">Overview</h2>
                                         <p className="text-sm text-slate-500 mt-1">Here's what's happening in your workspace today.</p>
                                     </div>
-                                    <div className="flex items-center gap-3">
-                                        <Button size="sm" variant="outline" className="shadow-sm border-slate-200" onClick={() => setShowAddClientModal(true)}>
-                                            <UserPlus className="mr-2 h-4 w-4" /> Add Client
-                                        </Button>
-                                        <Link 
-                                            href={route('erp.invoices.create')}
-                                            className={cn(buttonVariants({ size: 'sm' }), "shadow-sm")}
-                                        >
-                                            <Plus className="mr-2 h-4 w-4" /> New Invoice
-                                        </Link>
-                                    </div>
+                                    {!isReadOnlyMember && (
+                                        <div className="flex items-center gap-3">
+                                            <Button size="sm" variant="outline" className="shadow-sm border-slate-200" onClick={() => setShowAddClientModal(true)}>
+                                                <UserPlus className="mr-2 h-4 w-4" /> Add Client
+                                            </Button>
+                                            <Link 
+                                                href={route('erp.invoices.create')}
+                                                className={cn(buttonVariants({ size: 'sm' }), "shadow-sm")}
+                                            >
+                                                <Plus className="mr-2 h-4 w-4" /> New Invoice
+                                            </Link>
+                                        </div>
+                                    )}
                                 </div>
 
                                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
@@ -528,10 +751,10 @@ export default function ERPDashboard({ stats: serverStats, clients: serverClient
                                     {/* Main Content Column */}
                                     <div className="lg:col-span-2 space-y-8">
                                         
-                                        <OperationalCard title="Active Projects" action={<button onClick={() => setCurrentSection('projects')} className="text-sm text-primary hover:underline transition-colors">View all</button>}>
+                                        <OperationalCard title="Active Projects" action={<button onClick={() => handleSetSection('projects')} className="text-sm text-primary hover:underline transition-colors">View all</button>}>
                                             <div className="space-y-3">
                                                 {projects.filter(p => p.status === 'Active' || p.status === 'Planning').slice(0, 3).map((proj) => (
-                                                    <div key={proj.id} className="group border border-border p-4 rounded-xl hover:bg-surface-raised transition-all cursor-pointer" onClick={() => setCurrentSection('projects')}>
+                                                    <div key={proj.id} className="group border border-border p-4 rounded-xl hover:bg-surface-raised transition-all cursor-pointer" onClick={() => handleSetSection('projects')}>
                                                         <div className="flex items-start justify-between">
                                                             <div>
                                                                 <h4 className="font-medium text-text-primary text-sm group-hover:text-primary transition-colors">{proj.name}</h4>
@@ -549,7 +772,7 @@ export default function ERPDashboard({ stats: serverStats, clients: serverClient
                                             </div>
                                         </OperationalCard>
 
-                                        <OperationalCard title="Recent Invoices" noPadding action={<button onClick={() => setCurrentSection('invoices')} className="text-sm text-primary hover:underline transition-colors">View all</button>}>
+                                        <OperationalCard title="Recent Invoices" noPadding action={<button onClick={() => handleSetSection('invoices')} className="text-sm text-primary hover:underline transition-colors">View all</button>}>
                                             <div className="divide-y divide-border/40">
                                                 {activeInvoices.length === 0 ? (
                                                     <EmptyState 
@@ -586,25 +809,29 @@ export default function ERPDashboard({ stats: serverStats, clients: serverClient
                                         <div>
                                             <h3 className="text-sm font-semibold text-slate-900 mb-4">Quick Actions</h3>
                                             <div className="space-y-2">
-                                                <button onClick={() => setShowAddClientModal(true)} className="w-full flex items-center justify-between p-3 rounded-xl border border-slate-100 bg-white hover:border-slate-300 hover:shadow-sm transition-all text-left group">
-                                                    <div className="flex items-center gap-3">
-                                                        <div className="bg-slate-50 p-2 rounded-lg group-hover:bg-white transition-colors">
-                                                            <UserPlus className="h-4 w-4 text-slate-600" />
-                                                        </div>
-                                                        <span className="font-medium text-slate-700 text-sm">Add Client</span>
-                                                    </div>
-                                                    <ChevronRight className="h-4 w-4 text-slate-400 group-hover:text-slate-600 transition-colors" />
-                                                </button>
-                                                <button onClick={() => setShowAddProjectModal(true)} className="w-full flex items-center justify-between p-3 rounded-xl border border-slate-100 bg-white hover:border-slate-300 hover:shadow-sm transition-all text-left group">
-                                                    <div className="flex items-center gap-3">
-                                                        <div className="bg-slate-50 p-2 rounded-lg group-hover:bg-white transition-colors">
-                                                            <Briefcase className="h-4 w-4 text-slate-600" />
-                                                        </div>
-                                                        <span className="font-medium text-slate-700 text-sm">Create Project</span>
-                                                    </div>
-                                                    <ChevronRight className="h-4 w-4 text-slate-400 group-hover:text-slate-600 transition-colors" />
-                                                </button>
-                                                <button onClick={() => setCurrentSection('tasks')} className="w-full flex items-center justify-between p-3 rounded-xl border border-slate-100 bg-white hover:border-slate-300 hover:shadow-sm transition-all text-left group">
+                                                {!isReadOnlyMember && (
+                                                    <>
+                                                        <button onClick={() => setShowAddClientModal(true)} className="w-full flex items-center justify-between p-3 rounded-xl border border-slate-100 bg-white hover:border-slate-300 hover:shadow-sm transition-all text-left group">
+                                                            <div className="flex items-center gap-3">
+                                                                <div className="bg-slate-50 p-2 rounded-lg group-hover:bg-white transition-colors">
+                                                                    <UserPlus className="h-4 w-4 text-slate-600" />
+                                                                </div>
+                                                                <span className="font-medium text-slate-700 text-sm">Add Client</span>
+                                                            </div>
+                                                            <ChevronRight className="h-4 w-4 text-slate-400 group-hover:text-slate-600 transition-colors" />
+                                                        </button>
+                                                        <button onClick={() => setShowAddProjectModal(true)} className="w-full flex items-center justify-between p-3 rounded-xl border border-slate-100 bg-white hover:border-slate-300 hover:shadow-sm transition-all text-left group">
+                                                            <div className="flex items-center gap-3">
+                                                                <div className="bg-slate-50 p-2 rounded-lg group-hover:bg-white transition-colors">
+                                                                    <Briefcase className="h-4 w-4 text-slate-600" />
+                                                                </div>
+                                                                <span className="font-medium text-slate-700 text-sm">Create Project</span>
+                                                            </div>
+                                                            <ChevronRight className="h-4 w-4 text-slate-400 group-hover:text-slate-600 transition-colors" />
+                                                        </button>
+                                                    </>
+                                                )}
+                                                <button onClick={() => handleSetSection('tasks')} className="w-full flex items-center justify-between p-3 rounded-xl border border-slate-100 bg-white hover:border-slate-300 hover:shadow-sm transition-all text-left group">
                                                     <div className="flex items-center gap-3">
                                                         <div className="bg-slate-50 p-2 rounded-lg group-hover:bg-white transition-colors">
                                                             <CheckSquare className="h-4 w-4 text-slate-600" />
@@ -620,7 +847,7 @@ export default function ERPDashboard({ stats: serverStats, clients: serverClient
                                         <div>
                                             <div className="flex items-center justify-between mb-4">
                                                 <h3 className="text-sm font-semibold text-slate-900">Pending Tasks</h3>
-                                                <button onClick={() => setCurrentSection('tasks')} className="text-sm text-slate-500 hover:text-slate-900 transition-colors">View all</button>
+                                                <button onClick={() => handleSetSection('tasks')} className="text-sm text-slate-500 hover:text-slate-900 transition-colors">View all</button>
                                             </div>
                                             <div className="bg-white border border-slate-100 rounded-xl shadow-sm p-4 space-y-4">
                                                 {tasks.filter(t => t.category !== 'Done').slice(0, 4).map((t) => (
@@ -658,11 +885,11 @@ export default function ERPDashboard({ stats: serverStats, clients: serverClient
                                 <ModulePageHeader 
                                     title="Clients" 
                                     description="Manage your clients, contacts, and their billing profiles."
-                                    actions={
+                                    actions={!isReadOnlyMember && (
                                         <Button size="sm" onClick={() => setShowAddClientModal(true)} className="shadow-none">
                                             <Plus className="mr-1.5 h-3.5 w-3.5" /> Add Client
                                         </Button>
-                                    }
+                                    )}
                                 />
 
                                 <OperationalCard>
@@ -675,14 +902,14 @@ export default function ERPDashboard({ stats: serverStats, clients: serverClient
                                                     <th className="px-6 py-3.5">Address</th>
                                                     <th className="px-6 py-3.5 text-right">Invoiced</th>
                                                     <th className="px-6 py-3.5 text-right">Paid</th>
-                                                    <th className="px-6 py-3.5 text-center">Wallet Action</th>
-                                                    <th className="px-6 py-3.5 text-right">Control</th>
+                                                    {!isReadOnlyMember && <th className="px-6 py-3.5 text-center">Wallet Action</th>}
+                                                    {!isReadOnlyMember && <th className="px-6 py-3.5 text-right">Control</th>}
                                                 </tr>
                                             </thead>
                                             <tbody className="divide-y divide-slate-100">
                                                 {activeClients.length === 0 ? (
                                                     <tr>
-                                                        <td colSpan={7} className="p-0">
+                                                        <td colSpan={isReadOnlyMember ? 5 : 7} className="p-0">
                                                             <EmptyState 
                                                                 icon={Users} 
                                                                 title="No Clients" 
@@ -708,45 +935,49 @@ export default function ERPDashboard({ stats: serverStats, clients: serverClient
                                                             <td className="px-6 py-4 text-right font-bold text-emerald-600 font-mono">
                                                                 <CurrencyDisplay amount={client.totalPaid} currency={client.currency || 'USD'} />
                                                             </td>
-                                                            <td className="px-6 py-4 text-center">
-                                                                <Button 
-                                                                    size="sm" 
-                                                                    variant="outline" 
-                                                                    className="h-8 shadow-none border-indigo-100 text-indigo-600 hover:bg-indigo-50 font-semibold"
-                                                                    onClick={() => {
-                                                                        setSelectedClient(client);
-                                                                        setShowWalletModal(true);
-                                                                    }}
-                                                                >
-                                                                    <CreditCard className="mr-1 h-3.5 w-3.5" /> Adjust Balance
-                                                                </Button>
-                                                            </td>
-                                                            <td className="px-6 py-4 text-right">
-                                                                <div className="flex items-center justify-end gap-1.5">
-                                                                    <button 
+                                                            {!isReadOnlyMember && (
+                                                                <td className="px-6 py-4 text-center">
+                                                                    <Button 
+                                                                        size="sm" 
+                                                                        variant="outline" 
+                                                                        className="h-8 shadow-none border-indigo-100 text-indigo-600 hover:bg-indigo-50 font-semibold"
                                                                         onClick={() => {
                                                                             setSelectedClient(client);
-                                                                            setClientForm({
-                                                                                name: client.name,
-                                                                                email: client.email || '',
-                                                                                phone: client.phone || '',
-                                                                                address: client.address || '',
-                                                                                currency: client.currency || 'USD'
-                                                                            });
-                                                                            setShowEditClientModal(true);
-                                                                        }} 
-                                                                        className="p-1 hover:bg-slate-100 rounded text-slate-500"
+                                                                            setShowWalletModal(true);
+                                                                        }}
                                                                     >
-                                                                        <Edit2 className="h-3.5 w-3.5" />
-                                                                    </button>
-                                                                    <button 
-                                                                        onClick={() => handleDeleteClient(client)} 
-                                                                        className="p-1 hover:bg-rose-50 rounded text-rose-500"
-                                                                    >
-                                                                        <Trash2 className="h-3.5 w-3.5" />
-                                                                    </button>
-                                                                </div>
-                                                            </td>
+                                                                        <CreditCard className="mr-1 h-3.5 w-3.5" /> Adjust Balance
+                                                                    </Button>
+                                                                </td>
+                                                            )}
+                                                            {!isReadOnlyMember && (
+                                                                <td className="px-6 py-4 text-right">
+                                                                    <div className="flex items-center justify-end gap-1.5">
+                                                                        <button 
+                                                                            onClick={() => {
+                                                                                setSelectedClient(client);
+                                                                                setClientForm({
+                                                                                    name: client.name,
+                                                                                    email: client.email || '',
+                                                                                    phone: client.phone || '',
+                                                                                    address: client.address || '',
+                                                                                    currency: client.currency || 'USD'
+                                                                                });
+                                                                                setShowEditClientModal(true);
+                                                                            }} 
+                                                                            className="p-1 hover:bg-slate-100 rounded text-slate-500"
+                                                                        >
+                                                                            <Edit2 className="h-3.5 w-3.5" />
+                                                                        </button>
+                                                                        <button 
+                                                                            onClick={() => handleDeleteClient(client)} 
+                                                                            className="p-1 hover:bg-rose-50 rounded text-rose-500"
+                                                                        >
+                                                                            <Trash2 className="h-3.5 w-3.5" />
+                                                                        </button>
+                                                                    </div>
+                                                                </td>
+                                                            )}
                                                         </tr>
                                                     ))
                                                 )}
@@ -763,11 +994,11 @@ export default function ERPDashboard({ stats: serverStats, clients: serverClient
                                 <ModulePageHeader 
                                     title="Projects" 
                                     description="Manage active projects, track progress, and monitor deadlines."
-                                    actions={
+                                    actions={!isReadOnlyMember && (
                                         <Button size="sm" onClick={() => setShowAddProjectModal(true)} className="shadow-none">
                                             <Plus className="mr-1.5 h-3.5 w-3.5" /> New Project
                                         </Button>
-                                    }
+                                    )}
                                 />
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -798,8 +1029,38 @@ export default function ERPDashboard({ stats: serverStats, clients: serverClient
                                                 </div>
 
                                                 <div className="flex items-center justify-between text-xs pt-3 border-t border-slate-100 text-slate-400 font-mono">
-                                                    <span>Budget: <span className="font-semibold text-slate-700">{formatMoney(proj.budget, 'USD')}</span></span>
-                                                    <span>Deadline: <span className="font-semibold text-slate-700">{formatDate(proj.deadline)}</span></span>
+                                                    <div className="flex items-center gap-4">
+                                                        <span>Budget: <span className="font-semibold text-slate-700">{formatMoney(proj.budget, 'USD')}</span></span>
+                                                        <span>Deadline: <span className="font-semibold text-slate-700">{formatDate(proj.deadline)}</span></span>
+                                                    </div>
+                                                    {!isReadOnlyMember && (
+                                                        <div className="flex items-center gap-1">
+                                                            <button 
+                                                                onClick={() => {
+                                                                    setEditProjectForm({
+                                                                        id: proj.id,
+                                                                        name: proj.name,
+                                                                        client_id: proj.client_id || '',
+                                                                        budget: proj.budget || '',
+                                                                        due_date: proj.deadline || '',
+                                                                        status: proj.status || 'Planning'
+                                                                    });
+                                                                    setShowEditProjectModal(true);
+                                                                }}
+                                                                className="p-1.5 hover:bg-slate-100 rounded text-slate-500 transition-colors"
+                                                                title="Edit Project"
+                                                            >
+                                                                <Edit2 className="h-3.5 w-3.5" />
+                                                            </button>
+                                                            <button 
+                                                                onClick={() => setDeleteProjectConfirm({ open: true, project: proj })}
+                                                                className="p-1.5 hover:bg-rose-50 rounded text-rose-500 transition-colors"
+                                                                title="Delete Project"
+                                                            >
+                                                                <Trash2 className="h-3.5 w-3.5" />
+                                                            </button>
+                                                        </div>
+                                                    )}
                                                 </div>
                                             </div>
                                         </OperationalCard>
@@ -892,14 +1153,14 @@ export default function ERPDashboard({ stats: serverStats, clients: serverClient
                                 <ModulePageHeader 
                                     title="Invoices" 
                                     description="Create, send, and track client invoices."
-                                    actions={
+                                    actions={!isReadOnlyMember && (
                                         <Link 
                                             href={route('erp.invoices.create')}
                                             className={cn(buttonVariants({ size: 'sm' }), "shadow-none")}
                                         >
                                             <Plus className="mr-1.5 h-3.5 w-3.5" /> New Invoice
                                         </Link>
-                                    }
+                                    )}
                                 />
 
                                 <OperationalCard>
@@ -957,12 +1218,14 @@ export default function ERPDashboard({ stats: serverStats, clients: serverClient
                                                                      >
                                                                          <Eye className="h-4 w-4" />
                                                                      </Link>
-                                                                     <Link 
-                                                                         href={route('erp.invoices.edit', inv.id)} 
-                                                                         className={cn(buttonVariants({ variant: 'ghost', size: 'icon' }), "h-8 w-8 text-slate-400 hover:text-slate-900")}
-                                                                     >
-                                                                         <Edit2 className="h-4 w-4" />
-                                                                     </Link>
+                                                                     {!isReadOnlyMember && (
+                                                                         <Link 
+                                                                             href={route('erp.invoices.edit', inv.id)} 
+                                                                             className={cn(buttonVariants({ variant: 'ghost', size: 'icon' }), "h-8 w-8 text-slate-400 hover:text-slate-900")}
+                                                                         >
+                                                                             <Edit2 className="h-4 w-4" />
+                                                                         </Link>
+                                                                     )}
                                                                  </div>
                                                              </td>
                                                         </tr>
@@ -1035,11 +1298,11 @@ export default function ERPDashboard({ stats: serverStats, clients: serverClient
                                 <ModulePageHeader 
                                     title="Files" 
                                     description="Secure cloud repository for your documents and files."
-                                    actions={
+                                    actions={!isReadOnlyMember && (
                                         <Button size="sm" onClick={() => setShowAddDocModal(true)} className="shadow-none">
                                             <Plus className="mr-1.5 h-3.5 w-3.5" /> Upload File
                                         </Button>
-                                    }
+                                    )}
                                 />
 
                                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -1100,8 +1363,10 @@ export default function ERPDashboard({ stats: serverStats, clients: serverClient
                                                         <td className="px-6 py-4 font-mono text-xs text-slate-400">{doc.size}</td>
                                                         <td className="px-6 py-4 text-right">
                                                             <div className="flex items-center justify-end gap-2 text-slate-400">
-                                                                <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-indigo-600"><LinkIcon className="h-4 w-4" /></Button>
-                                                                <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-indigo-600"><Eye className="h-4 w-4" /></Button>
+                                                                <a href={route('erp.files.show', doc.id)} target="_blank" className={cn(buttonVariants({ variant: 'ghost', size: 'icon' }), "h-8 w-8 text-slate-400 hover:text-indigo-600")}><Cloud className="h-4 w-4" /></a>
+                                                                {!isReadOnlyMember && (
+                                                                    <Button variant="ghost" size="icon" onClick={() => handleDeleteDoc(doc.id)} className="h-8 w-8 text-slate-400 hover:text-rose-600"><Trash2 className="h-4 w-4" /></Button>
+                                                                )}
                                                             </div>
                                                         </td>
                                                     </tr>
@@ -1385,9 +1650,24 @@ export default function ERPDashboard({ stats: serverStats, clients: serverClient
                                                             onChange={(e) => setNoteEditor(prev => ({ ...prev, title: e.target.value }))}
                                                         />
                                                     </div>
-                                                    <Badge className="bg-indigo-50 text-indigo-700 hover:bg-indigo-50 border-none font-bold text-[10px] shrink-0 font-mono">
-                                                        Committed
-                                                    </Badge>
+                                                    <div className="flex items-center gap-1.5 shrink-0 ml-3">
+                                                        <Button
+                                                            size="sm"
+                                                            onClick={handleSaveNote}
+                                                            disabled={isSavingNote}
+                                                            className="h-7 px-3 text-xs shadow-none"
+                                                        >
+                                                            {isSavingNote ? 'Saving...' : 'Save'}
+                                                        </Button>
+                                                        <Button
+                                                            size="icon"
+                                                            variant="ghost"
+                                                            onClick={() => handleDeleteNote(selectedNote.id)}
+                                                            className="h-7 w-7 text-slate-400 hover:text-rose-600"
+                                                        >
+                                                            <Trash2 className="h-3.5 w-3.5" />
+                                                        </Button>
+                                                    </div>
                                                 </div>
 
                                                 <Textarea 
@@ -1488,7 +1768,8 @@ export default function ERPDashboard({ stats: serverStats, clients: serverClient
                                                     <th className="px-6 py-3.5">Client Tenant</th>
                                                     <th className="px-6 py-3.5">Priority</th>
                                                     <th className="px-6 py-3.5">Status</th>
-                                                    <th className="px-6 py-3.5 text-right">Date Created</th>
+                                                    <th className="px-6 py-3.5">Date Created</th>
+                                                    <th className="px-6 py-3.5 text-right">Actions</th>
                                                 </tr>
                                             </thead>
                                             <tbody className="divide-y divide-slate-100 font-sans text-[13px] text-slate-700">
@@ -1499,20 +1780,53 @@ export default function ERPDashboard({ stats: serverStats, clients: serverClient
                                                         <td className="px-6 py-4 font-medium text-slate-800">{t.client}</td>
                                                         <td className="px-6 py-4">
                                                             <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold uppercase ${
-                                                                t.priority === 'High' ? 'bg-rose-50 text-rose-700' :
-                                                                t.priority === 'Medium' ? 'bg-amber-50 text-amber-700' : 'bg-slate-100 text-slate-500'
+                                                                t.priority.toLowerCase() === 'high' || t.priority.toLowerCase() === 'urgent' ? 'bg-rose-50 text-rose-700' :
+                                                                t.priority.toLowerCase() === 'medium' ? 'bg-amber-50 text-amber-700' : 'bg-slate-100 text-slate-500'
                                                             }`}>
                                                                 {t.priority}
                                                             </span>
                                                         </td>
                                                         <td className="px-6 py-4">
                                                             <Badge className={`text-[10px] uppercase font-bold tracking-wider rounded ${
-                                                                t.status === 'Resolved' ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-600'
+                                                                t.status.toLowerCase() === 'resolved' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' :
+                                                                t.status.toLowerCase() === 'closed' ? 'bg-slate-100 text-slate-400 border-slate-200' : 'bg-indigo-50 text-indigo-700 border-indigo-200'
                                                             }`}>
                                                                 {t.status}
                                                             </Badge>
                                                         </td>
-                                                        <td className="px-6 py-4 text-right text-slate-400 font-mono text-xs">{formatDate(t.date)}</td>
+                                                        <td className="px-6 py-4 text-slate-400 font-mono text-xs">{formatDate(t.date)}</td>
+                                                        <td className="px-6 py-4 text-right">
+                                                            <div className="flex justify-end gap-1.5">
+                                                                {(t.status.toLowerCase() !== 'resolved' && t.status.toLowerCase() !== 'closed') && (
+                                                                    <Button 
+                                                                        size="xs" 
+                                                                        variant="ghost" 
+                                                                        className="h-7 px-2 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 text-xs shadow-none border-none"
+                                                                        onClick={() => handleResolveTicket(t.id)}
+                                                                    >
+                                                                        Resolve
+                                                                    </Button>
+                                                                )}
+                                                                {t.status.toLowerCase() !== 'closed' && (
+                                                                    <Button 
+                                                                        size="xs" 
+                                                                        variant="ghost" 
+                                                                        className="h-7 px-2 text-amber-600 hover:text-amber-700 hover:bg-amber-50 text-xs shadow-none border-none"
+                                                                        onClick={() => handleCloseTicket(t.id)}
+                                                                    >
+                                                                        Close
+                                                                    </Button>
+                                                                )}
+                                                                <Button 
+                                                                    size="xs" 
+                                                                    variant="ghost" 
+                                                                    className="h-7 px-2 text-rose-600 hover:text-rose-700 hover:bg-rose-50 text-xs shadow-none border-none"
+                                                                    onClick={() => handleDeleteTicket(t.id)}
+                                                                >
+                                                                    <Trash2 className="h-3.5 w-3.5" />
+                                                                </Button>
+                                                            </div>
+                                                        </td>
                                                     </tr>
                                                 ))}
                                             </tbody>
@@ -1732,6 +2046,130 @@ export default function ERPDashboard({ stats: serverStats, clients: serverClient
                 </div>
             )}
 
+            {/* ADD PROJECT MODAL */}
+            {showAddProjectModal && (
+                <div className="fixed inset-0 bg-slate-950/20 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fade-in">
+                    <OperationalCard className="w-full max-w-md shadow-2xl animate-scale-up">
+                        <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+                            <h3 className="font-semibold text-slate-800 text-[14px]">Create New Project</h3>
+                            <button onClick={() => setShowAddProjectModal(false)} className="p-1 hover:bg-slate-100 rounded text-slate-400">
+                                <X className="h-4 w-4" />
+                            </button>
+                        </div>
+                        <form onSubmit={handleAddProject} className="p-6 space-y-4">
+                            <div className="space-y-1">
+                                <label className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Project Name</label>
+                                <Input required placeholder="Website Redesign" value={newProjectForm.name} onChange={e => setNewProjectForm(prev => ({ ...prev, name: e.target.value }))} className="shadow-none" />
+                            </div>
+                            <div className="space-y-1">
+                                <label className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Client</label>
+                                <select 
+                                    className="flex h-10 w-full rounded-md border border-slate-200 bg-background px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-slate-950 shadow-none"
+                                    value={newProjectForm.client_id}
+                                    onChange={e => setNewProjectForm(prev => ({ ...prev, client_id: e.target.value }))}
+                                    required
+                                >
+                                    <option value="" disabled>Select a Client</option>
+                                    {activeClients.map(c => (
+                                        <option key={c.id} value={c.id}>{c.name}</option>
+                                    ))}
+                                </select>
+                            </div>
+                            <div className="space-y-1">
+                                <label className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Status</label>
+                                <select 
+                                    className="flex h-10 w-full rounded-md border border-slate-200 bg-background px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-slate-950 shadow-none"
+                                    value={newProjectForm.status}
+                                    onChange={e => setNewProjectForm(prev => ({ ...prev, status: e.target.value }))}
+                                >
+                                    <option value="Planning">Planning</option>
+                                    <option value="Active">Active</option>
+                                    <option value="On Hold">On Hold</option>
+                                    <option value="Completed">Completed</option>
+                                    <option value="Cancelled">Cancelled</option>
+                                </select>
+                            </div>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="space-y-1">
+                                    <label className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Budget ($)</label>
+                                    <Input type="number" min="0" step="0.01" placeholder="5000.00" value={newProjectForm.budget} onChange={e => setNewProjectForm(prev => ({ ...prev, budget: e.target.value }))} className="shadow-none" />
+                                </div>
+                                <div className="space-y-1">
+                                    <label className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Deadline</label>
+                                    <Input type="date" value={newProjectForm.due_date} onChange={e => setNewProjectForm(prev => ({ ...prev, due_date: e.target.value }))} className="shadow-none" />
+                                </div>
+                            </div>
+                            <div className="pt-4 border-t flex justify-end gap-2">
+                                <Button type="button" variant="outline" size="sm" className="shadow-none" onClick={() => setShowAddProjectModal(false)}>Cancel</Button>
+                                <Button type="submit" size="sm" className="shadow-none bg-indigo-600 hover:bg-indigo-700 text-white font-semibold">Create Project</Button>
+                            </div>
+                        </form>
+                    </OperationalCard>
+                </div>
+            )}
+
+            {/* EDIT PROJECT MODAL */}
+            {showEditProjectModal && (
+                <div className="fixed inset-0 bg-slate-950/20 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+                    <OperationalCard className="w-full max-w-md shadow-2xl">
+                        <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+                            <h3 className="font-semibold text-slate-800 text-[14px]">Edit Project</h3>
+                            <button onClick={() => setShowEditProjectModal(false)} className="p-1 hover:bg-slate-100 rounded text-slate-400">
+                                <X className="h-4 w-4" />
+                            </button>
+                        </div>
+                        <form onSubmit={handleEditProject} className="p-6 space-y-4">
+                            <div className="space-y-1">
+                                <label className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Project Name</label>
+                                <Input required placeholder="Website Redesign" value={editProjectForm.name} onChange={e => setEditProjectForm(prev => ({ ...prev, name: e.target.value }))} className="shadow-none" />
+                            </div>
+                            <div className="space-y-1">
+                                <label className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Client</label>
+                                <select 
+                                    className="flex h-10 w-full rounded-md border border-slate-200 bg-background px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-slate-950 shadow-none"
+                                    value={editProjectForm.client_id}
+                                    onChange={e => setEditProjectForm(prev => ({ ...prev, client_id: e.target.value }))}
+                                    required
+                                >
+                                    <option value="" disabled>Select a Client</option>
+                                    {activeClients.map(c => (
+                                        <option key={c.id} value={c.id}>{c.name}</option>
+                                    ))}
+                                </select>
+                            </div>
+                            <div className="space-y-1">
+                                <label className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Status</label>
+                                <select 
+                                    className="flex h-10 w-full rounded-md border border-slate-200 bg-background px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-slate-950 shadow-none"
+                                    value={editProjectForm.status}
+                                    onChange={e => setEditProjectForm(prev => ({ ...prev, status: e.target.value }))}
+                                >
+                                    <option value="Planning">Planning</option>
+                                    <option value="Active">Active</option>
+                                    <option value="On Hold">On Hold</option>
+                                    <option value="Completed">Completed</option>
+                                    <option value="Cancelled">Cancelled</option>
+                                </select>
+                            </div>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="space-y-1">
+                                    <label className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Budget ($)</label>
+                                    <Input type="number" min="0" step="0.01" placeholder="5000.00" value={editProjectForm.budget} onChange={e => setEditProjectForm(prev => ({ ...prev, budget: e.target.value }))} className="shadow-none" />
+                                </div>
+                                <div className="space-y-1">
+                                    <label className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Deadline</label>
+                                    <Input type="date" value={editProjectForm.due_date} onChange={e => setEditProjectForm(prev => ({ ...prev, due_date: e.target.value }))} className="shadow-none" />
+                                </div>
+                            </div>
+                            <div className="pt-4 border-t flex justify-end gap-2">
+                                <Button type="button" variant="outline" size="sm" className="shadow-none" onClick={() => setShowEditProjectModal(false)}>Cancel</Button>
+                                <Button type="submit" size="sm" className="shadow-none bg-indigo-600 hover:bg-indigo-700 text-white font-semibold">Update Project</Button>
+                            </div>
+                        </form>
+                    </OperationalCard>
+                </div>
+            )}
+
             {/* ADJUST CLIENT WALLET MODAL */}
             {showWalletModal && selectedClient && (
                 <div className="fixed inset-0 bg-slate-950/20 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fade-in">
@@ -1786,45 +2224,7 @@ export default function ERPDashboard({ stats: serverStats, clients: serverClient
                 </div>
             )}
 
-            {/* ADD PROJECT MODAL */}
-            {showAddProjectModal && (
-                <div className="fixed inset-0 bg-slate-950/20 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-                    <OperationalCard className="w-full max-w-md shadow-2xl">
-                        <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
-                            <h3 className="font-semibold text-slate-800 text-[14px]">Create Project</h3>
-                            <button onClick={() => setShowAddProjectModal(false)} className="p-1 hover:bg-slate-100 rounded text-slate-400">
-                                <X className="h-4 w-4" />
-                            </button>
-                        </div>
-                        <form onSubmit={handleAddProject} className="p-6 space-y-4">
-                            <div className="space-y-1">
-                                <label className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Project Name</label>
-                                <Input required placeholder="E-commerce Gateway" value={newProjectForm.name} onChange={e => setNewProjectForm(prev => ({ ...prev, name: e.target.value }))} className="shadow-none" />
-                            </div>
-                            <div className="space-y-1">
-                                <label className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Client Tenant</label>
-                                <Input required placeholder="Nexus Tech Inc" value={newProjectForm.client} onChange={e => setNewProjectForm(prev => ({ ...prev, client: e.target.value }))} className="shadow-none" />
-                            </div>
-                            <div className="space-y-1">
-                                <label className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Budget ($)</label>
-                                <Input required type="number" placeholder="5000" value={newProjectForm.budget} onChange={e => setNewProjectForm(prev => ({ ...prev, budget: e.target.value }))} className="shadow-none font-mono" />
-                            </div>
-                            <div className="space-y-1">
-                                <label className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Deadline</label>
-                                <Input required type="date" value={newProjectForm.deadline} onChange={e => setNewProjectForm(prev => ({ ...prev, deadline: e.target.value }))} className="shadow-none" />
-                            </div>
-                            <div className="space-y-1">
-                                <label className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Project Leader</label>
-                                <Input placeholder="Sarah Lin" value={newProjectForm.leader} onChange={e => setNewProjectForm(prev => ({ ...prev, leader: e.target.value }))} className="shadow-none" />
-                            </div>
-                            <div className="pt-4 border-t flex justify-end gap-2">
-                                <Button type="button" variant="outline" size="sm" className="shadow-none" onClick={() => setShowAddProjectModal(false)}>Cancel</Button>
-                                <Button type="submit" size="sm" className="shadow-none bg-indigo-600 hover:bg-indigo-700 text-white font-semibold">Initiate Project</Button>
-                            </div>
-                        </form>
-                    </OperationalCard>
-                </div>
-            )}
+
 
             {/* LOG EXPENSE MODAL */}
             {showAddExpenseModal && (
@@ -1887,8 +2287,8 @@ export default function ERPDashboard({ stats: serverStats, clients: serverClient
                         </div>
                         <form onSubmit={handleAddDoc} className="p-6 space-y-4">
                             <div className="space-y-1">
-                                <label className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Document Label</label>
-                                <Input required placeholder="Globex_Master_SOW" value={docForm.name} onChange={e => setDocForm(prev => ({ ...prev, name: e.target.value }))} className="shadow-none" />
+                                <label className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Select File</label>
+                                <Input required type="file" onChange={e => setDocFile(e.target.files ? e.target.files[0] : null)} className="shadow-none py-1.5" />
                             </div>
                             <div className="space-y-1">
                                 <label className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Classification</label>
@@ -1897,22 +2297,11 @@ export default function ERPDashboard({ stats: serverStats, clients: serverClient
                                     value={docForm.type}
                                     onChange={e => setDocForm(prev => ({ ...prev, type: e.target.value }))}
                                 >
+                                    <option value="Document">General Document</option>
                                     <option value="Contract">Master Agreement</option>
                                     <option value="Proposal">Client Proposal</option>
                                     <option value="Receipt">Expense Receipt</option>
                                     <option value="Tax">Corporate Tax Sheet</option>
-                                </select>
-                            </div>
-                            <div className="space-y-1">
-                                <label className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 flex items-center gap-1.5"><Cloud className="h-3 w-3" /> Storage Provider</label>
-                                <select 
-                                    className="flex h-10 w-full rounded-md border border-slate-200 bg-background px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500 shadow-none font-medium"
-                                    value={docForm.provider}
-                                    onChange={e => setDocForm(prev => ({ ...prev, provider: e.target.value }))}
-                                >
-                                    {storageProviders.map(p => (
-                                        <option key={p.id} value={p.name}>{p.name} ({p.driver})</option>
-                                    ))}
                                 </select>
                             </div>
                             <div className="pt-4 border-t flex justify-end gap-2">
@@ -2050,7 +2439,30 @@ export default function ERPDashboard({ stats: serverStats, clients: serverClient
                             </div>
                             <div className="space-y-1">
                                 <label className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Client Tenant</label>
-                                <Input required placeholder="Nexus Tech Inc" value={newTicketForm.client} onChange={e => setNewTicketForm(prev => ({ ...prev, client: e.target.value }))} className="shadow-none" />
+                                <select 
+                                    className="flex h-10 w-full rounded-md border border-slate-200 bg-background px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-slate-950 shadow-none"
+                                    value={newTicketForm.client_id}
+                                    onChange={e => setNewTicketForm(prev => ({ 
+                                        ...prev, 
+                                        client_id: e.target.value, 
+                                        client_name: e.target.value === '' ? prev.client_name : '' 
+                                    }))}
+                                >
+                                    <option value="">-- New Client (Quick Create) --</option>
+                                    {activeClients.map(c => (
+                                        <option key={c.id} value={c.id}>{c.name}</option>
+                                    ))}
+                                </select>
+                            </div>
+                            {newTicketForm.client_id === '' && (
+                                <div className="space-y-1">
+                                    <label className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">New Client Name</label>
+                                    <Input required placeholder="Nexus Tech Inc" value={newTicketForm.client_name} onChange={e => setNewTicketForm(prev => ({ ...prev, client_name: e.target.value }))} className="shadow-none" />
+                                </div>
+                            )}
+                            <div className="space-y-1">
+                                <label className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Description</label>
+                                <Textarea required placeholder="Describe the issue in detail..." value={newTicketForm.description} onChange={e => setNewTicketForm(prev => ({ ...prev, description: e.target.value }))} className="shadow-none h-20" />
                             </div>
                             <div className="space-y-1">
                                 <label className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Priority</label>

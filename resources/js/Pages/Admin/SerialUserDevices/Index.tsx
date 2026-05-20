@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Head, Link, router } from '@inertiajs/react';
+import { Head, Link, router, usePage } from '@inertiajs/react';
 import AdminLayout from '@/Layouts/AdminLayout';
 import { Badge } from '@/Components/ui/badge';
 import { Button } from '@/Components/ui/button';
@@ -34,13 +34,15 @@ const statusColor: Record<string, string> = {
 };
 
 export default function SerialUserDevicesIndex({ userDevices, filters, statuses, stats, perPageOptions }: Props) {
+    const { auth } = usePage().props as any;
     const [search, setSearch] = useState(filters.search ?? '');
 
     const applyFilter = (key: string, value: string) => {
         router.get(route('admin.serial-user-devices.index'), { ...filters, [key]: value || undefined }, { preserveState: true, replace: true });
     };
 
-    const updateStatus = (assignment: Assignment, status: string) => {
+    const updateStatus = (assignment: Assignment, status: string | null) => {
+        if (!status) return;
         router.patch(route('admin.serial-user-devices.status', assignment.id), { status });
     };
 
@@ -50,7 +52,7 @@ export default function SerialUserDevicesIndex({ userDevices, filters, statuses,
     };
 
     return (
-        <AdminLayout>
+        <AdminLayout user={auth.user}>
             <Head title="User Device Assignments" />
             <div className="min-h-screen bg-zinc-950 p-6 space-y-6">
                 {/* Header */}

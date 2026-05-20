@@ -21,6 +21,24 @@ return new class extends Migration
         Schema::table('tools', function (Blueprint $table) {
             $table->dropColumn('max_devices');
         });
+
+        Schema::create('activated_devices', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('tool_license_id')->constrained('tool_licenses')->cascadeOnDelete();
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->string('hardware_fingerprint');        // SHA256 of CPU+MAC
+            $table->string('device_name')->nullable();
+            $table->string('os')->nullable();              // windows|mac|linux
+            $table->string('app_version')->nullable();     // version of the desktop app
+            $table->string('status')->default('active');   // active|revoked|banned
+            $table->timestamp('last_seen_at')->nullable();
+            $table->timestamp('revoked_at')->nullable();
+            $table->string('ip_address')->nullable();
+            $table->timestamps();
+
+            $table->unique(['tool_license_id', 'hardware_fingerprint']);
+            $table->index(['hardware_fingerprint']);
+        });
     }
 
     public function down(): void

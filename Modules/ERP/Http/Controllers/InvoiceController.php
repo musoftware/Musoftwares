@@ -15,6 +15,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Modules\ERP\Models\Tenant;
 use Modules\Core\Services\ActivityService;
 use App\Events\InvoicePaid;
 
@@ -27,9 +28,20 @@ class InvoiceController extends Controller
         $this->exchangeRateService = $exchangeRateService;
     }
 
+    // ── Tenant resolution ─────────────────────────────────────────
+
+    private function resolveTenant(): Tenant
+    {
+        return Tenant::where('user_id', Auth::id())->firstOrFail();
+    }
+
+    // ── Index ─────────────────────────────────────────────────────
+
     public function index(Request $request)
     {
-        $query = Invoice::with('client');
+        $tenant = $this->resolveTenant();
+
+        $query = Invoice::with('client')->where('tenant_id', $tenant->id);
 
         if ($request->filled('search')) {
             $query->where(function($q) use ($request) {
@@ -50,28 +62,33 @@ class InvoiceController extends Controller
 
         $invoices = $query->latest()->paginate(15)->withQueryString();
 
-        // Stats in business currency
+        // Stats scoped to this tenant only
+        $businessCurrency = Auth::user()->preferred_currency ?? config('app.business_currency', 'USD');
         $stats = [
-            'total' => Invoice::sum('business_amount'),
-            'paid' => Invoice::where('status', 'paid')->sum('business_amount'),
-            'pending' => Invoice::where('status', 'sent')->sum('business_amount'),
-            'overdue' => Invoice::where('status', 'sent')->where('due_date', '<', now())->sum('business_amount'),
-            'business_currency' => config('app.business_currency', 'USD'),
+            'total'             => Invoice::where('tenant_id', $tenant->id)->sum('business_amount'),
+            'paid'              => Invoice::where('tenant_id', $tenant->id)->where('status', 'paid')->sum('business_amount'),
+            'pending'           => Invoice::where('tenant_id', $tenant->id)->where('status', 'sent')->sum('business_amount'),
+            'overdue'           => Invoice::where('tenant_id', $tenant->id)->where('status', 'sent')->where('due_date', '<', now())->sum('business_amount'),
+            'business_currency' => $businessCurrency,
         ];
 
         return Inertia::render('ERP/Invoices/Index', [
             'invoices' => $invoices,
-            'stats' => $stats,
-            'filters' => $request->only(['search', 'status', 'currency']),
+            'stats'    => $stats,
+            'filters'  => $request->only(['search', 'status', 'currency']),
         ]);
     }
 
     public function create()
     {
+        $tenant           = $this->resolveTenant();
+        $businessCurrency = Auth::user()->preferred_currency ?? config('app.business_currency', 'USD');
+
         return Inertia::render('ERP/Invoices/Create', [
-            'clients' => TenantClient::all(),
-            'currencies' => Currency::where('is_active', true)->get(),
-            'business_currency' => config('app.business_currency', 'USD'),
+            'clients'           => TenantClient::where('tenant_id', $tenant->id)->get(),
+            'projects'          => \Modules\ERP\Models\Project::where('tenant_id', $tenant->id)->get(),
+            'currencies'        => Currency::where('is_active', true)->get(),
+            'business_currency' => $businessCurrency,
         ]);
     }
 
@@ -79,6 +96,7 @@ class InvoiceController extends Controller
     {
         $validated = $request->validate([
             'client_id' => 'required|exists:tenant_clients,id',
+            'project_id' => 'nullable|exists:projects,id',
             'invoice_number' => 'required|string',
             'issued_at' => 'required|date',
             'due_date' => 'required|date|after_or_equal:issued_at',
@@ -94,33 +112,42 @@ class InvoiceController extends Controller
             'notes' => 'nullable|string',
         ]);
 
-        return DB::transaction(function () use ($validated, $request) {
-            $businessCurrency = config('app.business_currency', 'USD');
+        $tenant = $this->resolveTenant();
+
+        // Ensure client belongs to this tenant
+        $client = TenantClient::where('tenant_id', $tenant->id)
+            ->findOrFail($validated['client_id']);
+
+        return DB::transaction(function () use ($validated, $tenant, $client) {
+            $businessCurrency = Auth::user()->preferred_currency ?? config('app.business_currency', 'USD');
             $rate = $this->exchangeRateService->getRate($validated['amount_currency'], $businessCurrency, $validated['issued_at']);
 
             $subtotal = collect($validated['items'])->sum(fn($i) => $i['unit_price'] * $i['quantity']);
             $discount = $validated['discount_amount'] ?? 0;
-            $taxable = $subtotal - $discount;
-            $tax = $taxable * (($validated['tax_rate'] ?? 0) / 100);
-            $total = $taxable + $tax;
+            $taxable  = $subtotal - $discount;
+            $tax      = $taxable * (($validated['tax_rate'] ?? 0) / 100);
+            $total    = $taxable + $tax;
 
             $invoice = Invoice::create([
-                'client_id' => $validated['client_id'],
-                'invoice_number' => $validated['invoice_number'],
-                'status' => 'draft',
-                'amount' => $total,
-                'amount_currency' => $validated['amount_currency'],
-                'business_amount' => $total * $rate,
+                'tenant_id'         => $tenant->id,   // FIX H1: was missing
+                'client_id'         => $client->id,
+                'project_id'        => $validated['project_id'] ?? null,
+                'invoice_number'    => $validated['invoice_number'],
+                'status'            => 'draft',
+                'paid_amount'       => 0,
+                'amount'            => $total,
+                'amount_currency'   => $validated['amount_currency'],
+                'business_amount'   => $total * $rate,
                 'business_currency' => $businessCurrency,
-                'exchange_rate' => $rate,
-                'exchange_rate_date' => $validated['issued_at'],
-                'discount_amount' => $discount,
-                'tax_rate' => $validated['tax_rate'] ?? 0,
-                'tax_amount' => $tax,
-                'issued_at' => $validated['issued_at'],
-                'due_date' => $validated['due_date'],
-                'notes' => $validated['notes'],
-                'created_by' => Auth::id(),
+                'exchange_rate'     => $rate,
+                'exchange_rate_date'=> $validated['issued_at'],
+                'discount_amount'   => $discount,
+                'tax_rate'          => $validated['tax_rate'] ?? 0,
+                'tax_amount'        => $tax,
+                'issued_at'         => $validated['issued_at'],
+                'due_date'          => $validated['due_date'],
+                'notes'             => $validated['notes'],
+                'created_by'        => Auth::id(),
             ]);
 
             foreach ($validated['items'] as $index => $itemData) {
@@ -167,7 +194,7 @@ class InvoiceController extends Controller
 
     public function show(Invoice $invoice)
     {
-        $invoice->load(['client.wallet', 'items.timerSessions', 'costs', 'creator']);
+        $invoice->load(['client.wallet', 'items.timerSessions', 'costs', 'creator', 'project']);
 
         // This is a simplified timeline, in real app it might be a separate table
         $timeline = [
@@ -187,11 +214,26 @@ class InvoiceController extends Controller
 
     public function edit(Invoice $invoice)
     {
+        // Guard M2: prevent editing finalised invoices
+        if (in_array($invoice->status, ['paid', 'cancelled', 'refunded'])) {
+            return redirect()->route('erp.invoices.show', $invoice->id)
+                ->with('error', 'A ' . $invoice->status . ' invoice cannot be edited.');
+        }
+
+        $tenant = $this->resolveTenant();
+
+        // Ensure this invoice belongs to the current tenant
+        if ($invoice->tenant_id !== $tenant->id) {
+            abort(403, 'Unauthorized access to invoice.');
+        }
+
         $invoice->load(['items', 'costs']);
         return Inertia::render('ERP/Invoices/Edit', [
-            'invoice' => $invoice,
-            'clients' => TenantClient::all(),
-            'currencies' => Currency::where('is_active', true)->get(),
+            'invoice'           => $invoice,
+            'clients'           => TenantClient::where('tenant_id', $tenant->id)->get(),
+            'projects'          => \Modules\ERP\Models\Project::where('tenant_id', $tenant->id)->get(),
+            'currencies'        => Currency::where('is_active', true)->get(),
+            'business_currency' => Auth::user()->preferred_currency ?? config('app.business_currency', 'USD'),
         ]);
     }
 
@@ -199,6 +241,7 @@ class InvoiceController extends Controller
     {
         $validated = $request->validate([
             'client_id' => 'required|exists:tenant_clients,id',
+            'project_id' => 'nullable|exists:projects,id',
             'issued_at' => 'required|date',
             'due_date' => 'required|date|after_or_equal:issued_at',
             'amount_currency' => 'required|string|size:3',
@@ -214,8 +257,18 @@ class InvoiceController extends Controller
             'notes' => 'nullable|string',
         ]);
 
-        return DB::transaction(function () use ($validated, $invoice) {
-            $businessCurrency = config('app.business_currency', 'USD');
+        // Guard M2: prevent editing finalised invoices
+        if (in_array($invoice->status, ['paid', 'cancelled', 'refunded'])) {
+            return back()->withErrors(['status' => 'A ' . $invoice->status . ' invoice cannot be edited.']);
+        }
+
+        $tenant = $this->resolveTenant();
+        if ($invoice->tenant_id !== $tenant->id) {
+            abort(403, 'Unauthorized access to invoice.');
+        }
+
+        return DB::transaction(function () use ($validated, $invoice, $tenant) {
+            $businessCurrency = Auth::user()->preferred_currency ?? config('app.business_currency', 'USD');
             $rate = $this->exchangeRateService->getRate($validated['amount_currency'], $businessCurrency, $validated['issued_at']);
 
             $subtotal = collect($validated['items'])->sum(fn($i) => $i['unit_price'] * $i['quantity']);
@@ -226,6 +279,7 @@ class InvoiceController extends Controller
 
             $invoice->update([
                 'client_id' => $validated['client_id'],
+                'project_id' => $validated['project_id'] ?? null,
                 'amount' => $total,
                 'amount_currency' => $validated['amount_currency'],
                 'business_amount' => $total * $rate,
@@ -382,19 +436,30 @@ class InvoiceController extends Controller
 
     public function duplicate(Invoice $invoice)
     {
-        $newInvoice = $invoice->replicate(['invoice_number', 'status', 'paid_at']);
-        $newInvoice->invoice_number = $invoice->invoice_number . '-COPY';
-        $newInvoice->status = 'draft';
+        $tenant = $this->resolveTenant();
+        if ($invoice->tenant_id !== $tenant->id) {
+            abort(403, 'Unauthorized access to invoice.');
+        }
+
+        // M3 fix: use timestamp suffix to avoid unique(tenant_id, invoice_number) constraint
+        $newNumber = $invoice->invoice_number . '-COPY-' . now()->format('YmdHis');
+
+        $newInvoice = $invoice->replicate(['invoice_number', 'status', 'paid_at', 'paid_amount', 'issued_at']);
+        $newInvoice->invoice_number = $newNumber;
+        $newInvoice->status         = 'draft';
+        $newInvoice->paid_amount    = 0;
+        $newInvoice->issued_at      = null;
+        $newInvoice->paid_at        = null;
         $newInvoice->save();
 
         foreach ($invoice->items as $item) {
-            $newItem = $item->replicate(['invoice_id']);
+            $newItem             = $item->replicate(['invoice_id']);
             $newItem->invoice_id = $newInvoice->id;
             $newItem->save();
         }
 
         return redirect()->route('erp.invoices.edit', $newInvoice->id)
-            ->with('success', 'Invoice duplicated.');
+            ->with('success', 'Invoice duplicated as draft.');
     }
 
     public function downloadPdf(Invoice $invoice)
@@ -405,6 +470,15 @@ class InvoiceController extends Controller
 
     public function destroy(Invoice $invoice)
     {
+        $tenant = $this->resolveTenant();
+        if ($invoice->tenant_id !== $tenant->id) {
+            abort(403, 'Unauthorized access to invoice.');
+        }
+
+        if ($invoice->status === 'paid') {
+            return back()->withErrors(['status' => 'A paid invoice cannot be deleted.']);
+        }
+
         $invoice->delete();
         return redirect()->route('erp.invoices.index')
             ->with('success', 'Invoice deleted.');

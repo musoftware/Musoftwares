@@ -35,4 +35,10 @@ class Tenant extends Model
     {
         return $this->hasMany(ClientWallet::class);
     }
+
+    public function teamMembers(): HasMany
+    {
+        return $this->hasMany(TeamMember::class);
+    }
 }
+

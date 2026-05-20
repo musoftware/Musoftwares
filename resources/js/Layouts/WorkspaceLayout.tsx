@@ -13,7 +13,7 @@ interface WorkspaceLayoutProps extends PropsWithChildren {
         icon: any;
         badge?: number;
         href?: string;
-        onClick?: () => void;
+        onClick?: (e?: any) => void;
         isActive: boolean;
     }>;
 }
@@ -32,7 +32,7 @@ export default function WorkspaceLayout({
         <AuthenticatedLayout header="Workspace">
             <Head title={`Workspace — ${title}`} />
 
-            <div className="mx-auto w-full max-w-7xl space-y-8 px-4 py-8 sm:px-6 lg:px-8">
+            <div className="mx-auto w-full max-w-full space-y-8 px-4 py-8 sm:px-6 lg:px-8">
                 {/* Contextual Breadcrumb Navigator */}
                 <div className="mb-8 flex items-center gap-1.5 text-sm text-slate-500">
                     <span className="cursor-pointer transition-colors hover:text-slate-900">
@@ -96,7 +96,7 @@ export default function WorkspaceLayout({
                                     );
                                     
                                     return item.href ? (
-                                        <Link key={item.id} href={item.href} className={classes}>
+                                        <Link key={item.id} href={item.href} onClick={item.onClick} className={classes}>
                                             {content}
                                         </Link>
                                     ) : (
