@@ -138,7 +138,7 @@ class DownloadController extends Controller
      * GET /tools/agent/download/{type}
      * Requires auth.
      */
-    public function downloadAgent(Request $request, string $type): StreamedResponse|RedirectResponse|\Illuminate\Http\JsonResponse|\Illuminate\Http\Response
+    public function downloadAgent(Request $request, string $type): StreamedResponse|RedirectResponse|\Illuminate\Http\JsonResponse|\Illuminate\Http\Response|\Symfony\Component\HttpFoundation\BinaryFileResponse
     {
         abort_unless(in_array($type, ['node', 'python']), 404);
 
@@ -147,6 +147,22 @@ class DownloadController extends Controller
             str_contains($request->userAgent() ?? '', 'Mac')     => 'mac',
             default                                               => 'linux',
         };
+
+        // If type is node, try to serve the compiled runtime package from public downloads folder first
+        if ($type === 'node') {
+            $platformDir = match($platform) {
+                'win'   => 'windows',
+                'mac'   => 'macos',
+                default => 'linux',
+            };
+            $ext = $platform === 'win' ? '.exe' : '';
+            $runtimeFileName = "musoftware-runtime-{$platform}{$ext}";
+            $publicFilePath = public_path("downloads/runtime/{$platformDir}/{$runtimeFileName}");
+
+            if (file_exists($publicFilePath)) {
+                return response()->download($publicFilePath, $runtimeFileName);
+            }
+        }
 
         $fileName = "musoftware-agent-{$type}-{$platform}";
         $fileName .= $platform === 'win' ? '.exe' : '';

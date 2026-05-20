@@ -67,6 +67,12 @@ export default function ScreenshotFeedbackRunner({ tool, subscription, runtimePo
     const [selectedScreenshotId, setSelectedScreenshotId] = useState<string | null>(null);
     const [pins, setPins] = useState<any[]>([]);
 
+    // Custom Annotator States
+    const [pendingPin, setPendingPin] = useState<{ x: number, y: number } | null>(null);
+    const [newPinComment, setNewPinComment] = useState('');
+    const [selectedPinId, setSelectedPinId] = useState<string | null>(null);
+    const [filterStatus, setFilterStatus] = useState<'all' | 'open' | 'resolved'>('all');
+
     // Initial load
     useEffect(() => {
         if (connected) {
@@ -165,19 +171,32 @@ export default function ScreenshotFeedbackRunner({ tool, subscription, runtimePo
     const handleReviewClick = (screenshotId: string) => {
         setSelectedScreenshotId(screenshotId);
         setActiveTab('review');
+        setPendingPin(null);
     };
 
-    const handleImageClick = async (e: React.MouseEvent<HTMLImageElement>) => {
+    const handleImageClick = (e: React.MouseEvent<HTMLImageElement>) => {
         const rect = e.currentTarget.getBoundingClientRect();
         const x = ((e.clientX - rect.left) / rect.width) * 100;
         const y = ((e.clientY - rect.top) / rect.height) * 100;
         
-        const comment = prompt('Enter your comment for this pin:');
-        if (!comment) return;
-        
+        setPendingPin({ x, y });
+        setNewPinComment('');
+    };
+
+    const handleSavePin = async (e?: React.FormEvent) => {
+        if (e) e.preventDefault();
+        if (!pendingPin || !newPinComment.trim() || !selectedScreenshotId) return;
         try {
-            await callRPC('add_pin', { screenshotId: selectedScreenshotId, x, y, comment });
+            await callRPC('add_pin', { 
+                screenshotId: selectedScreenshotId, 
+                x: pendingPin.x, 
+                y: pendingPin.y, 
+                comment: newPinComment.trim() 
+            });
+            setNewPinComment('');
+            setPendingPin(null);
             fetchPins();
+            fetchActivities();
         } catch (err) {
             alert('Failed to add pin');
         }
@@ -187,6 +206,7 @@ export default function ScreenshotFeedbackRunner({ tool, subscription, runtimePo
         try {
             await callRPC('resolve_pin', { pinId });
             fetchPins();
+            fetchActivities();
         } catch (err) {
             alert('Failed to resolve pin');
         }
@@ -381,6 +401,260 @@ export default function ScreenshotFeedbackRunner({ tool, subscription, runtimePo
                         </div>
                     </div>
                 )}
+
+                {activeTab === 'review' && selectedScreenshotId && (() => {
+                    const currentScreenshot = screenshots.find(s => s.id === selectedScreenshotId);
+                    return (
+                        <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                            {/* Breadcrumbs / Back navigation */}
+                            <div className="flex items-center gap-2 text-sm text-slate-500 mb-2">
+                                <button onClick={() => setActiveTab('projects')} className="hover:text-slate-900 transition-colors">Workspaces</button>
+                                <ChevronRight className="w-3 h-3" />
+                                <button onClick={() => setActiveTab('screenshots')} className="hover:text-slate-900 transition-colors">{projects.find(p => p.id === selectedProjectId)?.name}</button>
+                                <ChevronRight className="w-3 h-3" />
+                                <span className="font-medium text-slate-900 truncate max-w-[200px]">{currentScreenshot?.filename}</span>
+                            </div>
+
+                            {/* Top bar with screenshot name and close button */}
+                            <div className="flex items-center justify-between border-b border-slate-200 pb-4">
+                                <div>
+                                    <h1 className="text-xl font-bold tracking-tight">{currentScreenshot?.filename}</h1>
+                                    <p className="text-xs text-slate-400 mt-0.5">Click anywhere on the screenshot to drop a feedback pin.</p>
+                                </div>
+                                <button 
+                                    onClick={() => { setActiveTab('screenshots'); setPendingPin(null); }}
+                                    className="p-2 hover:bg-slate-100 rounded-lg text-slate-400 hover:text-slate-900 transition-colors border border-slate-200"
+                                >
+                                    <X className="w-4 h-4" />
+                                </button>
+                            </div>
+
+                            {/* Split Workspace Layout */}
+                            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+                                {/* Left Side: Dynamic Canvas Workspace (2/3 width) */}
+                                <div className="lg:col-span-2 space-y-4">
+                                    <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm flex items-center justify-center relative overflow-hidden group">
+                                        <div className="relative max-w-full inline-block rounded-xl border border-slate-100 shadow-sm overflow-hidden select-none">
+                                            {currentScreenshot?.base64 ? (
+                                                <img 
+                                                    src={currentScreenshot.base64} 
+                                                    alt={currentScreenshot.filename} 
+                                                    onClick={handleImageClick}
+                                                    className="max-h-[65vh] w-auto object-contain cursor-crosshair transition-all"
+                                                />
+                                            ) : (
+                                                <div className="w-[500px] h-[300px] flex items-center justify-center bg-slate-50 text-slate-400">
+                                                    <ImageIcon className="w-8 h-8 animate-pulse" />
+                                                </div>
+                                            )}
+
+                                            {/* Pins Layer */}
+                                            {pins
+                                                .filter(pin => {
+                                                    if (filterStatus === 'open') return pin.status === 'open';
+                                                    if (filterStatus === 'resolved') return pin.status === 'resolved';
+                                                    return true;
+                                                })
+                                                .map((pin, idx) => {
+                                                    const isOpen = pin.status === 'open';
+                                                    const isFocused = selectedPinId === pin.id;
+                                                    return (
+                                                        <div 
+                                                            key={pin.id}
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                setSelectedPinId(pin.id);
+                                                                const el = document.getElementById(`pin-card-${pin.id}`);
+                                                                if (el) {
+                                                                    el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                                                                }
+                                                            }}
+                                                            onMouseEnter={() => setSelectedPinId(pin.id)}
+                                                            onMouseLeave={() => setSelectedPinId(null)}
+                                                            className={`absolute cursor-pointer transition-all duration-200 z-20 flex items-center justify-center -translate-x-1/2 -translate-y-1/2 rounded-full font-sans text-xs font-bold shadow-md
+                                                                ${isOpen 
+                                                                    ? 'w-7 h-7 bg-slate-900 border-2 border-white text-white' 
+                                                                    : 'w-6 h-6 bg-emerald-500 border-2 border-white text-white'
+                                                                }
+                                                                ${isFocused ? 'scale-125 ring-4 ring-slate-900/10' : 'hover:scale-115'}
+                                                            `}
+                                                            style={{ left: `${pin.x}%`, top: `${pin.y}%` }}
+                                                        >
+                                                            {isOpen ? (
+                                                                <>
+                                                                    {idx + 1}
+                                                                    <span className="absolute -inset-1 rounded-full border border-slate-900 animate-ping opacity-35 pointer-events-none" />
+                                                                </>
+                                                            ) : (
+                                                                <CheckCircle2 className="w-3.5 h-3.5" />
+                                                            )}
+                                                        </div>
+                                                    );
+                                                })
+                                            }
+
+                                            {/* Floating dynamic popup input form */}
+                                            {pendingPin && (
+                                                <div 
+                                                    className="absolute z-30 -translate-x-1/2 mt-4 bg-white border border-slate-200 rounded-xl shadow-xl p-4 w-72 animate-in zoom-in-95 duration-150"
+                                                    style={{ left: `${pendingPin.x}%`, top: `${pendingPin.y}%` }}
+                                                    onClick={(e) => e.stopPropagation()}
+                                                >
+                                                    {/* Visual arrow pointer */}
+                                                    <div className="absolute -top-1.5 left-1/2 -translate-x-1/2 w-3 h-3 bg-white border-t border-l border-slate-200 rotate-45" />
+
+                                                    <form onSubmit={handleSavePin} className="space-y-3 relative z-10">
+                                                        <div className="flex items-center justify-between">
+                                                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Add Comment</span>
+                                                            <button 
+                                                                type="button" 
+                                                                onClick={() => setPendingPin(null)}
+                                                                className="text-slate-400 hover:text-slate-900 p-0.5 rounded hover:bg-slate-50 transition-colors"
+                                                            >
+                                                                <X className="w-3.5 h-3.5" />
+                                                            </button>
+                                                        </div>
+                                                        <textarea 
+                                                            autoFocus
+                                                            rows={3}
+                                                            value={newPinComment}
+                                                            onChange={(e) => setNewPinComment(e.target.value)}
+                                                            placeholder="What needs feedback at this exact spot?"
+                                                            className="w-full text-xs bg-slate-50 border border-slate-200 rounded-lg p-2.5 outline-none focus:border-slate-900 transition-colors resize-none font-sans"
+                                                        />
+                                                        <div className="flex justify-end gap-2 text-xs">
+                                                            <button 
+                                                                type="button" 
+                                                                onClick={() => setPendingPin(null)}
+                                                                className="px-2.5 py-1.5 border border-slate-200 rounded-lg font-medium hover:bg-slate-50 transition-colors text-slate-600"
+                                                            >
+                                                                Cancel
+                                                            </button>
+                                                            <button 
+                                                                type="submit"
+                                                                disabled={!newPinComment.trim()}
+                                                                className="px-3 py-1.5 bg-black text-white rounded-lg font-medium hover:bg-slate-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
+                                                            >
+                                                                Save Pin
+                                                            </button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Right Side: Annotations Sidebar (1/3 width) */}
+                                <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden flex flex-col h-[65vh]">
+                                    {/* Header with total and count */}
+                                    <div className="p-4 border-b border-slate-100 bg-slate-50/50">
+                                        <h3 className="font-bold text-sm tracking-tight text-slate-800">Annotations</h3>
+                                        
+                                        {/* Sidebar Navigation Tabs */}
+                                        <div className="flex bg-slate-100 rounded-lg p-0.5 mt-3 text-xs">
+                                            <button 
+                                                onClick={() => setFilterStatus('all')}
+                                                className={`flex-1 py-1 rounded-md font-medium transition-colors ${filterStatus === 'all' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-900'}`}
+                                            >
+                                                All ({pins.length})
+                                            </button>
+                                            <button 
+                                                onClick={() => setFilterStatus('open')}
+                                                className={`flex-1 py-1 rounded-md font-medium transition-colors ${filterStatus === 'open' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-900'}`}
+                                            >
+                                                Open ({pins.filter(p => p.status === 'open').length})
+                                            </button>
+                                            <button 
+                                                onClick={() => setFilterStatus('resolved')}
+                                                className={`flex-1 py-1 rounded-md font-medium transition-colors ${filterStatus === 'resolved' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-900'}`}
+                                            >
+                                                Resolved ({pins.filter(p => p.status === 'resolved').length})
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    {/* Comments List */}
+                                    <div className="flex-1 overflow-y-auto p-4 space-y-3 scrollbar-thin">
+                                        {pins
+                                            .filter(pin => {
+                                                if (filterStatus === 'open') return pin.status === 'open';
+                                                if (filterStatus === 'resolved') return pin.status === 'resolved';
+                                                return true;
+                                            })
+                                            .map((pin, idx) => {
+                                                const isOpen = pin.status === 'open';
+                                                const isFocused = selectedPinId === pin.id;
+                                                
+                                                return (
+                                                    <div 
+                                                        key={pin.id}
+                                                        id={`pin-card-${pin.id}`}
+                                                        onMouseEnter={() => setSelectedPinId(pin.id)}
+                                                        onMouseLeave={() => setSelectedPinId(null)}
+                                                        className={`border rounded-xl p-3.5 transition-all duration-200 group/card relative
+                                                            ${isFocused 
+                                                                ? 'border-slate-900 bg-slate-50/70 shadow-sm' 
+                                                                : 'border-slate-100 bg-white hover:border-slate-200 hover:shadow-xs'
+                                                            }
+                                                        `}
+                                                    >
+                                                        <div className="flex items-start justify-between gap-3">
+                                                            <div className="flex items-center gap-2">
+                                                                <div className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold shadow-xs
+                                                                    ${isOpen 
+                                                                        ? 'bg-slate-900 text-white' 
+                                                                        : 'bg-emerald-100 text-emerald-700'
+                                                                    }
+                                                                `}>
+                                                                    {isOpen ? idx + 1 : <CheckCircle2 className="w-3.5 h-3.5" />}
+                                                                </div>
+                                                                <span className="text-[10px] font-semibold text-slate-400 tracking-tight">
+                                                                    {new Date(pin.created_at * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                                                </span>
+                                                            </div>
+
+                                                            {isOpen && (
+                                                                <button 
+                                                                    onClick={() => handleResolvePin(pin.id)}
+                                                                    className="opacity-0 group-hover/card:opacity-100 p-1 hover:bg-emerald-50 text-slate-400 hover:text-emerald-600 rounded-md transition-all border border-transparent hover:border-emerald-100 shadow-2xs"
+                                                                    title="Mark resolved"
+                                                                >
+                                                                    <CheckCircle2 className="w-3.5 h-3.5" />
+                                                                </button>
+                                                            )}
+                                                        </div>
+
+                                                        <p className="text-xs text-slate-700 mt-2 font-sans leading-relaxed whitespace-pre-wrap">
+                                                            {pin.comment}
+                                                        </p>
+                                                        
+                                                        {!isOpen && (
+                                                            <div className="mt-2.5 flex items-center gap-1 text-[10px] text-emerald-600 font-medium bg-emerald-50/50 w-fit px-2 py-0.5 rounded-md border border-emerald-100/50">
+                                                                <CheckCircle2 className="w-3 h-3" /> Resolved
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                );
+                                            })
+                                        }
+
+                                        {pins.filter(pin => {
+                                            if (filterStatus === 'open') return pin.status === 'open';
+                                            if (filterStatus === 'resolved') return pin.status === 'resolved';
+                                            return true;
+                                        }).length === 0 && (
+                                            <div className="py-12 text-center text-slate-400">
+                                                <MessageSquareText className="w-6 h-6 text-slate-200 mx-auto mb-2" />
+                                                <p className="text-xs">No annotations in this category</p>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    );
+                })()}
             </main>
         </div>
     );
