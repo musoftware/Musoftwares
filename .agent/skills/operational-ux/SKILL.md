@@ -113,7 +113,9 @@ Tables, cards, and widgets MUST display real runtime data, not hardcoded placeho
 ## Architecture Responsibility
 **Frontend (UI)**: ONLY renders state, triggers actions via Runtime SDK, subscribes to events, and displays progress. It NEVER owns operational logic or truth.
 **Runtime Agent**: Handles execution, queues, workers, automation, browser sessions, local storage, CSV parsing, retries, logs, and concurrency. IT OWNS the operational entities (Campaigns, Queues, Sessions).
-**Laravel Backend**: Handles ONLY authentication, subscriptions, billing, marketplace, licensing, user accounts, and high-level metadata. It NEVER handles local operational execution or heavy processing (like CSV uploads).
+**Laravel Backend Strict Rule**: 
+For any Tool/Plugin, its ONLY connection to the Laravel backend is checking if the user is subscribed to the service or not.
+EVERYTHING ELSE related to the tools (data, configurations, campaigns, logs, operational entities, processing) MUST be handled by the Local Runtime Agent and stored locally in the client's local SQLite database. The Laravel backend must NEVER be used to store or process tool-specific data.
 
 ## Realtime System Requirement
 Operational software MUST feel alive. You must always implement:
