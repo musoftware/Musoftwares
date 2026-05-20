@@ -4,7 +4,7 @@ const fs = require('fs');
 async function runE2ETests() {
     console.log('🚀 Starting B2B Prospector E2E Tests...');
     
-    const pluginPath = path.join(__dirname, 'tools', 'musoftware-runtime', 'plugins', 'b2b-prospector');
+    const pluginPath = path.join(__dirname, '..', 'newmusoftwareTools', 'musoftware-runtime', 'plugins', 'b2b-prospector');
     const workerModule = require(path.join(pluginPath, 'worker.js'));
     const DatabaseManager = require(path.join(pluginPath, 'database.js'));
 
@@ -42,7 +42,7 @@ async function runE2ETests() {
             name: 'E2E Test Campaign',
             keyword: 'CEO',
             country: 'USA',
-            sources: ['linkedin'],
+            sources: ['google_maps'],
             daily_limit: 2
         });
         
@@ -68,10 +68,10 @@ async function runE2ETests() {
         const startRes = await simulateRequest('prospecting.campaign.start', { campaignId });
         if (!startRes.success) throw new Error('Failed to start campaign');
         
-        console.log(`⏳ Waiting 5 seconds for Scraper engine to process limits and emit leads...`);
+        console.log(`⏳ Waiting 25 seconds for Scraper engine to process limits and emit leads...`);
         
         // Wait for pipeline to finish
-        await new Promise(r => setTimeout(r, 5000));
+        await new Promise(r => setTimeout(r, 25000));
 
         // Check if leads reached the UI
         const uiEvents = emittedEvents.filter(e => e.event === 'prospecting.lead.extracted.ui');

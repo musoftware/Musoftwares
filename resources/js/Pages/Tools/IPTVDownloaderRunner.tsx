@@ -377,7 +377,7 @@ export default function IPTVDownloaderRunner() {
         setActiveWorkspace('downloads');
 
         try {
-            const response = await fetch(`${RUNTIME_HTTP}/plugins/iptv-downloader/run`, {
+            const response = await fetch(`${getRuntimeHttp()}/plugins/iptv-downloader/run`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -412,7 +412,7 @@ export default function IPTVDownloaderRunner() {
 
     const handleStopTask = async (taskId: string) => {
         try {
-            await fetch(`${RUNTIME_HTTP}/tasks/${taskId}/stop`, { method: 'POST' });
+            await fetch(`${getRuntimeHttp()}/tasks/${taskId}/stop`, { method: 'POST' });
             setDownloadTasks(prev => {
                 const copy = { ...prev };
                 delete copy[taskId];
