@@ -13,6 +13,7 @@ const components: Record<string, React.ElementType> = {
     'format-extractor':         lazy(() => import('./FormatExtractorRunner')),
     'IPTVDownloaderRunner':     lazy(() => import('./IPTVDownloaderRunner')),
     'iptv-downloader':          lazy(() => import('./IPTVDownloaderRunner')),
+    'opensooq':                 lazy(() => import('./OpensooqRunner')),
 };
 
 export default function Runner({ tool, subscription, runtimePort, pluginSlug }: any) {
