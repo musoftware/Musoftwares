@@ -114,9 +114,27 @@ When adding a new commonly-used dependency:
 
 ## 5. Binary & Native Module Rules
 
-### 5.1 Browser Automation
-- Playwright/Puppeteer browsers must be downloaded on first use by the runtime itself — never assume they're pre-installed.
-- Store downloaded browsers in the runtime's own data directory, not system-wide.
+### 5.1 Browser Automation (Playwright / Puppeteer)
+Playwright and Puppeteer are Node.js API libraries — they do NOT include the actual Chromium browser binary (~150MB). End users cannot run `npx playwright install` because they don't have npm.
+
+**The `core/BrowserManager.js` module handles this.** It auto-downloads Chromium on first use and stores it in `{DATA_ROOT}/browsers/`. All plugins MUST use it.
+
+```javascript
+// ❌ FORBIDDEN — will crash on end-user machines (no Chromium binary)
+const browser = await chromium.launch({ headless: true });
+
+// ✅ CORRECT — auto-provisions Chromium before launching
+const browserMgr = require('../../core/BrowserManager');
+const executablePath = await browserMgr.ensureChromium();
+const browser = await chromium.launch({ headless: true, executablePath });
+```
+
+Rules:
+- **Always** call `browserMgr.ensureChromium()` before any `chromium.launch()` or `puppeteer.launch()`.
+- **Always** pass the returned path as `executablePath` to the launch options.
+- **Never** call `npx playwright install` or assume browsers exist on disk.
+- **All plugins share ONE Chromium binary** — never download per-plugin copies.
+- The `PLAYWRIGHT_BROWSERS_PATH` env var is set at runtime boot to ensure Playwright's internal resolver also finds the managed binary.
 
 ### 5.2 Native Modules
 - Native modules (`better-sqlite3`, `sqlite3`, etc.) must have pre-built binaries for the target platform included in the distribution.
