@@ -13,9 +13,9 @@ return new class extends Migration
             // when we drop the compound user_id_tool_id_index.
             $table->index('user_id', 'temp_user_id_index');
             
-            // Note: tool_subscriptions does NOT have foreign keys on tool_id or tool_pricing_plan_id, only indexes
-            $table->dropIndex('tool_subscriptions_tool_id_foreign'); 
-            $table->dropIndex('tool_subscriptions_tool_pricing_plan_id_foreign'); 
+            // Drop foreign keys first, then indexes
+            $table->dropForeign('tool_subscriptions_tool_id_foreign'); 
+            $table->dropForeign('tool_subscriptions_tool_pricing_plan_id_foreign'); 
             $table->dropIndex(['user_id', 'tool_id']);
         });
 
