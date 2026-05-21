@@ -368,6 +368,7 @@ function FloatingBadge({ host, onDisconnect }: { host: string; onDisconnect: () 
 export default function Runner({ tool, subscription, runtimePort, pluginSlug }: any) {
     const runnerKey = tool.runner_component?.trim();
     const Component = components[runnerKey];
+    console.log("Runner Debug:", { runner_component: tool.runner_component, runnerKey, keys: Object.keys(components) });
     const [isMobile, setIsMobile] = useState(false);
     const [status, setStatus] = useState<'checking' | 'online' | 'offline'>('checking');
     const [currentHost, setCurrentHost] = useState('127.0.0.1');
