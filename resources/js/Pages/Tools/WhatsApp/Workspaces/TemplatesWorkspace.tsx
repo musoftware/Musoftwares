@@ -31,6 +31,10 @@ interface Template {
 interface Props {
     callRPC: (action: string, data?: any) => Promise<any>;
     onUseTemplate?: (template: Template) => void;
+    onTemplatesChange?: (templates: Template[]) => void;
+    initialEditTemplateId?: string | null;
+    setInitialEditTemplateId?: (id: string | null) => void;
+    daemonConnected?: boolean;
 }
 
 function TemplateCard({ tpl, onEdit, onDelete, onUse }: any) {
@@ -167,22 +171,47 @@ function TemplateEditor({ template, onSave, onCancel }: any) {
     );
 }
 
-export default function TemplatesWorkspace({ callRPC, onUseTemplate }: Props) {
+export default function TemplatesWorkspace({ 
+    callRPC, onUseTemplate, onTemplatesChange,
+    initialEditTemplateId, setInitialEditTemplateId,
+    daemonConnected
+}: Props) {
     const [templates, setTemplates] = useState<Template[]>([]);
     const [loading, setLoading]     = useState(false);
     const [editTarget, setEditTarget] = useState<Template | null | 'new'>(null);
     const [search, setSearch]       = useState('');
 
     const fetch = async () => {
+        if (!daemonConnected) return;
         setLoading(true);
         try {
             const res: any = await callRPC('getTemplates');
-            setTemplates(res.templates || []);
+            const list = res.templates || [];
+            setTemplates(list);
+            if (onTemplatesChange) {
+                onTemplatesChange(list);
+            }
         } catch (e) { console.error(e); }
         setLoading(false);
     };
 
-    useEffect(() => { fetch(); }, []);
+    useEffect(() => {
+        if (daemonConnected) {
+            fetch();
+        }
+    }, [daemonConnected]);
+
+    useEffect(() => {
+        if (initialEditTemplateId && templates.length > 0) {
+            const found = templates.find(t => t.id === initialEditTemplateId);
+            if (found) {
+                setEditTarget(found);
+            }
+            if (setInitialEditTemplateId) {
+                setInitialEditTemplateId(null);
+            }
+        }
+    }, [initialEditTemplateId, templates, setInitialEditTemplateId]);
 
     const handleSave = async (tpl: any) => {
         await callRPC('saveTemplate', tpl);

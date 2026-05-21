@@ -119,7 +119,23 @@ function exportCSV(contacts: any[], campaignName: string) {
     URL.revokeObjectURL(url);
 }
 
-export default function CampaignReportWorkspace({ t, callRPC, campaignId, campaignName, onBack }: any) {
+function formatTimeSafe(dateStr: string | null | undefined) {
+    if (!dateStr) return '—';
+    try {
+        // SQLite uses 'YYYY-MM-DD HH:MM:SS' - convert to ISO 'YYYY-MM-DDTHH:MM:SSZ' safely
+        const isoStr = dateStr.includes('T') ? dateStr : dateStr.replace(' ', 'T') + (dateStr.includes('Z') ? '' : 'Z');
+        const date = new Date(isoStr);
+        if (isNaN(date.getTime())) {
+            const fallbackDate = new Date(dateStr);
+            return isNaN(fallbackDate.getTime()) ? '—' : fallbackDate.toLocaleTimeString();
+        }
+        return date.toLocaleTimeString();
+    } catch (_) {
+        return '—';
+    }
+}
+
+export default function CampaignReportWorkspace({ t, callRPC, campaignId, campaignName, onBack, daemonConnected }: any) {
     const [contacts, setContacts]   = useState<any[]>([]);
     const [stats, setStats]         = useState<any>({});
     const [loading, setLoading]     = useState(false);
@@ -127,6 +143,7 @@ export default function CampaignReportWorkspace({ t, callRPC, campaignId, campai
     const [showFilter, setShowFilter]     = useState(false);
 
     const fetchData = async () => {
+        if (!daemonConnected || !campaignId) return;
         setLoading(true);
         try {
             const res: any = await callRPC('getCampaignContacts', { campaignId, statusFilter: statusFilter !== 'all' ? statusFilter : null });
@@ -139,23 +156,57 @@ export default function CampaignReportWorkspace({ t, callRPC, campaignId, campai
         setLoading(false);
     };
 
-    useEffect(() => { if (campaignId) fetchData(); }, [campaignId, statusFilter]);
+    useEffect(() => {
+        if (!daemonConnected || !campaignId) return;
+
+        // Fetch immediately with loading spinner on mount/filter changes
+        fetchData();
+
+        // Establish 3-second silent background poll for real-time receipt and progress updates
+        const interval = setInterval(() => {
+            const fetchSilent = async () => {
+                try {
+                    const res: any = await callRPC('getCampaignContacts', { campaignId, statusFilter: statusFilter !== 'all' ? statusFilter : null });
+                    setContacts(res.contacts || []);
+                    const statsRes: any = await callRPC('getCampaignLogs', { campaignId });
+                    setStats(statsRes.stats || {});
+                } catch (err) {
+                    console.error('Silent background fetch error:', err);
+                }
+            };
+            fetchSilent();
+        }, 3000);
+
+        return () => clearInterval(interval);
+    }, [campaignId, statusFilter, daemonConnected]);
 
     const totalContacts = stats.total || contacts.length;
-    const sent      = stats.sent      || 0;
-    const delivered = stats.delivered || 0;
-    const readCount = stats.read_count || 0;
-    const replied   = stats.replied   || 0;
-    const failed    = stats.failed    || 0;
-    const pending   = stats.pending   || 0;
+    const rawSent      = stats.sent      || 0;
+    const rawDelivered = stats.delivered || 0;
+    const rawRead      = stats.read_count || 0;
+    const rawReplied   = stats.replied   || 0;
+    const failed       = stats.failed    || 0;
+    const pending      = stats.pending   || 0;
+
+    // Exclusive counts for current state breakdown (Donut and KPI Cards)
+    const exclSent      = rawSent;
+    const exclDelivered = rawDelivered;
+    const exclRead      = rawRead;
+    const exclReplied   = rawReplied;
+
+    // Cumulative conversions across the funnel (reconstructed from exclusive counts)
+    const cumReplied   = exclReplied;
+    const cumRead      = exclRead + cumReplied;
+    const cumDelivered = exclDelivered + cumRead;
+    const cumSent      = exclSent + cumDelivered;
 
     const donutSegments = [
-        { value: sent,      color: STATUS_COLORS.sent,      label: 'Sent' },
-        { value: delivered, color: STATUS_COLORS.delivered,  label: 'Delivered' },
-        { value: readCount, color: STATUS_COLORS.read,       label: 'Read' },
-        { value: replied,   color: STATUS_COLORS.replied,    label: 'Replied' },
-        { value: failed,    color: STATUS_COLORS.failed,     label: 'Failed' },
-        { value: pending,   color: STATUS_COLORS.pending,    label: 'Pending' },
+        { value: exclSent,      color: STATUS_COLORS.sent,      label: 'Sent' },
+        { value: exclDelivered, color: STATUS_COLORS.delivered,  label: 'Delivered' },
+        { value: exclRead,       color: STATUS_COLORS.read,       label: 'Read' },
+        { value: exclReplied,   color: STATUS_COLORS.replied,    label: 'Replied' },
+        { value: failed,        color: STATUS_COLORS.failed,     label: 'Failed' },
+        { value: pending,       color: STATUS_COLORS.pending,    label: 'Pending' },
     ].filter(s => s.value > 0);
 
     const filteredContacts = statusFilter === 'all' ? contacts : contacts.filter(c => c.status === statusFilter);
@@ -186,7 +237,10 @@ export default function CampaignReportWorkspace({ t, callRPC, campaignId, campai
                 {/* Donut Chart Card */}
                 <Card>
                     <CardContent className="p-7 flex flex-col items-center justify-center">
-                        <h3 className="text-sm font-bold uppercase tracking-wider mb-6">Delivery Breakdown</h3>
+                        <div className="text-center mb-6">
+                            <h3 className="text-sm font-bold uppercase tracking-wider">Delivery Breakdown</h3>
+                            <p className="text-[10px] text-muted-foreground mt-0.5">Current status per contact (Non-cumulative)</p>
+                        </div>
                         <DonutChart segments={donutSegments} />
                     </CardContent>
                 </Card>
@@ -194,13 +248,16 @@ export default function CampaignReportWorkspace({ t, callRPC, campaignId, campai
                 {/* Bar Stats Card */}
                 <Card>
                     <CardContent className="p-7">
-                        <h3 className="text-sm font-bold uppercase tracking-wider mb-6">Engagement Funnel</h3>
+                        <div className="mb-6">
+                            <h3 className="text-sm font-bold uppercase tracking-wider">Engagement Funnel</h3>
+                            <p className="text-[10px] text-muted-foreground mt-0.5">Cumulative conversions across the funnel</p>
+                        </div>
                         <div className="space-y-4">
-                            <StatBar label="Sent"      value={sent}      total={totalContacts} color={STATUS_COLORS.sent}      icon={Mail} />
-                            <StatBar label="Delivered" value={delivered} total={totalContacts} color={STATUS_COLORS.delivered}  icon={CheckCircle2} />
-                            <StatBar label="Read"      value={readCount} total={totalContacts} color={STATUS_COLORS.read}       icon={Eye} />
-                            <StatBar label="Replied"   value={replied}   total={totalContacts} color={STATUS_COLORS.replied}    icon={MessageCircle} />
-                            <StatBar label="Failed"    value={failed}    total={totalContacts} color={STATUS_COLORS.failed}     icon={XCircle} />
+                            <StatBar label="Sent"      value={cumSent}      total={totalContacts} color={STATUS_COLORS.sent}      icon={Mail} />
+                            <StatBar label="Delivered" value={cumDelivered} total={totalContacts} color={STATUS_COLORS.delivered}  icon={CheckCircle2} />
+                            <StatBar label="Read"      value={cumRead}      total={totalContacts} color={STATUS_COLORS.read}       icon={Eye} />
+                            <StatBar label="Replied"   value={cumReplied}   total={totalContacts} color={STATUS_COLORS.replied}    icon={MessageCircle} />
+                            <StatBar label="Failed"    value={failed}       total={totalContacts} color={STATUS_COLORS.failed}     icon={XCircle} />
                             {pending > 0 && <StatBar label="Pending" value={pending} total={totalContacts} color={STATUS_COLORS.pending} icon={Clock} />}
                         </div>
                     </CardContent>
@@ -211,10 +268,10 @@ export default function CampaignReportWorkspace({ t, callRPC, campaignId, campai
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
                 {[
                     { label: 'Total',     value: totalContacts, color: '#64748b', bg: 'bg-muted' },
-                    { label: 'Sent',      value: sent,          color: STATUS_COLORS.sent,      bg: 'bg-emerald-500/10' },
-                    { label: 'Delivered', value: delivered,     color: STATUS_COLORS.delivered,  bg: 'bg-blue-500/10' },
-                    { label: 'Read',      value: readCount,     color: STATUS_COLORS.read,       bg: 'bg-violet-500/10' },
-                    { label: 'Replied',   value: replied,       color: STATUS_COLORS.replied,    bg: 'bg-amber-500/10' },
+                    { label: 'Sent',      value: exclSent,      color: STATUS_COLORS.sent,      bg: 'bg-emerald-500/10' },
+                    { label: 'Delivered', value: exclDelivered, color: STATUS_COLORS.delivered,  bg: 'bg-blue-500/10' },
+                    { label: 'Read',      value: exclRead,      color: STATUS_COLORS.read,       bg: 'bg-violet-500/10' },
+                    { label: 'Replied',   value: exclReplied,   color: STATUS_COLORS.replied,    bg: 'bg-amber-500/10' },
                     { label: 'Failed',    value: failed,        color: STATUS_COLORS.failed,     bg: 'bg-red-500/10' },
                 ].map(({ label, value, color, bg }) => (
                     <div key={label} className={`${bg} border rounded-2xl p-4 text-center`}>
@@ -260,11 +317,11 @@ export default function CampaignReportWorkspace({ t, callRPC, campaignId, campai
                             </tr>
                         </thead>
                         <tbody className="divide-y">
-                            {filteredContacts.map((c: any) => {
+                            {filteredContacts.map((c: any, index: number) => {
                                 const StatusIcon = STATUS_ICONS[c.status] || Clock;
                                 const color      = STATUS_COLORS[c.status] || '#94a3b8';
                                 return (
-                                    <tr key={c.id} className="hover:bg-muted/50 transition-colors">
+                                    <tr key={`${c.phone || ''}-${index}`} className="hover:bg-muted/50 transition-colors">
                                         <td className="px-6 py-3 font-mono text-muted-foreground text-xs">{c.phone}</td>
                                         <td className="px-6 py-3 font-medium text-xs">{c.name || '—'}</td>
                                         <td className="px-6 py-3">
@@ -273,10 +330,10 @@ export default function CampaignReportWorkspace({ t, callRPC, campaignId, campai
                                                 {c.status}
                                             </Badge>
                                         </td>
-                                        <td className="px-6 py-3 text-muted-foreground text-xs">{c.sent_at ? new Date(c.sent_at).toLocaleTimeString() : '—'}</td>
-                                        <td className="px-6 py-3 text-muted-foreground text-xs">{c.delivered_at ? new Date(c.delivered_at).toLocaleTimeString() : '—'}</td>
-                                        <td className="px-6 py-3 text-muted-foreground text-xs">{c.read_at ? new Date(c.read_at).toLocaleTimeString() : '—'}</td>
-                                        <td className="px-6 py-3 text-muted-foreground text-xs">{c.replied_at ? new Date(c.replied_at).toLocaleTimeString() : '—'}</td>
+                                        <td className="px-6 py-3 text-muted-foreground text-xs">{formatTimeSafe(c.sent_at)}</td>
+                                        <td className="px-6 py-3 text-muted-foreground text-xs">{formatTimeSafe(c.delivered_at)}</td>
+                                        <td className="px-6 py-3 text-muted-foreground text-xs">{formatTimeSafe(c.read_at)}</td>
+                                        <td className="px-6 py-3 text-muted-foreground text-xs">{formatTimeSafe(c.replied_at)}</td>
                                         <td className="px-6 py-3 text-destructive text-xs max-w-[200px] truncate" title={c.error_message}>{c.error_message || '—'}</td>
                                     </tr>
                                 );
