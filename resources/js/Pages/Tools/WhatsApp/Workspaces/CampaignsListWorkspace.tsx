@@ -6,10 +6,17 @@ import {
 import { Card, CardContent } from '@/Components/ui/card';
 import { Button } from '@/Components/ui/button';
 import { Badge } from '@/Components/ui/badge';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from '@/Components/ui/dropdown-menu';
 
 const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string; pulse?: boolean }> = {
     created:   { label: 'Ready',     color: 'text-slate-500',  bg: 'bg-slate-100'  },
     running:   { label: 'Running',   color: 'text-blue-600',   bg: 'bg-blue-50',  pulse: true },
+    processing: { label: 'Running',   color: 'text-blue-600',   bg: 'bg-blue-50',  pulse: true },
     paused:    { label: 'Paused',    color: 'text-amber-600',  bg: 'bg-amber-50'  },
     stopped:   { label: 'Stopped',   color: 'text-slate-500',  bg: 'bg-slate-100' },
     completed: { label: 'Completed', color: 'text-emerald-600', bg: 'bg-emerald-50' },
@@ -17,18 +24,17 @@ const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string; 
 };
 
 function CampaignActions({ campaign, onStart, onPause, onResume, onStop, onDelete, onViewReport }: any) {
-    const [open, setOpen] = useState(false);
     const { status } = campaign;
 
     return (
         <div className="flex items-center gap-1.5 justify-end">
             {/* Primary action */}
-            {status === 'created' && (
+            {(status === 'created' || status === 'stopped' || status === 'failed') && (
                 <Button size="icon" onClick={() => onStart(campaign.id)} title="Start" className="h-8 w-8 bg-teal-600 hover:bg-teal-700 text-white">
                     <Play className="w-3.5 h-3.5 fill-white" />
                 </Button>
             )}
-            {status === 'running' && (
+            {(status === 'running' || status === 'processing') && (
                 <Button size="icon" onClick={() => onPause(campaign.id)} title="Pause" className="h-8 w-8 bg-amber-500 hover:bg-amber-600 text-white">
                     <Pause className="w-3.5 h-3.5 fill-white" />
                 </Button>
@@ -45,33 +51,34 @@ function CampaignActions({ campaign, onStart, onPause, onResume, onStop, onDelet
             </Button>
 
             {/* More menu */}
-            <div className="relative">
-                <Button size="icon" variant="ghost" onClick={() => setOpen(o => !o)} className="h-8 w-8 bg-muted hover:bg-muted/80 text-muted-foreground">
+            <DropdownMenu>
+                <DropdownMenuTrigger className="inline-flex items-center justify-center rounded-md h-8 w-8 bg-muted hover:bg-muted/80 text-muted-foreground transition-colors duration-150 outline-none select-none cursor-pointer focus:ring-0">
                     <MoreVertical className="w-3.5 h-3.5" />
-                </Button>
-                {open && (
-                    <div className="absolute right-0 top-full mt-1 bg-popover border text-popover-foreground rounded-xl shadow-xl z-10 min-w-[140px] py-1 overflow-hidden" onClick={e => e.stopPropagation()}>
-                        {(status === 'running' || status === 'paused') && (
-                            <Button variant="ghost" onClick={() => { onStop(campaign.id); setOpen(false); }} className="w-full justify-start rounded-none h-auto px-4 py-2 text-xs font-bold hover:bg-accent hover:text-accent-foreground flex items-center gap-2">
-                                <Square className="w-3.5 h-3.5 text-muted-foreground" /> Stop Campaign
-                            </Button>
-                        )}
-                        <Button variant="ghost" onClick={() => { onDelete(campaign.id); setOpen(false); }} className="w-full justify-start rounded-none h-auto px-4 py-2 text-xs font-bold text-destructive hover:bg-destructive/10 hover:text-destructive flex items-center gap-2">
-                            <Trash2 className="w-3.5 h-3.5" /> Delete
-                        </Button>
-                    </div>
-                )}
-            </div>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="min-w-[140px]">
+                    {(status === 'running' || status === 'processing' || status === 'paused') && (
+                        <DropdownMenuItem onClick={() => onStop(campaign.id)} className="font-bold flex items-center gap-2 cursor-pointer">
+                            <Square className="w-3.5 h-3.5 text-muted-foreground" />
+                            <span>Stop Campaign</span>
+                        </DropdownMenuItem>
+                    )}
+                    <DropdownMenuItem onClick={() => onDelete(campaign.id)} variant="destructive" className="font-bold flex items-center gap-2 cursor-pointer">
+                        <Trash2 className="w-3.5 h-3.5" />
+                        <span>Delete</span>
+                    </DropdownMenuItem>
+                </DropdownMenuContent>
+            </DropdownMenu>
         </div>
     );
 }
 
-export default function CampaignsListWorkspace({ t, callRPC, onViewReport, onCreateCampaign, activeCampaigns }: any) {
+export default function CampaignsListWorkspace({ t, callRPC, onViewReport, onCreateCampaign, activeCampaigns, daemonConnected }: any) {
     const [campaigns, setCampaigns]   = useState<any[]>([]);
     const [loading, setLoading]       = useState(false);
     const [actionLoading, setActionLoading] = useState<string | null>(null);
 
     const fetchCampaigns = async () => {
+        if (!daemonConnected) return;
         setLoading(true);
         try {
             const res: any = await callRPC('getCampaigns');
@@ -80,15 +87,20 @@ export default function CampaignsListWorkspace({ t, callRPC, onViewReport, onCre
         setLoading(false);
     };
 
-    useEffect(() => { fetchCampaigns(); }, []);
+    useEffect(() => {
+        if (daemonConnected) {
+            fetchCampaigns();
+        }
+    }, [daemonConnected]);
 
     // Auto-refresh running campaigns
     useEffect(() => {
-        const hasRunning = campaigns.some(c => c.status === 'running');
+        if (!daemonConnected) return;
+        const hasRunning = campaigns.some(c => c.status === 'running' || c.status === 'processing');
         if (!hasRunning) return;
         const interval = setInterval(fetchCampaigns, 5000);
         return () => clearInterval(interval);
-    }, [campaigns]);
+    }, [campaigns, daemonConnected]);
 
     // Merge live progress from activeCampaigns
     const mergedCampaigns = campaigns.map(c => {
@@ -199,11 +211,11 @@ export default function CampaignsListWorkspace({ t, callRPC, onViewReport, onCre
                                         <td className="px-6 py-4">
                                             <CampaignActions
                                                 campaign={c}
-                                                onStart={id   => rpc('startCampaign', id)}
-                                                onPause={id   => rpc('pauseCampaign', id)}
-                                                onResume={id  => rpc('resumeCampaign', id)}
-                                                onStop={id    => rpc('stopCampaign', id)}
-                                                onDelete={id  => { if (confirm('Delete this campaign? This cannot be undone.')) rpc('deleteCampaign', id); }}
+                                                onStart={(id: string)   => rpc('startCampaign', id)}
+                                                onPause={(id: string)   => rpc('pauseCampaign', id)}
+                                                onResume={(id: string)  => rpc('resumeCampaign', id)}
+                                                onStop={(id: string)    => rpc('stopCampaign', id)}
+                                                onDelete={(id: string)  => { if (confirm('Delete this campaign? This cannot be undone.')) rpc('deleteCampaign', id); }}
                                                 onViewReport={onViewReport}
                                             />
                                         </td>
