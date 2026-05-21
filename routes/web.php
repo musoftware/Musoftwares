@@ -286,6 +286,17 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
     Route::post('/sequences/{sequence}/generate-ai', [\App\Http\Controllers\Admin\SequenceController::class, 'generateStepsWithAI'])->name('sequences.generate-ai');
     Route::post('/sequences/{sequence}/apply-ai', [\App\Http\Controllers\Admin\SequenceController::class, 'applyGeneratedSteps'])->name('sequences.apply-ai');
 
+    // ── Admin Campaigns ───────────────────────────────────────────
+    Route::get('/campaigns', [\App\Http\Controllers\Admin\CampaignController::class, 'index'])->name('campaigns.index');
+    Route::post('/campaigns', [\App\Http\Controllers\Admin\CampaignController::class, 'store'])->name('campaigns.store');
+    Route::get('/campaigns/{campaign}', [\App\Http\Controllers\Admin\CampaignController::class, 'show'])->name('campaigns.show');
+    Route::put('/campaigns/{campaign}', [\App\Http\Controllers\Admin\CampaignController::class, 'update'])->name('campaigns.update');
+    Route::delete('/campaigns/{campaign}', [\App\Http\Controllers\Admin\CampaignController::class, 'destroy'])->name('campaigns.destroy');
+    Route::post('/campaigns/generate-ai-content', [\App\Http\Controllers\Admin\CampaignController::class, 'generateAIContent'])->name('campaigns.generate-ai');
+    Route::post('/campaigns/{campaign}/schedule', [\App\Http\Controllers\Admin\CampaignController::class, 'schedule'])->name('campaigns.schedule');
+    Route::post('/campaigns/{campaign}/pause', [\App\Http\Controllers\Admin\CampaignController::class, 'pause'])->name('campaigns.pause');
+    Route::post('/campaigns/{campaign}/resume', [\App\Http\Controllers\Admin\CampaignController::class, 'resume'])->name('campaigns.resume');
+
     // ── User Management (Full Admin Control) ────────────────────────
     // Recovered from old project: Admin/UsersController
     Route::get('/users', [\App\Http\Controllers\Admin\UsersController::class, 'index'])->name('users.index');
