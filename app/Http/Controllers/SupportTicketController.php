@@ -16,8 +16,7 @@ class SupportTicketController extends Controller
     {
         $user = Auth::user();
         $isAdmin = $user->hasRole('admin');
-
-        $query = SupportTicket::with(['client', 'conversation.messages.sender']);
+        $query = SupportTicket::with(['tenantClient', 'platformClient', 'conversation.messages.sender']);
 
         if (!$isAdmin) {
             $query->where('client_id', $user->id);

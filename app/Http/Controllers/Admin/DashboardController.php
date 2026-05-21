@@ -55,7 +55,7 @@ class DashboardController extends Controller
         $moduleBreakdown = $this->getModuleBreakdown();
 
         // ── Recent Invoices ──────────────────────────────────────
-        $recentInvoices = Invoice::with('client')
+        $recentInvoices = Invoice::with(['tenantClient', 'platformClient'])
             ->latest()
             ->take(5)
             ->get()

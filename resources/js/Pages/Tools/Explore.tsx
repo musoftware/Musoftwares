@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Head, router } from '@inertiajs/react';
 import ToolsPublicLayout from '@/Layouts/ToolsPublicLayout';
 import { Input } from '@/Components/ui/input';
+import { Button } from '@/Components/ui/button';
 import { ToolCard } from '@/Components/Tools/ToolCard';
 import { PlatformBadges } from '@/Components/Tools/PlatformBadge';
 import {
@@ -109,31 +110,27 @@ export default function Explore({ tools, categories, subscribedSlugs, filters }:
 
                 {/* Category filter strip */}
                 <div className="flex flex-wrap gap-1.5">
-                    <button
+                    <Button
+                        variant={activeCategory === '' ? 'default' : 'outline'}
+                        size="sm"
                         onClick={() => handleCategory('')}
-                        className={`px-3.5 py-1.5 rounded-lg text-xs font-medium transition-all border ${
-                            activeCategory === ''
-                                ? 'bg-slate-900 text-white border-slate-900'
-                                : 'bg-white text-slate-600 border-slate-200 hover:border-slate-300 hover:bg-slate-50'
-                        }`}
+                        className="rounded-lg text-xs"
                     >
                         All Tools
-                    </button>
+                    </Button>
                     {Object.entries(categories).map(([key, label]) => {
                         const Icon = CATEGORY_ICONS[key] ?? Zap;
                         return (
-                            <button
+                            <Button
                                 key={key}
+                                variant={activeCategory === key ? 'default' : 'outline'}
+                                size="sm"
                                 onClick={() => handleCategory(key)}
-                                className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-medium transition-all border ${
-                                    activeCategory === key
-                                        ? 'bg-slate-900 text-white border-slate-900'
-                                        : 'bg-white text-slate-600 border-slate-200 hover:border-slate-300 hover:bg-slate-50'
-                                }`}
+                                className="rounded-lg text-xs gap-1.5"
                             >
                                 <Icon className="h-3 w-3" />
                                 {label}
-                            </button>
+                            </Button>
                         );
                     })}
                 </div>
@@ -141,18 +138,18 @@ export default function Explore({ tools, categories, subscribedSlugs, filters }:
                 {/* Tool grid */}
                 {tools.data.length === 0 ? (
                     <div className="text-center py-20">
-                        <div className="w-14 h-14 rounded-2xl bg-slate-100 flex items-center justify-center mx-auto mb-4">
-                            <ShoppingBag className="h-7 w-7 text-slate-300" />
+                        <div className="w-14 h-14 rounded-2xl bg-secondary flex items-center justify-center mx-auto mb-4">
+                            <ShoppingBag className="h-7 w-7 text-muted-foreground" />
                         </div>
-                        <p className="text-base font-semibold text-slate-700 mb-1">No tools found</p>
-                        <p className="text-sm text-slate-400">Try adjusting your search or category.</p>
+                        <p className="text-base font-semibold mb-1">No tools found</p>
+                        <p className="text-sm text-muted-foreground">Try adjusting your search or category.</p>
                     </div>
                 ) : (
                     <>
                         {/* Featured section */}
                         {featuredTools.length > 0 && activeCategory === '' && !filters.search && (
                             <div className="space-y-3">
-                                <h2 className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Featured</h2>
+                                <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Featured</h2>
                                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                                     {featuredTools.map(tool => (
                                         <ToolCard
@@ -178,7 +175,7 @@ export default function Explore({ tools, categories, subscribedSlugs, filters }:
                             </div>
                         ) : regularTools.length > 0 ? (
                             <div className="space-y-3">
-                                <h2 className="text-xs font-semibold text-slate-400 uppercase tracking-wider">All Tools</h2>
+                                <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">All Tools</h2>
                                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                                     {regularTools.map(tool => (
                                         <ToolCard
@@ -197,17 +194,13 @@ export default function Explore({ tools, categories, subscribedSlugs, filters }:
                 {tools.links.length > 3 && (
                     <div className="flex justify-center gap-1 pt-4">
                         {tools.links.map((link: any, i: number) => (
-                            <button
+                            <Button
                                 key={i}
+                                variant={link.active ? 'default' : 'outline'}
+                                size="sm"
                                 disabled={!link.url || link.active}
                                 onClick={() => link.url && router.visit(link.url)}
-                                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
-                                    link.active
-                                        ? 'bg-slate-900 text-white'
-                                        : link.url
-                                        ? 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'
-                                        : 'bg-white border border-slate-100 text-slate-300 cursor-not-allowed'
-                                }`}
+                                className="rounded-lg text-xs min-w-8"
                                 dangerouslySetInnerHTML={{ __html: link.label }}
                             />
                         ))}

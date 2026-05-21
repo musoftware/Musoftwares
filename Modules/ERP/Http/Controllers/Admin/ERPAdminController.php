@@ -91,7 +91,7 @@ class ERPAdminController extends Controller
             ]);
 
         $invoices = Invoice::where('tenant_id', $tenant->id)
-            ->with('client')
+            ->with(['tenantClient', 'platformClient'])
             ->latest()
             ->limit(30)
             ->get()

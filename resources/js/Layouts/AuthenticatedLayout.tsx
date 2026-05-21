@@ -275,6 +275,68 @@ function AuthenticatedContent({
                                     </DropdownMenuContent>
                                 </DropdownMenu>
 
+                                {/* SERVICES MEGA MENU */}
+                                <DropdownMenu>
+                                    <div className="relative inline-block">
+                                        <DropdownMenuTrigger className="inline-flex items-center gap-1.5 h-8 px-3 rounded-lg text-sm font-medium leading-none text-emerald-600 hover:bg-emerald-50 hover:text-emerald-700 transition-colors duration-150 outline-none select-none">
+                                            <Briefcase className="mr-1.5 h-3.5 w-3.5" /> Services <ChevronDown className="ml-1 h-3.5 w-3.5 opacity-50" />
+                                        </DropdownMenuTrigger>
+                                    </div>
+                                    <DropdownMenuContent align="start" className="w-[320px] p-2 rounded-xl shadow-xl border border-slate-200 bg-white isolate z-50">
+                                        <div className="px-2 py-2 mb-1 border-b border-slate-50">
+                                            <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Service Hubs</p>
+                                        </div>
+                                        
+                                        <DropdownMenuItem 
+                                            className={cn(
+                                                "p-0 mb-1 outline-none border transition-colors duration-150 cursor-pointer",
+                                                isFreelanceActive ? "bg-emerald-50/80 border-emerald-100" : "hover:bg-slate-50 border-transparent"
+                                            )}
+                                            render={<Link href={safeRoute('freelance.dashboard')} className="flex items-start gap-3 p-2.5 rounded-lg w-full" />}
+                                        >
+                                            <div className={cn(
+                                                "w-8 h-8 rounded-md flex items-center justify-center shrink-0 transition-colors",
+                                                isFreelanceActive ? "bg-emerald-100" : "bg-slate-100 group-hover/dropdown-menu-item:bg-emerald-50"
+                                            )}>
+                                                <Briefcase className={cn("w-4 h-4", isFreelanceActive ? "text-emerald-700" : "text-slate-500 group-hover/dropdown-menu-item:text-emerald-600")} />
+                                            </div>
+                                            <div className="flex-1 min-w-0">
+                                                <div className="flex items-center justify-between">
+                                                    <p className={cn("text-sm font-medium", isFreelanceActive ? "text-emerald-900" : "text-slate-900")}>Freelance Hub</p>
+                                                    <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-emerald-100 text-emerald-700">Points-Based</span>
+                                                </div>
+                                                <p className={cn("text-xs truncate", isFreelanceActive ? "text-emerald-700/70" : "text-slate-500")}>
+                                                    Jobs, proposals &amp; earnings
+                                                </p>
+                                            </div>
+                                        </DropdownMenuItem>
+
+                                        <DropdownMenuItem 
+                                            className={cn(
+                                                "p-0 outline-none border transition-colors duration-150 cursor-pointer",
+                                                isMarketplaceActive ? "bg-violet-50/80 border-violet-100" : "hover:bg-slate-50 border-transparent"
+                                            )}
+                                            render={<Link href={safeRoute('marketplace.dashboard')} className="flex items-start gap-3 p-2.5 rounded-lg w-full" />}
+                                        >
+                                            <div className={cn(
+                                                "w-8 h-8 rounded-md flex items-center justify-center shrink-0 transition-colors",
+                                                isMarketplaceActive ? "bg-violet-100" : "bg-slate-100 group-hover/dropdown-menu-item:bg-violet-50"
+                                            )}>
+                                                <Megaphone className={cn("w-4 h-4", isMarketplaceActive ? "text-violet-700" : "text-slate-500 group-hover/dropdown-menu-item:text-violet-600")} />
+                                            </div>
+                                            <div className="flex-1 min-w-0">
+                                                <div className="flex items-center justify-between">
+                                                    <p className={cn("text-sm font-medium", isMarketplaceActive ? "text-violet-900" : "text-slate-900")}>Marketing Suite</p>
+                                                    <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-violet-100 text-violet-700">Free</span>
+                                                </div>
+                                                <p className={cn("text-xs truncate", isMarketplaceActive ? "text-violet-700/70" : "text-slate-500")}>
+                                                    Services, clients &amp; campaigns
+                                                </p>
+                                            </div>
+                                        </DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
+
                                 {/* iSAAS MEGA MENU */}
                                 <DropdownMenu>
                                     <div className="relative inline-block">
@@ -314,54 +376,6 @@ function AuthenticatedContent({
                                                 </div>
                                                 <p className={cn("text-xs truncate", isErpActive ? "text-indigo-700/70" : "text-slate-500")}>
                                                     {!activeModules.erp ? 'Subscribe to access' : 'Clients, invoices, timers'}
-                                                </p>
-                                            </div>
-                                        </DropdownMenuItem>
-
-                                        <DropdownMenuItem 
-                                            className={cn(
-                                                "p-0 mb-1 outline-none border transition-colors duration-150 cursor-pointer",
-                                                isFreelanceActive ? "bg-emerald-50/80 border-emerald-100" : "hover:bg-slate-50 border-transparent"
-                                            )}
-                                            render={<Link href={safeRoute('freelance.dashboard')} className="flex items-start gap-3 p-2.5 rounded-lg w-full" />}
-                                        >
-                                            <div className={cn(
-                                                "w-8 h-8 rounded-md flex items-center justify-center shrink-0 transition-colors",
-                                                isFreelanceActive ? "bg-emerald-100" : "bg-slate-100 group-hover/dropdown-menu-item:bg-emerald-50"
-                                            )}>
-                                                <Briefcase className={cn("w-4 h-4", isFreelanceActive ? "text-emerald-700" : "text-slate-500 group-hover/dropdown-menu-item:text-emerald-600")} />
-                                            </div>
-                                            <div className="flex-1 min-w-0">
-                                                <div className="flex items-center justify-between">
-                                                    <p className={cn("text-sm font-medium", isFreelanceActive ? "text-emerald-900" : "text-slate-900")}>Freelance Hub</p>
-                                                    <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-emerald-100 text-emerald-700">Points-Based</span>
-                                                </div>
-                                                <p className={cn("text-xs truncate", isFreelanceActive ? "text-emerald-700/70" : "text-slate-500")}>
-                                                    Jobs, proposals &amp; earnings
-                                                </p>
-                                            </div>
-                                        </DropdownMenuItem>
-
-                                        <DropdownMenuItem 
-                                            className={cn(
-                                                "p-0 mb-1 outline-none border transition-colors duration-150 cursor-pointer",
-                                                isMarketplaceActive ? "bg-violet-50/80 border-violet-100" : "hover:bg-slate-50 border-transparent"
-                                            )}
-                                            render={<Link href={safeRoute('marketplace.dashboard')} className="flex items-start gap-3 p-2.5 rounded-lg w-full" />}
-                                        >
-                                            <div className={cn(
-                                                "w-8 h-8 rounded-md flex items-center justify-center shrink-0 transition-colors",
-                                                isMarketplaceActive ? "bg-violet-100" : "bg-slate-100 group-hover/dropdown-menu-item:bg-violet-50"
-                                            )}>
-                                                <Megaphone className={cn("w-4 h-4", isMarketplaceActive ? "text-violet-700" : "text-slate-500 group-hover/dropdown-menu-item:text-violet-600")} />
-                                            </div>
-                                            <div className="flex-1 min-w-0">
-                                                <div className="flex items-center justify-between">
-                                                    <p className={cn("text-sm font-medium", isMarketplaceActive ? "text-violet-900" : "text-slate-900")}>Marketing Suite</p>
-                                                    <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-violet-100 text-violet-700">Free</span>
-                                                </div>
-                                                <p className={cn("text-xs truncate", isMarketplaceActive ? "text-violet-700/70" : "text-slate-500")}>
-                                                    Services, clients &amp; campaigns
                                                 </p>
                                             </div>
                                         </DropdownMenuItem>
