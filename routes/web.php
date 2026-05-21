@@ -432,6 +432,21 @@ Route::post('/crm/embed/capture/{token}', [\Modules\CRM\Http\Controllers\LeadCap
     ->name('crm.embed.capture.store')
     ->withoutMiddleware([\Illuminate\Http\Middleware\FrameGuard::class]);
 
+// CRM iSAAS Subscriber Routes
+Route::middleware(['auth', 'verified', 'onboarding'])->prefix('crm')->name('crm.')->group(function () {
+    Route::get('/dashboard', [\Modules\CRM\Http\Controllers\DashboardController::class, 'index'])->name('dashboard');
+    
+    // Campaigns
+    Route::get('/campaigns', [\Modules\CRM\Http\Controllers\CampaignController::class, 'index'])->name('campaigns.index');
+    Route::post('/campaigns', [\Modules\CRM\Http\Controllers\CampaignController::class, 'store'])->name('campaigns.store');
+    Route::get('/campaigns/{campaign}', [\Modules\CRM\Http\Controllers\CampaignController::class, 'show'])->name('campaigns.show');
+
+    // Leads
+    Route::get('/leads', [\Modules\CRM\Http\Controllers\LeadController::class, 'index'])->name('leads.index');
+    Route::get('/leads/{lead}', [\Modules\CRM\Http\Controllers\LeadController::class, 'show'])->name('leads.show');
+    Route::patch('/leads/{lead}/status', [\Modules\CRM\Http\Controllers\LeadController::class, 'updateStatus'])->name('leads.updateStatus');
+});
+
 
 
 // SaaS Subscription & Billing Routes

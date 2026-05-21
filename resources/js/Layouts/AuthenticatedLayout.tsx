@@ -72,6 +72,7 @@ function AuthenticatedContent({
     };
 
     const isErpActive = isRouteActive('erp');
+    const isCrmActive = isRouteActive('crm');
     const isFreelanceActive = isRouteActive('freelance');
     const isMarketplaceActive = isRouteActive('marketplace');
     const isBookingActive = isRouteActive('booking');
@@ -363,6 +364,30 @@ function AuthenticatedContent({
                                                 </div>
                                                 <p className={cn("text-xs truncate", isErpActive ? "text-indigo-700/70" : "text-slate-500")}>
                                                     {!activeModules.erp ? 'Subscribe to access' : 'Clients, invoices, timers'}
+                                                </p>
+                                            </div>
+                                        </DropdownMenuItem>
+
+                                        <DropdownMenuItem 
+                                            className={cn(
+                                                "p-0 mb-1 outline-none border transition-colors duration-150 cursor-pointer",
+                                                isCrmActive ? "bg-indigo-50/80 border-indigo-100" : "hover:bg-slate-50 border-transparent"
+                                            )}
+                                            render={<Link href={safeRoute('crm.dashboard')} className="flex items-start gap-3 p-2.5 rounded-lg w-full" />}
+                                        >
+                                            <div className={cn(
+                                                "w-8 h-8 rounded-md flex items-center justify-center shrink-0 transition-colors",
+                                                isCrmActive ? "bg-indigo-100" : "bg-slate-100 group-hover/dropdown-menu-item:bg-indigo-50"
+                                            )}>
+                                                <Megaphone className={cn("w-4 h-4", isCrmActive ? "text-indigo-700" : "text-slate-500 group-hover/dropdown-menu-item:text-indigo-600")} />
+                                            </div>
+                                            <div className="flex-1 min-w-0">
+                                                <div className="flex items-center justify-between">
+                                                    <p className={cn("text-sm font-medium", isCrmActive ? "text-indigo-900" : "text-slate-900")}>Lead Gen CRM</p>
+                                                    {isCrmActive && <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-indigo-100 text-indigo-700">Active</span>}
+                                                </div>
+                                                <p className={cn("text-xs truncate", isCrmActive ? "text-indigo-700/70" : "text-slate-500")}>
+                                                    Capture leads and manage campaigns
                                                 </p>
                                             </div>
                                         </DropdownMenuItem>

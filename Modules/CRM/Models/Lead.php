@@ -11,12 +11,15 @@ class Lead extends Model
     use HasFactory, \Illuminate\Database\Eloquent\SoftDeletes, CleansLeadData;
 
     protected $fillable = [
+        'user_id',
+        'campaign_id',
+        'source',
         'name',
         'email',
         'company',
         'message',
         'status',
-        'locale', // Added locale
+        'locale',
         'phone',
         'ip_address',
         'user_agent',
