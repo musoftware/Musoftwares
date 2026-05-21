@@ -11,6 +11,11 @@ class Campaign extends Model
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
+        'user_id',
+        'embed_token',
+        'form_title',
+        'form_description',
+        'button_text',
         'name',
         'description',
         'type',
