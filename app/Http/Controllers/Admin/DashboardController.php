@@ -85,14 +85,14 @@ class DashboardController extends Controller
             ]);
 
         // ── New Tenants (recent) ─────────────────────────────────
-        $newTenants = Tenant::with('owner')
+        $newTenants = Tenant::with('user')
             ->latest()
             ->take(5)
             ->get()
             ->map(fn($t) => [
                 'id' => $t->id,
                 'name' => $t->name,
-                'owner_name' => $t->owner?->name ?? 'Unknown',
+                'owner_name' => $t->user?->name ?? 'Unknown',
                 'status' => $t->status,
                 'created_at' => $t->created_at?->diffForHumans() ?? 'recently',
                 'initials' => strtoupper(substr($t->name, 0, 2)),
