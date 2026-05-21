@@ -47,10 +47,20 @@ class HandleInertiaRequests extends Middleware
                         return [
                             'erp' => $service->hasActiveSubscription($user, 'erp'),
                             'freelance' => $service->hasActiveSubscription($user, 'freelance'),
+                            'booking' => $service->hasActiveSubscription($user, 'booking'),
+                            'intelligence' => $service->hasActiveSubscription($user, 'intelligence'),
+                            'tools' => $service->hasActiveSubscription($user, 'tools'),
                             'marketplace' => true,
                         ];
                     } catch (\Throwable $e) {
-                        return ['erp' => true, 'freelance' => true, 'marketplace' => true];
+                        return [
+                            'erp' => true, 
+                            'freelance' => true, 
+                            'booking' => true,
+                            'intelligence' => true,
+                            'tools' => true,
+                            'marketplace' => true
+                        ];
                     }
                 }
             ],

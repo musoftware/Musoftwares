@@ -3,6 +3,9 @@ import {
     Search, Dna, Music, Layout, Clock, AlignLeft, Copy,
     CheckCircle, AlertCircle, RefreshCw, TrendingUp, Sparkles
 } from 'lucide-react';
+import { Button } from '@/Components/ui/button';
+import { Input } from '@/Components/ui/input';
+import { Badge } from '@/Components/ui/badge';
 
 const getRuntimeHost = () => typeof window !== 'undefined' ? (window.localStorage.getItem('musoftware_runtime_host') || '127.0.0.1') : '127.0.0.1';
 const getRuntimeHttp = () => `http://${getRuntimeHost()}:18400`;
@@ -15,13 +18,15 @@ function CopyButton({ text }: { text: string }) {
         navigator.clipboard.writeText(text).then(() => { setCopied(true); setTimeout(() => setCopied(false), 2000); });
     };
     return (
-        <button
+        <Button
+            variant="ghost"
+            size="sm"
             onClick={copy}
-            className="flex items-center gap-1 text-[10px] font-bold text-slate-400 hover:text-slate-700 transition-colors px-2 py-1 rounded-lg hover:bg-slate-100"
+            className="flex items-center gap-1 h-7 text-[10px] font-bold text-slate-400 hover:text-slate-700 transition-colors px-2 rounded-lg hover:bg-slate-100"
         >
             {copied ? <CheckCircle className="w-3 h-3 text-emerald-500" /> : <Copy className="w-3 h-3" />}
             {copied ? 'Copied!' : 'Copy'}
-        </button>
+        </Button>
     );
 }
 
@@ -165,10 +170,10 @@ export default function FormatExtractorRunner({ tool }: any) {
                     </div>
                     <span className="font-bold text-sm text-slate-800 tracking-tight">Format DNA Extractor</span>
                 </div>
-                <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase border ${status === 'running' ? 'bg-amber-50 border-amber-200 text-amber-700' : status === 'done' ? 'bg-emerald-50 border-emerald-200 text-emerald-700' : 'bg-slate-100 border-slate-200 text-slate-500'}`}>
+                <Badge variant="outline" className={`gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase ${status === 'running' ? 'bg-amber-50 border-amber-200 text-amber-700' : status === 'done' ? 'bg-emerald-50 border-emerald-200 text-emerald-700' : 'bg-slate-100 border-slate-200 text-slate-500'}`}>
                     <div className={`w-1.5 h-1.5 rounded-full ${status === 'running' ? 'bg-amber-500 animate-pulse' : status === 'done' ? 'bg-emerald-500' : 'bg-slate-400'}`} />
                     {status === 'running' ? 'Extracting...' : status === 'done' ? 'Blueprint Ready' : 'Ready'}
-                </div>
+                </Badge>
             </div>
 
             <div className="max-w-3xl mx-auto px-4 py-8 space-y-6">
@@ -183,32 +188,32 @@ export default function FormatExtractorRunner({ tool }: any) {
                     <div className="space-y-3">
                         <div className="relative">
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                            <input
+                            <Input
                                 type="url"
                                 value={url}
                                 onChange={e => setUrl(e.target.value)}
                                 onKeyDown={e => e.key === 'Enter' && handleExtract()}
                                 placeholder="https://www.tiktok.com/@user/video/..."
-                                className="w-full pl-9 pr-4 py-2.5 text-sm border border-slate-200 focus:border-teal-400 rounded-xl outline-none transition-all bg-slate-50 font-mono"
+                                className="pl-9 h-11 text-sm bg-slate-50 font-mono"
                             />
                         </div>
-                        <input
+                        <Input
                             type="text"
                             value={niche}
                             onChange={e => setNiche(e.target.value)}
                             placeholder="Niche (optional) — e.g. fitness, finance, food..."
-                            className="w-full px-4 py-2.5 text-sm border border-slate-200 focus:border-teal-400 rounded-xl outline-none transition-all bg-slate-50"
+                            className="h-11 text-sm bg-slate-50"
                         />
                     </div>
 
-                    <button
+                    <Button
                         onClick={handleExtract}
                         disabled={!url.trim() || status === 'running'}
-                        className="w-full py-3 bg-gradient-to-r from-teal-500 to-emerald-500 text-white rounded-xl text-sm font-bold hover:opacity-90 transition-all shadow-md active:scale-95 disabled:opacity-40 disabled:shadow-none flex items-center justify-center gap-2"
+                        className="w-full h-12 bg-gradient-to-r from-teal-500 to-emerald-500 text-white rounded-xl text-sm font-bold hover:opacity-90 shadow-md flex items-center justify-center gap-2"
                     >
                         {status === 'running' ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Dna className="w-4 h-4" />}
                         {status === 'running' ? 'Extracting Blueprint...' : 'Extract Format'}
-                    </button>
+                    </Button>
 
                     {/* Progress */}
                     {status === 'running' && (
