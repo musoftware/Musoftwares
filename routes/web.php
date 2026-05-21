@@ -209,6 +209,11 @@ Route::middleware(['auth', 'verified', 'onboarding', 'role:admin'])->prefix('adm
     Route::post('/services/{id}/reject', [\Modules\Marketplace\Http\Controllers\ServiceController::class, 'reject'])->name('services.reject');
     Route::post('/services/{id}/feature', [\Modules\Marketplace\Http\Controllers\ServiceController::class, 'feature'])->name('services.feature');
 
+    // Orders
+    Route::get('/orders', [\App\Http\Controllers\Admin\MarketplaceOrderController::class, 'index'])->name('orders.index');
+    Route::get('/orders/{order}', [\App\Http\Controllers\Admin\MarketplaceOrderController::class, 'show'])->name('orders.show');
+    Route::post('/orders/{order}/dispute', [\App\Http\Controllers\Admin\MarketplaceOrderController::class, 'resolveDispute'])->name('orders.dispute.resolve');
+
     // Admin Views mapping to components later
     Route::get('/pending-services', function () {
         return Inertia::render('Admin/Marketplace/Pending', [
@@ -238,6 +243,14 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
     Route::get('/kyc', [\App\Http\Controllers\Admin\KycController::class, 'index'])->name('kyc.index');
     Route::post('/kyc/{id}/approve', [\App\Http\Controllers\Admin\KycController::class, 'approve'])->name('kyc.approve');
     Route::post('/kyc/{id}/reject', [\App\Http\Controllers\Admin\KycController::class, 'reject'])->name('kyc.reject');
+
+    // ── Admin Projects ──────────────────────────────────────────────
+    Route::resource('/projects', \App\Http\Controllers\Admin\ProjectController::class)->except(['create', 'edit', 'show']);
+    Route::post('/projects/{project}/archive', [\App\Http\Controllers\Admin\ProjectController::class, 'archive'])->name('projects.archive');
+    Route::post('/projects/{project}/restore', [\App\Http\Controllers\Admin\ProjectController::class, 'restore'])->name('projects.restore');
+
+    // ── Admin Plans ───────────────────────────────────────────────
+    Route::resource('/plans', \App\Http\Controllers\Admin\PlanController::class)->except(['create', 'edit', 'show']);
 
     // ── User Management (Full Admin Control) ────────────────────────
     // Recovered from old project: Admin/UsersController
