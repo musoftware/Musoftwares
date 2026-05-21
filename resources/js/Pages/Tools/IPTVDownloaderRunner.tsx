@@ -4,6 +4,13 @@ import {
     Trash2, Search, ArrowRight, CheckCircle2, AlertCircle, RefreshCw,
     Folder, HardDrive, ShieldCheck, HelpCircle, Star, Terminal, ChevronRight
 } from 'lucide-react';
+import { Button } from '@/Components/ui/button';
+import { Card } from '@/Components/ui/card';
+import { Input } from '@/Components/ui/input';
+import { Label } from '@/Components/ui/label';
+import { Badge } from '@/Components/ui/badge';
+import { Switch } from '@/Components/ui/switch';
+import { Textarea } from '@/Components/ui/textarea';
 
 const getRuntimeHost = () => typeof window !== 'undefined' ? (window.localStorage.getItem('musoftware_runtime_host') || '127.0.0.1') : '127.0.0.1';
 const getRuntimeHttp = () => `http://${getRuntimeHost()}:18400`;
@@ -468,36 +475,40 @@ export default function IPTVDownloaderRunner() {
                     </div>
 
                     <nav className="space-y-1">
-                        <button
+                        <Button
+                            variant="ghost"
                             onClick={() => setActiveWorkspace('dashboard')}
-                            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold tracking-wide transition-all ${activeWorkspace === 'dashboard' ? 'bg-indigo-50 text-indigo-600' : 'text-slate-500 hover:text-slate-950 hover:bg-slate-50'}`}
+                            className={`w-full justify-start gap-3 h-11 text-xs tracking-wide ${activeWorkspace === 'dashboard' ? 'bg-indigo-50 text-indigo-600 font-semibold' : 'text-slate-500 font-medium'}`}
                         >
                             <Star className="w-4 h-4" /> Overview Dashboard
-                        </button>
-                        <button
+                        </Button>
+                        <Button
+                            variant="ghost"
                             onClick={() => setActiveWorkspace('playlists')}
-                            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold tracking-wide transition-all ${activeWorkspace === 'playlists' ? 'bg-indigo-50 text-indigo-600' : 'text-slate-500 hover:text-slate-950 hover:bg-slate-50'}`}
+                            className={`w-full justify-start gap-3 h-11 text-xs tracking-wide ${activeWorkspace === 'playlists' ? 'bg-indigo-50 text-indigo-600 font-semibold' : 'text-slate-500 font-medium'}`}
                         >
                             <List className="w-4 h-4" /> Manage Playlists
-                        </button>
-                        <button
+                        </Button>
+                        <Button
+                            variant="ghost"
                             onClick={() => setActiveWorkspace('browser')}
-                            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold tracking-wide transition-all ${activeWorkspace === 'browser' ? 'bg-indigo-50 text-indigo-600' : 'text-slate-500 hover:text-slate-950 hover:bg-slate-50'}`}
+                            className={`w-full justify-start gap-3 h-11 text-xs tracking-wide ${activeWorkspace === 'browser' ? 'bg-indigo-50 text-indigo-600 font-semibold' : 'text-slate-500 font-medium'}`}
                         >
                             <Tv className="w-4 h-4" /> Channel Browser
-                        </button>
-                        <button
+                        </Button>
+                        <Button
+                            variant="ghost"
                             onClick={() => setActiveWorkspace('downloads')}
-                            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold tracking-wide transition-all ${activeWorkspace === 'downloads' ? 'bg-indigo-50 text-indigo-600' : 'text-slate-500 hover:text-slate-950 hover:bg-slate-50'}`}
+                            className={`w-full justify-start gap-3 h-11 text-xs tracking-wide ${activeWorkspace === 'downloads' ? 'bg-indigo-50 text-indigo-600 font-semibold' : 'text-slate-500 font-medium'}`}
                         >
                             <Download className="w-4 h-4" />
                             <span className="flex-1 text-left">Downloads & Recs</span>
                             {activeDownloadsCount > 0 && (
-                                <span className="bg-rose-500 text-white font-black text-[9px] px-2 py-0.5 rounded-full uppercase leading-none animate-pulse">
+                                <Badge variant="destructive" className="animate-pulse text-[9px] px-2 py-0.5 uppercase">
                                     {activeDownloadsCount} Active
-                                </span>
+                                </Badge>
                             )}
-                        </button>
+                        </Button>
                     </nav>
                 </div>
 
@@ -586,12 +597,19 @@ export default function IPTVDownloaderRunner() {
                                     <h2 className="text-xl font-bold tracking-tight">Zero-Install Stream Recording</h2>
                                     <p className="text-sm text-slate-400 leading-relaxed">Our native Javascript engine parses live HLS indexes (.m3u8), tracks duplicates, and writes seamless TS stream chunks natively. No ffmpeg setup or complex local drivers required.</p>
                                     <div className="flex gap-4 pt-2">
-                                        <button onClick={() => setActiveWorkspace('playlists')} className="px-4 py-2.5 bg-white text-slate-950 text-xs font-extrabold uppercase rounded-xl hover:bg-slate-50 transition-all active:scale-95 shadow-md">
+                                        <Button 
+                                            onClick={() => setActiveWorkspace('playlists')} 
+                                            variant="secondary"
+                                            className="text-xs font-extrabold uppercase h-10 px-6 shadow-md"
+                                        >
                                             Add M3U Playlist
-                                        </button>
-                                        <button onClick={() => setActiveWorkspace('browser')} className="px-4 py-2.5 bg-indigo-600 text-white text-xs font-extrabold uppercase rounded-xl hover:bg-indigo-700 transition-all active:scale-95 border border-indigo-500/30">
+                                        </Button>
+                                        <Button 
+                                            onClick={() => setActiveWorkspace('browser')} 
+                                            className="bg-indigo-600 text-white hover:bg-indigo-700 text-xs font-extrabold uppercase h-10 px-6 border border-indigo-500/30"
+                                        >
                                             Browse Channels
-                                        </button>
+                                        </Button>
                                     </div>
                                 </div>
                             </div>
@@ -613,35 +631,35 @@ export default function IPTVDownloaderRunner() {
                                         <h3 className="font-extrabold text-slate-800 text-sm">Add New Playlist</h3>
 
                                         <div className="flex bg-slate-100 p-1 rounded-xl">
-                                            <button onClick={() => setPlaylistType('m3u')} className={`flex-1 py-1.5 text-[10px] font-bold uppercase rounded-lg transition-all ${playlistType === 'm3u' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-500'}`}>M3U URL / File</button>
-                                            <button onClick={() => setPlaylistType('xtream')} className={`flex-1 py-1.5 text-[10px] font-bold uppercase rounded-lg transition-all ${playlistType === 'xtream' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-500'}`}>Xtream API</button>
+                                            <Button variant="ghost" onClick={() => setPlaylistType('m3u')} className={`flex-1 h-8 text-[10px] font-bold uppercase rounded-lg ${playlistType === 'm3u' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200/50'}`}>M3U URL / File</Button>
+                                            <Button variant="ghost" onClick={() => setPlaylistType('xtream')} className={`flex-1 h-8 text-[10px] font-bold uppercase rounded-lg ${playlistType === 'xtream' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200/50'}`}>Xtream API</Button>
                                         </div>
 
                                         <div className="space-y-4">
                                             <div className="space-y-1.5">
-                                                <label className="text-[10px] font-black text-slate-400 uppercase">Playlist Name</label>
-                                                <input type="text" value={playlistName} onChange={e => setPlaylistName(e.target.value)} placeholder="e.g. Premium HD US" className="w-full px-4 py-2.5 text-xs font-semibold border border-slate-200 focus:border-indigo-400 rounded-xl outline-none transition-all bg-slate-50" />
+                                                <Label className="text-[10px] font-black text-slate-400 uppercase">Playlist Name</Label>
+                                                <Input type="text" value={playlistName} onChange={e => setPlaylistName(e.target.value)} placeholder="e.g. Premium HD US" />
                                             </div>
 
                                             {playlistType === 'm3u' ? (
                                                 <div className="space-y-1.5">
-                                                    <label className="text-[10px] font-black text-slate-400 uppercase">M3U Playlist URL</label>
-                                                    <input type="url" value={playlistUrl} onChange={e => setPlaylistUrl(e.target.value)} placeholder="http://example.com/get.php?auth=..." className="w-full px-4 py-2.5 text-xs font-mono font-semibold border border-slate-200 focus:border-indigo-400 rounded-xl outline-none transition-all bg-slate-50" />
+                                                    <Label className="text-[10px] font-black text-slate-400 uppercase">M3U Playlist URL</Label>
+                                                    <Input type="url" value={playlistUrl} onChange={e => setPlaylistUrl(e.target.value)} placeholder="http://example.com/get.php?auth=..." className="font-mono" />
                                                 </div>
                                             ) : (
                                                 <>
                                                     <div className="space-y-1.5">
-                                                        <label className="text-[10px] font-black text-slate-400 uppercase">Server Host URL</label>
-                                                        <input type="url" value={xtreamHost} onChange={e => setXtreamHost(e.target.value)} placeholder="http://example.com:8080" className="w-full px-4 py-2.5 text-xs font-mono font-semibold border border-slate-200 focus:border-indigo-400 rounded-xl outline-none transition-all bg-slate-50" />
+                                                        <Label className="text-[10px] font-black text-slate-400 uppercase">Server Host URL</Label>
+                                                        <Input type="url" value={xtreamHost} onChange={e => setXtreamHost(e.target.value)} placeholder="http://example.com:8080" className="font-mono" />
                                                     </div>
                                                     <div className="grid grid-cols-2 gap-4">
                                                         <div className="space-y-1.5">
-                                                            <label className="text-[10px] font-black text-slate-400 uppercase">Username</label>
-                                                            <input type="text" value={xtreamUser} onChange={e => setXtreamUser(e.target.value)} className="w-full px-4 py-2.5 text-xs font-mono font-semibold border border-slate-200 focus:border-indigo-400 rounded-xl outline-none transition-all bg-slate-50" />
+                                                            <Label className="text-[10px] font-black text-slate-400 uppercase">Username</Label>
+                                                            <Input type="text" value={xtreamUser} onChange={e => setXtreamUser(e.target.value)} className="font-mono" />
                                                         </div>
                                                         <div className="space-y-1.5">
-                                                            <label className="text-[10px] font-black text-slate-400 uppercase">Password</label>
-                                                            <input type="password" value={xtreamPass} onChange={e => setXtreamPass(e.target.value)} className="w-full px-4 py-2.5 text-xs font-mono font-semibold border border-slate-200 focus:border-indigo-400 rounded-xl outline-none transition-all bg-slate-50" />
+                                                            <Label className="text-[10px] font-black text-slate-400 uppercase">Password</Label>
+                                                            <Input type="password" value={xtreamPass} onChange={e => setXtreamPass(e.target.value)} className="font-mono" />
                                                         </div>
                                                     </div>
                                                 </>
@@ -657,26 +675,26 @@ export default function IPTVDownloaderRunner() {
 
                                         {playlistType === 'm3u' ? (
                                             <>
-                                                <button onClick={handleAddPlaylist} disabled={isParsing || !playlistName.trim() || !playlistUrl.trim()} className="w-full py-3 bg-indigo-600 text-white rounded-xl text-xs font-black uppercase hover:bg-indigo-700 transition-all shadow-md active:scale-95 disabled:opacity-40 flex items-center justify-center gap-2">
-                                                    {isParsing ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
+                                                <Button onClick={handleAddPlaylist} disabled={isParsing || !playlistName.trim() || !playlistUrl.trim()} className="w-full h-11 bg-indigo-600 hover:bg-indigo-700 text-xs font-black uppercase">
+                                                    {isParsing ? <RefreshCw className="w-4 h-4 animate-spin mr-2" /> : <Plus className="w-4 h-4 mr-2" />}
                                                     {isParsing ? 'Parsing Playlist...' : 'Import Playlist URL'}
-                                                </button>
+                                                </Button>
                                                 <div className="relative flex items-center justify-center my-4">
                                                     <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-slate-100" /></div>
                                                     <span className="relative px-3 bg-white text-[9px] font-bold text-slate-400 uppercase">Or Upload File</span>
                                                 </div>
-                                                <label className="w-full flex flex-col items-center justify-center py-5 border border-dashed border-slate-200 rounded-2xl hover:bg-slate-50/50 transition-all cursor-pointer">
+                                                <Label className="w-full flex flex-col items-center justify-center py-5 border border-dashed border-slate-200 rounded-2xl hover:bg-slate-50/50 transition-all cursor-pointer">
                                                     <Folder className="w-6 h-6 text-slate-400 mb-1.5" />
                                                     <span className="text-[10px] font-bold text-slate-700">Choose .m3u playlist file</span>
                                                     <span className="text-[9px] text-slate-400 mt-0.5">Loads directly to local database</span>
-                                                    <input type="file" accept=".m3u,.m3u8,.txt" onChange={handleFileUpload} className="hidden" />
-                                                </label>
+                                                    <Input type="file" accept=".m3u,.m3u8,.txt" onChange={handleFileUpload} className="hidden" />
+                                                </Label>
                                             </>
                                         ) : (
-                                            <button onClick={handleAddXtreamPlaylist} disabled={isParsing || !playlistName.trim() || !xtreamHost.trim() || !xtreamUser.trim() || !xtreamPass.trim()} className="w-full py-3 bg-indigo-600 text-white rounded-xl text-xs font-black uppercase hover:bg-indigo-700 transition-all shadow-md active:scale-95 disabled:opacity-40 flex items-center justify-center gap-2">
-                                                {isParsing ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
+                                            <Button onClick={handleAddXtreamPlaylist} disabled={isParsing || !playlistName.trim() || !xtreamHost.trim() || !xtreamUser.trim() || !xtreamPass.trim()} className="w-full h-11 bg-indigo-600 hover:bg-indigo-700 text-xs font-black uppercase">
+                                                {isParsing ? <RefreshCw className="w-4 h-4 animate-spin mr-2" /> : <Plus className="w-4 h-4 mr-2" />}
                                                 {isParsing ? 'Authenticating...' : 'Add Xtream Playlist'}
-                                            </button>
+                                            </Button>
                                         )}
                                     </div>
                                 </div>
@@ -711,18 +729,22 @@ export default function IPTVDownloaderRunner() {
                                                         </div>
 
                                                         <div className="flex items-center gap-2">
-                                                            <button
+                                                            <Button
+                                                                variant="outline"
+                                                                size="sm"
                                                                 onClick={() => { setSelectedPlaylistId(pl.id); setActiveWorkspace('browser'); }}
-                                                                className="px-3.5 py-1.5 bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200 rounded-lg text-[10px] font-bold uppercase transition-all"
+                                                                className="h-8 text-[10px] font-bold uppercase"
                                                             >
                                                                 Open Browser
-                                                            </button>
-                                                            <button
+                                                            </Button>
+                                                            <Button
+                                                                variant="ghost"
+                                                                size="icon"
                                                                 onClick={() => handleDeletePlaylist(pl.id)}
-                                                                className="p-2 hover:bg-rose-50 text-slate-400 hover:text-rose-600 rounded-lg transition-all"
+                                                                className="h-8 w-8 text-slate-400 hover:text-rose-600 hover:bg-rose-50"
                                                             >
                                                                 <Trash2 className="w-4 h-4" />
-                                                            </button>
+                                                            </Button>
                                                         </div>
                                                     </div>
                                                 ))}
@@ -744,80 +766,85 @@ export default function IPTVDownloaderRunner() {
                                 </div>
 
                                 <div className="flex items-center gap-3">
-                                    <select
+                                    <Input
+                                        type="select"
+                                        as="select"
                                         value={selectedPlaylistId}
-                                        onChange={e => { setSelectedPlaylistId(e.target.value); setSelectedGroup(''); }}
-                                        className="px-4 py-2 border border-slate-250 rounded-xl bg-white text-xs font-bold shadow-sm outline-none"
+                                        onChange={(e: any) => { setSelectedPlaylistId(e.target.value); setSelectedGroup(''); }}
+                                        className="w-48 bg-white font-bold"
                                     >
                                         <option value="">Select Playlist...</option>
                                         {playlists.map(pl => <option key={pl.id} value={pl.id}>{pl.name}</option>)}
-                                    </select>
+                                    </Input>
 
-                                    <button
+                                    <Button
+                                        variant={bookmarkedOnly ? "destructive" : "outline"}
                                         onClick={() => setBookmarkedOnly(!bookmarkedOnly)}
-                                        className={`px-4 py-2 rounded-xl text-xs font-bold border transition-all flex items-center gap-1.5 ${bookmarkedOnly ? 'bg-rose-500 border-rose-500 text-white' : 'bg-white border-slate-250 text-slate-700'}`}
+                                        className="font-bold gap-1.5"
                                     >
                                         <Star className={`w-3.5 h-3.5 ${bookmarkedOnly ? 'fill-white' : ''}`} /> Favorites Only
-                                    </button>
+                                    </Button>
                                 </div>
                             </div>
 
                             {/* Stream Type Tabs */}
                             {playlists.length > 0 && selectedPlaylistId && (
                                 <div className="flex border-b border-slate-200">
-                                    <button onClick={() => { setStreamType('live'); setSelectedGroup(''); }} className={`px-6 py-3 text-xs font-bold uppercase transition-all border-b-2 ${streamType === 'live' ? 'text-indigo-600 border-indigo-600' : 'text-slate-400 border-transparent hover:text-slate-700'}`}>Live TV</button>
-                                    <button onClick={() => { setStreamType('vod'); setSelectedGroup(''); }} className={`px-6 py-3 text-xs font-bold uppercase transition-all border-b-2 ${streamType === 'vod' ? 'text-indigo-600 border-indigo-600' : 'text-slate-400 border-transparent hover:text-slate-700'}`}>Movies (VOD)</button>
-                                    <button onClick={() => { setStreamType('series'); setSelectedGroup(''); }} className={`px-6 py-3 text-xs font-bold uppercase transition-all border-b-2 ${streamType === 'series' ? 'text-indigo-600 border-indigo-600' : 'text-slate-400 border-transparent hover:text-slate-700'}`}>Series</button>
+                                    <Button variant="ghost" onClick={() => { setStreamType('live'); setSelectedGroup(''); }} className={`px-6 py-3 rounded-none h-auto text-xs font-bold uppercase border-b-2 ${streamType === 'live' ? 'text-indigo-600 border-indigo-600' : 'text-slate-400 border-transparent hover:text-slate-700'}`}>Live TV</Button>
+                                    <Button variant="ghost" onClick={() => { setStreamType('vod'); setSelectedGroup(''); }} className={`px-6 py-3 rounded-none h-auto text-xs font-bold uppercase border-b-2 ${streamType === 'vod' ? 'text-indigo-600 border-indigo-600' : 'text-slate-400 border-transparent hover:text-slate-700'}`}>Movies (VOD)</Button>
+                                    <Button variant="ghost" onClick={() => { setStreamType('series'); setSelectedGroup(''); }} className={`px-6 py-3 rounded-none h-auto text-xs font-bold uppercase border-b-2 ${streamType === 'series' ? 'text-indigo-600 border-indigo-600' : 'text-slate-400 border-transparent hover:text-slate-700'}`}>Series</Button>
                                 </div>
                             )}
 
                             {playlists.length === 0 ? (
-                                <div className="py-20 text-center border border-dashed border-slate-200 rounded-3xl bg-white">
+                                <Card className="py-20 text-center border-dashed">
                                     <Tv className="w-8 h-8 text-slate-300 mx-auto mb-3" />
                                     <h3 className="text-xs font-bold text-slate-900">No Playlists Registered</h3>
-                                    <button onClick={() => setActiveWorkspace('playlists')} className="mt-4 px-4 py-2 bg-indigo-600 text-white text-xs font-bold uppercase rounded-xl hover:bg-indigo-700 transition-all">
+                                    <Button onClick={() => setActiveWorkspace('playlists')} className="mt-4 uppercase font-bold text-xs">
                                         Go Install Playlist
-                                    </button>
-                                </div>
+                                    </Button>
+                                </Card>
                             ) : (
                                 <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
                                     {/* Sidebar Categories Column */}
                                     <div className="lg:col-span-1 space-y-4">
-                                        <div className="bg-white border border-slate-200 rounded-3xl p-5 shadow-sm space-y-4">
+                                        <Card className="p-5 space-y-4">
                                             <h3 className="font-extrabold text-slate-800 text-xs uppercase tracking-wider">Categories</h3>
                                             
                                             <div className="relative">
                                                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
-                                                <input
+                                                <Input
                                                     type="text"
                                                     value={searchQuery}
                                                     onChange={e => setSearchQuery(e.target.value)}
                                                     placeholder="Search channels..."
-                                                    className="w-full pl-9 pr-4 py-2 text-xs font-semibold border border-slate-200 focus:border-indigo-400 rounded-xl outline-none transition-all bg-slate-50"
+                                                    className="pl-9 h-10 text-xs font-semibold bg-slate-50"
                                                 />
                                             </div>
 
                                             <div className="max-h-[50vh] overflow-y-auto space-y-1 pr-1.5 scrollbar-thin">
-                                                <button
+                                                <Button
+                                                    variant="ghost"
                                                     onClick={() => setSelectedGroup('')}
-                                                    className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-left text-xs font-bold transition-all ${selectedGroup === '' ? 'bg-slate-100 text-slate-900' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'}`}
+                                                    className={`w-full justify-between h-auto py-2 text-xs font-bold ${selectedGroup === '' ? 'bg-slate-100 text-slate-900' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'}`}
                                                 >
                                                     <span>All Groups</span>
-                                                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-slate-200/50">{totalChannelsCount}</span>
-                                                </button>
+                                                    <Badge variant="secondary" className="text-[10px] bg-slate-200/50">{totalChannelsCount}</Badge>
+                                                </Button>
                                                 
                                                 {groups.map(g => (
-                                                    <button
+                                                    <Button
+                                                        variant="ghost"
                                                         key={g.name}
                                                         onClick={() => setSelectedGroup(g.name)}
-                                                        className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-left text-xs font-bold transition-all ${selectedGroup === g.name ? 'bg-slate-100 text-slate-900' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'}`}
+                                                        className={`w-full justify-between h-auto py-2 text-xs font-bold ${selectedGroup === g.name ? 'bg-slate-100 text-slate-900' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'}`}
                                                     >
                                                         <span className="truncate">{g.name}</span>
-                                                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-slate-200/50">{g.count}</span>
-                                                    </button>
+                                                        <Badge variant="secondary" className="text-[10px] bg-slate-200/50">{g.count}</Badge>
+                                                    </Button>
                                                 ))}
                                             </div>
-                                        </div>
+                                        </Card>
                                     </div>
 
                                     {/* Channels List Area */}
@@ -845,20 +872,21 @@ export default function IPTVDownloaderRunner() {
                                                                 <div className="min-w-0">
                                                                     <div className="flex items-center gap-2">
                                                                         <h4 className="font-bold text-slate-800 text-xs truncate leading-none">{ch.name}</h4>
-                                                                        <button onClick={() => handleToggleBookmark(ch.id)} className="p-0.5 rounded text-slate-300 hover:text-rose-500 hover:bg-rose-50 transition-all shrink-0">
+                                                                        <Button variant="ghost" size="icon" onClick={() => handleToggleBookmark(ch.id)} className="h-6 w-6 text-slate-300 hover:text-rose-500 hover:bg-rose-50 shrink-0">
                                                                             <Star className={`w-3.5 h-3.5 ${ch.bookmarked === 1 ? 'text-rose-500 fill-rose-500' : ''}`} />
-                                                                        </button>
+                                                                        </Button>
                                                                     </div>
                                                                     <span className="text-[10px] font-bold text-indigo-600 block mt-1.5 truncate uppercase">{ch.group_title}</span>
                                                                 </div>
                                                             </div>
 
-                                                            <button
+                                                            <Button
+                                                                size="sm"
                                                                 onClick={() => setShowRecordConfig(ch)}
-                                                                className="px-3.5 py-1.5 bg-indigo-600 text-white rounded-lg text-[10px] font-black uppercase hover:bg-indigo-700 transition-all flex items-center gap-1 shrink-0"
+                                                                className="h-8 bg-indigo-600 text-white text-[10px] font-black uppercase hover:bg-indigo-700 shrink-0 gap-1"
                                                             >
                                                                 <Play className="w-3 h-3 fill-white" /> Record
-                                                            </button>
+                                                            </Button>
                                                         </div>
                                                     ))}
                                                 </div>
@@ -868,23 +896,27 @@ export default function IPTVDownloaderRunner() {
                                         {/* Pagination panel */}
                                         {totalChannelsCount > itemsPerPage && (
                                             <div className="flex items-center justify-between bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
-                                                <button
+                                                <Button
+                                                    variant="outline"
+                                                    size="sm"
                                                     onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
                                                     disabled={currentPage === 1}
-                                                    className="px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-700 uppercase hover:bg-slate-100 disabled:opacity-40 transition-all active:scale-95"
+                                                    className="uppercase font-bold text-xs"
                                                 >
                                                     Previous
-                                                </button>
+                                                </Button>
                                                 <span className="text-[11px] font-bold text-slate-500">
                                                     Page {currentPage} of {Math.ceil(totalChannelsCount / itemsPerPage)}
                                                 </span>
-                                                <button
+                                                <Button
+                                                    variant="outline"
+                                                    size="sm"
                                                     onClick={() => handlePageChange(Math.min(Math.ceil(totalChannelsCount / itemsPerPage), currentPage + 1))}
                                                     disabled={currentPage >= Math.ceil(totalChannelsCount / itemsPerPage)}
-                                                    className="px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-700 uppercase hover:bg-slate-100 disabled:opacity-40 transition-all active:scale-95"
+                                                    className="uppercase font-bold text-xs"
                                                 >
                                                     Next
-                                                </button>
+                                                </Button>
                                             </div>
                                         )}
                                     </div>
@@ -914,12 +946,14 @@ export default function IPTVDownloaderRunner() {
                                                         <h4 className="font-extrabold text-slate-950 text-sm truncate leading-none">{task.channel_name}</h4>
                                                         <p className="text-[10px] font-mono text-slate-400 truncate mt-2">{task.url}</p>
                                                     </div>
-                                                    <button
+                                                    <Button
+                                                        variant="outline"
+                                                        size="sm"
                                                         onClick={() => handleStopTask(task.id)}
-                                                        className="px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-lg text-[9px] font-bold uppercase transition-all flex items-center gap-1 border border-rose-100 shrink-0"
+                                                        className="h-7 bg-rose-50 hover:bg-rose-100 text-rose-600 border-rose-100 text-[9px] font-bold uppercase gap-1 shrink-0"
                                                     >
                                                         <Square className="w-2.5 h-2.5 fill-rose-600" /> Stop Rec
-                                                    </button>
+                                                    </Button>
                                                 </div>
 
                                                 <div className="space-y-1.5">
@@ -936,13 +970,15 @@ export default function IPTVDownloaderRunner() {
                                                 </div>
 
                                                 <div className="flex items-center justify-between pt-1 border-t border-slate-50">
-                                                    <button
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="sm"
                                                         onClick={() => setShowLogsTaskId(showLogsTaskId === task.id ? null : task.id)}
-                                                        className="text-[9px] font-bold text-slate-400 hover:text-slate-900 transition-colors uppercase tracking-wider flex items-center gap-1"
+                                                        className="h-6 text-[9px] font-bold text-slate-400 hover:text-slate-900 uppercase tracking-wider gap-1 px-2"
                                                     >
                                                         <Terminal className="w-3.5 h-3.5" />
                                                         {showLogsTaskId === task.id ? 'Hide Logs console' : 'View execution logs'}
-                                                    </button>
+                                                    </Button>
                                                     <span className="text-[9px] px-2 py-0.5 bg-indigo-50 border border-indigo-100 rounded text-indigo-700 font-bold uppercase tracking-wider leading-none">
                                                         Recording Live
                                                     </span>
@@ -1017,12 +1053,14 @@ export default function IPTVDownloaderRunner() {
                                                     </div>
 
                                                     <div className="flex items-center gap-2 shrink-0">
-                                                        <button
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="icon"
                                                             onClick={() => handleDeleteDownloadHistory(dl.id)}
-                                                            className="p-2 hover:bg-rose-50 text-slate-400 hover:text-rose-600 rounded-lg transition-all"
+                                                            className="h-8 w-8 text-slate-400 hover:text-rose-600 hover:bg-rose-50"
                                                         >
                                                             <Trash2 className="w-4 h-4" />
-                                                        </button>
+                                                        </Button>
                                                     </div>
                                                 </div>
                                             );
@@ -1049,9 +1087,9 @@ export default function IPTVDownloaderRunner() {
                                     <span className="text-[10px] text-slate-400 block font-semibold mt-0.5">{showRecordConfig.name}</span>
                                 </div>
                             </div>
-                            <button onClick={() => setShowRecordConfig(null)} className="p-1 hover:bg-slate-100 rounded-lg text-slate-400 hover:text-slate-800 transition-all text-xs font-bold leading-none">
+                            <Button variant="ghost" size="sm" onClick={() => setShowRecordConfig(null)} className="text-slate-400 hover:text-slate-800 text-xs font-bold px-2 h-6">
                                 Close
-                            </button>
+                            </Button>
                         </div>
 
                         {/* Presets and Custom timing selector */}
@@ -1065,41 +1103,44 @@ export default function IPTVDownloaderRunner() {
                                     { l: '5 Minutes Loop', v: 300 },
                                     { l: '1 Hour Broadcast', v: 3600 },
                                 ].map(p => (
-                                    <button
+                                    <Button
+                                        variant={recordDurationPreset === p.v ? "default" : "outline"}
                                         key={p.v}
                                         onClick={() => setRecordDurationPreset(p.v)}
-                                        className={`px-3 py-2.5 border rounded-xl text-[10px] font-bold text-center transition-all ${recordDurationPreset === p.v ? 'bg-indigo-600 border-indigo-600 text-white shadow-sm' : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100'}`}
+                                        className={`h-auto py-2.5 text-[10px] font-bold ${recordDurationPreset === p.v ? 'bg-indigo-600 hover:bg-indigo-700' : 'text-slate-600 hover:bg-slate-100'}`}
                                     >
                                         {p.l}
-                                    </button>
+                                    </Button>
                                 ))}
-                                <button
+                                <Button
+                                    variant={recordDurationPreset === -1 ? "default" : "outline"}
                                     onClick={() => setRecordDurationPreset(-1)}
-                                    className={`px-3 py-2.5 border rounded-xl text-[10px] font-bold text-center transition-all col-span-2 ${recordDurationPreset === -1 ? 'bg-indigo-600 border-indigo-600 text-white shadow-sm' : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100'}`}
+                                    className={`h-auto py-2.5 text-[10px] font-bold col-span-2 ${recordDurationPreset === -1 ? 'bg-indigo-600 hover:bg-indigo-700' : 'text-slate-600 hover:bg-slate-100'}`}
                                 >
                                     Custom Seconds Duration
-                                </button>
+                                </Button>
                             </div>
 
                             {recordDurationPreset === -1 && (
                                 <div className="space-y-1.5 animate-in slide-in-from-top-2 duration-200">
-                                    <input
+                                    <Input
                                         type="number"
                                         value={recordDurationCustom}
                                         onChange={e => setRecordDurationCustom(e.target.value)}
                                         placeholder="Enter duration in seconds (e.g. 180)"
-                                        className="w-full px-4 py-2.5 text-xs font-semibold border border-slate-200 focus:border-indigo-400 rounded-xl outline-none bg-slate-50"
+                                        className="bg-slate-50 font-semibold"
                                     />
                                 </div>
                             )}
                         </div>
 
-                        <button
+                        <Button
                             onClick={triggerDownload}
-                            className="w-full py-3 bg-indigo-600 text-white rounded-xl text-xs font-black uppercase hover:bg-indigo-700 transition-all shadow-md active:scale-95 flex items-center justify-center gap-1.5"
+                            className="w-full h-11 bg-indigo-600 hover:bg-indigo-700 text-xs font-black uppercase"
                         >
-                            <Play className="w-3.5 h-3.5 fill-white" /> Start Local Capture
-                        </button>
+                            <Play className="w-4 h-4 fill-white mr-2" />
+                            Start Capture Session
+                        </Button>
                     </div>
                 </div>
             )}

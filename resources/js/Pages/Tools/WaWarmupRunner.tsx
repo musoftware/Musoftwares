@@ -4,6 +4,9 @@ import {
     RefreshCw, AlertCircle, CheckCircle2, Activity,
     Thermometer, Zap, Clock, BarChart3, Wifi, X
 } from 'lucide-react';
+import { Button } from '@/Components/ui/button';
+import { Input } from '@/Components/ui/input';
+import { Badge } from '@/Components/ui/badge';
 
 const getRuntimeHost = () =>
     typeof window !== 'undefined' ? (window.localStorage.getItem('musoftware_runtime_host') || '127.0.0.1') : '127.0.0.1';
@@ -20,9 +23,9 @@ function TrustBadge({ grade }: { grade: string }) {
         'F':  'bg-rose-500/20 text-rose-400 border-rose-500/30',
     };
     return (
-        <span className={`text-xs font-black px-2 py-0.5 rounded-full border ${colors[grade] || 'bg-slate-700 text-slate-400 border-slate-600'}`}>
+        <Badge variant="outline" className={`text-[10px] font-black px-2 py-0.5 rounded-full ${colors[grade] || 'bg-slate-700 text-slate-400 border-slate-600'}`}>
             {grade}
-        </span>
+        </Badge>
     );
 }
 
@@ -50,9 +53,9 @@ function NumberCard({ number, onRemove }: { number: any; onRemove: () => void })
                 </div>
                 <div className="flex items-center gap-2">
                     <TrustBadge grade={number.trust_grade || 'C'} />
-                    <button onClick={onRemove} className="p-1 text-slate-600 hover:text-rose-400 transition-colors">
+                    <Button variant="ghost" size="icon" onClick={onRemove} className="h-6 w-6 text-slate-600 hover:text-rose-400 hover:bg-transparent">
                         <X className="w-3.5 h-3.5" />
-                    </button>
+                    </Button>
                 </div>
             </div>
 
@@ -86,17 +89,17 @@ function NumberCard({ number, onRemove }: { number: any; onRemove: () => void })
             {/* Actions */}
             <div className="flex gap-2 mt-4">
                 {number.status === 'running' ? (
-                    <button className="flex-1 flex items-center justify-center gap-1.5 py-2 bg-yellow-500/10 border border-yellow-500/20 text-yellow-400 rounded-xl text-xs font-bold hover:bg-yellow-500/15 transition-all">
-                        <Square className="w-3 h-3" /> Pause
-                    </button>
+                    <Button variant="outline" className="flex-1 h-9 bg-yellow-500/10 border-yellow-500/20 text-yellow-400 hover:bg-yellow-500/15 hover:text-yellow-400">
+                        <Square className="w-3 h-3 mr-1.5" /> Pause
+                    </Button>
                 ) : (
-                    <button className="flex-1 flex items-center justify-center gap-1.5 py-2 bg-green-500/10 border border-green-500/20 text-green-400 rounded-xl text-xs font-bold hover:bg-green-500/15 transition-all">
-                        <Play className="w-3 h-3" /> Resume Warmup
-                    </button>
+                    <Button variant="outline" className="flex-1 h-9 bg-green-500/10 border-green-500/20 text-green-400 hover:bg-green-500/15 hover:text-green-400">
+                        <Play className="w-3 h-3 mr-1.5" /> Resume Warmup
+                    </Button>
                 )}
-                <button className="px-3 py-2 bg-slate-800 border border-slate-700 text-slate-400 rounded-xl text-xs font-bold hover:bg-slate-700 transition-all">
+                <Button variant="outline" size="icon" className="h-9 w-10 bg-slate-800 border-slate-700 text-slate-400 hover:bg-slate-700 hover:text-slate-300">
                     <Activity className="w-3.5 h-3.5" />
-                </button>
+                </Button>
             </div>
         </div>
     );
@@ -111,27 +114,27 @@ function AddNumberModal({ onClose, onAdd }: { onClose: () => void; onAdd: (n: an
             <div className="w-full max-w-sm bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-5">
                 <div className="flex items-center justify-between">
                     <h3 className="text-sm font-bold text-white flex items-center gap-2"><Plus className="w-4 h-4 text-green-400" /> Add Number to Warmup</h3>
-                    <button onClick={onClose} className="text-slate-600 hover:text-white transition-colors"><X className="w-4 h-4" /></button>
+                    <Button variant="ghost" size="icon" onClick={onClose} className="h-6 w-6 text-slate-600 hover:text-white hover:bg-transparent"><X className="w-4 h-4" /></Button>
                 </div>
                 <div className="space-y-3">
                     <div>
                         <label className="text-[10px] font-black uppercase tracking-wider text-slate-500 block mb-1.5">Phone Number</label>
-                        <input type="text" value={phone} onChange={e => setPhone(e.target.value)} placeholder="+1 555 000 0000"
-                            className="w-full px-3 py-2.5 text-sm bg-slate-800 border border-slate-700 focus:border-green-500 rounded-xl outline-none transition-all text-white font-mono" />
+                        <Input type="text" value={phone} onChange={e => setPhone(e.target.value)} placeholder="+1 555 000 0000"
+                            className="h-10 text-sm bg-slate-800 border-slate-700 focus-visible:ring-green-500 text-white font-mono" />
                     </div>
                     <div>
                         <label className="text-[10px] font-black uppercase tracking-wider text-slate-500 block mb-1.5">Label (optional)</label>
-                        <input type="text" value={label} onChange={e => setLabel(e.target.value)} placeholder="Marketing #1, Agency client..."
-                            className="w-full px-3 py-2.5 text-sm bg-slate-800 border border-slate-700 focus:border-green-500 rounded-xl outline-none transition-all text-white" />
+                        <Input type="text" value={label} onChange={e => setLabel(e.target.value)} placeholder="Marketing #1, Agency client..."
+                            className="h-10 text-sm bg-slate-800 border-slate-700 focus-visible:ring-green-500 text-white" />
                     </div>
                 </div>
                 <div className="flex gap-3 pt-2 border-t border-slate-800">
-                    <button onClick={onClose} className="flex-1 py-2.5 border border-slate-800 text-slate-400 rounded-xl text-sm font-bold hover:bg-slate-800 transition-all">Cancel</button>
-                    <button onClick={() => { if (!phone.trim()) return; onAdd({ phone: phone.trim(), label: label.trim(), status: 'idle', warmup_day: 0, trust_grade: 'C', trust_score: 40, ban_risk: 5, msgs_today: 0 }); onClose(); }}
+                    <Button variant="outline" onClick={onClose} className="flex-1 h-10 border-slate-800 text-slate-400 hover:bg-slate-800 hover:text-slate-400">Cancel</Button>
+                    <Button onClick={() => { if (!phone.trim()) return; onAdd({ phone: phone.trim(), label: label.trim(), status: 'idle', warmup_day: 0, trust_grade: 'C', trust_score: 40, ban_risk: 5, msgs_today: 0 }); onClose(); }}
                         disabled={!phone.trim()}
-                        className="flex-1 py-2.5 bg-green-500 text-white rounded-xl text-sm font-bold hover:bg-green-600 transition-all disabled:opacity-40">
+                        className="flex-1 h-10 bg-green-500 text-white hover:bg-green-600">
                         Start Warmup
-                    </button>
+                    </Button>
                 </div>
             </div>
         </div>
@@ -217,9 +220,9 @@ export default function WaWarmupRunner({ tool }: any) {
                     </div>
                     <span className="font-bold text-sm">WhatsApp Number Warmup</span>
                 </div>
-                <button onClick={() => setShowAdd(true)} className="flex items-center gap-1.5 px-4 py-2 bg-green-500 text-white rounded-xl text-xs font-bold hover:bg-green-600 transition-all shadow-lg shadow-green-500/20 active:scale-95">
+                <Button onClick={() => setShowAdd(true)} className="gap-1.5 h-9 bg-green-500 text-white hover:bg-green-600 shadow-lg shadow-green-500/20">
                     <Plus className="w-3.5 h-3.5" /> Add Number
-                </button>
+                </Button>
             </div>
 
             <div className="max-w-5xl mx-auto px-4 py-8 space-y-6">
@@ -262,9 +265,9 @@ export default function WaWarmupRunner({ tool }: any) {
                         <Thermometer className="w-10 h-10 text-slate-700 mx-auto mb-4" />
                         <h3 className="text-sm font-bold text-slate-400">No numbers in warmup yet</h3>
                         <p className="text-xs text-slate-600 mt-2 max-w-sm mx-auto">Add a WhatsApp number to start the automated 14-day trust-building schedule. New numbers need warmup before bulk campaigns to avoid bans.</p>
-                        <button onClick={() => setShowAdd(true)} className="mt-6 flex items-center gap-2 px-6 py-2.5 bg-green-500 text-white rounded-xl text-sm font-bold hover:bg-green-600 transition-all mx-auto shadow-lg shadow-green-500/20">
+                        <Button onClick={() => setShowAdd(true)} className="mt-6 gap-2 h-10 bg-green-500 text-white hover:bg-green-600 mx-auto shadow-lg shadow-green-500/20">
                             <Plus className="w-4 h-4" /> Add First Number
-                        </button>
+                        </Button>
                     </div>
                 )}
             </div>

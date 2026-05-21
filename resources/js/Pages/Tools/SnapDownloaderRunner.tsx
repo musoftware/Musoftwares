@@ -8,6 +8,13 @@ import {
     FileVideo, Image as ImageIcon, Film, ArrowRight, StopCircle,
     Eye, ChevronDown, ChevronUp, History, LayoutGrid, Lock,
 } from 'lucide-react';
+import { Button } from '@/Components/ui/button';
+import { Card } from '@/Components/ui/card';
+import { Input } from '@/Components/ui/input';
+import { Label } from '@/Components/ui/label';
+import { Badge } from '@/Components/ui/badge';
+import { Switch } from '@/Components/ui/switch';
+import { Textarea } from '@/Components/ui/textarea';
 
 // ─── Runtime Helpers ─────────────────────────────────────────────────────────
 const getRuntimeHost = () =>
@@ -184,9 +191,9 @@ function LogTerminal({ logs, target, onClose }: {
                 <span className="text-[10px] font-mono truncate max-w-[120px] sm:max-w-xs" style={{ color: 'rgba(255,255,255,0.2)' }}>
                     {target}
                 </span>
-                <button onClick={onClose} className="p-1" style={{ color: 'rgba(255,255,255,0.3)' }}>
+                <Button variant="ghost" size="icon" onClick={onClose} className="h-6 w-6 hover:bg-transparent" style={{ color: 'rgba(255,255,255,0.3)' }}>
                     <XCircle className="w-3.5 h-3.5" />
-                </button>
+                </Button>
             </div>
             <div className="h-48 sm:h-64 overflow-y-auto p-4 font-mono text-[11px] space-y-1">
                 {logs.length === 0 ? (
@@ -423,24 +430,24 @@ export default function SnapDownloaderRunner() {
                     {navItems.map(item => {
                         const active = activeWorkspace === item.id;
                         return (
-                            <button
+                            <Button
+                                variant="ghost"
                                 key={item.id}
                                 onClick={() => setActiveWorkspace(item.id)}
-                                className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition-all"
+                                className="w-full justify-start gap-3 h-11 text-xs font-semibold transition-all"
                                 style={{
                                     background: active ? 'rgba(245,158,11,0.12)' : 'transparent',
                                     color: active ? '#f59e0b' : 'rgba(255,255,255,0.4)',
-                                    minHeight: '44px',
                                 }}
                             >
                                 <span style={{ color: active ? '#f59e0b' : 'rgba(255,255,255,0.3)' }}>{item.icon}</span>
                                 <span className="flex-1 text-left">{item.label}</span>
                                 {item.badge !== undefined && item.badge > 0 && (
-                                    <span className="w-5 h-5 rounded-full text-[9px] font-black flex items-center justify-center" style={{ background: '#f59e0b', color: '#000' }}>
+                                    <Badge variant="secondary" className="px-1.5 min-w-[20px] justify-center text-[9px] font-black" style={{ background: '#f59e0b', color: '#000' }}>
                                         {item.badge}
-                                    </span>
+                                    </Badge>
                                 )}
-                            </button>
+                            </Button>
                         );
                     })}
                 </nav>
@@ -473,9 +480,9 @@ export default function SnapDownloaderRunner() {
                     <div className="flex items-center gap-2">
                         <span className="w-2 h-2 rounded-full animate-pulse" style={{ background: '#10b981', boxShadow: '0 0 5px #10b981' }} />
                         <span className="text-[10px] font-semibold" style={{ color: '#10b981' }}>Live</span>
-                        <button onClick={loadAll} className="ml-1 p-2 rounded-lg" style={{ background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.5)' }}>
+                        <Button variant="ghost" size="icon" onClick={loadAll} className="ml-1 h-8 w-8 rounded-lg" style={{ background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.5)' }}>
                             <RefreshCw className="w-3.5 h-3.5" />
-                        </button>
+                        </Button>
                     </div>
                 </header>
 
@@ -488,9 +495,9 @@ export default function SnapDownloaderRunner() {
                             {runningCount > 0 ? `${runningCount} active` : 'No active downloads'}
                         </span>
                     </div>
-                    <button onClick={loadAll} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-semibold transition-all" style={{ background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.5)' }}>
+                    <Button variant="ghost" size="sm" onClick={loadAll} className="gap-1.5 h-7 text-[10px] font-semibold transition-all" style={{ background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.5)' }}>
                         <RefreshCw className="w-3 h-3" /> Refresh
-                    </button>
+                    </Button>
                 </header>
 
                 {/* Scrollable Content */}
@@ -513,22 +520,22 @@ export default function SnapDownloaderRunner() {
                                     <label className="text-[10px] font-black uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.35)' }}>Target Profile</label>
                                     <div className="relative">
                                         <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: 'rgba(255,255,255,0.25)' }} />
-                                        <input
+                                        <Input
                                             type="text"
                                             value={targetUrl}
                                             onChange={e => { setTargetUrl(e.target.value); setFormError(''); }}
-                                            onKeyDown={e => e.key === 'Enter' && handleQueueAdd()}
+                                            onKeyDown={(e: any) => e.key === 'Enter' && handleQueueAdd()}
                                             placeholder="Username or Snapchat URL"
-                                            className="w-full pl-11 pr-4 py-3.5 rounded-xl text-sm font-medium outline-none transition-all"
+                                            className="w-full pl-11 h-12 text-sm font-medium"
                                             style={{
                                                 background: 'rgba(255,255,255,0.04)',
-                                                border: `1px solid ${formError ? '#f43f5e' : 'rgba(255,255,255,0.08)'}`,
+                                                borderColor: formError ? '#f43f5e' : 'rgba(255,255,255,0.08)',
                                                 color: '#fff',
                                                 fontSize: '16px', // prevents iOS zoom on focus
                                             }}
                                         />
                                     </div>
-                                    {formError && <p className="text-xs" style={{ color: '#f43f5e' }}>{formError}</p>}
+                                    {formError && <p className="text-xs text-rose-500">{formError}</p>}
                                 </div>
 
                                 {/* Media Filters */}
@@ -543,36 +550,36 @@ export default function SnapDownloaderRunner() {
                                         ].map(f => {
                                             const active = (filters as any)[f.id];
                                             return (
-                                                <button
+                                                <Button
+                                                    variant="outline"
                                                     key={f.id}
                                                     onClick={() => setFilters(p => ({ ...p, [f.id]: !(p as any)[f.id] }))}
-                                                    className="flex items-center gap-3 p-3.5 rounded-xl border transition-all text-left"
+                                                    className="justify-start gap-3 h-auto p-3.5"
                                                     style={{
                                                         background: active ? 'rgba(245,158,11,0.1)' : 'rgba(255,255,255,0.02)',
                                                         borderColor: active ? 'rgba(245,158,11,0.4)' : 'rgba(255,255,255,0.06)',
                                                         color: active ? '#f59e0b' : 'rgba(255,255,255,0.4)',
-                                                        minHeight: '52px',
                                                     }}
                                                 >
                                                     {f.icon}
                                                     <span className="text-xs font-bold">{f.label}</span>
                                                     {active && <CheckCircle2 className="w-3.5 h-3.5 ml-auto" />}
-                                                </button>
+                                                </Button>
                                             );
                                         })}
                                     </div>
                                 </div>
 
                                 {/* CTA */}
-                                <button
+                                <Button
                                     onClick={handleQueueAdd}
                                     disabled={isQueuing || !targetUrl.trim()}
-                                    className="w-full py-4 rounded-xl font-black text-sm uppercase tracking-widest flex items-center justify-center gap-3 transition-all active:scale-95 disabled:opacity-40"
-                                    style={{ background: 'linear-gradient(135deg, #f59e0b, #b45309)', color: '#000', minHeight: '52px' }}
+                                    className="w-full h-14 font-black text-sm uppercase tracking-widest gap-3"
+                                    style={{ background: 'linear-gradient(135deg, #f59e0b, #b45309)', color: '#000' }}
                                 >
                                     {isQueuing ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Play className="w-4 h-4 fill-current" />}
                                     {isQueuing ? 'Adding...' : 'Start Download'}
-                                </button>
+                                </Button>
                             </div>
 
                             {/* Privacy Banner — outcome language, no architecture disclosure */}
@@ -606,9 +613,9 @@ export default function SnapDownloaderRunner() {
                                     title="No active downloads"
                                     sub="Start a download from the Download tab"
                                     cta={
-                                        <button onClick={() => setActiveWorkspace('new')} className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold" style={{ background: 'rgba(245,158,11,0.15)', color: '#f59e0b', minHeight: '44px' }}>
+                                        <Button onClick={() => setActiveWorkspace('new')} className="gap-2 h-11 text-xs font-bold" style={{ background: 'rgba(245,158,11,0.15)', color: '#f59e0b' }}>
                                             <Download className="w-3.5 h-3.5" /> New Download
-                                        </button>
+                                        </Button>
                                     }
                                 />
                             )}
@@ -669,30 +676,36 @@ export default function SnapDownloaderRunner() {
 
                                             {/* Actions Row — wraps on mobile */}
                                             <div className="flex items-center gap-2 mt-4 flex-wrap">
-                                                <button
+                                                <Button
+                                                    variant="ghost"
+                                                    size="sm"
                                                     onClick={() => selectProcess(proc)}
-                                                    className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-[11px] font-semibold transition-all"
-                                                    style={{ background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.6)', minHeight: '36px' }}
+                                                    className="gap-1.5 h-9 text-[11px] font-semibold transition-all"
+                                                    style={{ background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.6)' }}
                                                 >
                                                     <Terminal className="w-3 h-3" /> Logs
-                                                </button>
+                                                </Button>
                                                 {proc.outputDir && (
-                                                    <button
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="sm"
                                                         onClick={() => handleOpenFolder(proc.target.replace(/^@/, '').replace(/.*\//, ''))}
-                                                        className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-[11px] font-semibold transition-all"
-                                                        style={{ background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.6)', minHeight: '36px' }}
+                                                        className="gap-1.5 h-9 text-[11px] font-semibold transition-all"
+                                                        style={{ background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.6)' }}
                                                     >
                                                         <FolderOpen className="w-3 h-3" /> Folder
-                                                    </button>
+                                                    </Button>
                                                 )}
                                                 {proc.status === 'running' && (
-                                                    <button
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="sm"
                                                         onClick={() => handleStopProcess(proc.id)}
-                                                        className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-[11px] font-bold transition-all ml-auto"
-                                                        style={{ background: 'rgba(244,63,94,0.15)', color: '#f43f5e', border: '1px solid rgba(244,63,94,0.25)', minHeight: '36px' }}
+                                                        className="gap-1.5 h-9 text-[11px] font-bold transition-all ml-auto"
+                                                        style={{ background: 'rgba(244,63,94,0.15)', color: '#f43f5e', border: '1px solid rgba(244,63,94,0.25)' }}
                                                     >
                                                         <StopCircle className="w-3 h-3" /> Stop
-                                                    </button>
+                                                    </Button>
                                                 )}
                                             </div>
                                         </div>
@@ -751,13 +764,15 @@ export default function SnapDownloaderRunner() {
                                             </div>
 
                                             {job.status !== 'running' && (
-                                                <button
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
                                                     onClick={() => handleQueueRemove(job.id)}
-                                                    className="p-2.5 rounded-xl transition-all shrink-0"
-                                                    style={{ background: 'rgba(244,63,94,0.08)', color: 'rgba(244,63,94,0.6)', minWidth: '44px', minHeight: '44px' }}
+                                                    className="h-11 w-11 shrink-0"
+                                                    style={{ background: 'rgba(244,63,94,0.08)', color: 'rgba(244,63,94,0.6)' }}
                                                 >
                                                     <Trash2 className="w-4 h-4 mx-auto" />
-                                                </button>
+                                                </Button>
                                             )}
                                         </div>
                                     ))}
@@ -776,9 +791,9 @@ export default function SnapDownloaderRunner() {
                                     <h1 className="text-xl sm:text-2xl font-black text-white">Saved Files</h1>
                                     <p className="text-xs mt-1" style={{ color: 'rgba(255,255,255,0.35)' }}>Saved media, organised by profile</p>
                                 </div>
-                                <button onClick={() => handleOpenFolder()} className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold" style={{ background: 'rgba(245,158,11,0.1)', color: '#f59e0b', minHeight: '44px' }}>
+                                <Button variant="ghost" onClick={() => handleOpenFolder()} className="gap-1.5 h-11 text-xs font-bold" style={{ background: 'rgba(245,158,11,0.1)', color: '#f59e0b' }}>
                                     <FolderOpen className="w-3.5 h-3.5" /> Open All
-                                </button>
+                                </Button>
                             </div>
 
                             {folders.length === 0 ? (
@@ -790,25 +805,26 @@ export default function SnapDownloaderRunner() {
                             ) : (
                                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                                     {folders.map(folder => (
-                                        <button
+                                        <Button
+                                            variant="ghost"
                                             key={folder.path}
                                             onClick={() => handleOpenFolder(folder.name)}
-                                            className="p-4 rounded-2xl border text-left transition-all hover:border-amber-500/30 active:scale-95"
-                                            style={{ background: '#13161f', borderColor: 'rgba(255,255,255,0.06)', minHeight: '80px' }}
+                                            className="p-4 h-auto justify-start text-left transition-all hover:border-amber-500/30 active:scale-95 border"
+                                            style={{ background: '#13161f', borderColor: 'rgba(255,255,255,0.06)' }}
                                         >
-                                            <div className="flex items-start gap-3">
+                                            <div className="flex items-start gap-3 w-full">
                                                 <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style={{ background: 'rgba(245,158,11,0.1)' }}>
                                                     <FolderOpen className="w-4.5 h-4.5" style={{ color: '#f59e0b' }} />
                                                 </div>
                                                 <div className="flex-1 min-w-0">
                                                     <div className="font-bold text-white text-sm truncate">{folder.name}</div>
-                                                    <div className="text-[11px] mt-0.5" style={{ color: 'rgba(255,255,255,0.35)' }}>
+                                                    <div className="text-[11px] mt-0.5 font-normal" style={{ color: 'rgba(255,255,255,0.35)' }}>
                                                         {folder.fileCount} file{folder.fileCount !== 1 ? 's' : ''} · {formatBytes(folder.totalSize)}
                                                     </div>
                                                 </div>
                                                 <ChevronRight className="w-4 h-4 shrink-0 mt-1" style={{ color: 'rgba(255,255,255,0.2)' }} />
                                             </div>
-                                        </button>
+                                        </Button>
                                     ))}
                                 </div>
                             )}
@@ -826,9 +842,9 @@ export default function SnapDownloaderRunner() {
                                     <p className="text-xs mt-1" style={{ color: 'rgba(255,255,255,0.35)' }}>Past completed and stopped downloads</p>
                                 </div>
                                 {history.length > 0 && (
-                                    <button onClick={handleClearHistory} className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold" style={{ background: 'rgba(244,63,94,0.1)', color: '#f43f5e', minHeight: '44px' }}>
+                                    <Button variant="ghost" onClick={handleClearHistory} className="gap-2 h-11 text-xs font-semibold" style={{ background: 'rgba(244,63,94,0.1)', color: '#f43f5e' }}>
                                         <Trash2 className="w-3.5 h-3.5" /> Clear
-                                    </button>
+                                    </Button>
                                 )}
                             </div>
 
@@ -867,20 +883,24 @@ export default function SnapDownloaderRunner() {
 
                                                 {/* Actions */}
                                                 <div className="flex items-center gap-2 shrink-0">
-                                                    <button
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
                                                         onClick={() => selectProcess(item)}
-                                                        className="p-2.5 rounded-xl transition-all"
-                                                        style={{ background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.5)', minWidth: '44px', minHeight: '44px' }}
+                                                        className="h-9 w-9 transition-all"
+                                                        style={{ background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.5)' }}
                                                     >
-                                                        <Eye className="w-4 h-4 mx-auto" />
-                                                    </button>
-                                                    <button
+                                                        <Eye className="w-4 h-4" />
+                                                    </Button>
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
                                                         onClick={() => handleOpenFolder(item.target.replace(/^@/, '').replace(/.*\//, ''))}
-                                                        className="p-2.5 rounded-xl transition-all"
-                                                        style={{ background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.5)', minWidth: '44px', minHeight: '44px' }}
+                                                        className="h-9 w-9 transition-all"
+                                                        style={{ background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.5)' }}
                                                     >
-                                                        <FolderOpen className="w-4 h-4 mx-auto" />
-                                                    </button>
+                                                        <FolderOpen className="w-4 h-4" />
+                                                    </Button>
                                                 </div>
                                             </div>
 

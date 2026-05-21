@@ -8,9 +8,7 @@ use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Inertia\Response;
-use Modules\Tools\Models\Tool;
 use Modules\Tools\Models\ToolLicense;
-use Modules\Tools\Models\ToolPricingPlan;
 use Modules\Tools\Models\ToolSubscription;
 
 class SubscriptionController extends Controller
@@ -26,26 +24,30 @@ class SubscriptionController extends Controller
     public function billing(): Response
     {
         $subscriptions = ToolSubscription::where('user_id', auth()->id())
-            ->with(['tool:id,slug,title,icon,category', 'plan:id,name'])
             ->latest()
             ->get()
-            ->map(fn($sub) => [
-                'id'           => $sub->id,
-                'tool'         => [
-                    'slug'     => $sub->tool->slug,
-                    'title'    => $sub->tool->title,
-                    'icon_url' => $sub->tool->icon_url,
-                    'category' => $sub->tool->category,
-                ],
-                'plan_name'    => $sub->plan->name ?? 'N/A',
-                'billing_cycle' => $sub->billing_cycle,
-                'amount_paid'  => $sub->amount_paid,
-                'currency'     => $sub->currency,
-                'status'       => $sub->status,
-                'is_active'    => $sub->isActive(),
-                'starts_at'    => $sub->starts_at->toDateString(),
-                'expires_at'   => $sub->expires_at?->toDateString(),
-            ]);
+            ->map(function ($sub) {
+                $tool = collect(config('tools'))->firstWhere('guid', $sub->tool_guid);
+                $plan = $tool ? collect($tool['plans'] ?? [])->firstWhere('guid', $sub->plan_guid) : null;
+                
+                return [
+                    'id'           => $sub->id,
+                    'tool'         => [
+                        'slug'     => $tool['slug'] ?? 'unknown',
+                        'title'    => $tool['title'] ?? 'Unknown Tool',
+                        'icon_url' => $tool['icon_url'] ?? null,
+                        'category' => $tool['category'] ?? 'unknown',
+                    ],
+                    'plan_name'    => $plan['name'] ?? 'N/A',
+                    'billing_cycle' => $sub->billing_cycle,
+                    'amount_paid'  => $sub->amount_paid,
+                    'currency'     => $sub->currency,
+                    'status'       => $sub->status,
+                    'is_active'    => $sub->isActive(),
+                    'starts_at'    => $sub->starts_at->toDateString(),
+                    'expires_at'   => $sub->expires_at?->toDateString(),
+                ];
+            });
 
         return Inertia::render('Tools/Billing', [
             'subscriptions' => $subscriptions,
@@ -55,14 +57,21 @@ class SubscriptionController extends Controller
     /**
      * Show subscription checkout page for a plan.
      */
-    public function checkout(string $slug, int $planId): Response
+    public function checkout(string $slug, string $planGuid): Response
     {
-        $tool = Tool::where('slug', $slug)->where('is_active', true)->firstOrFail();
-        $plan = ToolPricingPlan::where('tool_id', $tool->id)->findOrFail($planId);
+        $tool = collect(config('tools'))->firstWhere('slug', $slug);
+        if (!$tool || !($tool['is_active'] ?? false)) {
+            abort(404);
+        }
+
+        $plan = collect($tool['plans'] ?? [])->firstWhere('guid', $planGuid);
+        if (!$plan) {
+            abort(404);
+        }
 
         // Check existing active subscription
         $existing = ToolSubscription::where('user_id', auth()->id())
-            ->where('tool_id', $tool->id)
+            ->where('tool_guid', $tool['guid'])
             ->where('status', 'active')
             ->first();
 
@@ -70,16 +79,16 @@ class SubscriptionController extends Controller
 
         return Inertia::render('Tools/Subscribe', [
             'tool'          => [
-                'slug'    => $tool->slug,
-                'title'   => $tool->title,
-                'icon_url' => $tool->icon_url,
+                'slug'    => $tool['slug'],
+                'title'   => $tool['title'],
+                'icon_url' => $tool['icon_url'] ?? null,
             ],
             'plan'          => [
-                'id'            => $plan->id,
-                'name'          => $plan->name,
-                'price_monthly' => $plan->price_monthly,
-                'price_yearly'  => $plan->price_yearly,
-                'features'      => $plan->features ?? [],
+                'id'            => $plan['guid'],
+                'name'          => $plan['name'],
+                'price_monthly' => $plan['price_monthly'],
+                'price_yearly'  => $plan['price_yearly'],
+                'features'      => $plan['features'] ?? [],
             ],
             'walletBalance' => $walletBalance,
             'hasExisting'   => (bool) $existing,
@@ -89,14 +98,21 @@ class SubscriptionController extends Controller
     /**
      * Process subscription — free plans activate instantly, paid plans use wallet/kashier.
      */
-    public function subscribe(Request $request, string $slug, int $planId): RedirectResponse
+    public function subscribe(Request $request, string $slug, string $planGuid): RedirectResponse
     {
-        $tool = Tool::where('slug', $slug)->where('is_active', true)->firstOrFail();
-        $plan = ToolPricingPlan::where('tool_id', $tool->id)->findOrFail($planId);
+        $tool = collect(config('tools'))->firstWhere('slug', $slug);
+        if (!$tool || !($tool['is_active'] ?? false)) {
+            abort(404);
+        }
+
+        $plan = collect($tool['plans'] ?? [])->firstWhere('guid', $planGuid);
+        if (!$plan) {
+            abort(404);
+        }
 
         $price = $request->input('billing_cycle') === 'yearly'
-            ? $plan->price_yearly
-            : $plan->price_monthly;
+            ? $plan['price_yearly']
+            : $plan['price_monthly'];
 
         $isFree = $price <= 0;
 
@@ -107,7 +123,7 @@ class SubscriptionController extends Controller
 
         // Prevent duplicate active subscription
         $existing = ToolSubscription::where('user_id', auth()->id())
-            ->where('tool_id', $tool->id)
+            ->where('tool_guid', $tool['guid'])
             ->where('status', 'active')
             ->first();
 
@@ -130,8 +146,8 @@ class SubscriptionController extends Controller
 
             $sub = ToolSubscription::create([
                 'user_id'              => auth()->id(),
-                'tool_id'              => $tool->id,
-                'tool_pricing_plan_id' => $plan->id,
+                'tool_guid'            => $tool['guid'],
+                'plan_guid'            => $plan['guid'],
                 'billing_cycle'        => $request->billing_cycle,
                 'amount_paid'          => $price,
                 'currency'             => 'USD',

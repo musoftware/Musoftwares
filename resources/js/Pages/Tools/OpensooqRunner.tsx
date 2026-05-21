@@ -4,6 +4,9 @@ import {
     AlertCircle, CheckCircle2, RefreshCw, Globe,
     Phone, Mail, Tag, Building, ChevronDown, Clipboard
 } from 'lucide-react';
+import { Button } from '@/Components/ui/button';
+import { Input } from '@/Components/ui/input';
+import { Badge } from '@/Components/ui/badge';
 
 const getRuntimeHost = () => typeof window !== 'undefined' ? (window.localStorage.getItem('musoftware_runtime_host') || '127.0.0.1') : '127.0.0.1';
 const getWsUrl       = () => `ws://${getRuntimeHost()}:18401/ws`;
@@ -58,13 +61,14 @@ function LeadCard({ lead, idx }: { lead: any; idx: number }) {
                     <p className="text-xs text-slate-500 truncate">{lead.source || 'opensooq'}</p>
                 </div>
             </div>
-            <button
+            <Button
+                variant="ghost" size="icon"
                 onClick={copyRow}
-                className="opacity-0 group-hover:opacity-100 transition-opacity p-1.5 hover:bg-slate-100 rounded-lg"
+                className="opacity-0 group-hover:opacity-100 transition-opacity h-8 w-8 hover:bg-slate-100"
                 title="Copy row"
             >
                 {copied ? <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" /> : <Clipboard className="w-3.5 h-3.5 text-slate-400" />}
-            </button>
+            </Button>
         </div>
     );
 }
@@ -232,17 +236,18 @@ export default function OpensooqRunner({ tool }: any) {
                 </div>
                 <div className="flex items-center gap-3">
                     {leads.length > 0 && (
-                        <button
+                        <Button
+                            variant="outline"
                             onClick={() => exportCSV(leads)}
-                            className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-lg text-xs font-bold hover:bg-emerald-100 transition-all"
+                            className="h-8 gap-1.5 px-3 bg-emerald-50 border-emerald-200 text-emerald-700 hover:bg-emerald-100 hover:text-emerald-800 text-xs font-bold"
                         >
                             <Download className="w-3.5 h-3.5" /> Export CSV
-                        </button>
+                        </Button>
                     )}
-                    <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase border ${status === 'running' ? 'bg-orange-50 border-orange-200 text-orange-700' : status === 'done' ? 'bg-emerald-50 border-emerald-200 text-emerald-700' : 'bg-slate-100 border-slate-200 text-slate-500'}`}>
+                    <Badge variant="outline" className={`gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase ${status === 'running' ? 'bg-orange-50 border-orange-200 text-orange-700' : status === 'done' ? 'bg-emerald-50 border-emerald-200 text-emerald-700' : 'bg-slate-100 border-slate-200 text-slate-500'}`}>
                         <div className={`w-1.5 h-1.5 rounded-full ${status === 'running' ? 'bg-orange-500 animate-pulse' : status === 'done' ? 'bg-emerald-500' : 'bg-slate-400'}`} />
                         {status === 'running' ? 'Extracting...' : status === 'done' ? `${leads.length} leads found` : 'Ready'}
-                    </div>
+                    </Badge>
                 </div>
             </div>
 
@@ -261,13 +266,13 @@ export default function OpensooqRunner({ tool }: any) {
                             <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1.5">Keyword / Category</label>
                             <div className="relative">
                                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                                <input
+                                <Input
                                     type="text"
                                     value={keyword}
                                     onChange={e => setKeyword(e.target.value)}
                                     onKeyDown={e => e.key === 'Enter' && handleStart()}
                                     placeholder="real estate, cars, jobs..."
-                                    className="w-full pl-9 pr-4 py-2.5 text-sm border border-slate-200 focus:border-orange-400 rounded-xl outline-none transition-all bg-slate-50"
+                                    className="pl-9 h-11 text-sm bg-slate-50"
                                 />
                             </div>
                         </div>
@@ -280,7 +285,7 @@ export default function OpensooqRunner({ tool }: any) {
                                 <select
                                     value={country}
                                     onChange={e => setCountry(e.target.value)}
-                                    className="w-full pl-9 pr-8 py-2.5 text-sm border border-slate-200 focus:border-orange-400 rounded-xl outline-none transition-all bg-slate-50 appearance-none"
+                                    className="w-full pl-9 pr-8 h-11 text-sm border border-slate-200 focus:border-orange-400 rounded-md outline-none transition-all bg-slate-50 appearance-none"
                                 >
                                     {COUNTRIES.map(c => (
                                         <option key={c.code} value={c.code}>{c.name}</option>
@@ -295,12 +300,12 @@ export default function OpensooqRunner({ tool }: any) {
                             <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1.5">Max Leads</label>
                             <div className="relative">
                                 <Users className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                                <input
+                                <Input
                                     type="number"
                                     min={10} max={1000} step={10}
                                     value={limit}
                                     onChange={e => setLimit(parseInt(e.target.value, 10))}
-                                    className="w-full pl-9 pr-4 py-2.5 text-sm border border-slate-200 focus:border-orange-400 rounded-xl outline-none transition-all bg-slate-50"
+                                    className="pl-9 h-11 text-sm bg-slate-50"
                                 />
                             </div>
                         </div>
@@ -309,28 +314,30 @@ export default function OpensooqRunner({ tool }: any) {
                     {/* Start / Stop button */}
                     <div className="flex gap-3">
                         {status === 'running' ? (
-                            <button
+                            <Button
+                                variant="outline"
                                 onClick={handleStop}
-                                className="flex items-center gap-2 px-6 py-2.5 bg-rose-50 border border-rose-200 text-rose-700 rounded-xl text-sm font-bold hover:bg-rose-100 transition-all active:scale-95"
+                                className="h-11 gap-2 px-6 bg-rose-50 border-rose-200 text-rose-700 hover:bg-rose-100 hover:text-rose-800 text-sm font-bold"
                             >
                                 <Square className="w-4 h-4" /> Stop
-                            </button>
+                            </Button>
                         ) : (
-                            <button
+                            <Button
                                 onClick={handleStart}
                                 disabled={!keyword.trim()}
-                                className="flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-orange-500 to-rose-500 text-white rounded-xl text-sm font-bold hover:opacity-90 transition-all shadow-md active:scale-95 disabled:opacity-40 disabled:shadow-none"
+                                className="h-11 gap-2 px-6 bg-gradient-to-r from-orange-500 to-rose-500 text-white shadow-md text-sm font-bold hover:opacity-90"
                             >
                                 <Play className="w-4 h-4" /> Start Extraction
-                            </button>
+                            </Button>
                         )}
                         {leads.length > 0 && status !== 'running' && (
-                            <button
+                            <Button
+                                variant="outline"
                                 onClick={() => { setLeads([]); setStatus('idle'); setProgress(0); }}
-                                className="px-4 py-2.5 border border-slate-200 text-slate-500 rounded-xl text-sm font-medium hover:bg-slate-50 transition-all"
+                                className="h-11 px-4 border-slate-200 text-slate-500 hover:bg-slate-50 hover:text-slate-600 text-sm font-medium"
                             >
                                 Clear
-                            </button>
+                            </Button>
                         )}
                     </div>
 
@@ -374,12 +381,12 @@ export default function OpensooqRunner({ tool }: any) {
                     <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden animate-in fade-in slide-in-from-bottom-3 duration-400">
                         <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
                             <h3 className="font-bold text-slate-800 text-sm">{leads.length} Leads Extracted</h3>
-                            <button
+                            <Button
                                 onClick={() => exportCSV(leads)}
-                                className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-900 text-white rounded-lg text-xs font-bold hover:bg-slate-800 transition-all active:scale-95"
+                                className="h-8 gap-1.5 px-3 bg-slate-900 text-white hover:bg-slate-800 text-xs font-bold"
                             >
                                 <Download className="w-3.5 h-3.5" /> Export CSV
-                            </button>
+                            </Button>
                         </div>
 
                         {/* Table header */}
@@ -401,12 +408,13 @@ export default function OpensooqRunner({ tool }: any) {
                             <p className="text-[10px] text-slate-400 font-medium">
                                 {status === 'running' ? 'Live — more leads incoming...' : `Extraction complete`}
                             </p>
-                            <button
+                            <Button
+                                variant="ghost"
                                 onClick={() => exportCSV(leads)}
-                                className="text-[10px] font-bold text-orange-600 hover:text-orange-700 transition-colors"
+                                className="h-auto p-0 text-[10px] font-bold text-orange-600 hover:text-orange-700 hover:bg-transparent"
                             >
                                 Download all as CSV →
-                            </button>
+                            </Button>
                         </div>
                     </div>
                 )}

@@ -52,13 +52,13 @@ function CampaignActions({ campaign, onStart, onPause, onResume, onStop, onDelet
                 {open && (
                     <div className="absolute right-0 top-full mt-1 bg-popover border text-popover-foreground rounded-xl shadow-xl z-10 min-w-[140px] py-1 overflow-hidden" onClick={e => e.stopPropagation()}>
                         {(status === 'running' || status === 'paused') && (
-                            <button onClick={() => { onStop(campaign.id); setOpen(false); }} className="w-full text-left px-4 py-2 text-xs font-bold hover:bg-accent hover:text-accent-foreground flex items-center gap-2">
+                            <Button variant="ghost" onClick={() => { onStop(campaign.id); setOpen(false); }} className="w-full justify-start rounded-none h-auto px-4 py-2 text-xs font-bold hover:bg-accent hover:text-accent-foreground flex items-center gap-2">
                                 <Square className="w-3.5 h-3.5 text-muted-foreground" /> Stop Campaign
-                            </button>
+                            </Button>
                         )}
-                        <button onClick={() => { onDelete(campaign.id); setOpen(false); }} className="w-full text-left px-4 py-2 text-xs font-bold text-destructive hover:bg-destructive/10 flex items-center gap-2">
+                        <Button variant="ghost" onClick={() => { onDelete(campaign.id); setOpen(false); }} className="w-full justify-start rounded-none h-auto px-4 py-2 text-xs font-bold text-destructive hover:bg-destructive/10 hover:text-destructive flex items-center gap-2">
                             <Trash2 className="w-3.5 h-3.5" /> Delete
-                        </button>
+                        </Button>
                     </div>
                 )}
             </div>
@@ -177,23 +177,23 @@ export default function CampaignsListWorkspace({ t, callRPC, onViewReport, onCre
                                                 <span className="text-[10px] font-black text-muted-foreground">{percent}%</span>
                                             </div>
                                         </td>
-                                        <td className="px-6 py-4 text-teal-600 font-black">
+                                        <td className="px-6 py-4 text-teal-600 font-black text-center tabular-nums">
                                             <div className="flex items-center justify-center gap-1.5">
                                                 <CheckCircle2 className="w-3.5 h-3.5" />
                                                 {c.sent_count || 0}
                                             </div>
                                         </td>
-                                        <td className="px-6 py-4 text-destructive font-black">
+                                        <td className="px-6 py-4 text-destructive font-black text-center tabular-nums">
                                             <div className="flex items-center justify-center gap-1.5">
                                                 <XCircle className="w-3.5 h-3.5" />
                                                 {c.failed_count || 0}
                                             </div>
                                         </td>
                                         <td className="px-6 py-4 text-muted-foreground text-xs font-medium text-center">{c.account_id || '—'}</td>
-                                        <td className="px-6 py-4 text-muted-foreground text-xs">
+                                        <td className="px-6 py-4 text-muted-foreground text-xs text-center tabular-nums">
                                             <div className="flex items-center justify-center gap-1.5">
                                                 <Clock className="w-3 h-3" />
-                                                {c.created_at ? new Date(c.created_at + (c.created_at.includes('Z') || c.created_at.includes('T') ? '' : ' UTC')).toLocaleDateString() : '—'}
+                                                {c.created_at ? new Date(c.created_at.replace(' ', 'T') + (c.created_at.includes('Z') ? '' : 'Z')).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : '—'}
                                             </div>
                                         </td>
                                         <td className="px-6 py-4">

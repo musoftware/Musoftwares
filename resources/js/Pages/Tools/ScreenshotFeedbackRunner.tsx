@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { LayoutDashboard, Image as ImageIcon, MessageSquareText, Activity, AlertCircle, Plus, Upload, MoreHorizontal, CheckCircle2, ChevronRight, X } from 'lucide-react';
-
+import { Button } from '@/Components/ui/button';
+import { Badge } from '@/Components/ui/badge';
+import { Textarea } from '@/Components/ui/textarea';
 // A simple local WebSocket client to interface with the Generic Layer
 function useRuntimeWS(pluginSlug: string) {
     const [ws, setWs] = useState<WebSocket | null>(null);
@@ -239,26 +241,29 @@ export default function ScreenshotFeedbackRunner({ tool, subscription, runtimePo
                     <div className="h-4 w-px bg-slate-200" />
                     
                     <div className="flex items-center gap-1">
-                        <button 
+                        <Button 
+                            variant="ghost"
                             onClick={() => setActiveTab('projects')}
-                            className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${activeTab === 'projects' ? 'bg-slate-100 text-slate-900' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'}`}
+                            className={`h-8 px-3 text-sm font-medium transition-colors ${activeTab === 'projects' ? 'bg-slate-100 text-slate-900' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'}`}
                         >
                             Projects
-                        </button>
+                        </Button>
                         {selectedProjectId && (
                             <>
-                                <button 
+                                <Button 
+                                    variant="ghost"
                                     onClick={() => setActiveTab('screenshots')}
-                                    className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${(activeTab === 'screenshots' || activeTab === 'review') ? 'bg-slate-100 text-slate-900' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'}`}
+                                    className={`h-8 px-3 text-sm font-medium transition-colors ${(activeTab === 'screenshots' || activeTab === 'review') ? 'bg-slate-100 text-slate-900' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'}`}
                                 >
                                     Screenshots
-                                </button>
-                                <button 
+                                </Button>
+                                <Button 
+                                    variant="ghost"
                                     onClick={() => setActiveTab('activity')}
-                                    className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${activeTab === 'activity' ? 'bg-slate-100 text-slate-900' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'}`}
+                                    className={`h-8 px-3 text-sm font-medium transition-colors ${activeTab === 'activity' ? 'bg-slate-100 text-slate-900' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'}`}
                                 >
                                     Activity Feed
-                                </button>
+                                </Button>
                             </>
                         )}
                     </div>
@@ -281,9 +286,9 @@ export default function ScreenshotFeedbackRunner({ tool, subscription, runtimePo
                                 <h1 className="text-2xl font-bold tracking-tight">Workspaces</h1>
                                 <p className="text-sm text-slate-500 mt-1">Select a project to view and annotate screenshots.</p>
                             </div>
-                            <button onClick={handleCreateProject} className="flex items-center gap-1.5 px-4 py-2 bg-black text-white rounded-lg text-sm font-medium hover:bg-slate-800 transition-colors shadow-sm active:scale-95">
+                            <Button onClick={handleCreateProject} className="gap-1.5 h-9 bg-black text-white hover:bg-slate-800 shadow-sm">
                                 <Plus className="w-4 h-4" /> New Project
-                            </button>
+                            </Button>
                         </div>
 
                         {projects.length === 0 ? (
@@ -304,9 +309,9 @@ export default function ScreenshotFeedbackRunner({ tool, subscription, runtimePo
                                             <div className="w-10 h-10 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center">
                                                 <LayoutDashboard className="w-5 h-5 text-slate-600" />
                                             </div>
-                                            <button className="opacity-0 group-hover:opacity-100 p-1 hover:bg-slate-50 rounded-md transition-all text-slate-400 hover:text-slate-900">
+                                            <Button variant="ghost" size="icon" className="opacity-0 group-hover:opacity-100 h-8 w-8 text-slate-400 hover:text-slate-900">
                                                 <MoreHorizontal className="w-4 h-4" />
-                                            </button>
+                                            </Button>
                                         </div>
                                         
                                         <div>
@@ -330,16 +335,16 @@ export default function ScreenshotFeedbackRunner({ tool, subscription, runtimePo
                 {activeTab === 'screenshots' && selectedProjectId && (
                     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
                         <div className="flex items-center gap-2 text-sm text-slate-500 mb-2">
-                            <button onClick={() => setActiveTab('projects')} className="hover:text-slate-900 transition-colors">Workspaces</button>
+                            <Button variant="link" onClick={() => setActiveTab('projects')} className="h-auto p-0 text-slate-500 hover:text-slate-900 transition-colors font-normal">Workspaces</Button>
                             <ChevronRight className="w-3 h-3" />
                             <span className="font-medium text-slate-900">{projects.find(p => p.id === selectedProjectId)?.name}</span>
                         </div>
                         
                         <div className="flex items-center justify-between">
                             <h1 className="text-2xl font-bold tracking-tight">Screenshots</h1>
-                            <button onClick={handleUploadScreenshot} className="flex items-center gap-1.5 px-4 py-2 bg-black text-white rounded-lg text-sm font-medium hover:bg-slate-800 transition-colors shadow-sm active:scale-95">
+                            <Button onClick={handleUploadScreenshot} className="gap-1.5 h-9 bg-black text-white hover:bg-slate-800 shadow-sm">
                                 <Upload className="w-4 h-4" /> Upload
-                            </button>
+                            </Button>
                         </div>
 
                         {screenshots.length === 0 ? (
@@ -364,12 +369,14 @@ export default function ScreenshotFeedbackRunner({ tool, subscription, runtimePo
                                                 <h4 className="font-medium text-sm text-slate-900 truncate">{s.filename}</h4>
                                                 <p className="text-xs text-slate-500 mt-0.5">{new Date(s.created_at * 1000).toLocaleDateString()}</p>
                                             </div>
-                                            <button 
+                                            <Button 
+                                                variant="outline"
+                                                size="sm"
                                                 onClick={() => handleReviewClick(s.id)}
-                                                className="px-3 py-1.5 bg-slate-50 hover:bg-slate-100 text-slate-700 rounded-md text-xs font-medium transition-colors border border-slate-200"
+                                                className="h-8 text-xs font-medium bg-slate-50 hover:bg-slate-100"
                                             >
                                                 Review
-                                            </button>
+                                            </Button>
                                         </div>
                                     </div>
                                 ))}
@@ -409,9 +416,9 @@ export default function ScreenshotFeedbackRunner({ tool, subscription, runtimePo
                         <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
                             {/* Breadcrumbs / Back navigation */}
                             <div className="flex items-center gap-2 text-sm text-slate-500 mb-2">
-                                <button onClick={() => setActiveTab('projects')} className="hover:text-slate-900 transition-colors">Workspaces</button>
+                                <Button variant="link" onClick={() => setActiveTab('projects')} className="h-auto p-0 text-slate-500 hover:text-slate-900 transition-colors font-normal">Workspaces</Button>
                                 <ChevronRight className="w-3 h-3" />
-                                <button onClick={() => setActiveTab('screenshots')} className="hover:text-slate-900 transition-colors">{projects.find(p => p.id === selectedProjectId)?.name}</button>
+                                <Button variant="link" onClick={() => setActiveTab('screenshots')} className="h-auto p-0 text-slate-500 hover:text-slate-900 transition-colors font-normal">{projects.find(p => p.id === selectedProjectId)?.name}</Button>
                                 <ChevronRight className="w-3 h-3" />
                                 <span className="font-medium text-slate-900 truncate max-w-[200px]">{currentScreenshot?.filename}</span>
                             </div>
@@ -422,12 +429,14 @@ export default function ScreenshotFeedbackRunner({ tool, subscription, runtimePo
                                     <h1 className="text-xl font-bold tracking-tight">{currentScreenshot?.filename}</h1>
                                     <p className="text-xs text-slate-400 mt-0.5">Click anywhere on the screenshot to drop a feedback pin.</p>
                                 </div>
-                                <button 
+                                <Button 
+                                    variant="outline"
+                                    size="icon"
                                     onClick={() => { setActiveTab('screenshots'); setPendingPin(null); }}
-                                    className="p-2 hover:bg-slate-100 rounded-lg text-slate-400 hover:text-slate-900 transition-colors border border-slate-200"
+                                    className="h-8 w-8 text-slate-400 hover:text-slate-900"
                                 >
                                     <X className="w-4 h-4" />
-                                </button>
+                                </Button>
                             </div>
 
                             {/* Split Workspace Layout */}
@@ -507,37 +516,42 @@ export default function ScreenshotFeedbackRunner({ tool, subscription, runtimePo
                                                     <form onSubmit={handleSavePin} className="space-y-3 relative z-10">
                                                         <div className="flex items-center justify-between">
                                                             <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Add Comment</span>
-                                                            <button 
+                                                            <Button 
+                                                                variant="ghost"
+                                                                size="icon"
                                                                 type="button" 
                                                                 onClick={() => setPendingPin(null)}
-                                                                className="text-slate-400 hover:text-slate-900 p-0.5 rounded hover:bg-slate-50 transition-colors"
+                                                                className="h-6 w-6 text-slate-400 hover:text-slate-900 hover:bg-slate-50"
                                                             >
                                                                 <X className="w-3.5 h-3.5" />
-                                                            </button>
+                                                            </Button>
                                                         </div>
-                                                        <textarea 
+                                                        <Textarea 
                                                             autoFocus
                                                             rows={3}
                                                             value={newPinComment}
                                                             onChange={(e) => setNewPinComment(e.target.value)}
                                                             placeholder="What needs feedback at this exact spot?"
-                                                            className="w-full text-xs bg-slate-50 border border-slate-200 rounded-lg p-2.5 outline-none focus:border-slate-900 transition-colors resize-none font-sans"
+                                                            className="text-xs bg-slate-50 resize-none font-sans"
                                                         />
                                                         <div className="flex justify-end gap-2 text-xs">
-                                                            <button 
+                                                            <Button 
+                                                                variant="outline"
+                                                                size="sm"
                                                                 type="button" 
                                                                 onClick={() => setPendingPin(null)}
-                                                                className="px-2.5 py-1.5 border border-slate-200 rounded-lg font-medium hover:bg-slate-50 transition-colors text-slate-600"
+                                                                className="h-7 text-xs font-medium text-slate-600"
                                                             >
                                                                 Cancel
-                                                            </button>
-                                                            <button 
+                                                            </Button>
+                                                            <Button 
+                                                                size="sm"
                                                                 type="submit"
                                                                 disabled={!newPinComment.trim()}
-                                                                className="px-3 py-1.5 bg-black text-white rounded-lg font-medium hover:bg-slate-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
+                                                                className="h-7 text-xs bg-black text-white hover:bg-slate-800 shadow-sm"
                                                             >
                                                                 Save Pin
-                                                            </button>
+                                                            </Button>
                                                         </div>
                                                     </form>
                                                 </div>
@@ -554,24 +568,27 @@ export default function ScreenshotFeedbackRunner({ tool, subscription, runtimePo
                                         
                                         {/* Sidebar Navigation Tabs */}
                                         <div className="flex bg-slate-100 rounded-lg p-0.5 mt-3 text-xs">
-                                            <button 
+                                            <Button 
+                                                variant="ghost"
                                                 onClick={() => setFilterStatus('all')}
-                                                className={`flex-1 py-1 rounded-md font-medium transition-colors ${filterStatus === 'all' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-900'}`}
+                                                className={`flex-1 h-7 rounded-md font-medium transition-colors ${filterStatus === 'all' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-900 hover:bg-transparent'}`}
                                             >
                                                 All ({pins.length})
-                                            </button>
-                                            <button 
+                                            </Button>
+                                            <Button 
+                                                variant="ghost"
                                                 onClick={() => setFilterStatus('open')}
-                                                className={`flex-1 py-1 rounded-md font-medium transition-colors ${filterStatus === 'open' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-900'}`}
+                                                className={`flex-1 h-7 rounded-md font-medium transition-colors ${filterStatus === 'open' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-900 hover:bg-transparent'}`}
                                             >
                                                 Open ({pins.filter(p => p.status === 'open').length})
-                                            </button>
-                                            <button 
+                                            </Button>
+                                            <Button 
+                                                variant="ghost"
                                                 onClick={() => setFilterStatus('resolved')}
-                                                className={`flex-1 py-1 rounded-md font-medium transition-colors ${filterStatus === 'resolved' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-900'}`}
+                                                className={`flex-1 h-7 rounded-md font-medium transition-colors ${filterStatus === 'resolved' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-900 hover:bg-transparent'}`}
                                             >
                                                 Resolved ({pins.filter(p => p.status === 'resolved').length})
-                                            </button>
+                                            </Button>
                                         </div>
                                     </div>
 
@@ -616,13 +633,15 @@ export default function ScreenshotFeedbackRunner({ tool, subscription, runtimePo
                                                             </div>
 
                                                             {isOpen && (
-                                                                <button 
+                                                                <Button 
+                                                                    variant="ghost"
+                                                                    size="icon"
                                                                     onClick={() => handleResolvePin(pin.id)}
-                                                                    className="opacity-0 group-hover/card:opacity-100 p-1 hover:bg-emerald-50 text-slate-400 hover:text-emerald-600 rounded-md transition-all border border-transparent hover:border-emerald-100 shadow-2xs"
+                                                                    className="opacity-0 group-hover/card:opacity-100 h-6 w-6 hover:bg-emerald-50 text-slate-400 hover:text-emerald-600 transition-all border border-transparent hover:border-emerald-100"
                                                                     title="Mark resolved"
                                                                 >
                                                                     <CheckCircle2 className="w-3.5 h-3.5" />
-                                                                </button>
+                                                                </Button>
                                                             )}
                                                         </div>
 

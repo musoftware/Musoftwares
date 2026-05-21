@@ -3,6 +3,9 @@ import {
     Search, Target, Plus, Trash2, BarChart2, Sparkles,
     AlertCircle, CheckCircle, RefreshCw, ChevronDown, ChevronUp
 } from 'lucide-react';
+import { Button } from '@/Components/ui/button';
+import { Input } from '@/Components/ui/input';
+import { Badge } from '@/Components/ui/badge';
 
 const getRuntimeHost = () => typeof window !== 'undefined' ? (window.localStorage.getItem('musoftware_runtime_host') || '127.0.0.1') : '127.0.0.1';
 const getRuntimeHttp = () => `http://${getRuntimeHost()}:18400`;
@@ -65,9 +68,10 @@ function AnalysisCard({ a, idx }: { a: any; idx: number }) {
     return (
         <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
             {/* Summary row */}
-            <button
+            <Button
+                variant="ghost"
                 onClick={() => setOpen(v => !v)}
-                className="w-full flex items-center gap-4 p-5 hover:bg-slate-50 transition-colors text-left"
+                className="w-full h-auto flex items-center gap-4 p-5 hover:bg-slate-50 transition-colors text-left rounded-none"
             >
                 <GradeBadge grade={a.grade} emoji={a.grade_emoji} />
                 <div className="flex-1 min-w-0 space-y-1.5">
@@ -80,7 +84,7 @@ function AnalysisCard({ a, idx }: { a: any; idx: number }) {
                     <span className="text-[9px] font-bold text-slate-400 uppercase">/100</span>
                 </div>
                 {open ? <ChevronUp className="w-4 h-4 text-slate-400 shrink-0" /> : <ChevronDown className="w-4 h-4 text-slate-400 shrink-0" />}
-            </button>
+            </Button>
 
             {/* Expanded detail */}
             {open && (
@@ -234,10 +238,10 @@ export default function HookAnalyzerRunner({ tool }: any) {
                     </div>
                     <span className="font-bold text-sm text-slate-800 tracking-tight">Hook Analyzer</span>
                 </div>
-                <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase border ${status === 'running' ? 'bg-amber-50 border-amber-200 text-amber-700' : status === 'done' ? 'bg-emerald-50 border-emerald-200 text-emerald-700' : 'bg-slate-100 border-slate-200 text-slate-500'}`}>
+                <Badge variant="outline" className={`gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase ${status === 'running' ? 'bg-amber-50 border-amber-200 text-amber-700' : status === 'done' ? 'bg-emerald-50 border-emerald-200 text-emerald-700' : 'bg-slate-100 border-slate-200 text-slate-500'}`}>
                     <div className={`w-1.5 h-1.5 rounded-full ${status === 'running' ? 'bg-amber-500 animate-pulse' : status === 'done' ? 'bg-emerald-500' : 'bg-slate-400'}`} />
                     {status === 'running' ? 'Analyzing...' : status === 'done' ? 'Done' : 'Ready'}
-                </div>
+                </Badge>
             </div>
 
             <div className="max-w-3xl mx-auto px-4 py-8 space-y-6">
@@ -252,13 +256,14 @@ export default function HookAnalyzerRunner({ tool }: any) {
                     {/* Mode toggle */}
                     <div className="flex border border-slate-200 rounded-xl overflow-hidden p-1 gap-1 w-fit">
                         {(['single', 'batch'] as const).map(m => (
-                            <button
+                            <Button
+                                variant={mode === m ? 'default' : 'ghost'}
                                 key={m}
                                 onClick={() => setMode(m)}
-                                className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${mode === m ? 'bg-slate-900 text-white shadow-sm' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'}`}
+                                className={`h-8 px-4 text-xs font-bold transition-all ${mode === m ? 'bg-slate-900 text-white shadow-sm hover:bg-slate-800' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'}`}
                             >
                                 {m === 'single' ? 'Single URL' : 'Batch (up to 10)'}
-                            </button>
+                            </Button>
                         ))}
                     </div>
 
@@ -266,13 +271,13 @@ export default function HookAnalyzerRunner({ tool }: any) {
                     {mode === 'single' && (
                         <div className="relative">
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                            <input
+                            <Input
                                 type="url"
                                 value={singleUrl}
                                 onChange={e => setSingleUrl(e.target.value)}
                                 onKeyDown={e => e.key === 'Enter' && handleAnalyze()}
                                 placeholder="https://www.tiktok.com/@user/video/..."
-                                className="w-full pl-9 pr-4 py-2.5 text-sm border border-slate-200 focus:border-violet-400 rounded-xl outline-none transition-all bg-slate-50 font-mono"
+                                className="pl-9 h-11 text-sm bg-slate-50 font-mono"
                             />
                         </div>
                     )}
@@ -284,38 +289,38 @@ export default function HookAnalyzerRunner({ tool }: any) {
                                 <div key={i} className="flex gap-2">
                                     <div className="relative flex-1">
                                         <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[10px] font-black text-slate-400">{i + 1}</span>
-                                        <input
+                                        <Input
                                             type="url"
                                             value={u}
                                             onChange={e => updateUrl(i, e.target.value)}
                                             placeholder="https://www.tiktok.com/@user/video/..."
-                                            className="w-full pl-8 pr-4 py-2.5 text-sm border border-slate-200 focus:border-violet-400 rounded-xl outline-none transition-all bg-slate-50 font-mono"
+                                            className="pl-8 h-11 text-sm bg-slate-50 font-mono"
                                         />
                                     </div>
                                     {batchUrls.length > 1 && (
-                                        <button onClick={() => removeUrl(i)} className="p-2.5 text-slate-400 hover:text-rose-500 hover:bg-rose-50 rounded-xl transition-all">
+                                        <Button variant="ghost" size="icon" onClick={() => removeUrl(i)} className="h-11 w-11 text-slate-400 hover:text-rose-500 hover:bg-rose-50 transition-all">
                                             <Trash2 className="w-4 h-4" />
-                                        </button>
+                                        </Button>
                                     )}
                                 </div>
                             ))}
                             {batchUrls.length < 10 && (
-                                <button onClick={addUrl} className="flex items-center gap-1.5 text-xs font-bold text-violet-600 hover:text-violet-700 transition-colors">
+                                <Button variant="ghost" onClick={addUrl} className="gap-1.5 h-8 text-xs font-bold text-violet-600 hover:text-violet-700 hover:bg-violet-50 transition-colors">
                                     <Plus className="w-3.5 h-3.5" /> Add another URL
-                                </button>
+                                </Button>
                             )}
                         </div>
                     )}
 
                     {/* Analyze button */}
-                    <button
+                    <Button
                         onClick={handleAnalyze}
                         disabled={status === 'running' || (mode === 'single' ? !singleUrl.trim() : batchUrls.every(u => !u.trim()))}
-                        className="w-full py-3 bg-gradient-to-r from-violet-600 to-purple-600 text-white rounded-xl text-sm font-bold hover:opacity-90 transition-all shadow-md active:scale-95 disabled:opacity-40 disabled:shadow-none flex items-center justify-center gap-2"
+                        className="w-full h-12 bg-gradient-to-r from-violet-600 to-purple-600 text-white rounded-xl text-sm font-bold hover:opacity-90 shadow-md gap-2"
                     >
                         {status === 'running' ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Target className="w-4 h-4" />}
                         {status === 'running' ? 'Analyzing Hooks...' : mode === 'batch' ? `Analyze ${batchUrls.filter(u => u.trim()).length} Videos` : 'Analyze Hook'}
-                    </button>
+                    </Button>
 
                     {/* Progress */}
                     {status === 'running' && (

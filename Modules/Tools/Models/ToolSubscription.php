@@ -10,7 +10,7 @@ use Illuminate\Support\Str;
 class ToolSubscription extends Model
 {
     protected $fillable = [
-        'user_id', 'tool_id', 'tool_pricing_plan_id', 'billing_cycle',
+        'user_id', 'tool_guid', 'plan_guid', 'billing_cycle',
         'amount_paid', 'currency', 'status', 'payment_method',
         'payment_reference', 'starts_at', 'expires_at', 'cancelled_at',
     ];
@@ -29,14 +29,18 @@ class ToolSubscription extends Model
         return $this->belongsTo(\App\Models\User::class);
     }
 
-    public function tool(): BelongsTo
+    public function getToolAttribute()
     {
-        return $this->belongsTo(Tool::class);
+        return config("tools.{$this->tool_guid}");
     }
 
-    public function plan(): BelongsTo
+    public function getPlanAttribute()
     {
-        return $this->belongsTo(ToolPricingPlan::class, 'tool_pricing_plan_id');
+        $tool = $this->tool;
+        if ($tool && isset($tool['plans'][$this->plan_guid])) {
+            return $tool['plans'][$this->plan_guid];
+        }
+        return null;
     }
 
     public function licenses(): HasMany
@@ -63,7 +67,7 @@ class ToolSubscription extends Model
         return ToolLicense::create([
             'license_key'           => Str::uuid(),
             'user_id'               => $this->user_id,
-            'tool_id'               => $this->tool_id,
+            'tool_guid'             => $this->tool_guid,
             'tool_subscription_id'  => $this->id,
             'status'                => 'active',
             'expires_at'            => $this->expires_at,

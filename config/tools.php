@@ -1,0 +1,593 @@
+<?php
+
+return [
+    '832b99f8-26dc-405b-b741-36c3b982a32e' => [
+        'guid' => '832b99f8-26dc-405b-b741-36c3b982a32e',
+        'title' => 'TikTok Intelligence Engine',
+        'slug' => 'tiktok-intelligence',
+        'short_description' => 'Discover viral creators, monitor competitors, track UGC trends, and build actionable market intelligence pipelines.',
+        'description' => 'The TikTok Intelligence Engine is a production-grade intelligence platform that runs entirely locally on your machine.
+
+- Discover viral creators by niche and engagement
+- Track competitors and hashtag trends automatically
+- Build a local UGC vault of top-performing content
+- Extract leads and contact data
+- Ensure privacy with 100% local SQLite storage',
+        'category' => 'intelligence',
+        'supported_os' => array (
+  0 => 'windows',
+  1 => 'mac',
+  2 => 'linux',
+),
+        'is_featured' => true,
+        'is_active' => true,
+        'runner_component' => 'tiktok-intelligence',
+        'features' => array (
+  0 => 'Creator Discovery Engine',
+  1 => 'Competitor Monitoring Jobs',
+  2 => 'UGC Vault & Analytics',
+  3 => 'Lead Intelligence Pipeline',
+  4 => 'Anti-detection Stealth Mode',
+  5 => 'Local Execution Environment',
+),
+        'requirements' => array (
+  0 => 'Musoftware Runtime Agent running locally',
+  1 => 'Internet connection required for execution',
+),
+        'plans' => [
+            '9e8b5cfc-30e4-4bf3-944c-a11214d6b58f' => [
+                'guid' => '9e8b5cfc-30e4-4bf3-944c-a11214d6b58f',
+                'name' => 'Creator Intelligence',
+                'price_monthly' => 0,
+                'price_yearly' => 0,
+                'is_popular' => false,
+                'features' => array (
+  0 => 'Creator Discovery Engine',
+  1 => '10 Active Monitoring Jobs',
+  2 => 'UGC Vault Access',
+  3 => 'Email support',
+),
+            ],
+            '8b4ae73a-fbf6-4fc9-8752-88590a7ce10a' => [
+                'guid' => '8b4ae73a-fbf6-4fc9-8752-88590a7ce10a',
+                'name' => 'Market Intelligence',
+                'price_monthly' => 0,
+                'price_yearly' => 0,
+                'is_popular' => true,
+                'features' => array (
+  0 => 'Lead Enrichment Pipeline',
+  1 => 'Unlimited Monitoring Jobs',
+  2 => 'Competitor Timeline Feed',
+  3 => 'Priority support',
+),
+            ],
+        ],
+        'version' => '3.0.0',
+    ],
+    '8b8b5c09-0763-4d4b-9c76-26c2688e3d8f' => [
+        'guid' => '8b8b5c09-0763-4d4b-9c76-26c2688e3d8f',
+        'title' => 'B2B Prospector',
+        'slug' => 'b2b-prospector',
+        'short_description' => 'Enterprise-grade lead discovery, enrichment, and cold email outreach built directly into your local runtime.',
+        'description' => 'The B2B Prospector is a complete B2B prospecting ecosystem designed to rival Apollo.io and Instantly.ai, but running 100% locally to ensure data privacy and maximum deliverability.
+
+- Find verified decision-maker emails across LinkedIn and millions of websites
+- AI Lead Enrichment using local pipelines
+- Built-in multi-source scraper (LinkedIn, Google Maps, Web)
+- Unlimited local email verification (SMTP/MX checks without cloud costs)
+- AI-generated cold outreach sequences
+- Connect unlimited IMAP/SMTP inboxes with local IP sending',
+        'category' => 'intelligence',
+        'supported_os' => array (
+  0 => 'windows',
+  1 => 'mac',
+  2 => 'linux',
+),
+        'is_featured' => true,
+        'is_active' => true,
+        'runner_component' => 'b2b-prospector',
+        'features' => array (
+  0 => 'Multi-source scraping (LinkedIn/Maps/Web)',
+  1 => 'Unlimited local email verification',
+  2 => 'AI Lead Enrichment & Scoring',
+  3 => 'AI Outreach Sequence Generator',
+  4 => 'Unlimited Inbox Connections',
+  5 => 'Local SQLite Privacy',
+),
+        'requirements' => array (
+  0 => 'Musoftware Runtime Agent running locally',
+  1 => 'Internet connection required',
+),
+        'plans' => [
+            '48e3a0de-67c3-48a0-9bcc-573ea4748bd6' => [
+                'guid' => '48e3a0de-67c3-48a0-9bcc-573ea4748bd6',
+                'name' => 'Prospector',
+                'price_monthly' => 0,
+                'price_yearly' => 0,
+                'is_popular' => false,
+                'features' => array (
+  0 => '10,000 scrapes/day',
+  1 => 'Basic email verification',
+  2 => '3 Connected Inboxes',
+  3 => 'CSV export',
+),
+            ],
+            '2ceadfb7-e5d1-46fc-a246-59436007fd57' => [
+                'guid' => '2ceadfb7-e5d1-46fc-a246-59436007fd57',
+                'name' => 'Enterprise Intelligence',
+                'price_monthly' => 0,
+                'price_yearly' => 0,
+                'is_popular' => true,
+                'features' => array (
+  0 => 'Unlimited scraping limits',
+  1 => 'Advanced AI Enrichment',
+  2 => 'AI Sequence Generation',
+  3 => 'Unlimited Inboxes',
+  4 => 'API Access',
+),
+            ],
+        ],
+        'version' => '2.0.0',
+    ],
+    'cd07ba6f-422d-4e72-86d2-c60a2f5ce0fb' => [
+        'guid' => 'cd07ba6f-422d-4e72-86d2-c60a2f5ce0fb',
+        'title' => 'Competitor Intelligence',
+        'slug' => 'competitor-intel',
+        'short_description' => 'Monitor competitor ads, pricing, and content changes in real time.',
+        'description' => 'Stay ahead of your competition with automated monitoring.
+
+- Track Facebook, TikTok, and Google Ads
+- Price monitoring with alert notifications
+- Website change detection
+- Weekly report generation',
+        'category' => 'monitoring',
+        'supported_os' => array (
+  0 => 'windows',
+  1 => 'mac',
+  2 => 'linux',
+),
+        'is_featured' => true,
+        'is_active' => false,
+        'features' => array (
+  0 => 'Facebook & TikTok Ad spy',
+  1 => 'Price tracking with alerts',
+  2 => 'Website change detection',
+  3 => 'Competitor keyword tracking',
+  4 => 'Automated weekly reports',
+  5 => 'Slack / Email notifications',
+),
+        'requirements' => array (
+  0 => 'Windows 10 / macOS 12 / Ubuntu 20+',
+  1 => '4 GB RAM',
+  2 => 'Internet connection',
+),
+        'plans' => [
+            'bac44854-dbc4-4689-996a-d8cf9593c4be' => [
+                'guid' => 'bac44854-dbc4-4689-996a-d8cf9593c4be',
+                'name' => 'Watcher',
+                'price_monthly' => 0,
+                'price_yearly' => 0,
+                'is_popular' => false,
+                'features' => array (
+  0 => '5 competitors',
+  1 => 'Weekly reports',
+),
+            ],
+            '6f6387c2-ea22-4e80-ad67-547b885500f0' => [
+                'guid' => '6f6387c2-ea22-4e80-ad67-547b885500f0',
+                'name' => 'Hunter',
+                'price_monthly' => 0,
+                'price_yearly' => 0,
+                'is_popular' => true,
+                'features' => array (
+  0 => 'Unlimited competitors',
+  1 => 'Daily reports',
+  2 => 'Slack alerts',
+  3 => 'API access',
+),
+            ],
+        ],
+        'version' => '3.0.1',
+    ],
+    '7a4af7e5-ea44-49af-8dbf-dac14c807120' => [
+        'guid' => '7a4af7e5-ea44-49af-8dbf-dac14c807120',
+        'title' => 'WhatsApp Sender Pro',
+        'slug' => 'whatsapp-sender-pro',
+        'short_description' => 'Enterprise-grade WhatsApp Operations tool supporting multi-session automation, bulk campaigns, and AI auto-replies.',
+        'description' => 'WhatsApp Sender Pro is a complete enterprise operations platform running as a local runtime plugin.
+
+- Multi-session WhatsApp automation with Playwright
+- Bulk messaging and campaign scheduling
+- AI-powered auto-replies using ChatGPT
+- Robust anti-ban logic with human typing simulation and pacing
+- Local SQLite privacy for all contacts and chat logs',
+        'category' => 'automation',
+        'supported_os' => array (
+  0 => 'windows',
+  1 => 'mac',
+  2 => 'linux',
+),
+        'is_featured' => true,
+        'is_active' => true,
+        'runner_component' => 'whatsapp-sender-pro',
+        'features' => array (
+  0 => 'Multi-session management',
+  1 => 'Bulk Campaign Engine',
+  2 => 'AI Auto-Replies (GPT-4)',
+  3 => 'Anti-Ban pacing & stealth mode',
+  4 => 'Local DB storage',
+),
+        'requirements' => array (
+  0 => 'Musoftware Runtime Agent running locally',
+  1 => 'Active WhatsApp account on a mobile device',
+  2 => 'Internet connection',
+),
+        'plans' => [
+            '9a95a2ab-42c7-4a8e-bc47-79b8e3e5470d' => [
+                'guid' => '9a95a2ab-42c7-4a8e-bc47-79b8e3e5470d',
+                'name' => 'Starter',
+                'price_monthly' => 0,
+                'price_yearly' => 0,
+                'is_popular' => false,
+                'features' => array (
+  0 => '1 Connected Number',
+  1 => '1,000 messages/day',
+  2 => 'Basic campaigns',
+),
+            ],
+            'd71b5ed6-e3df-43d5-b14c-333fd4f32d17' => [
+                'guid' => 'd71b5ed6-e3df-43d5-b14c-333fd4f32d17',
+                'name' => 'Enterprise',
+                'price_monthly' => 0,
+                'price_yearly' => 0,
+                'is_popular' => true,
+                'features' => array (
+  0 => 'Unlimited Numbers',
+  1 => 'Unlimited sending limits',
+  2 => 'AI Auto-Reply Engine',
+  3 => 'API Access',
+),
+            ],
+        ],
+        'version' => '1.0.0',
+    ],
+    '9eac08aa-a59a-46b4-859b-588b33810920' => [
+        'guid' => '9eac08aa-a59a-46b4-859b-588b33810920',
+        'title' => 'Viral Autopsy',
+        'slug' => 'viral-autopsy',
+        'short_description' => 'Paste any TikTok URL — get a full breakdown of WHY it went viral with a 0-100 Viral Score.',
+        'description' => 'Viral Autopsy analyzes any TikTok video across 5 dimensions to explain exactly why it performed the way it did.
+
+- Caption & Hook psychology analysis
+- Engagement metrics vs. TikTok benchmarks
+- Sound strategy evaluation
+- Content structure breakdown
+- Posting timing analysis
+- Actionable improvement suggestions
+
+Get a Viral Score (0-100) with detailed per-dimension breakdown.',
+        'category' => 'intelligence',
+        'supported_os' => array (
+  0 => 'windows',
+  1 => 'mac',
+  2 => 'linux',
+),
+        'is_featured' => true,
+        'is_active' => true,
+        'is_free' => true,
+        'runner_component' => 'viral-autopsy',
+        'features' => array (
+  0 => '5-dimension viral analysis',
+  1 => 'Viral Score (0-100)',
+  2 => 'Caption psychology breakdown',
+  3 => 'Engagement benchmarking',
+  4 => 'Sound strategy evaluation',
+  5 => 'Improvement suggestions',
+),
+        'requirements' => array (
+  0 => 'Musoftware Runtime Agent running locally',
+  1 => 'Internet connection',
+),
+        'plans' => [
+            '496bab34-d90e-46d9-b2cc-1779da9ddb62' => [
+                'guid' => '496bab34-d90e-46d9-b2cc-1779da9ddb62',
+                'name' => 'Free',
+                'price_monthly' => 0,
+                'price_yearly' => 0,
+                'is_popular' => false,
+                'features' => array (
+  0 => '3 analyses/day',
+  1 => 'Basic report',
+),
+            ],
+            '25e290eb-7429-4110-8e3b-fba92d9621e4' => [
+                'guid' => '25e290eb-7429-4110-8e3b-fba92d9621e4',
+                'name' => 'Pro',
+                'price_monthly' => 0,
+                'price_yearly' => 0,
+                'is_popular' => true,
+                'features' => array (
+  0 => 'Unlimited analyses',
+  1 => 'Full report + JSON export',
+  2 => 'Priority support',
+),
+            ],
+        ],
+        'version' => '1.0.0',
+    ],
+    'b96bfb82-7726-4d8a-9b38-a4b58a8687c2' => [
+        'guid' => 'b96bfb82-7726-4d8a-9b38-a4b58a8687c2',
+        'title' => 'Hook Analyzer',
+        'slug' => 'hook-analyzer',
+        'short_description' => 'Analyze TikTok hooks — get a Hook Score, pattern detection, and specific suggestions to improve retention.',
+        'description' => 'Hook Analyzer scores the first 3 seconds of any TikTok video using proven hook pattern matching.
+
+- Hook Score (0-100) with grade (S/A/B/C/D/F)
+- Pattern detection (curiosity gap, scroll stopper, POV, etc.)
+- Power word analysis
+- Retention estimation
+- Alternative hook suggestions
+- Batch analysis mode (compare multiple videos)',
+        'category' => 'intelligence',
+        'supported_os' => array (
+  0 => 'windows',
+  1 => 'mac',
+  2 => 'linux',
+),
+        'is_featured' => true,
+        'is_active' => true,
+        'is_free' => true,
+        'runner_component' => 'hook-analyzer',
+        'features' => array (
+  0 => 'Hook Score grading system',
+  1 => '10+ hook pattern recognition',
+  2 => 'Batch analysis mode',
+  3 => 'Power word analysis',
+  4 => 'Alternative hook generator',
+  5 => 'Retention prediction',
+),
+        'requirements' => array (
+  0 => 'Musoftware Runtime Agent running locally',
+  1 => 'Internet connection',
+),
+        'plans' => [
+            '9c7070a2-53e2-490b-9da2-37a1806d3ce5' => [
+                'guid' => '9c7070a2-53e2-490b-9da2-37a1806d3ce5',
+                'name' => 'Free',
+                'price_monthly' => 0,
+                'price_yearly' => 0,
+                'is_popular' => false,
+                'features' => array (
+  0 => '5 analyses/day',
+  1 => 'Single URL mode',
+),
+            ],
+            'df148830-7a9b-4406-bfb7-ddecc6577cfb' => [
+                'guid' => 'df148830-7a9b-4406-bfb7-ddecc6577cfb',
+                'name' => 'Pro',
+                'price_monthly' => 0,
+                'price_yearly' => 0,
+                'is_popular' => true,
+                'features' => array (
+  0 => 'Unlimited analyses',
+  1 => 'Batch mode (10 URLs)',
+  2 => 'JSON export',
+),
+            ],
+        ],
+        'version' => '1.0.0',
+    ],
+    '6212a6ac-477e-4b72-8610-b479a9bc92ac' => [
+        'guid' => '6212a6ac-477e-4b72-8610-b479a9bc92ac',
+        'title' => 'Format DNA Extractor',
+        'slug' => 'format-extractor',
+        'short_description' => 'Extract the viral format blueprint from any TikTok video — reusable hook templates, structure patterns, and sound strategy.',
+        'description' => 'Format DNA Extractor reverse-engineers viral TikTok formats into reusable blueprints.
+
+Not copying content — copying the psychology.
+
+- Hook template with fill-in-the-blank format
+- Content structure detection (6 proven structures)
+- Sound strategy extraction
+- Caption format template
+- Duration recommendation
+- Copyable blueprint for your own content',
+        'category' => 'intelligence',
+        'supported_os' => array (
+  0 => 'windows',
+  1 => 'mac',
+  2 => 'linux',
+),
+        'is_featured' => true,
+        'is_active' => true,
+        'is_free' => true,
+        'runner_component' => 'format-extractor',
+        'features' => array (
+  0 => 'Hook template extraction',
+  1 => '6 content structure patterns',
+  2 => 'Sound strategy analysis',
+  3 => 'Caption format template',
+  4 => 'Copyable text blueprint',
+  5 => 'Niche-aware recommendations',
+),
+        'requirements' => array (
+  0 => 'Musoftware Runtime Agent running locally',
+  1 => 'Internet connection',
+),
+        'plans' => [
+            '5a1e6dfb-4889-4f28-bcce-5d778aa93214' => [
+                'guid' => '5a1e6dfb-4889-4f28-bcce-5d778aa93214',
+                'name' => 'Free',
+                'price_monthly' => 0,
+                'price_yearly' => 0,
+                'is_popular' => false,
+                'features' => array (
+  0 => '3 extractions/day',
+),
+            ],
+            '4640844a-c4cd-4df1-b84f-944c4771d899' => [
+                'guid' => '4640844a-c4cd-4df1-b84f-944c4771d899',
+                'name' => 'Pro',
+                'price_monthly' => 0,
+                'price_yearly' => 0,
+                'is_popular' => true,
+                'features' => array (
+  0 => 'Unlimited extractions',
+  1 => 'Blueprint library (coming soon)',
+),
+            ],
+        ],
+        'version' => '1.0.0',
+    ],
+    'ef4539db-2749-4df3-9dab-2f737a7200c9' => [
+        'guid' => 'ef4539db-2749-4df3-9dab-2f737a7200c9',
+        'title' => 'IPTV Downloader & Recorder',
+        'slug' => 'iptv-downloader',
+        'short_description' => 'A professional-grade operational workspace for loading IPTV playlists, category-browsing channels, and recording live streams or downloading VOD assets locally.',
+        'description' => 'IPTV Downloader & Recorder is a complete live stream capture and playlist management ecosystem running entirely inside your local runtime.
+
+- Load playlists via M3U URL or local file upload
+- Search and filter channels by category or group-title
+- Native, segment-by-segment HLS stream recorder
+- Preset and custom recording duration clocks
+- Live download terminal console and statistics tracking
+- 100% private data kept inside a local SQLite database',
+        'category' => 'Media',
+        'supported_os' => array (
+  0 => 'windows',
+  1 => 'mac',
+  2 => 'linux',
+),
+        'is_featured' => true,
+        'is_active' => true,
+        'is_free' => true,
+        'runner_component' => 'IPTVDownloaderRunner',
+        'features' => array (
+  0 => 'M3U/M3U8 Playlist Indexer',
+  1 => 'Category-based Channel Browser',
+  2 => 'Native Segment-by-segment HLS Recorder',
+  3 => 'Direct VOD Asset Downloader',
+  4 => 'Real-time Download Console & Speedometer',
+  5 => 'Private SQLite Storage Layer',
+),
+        'requirements' => array (
+  0 => 'Musoftware Runtime Agent running locally',
+  1 => 'Internet connection',
+),
+        'plans' => [
+            'e4feca57-36c8-4152-b243-39c44063c6f3' => [
+                'guid' => 'e4feca57-36c8-4152-b243-39c44063c6f3',
+                'name' => 'Free Live Stream Capture',
+                'price_monthly' => 0,
+                'price_yearly' => 0,
+                'is_popular' => true,
+                'features' => array (
+  0 => 'Unlimited Playlist Indexing',
+  1 => 'Channel Browsing & Bookmarks',
+  2 => 'Standard HLS Stream Recording',
+  3 => 'Local Download Archive',
+),
+            ],
+        ],
+        'version' => '1.0.0',
+    ],
+    '50dc5bff-8c85-423c-9d65-f66648c66e46' => [
+        'guid' => '50dc5bff-8c85-423c-9d65-f66648c66e46',
+        'title' => 'Screenshot Feedback Workspace',
+        'slug' => 'screenshot-feedback',
+        'short_description' => 'A clean, operational workspace for UI review, feedback pins, and screenshot organization.',
+        'description' => 'Screenshot Feedback Workspace is a visual review tool that lets you drop pin-based comments directly on design screenshots.
+
+- Upload and organize screenshots by project
+- Place precise feedback pins on visual assets
+- Filter comment threads by Open, Resolved, or All
+- Sync issues in real time with local SQLite storage',
+        'category' => 'Productivity',
+        'supported_os' => array (
+  0 => 'windows',
+  1 => 'mac',
+  2 => 'linux',
+),
+        'is_featured' => true,
+        'is_active' => true,
+        'is_free' => true,
+        'runner_component' => 'ScreenshotFeedbackRunner',
+        'features' => array (
+  0 => 'Interactive Annotator Canvas',
+  1 => 'Precision coordinate pinning',
+  2 => 'Comment thread status filtering (Open/Resolved)',
+  3 => 'Synced workspace timelines',
+  4 => 'Local private SQLite storage',
+),
+        'requirements' => array (
+  0 => 'Musoftware Runtime Agent running locally',
+  1 => 'Internet connection',
+),
+        'plans' => [
+            '1b25fd48-2ec8-49da-b3c2-ef153b4088be' => [
+                'guid' => '1b25fd48-2ec8-49da-b3c2-ef153b4088be',
+                'name' => 'Free Reviewer',
+                'price_monthly' => 0,
+                'price_yearly' => 0,
+                'is_popular' => true,
+                'features' => array (
+  0 => 'Unlimited Pins',
+  1 => 'Interactive Canvas popovers',
+  2 => 'Sidebar Status filters',
+  3 => 'Offline-first SQLite DB',
+),
+            ],
+        ],
+        'version' => '1.0.0',
+    ],
+    '2d142935-58f5-4bc3-bfce-d0e1af658e32' => [
+        'guid' => '2d142935-58f5-4bc3-bfce-d0e1af658e32',
+        'title' => 'OpenSooq Lead Extractor',
+        'slug' => 'opensooq',
+        'short_description' => 'Extract real buyer and seller leads from OpenSooq listings — by keyword, category, and country.',
+        'description' => 'OpenSooq Lead Extractor mines verified leads from OpenSooq.com, the largest classifieds marketplace in the Arab world.
+
+- Search any category, keyword, or country
+- Extract contact details, listing data, and phone numbers
+- Enrich leads with source, title, and region
+- Export to CSV or push directly into your CRM
+- 100% local execution — no cloud API costs',
+        'category' => 'intelligence',
+        'supported_os' => array (
+  0 => 'windows',
+  1 => 'mac',
+  2 => 'linux',
+),
+        'is_featured' => true,
+        'is_active' => true,
+        'is_free' => true,
+        'runner_component' => 'opensooq',
+        'features' => array (
+  0 => 'Keyword & category search',
+  1 => 'Phone number extraction',
+  2 => 'Multi-country targeting',
+  3 => 'CRM-ready CSV export',
+  4 => 'Local SQLite storage',
+  5 => 'Anti-detection pacing',
+),
+        'requirements' => array (
+  0 => 'Musoftware Runtime Agent running locally',
+  1 => 'Internet connection',
+),
+        'plans' => [
+            '8107329a-d69b-4c9a-9ecb-a41fd56bbc60' => [
+                'guid' => '8107329a-d69b-4c9a-9ecb-a41fd56bbc60',
+                'name' => 'Free',
+                'price_monthly' => 0,
+                'price_yearly' => 0,
+                'is_popular' => true,
+                'features' => array (
+  0 => 'Unlimited extractions',
+  1 => 'CSV export',
+  2 => 'Multi-country support',
+),
+            ],
+        ],
+        'version' => '1.0.0',
+    ],
+];
