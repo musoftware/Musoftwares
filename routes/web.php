@@ -314,6 +314,22 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
         Route::post('/{tool}/upload-version', [\App\Http\Controllers\Admin\Tools\AdminToolController::class, 'uploadVersion'])->name('upload-version');
     });
 
+    // ── Reseller Management ────────────────────────────────────────────────────
+    Route::prefix('resellers')->name('resellers.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\Tools\AdminResellerController::class, 'index'])->name('index');
+        Route::get('/create', [\App\Http\Controllers\Admin\Tools\AdminResellerController::class, 'create'])->name('create');
+        Route::post('/', [\App\Http\Controllers\Admin\Tools\AdminResellerController::class, 'store'])->name('store');
+        Route::get('/search-users', [\App\Http\Controllers\Admin\Tools\AdminResellerController::class, 'searchUsers'])->name('search-users');
+        Route::get('/{id}', [\App\Http\Controllers\Admin\Tools\AdminResellerController::class, 'show'])->name('show');
+        Route::put('/{id}', [\App\Http\Controllers\Admin\Tools\AdminResellerController::class, 'update'])->name('update');
+        Route::delete('/{id}', [\App\Http\Controllers\Admin\Tools\AdminResellerController::class, 'destroy'])->name('destroy');
+        Route::post('/{id}/balance', [\App\Http\Controllers\Admin\Tools\AdminResellerController::class, 'adjustBalance'])->name('balance');
+        Route::post('/{resellerId}/users/{userId}/suspend', [\App\Http\Controllers\Admin\Tools\AdminResellerController::class, 'suspendUser'])->name('users.suspend');
+        Route::post('/{resellerId}/users/{userId}/activate', [\App\Http\Controllers\Admin\Tools\AdminResellerController::class, 'activateUser'])->name('users.activate');
+        Route::post('/{resellerId}/users/{userId}/clear-flag', [\App\Http\Controllers\Admin\Tools\AdminResellerController::class, 'clearSharingFlag'])->name('users.clear-flag');
+        Route::post('/{resellerId}/users/{userId}/toggle-check', [\App\Http\Controllers\Admin\Tools\AdminResellerController::class, 'toggleSharingCheck'])->name('users.toggle-check');
+    });
+
     // ERP Oversight Admin Routes
     Route::prefix('erp')->name('erp.')->group(function () {
         Route::get('/', [\Modules\ERP\Http\Controllers\Admin\ERPAdminController::class, 'index'])->name('index');
@@ -326,6 +342,13 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/admin/stop-impersonating', [\App\Http\Controllers\ImpersonateController::class, 'stopImpersonating'])->name('admin.stop-impersonate');
 });
+
+// ── Reseller Portal (public, iframe-embeddable) ───────────────────────────────
+// No auth middleware here — the portal itself decides whether to show login or tools.
+// X-Frame-Options is set to ALLOWALL for this route via a response header.
+Route::get('/reseller/{token}', [\Modules\Tools\Http\Controllers\ResellerPortalController::class, 'show'])
+    ->name('reseller.portal')
+    ->withoutMiddleware([\Illuminate\Http\Middleware\FrameGuard::class]);
 
 
 

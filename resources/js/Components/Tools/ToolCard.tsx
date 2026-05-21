@@ -81,7 +81,7 @@ export function ToolCard({ tool, isSubscribed = false }: ToolCardProps) {
                     <span className="w-1 h-1 rounded-full bg-slate-200" />
                     <span className={`flex items-center gap-1 text-slate-400`}>
                         <Users className="h-3 w-3" />
-                        {tool.active_users.toLocaleString()}
+                        {(tool.active_users || 0).toLocaleString()}
                     </span>
                 </div>
             </div>

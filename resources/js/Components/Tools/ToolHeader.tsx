@@ -89,7 +89,7 @@ export function ToolHeader({ tool, isSubscribed }: ToolHeaderProps) {
                     <div className="flex items-center gap-4 mt-3 text-xs text-slate-400">
                         <span className="flex items-center gap-1">
                             <Users className="h-4 w-4" />
-                            {tool.active_users.toLocaleString()} active users
+                            {(tool.active_users || 0).toLocaleString()} active users
                         </span>
                     </div>
                 </div>
