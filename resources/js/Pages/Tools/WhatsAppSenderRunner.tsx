@@ -5,6 +5,9 @@ import AccountsWorkspace from './WhatsApp/Workspaces/AccountsWorkspace';
 import CampaignWorkspace from './WhatsApp/Workspaces/CampaignWorkspace';
 import DeliverabilityWorkspace from './WhatsApp/Workspaces/DeliverabilityWorkspace';
 import ScorecardWorkspace from './WhatsApp/Workspaces/ScorecardWorkspace';
+import GroupsWorkspace from './WhatsApp/Workspaces/GroupsWorkspace';
+import CampaignsListWorkspace from './WhatsApp/Workspaces/CampaignsListWorkspace';
+import CampaignReportWorkspace from './WhatsApp/Workspaces/CampaignReportWorkspace';
 
 // Nested translation structure for cleaner workspace integration
 const translations = {
@@ -260,12 +263,14 @@ function useRuntimeWS(pluginSlug: string, onBroadcast?: ((event: string, data: a
 
 export default function WhatsAppSenderRunner({ tool, subscription, runtimePort, pluginSlug }: any) {
     const [locale, setLocale] = useState<'en' | 'ar'>('en');
-    const [activeTab, setActiveTab] = useState<'accounts' | 'campaign' | 'deliverability' | 'scorecard'>('accounts');
+    const [activeTab, setActiveTab] = useState<'accounts' | 'campaign' | 'groups' | 'history' | 'report'>('accounts');
+    const [reportCampaignId, setReportCampaignId] = useState<string | null>(null);
+    const [reportCampaignName, setReportCampaignName] = useState<string | null>(null);
 
     const [sessions, setSessions] = useState<any[]>([]);
     const [newAccountId, setNewAccountId] = useState('');
     const [newProxy, setNewProxy] = useState('');
-    const [newHeadless, setNewHeadless] = useState(false);
+    const [newHeadless, setNewHeadless] = useState(true);
     
     const [activeQR, setActiveQR] = useState<string | null>(null);
     const [qrSessionId, setQrSessionId] = useState<string | null>(null);
@@ -361,7 +366,7 @@ export default function WhatsAppSenderRunner({ tool, subscription, runtimePort, 
         if (event === 'whatsapp.campaign.completed' && data.campaignId === runningCampaignIdRef.current) {
             setIsCampaignRunning(false);
             setCampaignResult(data);
-            setActiveTab('scorecard');
+            setActiveTab('history');
         }
     };
 
@@ -457,7 +462,7 @@ export default function WhatsAppSenderRunner({ tool, subscription, runtimePort, 
 
         const campId = `campaign-${Date.now()}`;
         runningCampaignIdRef.current = campId;
-        setActiveTab('deliverability');
+        setActiveTab('history');
 
         try {
             const host = typeof window !== 'undefined' ? (window.localStorage.getItem('musoftware_runtime_host') || '127.0.0.1') : '127.0.0.1';
@@ -598,20 +603,34 @@ export default function WhatsAppSenderRunner({ tool, subscription, runtimePort, 
                 />
             )}
 
-            {activeTab === 'deliverability' && (
-                <DeliverabilityWorkspace 
+            {activeTab === 'groups' && (
+                <GroupsWorkspace 
                     t={t}
-                    isCampaignRunning={isCampaignRunning}
-                    handleStopCampaign={handleStopCampaign}
-                    campaignProgress={campaignProgress}
-                    deliverabilityGrid={deliverabilityGrid}
+                    callRPC={callRPC}
+                    selectedAccount={selectedAccount}
+                    sessions={sessions}
                 />
             )}
 
-            {activeTab === 'scorecard' && campaignResult && (
-                <ScorecardWorkspace 
+            {activeTab === 'history' && (
+                <CampaignsListWorkspace 
                     t={t}
-                    campaignResult={campaignResult}
+                    callRPC={callRPC}
+                    onViewReport={(id: string, name: string) => {
+                        setReportCampaignId(id);
+                        setReportCampaignName(name);
+                        setActiveTab('report');
+                    }}
+                />
+            )}
+
+            {activeTab === 'report' && reportCampaignId && (
+                <CampaignReportWorkspace 
+                    t={t}
+                    callRPC={callRPC}
+                    campaignId={reportCampaignId}
+                    campaignName={reportCampaignName}
+                    onBack={() => setActiveTab('history')}
                 />
             )}
         </ToolShellLayout>

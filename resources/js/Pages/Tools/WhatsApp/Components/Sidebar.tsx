@@ -5,8 +5,8 @@ import {
 } from 'lucide-react';
 
 interface SidebarProps {
-    activeTab: 'accounts' | 'campaign' | 'deliverability' | 'scorecard';
-    setActiveTab: (tab: 'accounts' | 'campaign' | 'deliverability' | 'scorecard') => void;
+    activeTab: 'accounts' | 'campaign' | 'groups' | 'history' | 'report';
+    setActiveTab: (tab: 'accounts' | 'campaign' | 'groups' | 'history' | 'report') => void;
     locale: 'en' | 'ar';
     setLocale: (locale: 'en' | 'ar') => void;
     daemonConnected: boolean;
@@ -68,32 +68,28 @@ export default function Sidebar({
                         <span>{t.tabs.campaign}</span>
                     </button>
                     <button 
-                        onClick={() => setActiveTab('deliverability')}
+                        onClick={() => setActiveTab('groups')}
                         className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all ${
-                            activeTab === 'deliverability' 
+                            activeTab === 'groups' 
+                                ? 'bg-teal-50 text-teal-700 border border-teal-100' 
+                                : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'
+                        }`}
+                    >
+                        <Users className="w-4 h-4" />
+                        <span>Groups</span>
+                    </button>
+                    <button 
+                        onClick={() => setActiveTab('history')}
+                        className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all ${
+                            activeTab === 'history' 
                                 ? 'bg-teal-50 text-teal-700 border border-teal-100' 
                                 : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'
                         }`}
                     >
                         <LayoutDashboard className="w-4 h-4" />
-                        <span>{t.tabs.deliverability}</span>
-                        {isCampaignRunning && (
-                            <span className="w-2 h-2 rounded-full bg-amber-500 animate-ping ml-auto" />
-                        )}
+                        <span>History & Reports</span>
                     </button>
-                    {hasResult && (
-                        <button 
-                            onClick={() => setActiveTab('scorecard')}
-                            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all ${
-                                activeTab === 'scorecard' 
-                                    ? 'bg-teal-50 text-teal-700 border border-teal-100' 
-                                    : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'
-                            }`}
-                        >
-                            <ShieldAlert className="w-4 h-4" />
-                            <span>{t.tabs.scorecard}</span>
-                        </button>
-                    )}
+
                 </nav>
 
                 <div className="p-4 border-t border-slate-100">
@@ -132,30 +128,27 @@ export default function Sidebar({
                     <span className="text-[9px] mt-0.5 font-bold truncate w-full text-center">{t.tabs.campaign}</span>
                 </button>
                 <button 
-                    onClick={() => setActiveTab('deliverability')}
+                    onClick={() => setActiveTab('groups')}
                     className={`flex flex-col items-center justify-center w-[72px] h-14 rounded-xl transition-all relative ${
-                        activeTab === 'deliverability' ? 'text-teal-600' : 'text-slate-400 hover:text-slate-600'
+                        activeTab === 'groups' ? 'text-teal-600' : 'text-slate-400 hover:text-slate-600'
                     }`}
                 >
-                    <div className={`p-1.5 rounded-lg transition-colors ${activeTab === 'deliverability' ? 'bg-teal-50' : ''}`}>
-                        <LayoutDashboard className={`w-5 h-5 ${activeTab === 'deliverability' ? 'scale-110' : ''} transition-transform`} />
-                        {isCampaignRunning && (
-                            <span className="absolute top-1.5 right-4 w-2 h-2 rounded-full bg-amber-500 animate-ping" />
-                        )}
+                    <div className={`p-1.5 rounded-lg transition-colors ${activeTab === 'groups' ? 'bg-teal-50' : ''}`}>
+                        <Users className={`w-5 h-5 ${activeTab === 'groups' ? 'scale-110' : ''} transition-transform`} />
                     </div>
-                    <span className="text-[9px] mt-0.5 font-bold truncate w-full text-center">{t.tabs.deliverability}</span>
+                    <span className="text-[9px] mt-0.5 font-bold truncate w-full text-center">Groups</span>
                 </button>
                 {hasResult && (
                     <button 
-                        onClick={() => setActiveTab('scorecard')}
+                        onClick={() => setActiveTab('history')}
                         className={`flex flex-col items-center justify-center w-[72px] h-14 rounded-xl transition-all ${
-                            activeTab === 'scorecard' ? 'text-teal-600' : 'text-slate-400 hover:text-slate-600'
+                            activeTab === 'history' ? 'text-teal-600' : 'text-slate-400 hover:text-slate-600'
                         }`}
                     >
-                        <div className={`p-1.5 rounded-lg transition-colors ${activeTab === 'scorecard' ? 'bg-teal-50' : ''}`}>
-                            <ShieldAlert className={`w-5 h-5 ${activeTab === 'scorecard' ? 'scale-110' : ''} transition-transform`} />
+                        <div className={`p-1.5 rounded-lg transition-colors ${activeTab === 'history' ? 'bg-teal-50' : ''}`}>
+                            <LayoutDashboard className={`w-5 h-5 ${activeTab === 'history' ? 'scale-110' : ''} transition-transform`} />
                         </div>
-                        <span className="text-[9px] mt-0.5 font-bold truncate w-full text-center">{t.tabs.scorecard}</span>
+                        <span className="text-[9px] mt-0.5 font-bold truncate w-full text-center">History</span>
                     </button>
                 )}
             </div>
