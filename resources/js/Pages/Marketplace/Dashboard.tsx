@@ -23,6 +23,7 @@ import { MetricCard } from '@/Components/ui/MetricCard';
 import { OperationalCard } from '@/Components/ui/OperationalCard';
 import { EmptyState } from '@/Components/ui/EmptyState';
 import { StatusBadge } from '@/Components/ui/StatusBadge';
+import { useMarketplaceMode } from '@/Components/Marketplace/MarketplaceModeContext';
 
 export default function MarketplaceDashboard({
     stats: initialStats,
@@ -32,6 +33,10 @@ export default function MarketplaceDashboard({
     categories = []
 }: any) {
     const [selectedService, setSelectedService] = useState<any>(null);
+
+    const marketplaceModeContext = useMarketplaceMode();
+    const mode = marketplaceModeContext?.mode || 'client';
+    const isClient = mode === 'client';
 
     const stats = initialStats || {
         lockedEscrow: 0,
@@ -47,7 +52,7 @@ export default function MarketplaceDashboard({
     const menuItems = [
         { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, href: '/marketplace', isActive: true },
         { id: 'services', label: 'Services', icon: Layers, href: '/marketplace/services', isActive: false },
-        { id: 'orders', label: 'Orders', icon: Clock, href: '/marketplace/orders', isActive: false },
+        { id: 'orders', label: 'Orders', icon: Clock, href: mode === 'seller' ? '/marketplace/orders?tab=sales' : '/marketplace/orders', isActive: false },
     ];
 
     return (
@@ -104,7 +109,8 @@ export default function MarketplaceDashboard({
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     <div className="lg:col-span-2 space-y-8">
-                        <OperationalCard title="Active Orders (As Seller)" description="Manage deliverables and track milestones for your clients." noPadding>
+                        {!isClient && (
+                            <OperationalCard title="Active Orders (As Seller)" description="Manage deliverables and track milestones for your clients." noPadding>
                             <div className="divide-y divide-slate-100">
                                 {activeSales.map((sale: any) => (
                                     <div key={sale.id} className="p-4 hover:bg-slate-50/50 transition flex items-center justify-between">
@@ -137,7 +143,9 @@ export default function MarketplaceDashboard({
                                 )}
                             </div>
                         </OperationalCard>
+                        )}
 
+                        {isClient && (
                         <OperationalCard title="My Purchases (As Buyer)" description="Track deliverables, files, and review services you bought." noPadding>
                             <div className="divide-y divide-slate-100">
                                 {activePurchases.map((purchase: any) => (
@@ -171,7 +179,9 @@ export default function MarketplaceDashboard({
                                 )}
                             </div>
                         </OperationalCard>
+                        )}
 
+                        {!isClient && (
                         <OperationalCard title="My Service Catalog" description="Your publicly visible services and customized package offerings." noPadding>
                             <div className="divide-y divide-slate-100">
                                 {listedGigs.map((gig: any) => (
@@ -206,6 +216,7 @@ export default function MarketplaceDashboard({
                                 )}
                             </div>
                         </OperationalCard>
+                        )}
                     </div>
 
                     <div className="space-y-6">
@@ -228,7 +239,7 @@ export default function MarketplaceDashboard({
                                     <ArrowUpRight className="h-3.5 w-3.5 text-slate-400 group-hover:text-slate-600 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
                                 </Link>
 
-                                <Link href="/marketplace/orders" className="flex items-center justify-between p-2.5 rounded-lg border border-slate-200 hover:border-slate-300 hover:bg-slate-50 text-slate-900 transition group text-sm font-medium bg-white">
+                                <Link href={mode === 'seller' ? "/marketplace/orders?tab=sales" : "/marketplace/orders"} className="flex items-center justify-between p-2.5 rounded-lg border border-slate-200 hover:border-slate-300 hover:bg-slate-50 text-slate-900 transition group text-sm font-medium bg-white">
                                     <span className="flex items-center gap-2">
                                         <Clock className="h-4 w-4 text-slate-400 group-hover:text-slate-600" /> Order History
                                     </span>
