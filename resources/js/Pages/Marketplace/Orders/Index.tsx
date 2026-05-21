@@ -2,8 +2,32 @@ import { StatusBadge } from '@/Components/ui/StatusBadge';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link, router } from '@inertiajs/react';
 
+import { useEffect } from 'react';
+import { useMarketplaceMode } from '@/Components/Marketplace/MarketplaceModeContext';
+
 export default function Index({ orders, tab }: any) {
+    const { mode, setMode } = useMarketplaceMode();
+
+    useEffect(() => {
+        // Sync context mode with current tab
+        if (tab === 'sales' && mode !== 'seller') {
+            setMode('seller');
+        } else if (tab === 'purchases' && mode !== 'client') {
+            setMode('client');
+        }
+    }, [tab]);
+
+    useEffect(() => {
+        // If mode changes via header toggle, reload the page with correct tab
+        if (mode === 'seller' && tab !== 'sales') {
+            router.get(route('marketplace.orders.index'), { tab: 'sales' }, { preserveState: true });
+        } else if (mode === 'client' && tab === 'sales') {
+            router.get(route('marketplace.orders.index'), { tab: 'purchases' }, { preserveState: true });
+        }
+    }, [mode]);
+
     const handleTabChange = (newTab: string) => {
+        setMode(newTab === 'sales' ? 'seller' : 'client');
         router.get(
             route('marketplace.orders.index'),
             { tab: newTab },

@@ -91,4 +91,121 @@ class PlatformInvoice extends Model
     {
         return $this->hasMany(PlatformInvoiceItem::class, 'invoice_id');
     }
+
+    /**
+     * Mark the invoice as paid manually.
+     */
+    public function markAsPaid()
+    {
+        if ($this->status === 'paid') {
+            return;
+        }
+
+        $this->paid_amount = $this->amount;
+        $this->status = 'paid';
+        $this->paid_at = now();
+        $this->save();
+
+        // Create received and used transactions to record the direct payment
+        PlatformTransaction::addBalance(
+            $this->user_id,
+            $this->amount,
+            'Payment received for Platform Invoice #' . $this->invoice_number,
+            'received',
+            $this->currency,
+            $this->id
+        );
+        PlatformTransaction::addBalance(
+            $this->user_id,
+            -1 * $this->amount,
+            'Payment applied to Platform Invoice #' . $this->invoice_number,
+            'used',
+            $this->currency,
+            $this->id
+        );
+    }
+
+    /**
+     * Bill the invoice (pay it using the user's wallet balance).
+     */
+    public function billInvoice()
+    {
+        if ($this->status === 'paid') {
+            return;
+        }
+
+        $unpaid = $this->remaining;
+        if ($unpaid <= 0) {
+            return;
+        }
+
+        // Deduct from wallet balance
+        PlatformTransaction::addBalance(
+            $this->user_id,
+            -1 * $unpaid,
+            'Paid Platform Invoice #' . $this->invoice_number,
+            'used',
+            $this->currency,
+            $this->id
+        );
+
+        $this->paid_amount = $this->amount;
+        $this->status = 'paid';
+        $this->paid_at = now();
+        $this->save();
+    }
+
+    /**
+     * Partially bill the invoice using wallet balance.
+     */
+    public function partiallyBillInvoice($paidAmount)
+    {
+        if ($this->status === 'paid' || $paidAmount <= 0) {
+            return;
+        }
+
+        $remaining = $this->remaining;
+        $actualPaid = min($paidAmount, $remaining);
+
+        // Deduct from wallet balance
+        PlatformTransaction::addBalance(
+            $this->user_id,
+            -1 * $actualPaid,
+            'Partially Paid Platform Invoice #' . $this->invoice_number,
+            'used',
+            $this->currency,
+            $this->id
+        );
+
+        $this->paid_amount += $actualPaid;
+        if ($this->remaining <= 0) {
+            $this->status = 'paid';
+            $this->paid_at = now();
+        } else {
+            $this->status = 'partially_paid';
+        }
+        $this->save();
+    }
+
+    /**
+     * Cancel the invoice and refund any paid amounts back to the user's wallet.
+     */
+    public function cancelInvoice()
+    {
+        if (in_array($this->status, ['paid', 'partially_paid']) && $this->paid_amount > 0) {
+            PlatformTransaction::addBalance(
+                $this->user_id,
+                $this->paid_amount,
+                'Refund for Cancelled Platform Invoice #' . $this->invoice_number,
+                'refunded',
+                $this->currency,
+                $this->id
+            );
+            
+            $this->paid_amount = 0;
+        }
+        
+        $this->status = 'cancelled';
+        $this->save();
+    }
 }

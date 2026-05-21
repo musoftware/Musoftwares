@@ -26,6 +26,7 @@ import CommandPalette from '@/Components/CommandPalette';
 import ProductTourModal from '@/Components/ProductTourModal';
 import axios from 'axios';
 import FreelanceModeToggle from '@/Components/Freelance/FreelanceModeToggle';
+import MarketplaceModeToggle from '@/Components/Marketplace/MarketplaceModeToggle';
 
 export default function Authenticated(props: PropsWithChildren<{ header?: ReactNode }>) {
     return (
@@ -453,6 +454,11 @@ function AuthenticatedContent({
                             {isFreelanceActive && (
                                 <div className="mr-1 sm:mr-2">
                                     <FreelanceModeToggle />
+                                </div>
+                            )}
+                            {isMarketplaceActive && (
+                                <div className="mr-1 sm:mr-2">
+                                    <MarketplaceModeToggle />
                                 </div>
                             )}
                             {!auth?.team_member && (
