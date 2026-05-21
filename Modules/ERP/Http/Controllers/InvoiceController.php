@@ -40,8 +40,7 @@ class InvoiceController extends Controller
     public function index(Request $request)
     {
         $tenant = $this->resolveTenant();
-
-        $query = Invoice::with('client')->where('tenant_id', $tenant->id);
+        $query = Invoice::with(['tenantClient', 'platformClient'])->where('tenant_id', $tenant->id);
 
         if ($request->filled('search')) {
             $query->where(function($q) use ($request) {

@@ -13,10 +13,11 @@ This skill automatically applies when you are:
 - Styling pages or tweaking layouts.
 - Reviewing UX consistency.
 
-## 1. The Shadcn Mandate
-- Musoftware uses **Shadcn UI** exclusively as the base component library.
+## 1. The Shadcn Mandate (STRICT RULE)
+- **Shadcn UI ONLY**: You MUST use Shadcn components (Card, Button, Input, Table, Badge, etc.) everywhere across the entire application and all tools. Do NOT build custom UI components with raw Tailwind classes (like `bg-white rounded-xl shadow-md` or custom form elements).
+- **Refactor Raw Tailwind**: If a UI element needs to be built (e.g., a card, a button, an input, a switch), you MUST use the corresponding Shadcn component. Refactor any existing raw Tailwind components into Shadcn components.
 - **No Ad-hoc Components**: Use the Shadcn dropdown, not a raw `div` with Tailwind.
-- **Tokens over Hardcodes**: Rely on Tailwind's configuration (`primary`, `muted`, `accent`). Ensure Dark Mode works flawlessly.
+- **Tokens over Hardcodes**: Rely on Tailwind's configuration (`bg-background`, `text-foreground`, `primary`, `muted`, `accent`). Ensure Dark Mode works flawlessly.
 
 ## 2. Component Philosophy
 Components must be: **reusable, calm, compact, and obvious.**

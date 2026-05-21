@@ -9,6 +9,7 @@ import { PricingPanel } from '@/Components/Tools/PricingPanel';
 import { DownloadPanel } from '@/Components/Tools/DownloadPanel';
 import { PlatformBadges } from '@/Components/Tools/PlatformBadge';
 import { Cpu } from 'lucide-react';
+import { Card } from '@/Components/ui/card';
 
 interface PricingPlan {
     id: number; name: string; price_monthly: number; price_yearly: number;
@@ -136,33 +137,33 @@ export default function Show({ tool, userSubscription, userLicense }: Props) {
 
                         {/* Pricing panel (not subscribed) */}
                         {!isSubscribed && (tool.pricing_plans ?? []).length > 0 && (
-                            <div className="bg-white border border-slate-200 rounded-xl p-5">
+                            <Card className="p-5">
                                 <PricingPanel
                                     plans={tool.pricing_plans}
                                     toolSlug={tool.slug}
                                     isAuthed={isAuthed}
                                 />
-                            </div>
+                            </Card>
                         )}
 
                         {/* Info meta card */}
-                        <div className="bg-white border border-slate-200 rounded-xl p-4 space-y-3">
-                            <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Details</p>
+                        <Card className="p-4 space-y-3">
+                            <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Details</p>
                             <div className="space-y-2">
                                 <div className="flex justify-between text-xs">
-                                    <span className="text-slate-500">Version</span>
-                                    <code className="font-mono text-slate-700 font-medium">v{tool.current_version}</code>
+                                    <span className="text-muted-foreground">Version</span>
+                                    <code className="font-mono text-foreground font-medium">v{tool.current_version}</code>
                                 </div>
                                 <div className="flex justify-between text-xs">
-                                    <span className="text-slate-500">Category</span>
-                                    <span className="text-slate-700 capitalize">{tool.category_label}</span>
+                                    <span className="text-muted-foreground">Category</span>
+                                    <span className="text-foreground capitalize">{tool.category_label}</span>
                                 </div>
                                 <div className="flex justify-between text-xs">
-                                    <span className="text-slate-500">Downloads</span>
-                                    <span className="text-slate-700 font-medium">{tool.download_count.toLocaleString()}</span>
+                                    <span className="text-muted-foreground">Downloads</span>
+                                    <span className="text-foreground font-medium">{tool.download_count.toLocaleString()}</span>
                                 </div>
                             </div>
-                        </div>
+                        </Card>
                     </div>
                 </div>
             </div>

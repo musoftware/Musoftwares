@@ -22,7 +22,8 @@ This skill automatically applies when you are:
 - **Typography**: Inter font.
 
 > [!CAUTION]
-> **No Custom CSS/Component Bloat.** Do not build custom UI components from scratch if a Shadcn component exists for that purpose. Always use the established Shadcn library components to guarantee visual consistency.
+> **STRICT SHADCN-ONLY POLICY:** You MUST use Shadcn components (Card, Button, Input, Table, Badge, etc.) everywhere across the entire application and all tools. Do NOT build custom UI components with raw Tailwind classes (like `bg-white rounded-xl shadow-md` or custom form elements).
+> If a UI element needs to be built (e.g., a card, a button, an input, a switch), you MUST use the corresponding Shadcn component. Refactor any existing raw Tailwind components into Shadcn components.
 
 ## 2. Website UI Philosophy (CRITICAL)
 Inspired by Apple, Linear, Raycast, Notion, Stripe, and Arc Browser, the UI should feel: **minimal, intentional, obvious, soft, premium, and focused.**

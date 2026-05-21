@@ -86,7 +86,7 @@ class ERPDashboardController extends Controller
         // ── Real Invoice List ─────────────────────────────────────
         $invoices = collect();
         if ($tenantId) {
-            $invoices = Invoice::with('client')
+            $invoices = Invoice::with(['tenantClient', 'platformClient'])
                 ->where('tenant_id', $tenantId)
                 ->whereIn('status', ['draft', 'sent', 'partial'])
                 ->latest()
@@ -190,7 +190,7 @@ class ERPDashboardController extends Controller
         // ── Real Projects List ─────────────────────────────────────
         $projects = collect();
         if ($tenantId) {
-            $projects = Project::with('client')
+            $projects = Project::with(['tenantClient', 'platformClient'])
                 ->where('tenant_id', $tenantId)
                 ->latest()
                 ->limit(10)
@@ -213,7 +213,7 @@ class ERPDashboardController extends Controller
         // ── Real Support Tickets ──────────────────────────────────
         $supportTickets = collect();
         if ($tenantId) {
-            $supportTickets = SupportTicket::with('client')
+            $supportTickets = SupportTicket::with(['tenantClient', 'platformClient'])
                 ->where('tenant_id', $tenantId)
                 ->latest()
                 ->limit(10)

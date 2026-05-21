@@ -3,6 +3,7 @@ import { Head, Link, router } from '@inertiajs/react';
 import ToolsPublicLayout from '@/Layouts/ToolsPublicLayout';
 import { Button } from '@/Components/ui/button';
 import { Badge } from '@/Components/ui/badge';
+import { Card } from '@/Components/ui/card';
 import { ExternalLink, Key, Copy, Check, Monitor, Smartphone, ShoppingBag } from 'lucide-react';
 
 interface License {
@@ -41,35 +42,35 @@ export default function MyLicenses({ licenses }: Props) {
                 </div>
 
                 {licenses.length === 0 ? (
-                    <div className="text-center py-14 bg-white border border-slate-200 rounded-xl">
-                        <div className="w-12 h-12 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center mx-auto mb-3">
-                            <Key className="h-6 w-6 text-slate-300" />
+                    <Card className="text-center py-14">
+                        <div className="w-12 h-12 rounded-2xl bg-secondary flex items-center justify-center mx-auto mb-3">
+                            <Key className="h-6 w-6 text-muted-foreground" />
                         </div>
-                        <p className="text-sm font-semibold text-slate-700">No licenses yet</p>
-                        <p className="text-xs text-slate-400 mt-1 mb-4">Subscribe to a tool to receive your license key.</p>
+                        <p className="text-sm font-semibold">No licenses yet</p>
+                        <p className="text-xs text-muted-foreground mt-1 mb-4">Subscribe to a tool to receive your license key.</p>
                         
                         <Link href={route('tools.marketplace.index')}>
-                            <Button className="bg-slate-900 text-white hover:bg-slate-800 gap-2 h-9 text-xs">
+                            <Button className="gap-2 h-9 text-xs">
                                 <ShoppingBag className="h-4 w-4" /> Browse Tools
                             </Button>
                         </Link>
-                    </div>
+                    </Card>
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {licenses.map(lic => {
                             return (
-                                <div key={lic.id} className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow relative group">
+                                <Card key={lic.id} className="overflow-hidden hover:shadow-md transition-shadow relative group">
                                     <div className="p-5">
                                         <div className="flex justify-between items-start mb-4">
-                                            <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center shrink-0">
-                                                {lic.tool.icon_url ? <img src={lic.tool.icon_url} className="w-6 h-6 object-contain" alt="" /> : <Key className="h-5 w-5 text-slate-400" />}
+                                            <div className="w-10 h-10 rounded-xl bg-secondary flex items-center justify-center shrink-0">
+                                                {lic.tool.icon_url ? <img src={lic.tool.icon_url} className="w-6 h-6 object-contain" alt="" /> : <Key className="h-5 w-5 text-muted-foreground" />}
                                             </div>
                                             <Badge variant="secondary" className={STATUS_STYLE[lic.status] || ''}>
                                                 {lic.status}
                                             </Badge>
                                         </div>
-                                        <h3 className="font-bold text-slate-900 mb-1">{lic.tool.title}</h3>
-                                        <p className="text-xs text-slate-500 mb-4 font-mono truncate">{lic.license_key}</p>
+                                        <h3 className="font-bold mb-1">{lic.tool.title}</h3>
+                                        <p className="text-xs text-muted-foreground mb-4 font-mono truncate">{lic.license_key}</p>
                                         <div className="flex gap-2">
                                             <Button
                                                 variant="outline"
@@ -84,7 +85,7 @@ export default function MyLicenses({ licenses }: Props) {
                                                 <Button
                                                     variant="outline"
                                                     size="sm"
-                                                    className="w-full gap-2 text-xs border-indigo-200 text-indigo-600 hover:bg-indigo-50 h-8"
+                                                    className="w-full gap-2 text-xs border-indigo-200 text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-950 h-8"
                                                 >
                                                     <ExternalLink className="h-3.5 w-3.5" />
                                                     Open Tool
@@ -92,7 +93,7 @@ export default function MyLicenses({ licenses }: Props) {
                                             </Link>
                                         </div>
                                     </div>
-                                </div>
+                                </Card>
                             );
                         })}
                     </div>
