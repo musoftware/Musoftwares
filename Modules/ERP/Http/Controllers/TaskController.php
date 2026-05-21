@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use Modules\ERP\Models\ERPTask;
 use Modules\ERP\Models\ERPTodoItem;
 use Modules\ERP\Models\TenantClient;
-use Modules\ERP\Models\Project;
+use Modules\Core\Models\Project;
 use Modules\ERP\Models\Tenant;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;

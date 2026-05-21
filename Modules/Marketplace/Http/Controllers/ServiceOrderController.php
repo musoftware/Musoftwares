@@ -4,8 +4,8 @@ namespace Modules\Marketplace\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Modules\Marketplace\Models\ServiceOrder;
-use Modules\Marketplace\Models\ServicePackage;
+use Modules\Core\Models\ServiceOrder;
+use Modules\Core\Models\ServicePackage;
 use Modules\Core\Services\FinancialTransactionService;
 use Modules\Core\Models\Wallet;
 use Modules\Core\Models\Conversation;

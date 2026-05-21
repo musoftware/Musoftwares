@@ -57,6 +57,6 @@ class Booking extends Model
     // Optional: link to project if applicable
     // public function project()
     // {
-    //     return $this->belongsTo(\Modules\ERP\Models\Project::class, 'project_id');
+    //     return $this->belongsTo(\Modules\Core\Models\Project::class, 'project_id');
     // }
 }

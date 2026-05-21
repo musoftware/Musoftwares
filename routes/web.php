@@ -217,13 +217,13 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin/ma
     // Admin Views mapping to components later
     Route::get('/pending-services', function () {
         return Inertia::render('Admin/Marketplace/Pending', [
-            'services' => \Modules\Marketplace\Models\Service::with(['seller', 'category'])->where('status', 'draft')->paginate(15)
+            'services' => \Modules\Core\Models\Service::with(['seller', 'category'])->where('status', 'draft')->paginate(15)
         ]);
     })->name('services.pending');
 
     Route::get('/all-services', function () {
         return Inertia::render('Admin/Marketplace/All', [
-            'services' => \Modules\Marketplace\Models\Service::with(['seller', 'category'])->paginate(15)
+            'services' => \Modules\Core\Models\Service::with(['seller', 'category'])->paginate(15)
         ]);
     })->name('services.all');
 });

@@ -9,7 +9,7 @@ use Modules\Core\Models\Wallet;
 use Modules\Core\Models\WalletTransaction;
 use Modules\Core\Models\SupportTicket;
 use Modules\Core\Models\UserWithdrawal;
-use Modules\ERP\Models\Invoice;
+use Modules\Core\Models\Invoice;
 use Modules\ERP\Models\TenantClient;
 use Modules\ERP\Models\RecurringEntry;
 use Inertia\Inertia;

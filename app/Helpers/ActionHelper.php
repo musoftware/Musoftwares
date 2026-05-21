@@ -2,8 +2,8 @@
 
 namespace App\Helpers;
 
-use App\Models\CurrenciesExchange;
-use App\Models\Currency;
+use Modules\Core\Models\CurrenciesExchange;
+use Modules\Core\Models\Currency;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;

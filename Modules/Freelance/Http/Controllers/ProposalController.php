@@ -3,9 +3,9 @@
 namespace Modules\Freelance\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use Modules\Freelance\Models\Job;
+use Modules\Core\Models\Job;
 use Modules\Freelance\Models\Proposal;
-use Modules\Freelance\Models\Contract;
+use Modules\Core\Models\Contract;
 use Modules\Freelance\Models\PointTransaction;
 use Illuminate\Http\Request;
 use Inertia\Inertia;

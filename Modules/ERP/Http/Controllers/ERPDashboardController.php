@@ -5,11 +5,11 @@ namespace Modules\ERP\Http\Controllers;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Modules\ERP\Models\Invoice;
+use Modules\Core\Models\Invoice;
 use Modules\ERP\Models\TenantClient;
 use Modules\ERP\Models\RecurringEntry;
 use Modules\ERP\Models\Tenant;
-use Modules\ERP\Models\Project;
+use Modules\Core\Models\Project;
 use Modules\ERP\Models\SupportTicket;
 use Modules\ERP\Models\Activity;
 use Modules\ERP\Models\TenantFile;
@@ -513,7 +513,7 @@ class ERPDashboardController extends Controller
                         ]);
 
                         // Create invoice item
-                        \Modules\ERP\Models\InvoiceItem::create([
+                        \Modules\Core\Models\InvoiceItem::create([
                             'invoice_id' => $invoice->id,
                             'tenant_id' => $tenant->id,
                             'type' => 'simple',

@@ -6,8 +6,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use Modules\Marketplace\Models\ServiceOrder;
-use Modules\Marketplace\Models\ServiceReview;
+use Modules\Core\Models\ServiceOrder;
+use Modules\Core\Models\ServiceReview;
 
 class ServiceReviewController extends Controller
 {

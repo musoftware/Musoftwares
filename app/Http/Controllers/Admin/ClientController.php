@@ -49,7 +49,7 @@ class ClientController extends Controller
         
         // Retrieve currencies and plans safely (they might not exist in V2 yet, but we copied models)
         $currencies = class_exists(\Modules\Core\Models\Currency::class) ? \Modules\Core\Models\Currency::all() : [];
-        $plans = class_exists(\App\Models\Plan::class) ? \App\Models\Plan::all() : [];
+        $plans = class_exists(\Modules\Core\Models\Plan::class) ? \Modules\Core\Models\Plan::all() : [];
 
         return Inertia::render('Admin/Clients/Edit', [
             'user' => $user,
@@ -248,7 +248,7 @@ class ClientController extends Controller
             'description' => 'nullable|string'
         ]);
 
-        $task = \App\Models\Task::create([
+        $task = \Modules\Core\Models\Task::create([
             'user_id' => $id,
             'task_name' => $request->title,
             'task_description' => $request->description,
