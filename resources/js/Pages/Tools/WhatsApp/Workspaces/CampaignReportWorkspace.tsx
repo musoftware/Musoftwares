@@ -35,8 +35,8 @@ export default function CampaignReportWorkspace({ t, callRPC, campaignId, campai
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm flex items-center gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                <div className="bg-white/60 backdrop-blur-xl border border-white/60 rounded-3xl p-7 shadow-[0_8px_30px_rgb(0,0,0,0.04)] flex items-center gap-5 hover:-translate-y-1 transition-transform">
                     <div className="w-12 h-12 rounded-xl bg-slate-50 flex items-center justify-center text-slate-400">
                         <FileText className="w-6 h-6" />
                     </div>
@@ -45,7 +45,7 @@ export default function CampaignReportWorkspace({ t, callRPC, campaignId, campai
                         <p className="text-2xl font-black text-slate-800">{logs.length}</p>
                     </div>
                 </div>
-                <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm flex items-center gap-4">
+                <div className="bg-white/60 backdrop-blur-xl border border-white/60 rounded-3xl p-7 shadow-[0_8px_30px_rgb(0,0,0,0.04)] flex items-center gap-5 hover:-translate-y-1 transition-transform">
                     <div className="w-12 h-12 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-500">
                         <CheckCircle2 className="w-6 h-6" />
                     </div>
@@ -54,7 +54,7 @@ export default function CampaignReportWorkspace({ t, callRPC, campaignId, campai
                         <p className="text-2xl font-black text-emerald-600">{sentCount}</p>
                     </div>
                 </div>
-                <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm flex items-center gap-4">
+                <div className="bg-white/60 backdrop-blur-xl border border-white/60 rounded-3xl p-7 shadow-[0_8px_30px_rgb(0,0,0,0.04)] flex items-center gap-5 hover:-translate-y-1 transition-transform">
                     <div className="w-12 h-12 rounded-xl bg-rose-50 flex items-center justify-center text-rose-500">
                         <XCircle className="w-6 h-6" />
                     </div>
@@ -65,10 +65,10 @@ export default function CampaignReportWorkspace({ t, callRPC, campaignId, campai
                 </div>
             </div>
 
-            <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
-                <div className="p-4 border-b border-slate-100 flex items-center justify-between">
+            <div className="bg-white/60 backdrop-blur-xl border border-white/60 rounded-3xl p-7 shadow-[0_8px_30px_rgb(0,0,0,0.04)] overflow-hidden transition-all hover:bg-white/80">
+                <div className="pb-4 border-b border-slate-100 flex items-center justify-between mb-4">
                     <h3 className="font-bold text-slate-800 text-sm">Detailed Delivery Logs</h3>
-                    <button className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-teal-600 hover:bg-teal-50 rounded-lg transition-all">
+                    <button className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-teal-500 to-emerald-600 hover:from-teal-400 hover:to-emerald-500 text-white rounded-xl text-xs font-bold transition-all shadow-[0_4px_10px_rgb(20,184,166,0.3)] hover:shadow-[0_6px_15px_rgb(20,184,166,0.4)] active:scale-95">
                         <Download className="w-3.5 h-3.5" /> Export CSV
                     </button>
                 </div>

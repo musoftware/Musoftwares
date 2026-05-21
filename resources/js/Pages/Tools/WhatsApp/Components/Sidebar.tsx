@@ -22,7 +22,7 @@ export default function Sidebar({
     return (
         <>
             {/* Desktop Sidebar */}
-            <div className="hidden md:flex flex-col h-screen sticky top-0 w-64 bg-white border-r border-slate-200 shrink-0">
+            <div className="hidden md:flex flex-col h-screen sticky top-0 w-64 bg-white/70 backdrop-blur-2xl border-r border-slate-200/60 shrink-0 shadow-[4px_0_24px_-12px_rgba(0,0,0,0.05)] z-20 relative">
                 <div className="p-6 border-b border-slate-100 flex items-center gap-3">
                     <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-500 to-teal-600 flex items-center justify-center shadow-md shrink-0">
                         <MessageSquare className="w-5 h-5 text-white" />
