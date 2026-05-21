@@ -19,6 +19,7 @@ const components: Record<string, React.ElementType> = {
     'IPTVDownloaderRunner':     lazy(() => import('./IPTVDownloaderRunner')),
     'iptv-downloader':          lazy(() => import('./IPTVDownloaderRunner')),
     'opensooq':                 lazy(() => import('./OpensooqRunner')),
+    'google-maps':              lazy(() => import('./GoogleMapsRunner')),
     'SnapDownloaderRunner':     lazy(() => import('./SnapDownloaderRunner')),
 };
 
