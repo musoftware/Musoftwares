@@ -76,31 +76,37 @@ export default function Show({ client, wallets }) {
         });
     };
 
+    const [taskForm, setTaskForm] = useState({ title: '', description: '' });
     const submitAssignTask = (e) => {
         e.preventDefault();
-        router.post(`/admin/clients/${client.id}/tasks`, {}, {
+        router.post(`/admin/clients/${client.id}/tasks`, taskForm, {
             onSuccess: () => {
                 setIsAssignTaskOpen(false);
+                setTaskForm({ title: '', description: '' });
                 alert("Task assigned successfully!");
             }
         });
     };
 
+    const [swapForm, setSwapForm] = useState({ amount: '', target_user_id: '' });
     const submitSwapBudget = (e) => {
         e.preventDefault();
-        router.post(`/admin/clients/${client.id}/swap-budget`, {}, {
+        router.post(`/admin/clients/${client.id}/swap-budget`, swapForm, {
             onSuccess: () => {
                 setIsSwapBudgetOpen(false);
+                setSwapForm({ amount: '', target_user_id: '' });
                 alert("Budget swapped successfully!");
             }
         });
     };
 
+    const [membershipForm, setMembershipForm] = useState({ plan_id: '1' });
     const submitActivateMembership = (e) => {
         e.preventDefault();
-        router.post(`/admin/clients/${client.id}/memberships`, {}, {
+        router.post(`/admin/clients/${client.id}/membership`, membershipForm, {
             onSuccess: () => {
                 setIsActivateMembershipOpen(false);
+                setMembershipForm({ plan_id: '1' });
                 alert("Membership activated successfully!");
             }
         });
@@ -154,19 +160,19 @@ export default function Show({ client, wallets }) {
                                 <span>Assign Task</span>
                             </DropdownMenuItem>
                             <DropdownMenuItem asChild>
-                                <Link href={`/admin/clients/${client.id}/files`} className="w-full cursor-pointer">
+                                <Link href={`/admin/clients/${client.id}/files`} className="w-full cursor-pointer flex items-center">
                                     <FileText className="mr-2 h-4 w-4" />
                                     <span>Files</span>
                                 </Link>
                             </DropdownMenuItem>
                             <DropdownMenuItem asChild>
-                                <Link href={`/admin/clients/${client.id}/reports`} className="w-full cursor-pointer">
+                                <Link href={`/admin/clients/${client.id}/reports`} className="w-full cursor-pointer flex items-center">
                                     <FileText className="mr-2 h-4 w-4" />
                                     <span>Reports</span>
                                 </Link>
                             </DropdownMenuItem>
                             <DropdownMenuItem asChild>
-                                <Link href={`/admin/clients/${client.id}/referrals`} className="w-full cursor-pointer">
+                                <Link href={`/admin/clients/${client.id}/referrals`} className="w-full cursor-pointer flex items-center">
                                     <MessageCircle className="mr-2 h-4 w-4" />
                                     <span>Manage Referrals</span>
                                 </Link>
@@ -180,19 +186,19 @@ export default function Show({ client, wallets }) {
                         <DropdownMenuGroup>
                             <DropdownMenuLabel>Finance</DropdownMenuLabel>
                             <DropdownMenuItem asChild>
-                                <Link href={`/admin/invoices/create?client_id=${client.id}`} className="w-full cursor-pointer">
+                                <Link href={`/admin/invoices/create?client_id=${client.id}`} className="w-full cursor-pointer flex items-center">
                                     <FileText className="mr-2 h-4 w-4" />
                                     <span>New Invoice</span>
                                 </Link>
                             </DropdownMenuItem>
                             <DropdownMenuItem asChild>
-                                <Link href={`/admin/invoices?client_id=${client.id}`} className="w-full cursor-pointer">
+                                <Link href={`/admin/invoices?client_id=${client.id}`} className="w-full cursor-pointer flex items-center">
                                     <FileText className="mr-2 h-4 w-4" />
                                     <span>Invoices</span>
                                 </Link>
                             </DropdownMenuItem>
                             <DropdownMenuItem asChild>
-                                <Link href={`/admin/finance?client_id=${client.id}`} className="w-full cursor-pointer">
+                                <Link href={`/admin/finance?client_id=${client.id}`} className="w-full cursor-pointer flex items-center">
                                     <Wallet className="mr-2 h-4 w-4" />
                                     <span>All Transactions</span>
                                 </Link>

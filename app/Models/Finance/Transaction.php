@@ -2,9 +2,9 @@
 
 namespace App\Models\Finance;
 
-use App\Helper\BalancesHelper;
-use App\Helper\FinanceHelper;
-use App\Helper\TextHelper;
+use App\Helpers\BalancesHelper;
+use App\Helpers\FinanceHelper;
+use App\Helpers\TextHelper;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
