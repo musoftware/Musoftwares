@@ -25,7 +25,7 @@ import {
 } from "@/Components/ui/dialog";
 import { EmptyState } from '@/Components/ui/EmptyState';
 import { format } from 'date-fns';
-import { Calendar, Clock, CreditCard, ExternalLink, MoreVertical, Search, UserCircle2, Briefcase, FileText, CheckCircle, XCircle } from 'lucide-react';
+import { Calendar, Clock, CreditCard, ExternalLink, MoreVertical, Search, UserCircle2, Briefcase, FileText, CheckCircle, XCircle, Users } from 'lucide-react';
 
 export default function Appointments({ bookings, filters }: any) {
     const [search, setSearch] = useState(filters?.search || '');
@@ -105,6 +105,7 @@ export default function Appointments({ bookings, filters }: any) {
             menuItems={[
                 { id: 'appointments', label: 'Appointments', icon: Clock, href: '/booking/appointments', isActive: true },
                 { id: 'availability', label: 'Availability', icon: Calendar, href: '/booking', isActive: false },
+                { id: 'providers', label: 'Providers', icon: Users, href: '/booking/providers', isActive: false },
             ]}
         >
             <Head title="Appointments" />
