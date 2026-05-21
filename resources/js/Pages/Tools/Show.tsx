@@ -159,7 +159,7 @@ export default function Show({ tool, userSubscription, userLicense }: Props) {
                                     <span className="text-foreground capitalize">{tool.category_label}</span>
                                 </div>
                                 <div className="flex justify-between text-xs">
-                                    <span className="text-muted-foreground">Downloads</span>
+                                    <span className="text-muted-foreground">Active Users</span>
                                     <span className="text-foreground font-medium">{tool.download_count.toLocaleString()}</span>
                                 </div>
                             </div>
