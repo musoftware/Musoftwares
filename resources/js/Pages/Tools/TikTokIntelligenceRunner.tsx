@@ -4,6 +4,9 @@ import {
     Play, Square, RefreshCw, AlertCircle, Download,
     Search, BarChart3, Bookmark, Users, Zap, Brain
 } from 'lucide-react';
+import { Button } from '@/Components/ui/button';
+import { Input } from '@/Components/ui/input';
+import { Badge } from '@/Components/ui/badge';
 
 const getRuntimeHost = () =>
     typeof window !== 'undefined' ? (window.localStorage.getItem('musoftware_runtime_host') || '127.0.0.1') : '127.0.0.1';
@@ -40,7 +43,7 @@ function CreatorCard({ creator, idx }: { creator: any; idx: number }) {
             <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-1">
                     <p className="text-sm font-bold text-white truncate">@{creator.username || `creator_${idx}`}</p>
-                    {viralScore >= 80 && <span className="text-[9px] font-black uppercase bg-pink-500/20 text-pink-400 border border-pink-500/30 px-1.5 py-0.5 rounded-full">🔥 Viral</span>}
+                    {viralScore >= 80 && <Badge variant="outline" className="text-[9px] font-black uppercase bg-pink-500/20 text-pink-400 border-pink-500/30 px-1.5 py-0.5 rounded-full">🔥 Viral</Badge>}
                 </div>
                 <p className="text-xs text-slate-400 truncate">{creator.niche || 'General'}</p>
                 <div className="flex items-center gap-3 mt-2">
@@ -60,9 +63,9 @@ function CreatorCard({ creator, idx }: { creator: any; idx: number }) {
 // ── Tab ───────────────────────────────────────────────────────────────────────
 function Tab({ active, onClick, children }: any) {
     return (
-        <button onClick={onClick} className={`px-4 py-2 text-xs font-bold rounded-xl transition-all ${active ? 'bg-pink-500 text-white shadow-lg shadow-pink-500/30' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800'}`}>
+        <Button variant={active ? 'default' : 'ghost'} onClick={onClick} className={`h-9 px-4 text-xs font-bold rounded-xl transition-all ${active ? 'bg-pink-500 text-white hover:bg-pink-600 shadow-lg shadow-pink-500/30' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800'}`}>
             {children}
-        </button>
+        </Button>
     );
 }
 
@@ -161,10 +164,10 @@ export default function TikTokIntelligenceRunner({ tool }: any) {
                     <Tab active={tab === 'monitor'} onClick={() => setTab('monitor')}><Eye className="w-3 h-3 inline mr-1" />Monitor</Tab>
                     <Tab active={tab === 'vault'} onClick={() => setTab('vault')}><Bookmark className="w-3 h-3 inline mr-1" />UGC Vault</Tab>
                 </div>
-                <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase border ${status === 'running' ? 'bg-pink-500/10 border-pink-500/30 text-pink-400' : status === 'done' ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400' : 'bg-slate-800 border-slate-700 text-slate-500'}`}>
+                <Badge variant="outline" className={`gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase ${status === 'running' ? 'bg-pink-500/10 border-pink-500/30 text-pink-400' : status === 'done' ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400' : 'bg-slate-800 border-slate-700 text-slate-500'}`}>
                     <div className={`w-1.5 h-1.5 rounded-full ${status === 'running' ? 'bg-pink-500 animate-pulse' : status === 'done' ? 'bg-emerald-500' : 'bg-slate-600'}`} />
                     {status === 'running' ? 'Scanning...' : status === 'done' ? `${creators.length} found` : 'Ready'}
-                </div>
+                </Badge>
             </div>
 
             <div className="max-w-5xl mx-auto px-4 py-8 space-y-6">
@@ -181,33 +184,33 @@ export default function TikTokIntelligenceRunner({ tool }: any) {
                                     <label className="text-[10px] font-black uppercase tracking-wider text-slate-500 block mb-1.5">Search Keyword</label>
                                     <div className="relative">
                                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-600" />
-                                        <input type="text" value={keyword} onChange={e => setKeyword(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleDiscover()}
+                                        <Input type="text" value={keyword} onChange={e => setKeyword(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleDiscover()}
                                             placeholder="muscle building, meal prep..."
-                                            className="w-full pl-9 pr-4 py-2.5 text-sm bg-slate-800 border border-slate-700 focus:border-pink-500 rounded-xl outline-none transition-all text-white placeholder:text-slate-600" />
+                                            className="pl-9 h-11 text-sm bg-slate-800 border-slate-700 focus-visible:ring-pink-500 text-white placeholder:text-slate-600" />
                                     </div>
                                 </div>
                                 <div>
                                     <label className="text-[10px] font-black uppercase tracking-wider text-slate-500 block mb-1.5">Niche</label>
                                     <select value={niche} onChange={e => setNiche(e.target.value)}
-                                        className="w-full px-3 py-2.5 text-sm bg-slate-800 border border-slate-700 focus:border-pink-500 rounded-xl outline-none transition-all text-white">
+                                        className="w-full h-11 px-3 text-sm bg-slate-800 border border-slate-700 focus:border-pink-500 rounded-md outline-none text-white">
                                         {NICHES.map(n => <option key={n} value={n}>{n.charAt(0).toUpperCase() + n.slice(1)}</option>)}
                                     </select>
                                 </div>
                                 <div className="flex items-end">
                                     <div className="flex gap-2 w-full">
                                         {status === 'running' ? (
-                                            <button onClick={() => setStatus('done')} className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-rose-500/10 border border-rose-500/20 text-rose-400 rounded-xl text-sm font-bold">
+                                            <Button variant="outline" onClick={() => setStatus('done')} className="flex-1 gap-2 h-11 bg-rose-500/10 border-rose-500/20 text-rose-400 hover:bg-rose-500/20 hover:text-rose-400">
                                                 <Square className="w-4 h-4" /> Stop
-                                            </button>
+                                            </Button>
                                         ) : (
-                                            <button onClick={handleDiscover} disabled={!keyword.trim()} className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-gradient-to-r from-pink-500 to-rose-500 text-white rounded-xl text-sm font-bold hover:opacity-90 transition-all shadow-lg shadow-pink-500/20 active:scale-95 disabled:opacity-40">
+                                            <Button onClick={handleDiscover} disabled={!keyword.trim()} className="flex-1 gap-2 h-11 bg-gradient-to-r from-pink-500 to-rose-500 text-white shadow-lg shadow-pink-500/20 hover:opacity-90">
                                                 <Zap className="w-4 h-4" /> Discover Creators
-                                            </button>
+                                            </Button>
                                         )}
                                         {creators.length > 0 && (
-                                            <button onClick={exportCSV} className="px-4 py-2.5 bg-slate-800 border border-slate-700 text-slate-300 rounded-xl text-sm font-bold hover:bg-slate-700 transition-all">
+                                            <Button variant="outline" size="icon" onClick={exportCSV} className="h-11 w-12 bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700 hover:text-slate-200">
                                                 <Download className="w-4 h-4" />
-                                            </button>
+                                            </Button>
                                         )}
                                     </div>
                                 </div>
@@ -268,9 +271,9 @@ export default function TikTokIntelligenceRunner({ tool }: any) {
                         <Eye className="w-10 h-10 text-slate-700 mx-auto mb-4" />
                         <h3 className="text-sm font-bold text-slate-400">Competitor Monitoring Jobs</h3>
                         <p className="text-xs text-slate-600 mt-2 max-w-sm mx-auto">Add competitors and hashtags to track. The intelligence engine will monitor them daily and alert you to viral content and trend changes.</p>
-                        <button className="mt-6 px-6 py-2.5 bg-pink-500/10 border border-pink-500/30 text-pink-400 rounded-xl text-sm font-bold hover:bg-pink-500/20 transition-all">
+                        <Button variant="outline" className="mt-6 h-10 bg-pink-500/10 border-pink-500/30 text-pink-400 hover:bg-pink-500/20 hover:text-pink-400">
                             + Add Monitoring Job
-                        </button>
+                        </Button>
                     </div>
                 )}
 
@@ -279,9 +282,9 @@ export default function TikTokIntelligenceRunner({ tool }: any) {
                         <Bookmark className="w-10 h-10 text-slate-700 mx-auto mb-4" />
                         <h3 className="text-sm font-bold text-slate-400">UGC Content Vault</h3>
                         <p className="text-xs text-slate-600 mt-2 max-w-sm mx-auto">Discovered viral content is automatically saved here. Browse, filter, and extract format blueprints from the best-performing videos in your niche.</p>
-                        <button className="mt-6 px-6 py-2.5 bg-pink-500/10 border border-pink-500/30 text-pink-400 rounded-xl text-sm font-bold hover:bg-pink-500/20 transition-all">
+                        <Button variant="outline" className="mt-6 h-10 bg-pink-500/10 border-pink-500/30 text-pink-400 hover:bg-pink-500/20 hover:text-pink-400">
                             Sync Vault Now
-                        </button>
+                        </Button>
                     </div>
                 )}
             </div>

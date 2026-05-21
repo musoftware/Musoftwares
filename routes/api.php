@@ -39,18 +39,17 @@ Route::get('runtime/version', function () {
 // ── Runtime Plugin Manifest (public) ─────────────────────────────────────────
 // Lists all available plugins (no auth — only returns public metadata).
 Route::get('runtime/plugins', function (\Illuminate\Http\Request $request) {
-    $tools = \Modules\Tools\Models\Tool::where('is_active', true)
-        ->whereNotNull('metadata->runtime')
-        ->select(['id', 'title', 'slug', 'metadata'])
-        ->get()
+    $tools = collect(config('tools'))
+        ->filter(fn($t) => $t['is_active'] ?? false)
         ->map(fn($t) => [
-            'id'          => $t->slug,
-            'name'        => $t->title,
-            'slug'        => $t->slug,
-            'runtime'     => $t->metadata['runtime'] ?? 'nodejs',
-            'description' => $t->metadata['description'] ?? '',
-            'version'     => $t->latestVersion?->version ?? '1.0.0',
-        ]);
+            'id'          => $t['slug'],
+            'name'        => $t['title'],
+            'slug'        => $t['slug'],
+            'runtime'     => 'nodejs',
+            'description' => $t['short_description'] ?? '',
+            'version'     => $t['version'] ?? '1.0.0',
+        ])
+        ->values();
 
     return response()->json(['plugins' => $tools]);
 })->name('api.runtime.plugins');

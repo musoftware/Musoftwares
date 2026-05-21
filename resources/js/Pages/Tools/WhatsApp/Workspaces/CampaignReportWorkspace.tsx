@@ -237,9 +237,9 @@ export default function CampaignReportWorkspace({ t, callRPC, campaignId, campai
                         {showFilter && (
                             <div className="absolute right-0 top-full mt-1 bg-popover text-popover-foreground border rounded-xl shadow-xl z-10 min-w-[140px] py-1 overflow-hidden">
                                 {['all', 'sent', 'delivered', 'read', 'replied', 'failed', 'pending'].map(s => (
-                                    <button key={s} onClick={() => { setStatusFilter(s); setShowFilter(false); }} className={`w-full text-left px-4 py-2 text-xs font-bold capitalize transition-colors ${statusFilter === s ? 'bg-teal-50 text-teal-600 dark:bg-teal-950/30' : 'hover:bg-accent'}`}>
+                                    <Button variant="ghost" key={s} onClick={() => { setStatusFilter(s); setShowFilter(false); }} className={`w-full justify-start rounded-none h-auto px-4 py-2 text-xs font-bold capitalize transition-colors ${statusFilter === s ? 'bg-teal-50 text-teal-600 hover:bg-teal-100 hover:text-teal-700 dark:bg-teal-950/30' : 'hover:bg-accent'}`}>
                                         {s === 'all' ? 'All' : s}
-                                    </button>
+                                    </Button>
                                 ))}
                             </div>
                         )}

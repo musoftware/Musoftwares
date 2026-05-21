@@ -40,50 +40,53 @@ export default function AccountsWorkspace({
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Connect new session column */}
-                <Card className="h-fit">
-                    <CardHeader className="pb-4 border-b">
-                        <CardTitle className="text-base flex items-center gap-2.5">
+                <Card className="h-fit border-teal-200 shadow-sm relative overflow-hidden">
+                    <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-teal-400 to-emerald-500"></div>
+                    <CardHeader className="pb-4 border-b bg-teal-50/30">
+                        <CardTitle className="text-lg flex items-center gap-2.5">
                             <Settings2 className="w-5 h-5 text-teal-600" />
                             {t.accounts.addAccount}
                         </CardTitle>
                     </CardHeader>
                     <CardContent className="pt-6">
-                        <form onSubmit={handleConnectSession} className="space-y-4">
+                        <form onSubmit={handleConnectSession} className="space-y-5">
                             <div className="space-y-2">
-                                <Label htmlFor="accountId">{t.accounts.accountId}</Label>
+                                <Label htmlFor="accountId" className="font-semibold">{t.accounts.accountId}</Label>
                                 <Input
                                     id="accountId"
                                     type="text"
                                     value={newAccountId}
                                     onChange={e => setNewAccountId(e.target.value)}
                                     placeholder={t.accounts.accountIdPlaceholder}
+                                    className="border-slate-300 focus-visible:ring-teal-500"
                                     required
                                 />
                             </div>
                             <div className="space-y-2">
-                                <Label htmlFor="proxy">{t.accounts.proxy}</Label>
+                                <Label htmlFor="proxy" className="font-semibold">{t.accounts.proxy}</Label>
                                 <Input
                                     id="proxy"
                                     type="text"
                                     value={newProxy}
                                     onChange={e => setNewProxy(e.target.value)}
                                     placeholder={t.accounts.proxyPlaceholder}
+                                    className="border-slate-300 focus-visible:ring-teal-500"
                                 />
                             </div>
-                            <div className="flex items-center gap-3 py-2">
+                            <div className="flex items-center gap-3 py-2 bg-slate-50 p-3 rounded-lg border border-slate-100">
                                 <Switch
                                     id="headless-toggle"
                                     checked={newHeadless}
                                     onCheckedChange={setNewHeadless}
                                 />
-                                <Label htmlFor="headless-toggle" className="cursor-pointer font-normal text-sm">{t.accounts.headless}</Label>
+                                <Label htmlFor="headless-toggle" className="cursor-pointer font-medium text-sm">{t.accounts.headless}</Label>
                             </div>
                             <Button
                                 type="submit"
                                 disabled={!daemonConnected}
-                                className="w-full bg-teal-600 hover:bg-teal-700 text-white gap-2"
+                                className="w-full bg-teal-600 hover:bg-teal-700 text-white gap-2 py-6 text-lg font-bold shadow-md hover:shadow-lg transition-all"
                             >
-                                <Play className="w-3.5 h-3.5" />
+                                <QrCode className="w-5 h-5" />
                                 {t.accounts.connect}
                             </Button>
                         </form>

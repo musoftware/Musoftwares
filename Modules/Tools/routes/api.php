@@ -58,47 +58,45 @@ Route::prefix('tools')->name('api.tools.')->group(function () {
             $subscriptions = \Modules\Tools\Models\ToolSubscription::where('user_id', auth()->id())
                 ->where('status', 'active')
                 ->where(fn($q) => $q->whereNull('expires_at')->orWhere('expires_at', '>', now()))
-                ->with(['tool.latestVersion'])
                 ->get();
 
             $paidPlugins = $subscriptions
-                ->filter(fn($s) => $s->tool && $s->tool->latestVersion)
+                ->filter(fn($s) => $s->tool)
                 ->filter(function ($s) use ($agentType, $pluginFileExists) {
-                    $runtime = $s->tool->metadata['runtime'] ?? 'nodejs';
-                    return $runtime === $agentType && $pluginFileExists($s->tool->slug, $s->tool->latestVersion);
+                    $tool = (object) $s->tool;
+                    $runtime = $tool->metadata['runtime'] ?? 'nodejs';
+                    return $runtime === $agentType && $pluginFileExists($tool->slug, null);
                 })
-                ->map(fn($s) => [
-                    'tool_slug'      => $s->tool->slug,
-                    'name'           => $s->tool->title,
-                    'version'        => $s->tool->latestVersion->version,
-                    'download_url'   => $s->tool->latestVersion->file_path
-                        ? url()->temporarySignedRoute('api.tools.plugin.download', now()->addHour(), ['slug' => $s->tool->slug])
-                        : null,
-                    'is_subscribed'  => true,
-                    'license_status' => $s->status,  // 'active' | 'expired' | 'suspended'
-                    'expires_at'     => $s->expires_at?->toIso8601String(),
-                ]);
+                ->map(function ($s) {
+                    $tool = (object) $s->tool;
+                    return [
+                        'tool_slug'      => $tool->slug,
+                        'name'           => $tool->title,
+                        'version'        => $tool->version ?? '1.0.0',
+                        'download_url'   => url()->temporarySignedRoute('api.tools.plugin.download', now()->addHour(), ['slug' => $tool->slug]),
+                        'is_subscribed'  => true,
+                        'license_status' => $s->status,  // 'active' | 'expired' | 'suspended'
+                        'expires_at'     => $s->expires_at?->toIso8601String(),
+                    ];
+                });
 
             // Slugs already covered by a paid subscription (avoid duplicates)
             $subscribedSlugs = $paidPlugins->pluck('tool_slug')->all();
 
             // ── 2. Free tools — no subscription needed ──────────────────────
-            $freePlugins = \Modules\Tools\Models\Tool::where('is_active', true)
-                // ->where('is_free', true) // Bypassed for testing
-                ->whereNotIn('slug', $subscribedSlugs)
-                ->with('latestVersion')
-                ->get()
+            $freePlugins = collect(config('tools'))
+                ->filter(fn($t) => ($t['is_active'] ?? false) && !in_array($t['slug'], $subscribedSlugs))
+                ->map(fn($t) => (object) $t)
+                ->values()
                 ->filter(function ($tool) use ($agentType, $pluginFileExists) {
                     $runtime = $tool->metadata['runtime'] ?? 'nodejs';
-                    return $runtime === $agentType && $tool->latestVersion !== null && $pluginFileExists($tool->slug, $tool->latestVersion);
+                    return $runtime === $agentType && $pluginFileExists($tool->slug, null);
                 })
                 ->map(fn($tool) => [
                     'tool_slug'      => $tool->slug,
                     'name'           => $tool->title,
-                    'version'        => $tool->latestVersion->version,
-                    'download_url'   => $tool->latestVersion->file_path
-                        ? url()->temporarySignedRoute('api.tools.plugin.download', now()->addHour(), ['slug' => $tool->slug])
-                        : null,
+                    'version'        => $tool->version ?? '1.0.0',
+                    'download_url'   => url()->temporarySignedRoute('api.tools.plugin.download', now()->addHour(), ['slug' => $tool->slug]),
                     'is_subscribed'  => false,
                     'license_status' => 'active', // free tools are always active
                     'expires_at'     => null,
@@ -128,8 +126,11 @@ Route::prefix('tools')->name('api.tools.')->group(function () {
             return response()->download($publicFilePathZip, "{$slug}.zip");
         }
 
-        $tool    = \Modules\Tools\Models\Tool::where('slug', $slug)->firstOrFail();
-        $version = $tool->latestVersion;
+        $toolConfig = collect(config('tools'))->firstWhere('slug', $slug);
+        if (!$toolConfig) {
+            abort(404, 'Plugin not found.');
+        }
+        $version = $toolConfig['latestVersion'] ?? null; // Adjust according to config setup if needed
         if (!$version || !$version->file_path || !\Illuminate\Support\Facades\Storage::exists($version->file_path)) {
             abort(404, 'Plugin file not found.');
         }

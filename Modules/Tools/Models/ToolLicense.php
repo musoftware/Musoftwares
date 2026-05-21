@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class ToolLicense extends Model
 {
     protected $fillable = [
-        'license_key', 'user_id', 'tool_id', 'tool_subscription_id',
+        'license_key', 'user_id', 'tool_guid', 'tool_subscription_id',
         'status', 'expires_at', 'last_validated_at',
     ];
 
@@ -25,9 +25,9 @@ class ToolLicense extends Model
         return $this->belongsTo(\App\Models\User::class);
     }
 
-    public function tool(): BelongsTo
+    public function getToolAttribute()
     {
-        return $this->belongsTo(Tool::class);
+        return collect(config('tools'))->firstWhere('guid', $this->tool_guid);
     }
 
     public function subscription(): BelongsTo

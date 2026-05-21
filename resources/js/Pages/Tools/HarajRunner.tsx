@@ -4,6 +4,9 @@ import {
     AlertCircle, CheckCircle2, RefreshCw,
     Phone, Tag, ChevronDown, Clipboard, ShoppingBag
 } from 'lucide-react';
+import { Button } from '@/Components/ui/button';
+import { Input } from '@/Components/ui/input';
+import { Badge } from '@/Components/ui/badge';
 
 const getRuntimeHost = () =>
     typeof window !== 'undefined' ? (window.localStorage.getItem('musoftware_runtime_host') || '127.0.0.1') : '127.0.0.1';
@@ -39,9 +42,9 @@ function LeadCard({ lead, idx }: { lead: any; idx: number }) {
                     <p className="text-xs font-semibold text-emerald-600 truncate">{lead.price || '—'}</p>
                 </div>
             </div>
-            <button onClick={copyRow} className="opacity-0 group-hover:opacity-100 transition-opacity p-1.5 hover:bg-slate-100 rounded-lg" title="Copy row">
+            <Button variant="ghost" size="icon" onClick={copyRow} className="opacity-0 group-hover:opacity-100 transition-opacity h-8 w-8 hover:bg-slate-100" title="Copy row">
                 {copied ? <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" /> : <Clipboard className="w-3.5 h-3.5 text-slate-400" />}
-            </button>
+            </Button>
         </div>
     );
 }
@@ -170,14 +173,14 @@ export default function HarajRunner({ tool }: any) {
                 </div>
                 <div className="flex items-center gap-3">
                     {leads.length > 0 && (
-                        <button onClick={() => exportCSV(leads)} className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-lg text-xs font-bold hover:bg-emerald-100 transition-all">
+                        <Button variant="outline" onClick={() => exportCSV(leads)} className="h-8 gap-1.5 px-3 bg-emerald-50 border-emerald-200 text-emerald-700 hover:bg-emerald-100 hover:text-emerald-800 text-xs font-bold">
                             <Download className="w-3.5 h-3.5" /> Export CSV
-                        </button>
+                        </Button>
                     )}
-                    <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase border ${status === 'running' ? 'bg-green-50 border-green-200 text-green-700' : status === 'done' ? 'bg-emerald-50 border-emerald-200 text-emerald-700' : 'bg-slate-100 border-slate-200 text-slate-500'}`}>
+                    <Badge variant="outline" className={`gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase ${status === 'running' ? 'bg-green-50 border-green-200 text-green-700' : status === 'done' ? 'bg-emerald-50 border-emerald-200 text-emerald-700' : 'bg-slate-100 border-slate-200 text-slate-500'}`}>
                         <div className={`w-1.5 h-1.5 rounded-full ${status === 'running' ? 'bg-green-500 animate-pulse' : status === 'done' ? 'bg-emerald-500' : 'bg-slate-400'}`} />
                         {status === 'running' ? 'Extracting...' : status === 'done' ? `${leads.length} leads found` : 'Ready'}
-                    </div>
+                    </Badge>
                 </div>
             </div>
 
@@ -194,11 +197,11 @@ export default function HarajRunner({ tool }: any) {
                             <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1.5">Keyword / Category</label>
                             <div className="relative">
                                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                                <input
+                                <Input
                                     type="text" value={keyword} onChange={e => setKeyword(e.target.value)}
                                     onKeyDown={e => e.key === 'Enter' && handleStart()}
                                     placeholder="cars, electronics, furniture, real estate..."
-                                    className="w-full pl-9 pr-4 py-2.5 text-sm border border-slate-200 focus:border-green-400 rounded-xl outline-none transition-all bg-slate-50"
+                                    className="pl-9 h-11 text-sm bg-slate-50"
                                 />
                             </div>
                         </div>
@@ -206,29 +209,29 @@ export default function HarajRunner({ tool }: any) {
                             <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1.5">Max Leads</label>
                             <div className="relative">
                                 <Users className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                                <input type="number" min={10} max={500} step={10} value={limit} onChange={e => setLimit(parseInt(e.target.value, 10))}
-                                    className="w-full pl-9 pr-4 py-2.5 text-sm border border-slate-200 focus:border-green-400 rounded-xl outline-none transition-all bg-slate-50" />
+                                <Input type="number" min={10} max={500} step={10} value={limit} onChange={e => setLimit(parseInt(e.target.value, 10))}
+                                    className="pl-9 h-11 text-sm bg-slate-50" />
                             </div>
                         </div>
                     </div>
 
                     <div className="flex gap-3">
                         {status === 'running' ? (
-                            <button onClick={() => { setStatus('done'); setProgressMsg(`Stopped — ${leads.length} leads captured.`); }}
-                                className="flex items-center gap-2 px-6 py-2.5 bg-rose-50 border border-rose-200 text-rose-700 rounded-xl text-sm font-bold hover:bg-rose-100 transition-all active:scale-95">
+                            <Button variant="outline" onClick={() => { setStatus('done'); setProgressMsg(`Stopped — ${leads.length} leads captured.`); }}
+                                className="h-11 gap-2 px-6 bg-rose-50 border-rose-200 text-rose-700 hover:bg-rose-100 hover:text-rose-800 text-sm font-bold">
                                 <Square className="w-4 h-4" /> Stop
-                            </button>
+                            </Button>
                         ) : (
-                            <button onClick={handleStart} disabled={!keyword.trim()}
-                                className="flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-xl text-sm font-bold hover:opacity-90 transition-all shadow-md active:scale-95 disabled:opacity-40 disabled:shadow-none">
+                            <Button onClick={handleStart} disabled={!keyword.trim()}
+                                className="h-11 gap-2 px-6 bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-md text-sm font-bold hover:opacity-90">
                                 <Play className="w-4 h-4" /> Start Extraction
-                            </button>
+                            </Button>
                         )}
                         {leads.length > 0 && status !== 'running' && (
-                            <button onClick={() => { setLeads([]); setStatus('idle'); setProgress(0); }}
-                                className="px-4 py-2.5 border border-slate-200 text-slate-500 rounded-xl text-sm font-medium hover:bg-slate-50 transition-all">
+                            <Button variant="outline" onClick={() => { setLeads([]); setStatus('idle'); setProgress(0); }}
+                                className="h-11 px-4 border-slate-200 text-slate-500 hover:bg-slate-50 hover:text-slate-600 text-sm font-medium">
                                 Clear
-                            </button>
+                            </Button>
                         )}
                     </div>
 
@@ -267,9 +270,9 @@ export default function HarajRunner({ tool }: any) {
                     <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden animate-in fade-in slide-in-from-bottom-3 duration-400">
                         <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
                             <h3 className="font-bold text-slate-800 text-sm">{leads.length} Leads Extracted from Haraj</h3>
-                            <button onClick={() => exportCSV(leads)} className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-900 text-white rounded-lg text-xs font-bold hover:bg-slate-800 transition-all active:scale-95">
+                            <Button onClick={() => exportCSV(leads)} className="h-8 gap-1.5 px-3 bg-slate-900 text-white hover:bg-slate-800 text-xs font-bold">
                                 <Download className="w-3.5 h-3.5" /> Export CSV
-                            </button>
+                            </Button>
                         </div>
                         <div className="grid grid-cols-2 md:grid-cols-5 gap-3 px-5 py-2 bg-slate-50 border-b border-slate-100">
                             {['Name', 'Phone', 'Listing Title', '', 'Price'].map((h, i) => (
@@ -283,9 +286,9 @@ export default function HarajRunner({ tool }: any) {
                             <p className="text-[10px] text-slate-400 font-medium">
                                 {status === 'running' ? 'Live — more leads incoming...' : 'Extraction complete'}
                             </p>
-                            <button onClick={() => exportCSV(leads)} className="text-[10px] font-bold text-green-600 hover:text-green-700 transition-colors">
+                            <Button variant="ghost" onClick={() => exportCSV(leads)} className="h-auto p-0 text-[10px] font-bold text-green-600 hover:text-green-700 hover:bg-transparent">
                                 Download all as CSV →
-                            </button>
+                            </Button>
                         </div>
                     </div>
                 )}
