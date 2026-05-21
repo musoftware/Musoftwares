@@ -249,9 +249,48 @@ function useRuntimeWS(pluginSlug: string, onBroadcast?: ((event: string, data: a
 
 export default function WhatsAppSenderRunner({ tool, subscription, runtimePort, pluginSlug }: any) {
     const [locale, setLocale]   = useState<'en' | 'ar'>('en');
-    const [activeTab, setActiveTab] = useState<TabId>('accounts');
-    const [reportCampaignId, setReportCampaignId]     = useState<string | null>(null);
-    const [reportCampaignName, setReportCampaignName] = useState<string | null>(null);
+    
+    // Initialize state from URL
+    const [activeTab, setActiveTab] = useState<TabId>(() => {
+        if (typeof window !== 'undefined') {
+            const params = new URLSearchParams(window.location.search);
+            const path = params.get('path') as TabId;
+            if (path && ['accounts', 'campaign', 'groups', 'group-campaign', 'history', 'report', 'templates'].includes(path)) {
+                return path;
+            }
+        }
+        return 'accounts';
+    });
+    
+    const [reportCampaignId, setReportCampaignId] = useState<string | null>(() => {
+        if (typeof window !== 'undefined') return new URLSearchParams(window.location.search).get('reportId');
+        return null;
+    });
+    
+    const [reportCampaignName, setReportCampaignName] = useState<string | null>(() => {
+        if (typeof window !== 'undefined') return new URLSearchParams(window.location.search).get('reportName');
+        return null;
+    });
+
+    // Sync state to URL
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            const url = new URL(window.location.href);
+            url.searchParams.set('path', activeTab);
+            
+            if (activeTab === 'report' && reportCampaignId) {
+                url.searchParams.set('reportId', reportCampaignId);
+                if (reportCampaignName) {
+                    url.searchParams.set('reportName', reportCampaignName);
+                }
+            } else {
+                url.searchParams.delete('reportId');
+                url.searchParams.delete('reportName');
+            }
+            
+            window.history.replaceState({}, '', url.toString());
+        }
+    }, [activeTab, reportCampaignId, reportCampaignName]);
 
     // Sessions
     const [sessions, setSessions]               = useState<any[]>([]);

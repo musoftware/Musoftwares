@@ -3,13 +3,16 @@ import {
     ArrowLeft, CheckCircle2, XCircle, FileText, Download,
     RefreshCw, Clock, MessageCircle, Eye, Mail, Filter, ChevronDown
 } from 'lucide-react';
+import { Card, CardContent } from '@/Components/ui/card';
+import { Button } from '@/Components/ui/button';
+import { Badge } from '@/Components/ui/badge';
 
 // ── Inline SVG Donut Chart ──────────────────────────────────────────────────
 function DonutChart({ segments }: { segments: { value: number; color: string; label: string }[] }) {
     const total = segments.reduce((s, seg) => s + seg.value, 0);
     if (total === 0) return (
-        <div className="w-40 h-40 rounded-full border-8 border-slate-100 flex items-center justify-center">
-            <span className="text-xs text-slate-400">No data</span>
+        <div className="w-40 h-40 rounded-full border-8 border-muted flex items-center justify-center">
+            <span className="text-xs text-muted-foreground">No data</span>
         </div>
     );
 
@@ -30,7 +33,7 @@ function DonutChart({ segments }: { segments: { value: number; color: string; la
         <div className="flex flex-col items-center gap-4">
             <div className="relative">
                 <svg width="160" height="160" viewBox="0 0 160 160">
-                    <circle cx={cx} cy={cy} r={radius} fill="none" stroke="#f1f5f9" strokeWidth="20" />
+                    <circle cx={cx} cy={cy} r={radius} fill="none" stroke="hsl(var(--muted))" strokeWidth="20" />
                     {slices.map((s, i) => (
                         <circle
                             key={i}
@@ -44,15 +47,15 @@ function DonutChart({ segments }: { segments: { value: number; color: string; la
                             className="transition-all duration-500"
                         />
                     ))}
-                    <text x={cx} y={cy - 6} textAnchor="middle" className="text-lg font-black fill-slate-800" style={{ fontSize: '22px', fontWeight: 900 }}>{total}</text>
-                    <text x={cx} y={cy + 12} textAnchor="middle" fill="#94a3b8" style={{ fontSize: '10px', fontWeight: 600 }}>Total</text>
+                    <text x={cx} y={cy - 6} textAnchor="middle" className="text-lg font-black fill-foreground" style={{ fontSize: '22px', fontWeight: 900 }}>{total}</text>
+                    <text x={cx} y={cy + 12} textAnchor="middle" className="fill-muted-foreground" style={{ fontSize: '10px', fontWeight: 600 }}>Total</text>
                 </svg>
             </div>
             <div className="flex flex-wrap justify-center gap-x-4 gap-y-1.5">
                 {slices.map((s, i) => (
-                    <div key={i} className="flex items-center gap-1.5 text-xs font-semibold text-slate-600">
+                    <div key={i} className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground">
                         <div className="w-2.5 h-2.5 rounded-full" style={{ background: s.color }} />
-                        {s.label} <span className="text-slate-400">({s.value})</span>
+                        {s.label} <span className="text-muted-foreground/70">({s.value})</span>
                     </div>
                 ))}
             </div>
@@ -70,10 +73,10 @@ function StatBar({ label, value, total, color, icon: Icon }: any) {
             </div>
             <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between mb-1">
-                    <span className="text-xs font-bold text-slate-600">{label}</span>
-                    <span className="text-xs font-black" style={{ color }}>{value} <span className="text-slate-400 font-normal">({pct}%)</span></span>
+                    <span className="text-xs font-bold">{label}</span>
+                    <span className="text-xs font-black" style={{ color }}>{value} <span className="text-muted-foreground font-normal">({pct}%)</span></span>
                 </div>
-                <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
+                <div className="h-2 bg-secondary rounded-full overflow-hidden">
                     <div className="h-full rounded-full transition-all duration-700" style={{ width: `${pct}%`, background: color }} />
                 </div>
             </div>
@@ -161,76 +164,80 @@ export default function CampaignReportWorkspace({ t, callRPC, campaignId, campai
         <div className="space-y-6 animate-in fade-in duration-300">
             {/* Header */}
             <div className="flex items-center gap-4">
-                <button onClick={onBack} className="p-2.5 hover:bg-slate-100 border border-slate-200 text-slate-500 rounded-xl transition-all">
+                <Button variant="outline" size="icon" onClick={onBack}>
                     <ArrowLeft className="w-4 h-4" />
-                </button>
+                </Button>
                 <div className="flex-1">
-                    <h2 className="text-xl font-bold tracking-tight text-slate-800">Campaign Report</h2>
-                    <p className="text-xs text-slate-400 mt-0.5">{campaignName} &mdash; <span className="font-mono">{campaignId}</span></p>
+                    <h2 className="text-xl font-bold tracking-tight">Campaign Report</h2>
+                    <p className="text-xs text-muted-foreground mt-0.5">{campaignName} &mdash; <span className="font-mono">{campaignId}</span></p>
                 </div>
                 <div className="flex items-center gap-2">
-                    <button onClick={fetchData} disabled={loading} className="p-2.5 hover:bg-slate-100 border border-slate-200 text-slate-500 rounded-xl transition-all">
+                    <Button variant="outline" size="icon" onClick={fetchData} disabled={loading}>
                         <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
-                    </button>
-                    <button onClick={() => exportCSV(contacts, campaignName)} className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-teal-500 to-emerald-600 text-white rounded-xl text-sm font-bold hover:from-teal-400 hover:to-emerald-500 transition-all shadow-[0_4px_10px_rgb(52,211,153,0.25)] active:scale-95">
+                    </Button>
+                    <Button onClick={() => exportCSV(contacts, campaignName)} className="bg-teal-600 hover:bg-teal-700 text-white gap-2">
                         <Download className="w-4 h-4" /> Export CSV
-                    </button>
+                    </Button>
                 </div>
             </div>
 
             {/* Analytics Row */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
                 {/* Donut Chart Card */}
-                <div className="bg-white/70 backdrop-blur-xl border border-white/60 rounded-3xl p-7 shadow-[0_8px_30px_rgb(0,0,0,0.04)] flex flex-col items-center justify-center">
-                    <h3 className="text-sm font-bold text-slate-600 uppercase tracking-wider mb-6">Delivery Breakdown</h3>
-                    <DonutChart segments={donutSegments} />
-                </div>
+                <Card>
+                    <CardContent className="p-7 flex flex-col items-center justify-center">
+                        <h3 className="text-sm font-bold uppercase tracking-wider mb-6">Delivery Breakdown</h3>
+                        <DonutChart segments={donutSegments} />
+                    </CardContent>
+                </Card>
 
                 {/* Bar Stats Card */}
-                <div className="bg-white/70 backdrop-blur-xl border border-white/60 rounded-3xl p-7 shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
-                    <h3 className="text-sm font-bold text-slate-600 uppercase tracking-wider mb-6">Engagement Funnel</h3>
-                    <div className="space-y-4">
-                        <StatBar label="Sent"      value={sent}      total={totalContacts} color={STATUS_COLORS.sent}      icon={Mail} />
-                        <StatBar label="Delivered" value={delivered} total={totalContacts} color={STATUS_COLORS.delivered}  icon={CheckCircle2} />
-                        <StatBar label="Read"      value={readCount} total={totalContacts} color={STATUS_COLORS.read}       icon={Eye} />
-                        <StatBar label="Replied"   value={replied}   total={totalContacts} color={STATUS_COLORS.replied}    icon={MessageCircle} />
-                        <StatBar label="Failed"    value={failed}    total={totalContacts} color={STATUS_COLORS.failed}     icon={XCircle} />
-                        {pending > 0 && <StatBar label="Pending" value={pending} total={totalContacts} color={STATUS_COLORS.pending} icon={Clock} />}
-                    </div>
-                </div>
+                <Card>
+                    <CardContent className="p-7">
+                        <h3 className="text-sm font-bold uppercase tracking-wider mb-6">Engagement Funnel</h3>
+                        <div className="space-y-4">
+                            <StatBar label="Sent"      value={sent}      total={totalContacts} color={STATUS_COLORS.sent}      icon={Mail} />
+                            <StatBar label="Delivered" value={delivered} total={totalContacts} color={STATUS_COLORS.delivered}  icon={CheckCircle2} />
+                            <StatBar label="Read"      value={readCount} total={totalContacts} color={STATUS_COLORS.read}       icon={Eye} />
+                            <StatBar label="Replied"   value={replied}   total={totalContacts} color={STATUS_COLORS.replied}    icon={MessageCircle} />
+                            <StatBar label="Failed"    value={failed}    total={totalContacts} color={STATUS_COLORS.failed}     icon={XCircle} />
+                            {pending > 0 && <StatBar label="Pending" value={pending} total={totalContacts} color={STATUS_COLORS.pending} icon={Clock} />}
+                        </div>
+                    </CardContent>
+                </Card>
             </div>
 
             {/* Summary KPI Cards */}
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
                 {[
-                    { label: 'Total',     value: totalContacts, color: '#64748b', bg: 'bg-slate-50' },
-                    { label: 'Sent',      value: sent,          color: STATUS_COLORS.sent,      bg: 'bg-emerald-50' },
-                    { label: 'Delivered', value: delivered,     color: STATUS_COLORS.delivered,  bg: 'bg-blue-50' },
-                    { label: 'Read',      value: readCount,     color: STATUS_COLORS.read,       bg: 'bg-violet-50' },
-                    { label: 'Replied',   value: replied,       color: STATUS_COLORS.replied,    bg: 'bg-amber-50' },
-                    { label: 'Failed',    value: failed,        color: STATUS_COLORS.failed,     bg: 'bg-red-50' },
+                    { label: 'Total',     value: totalContacts, color: '#64748b', bg: 'bg-muted' },
+                    { label: 'Sent',      value: sent,          color: STATUS_COLORS.sent,      bg: 'bg-emerald-500/10' },
+                    { label: 'Delivered', value: delivered,     color: STATUS_COLORS.delivered,  bg: 'bg-blue-500/10' },
+                    { label: 'Read',      value: readCount,     color: STATUS_COLORS.read,       bg: 'bg-violet-500/10' },
+                    { label: 'Replied',   value: replied,       color: STATUS_COLORS.replied,    bg: 'bg-amber-500/10' },
+                    { label: 'Failed',    value: failed,        color: STATUS_COLORS.failed,     bg: 'bg-red-500/10' },
                 ].map(({ label, value, color, bg }) => (
-                    <div key={label} className={`${bg} border border-white/60 rounded-2xl p-4 text-center shadow-[0_4px_15px_rgb(0,0,0,0.03)]`}>
+                    <div key={label} className={`${bg} border rounded-2xl p-4 text-center`}>
                         <p className="text-2xl font-black" style={{ color }}>{value}</p>
-                        <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mt-0.5">{label}</p>
+                        <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mt-0.5">{label}</p>
                     </div>
                 ))}
             </div>
 
             {/* Contact Table with Filter */}
-            <div className="bg-white/70 backdrop-blur-xl border border-white/60 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] overflow-hidden">
-                <div className="px-7 py-5 border-b border-slate-100/80 flex items-center justify-between">
-                    <h3 className="font-bold text-slate-800 text-sm">Per-Contact Engagement</h3>
+            <Card className="overflow-hidden">
+                <div className="px-7 py-5 border-b flex items-center justify-between">
+                    <h3 className="font-bold text-sm">Per-Contact Engagement</h3>
                     <div className="relative">
-                        <button onClick={() => setShowFilter(f => !f)} className="flex items-center gap-2 px-3 py-1.5 border border-slate-200 text-slate-600 rounded-xl text-xs font-bold hover:bg-slate-50 transition-colors">
+                        <Button variant="outline" size="sm" onClick={() => setShowFilter(f => !f)} className="gap-2 text-xs h-8">
                             <Filter className="w-3.5 h-3.5" />
                             {statusFilter === 'all' ? 'All Status' : statusFilter.charAt(0).toUpperCase() + statusFilter.slice(1)}
                             <ChevronDown className={`w-3.5 h-3.5 transition-transform ${showFilter ? 'rotate-180' : ''}`} />
-                        </button>
+                        </Button>
                         {showFilter && (
-                            <div className="absolute right-0 top-full mt-1 bg-white border border-slate-200 rounded-xl shadow-xl z-10 min-w-[140px] py-1 overflow-hidden">
+                            <div className="absolute right-0 top-full mt-1 bg-popover text-popover-foreground border rounded-xl shadow-xl z-10 min-w-[140px] py-1 overflow-hidden">
                                 {['all', 'sent', 'delivered', 'read', 'replied', 'failed', 'pending'].map(s => (
-                                    <button key={s} onClick={() => { setStatusFilter(s); setShowFilter(false); }} className={`w-full text-left px-4 py-2 text-xs font-bold capitalize transition-colors ${statusFilter === s ? 'bg-teal-50 text-teal-600' : 'text-slate-600 hover:bg-slate-50'}`}>
+                                    <button key={s} onClick={() => { setStatusFilter(s); setShowFilter(false); }} className={`w-full text-left px-4 py-2 text-xs font-bold capitalize transition-colors ${statusFilter === s ? 'bg-teal-50 text-teal-600 dark:bg-teal-950/30' : 'hover:bg-accent'}`}>
                                         {s === 'all' ? 'All' : s}
                                     </button>
                                 ))}
@@ -240,7 +247,7 @@ export default function CampaignReportWorkspace({ t, callRPC, campaignId, campai
                 </div>
                 <div className="overflow-x-auto max-h-[500px] overflow-y-auto">
                     <table className="w-full text-left text-sm whitespace-nowrap">
-                        <thead className="bg-slate-50/80 border-b border-slate-100 text-slate-500 font-semibold uppercase text-[10px] tracking-wider sticky top-0">
+                        <thead className="bg-muted/50 border-b text-muted-foreground font-semibold uppercase text-[10px] tracking-wider sticky top-0">
                             <tr>
                                 <th className="px-6 py-4">Phone</th>
                                 <th className="px-6 py-4">Name</th>
@@ -252,31 +259,31 @@ export default function CampaignReportWorkspace({ t, callRPC, campaignId, campai
                                 <th className="px-6 py-4">Error</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-slate-50">
+                        <tbody className="divide-y">
                             {filteredContacts.map((c: any) => {
                                 const StatusIcon = STATUS_ICONS[c.status] || Clock;
                                 const color      = STATUS_COLORS[c.status] || '#94a3b8';
                                 return (
-                                    <tr key={c.id} className="hover:bg-slate-50/60 transition-colors">
-                                        <td className="px-6 py-3 font-mono text-slate-600 text-xs">{c.phone}</td>
-                                        <td className="px-6 py-3 text-slate-700 font-medium text-xs">{c.name || '—'}</td>
+                                    <tr key={c.id} className="hover:bg-muted/50 transition-colors">
+                                        <td className="px-6 py-3 font-mono text-muted-foreground text-xs">{c.phone}</td>
+                                        <td className="px-6 py-3 font-medium text-xs">{c.name || '—'}</td>
                                         <td className="px-6 py-3">
-                                            <span className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full w-fit" style={{ background: `${color}18`, color }}>
+                                            <Badge variant="outline" className="gap-1.5 text-[10px] uppercase tracking-wider" style={{ background: `${color}18`, color, borderColor: `${color}30` }}>
                                                 <StatusIcon className="w-3 h-3" />
                                                 {c.status}
-                                            </span>
+                                            </Badge>
                                         </td>
-                                        <td className="px-6 py-3 text-slate-400 text-xs">{c.sent_at ? new Date(c.sent_at).toLocaleTimeString() : '—'}</td>
-                                        <td className="px-6 py-3 text-slate-400 text-xs">{c.delivered_at ? new Date(c.delivered_at).toLocaleTimeString() : '—'}</td>
-                                        <td className="px-6 py-3 text-slate-400 text-xs">{c.read_at ? new Date(c.read_at).toLocaleTimeString() : '—'}</td>
-                                        <td className="px-6 py-3 text-slate-400 text-xs">{c.replied_at ? new Date(c.replied_at).toLocaleTimeString() : '—'}</td>
-                                        <td className="px-6 py-3 text-rose-500 text-xs max-w-[200px] truncate" title={c.error_message}>{c.error_message || '—'}</td>
+                                        <td className="px-6 py-3 text-muted-foreground text-xs">{c.sent_at ? new Date(c.sent_at).toLocaleTimeString() : '—'}</td>
+                                        <td className="px-6 py-3 text-muted-foreground text-xs">{c.delivered_at ? new Date(c.delivered_at).toLocaleTimeString() : '—'}</td>
+                                        <td className="px-6 py-3 text-muted-foreground text-xs">{c.read_at ? new Date(c.read_at).toLocaleTimeString() : '—'}</td>
+                                        <td className="px-6 py-3 text-muted-foreground text-xs">{c.replied_at ? new Date(c.replied_at).toLocaleTimeString() : '—'}</td>
+                                        <td className="px-6 py-3 text-destructive text-xs max-w-[200px] truncate" title={c.error_message}>{c.error_message || '—'}</td>
                                     </tr>
                                 );
                             })}
                             {filteredContacts.length === 0 && !loading && (
                                 <tr>
-                                    <td colSpan={8} className="px-6 py-12 text-center text-slate-400 text-sm">
+                                    <td colSpan={8} className="px-6 py-12 text-center text-muted-foreground text-sm">
                                         {statusFilter !== 'all' ? `No contacts with status "${statusFilter}"` : 'No contacts recorded for this campaign yet.'}
                                     </td>
                                 </tr>
@@ -284,7 +291,7 @@ export default function CampaignReportWorkspace({ t, callRPC, campaignId, campai
                         </tbody>
                     </table>
                 </div>
-            </div>
+            </Card>
         </div>
     );
 }

@@ -1,5 +1,12 @@
 import React from 'react';
 import { Users, MessageSquare, Sparkles, ShieldCheck, Send } from 'lucide-react';
+import { Card, CardHeader, CardTitle, CardContent } from '@/Components/ui/card';
+import { Button } from '@/Components/ui/button';
+import { Input } from '@/Components/ui/input';
+import { Label } from '@/Components/ui/label';
+import { Switch } from '@/Components/ui/switch';
+import { Textarea } from '@/Components/ui/textarea';
+import { Badge } from '@/Components/ui/badge';
 
 export default function CampaignWorkspace({
     t, contactsText, setContactsText, getParsedRecipients,
@@ -15,62 +22,66 @@ export default function CampaignWorkspace({
             {/* Left Column */}
             <div className="space-y-6">
                 {/* Contacts Parser card */}
-                <div className="bg-white/60 backdrop-blur-xl border border-white/60 rounded-3xl p-7 shadow-[0_8px_30px_rgb(0,0,0,0.04)] space-y-4 transition-all hover:bg-white/80">
-                    <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-                        <div className="flex items-center gap-2">
-                            <Users className="w-4.5 h-4.5 text-teal-600" />
-                            <h3 className="font-bold text-slate-800 text-sm">{t.campaign.contactsLabel}</h3>
-                        </div>
-                        {getParsedRecipients.length > 0 && (
-                            <span className="text-[10px] font-extrabold uppercase px-2.5 py-1 bg-teal-50 border border-teal-200 text-teal-700 rounded-full tracking-wider">
-                                {getParsedRecipients.length} {t.campaign.parsedContacts}
-                            </span>
-                        )}
-                    </div>
-
-                    <textarea
-                        rows={6}
-                        value={contactsText}
-                        onChange={e => setContactsText(e.target.value)}
-                        placeholder={t.campaign.contactsPlaceholder}
-                        className="w-full text-xs border border-slate-200 focus:border-teal-500 rounded-xl p-4 outline-none transition-all resize-none font-mono"
-                    />
-
-                    {/* Parsed recipients visual grid preview */}
-                    {getParsedRecipients.length > 0 && (
-                        <div className="max-h-36 overflow-y-auto border border-slate-100 rounded-xl divide-y divide-slate-50">
-                            {getParsedRecipients.slice(0, 10).map((c: any, idx: number) => (
-                                <div key={idx} className="p-2.5 flex items-center justify-between text-[11px] font-medium text-slate-600 bg-slate-50/50">
-                                    <span className="font-mono text-slate-700 font-bold">{c.phone}</span>
-                                    <span className="truncate max-w-[120px]">{c.name || '—'}</span>
-                                    <span className="truncate max-w-[120px] text-slate-400">{c.company || '—'}</span>
-                                </div>
-                            ))}
-                            {getParsedRecipients.length > 10 && (
-                                <div className="p-2 text-center text-[10px] text-slate-400 font-bold">
-                                    + {getParsedRecipients.length - 10} more recipients
-                                </div>
+                <Card>
+                    <CardHeader className="pb-4 border-b">
+                        <div className="flex items-center justify-between">
+                            <CardTitle className="text-base flex items-center gap-2">
+                                <Users className="w-4.5 h-4.5 text-teal-600" />
+                                {t.campaign.contactsLabel}
+                            </CardTitle>
+                            {getParsedRecipients.length > 0 && (
+                                <Badge variant="secondary" className="bg-teal-50 text-teal-700 hover:bg-teal-100">
+                                    {getParsedRecipients.length} {t.campaign.parsedContacts}
+                                </Badge>
                             )}
                         </div>
-                    )}
-                </div>
+                    </CardHeader>
+                    <CardContent className="pt-6 space-y-4">
+                        <Textarea
+                            rows={6}
+                            value={contactsText}
+                            onChange={e => setContactsText(e.target.value)}
+                            placeholder={t.campaign.contactsPlaceholder}
+                            className="font-mono text-xs resize-none"
+                        />
+
+                        {/* Parsed recipients visual grid preview */}
+                        {getParsedRecipients.length > 0 && (
+                            <div className="max-h-36 overflow-y-auto border rounded-xl divide-y">
+                                {getParsedRecipients.slice(0, 10).map((c: any, idx: number) => (
+                                    <div key={idx} className="p-2.5 flex items-center justify-between text-[11px] font-medium bg-muted/50">
+                                        <span className="font-mono font-bold">{c.phone}</span>
+                                        <span className="truncate max-w-[120px]">{c.name || '—'}</span>
+                                        <span className="truncate max-w-[120px] text-muted-foreground">{c.company || '—'}</span>
+                                    </div>
+                                ))}
+                                {getParsedRecipients.length > 10 && (
+                                    <div className="p-2 text-center text-[10px] text-muted-foreground font-bold bg-muted/20">
+                                        + {getParsedRecipients.length - 10} more recipients
+                                    </div>
+                                )}
+                            </div>
+                        )}
+                    </CardContent>
+                </Card>
 
                 {/* Template Selector card */}
-                <div className="bg-white/60 backdrop-blur-xl border border-white/60 rounded-3xl p-7 shadow-[0_8px_30px_rgb(0,0,0,0.04)] space-y-4 transition-all hover:bg-white/80">
-                    <div className="flex items-center gap-2 border-b border-slate-100 pb-3">
-                        <MessageSquare className="w-4.5 h-4.5 text-teal-600" />
-                        <h3 className="font-bold text-slate-800 text-sm">Select Message Template</h3>
-                    </div>
-
-                    <div className="space-y-4">
+                <Card>
+                    <CardHeader className="pb-4 border-b">
+                        <CardTitle className="text-base flex items-center gap-2">
+                            <MessageSquare className="w-4.5 h-4.5 text-teal-600" />
+                            Select Message Template
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent className="pt-6 space-y-4">
                         {templates.length === 0 ? (
-                            <div className="text-sm text-slate-500 bg-slate-50 p-4 rounded-xl border border-slate-100 text-center">
+                            <div className="text-sm text-muted-foreground bg-muted p-4 rounded-xl text-center">
                                 No templates found. Please create one in the Templates tab first!
                             </div>
                         ) : (
                             <div className="space-y-3">
                                 {templates.map((tpl: any) => (
-                                    <label key={tpl.id} className={`flex items-start gap-3 p-3 rounded-xl border cursor-pointer transition-all ${selectedTemplateId === tpl.id ? 'border-teal-500 bg-teal-50/50 shadow-sm' : 'border-slate-200 hover:border-teal-300'}`}>
+                                    <label key={tpl.id} className={`flex items-start gap-3 p-3 rounded-xl border cursor-pointer transition-all ${selectedTemplateId === tpl.id ? 'border-teal-500 bg-teal-50/50 dark:bg-teal-950/20 shadow-sm' : 'hover:border-teal-300'}`}>
                                         <input
                                             type="radio"
                                             name="template_select"
@@ -79,143 +90,142 @@ export default function CampaignWorkspace({
                                             className="mt-1 text-teal-600 focus:ring-teal-500"
                                         />
                                         <div className="flex-1 min-w-0">
-                                            <h4 className="font-bold text-sm text-slate-800">{tpl.name}</h4>
-                                            <p className="text-xs text-slate-500 line-clamp-2 mt-0.5">{tpl.message}</p>
+                                            <h4 className="font-bold text-sm">{tpl.name}</h4>
+                                            <p className="text-xs text-muted-foreground line-clamp-2 mt-0.5">{tpl.message}</p>
                                             {tpl.media_url && (
-                                                <div className="flex items-center gap-1 mt-2 text-[10px] font-bold uppercase tracking-wider text-teal-600 bg-teal-100/50 w-fit px-2 py-0.5 rounded">
+                                                <Badge variant="outline" className="mt-2 gap-1 bg-teal-50/50 text-teal-700">
                                                     <Sparkles className="w-3 h-3" />
                                                     {tpl.media_type} Attached
-                                                </div>
+                                                </Badge>
                                             )}
                                         </div>
                                     </label>
                                 ))}
                             </div>
                         )}
-                    </div>
-                </div>
+                    </CardContent>
+                </Card>
 
                 {/* Safety configuration card */}
-                <div className="bg-white/60 backdrop-blur-xl border border-white/60 rounded-3xl p-7 shadow-[0_8px_30px_rgb(0,0,0,0.04)] space-y-4 transition-all hover:bg-white/80">
-                    <div className="flex items-center gap-2 border-b border-slate-100 pb-3">
-                        <ShieldCheck className="w-4.5 h-4.5 text-teal-600" />
-                        <h3 className="font-bold text-slate-800 text-sm">{t.campaign.safetyLabel}</h3>
-                    </div>
-
-                    {/* Min/Max WPM speed sliders */}
-                    <div className="space-y-2">
-                        <div className="flex items-center justify-between text-xs">
-                            <span className="font-semibold text-slate-500">{t.campaign.typingSpeed}</span>
-                            <span className="font-black text-slate-700">{minWpm} - {maxWpm} WPM</span>
-                        </div>
-                        <div className="grid grid-cols-2 gap-4">
-                            <input
-                                type="range"
-                                min={30}
-                                max={60}
-                                value={minWpm}
-                                onChange={e => setMinWpm(Number(e.target.value))}
-                                className="h-1.5 bg-slate-100 rounded-lg appearance-none cursor-pointer accent-teal-600"
-                            />
-                            <input
-                                type="range"
-                                min={61}
-                                max={100}
-                                value={maxWpm}
-                                onChange={e => setMaxWpm(Number(e.target.value))}
-                                className="h-1.5 bg-slate-100 rounded-lg appearance-none cursor-pointer accent-teal-600"
-                            />
-                        </div>
-                    </div>
-
-                    {/* Typo Correction percentage slider */}
-                    <div className="space-y-2">
-                        <div className="flex items-center justify-between text-xs">
-                            <span className="font-semibold text-slate-500">{t.campaign.typoChance}</span>
-                            <span className="font-black text-slate-700">{typoChance}%</span>
-                        </div>
-                        <input
-                            type="range"
-                            min={0}
-                            max={15}
-                            value={typoChance}
-                            onChange={e => setTypoChance(Number(e.target.value))}
-                            className="w-full h-1.5 bg-slate-100 rounded-lg appearance-none cursor-pointer accent-teal-600"
-                        />
-                    </div>
-
-                    {/* Anti ban toggle switches */}
-                    <div className="space-y-3.5 pt-2">
-                        <div className="flex items-center justify-between">
-                            <label className="text-xs font-semibold text-slate-600 select-none">{t.campaign.useSynonyms}</label>
-                            <input
-                                type="checkbox"
-                                checked={useSynonyms}
-                                onChange={e => setUseSynonyms(e.target.checked)}
-                                className="w-4 h-4 text-teal-650 accent-teal-600 border-slate-350 rounded focus:ring-teal-500"
-                            />
-                        </div>
-                        <div className="flex items-center justify-between">
-                            <label className="text-xs font-semibold text-slate-600 select-none">{t.campaign.bellCurve}</label>
-                            <input
-                                type="checkbox"
-                                checked={bellCurve}
-                                onChange={e => setBellCurve(e.target.checked)}
-                                className="w-4 h-4 text-teal-650 accent-teal-600 border-slate-350 rounded focus:ring-teal-500"
-                            />
-                        </div>
-                        <div className="flex items-center justify-between">
-                            <label className="text-xs font-semibold text-slate-600 select-none">{t.campaign.trackDelivery}</label>
-                            <input
-                                type="checkbox"
-                                checked={trackDelivery}
-                                onChange={e => setTrackDelivery(e.target.checked)}
-                                className="w-4 h-4 text-teal-650 accent-teal-600 border-slate-350 rounded focus:ring-teal-500"
-                            />
-                        </div>
-                        <div className="flex items-center justify-between">
-                            <label className="text-xs font-semibold text-slate-600 select-none">{t.campaign.stopOnBlock}</label>
-                            <input
-                                type="checkbox"
-                                checked={stopOnBlock}
-                                onChange={e => setStopOnBlock(e.target.checked)}
-                                className="w-4 h-4 text-teal-650 accent-teal-600 border-slate-350 rounded focus:ring-teal-500"
-                            />
-                        </div>
-                    </div>
-
-                    {stopOnBlock && (
-                        <div className="space-y-2 pt-1 animate-in slide-in-from-top-1 duration-200">
-                            <div className="flex items-center justify-between text-[11px]">
-                                <span className="font-semibold text-slate-450">{t.campaign.maxBlockRate}</span>
-                                <span className="font-black text-rose-600">{maxBlockRate}%</span>
+                <Card>
+                    <CardHeader className="pb-4 border-b">
+                        <CardTitle className="text-base flex items-center gap-2">
+                            <ShieldCheck className="w-4.5 h-4.5 text-teal-600" />
+                            {t.campaign.safetyLabel}
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent className="pt-6 space-y-6">
+                        {/* Min/Max WPM speed sliders */}
+                        <div className="space-y-2">
+                            <div className="flex items-center justify-between text-xs">
+                                <Label>{t.campaign.typingSpeed}</Label>
+                                <span className="font-black">{minWpm} - {maxWpm} WPM</span>
                             </div>
-                            <input
+                            <div className="grid grid-cols-2 gap-4">
+                                <Input
+                                    type="range"
+                                    min={30}
+                                    max={60}
+                                    value={minWpm}
+                                    onChange={e => setMinWpm(Number(e.target.value))}
+                                    className="p-0 h-auto border-none cursor-pointer"
+                                />
+                                <Input
+                                    type="range"
+                                    min={61}
+                                    max={100}
+                                    value={maxWpm}
+                                    onChange={e => setMaxWpm(Number(e.target.value))}
+                                    className="p-0 h-auto border-none cursor-pointer"
+                                />
+                            </div>
+                        </div>
+
+                        {/* Typo Correction percentage slider */}
+                        <div className="space-y-2">
+                            <div className="flex items-center justify-between text-xs">
+                                <Label>{t.campaign.typoChance}</Label>
+                                <span className="font-black">{typoChance}%</span>
+                            </div>
+                            <Input
                                 type="range"
-                                min={2}
-                                max={20}
-                                value={maxBlockRate}
-                                onChange={e => setMaxBlockRate(Number(e.target.value))}
-                                className="w-full h-1.5 bg-slate-100 rounded-lg appearance-none cursor-pointer accent-rose-600"
+                                min={0}
+                                max={15}
+                                value={typoChance}
+                                onChange={e => setTypoChance(Number(e.target.value))}
+                                className="p-0 h-auto border-none cursor-pointer"
                             />
                         </div>
-                    )}
-                </div>
+
+                        {/* Anti ban toggle switches */}
+                        <div className="space-y-4 pt-2">
+                            <div className="flex items-center justify-between">
+                                <Label htmlFor="useSynonyms" className="cursor-pointer">{t.campaign.useSynonyms}</Label>
+                                <Switch
+                                    id="useSynonyms"
+                                    checked={useSynonyms}
+                                    onCheckedChange={setUseSynonyms}
+                                />
+                            </div>
+                            <div className="flex items-center justify-between">
+                                <Label htmlFor="bellCurve" className="cursor-pointer">{t.campaign.bellCurve}</Label>
+                                <Switch
+                                    id="bellCurve"
+                                    checked={bellCurve}
+                                    onCheckedChange={setBellCurve}
+                                />
+                            </div>
+                            <div className="flex items-center justify-between">
+                                <Label htmlFor="trackDelivery" className="cursor-pointer">{t.campaign.trackDelivery}</Label>
+                                <Switch
+                                    id="trackDelivery"
+                                    checked={trackDelivery}
+                                    onCheckedChange={setTrackDelivery}
+                                />
+                            </div>
+                            <div className="flex items-center justify-between">
+                                <Label htmlFor="stopOnBlock" className="cursor-pointer text-destructive">{t.campaign.stopOnBlock}</Label>
+                                <Switch
+                                    id="stopOnBlock"
+                                    checked={stopOnBlock}
+                                    onCheckedChange={setStopOnBlock}
+                                />
+                            </div>
+                        </div>
+
+                        {stopOnBlock && (
+                            <div className="space-y-2 pt-1 animate-in slide-in-from-top-1 duration-200">
+                                <div className="flex items-center justify-between text-[11px]">
+                                    <Label className="text-destructive">{t.campaign.maxBlockRate}</Label>
+                                    <span className="font-black text-destructive">{maxBlockRate}%</span>
+                                </div>
+                                <Input
+                                    type="range"
+                                    min={2}
+                                    max={20}
+                                    value={maxBlockRate}
+                                    onChange={e => setMaxBlockRate(Number(e.target.value))}
+                                    className="p-0 h-auto border-none cursor-pointer accent-destructive"
+                                />
+                            </div>
+                        )}
+                    </CardContent>
+                </Card>
 
                 {/* Select dispatch accounts configuration */}
                 <div className="space-y-4">
                     <div className="flex flex-col md:flex-row items-stretch md:items-center gap-3">
-                        <input
+                        <Input
                             type="text"
                             value={campaignName}
                             onChange={e => setCampaignName(e.target.value)}
                             placeholder="Enter Campaign Identifier Name"
-                            className="flex-1 text-xs border border-slate-200 focus:border-teal-500 rounded-xl px-4 py-2.5 outline-none transition-all bg-white"
+                            className="flex-1"
                         />
                         <select
                             value={selectedAccount}
                             onChange={e => setSelectedAccount(e.target.value)}
-                            className="text-xs border border-slate-200 rounded-xl px-3 py-2.5 outline-none bg-white font-bold text-slate-600"
+                            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:w-auto font-medium"
                         >
                             <option value="">Select Routing Session</option>
                             {sessions.filter((s: any) => s.state === 'connected').map((s: any) => (
@@ -224,14 +234,15 @@ export default function CampaignWorkspace({
                         </select>
                     </div>
 
-                    <button
+                    <Button
                         onClick={handleLaunchCampaign}
                         disabled={isCampaignRunning}
-                        className="w-full py-4 bg-gradient-to-r from-teal-500 to-emerald-600 hover:from-teal-400 hover:to-emerald-500 text-white rounded-2xl text-sm font-extrabold transition-all shadow-[0_8px_20px_rgb(20,184,166,0.3)] hover:shadow-[0_12px_25px_rgb(20,184,166,0.4)] active:scale-95 flex items-center justify-center gap-2.5 disabled:opacity-50"
+                        size="lg"
+                        className="w-full bg-teal-600 hover:bg-teal-700 text-white gap-2"
                     >
                         <Send className="w-4 h-4" />
                         {t.campaign.launchButton}
-                    </button>
+                    </Button>
                 </div>
             </div>
         </div>

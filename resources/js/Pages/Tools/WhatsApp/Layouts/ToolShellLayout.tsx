@@ -12,7 +12,7 @@ export default function ToolShellLayout({ children, sidebar, locale }: ToolShell
     return (
         <div 
             dir={isRtl ? 'rtl' : 'ltr'} 
-            className={`min-h-screen bg-[#F8FAFC] text-slate-900 font-sans selection:bg-teal-500 selection:text-white flex flex-col md:flex-row transition-all duration-300 ${isRtl ? 'text-right' : 'text-left'} relative overflow-hidden`}
+            className={`min-h-screen bg-background text-foreground font-sans selection:bg-teal-500 selection:text-white flex flex-col md:flex-row transition-all duration-300 ${isRtl ? 'text-right' : 'text-left'} relative overflow-hidden`}
         >
             {/* Ambient Premium Background */}
             <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-teal-400/10 rounded-full blur-[120px] -z-10 animate-pulse pointer-events-none" style={{ animationDuration: '8s' }} />
