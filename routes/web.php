@@ -275,6 +275,17 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
     Route::post('/calculator/save', [\App\Http\Controllers\Admin\PriceCalculatorController::class, 'saveProposal'])->name('calculator.save');
     Route::post('/calculator/{proposal}/convert', [\App\Http\Controllers\Admin\PriceCalculatorController::class, 'convertToContract'])->name('calculator.convert');
 
+    // ── Admin Sequences ───────────────────────────────────────────
+    Route::get('/sequences', [\App\Http\Controllers\Admin\SequenceController::class, 'index'])->name('sequences.index');
+    Route::post('/sequences', [\App\Http\Controllers\Admin\SequenceController::class, 'store'])->name('sequences.store');
+    Route::get('/sequences/{sequence}', [\App\Http\Controllers\Admin\SequenceController::class, 'show'])->name('sequences.show');
+    Route::delete('/sequences/{sequence}', [\App\Http\Controllers\Admin\SequenceController::class, 'destroy'])->name('sequences.destroy');
+    Route::post('/sequences/{sequence}/steps', [\App\Http\Controllers\Admin\SequenceController::class, 'storeStep'])->name('sequences.steps.store');
+    Route::put('/sequences/steps/{step}', [\App\Http\Controllers\Admin\SequenceController::class, 'updateStep'])->name('sequences.steps.update');
+    Route::delete('/sequences/steps/{step}', [\App\Http\Controllers\Admin\SequenceController::class, 'deleteStep'])->name('sequences.steps.destroy');
+    Route::post('/sequences/{sequence}/generate-ai', [\App\Http\Controllers\Admin\SequenceController::class, 'generateStepsWithAI'])->name('sequences.generate-ai');
+    Route::post('/sequences/{sequence}/apply-ai', [\App\Http\Controllers\Admin\SequenceController::class, 'applyGeneratedSteps'])->name('sequences.apply-ai');
+
     // ── User Management (Full Admin Control) ────────────────────────
     // Recovered from old project: Admin/UsersController
     Route::get('/users', [\App\Http\Controllers\Admin\UsersController::class, 'index'])->name('users.index');
