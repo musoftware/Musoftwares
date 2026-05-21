@@ -1,4 +1,5 @@
 import { Head, Link } from '@inertiajs/react';
+import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
 
 export default function Index({ clients }) {
     const formatCurrency = (amount, currency = 'USD') => {
@@ -9,10 +10,7 @@ export default function Index({ clients }) {
     };
 
     return (
-        <div className="p-6">
-            <Head title="Clients" />
-            <h1 className="mb-6 text-3xl font-bold">Clients</h1>
-
+        <AdminSidebarLayout title="Users" header="Platform Users">
             <div className="overflow-hidden rounded-lg bg-white shadow">
                 <table className="w-full text-left">
                     <thead className="border-b bg-gray-50">
@@ -67,7 +65,7 @@ export default function Index({ clients }) {
                                     colSpan="5"
                                     className="p-4 text-center text-gray-500"
                                 >
-                                    No clients found.
+                                    No users found.
                                 </td>
                             </tr>
                         )}
@@ -82,6 +80,6 @@ export default function Index({ clients }) {
                     {clients.total} entries
                 </span>
             </div>
-        </div>
+        </AdminSidebarLayout>
     );
 }
