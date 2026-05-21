@@ -5,9 +5,9 @@ namespace Modules\Marketplace\Http\Controllers;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use Modules\Core\Models\Service;
-use Modules\Core\Models\ServiceOrder;
-use Modules\Core\Models\ServiceCategory;
+use Modules\Marketplace\Models\Service;
+use Modules\Marketplace\Models\ServiceOrder;
+use Modules\Marketplace\Models\ServiceCategory;
 
 class DashboardController extends Controller
 {

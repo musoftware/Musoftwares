@@ -5,9 +5,9 @@ namespace Modules\Marketplace\Http\Controllers;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Modules\Core\Models\Service;
-use Modules\Core\Models\ServiceCategory;
-use Modules\Core\Models\ServicePackage;
+use Modules\Marketplace\Models\Service;
+use Modules\Marketplace\Models\ServiceCategory;
+use Modules\Marketplace\Models\ServicePackage;
 use Inertia\Inertia;
 
 class ServiceController extends Controller

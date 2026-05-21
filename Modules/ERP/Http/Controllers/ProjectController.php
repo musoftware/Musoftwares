@@ -5,7 +5,7 @@ namespace Modules\ERP\Http\Controllers;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Modules\Core\Models\Project;
+use Modules\ERP\Models\Project;
 use Modules\ERP\Models\Tenant;
 use Modules\ERP\Services\ActivityLogger;
 

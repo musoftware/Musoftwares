@@ -2,8 +2,8 @@
 
 namespace App\Helpers;
 
-use Modules\Core\Models\File;
-use Modules\Core\Models\FileFolder;
+use App\Models\File;
+use App\Models\FileFolder;
 use App\Models\Freelance\Client;
 use App\Models\Freelance\Currency;
 use App\Models\User;
@@ -39,14 +39,14 @@ class FileHelper
     public static function HasFile($id)
     {
         if (is_string($id) && !is_numeric($id)) return false;
-        $file = \Modules\Core\Models\File::find($id);
+        $file = \App\Models\File::find($id);
         return ($file != null);
     }
 
     public static function Image($id)
     {
         if (is_string($id) && !is_numeric($id)) return '';
-        $file = \Modules\Core\Models\File::find($id);
+        $file = \App\Models\File::find($id);
         return $file->image();
     }
 

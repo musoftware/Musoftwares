@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use Modules\Core\Models\SerialDevice;
-use Modules\Core\Models\SerialSoftware;
+use App\Models\SerialDevice;
+use App\Models\SerialSoftware;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 

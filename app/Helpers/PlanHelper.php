@@ -2,8 +2,8 @@
 
 namespace App\Helpers;
 
-use Modules\Core\Models\AdminSettings;
-use Modules\Core\Models\Currency;
+use App\Models\AdminSettings;
+use App\Models\Currency;
 use App\Models\User;
 use BaconQrCode\Renderer\Image\ImagickImageBackEnd;
 use BaconQrCode\Renderer\ImageRenderer;

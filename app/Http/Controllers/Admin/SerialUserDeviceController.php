@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use Modules\Core\Models\SerialDevice;
-use Modules\Core\Models\SerialUserDevice;
+use App\Models\SerialDevice;
+use App\Models\SerialUserDevice;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
