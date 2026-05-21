@@ -585,6 +585,14 @@ function AuthenticatedContent({
                                     {!auth?.team_member ? (
                                         <>
                                             <DropdownMenuGroup>
+                                                {user?.role === 'admin' && (
+                                                    <DropdownMenuItem 
+                                                        className="cursor-pointer rounded-lg text-sm bg-indigo-50 text-indigo-700 focus:bg-indigo-100 focus:text-indigo-800 mb-1"
+                                                        render={<Link href={safeRoute('admin.dashboard')} className="flex items-center w-full font-medium" />}
+                                                    >
+                                                        <Shield className="mr-2 h-4 w-4 text-indigo-600" /> Admin Dashboard
+                                                    </DropdownMenuItem>
+                                                )}
                                                 <DropdownMenuItem 
                                                     className="cursor-pointer rounded-lg text-sm"
                                                     render={<Link href={safeRoute('profile.edit')} className="flex items-center w-full" />}
