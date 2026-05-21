@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 use Modules\ERP\Models\Tenant;
-use Modules\Core\Models\TeamMember;
+use Modules\ERP\Models\TeamMember;
 use Inertia\Inertia;
 use Inertia\Response as InertiaResponse;
 

@@ -7,7 +7,7 @@ use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Modules\ERP\Models\Tenant;
-use Modules\Core\Models\TeamMember;
+use Modules\ERP\Models\TeamMember;
 use Modules\ERP\Models\TenantClient;
 use Tests\TestCase;
 

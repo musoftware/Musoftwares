@@ -3,7 +3,7 @@
 namespace App\Helpers;
 
 use App\Models\User;
-use Modules\Core\Models\Currency;
+use App\Models\Currency;
 use Asantibanez\LivewireCharts\Models\ColumnChartModel;
 use Asantibanez\LivewireCharts\Models\LineChartModel;
 use http\Client;

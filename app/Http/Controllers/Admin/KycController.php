@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
-use Modules\Core\Models\KycDocument;
+use App\Models\KycDocument;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 

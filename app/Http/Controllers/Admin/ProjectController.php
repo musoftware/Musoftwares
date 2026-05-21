@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use Modules\Core\Models\Project;
+use Modules\ERP\Models\Project;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Inertia\Inertia;

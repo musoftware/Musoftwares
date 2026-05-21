@@ -2,7 +2,7 @@
 
 namespace App\Helpers;
 
-use Modules\Core\Models\AdminSettings;
+use App\Models\AdminSettings;
 use BaconQrCode\Renderer\Image\ImagickImageBackEnd;
 use BaconQrCode\Renderer\ImageRenderer;
 use BaconQrCode\Renderer\Module\RoundnessModule;

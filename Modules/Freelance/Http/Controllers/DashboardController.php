@@ -5,10 +5,10 @@ namespace Modules\Freelance\Http\Controllers;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use Modules\Core\Models\Contract;
+use Modules\Freelance\Models\Contract;
 use Modules\Freelance\Models\Proposal;
 use Modules\Freelance\Models\PointTransaction;
-use Modules\Core\Models\Job;
+use Modules\Freelance\Models\Job;
 use Carbon\Carbon;
 
 class DashboardController extends Controller

@@ -4,7 +4,7 @@ namespace Modules\Marketplace\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Modules\Core\Models\ServiceCategory;
+use Modules\Marketplace\Models\ServiceCategory;
 use Illuminate\Support\Str;
 
 class ServiceCategoryController extends Controller

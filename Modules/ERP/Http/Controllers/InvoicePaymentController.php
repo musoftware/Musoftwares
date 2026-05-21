@@ -3,7 +3,7 @@
 namespace Modules\ERP\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use Modules\Core\Models\Invoice;
+use Modules\ERP\Models\Invoice;
 use Modules\ERP\Models\ClientWallet;
 use Modules\ERP\Models\WalletTransaction as ClientWalletTransaction;
 use Illuminate\Http\Request;

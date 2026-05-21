@@ -12,7 +12,7 @@ trait IsPlatformClient
 {
     public function invoices()
     {
-        return $this->hasMany(\Modules\Core\Models\Invoice::class, 'client_id')
+        return $this->hasMany(\Modules\ERP\Models\Invoice::class, 'client_id')
                     ->where('tenant_id', Tenant::platformId());
     }
 
@@ -30,7 +30,7 @@ trait IsPlatformClient
 
     public function projects()
     {
-        return $this->hasMany(\Modules\Core\Models\Project::class, 'client_id')
+        return $this->hasMany(\Modules\ERP\Models\Project::class, 'client_id')
                     ->where('tenant_id', Tenant::platformId());
     }
 }

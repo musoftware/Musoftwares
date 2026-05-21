@@ -4,8 +4,8 @@ namespace Modules\Marketplace\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Modules\Core\Models\ServicePackage;
-use Modules\Core\Models\Service;
+use Modules\Marketplace\Models\ServicePackage;
+use Modules\Marketplace\Models\Service;
 
 class ServicePackageController extends Controller
 {
