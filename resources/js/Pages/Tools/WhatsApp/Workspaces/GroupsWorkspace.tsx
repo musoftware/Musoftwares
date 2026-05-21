@@ -6,7 +6,7 @@ import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
 import { Textarea } from '@/Components/ui/textarea';
 
-export default function GroupsWorkspace({ t, callRPC, selectedAccount, sessions }: any) {
+export default function GroupsWorkspace({ t, callRPC, selectedAccount, sessions, daemonConnected }: any) {
     const [groups, setGroups] = useState<any[]>([]);
     const [loading, setLoading] = useState(false);
     
@@ -19,7 +19,7 @@ export default function GroupsWorkspace({ t, callRPC, selectedAccount, sessions 
     const [newMembers, setNewMembers] = useState('');
 
     const fetchGroups = async () => {
-        if (!selectedAccount) return;
+        if (!selectedAccount || !daemonConnected) return;
         setLoading(true);
         try {
             const res: any = await callRPC('listGroups', { accountId: selectedAccount });
@@ -74,8 +74,8 @@ export default function GroupsWorkspace({ t, callRPC, selectedAccount, sessions 
     };
 
     useEffect(() => {
-        if (selectedAccount) fetchGroups();
-    }, [selectedAccount]);
+        if (selectedAccount && daemonConnected) fetchGroups();
+    }, [selectedAccount, daemonConnected]);
 
     if (!selectedAccount) {
         return (
