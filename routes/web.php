@@ -252,6 +252,13 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
     // ── Admin Plans ───────────────────────────────────────────────
     Route::resource('/plans', \App\Http\Controllers\Admin\PlanController::class)->except(['create', 'edit', 'show']);
 
+    // ── Admin Invoices (Platform Billing) ─────────────────────────
+    Route::get('/invoices', [\App\Http\Controllers\Admin\InvoiceController::class, 'index'])->name('invoices.index');
+    Route::get('/invoices/unpaid', [\App\Http\Controllers\Admin\InvoiceController::class, 'unpaid'])->name('invoices.unpaid');
+    Route::get('/invoices/archive', [\App\Http\Controllers\Admin\InvoiceController::class, 'archive'])->name('invoices.archive');
+    Route::post('/invoices/{invoice}/mark-paid', [\App\Http\Controllers\Admin\InvoiceController::class, 'markPaid'])->name('invoices.mark-paid');
+    Route::post('/invoices/{invoice}/cancel', [\App\Http\Controllers\Admin\InvoiceController::class, 'cancel'])->name('invoices.cancel');
+
     // ── User Management (Full Admin Control) ────────────────────────
     // Recovered from old project: Admin/UsersController
     Route::get('/users', [\App\Http\Controllers\Admin\UsersController::class, 'index'])->name('users.index');
