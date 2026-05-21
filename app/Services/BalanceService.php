@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\DB;
 
 /**
  * Balance management service providing reconciliation and computation utilities.
- * Recovered from old project: App\Helper\BalancesHelper
+ * Recovered from old project: App\Helpers\BalancesHelper
  * Modernized: Service-oriented, wallet-based (not user-field-based).
  */
 class BalanceService
