@@ -259,6 +259,22 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
     Route::post('/invoices/{invoice}/mark-paid', [\App\Http\Controllers\Admin\InvoiceController::class, 'markPaid'])->name('invoices.mark-paid');
     Route::post('/invoices/{invoice}/cancel', [\App\Http\Controllers\Admin\InvoiceController::class, 'cancel'])->name('invoices.cancel');
 
+    // ── Admin Leads ───────────────────────────────────────────────
+    Route::get('/leads', [\App\Http\Controllers\Admin\LeadController::class, 'index'])->name('leads.index');
+    Route::post('/leads/{lead}/status', [\App\Http\Controllers\Admin\LeadController::class, 'updateStatus'])->name('leads.update-status');
+    Route::delete('/leads/{lead}', [\App\Http\Controllers\Admin\LeadController::class, 'destroy'])->name('leads.destroy');
+
+    // ── Admin Contracts ───────────────────────────────────────────
+    Route::get('/contracts', [\App\Http\Controllers\Admin\ContractController::class, 'index'])->name('contracts.index');
+    Route::post('/contracts/{contract}/status', [\App\Http\Controllers\Admin\ContractController::class, 'updateStatus'])->name('contracts.update-status');
+    Route::delete('/contracts/{contract}', [\App\Http\Controllers\Admin\ContractController::class, 'destroy'])->name('contracts.destroy');
+
+    // ── Admin Price Calculator ────────────────────────────────────
+    Route::get('/calculator', [\App\Http\Controllers\Admin\PriceCalculatorController::class, 'index'])->name('calculator.index');
+    Route::post('/calculator/calculate-ai', [\App\Http\Controllers\Admin\PriceCalculatorController::class, 'calculateAI'])->name('calculator.calculate-ai');
+    Route::post('/calculator/save', [\App\Http\Controllers\Admin\PriceCalculatorController::class, 'saveProposal'])->name('calculator.save');
+    Route::post('/calculator/{proposal}/convert', [\App\Http\Controllers\Admin\PriceCalculatorController::class, 'convertToContract'])->name('calculator.convert');
+
     // ── User Management (Full Admin Control) ────────────────────────
     // Recovered from old project: Admin/UsersController
     Route::get('/users', [\App\Http\Controllers\Admin\UsersController::class, 'index'])->name('users.index');
