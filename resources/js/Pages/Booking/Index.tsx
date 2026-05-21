@@ -6,7 +6,7 @@ import { OperationalCard } from '@/Components/ui/OperationalCard';
 import { EmptyState } from '@/Components/ui/EmptyState';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/Components/ui/card';
 import { Badge } from '@/Components/ui/badge';
-import { Calendar, Clock, Copy, Plus, MoreHorizontal } from 'lucide-react';
+import { Calendar, Clock, Copy, Plus, MoreHorizontal, Users } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/Components/ui/dropdown-menu';
 import { CurrencyDisplay } from '@/Components/ui/CurrencyDisplay';
 
@@ -36,6 +36,7 @@ export default function Index({ events }: { events: EventType[] }) {
             menuItems={[
                 { id: 'appointments', label: 'Appointments', icon: Clock, href: '/booking/appointments', isActive: false },
                 { id: 'availability', label: 'Availability', icon: Calendar, href: '/booking', isActive: true },
+                { id: 'providers', label: 'Providers', icon: Users, href: '/booking/providers', isActive: false },
             ]}
         >
             <Head title="Booking Events" />

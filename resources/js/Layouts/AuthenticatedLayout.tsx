@@ -384,7 +384,6 @@ function AuthenticatedContent({
                                                     <p className={cn("text-sm font-medium", isBookingActive ? "text-amber-900" : "text-slate-900")}>Booking</p>
                                                     {isBookingActive && <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-amber-100 text-amber-700">Active</span>}
                                                     {!activeModules.booking && <Lock className="w-3.5 h-3.5 text-slate-400" />}
-                                                    {activeModules.booking && !isBookingActive && <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-amber-100 text-amber-700">Add-on</span>}
                                                 </div>
                                                 <p className={cn("text-xs truncate", isBookingActive ? "text-amber-700/70" : "text-slate-500")}>
                                                     {!activeModules.booking ? 'Subscribe to access' : 'Appointments & Availability'}
