@@ -107,7 +107,7 @@ export default function Index({
             label: 'Invoice No',
             render: (row: Invoice) => (
                 <Link
-                    href={route('erp.client-invoices.pay', row.uuid)}
+                    href={route('erp.client-invoices.pay', row.id)}
                     className="font-mono text-slate-900 font-semibold hover:text-indigo-600 transition-colors text-[13px]"
                 >
                     {row.invoice_number}
@@ -183,7 +183,7 @@ export default function Index({
                 <div className="flex items-center justify-end gap-2">
                     {row.status !== 'paid' && row.status !== 'cancelled' && row.status !== 'refunded' ? (
                         <Link
-                            href={route('erp.client-invoices.pay', row.uuid)}
+                            href={route('erp.client-invoices.pay', row.id)}
                             className={buttonVariants({
                                 variant: 'default',
                                 size: 'sm',
@@ -194,7 +194,7 @@ export default function Index({
                         </Link>
                     ) : (
                         <Link
-                            href={route('erp.client-invoices.pay', row.uuid)}
+                            href={route('erp.client-invoices.pay', row.id)}
                             className={buttonVariants({
                                 variant: 'ghost',
                                 size: 'icon-sm',

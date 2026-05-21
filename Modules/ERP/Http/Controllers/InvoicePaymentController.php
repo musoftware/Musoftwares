@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
+use Modules\ERP\Models\Tenant;
 
 /**
  * Client-facing invoice payment controller.
@@ -33,16 +34,12 @@ class InvoicePaymentController extends Controller
      */
     public function show(Request $request, string $uuid)
     {
-        $user   = Auth::user();
-        $client = $user->resolveClient();
+        $user = Auth::user();
 
-        if (!$client) {
-            abort(404, 'No client record is linked to your account.');
-        }
-
-        $invoice = Invoice::where('uuid', $uuid)
-            ->where('client_id', $client->id)
-            ->with(['items', 'client'])
+        $invoice = Invoice::where('id', $uuid)
+            ->where('client_id', $user->id)
+            ->where('tenant_id', Tenant::platformId())
+            ->with(['items'])
             ->firstOrFail();
 
         if ($invoice->status === 'paid') {
@@ -50,8 +47,8 @@ class InvoicePaymentController extends Controller
                 ->with('info', 'This invoice is already paid.');
         }
 
-        // Load the ERP ClientWallet — this is tenant-managed bookkeeping credit
-        $wallet  = ClientWallet::where('client_id', $client->id)->first();
+        // Load the ERP ClientWallet for the platform tenant
+        $wallet  = $user->platformWallet;
         $balance = $wallet ? (float) $wallet->balance : 0.0;
 
         return Inertia::render('ERP/ClientInvoices/Pay', [
@@ -87,15 +84,11 @@ class InvoicePaymentController extends Controller
             'amount' => 'required|numeric|min:0.01',
         ]);
 
-        $user   = Auth::user();
-        $client = $user->resolveClient();
+        $user = Auth::user();
 
-        if (!$client) {
-            return response()->json(['success' => false, 'message' => 'No client record linked to your account.'], 403);
-        }
-
-        $invoice = Invoice::where('uuid', $uuid)
-            ->where('client_id', $client->id)
+        $invoice = Invoice::where('id', $uuid)
+            ->where('client_id', $user->id)
+            ->where('tenant_id', Tenant::platformId())
             ->firstOrFail();
 
         if ($invoice->status === 'paid') {
@@ -110,9 +103,9 @@ class InvoicePaymentController extends Controller
         $amount    = min((float) $request->input('amount'), $remaining);
 
         try {
-            $result = DB::transaction(function () use ($invoice, $client, $amount) {
-                $wallet = ClientWallet::where('tenant_id', $invoice->tenant_id)
-                    ->where('client_id', $client->id)
+            $result = DB::transaction(function () use ($invoice, $user, $amount) {
+                $wallet = ClientWallet::where('tenant_id', Tenant::platformId())
+                    ->where('client_id', $user->id)
                     ->lockForUpdate()
                     ->firstOrFail();
 
@@ -177,24 +170,16 @@ class InvoicePaymentController extends Controller
      */
     public function clientIndex(Request $request)
     {
-        $user   = Auth::user();
-        $client = $user->resolveClient();
+        $user = Auth::user();
 
-        if (!$client) {
-            return Inertia::render('ERP/ClientInvoices/Index', [
-                'invoices'        => collect(),
-                'unpaid_invoices' => collect(),
-                'paid_invoices'   => collect(),
-                'no_client'       => true,
-            ]);
-        }
-
-        $invoices = Invoice::where('client_id', $client->id)
+        $invoices = Invoice::where('client_id', $user->id)
+            ->where('tenant_id', Tenant::platformId())
             ->with('items')
             ->latest()
             ->paginate(14)
             ->through(fn($inv) => [
                 'id'            => $inv->id,
+                'uuid'          => $inv->uuid ?? $inv->id,
                 'invoice_number'=> $inv->invoice_number,
                 'amount'        => (float) $inv->amount,
                 'paid_amount'   => (float) $inv->paid_amount,
@@ -209,8 +194,8 @@ class InvoicePaymentController extends Controller
         $unpaidInvoices  = $collection->filter(fn($i) => $i['status'] !== 'paid')->values();
         $paidInvoices    = $collection->filter(fn($i) => $i['status'] === 'paid')->values();
 
-        // ERP client wallet balance
-        $wallet  = ClientWallet::where('client_id', $client->id)->first();
+        // ERP client wallet balance for platform
+        $wallet  = $user->platformWallet;
         $balance = $wallet ? (float) $wallet->balance : 0.0;
 
         return Inertia::render('ERP/ClientInvoices/Index', [

@@ -40,5 +40,13 @@ class Tenant extends Model
     {
         return $this->hasMany(TeamMember::class);
     }
+
+    /**
+     * Get the designated Platform (Master) Tenant ID.
+     */
+    public static function platformId(): int
+    {
+        return (int) config('erp.platform_tenant_id', 1);
+    }
 }
 

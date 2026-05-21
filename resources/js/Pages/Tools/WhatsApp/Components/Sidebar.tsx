@@ -73,14 +73,18 @@ export default function Sidebar({
 
                 {/* Runtime status */}
                 <div className="p-4 border-b border-slate-100">
-                    <div className={`flex items-center gap-2 px-3 py-2.5 rounded-xl border text-xs font-semibold uppercase tracking-wider transition-all duration-300 ${
-                        daemonConnected
-                            ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                            : 'bg-rose-50 text-rose-700 border-rose-200 animate-pulse'
-                    }`}>
-                        <div className={`w-2 h-2 rounded-full flex-shrink-0 ${daemonConnected ? 'bg-emerald-500 animate-ping' : 'bg-rose-500'}`} />
+                    <a 
+                        href={daemonConnected ? undefined : "musoftware://launch"}
+                        className={`flex items-center gap-2 px-3 py-2.5 rounded-xl border text-xs font-semibold uppercase tracking-wider transition-all duration-300 ${
+                            daemonConnected
+                                ? 'bg-emerald-50 text-emerald-700 border-emerald-200 cursor-default'
+                                : 'bg-rose-50 text-rose-700 border-rose-200 hover:bg-rose-100 hover:border-rose-300 cursor-pointer shadow-sm hover:shadow-md group'
+                        }`}
+                        title={daemonConnected ? undefined : "Click to launch the Musoftware Runtime app"}
+                    >
+                        <div className={`w-2 h-2 rounded-full flex-shrink-0 ${daemonConnected ? 'bg-emerald-500 animate-ping' : 'bg-rose-500 group-hover:animate-pulse'}`} />
                         <span>{daemonConnected ? t.connected : t.disconnected}</span>
-                    </div>
+                    </a>
                 </div>
 
                 {/* Navigation */}

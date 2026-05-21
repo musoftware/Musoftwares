@@ -1,6 +1,7 @@
 import React, { Suspense, lazy, useState, useEffect } from 'react';
 import { Head } from '@inertiajs/react';
 import { runtimeSDK } from '@/lib/runtime-sdk';
+import { RuntimeStatusBanner } from '@/Components/Tools/RuntimeStatusBanner';
 import {
     Wifi, Shield, Copy, Check, Terminal, ArrowRight,
     Sparkles, Laptop, Smartphone, AlertCircle, RefreshCw, X, Link as LinkIcon, Settings
@@ -436,20 +437,24 @@ export default function Runner({ tool, subscription, runtimePort, pluginSlug }: 
     }
 
     return (
-        <>
+        <div className="flex flex-col min-h-screen w-full">
             <Head title={tool.title} />
+            
+            <RuntimeStatusBanner toolSlug={pluginSlug} />
             
             {isMobile && status === 'online' && (
                 <FloatingBadge host={currentHost} onDisconnect={handleDisconnect} />
             )}
 
-            <Suspense fallback={
-                <div className="min-h-screen bg-slate-50 flex items-center justify-center">
-                    <div className="w-8 h-8 border-2 border-slate-900 border-t-transparent rounded-full animate-spin" />
-                </div>
-            }>
-                <Component tool={tool} subscription={subscription} runtimePort={runtimePort} pluginSlug={pluginSlug} />
-            </Suspense>
-        </>
+            <div className="flex-1 w-full">
+                <Suspense fallback={
+                    <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+                        <div className="w-8 h-8 border-2 border-slate-900 border-t-transparent rounded-full animate-spin" />
+                    </div>
+                }>
+                    <Component tool={tool} subscription={subscription} runtimePort={runtimePort} pluginSlug={pluginSlug} />
+                </Suspense>
+            </div>
+        </div>
     );
 }

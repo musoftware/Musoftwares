@@ -103,19 +103,60 @@ class DashboardController extends Controller
         // ── Points Balance ───────────────────────────────────────
         $pointsBalance = $user->points_balance ?? 0;
 
-        // ── Active Subscriptions ─────────────────────────────────
+        // ── Active Subscriptions & Total Monthly ────────────────
         $activeSubscriptions = DB::table('user_subscriptions')
             ->where('client_id', $user->id)
             ->where('status', 'active')
             ->count();
 
-        // ── Active Modules List ──────────────────────────────────
-        $subscriptionService = app(\App\Services\SubscriptionService::class);
-        $subscribedModules = [
-            'erp' => $subscriptionService->hasActiveSubscription($user, 'erp'),
-            'freelance' => $subscriptionService->hasActiveSubscription($user, 'freelance'),
-            'marketing' => $subscriptionService->hasActiveSubscription($user, 'marketing'),
-        ];
+        $erpMonthly = DB::table('user_subscriptions')
+            ->join('module_plans', 'user_subscriptions.plan_id', '=', 'module_plans.id')
+            ->where('user_subscriptions.client_id', $user->id)
+            ->where('user_subscriptions.status', 'active')
+            ->sum('module_plans.price');
+
+        $toolsMonthly = 0;
+        try {
+            $toolsMonthly = DB::table('tool_subscriptions')
+                ->where('user_id', $user->id)
+                ->where('status', 'active')
+                ->sum('amount_paid');
+        } catch (\Throwable $e) {
+            // Table may not exist yet
+        }
+
+        $totalMonthlySubscription = (float) $erpMonthly + (float) $toolsMonthly;
+
+        // ── Chart Data (Wallet 6 Months) ─────────────────────────
+        $sixMonthsAgo = Carbon::now()->subMonths(5)->startOfMonth();
+        $chartTransactions = WalletTransaction::where('wallet_id', $wallet->id)
+            ->where('created_at', '>=', $sixMonthsAgo)
+            ->select(
+                DB::raw("DATE_FORMAT(created_at, '%b') as month"),
+                DB::raw("DATE_FORMAT(created_at, '%Y-%m') as sort_month"),
+                'type',
+                DB::raw('SUM(amount) as total')
+            )
+            ->groupBy('month', 'sort_month', 'type')
+            ->orderBy('sort_month')
+            ->get();
+
+        $chartDataRaw = [];
+        for ($i = 5; $i >= 0; $i--) {
+            $m = Carbon::now()->subMonths($i)->format('b');
+            $chartDataRaw[$m] = ['month' => $m, 'deposit' => 0, 'withdrawal' => 0];
+        }
+
+        foreach ($chartTransactions as $txn) {
+            if (isset($chartDataRaw[$txn->month])) {
+                if ($txn->type === 'credit') {
+                    $chartDataRaw[$txn->month]['deposit'] = (float) $txn->total;
+                } else {
+                    $chartDataRaw[$txn->month]['withdrawal'] = (float) $txn->total;
+                }
+            }
+        }
+        $chartData = array_values($chartDataRaw);
 
         // ── Build stats ──────────────────────────────────────────
         $stats = [
@@ -125,6 +166,7 @@ class DashboardController extends Controller
             'unpaidInvoices'      => $unpaidCount,
             'unpaidAmount'        => $unpaidAmount,
             'activeSubscriptions' => max($activeSubscriptions, 0),
+            'totalMonthlySubscription' => $totalMonthlySubscription,
             'openTickets'         => $openTicketsCount,
             'pendingWithdrawals'  => $pendingWithdrawals,
             'currency'            => $wallet->currency ?? 'USD',
@@ -156,7 +198,7 @@ class DashboardController extends Controller
             'stats'               => $stats,
             'pendingInvoices'     => $pendingInvoices,
             'recentTransactions'  => $recentTransactions,
-            'subscribedModules'   => $subscribedModules,
+            'chartData'           => $chartData,
             'activeToolLicenses'  => $activeToolLicenses,
         ]);
     }
