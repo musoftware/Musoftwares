@@ -23,8 +23,9 @@ This skill automatically applies when you are:
 - Always add columns first, migrate data in a background job, and drop old columns in a subsequent release.
 
 ## 3. Worker Node Scaling
-- The queue system must be horizontally scalable.
-- Use Redis as the queue driver in production. Do not use the `database` driver for heavy workloads as it causes deadlocks.
+- The cloud queue system (Laravel) must be horizontally scalable.
+- Use Redis as the queue driver for the **Laravel cloud backend** in production. Do not use the `database` driver for heavy workloads as it causes deadlocks.
+- The **local runtime** must NEVER require Redis. It uses SQLite and in-process queues by default. Redis is an optional enterprise add-on activated via `REDIS_URL`. See the `zero-dependency-runtime` skill.
 
 ## Summary Checklist
 - [ ] Are migrations written in a non-destructive manner?
