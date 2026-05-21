@@ -12,7 +12,7 @@ export default function AccountsWorkspace({
             {activeQR && (
                 <div className="bg-gradient-to-tr from-slate-950 to-slate-900 border border-slate-800 rounded-3xl p-6 text-white flex flex-col md:flex-row items-center gap-8 shadow-2xl relative overflow-hidden">
                     <div className="absolute top-0 right-0 w-64 h-64 bg-teal-500/10 rounded-full blur-3xl -z-10" />
-                    
+
                     <div className="bg-white p-4 rounded-2xl shrink-0 shadow-lg border border-slate-100 flex flex-col items-center justify-center">
                         <img src={activeQR} alt="WhatsApp QR Code" className="w-48 h-48 md:w-56 md:h-56" />
                         <div className="flex items-center gap-1.5 mt-3 text-slate-500 text-xs font-bold">
@@ -43,7 +43,7 @@ export default function AccountsWorkspace({
                     <form onSubmit={handleConnectSession} className="space-y-4">
                         <div>
                             <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">{t.accounts.accountId}</label>
-                            <input 
+                            <input
                                 type="text"
                                 value={newAccountId}
                                 onChange={e => setNewAccountId(e.target.value)}
@@ -54,7 +54,7 @@ export default function AccountsWorkspace({
                         </div>
                         <div>
                             <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">{t.accounts.proxy}</label>
-                            <input 
+                            <input
                                 type="text"
                                 value={newProxy}
                                 onChange={e => setNewProxy(e.target.value)}
@@ -63,7 +63,7 @@ export default function AccountsWorkspace({
                             />
                         </div>
                         <div className="flex items-center gap-3 py-1">
-                            <input 
+                            <input
                                 id="headless-toggle"
                                 type="checkbox"
                                 checked={newHeadless}
@@ -72,7 +72,7 @@ export default function AccountsWorkspace({
                             />
                             <label htmlFor="headless-toggle" className="text-xs font-semibold text-slate-600 select-none cursor-pointer">{t.accounts.headless}</label>
                         </div>
-                        <button 
+                        <button
                             type="submit"
                             disabled={!daemonConnected}
                             className="w-full py-3.5 bg-gradient-to-r from-teal-500 to-emerald-600 hover:from-teal-400 hover:to-emerald-500 text-white rounded-2xl text-sm font-extrabold transition-all shadow-[0_8px_20px_rgb(20,184,166,0.3)] hover:shadow-[0_12px_25px_rgb(20,184,166,0.4)] flex items-center justify-center gap-2 active:scale-95 disabled:opacity-50 disabled:shadow-none"
@@ -90,7 +90,7 @@ export default function AccountsWorkspace({
                             <h2 className="text-xl font-bold tracking-tight text-slate-850">{t.accounts.activeSessions}</h2>
                             <p className="text-xs text-slate-400 mt-1">{t.accounts.description}</p>
                         </div>
-                        <button 
+                        <button
                             onClick={fetchSessions}
                             className="p-2 hover:bg-slate-100 border border-slate-200 text-slate-500 rounded-xl transition-all active:scale-95"
                         >
@@ -127,7 +127,7 @@ export default function AccountsWorkspace({
                                                 </span>
                                             </div>
                                         </div>
-                                        <button 
+                                        <button
                                             onClick={() => handleDisconnectSession(s.accountId)}
                                             className="text-slate-400 hover:text-rose-500 p-1.5 hover:bg-rose-50 rounded-lg transition-all"
                                             title={t.accounts.disconnect}
@@ -143,11 +143,11 @@ export default function AccountsWorkspace({
                                                 <span>{s.health.trustScore}/100</span>
                                             </div>
                                             <div className="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
-                                                <div 
+                                                <div
                                                     className={`h-full transition-all ${
-                                                        s.health.trustScore > 80 ? 'bg-emerald-500' : 
+                                                        s.health.trustScore > 80 ? 'bg-emerald-500' :
                                                         s.health.trustScore > 50 ? 'bg-amber-500' : 'bg-rose-500'
-                                                    }`} 
+                                                    }`}
                                                     style={{ width: `${s.health.trustScore}%` }}
                                                 />
                                             </div>

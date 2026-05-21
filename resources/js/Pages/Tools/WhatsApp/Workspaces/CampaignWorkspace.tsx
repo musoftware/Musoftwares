@@ -30,14 +30,14 @@ export default function CampaignWorkspace({
                         )}
                     </div>
 
-                    <textarea 
+                    <textarea
                         rows={6}
                         value={contactsText}
                         onChange={e => setContactsText(e.target.value)}
                         placeholder={t.campaign.contactsPlaceholder}
                         className="w-full text-xs border border-slate-200 focus:border-teal-500 rounded-xl p-4 outline-none transition-all resize-none font-mono"
                     />
-                    
+
                     {/* Parsed recipients visual grid preview */}
                     {getParsedRecipients.length > 0 && (
                         <div className="max-h-36 overflow-y-auto border border-slate-100 rounded-xl divide-y divide-slate-50">
@@ -69,7 +69,7 @@ export default function CampaignWorkspace({
                         <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">{t.campaign.personalizationTags}</span>
                         <div className="flex flex-wrap gap-2">
                             {['{name}', '{phone}', '{company}'].map(tag => (
-                                <button 
+                                <button
                                     key={tag}
                                     onClick={() => insertTag(tag)}
                                     className="px-2.5 py-1 text-[10px] font-bold text-teal-700 border border-teal-200 bg-teal-50/50 hover:bg-teal-100/50 transition-all rounded-md"
@@ -80,7 +80,7 @@ export default function CampaignWorkspace({
                         </div>
                     </div>
 
-                    <textarea 
+                    <textarea
                         rows={6}
                         value={messageText}
                         onChange={e => setMessageText(e.target.value)}
@@ -101,7 +101,7 @@ export default function CampaignWorkspace({
 
                     <div className="flex border border-slate-200 rounded-xl overflow-hidden p-1 gap-1">
                         {(['none', 'media', 'vcard'] as const).map(mode => (
-                            <button 
+                            <button
                                 key={mode}
                                 type="button"
                                 onClick={() => setAttachmentMode(mode)}
@@ -115,7 +115,7 @@ export default function CampaignWorkspace({
                     {attachmentMode === 'media' && (
                         <div className="space-y-2.5 animate-in slide-in-from-top-2 duration-300">
                             <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400">{t.campaign.attachmentUrl}</label>
-                            <input 
+                            <input
                                 type="url"
                                 value={attachmentUrl}
                                 onChange={e => setAttachmentUrl(e.target.value)}
@@ -130,7 +130,7 @@ export default function CampaignWorkspace({
                             <div className="grid grid-cols-2 gap-3">
                                 <div>
                                     <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">{t.campaign.vcardName}</label>
-                                    <input 
+                                    <input
                                         type="text"
                                         value={vcardName}
                                         onChange={e => setVcardName(e.target.value)}
@@ -140,7 +140,7 @@ export default function CampaignWorkspace({
                                 </div>
                                 <div>
                                     <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">{t.campaign.vcardPhone}</label>
-                                    <input 
+                                    <input
                                         type="text"
                                         value={vcardPhone}
                                         onChange={e => setVcardPhone(e.target.value)}
@@ -151,7 +151,7 @@ export default function CampaignWorkspace({
                             </div>
                             <div>
                                 <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">{t.campaign.vcardCompany}</label>
-                                <input 
+                                <input
                                     type="text"
                                     value={vcardCompany}
                                     onChange={e => setVcardCompany(e.target.value)}
@@ -177,7 +177,7 @@ export default function CampaignWorkspace({
                             <span className="font-black text-slate-700">{minWpm} - {maxWpm} WPM</span>
                         </div>
                         <div className="grid grid-cols-2 gap-4">
-                            <input 
+                            <input
                                 type="range"
                                 min={30}
                                 max={60}
@@ -185,7 +185,7 @@ export default function CampaignWorkspace({
                                 onChange={e => setMinWpm(Number(e.target.value))}
                                 className="h-1.5 bg-slate-100 rounded-lg appearance-none cursor-pointer accent-teal-600"
                             />
-                            <input 
+                            <input
                                 type="range"
                                 min={61}
                                 max={100}
@@ -202,7 +202,7 @@ export default function CampaignWorkspace({
                             <span className="font-semibold text-slate-500">{t.campaign.typoChance}</span>
                             <span className="font-black text-slate-700">{typoChance}%</span>
                         </div>
-                        <input 
+                        <input
                             type="range"
                             min={0}
                             max={15}
@@ -216,7 +216,7 @@ export default function CampaignWorkspace({
                     <div className="space-y-3.5 pt-2">
                         <div className="flex items-center justify-between">
                             <label className="text-xs font-semibold text-slate-600 select-none">{t.campaign.useSynonyms}</label>
-                            <input 
+                            <input
                                 type="checkbox"
                                 checked={useSynonyms}
                                 onChange={e => setUseSynonyms(e.target.checked)}
@@ -225,7 +225,7 @@ export default function CampaignWorkspace({
                         </div>
                         <div className="flex items-center justify-between">
                             <label className="text-xs font-semibold text-slate-600 select-none">{t.campaign.bellCurve}</label>
-                            <input 
+                            <input
                                 type="checkbox"
                                 checked={bellCurve}
                                 onChange={e => setBellCurve(e.target.checked)}
@@ -234,7 +234,7 @@ export default function CampaignWorkspace({
                         </div>
                         <div className="flex items-center justify-between">
                             <label className="text-xs font-semibold text-slate-600 select-none">{t.campaign.trackDelivery}</label>
-                            <input 
+                            <input
                                 type="checkbox"
                                 checked={trackDelivery}
                                 onChange={e => setTrackDelivery(e.target.checked)}
@@ -243,7 +243,7 @@ export default function CampaignWorkspace({
                         </div>
                         <div className="flex items-center justify-between">
                             <label className="text-xs font-semibold text-slate-600 select-none">{t.campaign.stopOnBlock}</label>
-                            <input 
+                            <input
                                 type="checkbox"
                                 checked={stopOnBlock}
                                 onChange={e => setStopOnBlock(e.target.checked)}
@@ -258,7 +258,7 @@ export default function CampaignWorkspace({
                                 <span className="font-semibold text-slate-450">{t.campaign.maxBlockRate}</span>
                                 <span className="font-black text-rose-600">{maxBlockRate}%</span>
                             </div>
-                            <input 
+                            <input
                                 type="range"
                                 min={2}
                                 max={20}
@@ -273,14 +273,14 @@ export default function CampaignWorkspace({
                 {/* Select dispatch accounts configuration */}
                 <div className="space-y-4">
                     <div className="flex flex-col md:flex-row items-stretch md:items-center gap-3">
-                        <input 
+                        <input
                             type="text"
                             value={campaignName}
                             onChange={e => setCampaignName(e.target.value)}
                             placeholder="Enter Campaign Identifier Name"
                             className="flex-1 text-xs border border-slate-200 focus:border-teal-500 rounded-xl px-4 py-2.5 outline-none transition-all bg-white"
                         />
-                        <select 
+                        <select
                             value={selectedAccount}
                             onChange={e => setSelectedAccount(e.target.value)}
                             className="text-xs border border-slate-200 rounded-xl px-3 py-2.5 outline-none bg-white font-bold text-slate-600"
@@ -292,7 +292,7 @@ export default function CampaignWorkspace({
                         </select>
                     </div>
 
-                    <button 
+                    <button
                         onClick={handleLaunchCampaign}
                         disabled={isCampaignRunning}
                         className="w-full py-4 bg-gradient-to-r from-teal-500 to-emerald-600 hover:from-teal-400 hover:to-emerald-500 text-white rounded-2xl text-sm font-extrabold transition-all shadow-[0_8px_20px_rgb(20,184,166,0.3)] hover:shadow-[0_12px_25px_rgb(20,184,166,0.4)] active:scale-95 flex items-center justify-center gap-2.5 disabled:opacity-50"
