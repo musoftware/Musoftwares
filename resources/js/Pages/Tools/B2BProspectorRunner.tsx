@@ -1,5 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { LayoutDashboard, Users, Mail, Key, Settings, Play, Square, Download, Plus, CheckCircle, AlertCircle, Info, ChevronRight, Search, Trash2, MailQuestion, ShieldCheck, Zap, RefreshCw, Layers, HelpCircle, FileText } from 'lucide-react';
+import { Button } from '@/Components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/Components/ui/card';
+import { Input } from '@/Components/ui/input';
+import { Label } from '@/Components/ui/label';
+import { Badge } from '@/Components/ui/badge';
+import { Switch } from '@/Components/ui/switch';
+import { Textarea } from '@/Components/ui/textarea';
 
 // Unified WebSocket client connecting to the Musoftware Runtime
 function useRuntimeWS(pluginSlug: string, onBroadcast?: ((event: string, data: any) => void) | null) {
@@ -535,36 +542,41 @@ export default function B2BProspectorRunner({ tool, subscription, runtimePort, p
                     <div className="h-5 w-px bg-slate-200" />
                     
                     <nav className="flex items-center gap-1.5">
-                        <button 
+                        <Button 
+                            variant={activeTab === 'campaigns' ? 'default' : 'ghost'}
+                            size="sm"
                             onClick={() => setActiveTab('campaigns')}
-                            className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all ${activeTab === 'campaigns' ? 'bg-slate-950 text-white shadow-sm' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-100'}`}
                         >
                             Find Leads
-                        </button>
-                        <button 
+                        </Button>
+                        <Button 
+                            variant={activeTab === 'leads' ? 'default' : 'ghost'}
+                            size="sm"
                             onClick={() => setActiveTab('leads')}
-                            className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all ${activeTab === 'leads' ? 'bg-slate-950 text-white shadow-sm' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-100'}`}
                         >
                             Lead Manager
-                        </button>
-                        <button 
+                        </Button>
+                        <Button 
+                            variant={activeTab === 'inboxes' ? 'default' : 'ghost'}
+                            size="sm"
                             onClick={() => setActiveTab('inboxes')}
-                            className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all ${activeTab === 'inboxes' ? 'bg-slate-950 text-white shadow-sm' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-100'}`}
                         >
                             Sending Mailboxes
-                        </button>
-                        <button 
+                        </Button>
+                        <Button 
+                            variant={activeTab === 'outreach' ? 'default' : 'ghost'}
+                            size="sm"
                             onClick={() => setActiveTab('outreach')}
-                            className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all ${activeTab === 'outreach' ? 'bg-slate-950 text-white shadow-sm' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-100'}`}
                         >
                             Outreach Sequences
-                        </button>
-                        <button 
+                        </Button>
+                        <Button 
+                            variant={activeTab === 'linked-profiles' ? 'default' : 'ghost'}
+                            size="sm"
                             onClick={() => setActiveTab('linked-profiles')}
-                            className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all ${activeTab === 'linked-profiles' ? 'bg-slate-950 text-white shadow-sm' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-100'}`}
                         >
                             LinkedIn Profile
-                        </button>
+                        </Button>
                     </nav>
                 </div>
 
@@ -636,27 +648,27 @@ export default function B2BProspectorRunner({ tool, subscription, runtimePort, p
                                     <h1 className="text-2xl font-bold tracking-tight bg-gradient-to-r from-slate-950 to-slate-800 bg-clip-text text-transparent">Lead Finder</h1>
                                     <p className="text-xs text-slate-500 mt-1">Create searching sequences to discover target accounts and verify their email data privately.</p>
                                 </div>
-                                <button 
+                                <Button 
                                     onClick={() => setShowNewCampaignModal(true)}
-                                    className="flex items-center gap-1.5 px-4 py-2 bg-slate-950 text-white rounded-xl text-xs font-semibold hover:bg-slate-850 hover:shadow-lg hover:shadow-slate-950/10 transition-all active:scale-98"
+                                    className="gap-1.5"
                                 >
                                     <Plus className="w-4 h-4" /> New Search Campaign
-                                </button>
+                                </Button>
                             </div>
 
                             {/* Campaign Grid */}
                             {campaigns.length === 0 ? (
-                                <div className="py-24 text-center border-2 border-dashed border-slate-200 rounded-3xl bg-white shadow-sm">
+                                <Card className="py-24 text-center border-dashed">
                                     <Users className="w-10 h-10 text-slate-300 mx-auto mb-4" />
                                     <h3 className="text-sm font-bold text-slate-900">No campaigns launched yet</h3>
                                     <p className="text-xs text-slate-500 mt-1.5 max-w-xs mx-auto">Create your first Lead Finder campaign to start sourcing verified emails locally.</p>
-                                    <button 
+                                    <Button 
                                         onClick={() => setShowNewCampaignModal(true)}
-                                        className="mt-6 px-4 py-2 bg-slate-950 text-white text-xs font-semibold rounded-xl hover:bg-slate-800 transition-all"
+                                        className="mt-6"
                                     >
                                         Create Campaign
-                                    </button>
-                                </div>
+                                    </Button>
+                                </Card>
                             ) : (
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     {campaigns.map(camp => {
@@ -664,7 +676,7 @@ export default function B2BProspectorRunner({ tool, subscription, runtimePort, p
                                         const isRunning = runningCampaignIds.includes(camp.id);
                                         
                                         return (
-                                            <div key={camp.id} className="bg-white border border-slate-200/80 rounded-2xl p-6 hover:shadow-md hover:border-slate-300 transition-all flex flex-col justify-between relative overflow-hidden group">
+                                            <Card key={camp.id} className="p-6 hover:shadow-md transition-all flex flex-col justify-between relative overflow-hidden group">
                                                 {isRunning && (
                                                     <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-teal-400 to-indigo-500 animate-pulse" />
                                                 )}
@@ -675,13 +687,13 @@ export default function B2BProspectorRunner({ tool, subscription, runtimePort, p
                                                             <h3 className="font-bold text-slate-900 text-sm leading-tight group-hover:text-teal-600 transition-colors">{camp.name}</h3>
                                                             <span className="text-[10px] text-slate-400 mt-0.5 block font-mono">{camp.keyword} • {camp.city || camp.country || 'Global'}</span>
                                                         </div>
-                                                        <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold tracking-wide uppercase border ${
+                                                        <Badge variant="outline" className={`uppercase tracking-wide ${
                                                             camp.status === 'running' ? 'bg-teal-50 text-teal-700 border-teal-200' :
                                                             camp.status === 'completed' ? 'bg-indigo-50 text-indigo-700 border-indigo-200' :
                                                             'bg-slate-50 text-slate-500 border-slate-200'
                                                         }`}>
                                                             {camp.status}
-                                                        </span>
+                                                        </Badge>
                                                     </div>
 
                                                     {/* Scrape Target Detail */}
@@ -712,33 +724,39 @@ export default function B2BProspectorRunner({ tool, subscription, runtimePort, p
 
                                                 {/* Bottom controls */}
                                                 <div className="border-t border-slate-100 pt-4 flex items-center justify-between gap-3">
-                                                    <button 
+                                                    <Button 
+                                                        variant="ghost"
+                                                        size="sm"
                                                         onClick={() => {
                                                             setSelectedCampaignId(camp.id);
                                                             setActiveTab('leads');
                                                         }}
-                                                        className="text-[11px] font-bold text-slate-500 hover:text-slate-900 flex items-center gap-1 transition-colors"
+                                                        className="text-xs text-slate-500 hover:text-slate-900"
                                                     >
-                                                        View Leads <ChevronRight className="w-3.5 h-3.5" />
-                                                    </button>
+                                                        View Leads <ChevronRight className="w-3.5 h-3.5 ml-1" />
+                                                    </Button>
                                                     
                                                     {isRunning ? (
-                                                        <button 
+                                                        <Button 
+                                                            variant="outline"
+                                                            size="sm"
                                                             onClick={() => handleStopCampaign(camp.id)}
-                                                            className="flex items-center gap-1 px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-100 rounded-lg text-[10px] font-bold transition-all active:scale-95"
+                                                            className="h-8 bg-rose-50 hover:bg-rose-100 text-rose-700 border-rose-100 text-[11px]"
                                                         >
-                                                            <Square className="w-3 h-3 fill-rose-700" /> Pause Search
-                                                        </button>
+                                                            <Square className="w-3 h-3 fill-rose-700 mr-1" /> Pause Search
+                                                        </Button>
                                                     ) : (
-                                                        <button 
+                                                        <Button 
+                                                            variant="outline"
+                                                            size="sm"
                                                             onClick={() => handleStartCampaign(camp.id)}
-                                                            className="flex items-center gap-1 px-3 py-1.5 bg-teal-50 hover:bg-teal-100 text-teal-700 border border-teal-100 rounded-lg text-[10px] font-bold transition-all active:scale-95"
+                                                            className="h-8 bg-teal-50 hover:bg-teal-100 text-teal-700 border-teal-100 text-[11px]"
                                                         >
-                                                            <Play className="w-3 h-3 fill-teal-700" /> Launch Scraper
-                                                        </button>
+                                                            <Play className="w-3 h-3 fill-teal-700 mr-1" /> Launch Scraper
+                                                        </Button>
                                                     )}
                                                 </div>
-                                            </div>
+                                            </Card>
                                         );
                                     })}
                                 </div>
@@ -754,14 +772,15 @@ export default function B2BProspectorRunner({ tool, subscription, runtimePort, p
                                     <h1 className="text-2xl font-bold tracking-tight bg-gradient-to-r from-slate-950 to-slate-800 bg-clip-text text-transparent">Lead Database</h1>
                                     <p className="text-xs text-slate-500 mt-1">Review harvested decision makers, verified contact emails, and outbound status.</p>
                                 </div>
-                                <button 
+                                <Button 
                                     onClick={handleExportLeads}
                                     disabled={!!exportingJobId}
-                                    className="flex items-center justify-center gap-1.5 px-4 py-2 border border-slate-200 bg-white hover:bg-slate-50 text-slate-800 rounded-xl text-xs font-semibold transition-all active:scale-98 shadow-sm disabled:opacity-50"
+                                    variant="outline"
+                                    className="gap-1.5"
                                 >
                                     <Download className="w-4 h-4" /> 
                                     {exportingJobId ? `Exporting (${exportProgress || 0} rows)...` : 'Download CSV'}
-                                </button>
+                                </Button>
                             </div>
 
                             {/* Export Path Notification */}
@@ -779,40 +798,44 @@ export default function B2BProspectorRunner({ tool, subscription, runtimePort, p
                             <div className="p-4 bg-white border border-slate-200 rounded-2xl shadow-sm flex flex-col md:flex-row items-center gap-3.5">
                                 <div className="relative flex-1 w-full">
                                     <Search className="w-4 h-4 text-slate-400 absolute left-3 top-3.5" />
-                                    <input 
+                                    <Input 
                                         type="text" 
                                         placeholder="Search by name, company, or email..." 
                                         value={leadsSearch}
                                         onChange={(e) => { setLeadsSearch(e.target.value); setLeadsOffset(0); }}
-                                        className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-9 pr-4 py-2.5 text-xs focus:bg-white focus:outline-none focus:ring-1 focus:ring-slate-900 transition-all placeholder:text-slate-400"
+                                        className="pl-9 bg-slate-50 border-slate-200 h-10 w-full"
                                     />
                                 </div>
 
                                 <div className="flex items-center gap-3.5 w-full md:w-auto shrink-0">
                                     {/* Campaign Selector */}
-                                    <select 
+                                    <Input 
+                                        type="select"
+                                        as="select"
                                         value={selectedCampaignId}
-                                        onChange={(e) => { setSelectedCampaignId(e.target.value); setLeadsOffset(0); }}
-                                        className="w-full md:w-44 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-xs focus:outline-none"
+                                        onChange={(e: any) => { setSelectedCampaignId(e.target.value); setLeadsOffset(0); }}
+                                        className="md:w-44 bg-slate-50 border-slate-200 h-10 text-xs"
                                     >
                                         <option value="">All Campaigns</option>
                                         {campaigns.map(c => (
                                             <option key={c.id} value={c.id}>{c.name}</option>
                                         ))}
-                                    </select>
+                                    </Input>
 
                                     {/* Email Health Status Selector */}
-                                    <select 
+                                    <Input 
+                                        type="select"
+                                        as="select"
                                         value={leadsEmailFilter}
-                                        onChange={(e) => { setLeadsEmailFilter(e.target.value); setLeadsOffset(0); }}
-                                        className="w-full md:w-44 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-xs focus:outline-none"
+                                        onChange={(e: any) => { setLeadsEmailFilter(e.target.value); setLeadsOffset(0); }}
+                                        className="md:w-44 bg-slate-50 border-slate-200 h-10 text-xs"
                                     >
                                         <option value="">All Verification States</option>
                                         <option value="valid">Verified Clean</option>
                                         <option value="invalid">Risky Bounce</option>
                                         <option value="catchall">Accept All</option>
                                         <option value="unverified">Unverified</option>
-                                    </select>
+                                    </Input>
                                 </div>
                             </div>
 
@@ -885,20 +908,22 @@ export default function B2BProspectorRunner({ tool, subscription, runtimePort, p
                                     <div className="p-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
                                         <span>Showing {leads.length} of {totalLeads} harvested leads</span>
                                         <div className="flex items-center gap-2">
-                                            <button 
+                                            <Button 
                                                 onClick={() => setLeadsOffset(prev => Math.max(0, prev - leadsLimit))}
                                                 disabled={leadsOffset === 0}
-                                                className="px-3 py-1.5 border border-slate-200 rounded-lg hover:bg-white transition-colors bg-slate-100 disabled:opacity-50 font-semibold"
+                                                variant="outline"
+                                                size="sm"
                                             >
                                                 Back
-                                            </button>
-                                            <button 
+                                            </Button>
+                                            <Button 
                                                 onClick={() => setLeadsOffset(prev => prev + leadsLimit)}
                                                 disabled={leadsOffset + leadsLimit >= totalLeads}
-                                                className="px-3 py-1.5 border border-slate-200 rounded-lg hover:bg-white transition-colors bg-slate-100 disabled:opacity-50 font-semibold"
+                                                variant="outline"
+                                                size="sm"
                                             >
                                                 Next
-                                            </button>
+                                            </Button>
                                         </div>
                                     </div>
                                 </div>
@@ -921,79 +946,73 @@ export default function B2BProspectorRunner({ tool, subscription, runtimePort, p
                                     
                                     <form onSubmit={handleConnectInbox} className="space-y-3 text-xs">
                                         <div className="space-y-1">
-                                            <label className="text-slate-500 font-semibold">Sender Email Address</label>
-                                            <input 
+                                            <Label>Sender Email Address</Label>
+                                            <Input 
                                                 type="email" 
                                                 required
                                                 placeholder="e.g. sales@yourdomain.com"
                                                 value={newInboxEmail}
                                                 onChange={(e) => setNewInboxEmail(e.target.value)}
-                                                className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 focus:bg-white focus:outline-none"
                                             />
                                         </div>
                                         <div className="space-y-1">
-                                            <label className="text-slate-500 font-semibold">SMTP Sending Host</label>
-                                            <input 
+                                            <Label>SMTP Sending Host</Label>
+                                            <Input 
                                                 type="text" 
                                                 required
                                                 placeholder="e.g. smtp.mailtrap.io"
                                                 value={newInboxHost}
                                                 onChange={(e) => setNewInboxHost(e.target.value)}
-                                                className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 focus:bg-white focus:outline-none"
                                             />
                                         </div>
                                         <div className="grid grid-cols-2 gap-2">
                                             <div className="space-y-1">
-                                                <label className="text-slate-500 font-semibold">SMTP Port</label>
-                                                <input 
+                                                <Label>SMTP Port</Label>
+                                                <Input 
                                                     type="text" 
                                                     required
                                                     placeholder="587"
                                                     value={newInboxPort}
                                                     onChange={(e) => setNewInboxPort(e.target.value)}
-                                                    className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 focus:bg-white focus:outline-none"
                                                 />
                                             </div>
                                             <div className="space-y-1">
-                                                <label className="text-slate-500 font-semibold">IMAP Host (Opt.)</label>
-                                                <input 
+                                                <Label>IMAP Host (Opt.)</Label>
+                                                <Input 
                                                     type="text" 
                                                     placeholder="e.g. imap.domain.com"
                                                     value={newInboxImapHost}
                                                     onChange={(e) => setNewInboxImapHost(e.target.value)}
-                                                    className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 focus:bg-white focus:outline-none"
                                                 />
                                             </div>
                                         </div>
                                         <div className="space-y-1">
-                                            <label className="text-slate-500 font-semibold">SMTP/IMAP Login User</label>
-                                            <input 
+                                            <Label>SMTP/IMAP Login User</Label>
+                                            <Input 
                                                 type="text" 
                                                 required
                                                 placeholder="sales@yourdomain.com"
                                                 value={newInboxUser}
                                                 onChange={(e) => setNewInboxUser(e.target.value)}
-                                                className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 focus:bg-white focus:outline-none"
                                             />
                                         </div>
                                         <div className="space-y-1">
-                                            <label className="text-slate-500 font-semibold">SMTP/IMAP Secret Password</label>
-                                            <input 
+                                            <Label>SMTP/IMAP Secret Password</Label>
+                                            <Input 
                                                 type="password" 
                                                 required
                                                 placeholder="••••••••••••"
                                                 value={newInboxPass}
                                                 onChange={(e) => setNewInboxPass(e.target.value)}
-                                                className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 focus:bg-white focus:outline-none"
                                             />
                                         </div>
                                         
-                                        <button 
+                                        <Button 
                                             type="submit"
-                                            className="w-full py-2.5 bg-slate-950 text-white rounded-lg font-semibold hover:bg-slate-800 transition-all mt-4"
+                                            className="w-full mt-4"
                                         >
                                             Add sending Mailbox
-                                        </button>
+                                        </Button>
                                     </form>
                                 </div>
 
@@ -1032,21 +1051,25 @@ export default function B2BProspectorRunner({ tool, subscription, runtimePort, p
                                                                     {inbox.status === 'active' ? 'Operational' : 'Failed Connection'}
                                                                 </span>
                                                                 
-                                                                <button 
+                                                                <Button 
+                                                                    variant="outline"
+                                                                    size="sm"
                                                                     onClick={() => handleTestInbox(inbox)}
                                                                     disabled={isTesting}
-                                                                    className="px-2.5 py-1 text-[10px] font-semibold border border-slate-200 rounded-md hover:bg-slate-50 bg-white transition-colors disabled:opacity-50 flex items-center gap-1"
+                                                                    className="h-7 text-[10px]"
                                                                 >
-                                                                    {isTesting ? <RefreshCw className="w-3 h-3 animate-spin" /> : null}
+                                                                    {isTesting && <RefreshCw className="w-3 h-3 animate-spin mr-1" />}
                                                                     Test SMTP
-                                                                </button>
+                                                                </Button>
                                                                 
-                                                                <button 
+                                                                <Button 
+                                                                    variant="ghost"
+                                                                    size="icon"
                                                                     onClick={() => handleDeleteInbox(inbox.id)}
-                                                                    className="p-1.5 text-slate-400 hover:text-rose-600 rounded-md hover:bg-rose-50 transition-colors"
+                                                                    className="h-7 w-7 text-slate-400 hover:text-rose-600 hover:bg-rose-50"
                                                                 >
                                                                     <Trash2 className="w-3.5 h-3.5" />
-                                                                </button>
+                                                                </Button>
                                                             </div>
                                                         </div>
                                                     );
@@ -1116,54 +1139,51 @@ export default function B2BProspectorRunner({ tool, subscription, runtimePort, p
 
                                             <form onSubmit={handleSaveSequence} className="space-y-4 text-xs">
                                                 <div className="space-y-1">
-                                                    <label className="text-slate-500 font-semibold block">Email Subject line</label>
-                                                    <input 
+                                                    <Label>Email Subject line</Label>
+                                                    <Input 
                                                         type="text" 
                                                         required
                                                         placeholder="e.g. Quick question about {{company}}"
                                                         value={seqSubject}
                                                         onChange={(e) => setSeqSubject(e.target.value)}
-                                                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 focus:bg-white focus:outline-none"
                                                     />
                                                 </div>
 
                                                 <div className="space-y-1">
                                                     <div className="flex items-center justify-between mb-1">
-                                                        <label className="text-slate-500 font-semibold">Message Body</label>
+                                                        <Label>Message Body</Label>
                                                         <span className="text-[10px] text-slate-400 font-mono">Variables: {"{{name}}"}, {"{{company}}"}, {"{{title}}"}</span>
                                                     </div>
-                                                    <textarea 
+                                                    <Textarea 
                                                         required
                                                         rows={8}
                                                         placeholder={`Hi {{name}},\n\nSaw you are the {{title}} at {{company}}.\n\nWould love to discuss your local scraping setup.\n\nBest,\nSales Team`}
                                                         value={seqBody}
                                                         onChange={(e) => setSeqBody(e.target.value)}
-                                                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:bg-white focus:outline-none font-sans"
                                                     />
                                                 </div>
 
                                                 <div className="space-y-1 max-w-xs">
-                                                    <label className="text-slate-500 font-semibold block">Time delay before sending</label>
+                                                    <Label>Time delay before sending</Label>
                                                     <div className="flex items-center gap-2">
-                                                        <input 
+                                                        <Input 
                                                             type="number" 
                                                             min={1} 
                                                             value={seqDelay}
                                                             onChange={(e) => setSeqDelay(parseInt(e.target.value) || 1)}
-                                                            className="w-20 bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 focus:bg-white focus:outline-none text-center font-bold"
+                                                            className="w-20 text-center font-bold"
                                                         />
                                                         <span className="text-slate-500">days after trigger</span>
                                                     </div>
                                                 </div>
 
                                                 <div className="pt-3 border-t border-slate-100 flex justify-end">
-                                                    <button 
+                                                    <Button 
                                                         type="submit"
                                                         disabled={savingSequence}
-                                                        className="px-5 py-2 bg-slate-950 text-white rounded-xl text-xs font-semibold hover:bg-slate-800 transition-all active:scale-95 disabled:opacity-50"
                                                     >
                                                         {savingSequence ? 'Saving Template...' : 'Save Outreach sequence'}
-                                                    </button>
+                                                    </Button>
                                                 </div>
                                             </form>
                                         </div>
@@ -1217,26 +1237,24 @@ export default function B2BProspectorRunner({ tool, subscription, runtimePort, p
 
                                         <form onSubmit={handleSaveLinkedInCookie} className="space-y-4 text-xs">
                                             <div className="space-y-1">
-                                                <label className="text-slate-500 font-semibold block">LinkedIn Connection Key (`li_at` value)</label>
-                                                <input 
+                                                <Label>LinkedIn Connection Key (`li_at` value)</Label>
+                                                <Input 
                                                     type="password" 
                                                     required
                                                     placeholder="Paste the session value e.g. AQEDAT..."
                                                     value={sessionCookieInput}
                                                     onChange={(e) => setSessionCookieInput(e.target.value)}
-                                                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 focus:bg-white focus:outline-none"
                                                 />
                                                 <p className="text-[10px] text-slate-400 mt-1 leading-relaxed">Your session token is saved securely in your **local SQLite database** only. It is never transmitted to our cloud backend servers.</p>
                                             </div>
 
                                             <div className="flex justify-end pt-2 border-t border-slate-100">
-                                                <button 
+                                                <Button 
                                                     type="submit"
                                                     disabled={savingCookie}
-                                                    className="px-5 py-2 bg-slate-950 text-white rounded-xl text-xs font-semibold hover:bg-slate-800 transition-all active:scale-95 disabled:opacity-50"
                                                 >
                                                     {savingCookie ? 'Linking Token...' : 'Link Connection Key'}
-                                                </button>
+                                                </Button>
                                             </div>
                                         </form>
                                     </div>
@@ -1264,118 +1282,108 @@ export default function B2BProspectorRunner({ tool, subscription, runtimePort, p
                     <div className="bg-white w-full max-w-lg rounded-2xl shadow-xl overflow-hidden border border-slate-200/80 animate-in zoom-in-95 duration-200">
                         <div className="px-6 py-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
                             <h3 className="font-bold text-slate-900 text-sm tracking-tight">New Search Campaign</h3>
-                            <button 
+                            <Button
+                                variant="ghost" size="icon"
                                 onClick={() => setShowNewCampaignModal(false)}
-                                className="text-slate-400 hover:text-slate-900 font-bold text-sm"
+                                className="h-6 w-6 text-slate-400 hover:text-slate-900 font-bold text-sm hover:bg-transparent"
                             >
                                 ✕
-                            </button>
+                            </Button>
                         </div>
 
                         <form onSubmit={handleCreateCampaign} className="p-6 space-y-4 text-xs">
                             <div className="space-y-1">
-                                <label className="text-slate-500 font-semibold block">Campaign Name</label>
-                                <input 
+                                <Label>Campaign Name</Label>
+                                <Input 
                                     type="text" 
                                     required
                                     placeholder="e.g. US Tech Founders"
                                     value={newCampName}
                                     onChange={(e) => setNewCampName(e.target.value)}
-                                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 focus:bg-white focus:outline-none"
                                 />
                             </div>
 
                             <div className="space-y-1">
-                                <label className="text-slate-500 font-semibold block">Target Search Keyword (Job title or company domain)</label>
-                                <input 
+                                <Label>Target Search Keyword (Job title or company domain)</Label>
+                                <Input 
                                     type="text" 
                                     required
                                     placeholder="e.g. Chief Executive Officer"
                                     value={newCampKeyword}
                                     onChange={(e) => setNewCampKeyword(e.target.value)}
-                                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 focus:bg-white focus:outline-none"
                                 />
                             </div>
 
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="space-y-1">
-                                    <label className="text-slate-500 font-semibold block">Country Filter</label>
-                                    <input 
+                                    <Label>Country Filter</Label>
+                                    <Input 
                                         type="text" 
                                         placeholder="USA"
                                         value={newCampCountry}
                                         onChange={(e) => setNewCampCountry(e.target.value)}
-                                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 focus:bg-white focus:outline-none"
                                     />
                                 </div>
                                 <div className="space-y-1">
-                                    <label className="text-slate-500 font-semibold block">City Filter (Optional)</label>
-                                    <input 
+                                    <Label>City Filter (Optional)</Label>
+                                    <Input 
                                         type="text" 
                                         placeholder="San Francisco"
                                         value={newCampCity}
                                         onChange={(e) => setNewCampCity(e.target.value)}
-                                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 focus:bg-white focus:outline-none"
                                     />
                                 </div>
                             </div>
 
                             <div className="space-y-2">
-                                <label className="text-slate-500 font-semibold block">Lead Search Sources</label>
+                                <Label>Lead Search Sources</Label>
                                 <div className="flex items-center gap-3">
-                                    <button 
+                                    <Button 
                                         type="button"
+                                        variant={newCampSources.includes('linkedin') ? 'default' : 'outline'}
                                         onClick={() => toggleSource('linkedin')}
-                                        className={`px-4 py-2 rounded-xl border text-xs font-semibold flex items-center gap-1.5 transition-all ${
-                                            newCampSources.includes('linkedin') 
-                                                ? 'bg-slate-950 text-white border-slate-900 shadow-sm' 
-                                                : 'bg-slate-50 text-slate-600 border-slate-200 hover:border-slate-350'
-                                        }`}
+                                        className="gap-1.5"
                                     >
                                         <CheckCircle className={`w-3.5 h-3.5 ${newCampSources.includes('linkedin') ? 'text-teal-400' : 'opacity-30'}`} />
                                         LinkedIn Profile Search
-                                    </button>
-                                    <button 
+                                    </Button>
+                                    <Button 
                                         type="button"
+                                        variant={newCampSources.includes('google_maps') ? 'default' : 'outline'}
                                         onClick={() => toggleSource('google_maps')}
-                                        className={`px-4 py-2 rounded-xl border text-xs font-semibold flex items-center gap-1.5 transition-all ${
-                                            newCampSources.includes('google_maps') 
-                                                ? 'bg-slate-950 text-white border-slate-900 shadow-sm' 
-                                                : 'bg-slate-50 text-slate-600 border-slate-200 hover:border-slate-350'
-                                        }`}
+                                        className="gap-1.5"
                                     >
                                         <CheckCircle className={`w-3.5 h-3.5 ${newCampSources.includes('google_maps') ? 'text-teal-400' : 'opacity-30'}`} />
                                         Google Maps Places
-                                    </button>
+                                    </Button>
                                 </div>
                             </div>
 
                             <div className="space-y-1 max-w-[200px]">
-                                <label className="text-slate-500 font-semibold block">Daily Speed Limit (leads)</label>
-                                <input 
+                                <Label>Daily Speed Limit (leads)</Label>
+                                <Input 
                                     type="number" 
                                     min={10} 
                                     max={1000}
                                     value={newCampLimit}
                                     onChange={(e) => setNewCampLimit(parseInt(e.target.value) || 100)}
-                                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-xs focus:bg-white focus:outline-none text-center font-bold"
+                                    className="text-center font-bold"
                                 />
                             </div>
 
                             <div className="pt-4 border-t border-slate-100 flex items-center justify-end gap-3.5">
-                                <button 
+                                <Button 
                                     type="button"
+                                    variant="ghost"
                                     onClick={() => setShowNewCampaignModal(false)}
-                                    className="px-4 py-2 text-slate-500 hover:text-slate-800 font-semibold"
                                 >
                                     Cancel
-                                </button>
-                                <button 
+                                </Button>
+                                <Button 
                                     type="submit"
-                                    className="px-5 py-2 bg-slate-950 text-white rounded-xl font-semibold hover:bg-slate-850 transition-all active:scale-95"
                                 >
                                     Save Draft Campaign
-                                </button>
+                                </Button>
                             </div>
                         </form>
                     </div>

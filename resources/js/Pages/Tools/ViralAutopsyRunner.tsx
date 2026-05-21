@@ -4,6 +4,9 @@ import {
     AlertCircle, CheckCircle, BarChart2, Sparkles, ExternalLink,
     ChevronDown, ChevronUp, RefreshCw
 } from 'lucide-react';
+import { Button } from '@/Components/ui/button';
+import { Input } from '@/Components/ui/input';
+import { Badge } from '@/Components/ui/badge';
 
 const getRuntimeHost = () => typeof window !== 'undefined' ? (window.localStorage.getItem('musoftware_runtime_host') || '127.0.0.1') : '127.0.0.1';
 const getRuntimeHttp = () => `http://${getRuntimeHost()}:18400`;
@@ -44,9 +47,9 @@ function VerdictBadge({ score }: { score: number }) {
         score >= 35 ? { label: 'Average',           emoji: '📊', cls: 'bg-slate-50  border-slate-200  text-slate-600' } :
                       { label: 'Needs Work',        emoji: '⚠️', cls: 'bg-slate-50  border-slate-200  text-slate-500' };
     return (
-        <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full border text-xs font-extrabold uppercase tracking-wider ${cls}`}>
+        <Badge variant="outline" className={`gap-1.5 px-3 py-1 rounded-full text-xs font-extrabold uppercase tracking-wider ${cls}`}>
             {emoji} {label}
-        </span>
+        </Badge>
     );
 }
 
@@ -75,16 +78,17 @@ function Section({ icon: Icon, title, children, color = 'text-slate-600' }: any)
     const [open, setOpen] = useState(true);
     return (
         <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
-            <button
+            <Button
+                variant="ghost"
                 onClick={() => setOpen(v => !v)}
-                className="w-full flex items-center justify-between px-5 py-4 hover:bg-slate-50 transition-colors"
+                className="w-full h-auto flex items-center justify-between px-5 py-4 hover:bg-slate-50 transition-colors rounded-none"
             >
                 <div className="flex items-center gap-2.5">
                     <Icon className={`w-4 h-4 ${color}`} />
                     <h3 className="font-bold text-slate-800 text-sm">{title}</h3>
                 </div>
                 {open ? <ChevronUp className="w-4 h-4 text-slate-400" /> : <ChevronDown className="w-4 h-4 text-slate-400" />}
-            </button>
+            </Button>
             {open && <div className="px-5 pb-5 pt-1">{children}</div>}
         </div>
     );
@@ -178,10 +182,10 @@ export default function ViralAutopsyRunner({ tool }: any) {
                     </div>
                     <span className="font-bold text-sm text-slate-800 tracking-tight">Viral Autopsy</span>
                 </div>
-                <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase border ${status === 'running' ? 'bg-amber-50 border-amber-200 text-amber-700' : status === 'done' ? 'bg-emerald-50 border-emerald-200 text-emerald-700' : 'bg-slate-100 border-slate-200 text-slate-500'}`}>
+                <Badge variant="outline" className={`gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase ${status === 'running' ? 'bg-amber-50 border-amber-200 text-amber-700' : status === 'done' ? 'bg-emerald-50 border-emerald-200 text-emerald-700' : 'bg-slate-100 border-slate-200 text-slate-500'}`}>
                     <div className={`w-1.5 h-1.5 rounded-full ${status === 'running' ? 'bg-amber-500 animate-pulse' : status === 'done' ? 'bg-emerald-500' : 'bg-slate-400'}`} />
                     {status === 'running' ? 'Analyzing...' : status === 'done' ? 'Analysis Complete' : 'Ready'}
-                </div>
+                </Badge>
             </div>
 
             <div className="max-w-4xl mx-auto px-4 py-8 space-y-6">
@@ -196,23 +200,23 @@ export default function ViralAutopsyRunner({ tool }: any) {
                     <div className="flex gap-3">
                         <div className="relative flex-1">
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                            <input
+                            <Input
                                 type="url"
                                 value={url}
                                 onChange={e => setUrl(e.target.value)}
                                 onKeyDown={e => e.key === 'Enter' && handleAnalyze()}
                                 placeholder="https://www.tiktok.com/@user/video/..."
-                                className="w-full pl-9 pr-4 py-2.5 text-sm border border-slate-200 focus:border-rose-400 rounded-xl outline-none transition-all bg-slate-50 font-mono"
+                                className="pl-9 h-11 text-sm bg-slate-50 font-mono"
                             />
                         </div>
-                        <button
+                        <Button
                             onClick={handleAnalyze}
                             disabled={!url.trim() || status === 'running'}
-                            className="px-5 py-2.5 bg-gradient-to-r from-rose-500 to-orange-500 text-white rounded-xl text-sm font-bold hover:opacity-90 transition-all shadow-md active:scale-95 disabled:opacity-40 disabled:shadow-none flex items-center gap-2"
+                            className="gap-2 px-5 h-11 bg-gradient-to-r from-rose-500 to-orange-500 text-white rounded-xl text-sm font-bold hover:opacity-90 shadow-md"
                         >
                             {status === 'running' ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Zap className="w-4 h-4" />}
                             {status === 'running' ? 'Analyzing...' : 'Analyze'}
-                        </button>
+                        </Button>
                     </div>
 
                     {/* Progress bar */}
@@ -319,7 +323,7 @@ export default function ViralAutopsyRunner({ tool }: any) {
                             {cap.triggers?.length > 0 && (
                                 <div className="flex flex-wrap gap-1.5 mb-4">
                                     {cap.triggers.map((t: string) => (
-                                        <span key={t} className="px-2.5 py-1 bg-violet-50 border border-violet-100 text-violet-700 rounded-full text-[10px] font-bold uppercase tracking-wider">{t}</span>
+                                        <Badge variant="outline" key={t} className="bg-violet-50 border-violet-100 text-violet-700 rounded-full text-[10px] font-bold uppercase tracking-wider">{t}</Badge>
                                     ))}
                                 </div>
                             )}

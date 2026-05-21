@@ -1,5 +1,6 @@
 import React from 'react';
 import { Square } from 'lucide-react';
+import { Button } from '@/Components/ui/button';
 
 export default function DeliverabilityWorkspace({
     t, isCampaignRunning, handleStopCampaign, campaignProgress, deliverabilityGrid
@@ -15,13 +16,14 @@ export default function DeliverabilityWorkspace({
                     </div>
 
                     {isCampaignRunning && (
-                        <button 
+                        <Button 
+                            variant="outline"
                             onClick={handleStopCampaign}
-                            className="flex items-center gap-1.5 px-4 py-2 bg-rose-50 border border-rose-200 hover:bg-rose-100/50 text-rose-600 rounded-xl text-xs font-bold transition-all shadow-sm active:scale-95 shrink-0"
+                            className="h-9 gap-1.5 px-4 bg-rose-50 border-rose-200 text-rose-600 hover:bg-rose-100 hover:text-rose-700 text-xs font-bold shrink-0"
                         >
                             <Square className="w-3.5 h-3.5" />
                             {t.deliverability.stopCampaign}
-                        </button>
+                        </Button>
                     )}
                 </div>
 
