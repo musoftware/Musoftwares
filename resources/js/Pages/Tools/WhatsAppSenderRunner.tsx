@@ -40,7 +40,14 @@ const translations = {
             description: "Manage connected devices and proxies.",
             noAccounts: "No accounts connected yet. Link an account to start.",
             disconnect: "Disconnect Account",
-            trustScore: "Health Score"
+            trustScore: "Health Score",
+            deleteSession: "Delete Account",
+            rename: "Rename Session",
+            reconnect: "Reconnect",
+            checkStatus: "Check Status",
+            checkStatusResult: "Status",
+            showPhoto: "Profile Photo",
+            photoOnlyConnected: "Only available when connected"
         },
         campaign: {
             contactsLabel: "Contacts List",
@@ -128,7 +135,14 @@ const translations = {
             description: "إدارة الأجهزة المتصلة.",
             noAccounts: "لا توجد حسابات مرتبطة.",
             disconnect: "قطع الاتصال",
-            trustScore: "درجة الصحة"
+            trustScore: "درجة الصحة",
+            deleteSession: "حذف الحساب",
+            rename: "تعديل الاسم",
+            reconnect: "إعادة الاتصال",
+            checkStatus: "فحص الحالة",
+            checkStatusResult: "الحالة",
+            showPhoto: "صورة الحساب",
+            photoOnlyConnected: "متاح فقط عند الاتصال"
         },
         campaign: {
             contactsLabel: "قائمة الأرقام",
@@ -309,6 +323,12 @@ export default function WhatsAppSenderRunner({ tool, subscription, runtimePort, 
     // Simplified Campaign: Only use templates
     const [templates, setTemplates]             = useState<any[]>([]);
     const [selectedTemplateId, setSelectedTemplateId] = useState('');
+    const [initialEditTemplateId, setInitialEditTemplateId] = useState<string | null>(null);
+
+    const handleEditTemplate = (templateId: string) => {
+        setInitialEditTemplateId(templateId);
+        setActiveTab('templates');
+    };
     
     const [minWpm, setMinWpm]                   = useState(45);
     const [maxWpm, setMaxWpm]                   = useState(75);
@@ -388,6 +408,12 @@ export default function WhatsAppSenderRunner({ tool, subscription, runtimePort, 
         }
     }, [daemonConnected]);
 
+    useEffect(() => {
+        if (daemonConnected && (activeTab === 'campaign' || activeTab === 'templates')) {
+            fetchTemplates();
+        }
+    }, [activeTab, daemonConnected]);
+
     const fetchTemplates = async () => {
         try {
             const res: any = await callRPC('getTemplates');
@@ -444,6 +470,49 @@ export default function WhatsAppSenderRunner({ tool, subscription, runtimePort, 
         }
     };
 
+    const handleDeleteSession = async (accountId: string) => {
+        try {
+            await callRPC('deleteSession', { accountId });
+            setSessions(prev => prev.filter(s => s.accountId !== accountId));
+            if (qrSessionId === accountId) { setActiveQR(null); setQrSessionId(null); }
+        } catch (err: any) {
+            alert(`Delete Error: ${err.message}`);
+        }
+    };
+
+    const handleRenameSession = async (accountId: string, newName: string) => {
+        try {
+            await callRPC('renameSession', { accountId, newName });
+            setSessions(prev => prev.map(s => s.accountId === accountId ? { ...s, displayName: newName } : s));
+        } catch (err: any) {
+            alert(`Rename Error: ${err.message}`);
+        }
+    };
+
+    const handleCheckStatus = async (accountId: string) => {
+        try {
+            const res: any = await callRPC('checkSessionStatus', { accountId });
+            // Update local state with fresh status
+            setSessions(prev => prev.map(s =>
+                s.accountId === accountId
+                    ? { ...s, state: res.status, phoneNumber: res.phoneNumber || s.phoneNumber }
+                    : s
+            ));
+            return res;
+        } catch (err: any) {
+            return { status: 'error', phoneNumber: null };
+        }
+    };
+
+    const handleGetProfilePhoto = async (accountId: string): Promise<string | null> => {
+        try {
+            const res: any = await callRPC('getProfilePicture', { accountId });
+            return res?.url || null;
+        } catch {
+            return null;
+        }
+    };
+
     // ── Campaign compose ──────────────────────────────────────────────────────
 
     const parseContacts = () => {
@@ -454,7 +523,8 @@ export default function WhatsAppSenderRunner({ tool, subscription, runtimePort, 
         }).filter(c => c.phone.length >= 7);
     };
 
-    const insertTag = (tag: string) => setMessageText(prev => prev + tag);
+
+
 
     const handleLaunchCampaign = async () => {
         const parsed = parseContacts();
@@ -476,7 +546,14 @@ export default function WhatsAppSenderRunner({ tool, subscription, runtimePort, 
                 mediaUrl:     tpl.media_url,
                 mediaType:    tpl.media_type,
                 type:         'bulk',
-                delayMs:      4000
+                minWpm,
+                maxWpm,
+                typoChance,
+                useSynonyms,
+                bellCurve,
+                trackDelivery,
+                stopOnBlock,
+                maxBlockRate
             });
 
             // Step 2: Start it
@@ -488,6 +565,31 @@ export default function WhatsAppSenderRunner({ tool, subscription, runtimePort, 
             alert(`Campaign Error: ${err.message}`);
             setIsCampaignRunning(false);
         }
+    };
+
+    const handleSendTestMessage = async (testNumber: string) => {
+        if (!selectedAccount) throw new Error(t.campaign.selectAccountError);
+        if (!selectedTemplateId) throw new Error("Please select a template first.");
+
+        const tpl = templates.find(t => t.id === selectedTemplateId);
+        if (!tpl) throw new Error("Template not found");
+
+        const testCampaignId = `test_${Date.now()}`;
+        
+        // Step 1: Create test campaign record
+        await callRPC('createCampaign', {
+            campaignId: testCampaignId,
+            name: `Test Send - ${testNumber}`,
+            accountId:    selectedAccount,
+            contactsJson: [{ phone: testNumber.trim(), name: 'Test Recipient', company: 'Musoftware Co.' }],
+            message:      tpl.message,
+            mediaUrl:     tpl.media_url,
+            mediaType:    tpl.media_type,
+            type:         'bulk'
+        });
+
+        // Step 2: Start it
+        await callRPC('startCampaign', { campaignId: testCampaignId, accountId: selectedAccount });
     };
 
     // ── Template → Campaign autofill ──────────────────────────────────────────
@@ -534,12 +636,17 @@ export default function WhatsAppSenderRunner({ tool, subscription, runtimePort, 
                     sessions={sessions}
                     fetchSessions={fetchSessions}
                     handleDisconnectSession={handleDisconnectSession}
+                    handleDeleteSession={handleDeleteSession}
+                    handleRenameSession={handleRenameSession}
+                    handleCheckStatus={handleCheckStatus}
+                    handleGetProfilePhoto={handleGetProfilePhoto}
                 />
             )}
 
             {activeTab === 'campaign' && (
                 <CampaignWorkspace
                     t={t}
+                    locale={locale}
                     contactsText={contactsText}
                     setContactsText={setContactsText}
                     getParsedRecipients={getParsedRecipients}
@@ -570,7 +677,9 @@ export default function WhatsAppSenderRunner({ tool, subscription, runtimePort, 
                     setSelectedAccount={setSelectedAccount}
                     sessions={sessions}
                     handleLaunchCampaign={handleLaunchCampaign}
+                    handleSendTestMessage={handleSendTestMessage}
                     isCampaignRunning={isCampaignRunning}
+                    onEditTemplate={handleEditTemplate}
                 />
             )}
 
@@ -584,7 +693,11 @@ export default function WhatsAppSenderRunner({ tool, subscription, runtimePort, 
             {activeTab === 'templates' && (
                 <TemplatesWorkspace
                     callRPC={callRPC}
+                    daemonConnected={daemonConnected}
                     onUseTemplate={handleUseTemplate}
+                    onTemplatesChange={setTemplates}
+                    initialEditTemplateId={initialEditTemplateId}
+                    setInitialEditTemplateId={setInitialEditTemplateId}
                 />
             )}
 
@@ -594,6 +707,7 @@ export default function WhatsAppSenderRunner({ tool, subscription, runtimePort, 
                     callRPC={callRPC}
                     selectedAccount={selectedAccount}
                     sessions={sessions}
+                    daemonConnected={daemonConnected}
                 />
             )}
 
@@ -602,6 +716,7 @@ export default function WhatsAppSenderRunner({ tool, subscription, runtimePort, 
                     t={t}
                     callRPC={callRPC}
                     activeCampaigns={activeCampaigns}
+                    daemonConnected={daemonConnected}
                     onViewReport={(id: string, name: string) => {
                         setReportCampaignId(id);
                         setReportCampaignName(name);
@@ -616,6 +731,7 @@ export default function WhatsAppSenderRunner({ tool, subscription, runtimePort, 
                     callRPC={callRPC}
                     campaignId={reportCampaignId}
                     campaignName={reportCampaignName}
+                    daemonConnected={daemonConnected}
                     onBack={() => setActiveTab('history')}
                 />
             )}
