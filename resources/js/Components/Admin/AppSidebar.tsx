@@ -30,7 +30,6 @@ const items = [
         { title: "Services Dashboard", url: "/admin/services" },
         { title: "Projects", url: "/admin/projects" },
         { title: "Plans", url: "/admin/plans" },
-        { title: "Job Listings", url: "/admin/job-listings" },
         { title: "Blog Articles", url: "/admin/blog-articles" },
         { title: "Landing Pages", url: "/admin/service-landing-pages" },
     ]
@@ -74,6 +73,14 @@ const items = [
         { title: "WhatsApp API", url: "/admin/whatsapp" },
         { title: "AI Messages", url: "/admin/whatsapp/ai-chats" },
         { title: "AI Playground", url: "/admin/whatsapp/ai-playground" },
+    ]
+  },
+  { 
+    title: "Freelancer", 
+    url: "/admin/freelancer", 
+    icon: Globe,
+    subItems: [
+        { title: "Job Listings", url: "/admin/job-listings" },
     ]
   },
   { 
