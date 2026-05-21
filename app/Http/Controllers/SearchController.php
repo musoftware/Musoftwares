@@ -36,8 +36,8 @@ class SearchController extends Controller
         }
 
         // Search Invoices
-        if (class_exists(\Modules\ERP\Models\Invoice::class)) {
-            $invoices = \Modules\ERP\Models\Invoice::where('invoice_number', 'like', "%{$query}%")
+        if (class_exists(\Modules\Core\Models\Invoice::class)) {
+            $invoices = \Modules\Core\Models\Invoice::where('invoice_number', 'like', "%{$query}%")
                 ->take(5)
                 ->get();
 
@@ -52,8 +52,8 @@ class SearchController extends Controller
         }
 
         // Search Services
-        if (class_exists(\Modules\Marketplace\Models\Service::class)) {
-            $services = \Modules\Marketplace\Models\Service::where('title', 'like', "%{$query}%")
+        if (class_exists(\Modules\Core\Models\Service::class)) {
+            $services = \Modules\Core\Models\Service::where('title', 'like', "%{$query}%")
                 ->take(5)
                 ->get();
 
@@ -68,8 +68,8 @@ class SearchController extends Controller
         }
 
         // Search Jobs
-        if (class_exists(\Modules\Freelance\Models\Job::class)) {
-            $jobs = \Modules\Freelance\Models\Job::where('title', 'like', "%{$query}%")
+        if (class_exists(\Modules\Core\Models\Job::class)) {
+            $jobs = \Modules\Core\Models\Job::where('title', 'like', "%{$query}%")
                 ->take(5)
                 ->get();
 

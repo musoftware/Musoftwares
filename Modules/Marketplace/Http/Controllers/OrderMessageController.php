@@ -4,7 +4,7 @@ namespace Modules\Marketplace\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Modules\Marketplace\Models\ServiceOrder;
+use Modules\Core\Models\ServiceOrder;
 use Modules\Core\Models\Message;
 use Modules\Core\Models\Conversation;
 

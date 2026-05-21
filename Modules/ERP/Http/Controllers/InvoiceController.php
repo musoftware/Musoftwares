@@ -3,9 +3,9 @@
 namespace Modules\ERP\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use Modules\ERP\Models\Invoice;
-use Modules\ERP\Models\InvoiceItem;
-use Modules\ERP\Models\InvoiceCost;
+use Modules\Core\Models\Invoice;
+use Modules\Core\Models\InvoiceItem;
+use Modules\Core\Models\InvoiceCost;
 use Modules\ERP\Models\WalletTransaction;
 use Modules\ERP\Models\TenantClient;
 use Modules\Core\Models\Currency;
@@ -85,7 +85,7 @@ class InvoiceController extends Controller
 
         return Inertia::render('ERP/Invoices/Create', [
             'clients'           => TenantClient::where('tenant_id', $tenant->id)->get(),
-            'projects'          => \Modules\ERP\Models\Project::where('tenant_id', $tenant->id)->get(),
+            'projects'          => \Modules\Core\Models\Project::where('tenant_id', $tenant->id)->get(),
             'currencies'        => Currency::where('is_active', true)->get(),
             'business_currency' => $businessCurrency,
         ]);
@@ -230,7 +230,7 @@ class InvoiceController extends Controller
         return Inertia::render('ERP/Invoices/Edit', [
             'invoice'           => $invoice,
             'clients'           => TenantClient::where('tenant_id', $tenant->id)->get(),
-            'projects'          => \Modules\ERP\Models\Project::where('tenant_id', $tenant->id)->get(),
+            'projects'          => \Modules\Core\Models\Project::where('tenant_id', $tenant->id)->get(),
             'currencies'        => Currency::where('is_active', true)->get(),
             'business_currency' => Auth::user()->preferred_currency ?? config('app.business_currency', 'USD'),
         ]);

@@ -2,7 +2,7 @@
 
 namespace Modules\Core\Services;
 
-use Modules\ERP\Models\Invoice;
+use Modules\Core\Models\Invoice;
 use Modules\Core\Models\SiteSetting;
 use Modules\Core\Models\ReferralEarning;
 use Modules\Core\Models\Wallet;

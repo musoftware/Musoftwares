@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Modules\Marketplace\Models\ServiceOrder;
+use Modules\Core\Models\ServiceOrder;
 use Inertia\Inertia;
 
 class MarketplaceOrderController extends Controller

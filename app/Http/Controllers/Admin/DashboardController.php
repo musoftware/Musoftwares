@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Modules\ERP\Models\Tenant;
-use Modules\ERP\Models\Invoice;
+use Modules\Core\Models\Invoice;
 use Modules\Core\Models\WalletTransaction;
 use Modules\Core\Models\UserWithdrawal;
 use Illuminate\Support\Facades\DB;

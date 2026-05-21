@@ -3,9 +3,9 @@
 namespace Modules\Core\Services;
 
 use App\Models\User;
-use Modules\ERP\Models\Invoice;
-use Modules\Marketplace\Models\Service;
-use Modules\Freelance\Models\Job;
+use Modules\Core\Models\Invoice;
+use Modules\Core\Models\Service;
+use Modules\Core\Models\Job;
 use Modules\ERP\Models\WithdrawalRequest;
 use Illuminate\Support\Facades\Cache;
 

@@ -3,7 +3,7 @@
 namespace Modules\Freelance\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use Modules\Freelance\Models\Contract;
+use Modules\Core\Models\Contract;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\DB;

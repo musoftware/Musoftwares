@@ -96,7 +96,7 @@ class AdminNoteController extends Controller
 
         $mappings = [
             'client' => \Modules\ERP\Models\Client::class,
-            'invoice' => \Modules\ERP\Models\Invoice::class,
+            'invoice' => \Modules\Core\Models\Invoice::class,
         ];
 
         return $mappings[strtolower($type)] ?? null;
