@@ -3,11 +3,6 @@ import { Link, router } from '@inertiajs/react';
 import { Button } from '@/Components/ui/button';
 import { ExternalLink, Shield, Smartphone, RefreshCw, CheckCircle2, Monitor } from 'lucide-react';
 
-interface UserLicense {
-    id: number;
-    license_key: string;
-}
-
 interface UserSubscription {
     id: number;
     plan_name: string;
@@ -26,7 +21,6 @@ interface DownloadPanelProps {
     toolSlug: string;
     toolTitle: string;
     userSubscription: UserSubscription;
-    userLicense: UserLicense | null;
     latestVersion?: ToolVersion | null;
 }
 
@@ -38,7 +32,6 @@ export function DownloadPanel({
     toolSlug,
     toolTitle,
     userSubscription,
-    userLicense,
     latestVersion,
 }: DownloadPanelProps) {
     return (

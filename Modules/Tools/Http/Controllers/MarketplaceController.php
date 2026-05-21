@@ -7,7 +7,6 @@ use Illuminate\Routing\Controller;
 use Inertia\Inertia;
 use Inertia\Response;
 use Illuminate\Pagination\LengthAwarePaginator;
-use Modules\Tools\Models\ToolLicense;
 use Modules\Tools\Models\ToolSubscription;
 
 class MarketplaceController extends Controller
@@ -83,17 +82,10 @@ class MarketplaceController extends Controller
             abort(404);
         }
 
-        $userLicense = null;
         $userSubscription = null;
 
         if (auth()->check()) {
             $userSubscription = ToolSubscription::where('user_id', auth()->id())
-                ->where('tool_guid', $tool['guid'])
-                ->where('status', 'active')
-                ->latest()
-                ->first();
-
-            $userLicense = ToolLicense::where('user_id', auth()->id())
                 ->where('tool_guid', $tool['guid'])
                 ->where('status', 'active')
                 ->latest()
@@ -123,10 +115,6 @@ class MarketplaceController extends Controller
         return Inertia::render('Tools/Show', [
             'tool'             => $this->serializeToolFull($tool),
             'userSubscription' => $mockedSubscription,
-            'userLicense'      => $userLicense ? [
-                'id'             => $userLicense->id,
-                'license_key'    => $userLicense->license_key,
-                ] : null,
         ]);
     }
 
