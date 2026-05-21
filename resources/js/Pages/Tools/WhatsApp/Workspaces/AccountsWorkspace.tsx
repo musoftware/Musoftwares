@@ -4,7 +4,7 @@ import { QrCode, RefreshCw, Settings2, Play, Power, Trash2 } from 'lucide-react'
 export default function AccountsWorkspace({
     activeQR, qrCountdown, qrSessionId, t,
     newAccountId, setNewAccountId, newProxy, setNewProxy, newHeadless, setNewHeadless,
-    daemonConnected, handleConnectSession, sessions, fetchSessions, handleDisconnectSession
+    daemonConnected, handleConnectSession, handleReconnectSession, sessions, fetchSessions, handleDisconnectSession
 }: any) {
     return (
         <div className="space-y-6 animate-in fade-in duration-300">
@@ -127,13 +127,24 @@ export default function AccountsWorkspace({
                                                 </span>
                                             </div>
                                         </div>
-                                        <button
-                                            onClick={() => handleDisconnectSession(s.accountId)}
-                                            className="text-slate-400 hover:text-rose-500 p-1.5 hover:bg-rose-50 rounded-lg transition-all"
-                                            title={t.accounts.disconnect}
-                                        >
-                                            <Power className="w-4 h-4" />
-                                        </button>
+                                        <div className="flex items-center gap-1">
+                                            {s.state !== 'connected' && s.state !== 'connecting' && (
+                                                <button
+                                                    onClick={() => handleReconnectSession(s.accountId)}
+                                                    className="text-teal-500 hover:text-teal-600 p-1.5 hover:bg-teal-50 rounded-lg transition-all"
+                                                    title="Connect / Show QR"
+                                                >
+                                                    <Play className="w-4 h-4" />
+                                                </button>
+                                            )}
+                                            <button
+                                                onClick={() => handleDisconnectSession(s.accountId)}
+                                                className="text-slate-400 hover:text-rose-500 p-1.5 hover:bg-rose-50 rounded-lg transition-all"
+                                                title={t.accounts.disconnect}
+                                            >
+                                                <Power className="w-4 h-4" />
+                                            </button>
+                                        </div>
                                     </div>
 
                                     {s.health && (

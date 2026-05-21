@@ -367,14 +367,18 @@ export default function WhatsAppSenderRunner({ tool, subscription, runtimePort, 
     const handleConnectSession = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!newAccountId.trim()) return;
+        handleReconnectSession(newAccountId.trim(), newProxy.trim() || null, newHeadless);
+        setNewAccountId('');
+        setNewProxy('');
+    };
+
+    const handleReconnectSession = async (accountId: string, proxy: string | null = null, headless: boolean = true) => {
         try {
-            await callRPC('connectSession', { accountId: newAccountId.trim(), proxy: newProxy.trim() || null, headless: newHeadless });
+            await callRPC('connectSession', { accountId, proxy, headless });
             setSessions(prev => [
-                ...prev.filter(s => s.accountId !== newAccountId.trim()),
-                { accountId: newAccountId.trim(), state: 'connecting', health: { trustScore: 50 } }
+                ...prev.filter(s => s.accountId !== accountId),
+                { accountId, state: 'connecting', health: { trustScore: 50 } }
             ]);
-            setNewAccountId('');
-            setNewProxy('');
         } catch (err: any) {
             alert(`Connect Error: ${err.message}`);
         }
@@ -480,6 +484,7 @@ export default function WhatsAppSenderRunner({ tool, subscription, runtimePort, 
                     setNewHeadless={setNewHeadless}
                     daemonConnected={daemonConnected}
                     handleConnectSession={handleConnectSession}
+                    handleReconnectSession={handleReconnectSession}
                     sessions={sessions}
                     fetchSessions={fetchSessions}
                     handleDisconnectSession={handleDisconnectSession}
