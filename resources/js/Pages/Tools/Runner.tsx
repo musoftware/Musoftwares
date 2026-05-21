@@ -27,6 +27,7 @@ const components: Record<string, React.ElementType> = {
     'opensooq':                 lazy(() => import('./OpensooqRunner')),
     'google-maps':              lazy(() => import('./GoogleMapsRunner')),
     'SnapDownloaderRunner':     lazy(() => import('./SnapDownloaderRunner')),
+    'tiktok-intelligence':      lazy(() => import('./TikTokIntelligenceRunner')),
 };
 
 function SetupWizard({ currentHost, onLinked }: { currentHost: string; onLinked: (ip: string) => void }) {
@@ -365,7 +366,8 @@ function FloatingBadge({ host, onDisconnect }: { host: string; onDisconnect: () 
 }
 
 export default function Runner({ tool, subscription, runtimePort, pluginSlug }: any) {
-    const Component = components[tool.runner_component];
+    const runnerKey = tool.runner_component?.trim();
+    const Component = components[runnerKey];
     const [isMobile, setIsMobile] = useState(false);
     const [status, setStatus] = useState<'checking' | 'online' | 'offline'>('checking');
     const [currentHost, setCurrentHost] = useState('127.0.0.1');

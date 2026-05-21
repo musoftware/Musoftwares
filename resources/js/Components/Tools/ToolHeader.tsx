@@ -1,6 +1,6 @@
 import React from 'react';
 import { router } from '@inertiajs/react';
-import { Download, Star, Cpu, CheckCircle2, ChevronRight } from 'lucide-react';
+import { Download, Star, Cpu, CheckCircle2, ChevronRight, Users } from 'lucide-react';
 import { Badge } from '@/Components/ui/badge';
 import { PlatformBadges } from './PlatformBadge';
 import { RuntimeBadge } from './RuntimeBadge';
