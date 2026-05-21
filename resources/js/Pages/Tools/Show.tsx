@@ -157,7 +157,7 @@ export default function Show({ tool, userSubscription }: Props) {
                                 </div>
                                 <div className="flex justify-between text-xs">
                                     <span className="text-muted-foreground">Active Users</span>
-                                    <span className="text-foreground font-medium">{tool.active_users.toLocaleString()}</span>
+                                    <span className="text-foreground font-medium">{(tool.active_users || 0).toLocaleString()}</span>
                                 </div>
                             </div>
                         </Card>
