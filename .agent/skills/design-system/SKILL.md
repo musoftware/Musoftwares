@@ -87,3 +87,8 @@ Even advanced systems must feel simple and guided through progressive disclosure
 
 ## Final AI Behavior
 When generating plugins or tools, automatically build full multi-workspace layouts, separate operational domains, and create a complete software-grade UX without needing user reminders.
+
+## 6. Unified Layout Width
+- **Standard Application Pages**: Must use a boxed, centered layout (`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8`). This ensures a unified shape across all pages and prevents content from stretching uncomfortably on ultra-wide screens.
+- **Data-Heavy Views**: Full-width (`w-full px-4`) is strictly reserved ONLY for giant data tables, complex kanban boards, or highly dense technical interfaces where horizontal space is critical.
+- **Implementation Rule**: Always default to the boxed layout (`max-w-7xl`) for dashboards, forms, profile settings, and standard list views.

@@ -62,7 +62,7 @@ export default function Pay({
         setErrorMessage(null);
         try {
             const response = await axios.post(
-                route('erp.client-invoices.pay.wallet', invoice.uuid),
+                route('erp.client-invoices.pay.wallet', invoice.id),
                 { amount: invoice.remaining }
             );
 

@@ -26,7 +26,7 @@ start "Vite Dev Server" cmd /k "npm run dev"
 
 :: Start Musoftware Runtime agent
 echo [3/3] Starting Musoftware Runtime agent...
-start "Musoftware Runtime" cmd /k "cd tools\musoftware-runtime && npm run start"
+start "Musoftware Runtime" cmd /k "cd ..\newmusoftwareTools\musoftware-runtime && npm run dev"
 
 echo.
 echo =============================================

@@ -347,9 +347,17 @@ export default function SnapDownloaderRunner() {
                     </div>
                     <div>
                         <h3 className="font-bold text-white text-lg">Connecting...</h3>
-                        <p className="text-xs text-slate-500 mt-2 leading-relaxed">
+                        <p className="text-xs text-slate-500 mt-2 leading-relaxed mb-4">
                             Make sure the Musoftware desktop client is running on your computer.
                         </p>
+                        <a
+                            href="musoftware://open"
+                            className="inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition-all w-full"
+                            style={{ background: 'rgba(245,158,11,0.15)', color: '#f59e0b', border: '1px solid rgba(245,158,11,0.25)' }}
+                        >
+                            <Terminal className="w-4 h-4" />
+                            Launch Runtime App
+                        </a>
                     </div>
                     <div className="h-1 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.05)' }}>
                         <div className="h-full rounded-full animate-pulse" style={{ width: '60%', background: 'linear-gradient(90deg, #f59e0b, #d97706)' }} />

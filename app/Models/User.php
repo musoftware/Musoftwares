@@ -10,10 +10,11 @@ use Laravel\Sanctum\HasApiTokens;
 use Laravel\Scout\Searchable;
 use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use App\Traits\IsPlatformClient;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable, HasRoles, Searchable;
+    use HasApiTokens, HasFactory, Notifiable, HasRoles, Searchable, IsPlatformClient;
 
     protected $fillable = [
         'name',
@@ -95,16 +96,13 @@ class User extends Authenticatable
     }
 
     /**
-     * Resolve the TenantClient for this user.
-     * Tries user_id FK first, then falls back to email match for legacy data.
+     * Resolve the ERP client profile for this user.
+     * Legacy method - retained for backward compatibility with older controllers.
+     * For platform billing, we now use the User model directly via IsPlatformClient trait.
      */
-    public function resolveClient(): ?\Modules\ERP\Models\TenantClient
+    public function resolveClient()
     {
-        $client = $this->client()->first();
-        if (!$client && $this->email) {
-            $client = \Modules\ERP\Models\TenantClient::where('email', $this->email)->first();
-        }
-        return $client;
+        return \Modules\ERP\Models\TenantClient::where('user_id', $this->id)->first();
     }
 
     public function pointTransactions()

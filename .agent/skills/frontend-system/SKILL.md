@@ -109,6 +109,13 @@ The Frontend UI is ONLY an **operational control surface**. The REAL system exis
 NEVER create fake dashboards, static metrics, fake progress bars, mock runtime states, disconnected tabs, dead buttons, or simulated success messages. 
 Tables, cards, and widgets MUST display real runtime data, not hardcoded placeholders.
 
+## Runtime Status Representation
+NEVER use temporary, collapsing badges (e.g., a "Runtime Connected" green banner that disappears after a few seconds) to display the runtime connection state.
+Instead, use a persistent, fixed UI control strap (e.g., a slim top navigation bar) containing quick actions for the runtime:
+- If disconnected: A "Run Runtime" button.
+- If connected: "Restart" and "Close" buttons.
+The user should always have immediate, permanent access to these controls without relying on transient success badges.
+
 ## Architecture Responsibility
 **Frontend (UI)**: ONLY renders state, triggers actions via Runtime SDK, subscribes to events, and displays progress. It NEVER owns operational logic or truth.
 **Runtime Agent**: Handles execution, queues, workers, automation, browser sessions, local storage, CSV parsing, retries, logs, and concurrency. IT OWNS the operational entities (Campaigns, Queues, Sessions).

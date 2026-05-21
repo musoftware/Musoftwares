@@ -14,6 +14,7 @@ import { useRuntimeStatus } from '@/hooks/useRuntimeStatus';
 import {
     Download, WifiOff, CheckCircle2,
     Loader2, AlertCircle, RefreshCw,
+    Play, Power
 } from 'lucide-react';
 
 interface Props {
@@ -22,20 +23,9 @@ interface Props {
 }
 
 export function RuntimeStatusBanner({ toolSlug }: Props) {
-    const { status, version, plugins, lastEvent } = useRuntimeStatus();
-    const [collapsed, setCollapsed]   = useState(false);
+    const { status, version, plugins, lastEvent, send } = useRuntimeStatus();
     const [installing, setInstalling] = useState<string | null>(null);
     const [updateAvail, setUpdateAvail] = useState<string | null>(null);
-
-    // Auto-collapse online banner
-    useEffect(() => {
-        if (status === 'online') {
-            const t = setTimeout(() => setCollapsed(true), 4000);
-            return () => clearTimeout(t);
-        } else {
-            setCollapsed(false);
-        }
-    }, [status]);
 
     // Handle WS events
     useEffect(() => {
@@ -53,11 +43,54 @@ export function RuntimeStatusBanner({ toolSlug }: Props) {
         }
     }, [lastEvent]);
 
+    const renderControls = () => (
+        <div className="w-full flex items-center justify-between px-4 py-1.5 bg-slate-950 border-b border-slate-900 z-50">
+            <div className="flex items-center gap-2">
+                <div className={`h-1.5 w-1.5 rounded-full ${status === 'online' ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)]' : 'bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.8)]'}`} />
+                <span className="text-xs font-medium text-slate-400">
+                    Runtime {status === 'online' ? 'Connected' : (status === 'detecting' ? 'Detecting...' : 'Disconnected')}
+                </span>
+            </div>
+            <div className="flex items-center gap-1.5">
+                {status !== 'online' ? (
+                    <button
+                        onClick={() => { window.location.href = 'musoftware://launch'; }}
+                        className="flex items-center gap-1.5 px-3 py-1 bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 hover:text-emerald-300 rounded text-xs font-semibold transition-colors"
+                    >
+                        <Play className="h-3 w-3" />
+                        Run Runtime
+                    </button>
+                ) : (
+                    <>
+                        <button
+                            onClick={() => { send('runtime.restart'); }}
+                            title="Restart Runtime"
+                            className="flex items-center gap-1.5 px-3 py-1 bg-slate-800/50 text-slate-300 hover:bg-slate-700 hover:text-white rounded text-xs font-medium transition-colors"
+                        >
+                            <RefreshCw className="h-3 w-3" />
+                            Restart
+                        </button>
+                        <button
+                            onClick={() => { send('runtime.close'); }}
+                            title="Close Runtime"
+                            className="flex items-center gap-1.5 px-3 py-1 bg-red-500/10 text-red-400 hover:bg-red-500/20 hover:text-red-300 rounded text-xs font-medium transition-colors"
+                        >
+                            <Power className="h-3 w-3" />
+                            Close
+                        </button>
+                    </>
+                )}
+            </div>
+        </div>
+    );
+
     if (status === 'detecting') return null;
-    if (status === 'online' && collapsed && !installing && !updateAvail) return null;
+    if (status === 'online' && !installing && !updateAvail) return renderControls();
 
     return (
-        <div className="w-full">
+        <>
+            {renderControls()}
+            <div className="w-full">
             {/* ── NOT INSTALLED ─────────────────────────────────────────────── */}
             {status === 'not_installed' && (
                 <div className="flex items-center gap-3 px-4 py-2.5 bg-slate-900/80 border-b border-slate-800 text-sm">
@@ -90,21 +123,6 @@ export function RuntimeStatusBanner({ toolSlug }: Props) {
                 </div>
             )}
 
-            {/* ── ONLINE ────────────────────────────────────────────────────── */}
-            {status === 'online' && !collapsed && !installing && (
-                <div className="flex items-center gap-2 px-4 py-2 bg-emerald-950/50 border-b border-emerald-900/30 text-sm">
-                    <CheckCircle2 className="h-4 w-4 text-emerald-400 shrink-0" />
-                    <span className="text-emerald-300">
-                        Runtime connected
-                        {version && <span className="text-emerald-500 ml-1 font-mono text-xs">v{version}</span>}
-                        {plugins.length > 0 && (
-                            <span className="text-emerald-600 ml-2">
-                                · {plugins.length} plugin{plugins.length !== 1 ? 's' : ''}
-                            </span>
-                        )}
-                    </span>
-                </div>
-            )}
 
             {/* ── PLUGIN INSTALLING ─────────────────────────────────────────── */}
             {installing && (
@@ -134,5 +152,6 @@ export function RuntimeStatusBanner({ toolSlug }: Props) {
                 </div>
             )}
         </div>
+        </>
     );
 }

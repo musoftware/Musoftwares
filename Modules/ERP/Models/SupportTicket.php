@@ -14,9 +14,21 @@ class SupportTicket extends TenantModel
         'status', 'priority', 'assigned_to', 'created_by'
     ];
 
-    public function client(): BelongsTo
+    public function platformClient(): BelongsTo
+    {
+        return $this->belongsTo(\App\Models\User::class, 'client_id');
+    }
+
+    public function tenantClient(): BelongsTo
     {
         return $this->belongsTo(TenantClient::class, 'client_id');
+    }
+
+    public function getClientAttribute()
+    {
+        return $this->tenant_id === Tenant::platformId() 
+            ? $this->platformClient 
+            : $this->tenantClient;
     }
 
     public function project(): BelongsTo
