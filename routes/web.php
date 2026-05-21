@@ -197,7 +197,7 @@ Route::prefix('marketplace')->name('marketplace.')->group(function () {
 });
 
 // Marketplace Admin Routes
-Route::middleware(['auth', 'verified', 'onboarding', 'role:admin'])->prefix('admin/marketplace')->name('admin.marketplace.')->group(function () {
+Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin/marketplace')->name('admin.marketplace.')->group(function () {
     // Categories
     Route::get('/categories', [\Modules\Marketplace\Http\Controllers\ServiceCategoryController::class, 'index'])->name('categories.index');
     Route::post('/categories', [\Modules\Marketplace\Http\Controllers\ServiceCategoryController::class, 'store'])->name('categories.store');
@@ -296,6 +296,13 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
     Route::post('/campaigns/{campaign}/schedule', [\App\Http\Controllers\Admin\CampaignController::class, 'schedule'])->name('campaigns.schedule');
     Route::post('/campaigns/{campaign}/pause', [\App\Http\Controllers\Admin\CampaignController::class, 'pause'])->name('campaigns.pause');
     Route::post('/campaigns/{campaign}/resume', [\App\Http\Controllers\Admin\CampaignController::class, 'resume'])->name('campaigns.resume');
+
+    // ── Admin Financial Operations ────────────────────────────────
+    Route::get('/finance', [\App\Http\Controllers\Admin\FinancialOperationsController::class, 'index'])->name('finance.index');
+    Route::post('/finance', [\App\Http\Controllers\Admin\FinancialOperationsController::class, 'store'])->name('finance.store');
+    Route::put('/finance/{entry}', [\App\Http\Controllers\Admin\FinancialOperationsController::class, 'update'])->name('finance.update');
+    Route::delete('/finance/{entry}', [\App\Http\Controllers\Admin\FinancialOperationsController::class, 'destroy'])->name('finance.destroy');
+    Route::post('/finance/{entry}/mark-paid', [\App\Http\Controllers\Admin\FinancialOperationsController::class, 'markAsPaid'])->name('finance.mark-paid');
 
     // ── User Management (Full Admin Control) ────────────────────────
     // Recovered from old project: Admin/UsersController
