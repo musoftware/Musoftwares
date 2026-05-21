@@ -26,6 +26,7 @@ import CommandPalette from '@/Components/CommandPalette';
 import ProductTourModal from '@/Components/ProductTourModal';
 import axios from 'axios';
 import FreelanceModeToggle from '@/Components/Freelance/FreelanceModeToggle';
+import MarketplaceModeToggle from '@/Components/Marketplace/MarketplaceModeToggle';
 
 export default function Authenticated(props: PropsWithChildren<{ header?: ReactNode }>) {
     return (
@@ -213,20 +214,6 @@ function AuthenticatedContent({
                                         </span>
                                     )}
                                 </div>
-
-                                {!auth?.team_member && (
-                                    <div className="relative">
-                                        <NavLink href={activeModules.erp ? safeRoute('erp.dashboard') : safeRoute('subscriptions.plans', { module: 'erp' })} active={isRouteActive('erp')}>
-                                            ERP
-                                        </NavLink>
-                                        {isTourOpen && tourStep === 3 && (
-                                            <span className="absolute -top-1 right-0 flex h-3 w-3">
-                                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-                                                <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500" />
-                                            </span>
-                                        )}
-                                    </div>
-                                )}
                                 
                                 {!auth?.team_member && (
                                     <>
@@ -398,7 +385,6 @@ function AuthenticatedContent({
                                                     <p className={cn("text-sm font-medium", isBookingActive ? "text-amber-900" : "text-slate-900")}>Booking</p>
                                                     {isBookingActive && <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-amber-100 text-amber-700">Active</span>}
                                                     {!activeModules.booking && <Lock className="w-3.5 h-3.5 text-slate-400" />}
-                                                    {activeModules.booking && !isBookingActive && <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-amber-100 text-amber-700">Add-on</span>}
                                                 </div>
                                                 <p className={cn("text-xs truncate", isBookingActive ? "text-amber-700/70" : "text-slate-500")}>
                                                     {!activeModules.booking ? 'Subscribe to access' : 'Appointments & Availability'}
@@ -470,6 +456,11 @@ function AuthenticatedContent({
                                     <FreelanceModeToggle />
                                 </div>
                             )}
+                            {isMarketplaceActive && (
+                                <div className="mr-1 sm:mr-2">
+                                    <MarketplaceModeToggle />
+                                </div>
+                            )}
                             {!auth?.team_member && (
                                 <div className="hidden md:flex items-center gap-2 mr-2">
                                     {/* Add Balance pill — locked geometry */}
@@ -482,14 +473,22 @@ function AuthenticatedContent({
                                     </Link>
 
                                     {/* Wallet pill — locked geometry */}
-                                    <Link
-                                        href={safeRoute('financial.transactions')}
-                                        className="inline-flex items-center gap-1.5 h-8 min-w-[90px] justify-center px-3 bg-slate-100 hover:bg-slate-200 rounded-full transition-colors duration-150 text-xs font-medium text-slate-900"
-                                        title="Wallet Balance"
-                                    >
-                                        <Wallet className="w-3.5 h-3.5 text-slate-500 shrink-0" />
-                                        <span>{wallet ? `${Number(wallet.balance).toFixed(2)} ${wallet.currency}` : '$0.00'}</span>
-                                    </Link>
+                                    <div className="relative">
+                                        <Link
+                                            href={safeRoute('financial.transactions')}
+                                            className="inline-flex items-center gap-1.5 h-8 min-w-[90px] justify-center px-3 bg-slate-100 hover:bg-slate-200 rounded-full transition-colors duration-150 text-xs font-medium text-slate-900"
+                                            title="Wallet Balance"
+                                        >
+                                            <Wallet className="w-3.5 h-3.5 text-slate-500 shrink-0" />
+                                            <span>{wallet ? `${Number(wallet.balance).toFixed(2)} ${wallet.currency}` : '$0.00'}</span>
+                                        </Link>
+                                        {isTourOpen && tourStep === 3 && (
+                                            <span className="absolute -top-1 -right-1 flex h-3 w-3">
+                                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                                                <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500" />
+                                            </span>
+                                        )}
+                                    </div>
 
                                     {/* Points pill — locked geometry */}
                                     <Link
@@ -586,6 +585,14 @@ function AuthenticatedContent({
                                     {!auth?.team_member ? (
                                         <>
                                             <DropdownMenuGroup>
+                                                {user?.role === 'admin' && (
+                                                    <DropdownMenuItem 
+                                                        className="cursor-pointer rounded-lg text-sm bg-indigo-50 text-indigo-700 focus:bg-indigo-100 focus:text-indigo-800 mb-1"
+                                                        render={<Link href={safeRoute('admin.dashboard')} className="flex items-center w-full font-medium" />}
+                                                    >
+                                                        <Shield className="mr-2 h-4 w-4 text-indigo-600" /> Admin Dashboard
+                                                    </DropdownMenuItem>
+                                                )}
                                                 <DropdownMenuItem 
                                                     className="cursor-pointer rounded-lg text-sm"
                                                     render={<Link href={safeRoute('profile.edit')} className="flex items-center w-full" />}

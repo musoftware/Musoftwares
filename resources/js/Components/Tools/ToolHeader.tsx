@@ -1,6 +1,6 @@
 import React from 'react';
 import { router } from '@inertiajs/react';
-import { Download, Star, Cpu, CheckCircle2, ChevronRight } from 'lucide-react';
+import { Download, Star, Cpu, CheckCircle2, ChevronRight, Users } from 'lucide-react';
 import { Badge } from '@/Components/ui/badge';
 import { PlatformBadges } from './PlatformBadge';
 import { RuntimeBadge } from './RuntimeBadge';
@@ -15,7 +15,7 @@ interface ToolHeaderProps {
         category_label: string;
         supported_os: string[];
         current_version: string;
-        download_count: number;
+        active_users: number;
         is_featured: boolean;
     };
     isSubscribed: boolean;
@@ -88,8 +88,8 @@ export function ToolHeader({ tool, isSubscribed }: ToolHeaderProps) {
                     {/* Stats */}
                     <div className="flex items-center gap-4 mt-3 text-xs text-slate-400">
                         <span className="flex items-center gap-1">
-                            <Download className="h-3 w-3" />
-                            {tool.download_count.toLocaleString()} downloads
+                            <Users className="h-4 w-4" />
+                            {(tool.active_users || 0).toLocaleString()} active users
                         </span>
                     </div>
                 </div>

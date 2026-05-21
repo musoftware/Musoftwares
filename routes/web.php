@@ -209,6 +209,11 @@ Route::middleware(['auth', 'verified', 'onboarding', 'role:admin'])->prefix('adm
     Route::post('/services/{id}/reject', [\Modules\Marketplace\Http\Controllers\ServiceController::class, 'reject'])->name('services.reject');
     Route::post('/services/{id}/feature', [\Modules\Marketplace\Http\Controllers\ServiceController::class, 'feature'])->name('services.feature');
 
+    // Orders
+    Route::get('/orders', [\App\Http\Controllers\Admin\MarketplaceOrderController::class, 'index'])->name('orders.index');
+    Route::get('/orders/{order}', [\App\Http\Controllers\Admin\MarketplaceOrderController::class, 'show'])->name('orders.show');
+    Route::post('/orders/{order}/dispute', [\App\Http\Controllers\Admin\MarketplaceOrderController::class, 'resolveDispute'])->name('orders.dispute.resolve');
+
     // Admin Views mapping to components later
     Route::get('/pending-services', function () {
         return Inertia::render('Admin/Marketplace/Pending', [
@@ -238,6 +243,59 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
     Route::get('/kyc', [\App\Http\Controllers\Admin\KycController::class, 'index'])->name('kyc.index');
     Route::post('/kyc/{id}/approve', [\App\Http\Controllers\Admin\KycController::class, 'approve'])->name('kyc.approve');
     Route::post('/kyc/{id}/reject', [\App\Http\Controllers\Admin\KycController::class, 'reject'])->name('kyc.reject');
+
+    // ── Admin Projects ──────────────────────────────────────────────
+    Route::resource('/projects', \App\Http\Controllers\Admin\ProjectController::class)->except(['create', 'edit', 'show']);
+    Route::post('/projects/{project}/archive', [\App\Http\Controllers\Admin\ProjectController::class, 'archive'])->name('projects.archive');
+    Route::post('/projects/{project}/restore', [\App\Http\Controllers\Admin\ProjectController::class, 'restore'])->name('projects.restore');
+
+    // ── Admin Plans ───────────────────────────────────────────────
+    Route::resource('/plans', \App\Http\Controllers\Admin\PlanController::class)->except(['create', 'edit', 'show']);
+
+    // ── Admin Invoices (Platform Billing) ─────────────────────────
+    Route::get('/invoices', [\App\Http\Controllers\Admin\InvoiceController::class, 'index'])->name('invoices.index');
+    Route::get('/invoices/unpaid', [\App\Http\Controllers\Admin\InvoiceController::class, 'unpaid'])->name('invoices.unpaid');
+    Route::get('/invoices/archive', [\App\Http\Controllers\Admin\InvoiceController::class, 'archive'])->name('invoices.archive');
+    Route::post('/invoices/{invoice}/mark-paid', [\App\Http\Controllers\Admin\InvoiceController::class, 'markPaid'])->name('invoices.mark-paid');
+    Route::post('/invoices/{invoice}/cancel', [\App\Http\Controllers\Admin\InvoiceController::class, 'cancel'])->name('invoices.cancel');
+
+    // ── Admin Leads ───────────────────────────────────────────────
+    Route::get('/leads', [\App\Http\Controllers\Admin\LeadController::class, 'index'])->name('leads.index');
+    Route::post('/leads/{lead}/status', [\App\Http\Controllers\Admin\LeadController::class, 'updateStatus'])->name('leads.update-status');
+    Route::delete('/leads/{lead}', [\App\Http\Controllers\Admin\LeadController::class, 'destroy'])->name('leads.destroy');
+
+    // ── Admin Contracts ───────────────────────────────────────────
+    Route::get('/contracts', [\App\Http\Controllers\Admin\ContractController::class, 'index'])->name('contracts.index');
+    Route::post('/contracts/{contract}/status', [\App\Http\Controllers\Admin\ContractController::class, 'updateStatus'])->name('contracts.update-status');
+    Route::delete('/contracts/{contract}', [\App\Http\Controllers\Admin\ContractController::class, 'destroy'])->name('contracts.destroy');
+
+    // ── Admin Price Calculator ────────────────────────────────────
+    Route::get('/calculator', [\App\Http\Controllers\Admin\PriceCalculatorController::class, 'index'])->name('calculator.index');
+    Route::post('/calculator/calculate-ai', [\App\Http\Controllers\Admin\PriceCalculatorController::class, 'calculateAI'])->name('calculator.calculate-ai');
+    Route::post('/calculator/save', [\App\Http\Controllers\Admin\PriceCalculatorController::class, 'saveProposal'])->name('calculator.save');
+    Route::post('/calculator/{proposal}/convert', [\App\Http\Controllers\Admin\PriceCalculatorController::class, 'convertToContract'])->name('calculator.convert');
+
+    // ── Admin Sequences ───────────────────────────────────────────
+    Route::get('/sequences', [\App\Http\Controllers\Admin\SequenceController::class, 'index'])->name('sequences.index');
+    Route::post('/sequences', [\App\Http\Controllers\Admin\SequenceController::class, 'store'])->name('sequences.store');
+    Route::get('/sequences/{sequence}', [\App\Http\Controllers\Admin\SequenceController::class, 'show'])->name('sequences.show');
+    Route::delete('/sequences/{sequence}', [\App\Http\Controllers\Admin\SequenceController::class, 'destroy'])->name('sequences.destroy');
+    Route::post('/sequences/{sequence}/steps', [\App\Http\Controllers\Admin\SequenceController::class, 'storeStep'])->name('sequences.steps.store');
+    Route::put('/sequences/steps/{step}', [\App\Http\Controllers\Admin\SequenceController::class, 'updateStep'])->name('sequences.steps.update');
+    Route::delete('/sequences/steps/{step}', [\App\Http\Controllers\Admin\SequenceController::class, 'deleteStep'])->name('sequences.steps.destroy');
+    Route::post('/sequences/{sequence}/generate-ai', [\App\Http\Controllers\Admin\SequenceController::class, 'generateStepsWithAI'])->name('sequences.generate-ai');
+    Route::post('/sequences/{sequence}/apply-ai', [\App\Http\Controllers\Admin\SequenceController::class, 'applyGeneratedSteps'])->name('sequences.apply-ai');
+
+    // ── Admin Campaigns ───────────────────────────────────────────
+    Route::get('/campaigns', [\App\Http\Controllers\Admin\CampaignController::class, 'index'])->name('campaigns.index');
+    Route::post('/campaigns', [\App\Http\Controllers\Admin\CampaignController::class, 'store'])->name('campaigns.store');
+    Route::get('/campaigns/{campaign}', [\App\Http\Controllers\Admin\CampaignController::class, 'show'])->name('campaigns.show');
+    Route::put('/campaigns/{campaign}', [\App\Http\Controllers\Admin\CampaignController::class, 'update'])->name('campaigns.update');
+    Route::delete('/campaigns/{campaign}', [\App\Http\Controllers\Admin\CampaignController::class, 'destroy'])->name('campaigns.destroy');
+    Route::post('/campaigns/generate-ai-content', [\App\Http\Controllers\Admin\CampaignController::class, 'generateAIContent'])->name('campaigns.generate-ai');
+    Route::post('/campaigns/{campaign}/schedule', [\App\Http\Controllers\Admin\CampaignController::class, 'schedule'])->name('campaigns.schedule');
+    Route::post('/campaigns/{campaign}/pause', [\App\Http\Controllers\Admin\CampaignController::class, 'pause'])->name('campaigns.pause');
+    Route::post('/campaigns/{campaign}/resume', [\App\Http\Controllers\Admin\CampaignController::class, 'resume'])->name('campaigns.resume');
 
     // ── User Management (Full Admin Control) ────────────────────────
     // Recovered from old project: Admin/UsersController
@@ -314,6 +372,22 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
         Route::post('/{tool}/upload-version', [\App\Http\Controllers\Admin\Tools\AdminToolController::class, 'uploadVersion'])->name('upload-version');
     });
 
+    // ── Reseller Management ────────────────────────────────────────────────────
+    Route::prefix('resellers')->name('resellers.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\Tools\AdminResellerController::class, 'index'])->name('index');
+        Route::get('/create', [\App\Http\Controllers\Admin\Tools\AdminResellerController::class, 'create'])->name('create');
+        Route::post('/', [\App\Http\Controllers\Admin\Tools\AdminResellerController::class, 'store'])->name('store');
+        Route::get('/search-users', [\App\Http\Controllers\Admin\Tools\AdminResellerController::class, 'searchUsers'])->name('search-users');
+        Route::get('/{id}', [\App\Http\Controllers\Admin\Tools\AdminResellerController::class, 'show'])->name('show');
+        Route::put('/{id}', [\App\Http\Controllers\Admin\Tools\AdminResellerController::class, 'update'])->name('update');
+        Route::delete('/{id}', [\App\Http\Controllers\Admin\Tools\AdminResellerController::class, 'destroy'])->name('destroy');
+        Route::post('/{id}/balance', [\App\Http\Controllers\Admin\Tools\AdminResellerController::class, 'adjustBalance'])->name('balance');
+        Route::post('/{resellerId}/users/{userId}/suspend', [\App\Http\Controllers\Admin\Tools\AdminResellerController::class, 'suspendUser'])->name('users.suspend');
+        Route::post('/{resellerId}/users/{userId}/activate', [\App\Http\Controllers\Admin\Tools\AdminResellerController::class, 'activateUser'])->name('users.activate');
+        Route::post('/{resellerId}/users/{userId}/clear-flag', [\App\Http\Controllers\Admin\Tools\AdminResellerController::class, 'clearSharingFlag'])->name('users.clear-flag');
+        Route::post('/{resellerId}/users/{userId}/toggle-check', [\App\Http\Controllers\Admin\Tools\AdminResellerController::class, 'toggleSharingCheck'])->name('users.toggle-check');
+    });
+
     // ERP Oversight Admin Routes
     Route::prefix('erp')->name('erp.')->group(function () {
         Route::get('/', [\Modules\ERP\Http\Controllers\Admin\ERPAdminController::class, 'index'])->name('index');
@@ -326,6 +400,13 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/admin/stop-impersonating', [\App\Http\Controllers\ImpersonateController::class, 'stopImpersonating'])->name('admin.stop-impersonate');
 });
+
+// ── Reseller Portal (public, iframe-embeddable) ───────────────────────────────
+// No auth middleware here — the portal itself decides whether to show login or tools.
+// X-Frame-Options is set to ALLOWALL for this route via a response header.
+Route::get('/reseller/{token}', [\Modules\Tools\Http\Controllers\ResellerPortalController::class, 'show'])
+    ->name('reseller.portal')
+    ->withoutMiddleware([\Illuminate\Http\Middleware\FrameGuard::class]);
 
 
 

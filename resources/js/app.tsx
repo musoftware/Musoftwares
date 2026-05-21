@@ -7,6 +7,7 @@ import { createRoot } from 'react-dom/client';
 import { Toaster } from '@/Components/ui/toaster';
 import { GlobalErrorHandler } from '@/Components/GlobalErrorHandler';
 import { FreelanceModeProvider } from '@/Components/Freelance/FreelanceModeContext';
+import { MarketplaceModeProvider } from '@/Components/Marketplace/MarketplaceModeContext';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
@@ -21,11 +22,13 @@ createInertiaApp({
         const root = createRoot(el);
 
         root.render(
-            <FreelanceModeProvider>
-                <App {...props} />
-                <Toaster />
-                <GlobalErrorHandler />
-            </FreelanceModeProvider>
+            <MarketplaceModeProvider>
+                <FreelanceModeProvider>
+                    <App {...props} />
+                    <Toaster />
+                    <GlobalErrorHandler />
+                </FreelanceModeProvider>
+            </MarketplaceModeProvider>
         );
     },
     progress: {

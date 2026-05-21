@@ -24,7 +24,7 @@ interface Props {
         id: number; slug: string; title: string; description: string;
         short_description: string; icon_url: string | null; category: string;
         category_label: string; supported_os: string[]; current_version: string;
-        download_count: number; is_featured: boolean; features: string[];
+        active_users: number; is_featured: boolean; features: string[];
         requirements: string[];
         screenshots: { id: number; url: string; caption: string | null }[];
         pricing_plans: PricingPlan[];
@@ -34,11 +34,9 @@ interface Props {
         id: number; plan_name: string; billing_cycle: string;
         status: string; expires_at: string;
     } | null;
-    userLicense: {
-        id: number; license_key: string; } | null;
 }
 
-export default function Show({ tool, userSubscription, userLicense }: Props) {
+export default function Show({ tool, userSubscription }: Props) {
     const { auth } = usePage().props as any;
     const isAuthed = !!auth?.user;
     const isSubscribed = !!userSubscription && userSubscription.status === 'active';
@@ -130,7 +128,6 @@ export default function Show({ tool, userSubscription, userLicense }: Props) {
                                 toolSlug={tool.slug}
                                 toolTitle={tool.title}
                                 userSubscription={userSubscription}
-                                userLicense={userLicense}
                                 latestVersion={latestVersion}
                             />
                         )}
@@ -159,8 +156,8 @@ export default function Show({ tool, userSubscription, userLicense }: Props) {
                                     <span className="text-foreground capitalize">{tool.category_label}</span>
                                 </div>
                                 <div className="flex justify-between text-xs">
-                                    <span className="text-muted-foreground">Downloads</span>
-                                    <span className="text-foreground font-medium">{tool.download_count.toLocaleString()}</span>
+                                    <span className="text-muted-foreground">Active Users</span>
+                                    <span className="text-foreground font-medium">{(tool.active_users || 0).toLocaleString()}</span>
                                 </div>
                             </div>
                         </Card>

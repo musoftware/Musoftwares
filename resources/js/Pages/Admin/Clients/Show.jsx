@@ -1,10 +1,11 @@
 import { Head, Link } from '@inertiajs/react';
 import { Copy, Mail, MessageCircle } from 'lucide-react';
+import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
 
 export default function Show({ client, wallets }) {
-    const handleLoginAsClient = () => {
+    const handleLoginAsUser = () => {
         // Implement impersonation logic later, mock for now
-        alert(`Impersonating client: ${client.name}`);
+        alert(`Impersonating user: ${client.name}`);
     };
 
     const formatCurrency = (amount, currency = 'USD') => {
@@ -23,16 +24,14 @@ export default function Show({ client, wallets }) {
     };
 
     return (
-        <div className="mx-auto max-w-5xl p-6">
-            <Head title={`Client Profile: ${client.name}`} />
-
+        <AdminSidebarLayout title={`User Profile: ${client.name}`} header="User Details">
             <div className="flex justify-between items-center mb-6">
-                <h1 className="text-3xl font-bold font-sora">Client Profile</h1>
+                <h1 className="text-3xl font-bold font-sora">User Profile</h1>
                 <button
-                    onClick={handleLoginAsClient}
+                    onClick={handleLoginAsUser}
                     className="bg-indigo-600 text-white px-4 py-2 rounded-[8px] hover:bg-indigo-700 transition shadow-sm"
                 >
-                    Login as client
+                    Login as user
                 </button>
             </div>
 
@@ -105,7 +104,7 @@ export default function Show({ client, wallets }) {
 
                             <div className="pt-4 border-t mt-4">
                                 <div className="flex justify-between text-sm mb-1">
-                                    <span className="text-gray-500">Referred Clients:</span>
+                                    <span className="text-gray-500">Referred Users:</span>
                                     <span className="font-bold">3</span>
                                 </div>
                                 <div className="flex justify-between text-sm">
@@ -195,6 +194,6 @@ export default function Show({ client, wallets }) {
                     ))}
                 </div>
             </div>
-        </div>
+        </AdminSidebarLayout>
     );
 }

@@ -7,7 +7,6 @@ use Illuminate\Routing\Controller;
 use Inertia\Inertia;
 use Inertia\Response;
 use Illuminate\Pagination\LengthAwarePaginator;
-use Modules\Tools\Models\ToolLicense;
 use Modules\Tools\Models\ToolSubscription;
 
 class MarketplaceController extends Controller
@@ -83,17 +82,10 @@ class MarketplaceController extends Controller
             abort(404);
         }
 
-        $userLicense = null;
         $userSubscription = null;
 
         if (auth()->check()) {
             $userSubscription = ToolSubscription::where('user_id', auth()->id())
-                ->where('tool_guid', $tool['guid'])
-                ->where('status', 'active')
-                ->latest()
-                ->first();
-
-            $userLicense = ToolLicense::where('user_id', auth()->id())
                 ->where('tool_guid', $tool['guid'])
                 ->where('status', 'active')
                 ->latest()
@@ -123,10 +115,6 @@ class MarketplaceController extends Controller
         return Inertia::render('Tools/Show', [
             'tool'             => $this->serializeToolFull($tool),
             'userSubscription' => $mockedSubscription,
-            'userLicense'      => $userLicense ? [
-                'id'             => $userLicense->id,
-                'license_key'    => $userLicense->license_key,
-                ] : null,
         ]);
     }
 
@@ -190,7 +178,7 @@ class MarketplaceController extends Controller
             'category_label'    => $categories[$tool['category']] ?? $tool['category'],
             'supported_os'      => $this->safeArray($tool['supported_os'] ?? []),
             'current_version'   => $tool['version'] ?? '1.0.0',
-            'download_count'    => $tool['downloads_count'] ?? 0, // Mocked
+            'active_users'      => $tool['active_users'] ?? rand(100, 5000), // Mocked
             'is_featured'       => $tool['is_featured'] ?? false,
             'starting_price'    => $lowestMonthly ?? 0,
             'is_free'           => ($lowestMonthly == 0),
@@ -212,7 +200,7 @@ class MarketplaceController extends Controller
             'category_label'    => $categories[$tool['category']] ?? $tool['category'],
             'supported_os'      => $this->safeArray($tool['supported_os'] ?? []),
             'current_version'   => $tool['version'] ?? '1.0.0',
-            'download_count'    => $tool['download_count'] ?? 0,
+            'active_users'      => $tool['active_users'] ?? rand(100, 5000),
             'is_featured'       => $tool['is_featured'] ?? false,
             'features'          => $this->safeArray($tool['features'] ?? []),
             'requirements'      => $this->safeArray($tool['requirements'] ?? []),
