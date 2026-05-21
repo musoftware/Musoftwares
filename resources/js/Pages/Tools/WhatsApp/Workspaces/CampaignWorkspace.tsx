@@ -2,10 +2,8 @@ import React from 'react';
 import { Users, MessageSquare, Sparkles, ShieldCheck, Send } from 'lucide-react';
 
 export default function CampaignWorkspace({
-    t, contactsText, setContactsText, getParsedRecipients, insertTag,
-    messageText, setMessageText, attachmentMode, setAttachmentMode,
-    attachmentUrl, setAttachmentUrl, vcardName, setVcardName,
-    vcardPhone, setVcardPhone, vcardCompany, setVcardCompany,
+    t, contactsText, setContactsText, getParsedRecipients,
+    templates, selectedTemplateId, setSelectedTemplateId,
     minWpm, setMinWpm, maxWpm, setMaxWpm, typoChance, setTypoChance,
     useSynonyms, setUseSynonyms, bellCurve, setBellCurve,
     trackDelivery, setTrackDelivery, stopOnBlock, setStopOnBlock, maxBlockRate, setMaxBlockRate,
@@ -57,110 +55,44 @@ export default function CampaignWorkspace({
                     )}
                 </div>
 
-                {/* Message editor card */}
+                {/* Template Selector card */}
                 <div className="bg-white/60 backdrop-blur-xl border border-white/60 rounded-3xl p-7 shadow-[0_8px_30px_rgb(0,0,0,0.04)] space-y-4 transition-all hover:bg-white/80">
                     <div className="flex items-center gap-2 border-b border-slate-100 pb-3">
                         <MessageSquare className="w-4.5 h-4.5 text-teal-600" />
-                        <h3 className="font-bold text-slate-800 text-sm">{t.campaign.messageLabel}</h3>
+                        <h3 className="font-bold text-slate-800 text-sm">Select Message Template</h3>
                     </div>
 
-                    {/* Personalization key injectors */}
-                    <div className="space-y-1.5">
-                        <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">{t.campaign.personalizationTags}</span>
-                        <div className="flex flex-wrap gap-2">
-                            {['{name}', '{phone}', '{company}'].map(tag => (
-                                <button
-                                    key={tag}
-                                    onClick={() => insertTag(tag)}
-                                    className="px-2.5 py-1 text-[10px] font-bold text-teal-700 border border-teal-200 bg-teal-50/50 hover:bg-teal-100/50 transition-all rounded-md"
-                                >
-                                    {tag}
-                                </button>
-                            ))}
-                        </div>
-                    </div>
-
-                    <textarea
-                        rows={6}
-                        value={messageText}
-                        onChange={e => setMessageText(e.target.value)}
-                        placeholder={t.campaign.messagePlaceholder}
-                        className="w-full text-xs border border-slate-200 focus:border-teal-500 rounded-xl p-4 outline-none transition-all resize-none leading-relaxed"
-                    />
-                </div>
-            </div>
-
-            {/* Right Column */}
-            <div className="space-y-6">
-                {/* Attachment Options card */}
-                <div className="bg-white/60 backdrop-blur-xl border border-white/60 rounded-3xl p-7 shadow-[0_8px_30px_rgb(0,0,0,0.04)] space-y-4 transition-all hover:bg-white/80">
-                    <div className="flex items-center gap-2 border-b border-slate-100 pb-3">
-                        <Sparkles className="w-4.5 h-4.5 text-teal-600" />
-                        <h3 className="font-bold text-slate-800 text-sm">{t.campaign.attachmentLabel}</h3>
-                    </div>
-
-                    <div className="flex border border-slate-200 rounded-xl overflow-hidden p-1 gap-1">
-                        {(['none', 'media', 'vcard'] as const).map(mode => (
-                            <button
-                                key={mode}
-                                type="button"
-                                onClick={() => setAttachmentMode(mode)}
-                                className={`flex-1 py-1.5 rounded-lg text-xs font-bold transition-all ${attachmentMode === mode ? 'bg-slate-900 text-white shadow-sm' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'}`}
-                            >
-                                {t.campaign.attachmentModes[mode]}
-                            </button>
-                        ))}
-                    </div>
-
-                    {attachmentMode === 'media' && (
-                        <div className="space-y-2.5 animate-in slide-in-from-top-2 duration-300">
-                            <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400">{t.campaign.attachmentUrl}</label>
-                            <input
-                                type="url"
-                                value={attachmentUrl}
-                                onChange={e => setAttachmentUrl(e.target.value)}
-                                placeholder={t.campaign.attachmentUrlPlaceholder}
-                                className="w-full text-xs border border-slate-200 focus:border-teal-500 rounded-xl px-4 py-2.5 outline-none transition-all"
-                            />
-                        </div>
-                    )}
-
-                    {attachmentMode === 'vcard' && (
-                        <div className="space-y-3.5 animate-in slide-in-from-top-2 duration-300">
-                            <div className="grid grid-cols-2 gap-3">
-                                <div>
-                                    <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">{t.campaign.vcardName}</label>
-                                    <input
-                                        type="text"
-                                        value={vcardName}
-                                        onChange={e => setVcardName(e.target.value)}
-                                        placeholder="John Doe"
-                                        className="w-full text-xs border border-slate-200 focus:border-teal-500 rounded-xl px-3 py-2 outline-none transition-all"
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">{t.campaign.vcardPhone}</label>
-                                    <input
-                                        type="text"
-                                        value={vcardPhone}
-                                        onChange={e => setVcardPhone(e.target.value)}
-                                        placeholder="+123456789"
-                                        className="w-full text-xs border border-slate-200 focus:border-teal-500 rounded-xl px-3 py-2 outline-none transition-all"
-                                    />
-                                </div>
+                    <div className="space-y-4">
+                        {templates.length === 0 ? (
+                            <div className="text-sm text-slate-500 bg-slate-50 p-4 rounded-xl border border-slate-100 text-center">
+                                No templates found. Please create one in the Templates tab first!
                             </div>
-                            <div>
-                                <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">{t.campaign.vcardCompany}</label>
-                                <input
-                                    type="text"
-                                    value={vcardCompany}
-                                    onChange={e => setVcardCompany(e.target.value)}
-                                    placeholder="Acme Corp"
-                                    className="w-full text-xs border border-slate-200 focus:border-teal-500 rounded-xl px-3 py-2 outline-none transition-all"
-                                />
+                        ) : (
+                            <div className="space-y-3">
+                                {templates.map((tpl: any) => (
+                                    <label key={tpl.id} className={`flex items-start gap-3 p-3 rounded-xl border cursor-pointer transition-all ${selectedTemplateId === tpl.id ? 'border-teal-500 bg-teal-50/50 shadow-sm' : 'border-slate-200 hover:border-teal-300'}`}>
+                                        <input
+                                            type="radio"
+                                            name="template_select"
+                                            checked={selectedTemplateId === tpl.id}
+                                            onChange={() => setSelectedTemplateId(tpl.id)}
+                                            className="mt-1 text-teal-600 focus:ring-teal-500"
+                                        />
+                                        <div className="flex-1 min-w-0">
+                                            <h4 className="font-bold text-sm text-slate-800">{tpl.name}</h4>
+                                            <p className="text-xs text-slate-500 line-clamp-2 mt-0.5">{tpl.message}</p>
+                                            {tpl.media_url && (
+                                                <div className="flex items-center gap-1 mt-2 text-[10px] font-bold uppercase tracking-wider text-teal-600 bg-teal-100/50 w-fit px-2 py-0.5 rounded">
+                                                    <Sparkles className="w-3 h-3" />
+                                                    {tpl.media_type} Attached
+                                                </div>
+                                            )}
+                                        </div>
+                                    </label>
+                                ))}
                             </div>
-                        </div>
-                    )}
+                        )}
+                    </div>
                 </div>
 
                 {/* Safety configuration card */}
