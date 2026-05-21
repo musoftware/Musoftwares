@@ -3,6 +3,12 @@ import {
     FileText, Plus, Trash2, Edit3, X, Check, Save,
     Image, Video, FileArchive, Mic, RefreshCw, Search, Tag
 } from 'lucide-react';
+import { Card, CardContent } from '@/Components/ui/card';
+import { Button } from '@/Components/ui/button';
+import { Input } from '@/Components/ui/input';
+import { Label } from '@/Components/ui/label';
+import { Textarea } from '@/Components/ui/textarea';
+import { Badge } from '@/Components/ui/badge';
 
 const MEDIA_TYPES = [
     { value: 'text',     label: 'Text Only',  icon: FileText },
@@ -30,46 +36,52 @@ interface Props {
 function TemplateCard({ tpl, onEdit, onDelete, onUse }: any) {
     const MediaIcon = MEDIA_TYPES.find(m => m.value === tpl.media_type)?.icon || FileText;
     return (
-        <div className="group bg-white/70 backdrop-blur-xl border border-white/60 rounded-2xl p-5 shadow-[0_4px_20px_rgb(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] hover:-translate-y-0.5 transition-all duration-200">
-            <div className="flex items-start justify-between gap-3 mb-3">
-                <div className="flex items-center gap-2.5 min-w-0">
-                    <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center flex-shrink-0 shadow-[0_4px_10px_rgb(52,211,153,0.3)]">
-                        <MediaIcon className="w-4 h-4 text-white" />
+        <Card className="group hover:shadow-md transition-all duration-200">
+            <CardContent className="p-5">
+                <div className="flex items-start justify-between gap-3 mb-3">
+                    <div className="flex items-center gap-2.5 min-w-0">
+                        <div className="w-9 h-9 rounded-xl bg-teal-600 flex items-center justify-center flex-shrink-0 text-white shadow-sm">
+                            <MediaIcon className="w-4 h-4" />
+                        </div>
+                        <div className="min-w-0">
+                            <h3 className="font-bold text-sm truncate">{tpl.name}</h3>
+                            <Badge variant="secondary" className="bg-emerald-50 text-emerald-700 mt-0.5 text-[10px]">
+                                {tpl.media_type}
+                            </Badge>
+                        </div>
                     </div>
-                    <div className="min-w-0">
-                        <h3 className="font-bold text-slate-800 text-sm truncate">{tpl.name}</h3>
-                        <span className="text-[10px] font-semibold uppercase tracking-wider text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">{tpl.media_type}</span>
+                    <div className="flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
+                        <Button size="icon" variant="ghost" onClick={() => onUse(tpl)} className="h-8 w-8 text-teal-600 hover:text-teal-700 hover:bg-teal-50" title="Use Template">
+                            <Check className="w-3.5 h-3.5" />
+                        </Button>
+                        <Button size="icon" variant="ghost" onClick={() => onEdit(tpl)} className="h-8 w-8 text-slate-600 hover:text-slate-800 hover:bg-slate-100" title="Edit">
+                            <Edit3 className="w-3.5 h-3.5" />
+                        </Button>
+                        <Button size="icon" variant="ghost" onClick={() => onDelete(tpl.id)} className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10" title="Delete">
+                            <Trash2 className="w-3.5 h-3.5" />
+                        </Button>
                     </div>
                 </div>
-                <div className="flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
-                    <button onClick={() => onUse(tpl)} className="p-1.5 bg-teal-500 text-white rounded-lg hover:bg-teal-400 transition-colors" title="Use Template">
-                        <Check className="w-3.5 h-3.5" />
-                    </button>
-                    <button onClick={() => onEdit(tpl)} className="p-1.5 bg-slate-100 text-slate-600 rounded-lg hover:bg-slate-200 transition-colors" title="Edit">
-                        <Edit3 className="w-3.5 h-3.5" />
-                    </button>
-                    <button onClick={() => onDelete(tpl.id)} className="p-1.5 bg-red-50 text-red-500 rounded-lg hover:bg-red-100 transition-colors" title="Delete">
-                        <Trash2 className="w-3.5 h-3.5" />
-                    </button>
-                </div>
-            </div>
 
-            {tpl.message && (
-                <p className="text-xs text-slate-500 line-clamp-3 leading-relaxed mb-3">{tpl.message}</p>
-            )}
-            {tpl.media_url && (
-                <div className="text-[10px] font-mono text-slate-400 bg-slate-50 rounded-lg px-3 py-1.5 truncate mb-3">
-                    🔗 {tpl.media_url}
-                </div>
-            )}
-            {tpl.tags && tpl.tags.length > 0 && (
-                <div className="flex flex-wrap gap-1">
-                    {tpl.tags.map((tag: string) => (
-                        <span key={tag} className="text-[10px] font-semibold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full">#{tag}</span>
-                    ))}
-                </div>
-            )}
-        </div>
+                {tpl.message && (
+                    <p className="text-xs text-muted-foreground line-clamp-3 leading-relaxed mb-3">{tpl.message}</p>
+                )}
+                {tpl.media_url && (
+                    <div className="text-[10px] font-mono text-muted-foreground bg-muted rounded-lg px-3 py-1.5 truncate mb-3">
+                        🔗 {tpl.media_url}
+                    </div>
+                )}
+                {tpl.tags && tpl.tags.length > 0 && (
+                    <div className="flex flex-wrap gap-1">
+                        {tpl.tags.map((tag: string) => (
+                            <Badge key={tag} variant="outline" className="text-[10px] font-semibold text-muted-foreground bg-muted/50">
+                                #{tag}
+                            </Badge>
+                        ))}
+                    </div>
+                )}
+            </CardContent>
+        </Card>
     );
 }
 
@@ -91,57 +103,66 @@ function TemplateEditor({ template, onSave, onCancel }: any) {
     };
 
     return (
-        <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4" onClick={(e) => { if (e.target === e.currentTarget) onCancel(); }}>
-            <div className="bg-white rounded-3xl shadow-2xl w-full max-w-xl p-8 animate-in zoom-in-95 duration-200">
-                <div className="flex items-center justify-between mb-6">
-                    <h2 className="text-lg font-bold text-slate-800">{template?.id ? 'Edit Template' : 'New Template'}</h2>
-                    <button onClick={onCancel} className="p-2 hover:bg-slate-100 rounded-xl transition-colors"><X className="w-4 h-4 text-slate-400" /></button>
-                </div>
-
-                <div className="space-y-4">
-                    <div>
-                        <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Template Name</label>
-                        <input value={name} onChange={e => setName(e.target.value)} placeholder="e.g. Welcome Message" className="w-full px-4 py-3 border border-slate-200 rounded-xl text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-teal-400/40 focus:border-teal-400 transition-all" />
+        <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center p-4" onClick={(e) => { if (e.target === e.currentTarget) onCancel(); }}>
+            <Card className="w-full max-w-xl animate-in zoom-in-95 duration-200">
+                <CardContent className="p-8">
+                    <div className="flex items-center justify-between mb-6">
+                        <h2 className="text-lg font-bold">{template?.id ? 'Edit Template' : 'New Template'}</h2>
+                        <Button variant="ghost" size="icon" onClick={onCancel}>
+                            <X className="w-4 h-4 text-muted-foreground" />
+                        </Button>
                     </div>
 
-                    <div>
-                        <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Message</label>
-                        <textarea value={message} onChange={e => setMessage(e.target.value)} placeholder="Hi {name}! Your message here..." rows={4} className="w-full px-4 py-3 border border-slate-200 rounded-xl text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-teal-400/40 focus:border-teal-400 transition-all resize-none" />
-                        <p className="text-[10px] text-slate-400 mt-1">Variables: <code className="bg-slate-100 px-1 rounded">{'{name}'}</code> <code className="bg-slate-100 px-1 rounded">{'{phone}'}</code> <code className="bg-slate-100 px-1 rounded">{'{company}'}</code></p>
-                    </div>
+                    <div className="space-y-4">
+                        <div className="space-y-2">
+                            <Label>Template Name</Label>
+                            <Input value={name} onChange={e => setName(e.target.value)} placeholder="e.g. Welcome Message" />
+                        </div>
 
-                    <div>
-                        <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Media Type</label>
-                        <div className="grid grid-cols-5 gap-2">
-                            {MEDIA_TYPES.map(({ value, label, icon: Icon }) => (
-                                <button key={value} onClick={() => setMediaType(value)} className={`flex flex-col items-center gap-1 py-2.5 px-2 rounded-xl border text-center transition-all ${mediaType === value ? 'border-teal-400 bg-teal-50 text-teal-600' : 'border-slate-200 hover:border-slate-300 text-slate-500'}`}>
-                                    <Icon className="w-4 h-4" />
-                                    <span className="text-[9px] font-bold uppercase tracking-wider">{label}</span>
-                                </button>
-                            ))}
+                        <div className="space-y-2">
+                            <Label>Message</Label>
+                            <Textarea value={message} onChange={e => setMessage(e.target.value)} placeholder="Hi {name}! Your message here..." rows={4} className="resize-none" />
+                            <p className="text-[10px] text-muted-foreground mt-1">Variables: <code className="bg-muted px-1 rounded">{'{name}'}</code> <code className="bg-muted px-1 rounded">{'{phone}'}</code> <code className="bg-muted px-1 rounded">{'{company}'}</code></p>
+                        </div>
+
+                        <div className="space-y-2">
+                            <Label>Media Type</Label>
+                            <div className="grid grid-cols-5 gap-2">
+                                {MEDIA_TYPES.map(({ value, label, icon: Icon }) => (
+                                    <Button 
+                                        key={value} 
+                                        variant={mediaType === value ? 'default' : 'outline'}
+                                        onClick={() => setMediaType(value)} 
+                                        className={`h-auto flex flex-col items-center gap-1 py-2.5 px-2 ${mediaType === value ? 'bg-teal-600 hover:bg-teal-700' : ''}`}
+                                    >
+                                        <Icon className="w-4 h-4" />
+                                        <span className="text-[9px] font-bold uppercase tracking-wider">{label}</span>
+                                    </Button>
+                                ))}
+                            </div>
+                        </div>
+
+                        {mediaType !== 'text' && (
+                            <div className="space-y-2">
+                                <Label>Media URL</Label>
+                                <Input value={mediaUrl} onChange={e => setMediaUrl(e.target.value)} placeholder="https://example.com/media.jpg" className="font-mono" />
+                            </div>
+                        )}
+
+                        <div className="space-y-2">
+                            <Label>Tags (comma-separated)</Label>
+                            <Input value={tagsInput} onChange={e => setTagsInput(e.target.value)} placeholder="promo, welcome, arabic" />
                         </div>
                     </div>
 
-                    {mediaType !== 'text' && (
-                        <div>
-                            <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Media URL</label>
-                            <input value={mediaUrl} onChange={e => setMediaUrl(e.target.value)} placeholder="https://example.com/media.jpg" className="w-full px-4 py-3 border border-slate-200 rounded-xl text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-teal-400/40 focus:border-teal-400 transition-all font-mono" />
-                        </div>
-                    )}
-
-                    <div>
-                        <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Tags (comma-separated)</label>
-                        <input value={tagsInput} onChange={e => setTagsInput(e.target.value)} placeholder="promo, welcome, arabic" className="w-full px-4 py-3 border border-slate-200 rounded-xl text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-teal-400/40 focus:border-teal-400 transition-all" />
+                    <div className="flex gap-3 mt-6">
+                        <Button variant="outline" onClick={onCancel} className="flex-1">Cancel</Button>
+                        <Button onClick={handleSave} disabled={saving} className="flex-1 bg-teal-600 hover:bg-teal-700 text-white gap-2">
+                            {saving ? <><div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" /> Saving...</> : <><Save className="w-4 h-4" /> Save Template</>}
+                        </Button>
                     </div>
-                </div>
-
-                <div className="flex gap-3 mt-6">
-                    <button onClick={onCancel} className="flex-1 py-3 border border-slate-200 text-slate-600 rounded-xl text-sm font-bold hover:bg-slate-50 transition-colors">Cancel</button>
-                    <button onClick={handleSave} disabled={saving} className="flex-1 py-3 bg-gradient-to-r from-teal-500 to-emerald-600 text-white rounded-xl text-sm font-bold hover:from-teal-400 hover:to-emerald-500 transition-all shadow-[0_4px_15px_rgb(52,211,153,0.3)] active:scale-95 disabled:opacity-60 flex items-center justify-center gap-2">
-                        {saving ? <><div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" /> Saving...</> : <><Save className="w-4 h-4" /> Save Template</>}
-                    </button>
-                </div>
-            </div>
+                </CardContent>
+            </Card>
         </div>
     );
 }
@@ -186,39 +207,41 @@ export default function TemplatesWorkspace({ callRPC, onUseTemplate }: Props) {
             {/* Header */}
             <div className="flex items-center justify-between">
                 <div>
-                    <h2 className="text-xl font-bold tracking-tight text-slate-800">Message Templates</h2>
-                    <p className="text-xs text-slate-400 mt-1">Save reusable messages and media — load them instantly when creating campaigns.</p>
+                    <h2 className="text-xl font-bold tracking-tight">Message Templates</h2>
+                    <p className="text-sm text-muted-foreground mt-1">Save reusable messages and media — load them instantly when creating campaigns.</p>
                 </div>
                 <div className="flex items-center gap-2">
-                    <button onClick={fetch} disabled={loading} className="p-2 hover:bg-slate-100 border border-slate-200 text-slate-500 rounded-xl transition-all">
+                    <Button variant="outline" size="icon" onClick={fetch} disabled={loading}>
                         <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
-                    </button>
-                    <button onClick={() => setEditTarget('new')} className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-teal-500 to-emerald-600 text-white rounded-xl text-sm font-bold hover:from-teal-400 hover:to-emerald-500 transition-all shadow-[0_4px_10px_rgb(52,211,153,0.3)] active:scale-95">
+                    </Button>
+                    <Button onClick={() => setEditTarget('new')} className="bg-teal-600 hover:bg-teal-700 text-white gap-2">
                         <Plus className="w-4 h-4" /> New Template
-                    </button>
+                    </Button>
                 </div>
             </div>
 
             {/* Search */}
             <div className="relative">
-                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search templates by name, content, or tag…" className="w-full pl-10 pr-4 py-3 bg-white/70 border border-slate-200/80 rounded-xl text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-teal-400/40 focus:border-teal-400 transition-all" />
+                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <Input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search templates by name, content, or tag…" className="pl-10" />
             </div>
 
             {/* Template Grid */}
             {filtered.length === 0 && !loading ? (
-                <div className="bg-white/60 backdrop-blur-xl border border-white/60 rounded-3xl p-14 shadow-[0_8px_30px_rgb(0,0,0,0.04)] flex flex-col items-center gap-4 text-center">
-                    <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center">
-                        <FileText className="w-8 h-8 text-slate-300" />
-                    </div>
-                    <div>
-                        <h3 className="font-bold text-slate-600">No Templates Yet</h3>
-                        <p className="text-sm text-slate-400 mt-1">Create your first template to speed up campaign creation.</p>
-                    </div>
-                    <button onClick={() => setEditTarget('new')} className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-teal-500 to-emerald-600 text-white rounded-xl text-sm font-bold hover:from-teal-400 hover:to-emerald-500 transition-all shadow-[0_4px_10px_rgb(52,211,153,0.3)]">
-                        <Plus className="w-4 h-4" /> Create First Template
-                    </button>
-                </div>
+                <Card className="border-dashed">
+                    <CardContent className="flex flex-col items-center gap-4 text-center py-16">
+                        <div className="w-16 h-16 rounded-2xl bg-muted flex items-center justify-center">
+                            <FileText className="w-8 h-8 text-muted-foreground" />
+                        </div>
+                        <div>
+                            <h3 className="font-bold">No Templates Yet</h3>
+                            <p className="text-sm text-muted-foreground mt-1">Create your first template to speed up campaign creation.</p>
+                        </div>
+                        <Button onClick={() => setEditTarget('new')} className="bg-teal-600 hover:bg-teal-700 text-white gap-2">
+                            <Plus className="w-4 h-4" /> Create First Template
+                        </Button>
+                    </CardContent>
+                </Card>
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
                     {filtered.map(tpl => (
