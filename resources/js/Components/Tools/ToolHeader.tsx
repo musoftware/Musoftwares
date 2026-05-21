@@ -15,7 +15,7 @@ interface ToolHeaderProps {
         category_label: string;
         supported_os: string[];
         current_version: string;
-        download_count: number;
+        active_users: number;
         is_featured: boolean;
     };
     isSubscribed: boolean;
@@ -89,7 +89,7 @@ export function ToolHeader({ tool, isSubscribed }: ToolHeaderProps) {
                     <div className="flex items-center gap-4 mt-3 text-xs text-slate-400">
                         <span className="flex items-center gap-1">
                             <Users className="h-4 w-4" />
-                            {tool.download_count.toLocaleString()} active users
+                            {tool.active_users.toLocaleString()} active users
                         </span>
                     </div>
                 </div>

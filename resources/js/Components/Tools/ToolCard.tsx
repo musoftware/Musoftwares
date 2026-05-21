@@ -24,7 +24,7 @@ interface Tool {
     category_label: string;
     supported_os: string[];
     current_version: string;
-    download_count: number;
+    active_users: number;
     is_featured: boolean;
     starting_price: number;
     is_free: boolean;
@@ -81,7 +81,7 @@ export function ToolCard({ tool, isSubscribed = false }: ToolCardProps) {
                     <span className="w-1 h-1 rounded-full bg-slate-200" />
                     <span className={`flex items-center gap-1 text-slate-400`}>
                         <Users className="h-3 w-3" />
-                        {tool.download_count.toLocaleString()}
+                        {tool.active_users.toLocaleString()}
                     </span>
                 </div>
             </div>
