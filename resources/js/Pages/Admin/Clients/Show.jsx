@@ -148,12 +148,6 @@ export default function Show({ client, wallets }) {
                             <div className="flex justify-between items-end mb-4 border-b pb-2">
                                 <div>
                                     <h2 className="text-xl font-bold font-sora">Wallet ({wallet.context})</h2>
-                                    <Link 
-                                        href={`/erp/clients/${client.id}/wallet`}
-                                        className="text-xs font-semibold text-indigo-600 hover:underline mt-1 inline-block"
-                                    >
-                                        Manage Detailed Ledger &rarr;
-                                    </Link>
                                 </div>
                                 <span className="text-3xl font-bold text-green-600 font-jetbrains">
                                     {formatCurrency(wallet.balance, wallet.currency)}
