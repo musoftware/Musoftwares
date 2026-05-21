@@ -34,7 +34,7 @@ export default function AccountsWorkspace({
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Connect new session column */}
-                <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm h-fit">
+                <div className="bg-white/60 backdrop-blur-xl border border-white/60 rounded-3xl p-7 shadow-[0_8px_30px_rgb(0,0,0,0.04)] h-fit hover:bg-white/80 transition-all">
                     <div className="flex items-center gap-2.5 pb-4 border-b border-slate-100 mb-4">
                         <Settings2 className="w-5 h-5 text-teal-600" />
                         <h3 className="font-bold text-slate-800 text-sm">{t.accounts.addAccount}</h3>
@@ -75,7 +75,7 @@ export default function AccountsWorkspace({
                         <button 
                             type="submit"
                             disabled={!daemonConnected}
-                            className="w-full py-2.5 bg-slate-900 text-white rounded-xl text-xs font-bold hover:bg-slate-800 transition-all shadow-md flex items-center justify-center gap-2 active:scale-95 disabled:bg-slate-300 disabled:shadow-none"
+                            className="w-full py-3.5 bg-gradient-to-r from-teal-500 to-emerald-600 hover:from-teal-400 hover:to-emerald-500 text-white rounded-2xl text-sm font-extrabold transition-all shadow-[0_8px_20px_rgb(20,184,166,0.3)] hover:shadow-[0_12px_25px_rgb(20,184,166,0.4)] flex items-center justify-center gap-2 active:scale-95 disabled:opacity-50 disabled:shadow-none"
                         >
                             <Play className="w-3.5 h-3.5" />
                             {t.accounts.connect}
@@ -107,9 +107,9 @@ export default function AccountsWorkspace({
                             </div>
                         </div>
                     ) : (
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                             {sessions.map((s: any) => (
-                                <div key={s.accountId} className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm relative overflow-hidden group">
+                                <div key={s.accountId} className="bg-white/60 backdrop-blur-xl border border-white/60 rounded-3xl p-6 shadow-[0_4px_20px_rgb(0,0,0,0.03)] relative overflow-hidden group hover:bg-white/90 hover:-translate-y-1 transition-all duration-300">
                                     <div className="flex justify-between items-start mb-4">
                                         <div>
                                             <h4 className="font-extrabold text-slate-800 flex items-center gap-2">

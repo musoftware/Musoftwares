@@ -32,7 +32,7 @@ export default function CampaignsListWorkspace({ t, callRPC, onViewReport }: any
                 </button>
             </div>
 
-            <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+            <div className="bg-white/60 backdrop-blur-xl border border-white/60 rounded-3xl p-7 shadow-[0_8px_30px_rgb(0,0,0,0.04)] overflow-hidden hover:bg-white/80 transition-all">
                 <div className="overflow-x-auto">
                     <table className="w-full text-left text-sm whitespace-nowrap">
                         <thead className="bg-slate-50 border-b border-slate-100 text-slate-500 font-semibold uppercase text-[10px] tracking-wider">
@@ -85,7 +85,7 @@ export default function CampaignsListWorkspace({ t, callRPC, onViewReport }: any
                                         <td className="px-6 py-4 text-right">
                                             <button 
                                                 onClick={() => onViewReport(c.id, c.name)}
-                                                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-900 text-white rounded-lg text-xs font-bold hover:bg-slate-800 transition-all active:scale-95 shadow-sm"
+                                                className="inline-flex items-center gap-1.5 px-4 py-2 bg-gradient-to-r from-slate-800 to-slate-900 text-white rounded-xl text-xs font-bold hover:from-slate-700 hover:to-slate-800 transition-all active:scale-95 shadow-[0_4px_10px_rgb(0,0,0,0.1)]"
                                             >
                                                 <Eye className="w-3.5 h-3.5" />
                                                 Report

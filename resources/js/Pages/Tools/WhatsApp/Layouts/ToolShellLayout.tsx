@@ -12,14 +12,18 @@ export default function ToolShellLayout({ children, sidebar, locale }: ToolShell
     return (
         <div 
             dir={isRtl ? 'rtl' : 'ltr'} 
-            className={`min-h-screen bg-[#F8FAFC] text-slate-900 font-sans selection:bg-teal-500 selection:text-white flex flex-col md:flex-row transition-all duration-300 ${isRtl ? 'text-right' : 'text-left'}`}
+            className={`min-h-screen bg-[#F8FAFC] text-slate-900 font-sans selection:bg-teal-500 selection:text-white flex flex-col md:flex-row transition-all duration-300 ${isRtl ? 'text-right' : 'text-left'} relative overflow-hidden`}
         >
+            {/* Ambient Premium Background */}
+            <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-teal-400/10 rounded-full blur-[120px] -z-10 animate-pulse pointer-events-none" style={{ animationDuration: '8s' }} />
+            <div className="absolute bottom-0 right-0 w-[600px] h-[600px] bg-indigo-500/5 rounded-full blur-[150px] -z-10 pointer-events-none" />
+
             {/* Sidebar & Bottom Nav Rendered via Sidebar Component */}
             {sidebar}
             
             {/* Main Content */}
-            <main className="flex-1 flex flex-col min-h-screen overflow-x-hidden mb-20 md:mb-0">
-                <div className="flex-1 p-4 md:p-8 max-w-6xl mx-auto w-full animate-in fade-in duration-300">
+            <main className="flex-1 flex flex-col min-h-screen overflow-x-hidden mb-20 md:mb-0 relative z-10">
+                <div className="flex-1 p-4 md:p-10 max-w-7xl mx-auto w-full animate-in fade-in zoom-in-95 duration-500">
                     {children}
                 </div>
             </main>
