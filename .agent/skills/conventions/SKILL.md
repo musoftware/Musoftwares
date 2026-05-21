@@ -21,6 +21,24 @@ While variable names and database schemas should remain technically accurate, **
 - **BAD**: “Runtime Worker Crash Recovery” | **GOOD**: “Automatic Recovery”
 - **BAD**: “Distributed Multi-Session Orchestration” | **GOOD**: “Multi-Account Sending”
 
+### 1.1 No Architecture Disclosure Rule (CRITICAL)
+**NEVER tell the end user how the system works internally — not in UI text, tooltips, badges, feature descriptions, or any in-app copy.**
+
+Users must NOT be told:
+- That processing runs locally via Node.js or any specific engine
+- That files are saved to their local hard drive
+- That no cloud upload occurs ("Zero-Cloud Processing")
+- That a runtime agent, worker, or background process is involved
+- What technology, protocol, or stack powers any feature
+
+The user only needs to know **what the feature does for them**, not how it is built.
+- **BAD**: "Downloads run entirely on your machine via the local Node.js engine. Files are saved directly to your hard drive — no cloud upload."
+- **GOOD**: "Your downloads are saved directly to your chosen folder."
+- **BAD**: "Zero-Cloud Processing — runs on your local machine."
+- **GOOD**: "Fast and private — everything stays on your computer."
+
+Express privacy or performance benefits in **outcome language**, never in **architecture language**.
+
 ### Button & Action Labels
 Buttons must feel obvious, calm, and direct.
 - **GOOD**: Start Campaign, Connect Account, Import Contacts, Continue, Save Changes.

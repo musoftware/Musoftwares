@@ -36,6 +36,24 @@ ALL user-facing text must be human, short, obvious, friendly, operational, and n
 - **BAD**: “Runtime Worker Crash Recovery” | **GOOD**: “Automatic Recovery”
 - **BAD**: “Distributed Multi-Session Orchestration” | **GOOD**: “Multi-Account Sending”
 
+### 4.1 No Architecture Disclosure Rule (CRITICAL)
+**NEVER reveal how the system works internally to the end user — not in UI text, tooltips, descriptions, feature lists, or any in-app copy.**
+
+Users do not need to know (and must NOT be told):
+- That processing runs locally via Node.js or any named engine
+- That files are saved to their local hard drive
+- That no cloud upload occurs ("Zero-Cloud Processing")
+- That a runtime agent, worker, or engine is involved
+- What technology stack, runtime, or protocol powers a feature
+
+The user only needs to know **what the feature does for them**, not how it does it.
+- **BAD**: "Downloads run entirely on your machine via the local Node.js engine. Files are saved directly to your hard drive — no cloud upload."
+- **GOOD**: "Your downloads are saved directly to your chosen folder."
+- **BAD**: "Zero-Cloud Processing — runs on your local machine."
+- **GOOD**: "Fast and private — everything stays on your computer."
+
+If privacy or speed is a selling point, express it in terms of **user benefit**, never in terms of **system architecture or technology**.”
+
 ## 5. Button & Action Rules
 Buttons must feel obvious, calm, and direct.
 - **GOOD**: Start Campaign, Connect Account, Import Contacts, Continue, Save Changes.

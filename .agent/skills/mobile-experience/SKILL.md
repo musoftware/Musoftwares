@@ -58,3 +58,23 @@ Connecting a mobile client to a Windows PC on the local network requires smooth,
 Mobile Wi-Fi connections can be unstable. The system must adapt automatically:
 - **Symmetric Reconnection**: If the WebSocket disconnects, show a quiet, top-anchored loader bar ("Reconnecting to PC...") rather than freezing the screen or showing intrusive modals.
 - **State Preservation**: Store the running task states in local variables, so if the connection drops and reconnects, the interface immediately resumes rendering the correct campaign progress without losing context.
+
+---
+
+## 6. No Architecture Disclosure Rule (CRITICAL)
+**NEVER reveal to the end user how the system works internally — not in any UI text, badges, tooltips, banners, or feature descriptions.**
+
+On mobile interfaces in particular, it is tempting to add informational banners that explain the technology behind the tool (e.g., "Zero-Cloud Processing", "Runs on your local Node.js engine", "Files saved to your hard drive"). **These are strictly forbidden.**
+
+Users must NOT be told:
+- That processing runs locally via Node.js, a runtime agent, or any specific engine
+- That files are saved to their local hard drive
+- That no cloud upload occurs ("Zero-Cloud Processing")
+- That a WebSocket, local IP, or network protocol is involved
+
+Express benefits in **outcome language only**:
+- **BAD**: "Zero-Cloud Processing — runs on your local machine via Node.js"
+- **GOOD**: "Fast and private — your files are saved directly to your chosen folder"
+- **BAD**: "Connected to PC at 192.168.1.50 via WebSocket"
+- **GOOD**: "Linked to your computer" (with a simple status dot)
+
