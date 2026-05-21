@@ -266,12 +266,11 @@ export default function WhatsAppSenderRunner({ tool, subscription, runtimePort, 
     const [campaignName, setCampaignName]       = useState('');
     const [selectedAccount, setSelectedAccount] = useState('');
     const [contactsText, setContactsText]       = useState('');
-    const [messageText, setMessageText]         = useState('');
-    const [attachmentMode, setAttachmentMode]   = useState<'none' | 'media' | 'vcard'>('none');
-    const [attachmentUrl, setAttachmentUrl]     = useState('');
-    const [vcardName, setVcardName]             = useState('');
-    const [vcardPhone, setVcardPhone]           = useState('');
-    const [vcardCompany, setVcardCompany]       = useState('');
+    
+    // Simplified Campaign: Only use templates
+    const [templates, setTemplates]             = useState<any[]>([]);
+    const [selectedTemplateId, setSelectedTemplateId] = useState('');
+    
     const [minWpm, setMinWpm]                   = useState(45);
     const [maxWpm, setMaxWpm]                   = useState(75);
     const [typoChance, setTypoChance]           = useState(5);
@@ -341,9 +340,21 @@ export default function WhatsAppSenderRunner({ tool, subscription, runtimePort, 
 
     const { connected: daemonConnected, callRPC } = useRuntimeWS(pluginSlug || 'whatsapp-sender', onBroadcast);
 
-    // ── Session management ────────────────────────────────────────────────────
+    // ── Session & Template management ────────────────────────────────────────────────────
 
-    useEffect(() => { if (daemonConnected) fetchSessions(); }, [daemonConnected]);
+    useEffect(() => { 
+        if (daemonConnected) {
+            fetchSessions();
+            fetchTemplates();
+        }
+    }, [daemonConnected]);
+
+    const fetchTemplates = async () => {
+        try {
+            const res: any = await callRPC('getTemplates');
+            setTemplates(res.templates || []);
+        } catch (err) { console.error('fetchTemplates failed:', err); }
+    };
 
     useEffect(() => {
         let timer: any;
@@ -410,7 +421,10 @@ export default function WhatsAppSenderRunner({ tool, subscription, runtimePort, 
         const parsed = parseContacts();
         if (!selectedAccount) return alert(t.campaign.selectAccountError);
         if (parsed.length === 0)  return alert(t.campaign.noContactsError);
-        if (!messageText.trim() && attachmentMode === 'none') return alert(t.campaign.emptyMessageError);
+        if (!selectedTemplateId) return alert("Please select a template to use for this campaign.");
+
+        const tpl = templates.find(t => t.id === selectedTemplateId);
+        if (!tpl) return;
 
         setIsCampaignRunning(true);
         try {
@@ -419,15 +433,15 @@ export default function WhatsAppSenderRunner({ tool, subscription, runtimePort, 
                 name:         campaignName.trim() || `Campaign ${new Date().toLocaleDateString()}`,
                 accountId:    selectedAccount,
                 contactsJson: parsed,
-                message:      messageText,
-                mediaUrl:     attachmentMode === 'media' ? attachmentUrl : null,
-                mediaType:    attachmentMode !== 'none' ? attachmentMode : 'text',
+                message:      tpl.message,
+                mediaUrl:     tpl.media_url,
+                mediaType:    tpl.media_type,
                 type:         'bulk',
                 delayMs:      4000
             });
 
             // Step 2: Start it
-            await callRPC('startCampaign', { campaignId: res.campaignId });
+            await callRPC('startCampaign', { campaignId: res.campaignId, accountId: selectedAccount });
 
             // Switch to history tab to monitor
             setActiveTab('history');
@@ -440,14 +454,7 @@ export default function WhatsAppSenderRunner({ tool, subscription, runtimePort, 
     // ── Template → Campaign autofill ──────────────────────────────────────────
 
     const handleUseTemplate = (template: any) => {
-        setMessageText(template.message || '');
-        if (template.media_url) {
-            setAttachmentMode(template.media_type === 'text' ? 'none' : 'media');
-            setAttachmentUrl(template.media_url);
-        } else {
-            setAttachmentMode('none');
-            setAttachmentUrl('');
-        }
+        setSelectedTemplateId(template.id);
         setActiveTab('campaign');
     };
 
@@ -497,19 +504,11 @@ export default function WhatsAppSenderRunner({ tool, subscription, runtimePort, 
                     contactsText={contactsText}
                     setContactsText={setContactsText}
                     getParsedRecipients={getParsedRecipients}
-                    insertTag={insertTag}
-                    messageText={messageText}
-                    setMessageText={setMessageText}
-                    attachmentMode={attachmentMode}
-                    setAttachmentMode={setAttachmentMode}
-                    attachmentUrl={attachmentUrl}
-                    setAttachmentUrl={setAttachmentUrl}
-                    vcardName={vcardName}
-                    setVcardName={setVcardName}
-                    vcardPhone={vcardPhone}
-                    setVcardPhone={setVcardPhone}
-                    vcardCompany={vcardCompany}
-                    setVcardCompany={setVcardCompany}
+                    
+                    templates={templates}
+                    selectedTemplateId={selectedTemplateId}
+                    setSelectedTemplateId={setSelectedTemplateId}
+
                     minWpm={minWpm}
                     setMinWpm={setMinWpm}
                     maxWpm={maxWpm}
