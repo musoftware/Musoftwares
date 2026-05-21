@@ -2,10 +2,10 @@
 
 namespace App\Helpers;
 
-use App\Models\Action;
-use App\Models\Invoice;
-use App\Models\PointSupport;
-use App\Models\Transaction;
+use App\Models\Users\Action;
+use App\Models\Finance\Invoice;
+use App\Models\Operations\PointSupport;
+use App\Models\Finance\Transaction;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Cache;

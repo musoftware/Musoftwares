@@ -4,8 +4,8 @@ namespace App\Helpers;
 
 use App\Events\AmountReceived;
 
-use App\Models\CostTransaction;
-use App\Models\Transaction;
+use App\Models\Finance\CostTransaction;
+use App\Models\Finance\Transaction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;

@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\CRM\PlatformLead;
+use Modules\CRM\Models\PlatformLead;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 

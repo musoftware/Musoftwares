@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
-use App\Models\WalletTransfer;
+use App\Models\Finance\WalletTransfer;
 use App\Services\WalletTransferService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;

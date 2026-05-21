@@ -2,9 +2,9 @@
 
 namespace App\Helpers;
 
-use App\Models\CurrenciesExchange;
-use App\Models\Currency;
-use App\Models\Project;
+use App\Models\Finance\CurrenciesExchange;
+use App\Models\Finance\Currency;
+use App\Models\Marketplace\Project;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -724,7 +724,7 @@ class FinanceHelper
 
     public static function FormatMoneyCurrentBusiness($money)
     {
-        return static::instance()->format_money($money, \App\Models\CurrenciesExchange::BusinessCurrency());
+        return static::instance()->format_money($money, \App\Models\Finance\CurrenciesExchange::BusinessCurrency());
     }
 
     public function totalSpendThisMonth($user)
@@ -771,7 +771,7 @@ class FinanceHelper
     {
         $unpaid = $invoice->unpaid_total();
         // Convert unpaid amount to EGP for payment link
-        $unpaidInEGP = \App\Models\CurrenciesExchange::RateToday($unpaid, $invoice->user->currency, 2);
+        $unpaidInEGP = \App\Models\Finance\CurrenciesExchange::RateToday($unpaid, $invoice->user->currency, 2);
 
         $message = "";
         if ($isArabic) {
@@ -802,12 +802,12 @@ class FinanceHelper
             $startDate = \Carbon\Carbon::now()->subMonths(6)->startOfMonth();
             $endDate = \Carbon\Carbon::now()->endOfMonth();
 
-            $costs = \App\Models\CostTransaction::whereBetween('created_at', [$startDate, $endDate])->get();
+            $costs = \App\Models\Finance\CostTransaction::whereBetween('created_at', [$startDate, $endDate])->get();
 
             $totalCost = 0;
             foreach ($costs as $cost) {
                 // Convert to EGP (ID 2).
-                $totalCost += \App\Models\CurrenciesExchange::RateToday($cost->amount, $cost->currency, 2);
+                $totalCost += \App\Models\Finance\CurrenciesExchange::RateToday($cost->amount, $cost->currency, 2);
             }
 
             $avgMonthlyCost = 0;
@@ -821,7 +821,7 @@ class FinanceHelper
 
             // 3. Safety Margin & Growth Adjustment
             // Default 150% if not set
-            $adjustmentPercent = (int)\App\Models\AdminSettings::GetValue('overhead_cost_default', 150);
+            $adjustmentPercent = (int)\App\Models\Users\AdminSettings::GetValue('overhead_cost_default', 150);
             if ($adjustmentPercent <= 0) $adjustmentPercent = 150;
 
             // "Recommended Minimum Daily Charge"
