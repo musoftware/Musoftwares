@@ -2,7 +2,7 @@
 
 namespace App\Helpers;
 
-use App\Models\UserReferral;
+use App\Models\Users\UserReferral;
 use GuzzleHttp\Client;
 
 class ReferralHelper

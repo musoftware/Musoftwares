@@ -2,8 +2,8 @@
 
 namespace App\Helpers;
 
-use App\Models\AdminSettings;
-use App\Models\Currency;
+use App\Models\Users\AdminSettings;
+use App\Models\Finance\Currency;
 use App\Models\User;
 use App\Services\GameArterService;
 use App\Services\GameMonetizeService;

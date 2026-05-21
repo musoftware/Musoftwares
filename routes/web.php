@@ -424,6 +424,14 @@ Route::get('/reseller/{token}', [\Modules\Tools\Http\Controllers\ResellerPortalC
     ->name('reseller.portal')
     ->withoutMiddleware([\Illuminate\Http\Middleware\FrameGuard::class]);
 
+// CRM Lead Capture Iframe Routes (No Auth required, allowed to be embedded)
+Route::get('/crm/embed/capture/{token}', [\Modules\CRM\Http\Controllers\LeadCaptureController::class, 'show'])
+    ->name('crm.embed.capture.show')
+    ->withoutMiddleware([\Illuminate\Http\Middleware\FrameGuard::class]);
+Route::post('/crm/embed/capture/{token}', [\Modules\CRM\Http\Controllers\LeadCaptureController::class, 'store'])
+    ->name('crm.embed.capture.store')
+    ->withoutMiddleware([\Illuminate\Http\Middleware\FrameGuard::class]);
+
 
 
 // SaaS Subscription & Billing Routes

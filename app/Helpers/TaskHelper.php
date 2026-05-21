@@ -4,7 +4,7 @@ namespace App\Helpers;
 
 use App\Models\Freelance\Client;
 use App\Models\Freelance\Currency;
-use App\Models\Task;
+use App\Models\Marketplace\Task;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
