@@ -12,7 +12,7 @@ class ClientController extends Controller
 {
     public function index()
     {
-        $clients = User::where('role', 'client')->paginate(15);
+        $clients = User::paginate(15);
 
         // Eager load or manually fetch wallets
         // Assuming wallet owner_type is App\Models\User

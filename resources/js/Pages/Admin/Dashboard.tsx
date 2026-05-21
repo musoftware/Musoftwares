@@ -1,6 +1,6 @@
 import React from 'react';
 import { Head, Link } from '@inertiajs/react';
-import WorkspaceLayout from '@/Layouts/WorkspaceLayout';
+import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
 import { DollarSign, Building2, Users, ArrowDownCircle, Inbox, Plus, BarChart3, Settings } from 'lucide-react';
 import { LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer } from 'recharts';
 import { Button } from '@/Components/ui/button';
@@ -55,20 +55,11 @@ export default function Dashboard({ stats, revenueChartData, moduleBreakdown, re
         ) },
     ];
 
-    const menuItems = [
-        { id: 'dashboard', label: 'Dashboard', icon: BarChart3, href: '/admin', isActive: true },
-        { id: 'clients', label: 'Clients', icon: Users, href: '/admin/clients', isActive: false },
-        { id: 'marketplace', label: 'Marketplace', icon: Building2, href: '/admin/marketplace', isActive: false },
-        { id: 'reports', label: 'Reports', icon: DollarSign, href: '/admin/reports', isActive: false },
-        { id: 'settings', label: 'Settings', icon: Settings, href: '/admin/settings', isActive: false },
-    ];
-
     return (
-        <WorkspaceLayout 
+        <AdminSidebarLayout 
             title="Admin Platform"
-            workspaceName="Musoftware Admin"
-            tenantId="SYS-ADMIN"
-            menuItems={menuItems}
+            header="Admin Dashboard"
+            user={auth?.user}
         >
             <div className="space-y-8">
                 <ModulePageHeader 
@@ -231,6 +222,6 @@ export default function Dashboard({ stats, revenueChartData, moduleBreakdown, re
                     </>
                 )}
             </div>
-        </WorkspaceLayout>
+        </AdminSidebarLayout>
     );
 }

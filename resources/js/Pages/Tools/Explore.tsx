@@ -31,7 +31,7 @@ interface Tool {
     category_label: string;
     supported_os: string[];
     current_version: string;
-    download_count: number;
+    active_users: number;
     is_featured: boolean;
     starting_price: number;
     is_free: boolean;
@@ -150,7 +150,7 @@ export default function Explore({ tools, categories, subscribedSlugs, filters }:
                         {featuredTools.length > 0 && activeCategory === '' && !filters.search && (
                             <div className="space-y-3">
                                 <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Featured</h2>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                                <div className="flex flex-col gap-3">
                                     {featuredTools.map(tool => (
                                         <ToolCard
                                             key={tool.id}
@@ -164,7 +164,7 @@ export default function Explore({ tools, categories, subscribedSlugs, filters }:
 
                         {/* All tools */}
                         {(activeCategory !== '' || !!filters.search || featuredTools.length === 0) ? (
-                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                            <div className="flex flex-col gap-3">
                                 {tools.data.map(tool => (
                                     <ToolCard
                                         key={tool.id}
@@ -176,7 +176,7 @@ export default function Explore({ tools, categories, subscribedSlugs, filters }:
                         ) : regularTools.length > 0 ? (
                             <div className="space-y-3">
                                 <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">All Tools</h2>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                                <div className="flex flex-col gap-3">
                                     {regularTools.map(tool => (
                                         <ToolCard
                                             key={tool.id}

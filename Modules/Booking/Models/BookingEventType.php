@@ -38,4 +38,9 @@ class BookingEventType extends Model
     {
         return $this->belongsTo(\App\Models\User::class);
     }
+
+    public function providers()
+    {
+        return $this->belongsToMany(BookingProvider::class, 'booking_event_type_provider', 'booking_event_type_id', 'booking_provider_id');
+    }
 }
