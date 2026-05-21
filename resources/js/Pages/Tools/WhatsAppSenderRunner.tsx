@@ -3,31 +3,32 @@ import ToolShellLayout from './WhatsApp/Layouts/ToolShellLayout';
 import Sidebar from './WhatsApp/Components/Sidebar';
 import AccountsWorkspace from './WhatsApp/Workspaces/AccountsWorkspace';
 import CampaignWorkspace from './WhatsApp/Workspaces/CampaignWorkspace';
-import DeliverabilityWorkspace from './WhatsApp/Workspaces/DeliverabilityWorkspace';
-import ScorecardWorkspace from './WhatsApp/Workspaces/ScorecardWorkspace';
 import GroupsWorkspace from './WhatsApp/Workspaces/GroupsWorkspace';
+import GroupCampaignWorkspace from './WhatsApp/Workspaces/GroupCampaignWorkspace';
+import TemplatesWorkspace from './WhatsApp/Workspaces/TemplatesWorkspace';
 import CampaignsListWorkspace from './WhatsApp/Workspaces/CampaignsListWorkspace';
 import CampaignReportWorkspace from './WhatsApp/Workspaces/CampaignReportWorkspace';
 
-// Nested translation structure for cleaner workspace integration
+type TabId = 'accounts' | 'campaign' | 'groups' | 'group-campaign' | 'history' | 'report' | 'templates';
+
 const translations = {
     en: {
         title: "WhatsApp Sender",
-        subtitle: "Automated Messaging & Campaign Operations",
+        subtitle: "Campaign Engine & Automation",
         language: "العربية",
-        connected: "System Online",
-        disconnected: "System Offline",
+        connected: "Runtime Connected",
+        disconnected: "Runtime Offline",
         tabs: {
-            accounts: "WhatsApp Accounts",
-            campaign: "Campaign Details",
+            accounts: "WA Accounts",
+            campaign: "New Campaign",
             deliverability: "Live Activity",
-            scorecard: "Campaign Report"
+            scorecard: "Report"
         },
         accounts: {
             qrRefreshes: "Refreshes in",
             qrPendingBadge: "Awaiting Scan",
             qrTitle: "Link Device",
-            qrInstructions: "Open WhatsApp on your phone -> Settings -> Linked Devices -> Scan this QR code.",
+            qrInstructions: "Open WhatsApp → Settings → Linked Devices → Scan this QR code.",
             addAccount: "Connect New Account",
             accountId: "Account Identifier",
             accountIdPlaceholder: "e.g. Sales Team 1",
@@ -44,10 +45,10 @@ const translations = {
         campaign: {
             contactsLabel: "Contacts List",
             parsedContacts: "Valid Targets",
-            contactsPlaceholder: "Paste numbers or CSV here:\nphone,name\n201001234567,John\n201007654321,Jane",
+            contactsPlaceholder: "Paste numbers or CSV:\nphone,name,company\n966501234567,Ahmed,Aramco\n971501234567,Fatima,",
             messageLabel: "Message Content",
             personalizationTags: "Variables:",
-            messagePlaceholder: "Hi {name}! Welcome to {company}.",
+            messagePlaceholder: "Hi {name}! Welcome to our service.",
             attachmentLabel: "Attachments",
             attachmentModes: { none: 'None', media: 'Media Link', vcard: 'Contact Card' },
             attachmentUrl: "Public Media URL",
@@ -63,9 +64,9 @@ const translations = {
             trackDelivery: "Track Delivery Status",
             stopOnBlock: "Emergency Stop on Block",
             maxBlockRate: "Max Block Rate Threshold",
-            launchButton: "Start Campaign",
-            selectAccountError: "Please select a routing session first.",
-            noContactsError: "Please provide valid contacts.",
+            launchButton: "Create & Start Campaign",
+            selectAccountError: "Please select a connected WhatsApp account.",
+            noContactsError: "Please provide at least one valid contact.",
             emptyMessageError: "Please provide a message or attachment."
         },
         deliverability: {
@@ -80,56 +81,51 @@ const translations = {
             statusDelivered: "Delivered",
             statusSent: "Sent",
             statusReplied: "Replied",
-            statusBlocked: "Action Required",
+            statusBlocked: "Blocked",
             statusFailed: "Failed",
             statusPending: "Pending"
         },
         scorecard: {
             totalProcessed: "Total Targets",
             sentSuccessfully: "Sent",
-            failedOrSkipped: "Failed/Skipped",
-            blocksReceived: "Action Required",
+            failedOrSkipped: "Failed",
+            blocksReceived: "Blocked",
             title: "Delivery Health",
-            description: "Post-campaign diagnostic and safety score.",
+            description: "Post-campaign diagnostic.",
             trustGrade: "Health Grade",
-            scoreExplanation: "Based on delivery rates and blocks.",
+            scoreExplanation: "Based on delivery rates.",
             blockRate: "Block Rate",
-            banProbability: "Account Status Risk",
+            banProbability: "Account Risk",
             warmingRecommendation: "Recommendation",
-            grades: {
-                excellent: "Excellent Health",
-                good: "Good Health",
-                warning: "Warning Level",
-                danger: "Critical Level"
-            }
+            grades: { excellent: "Excellent", good: "Good", warning: "Warning", danger: "Critical" }
         }
     },
     ar: {
         title: "مرسل الواتساب",
-        subtitle: "نظام المراسلة الآلية وإدارة الحملات",
+        subtitle: "محرك الحملات والأتمتة",
         language: "English",
         connected: "النظام متصل",
         disconnected: "النظام غير متصل",
         tabs: {
             accounts: "حسابات الواتساب",
-            campaign: "تفاصيل الحملة",
+            campaign: "حملة جديدة",
             deliverability: "النشاط المباشر",
-            scorecard: "تقرير الحملة"
+            scorecard: "التقرير"
         },
         accounts: {
             qrRefreshes: "تحديث خلال",
             qrPendingBadge: "بانتظار المسح",
             qrTitle: "ربط جهاز",
-            qrInstructions: "افتح الواتساب -> الأجهزة المرتبطة -> امسح الرمز.",
+            qrInstructions: "افتح الواتساب → الأجهزة المرتبطة → امسح الرمز.",
             addAccount: "ربط حساب جديد",
             accountId: "اسم الحساب",
-            accountIdPlaceholder: "مثال: فريق المبيعات 1",
+            accountIdPlaceholder: "مثال: فريق المبيعات",
             proxy: "بروكسي (اختياري)",
             proxyPlaceholder: "http://user:pass@host:port",
             headless: "تشغيل في الخلفية",
             connect: "ربط الحساب",
             activeSessions: "الاتصالات النشطة",
-            description: "إدارة الأجهزة المتصلة والبروكسي.",
+            description: "إدارة الأجهزة المتصلة.",
             noAccounts: "لا توجد حسابات مرتبطة.",
             disconnect: "قطع الاتصال",
             trustScore: "درجة الصحة"
@@ -137,33 +133,33 @@ const translations = {
         campaign: {
             contactsLabel: "قائمة الأرقام",
             parsedContacts: "جهات اتصال صحيحة",
-            contactsPlaceholder: "الصق الأرقام هنا:\nphone,name\n201001234567,أحمد",
+            contactsPlaceholder: "phone,name,company\n966501234567,أحمد,أرامكو",
             messageLabel: "محتوى الرسالة",
             personalizationTags: "المتغيرات:",
-            messagePlaceholder: "مرحباً {name}! أهلاً بك في {company}.",
+            messagePlaceholder: "مرحباً {name}!",
             attachmentLabel: "المرفقات",
             attachmentModes: { none: 'بدون', media: 'رابط وسائط', vcard: 'بطاقة اتصال' },
-            attachmentUrl: "رابط الوسائط العام",
+            attachmentUrl: "رابط الوسائط",
             attachmentUrlPlaceholder: "https://...",
             vcardName: "الاسم",
             vcardPhone: "رقم الهاتف",
             vcardCompany: "الشركة",
             safetyLabel: "سرعة وأمان الإرسال",
             typingSpeed: "سرعة الكتابة",
-            typoChance: "نسبة تصحيح الأخطاء المطبعية",
-            useSynonyms: "استخدام مرادفات الذكاء الاصطناعي",
-            bellCurve: "تأخيرات منحنى الجرس البشري",
+            typoChance: "نسبة تصحيح الأخطاء",
+            useSynonyms: "مرادفات الذكاء الاصطناعي",
+            bellCurve: "تأخيرات منحنى الجرس",
             trackDelivery: "تتبع حالة التسليم",
             stopOnBlock: "إيقاف طوارئ عند الحظر",
             maxBlockRate: "الحد الأقصى لنسبة الحظر",
-            launchButton: "بدء الحملة",
-            selectAccountError: "يرجى تحديد حساب التوجيه أولاً.",
-            noContactsError: "يرجى تقديم جهات اتصال صحيحة.",
-            emptyMessageError: "يرجى إدخال رسالة أو إرفاق ملف."
+            launchButton: "إنشاء وبدء الحملة",
+            selectAccountError: "يرجى تحديد حساب متصل.",
+            noContactsError: "يرجى إدخال جهة اتصال واحدة على الأقل.",
+            emptyMessageError: "يرجى إدخال رسالة أو مرفق."
         },
         deliverability: {
             campaignProgress: "تقدم الحملة",
-            description: "تتبع تسليم الرسائل في الوقت الفعلي.",
+            description: "تتبع تسليم الرسائل.",
             stopCampaign: "إيقاف الحملة",
             colPhone: "الهاتف",
             colName: "الاسم",
@@ -173,215 +169,186 @@ const translations = {
             statusDelivered: "تم التسليم",
             statusSent: "تم الإرسال",
             statusReplied: "تم الرد",
-            statusBlocked: "إجراء مطلوب",
+            statusBlocked: "محظور",
             statusFailed: "فشل",
             statusPending: "قيد الانتظار"
         },
         scorecard: {
             totalProcessed: "إجمالي المستهدفين",
             sentSuccessfully: "تم الإرسال",
-            failedOrSkipped: "فشل/تم التخطي",
-            blocksReceived: "إجراء مطلوب",
+            failedOrSkipped: "فشل",
+            blocksReceived: "محظور",
             title: "صحة الإرسال",
-            description: "تشخيص ما بعد الحملة ودرجة الأمان.",
+            description: "تشخيص ما بعد الحملة.",
             trustGrade: "درجة الصحة",
-            scoreExplanation: "بناءً على معدلات التسليم والحظر.",
+            scoreExplanation: "بناءً على معدلات التسليم.",
             blockRate: "معدل الحظر",
-            banProbability: "خطر حالة الحساب",
+            banProbability: "خطر الحساب",
             warmingRecommendation: "التوصية",
-            grades: {
-                excellent: "صحة ممتازة",
-                good: "صحة جيدة",
-                warning: "مستوى تحذير",
-                danger: "مستوى حرج"
-            }
+            grades: { excellent: "ممتاز", good: "جيد", warning: "تحذير", danger: "حرج" }
         }
     }
 };
 
-function useRuntimeWS(pluginSlug: string, onBroadcast?: ((event: string, data: any) => void) | null) {
-    const [ws, setWs] = useState<WebSocket | null>(null);
-    const [connected, setConnected] = useState(false);
-    const pendingRequests = useRef<Map<string, { resolve: Function, reject: Function }>>(new Map());
-    const onBroadcastRef = useRef<((event: string, data: any) => void) | null>(null);
+// ── Runtime WebSocket Hook ────────────────────────────────────────────────────
 
+function useRuntimeWS(pluginSlug: string, onBroadcast?: ((event: string, data: any) => void) | null) {
+    const [ws, setWs]           = useState<WebSocket | null>(null);
+    const [connected, setConnected] = useState(false);
+    const pending = useRef<Map<string, { resolve: Function; reject: Function }>>(new Map());
+    const onBroadcastRef = useRef<((event: string, data: any) => void) | null>(null);
     onBroadcastRef.current = onBroadcast || null;
 
     useEffect(() => {
-        const host = typeof window !== 'undefined' ? (window.localStorage.getItem('musoftware_runtime_host') || '127.0.0.1') : '127.0.0.1';
+        const host   = typeof window !== 'undefined' ? (window.localStorage.getItem('musoftware_runtime_host') || '127.0.0.1') : '127.0.0.1';
         const socket = new WebSocket(`ws://${host}:18401/ws`);
-        
-        socket.onopen = () => setConnected(true);
-        socket.onclose = () => setConnected(false);
-        
-        socket.onmessage = (event) => {
+
+        socket.onopen  = () => setConnected(true);
+        socket.onclose = () => { setConnected(false); };
+
+        socket.onmessage = (ev) => {
             try {
-                const msg = JSON.parse(event.data);
+                const msg = JSON.parse(ev.data);
+                // RPC response/error routing
                 if (msg.type === 'plugin_rpc_res' || msg.type === 'plugin_rpc_error') {
-                    const resolver = pendingRequests.current.get(msg.requestId);
-                    if (resolver) {
-                        if (msg.type === 'plugin_rpc_error') resolver.reject(new Error(msg.payload.error));
-                        else resolver.resolve(msg.payload);
-                        pendingRequests.current.delete(msg.requestId);
+                    const r = pending.current.get(msg.requestId);
+                    if (r) {
+                        if (msg.type === 'plugin_rpc_error') r.reject(new Error(msg.payload?.error || 'RPC Error'));
+                        else r.resolve(msg.payload);
+                        pending.current.delete(msg.requestId);
                     }
                 }
+                // Broadcast events
                 if (msg.event && onBroadcastRef.current) {
                     onBroadcastRef.current(msg.event, msg.data);
                 }
-            } catch (err) {}
+            } catch (_) {}
         };
-        
+
         setWs(socket);
         return () => socket.close();
     }, []);
 
     const callRPC = async (action: string, data: any = {}) => {
-        if (!ws || ws.readyState !== WebSocket.OPEN) throw new Error('Not connected to runtime daemon');
-        
+        if (!ws || ws.readyState !== WebSocket.OPEN) throw new Error('Not connected to runtime — is the Musoftware Runtime running?');
         return new Promise((resolve, reject) => {
-            const requestId = Math.random().toString(36).substring(7);
-            pendingRequests.current.set(requestId, { resolve, reject });
-            
-            ws.send(JSON.stringify({
-                type: 'plugin_rpc',
-                requestId,
-                payload: { plugin: pluginSlug, action, data }
-            }));
-            
+            const requestId = Math.random().toString(36).substring(2, 9);
+            pending.current.set(requestId, { resolve, reject });
+            ws.send(JSON.stringify({ type: 'plugin_rpc', requestId, payload: { plugin: pluginSlug, action, data } }));
             setTimeout(() => {
-                const resolver = pendingRequests.current.get(requestId);
-                if (resolver) {
-                    resolver.reject(new Error('RPC request timed out'));
-                    pendingRequests.current.delete(requestId);
-                }
-            }, 30000);
+                const r = pending.current.get(requestId);
+                if (r) { r.reject(new Error('RPC timeout')); pending.current.delete(requestId); }
+            }, 30_000);
         });
     };
 
     return { connected, callRPC };
 }
 
+// ── Main Component ────────────────────────────────────────────────────────────
+
 export default function WhatsAppSenderRunner({ tool, subscription, runtimePort, pluginSlug }: any) {
-    const [locale, setLocale] = useState<'en' | 'ar'>('en');
-    const [activeTab, setActiveTab] = useState<'accounts' | 'campaign' | 'groups' | 'history' | 'report'>('accounts');
-    const [reportCampaignId, setReportCampaignId] = useState<string | null>(null);
+    const [locale, setLocale]   = useState<'en' | 'ar'>('en');
+    const [activeTab, setActiveTab] = useState<TabId>('accounts');
+    const [reportCampaignId, setReportCampaignId]     = useState<string | null>(null);
     const [reportCampaignName, setReportCampaignName] = useState<string | null>(null);
 
-    const [sessions, setSessions] = useState<any[]>([]);
-    const [newAccountId, setNewAccountId] = useState('');
-    const [newProxy, setNewProxy] = useState('');
-    const [newHeadless, setNewHeadless] = useState(true);
-    
-    const [activeQR, setActiveQR] = useState<string | null>(null);
-    const [qrSessionId, setQrSessionId] = useState<string | null>(null);
-    const [qrCountdown, setQrCountdown] = useState(20);
+    // Sessions
+    const [sessions, setSessions]               = useState<any[]>([]);
+    const [newAccountId, setNewAccountId]       = useState('');
+    const [newProxy, setNewProxy]               = useState('');
+    const [newHeadless, setNewHeadless]         = useState(true);
+    const [activeQR, setActiveQR]               = useState<string | null>(null);
+    const [qrSessionId, setQrSessionId]         = useState<string | null>(null);
+    const [qrCountdown, setQrCountdown]         = useState(20);
 
-    const [campaignName, setCampaignName] = useState('');
+    // Campaign compose state
+    const [campaignName, setCampaignName]       = useState('');
     const [selectedAccount, setSelectedAccount] = useState('');
-    const [contactsText, setContactsText] = useState('');
-    const [messageText, setMessageText] = useState('');
-    
-    const [attachmentMode, setAttachmentMode] = useState<'none' | 'media' | 'vcard'>('none');
-    const [attachmentUrl, setAttachmentUrl] = useState('');
-    const [vcardName, setVcardName] = useState('');
-    const [vcardPhone, setVcardPhone] = useState('');
-    const [vcardCompany, setVcardCompany] = useState('');
+    const [contactsText, setContactsText]       = useState('');
+    const [messageText, setMessageText]         = useState('');
+    const [attachmentMode, setAttachmentMode]   = useState<'none' | 'media' | 'vcard'>('none');
+    const [attachmentUrl, setAttachmentUrl]     = useState('');
+    const [vcardName, setVcardName]             = useState('');
+    const [vcardPhone, setVcardPhone]           = useState('');
+    const [vcardCompany, setVcardCompany]       = useState('');
+    const [minWpm, setMinWpm]                   = useState(45);
+    const [maxWpm, setMaxWpm]                   = useState(75);
+    const [typoChance, setTypoChance]           = useState(5);
+    const [useSynonyms, setUseSynonyms]         = useState(true);
+    const [bellCurve, setBellCurve]             = useState(true);
+    const [trackDelivery, setTrackDelivery]     = useState(true);
+    const [stopOnBlock, setStopOnBlock]         = useState(true);
+    const [maxBlockRate, setMaxBlockRate]       = useState(5);
 
-    const [minWpm, setMinWpm] = useState(45);
-    const [maxWpm, setMaxWpm] = useState(75);
-    const [typoChance, setTypoChance] = useState(5);
-    const [useSynonyms, setUseSynonyms] = useState(true);
-    const [bellCurve, setBellCurve] = useState(true);
-    const [trackDelivery, setTrackDelivery] = useState(true);
-    const [stopOnBlock, setStopOnBlock] = useState(true);
-    const [maxBlockRate, setMaxBlockRate] = useState(5);
-
+    // Campaign state
     const [isCampaignRunning, setIsCampaignRunning] = useState(false);
-    const [runningTaskId, setRunningTaskId] = useState<string | null>(null);
-    const [campaignProgress, setCampaignProgress] = useState({ sent: 0, failed: 0, skipped: 0, blocked: 0, total: 0, percent: 0 });
-    const [deliverabilityGrid, setDeliverabilityGrid] = useState<any[]>([]);
-    const [campaignResult, setCampaignResult] = useState<any>(null);
+    const [activeCampaigns, setActiveCampaigns]     = useState<Record<string, any>>({});
+    const runningCampaignsCount = Object.keys(activeCampaigns).length;
 
-    const runningCampaignIdRef = useRef<string | null>(null);
     const t = translations[locale];
+
+    // ── Broadcast event handler ───────────────────────────────────────────────
 
     const onBroadcast = (event: string, data: any) => {
         if (event.startsWith('whatsapp.session.')) {
-            const accountId = data.accountId;
+            const { accountId } = data;
             if (!accountId) return;
 
             setSessions(prev => {
-                const match = prev.find(s => s.accountId === accountId);
                 const stateMap: Record<string, string> = {
-                    'whatsapp.session.connecting': 'connecting',
-                    'whatsapp.session.connected': 'connected',
+                    'whatsapp.session.connecting':   'connecting',
+                    'whatsapp.session.connected':    'connected',
                     'whatsapp.session.disconnected': 'disconnected',
-                    'whatsapp.session.banned': 'banned',
-                    'whatsapp.session.error': 'error',
+                    'whatsapp.session.error':        'error',
                 };
                 const newState = stateMap[event];
-                
+
                 if (event === 'whatsapp.session.qr_updated') {
                     setActiveQR(data.qr);
                     setQrSessionId(accountId);
                     return prev.map(s => s.accountId === accountId ? { ...s, state: 'qr_pending' } : s);
                 }
-
                 if (event === 'whatsapp.session.connected' && qrSessionId === accountId) {
                     setActiveQR(null);
                     setQrSessionId(null);
                 }
-
                 if (newState) {
-                    if (match) {
-                        return prev.map(s => s.accountId === accountId ? { ...s, state: newState, health: { ...s.health, trustScore: data.trustScore || s.health?.trustScore || 50 } } : s);
-                    } else {
-                        return [...prev, { accountId, state: newState, health: { trustScore: data.trustScore || 50 }, lastActivity: null, startedAt: null }];
-                    }
+                    const match = prev.find(s => s.accountId === accountId);
+                    if (match) return prev.map(s => s.accountId === accountId ? { ...s, state: newState } : s);
+                    return [...prev, { accountId, state: newState, health: { trustScore: 50 } }];
                 }
                 return prev;
             });
         }
 
-        if (event === 'whatsapp.campaign.progress' && data.campaignId === runningCampaignIdRef.current) {
-            setCampaignProgress({
-                sent: data.sent || 0,
-                failed: data.failed || 0,
-                skipped: data.skipped || 0,
-                blocked: data.blocked || 0,
-                total: data.total || 0,
-                percent: data.percent || 0
-            });
-        }
-
-        if ((event === 'whatsapp.message.sent' || event === 'whatsapp.message.failed') && data.campaignId === runningCampaignIdRef.current) {
-            setDeliverabilityGrid(prev => prev.map(row => {
-                if (row.phone === data.phone) {
-                    return { ...row, status: event === 'whatsapp.message.sent' ? 'sent' : 'failed', reason: data.reason || null };
-                }
-                return row;
+        if (event === 'whatsapp.campaign.progress') {
+            setActiveCampaigns(prev => ({
+                ...prev,
+                [data.campaignId]: { sent: data.sent, failed: data.failed, total: data.total, percent: data.percent }
             }));
         }
 
-        if (event === 'whatsapp.campaign.completed' && data.campaignId === runningCampaignIdRef.current) {
+        if (event === 'whatsapp.campaign.completed' || event === 'whatsapp.campaign.stopped' || event === 'whatsapp.campaign.failed') {
+            setActiveCampaigns(prev => {
+                const next = { ...prev };
+                delete next[data.campaignId];
+                return next;
+            });
             setIsCampaignRunning(false);
-            setCampaignResult(data);
-            setActiveTab('history');
         }
     };
 
-    const { connected: daemonConnected, callRPC } = useRuntimeWS('whatsapp-sender', onBroadcast);
+    const { connected: daemonConnected, callRPC } = useRuntimeWS(pluginSlug || 'whatsapp-sender', onBroadcast);
 
-    useEffect(() => {
-        if (daemonConnected) fetchSessions();
-    }, [daemonConnected]);
+    // ── Session management ────────────────────────────────────────────────────
+
+    useEffect(() => { if (daemonConnected) fetchSessions(); }, [daemonConnected]);
 
     useEffect(() => {
         let timer: any;
         if (activeQR) {
-            timer = setInterval(() => {
-                setQrCountdown(prev => (prev <= 1 ? 20 : prev - 1));
-            }, 1000);
+            timer = setInterval(() => setQrCountdown(p => p <= 1 ? 20 : p - 1), 1000);
         } else {
             setQrCountdown(20);
         }
@@ -393,24 +360,15 @@ export default function WhatsAppSenderRunner({ tool, subscription, runtimePort, 
             const res: any = await callRPC('getSessions');
             setSessions(res.sessions || []);
             const firstConnected = res.sessions?.find((s: any) => s.state === 'connected');
-            if (firstConnected && !selectedAccount) {
-                setSelectedAccount(firstConnected.accountId);
-            }
-        } catch (err) {
-            console.error('Failed to load active sessions:', err);
-        }
+            if (firstConnected && !selectedAccount) setSelectedAccount(firstConnected.accountId);
+        } catch (err) { console.error('fetchSessions failed:', err); }
     };
 
     const handleConnectSession = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!newAccountId.trim()) return;
-
         try {
-            await callRPC('connectSession', {
-                accountId: newAccountId.trim(),
-                proxy: newProxy.trim() || null,
-                headless: newHeadless
-            });
+            await callRPC('connectSession', { accountId: newAccountId.trim(), proxy: newProxy.trim() || null, headless: newHeadless });
             setSessions(prev => [
                 ...prev.filter(s => s.accountId !== newAccountId.trim()),
                 { accountId: newAccountId.trim(), state: 'connecting', health: { trustScore: 50 } }
@@ -426,25 +384,20 @@ export default function WhatsAppSenderRunner({ tool, subscription, runtimePort, 
         try {
             await callRPC('disconnectSession', { accountId });
             fetchSessions();
-            if (qrSessionId === accountId) {
-                setActiveQR(null);
-                setQrSessionId(null);
-            }
+            if (qrSessionId === accountId) { setActiveQR(null); setQrSessionId(null); }
         } catch (err: any) {
             alert(`Disconnect Error: ${err.message}`);
         }
     };
 
+    // ── Campaign compose ──────────────────────────────────────────────────────
+
     const parseContacts = () => {
         if (!contactsText.trim()) return [];
         return contactsText.split('\n').map(line => {
             const parts = line.split(',');
-            return {
-                phone: parts[0]?.trim().replace(/[^0-9+]/g, '') || '',
-                name: parts[1]?.trim() || '',
-                company: parts[2]?.trim() || ''
-            };
-        }).filter(c => c.phone.length > 6);
+            return { phone: parts[0]?.trim().replace(/[^0-9+]/g, '') || '', name: parts[1]?.trim() || '', company: parts[2]?.trim() || '' };
+        }).filter(c => c.phone.length >= 7);
     };
 
     const insertTag = (tag: string) => setMessageText(prev => prev + tag);
@@ -452,94 +405,69 @@ export default function WhatsAppSenderRunner({ tool, subscription, runtimePort, 
     const handleLaunchCampaign = async () => {
         const parsed = parseContacts();
         if (!selectedAccount) return alert(t.campaign.selectAccountError);
-        if (parsed.length === 0) return alert(t.campaign.noContactsError);
+        if (parsed.length === 0)  return alert(t.campaign.noContactsError);
         if (!messageText.trim() && attachmentMode === 'none') return alert(t.campaign.emptyMessageError);
 
         setIsCampaignRunning(true);
-        setCampaignProgress({ sent: 0, failed: 0, skipped: 0, blocked: 0, total: parsed.length, percent: 0 });
-        setCampaignResult(null);
-        setDeliverabilityGrid(parsed.map(c => ({ ...c, status: 'pending', reason: null })));
-
-        const campId = `campaign-${Date.now()}`;
-        runningCampaignIdRef.current = campId;
-        setActiveTab('history');
-
         try {
-            const host = typeof window !== 'undefined' ? (window.localStorage.getItem('musoftware_runtime_host') || '127.0.0.1') : '127.0.0.1';
-            const response = await fetch(`http://${host}:${runtimePort || 18400}/plugins/whatsapp-sender/run`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    params: {
-                        action: 'send_bulk',
-                        contacts: parsed,
-                        message: messageText,
-                        media_type: attachmentMode,
-                        media_url: attachmentMode === 'media' ? attachmentUrl : null,
-                        vcard_name: attachmentMode === 'vcard' ? vcardName : '',
-                        vcard_phone: attachmentMode === 'vcard' ? vcardPhone : '',
-                        vcard_company: attachmentMode === 'vcard' ? vcardCompany : '',
-                        humanize: true,
-                        aggressiveness: 'moderate',
-                        delay_ms: 4000,
-                        account_id: selectedAccount,
-                        account_ids: [selectedAccount],
-                        humanizer_wpm: [minWpm, maxWpm],
-                        humanizer_typo_chance: typoChance / 100,
-                        humanizer_use_synonyms: useSynonyms,
-                        track_delivery: trackDelivery,
-                        stop_on_block: stopOnBlock,
-                        max_block_rate: maxBlockRate / 100,
-                        campaign_id: campId,
-                        campaign_name: campaignName.trim() || 'Bulk Campaign'
-                    }
-                })
+            // Step 1: Create campaign record via RPC
+            const res: any = await callRPC('createCampaign', {
+                name:         campaignName.trim() || `Campaign ${new Date().toLocaleDateString()}`,
+                accountId:    selectedAccount,
+                contactsJson: parsed,
+                message:      messageText,
+                mediaUrl:     attachmentMode === 'media' ? attachmentUrl : null,
+                mediaType:    attachmentMode !== 'none' ? attachmentMode : 'text',
+                type:         'bulk',
+                delayMs:      4000
             });
 
-            if (!response.ok) {
-                const errData = await response.json();
-                throw new Error(errData.error || 'Failed to trigger worker');
-            }
+            // Step 2: Start it
+            await callRPC('startCampaign', { campaignId: res.campaignId });
 
-            const data = await response.json();
-            setRunningTaskId(data.taskId);
+            // Switch to history tab to monitor
+            setActiveTab('history');
         } catch (err: any) {
-            alert(`Campaign Launch Failure: ${err.message}`);
+            alert(`Campaign Error: ${err.message}`);
             setIsCampaignRunning(false);
         }
     };
 
-    const handleStopCampaign = async () => {
-        if (!runningTaskId) return;
-        try {
-            const host = typeof window !== 'undefined' ? (window.localStorage.getItem('musoftware_runtime_host') || '127.0.0.1') : '127.0.0.1';
-            await fetch(`http://${host}:${runtimePort || 18400}/tasks/${runningTaskId}/stop`, { method: 'POST' });
-            setIsCampaignRunning(false);
-        } catch (err) {
-            console.error('Failed to stop task:', err);
+    // ── Template → Campaign autofill ──────────────────────────────────────────
+
+    const handleUseTemplate = (template: any) => {
+        setMessageText(template.message || '');
+        if (template.media_url) {
+            setAttachmentMode(template.media_type === 'text' ? 'none' : 'media');
+            setAttachmentUrl(template.media_url);
+        } else {
+            setAttachmentMode('none');
+            setAttachmentUrl('');
         }
+        setActiveTab('campaign');
     };
 
     const getParsedRecipients = parseContacts();
 
     return (
-        <ToolShellLayout 
-            locale={locale} 
+        <ToolShellLayout
+            locale={locale}
             sidebar={
-                <Sidebar 
-                    activeTab={activeTab} 
+                <Sidebar
+                    activeTab={activeTab}
                     setActiveTab={setActiveTab}
                     locale={locale}
                     setLocale={setLocale}
                     daemonConnected={daemonConnected}
                     isCampaignRunning={isCampaignRunning}
-                    hasResult={!!campaignResult}
+                    hasResult={false}
                     t={t}
+                    runningCampaignsCount={runningCampaignsCount}
                 />
             }
         >
             {activeTab === 'accounts' && (
-                <AccountsWorkspace 
+                <AccountsWorkspace
                     t={t}
                     activeQR={activeQR}
                     qrCountdown={qrCountdown}
@@ -557,9 +485,9 @@ export default function WhatsAppSenderRunner({ tool, subscription, runtimePort, 
                     handleDisconnectSession={handleDisconnectSession}
                 />
             )}
-            
+
             {activeTab === 'campaign' && (
-                <CampaignWorkspace 
+                <CampaignWorkspace
                     t={t}
                     contactsText={contactsText}
                     setContactsText={setContactsText}
@@ -603,8 +531,22 @@ export default function WhatsAppSenderRunner({ tool, subscription, runtimePort, 
                 />
             )}
 
+            {activeTab === 'group-campaign' && (
+                <GroupCampaignWorkspace
+                    callRPC={callRPC}
+                    sessions={sessions}
+                />
+            )}
+
+            {activeTab === 'templates' && (
+                <TemplatesWorkspace
+                    callRPC={callRPC}
+                    onUseTemplate={handleUseTemplate}
+                />
+            )}
+
             {activeTab === 'groups' && (
-                <GroupsWorkspace 
+                <GroupsWorkspace
                     t={t}
                     callRPC={callRPC}
                     selectedAccount={selectedAccount}
@@ -613,9 +555,10 @@ export default function WhatsAppSenderRunner({ tool, subscription, runtimePort, 
             )}
 
             {activeTab === 'history' && (
-                <CampaignsListWorkspace 
+                <CampaignsListWorkspace
                     t={t}
                     callRPC={callRPC}
+                    activeCampaigns={activeCampaigns}
                     onViewReport={(id: string, name: string) => {
                         setReportCampaignId(id);
                         setReportCampaignName(name);
@@ -625,7 +568,7 @@ export default function WhatsAppSenderRunner({ tool, subscription, runtimePort, 
             )}
 
             {activeTab === 'report' && reportCampaignId && (
-                <CampaignReportWorkspace 
+                <CampaignReportWorkspace
                     t={t}
                     callRPC={callRPC}
                     campaignId={reportCampaignId}
