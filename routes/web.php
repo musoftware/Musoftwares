@@ -238,6 +238,15 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
     // Clients (thin ERP-linked view)
     Route::get('/clients', [\App\Http\Controllers\Admin\ClientController::class, 'index'])->name('clients.index');
     Route::get('/clients/{id}', [\App\Http\Controllers\Admin\ClientController::class, 'show'])->name('clients.show');
+    Route::post('/clients/{id}/login-as', [\App\Http\Controllers\Admin\ClientController::class, 'loginAs'])->name('clients.login-as');
+    Route::post('/clients/{id}/reset-password', [\App\Http\Controllers\Admin\ClientController::class, 'resetPassword'])->name('clients.reset-password');
+    Route::post('/clients/{id}/wallet-transaction', [\App\Http\Controllers\Admin\ClientController::class, 'walletTransaction'])->name('clients.wallet-transaction');
+    Route::post('/clients/{id}/tasks', [\App\Http\Controllers\Admin\ClientController::class, 'storeTask'])->name('clients.tasks.store');
+    Route::post('/clients/{id}/swap-budget', [\App\Http\Controllers\Admin\ClientController::class, 'swapBudget'])->name('clients.swap-budget');
+    Route::post('/clients/{id}/memberships', [\App\Http\Controllers\Admin\ClientController::class, 'activateMembership'])->name('clients.memberships.store');
+    Route::get('/clients/{id}/referrals', [\App\Http\Controllers\Admin\ClientController::class, 'referrals'])->name('clients.referrals');
+    Route::get('/clients/{id}/files', [\App\Http\Controllers\Admin\ClientController::class, 'files'])->name('clients.files');
+    Route::get('/clients/{id}/reports', [\App\Http\Controllers\Admin\ClientController::class, 'reports'])->name('clients.reports');
 
     // KYC Review
     Route::get('/kyc', [\App\Http\Controllers\Admin\KycController::class, 'index'])->name('kyc.index');
