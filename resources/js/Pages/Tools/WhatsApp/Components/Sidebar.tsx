@@ -1,12 +1,12 @@
 import React from 'react';
 import {
     Users, Send, LayoutDashboard, Globe, MessageSquare,
-    FileText, UsersRound, BarChart3
+    FileText, UsersRound, BarChart3, Bot, Contact, FolderOpen, Radio
 } from 'lucide-react';
 import { Button } from '@/Components/ui/button';
 import { Badge } from '@/Components/ui/badge';
 
-type TabId = 'accounts' | 'campaign' | 'groups' | 'group-campaign' | 'history' | 'report' | 'templates' | 'inbox';
+type TabId = 'accounts' | 'campaign' | 'groups' | 'group-campaign' | 'history' | 'report' | 'templates' | 'inbox' | 'auto-reply' | 'contacts' | 'dashboard' | 'media' | 'broadcast';
 
 interface SidebarProps {
     activeTab: TabId;
@@ -22,16 +22,21 @@ interface SidebarProps {
 }
 
 const NAV_ITEMS = [
+    { id: 'dashboard',      icon: BarChart3,   label: 'Dashboard',      group: 'main' },
     { id: 'accounts',       icon: Users,       label: 'WA Accounts',    group: 'main' },
     { id: 'campaign',       icon: Send,        label: 'New Campaign',   group: 'main' },
     { id: 'group-campaign', icon: UsersRound,  label: 'Group Campaign', group: 'main' },
     { id: 'templates',      icon: FileText,    label: 'Templates',      group: 'main' },
     { id: 'inbox',          icon: MessageSquare, label: 'Inbox',        group: 'tools' },
-    { id: 'groups',         icon: Users,       label: 'My Groups',      group: 'tools' },
+    { id: 'auto-reply',     icon: Bot,         label: 'Auto-Reply',     group: 'tools' },
+    { id: 'contacts',       icon: Contact,     label: 'Contacts',       group: 'tools' },
+    { id: 'media',           icon: FolderOpen,  label: 'Media Library',  group: 'tools' },
+    { id: 'broadcast',       icon: Radio,       label: 'Broadcast Lists', group: 'tools' },
+    { id: 'groups',         icon: UsersRound,  label: 'My Groups',      group: 'tools' },
     { id: 'history',        icon: LayoutDashboard, label: 'Campaigns',  group: 'tools' },
 ];
 
-function NavButton({ item, active, onClick, badge }: any) {
+function NavButton({ item, active, onClick, badge, label }: any) {
     return (
         <Button
             variant={active ? "secondary" : "ghost"}
@@ -43,7 +48,7 @@ function NavButton({ item, active, onClick, badge }: any) {
             }`}
         >
             <item.icon className={`w-4 h-4 transition-transform ${active ? 'scale-105' : ''}`} />
-            <span className="flex-1 text-left">{item.label}</span>
+            <span className="flex-1 text-start">{label}</span>
             {badge > 0 && (
                 <Badge variant="default" className="bg-teal-500 hover:bg-teal-600 animate-pulse text-[9px] px-1.5 min-w-5 h-5 flex items-center justify-center rounded-full">
                     {badge}
@@ -65,14 +70,14 @@ export default function Sidebar({
     return (
         <>
             {/* Desktop Sidebar */}
-            <div className="hidden md:flex flex-col h-screen sticky top-0 w-64 bg-background border-r shrink-0 shadow-sm z-20">
+            <div className="hidden md:flex flex-col h-screen sticky top-0 w-64 bg-background border-r rtl:border-r-0 rtl:border-l shrink-0 shadow-sm z-20">
                 {/* Logo */}
                 <div className="p-6 border-b flex items-center gap-3">
                     <div className="w-10 h-10 rounded-xl bg-teal-600 flex items-center justify-center shrink-0">
                         <MessageSquare className="w-5 h-5 text-white" />
                     </div>
-                    <div>
-                        <h1 className="font-bold text-base tracking-tight leading-none">{t.title}</h1>
+                    <div className="min-w-0">
+                        <h1 className="font-bold text-base tracking-tight leading-none truncate">{t.title}</h1>
                         <p className="text-[10px] text-muted-foreground mt-1 font-medium truncate">{t.subtitle}</p>
                     </div>
                 </div>
@@ -89,27 +94,29 @@ export default function Sidebar({
                         title={daemonConnected ? undefined : "Click to launch the Musoftware Runtime app"}
                     >
                         <div className={`w-2 h-2 rounded-full flex-shrink-0 ${daemonConnected ? 'bg-emerald-500 animate-ping' : 'bg-destructive group-hover:animate-pulse'}`} />
-                        <span>{daemonConnected ? t.connected : t.disconnected}</span>
+                        <span className="truncate">{daemonConnected ? t.connected : t.disconnected}</span>
                     </a>
                 </div>
 
                 {/* Navigation */}
                 <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
-                    <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground px-4 pb-2">Sending</p>
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground px-4 pb-2 text-start">{locale === 'ar' ? 'الإرسال' : 'Sending'}</p>
                     {mainItems.map(item => (
                         <NavButton
                             key={item.id}
                             item={item}
+                            label={t.tabs[item.id] || item.label}
                             active={activeTab === item.id}
                             onClick={() => setActiveTab(item.id as TabId)}
                         />
                     ))}
 
-                    <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground px-4 pb-2 pt-4">Management</p>
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground px-4 pb-2 pt-4 text-start">{locale === 'ar' ? 'الإدارة' : 'Management'}</p>
                     {toolItems.map(item => (
                         <NavButton
                             key={item.id}
                             item={item}
+                            label={t.tabs[item.id] || item.label}
                             active={activeTab === item.id}
                             onClick={() => setActiveTab(item.id as TabId)}
                             badge={item.id === 'history' ? runningCampaignsCount : item.id === 'inbox' ? unreadInboxCount : 0}
@@ -149,7 +156,7 @@ export default function Sidebar({
                         <div className={`p-1.5 rounded-lg transition-colors ${activeTab === item.id ? 'bg-teal-50 dark:bg-teal-950/40' : ''}`}>
                             <item.icon className={`w-5 h-5 ${activeTab === item.id ? 'scale-110' : ''} transition-transform`} />
                         </div>
-                        <span className="text-[9px] mt-0.5 font-bold truncate w-full text-center">{item.label}</span>
+                        <span className="text-[9px] mt-0.5 font-bold truncate w-full text-center">{t.tabs[item.id] || item.label}</span>
                     </button>
                 ))}
             </div>

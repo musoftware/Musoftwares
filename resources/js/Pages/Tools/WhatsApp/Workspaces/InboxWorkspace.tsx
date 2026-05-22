@@ -22,7 +22,8 @@ function formatTime(dateStr: string) {
     } catch { return ''; }
 }
 
-export default function InboxWorkspace({ callRPC, daemonConnected, sessions, onNewMessageRef, onUnreadReset }: any) {
+export default function InboxWorkspace({ callRPC, daemonConnected, sessions, onNewMessageRef, onUnreadReset, t, locale }: any) {
+    const isRtl = locale === 'ar';
     const [threads, setThreads] = useState<any[]>([]);
     const [selectedThread, setSelectedThread] = useState<any>(null);
     const [messages, setMessages] = useState<any[]>([]);
@@ -151,7 +152,7 @@ export default function InboxWorkspace({ callRPC, daemonConnected, sessions, onN
             await fetchMessages(selectedThread.id);
             await fetchThreads();
         } catch (err: any) {
-            alert(`Failed to send: ${err.message}`);
+            alert(`${t.inbox.replyFailed}${err.message}`);
         }
         setSending(false);
     };
@@ -169,13 +170,13 @@ export default function InboxWorkspace({ callRPC, daemonConnected, sessions, onN
     return (
         <div className="h-[calc(100vh-120px)] flex rounded-2xl overflow-hidden border shadow-lg bg-background">
             {/* Thread List - Left Panel */}
-            <div className={`${selectedThread ? 'hidden md:flex' : 'flex'} flex-col w-full md:w-[360px] border-r bg-background`}>
+            <div className={`${selectedThread ? 'hidden md:flex' : 'flex'} flex-col w-full md:w-[360px] border-e bg-background`}>
                 {/* Header */}
                 <div className="p-4 border-b bg-gradient-to-r from-teal-600 to-teal-700">
                     <div className="flex items-center justify-between mb-3">
                         <div className="flex items-center gap-2">
                             <MessageCircle className="w-5 h-5 text-white" />
-                            <h2 className="text-white font-bold text-base">Inbox</h2>
+                            <h2 className="text-white font-bold text-base">{t.inbox.title}</h2>
                             {totalUnread > 0 && (
                                 <Badge className="bg-red-500 hover:bg-red-600 text-white text-[10px] px-1.5 min-w-5 h-5 flex items-center justify-center rounded-full animate-pulse">
                                     {totalUnread}
@@ -187,12 +188,12 @@ export default function InboxWorkspace({ callRPC, daemonConnected, sessions, onN
                         </Button>
                     </div>
                     <div className="relative">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-teal-200" />
+                        <Search className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-teal-200" />
                         <Input
                             value={searchQuery}
                             onChange={e => setSearchQuery(e.target.value)}
-                            placeholder="Search conversations..."
-                            className="pl-9 bg-white/15 border-white/20 text-white placeholder:text-teal-200/70 h-9 rounded-xl text-sm focus:bg-white/25"
+                            placeholder={t.inbox.searchPlaceholder}
+                            className="ps-9 bg-white/15 border-white/20 text-white placeholder:text-teal-200/70 h-9 rounded-xl text-sm focus:bg-white/25 text-start"
                         />
                     </div>
                 </div>
@@ -204,15 +205,15 @@ export default function InboxWorkspace({ callRPC, daemonConnected, sessions, onN
                             <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-4">
                                 <InboxIcon className="w-7 h-7 text-muted-foreground" />
                             </div>
-                            <p className="text-sm font-semibold text-muted-foreground">No conversations yet</p>
-                            <p className="text-xs text-muted-foreground/70 mt-1">Send a campaign and wait for replies</p>
+                            <p className="text-sm font-semibold text-muted-foreground">{t.inbox.emptyStateTitle}</p>
+                            <p className="text-xs text-muted-foreground/70 mt-1">{t.inbox.emptyStateSub}</p>
                         </div>
                     ) : (
                         filteredThreads.map(thread => (
                             <button
                                 key={thread.id}
                                 onClick={() => openThread(thread)}
-                                className={`w-full flex items-center gap-3 p-4 border-b transition-all text-left hover:bg-muted/50 ${
+                                className={`w-full flex items-center gap-3 p-4 border-b transition-all text-start hover:bg-muted/50 ${
                                     selectedThread?.id === thread.id ? 'bg-teal-50/80 dark:bg-teal-950/20' : ''
                                 }`}
                             >
@@ -228,13 +229,13 @@ export default function InboxWorkspace({ callRPC, daemonConnected, sessions, onN
                                         <p className="font-bold text-sm truncate">
                                             {thread.contact_name || `+${thread.contact_number}`}
                                         </p>
-                                        <span className="text-[10px] text-muted-foreground shrink-0 ml-2">
+                                        <span className="text-[10px] text-muted-foreground shrink-0 ms-2">
                                             {formatTime(thread.last_message_at)}
                                         </span>
                                     </div>
                                     <div className="flex items-center justify-between mt-0.5">
-                                        <p className="text-xs text-muted-foreground truncate pr-2">
-                                            {thread.last_message_preview || thread.last_message || 'No messages yet'}
+                                        <p className="text-xs text-muted-foreground truncate pe-2 text-start">
+                                            {thread.last_message_preview || thread.last_message || t.inbox.noMessagesYet}
                                         </p>
                                         {(thread.unread_count || 0) > 0 && (
                                             <Badge className="bg-teal-500 hover:bg-teal-600 text-white text-[10px] px-1.5 min-w-5 h-5 flex items-center justify-center rounded-full shrink-0">
@@ -261,14 +262,14 @@ export default function InboxWorkspace({ callRPC, daemonConnected, sessions, onN
                                 className="md:hidden h-8 w-8"
                                 onClick={() => setSelectedThread(null)}
                             >
-                                <ArrowLeft className="w-4 h-4" />
+                                <ArrowLeft className="w-4 h-4 rtl:rotate-180" />
                             </Button>
                             <div className="w-10 h-10 rounded-full bg-gradient-to-br from-teal-400 to-teal-600 flex items-center justify-center shadow-sm">
                                 <span className="text-white font-bold text-sm">
                                     {(selectedThread.contact_name || selectedThread.contact_number || '?')[0].toUpperCase()}
                                 </span>
                             </div>
-                            <div className="flex-1 min-w-0">
+                            <div className="flex-1 min-w-0 text-start">
                                 <p className="font-bold text-sm">{selectedThread.contact_name || `+${selectedThread.contact_number}`}</p>
                                 <p className="text-[11px] text-muted-foreground font-mono">+{selectedThread.contact_number}</p>
                             </div>
@@ -288,50 +289,55 @@ export default function InboxWorkspace({ callRPC, daemonConnected, sessions, onN
                             {messages.length === 0 && (
                                 <div className="flex items-center justify-center h-full">
                                     <p className="text-xs text-muted-foreground bg-white/80 dark:bg-black/30 px-4 py-2 rounded-lg">
-                                        No messages in this conversation
+                                        {t.inbox.noMessages}
                                     </p>
                                 </div>
                             )}
-                            {messages.map((msg, idx) => (
-                                <div key={msg.id || idx} className={`flex ${msg.direction === 'out' ? 'justify-end' : 'justify-start'}`}>
-                                    <div className={`relative max-w-[75%] rounded-2xl px-3.5 py-2 shadow-sm text-[13px] ${
-                                        msg.direction === 'out'
-                                            ? 'bg-[#d9fdd3] text-[#111b21] dark:bg-[#005c4b] dark:text-[#e9edef]'
-                                            : 'bg-white text-[#111b21] dark:bg-[#202c33] dark:text-[#e9edef]'
-                                    }`}>
-                                        {/* Media indicator */}
-                                        {msg.message_type !== 'text' && (
-                                            <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground mb-1 bg-black/5 dark:bg-white/5 rounded-lg px-2 py-1.5">
-                                                {msg.message_type === 'image' && <Image className="w-3.5 h-3.5" />}
-                                                {msg.message_type === 'document' && <Paperclip className="w-3.5 h-3.5" />}
-                                                {msg.message_type === 'audio' && <span>🎵</span>}
-                                                {msg.message_type === 'video' && <span>🎬</span>}
-                                                <span className="capitalize font-semibold">{msg.message_type}</span>
-                                            </div>
-                                        )}
-                                        {/* Message content */}
-                                        {msg.content && (
-                                            <p className="whitespace-pre-wrap break-words leading-relaxed">{msg.content}</p>
-                                        )}
-                                        {/* Timestamp */}
-                                        <div className="flex items-center justify-end gap-1 mt-1">
-                                            <span className="text-[10px] text-muted-foreground/70">{formatTime(msg.timestamp)}</span>
-                                            {msg.direction === 'out' && (
-                                                <CheckCheck className="w-3.5 h-3.5 text-teal-500" />
+                            {messages.map((msg, idx) => {
+                                const justifyClass = msg.direction === 'out' 
+                                    ? (isRtl ? 'justify-start' : 'justify-end') 
+                                    : (isRtl ? 'justify-end' : 'justify-start');
+                                return (
+                                    <div key={msg.id || idx} className={`flex ${justifyClass}`}>
+                                        <div className={`relative max-w-[75%] rounded-2xl px-3.5 py-2 shadow-sm text-[13px] ${
+                                            msg.direction === 'out'
+                                                ? 'bg-[#d9fdd3] text-[#111b21] dark:bg-[#005c4b] dark:text-[#e9edef]'
+                                                : 'bg-white text-[#111b21] dark:bg-[#202c33] dark:text-[#e9edef]'
+                                        }`}>
+                                            {/* Media indicator */}
+                                            {msg.message_type !== 'text' && (
+                                                <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground mb-1 bg-black/5 dark:bg-white/5 rounded-lg px-2 py-1.5">
+                                                    {msg.message_type === 'image' && <Image className="w-3.5 h-3.5" />}
+                                                    {msg.message_type === 'document' && <Paperclip className="w-3.5 h-3.5" />}
+                                                    {msg.message_type === 'audio' && <span>🎵</span>}
+                                                    {msg.message_type === 'video' && <span>🎬</span>}
+                                                    <span className="capitalize font-semibold">{msg.message_type}</span>
+                                                </div>
                                             )}
+                                            {/* Message content */}
+                                            {msg.content && (
+                                                <p className="whitespace-pre-wrap break-words leading-relaxed text-start">{msg.content}</p>
+                                            )}
+                                            {/* Timestamp */}
+                                            <div className="flex items-center justify-end gap-1 mt-1">
+                                                <span className="text-[10px] text-muted-foreground/70">{formatTime(msg.timestamp)}</span>
+                                                {msg.direction === 'out' && (
+                                                    <CheckCheck className="w-3.5 h-3.5 text-teal-500" />
+                                                )}
+                                            </div>
+                                            {/* Bubble tail */}
+                                            {idx === 0 || messages[idx-1]?.direction !== msg.direction ? (
+                                                <div className={`absolute top-0 w-3 h-3 ${
+                                                    msg.direction === 'out'
+                                                        ? 'right-[-5px] bg-[#d9fdd3] dark:bg-[#005c4b]'
+                                                        : 'left-[-5px] bg-white dark:bg-[#202c33]'
+                                                } rotate-45 transform origin-top-${msg.direction === 'out' ? 'left' : 'right'}`}
+                                                style={{ clipPath: msg.direction === 'out' ? 'polygon(100% 0, 0 0, 100% 100%)' : 'polygon(0 0, 100% 0, 0 100%)' }} />
+                                            ) : null}
                                         </div>
-                                        {/* Bubble tail */}
-                                        {idx === 0 || messages[idx-1]?.direction !== msg.direction ? (
-                                            <div className={`absolute top-0 w-3 h-3 ${
-                                                msg.direction === 'out'
-                                                    ? 'right-[-5px] bg-[#d9fdd3] dark:bg-[#005c4b]'
-                                                    : 'left-[-5px] bg-white dark:bg-[#202c33]'
-                                            } rotate-45 transform origin-top-${msg.direction === 'out' ? 'left' : 'right'}`}
-                                            style={{ clipPath: msg.direction === 'out' ? 'polygon(100% 0, 0 0, 100% 100%)' : 'polygon(0 0, 100% 0, 0 100%)' }} />
-                                        ) : null}
                                     </div>
-                                </div>
-                            ))}
+                                );
+                            })}
                             <div ref={messagesEndRef} />
                         </div>
 
@@ -344,8 +350,8 @@ export default function InboxWorkspace({ callRPC, daemonConnected, sessions, onN
                                         value={replyText}
                                         onChange={e => setReplyText(e.target.value)}
                                         onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSendReply(); } }}
-                                        placeholder="Type a message..."
-                                        className="pr-4 h-11 rounded-2xl bg-muted/50 border-0 text-sm focus:bg-muted"
+                                        placeholder={t.inbox.typePlaceholder}
+                                        className="px-4 h-11 rounded-2xl bg-muted/50 border-0 text-sm focus:bg-muted text-start"
                                         disabled={sending}
                                     />
                                 </div>
@@ -358,7 +364,7 @@ export default function InboxWorkspace({ callRPC, daemonConnected, sessions, onN
                                     {sending ? (
                                         <RefreshCw className="w-4 h-4 animate-spin" />
                                     ) : (
-                                        <Send className="w-4 h-4" />
+                                        <Send className="w-4 h-4 rtl:rotate-180" />
                                     )}
                                 </Button>
                             </div>
@@ -370,9 +376,9 @@ export default function InboxWorkspace({ callRPC, daemonConnected, sessions, onN
                         <div className="w-24 h-24 rounded-full bg-teal-50 dark:bg-teal-950/30 flex items-center justify-center mb-6">
                             <MessageCircle className="w-10 h-10 text-teal-400" />
                         </div>
-                        <h3 className="text-xl font-bold text-foreground/80">WhatsApp Inbox</h3>
+                        <h3 className="text-xl font-bold text-foreground/80">{t.inbox.detailsTitle}</h3>
                         <p className="text-sm text-muted-foreground mt-2 max-w-sm">
-                            Select a conversation to view messages and reply directly to your customers.
+                            {t.inbox.detailsSub}
                         </p>
                     </div>
                 )}
