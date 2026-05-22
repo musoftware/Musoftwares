@@ -66,8 +66,11 @@ class DownloadController extends Controller
             abort(404);
         }
 
-        // Verify active subscription or valid license - bypassed for testing
-        $hasAccess = true;
+        // Verify active subscription
+        $hasAccess = \Modules\Tools\Models\ToolSubscription::where('user_id', auth()->id())
+            ->where('tool_guid', $tool['guid'])
+            ->where('status', 'active')
+            ->exists();
 
         if (!$hasAccess) {
             return back()->with('error', 'You need an active subscription to download this tool.');
