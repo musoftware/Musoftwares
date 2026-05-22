@@ -20,7 +20,7 @@ import {
     Bell, ChevronDown, Wallet, Menu, Plus, Coins, LogOut, 
     Settings, User, History, Shield, CreditCard, Box, 
     LayoutDashboard, FileText, ArrowRightLeft, ArrowUpRight,
-    MessageSquare, LifeBuoy, Bookmark, Activity, Sparkles, Building2, Briefcase, Megaphone, Play, Lock, Calendar, Radar, Wrench
+    MessageSquare, LifeBuoy, Bookmark, Activity, Sparkles, Building2, Briefcase, Megaphone, Play, Lock, Calendar, Radar, Wrench, Download
 } from 'lucide-react';
 import CommandPalette from '@/Components/CommandPalette';
 import ProductTourModal from '@/Components/ProductTourModal';
@@ -641,6 +641,12 @@ function AuthenticatedContent({
                                                     render={<Link href={safeRoute('profile.edit')} className="flex items-center w-full" />}
                                                 >
                                                     <Shield className="mr-2 h-4 w-4 text-slate-400" /> Security Settings
+                                                </DropdownMenuItem>
+                                                <DropdownMenuItem 
+                                                    className="cursor-pointer rounded-lg text-sm"
+                                                    render={<Link href={safeRoute('settings.backup.index')} className="flex items-center w-full" />}
+                                                >
+                                                    <Download className="mr-2 h-4 w-4 text-slate-400" /> Backup & Restore
                                                 </DropdownMenuItem>
                                                 <DropdownMenuItem 
                                                     className="cursor-pointer rounded-lg text-sm"
