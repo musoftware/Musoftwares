@@ -1,20 +1,13 @@
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
 import { Head, router } from '@inertiajs/react';
 
-export default function All({ services }: any) {
+export default function All({ auth, services }: any) {
     const handleFeatureToggle = (id: number) => {
         router.post(route('admin.marketplace.services.feature', id));
     };
 
     return (
-        <AuthenticatedLayout
-            header={
-                <h2 className="text-xl leading-tight font-semibold text-gray-800">
-                    All Services
-                </h2>
-            }
-        >
-            <Head title="All Services" />
+        <AdminSidebarLayout user={auth?.user} title="All Services" header="All Services">
             <div className="py-12">
                 <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
                     <div className="overflow-hidden bg-white p-6 shadow-sm sm:rounded-lg">
@@ -117,6 +110,6 @@ export default function All({ services }: any) {
                     </div>
                 </div>
             </div>
-        </AuthenticatedLayout>
+        </AdminSidebarLayout>
     );
 }

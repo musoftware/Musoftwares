@@ -10,9 +10,20 @@ use Inertia\Inertia;
 
 class ClientController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $clients = User::paginate(15);
+        $query = User::query();
+
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%")
+                  ->orWhere('phone', 'like', "%{$search}%");
+            });
+        }
+
+        $clients = $query->paginate(15)->withQueryString();
 
         // Eager load or manually fetch wallets
         // Assuming wallet owner_type is App\Models\User
@@ -29,6 +40,9 @@ class ClientController extends Controller
 
         return Inertia::render('Admin/Clients/Index', [
             'clients' => $clients,
+            'filters' => [
+                'search' => $request->input('search', ''),
+            ],
         ]);
     }
 
