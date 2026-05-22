@@ -2,7 +2,7 @@ import React from 'react';
 import WorkspaceLayout from '@/Layouts/WorkspaceLayout';
 import { Head, router, Link } from '@inertiajs/react';
 import { Button } from '@/Components/ui/button';
-import { RefreshCw, Ban, Calendar, Clock, Receipt, Wallet, Layers, Sparkles, Building2, Settings } from 'lucide-react';
+import { RefreshCw, Ban, Calendar, Clock, Receipt, Wallet, Layers, Sparkles, Building2, Settings, Crown, ArrowRight } from 'lucide-react';
 import { ModulePageHeader } from '@/Components/ui/ModulePageHeader';
 import { MetricCard } from '@/Components/ui/MetricCard';
 import { OperationalCard } from '@/Components/ui/OperationalCard';
@@ -14,21 +14,22 @@ import { cn } from '@/lib/utils';
 
 interface Subscription {
     id: number;
-    module: string;
     plan_name: string;
-    price: number;
-    billing: string;
+    plan_slug: string;
+    billing_cycle: string;
+    amount: number;
+    currency: string;
     status: string;
     started_at: string;
     expires_at: string;
     auto_renew: boolean;
+    custom_items: string[] | null;
+    is_custom: boolean;
 }
 
 interface Invoice {
     id: number;
     invoice_number: string;
-    plan_name: string;
-    module: string;
     amount: number;
     currency: string;
     status: string;
@@ -44,7 +45,7 @@ interface ManageProps {
 }
 
 export default function Manage({ subscriptions, invoices, walletBalance, currency }: ManageProps) {
-    
+
     const formatMoney = (amount: number, customCurr?: string) => {
         return new Intl.NumberFormat('en-US', {
             style: 'currency',
@@ -70,8 +71,6 @@ export default function Manage({ subscriptions, invoices, walletBalance, currenc
 
     const invoiceColumns: any[] = [
         { key: 'invoice_number', label: 'Invoice #', render: (row: any) => <span className="font-mono font-medium">{row.invoice_number}</span> },
-        { key: 'module', label: 'Module', render: (row: any) => <span className="text-[10px] bg-surface-raised px-2 py-0.5 rounded font-semibold text-text-muted uppercase">{row.module}</span> },
-        { key: 'plan_name', label: 'Plan', render: (row: any) => <span className="text-sm font-medium">{row.plan_name}</span> },
         { key: 'amount', label: 'Amount Paid', render: (row: any) => <CurrencyDisplay amount={row.amount} currency={row.currency} className="font-semibold" /> },
         { key: 'payment_method', label: 'Payment Method', render: (row: any) => <span className="text-xs">{row.payment_method}</span> },
         { key: 'paid_at', label: 'Date', render: (row: any) => <span className="text-xs text-text-muted">{row.paid_at}</span> },
@@ -81,9 +80,18 @@ export default function Manage({ subscriptions, invoices, walletBalance, currenc
     const menuItems = [
         { id: 'dashboard', label: 'Overview', icon: Building2, href: '/dashboard', isActive: false },
         { id: 'wallet', label: 'Wallet', icon: Wallet, href: route().has('financial.add-balance') ? route('financial.add-balance') : '#', isActive: false },
-        { id: 'subscriptions', label: 'Subscriptions', icon: Sparkles, href: '/subscriptions/plans', isActive: true },
+        { id: 'subscriptions', label: 'Subscriptions', icon: Crown, href: '/subscriptions/manage', isActive: true },
+        { id: 'plans', label: 'Browse Plans', icon: Sparkles, href: '/subscriptions/plans', isActive: false },
         { id: 'settings', label: 'Settings', icon: Settings, href: '/profile', isActive: false },
     ];
+
+    const activeCount = subscriptions.filter(s => s.status === 'active').length;
+    const monthlySpend = subscriptions
+        .filter(s => s.status === 'active')
+        .reduce((sum, s) => {
+            if (s.billing_cycle === 'yearly') return sum + (s.amount / 12);
+            return sum + s.amount;
+        }, 0);
 
     return (
         <WorkspaceLayout 
@@ -95,11 +103,11 @@ export default function Manage({ subscriptions, invoices, walletBalance, currenc
             <div className="space-y-8">
                 <ModulePageHeader 
                     title="My Subscriptions"
-                    description="Manage renewals, cycles, billing, and platform module access."
+                    description="Manage your unified platform subscription, renewals, and billing history."
                     actions={
                         <Link href={route('subscriptions.plans')}>
-                            <Button className="shadow-sm bg-primary hover:bg-primary-hover text-white font-semibold h-9 text-xs">
-                                Explore Pricing Plans
+                            <Button className="shadow-sm bg-primary hover:bg-primary-hover text-white font-semibold h-9 text-xs gap-1.5">
+                                <Crown className="h-3.5 w-3.5" /> Explore Plans
                             </Button>
                         </Link>
                     }
@@ -107,34 +115,34 @@ export default function Manage({ subscriptions, invoices, walletBalance, currenc
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <MetricCard 
-                        label="Active Modules"
-                        value={subscriptions.filter(s => s.status === 'active').length}
+                        label="Active Subscription"
+                        value={activeCount > 0 ? subscriptions.find(s => s.status === 'active')?.plan_name ?? 'None' : 'None'}
                         icon={Layers}
                     />
                     <MetricCard 
-                        label="Wallet Balance"
-                        value={walletBalance}
-                        icon={Wallet}
+                        label="Monthly Run Rate"
+                        value={`${formatMoney(monthlySpend)}/mo`}
+                        icon={Receipt}
                     />
                     <MetricCard 
-                        label="Invoices Paid"
-                        value={invoices.filter(i => i.status === 'paid').length}
-                        icon={Receipt}
+                        label="Wallet Balance"
+                        value={formatMoney(walletBalance)}
+                        icon={Wallet}
                     />
                 </div>
 
                 <div className="space-y-6">
                     <h3 className="text-sm font-bold tracking-wider uppercase text-text-muted flex items-center gap-2">
-                        <Layers className="h-4 w-4" /> Subscription Access Layer
+                        <Layers className="h-4 w-4" /> Subscription History
                     </h3>
                     
                     {subscriptions.length === 0 ? (
                         <OperationalCard>
                             <EmptyState 
                                 icon={Clock}
-                                title="No active subscriptions found"
-                                description="You do not currently have any paid SaaS module subscriptions enabled. Unlock features in a single click."
-                                action={{ label: "Explore pricing plans", href: route('subscriptions.plans') }}
+                                title="No subscriptions yet"
+                                description="Subscribe to a plan to unlock platform features. Build your own or pick from our curated tiers."
+                                action={{ label: "Explore Plans", href: route('subscriptions.plans') }}
                             />
                         </OperationalCard>
                     ) : (
@@ -154,12 +162,17 @@ export default function Manage({ subscriptions, invoices, walletBalance, currenc
                                         <div className="p-6 space-y-5">
                                             <div className="flex justify-between items-start">
                                                 <div className="space-y-1">
-                                                    <span className="text-[10px] uppercase font-bold text-text-muted bg-surface-raised px-2 py-1 rounded">
-                                                        {sub.module} MODULE
-                                                    </span>
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="text-[10px] uppercase font-bold text-text-muted bg-surface-raised px-2 py-1 rounded">
+                                                            {sub.is_custom ? 'CUSTOM' : sub.plan_slug.toUpperCase().replace('_', ' ')}
+                                                        </span>
+                                                        <span className="text-[10px] uppercase font-medium text-slate-400">
+                                                            {sub.billing_cycle}
+                                                        </span>
+                                                    </div>
                                                     <h4 className="text-lg font-bold tracking-tight mt-1 text-text-primary">{sub.plan_name}</h4>
                                                     <p className="text-sm font-semibold text-primary">
-                                                        <CurrencyDisplay amount={sub.price} currency={currency} /> /{sub.billing === 'yearly' ? 'year' : 'month'}
+                                                        <CurrencyDisplay amount={sub.amount} currency={sub.currency} /> /{sub.billing_cycle === 'yearly' ? 'year' : 'month'}
                                                     </p>
                                                 </div>
 
@@ -169,6 +182,17 @@ export default function Manage({ subscriptions, invoices, walletBalance, currenc
                                                     {isExpired && <StatusBadge status="expired" />}
                                                 </div>
                                             </div>
+
+                                            {/* Custom items list */}
+                                            {sub.is_custom && sub.custom_items && sub.custom_items.length > 0 && (
+                                                <div className="flex flex-wrap gap-1.5">
+                                                    {sub.custom_items.map((item, i) => (
+                                                        <span key={i} className="text-[10px] font-medium bg-fuchsia-50 text-fuchsia-700 border border-fuchsia-100 px-2 py-0.5 rounded-full">
+                                                            {item}
+                                                        </span>
+                                                    ))}
+                                                </div>
+                                            )}
 
                                             <div className="grid grid-cols-2 gap-4 text-xs font-medium text-text-muted border-t border-b border-border/40 py-3">
                                                 <div className="flex items-center gap-2">
@@ -195,7 +219,7 @@ export default function Manage({ subscriptions, invoices, walletBalance, currenc
 
                                                 {(isCancelled || isExpired) && (
                                                     <Button
-                                                        onClick={() => handleRenew(sub.id, sub.price)}
+                                                        onClick={() => handleRenew(sub.id, sub.amount)}
                                                         size="sm"
                                                         className="shadow-none bg-primary hover:bg-primary-hover text-white font-semibold h-8 text-xs gap-1.5"
                                                     >
