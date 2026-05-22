@@ -32,7 +32,7 @@ export default function ISaasIndex() {
         formData.append('file', data.file);
 
         try {
-            const response = await axios.post(route('intelligence.isaas.process'), formData, {
+            const response = await axios.post(route('fbmb.process'), formData, {
                 responseType: 'blob'
             });
 

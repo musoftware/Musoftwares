@@ -4,8 +4,8 @@ namespace Tests\Feature;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Modules\Freelance\Models\PointPackage;
-use Modules\Freelance\Models\PointTransaction;
+use Modules\Core\Models\PointPackage;
+use Modules\Core\Models\PointTransaction;
 use Modules\Core\Models\Wallet;
 use Tests\TestCase;
 use Illuminate\Support\Facades\DB;

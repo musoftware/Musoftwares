@@ -14,36 +14,6 @@ Route::middleware(['auth', 'verified', 'onboarding', 'subscription:freelance'])-
     Route::post('/user-skills', [\Modules\Freelance\Http\Controllers\UserSkillController::class, 'store'])->name('user-skills.store');
     Route::delete('/user-skills/{skill_id}', [\Modules\Freelance\Http\Controllers\UserSkillController::class, 'destroy'])->name('user-skills.destroy');
 
-    // Points
-    Route::get('/points', function(Request $request) {
-        $packages = \Modules\Freelance\Models\PointPackage::all();
-        
-        $user = $request->user();
-        $preferredCurrency = $user->preferred_currency ?: 'USD';
-        
-        $financeService = app(\App\Services\FinanceService::class);
-        $egpToPreferredRate = $financeService->getExchangeRate('EGP', $preferredCurrency);
-
-        // Pre-convert package prices to user's preferred currency
-        $packages = $packages->map(function ($pkg) use ($financeService, $preferredCurrency) {
-            $pkg->price = $financeService->convertAmount((float) $pkg->price, $pkg->currency_code ?: 'EGP', $preferredCurrency);
-            $pkg->currency_code = $preferredCurrency;
-            return $pkg;
-        });
-
-        $transactions = \Modules\Freelance\Models\PointTransaction::where('user_id', $user->id)->latest()->paginate(10);
-        
-        return Inertia::render('Freelance/Points/Index', [
-            'packages' => $packages, 
-            'transactions' => $transactions,
-            'egpToPreferredRate' => $egpToPreferredRate,
-        ]);
-    })->name('points.index');
-    Route::resource('point-packages', \Modules\Freelance\Http\Controllers\PointPackageController::class)->except(['create', 'show', 'edit']);
-    Route::post('/point-purchases', [\Modules\Freelance\Http\Controllers\PointPurchaseController::class, 'store'])->name('point-purchases.store');
-    Route::post('/point-purchases/wallet', [\Modules\Freelance\Http\Controllers\PointPurchaseController::class, 'storeWallet'])->name('point-purchases.store-wallet');
-    Route::get('/point-purchases/success', [\Modules\Freelance\Http\Controllers\PointPurchaseController::class, 'success'])->name('point-purchases.success');
-    Route::get('/point-purchases/failure', [\Modules\Freelance\Http\Controllers\PointPurchaseController::class, 'failure'])->name('point-purchases.failure');
 
     // Jobs
     Route::get('/jobs/browse', [\Modules\Freelance\Http\Controllers\FreelanceJobController::class, 'index'])->name('jobs.browse');

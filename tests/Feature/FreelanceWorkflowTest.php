@@ -8,7 +8,7 @@ use Modules\Freelance\Models\Skill;
 use Modules\Freelance\Models\Job;
 use Modules\Freelance\Models\Proposal;
 use Modules\Freelance\Models\Contract;
-use Modules\Freelance\Models\PointTransaction;
+use Modules\Core\Models\PointTransaction;
 use Modules\Core\Models\Wallet;
 use Tests\TestCase;
 

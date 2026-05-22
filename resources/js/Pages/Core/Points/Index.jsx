@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import FreelanceLayout from '../Layout';
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { useForm, router, usePage } from '@inertiajs/react';
 import { formatMoney, formatNumber, formatDate } from '../../../lib/utils';
 import { CreditCard, Wallet, ArrowRight, CheckCircle2, History, AlertCircle, Zap, TrendingUp, RefreshCcw } from 'lucide-react';
@@ -26,7 +26,7 @@ export default function PointsIndex({ auth, packages, transactions, egpToPreferr
             : `You'll be redirected to Kashier to securely pay ${formatMoney(pkg.price, globalCurrency)}. Continue?`;
             
         if (confirm(msg)) {
-            router.post(route('freelance.point-purchases.store'), { package_id: pkg.id });
+            router.post(route('point-purchases.store'), { package_id: pkg.id });
         }
     };
 
@@ -39,14 +39,14 @@ export default function PointsIndex({ auth, packages, transactions, egpToPreferr
             : `You'll be redirected to Kashier to securely pay ${formatMoney(cost, globalCurrency)}. Continue?`;
 
         if (confirm(msg)) {
-            router.post(route('freelance.point-purchases.store-wallet'), { points: customPoints });
+            router.post(route('point-purchases.store-wallet'), { points: customPoints });
         }
     };
 
     const customCost = customPoints && !isNaN(customPoints) ? (Number(customPoints) * egpToPreferredRate) : 0;
 
     return (
-        <FreelanceLayout>
+        <AuthenticatedLayout header={<h2 className="font-semibold text-xl text-gray-800 leading-tight">Buy Points</h2>}>
             <div className="w-full pb-20 space-y-8">
                 
                 {/* Header & Balance Card */}
@@ -304,6 +304,6 @@ export default function PointsIndex({ auth, packages, transactions, egpToPreferr
                 </div>
 
             </div>
-        </FreelanceLayout>
+        </AuthenticatedLayout>
     );
 }

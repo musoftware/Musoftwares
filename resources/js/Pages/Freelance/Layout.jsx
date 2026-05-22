@@ -28,7 +28,7 @@ export default function FreelanceLayout({ children, clean = false }) {
             const freelancerOnlyPrefixes = [
                 '/freelance/jobs/browse',
                 '/freelance/proposals',
-                '/freelance/points'
+                '/points'
             ];
 
             const isClientOnlyPath = 
@@ -51,7 +51,7 @@ export default function FreelanceLayout({ children, clean = false }) {
         { id: 'jobs',       label: 'Find Work',     icon: Search,    href: '/freelance/jobs/browse',  isActive: currentPath.startsWith('/freelance/jobs/browse') || currentPath.startsWith('/freelance/jobs/') && !currentPath.includes('/my-jobs') && !currentPath.includes('/create') },
         { id: 'proposals',  label: 'My Proposals',  icon: Clock,     href: '/freelance/proposals',    isActive: currentPath.startsWith('/freelance/proposals') },
         { id: 'contracts',  label: 'My Contracts',  icon: Clock,     href: '/freelance/contracts',    isActive: currentPath.startsWith('/freelance/contracts') },
-        { id: 'points',     label: 'Buy Connects',  icon: Coins,     href: '/freelance/points',       isActive: currentPath.startsWith('/freelance/points') },
+        { id: 'points',     label: 'Buy Points',  icon: Coins,     href: '/points',       isActive: currentPath.startsWith('/points') },
     ];
 
     const clientMenuItems = [

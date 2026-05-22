@@ -107,7 +107,7 @@ class User extends Authenticatable
 
     public function pointTransactions()
     {
-        return $this->hasMany(\Modules\Freelance\Models\PointTransaction::class);
+        return $this->hasMany(\Modules\Core\Models\PointTransaction::class);
     }
 
     public function getPointsBalanceAttribute()

@@ -1,10 +1,10 @@
 <?php
 
-namespace Modules\Freelance\Http\Controllers;
+namespace Modules\Core\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use Modules\Freelance\Models\PointPackage;
-use Modules\Freelance\Models\PointTransaction;
+use Modules\Core\Models\PointPackage;
+use Modules\Core\Models\PointTransaction;
 use Modules\Core\Models\WalletTransaction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;

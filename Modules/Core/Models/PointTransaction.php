@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class PointTransaction extends Model
 {
-    protected $fillable = ['user_id', 'type', 'points', 'reference_type', 'reference_id'];
+    protected $fillable = ['user_id', 'type', 'points', 'reference_type', 'reference_id', 'description'];
 
     // immutable
     public $timestamps = true;
