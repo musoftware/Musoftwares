@@ -15,8 +15,8 @@ class PlatformPlanSeeder extends Seeder
         PlatformPlan::updateOrCreate(['slug' => 'starter'], [
             'name'             => 'Starter',
             'description'      => 'Perfect for getting started with WhatsApp automation.',
-            'monthly_price'    => 9.99,
-            'yearly_price'     => 99.99,
+            'monthly_price'    => 2,
+            'yearly_price'     => 20,
             'included_modules' => [],
             'included_tools'   => ['whatsapp'],
             'features'         => [
@@ -34,8 +34,8 @@ class PlatformPlanSeeder extends Seeder
         PlatformPlan::updateOrCreate(['slug' => 'professional'], [
             'name'             => 'Professional',
             'description'      => 'All automation tools for growing businesses.',
-            'monthly_price'    => 29.99,
-            'yearly_price'     => 299.99,
+            'monthly_price'    => 5,
+            'yearly_price'     => 50,
             'included_modules' => ['crm'],
             'included_tools'   => ['*'],
             'features'         => [
@@ -54,8 +54,8 @@ class PlatformPlanSeeder extends Seeder
         PlatformPlan::updateOrCreate(['slug' => 'business_suite'], [
             'name'             => 'Business Suite',
             'description'      => 'Complete business operating system — everything included.',
-            'monthly_price'    => 79.99,
-            'yearly_price'     => 799.99,
+            'monthly_price'    => 9,
+            'yearly_price'     => 90,
             'included_modules' => ['erp', 'crm', 'booking', 'intelligence'],
             'included_tools'   => ['*'],
             'features'         => [
