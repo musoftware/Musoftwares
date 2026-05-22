@@ -50,6 +50,7 @@ Route::middleware(['auth', 'verified', 'onboarding', 'subscription:erp', 'erp.te
     Route::delete('/team-members/{id}', [\Modules\ERP\Http\Controllers\Team\TeamMemberController::class, 'destroy'])->name('team-members.destroy');
 
     Route::get('/dashboard', [\Modules\ERP\Http\Controllers\ERPDashboardController::class, 'index'])->name('dashboard');
+    Route::post('/settings', [\Modules\ERP\Http\Controllers\ERPDashboardController::class, 'updateSettings'])->name('settings.update');
     Route::post('/clients', [\Modules\ERP\Http\Controllers\ERPDashboardController::class, 'storeClient'])->name('clients.store');
     Route::put('/clients/{client}', [\Modules\ERP\Http\Controllers\ERPDashboardController::class, 'updateClient'])->name('clients.update');
     Route::delete('/clients/{client}', [\Modules\ERP\Http\Controllers\ERPDashboardController::class, 'destroyClient'])->name('clients.destroy');
@@ -245,6 +246,8 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
     // Clients (thin ERP-linked view)
     Route::get('/clients', [\App\Http\Controllers\Admin\ClientController::class, 'index'])->name('clients.index');
     Route::get('/clients/{id}', [\App\Http\Controllers\Admin\ClientController::class, 'show'])->name('clients.show');
+    Route::get('/clients/{id}/edit', [\App\Http\Controllers\Admin\ClientController::class, 'edit'])->name('clients.edit');
+    Route::patch('/clients/{id}', [\App\Http\Controllers\Admin\ClientController::class, 'update'])->name('clients.update');
     Route::post('/clients/{id}/login-as', [\App\Http\Controllers\Admin\ClientController::class, 'loginAs'])->name('clients.login-as');
     Route::post('/clients/{id}/reset-password', [\App\Http\Controllers\Admin\ClientController::class, 'resetPassword'])->name('clients.reset-password');
     Route::post('/clients/{id}/wallet-transaction', [\App\Http\Controllers\Admin\ClientController::class, 'walletTransaction'])->name('clients.wallet-transaction');
