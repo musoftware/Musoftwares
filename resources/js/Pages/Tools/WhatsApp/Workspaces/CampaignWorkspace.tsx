@@ -408,13 +408,17 @@ export default function CampaignWorkspace({
                                         />
                                         <div className="flex-1 min-w-0">
                                             <h4 className="font-bold text-sm">{tpl.name}</h4>
-                                            <p className="text-xs text-muted-foreground line-clamp-2 mt-0.5">{tpl.message}</p>
-                                            {tpl.media_url && (
-                                                <Badge variant="outline" className="mt-2 gap-1 bg-teal-50/50 text-teal-700">
-                                                    <Sparkles className="w-3 h-3" />
-                                                    {tpl.media_type} Attached
-                                                </Badge>
-                                            )}
+                                            <p className="text-xs text-muted-foreground line-clamp-2 mt-0.5">
+                                                {(tpl.parts || []).find((p: any) => p.type === 'text')?.message || tpl.message}
+                                            </p>
+                                            <div className="flex flex-wrap gap-1 mt-1.5">
+                                                {(tpl.parts || []).map((p: any, idx: number) => (
+                                                    <Badge key={idx} variant="outline" className="text-[10px] gap-0.5 bg-teal-50/50 text-teal-700 dark:bg-teal-950/30 dark:text-teal-300">
+                                                        {p.type === 'text' ? '📝' : p.type === 'image' ? '🖼️' : p.type === 'video' ? '🎬' : p.type === 'document' ? '📄' : p.type === 'audio' ? '🎵' : '📎'}
+                                                        {p.type}
+                                                    </Badge>
+                                                ))}
+                                            </div>
                                         </div>
                                     </label>
                                 ))}
@@ -446,59 +450,52 @@ export default function CampaignWorkspace({
                                     </Button>
                                 </div>
 
-                                {/* Chat Body representing WhatsApp interface */}
-                                <div className="p-4 bg-[#efeae2] dark:bg-[#0b141a] flex flex-col space-y-2 max-h-[300px] overflow-y-auto relative" style={{ backgroundImage: 'radial-gradient(circle, rgba(0, 0, 0, 0.03) 1px, transparent 1px)', backgroundSize: '20px 20px' }}>
-                                    <div className="max-w-[85%] self-end relative rounded-2xl px-3.5 py-2.5 bg-[#d9fdd3] text-[#111b21] dark:bg-[#005c4b] dark:text-[#e9edef] shadow-md text-xs space-y-2 border border-[#d9fdd3]/20 dark:border-[#005c4b]/20">
-                                        {/* Media Preview inside Chat Bubble */}
-                                        {selectedTemplate.media_url && (
-                                            <div className="rounded-lg overflow-hidden border border-black/5 bg-black/5 dark:bg-black/20 mb-1">
-                                                {selectedTemplate.media_type === 'image' && (
-                                                    <img 
-                                                        src={selectedTemplate.media_url} 
-                                                        alt="Media Attachment Preview" 
-                                                        className="w-full max-h-48 object-cover"
-                                                        onError={(e) => {
-                                                            e.currentTarget.src = 'https://placehold.co/400x300?text=Invalid+Image+URL';
-                                                        }}
-                                                    />
-                                                )}
-                                                {selectedTemplate.media_type === 'video' && (
-                                                    <video 
-                                                        src={selectedTemplate.media_url} 
-                                                        className="w-full max-h-48 object-cover" 
-                                                        controls 
-                                                    />
-                                                )}
-                                                {selectedTemplate.media_type === 'audio' && (
-                                                    <audio 
-                                                        src={selectedTemplate.media_url} 
-                                                        className="w-full p-2 scale-90" 
-                                                        controls 
-                                                    />
-                                                )}
-                                                {selectedTemplate.media_type === 'document' && (
-                                                    <div className="p-3.5 flex items-center gap-2 bg-muted/40 text-left">
-                                                        <FileArchive className="size-6 text-red-500 shrink-0" />
-                                                        <span className="font-mono text-[10px] truncate max-w-[180px] font-bold">{selectedTemplate.media_url.split('/').pop()}</span>
+                                {/* Chat Body — renders each part as a separate WhatsApp bubble */}
+                                <div className="p-4 bg-[#efeae2] dark:bg-[#0b141a] flex flex-col space-y-2 max-h-[400px] overflow-y-auto relative" style={{ backgroundImage: 'radial-gradient(circle, rgba(0, 0, 0, 0.03) 1px, transparent 1px)', backgroundSize: '20px 20px' }}>
+                                    {(selectedTemplate.parts && selectedTemplate.parts.length > 0
+                                        ? selectedTemplate.parts
+                                        : [
+                                            ...(selectedTemplate.message ? [{ type: 'text', message: selectedTemplate.message }] : []),
+                                            ...(selectedTemplate.media_url ? [{ type: selectedTemplate.media_type, media_url: selectedTemplate.media_url }] : [])
+                                          ]
+                                    ).map((part: any, idx: number) => (
+                                        <div key={idx} className="max-w-[85%] self-end relative rounded-2xl px-3.5 py-2.5 bg-[#d9fdd3] text-[#111b21] dark:bg-[#005c4b] dark:text-[#e9edef] shadow-md text-xs space-y-1 border border-[#d9fdd3]/20 dark:border-[#005c4b]/20">
+                                            {part.type === 'text' && part.message && (
+                                                <p className="whitespace-pre-wrap leading-relaxed break-words font-sans text-[12px]">
+                                                    {renderMessageText(part.message)}
+                                                </p>
+                                            )}
+                                            {part.type === 'image' && part.media_url && (
+                                                <div className="rounded-lg overflow-hidden border border-black/5 bg-black/5 dark:bg-black/20">
+                                                    <img src={part.media_url} alt="" className="w-full max-h-48 object-cover" onError={(e) => { e.currentTarget.src = 'https://placehold.co/400x300?text=Image'; }} />
+                                                    {part.caption && <p className="px-1 py-1 text-[11px]">{part.caption}</p>}
+                                                </div>
+                                            )}
+                                            {part.type === 'video' && part.media_url && (
+                                                <div className="rounded-lg overflow-hidden border border-black/5 bg-black/5 dark:bg-black/20">
+                                                    <video src={part.media_url} className="w-full max-h-48 object-cover" controls />
+                                                    {part.caption && <p className="px-1 py-1 text-[11px]">{part.caption}</p>}
+                                                </div>
+                                            )}
+                                            {part.type === 'audio' && part.media_url && (
+                                                <audio src={part.media_url} className="w-full p-1 scale-90" controls />
+                                            )}
+                                            {part.type === 'document' && part.media_url && (
+                                                <div className="p-3 flex items-center gap-2 bg-muted/40 rounded-lg text-left">
+                                                    <FileArchive className="size-5 text-red-500 shrink-0" />
+                                                    <div className="min-w-0">
+                                                        <span className="font-mono text-[10px] truncate block max-w-[180px] font-bold">{part.media_url.split('/').pop()}</span>
+                                                        {part.caption && <span className="text-[10px] text-muted-foreground">{part.caption}</span>}
                                                     </div>
-                                                )}
+                                                </div>
+                                            )}
+                                            <div className="flex items-center justify-end gap-1 text-[9px] text-muted-foreground/80 self-end select-none">
+                                                <span>{new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                                                <span className="text-teal-600 dark:text-teal-400 font-bold">✓✓</span>
                                             </div>
-                                        )}
-
-                                        {/* Text Message with highlighted variables */}
-                                        <p className="whitespace-pre-wrap leading-relaxed break-words font-sans text-[12px]">
-                                            {renderMessageText(selectedTemplate.message)}
-                                        </p>
-
-                                        {/* Time Stamp and double tick */}
-                                        <div className="flex items-center justify-end gap-1 text-[9px] text-muted-foreground/80 self-end mt-1 select-none">
-                                            <span>{new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-                                            <span className="text-teal-600 dark:text-teal-400 font-bold">✓✓</span>
+                                            {idx === 0 && <div className="absolute right-[-5px] top-0 w-3 h-3 bg-[#d9fdd3] dark:bg-[#005c4b] rotate-45 transform origin-top-left" style={{ clipPath: 'polygon(100% 0, 0 0, 100% 100%)' }} />}
                                         </div>
-
-                                        {/* WhatsApp chat bubble tail */}
-                                        <div className="absolute right-[-5px] top-0 w-3 h-3 bg-[#d9fdd3] dark:bg-[#005c4b] rotate-45 transform origin-top-left" style={{ clipPath: 'polygon(100% 0, 0 0, 100% 100%)' }} />
-                                    </div>
+                                    ))}
                                 </div>
                             </div>
                         )}
