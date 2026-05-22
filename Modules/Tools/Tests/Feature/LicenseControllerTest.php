@@ -5,7 +5,6 @@ namespace Modules\Tools\Tests\Feature;
 use App\Models\User;
 use Illuminate\Support\Str;
 use Modules\Tools\Models\ActivatedDevice;
-use Modules\Tools\Models\Tool;
 use Modules\Tools\Models\ToolLicense;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -13,7 +12,6 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 class LicenseControllerTest extends TestCase
 {
     protected User $user;
-    protected Tool $tool;
     protected ToolLicense $license;
 
     protected function setUp(): void
@@ -22,28 +20,19 @@ class LicenseControllerTest extends TestCase
 
         $this->artisan('migrate:fresh', [
             '--path' => [
+                'Modules/Tools/Database/Migrations',
                 'database/migrations',
                 'Modules/Core/Database/Migrations',
                 'Modules/ERP/Database/Migrations',
-                'Modules/Tools/Database/Migrations',
             ]
         ]);
 
         $this->user = User::factory()->create();
         
-        $this->tool = Tool::create([
-            'title' => 'Test Tool',
-            'slug' => 'test-tool',
-            'description' => 'Test Description',
-            'category' => 'automation',
-            'is_active' => true,
-            'is_free' => false,
-        ]);
-        
         // Create a valid license for the user
         $this->license = ToolLicense::create([
             'user_id' => $this->user->id,
-            'tool_id' => $this->tool->id,
+            'tool_guid' => 'whatsapp-sender-pro',
             'license_key' => (string) Str::uuid(),
             'status' => 'active',
             'expires_at' => now()->addDays(30),

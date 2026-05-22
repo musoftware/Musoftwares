@@ -2,11 +2,16 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
     public function up(): void
     {
+        if (!Schema::hasTable('tools') || !Schema::hasTable('tool_pricing_plans')) {
+            return;
+        }
+
         // ── WhatsApp AI Agent ───────────────────────────────────────────────
         $agentId = DB::table('tools')->insertGetId([
             'title'             => 'WhatsApp AI Sales Agent',
@@ -74,6 +79,10 @@ return new class extends Migration
 
     public function down(): void
     {
+        if (!Schema::hasTable('tools') || !Schema::hasTable('tool_pricing_plans')) {
+            return;
+        }
+
         $slug = 'wa-ai-agent';
         $toolId = DB::table('tools')->where('slug', $slug)->value('id');
 

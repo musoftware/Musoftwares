@@ -22,7 +22,7 @@ class LicenseController extends Controller
     public function index(): Response
     {
         $licenses = ToolLicense::where('user_id', auth()->id())
-            ->with(['tool:id,slug,title,icon,category', 'activeDevices'])
+            ->with(['activeDevices'])
             ->latest()
             ->get()
             ->map(fn($lic) => [
@@ -51,7 +51,7 @@ class LicenseController extends Controller
     public function devices(int $licenseId): Response
     {
         $license = ToolLicense::where('user_id', auth()->id())
-            ->with(['tool:id,slug,title', 'devices'])
+            ->with(['devices'])
             ->findOrFail($licenseId);
 
         $devices = $license->devices->map(fn($d) => [

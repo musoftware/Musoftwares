@@ -177,7 +177,6 @@ class DashboardController extends Controller
         try {
             $activeToolLicenses = \Modules\Tools\Models\ToolLicense::where('user_id', $user->id)
                 ->where('status', 'active')
-                ->with(['tool:id,slug,title,icon'])
                 ->limit(4)
                 ->get()
                 ->map(fn ($lic) => [

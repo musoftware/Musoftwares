@@ -8,16 +8,20 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::table('tools', function (Blueprint $table) {
-            // Free tools are accessible to all authenticated users without a subscription
-            $table->boolean('is_free')->default(false)->after('is_featured');
-        });
+        if (Schema::hasTable('tools')) {
+            Schema::table('tools', function (Blueprint $table) {
+                // Free tools are accessible to all authenticated users without a subscription
+                $table->boolean('is_free')->default(false)->after('is_featured');
+            });
+        }
     }
 
     public function down(): void
     {
-        Schema::table('tools', function (Blueprint $table) {
-            $table->dropColumn('is_free');
-        });
+        if (Schema::hasTable('tools')) {
+            Schema::table('tools', function (Blueprint $table) {
+                $table->dropColumn('is_free');
+            });
+        }
     }
 };

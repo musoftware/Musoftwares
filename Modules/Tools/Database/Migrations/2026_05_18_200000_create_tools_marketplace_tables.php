@@ -27,10 +27,27 @@ return new class extends Migration
 
             $table->index(['user_id', 'tool_id']);
         });
+
+        // ─── License Keys ─────────────────────────────────────────────────────
+        Schema::create('tool_licenses', function (Blueprint $table) {
+            $table->id();
+            $table->uuid('license_key')->unique();
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->unsignedBigInteger('tool_id')->nullable();
+            $table->foreignId('tool_subscription_id')->nullable()->constrained('tool_subscriptions')->nullOnDelete();
+            $table->unsignedTinyInteger('max_devices')->default(3);
+            $table->string('status')->default('active');   // active|suspended|revoked
+            $table->timestamp('expires_at')->nullable();
+            $table->timestamp('last_validated_at')->nullable();
+            $table->timestamps();
+
+            $table->index(['user_id', 'tool_id']);
+        });
     }
 
     public function down(): void
     {
+        Schema::dropIfExists('tool_licenses');
         Schema::dropIfExists('tool_subscriptions');
     }
 };

@@ -34,6 +34,7 @@ return new class extends Migration
         });
 
         // ── 2. Register wa-funnel-engine in the Marketplace ─────────────────
+        if (Schema::hasTable('tools') && Schema::hasTable('tool_pricing_plans')) {
         $engineId = DB::table('tools')->insertGetId([
             'title'             => 'WhatsApp Funnel Engine',
             'slug'              => 'wa-funnel-engine',
@@ -95,16 +96,19 @@ return new class extends Migration
                 'sort_order'     => 2,
                 'created_at'     => now(),
                 'updated_at'     => now()]]);
+        }
     }
 
     public function down(): void
     {
-        $slug = 'wa-funnel-engine';
-        $toolId = DB::table('tools')->where('slug', $slug)->value('id');
+        if (Schema::hasTable('tools') && Schema::hasTable('tool_pricing_plans')) {
+            $slug = 'wa-funnel-engine';
+            $toolId = DB::table('tools')->where('slug', $slug)->value('id');
 
-        if ($toolId) {
-            DB::table('tool_pricing_plans')->where('tool_id', $toolId)->delete();
-            DB::table('tools')->where('id', $toolId)->delete();
+            if ($toolId) {
+                DB::table('tool_pricing_plans')->where('tool_id', $toolId)->delete();
+                DB::table('tools')->where('id', $toolId)->delete();
+            }
         }
 
         Schema::dropIfExists('wa_funnel_states');
