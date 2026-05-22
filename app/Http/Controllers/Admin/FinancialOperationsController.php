@@ -15,11 +15,13 @@ class FinancialOperationsController extends Controller
             'entries' => ['data' => []],
             'categories' => LedgerCategory::all(),
             'filters' => $request->only(['type', 'category_id']),
-            'summary' => [
+            'stats' => [
                 'total_monthly_expenses' => 0,
                 'total_monthly_income' => 0,
                 'total_monthly_salaries' => 0,
-            ]
+            ],
+            'users' => \App\Models\User::all() ?? [],
+            'currentTab' => $request->query('tab', 'expenses')
         ]);
     }
 

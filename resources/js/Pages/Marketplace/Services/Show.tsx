@@ -236,7 +236,7 @@ export default function Show({ service }: any) {
                                                         Package
                                                     </h3>
                                                     <span className="text-2xl font-bold text-gray-900">
-                                                        ${selectedPackage.price}
+                                                        ${Number(selectedPackage.price).toFixed(2)}
                                                     </span>
                                                 </div>
                                                 <p className="mb-6 text-sm text-gray-600">
@@ -361,7 +361,7 @@ export default function Show({ service }: any) {
                                                         className="flex w-full items-center justify-center gap-2 rounded-lg bg-indigo-600 px-4 py-3 font-bold text-white transition hover:bg-indigo-700"
                                                     >
                                                         Continue — $
-                                                        {selectedPackage.price}
+                                                        {Number(selectedPackage.price).toFixed(2)}
                                                         <svg
                                                             className="h-5 w-5"
                                                             fill="none"
