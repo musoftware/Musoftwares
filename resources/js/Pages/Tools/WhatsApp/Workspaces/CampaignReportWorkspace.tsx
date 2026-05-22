@@ -9,11 +9,17 @@ import { Button } from '@/Components/ui/button';
 import { Badge } from '@/Components/ui/badge';
 
 // ── Inline SVG Donut Chart ──────────────────────────────────────────────────
-function DonutChart({ segments }: { segments: { value: number; color: string; label: string }[] }) {
+interface DonutSegment {
+    value: number;
+    color: string;
+    label: string;
+}
+
+function DonutChart({ segments, t }: { segments: DonutSegment[]; t: any }) {
     const total = segments.reduce((s, seg) => s + seg.value, 0);
     if (total === 0) return (
         <div className="w-40 h-40 rounded-full border-8 border-muted flex items-center justify-center">
-            <span className="text-xs text-muted-foreground">No data</span>
+            <span className="text-xs text-muted-foreground">{t.report.noContactsRecorded || 'No data'}</span>
         </div>
     );
 
@@ -49,7 +55,7 @@ function DonutChart({ segments }: { segments: { value: number; color: string; la
                         />
                     ))}
                     <text x={cx} y={cy - 6} textAnchor="middle" className="text-lg font-black fill-foreground" style={{ fontSize: '22px', fontWeight: 900 }}>{total}</text>
-                    <text x={cx} y={cy + 12} textAnchor="middle" className="fill-muted-foreground" style={{ fontSize: '10px', fontWeight: 600 }}>Total</text>
+                    <text x={cx} y={cy + 12} textAnchor="middle" className="fill-muted-foreground" style={{ fontSize: '10px', fontWeight: 600 }}>{t.report.total}</text>
                 </svg>
             </div>
             <div className="flex flex-wrap justify-center gap-x-4 gap-y-1.5">
@@ -69,12 +75,12 @@ function StatBar({ label, value, total, color, icon: Icon }: any) {
     const pct = total > 0 ? Math.round((value / total) * 100) : 0;
     return (
         <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: `${color}20` }}>
+            <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style={{ background: `${color}20` }}>
                 <Icon className="w-4 h-4" style={{ color }} />
             </div>
             <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between mb-1">
-                    <span className="text-xs font-bold">{label}</span>
+                    <span className="text-xs font-bold text-start">{label}</span>
                     <span className="text-xs font-black" style={{ color }}>{value} <span className="text-muted-foreground font-normal">({pct}%)</span></span>
                 </div>
                 <div className="h-2 bg-secondary rounded-full overflow-hidden">
@@ -113,11 +119,25 @@ function formatDateForCSV(dateStr: string | null | undefined): string {
     } catch { return dateStr || ''; }
 }
 
-function exportCSV(contacts: any[], campaignName: string) {
-    const headers = ['Phone', 'Name', 'Company', 'Status', 'Sent At', 'Delivered At', 'Read At', 'Replied At', 'Error'];
+function exportCSV(contacts: any[], campaignName: string, t: any) {
+    const isAr = t.language === 'English'; // wait, in translations dictionary, ar t.language = 'English' and en t.language = 'العربية' to switch languages. So if t.language === 'English', the current language is Arabic!
+    const companyHeader = isAr ? 'الشركة' : 'Company';
+    const headers = [
+        t.report.colPhone || 'Phone',
+        t.report.colName || 'Name',
+        companyHeader,
+        t.report.colStatus || 'Status',
+        t.report.colSent || 'Sent At',
+        t.report.colDelivered || 'Delivered At',
+        t.report.colRead || 'Read At',
+        t.report.colReplied || 'Replied At',
+        t.report.colError || 'Error'
+    ];
     const rows = contacts.map(c => [
         c.phone || '',
-        c.name || '', c.company || '', c.status,
+        c.name || '',
+        c.company || '',
+        t.report[c.status] || c.status,
         formatDateForCSV(c.sent_at),
         formatDateForCSV(c.delivered_at),
         formatDateForCSV(c.read_at),
@@ -144,8 +164,6 @@ function exportCSV(contacts: any[], campaignName: string) {
     URL.revokeObjectURL(url);
 }
 
-
-
 function formatTimeSafe(dateStr: string | null | undefined) {
     if (!dateStr) return '—';
     try {
@@ -162,7 +180,7 @@ function formatTimeSafe(dateStr: string | null | undefined) {
     }
 }
 
-export default function CampaignReportWorkspace({ t, callRPC, campaignId, campaignName, onBack, daemonConnected }: any) {
+export default function CampaignReportWorkspace({ t, locale, callRPC, campaignId, campaignName, onBack, daemonConnected }: any) {
     const [contacts, setContacts]   = useState<any[]>([]);
     const [stats, setStats]         = useState<any>({});
     const [loading, setLoading]     = useState(false);
@@ -171,6 +189,7 @@ export default function CampaignReportWorkspace({ t, callRPC, campaignId, campai
     const [retryingContact, setRetryingContact] = useState<string | null>(null);
     const [retryingAll, setRetryingAll] = useState(false);
 
+    const isRtl = locale === 'ar';
 
     const fetchData = async () => {
         if (!daemonConnected || !campaignId) return;
@@ -220,12 +239,12 @@ export default function CampaignReportWorkspace({ t, callRPC, campaignId, campai
 
     // ── Donut: shows current exclusive status per contact ──
     const donutSegments = [
-        { value: rawSent,      color: STATUS_COLORS.sent,      label: 'Sent' },
-        { value: rawDelivered, color: STATUS_COLORS.delivered,  label: 'Delivered' },
-        { value: rawRead,      color: STATUS_COLORS.read,       label: 'Read' },
-        { value: rawReplied,   color: STATUS_COLORS.replied,    label: 'Replied' },
-        { value: failed,       color: STATUS_COLORS.failed,     label: 'Failed' },
-        { value: pending,      color: STATUS_COLORS.pending,    label: 'Pending' },
+        { value: rawSent,      color: STATUS_COLORS.sent,      label: t.report.sent },
+        { value: rawDelivered, color: STATUS_COLORS.delivered,  label: t.report.delivered },
+        { value: rawRead,      color: STATUS_COLORS.read,       label: t.report.read },
+        { value: rawReplied,   color: STATUS_COLORS.replied,    label: t.report.replied },
+        { value: failed,       color: STATUS_COLORS.failed,     label: t.report.failed },
+        { value: pending,      color: STATUS_COLORS.pending,    label: t.report.pending },
     ].filter(s => s.value > 0);
 
     const filteredContacts = statusFilter === 'all' ? contacts : contacts.filter(c => c.status === statusFilter);
@@ -235,11 +254,11 @@ export default function CampaignReportWorkspace({ t, callRPC, campaignId, campai
             {/* Header */}
             <div className="flex items-center gap-4">
                 <Button variant="outline" size="icon" onClick={onBack}>
-                    <ArrowLeft className="w-4 h-4" />
+                    <ArrowLeft className={`w-4 h-4 ${isRtl ? 'rotate-180' : ''}`} />
                 </Button>
-                <div className="flex-1">
-                    <h2 className="text-xl font-bold tracking-tight">Campaign Report</h2>
-                    <p className="text-xs text-muted-foreground mt-0.5">{campaignName} &mdash; <span className="font-mono">{campaignId}</span></p>
+                <div className="flex-1 min-w-0">
+                    <h2 className="text-xl font-bold tracking-tight text-start">{t.report.title}</h2>
+                    <p className="text-xs text-muted-foreground mt-0.5 text-start">{campaignName} &mdash; <span className="font-mono">{campaignId}</span></p>
                 </div>
                 <div className="flex items-center gap-2">
                     {failed > 0 && (
@@ -256,14 +275,14 @@ export default function CampaignReportWorkspace({ t, callRPC, campaignId, campai
                             className="bg-orange-500 hover:bg-orange-600 text-white gap-2 text-xs h-8"
                         >
                             {retryingAll ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <RotateCcw className="w-3.5 h-3.5" />}
-                            Retry All Failed ({failed})
+                            {t.report.retryAllBtn} ({failed})
                         </Button>
                     )}
                     <Button variant="outline" size="icon" onClick={fetchData} disabled={loading}>
                         <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
                     </Button>
-                    <Button onClick={() => exportCSV(contacts, campaignName)} className="bg-teal-600 hover:bg-teal-700 text-white gap-2">
-                        <Download className="w-4 h-4" /> Export CSV
+                    <Button onClick={() => exportCSV(contacts, campaignName, t)} className="bg-teal-600 hover:bg-teal-700 text-white gap-2">
+                        <Download className="w-4 h-4" /> {t.report.exportBtn}
                     </Button>
                 </div>
 
@@ -275,27 +294,27 @@ export default function CampaignReportWorkspace({ t, callRPC, campaignId, campai
                 <Card>
                     <CardContent className="p-7 flex flex-col items-center justify-center">
                         <div className="text-center mb-6">
-                            <h3 className="text-sm font-bold uppercase tracking-wider">Delivery Breakdown</h3>
-                            <p className="text-[10px] text-muted-foreground mt-0.5">Current status per contact</p>
+                            <h3 className="text-sm font-bold uppercase tracking-wider">{t.report.breakdownTitle}</h3>
+                            <p className="text-[10px] text-muted-foreground mt-0.5">{t.report.breakdownSub}</p>
                         </div>
-                        <DonutChart segments={donutSegments} />
+                        <DonutChart segments={donutSegments} t={t} />
                     </CardContent>
                 </Card>
 
                 {/* Bar Stats Card */}
                 <Card>
                     <CardContent className="p-7">
-                        <div className="mb-6">
-                            <h3 className="text-sm font-bold uppercase tracking-wider">Status Overview</h3>
-                            <p className="text-[10px] text-muted-foreground mt-0.5">Current status count per contact</p>
+                        <div className="mb-6 text-start">
+                            <h3 className="text-sm font-bold uppercase tracking-wider">{t.report.overviewTitle}</h3>
+                            <p className="text-[10px] text-muted-foreground mt-0.5">{t.report.overviewSub}</p>
                         </div>
                         <div className="space-y-4">
-                            <StatBar label="Sent"      value={rawSent}      total={totalContacts} color={STATUS_COLORS.sent}      icon={Mail} />
-                            <StatBar label="Delivered" value={rawDelivered} total={totalContacts} color={STATUS_COLORS.delivered}  icon={CheckCircle2} />
-                            <StatBar label="Read"      value={rawRead}      total={totalContacts} color={STATUS_COLORS.read}       icon={Eye} />
-                            <StatBar label="Replied"   value={rawReplied}   total={totalContacts} color={STATUS_COLORS.replied}    icon={MessageCircle} />
-                            <StatBar label="Failed"    value={failed}       total={totalContacts} color={STATUS_COLORS.failed}     icon={XCircle} />
-                            {pending > 0 && <StatBar label="Pending" value={pending} total={totalContacts} color={STATUS_COLORS.pending} icon={Clock} />}
+                            <StatBar label={t.report.sent}      value={rawSent}      total={totalContacts} color={STATUS_COLORS.sent}      icon={Mail} />
+                            <StatBar label={t.report.delivered} value={rawDelivered} total={totalContacts} color={STATUS_COLORS.delivered}  icon={CheckCircle2} />
+                            <StatBar label={t.report.read}      value={rawRead}      total={totalContacts} color={STATUS_COLORS.read}       icon={Eye} />
+                            <StatBar label={t.report.replied}   value={rawReplied}   total={totalContacts} color={STATUS_COLORS.replied}    icon={MessageCircle} />
+                            <StatBar label={t.report.failed}    value={failed}       total={totalContacts} color={STATUS_COLORS.failed}     icon={XCircle} />
+                            {pending > 0 && <StatBar label={t.report.pending} value={pending} total={totalContacts} color={STATUS_COLORS.pending} icon={Clock} />}
                         </div>
                     </CardContent>
                 </Card>
@@ -305,12 +324,12 @@ export default function CampaignReportWorkspace({ t, callRPC, campaignId, campai
             {/* Summary KPI Cards */}
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
                 {[
-                    { label: 'Total',     value: totalContacts, color: '#64748b', bg: 'bg-muted' },
-                    { label: 'Sent',      value: rawSent,       color: STATUS_COLORS.sent,      bg: 'bg-emerald-500/10' },
-                    { label: 'Delivered', value: rawDelivered,  color: STATUS_COLORS.delivered,  bg: 'bg-blue-500/10' },
-                    { label: 'Read',      value: rawRead,       color: STATUS_COLORS.read,       bg: 'bg-violet-500/10' },
-                    { label: 'Replied',   value: rawReplied,    color: STATUS_COLORS.replied,    bg: 'bg-amber-500/10' },
-                    { label: 'Failed',    value: failed,        color: STATUS_COLORS.failed,     bg: 'bg-red-500/10' },
+                    { label: t.report.total,     value: totalContacts, color: '#64748b', bg: 'bg-muted' },
+                    { label: t.report.sent,      value: rawSent,       color: STATUS_COLORS.sent,      bg: 'bg-emerald-500/10' },
+                    { label: t.report.delivered, value: rawDelivered,  color: STATUS_COLORS.delivered,  bg: 'bg-blue-500/10' },
+                    { label: t.report.read,      value: rawRead,       color: STATUS_COLORS.read,       bg: 'bg-violet-500/10' },
+                    { label: t.report.replied,   value: rawReplied,    color: STATUS_COLORS.replied,    bg: 'bg-amber-500/10' },
+                    { label: t.report.failed,    value: failed,        color: STATUS_COLORS.failed,     bg: 'bg-red-500/10' },
 
                 ].map(({ label, value, color, bg }) => (
                     <div key={label} className={`${bg} border rounded-2xl p-4 text-center`}>
@@ -323,18 +342,18 @@ export default function CampaignReportWorkspace({ t, callRPC, campaignId, campai
             {/* Contact Table with Filter */}
             <Card className="overflow-hidden">
                 <div className="px-7 py-5 border-b flex items-center justify-between">
-                    <h3 className="font-bold text-sm">Per-Contact Engagement</h3>
+                    <h3 className="font-bold text-sm text-start">{t.report.tableTitle}</h3>
                     <div className="relative">
                         <Button variant="outline" size="sm" onClick={() => setShowFilter(f => !f)} className="gap-2 text-xs h-8">
                             <Filter className="w-3.5 h-3.5" />
-                            {statusFilter === 'all' ? 'All Status' : statusFilter.charAt(0).toUpperCase() + statusFilter.slice(1)}
+                            {statusFilter === 'all' ? t.report.allStatus : (t.report[statusFilter] || statusFilter)}
                             <ChevronDown className={`w-3.5 h-3.5 transition-transform ${showFilter ? 'rotate-180' : ''}`} />
                         </Button>
                         {showFilter && (
-                            <div className="absolute right-0 top-full mt-1 bg-popover text-popover-foreground border rounded-xl shadow-xl z-10 min-w-[140px] py-1 overflow-hidden">
+                            <div className={`absolute ${isRtl ? 'left-0' : 'right-0'} top-full mt-1 bg-popover text-popover-foreground border rounded-xl shadow-xl z-10 min-w-[140px] py-1 overflow-hidden`}>
                                 {['all', 'sent', 'delivered', 'read', 'replied', 'failed', 'pending'].map(s => (
                                     <Button variant="ghost" key={s} onClick={() => { setStatusFilter(s); setShowFilter(false); }} className={`w-full justify-start rounded-none h-auto px-4 py-2 text-xs font-bold capitalize transition-colors ${statusFilter === s ? 'bg-teal-50 text-teal-600 hover:bg-teal-100 hover:text-teal-700 dark:bg-teal-950/30' : 'hover:bg-accent'}`}>
-                                        {s === 'all' ? 'All' : s}
+                                        {s === 'all' ? (isRtl ? 'الكل' : 'All') : (t.report[s] || s)}
                                     </Button>
                                 ))}
                             </div>
@@ -342,41 +361,41 @@ export default function CampaignReportWorkspace({ t, callRPC, campaignId, campai
                     </div>
                 </div>
                 <div className="overflow-x-auto max-h-[500px] overflow-y-auto">
-                    <table className="w-full text-left text-sm whitespace-nowrap">
-                        <thead className="bg-muted/50 border-b text-muted-foreground font-semibold uppercase text-[10px] tracking-wider sticky top-0">
+                    <table className="w-full text-start text-sm whitespace-nowrap">
+                        <thead className="bg-muted/50 border-b text-muted-foreground font-semibold uppercase text-[10px] tracking-wider sticky top-0 text-start">
                             <tr>
-                                <th className="px-6 py-4">Phone</th>
-                                <th className="px-6 py-4">Name</th>
-                                <th className="px-6 py-4">Status</th>
-                                <th className="px-6 py-4">Sent</th>
-                                <th className="px-6 py-4">Delivered</th>
-                                <th className="px-6 py-4">Read</th>
-                                <th className="px-6 py-4">Replied</th>
-                                <th className="px-6 py-4">Error</th>
-                                <th className="px-6 py-4 text-right">Action</th>
+                                <th className="px-6 py-4 text-start">{t.report.colPhone}</th>
+                                <th className="px-6 py-4 text-start">{t.report.colName}</th>
+                                <th className="px-6 py-4 text-start">{t.report.colStatus}</th>
+                                <th className="px-6 py-4 text-start">{t.report.colSent}</th>
+                                <th className="px-6 py-4 text-start">{t.report.colDelivered}</th>
+                                <th className="px-6 py-4 text-start">{t.report.colRead}</th>
+                                <th className="px-6 py-4 text-start">{t.report.colReplied}</th>
+                                <th className="px-6 py-4 text-start">{t.report.colError}</th>
+                                <th className="px-6 py-4 text-end">{t.report.colAction}</th>
                             </tr>
 
                         </thead>
-                        <tbody className="divide-y">
+                        <tbody className="divide-y text-start">
                             {filteredContacts.map((c: any, index: number) => {
                                 const StatusIcon = STATUS_ICONS[c.status] || Clock;
                                 const color      = STATUS_COLORS[c.status] || '#94a3b8';
                                 return (
                                     <tr key={`${c.phone || ''}-${index}`} className="hover:bg-muted/50 transition-colors">
-                                        <td className="px-6 py-3 font-mono text-muted-foreground text-xs">{c.phone}</td>
-                                        <td className="px-6 py-3 font-medium text-xs">{c.name || '—'}</td>
-                                        <td className="px-6 py-3">
+                                        <td className="px-6 py-3 font-mono text-muted-foreground text-xs text-start">{c.phone}</td>
+                                        <td className="px-6 py-3 font-medium text-xs text-start">{c.name || '—'}</td>
+                                        <td className="px-6 py-3 text-start">
                                             <Badge variant="outline" className="gap-1.5 text-[10px] uppercase tracking-wider" style={{ background: `${color}18`, color, borderColor: `${color}30` }}>
                                                 <StatusIcon className="w-3 h-3" />
-                                                {c.status}
+                                                {t.report[c.status] || c.status}
                                             </Badge>
                                         </td>
-                                        <td className="px-6 py-3 text-muted-foreground text-xs">{formatTimeSafe(c.sent_at)}</td>
-                                        <td className="px-6 py-3 text-muted-foreground text-xs">{formatTimeSafe(c.delivered_at)}</td>
-                                        <td className="px-6 py-3 text-muted-foreground text-xs">{formatTimeSafe(c.read_at)}</td>
-                                        <td className="px-6 py-3 text-muted-foreground text-xs">{formatTimeSafe(c.replied_at)}</td>
-                                        <td className="px-6 py-3 text-destructive text-xs max-w-[200px] truncate" title={c.error_message}>{c.error_message || '—'}</td>
-                                        <td className="px-6 py-3 text-right">
+                                        <td className="px-6 py-3 text-muted-foreground text-xs text-start">{formatTimeSafe(c.sent_at)}</td>
+                                        <td className="px-6 py-3 text-muted-foreground text-xs text-start">{formatTimeSafe(c.delivered_at)}</td>
+                                        <td className="px-6 py-3 text-muted-foreground text-xs text-start">{formatTimeSafe(c.read_at)}</td>
+                                        <td className="px-6 py-3 text-muted-foreground text-xs text-start">{formatTimeSafe(c.replied_at)}</td>
+                                        <td className="px-6 py-3 text-destructive text-xs max-w-[200px] truncate text-start" title={c.error_message}>{c.error_message || '—'}</td>
+                                        <td className="px-6 py-3 text-end">
                                             <div className="flex items-center justify-end gap-1">
                                                 {c.status === 'failed' && (
                                                     <Button
@@ -393,7 +412,7 @@ export default function CampaignReportWorkspace({ t, callRPC, campaignId, campai
                                                         className="h-7 px-2.5 gap-1 bg-orange-500 hover:bg-orange-600 text-white text-[10px] font-bold"
                                                     >
                                                         {retryingContact === c.phone ? <RefreshCw className="w-3 h-3 animate-spin" /> : <RotateCcw className="w-3 h-3" />}
-                                                        Retry
+                                                        {t.report.retrySingleBtn}
                                                     </Button>
                                                 )}
                                                 {(c.status === 'sent' || c.status === 'delivered' || c.status === 'read' || c.status === 'replied') && (
@@ -412,7 +431,7 @@ export default function CampaignReportWorkspace({ t, callRPC, campaignId, campai
                                                         className="h-7 px-2.5 gap-1 text-[10px] font-bold"
                                                     >
                                                         {retryingContact === c.phone ? <RefreshCw className="w-3 h-3 animate-spin" /> : <RotateCcw className="w-3 h-3" />}
-                                                        Resend
+                                                        {t.report.resendSingleBtn}
                                                     </Button>
                                                 )}
                                             </div>
@@ -424,8 +443,7 @@ export default function CampaignReportWorkspace({ t, callRPC, campaignId, campai
                             {filteredContacts.length === 0 && !loading && (
                                 <tr>
                                     <td colSpan={9} className="px-6 py-12 text-center text-muted-foreground text-sm">
-
-                                        {statusFilter !== 'all' ? `No contacts with status "${statusFilter}"` : 'No contacts recorded for this campaign yet.'}
+                                        {statusFilter !== 'all' ? `${t.report.noContactsFilter} "${t.report[statusFilter] || statusFilter}"` : t.report.noContactsRecorded}
                                     </td>
                                 </tr>
                             )}

@@ -21,20 +21,20 @@ import {
 import { StatusBadge } from '@/Components/ui/StatusBadge';
 
 // ── Tooltip Button helper ─────────────────────────────────────────────────────
-function TipButton({ tip, children, ...props }: any) {
+function TipButton({ tip, side = "left", children, ...props }: any) {
     return (
         <Tooltip>
             <TooltipTrigger asChild>
                 <Button {...props}>{children}</Button>
             </TooltipTrigger>
-            <TooltipContent side="left"><p>{tip}</p></TooltipContent>
+            <TooltipContent side={side}><p>{tip}</p></TooltipContent>
         </Tooltip>
     );
 }
 
 // ── Session Card ──────────────────────────────────────────────────────────────
 function SessionCard({
-    s, t,
+    s, t, locale,
     onReconnect, onDisconnect, onDelete, onRename, onCheckStatus, onGetPhoto
 }: any) {
     const [renaming, setRenaming]     = useState(false);
@@ -135,6 +135,7 @@ function SessionCard({
                             {s.state !== 'connected' && s.state !== 'connecting' && (
                                 <TipButton
                                     tip={t.accounts.reconnect}
+                                    side={locale === 'ar' ? 'right' : 'left'}
                                     variant="ghost" size="icon"
                                     onClick={() => onReconnect(s.accountId)}
                                     className="size-8 text-primary hover:bg-primary/10"
@@ -145,6 +146,7 @@ function SessionCard({
 
                             <TipButton
                                 tip={t.accounts.disconnect}
+                                side={locale === 'ar' ? 'right' : 'left'}
                                 variant="ghost" size="icon"
                                 onClick={() => onDisconnect(s.accountId)}
                                 className="size-8 text-muted-foreground hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-950/30"
@@ -166,6 +168,7 @@ function SessionCard({
                             ) : (
                                 <TipButton
                                     tip={t.accounts.deleteSession}
+                                    side={locale === 'ar' ? 'right' : 'left'}
                                     variant="ghost" size="icon"
                                     onClick={() => setDeleteConfirm(true)}
                                     className="size-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
@@ -192,7 +195,7 @@ function SessionCard({
                                 <span className="font-semibold text-foreground">{statusInfo.status}</span>
                             </span>
                             {statusInfo.phoneNumber && (
-                                <span className="ml-auto text-muted-foreground">{statusInfo.phoneNumber}</span>
+                                <span className="ms-auto text-muted-foreground">{statusInfo.phoneNumber}</span>
                             )}
                         </div>
                         <Separator />
@@ -226,7 +229,7 @@ function SessionCard({
                     <Button
                         variant="ghost"
                         size="sm"
-                        className="flex-1 gap-1.5 rounded-none h-9 text-xs text-muted-foreground hover:text-foreground hover:bg-muted/60 border-r"
+                        className="flex-1 gap-1.5 rounded-none h-9 text-xs text-muted-foreground hover:text-foreground hover:bg-muted/60 border-e"
                         onClick={handleCheckStatus}
                         disabled={statusLoading}
                     >
@@ -254,7 +257,7 @@ function SessionCard({
 
 // ── Main Export ────────────────────────────────────────────────────────────────
 export default function AccountsWorkspace({
-    activeQR, qrCountdown, qrSessionId, t,
+    activeQR, qrCountdown, qrSessionId, t, locale,
     newAccountId, setNewAccountId, newProxy, setNewProxy, newHeadless, setNewHeadless,
     daemonConnected, handleConnectSession, handleReconnectSession, sessions, fetchSessions,
     handleDisconnectSession, handleDeleteSession, handleRenameSession,
@@ -375,6 +378,7 @@ export default function AccountsWorkspace({
                                     key={s.accountId}
                                     s={s}
                                     t={t}
+                                    locale={locale}
                                     onReconnect={handleReconnectSession}
                                     onDisconnect={handleDisconnectSession}
                                     onDelete={handleDeleteSession}

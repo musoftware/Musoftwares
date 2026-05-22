@@ -69,7 +69,7 @@ export default function ScorecardWorkspace({ t, campaignResult }: any) {
 
                         <div className="space-y-3 leading-relaxed">
                             {/* Diagnosis output text block */}
-                            <p className="text-xs text-slate-350 font-bold border-l-2 border-teal-500 pl-3">
+                            <p className="text-xs text-slate-350 font-bold border-s-2 border-teal-500 ps-3">
                                 {campaignResult.healthGrade === 'A+' ? t.scorecard.grades.excellent :
                                  campaignResult.healthGrade === 'B' ? t.scorecard.grades.good :
                                  campaignResult.healthGrade === 'C' ? t.scorecard.grades.warning :

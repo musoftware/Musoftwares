@@ -9,8 +9,13 @@ import TemplatesWorkspace from './WhatsApp/Workspaces/TemplatesWorkspace';
 import CampaignsListWorkspace from './WhatsApp/Workspaces/CampaignsListWorkspace';
 import CampaignReportWorkspace from './WhatsApp/Workspaces/CampaignReportWorkspace';
 import InboxWorkspace from './WhatsApp/Workspaces/InboxWorkspace';
+import AutoReplyWorkspace from './WhatsApp/Workspaces/AutoReplyWorkspace';
+import ContactsWorkspace from './WhatsApp/Workspaces/ContactsWorkspace';
+import DashboardWorkspace from './WhatsApp/Workspaces/DashboardWorkspace';
+import MediaLibraryWorkspace from './WhatsApp/Workspaces/MediaLibraryWorkspace';
+import BroadcastListsWorkspace from './WhatsApp/Workspaces/BroadcastListsWorkspace';
 
-type TabId = 'accounts' | 'campaign' | 'groups' | 'group-campaign' | 'history' | 'report' | 'templates' | 'inbox';
+type TabId = 'accounts' | 'campaign' | 'groups' | 'group-campaign' | 'history' | 'report' | 'templates' | 'inbox' | 'auto-reply' | 'contacts' | 'dashboard' | 'media' | 'broadcast';
 
 const translations = {
     en: {
@@ -20,10 +25,19 @@ const translations = {
         connected: "Runtime Connected",
         disconnected: "Runtime Offline",
         tabs: {
+            dashboard: "Dashboard",
             accounts: "WA Accounts",
             campaign: "New Campaign",
-            deliverability: "Live Activity",
-            scorecard: "Report"
+            "group-campaign": "Group Campaign",
+            templates: "Templates",
+            inbox: "Inbox",
+            groups: "My Groups",
+            history: "Campaigns",
+            report: "Report",
+            "auto-reply": "Auto-Reply",
+            contacts: "Contacts",
+            media: "Media Library",
+            broadcast: "Broadcast Lists",
         },
         accounts: {
             qrRefreshes: "Refreshes in",
@@ -77,35 +91,183 @@ const translations = {
             noContactsError: "Please provide at least one valid contact.",
             emptyMessageError: "Please provide a message or attachment."
         },
-        deliverability: {
-            campaignProgress: "Campaign Progress",
-            description: "Real-time message delivery tracking.",
-            stopCampaign: "Stop Campaign",
+        inbox: {
+            title: "Inbox",
+            searchPlaceholder: "Search conversations...",
+            emptyStateTitle: "No conversations yet",
+            emptyStateSub: "Send a campaign and wait for replies",
+            noMessages: "No messages in this conversation",
+            typePlaceholder: "Type a message...",
+            unreadBadge: "unread",
+            detailsTitle: "WhatsApp Inbox",
+            detailsSub: "Select a conversation to view messages and reply directly to your customers.",
+            noMessagesYet: "No messages yet",
+            sending: "Sending...",
+            replyFailed: "Failed to send: "
+        },
+        groups: {
+            title: "Groups Management",
+            subtitle: "Manage, create, and add members to groups.",
+            noAccountTitle: "No Account Selected",
+            noAccountSub: "Please connect and select a WhatsApp account from the Accounts tab first.",
+            createNew: "Create New Group",
+            groupName: "Group Name",
+            groupNamePlaceholder: "My Awesome Group",
+            participants: "Initial Participants (Comma/Newline separated)",
+            participantsPlaceholder: "20101234567, 20109876543",
+            createBtn: "Create Group",
+            bulkAdd: "Bulk Add Members",
+            selectGroup: "Select Target Group",
+            chooseGroupPlaceholder: "Choose a group...",
+            newMembers: "New Members (Comma/Newline separated)",
+            newMembersPlaceholder: "20101234567, 20109876543",
+            addBtn: "Add Members",
+            yourGroups: "Your Groups",
+            noGroups: "No groups found for this account.",
+            createSuccess: "Group created successfully!",
+            addSuccess: "Members added successfully!",
+            selectAccountError: "Select an account first",
+            nameAndParticipantError: "Name and at least 1 participant required",
+            selectAccountGroupError: "Select account and group",
+            noParticipantsError: "No participants provided"
+        },
+        groupCampaign: {
+            title: "Group Campaign",
+            subtitle: "Create a WhatsApp group, add contacts, send a message — all in one flow.",
+            step1: "Account & Group",
+            step2: "Add Contacts",
+            step3: "Compose Message",
+            step4: "Launch",
+            accountLabel: "WhatsApp Account",
+            noAccountWarning: "No connected accounts. Please connect a WhatsApp account first.",
+            groupNameLabel: "Group Name",
+            groupNamePlaceholder: "e.g. VIP Customers Q2 2025",
+            deleteAfterLabel: "Delete group after sending",
+            deleteAfterSub: "The bot will leave the group automatically once the message is delivered.",
+            contactsLabel: "Contact List",
+            validContacts: "valid contacts",
+            contactsPlaceholder: "One per line — phone,name,company format:\n966501234567,Ahmed Al-Rashid,Aramco\n966507654321,Fatima,\n971501234567",
+            limitWarning: "WhatsApp limits groups to 1024 participants.",
+            moreContacts: "more",
+            msgTypeLabel: "Message Type",
+            mediaUrlLabel: "Media URL",
+            captionLabel: "Message / Caption",
+            captionPlaceholder: "Hello group members! We have an exclusive offer for you…",
+            summaryTitle: "Campaign Summary",
+            colAccount: "Account",
+            colGroupName: "Group Name",
+            colRecipients: "Recipients",
+            colMediaType: "Media Type",
+            colDeleteAfter: "Delete Group After",
+            yes: "Yes",
+            no: "No",
+            msgPreview: "Message Preview",
+            backBtn: "Back",
+            nextBtn: "Next",
+            launchingBtn: "Launching…",
+            launchBtn: "Launch Group Campaign",
+            launchedTitle: "Group Campaign Launched!",
+            launchedSub: "Creating group and sending to contacts…",
+            startAnotherBtn: "Start Another Group Campaign"
+        },
+        templates: {
+            title: "Message Templates",
+            subtitle: "Save reusable messages and media — load them instantly when creating campaigns.",
+            newBtn: "New Template",
+            searchPlaceholder: "Search templates by name, content, or tag…",
+            emptyTitle: "No Templates Yet",
+            emptySub: "Create your first template to speed up campaign creation.",
+            createFirstBtn: "Create First Template",
+            editTitle: "Edit Template",
+            newTemplateTitle: "New Template",
+            nameLabel: "Template Name",
+            namePlaceholder: "e.g. Welcome Message",
+            partsLabel: "Message Parts",
+            addPart: "Choose file",
+            uploading: "Uploading...",
+            change: "Change",
+            orUrl: "Or paste URL here...",
+            captionPlaceholder: "Caption for this (optional)",
+            tagsLabel: "Tags (comma-separated)",
+            tagsPlaceholder: "promo, welcome, arabic",
+            cancel: "Cancel",
+            saving: "Saving...",
+            saveBtn: "Save Template",
+            part: "part",
+            parts: "parts",
+            deleteConfirm: "Delete this template?",
+            nameRequiredError: "Template name is required",
+            partRequiredError: "Add at least one message or media part",
+            partTypes: {
+                text: "Text",
+                image: "Image",
+                video: "Video",
+                document: "Document",
+                audio: "Audio"
+            },
+            useBtn: "Use Template",
+            editBtn: "Edit",
+            deleteBtn: "Delete",
+            moveUp: "Move up",
+            moveDown: "Move down",
+            remove: "Remove",
+            writeMessagePlaceholder: "Write your message... Use {name}, {phone}, {company} for variables"
+        },
+        history: {
+            title: "Campaigns",
+            subtitle: "Manage all your campaigns — start, pause, stop, or review reports.",
+            colCampaign: "Campaign",
+            colType: "Type",
+            colStatus: "Status",
+            colProgress: "Progress",
+            colSent: "Sent",
+            colFailed: "Failed",
+            colAccount: "Account",
+            colCreated: "Created",
+            colActions: "Actions",
+            ready: "Ready",
+            running: "Running",
+            paused: "Paused",
+            stopped: "Stopped",
+            completed: "Completed",
+            failedStatus: "Failed",
+            retryBtn: "Retry",
+            nextIn: "next in",
+            deleteConfirm: "Delete this campaign? This cannot be undone.",
+            emptyTitle: "No campaigns yet",
+            emptySub: "Create your first campaign to get started.",
+            stopCampaign: "Stop Campaign"
+        },
+        report: {
+            title: "Campaign Report",
+            retryAllBtn: "Retry All Failed",
+            exportBtn: "Export CSV",
+            breakdownTitle: "Delivery Breakdown",
+            breakdownSub: "Current status per contact",
+            overviewTitle: "Status Overview",
+            overviewSub: "Current status count per contact",
+            total: "Total",
+            sent: "Sent",
+            delivered: "Delivered",
+            read: "Read",
+            replied: "Replied",
+            failed: "Failed",
+            pending: "Pending",
+            tableTitle: "Per-Contact Engagement",
+            allStatus: "All Status",
             colPhone: "Phone",
             colName: "Name",
-            colCompany: "Company",
             colStatus: "Status",
-            statusRead: "Read",
-            statusDelivered: "Delivered",
-            statusSent: "Sent",
-            statusReplied: "Replied",
-            statusBlocked: "Blocked",
-            statusFailed: "Failed",
-            statusPending: "Pending"
-        },
-        scorecard: {
-            totalProcessed: "Total Targets",
-            sentSuccessfully: "Sent",
-            failedOrSkipped: "Failed",
-            blocksReceived: "Blocked",
-            title: "Delivery Health",
-            description: "Post-campaign diagnostic.",
-            trustGrade: "Health Grade",
-            scoreExplanation: "Based on delivery rates.",
-            blockRate: "Block Rate",
-            banProbability: "Account Risk",
-            warmingRecommendation: "Recommendation",
-            grades: { excellent: "Excellent", good: "Good", warning: "Warning", danger: "Critical" }
+            colSent: "Sent At",
+            colDelivered: "Delivered At",
+            colRead: "Read At",
+            colReplied: "Replied At",
+            colError: "Error",
+            colAction: "Action",
+            retrySingleBtn: "Retry",
+            resendSingleBtn: "Resend",
+            noContactsFilter: "No contacts with status",
+            noContactsRecorded: "No contacts recorded for this campaign yet."
         }
     },
     ar: {
@@ -115,10 +277,19 @@ const translations = {
         connected: "النظام متصل",
         disconnected: "النظام غير متصل",
         tabs: {
+            dashboard: "لوحة التحكم",
             accounts: "حسابات الواتساب",
             campaign: "حملة جديدة",
-            deliverability: "النشاط المباشر",
-            scorecard: "التقرير"
+            "group-campaign": "حملة المجموعات",
+            templates: "القوالب",
+            inbox: "البريد الوارد",
+            groups: "مجموعاتي",
+            history: "الحملات",
+            report: "التقرير",
+            "auto-reply": "الرد التلقائي",
+            contacts: "جهات الاتصال",
+            media: "مكتبة الوسائط",
+            broadcast: "قوائم البث",
         },
         accounts: {
             qrRefreshes: "تحديث خلال",
@@ -172,35 +343,183 @@ const translations = {
             noContactsError: "يرجى إدخال جهة اتصال واحدة على الأقل.",
             emptyMessageError: "يرجى إدخال رسالة أو مرفق."
         },
-        deliverability: {
-            campaignProgress: "تقدم الحملة",
-            description: "تتبع تسليم الرسائل.",
-            stopCampaign: "إيقاف الحملة",
-            colPhone: "الهاتف",
-            colName: "الاسم",
-            colCompany: "الشركة",
-            colStatus: "الحالة",
-            statusRead: "تمت القراءة",
-            statusDelivered: "تم التسليم",
-            statusSent: "تم الإرسال",
-            statusReplied: "تم الرد",
-            statusBlocked: "محظور",
-            statusFailed: "فشل",
-            statusPending: "قيد الانتظار"
+        inbox: {
+            title: "البريد الوارد",
+            searchPlaceholder: "البحث في المحادثات...",
+            emptyStateTitle: "لا توجد محادثات بعد",
+            emptyStateSub: "أرسل حملة وانتظر الردود لتظهر هنا",
+            noMessages: "لا توجد رسائل في هذه المحادثة",
+            typePlaceholder: "اكتب رسالة...",
+            unreadBadge: "غير مقروءة",
+            detailsTitle: "صندوق وارد الواتساب",
+            detailsSub: "اختر محادثة لعرض الرسائل والرد مباشرة على عملائك.",
+            noMessagesYet: "لا توجد رسائل بعد",
+            sending: "جاري الإرسال...",
+            replyFailed: "فشل الإرسال: "
         },
-        scorecard: {
-            totalProcessed: "إجمالي المستهدفين",
-            sentSuccessfully: "تم الإرسال",
-            failedOrSkipped: "فشل",
-            blocksReceived: "محظور",
-            title: "صحة الإرسال",
-            description: "تشخيص ما بعد الحملة.",
-            trustGrade: "درجة الصحة",
-            scoreExplanation: "بناءً على معدلات التسليم.",
-            blockRate: "معدل الحظر",
-            banProbability: "خطر الحساب",
-            warmingRecommendation: "التوصية",
-            grades: { excellent: "ممتاز", good: "جيد", warning: "تحذير", danger: "حرج" }
+        groups: {
+            title: "إدارة المجموعات",
+            subtitle: "إنشاء المجموعات وإدارتها وإضافة الأعضاء إليها دفعة واحدة.",
+            noAccountTitle: "لم يتم اختيار حساب",
+            noAccountSub: "يرجى الاتصال واختيار حساب واتساب من علامة تبويب الحسابات أولاً.",
+            createNew: "إنشاء مجموعة جديدة",
+            groupName: "اسم المجموعة",
+            groupNamePlaceholder: "مجموعتي المتميزة",
+            participants: "المشاركون الأولون (مفصولين بفاصلة أو سطر جديد)",
+            participantsPlaceholder: "20101234567, 20109876543",
+            createBtn: "إنشاء المجموعة",
+            bulkAdd: "إضافة أعضاء دفعة واحدة",
+            selectGroup: "اختر المجموعة المستهدفة",
+            chooseGroupPlaceholder: "اختر مجموعة...",
+            newMembers: "أعضاء جدد (مفصولين بفاصلة أو سطر جديد)",
+            newMembersPlaceholder: "20101234567, 20109876543",
+            addBtn: "إضافة الأعضاء",
+            yourGroups: "مجموعاتك",
+            noGroups: "لم يتم العثور على مجموعات لهذا الحساب.",
+            createSuccess: "تم إنشاء المجموعة بنجاح!",
+            addSuccess: "تم إضافة الأعضاء بنجاح!",
+            selectAccountError: "يرجى تحديد حساب أولاً",
+            nameAndParticipantError: "اسم المجموعة ومشارك واحد على الأقل مطلوبان",
+            selectAccountGroupError: "يرجى تحديد الحساب والمجموعة المستهدفة",
+            noParticipantsError: "لم يتم تقديم مشاركين"
+        },
+        groupCampaign: {
+            title: "حملة المجموعات",
+            subtitle: "أنشئ مجموعة واتساب، أضف جهات الاتصال، أرسل رسالتك — كل ذلك في خطوة واحدة متكاملة.",
+            step1: "الحساب والمجموعة",
+            step2: "إضافة الأرقام",
+            step3: "كتابة الرسالة",
+            step4: "إطلاق الحملة",
+            accountLabel: "حساب الواتساب",
+            noAccountWarning: "لا توجد حسابات متصلة. يرجى ربط حساب واتساب أولاً.",
+            groupNameLabel: "اسم المجموعة",
+            groupNamePlaceholder: "مثال: عملاء VIP الربع الثاني 2025",
+            deleteAfterLabel: "حذف المجموعة بعد الإرسال",
+            deleteAfterSub: "سيغادر البوت المجموعة تلقائياً بعد تسليم الرسالة.",
+            contactsLabel: "قائمة جهات الاتصال",
+            validContacts: "أرقام صحيحة",
+            contactsPlaceholder: "رقم واحد في كل سطر — بصيغة: الرقم,الاسم,الشركة\n966501234567,أحمد الراشد,أرامكو\n966507654321,فاطمة,\n971501234567",
+            limitWarning: "يحد واتساب المجموعات بـ 1024 مشاركاً كحد أقصى.",
+            moreContacts: "أرقام أخرى",
+            msgTypeLabel: "نوع الرسالة",
+            mediaUrlLabel: "رابط الوسائط",
+            captionLabel: "الرسالة / شرح المرفق",
+            captionPlaceholder: "مرحباً بأعضاء المجموعة! لدينا عرض حصري لكم...",
+            summaryTitle: "ملخص الحملة",
+            colAccount: "الحساب المستخدم",
+            colGroupName: "اسم المجموعة",
+            colRecipients: "المستلمون",
+            colMediaType: "نوع الوسائط",
+            colDeleteAfter: "حذف المجموعة بعد الإرسال",
+            yes: "نعم",
+            no: "لا",
+            msgPreview: "معاينة الرسالة",
+            backBtn: "الخلف",
+            nextBtn: "التالي",
+            launchingBtn: "جاري الإطلاق...",
+            launchBtn: "إطلاق حملة المجموعات",
+            launchedTitle: "تم إطلاق حملة المجموعات بنجاح!",
+            launchedSub: "جاري إنشاء المجموعة وإرسال الرسائل إلى جهات الاتصال...",
+            startAnotherBtn: "بدء حملة مجموعات أخرى"
+        },
+        templates: {
+            title: "قوالب الرسائل",
+            subtitle: "احفظ الرسائل والوسائط لإعادة استخدامها وتحميلها فوراً عند إنشاء الحملات.",
+            newBtn: "قالب جديد",
+            searchPlaceholder: "البحث في القوالب بالاسم، المحتوى، أو الوسم...",
+            emptyTitle: "لا توجد قوالب بعد",
+            emptySub: "أنشئ قالبك الأول لتسريع عملية إطلاق الحملات مستقبلاً.",
+            createFirstBtn: "أنشئ قالبك الأول",
+            editTitle: "تعديل القالب",
+            newTemplateTitle: "قالب جديد",
+            nameLabel: "اسم القالب",
+            namePlaceholder: "مثال: رسالة الترحيب بالعملاء",
+            partsLabel: "أجزاء الرسالة",
+            addPart: "اختر ملفاً",
+            uploading: "جاري الرفع...",
+            change: "تغيير",
+            orUrl: "أو الصق الرابط هنا...",
+            captionPlaceholder: "شرح توضيحي للمرفق (اختياري)",
+            tagsLabel: "الوسوم (مفصولة بفاصلة)",
+            tagsPlaceholder: "عرض، ترحيب، عربي",
+            cancel: "إلغاء",
+            saving: "جاري الحفظ...",
+            saveBtn: "حفظ القالب",
+            part: "جزء",
+            parts: "أجزاء",
+            deleteConfirm: "هل أنت متأكد من حذف هذا القالب؟",
+            nameRequiredError: "اسم القالب مطلوب",
+            partRequiredError: "يرجى إضافة جزء نصي أو وسائط واحد على الأقل",
+            partTypes: {
+                text: "نص",
+                image: "صورة",
+                video: "فيديو",
+                document: "مستند",
+                audio: "صوت"
+            },
+            useBtn: "استخدام القالب",
+            editBtn: "تعديل",
+            deleteBtn: "حذف",
+            moveUp: "نقل للأعلى",
+            moveDown: "نقل للأسفل",
+            remove: "إزالة",
+            writeMessagePlaceholder: "اكتب رسالتك... استخدم {name}، {phone}، {company} للمتغيرات"
+        },
+        history: {
+            title: "الحملات الإعلانية",
+            subtitle: "إدارة كافة حملاتك — تشغيل، إيقاف مؤقت، إيقاف نهائي، أو مراجعة التقارير بالتفصيل.",
+            colCampaign: "الحملة",
+            colType: "النوع",
+            colStatus: "الحالة",
+            colProgress: "التقدم",
+            colSent: "الناجح",
+            colFailed: "الفاشل",
+            colAccount: "الحساب",
+            colCreated: "تاريخ الإنشاء",
+            colActions: "الإجراءات",
+            ready: "جاهزة",
+            running: "جاري الإرسال",
+            paused: "موقوفة مؤقتاً",
+            stopped: "موقوفة",
+            completed: "مكتملة",
+            failedStatus: "فاشلة",
+            retryBtn: "إعادة المحاولة",
+            nextIn: "الإرسال القادم خلال",
+            deleteConfirm: "هل أنت متأكد من حذف هذه الحملة؟ لا يمكن التراجع عن هذا الإجراء.",
+            emptyTitle: "لا توجد حملات بعد",
+            emptySub: "أنشئ حملتك الأولى للبدء في الإرسال والوصول لعملائك.",
+            stopCampaign: "إيقاف الحملة"
+        },
+        report: {
+            title: "تقرير الحملة التفصيلي",
+            retryAllBtn: "إعادة محاولة كافة الأرقام الفاشلة",
+            exportBtn: "تصدير كملف Excel CSV",
+            breakdownTitle: "تحليل عمليات التسليم",
+            breakdownSub: "الحالة التفصيلية لكل جهة اتصال",
+            overviewTitle: "نظرة عامة على الحالات",
+            overviewSub: "مجموع أعداد الحالات لكل جهة اتصال",
+            total: "الإجمالي",
+            sent: "تم الإرسال",
+            delivered: "تم التسليم",
+            read: "تمت القراءة",
+            replied: "تم الرد",
+            failed: "فشل الإرسال",
+            pending: "قيد الانتظار",
+            tableTitle: "مستوى تفاعل جهات الاتصال",
+            allStatus: "كافة الحالات",
+            colPhone: "رقم الهاتف",
+            colName: "الاسم",
+            colStatus: "الحالة",
+            colSent: "تاريخ الإرسال",
+            colDelivered: "تاريخ التسليم",
+            colRead: "تاريخ القراءة",
+            colReplied: "تاريخ الرد",
+            colError: "سبب الفشل",
+            colAction: "الإجراء",
+            retrySingleBtn: "إعادة إرسال",
+            resendSingleBtn: "إرسال مجدداً",
+            noContactsFilter: "لا توجد جهات اتصال بحالة",
+            noContactsRecorded: "لا توجد أرقام مسجلة في هذه الحملة حتى الآن."
         }
     }
 };
@@ -263,18 +582,30 @@ function useRuntimeWS(pluginSlug: string, onBroadcast?: ((event: string, data: a
 // ── Main Component ────────────────────────────────────────────────────────────
 
 export default function WhatsAppSenderRunner({ tool, subscription, runtimePort, pluginSlug }: any) {
-    const [locale, setLocale]   = useState<'en' | 'ar'>('en');
+    const [locale, setLocale]   = useState<'en' | 'ar'>(() => {
+        if (typeof window !== 'undefined') {
+            const saved = window.localStorage.getItem('whatsapp_sender_locale');
+            if (saved === 'en' || saved === 'ar') return saved;
+        }
+        return 'en';
+    });
+
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            window.localStorage.setItem('whatsapp_sender_locale', locale);
+        }
+    }, [locale]);
     
     // Initialize state from URL
     const [activeTab, setActiveTab] = useState<TabId>(() => {
         if (typeof window !== 'undefined') {
             const params = new URLSearchParams(window.location.search);
             const path = params.get('path') as TabId;
-            if (path && ['accounts', 'campaign', 'groups', 'group-campaign', 'history', 'report', 'templates', 'inbox'].includes(path)) {
+            if (path && ['dashboard', 'accounts', 'campaign', 'groups', 'group-campaign', 'history', 'report', 'templates', 'inbox', 'auto-reply', 'contacts', 'media', 'broadcast'].includes(path)) {
                 return path;
             }
         }
-        return 'accounts';
+        return 'dashboard';
     });
     
     const [reportCampaignId, setReportCampaignId] = useState<string | null>(() => {
@@ -286,6 +617,7 @@ export default function WhatsAppSenderRunner({ tool, subscription, runtimePort, 
         if (typeof window !== 'undefined') return new URLSearchParams(window.location.search).get('reportName');
         return null;
     });
+    const [followUpData, setFollowUpData] = useState<any>(null);
 
     // Sync state to URL
     useEffect(() => {
@@ -657,6 +989,16 @@ export default function WhatsAppSenderRunner({ tool, subscription, runtimePort, 
                 />
             }
         >
+            {activeTab === 'dashboard' && (
+                <DashboardWorkspace
+                    t={t}
+                    locale={locale}
+                    callRPC={callRPC}
+                    daemonConnected={daemonConnected}
+                    setActiveTab={setActiveTab}
+                />
+            )}
+
             {activeTab === 'accounts' && (
                 <AccountsWorkspace
                     t={t}
@@ -719,11 +1061,16 @@ export default function WhatsAppSenderRunner({ tool, subscription, runtimePort, 
                     handleSendTestMessage={handleSendTestMessage}
                     isCampaignRunning={isCampaignRunning}
                     onEditTemplate={handleEditTemplate}
+                    callRPC={callRPC}
+                    followUpData={followUpData}
+                    clearFollowUpData={() => setFollowUpData(null)}
                 />
             )}
 
             {activeTab === 'group-campaign' && (
                 <GroupCampaignWorkspace
+                    t={t}
+                    locale={locale}
                     callRPC={callRPC}
                     sessions={sessions}
                 />
@@ -731,6 +1078,8 @@ export default function WhatsAppSenderRunner({ tool, subscription, runtimePort, 
 
             {activeTab === 'templates' && (
                 <TemplatesWorkspace
+                    t={t}
+                    locale={locale}
                     callRPC={callRPC}
                     daemonConnected={daemonConnected}
                     onUseTemplate={handleUseTemplate}
@@ -743,6 +1092,7 @@ export default function WhatsAppSenderRunner({ tool, subscription, runtimePort, 
             {activeTab === 'groups' && (
                 <GroupsWorkspace
                     t={t}
+                    locale={locale}
                     callRPC={callRPC}
                     selectedAccount={selectedAccount}
                     sessions={sessions}
@@ -750,9 +1100,48 @@ export default function WhatsAppSenderRunner({ tool, subscription, runtimePort, 
                 />
             )}
 
+            {activeTab === 'auto-reply' && (
+                <AutoReplyWorkspace
+                    t={t}
+                    locale={locale}
+                    callRPC={callRPC}
+                    selectedAccount={selectedAccount}
+                    sessions={sessions}
+                    daemonConnected={daemonConnected}
+                />
+            )}
+
+            {activeTab === 'contacts' && (
+                <ContactsWorkspace
+                    t={t}
+                    locale={locale}
+                    callRPC={callRPC}
+                    daemonConnected={daemonConnected}
+                />
+            )}
+
+            {activeTab === 'media' && (
+                <MediaLibraryWorkspace
+                    t={t}
+                    locale={locale}
+                    callRPC={callRPC}
+                    daemonConnected={daemonConnected}
+                />
+            )}
+
+            {activeTab === 'broadcast' && (
+                <BroadcastListsWorkspace
+                    t={t}
+                    locale={locale}
+                    callRPC={callRPC}
+                    daemonConnected={daemonConnected}
+                />
+            )}
+
             {activeTab === 'history' && (
                 <CampaignsListWorkspace
                     t={t}
+                    locale={locale}
                     callRPC={callRPC}
                     activeCampaigns={activeCampaigns}
                     campaignDelays={campaignDelays}
@@ -762,6 +1151,10 @@ export default function WhatsAppSenderRunner({ tool, subscription, runtimePort, 
                         setReportCampaignName(name);
                         setActiveTab('report');
                     }}
+                    onCreateCampaign={(data: any) => {
+                        setFollowUpData(data);
+                        setActiveTab('campaign');
+                    }}
                 />
             )}
 
@@ -769,6 +1162,7 @@ export default function WhatsAppSenderRunner({ tool, subscription, runtimePort, 
             {activeTab === 'report' && reportCampaignId && (
                 <CampaignReportWorkspace
                     t={t}
+                    locale={locale}
                     callRPC={callRPC}
                     campaignId={reportCampaignId}
                     campaignName={reportCampaignName}
@@ -779,6 +1173,8 @@ export default function WhatsAppSenderRunner({ tool, subscription, runtimePort, 
 
             {activeTab === 'inbox' && (
                 <InboxWorkspace
+                    t={t}
+                    locale={locale}
                     callRPC={callRPC}
                     daemonConnected={daemonConnected}
                     sessions={sessions}

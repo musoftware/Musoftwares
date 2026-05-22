@@ -17,6 +17,7 @@ class DatabaseSeeder extends Seeder
             SiteSettingsSeeder::class,
             AdminUserSeeder::class,
             ModulePlanSeeder::class,
+            PlatformPlanSeeder::class,
         ]);
 
         $client = \App\Models\User::firstOrCreate(
