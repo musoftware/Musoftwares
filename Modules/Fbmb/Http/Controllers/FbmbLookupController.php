@@ -29,7 +29,7 @@ class FbmbLookupController extends Controller
     public function process(Request $request)
     {
         $request->validate([
-            'file' => 'required|file|mimes:txt,csv|max:10240',
+            'file' => 'required|file|extensions:txt,csv|max:10240',
         ]);
 
         $user = auth()->user();
@@ -43,7 +43,7 @@ class FbmbLookupController extends Controller
 
         $file = $request->file('file');
         $path = $file->store('temp_isaas');
-        $fullPath = storage_path('app/' . $path);
+        $fullPath = \Illuminate\Support\Facades\Storage::path($path);
 
         try {
             $result = $this->lookupService->processFile($user, $fullPath);

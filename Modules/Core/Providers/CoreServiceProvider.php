@@ -3,7 +3,7 @@
 namespace Modules\Core\Providers;
 
 use Illuminate\Support\ServiceProvider;
-use Modules\Core\Console\FetchExchangeRates;
+use Modules\Core\app\Console\FetchExchangeRates;
 
 class CoreServiceProvider extends ServiceProvider
 {
