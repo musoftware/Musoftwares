@@ -20,14 +20,14 @@ import { Link, usePage } from '@inertiajs/react';
 import ApplicationLogo from '@/Components/ApplicationLogo';
 
 const items = [
-  { title: "Dashboard", url: "/admin", icon: LayoutDashboard },
+  { title: "Dashboard", url: "/admin/dashboard", icon: LayoutDashboard },
   { 
     title: "User & Content", 
     url: "/admin/users-content", 
     icon: Users,
     subItems: [
         { title: "Users", url: "/admin/clients" },
-        { title: "Services Dashboard", url: "/admin/services" },
+
         { title: "Projects", url: "/admin/projects" },
         { title: "Plans", url: "/admin/plans" },
         { title: "Blog Articles", url: "/admin/blog-articles" },
