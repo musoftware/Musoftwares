@@ -1,11 +1,115 @@
-import { Head, Link } from '@inertiajs/react';
-import { Copy, Mail, MessageCircle } from 'lucide-react';
+import React, { useState } from 'react';
+import { Head, Link, router } from '@inertiajs/react';
+import { Copy, Mail, MessageCircle, ChevronDown, Key, Wallet, FileText, Briefcase, Trash2, Edit } from 'lucide-react';
 import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+    DropdownMenuGroup,
+} from "@/Components/ui/dropdown-menu";
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from "@/Components/ui/dialog";
+import { Button } from '@/Components/ui/button';
+import { Input } from '@/Components/ui/input';
+import { Label } from '@/Components/ui/label';
+import AdminNotesPanel from '@/Components/AdminNotesPanel';
 
 export default function Show({ client, wallets }) {
-    const handleLoginAsUser = () => {
-        // Implement impersonation logic later, mock for now
-        alert(`Impersonating user: ${client.name}`);
+    const [isLoginAsLoading, setIsLoginAsLoading] = useState(false);
+    const [isResetPassOpen, setIsResetPassOpen] = useState(false);
+    const [newPassword, setNewPassword] = useState('');
+    
+    // New Modal States
+    const [isAssignTaskOpen, setIsAssignTaskOpen] = useState(false);
+    const [isSwapBudgetOpen, setIsSwapBudgetOpen] = useState(false);
+    const [isActivateMembershipOpen, setIsActivateMembershipOpen] = useState(false);
+
+    const [isWalletModalOpen, setIsWalletModalOpen] = useState(false);
+    const [walletTxForm, setWalletTxForm] = useState({
+        wallet_id: wallets.length > 0 ? wallets[0].id : '',
+        type: 'credit',
+        amount: '',
+        fee: '',
+        is_used: false,
+        description: ''
+    });
+
+    const handleLoginAsUser = async () => {
+        setIsLoginAsLoading(true);
+        try {
+            const res = await window.axios.post(`/admin/clients/${client.id}/login-as`);
+            window.location.href = res.data.redirect_url;
+        } catch (e) {
+            alert('Failed to impersonate user.');
+        } finally {
+            setIsLoginAsLoading(false);
+        }
+    };
+
+    const handleResetPassword = async () => {
+        try {
+            const res = await window.axios.post(`/admin/clients/${client.id}/reset-password`);
+            setNewPassword(res.data.new_password);
+        } catch (e) {
+            alert('Failed to reset password.');
+        }
+    };
+
+    const submitWalletTx = (e) => {
+        e.preventDefault();
+        router.post(`/admin/clients/${client.id}/wallet-transaction`, walletTxForm, {
+            onSuccess: () => {
+                setIsWalletModalOpen(false);
+                setWalletTxForm({ ...walletTxForm, amount: '', description: '' });
+                alert("Wallet transaction successful!");
+            }
+        });
+    };
+
+    const [taskForm, setTaskForm] = useState({ title: '', description: '' });
+    const submitAssignTask = (e) => {
+        e.preventDefault();
+        router.post(`/admin/clients/${client.id}/tasks`, taskForm, {
+            onSuccess: () => {
+                setIsAssignTaskOpen(false);
+                setTaskForm({ title: '', description: '' });
+                alert("Task assigned successfully!");
+            }
+        });
+    };
+
+    const [swapForm, setSwapForm] = useState({ amount: '', target_user_id: '' });
+    const submitSwapBudget = (e) => {
+        e.preventDefault();
+        router.post(`/admin/clients/${client.id}/swap-budget`, swapForm, {
+            onSuccess: () => {
+                setIsSwapBudgetOpen(false);
+                setSwapForm({ amount: '', target_user_id: '' });
+                alert("Budget swapped successfully!");
+            }
+        });
+    };
+
+    const [membershipForm, setMembershipForm] = useState({ plan_id: '1' });
+    const submitActivateMembership = (e) => {
+        e.preventDefault();
+        router.post(`/admin/clients/${client.id}/membership`, membershipForm, {
+            onSuccess: () => {
+                setIsActivateMembershipOpen(false);
+                setMembershipForm({ plan_id: '1' });
+                alert("Membership activated successfully!");
+            }
+        });
     };
 
     const formatCurrency = (amount, currency = 'USD') => {
@@ -27,13 +131,287 @@ export default function Show({ client, wallets }) {
         <AdminSidebarLayout title={`User Profile: ${client.name}`} header="User Details">
             <div className="flex justify-between items-center mb-6">
                 <h1 className="text-3xl font-bold font-sora">User Profile</h1>
-                <button
-                    onClick={handleLoginAsUser}
-                    className="bg-indigo-600 text-white px-4 py-2 rounded-[8px] hover:bg-indigo-700 transition shadow-sm"
-                >
-                    Login as user
-                </button>
+                
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <Button className="bg-indigo-600 text-white px-4 py-2 rounded-[8px] hover:bg-indigo-700 transition shadow-sm flex items-center gap-2">
+                            Quick Actions <ChevronDown size={16} />
+                        </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-56">
+                        <DropdownMenuGroup>
+                            <DropdownMenuLabel>Account & Tools</DropdownMenuLabel>
+                            <DropdownMenuItem onClick={handleLoginAsUser} disabled={isLoginAsLoading}>
+                                <Briefcase className="mr-2 h-4 w-4" />
+                                <span>{isLoginAsLoading ? 'Logging in...' : 'Login As'}</span>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem asChild>
+                                <Link href={`/admin/clients/${client.id}/edit`} className="w-full cursor-pointer flex items-center">
+                                    <Edit className="mr-2 h-4 w-4" />
+                                    <span>Edit Profile</span>
+                                </Link>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => { setIsResetPassOpen(true); setNewPassword(''); }}>
+                                <Key className="mr-2 h-4 w-4" />
+                                <span>Reset Password</span>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => setIsAssignTaskOpen(true)}>
+                                <Briefcase className="mr-2 h-4 w-4" />
+                                <span>Assign Task</span>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem asChild>
+                                <Link href={`/admin/clients/${client.id}/files`} className="w-full cursor-pointer flex items-center">
+                                    <FileText className="mr-2 h-4 w-4" />
+                                    <span>Files</span>
+                                </Link>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem asChild>
+                                <Link href={`/admin/clients/${client.id}/reports`} className="w-full cursor-pointer flex items-center">
+                                    <FileText className="mr-2 h-4 w-4" />
+                                    <span>Reports</span>
+                                </Link>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem asChild>
+                                <Link href={`/admin/clients/${client.id}/referrals`} className="w-full cursor-pointer flex items-center">
+                                    <MessageCircle className="mr-2 h-4 w-4" />
+                                    <span>Manage Referrals</span>
+                                </Link>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => setIsActivateMembershipOpen(true)}>
+                                <Briefcase className="mr-2 h-4 w-4" />
+                                <span>Activate Membership</span>
+                            </DropdownMenuItem>
+                        </DropdownMenuGroup>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuGroup>
+                            <DropdownMenuLabel>Finance</DropdownMenuLabel>
+                            <DropdownMenuItem asChild>
+                                <Link href={`/admin/invoices/create?client_id=${client.id}`} className="w-full cursor-pointer flex items-center">
+                                    <FileText className="mr-2 h-4 w-4" />
+                                    <span>New Invoice</span>
+                                </Link>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem asChild>
+                                <Link href={`/admin/invoices?client_id=${client.id}`} className="w-full cursor-pointer flex items-center">
+                                    <FileText className="mr-2 h-4 w-4" />
+                                    <span>Invoices</span>
+                                </Link>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem asChild>
+                                <Link href={`/admin/finance?client_id=${client.id}`} className="w-full cursor-pointer flex items-center">
+                                    <Wallet className="mr-2 h-4 w-4" />
+                                    <span>All Transactions</span>
+                                </Link>
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem onClick={() => {
+                                setWalletTxForm({ ...walletTxForm, type: 'credit' });
+                                setIsWalletModalOpen(true);
+                            }}>
+                                <Wallet className="mr-2 h-4 w-4" />
+                                <span>Receive Money</span>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => {
+                                setWalletTxForm({ ...walletTxForm, type: 'debit' });
+                                setIsWalletModalOpen(true);
+                            }}>
+                                <Wallet className="mr-2 h-4 w-4" />
+                                <span>Send Money</span>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => {
+                                setWalletTxForm({ ...walletTxForm, type: 'refund' });
+                                setIsWalletModalOpen(true);
+                            }}>
+                                <Wallet className="mr-2 h-4 w-4" />
+                                <span>Refund Money</span>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => setIsSwapBudgetOpen(true)}>
+                                <Wallet className="mr-2 h-4 w-4" />
+                                <span>Swap Budgets</span>
+                            </DropdownMenuItem>
+                        </DropdownMenuGroup>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem className="text-red-600">
+                            <Trash2 className="mr-2 h-4 w-4" />
+                            <span>Delete User</span>
+                        </DropdownMenuItem>
+                    </DropdownMenuContent>
+                </DropdownMenu>
             </div>
+
+            {/* Modals */}
+            <Dialog open={isAssignTaskOpen} onOpenChange={setIsAssignTaskOpen}>
+                <DialogContent>
+                    <form onSubmit={submitAssignTask}>
+                        <DialogHeader>
+                            <DialogTitle>Assign Task</DialogTitle>
+                            <DialogDescription>
+                                Create an ERP Task for this client.
+                            </DialogDescription>
+                        </DialogHeader>
+                        <div className="py-4">
+                            <p className="text-sm text-gray-500">This will create a new task named <strong>{client.name}'s Task</strong> and link it to their ERP account.</p>
+                        </div>
+                        <DialogFooter>
+                            <Button type="button" variant="outline" onClick={() => setIsAssignTaskOpen(false)}>Cancel</Button>
+                            <Button type="submit">Create Task</Button>
+                        </DialogFooter>
+                    </form>
+                </DialogContent>
+            </Dialog>
+
+            <Dialog open={isSwapBudgetOpen} onOpenChange={setIsSwapBudgetOpen}>
+                <DialogContent>
+                    <form onSubmit={submitSwapBudget}>
+                        <DialogHeader>
+                            <DialogTitle>Swap Budgets</DialogTitle>
+                            <DialogDescription>
+                                Transfer funds from this user's wallet to another user's wallet.
+                            </DialogDescription>
+                        </DialogHeader>
+                        <div className="py-4">
+                            <p className="text-sm text-gray-500 mb-2">Select destination wallet and amount.</p>
+                            <div className="space-y-4">
+                                <Input type="number" placeholder="Amount to transfer" />
+                                <Input placeholder="Target user email or ID" />
+                            </div>
+                        </div>
+                        <DialogFooter>
+                            <Button type="button" variant="outline" onClick={() => setIsSwapBudgetOpen(false)}>Cancel</Button>
+                            <Button type="submit">Transfer Funds</Button>
+                        </DialogFooter>
+                    </form>
+                </DialogContent>
+            </Dialog>
+
+            <Dialog open={isActivateMembershipOpen} onOpenChange={setIsActivateMembershipOpen}>
+                <DialogContent>
+                    <form onSubmit={submitActivateMembership}>
+                        <DialogHeader>
+                            <DialogTitle>Activate Membership</DialogTitle>
+                            <DialogDescription>
+                                Manually assign a subscription plan to this user.
+                            </DialogDescription>
+                        </DialogHeader>
+                        <div className="py-4">
+                            <p className="text-sm text-gray-500 mb-2">Select a plan from the list below:</p>
+                            <select className="border-gray-300 rounded-md w-full">
+                                <option>Premium Monthly ($19.99)</option>
+                                <option>Enterprise Annual ($499.00)</option>
+                            </select>
+                        </div>
+                        <DialogFooter>
+                            <Button type="button" variant="outline" onClick={() => setIsActivateMembershipOpen(false)}>Cancel</Button>
+                            <Button type="submit">Activate Plan</Button>
+                        </DialogFooter>
+                    </form>
+                </DialogContent>
+            </Dialog>
+
+            <Dialog open={isResetPassOpen} onOpenChange={setIsResetPassOpen}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Reset Password</DialogTitle>
+                        <DialogDescription>
+                            Are you sure you want to reset this user's password? A new secure password will be generated.
+                        </DialogDescription>
+                    </DialogHeader>
+                    {newPassword ? (
+                        <div className="p-4 bg-green-50 border border-green-200 rounded-md">
+                            <p className="text-sm text-green-800 mb-2">Password reset successful! Provide this to the user:</p>
+                            <div className="font-mono text-lg font-bold bg-white p-2 rounded flex justify-between items-center">
+                                {newPassword}
+                                <Button variant="ghost" size="sm" onClick={() => copyToClipboard(newPassword)}><Copy size={14}/></Button>
+                            </div>
+                        </div>
+                    ) : (
+                        <DialogFooter>
+                            <Button variant="outline" onClick={() => setIsResetPassOpen(false)}>Cancel</Button>
+                            <Button variant="destructive" onClick={handleResetPassword}>Reset Password</Button>
+                        </DialogFooter>
+                    )}
+                </DialogContent>
+            </Dialog>
+
+            <Dialog open={isWalletModalOpen} onOpenChange={setIsWalletModalOpen}>
+                <DialogContent>
+                    <form onSubmit={submitWalletTx}>
+                        <DialogHeader>
+                            <DialogTitle>
+                                {walletTxForm.type === 'credit' ? 'Receive Money' : 'Send Money'}
+                            </DialogTitle>
+                            <DialogDescription>
+                                Add or remove funds directly from the user's platform wallet.
+                            </DialogDescription>
+                        </DialogHeader>
+                        <div className="py-4 space-y-4">
+                            <div>
+                                <Label>Select Wallet</Label>
+                                <select 
+                                    className="w-full mt-1 rounded-md border-gray-300"
+                                    value={walletTxForm.wallet_id}
+                                    onChange={(e) => setWalletTxForm({ ...walletTxForm, wallet_id: e.target.value })}
+                                    required
+                                >
+                                    {wallets.map(w => (
+                                        <option key={w.id} value={w.id}>{w.context} ({w.currency}) - Balance: {w.balance}</option>
+                                    ))}
+                                </select>
+                            </div>
+                            <div>
+                                <Label>Amount</Label>
+                                <Input 
+                                    type="number" 
+                                    step="0.01"
+                                    value={walletTxForm.amount}
+                                    onChange={(e) => setWalletTxForm({ ...walletTxForm, amount: e.target.value })}
+                                    required
+                                />
+                            </div>
+                            
+                            {(walletTxForm.type === 'credit' || walletTxForm.type === 'refund') && (
+                                <div className="flex gap-4">
+                                    <div className="flex-1">
+                                        <Label>Gateway Fee (optional)</Label>
+                                        <Input 
+                                            type="number" 
+                                            step="0.01"
+                                            value={walletTxForm.fee}
+                                            onChange={(e) => setWalletTxForm({ ...walletTxForm, fee: e.target.value })}
+                                            placeholder="0.00"
+                                        />
+                                    </div>
+                                    {walletTxForm.type === 'credit' && (
+                                        <div className="flex items-center space-x-2 pt-6">
+                                            <input 
+                                                type="checkbox" 
+                                                id="is_used" 
+                                                checked={walletTxForm.is_used}
+                                                onChange={(e) => setWalletTxForm({ ...walletTxForm, is_used: e.target.checked })}
+                                                className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                            />
+                                            <Label htmlFor="is_used" className="font-normal cursor-pointer text-gray-700">Mark as Used</Label>
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+
+                            <div>
+                                <Label>Description / Reason</Label>
+                                <Input 
+                                    value={walletTxForm.description}
+                                    onChange={(e) => setWalletTxForm({ ...walletTxForm, description: e.target.value })}
+                                    placeholder="Optional note"
+                                />
+                            </div>
+                        </div>
+                        <DialogFooter>
+                            <Button type="button" variant="outline" onClick={() => setIsWalletModalOpen(false)}>Cancel</Button>
+                            <Button type="submit">Confirm Transaction</Button>
+                        </DialogFooter>
+                    </form>
+                </DialogContent>
+            </Dialog>
 
             <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
                 {/* Profile Details */}
@@ -148,12 +526,6 @@ export default function Show({ client, wallets }) {
                             <div className="flex justify-between items-end mb-4 border-b pb-2">
                                 <div>
                                     <h2 className="text-xl font-bold font-sora">Wallet ({wallet.context})</h2>
-                                    <Link 
-                                        href={`/erp/clients/${client.id}/wallet`}
-                                        className="text-xs font-semibold text-indigo-600 hover:underline mt-1 inline-block"
-                                    >
-                                        Manage Detailed Ledger &rarr;
-                                    </Link>
                                 </div>
                                 <span className="text-3xl font-bold text-green-600 font-jetbrains">
                                     {formatCurrency(wallet.balance, wallet.currency)}
@@ -193,6 +565,10 @@ export default function Show({ client, wallets }) {
                         </div>
                     ))}
                 </div>
+            </div>
+
+            <div className="mt-8">
+                <AdminNotesPanel noteableType="App\Models\User" noteableId={client.id} />
             </div>
         </AdminSidebarLayout>
     );

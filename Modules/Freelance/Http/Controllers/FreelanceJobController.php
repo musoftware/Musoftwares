@@ -4,7 +4,7 @@ namespace Modules\Freelance\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use Modules\Freelance\Models\Job;
-use Modules\Freelance\Models\PointTransaction;
+use Modules\Core\Models\PointTransaction;
 use Modules\Freelance\Jobs\NotifyFreelancersForJob;
 use Illuminate\Http\Request;
 use Inertia\Inertia;

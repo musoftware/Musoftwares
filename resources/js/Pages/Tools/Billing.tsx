@@ -1,11 +1,10 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Head, router } from '@inertiajs/react';
-import WorkspaceLayout from '@/Layouts/WorkspaceLayout';
-import { ModulePageHeader } from '@/Components/ui/ModulePageHeader';
+import ToolsPublicLayout from '@/Layouts/ToolsPublicLayout';
 import { Button } from '@/Components/ui/button';
 import { Badge } from '@/Components/ui/badge';
 import { EmptyState } from '@/Components/ui/EmptyState';
-import { Download, ShoppingBag, Activity, Receipt, XCircle, CheckCircle2 } from 'lucide-react';
+import { Download, ShoppingBag, Receipt, XCircle, Calculator } from 'lucide-react';
 
 interface Subscription {
     id: number; plan_name: string; billing_cycle: string; amount_paid: number;
@@ -28,73 +27,111 @@ export default function Billing({ subscriptions }: Props) {
         suspended: 'bg-amber-100 text-amber-700',
     };
 
+    const totalMonthly = useMemo(() => {
+        return subscriptions
+            .filter(sub => sub.is_active && sub.status === 'active')
+            .reduce((total, sub) => {
+                if (sub.billing_cycle === 'yearly') {
+                    return total + (sub.amount_paid / 12);
+                }
+                return total + sub.amount_paid;
+            }, 0);
+    }, [subscriptions]);
+
     return (
-        <WorkspaceLayout title="Tool Billing" workspaceName="Tools" tenantId="SYS-TOOLS"
-            menuItems={[
-                { id: 'explore',   label: 'Explore',   icon: ShoppingBag, href: route('tools.explore'),   isActive: false },
-                { id: 'downloads', label: 'Downloads', icon: Download,    href: route('tools.downloads'), isActive: false },
-                { id: 'billing',   label: 'Billing',   icon: Activity,    href: route('tools.billing'),   isActive: true  },
-            ]}>
-            <Head title="Tool Billing" />
-            <div className="max-w-4xl mx-auto py-8 px-4 sm:px-6 lg:px-8 space-y-6">
+        <ToolsPublicLayout title="Billing" activeNav="billing">
+            <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-10">
+                {/* Page header */}
                 <div className="flex items-start justify-between">
-                    <ModulePageHeader title="Billing & Subscriptions" description="Manage your tool subscriptions and billing history." />
+                    <div>
+                        <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
+                            Billing & Subscriptions
+                        </h1>
+                        <p className="text-sm text-slate-500 mt-1">
+                            Manage your tool subscriptions and billing history.
+                        </p>
+                    </div>
                     <Button variant="outline" size="sm" className="gap-2" onClick={() => router.visit(route('tools.explore'))}>
                         <ShoppingBag className="h-4 w-4" /> Browse More Tools
                     </Button>
                 </div>
+
+                {subscriptions.length > 0 && (
+                    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-800 flex items-center justify-center">
+                                <Calculator className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
+                            </div>
+                            <div>
+                                <p className="text-sm font-medium text-slate-900 dark:text-white">Monthly Run Rate</p>
+                                <p className="text-xs text-slate-500">Total estimated cost per month for active tools</p>
+                            </div>
+                        </div>
+                        <div className="text-right">
+                            <p className="text-2xl font-bold text-slate-900 dark:text-white">
+                                ${totalMonthly.toFixed(2)}
+                                <span className="text-sm font-normal text-slate-500 ml-1">/mo</span>
+                            </p>
+                        </div>
+                    </div>
+                )}
 
                 {subscriptions.length === 0 ? (
                     <EmptyState icon={Receipt} title="No subscriptions yet"
                         description="Subscribe to a tool to see your billing history here."
                         action={{ label: 'Browse Tools', href: route('tools.explore') }} />
                 ) : (
-                    <div className="space-y-4">
-                        {subscriptions.map(sub => (
-                            <div key={sub.id} className={`bg-white border rounded-2xl p-6 shadow-sm ${sub.is_active ? 'border-slate-200/80' : 'border-slate-100'}`}>
-                                <div className="flex items-start gap-4">
-                                    <div className="w-11 h-11 rounded-xl bg-slate-100 flex items-center justify-center flex-shrink-0">
-                                        {sub.tool.icon_url
-                                            ? <img src={sub.tool.icon_url} alt="" className="w-8 h-8 object-contain" />
-                                            : <Download className="h-5 w-5 text-slate-400" />}
-                                    </div>
-
-                                    <div className="flex-1 min-w-0">
-                                        <div className="flex items-start justify-between gap-4">
-                                            <div>
-                                                <p className="font-semibold text-slate-900">{sub.tool.title}</p>
-                                                <p className="text-sm text-slate-500">{sub.plan_name} · {sub.billing_cycle}</p>
-                                            </div>
-                                            <div className="text-right flex-shrink-0">
-                                                <Badge className={`${statusColors[sub.status] ?? ''} hover:${statusColors[sub.status]}`}>{sub.status}</Badge>
-                                                <p className="text-lg font-bold text-slate-900 mt-1">${sub.amount_paid.toFixed(2)}<span className="text-xs text-slate-400 font-normal ml-1">{sub.currency}</span></p>
-                                            </div>
+                    <section className="space-y-4">
+                        <h2 className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                            Your Subscriptions
+                        </h2>
+                        <div className="space-y-4">
+                            {subscriptions.map(sub => (
+                                <div key={sub.id} className={`bg-white dark:bg-slate-900 border rounded-xl p-5 shadow-sm transition-all hover:border-slate-300 dark:hover:border-slate-700 ${sub.is_active ? 'border-slate-200 dark:border-slate-800' : 'border-slate-100 dark:border-slate-800/50'}`}>
+                                    <div className="flex items-start gap-4">
+                                        <div className="w-11 h-11 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 flex items-center justify-center flex-shrink-0">
+                                            {sub.tool.icon_url
+                                                ? <img src={sub.tool.icon_url} alt="" className="w-7 h-7 object-contain" />
+                                                : <Download className="h-5 w-5 text-slate-400" />}
                                         </div>
 
-                                        <div className="flex flex-wrap gap-x-6 gap-y-1 mt-3 text-xs text-slate-500">
-                                            <span>Started: {sub.starts_at}</span>
-                                            {sub.expires_at && <span>Expires: {sub.expires_at}</span>}
+                                        <div className="flex-1 min-w-0">
+                                            <div className="flex items-start justify-between gap-4">
+                                                <div>
+                                                    <p className="font-semibold text-slate-900 dark:text-white">{sub.tool.title}</p>
+                                                    <p className="text-sm text-slate-500">{sub.plan_name} · {sub.billing_cycle}</p>
+                                                </div>
+                                                <div className="text-right flex-shrink-0">
+                                                    <Badge className={`${statusColors[sub.status] ?? ''} hover:${statusColors[sub.status]}`}>{sub.status}</Badge>
+                                                    <p className="text-lg font-bold text-slate-900 dark:text-white mt-1">${sub.amount_paid.toFixed(2)}<span className="text-xs text-slate-400 font-normal ml-1">{sub.currency}</span></p>
+                                                </div>
+                                            </div>
+
+                                            <div className="flex flex-wrap gap-x-6 gap-y-1 mt-3 text-xs text-slate-500">
+                                                <span>Started: {sub.starts_at}</span>
+                                                {sub.expires_at && <span>Expires: {sub.expires_at}</span>}
+                                            </div>
                                         </div>
                                     </div>
+
+                                    {sub.is_active && (
+                                        <div className="flex gap-3 mt-5 pt-4 border-t border-slate-100 dark:border-slate-800">
+                                            <Button variant="outline" size="sm" className="gap-2 h-8"
+                                                onClick={() => router.visit(route('tools.download.generate', sub.tool.slug))}>
+                                                <Download className="h-3.5 w-3.5" /> Download
+                                            </Button>
+                                            <Button variant="outline" size="sm" className="gap-2 text-red-600 border-red-200 hover:bg-red-50 hover:border-red-300 dark:border-red-900/30 dark:hover:bg-red-900/10 h-8"
+                                                onClick={() => handleCancel(sub.id)}>
+                                                <XCircle className="h-3.5 w-3.5" /> Cancel
+                                            </Button>
+                                        </div>
+                                    )}
                                 </div>
-
-                                {sub.is_active && (
-                                    <div className="flex gap-3 mt-5 pt-4 border-t border-slate-100">
-                                        <Button variant="outline" size="sm" className="gap-2"
-                                            onClick={() => router.visit(route('tools.download.generate', sub.tool.slug))}>
-                                            <Download className="h-3.5 w-3.5" /> Download
-                                        </Button>
-                                        <Button variant="outline" size="sm" className="gap-2 text-red-600 border-red-200 hover:bg-red-50 hover:border-red-300"
-                                            onClick={() => handleCancel(sub.id)}>
-                                            <XCircle className="h-3.5 w-3.5" /> Cancel
-                                        </Button>
-                                    </div>
-                                )}
-                            </div>
-                        ))}
-                    </div>
+                            ))}
+                        </div>
+                    </section>
                 )}
             </div>
-        </WorkspaceLayout>
+        </ToolsPublicLayout>
     );
 }

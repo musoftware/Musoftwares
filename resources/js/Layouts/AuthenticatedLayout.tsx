@@ -20,7 +20,7 @@ import {
     Bell, ChevronDown, Wallet, Menu, Plus, Coins, LogOut, 
     Settings, User, History, Shield, CreditCard, Box, 
     LayoutDashboard, FileText, ArrowRightLeft, ArrowUpRight,
-    MessageSquare, LifeBuoy, Bookmark, Activity, Sparkles, Building2, Briefcase, Megaphone, Play, Lock, Calendar, Radar, Wrench
+    MessageSquare, LifeBuoy, Bookmark, Activity, Sparkles, Building2, Briefcase, Megaphone, Play, Lock, Calendar, Radar, Wrench, Download
 } from 'lucide-react';
 import CommandPalette from '@/Components/CommandPalette';
 import ProductTourModal from '@/Components/ProductTourModal';
@@ -72,12 +72,13 @@ function AuthenticatedContent({
     };
 
     const isErpActive = isRouteActive('erp');
+    const isCrmActive = isRouteActive('crm');
     const isFreelanceActive = isRouteActive('freelance');
     const isMarketplaceActive = isRouteActive('marketplace');
     const isBookingActive = isRouteActive('booking');
     const isIntelligenceActive = isRouteActive('intelligence');
     const isToolsActive = isRouteActive('tools');
-    const activeModules = auth?.active_modules || { erp: true, freelance: true, marketplace: true, booking: true, intelligence: true, tools: true };
+    const activeModules = auth?.active_modules || { erp: true, freelance: true, marketplace: true, booking: true, intelligence: true, tools: true, fbmb: true };
 
     const [isTourOpen, setIsTourOpen] = useState(false);
     const [tourStep, setTourStep] = useState(1);
@@ -370,6 +371,30 @@ function AuthenticatedContent({
                                         <DropdownMenuItem 
                                             className={cn(
                                                 "p-0 mb-1 outline-none border transition-colors duration-150 cursor-pointer",
+                                                isCrmActive ? "bg-indigo-50/80 border-indigo-100" : "hover:bg-slate-50 border-transparent"
+                                            )}
+                                            render={<Link href={safeRoute('crm.dashboard')} className="flex items-start gap-3 p-2.5 rounded-lg w-full" />}
+                                        >
+                                            <div className={cn(
+                                                "w-8 h-8 rounded-md flex items-center justify-center shrink-0 transition-colors",
+                                                isCrmActive ? "bg-indigo-100" : "bg-slate-100 group-hover/dropdown-menu-item:bg-indigo-50"
+                                            )}>
+                                                <Megaphone className={cn("w-4 h-4", isCrmActive ? "text-indigo-700" : "text-slate-500 group-hover/dropdown-menu-item:text-indigo-600")} />
+                                            </div>
+                                            <div className="flex-1 min-w-0">
+                                                <div className="flex items-center justify-between">
+                                                    <p className={cn("text-sm font-medium", isCrmActive ? "text-indigo-900" : "text-slate-900")}>Lead Gen CRM</p>
+                                                    {isCrmActive && <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-indigo-100 text-indigo-700">Active</span>}
+                                                </div>
+                                                <p className={cn("text-xs truncate", isCrmActive ? "text-indigo-700/70" : "text-slate-500")}>
+                                                    Capture leads and manage campaigns
+                                                </p>
+                                            </div>
+                                        </DropdownMenuItem>
+
+                                        <DropdownMenuItem 
+                                            className={cn(
+                                                "p-0 mb-1 outline-none border transition-colors duration-150 cursor-pointer",
                                                 isBookingActive ? "bg-amber-50/80 border-amber-100" : "hover:bg-slate-50 border-transparent"
                                             )}
                                             render={<Link href={activeModules.booking ? safeRoute('booking.index') : safeRoute('subscriptions.plans', { module: 'booking' })} className="flex items-start gap-3 p-2.5 rounded-lg w-full" />}
@@ -420,6 +445,30 @@ function AuthenticatedContent({
 
                                         <DropdownMenuItem 
                                             className={cn(
+                                                "p-0 mb-1 outline-none border transition-colors duration-150 cursor-pointer",
+                                                isRouteActive('fbmb.index') ? "bg-teal-50/80 border-teal-100" : "hover:bg-slate-50 border-transparent"
+                                            )}
+                                            render={<Link href={safeRoute('fbmb.index')} className="flex items-start gap-3 p-2.5 rounded-lg w-full" />}
+                                        >
+                                            <div className={cn(
+                                                "w-8 h-8 rounded-md flex items-center justify-center shrink-0 transition-colors",
+                                                isRouteActive('fbmb.index') ? "bg-teal-100" : "bg-slate-100 group-hover/dropdown-menu-item:bg-teal-50"
+                                            )}>
+                                                <Activity className={cn("w-4 h-4", isRouteActive('fbmb.index') ? "text-teal-700" : "text-slate-500 group-hover/dropdown-menu-item:text-teal-600")} />
+                                            </div>
+                                            <div className="flex-1 min-w-0">
+                                                <div className="flex items-center justify-between">
+                                                    <p className={cn("text-sm font-medium", isRouteActive('fbmb.index') ? "text-teal-900" : "text-slate-900")}>iSAAS FB Lookup</p>
+                                                    {isRouteActive('fbmb.index') && <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-teal-100 text-teal-700">Active</span>}
+                                                </div>
+                                                <p className={cn("text-xs truncate", isRouteActive('fbmb.index') ? "text-teal-700/70" : "text-slate-500")}>
+                                                    Search Mobile by FBID
+                                                </p>
+                                            </div>
+                                        </DropdownMenuItem>
+
+                                        <DropdownMenuItem 
+                                            className={cn(
                                                 "p-0 outline-none border transition-colors duration-150 cursor-pointer",
                                                 isToolsActive ? "bg-fuchsia-50/80 border-fuchsia-100" : "hover:bg-slate-50 border-transparent"
                                             )}
@@ -444,6 +493,10 @@ function AuthenticatedContent({
                                         </DropdownMenuItem>
                                     </DropdownMenuContent>
                                 </DropdownMenu>
+
+                                <NavLink href={safeRoute('subscriptions.plans')} active={isRouteActive('subscriptions')}>
+                                    <CreditCard className="h-3.5 w-3.5 text-amber-500" /> Subscription
+                                </NavLink>
                                     </>
                                 )}
                             </nav>
@@ -492,7 +545,7 @@ function AuthenticatedContent({
 
                                     {/* Points pill — locked geometry */}
                                     <Link
-                                        href={safeRoute('freelance.points.index')}
+                                        href={safeRoute('points.index')}
                                         className="inline-flex items-center gap-1.5 h-8 min-w-[60px] justify-center px-3 bg-amber-50 hover:bg-amber-100 border border-amber-100/80 rounded-full transition-colors duration-150 text-xs font-medium text-amber-700"
                                         title="Points/Connects Balance"
                                     >
@@ -619,7 +672,13 @@ function AuthenticatedContent({
                                                 </DropdownMenuItem>
                                                 <DropdownMenuItem 
                                                     className="cursor-pointer rounded-lg text-sm"
-                                                    render={<Link href={safeRoute('profile.edit')} className="flex items-center w-full" />}
+                                                    render={<Link href={safeRoute('settings.backup.index')} className="flex items-center w-full" />}
+                                                >
+                                                    <Download className="mr-2 h-4 w-4 text-slate-400" /> Backup & Restore
+                                                </DropdownMenuItem>
+                                                <DropdownMenuItem 
+                                                    className="cursor-pointer rounded-lg text-sm"
+                                                    render={<Link href={safeRoute('subscriptions.manage')} className="flex items-center w-full" />}
                                                 >
                                                     <Box className="mr-2 h-4 w-4 text-slate-400" /> Subscriptions
                                                 </DropdownMenuItem>

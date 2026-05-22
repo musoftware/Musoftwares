@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Cache;
 
 /**
  * Financial service providing consistent pricing, formatting, and calculation utilities.
- * Recovered from old project: App\Helper\FinanceHelper
+ * Recovered from old project: App\Helpers\FinanceHelper
  * Modernized: Singleton-less, dependency-injected, service-oriented.
  */
 class FinanceService
