@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import {
     ArrowLeft, CheckCircle2, XCircle, FileText, Download,
-    RefreshCw, Clock, MessageCircle, Eye, Mail, Filter, ChevronDown
+    RefreshCw, Clock, MessageCircle, Eye, Mail, Filter, ChevronDown, RotateCcw
 } from 'lucide-react';
+
 import { Card, CardContent } from '@/Components/ui/card';
 import { Button } from '@/Components/ui/button';
 import { Badge } from '@/Components/ui/badge';
@@ -102,15 +103,39 @@ const STATUS_ICONS: Record<string, any> = {
     pending:   Clock,
 };
 
+function formatDateForCSV(dateStr: string | null | undefined): string {
+    if (!dateStr) return '';
+    try {
+        const isoStr = dateStr.includes('T') ? dateStr : dateStr.replace(' ', 'T') + (dateStr.includes('Z') ? '' : 'Z');
+        const d = new Date(isoStr);
+        if (isNaN(d.getTime())) return dateStr;
+        return d.toLocaleString();
+    } catch { return dateStr || ''; }
+}
+
 function exportCSV(contacts: any[], campaignName: string) {
     const headers = ['Phone', 'Name', 'Company', 'Status', 'Sent At', 'Delivered At', 'Read At', 'Replied At', 'Error'];
     const rows = contacts.map(c => [
-        c.phone, c.name || '', c.company || '', c.status,
-        c.sent_at || '', c.delivered_at || '', c.read_at || '', c.replied_at || '',
+        c.phone || '',
+        c.name || '', c.company || '', c.status,
+        formatDateForCSV(c.sent_at),
+        formatDateForCSV(c.delivered_at),
+        formatDateForCSV(c.read_at),
+        formatDateForCSV(c.replied_at),
         c.error_message || ''
     ]);
-    const csv = [headers, ...rows].map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(',')).join('\n');
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const escapeCell = (val: string, colIdx: number) => {
+        const s = String(val).replace(/"/g, '""');
+        // Phone column: prefix with tab so Excel treats as text (prevents 2.01E+11)
+        if (colIdx === 0) return `"\t${s}"`;
+        return `"${s}"`;
+    };
+    const csvLines = [
+        headers.map(h => `"${h}"`).join(','),
+        ...rows.map(r => r.map((v, i) => escapeCell(v, i)).join(','))
+    ].join('\n');
+    // BOM for UTF-8 in Excel
+    const blob = new Blob(['\uFEFF' + csvLines], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
@@ -118,6 +143,8 @@ function exportCSV(contacts: any[], campaignName: string) {
     a.click();
     URL.revokeObjectURL(url);
 }
+
+
 
 function formatTimeSafe(dateStr: string | null | undefined) {
     if (!dateStr) return '—';
@@ -141,6 +168,9 @@ export default function CampaignReportWorkspace({ t, callRPC, campaignId, campai
     const [loading, setLoading]     = useState(false);
     const [statusFilter, setStatusFilter] = useState<string>('all');
     const [showFilter, setShowFilter]     = useState(false);
+    const [retryingContact, setRetryingContact] = useState<string | null>(null);
+    const [retryingAll, setRetryingAll] = useState(false);
+
 
     const fetchData = async () => {
         if (!daemonConnected || !campaignId) return;
@@ -188,25 +218,14 @@ export default function CampaignReportWorkspace({ t, callRPC, campaignId, campai
     const failed       = stats.failed    || 0;
     const pending      = stats.pending   || 0;
 
-    // Exclusive counts for current state breakdown (Donut and KPI Cards)
-    const exclSent      = rawSent;
-    const exclDelivered = rawDelivered;
-    const exclRead      = rawRead;
-    const exclReplied   = rawReplied;
-
-    // Cumulative conversions across the funnel (reconstructed from exclusive counts)
-    const cumReplied   = exclReplied;
-    const cumRead      = exclRead + cumReplied;
-    const cumDelivered = exclDelivered + cumRead;
-    const cumSent      = exclSent + cumDelivered;
-
+    // ── Donut: shows current exclusive status per contact ──
     const donutSegments = [
-        { value: exclSent,      color: STATUS_COLORS.sent,      label: 'Sent' },
-        { value: exclDelivered, color: STATUS_COLORS.delivered,  label: 'Delivered' },
-        { value: exclRead,       color: STATUS_COLORS.read,       label: 'Read' },
-        { value: exclReplied,   color: STATUS_COLORS.replied,    label: 'Replied' },
-        { value: failed,        color: STATUS_COLORS.failed,     label: 'Failed' },
-        { value: pending,       color: STATUS_COLORS.pending,    label: 'Pending' },
+        { value: rawSent,      color: STATUS_COLORS.sent,      label: 'Sent' },
+        { value: rawDelivered, color: STATUS_COLORS.delivered,  label: 'Delivered' },
+        { value: rawRead,      color: STATUS_COLORS.read,       label: 'Read' },
+        { value: rawReplied,   color: STATUS_COLORS.replied,    label: 'Replied' },
+        { value: failed,       color: STATUS_COLORS.failed,     label: 'Failed' },
+        { value: pending,      color: STATUS_COLORS.pending,    label: 'Pending' },
     ].filter(s => s.value > 0);
 
     const filteredContacts = statusFilter === 'all' ? contacts : contacts.filter(c => c.status === statusFilter);
@@ -223,6 +242,23 @@ export default function CampaignReportWorkspace({ t, callRPC, campaignId, campai
                     <p className="text-xs text-muted-foreground mt-0.5">{campaignName} &mdash; <span className="font-mono">{campaignId}</span></p>
                 </div>
                 <div className="flex items-center gap-2">
+                    {failed > 0 && (
+                        <Button
+                            onClick={async () => {
+                                setRetryingAll(true);
+                                try {
+                                    await callRPC('retryFailedMessages', { campaignId });
+                                    await fetchData();
+                                } catch (e: any) { alert(`Retry failed: ${e.message}`); }
+                                setRetryingAll(false);
+                            }}
+                            disabled={retryingAll}
+                            className="bg-orange-500 hover:bg-orange-600 text-white gap-2 text-xs h-8"
+                        >
+                            {retryingAll ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <RotateCcw className="w-3.5 h-3.5" />}
+                            Retry All Failed ({failed})
+                        </Button>
+                    )}
                     <Button variant="outline" size="icon" onClick={fetchData} disabled={loading}>
                         <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
                     </Button>
@@ -230,6 +266,7 @@ export default function CampaignReportWorkspace({ t, callRPC, campaignId, campai
                         <Download className="w-4 h-4" /> Export CSV
                     </Button>
                 </div>
+
             </div>
 
             {/* Analytics Row */}
@@ -239,7 +276,7 @@ export default function CampaignReportWorkspace({ t, callRPC, campaignId, campai
                     <CardContent className="p-7 flex flex-col items-center justify-center">
                         <div className="text-center mb-6">
                             <h3 className="text-sm font-bold uppercase tracking-wider">Delivery Breakdown</h3>
-                            <p className="text-[10px] text-muted-foreground mt-0.5">Current status per contact (Non-cumulative)</p>
+                            <p className="text-[10px] text-muted-foreground mt-0.5">Current status per contact</p>
                         </div>
                         <DonutChart segments={donutSegments} />
                     </CardContent>
@@ -249,14 +286,14 @@ export default function CampaignReportWorkspace({ t, callRPC, campaignId, campai
                 <Card>
                     <CardContent className="p-7">
                         <div className="mb-6">
-                            <h3 className="text-sm font-bold uppercase tracking-wider">Engagement Funnel</h3>
-                            <p className="text-[10px] text-muted-foreground mt-0.5">Cumulative conversions across the funnel</p>
+                            <h3 className="text-sm font-bold uppercase tracking-wider">Status Overview</h3>
+                            <p className="text-[10px] text-muted-foreground mt-0.5">Current status count per contact</p>
                         </div>
                         <div className="space-y-4">
-                            <StatBar label="Sent"      value={cumSent}      total={totalContacts} color={STATUS_COLORS.sent}      icon={Mail} />
-                            <StatBar label="Delivered" value={cumDelivered} total={totalContacts} color={STATUS_COLORS.delivered}  icon={CheckCircle2} />
-                            <StatBar label="Read"      value={cumRead}      total={totalContacts} color={STATUS_COLORS.read}       icon={Eye} />
-                            <StatBar label="Replied"   value={cumReplied}   total={totalContacts} color={STATUS_COLORS.replied}    icon={MessageCircle} />
+                            <StatBar label="Sent"      value={rawSent}      total={totalContacts} color={STATUS_COLORS.sent}      icon={Mail} />
+                            <StatBar label="Delivered" value={rawDelivered} total={totalContacts} color={STATUS_COLORS.delivered}  icon={CheckCircle2} />
+                            <StatBar label="Read"      value={rawRead}      total={totalContacts} color={STATUS_COLORS.read}       icon={Eye} />
+                            <StatBar label="Replied"   value={rawReplied}   total={totalContacts} color={STATUS_COLORS.replied}    icon={MessageCircle} />
                             <StatBar label="Failed"    value={failed}       total={totalContacts} color={STATUS_COLORS.failed}     icon={XCircle} />
                             {pending > 0 && <StatBar label="Pending" value={pending} total={totalContacts} color={STATUS_COLORS.pending} icon={Clock} />}
                         </div>
@@ -264,15 +301,17 @@ export default function CampaignReportWorkspace({ t, callRPC, campaignId, campai
                 </Card>
             </div>
 
+
             {/* Summary KPI Cards */}
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
                 {[
                     { label: 'Total',     value: totalContacts, color: '#64748b', bg: 'bg-muted' },
-                    { label: 'Sent',      value: exclSent,      color: STATUS_COLORS.sent,      bg: 'bg-emerald-500/10' },
-                    { label: 'Delivered', value: exclDelivered, color: STATUS_COLORS.delivered,  bg: 'bg-blue-500/10' },
-                    { label: 'Read',      value: exclRead,      color: STATUS_COLORS.read,       bg: 'bg-violet-500/10' },
-                    { label: 'Replied',   value: exclReplied,   color: STATUS_COLORS.replied,    bg: 'bg-amber-500/10' },
+                    { label: 'Sent',      value: rawSent,       color: STATUS_COLORS.sent,      bg: 'bg-emerald-500/10' },
+                    { label: 'Delivered', value: rawDelivered,  color: STATUS_COLORS.delivered,  bg: 'bg-blue-500/10' },
+                    { label: 'Read',      value: rawRead,       color: STATUS_COLORS.read,       bg: 'bg-violet-500/10' },
+                    { label: 'Replied',   value: rawReplied,    color: STATUS_COLORS.replied,    bg: 'bg-amber-500/10' },
                     { label: 'Failed',    value: failed,        color: STATUS_COLORS.failed,     bg: 'bg-red-500/10' },
+
                 ].map(({ label, value, color, bg }) => (
                     <div key={label} className={`${bg} border rounded-2xl p-4 text-center`}>
                         <p className="text-2xl font-black" style={{ color }}>{value}</p>
@@ -314,7 +353,9 @@ export default function CampaignReportWorkspace({ t, callRPC, campaignId, campai
                                 <th className="px-6 py-4">Read</th>
                                 <th className="px-6 py-4">Replied</th>
                                 <th className="px-6 py-4">Error</th>
+                                <th className="px-6 py-4 text-right">Action</th>
                             </tr>
+
                         </thead>
                         <tbody className="divide-y">
                             {filteredContacts.map((c: any, index: number) => {
@@ -335,12 +376,55 @@ export default function CampaignReportWorkspace({ t, callRPC, campaignId, campai
                                         <td className="px-6 py-3 text-muted-foreground text-xs">{formatTimeSafe(c.read_at)}</td>
                                         <td className="px-6 py-3 text-muted-foreground text-xs">{formatTimeSafe(c.replied_at)}</td>
                                         <td className="px-6 py-3 text-destructive text-xs max-w-[200px] truncate" title={c.error_message}>{c.error_message || '—'}</td>
+                                        <td className="px-6 py-3 text-right">
+                                            <div className="flex items-center justify-end gap-1">
+                                                {c.status === 'failed' && (
+                                                    <Button
+                                                        size="sm"
+                                                        disabled={retryingContact === c.phone}
+                                                        onClick={async () => {
+                                                            setRetryingContact(c.phone);
+                                                            try {
+                                                                await callRPC('retrySingleContact', { campaignId, phone: c.phone });
+                                                                await fetchData();
+                                                            } catch (e: any) { alert(`Retry failed: ${e.message}`); }
+                                                            setRetryingContact(null);
+                                                        }}
+                                                        className="h-7 px-2.5 gap-1 bg-orange-500 hover:bg-orange-600 text-white text-[10px] font-bold"
+                                                    >
+                                                        {retryingContact === c.phone ? <RefreshCw className="w-3 h-3 animate-spin" /> : <RotateCcw className="w-3 h-3" />}
+                                                        Retry
+                                                    </Button>
+                                                )}
+                                                {(c.status === 'sent' || c.status === 'delivered' || c.status === 'read' || c.status === 'replied') && (
+                                                    <Button
+                                                        size="sm"
+                                                        variant="outline"
+                                                        disabled={retryingContact === c.phone}
+                                                        onClick={async () => {
+                                                            setRetryingContact(c.phone);
+                                                            try {
+                                                                await callRPC('retrySingleContact', { campaignId, phone: c.phone });
+                                                                await fetchData();
+                                                            } catch (e: any) { alert(`Resend failed: ${e.message}`); }
+                                                            setRetryingContact(null);
+                                                        }}
+                                                        className="h-7 px-2.5 gap-1 text-[10px] font-bold"
+                                                    >
+                                                        {retryingContact === c.phone ? <RefreshCw className="w-3 h-3 animate-spin" /> : <RotateCcw className="w-3 h-3" />}
+                                                        Resend
+                                                    </Button>
+                                                )}
+                                            </div>
+                                        </td>
                                     </tr>
+
                                 );
                             })}
                             {filteredContacts.length === 0 && !loading && (
                                 <tr>
-                                    <td colSpan={8} className="px-6 py-12 text-center text-muted-foreground text-sm">
+                                    <td colSpan={9} className="px-6 py-12 text-center text-muted-foreground text-sm">
+
                                         {statusFilter !== 'all' ? `No contacts with status "${statusFilter}"` : 'No contacts recorded for this campaign yet.'}
                                     </td>
                                 </tr>

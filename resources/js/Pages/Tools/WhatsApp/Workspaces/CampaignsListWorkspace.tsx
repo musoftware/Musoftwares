@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import {
     LayoutDashboard, Play, CheckCircle2, XCircle, RefreshCw, Eye,
-    Pause, Square, Trash2, MoreVertical, X, Users, Layers, Clock
+    Pause, Square, Trash2, MoreVertical, X, Users, Layers, Clock, Timer, RotateCcw
 } from 'lucide-react';
+
 import { Card, CardContent } from '@/Components/ui/card';
 import { Button } from '@/Components/ui/button';
 import { Badge } from '@/Components/ui/badge';
@@ -23,15 +24,27 @@ const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string; 
     failed:    { label: 'Failed',    color: 'text-destructive',   bg: 'bg-destructive/10'   },
 };
 
-function CampaignActions({ campaign, onStart, onPause, onResume, onStop, onDelete, onViewReport }: any) {
+function CampaignActions({ campaign, onStart, onRetry, onPause, onResume, onStop, onDelete, onViewReport }: any) {
     const { status } = campaign;
 
     return (
         <div className="flex items-center gap-1.5 justify-end">
-            {/* Primary action */}
-            {(status === 'created' || status === 'stopped' || status === 'failed') && (
+            {/* Start — for fresh / stopped campaigns */}
+            {(status === 'created' || status === 'stopped') && (
                 <Button size="icon" onClick={() => onStart(campaign.id)} title="Start" className="h-8 w-8 bg-teal-600 hover:bg-teal-700 text-white">
                     <Play className="w-3.5 h-3.5 fill-white" />
+                </Button>
+            )}
+
+            {/* Retry — for stuck / failed / stopped campaigns */}
+            {(status === 'failed' || status === 'stopped' || status === 'paused') && (
+                <Button
+                    onClick={() => onRetry(campaign.id)}
+                    title="Retry Campaign"
+                    className="h-8 px-3 gap-1.5 bg-orange-500 hover:bg-orange-600 text-white text-[11px] font-bold"
+                >
+                    <RotateCcw className="w-3 h-3" />
+                    Retry
                 </Button>
             )}
             {(status === 'running' || status === 'processing') && (
@@ -62,6 +75,12 @@ function CampaignActions({ campaign, onStart, onPause, onResume, onStop, onDelet
                             <span>Stop Campaign</span>
                         </DropdownMenuItem>
                     )}
+                    {(status === 'stopped' || status === 'failed') && (
+                        <DropdownMenuItem onClick={() => onRetry(campaign.id)} className="font-bold flex items-center gap-2 cursor-pointer text-orange-600">
+                            <RotateCcw className="w-3.5 h-3.5" />
+                            <span>Retry</span>
+                        </DropdownMenuItem>
+                    )}
                     <DropdownMenuItem onClick={() => onDelete(campaign.id)} variant="destructive" className="font-bold flex items-center gap-2 cursor-pointer">
                         <Trash2 className="w-3.5 h-3.5" />
                         <span>Delete</span>
@@ -72,7 +91,8 @@ function CampaignActions({ campaign, onStart, onPause, onResume, onStop, onDelet
     );
 }
 
-export default function CampaignsListWorkspace({ t, callRPC, onViewReport, onCreateCampaign, activeCampaigns, daemonConnected }: any) {
+export default function CampaignsListWorkspace({ t, callRPC, onViewReport, onCreateCampaign, activeCampaigns, campaignDelays, daemonConnected }: any) {
+
     const [campaigns, setCampaigns]   = useState<any[]>([]);
     const [loading, setLoading]       = useState(false);
     const [actionLoading, setActionLoading] = useState<string | null>(null);
@@ -119,6 +139,31 @@ export default function CampaignsListWorkspace({ t, callRPC, onViewReport, onCre
         }
         setActionLoading(null);
     };
+
+    const handleRetry = async (campaignId: string) => {
+        setActionLoading(campaignId);
+        try {
+            // Try retrying failed messages first
+            const res: any = await callRPC('retryFailedMessages', { campaignId });
+            console.log(`Retrying ${res?.retriedCount || 0} failed messages`);
+            await fetchCampaigns();
+        } catch (e: any) {
+            // If no failed messages, just resume the campaign
+            if (e.message?.includes('No failed messages')) {
+                try {
+                    await callRPC('resumeCampaign', { campaignId });
+                    await fetchCampaigns();
+                } catch (e2: any) {
+                    alert(`Resume failed: ${e2.message}`);
+                }
+            } else {
+                alert(`Retry failed: ${e.message}`);
+            }
+        }
+        setActionLoading(null);
+    };
+
+
 
     return (
         <div className="space-y-6 animate-in fade-in duration-300" onClick={() => {}}>
@@ -174,9 +219,18 @@ export default function CampaignsListWorkspace({ t, callRPC, onViewReport, onCre
                                             </Badge>
                                         </td>
                                         <td className="px-6 py-4">
-                                            <Badge variant="secondary" className={`text-[10px] ${statusCfg.color} ${statusCfg.bg} ${statusCfg.pulse ? 'animate-pulse' : ''}`}>
-                                                {statusCfg.label}
-                                            </Badge>
+                                            <div className="flex flex-col items-start gap-1.5">
+                                                <Badge variant="secondary" className={`text-[10px] ${statusCfg.color} ${statusCfg.bg} ${statusCfg.pulse ? 'animate-pulse' : ''}`}>
+                                                    {statusCfg.label}
+                                                </Badge>
+                                                {/* Live delay countdown */}
+                                                {campaignDelays?.[c.id] && (c.status === 'running' || c.status === 'processing') && (
+                                                    <div className="flex items-center gap-1 text-[10px] font-mono text-amber-600 dark:text-amber-400 animate-pulse">
+                                                        <Timer className="w-3 h-3" />
+                                                        <span>next in {campaignDelays[c.id]}s</span>
+                                                    </div>
+                                                )}
+                                            </div>
                                         </td>
                                         <td className="px-6 py-4">
                                             <div className="flex items-center justify-center gap-2">
@@ -212,6 +266,7 @@ export default function CampaignsListWorkspace({ t, callRPC, onViewReport, onCre
                                             <CampaignActions
                                                 campaign={c}
                                                 onStart={(id: string)   => rpc('startCampaign', id)}
+                                                onRetry={(id: string)   => handleRetry(id)}
                                                 onPause={(id: string)   => rpc('pauseCampaign', id)}
                                                 onResume={(id: string)  => rpc('resumeCampaign', id)}
                                                 onStop={(id: string)    => rpc('stopCampaign', id)}
