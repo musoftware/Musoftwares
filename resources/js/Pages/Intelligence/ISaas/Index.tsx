@@ -143,8 +143,8 @@ export default function ISaasIndex() {
 
         if (!hasBalance) {
             toast({
-                title: "Insufficient credits",
-                description: "Your wallet balance is 0. Please add credits first.",
+                title: "Insufficient points",
+                description: "You have 0 points. Please get points first.",
                 variant: "destructive"
             });
             return;
@@ -245,17 +245,17 @@ export default function ISaasIndex() {
                         )}>
                             <div className="flex items-center gap-2 mb-1">
                                 <Wallet className={cn("w-4 h-4", hasBalance ? "text-emerald-500" : "text-amber-500")} />
-                                <span className="text-xs font-medium text-slate-500 uppercase tracking-wider">Credit Balance</span>
+                                <span className="text-xs font-medium text-slate-500 uppercase tracking-wider">Points</span>
                             </div>
                             <p className={cn(
                                 "text-2xl font-bold font-mono tracking-tight",
                                 hasBalance ? "text-emerald-700" : "text-amber-700"
                             )}>
-                                {walletBalance.toLocaleString()} <span className="text-sm font-normal text-slate-400">{currency}</span>
+                                {walletBalance.toLocaleString()} <span className="text-sm font-normal text-slate-400">Pts</span>
                             </p>
                             {!hasBalance && (
                                 <p className="text-xs text-amber-600 mt-1 flex items-center gap-1">
-                                    <AlertCircle className="w-3 h-3" /> Top up to start lookups
+                                    <AlertCircle className="w-3 h-3" /> Get points to start lookups
                                 </p>
                             )}
                             <div className={cn(
@@ -271,7 +271,7 @@ export default function ISaasIndex() {
                                 <span className="text-xs font-medium text-slate-500 uppercase tracking-wider">Cost Per Match</span>
                             </div>
                             <p className="text-2xl font-bold font-mono tracking-tight text-indigo-700">
-                                1 <span className="text-sm font-normal text-slate-400">Credit</span>
+                                1 <span className="text-sm font-normal text-slate-400">Point</span>
                             </p>
                             <p className="text-xs text-slate-500 mt-1">Only charged for successful matches</p>
                             <div className="absolute -right-2 -bottom-2 w-16 h-16 rounded-full bg-indigo-500 opacity-10" />
@@ -435,13 +435,13 @@ export default function ISaasIndex() {
                                                         </p>
                                                         <p>
                                                             <span className="font-medium text-slate-700">Max cost:</span>{' '}
-                                                            <span className="font-mono">{estimatedIds.toLocaleString()}</span> credits
+                                                            <span className="font-mono">{estimatedIds.toLocaleString()}</span> points
                                                             <span className="text-slate-400 ml-1">(only matched IDs are charged)</span>
                                                         </p>
                                                         {estimatedIds > walletBalance && (
                                                             <p className="text-amber-600 flex items-center gap-1 font-medium">
                                                                 <AlertCircle className="w-3 h-3" />
-                                                                Your balance may not cover all matches. Partial results may be available.
+                                                                Your points may not cover all matches. Partial results may be available.
                                                             </p>
                                                         )}
                                                     </div>
@@ -468,7 +468,7 @@ export default function ISaasIndex() {
                                             {!hasBalance && (
                                                 <p className="text-xs text-amber-600 flex items-center gap-1">
                                                     <AlertCircle className="w-3 h-3 shrink-0" />
-                                                    Add credits to your wallet to use this feature
+                                                    Get points to use this feature
                                                 </p>
                                             )}
                                         </div>
@@ -525,7 +525,7 @@ export default function ISaasIndex() {
                                                 </p>
                                             </div>
                                             <div className="rounded-xl border border-indigo-200 bg-indigo-50 p-4 text-center">
-                                                <p className="text-xs text-indigo-600 font-medium uppercase tracking-wider mb-1">Credits Used</p>
+                                                <p className="text-xs text-indigo-600 font-medium uppercase tracking-wider mb-1">Points Used</p>
                                                 <p className="text-2xl font-bold font-mono text-indigo-700">
                                                     {result.credits_used.toLocaleString()}
                                                 </p>
@@ -554,10 +554,10 @@ export default function ISaasIndex() {
                                         <div className="rounded-lg border border-slate-200 bg-slate-50 p-3 mb-6">
                                             <div className="flex items-center justify-between text-sm">
                                                 <span className="text-slate-500 flex items-center gap-1.5">
-                                                    <Wallet className="w-3.5 h-3.5" /> Remaining Balance
+                                                    <Wallet className="w-3.5 h-3.5" /> Remaining Points
                                                 </span>
                                                 <span className="font-mono font-semibold text-slate-800">
-                                                    {result.remaining_balance.toLocaleString()} {currency}
+                                                    {result.remaining_balance.toLocaleString()} Pts
                                                 </span>
                                             </div>
                                         </div>
@@ -587,7 +587,7 @@ export default function ISaasIndex() {
                                             <div className="mt-4 p-4 rounded-xl border border-amber-200 bg-amber-50">
                                                 <p className="text-sm text-amber-700 flex items-center gap-2">
                                                     <AlertCircle className="w-4 h-4 shrink-0" />
-                                                    No matches were found. No credits were deducted.
+                                                    No matches were found. No points were deducted.
                                                 </p>
                                             </div>
                                         )}
