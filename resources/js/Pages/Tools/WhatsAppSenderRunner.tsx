@@ -8,8 +8,9 @@ import GroupCampaignWorkspace from './WhatsApp/Workspaces/GroupCampaignWorkspace
 import TemplatesWorkspace from './WhatsApp/Workspaces/TemplatesWorkspace';
 import CampaignsListWorkspace from './WhatsApp/Workspaces/CampaignsListWorkspace';
 import CampaignReportWorkspace from './WhatsApp/Workspaces/CampaignReportWorkspace';
+import InboxWorkspace from './WhatsApp/Workspaces/InboxWorkspace';
 
-type TabId = 'accounts' | 'campaign' | 'groups' | 'group-campaign' | 'history' | 'report' | 'templates';
+type TabId = 'accounts' | 'campaign' | 'groups' | 'group-campaign' | 'history' | 'report' | 'templates' | 'inbox';
 
 const translations = {
     en: {
@@ -269,7 +270,7 @@ export default function WhatsAppSenderRunner({ tool, subscription, runtimePort, 
         if (typeof window !== 'undefined') {
             const params = new URLSearchParams(window.location.search);
             const path = params.get('path') as TabId;
-            if (path && ['accounts', 'campaign', 'groups', 'group-campaign', 'history', 'report', 'templates'].includes(path)) {
+            if (path && ['accounts', 'campaign', 'groups', 'group-campaign', 'history', 'report', 'templates', 'inbox'].includes(path)) {
                 return path;
             }
         }
@@ -342,13 +343,17 @@ export default function WhatsAppSenderRunner({ tool, subscription, runtimePort, 
     // Campaign state
     const [isCampaignRunning, setIsCampaignRunning] = useState(false);
     const [activeCampaigns, setActiveCampaigns]     = useState<Record<string, any>>({});
+    const [campaignDelays, setCampaignDelays]        = useState<Record<string, number>>({});  // campaignId → delaySec
     const runningCampaignsCount = Object.keys(activeCampaigns).length;
+    const [unreadInboxCount, setUnreadInboxCount] = useState(0);
+    const inboxNewMessageCallbackRef = useRef<((data: any) => void) | null>(null);
 
     const t = translations[locale];
 
     // ── Broadcast event handler ───────────────────────────────────────────────
 
     const onBroadcast = (event: string, data: any) => {
+        console.log('[Broadcast]', event, data);
         if (event.startsWith('whatsapp.session.')) {
             const { accountId } = data;
             if (!accountId) return;
@@ -387,13 +392,31 @@ export default function WhatsAppSenderRunner({ tool, subscription, runtimePort, 
             }));
         }
 
+        if (event === 'whatsapp.campaign.delay') {
+            // Show actual inter-message delay in the campaign list
+            setCampaignDelays(prev => ({ ...prev, [data.campaignId]: data.delaySec }));
+            // Clear after the delay has elapsed so it doesn't linger
+            setTimeout(() => {
+                setCampaignDelays(prev => { const n = { ...prev }; delete n[data.campaignId]; return n; });
+            }, (data.delayMs || 5000) + 500);
+        }
+
         if (event === 'whatsapp.campaign.completed' || event === 'whatsapp.campaign.stopped' || event === 'whatsapp.campaign.failed') {
             setActiveCampaigns(prev => {
                 const next = { ...prev };
                 delete next[data.campaignId];
                 return next;
             });
+            setCampaignDelays(prev => { const n = { ...prev }; delete n[data.campaignId]; return n; });
             setIsCampaignRunning(false);
+        }
+
+        // Real-time inbox
+        if (event === 'whatsapp.inbox.new_message') {
+            setUnreadInboxCount(prev => prev + 1);
+            if (inboxNewMessageCallbackRef.current) {
+                inboxNewMessageCallbackRef.current(data);
+            }
         }
     };
 
@@ -405,7 +428,18 @@ export default function WhatsAppSenderRunner({ tool, subscription, runtimePort, 
         if (daemonConnected) {
             fetchSessions();
             fetchTemplates();
+            // Fetch initial unread count
+            callRPC('getUnreadCount', {}).then((res: any) => setUnreadInboxCount(res?.count || 0)).catch(() => {});
         }
+    }, [daemonConnected]);
+
+    // Poll unread inbox count
+    useEffect(() => {
+        if (!daemonConnected) return;
+        const interval = setInterval(() => {
+            callRPC('getUnreadCount', {}).then((res: any) => setUnreadInboxCount(res?.count || 0)).catch(() => {});
+        }, 5000);
+        return () => clearInterval(interval);
     }, [daemonConnected]);
 
     useEffect(() => {
@@ -542,6 +576,8 @@ export default function WhatsAppSenderRunner({ tool, subscription, runtimePort, 
                 name:         campaignName.trim() || `Campaign ${new Date().toLocaleDateString()}`,
                 accountId:    selectedAccount,
                 contactsJson: parsed,
+                parts:        tpl.parts || [],
+                // Legacy fallback
                 message:      tpl.message,
                 mediaUrl:     tpl.media_url,
                 mediaType:    tpl.media_type,
@@ -582,6 +618,7 @@ export default function WhatsAppSenderRunner({ tool, subscription, runtimePort, 
             name: `Test Send - ${testNumber}`,
             accountId:    selectedAccount,
             contactsJson: [{ phone: testNumber.trim(), name: 'Test Recipient', company: 'Musoftware Co.' }],
+            parts:        tpl.parts || [],
             message:      tpl.message,
             mediaUrl:     tpl.media_url,
             mediaType:    tpl.media_type,
@@ -591,6 +628,7 @@ export default function WhatsAppSenderRunner({ tool, subscription, runtimePort, 
         // Step 2: Start it
         await callRPC('startCampaign', { campaignId: testCampaignId, accountId: selectedAccount });
     };
+
 
     // ── Template → Campaign autofill ──────────────────────────────────────────
 
@@ -615,6 +653,7 @@ export default function WhatsAppSenderRunner({ tool, subscription, runtimePort, 
                     hasResult={false}
                     t={t}
                     runningCampaignsCount={runningCampaignsCount}
+                    unreadInboxCount={unreadInboxCount}
                 />
             }
         >
@@ -716,6 +755,7 @@ export default function WhatsAppSenderRunner({ tool, subscription, runtimePort, 
                     t={t}
                     callRPC={callRPC}
                     activeCampaigns={activeCampaigns}
+                    campaignDelays={campaignDelays}
                     daemonConnected={daemonConnected}
                     onViewReport={(id: string, name: string) => {
                         setReportCampaignId(id);
@@ -725,6 +765,7 @@ export default function WhatsAppSenderRunner({ tool, subscription, runtimePort, 
                 />
             )}
 
+
             {activeTab === 'report' && reportCampaignId && (
                 <CampaignReportWorkspace
                     t={t}
@@ -733,6 +774,18 @@ export default function WhatsAppSenderRunner({ tool, subscription, runtimePort, 
                     campaignName={reportCampaignName}
                     daemonConnected={daemonConnected}
                     onBack={() => setActiveTab('history')}
+                />
+            )}
+
+            {activeTab === 'inbox' && (
+                <InboxWorkspace
+                    callRPC={callRPC}
+                    daemonConnected={daemonConnected}
+                    sessions={sessions}
+                    onNewMessageRef={inboxNewMessageCallbackRef}
+                    onUnreadReset={() => {
+                        callRPC('getUnreadCount', {}).then((res: any) => setUnreadInboxCount(res?.count || 0)).catch(() => {});
+                    }}
                 />
             )}
         </ToolShellLayout>
