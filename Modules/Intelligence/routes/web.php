@@ -6,6 +6,7 @@ use Modules\Intelligence\Http\Controllers\CompetitorController;
 use Modules\Intelligence\Http\Controllers\AdFeedController;
 use Modules\Intelligence\Http\Controllers\UgcController;
 use Modules\Intelligence\Http\Controllers\SwipeVaultController;
+use Modules\Intelligence\Http\Controllers\ISaasController;
 
 Route::middleware(['web', 'auth', 'verified', 'onboarding', 'subscription:intelligence'])->prefix('intelligence')->name('intelligence.')->group(function () {
 
@@ -36,5 +37,9 @@ Route::middleware(['web', 'auth', 'verified', 'onboarding', 'subscription:intell
     Route::delete('/swipe-vault/collections/{collection}', [SwipeVaultController::class, 'destroyCollection'])->name('swipe.collections.destroy');
     Route::post('/swipe-vault/collections/{collection}/items', [SwipeVaultController::class, 'storeItem'])->name('swipe.items.store');
     Route::delete('/swipe-vault/collections/{collection}/items/{item}', [SwipeVaultController::class, 'destroyItem'])->name('swipe.items.destroy');
+
+    // ── iSAAS Lookup ───────────────────────────────────────────────────────
+    Route::get('/isaas', [ISaasController::class, 'index'])->name('isaas.index');
+    Route::post('/isaas/process', [ISaasController::class, 'process'])->name('isaas.process');
 });
 

@@ -313,6 +313,7 @@ class ERPDashboardController extends Controller
         }
 
         return Inertia::render('ERP/Dashboard', [
+            'tenant' => $tenant,
             'stats' => $stats,
             'clients' => $clients,
             'invoices' => $invoices,
@@ -532,5 +533,25 @@ class ERPDashboardController extends Controller
             \Illuminate\Support\Facades\Log::error('ERP Onboarding wizard failed: ' . $e->getMessage());
             return back()->withErrors(['error' => 'Onboarding setup failed: ' . $e->getMessage()]);
         }
+    }
+
+    public function updateSettings(\Illuminate\Http\Request $request)
+    {
+        $validated = $request->validate([
+            'workspaceName' => 'required|string|max:255',
+            'taxRate' => 'nullable|numeric|min:0|max:100',
+            'defaultCurrency' => 'nullable|string|size:3',
+        ]);
+
+        $user = Auth::user();
+        $tenant = Tenant::where('user_id', $user->id)->firstOrFail();
+
+        $tenant->name = $validated['workspaceName'];
+        $tenant->save();
+
+        // Optionally save taxRate and defaultCurrency to user profile or meta if required
+        // For now, we update the primary workspace brand name
+
+        return redirect()->back()->with('success', 'Workspace settings updated successfully.');
     }
 }

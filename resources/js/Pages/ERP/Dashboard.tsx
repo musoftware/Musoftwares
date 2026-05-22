@@ -84,6 +84,11 @@ export function FinancialAmount({ amount, currency = 'USD', colorize = false }: 
 }
 
 interface ERPDashboardProps {
+    tenant?: {
+        id: number;
+        name: string;
+        user_id: number;
+    };
     stats?: {
         totalRevenue: number;
         outstandingRevenue: number;
@@ -136,7 +141,7 @@ interface ERPDashboardProps {
     }>;
 }
 
-export default function ERPDashboard({ stats: serverStats, clients: serverClients, invoices: serverInvoices, chartData: serverChartData, projects: serverProjects, supportTickets: serverTickets, activityLogs: serverActivityLogs, upcomingBookings: serverBookings, storageProviders: serverStorageProviders, documents: serverDocuments, tasks: serverTasks, notes: serverNotes }: ERPDashboardProps) {
+export default function ERPDashboard({ tenant: serverTenant, stats: serverStats, clients: serverClients, invoices: serverInvoices, chartData: serverChartData, projects: serverProjects, supportTickets: serverTickets, activityLogs: serverActivityLogs, upcomingBookings: serverBookings, storageProviders: serverStorageProviders, documents: serverDocuments, tasks: serverTasks, notes: serverNotes }: ERPDashboardProps) {
     const { toast } = useToast();
     const { auth } = usePage().props as any;
     const isTeamMember = !!auth?.team_member;
