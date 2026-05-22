@@ -3,7 +3,7 @@
 namespace App\Services;
 
 use App\Models\User;
-use App\Models\WalletTransfer;
+use App\Models\Finance\WalletTransfer;
 use Modules\Core\Services\WalletService;
 use Modules\Core\Services\ExchangeRateService;
 use Illuminate\Support\Facades\DB;

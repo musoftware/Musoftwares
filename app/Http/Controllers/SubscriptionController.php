@@ -6,8 +6,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Modules\ERP\Models\ModulePlan;
-use Modules\ERP\Models\UserSubscription;
+use App\Models\PlatformPlan;
+use App\Models\PlatformSubscription;
+use App\Models\PlatformServiceItem;
 use Modules\ERP\Models\SubscriptionInvoice;
 use Modules\ERP\Models\Tenant;
 use Modules\Core\Models\Wallet;
@@ -27,131 +28,274 @@ class SubscriptionController extends Controller
     }
 
     /**
-     * Show SaaS pricing and subscription plans.
+     * Show the unified pricing page with all platform plans.
      */
     public function plans(Request $request)
     {
-        $module = $request->query('module', 'erp');
         $user = Auth::user();
-        
-        // Fetch active plans for this module
-        $plans = ModulePlan::where('module', $module)
-            ->where('is_active', true)
-            ->orderBy('price', 'asc')
+
+        // Fetch all active platform plans
+        $plans = PlatformPlan::active()
+            ->orderBy('sort_order')
             ->get();
 
-        // Get current active subscription for this module if any
-        $activeSub = $this->subscriptionService->getActiveSubscription($user, $module);
-        
-        // Get wallet details
+        // Fetch service items for the custom plan builder
+        $serviceItems = PlatformServiceItem::active()
+            ->orderBy('sort_order')
+            ->get()
+            ->map(fn ($item) => [
+                'slug'          => $item->slug,
+                'name'          => $item->name,
+                'type'          => $item->type,
+                'description'   => $item->description,
+                'monthly_price' => (float) $item->monthly_price,
+                'yearly_price'  => (float) $item->yearly_price,
+                'icon'          => $item->icon,
+            ]);
+
+        // Get current active subscription
+        $activeSub = PlatformSubscription::with('plan')
+            ->forUser($user->id)
+            ->active()
+            ->first();
+
         $wallet = $user->getWallet();
-        
+
         return Inertia::render('Subscriptions/Plans', [
-            'plans' => $plans,
+            'plans' => $plans->map(fn ($plan) => [
+                'id'               => $plan->id,
+                'slug'             => $plan->slug,
+                'name'             => $plan->name,
+                'description'      => $plan->description,
+                'monthly_price'    => (float) $plan->monthly_price,
+                'yearly_price'     => (float) $plan->yearly_price,
+                'included_modules' => $plan->included_modules ?? [],
+                'included_tools'   => $plan->included_tools ?? [],
+                'features'         => $plan->features ?? [],
+                'is_custom'        => $plan->is_custom,
+            ]),
+            'serviceItems' => $serviceItems,
             'activeSubscription' => $activeSub ? [
-                'id' => $activeSub->id,
-                'plan_id' => $activeSub->plan_id,
-                'plan_name' => $activeSub->plan->name,
-                'status' => $activeSub->status,
-                'expires_at' => $activeSub->expires_at?->format('M d, Y') ?? '-',
-                'auto_renew' => $activeSub->auto_renew,
+                'id'            => $activeSub->id,
+                'plan_id'       => $activeSub->plan_id,
+                'plan_slug'     => $activeSub->plan->slug ?? null,
+                'plan_name'     => $activeSub->plan->name ?? 'Custom',
+                'status'        => $activeSub->status,
+                'billing_cycle' => $activeSub->billing_cycle,
+                'amount'        => (float) $activeSub->amount,
+                'expires_at'    => $activeSub->expires_at?->format('M d, Y') ?? '-',
+                'auto_renew'    => $activeSub->auto_renew,
+                'custom_items'  => $activeSub->custom_items,
             ] : null,
             'walletBalance' => (float) ($wallet->balance ?? 0),
             'currency' => $wallet->currency ?? 'USD',
-            'module' => $module,
         ]);
     }
 
     /**
-     * Subscribe using Wallet Balance (direct deduction).
+     * Subscribe to a fixed plan using wallet balance.
      */
     public function subscribe(Request $request)
     {
         $request->validate([
-            'plan_id' => 'required|exists:module_plans,id',
+            'plan_id'       => 'required|exists:platform_plans,id',
+            'billing_cycle' => 'required|in:monthly,yearly',
         ]);
 
         $user = Auth::user();
-        $plan = ModulePlan::findOrFail($request->plan_id);
+        $plan = PlatformPlan::findOrFail($request->plan_id);
         $wallet = $user->getWallet();
-        $price = (float) $plan->price;
+        $price = $plan->priceFor($request->billing_cycle);
 
-        // 1. Check wallet balance
+        if ($plan->is_custom) {
+            return back()->withErrors(['error' => 'Use the custom subscription endpoint for custom plans.']);
+        }
+
         if ($wallet->balance < $price) {
             return back()->withErrors(['error' => 'Insufficient wallet balance. Please add funds or pay via Kashier.']);
         }
 
         try {
-            $invoice = DB::transaction(function () use ($user, $plan, $wallet, $price) {
-                // 2. Deduct from wallet
+            DB::transaction(function () use ($user, $plan, $wallet, $price, $request) {
+                // Deduct from wallet
                 $balanceBefore = $wallet->balance;
                 $balanceAfter = $balanceBefore - $price;
-
                 $wallet->balance = $balanceAfter;
                 $wallet->save();
 
-                // 3. Record Wallet Transaction
+                // Record wallet transaction
                 WalletTransaction::create([
-                    'wallet_id' => $wallet->id,
-                    'type' => 'debit',
-                    'amount' => $price,
+                    'wallet_id'      => $wallet->id,
+                    'type'           => 'debit',
+                    'amount'         => $price,
                     'balance_before' => $balanceBefore,
-                    'balance_after' => $balanceAfter,
-                    'reference_type' => 'subscription_purchase',
-                    'description' => "Subscription payment for {$plan->name} ({$plan->billing})",
+                    'balance_after'  => $balanceAfter,
+                    'reference_type' => 'platform_subscription',
+                    'description'    => "Platform subscription: {$plan->name} ({$request->billing_cycle})",
                 ]);
 
-                // 4. Create/Update User Subscription
-                $duration = $plan->billing === 'yearly' ? 12 : 1;
-                $expiresAt = Carbon::now()->addMonths($duration);
-
-                // Cancel any previous subscriptions first
-                UserSubscription::where('client_id', $user->id)
-                    ->whereHas('plan', function ($q) use ($plan) {
-                        $q->where('module', $plan->module);
-                    })
+                // Expire any previous active subscription
+                PlatformSubscription::forUser($user->id)
+                    ->where('status', 'active')
                     ->update(['status' => 'expired']);
 
-                $subscription = UserSubscription::create([
-                    'client_id' => $user->id,
-                    'plan_id' => $plan->id,
-                    'status' => 'active',
-                    'started_at' => Carbon::now(),
-                    'expires_at' => $expiresAt,
-                    'auto_renew' => true,
+                // Create new subscription
+                $duration = $request->billing_cycle === 'yearly' ? 12 : 1;
+
+                PlatformSubscription::create([
+                    'user_id'           => $user->id,
+                    'plan_id'           => $plan->id,
+                    'billing_cycle'     => $request->billing_cycle,
+                    'amount'            => $price,
+                    'currency'          => $wallet->currency ?? 'USD',
+                    'status'            => 'active',
+                    'started_at'        => Carbon::now(),
+                    'expires_at'        => Carbon::now()->addMonths($duration),
+                    'auto_renew'        => true,
+                    'payment_method'    => 'wallet',
+                    'payment_reference' => 'wallet_deduction',
                 ]);
 
-                // 5. Generate Subscription Invoice
-                $invoiceNum = 'INV-SUB-' . strtoupper($plan->module) . '-' . time() . '-' . $user->id;
-                
-                return SubscriptionInvoice::create([
-                    'user_id' => $user->id,
-                    'plan_id' => $plan->id,
-                    'invoice_number' => $invoiceNum,
-                    'amount' => $price,
-                    'currency' => $wallet->currency ?? 'USD',
-                    'status' => 'paid',
-                    'payment_method' => 'wallet',
+                // Generate invoice
+                $invoiceNum = 'INV-PLT-' . strtoupper($plan->slug) . '-' . time() . '-' . $user->id;
+                SubscriptionInvoice::create([
+                    'user_id'               => $user->id,
+                    'plan_id'               => $plan->id,
+                    'invoice_number'        => $invoiceNum,
+                    'amount'                => $price,
+                    'currency'              => $wallet->currency ?? 'USD',
+                    'status'                => 'paid',
+                    'payment_method'        => 'wallet',
                     'transaction_reference' => 'wallet_deduction',
-                    'paid_at' => Carbon::now(),
+                    'paid_at'               => Carbon::now(),
                 ]);
             });
 
-            // 6. ERP Redirect Logic
-            if ($plan->module === 'erp') {
+            // ERP redirect logic
+            if ($plan->includesModule('erp')) {
                 $tenantExists = Tenant::where('user_id', $user->id)->exists();
                 if (!$tenantExists) {
                     return redirect()->route('erp.onboarding')->with('success', 'Subscription activated! Let\'s configure your Business OS workspace.');
                 }
-                return redirect()->route('erp.dashboard')->with('success', 'Subscription renewed successfully!');
+                return redirect()->route('erp.dashboard')->with('success', 'Subscription activated successfully!');
             }
 
-            return redirect()->route('subscriptions.manage')->with('success', "Subscription to {$plan->name} activated successfully!");
+            return redirect()->route('subscriptions.manage')->with('success', "Subscribed to {$plan->name} successfully!");
 
         } catch (\Exception $e) {
-            Log::error('Subscription via wallet failed: ' . $e->getMessage());
-            return back()->withErrors(['error' => 'An error occurred while processing your subscription: ' . $e->getMessage()]);
+            Log::error('Platform subscription via wallet failed: ' . $e->getMessage());
+            return back()->withErrors(['error' => 'An error occurred: ' . $e->getMessage()]);
         }
+    }
+
+    /**
+     * Subscribe to a custom plan using wallet balance.
+     */
+    public function subscribeCustom(Request $request)
+    {
+        $request->validate([
+            'items'         => 'required|array|min:1',
+            'items.*'       => 'string|exists:platform_service_items,slug',
+            'billing_cycle' => 'required|in:monthly,yearly',
+        ]);
+
+        $user = Auth::user();
+        $wallet = $user->getWallet();
+
+        // Find the custom plan
+        $customPlan = PlatformPlan::where('is_custom', true)->where('is_active', true)->first();
+        if (!$customPlan) {
+            return back()->withErrors(['error' => 'Custom plan is not available.']);
+        }
+
+        // Calculate price
+        $priceData = $this->subscriptionService->calculateCustomPrice($request->items, $request->billing_cycle);
+        $price = $priceData['total'];
+
+        if ($price <= 0) {
+            return back()->withErrors(['error' => 'Invalid selection. Please choose at least one service.']);
+        }
+
+        if ($wallet->balance < $price) {
+            return back()->withErrors(['error' => 'Insufficient wallet balance. Please add funds.']);
+        }
+
+        try {
+            DB::transaction(function () use ($user, $customPlan, $wallet, $price, $request) {
+                // Deduct from wallet
+                $balanceBefore = $wallet->balance;
+                $balanceAfter = $balanceBefore - $price;
+                $wallet->balance = $balanceAfter;
+                $wallet->save();
+
+                WalletTransaction::create([
+                    'wallet_id'      => $wallet->id,
+                    'type'           => 'debit',
+                    'amount'         => $price,
+                    'balance_before' => $balanceBefore,
+                    'balance_after'  => $balanceAfter,
+                    'reference_type' => 'platform_subscription_custom',
+                    'description'    => "Custom platform subscription ({$request->billing_cycle}): " . implode(', ', $request->items),
+                ]);
+
+                // Expire previous active subscription
+                PlatformSubscription::forUser($user->id)
+                    ->where('status', 'active')
+                    ->update(['status' => 'expired']);
+
+                $duration = $request->billing_cycle === 'yearly' ? 12 : 1;
+
+                PlatformSubscription::create([
+                    'user_id'           => $user->id,
+                    'plan_id'           => $customPlan->id,
+                    'billing_cycle'     => $request->billing_cycle,
+                    'amount'            => $price,
+                    'currency'          => $wallet->currency ?? 'USD',
+                    'status'            => 'active',
+                    'started_at'        => Carbon::now(),
+                    'expires_at'        => Carbon::now()->addMonths($duration),
+                    'auto_renew'        => true,
+                    'custom_items'      => $request->items,
+                    'payment_method'    => 'wallet',
+                    'payment_reference' => 'wallet_deduction',
+                ]);
+
+                $invoiceNum = 'INV-PLT-CUSTOM-' . time() . '-' . $user->id;
+                SubscriptionInvoice::create([
+                    'user_id'               => $user->id,
+                    'plan_id'               => $customPlan->id,
+                    'invoice_number'        => $invoiceNum,
+                    'amount'                => $price,
+                    'currency'              => $wallet->currency ?? 'USD',
+                    'status'                => 'paid',
+                    'payment_method'        => 'wallet',
+                    'transaction_reference' => 'wallet_deduction',
+                    'paid_at'               => Carbon::now(),
+                ]);
+            });
+
+            return redirect()->route('subscriptions.manage')->with('success', 'Custom subscription activated successfully!');
+
+        } catch (\Exception $e) {
+            Log::error('Custom platform subscription failed: ' . $e->getMessage());
+            return back()->withErrors(['error' => 'An error occurred: ' . $e->getMessage()]);
+        }
+    }
+
+    /**
+     * Calculate custom plan price (API endpoint for live preview).
+     */
+    public function calculateCustomPrice(Request $request)
+    {
+        $request->validate([
+            'items'         => 'required|array|min:1',
+            'items.*'       => 'string',
+            'billing_cycle' => 'required|in:monthly,yearly',
+        ]);
+
+        $result = $this->subscriptionService->calculateCustomPrice($request->items, $request->billing_cycle);
+
+        return response()->json($result);
     }
 
     /**
@@ -160,15 +304,17 @@ class SubscriptionController extends Controller
     public function checkoutKashier(Request $request)
     {
         $request->validate([
-            'plan_id' => 'required|exists:module_plans,id',
+            'plan_id'       => 'required|exists:platform_plans,id',
+            'billing_cycle' => 'required|in:monthly,yearly',
         ]);
 
         $user = Auth::user();
-        $plan = ModulePlan::findOrFail($request->plan_id);
+        $plan = PlatformPlan::findOrFail($request->plan_id);
         $wallet = $user->getWallet();
+        $price = $plan->priceFor($request->billing_cycle);
 
         $paymentUrl = KashierHelper::buildSubscriptionPaymentUrl(
-            (float) $plan->price,
+            $price,
             $user->id,
             $user->name,
             $user->email,
@@ -184,7 +330,7 @@ class SubscriptionController extends Controller
      */
     public function webhook(Request $request)
     {
-        Log::info('Kashier Subscription Webhook received:', $request->all());
+        Log::info('Kashier Platform Subscription Webhook received:', $request->all());
 
         if (KashierHelper::validatePayload()) {
             if ($request->input('data.status') === 'SUCCESS') {
@@ -202,53 +348,54 @@ class SubscriptionController extends Controller
 
                 if ($userId && $planId && $source === 'subscription-purchase' && $trxId && $amountPaid > 0) {
                     $user = \App\Models\User::find($userId);
-                    $plan = ModulePlan::find($planId);
+                    $plan = PlatformPlan::find($planId);
 
                     if ($user && $plan) {
-                        // Idempotency check
                         $alreadyProcessed = SubscriptionInvoice::where('transaction_reference', $trxId)->exists();
 
                         if (!$alreadyProcessed) {
                             DB::transaction(function () use ($user, $plan, $trxId, $amountPaid) {
-                                // 1. Deactivate old subscriptions for this module
-                                UserSubscription::where('client_id', $user->id)
-                                    ->whereHas('plan', function ($q) use ($plan) {
-                                        $q->where('module', $plan->module);
-                                    })
+                                // Expire old subscriptions
+                                PlatformSubscription::forUser($user->id)
+                                    ->where('status', 'active')
                                     ->update(['status' => 'expired']);
 
-                                // 2. Create new active subscription
-                                $duration = $plan->billing === 'yearly' ? 12 : 1;
+                                // Create new active subscription
+                                $duration = 1; // Default monthly; adjust based on plan config
                                 $expiresAt = Carbon::now()->addMonths($duration);
 
-                                UserSubscription::create([
-                                    'client_id' => $user->id,
-                                    'plan_id' => $plan->id,
-                                    'status' => 'active',
-                                    'started_at' => Carbon::now(),
-                                    'expires_at' => $expiresAt,
-                                    'auto_renew' => true,
+                                PlatformSubscription::create([
+                                    'user_id'           => $user->id,
+                                    'plan_id'           => $plan->id,
+                                    'billing_cycle'     => 'monthly',
+                                    'amount'            => $amountPaid,
+                                    'currency'          => 'USD',
+                                    'status'            => 'active',
+                                    'started_at'        => Carbon::now(),
+                                    'expires_at'        => $expiresAt,
+                                    'auto_renew'        => true,
+                                    'payment_method'    => 'kashier',
+                                    'payment_reference' => $trxId,
                                 ]);
 
-                                // 3. Create paid subscription invoice
-                                $invoiceNum = 'INV-SUB-' . strtoupper($plan->module) . '-' . time() . '-' . $user->id;
+                                $invoiceNum = 'INV-PLT-' . strtoupper($plan->slug) . '-' . time() . '-' . $user->id;
                                 SubscriptionInvoice::create([
-                                    'user_id' => $user->id,
-                                    'plan_id' => $plan->id,
-                                    'invoice_number' => $invoiceNum,
-                                    'amount' => $amountPaid,
-                                    'currency' => $plan->currency ?? 'USD',
-                                    'status' => 'paid',
-                                    'payment_method' => 'kashier',
+                                    'user_id'               => $user->id,
+                                    'plan_id'               => $plan->id,
+                                    'invoice_number'        => $invoiceNum,
+                                    'amount'                => $amountPaid,
+                                    'currency'              => $plan->currency ?? 'USD',
+                                    'status'                => 'paid',
+                                    'payment_method'        => 'kashier',
                                     'transaction_reference' => $trxId,
-                                    'paid_at' => Carbon::now(),
+                                    'paid_at'               => Carbon::now(),
                                 ]);
                             });
 
-                            Log::info("Kashier subscription payment processed successfully. User: $userId, Plan: {$plan->name}");
+                            Log::info("Kashier platform subscription processed. User: $userId, Plan: {$plan->name}");
                             return response()->json(['status' => 'success', 'message' => 'Subscription activated']);
                         } else {
-                            Log::warning("Duplicate Kashier subscription webhook received for Trx $trxId - skipped");
+                            Log::warning("Duplicate Kashier webhook for Trx $trxId — skipped");
                             return response()->json(['status' => 'success', 'message' => 'Already processed']);
                         }
                     }
@@ -266,19 +413,18 @@ class SubscriptionController extends Controller
     public function kashierSuccess(Request $request)
     {
         $user = Auth::user();
-        
-        // Find if there is an active ERP subscription to redirect to onboarding
+
         $hasErp = $this->subscriptionService->hasActiveSubscription($user, 'erp');
-        
+
         if ($hasErp) {
             $tenantExists = Tenant::where('user_id', $user->id)->exists();
             if (!$tenantExists) {
                 return redirect()->route('erp.onboarding')->with('success', 'Payment successful! Welcome to Musoftware ERP. Let\'s setup your workspace.');
             }
-            return redirect()->route('erp.dashboard')->with('success', 'Payment successful! Your ERP subscription is active.');
+            return redirect()->route('erp.dashboard')->with('success', 'Payment successful! Your subscription is active.');
         }
 
-        return redirect()->route('subscriptions.manage')->with('success', 'Payment successful! Your SaaS subscription has been activated.');
+        return redirect()->route('subscriptions.manage')->with('success', 'Payment successful! Your subscription has been activated.');
     }
 
     /**
@@ -296,40 +442,39 @@ class SubscriptionController extends Controller
     {
         $user = Auth::user();
 
-        // Fetch user subscriptions
-        $subscriptions = UserSubscription::with('plan')
-            ->where('client_id', $user->id)
+        $subscriptions = PlatformSubscription::with('plan')
+            ->forUser($user->id)
+            ->latest()
             ->get()
             ->map(function ($sub) {
                 return [
-                    'id' => $sub->id,
-                    'module' => strtoupper($sub->plan->module),
-                    'plan_name' => $sub->plan->name,
-                    'price' => (float) $sub->plan->price,
-                    'billing' => $sub->plan->billing,
-                    'status' => $sub->status,
-                    'started_at' => $sub->started_at->format('M d, Y'),
-                    'expires_at' => $sub->expires_at ? $sub->expires_at->format('M d, Y') : 'Lifetime',
-                    'auto_renew' => $sub->auto_renew,
+                    'id'            => $sub->id,
+                    'plan_name'     => $sub->plan->name ?? 'Custom Plan',
+                    'plan_slug'     => $sub->plan->slug ?? 'custom',
+                    'billing_cycle' => $sub->billing_cycle,
+                    'amount'        => (float) $sub->amount,
+                    'currency'      => $sub->currency,
+                    'status'        => $sub->status,
+                    'started_at'    => $sub->started_at?->format('M d, Y') ?? '-',
+                    'expires_at'    => $sub->expires_at?->format('M d, Y') ?? 'Lifetime',
+                    'auto_renew'    => $sub->auto_renew,
+                    'custom_items'  => $sub->custom_items,
+                    'is_custom'     => $sub->plan?->is_custom ?? false,
                 ];
             });
 
-        // Fetch transaction history/invoices
-        $invoices = SubscriptionInvoice::with('plan')
-            ->where('user_id', $user->id)
+        $invoices = SubscriptionInvoice::where('user_id', $user->id)
             ->latest()
             ->get()
             ->map(function ($inv) {
                 return [
-                    'id' => $inv->id,
-                    'invoice_number' => $inv->invoice_number,
-                    'plan_name' => $inv->plan->name,
-                    'module' => strtoupper($inv->plan->module),
-                    'amount' => (float) $inv->amount,
-                    'currency' => $inv->currency,
-                    'status' => $inv->status,
-                    'payment_method' => ucfirst($inv->payment_method ?? '-'),
-                    'paid_at' => $inv->paid_at ? $inv->paid_at->format('M d, Y') : '-',
+                    'id'              => $inv->id,
+                    'invoice_number'  => $inv->invoice_number,
+                    'amount'          => (float) $inv->amount,
+                    'currency'        => $inv->currency,
+                    'status'          => $inv->status,
+                    'payment_method'  => ucfirst($inv->payment_method ?? '-'),
+                    'paid_at'         => $inv->paid_at ? $inv->paid_at->format('M d, Y') : '-',
                 ];
             });
 
@@ -337,9 +482,9 @@ class SubscriptionController extends Controller
 
         return Inertia::render('Subscriptions/Manage', [
             'subscriptions' => $subscriptions,
-            'invoices' => $invoices,
+            'invoices'      => $invoices,
             'walletBalance' => (float) ($wallet->balance ?? 0),
-            'currency' => $wallet->currency ?? 'USD',
+            'currency'      => $wallet->currency ?? 'USD',
         ]);
     }
 
@@ -349,15 +494,13 @@ class SubscriptionController extends Controller
     public function cancel(Request $request)
     {
         $request->validate([
-            'id' => 'required|exists:user_subscriptions,id',
+            'id' => 'required|exists:platform_subscriptions,id',
         ]);
 
         $user = Auth::user();
-        $subscription = UserSubscription::where('client_id', $user->id)
-            ->where('id', $request->id)
-            ->firstOrFail();
+        $subscription = PlatformSubscription::forUser($user->id)
+            ->findOrFail($request->id);
 
-        // Set auto_renew to false so it cancels at expiration, or mark cancelled
         $subscription->auto_renew = false;
         $subscription->status = 'cancelled';
         $subscription->save();
@@ -371,18 +514,17 @@ class SubscriptionController extends Controller
     public function renew(Request $request)
     {
         $request->validate([
-            'id' => 'required|exists:user_subscriptions,id',
+            'id' => 'required|exists:platform_subscriptions,id',
         ]);
 
         $user = Auth::user();
-        $subscription = UserSubscription::with('plan')
-            ->where('client_id', $user->id)
-            ->where('id', $request->id)
-            ->firstOrFail();
+        $subscription = PlatformSubscription::with('plan')
+            ->forUser($user->id)
+            ->findOrFail($request->id);
 
         $plan = $subscription->plan;
         $wallet = $user->getWallet();
-        $price = (float) $plan->price;
+        $price = $plan ? $plan->priceFor($subscription->billing_cycle) : (float) $subscription->amount;
 
         if ($wallet->balance < $price) {
             return back()->withErrors(['error' => 'Insufficient wallet balance to renew. Please add funds.']);
@@ -390,30 +532,24 @@ class SubscriptionController extends Controller
 
         try {
             DB::transaction(function () use ($user, $subscription, $plan, $wallet, $price) {
-                // Deduct from wallet
                 $balanceBefore = $wallet->balance;
                 $balanceAfter = $balanceBefore - $price;
-
                 $wallet->balance = $balanceAfter;
                 $wallet->save();
 
-                // Record Wallet Transaction
                 WalletTransaction::create([
-                    'wallet_id' => $wallet->id,
-                    'type' => 'debit',
-                    'amount' => $price,
+                    'wallet_id'      => $wallet->id,
+                    'type'           => 'debit',
+                    'amount'         => $price,
                     'balance_before' => $balanceBefore,
-                    'balance_after' => $balanceAfter,
-                    'reference_type' => 'subscription_renewal',
-                    'description' => "Subscription renewal for {$plan->name} ({$plan->billing})",
+                    'balance_after'  => $balanceAfter,
+                    'reference_type' => 'platform_subscription_renewal',
+                    'description'    => "Subscription renewal: " . ($plan->name ?? 'Custom') . " ({$subscription->billing_cycle})",
                 ]);
 
-                // Update expiration date
-                $duration = $plan->billing === 'yearly' ? 12 : 1;
-                
-                // If it is active and not expired yet, extend from expires_at. Otherwise extend from now.
-                $baseDate = ($subscription->status === 'active' && $subscription->expires_at->isFuture()) 
-                    ? $subscription->expires_at 
+                $duration = $subscription->billing_cycle === 'yearly' ? 12 : 1;
+                $baseDate = ($subscription->status === 'active' && $subscription->expires_at?->isFuture())
+                    ? $subscription->expires_at
                     : Carbon::now();
 
                 $subscription->status = 'active';
@@ -421,18 +557,17 @@ class SubscriptionController extends Controller
                 $subscription->auto_renew = true;
                 $subscription->save();
 
-                // Create paid subscription invoice
-                $invoiceNum = 'INV-REN-' . strtoupper($plan->module) . '-' . time() . '-' . $user->id;
+                $invoiceNum = 'INV-REN-' . strtoupper($plan->slug ?? 'CUSTOM') . '-' . time() . '-' . $user->id;
                 SubscriptionInvoice::create([
-                    'user_id' => $user->id,
-                    'plan_id' => $plan->id,
-                    'invoice_number' => $invoiceNum,
-                    'amount' => $price,
-                    'currency' => $wallet->currency ?? 'USD',
-                    'status' => 'paid',
-                    'payment_method' => 'wallet',
+                    'user_id'               => $user->id,
+                    'plan_id'               => $plan?->id,
+                    'invoice_number'        => $invoiceNum,
+                    'amount'                => $price,
+                    'currency'              => $wallet->currency ?? 'USD',
+                    'status'                => 'paid',
+                    'payment_method'        => 'wallet',
                     'transaction_reference' => 'wallet_renewal',
-                    'paid_at' => Carbon::now(),
+                    'paid_at'               => Carbon::now(),
                 ]);
             });
 

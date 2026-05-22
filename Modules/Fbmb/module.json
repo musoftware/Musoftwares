@@ -1,0 +1,11 @@
+{
+    "name": "fbmb",
+    "alias": "fbmb",
+    "description": "Facebook Mobile Lookup Module",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\fbmb\\Providers\\FbmbServiceProvider"
+    ],
+    "files": []
+}

@@ -50,6 +50,7 @@ Route::middleware(['auth', 'verified', 'onboarding', 'subscription:erp', 'erp.te
     Route::delete('/team-members/{id}', [\Modules\ERP\Http\Controllers\Team\TeamMemberController::class, 'destroy'])->name('team-members.destroy');
 
     Route::get('/dashboard', [\Modules\ERP\Http\Controllers\ERPDashboardController::class, 'index'])->name('dashboard');
+    Route::post('/settings', [\Modules\ERP\Http\Controllers\ERPDashboardController::class, 'updateSettings'])->name('settings.update');
     Route::post('/clients', [\Modules\ERP\Http\Controllers\ERPDashboardController::class, 'storeClient'])->name('clients.store');
     Route::put('/clients/{client}', [\Modules\ERP\Http\Controllers\ERPDashboardController::class, 'updateClient'])->name('clients.update');
     Route::delete('/clients/{client}', [\Modules\ERP\Http\Controllers\ERPDashboardController::class, 'destroyClient'])->name('clients.destroy');
@@ -197,7 +198,7 @@ Route::prefix('marketplace')->name('marketplace.')->group(function () {
 });
 
 // Marketplace Admin Routes
-Route::middleware(['auth', 'verified', 'onboarding', 'role:admin'])->prefix('admin/marketplace')->name('admin.marketplace.')->group(function () {
+Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin/marketplace')->name('admin.marketplace.')->group(function () {
     // Categories
     Route::get('/categories', [\Modules\Marketplace\Http\Controllers\ServiceCategoryController::class, 'index'])->name('categories.index');
     Route::post('/categories', [\Modules\Marketplace\Http\Controllers\ServiceCategoryController::class, 'store'])->name('categories.store');
@@ -228,6 +229,13 @@ Route::middleware(['auth', 'verified', 'onboarding', 'role:admin'])->prefix('adm
     })->name('services.all');
 });
 
+// Settings & Account Routes
+Route::middleware(['auth', 'verified'])->prefix('settings')->name('settings.')->group(function () {
+    Route::get('/backup', [\App\Http\Controllers\TenantBackupController::class, 'index'])->name('backup.index');
+    Route::get('/backup/export', [\App\Http\Controllers\TenantBackupController::class, 'export'])->name('backup.export');
+    Route::post('/backup/import', [\App\Http\Controllers\TenantBackupController::class, 'import'])->name('backup.import');
+});
+
 // Admin Routes
 Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [\App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard');
@@ -238,6 +246,17 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
     // Clients (thin ERP-linked view)
     Route::get('/clients', [\App\Http\Controllers\Admin\ClientController::class, 'index'])->name('clients.index');
     Route::get('/clients/{id}', [\App\Http\Controllers\Admin\ClientController::class, 'show'])->name('clients.show');
+    Route::get('/clients/{id}/edit', [\App\Http\Controllers\Admin\ClientController::class, 'edit'])->name('clients.edit');
+    Route::patch('/clients/{id}', [\App\Http\Controllers\Admin\ClientController::class, 'update'])->name('clients.update');
+    Route::post('/clients/{id}/login-as', [\App\Http\Controllers\Admin\ClientController::class, 'loginAs'])->name('clients.login-as');
+    Route::post('/clients/{id}/reset-password', [\App\Http\Controllers\Admin\ClientController::class, 'resetPassword'])->name('clients.reset-password');
+    Route::post('/clients/{id}/wallet-transaction', [\App\Http\Controllers\Admin\ClientController::class, 'walletTransaction'])->name('clients.wallet-transaction');
+    Route::post('/clients/{id}/tasks', [\App\Http\Controllers\Admin\ClientController::class, 'storeTask'])->name('clients.tasks.store');
+    Route::post('/clients/{id}/swap-budget', [\App\Http\Controllers\Admin\ClientController::class, 'swapBudget'])->name('clients.swap-budget');
+    Route::post('/clients/{id}/memberships', [\App\Http\Controllers\Admin\ClientController::class, 'activateMembership'])->name('clients.memberships.store');
+    Route::get('/clients/{id}/referrals', [\App\Http\Controllers\Admin\ClientController::class, 'referrals'])->name('clients.referrals');
+    Route::get('/clients/{id}/files', [\App\Http\Controllers\Admin\ClientController::class, 'files'])->name('clients.files');
+    Route::get('/clients/{id}/reports', [\App\Http\Controllers\Admin\ClientController::class, 'reports'])->name('clients.reports');
 
     // KYC Review
     Route::get('/kyc', [\App\Http\Controllers\Admin\KycController::class, 'index'])->name('kyc.index');
@@ -296,6 +315,13 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
     Route::post('/campaigns/{campaign}/schedule', [\App\Http\Controllers\Admin\CampaignController::class, 'schedule'])->name('campaigns.schedule');
     Route::post('/campaigns/{campaign}/pause', [\App\Http\Controllers\Admin\CampaignController::class, 'pause'])->name('campaigns.pause');
     Route::post('/campaigns/{campaign}/resume', [\App\Http\Controllers\Admin\CampaignController::class, 'resume'])->name('campaigns.resume');
+
+    // ── Admin Financial Operations ────────────────────────────────
+    Route::get('/finance', [\App\Http\Controllers\Admin\FinancialOperationsController::class, 'index'])->name('finance.index');
+    Route::post('/finance', [\App\Http\Controllers\Admin\FinancialOperationsController::class, 'store'])->name('finance.store');
+    Route::put('/finance/{entry}', [\App\Http\Controllers\Admin\FinancialOperationsController::class, 'update'])->name('finance.update');
+    Route::delete('/finance/{entry}', [\App\Http\Controllers\Admin\FinancialOperationsController::class, 'destroy'])->name('finance.destroy');
+    Route::post('/finance/{entry}/mark-paid', [\App\Http\Controllers\Admin\FinancialOperationsController::class, 'markAsPaid'])->name('finance.mark-paid');
 
     // ── User Management (Full Admin Control) ────────────────────────
     // Recovered from old project: Admin/UsersController
@@ -408,12 +434,37 @@ Route::get('/reseller/{token}', [\Modules\Tools\Http\Controllers\ResellerPortalC
     ->name('reseller.portal')
     ->withoutMiddleware([\Illuminate\Http\Middleware\FrameGuard::class]);
 
+// CRM Lead Capture Iframe Routes (No Auth required, allowed to be embedded)
+Route::get('/crm/embed/capture/{token}', [\Modules\CRM\Http\Controllers\LeadCaptureController::class, 'show'])
+    ->name('crm.embed.capture.show')
+    ->withoutMiddleware([\Illuminate\Http\Middleware\FrameGuard::class]);
+Route::post('/crm/embed/capture/{token}', [\Modules\CRM\Http\Controllers\LeadCaptureController::class, 'store'])
+    ->name('crm.embed.capture.store')
+    ->withoutMiddleware([\Illuminate\Http\Middleware\FrameGuard::class]);
+
+// CRM iSAAS Subscriber Routes
+Route::middleware(['auth', 'verified', 'onboarding'])->prefix('crm')->name('crm.')->group(function () {
+    Route::get('/dashboard', [\Modules\CRM\Http\Controllers\DashboardController::class, 'index'])->name('dashboard');
+    
+    // Campaigns
+    Route::get('/campaigns', [\Modules\CRM\Http\Controllers\CampaignController::class, 'index'])->name('campaigns.index');
+    Route::post('/campaigns', [\Modules\CRM\Http\Controllers\CampaignController::class, 'store'])->name('campaigns.store');
+    Route::get('/campaigns/{campaign}', [\Modules\CRM\Http\Controllers\CampaignController::class, 'show'])->name('campaigns.show');
+
+    // Leads
+    Route::get('/leads', [\Modules\CRM\Http\Controllers\LeadController::class, 'index'])->name('leads.index');
+    Route::get('/leads/{lead}', [\Modules\CRM\Http\Controllers\LeadController::class, 'show'])->name('leads.show');
+    Route::patch('/leads/{lead}/status', [\Modules\CRM\Http\Controllers\LeadController::class, 'updateStatus'])->name('leads.updateStatus');
+});
+
 
 
 // SaaS Subscription & Billing Routes
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/subscriptions/plans', [\App\Http\Controllers\SubscriptionController::class, 'plans'])->name('subscriptions.plans');
     Route::post('/subscriptions/subscribe', [\App\Http\Controllers\SubscriptionController::class, 'subscribe'])->name('subscriptions.subscribe');
+    Route::post('/subscriptions/subscribe-custom', [\App\Http\Controllers\SubscriptionController::class, 'subscribeCustom'])->name('subscriptions.subscribe-custom');
+    Route::post('/subscriptions/calculate-custom', [\App\Http\Controllers\SubscriptionController::class, 'calculateCustomPrice'])->name('subscriptions.calculate-custom');
     Route::get('/subscriptions/manage', [\App\Http\Controllers\SubscriptionController::class, 'manage'])->name('subscriptions.manage');
     Route::post('/subscriptions/cancel', [\App\Http\Controllers\SubscriptionController::class, 'cancel'])->name('subscriptions.cancel');
     Route::post('/subscriptions/renew', [\App\Http\Controllers\SubscriptionController::class, 'renew'])->name('subscriptions.renew');
@@ -468,7 +519,7 @@ Route::middleware(['auth', 'verified'])->prefix('financial')->name('financial.')
 
 // Kashier Webhook (No Auth required)
 Route::post('/financial/add-balance/webhook', [\App\Http\Controllers\FinancialController::class, 'webhook'])->name('financial.add-balance.webhook');
-Route::post('/freelance/point-purchases/webhook', [\Modules\Freelance\Http\Controllers\PointPurchaseController::class, 'webhook'])->name('freelance.point-purchases.webhook');
+Route::post('/freelance/point-purchases/webhook', [\Modules\Core\Http\Controllers\PointPurchaseController::class, 'webhook'])->name('freelance.point-purchases.webhook');
 Route::post('/subscriptions/kashier/webhook', [\App\Http\Controllers\SubscriptionController::class, 'webhook'])->name('subscriptions.kashier.webhook');
 
 // General Messages Route
