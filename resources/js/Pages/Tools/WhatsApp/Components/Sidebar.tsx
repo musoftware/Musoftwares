@@ -6,7 +6,7 @@ import {
 import { Button } from '@/Components/ui/button';
 import { Badge } from '@/Components/ui/badge';
 
-type TabId = 'accounts' | 'campaign' | 'groups' | 'group-campaign' | 'history' | 'report' | 'templates';
+type TabId = 'accounts' | 'campaign' | 'groups' | 'group-campaign' | 'history' | 'report' | 'templates' | 'inbox';
 
 interface SidebarProps {
     activeTab: TabId;
@@ -18,6 +18,7 @@ interface SidebarProps {
     hasResult: boolean;
     t: any;
     runningCampaignsCount?: number;
+    unreadInboxCount?: number;
 }
 
 const NAV_ITEMS = [
@@ -25,6 +26,7 @@ const NAV_ITEMS = [
     { id: 'campaign',       icon: Send,        label: 'New Campaign',   group: 'main' },
     { id: 'group-campaign', icon: UsersRound,  label: 'Group Campaign', group: 'main' },
     { id: 'templates',      icon: FileText,    label: 'Templates',      group: 'main' },
+    { id: 'inbox',          icon: MessageSquare, label: 'Inbox',        group: 'tools' },
     { id: 'groups',         icon: Users,       label: 'My Groups',      group: 'tools' },
     { id: 'history',        icon: LayoutDashboard, label: 'Campaigns',  group: 'tools' },
 ];
@@ -54,7 +56,8 @@ function NavButton({ item, active, onClick, badge }: any) {
 export default function Sidebar({
     activeTab, setActiveTab, locale, setLocale,
     daemonConnected, isCampaignRunning, hasResult, t,
-    runningCampaignsCount = 0
+    runningCampaignsCount = 0,
+    unreadInboxCount = 0
 }: SidebarProps) {
     const mainItems = NAV_ITEMS.filter(n => n.group === 'main');
     const toolItems = NAV_ITEMS.filter(n => n.group === 'tools');
@@ -109,7 +112,7 @@ export default function Sidebar({
                             item={item}
                             active={activeTab === item.id}
                             onClick={() => setActiveTab(item.id as TabId)}
-                            badge={item.id === 'history' ? runningCampaignsCount : 0}
+                            badge={item.id === 'history' ? runningCampaignsCount : item.id === 'inbox' ? unreadInboxCount : 0}
                         />
                     ))}
                 </nav>
@@ -132,7 +135,7 @@ export default function Sidebar({
                 {[
                     { id: 'accounts',       icon: Users,           label: 'Accounts' },
                     { id: 'campaign',       icon: Send,            label: 'Campaign' },
-                    { id: 'group-campaign', icon: UsersRound,      label: 'Groups' },
+                    { id: 'inbox',          icon: MessageSquare,   label: 'Inbox' },
                     { id: 'templates',      icon: FileText,        label: 'Templates' },
                     { id: 'history',        icon: LayoutDashboard, label: 'History' },
                 ].map(item => (
