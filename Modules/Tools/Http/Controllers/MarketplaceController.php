@@ -102,14 +102,6 @@ class MarketplaceController extends Controller
                 'status'       => $userSubscription->status,
                 'expires_at'   => $userSubscription->expires_at?->toDateString(),
             ];
-        } elseif (auth()->check()) {
-            $mockedSubscription = [
-                'id'           => 0,
-                'plan_name'    => 'Free Testing Plan',
-                'billing_cycle' => 'free',
-                'status'       => 'active',
-                'expires_at'   => null,
-            ];
         }
 
         return Inertia::render('Tools/Show', [
@@ -135,11 +127,13 @@ class MarketplaceController extends Controller
             ->latest()
             ->first();
 
-        $planName = 'Free Testing Plan';
-        if ($subscription) {
-             $plan = collect($tool['plans'] ?? [])->firstWhere('guid', $subscription->plan_guid);
-             $planName = $plan['name'] ?? 'N/A';
+        if (!$subscription) {
+            return redirect()->route('tools.show', $slug)
+                ->with('error', 'You need an active subscription to run this tool.');
         }
+
+        $plan = collect($tool['plans'] ?? [])->firstWhere('guid', $subscription->plan_guid);
+        $planName = $plan['name'] ?? 'N/A';
 
         return Inertia::render('Tools/Runner', [
             'tool'         => [
