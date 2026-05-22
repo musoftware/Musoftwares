@@ -13,60 +13,52 @@ return new class extends Migration
      */
     public function up()
     {
-        // Add multi-tenant and iframe config fields to Campaigns
-        if (Schema::hasTable('campaigns')) {
-            Schema::table('campaigns', function (Blueprint $table) {
-                if (!Schema::hasColumn('campaigns', 'user_id')) {
-                    $table->unsignedBigInteger('user_id')->nullable()->after('id')->index();
-                }
-                if (!Schema::hasColumn('campaigns', 'embed_token')) {
-                    $table->uuid('embed_token')->nullable()->after('user_id')->unique();
-                }
-                if (!Schema::hasColumn('campaigns', 'form_title')) {
-                    $table->string('form_title')->nullable();
-                }
-                if (!Schema::hasColumn('campaigns', 'form_description')) {
-                    $table->text('form_description')->nullable();
-                }
-                if (!Schema::hasColumn('campaigns', 'button_text')) {
-                    $table->string('button_text')->nullable();
-                }
-            });
-        }
+        Schema::create('campaigns', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedBigInteger('user_id')->nullable()->index();
+            $table->uuid('embed_token')->nullable()->unique();
+            $table->string('form_title')->nullable();
+            $table->text('form_description')->nullable();
+            $table->string('button_text')->nullable();
+            $table->string('name');
+            $table->text('description')->nullable();
+            $table->string('type')->nullable();
+            $table->string('status')->default('active');
+            $table->timestamp('scheduled_at')->nullable();
+            $table->string('target_audience')->nullable();
+            $table->json('filter_criteria')->nullable();
+            $table->string('whatsapp_channel_id')->nullable();
+            $table->unsignedBigInteger('created_by')->nullable();
+            $table->integer('sent_count')->default(0);
+            $table->integer('failed_count')->default(0);
+            $table->integer('total_recipients')->default(0);
+            $table->timestamp('completed_at')->nullable();
+            $table->timestamps();
+            $table->softDeletes();
+        });
 
-        // Add multi-tenant fields to Leads
-        if (Schema::hasTable('leads')) {
-            Schema::table('leads', function (Blueprint $table) {
-                if (!Schema::hasColumn('leads', 'user_id')) {
-                    $table->unsignedBigInteger('user_id')->nullable()->after('id')->index();
-                }
-                if (!Schema::hasColumn('leads', 'campaign_id')) {
-                    $table->unsignedBigInteger('campaign_id')->nullable()->after('user_id')->index();
-                }
-                if (!Schema::hasColumn('leads', 'source')) {
-                    $table->string('source')->nullable()->after('campaign_id');
-                }
-            });
-        }
+        Schema::create('leads', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedBigInteger('user_id')->nullable()->index();
+            $table->unsignedBigInteger('campaign_id')->nullable()->index();
+            $table->string('source')->nullable();
+            $table->string('name');
+            $table->string('email')->nullable();
+            $table->string('phone')->nullable();
+            $table->string('company')->nullable();
+            $table->text('message')->nullable();
+            $table->string('status')->default('new');
+            $table->string('locale')->nullable();
+            $table->string('ip_address')->nullable();
+            $table->string('user_agent')->nullable();
+            $table->timestamps();
+            $table->softDeletes();
+        });
     }
 
-    /**
-     * Reverse the migrations.
-     *
-     * @return void
-     */
     public function down()
     {
-        if (Schema::hasTable('campaigns')) {
-            Schema::table('campaigns', function (Blueprint $table) {
-                $table->dropColumn(['user_id', 'embed_token', 'form_title', 'form_description', 'button_text']);
-            });
-        }
-        
-        if (Schema::hasTable('leads')) {
-            Schema::table('leads', function (Blueprint $table) {
-                $table->dropColumn(['user_id', 'campaign_id', 'source']);
-            });
-        }
+        Schema::dropIfExists('leads');
+        Schema::dropIfExists('campaigns');
     }
 };
