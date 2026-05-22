@@ -6,5 +6,6 @@
     "Shared": false,
     "Booking": true,
     "Intelligence": true,
-    "Tools": true
+    "Tools": true,
+    "fbmb": true
 }

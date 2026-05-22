@@ -78,7 +78,7 @@ function AuthenticatedContent({
     const isBookingActive = isRouteActive('booking');
     const isIntelligenceActive = isRouteActive('intelligence');
     const isToolsActive = isRouteActive('tools');
-    const activeModules = auth?.active_modules || { erp: true, freelance: true, marketplace: true, booking: true, intelligence: true, tools: true };
+    const activeModules = auth?.active_modules || { erp: true, freelance: true, marketplace: true, booking: true, intelligence: true, tools: true, fbmb: true };
 
     const [isTourOpen, setIsTourOpen] = useState(false);
     const [tourStep, setTourStep] = useState(1);
@@ -446,22 +446,22 @@ function AuthenticatedContent({
                                         <DropdownMenuItem 
                                             className={cn(
                                                 "p-0 mb-1 outline-none border transition-colors duration-150 cursor-pointer",
-                                                isRouteActive('intelligence.isaas.index') ? "bg-teal-50/80 border-teal-100" : "hover:bg-slate-50 border-transparent"
+                                                isRouteActive('fbmb.index') ? "bg-teal-50/80 border-teal-100" : "hover:bg-slate-50 border-transparent"
                                             )}
-                                            render={<Link href={safeRoute('intelligence.isaas.index')} className="flex items-start gap-3 p-2.5 rounded-lg w-full" />}
+                                            render={<Link href={safeRoute('fbmb.index')} className="flex items-start gap-3 p-2.5 rounded-lg w-full" />}
                                         >
                                             <div className={cn(
                                                 "w-8 h-8 rounded-md flex items-center justify-center shrink-0 transition-colors",
-                                                isRouteActive('intelligence.isaas.index') ? "bg-teal-100" : "bg-slate-100 group-hover/dropdown-menu-item:bg-teal-50"
+                                                isRouteActive('fbmb.index') ? "bg-teal-100" : "bg-slate-100 group-hover/dropdown-menu-item:bg-teal-50"
                                             )}>
-                                                <Activity className={cn("w-4 h-4", isRouteActive('intelligence.isaas.index') ? "text-teal-700" : "text-slate-500 group-hover/dropdown-menu-item:text-teal-600")} />
+                                                <Activity className={cn("w-4 h-4", isRouteActive('fbmb.index') ? "text-teal-700" : "text-slate-500 group-hover/dropdown-menu-item:text-teal-600")} />
                                             </div>
                                             <div className="flex-1 min-w-0">
                                                 <div className="flex items-center justify-between">
-                                                    <p className={cn("text-sm font-medium", isRouteActive('intelligence.isaas.index') ? "text-teal-900" : "text-slate-900")}>iSAAS FB Lookup</p>
-                                                    {isRouteActive('intelligence.isaas.index') && <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-teal-100 text-teal-700">Active</span>}
+                                                    <p className={cn("text-sm font-medium", isRouteActive('fbmb.index') ? "text-teal-900" : "text-slate-900")}>iSAAS FB Lookup</p>
+                                                    {isRouteActive('fbmb.index') && <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-teal-100 text-teal-700">Active</span>}
                                                 </div>
-                                                <p className={cn("text-xs truncate", isRouteActive('intelligence.isaas.index') ? "text-teal-700/70" : "text-slate-500")}>
+                                                <p className={cn("text-xs truncate", isRouteActive('fbmb.index') ? "text-teal-700/70" : "text-slate-500")}>
                                                     Search Mobile by FBID
                                                 </p>
                                             </div>
@@ -541,7 +541,7 @@ function AuthenticatedContent({
 
                                     {/* Points pill — locked geometry */}
                                     <Link
-                                        href={safeRoute('freelance.points.index')}
+                                        href={safeRoute('points.index')}
                                         className="inline-flex items-center gap-1.5 h-8 min-w-[60px] justify-center px-3 bg-amber-50 hover:bg-amber-100 border border-amber-100/80 rounded-full transition-colors duration-150 text-xs font-medium text-amber-700"
                                         title="Points/Connects Balance"
                                     >

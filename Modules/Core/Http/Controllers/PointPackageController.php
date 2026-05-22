@@ -1,9 +1,9 @@
 <?php
 
-namespace Modules\Freelance\Http\Controllers;
+namespace Modules\Core\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use Modules\Freelance\Models\PointPackage;
+use Modules\Core\Models\PointPackage;
 use Illuminate\Http\Request;
 
 class PointPackageController extends Controller

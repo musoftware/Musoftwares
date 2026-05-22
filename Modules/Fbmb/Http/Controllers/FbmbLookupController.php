@@ -1,19 +1,17 @@
 <?php
 
-namespace Modules\Intelligence\Http\Controllers;
+namespace Modules\fbmb\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
-use Modules\Intelligence\Services\ISaasLookupService;
-use Modules\Core\Services\WalletService;
-use Illuminate\Support\Facades\Storage;
+use Modules\fbmb\Services\FbmbLookupService;
 use Exception;
 
-class ISaasController extends Controller
+class FbmbLookupController extends Controller
 {
-    protected ISaasLookupService $lookupService;
+    protected FbmbLookupService $lookupService;
 
-    public function __construct(ISaasLookupService $lookupService)
+    public function __construct(FbmbLookupService $lookupService)
     {
         $this->lookupService = $lookupService;
     }
@@ -35,7 +33,6 @@ class ISaasController extends Controller
 
         try {
             $result = $this->lookupService->processFile(auth()->user(), $fullPath);
-            
             return response()->download($result['result_path'])->deleteFileAfterSend(true);
         } catch (Exception $e) {
             return response()->json(['message' => $e->getMessage()], 400);
