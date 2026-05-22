@@ -20,13 +20,13 @@ class ISaasController extends Controller
 
     public function index()
     {
-        return view('intelligence::isaas.index');
+        return \Inertia\Inertia::render('Intelligence/ISaas/Index');
     }
 
     public function process(Request $request)
     {
         $request->validate([
-            'file' => 'required|file|mimes:txt,csv',
+            'file' => 'required|file|extensions:txt,csv',
         ]);
 
         $file = $request->file('file');
