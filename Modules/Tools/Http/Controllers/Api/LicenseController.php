@@ -52,25 +52,13 @@ class LicenseController extends Controller
             if ($existing->status === 'banned') {
                 return response()->json(['success' => false, 'error' => 'device_banned'], 403);
             }
-            // Re-activate revoked device if under limit
+            // Re-activate revoked device
             if ($existing->status === 'revoked') {
-                if (!$license->canActivateDevice()) {
-                    return response()->json(['success' => false, 'error' => 'device_limit_reached', 'max' => $license->max_devices], 403);
-                }
                 $existing->update(['status' => 'active', 'revoked_at' => null]);
             }
             $existing->touchHeartbeat($request->ip(), $data['app_version'] ?? '');
             $license->touchValidation();
             return $this->activationSuccess($license, $existing);
-        }
-
-        // New device
-        if (!$license->canActivateDevice()) {
-            return response()->json([
-                'success' => false,
-                'error'   => 'device_limit_reached',
-                'current' => $license->activeDevices()->count(),
-            ], 403);
         }
 
         $device = ActivatedDevice::create([

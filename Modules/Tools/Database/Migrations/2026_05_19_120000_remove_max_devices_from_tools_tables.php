@@ -14,13 +14,17 @@ return new class extends Migration
             $table->dropColumn('max_devices');
         });
 
-        Schema::table('tool_pricing_plans', function (Blueprint $table) {
-            $table->dropColumn('max_devices');
-        });
+        if (Schema::hasTable('tool_pricing_plans')) {
+            Schema::table('tool_pricing_plans', function (Blueprint $table) {
+                $table->dropColumn('max_devices');
+            });
+        }
 
-        Schema::table('tools', function (Blueprint $table) {
-            $table->dropColumn('max_devices');
-        });
+        if (Schema::hasTable('tools')) {
+            Schema::table('tools', function (Blueprint $table) {
+                $table->dropColumn('max_devices');
+            });
+        }
 
         Schema::create('activated_devices', function (Blueprint $table) {
             $table->id();
@@ -43,13 +47,17 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::table('tools', function (Blueprint $table) {
-            $table->unsignedTinyInteger('max_devices')->default(3);
-        });
+        if (Schema::hasTable('tools')) {
+            Schema::table('tools', function (Blueprint $table) {
+                $table->unsignedTinyInteger('max_devices')->default(3);
+            });
+        }
 
-        Schema::table('tool_pricing_plans', function (Blueprint $table) {
-            $table->unsignedTinyInteger('max_devices')->default(1);
-        });
+        if (Schema::hasTable('tool_pricing_plans')) {
+            Schema::table('tool_pricing_plans', function (Blueprint $table) {
+                $table->unsignedTinyInteger('max_devices')->default(1);
+            });
+        }
 
         Schema::table('tool_licenses', function (Blueprint $table) {
             $table->unsignedTinyInteger('max_devices')->default(3);

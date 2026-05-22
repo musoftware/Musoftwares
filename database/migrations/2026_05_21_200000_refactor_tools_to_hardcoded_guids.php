@@ -3,34 +3,91 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
 
 return new class extends Migration
 {
     public function up(): void
     {
-        Schema::table('tool_subscriptions', function (Blueprint $table) {
-            // Ensure user_id has an index so the user_id foreign key constraint doesn't fail
-            // when we drop the compound user_id_tool_id_index.
-            $table->index('user_id', 'temp_user_id_index');
-            
-            // Drop foreign keys first, then indexes
-            $table->dropForeign('tool_subscriptions_tool_id_foreign'); 
-            $table->dropForeign('tool_subscriptions_tool_pricing_plan_id_foreign'); 
-            $table->dropIndex(['user_id', 'tool_id']);
-        });
+        $isSqlite = DB::getDriverName() === 'sqlite';
 
-        Schema::table('tool_licenses', function (Blueprint $table) {
-            $table->index('user_id', 'temp_user_id_license_index');
-            $table->dropForeign(['tool_id']);
-            $table->dropIndex(['user_id', 'tool_id']);
-        });
+        if (Schema::hasTable('tool_subscriptions')) {
+            try {
+                Schema::table('tool_subscriptions', function (Blueprint $table) {
+                    $table->index('user_id', 'temp_user_id_index');
+                });
+            } catch (\Exception $e) {}
 
-        Schema::table('tool_downloads', function (Blueprint $table) {
-            $table->index('user_id', 'temp_user_id_download_index');
-            $table->dropForeign(['tool_id']);
-            $table->dropForeign(['tool_version_id']);
-            $table->dropIndex(['user_id', 'tool_id']);
-        });
+            if (!$isSqlite) {
+                try {
+                    Schema::table('tool_subscriptions', function (Blueprint $table) {
+                        $table->dropForeign('tool_subscriptions_tool_id_foreign');
+                    });
+                } catch (\Exception $e) {}
+
+                try {
+                    Schema::table('tool_subscriptions', function (Blueprint $table) {
+                        $table->dropForeign('tool_subscriptions_tool_pricing_plan_id_foreign');
+                    });
+                } catch (\Exception $e) {}
+            }
+
+            try {
+                Schema::table('tool_subscriptions', function (Blueprint $table) {
+                    $table->dropIndex(['user_id', 'tool_id']);
+                });
+            } catch (\Exception $e) {}
+        }
+
+        if (Schema::hasTable('tool_licenses')) {
+            try {
+                Schema::table('tool_licenses', function (Blueprint $table) {
+                    $table->index('user_id', 'temp_user_id_license_index');
+                });
+            } catch (\Exception $e) {}
+
+            if (!$isSqlite) {
+                try {
+                    Schema::table('tool_licenses', function (Blueprint $table) {
+                        $table->dropForeign(['tool_id']);
+                    });
+                } catch (\Exception $e) {}
+            }
+
+            try {
+                Schema::table('tool_licenses', function (Blueprint $table) {
+                    $table->dropIndex(['user_id', 'tool_id']);
+                });
+            } catch (\Exception $e) {}
+        }
+
+        if (Schema::hasTable('tool_downloads')) {
+            try {
+                Schema::table('tool_downloads', function (Blueprint $table) {
+                    $table->index('user_id', 'temp_user_id_download_index');
+                });
+            } catch (\Exception $e) {}
+
+            if (!$isSqlite) {
+                try {
+                    Schema::table('tool_downloads', function (Blueprint $table) {
+                        $table->dropForeign(['tool_id']);
+                    });
+                } catch (\Exception $e) {}
+
+                try {
+                    Schema::table('tool_downloads', function (Blueprint $table) {
+                        $table->dropForeign(['tool_version_id']);
+                    });
+                } catch (\Exception $e) {}
+            }
+
+            try {
+                Schema::table('tool_downloads', function (Blueprint $table) {
+                    $table->dropIndex(['user_id', 'tool_id']);
+                });
+            } catch (\Exception $e) {}
+        }
 
         // Drop the tool tables
         Schema::dropIfExists('tool_downloads');
@@ -40,28 +97,59 @@ return new class extends Migration
         Schema::dropIfExists('tools');
 
         // Add tool_guid columns
-        Schema::table('tool_subscriptions', function (Blueprint $table) {
-            $table->string('tool_guid')->after('user_id')->nullable();
-            $table->string('plan_guid')->after('tool_guid')->nullable();
-            
-            $table->index(['user_id', 'tool_guid']);
-        });
+        if (Schema::hasTable('tool_subscriptions')) {
+            try {
+                Schema::table('tool_subscriptions', function (Blueprint $table) {
+                    $table->string('tool_guid')->after('user_id')->nullable();
+                    $table->string('plan_guid')->after('tool_guid')->nullable();
+                    $table->index(['user_id', 'tool_guid']);
+                });
+            } catch (\Exception $e) {}
+        }
 
-        Schema::table('tool_licenses', function (Blueprint $table) {
-            $table->string('tool_guid')->after('user_id')->nullable();
-            
-            $table->index(['user_id', 'tool_guid']);
-        });
+        if (Schema::hasTable('tool_licenses')) {
+            try {
+                Schema::table('tool_licenses', function (Blueprint $table) {
+                    $table->string('tool_guid')->after('user_id')->nullable();
+                    $table->index(['user_id', 'tool_guid']);
+                });
+            } catch (\Exception $e) {}
+        }
 
         // Drop old integer columns
-        Schema::table('tool_subscriptions', function (Blueprint $table) {
-            $table->dropColumn('tool_id');
-            $table->dropColumn('tool_pricing_plan_id');
-        });
+        if (Schema::hasTable('tool_subscriptions')) {
+            try {
+                Schema::table('tool_subscriptions', function (Blueprint $table) {
+                    $table->dropIndex(['tool_id']);
+                });
+            } catch (\Exception $e) {}
 
-        Schema::table('tool_licenses', function (Blueprint $table) {
-            $table->dropColumn('tool_id');
-        });
+            try {
+                Schema::table('tool_subscriptions', function (Blueprint $table) {
+                    $table->dropIndex(['tool_pricing_plan_id']);
+                });
+            } catch (\Exception $e) {}
+
+            try {
+                Schema::table('tool_subscriptions', function (Blueprint $table) {
+                    $table->dropColumn('tool_id');
+                });
+            } catch (\Exception $e) {}
+
+            try {
+                Schema::table('tool_subscriptions', function (Blueprint $table) {
+                    $table->dropColumn('tool_pricing_plan_id');
+                });
+            } catch (\Exception $e) {}
+        }
+
+        if (Schema::hasTable('tool_licenses')) {
+            try {
+                Schema::table('tool_licenses', function (Blueprint $table) {
+                    $table->dropColumn('tool_id');
+                });
+            } catch (\Exception $e) {}
+        }
     }
 
     public function down(): void

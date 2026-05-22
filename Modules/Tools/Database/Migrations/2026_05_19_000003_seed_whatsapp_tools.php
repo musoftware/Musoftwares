@@ -2,11 +2,16 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
     public function up(): void
     {
+        if (!Schema::hasTable('tools') || !Schema::hasTable('tool_pricing_plans')) {
+            return;
+        }
+
         // ── WhatsApp Bulk Sender v2 ──────────────────────────────────────────
         $senderId = DB::table('tools')->insertGetId([
             'title'             => 'WhatsApp Bulk Sender',
@@ -147,6 +152,10 @@ return new class extends Migration
 
     public function down(): void
     {
+        if (!Schema::hasTable('tools') || !Schema::hasTable('tool_pricing_plans')) {
+            return;
+        }
+
         $slugs = ['whatsapp-sender', 'wa-warmup'];
         $toolIds = DB::table('tools')->whereIn('slug', $slugs)->pluck('id');
 
