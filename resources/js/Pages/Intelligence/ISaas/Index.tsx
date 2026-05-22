@@ -49,9 +49,16 @@ export default function ISaasIndex() {
         reader.onload = (e) => {
             const text = e.target?.result as string;
             if (!text) return;
-            const lines = text.split(/[\n,]+/);
-            const ids = lines.filter(l => l.trim() && /^\d+$/.test(l.trim()));
-            setEstimatedIds(ids.length);
+            const lines = text.split('\n');
+            const ids = new Set();
+            lines.forEach(l => {
+                const parts = l.split(',');
+                const val = parts[0]?.trim();
+                if (val && /^\d+$/.test(val)) {
+                    ids.add(val);
+                }
+            });
+            setEstimatedIds(ids.size);
         };
         reader.readAsText(f);
     }, []);

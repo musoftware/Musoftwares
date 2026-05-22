@@ -57,7 +57,7 @@ class FbmbLookupService
         $chunks = array_chunk($ids, 500);
         foreach ($chunks as $chunk) {
             $placeholders = implode(',', array_fill(0, count($chunk), '?'));
-            $sql = "SELECT FBID, Phone FROM data WHERE FBID IN ($placeholders)";
+            $sql = "SELECT FBID, Phone FROM data WHERE FBID IN ($placeholders) GROUP BY FBID";
             $stmt = $pdo->prepare($sql);
             $stmt->execute($chunk);
             while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
@@ -112,16 +112,18 @@ class FbmbLookupService
         $handle = fopen($filePath, 'r');
         if ($handle) {
             while (($line = fgets($handle)) !== false) {
+                $line = trim($line);
+                if (empty($line)) continue;
+
+                // Extract only the first column as the ID
                 $parts = explode(',', $line);
-                foreach ($parts as $part) {
-                    $val = trim($part);
-                    if (is_numeric($val)) {
-                        $ids[] = $val;
-                    }
+                $val = trim($parts[0]);
+                if (is_numeric($val) && $val > 0) {
+                    $ids[] = $val;
                 }
             }
             fclose($handle);
         }
-        return array_unique($ids);
+        return array_values(array_unique($ids));
     }
 }
