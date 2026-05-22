@@ -2,6 +2,7 @@
 
 namespace Modules\fbmb\Providers;
 
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Modules\fbmb\Services\FbmbLookupService;
 
@@ -16,6 +17,7 @@ class FbmbServiceProvider extends ServiceProvider
 
     public function boot()
     {
-        $this->loadRoutesFrom(__DIR__ . '/../routes/web.php');
+        Route::middleware('web')
+            ->group(module_path('fbmb', 'routes/web.php'));
     }
 }

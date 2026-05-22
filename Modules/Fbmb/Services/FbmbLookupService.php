@@ -16,9 +16,20 @@ class FbmbLookupService
         $this->walletService = $walletService;
     }
 
+    /**
+     * Extract IDs from a file without processing.
+     * Useful for pre-validation / estimating cost.
+     */
+    public function countIds(string $filePath): int
+    {
+        return count($this->extractIds($filePath));
+    }
+
     public function processFile($user, string $filePath): array
     {
         $ids = $this->extractIds($filePath);
+        $totalIds = count($ids);
+
         if (empty($ids)) {
             throw new Exception("No valid IDs found in the uploaded file.");
         }
@@ -26,6 +37,11 @@ class FbmbLookupService
         $wallet = $user->wallet;
         if (! $wallet) {
             throw new Exception("User does not have an active wallet.");
+        }
+
+        $availableBalance = (float) $wallet->balance - (float) ($wallet->locked_balance ?? 0);
+        if ($availableBalance <= 0) {
+            throw new Exception("Insufficient credit balance. Please top up your wallet first.");
         }
 
         $dbPath = storage_path('app/db/All Arab.db');
@@ -53,17 +69,29 @@ class FbmbLookupService
         if ($foundCount > 0) {
             $costPerMatch = 1;
             $totalCost = $foundCount * $costPerMatch;
+
+            // Verify balance covers actual matches
+            if ($availableBalance < $totalCost) {
+                throw new Exception("Insufficient credits. Found {$foundCount} matches requiring {$totalCost} credits, but you only have {$availableBalance} available.");
+            }
+
             $this->walletService->debitAvailable(
                 $wallet,
                 $totalCost,
                 $wallet->currency,
                 'fbmb_lookup',
                 null,
-                "fbmb Facebook ID lookup for {$foundCount} records."
+                "iSAAS Facebook ID lookup: {$foundCount} matches from {$totalIds} IDs."
             );
         }
 
-        $resultCsvPath = storage_path('app/temp_isaas/result_' . uniqid() . '.csv');
+        // Ensure temp directory exists
+        $tempDir = storage_path('app/temp_isaas');
+        if (! is_dir($tempDir)) {
+            mkdir($tempDir, 0755, true);
+        }
+
+        $resultCsvPath = $tempDir . '/result_' . uniqid() . '.csv';
         $fp = fopen($resultCsvPath, 'w');
         fputcsv($fp, ['FBID', 'Phone']);
         foreach ($results as $result) {
@@ -72,6 +100,7 @@ class FbmbLookupService
         fclose($fp);
 
         return [
+            'total_ids' => $totalIds,
             'found_count' => $foundCount,
             'result_path' => $resultCsvPath,
         ];

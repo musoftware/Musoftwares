@@ -493,6 +493,10 @@ function AuthenticatedContent({
                                         </DropdownMenuItem>
                                     </DropdownMenuContent>
                                 </DropdownMenu>
+
+                                <NavLink href={safeRoute('subscriptions.plans')} active={isRouteActive('subscriptions')}>
+                                    <CreditCard className="h-3.5 w-3.5 text-amber-500" /> Subscription
+                                </NavLink>
                                     </>
                                 )}
                             </nav>
@@ -674,7 +678,7 @@ function AuthenticatedContent({
                                                 </DropdownMenuItem>
                                                 <DropdownMenuItem 
                                                     className="cursor-pointer rounded-lg text-sm"
-                                                    render={<Link href={safeRoute('profile.edit')} className="flex items-center w-full" />}
+                                                    render={<Link href={safeRoute('subscriptions.manage')} className="flex items-center w-full" />}
                                                 >
                                                     <Box className="mr-2 h-4 w-4 text-slate-400" /> Subscriptions
                                                 </DropdownMenuItem>

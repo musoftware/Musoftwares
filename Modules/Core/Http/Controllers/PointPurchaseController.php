@@ -85,9 +85,10 @@ class PointPurchaseController extends Controller
         $user = $request->user();
         $wallet = $user->getWallet();
 
-        // Calculate the EGP base cost (1 Point = 1 EGP) converted to the user's wallet currency
+        // Calculate the EGP base cost using volume discount tiers
+        $costEgp = PointsDashboardController::calculateCostEgp($points);
         $financeService = app(\App\Services\FinanceService::class);
-        $cost = $financeService->convertAmount((float) $points, 'EGP', $wallet->currency ?? 'USD');
+        $cost = $financeService->convertAmount($costEgp, 'EGP', $wallet->currency ?? 'USD');
 
         if ($wallet->balance < $cost) {
             // Redirect to Kashier if insufficient balance
@@ -134,12 +135,12 @@ class PointPurchaseController extends Controller
 
     public function success(Request $request)
     {
-        return redirect()->route('freelance.points.index')->with('success', 'Payment successful! Points have been credited to your account.');
+        return redirect()->route('points.index')->with('success', 'Payment successful! Points have been credited to your account.');
     }
 
     public function failure(Request $request)
     {
-        return redirect()->route('freelance.points.index')->with('error', 'Payment failed or was canceled. Please try again.');
+        return redirect()->route('points.index')->with('error', 'Payment failed or was canceled. Please try again.');
     }
 
     public function webhook(Request $request)
