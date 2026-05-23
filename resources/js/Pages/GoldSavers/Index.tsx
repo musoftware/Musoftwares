@@ -130,10 +130,12 @@ export default function Index({ records }: { records: GoldSaverRecord[] }) {
                                         </div>
 
                                         <div className="flex items-center space-x-2 pt-2">
-                                            <Checkbox 
+                                            <input 
+                                                type="checkbox"
                                                 id="zakat" 
+                                                className="w-4 h-4 rounded border-slate-300 text-slate-900 focus:ring-slate-900"
                                                 checked={data.zakat} 
-                                                onCheckedChange={(checked) => setData('zakat', checked as boolean)} 
+                                                onChange={(e) => setData('zakat', e.target.checked)} 
                                             />
                                             <Label htmlFor="zakat" className="font-normal cursor-pointer">Eligible for Zakat</Label>
                                         </div>
