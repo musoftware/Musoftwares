@@ -1020,6 +1020,9 @@ export default function WhatsAppSenderRunner({ tool, subscription, runtimePort, 
                     t={t}
                     runningCampaignsCount={runningCampaignsCount}
                     unreadInboxCount={unreadInboxCount}
+                    selectedAccount={selectedAccount}
+                    setSelectedAccount={setSelectedAccount}
+                    sessions={sessions}
                 />
             }
         >
@@ -1030,6 +1033,7 @@ export default function WhatsAppSenderRunner({ tool, subscription, runtimePort, 
                     callRPC={callRPC}
                     daemonConnected={daemonConnected}
                     setActiveTab={setActiveTab}
+                    selectedAccount={selectedAccount}
                 />
             )}
 
@@ -1155,6 +1159,7 @@ export default function WhatsAppSenderRunner({ tool, subscription, runtimePort, 
                     daemonConnected={daemonConnected}
                     validationCallbackRef={contactValidationCallbackRef}
                     sessions={sessions}
+                    selectedAccount={selectedAccount}
                 />
             )}
 
@@ -1188,6 +1193,7 @@ export default function WhatsAppSenderRunner({ tool, subscription, runtimePort, 
                     activeCampaigns={activeCampaigns}
                     campaignDelays={campaignDelays}
                     daemonConnected={daemonConnected}
+                    selectedAccount={selectedAccount}
                     onViewReport={(id: string, name: string) => {
                         setReportCampaignId(id);
                         setReportCampaignName(name);
@@ -1209,6 +1215,7 @@ export default function WhatsAppSenderRunner({ tool, subscription, runtimePort, 
                     campaignId={reportCampaignId}
                     campaignName={reportCampaignName}
                     daemonConnected={daemonConnected}
+                    selectedAccount={selectedAccount}
                     onBack={() => setActiveTab('history')}
                 />
             )}
@@ -1220,6 +1227,7 @@ export default function WhatsAppSenderRunner({ tool, subscription, runtimePort, 
                     callRPC={callRPC}
                     daemonConnected={daemonConnected}
                     sessions={sessions}
+                    selectedAccount={selectedAccount}
                     onNewMessageRef={inboxNewMessageCallbackRef}
                     onUnreadReset={() => {
                         callRPC('getUnreadCount', {}).then((res: any) => setUnreadInboxCount(res?.count || 0)).catch(() => {});
@@ -1234,6 +1242,7 @@ export default function WhatsAppSenderRunner({ tool, subscription, runtimePort, 
                     callRPC={callRPC}
                     daemonConnected={daemonConnected}
                     sessions={sessions}
+                    selectedAccount={selectedAccount}
                     onActivityRef={warmupActivityCallbackRef}
                 />
             )}
