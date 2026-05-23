@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {
     ArrowLeft, CheckCircle2, XCircle, FileText, Download,
-    RefreshCw, Clock, MessageCircle, Eye, Mail, Filter, ChevronDown, RotateCcw
+    RefreshCw, Clock, MessageCircle, Eye, Mail, Filter, ChevronDown, RotateCcw, Sparkles
 } from 'lucide-react';
 
 import { Card, CardContent } from '@/Components/ui/card';
@@ -188,6 +188,7 @@ export default function CampaignReportWorkspace({ t, locale, callRPC, campaignId
     const [showFilter, setShowFilter]     = useState(false);
     const [retryingContact, setRetryingContact] = useState<string | null>(null);
     const [retryingAll, setRetryingAll] = useState(false);
+    const [abStats, setAbStats] = useState<any>(null);
 
     const isRtl = locale === 'ar';
 
@@ -201,6 +202,14 @@ export default function CampaignReportWorkspace({ t, locale, callRPC, campaignId
             // Always fetch full stats regardless of filter
             const statsRes: any = await callRPC('getCampaignLogs', { campaignId });
             setStats(statsRes.stats || {});
+
+            // Fetch A/B stats if available
+            try {
+                const abRes: any = await callRPC('getCampaignABStats', { campaignId });
+                if (abRes.abStats && (abRes.abStats.A || abRes.abStats.B)) {
+                    setAbStats(abRes.abStats);
+                }
+            } catch { /* A/B not available for this campaign */ }
         } catch (err) { console.error(err); }
         setLoading(false);
     };
@@ -320,6 +329,95 @@ export default function CampaignReportWorkspace({ t, locale, callRPC, campaignId
                 </Card>
             </div>
 
+            {/* A/B Testing Comparison Card */}
+            {abStats && abStats.B && (
+                <Card className="overflow-hidden">
+                    <div className="px-7 py-5 border-b bg-muted/20 flex items-center gap-3">
+                        <div className="size-8 rounded-xl bg-indigo-100/60 dark:bg-indigo-950/40 flex items-center justify-center">
+                            <Sparkles className="w-4 h-4 text-indigo-600" />
+                        </div>
+                        <div>
+                            <h3 className="font-bold text-sm text-start">
+                                {isRtl ? 'نتائج اختبار A/B' : 'A/B Test Results'}
+                            </h3>
+                            <p className="text-[10px] text-muted-foreground mt-0.5 text-start">
+                                {isRtl ? 'مقارنة أداء النسختين' : 'Compare performance between variants'}
+                            </p>
+                        </div>
+                    </div>
+                    <CardContent className="p-7">
+                        <div className="grid grid-cols-2 gap-6">
+                            {(['A', 'B'] as const).map(variant => {
+                                const vs = abStats[variant] || { total: 0, sent: 0, delivered: 0, read_count: 0, replied: 0, failed: 0 };
+                                const variantColor = variant === 'A' ? 'teal' : 'orange';
+                                const totalSent = vs.sent || 1;
+                                const deliveryRate = Math.round((vs.delivered / totalSent) * 100) || 0;
+                                const readRate = Math.round((vs.read_count / totalSent) * 100) || 0;
+                                const replyRate = Math.round((vs.replied / totalSent) * 100) || 0;
+                                return (
+                                    <div key={variant} className="space-y-4">
+                                        <div className="flex items-center gap-3">
+                                            <div className={`w-8 h-8 rounded-xl bg-${variantColor}-500 flex items-center justify-center text-white font-black text-sm`}>
+                                                {variant}
+                                            </div>
+                                            <div className="text-start">
+                                                <p className="text-sm font-bold">
+                                                    {isRtl ? `النسخة ${variant}` : `Variant ${variant}`}
+                                                </p>
+                                                <p className="text-[10px] text-muted-foreground">
+                                                    {vs.total} {isRtl ? 'جهة اتصال' : 'contacts'}
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <div className="space-y-3">
+                                            {[
+                                                { label: isRtl ? 'تم التسليم' : 'Delivered', rate: deliveryRate, color: '#3b82f6' },
+                                                { label: isRtl ? 'تم القراءة' : 'Read', rate: readRate, color: '#8b5cf6' },
+                                                { label: isRtl ? 'تم الرد' : 'Replied', rate: replyRate, color: '#f59e0b' },
+                                            ].map(m => (
+                                                <div key={m.label} className="space-y-1">
+                                                    <div className="flex items-center justify-between">
+                                                        <span className="text-[10px] font-bold text-muted-foreground">{m.label}</span>
+                                                        <span className="text-xs font-black" style={{ color: m.color }}>{m.rate}%</span>
+                                                    </div>
+                                                    <div className="h-2 bg-secondary rounded-full overflow-hidden">
+                                                        <div className="h-full rounded-full transition-all duration-700" style={{ width: `${m.rate}%`, background: m.color }} />
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                        {vs.failed > 0 && (
+                                            <p className="text-[10px] text-destructive font-bold">
+                                                {vs.failed} {isRtl ? 'فشل' : 'failed'}
+                                            </p>
+                                        )}
+                                    </div>
+                                );
+                            })}
+                        </div>
+                        {/* Winner Banner */}
+                        {abStats.A && abStats.B && (() => {
+                            const aReply = abStats.A.replied || 0;
+                            const bReply = abStats.B.replied || 0;
+                            const winner = aReply > bReply ? 'A' : bReply > aReply ? 'B' : null;
+                            if (!winner) return null;
+                            const winColor = winner === 'A' ? 'teal' : 'orange';
+                            return (
+                                <div className={`mt-5 px-4 py-3 bg-${winColor}-50 dark:bg-${winColor}-950/20 border border-${winColor}-200/50 dark:border-${winColor}-800/30 rounded-xl flex items-center gap-3`}>
+                                    <div className={`w-6 h-6 rounded-lg bg-${winColor}-500 flex items-center justify-center text-white text-xs font-black`}>
+                                        {winner}
+                                    </div>
+                                    <p className={`text-xs font-bold text-${winColor}-700 dark:text-${winColor}-400`}>
+                                        {isRtl 
+                                            ? `النسخة ${winner} تحقق أداءً أفضل بناءً على نسبة الردود!` 
+                                            : `Variant ${winner} is outperforming based on reply rate!`}
+                                    </p>
+                                </div>
+                            );
+                        })()}
+                    </CardContent>
+                </Card>
+            )}
 
             {/* Summary KPI Cards */}
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">

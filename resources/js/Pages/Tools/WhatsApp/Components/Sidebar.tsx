@@ -1,12 +1,12 @@
 import React from 'react';
 import {
     Users, Send, LayoutDashboard, Globe, MessageSquare,
-    FileText, UsersRound, BarChart3, Bot, Contact, FolderOpen, Radio
+    FileText, UsersRound, BarChart3, Bot, Contact, FolderOpen, Radio, Shield
 } from 'lucide-react';
 import { Button } from '@/Components/ui/button';
 import { Badge } from '@/Components/ui/badge';
 
-type TabId = 'accounts' | 'campaign' | 'groups' | 'group-campaign' | 'history' | 'report' | 'templates' | 'inbox' | 'auto-reply' | 'contacts' | 'dashboard' | 'media' | 'broadcast';
+type TabId = 'accounts' | 'campaign' | 'groups' | 'group-campaign' | 'history' | 'report' | 'templates' | 'inbox' | 'auto-reply' | 'contacts' | 'dashboard' | 'media' | 'broadcast' | 'deliverability';
 
 interface SidebarProps {
     activeTab: TabId;
@@ -29,9 +29,10 @@ const NAV_ITEMS = [
     { id: 'templates',      icon: FileText,    label: 'Templates',      group: 'main' },
     { id: 'inbox',          icon: MessageSquare, label: 'Inbox',        group: 'tools' },
     { id: 'auto-reply',     icon: Bot,         label: 'Auto-Reply',     group: 'tools' },
+    { id: 'deliverability',  icon: Shield,      label: 'Warmup & Health', group: 'tools' },
     { id: 'contacts',       icon: Contact,     label: 'Contacts',       group: 'tools' },
     { id: 'media',           icon: FolderOpen,  label: 'Media Library',  group: 'tools' },
-    { id: 'broadcast',       icon: Radio,       label: 'Broadcast Lists', group: 'tools' },
+    { id: 'broadcast',       icon: Radio,       label: 'Direct Send Lists', group: 'tools' },
     { id: 'groups',         icon: UsersRound,  label: 'My Groups',      group: 'tools' },
     { id: 'history',        icon: LayoutDashboard, label: 'Campaigns',  group: 'tools' },
 ];

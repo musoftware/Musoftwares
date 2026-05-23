@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {
     FileText, Plus, Trash2, Edit3, X, Check, Save,
-    Image, Video, FileArchive, Mic, RefreshCw, Search, Tag, FolderOpen, CloudUpload
+    Image, Video, FileArchive, Mic, RefreshCw, Search, Tag, FolderOpen, CloudUpload,
+    MousePointerClick, ListOrdered, AlertTriangle, BarChart3
 } from 'lucide-react';
 import { Card, CardContent } from '@/Components/ui/card';
 import { Button } from '@/Components/ui/button';
@@ -105,11 +106,12 @@ function TemplateCard({ tpl, onEdit, onDelete, onUse, t, locale }: any) {
 }
 
 const PART_TYPES = [
-    { value: 'text',     label: 'Text',      icon: FileText,    color: 'bg-blue-500' },
-    { value: 'image',    label: 'Image',      icon: Image,       color: 'bg-emerald-500' },
-    { value: 'video',    label: 'Video',      icon: Video,       color: 'bg-purple-500' },
-    { value: 'document', label: 'Document',   icon: FileArchive, color: 'bg-amber-500' },
-    { value: 'audio',    label: 'Audio',      icon: Mic,         color: 'bg-rose-500' },
+    { value: 'text',     label: 'Text',      icon: FileText,        color: 'bg-blue-500' },
+    { value: 'image',    label: 'Image',      icon: Image,           color: 'bg-emerald-500' },
+    { value: 'video',    label: 'Video',      icon: Video,           color: 'bg-purple-500' },
+    { value: 'document', label: 'Document',   icon: FileArchive,     color: 'bg-amber-500' },
+    { value: 'audio',    label: 'Audio',      icon: Mic,             color: 'bg-rose-500' },
+    { value: 'poll',     label: 'Poll',       icon: BarChart3,       color: 'bg-pink-500' },
 ];
 
 interface TemplatePart {
@@ -118,6 +120,14 @@ interface TemplatePart {
     media_url?: string;
     caption?: string;
     send_as_voice?: boolean;
+    footer?: string;
+    buttons?: Array<{ id: string; text: string }>;
+    title?: string;
+    buttonText?: string;
+    sections?: Array<{ title: string; rows: Array<{ id: string; title: string; description: string }> }>;
+    pollName?: string;
+    pollOptions?: string[];
+    selectableCount?: number;
 }
 
 interface MediaItem {
@@ -358,6 +368,232 @@ function PartBlock({ part, index, onChange, onRemove, onMoveUp, onMoveDown, isFi
                         rows={3}
                         className="resize-none text-sm text-start"
                     />
+                ) : part.type === 'buttons' ? (
+                    /* ── Interactive Buttons Builder ── */
+                    <div className="space-y-3">
+                        <div className="flex items-center gap-2 px-2.5 py-1.5 bg-amber-50/80 dark:bg-amber-950/20 border border-amber-200/50 dark:border-amber-800/30 rounded-lg">
+                            <AlertTriangle className="w-3 h-3 text-amber-600 shrink-0" />
+                            <span className="text-[10px] text-amber-700 dark:text-amber-400 font-medium">
+                                {locale === 'ar' ? 'الأزرار التفاعلية قد تكون محدودة حسب نوع حساب واتساب (Business vs Personal)' : 'Interactive buttons may be limited depending on WhatsApp account type (Business vs Personal)'}
+                            </span>
+                        </div>
+                        <Textarea
+                            value={part.message || ''}
+                            onChange={e => onChange({ ...part, message: e.target.value })}
+                            placeholder={locale === 'ar' ? 'نص الرسالة الرئيسي...' : 'Main message text...'}
+                            rows={2}
+                            className="resize-none text-sm text-start"
+                        />
+                        <Input
+                            value={part.footer || ''}
+                            onChange={e => onChange({ ...part, footer: e.target.value })}
+                            placeholder={locale === 'ar' ? 'نص التذييل (اختياري)' : 'Footer text (optional)'}
+                            className="text-xs h-8 text-start"
+                        />
+                        <div className="space-y-2">
+                            <Label className="text-xs font-bold text-start block">
+                                {locale === 'ar' ? 'الأزرار (حد أقصى 3)' : 'Buttons (max 3)'}
+                            </Label>
+                            {(part.buttons || []).map((btn, bIdx) => (
+                                <div key={bIdx} className="flex items-center gap-2">
+                                    <div className="w-5 h-5 rounded-md bg-cyan-100 dark:bg-cyan-900/30 flex items-center justify-center text-cyan-600 text-[10px] font-bold shrink-0">{bIdx + 1}</div>
+                                    <Input
+                                        value={btn.text}
+                                        onChange={e => {
+                                            const updated = [...(part.buttons || [])];
+                                            updated[bIdx] = { ...updated[bIdx], text: e.target.value };
+                                            onChange({ ...part, buttons: updated });
+                                        }}
+                                        placeholder={locale === 'ar' ? `نص الزر ${bIdx + 1}` : `Button ${bIdx + 1} text`}
+                                        className="text-xs h-8 text-start flex-1"
+                                    />
+                                    <button type="button" onClick={() => {
+                                        const updated = (part.buttons || []).filter((_, i) => i !== bIdx);
+                                        onChange({ ...part, buttons: updated });
+                                    }} className="w-6 h-6 flex items-center justify-center rounded hover:bg-red-100 text-slate-400 hover:text-red-500">
+                                        <X className="w-3 h-3" />
+                                    </button>
+                                </div>
+                            ))}
+                            {(part.buttons || []).length < 3 && (
+                                <button type="button" onClick={() => {
+                                    const updated = [...(part.buttons || []), { id: `btn_${Date.now()}`, text: '' }];
+                                    onChange({ ...part, buttons: updated });
+                                }} className="w-full py-1.5 border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-lg text-xs text-slate-500 hover:text-cyan-600 hover:border-cyan-400/50 transition-colors font-bold">
+                                    + {locale === 'ar' ? 'إضافة زر' : 'Add Button'}
+                                </button>
+                            )}
+                        </div>
+                    </div>
+                ) : part.type === 'list' ? (
+                    /* ── Interactive List Menu Builder ── */
+                    <div className="space-y-3">
+                        <div className="flex items-center gap-2 px-2.5 py-1.5 bg-amber-50/80 dark:bg-amber-950/20 border border-amber-200/50 dark:border-amber-800/30 rounded-lg">
+                            <AlertTriangle className="w-3 h-3 text-amber-600 shrink-0" />
+                            <span className="text-[10px] text-amber-700 dark:text-amber-400 font-medium">
+                                {locale === 'ar' ? 'قوائم الرسائل قد تكون محدودة حسب نوع حساب واتساب' : 'List messages may be limited depending on WhatsApp account type'}
+                            </span>
+                        </div>
+                        <Textarea
+                            value={part.message || ''}
+                            onChange={e => onChange({ ...part, message: e.target.value })}
+                            placeholder={locale === 'ar' ? 'نص الرسالة الرئيسي...' : 'Main message text...'}
+                            rows={2}
+                            className="resize-none text-sm text-start"
+                        />
+                        <div className="grid grid-cols-2 gap-2">
+                            <Input
+                                value={part.footer || ''}
+                                onChange={e => onChange({ ...part, footer: e.target.value })}
+                                placeholder={locale === 'ar' ? 'التذييل (اختياري)' : 'Footer (optional)'}
+                                className="text-xs h-8 text-start"
+                            />
+                            <Input
+                                value={part.buttonText || ''}
+                                onChange={e => onChange({ ...part, buttonText: e.target.value })}
+                                placeholder={locale === 'ar' ? 'نص زر القائمة (مثال: القائمة)' : 'Menu button text (e.g. Menu)'}
+                                className="text-xs h-8 text-start"
+                            />
+                        </div>
+                        <div className="space-y-3">
+                            <Label className="text-xs font-bold text-start block">
+                                {locale === 'ar' ? 'أقسام القائمة' : 'List Sections'}
+                            </Label>
+                            {(part.sections || []).map((sec, sIdx) => (
+                                <div key={sIdx} className="border border-slate-200 dark:border-slate-700 rounded-xl p-3 space-y-2">
+                                    <div className="flex items-center gap-2">
+                                        <Input
+                                            value={sec.title}
+                                            onChange={e => {
+                                                const updated = [...(part.sections || [])];
+                                                updated[sIdx] = { ...updated[sIdx], title: e.target.value };
+                                                onChange({ ...part, sections: updated });
+                                            }}
+                                            placeholder={locale === 'ar' ? `عنوان القسم ${sIdx + 1}` : `Section ${sIdx + 1} title`}
+                                            className="text-xs h-7 text-start flex-1 font-bold"
+                                        />
+                                        <button type="button" onClick={() => {
+                                            const updated = (part.sections || []).filter((_, i) => i !== sIdx);
+                                            onChange({ ...part, sections: updated });
+                                        }} className="w-6 h-6 flex items-center justify-center rounded hover:bg-red-100 text-slate-400 hover:text-red-500">
+                                            <X className="w-3 h-3" />
+                                        </button>
+                                    </div>
+                                    {(sec.rows || []).map((row, rIdx) => (
+                                        <div key={rIdx} className="flex items-center gap-2 ps-4">
+                                            <div className="w-1.5 h-1.5 rounded-full bg-indigo-400 shrink-0" />
+                                            <Input
+                                                value={row.title}
+                                                onChange={e => {
+                                                    const updatedSections = [...(part.sections || [])];
+                                                    const updatedRows = [...(updatedSections[sIdx].rows || [])];
+                                                    updatedRows[rIdx] = { ...updatedRows[rIdx], title: e.target.value };
+                                                    updatedSections[sIdx] = { ...updatedSections[sIdx], rows: updatedRows };
+                                                    onChange({ ...part, sections: updatedSections });
+                                                }}
+                                                placeholder={locale === 'ar' ? 'عنوان العنصر' : 'Item title'}
+                                                className="text-xs h-7 text-start flex-1"
+                                            />
+                                            <Input
+                                                value={row.description}
+                                                onChange={e => {
+                                                    const updatedSections = [...(part.sections || [])];
+                                                    const updatedRows = [...(updatedSections[sIdx].rows || [])];
+                                                    updatedRows[rIdx] = { ...updatedRows[rIdx], description: e.target.value };
+                                                    updatedSections[sIdx] = { ...updatedSections[sIdx], rows: updatedRows };
+                                                    onChange({ ...part, sections: updatedSections });
+                                                }}
+                                                placeholder={locale === 'ar' ? 'الوصف' : 'Description'}
+                                                className="text-xs h-7 text-start flex-1"
+                                            />
+                                            <button type="button" onClick={() => {
+                                                const updatedSections = [...(part.sections || [])];
+                                                updatedSections[sIdx] = { ...updatedSections[sIdx], rows: (updatedSections[sIdx].rows || []).filter((_, i) => i !== rIdx) };
+                                                onChange({ ...part, sections: updatedSections });
+                                            }} className="w-5 h-5 flex items-center justify-center rounded hover:bg-red-100 text-slate-400 hover:text-red-500">
+                                                <X className="w-2.5 h-2.5" />
+                                            </button>
+                                        </div>
+                                    ))}
+                                    {(sec.rows || []).length < 10 && (
+                                        <button type="button" onClick={() => {
+                                            const updatedSections = [...(part.sections || [])];
+                                            const newRow = { id: `row_${Date.now()}`, title: '', description: '' };
+                                            updatedSections[sIdx] = { ...updatedSections[sIdx], rows: [...(updatedSections[sIdx].rows || []), newRow] };
+                                            onChange({ ...part, sections: updatedSections });
+                                        }} className="w-full py-1 border border-dashed border-slate-200 dark:border-slate-700 rounded-lg text-[10px] text-slate-500 hover:text-indigo-600 hover:border-indigo-400/50 transition-colors font-bold ms-4">
+                                            + {locale === 'ar' ? 'إضافة عنصر' : 'Add Row'}
+                                        </button>
+                                    )}
+                                </div>
+                            ))}
+                            <button type="button" onClick={() => {
+                                const newSection = { title: '', rows: [{ id: `row_${Date.now()}`, title: '', description: '' }] };
+                                onChange({ ...part, sections: [...(part.sections || []), newSection] });
+                            }} className="w-full py-1.5 border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-lg text-xs text-slate-500 hover:text-indigo-600 hover:border-indigo-400/50 transition-colors font-bold">
+                                + {locale === 'ar' ? 'إضافة قسم' : 'Add Section'}
+                            </button>
+                        </div>
+                    </div>
+                ) : part.type === 'poll' ? (
+                    /* ── Poll Builder ── */
+                    <div className="space-y-3">
+                        <Input
+                            value={part.pollName || ''}
+                            onChange={e => onChange({ ...part, pollName: e.target.value })}
+                            placeholder={locale === 'ar' ? 'سؤال التصويت...' : 'Poll question...'}
+                            className="text-sm h-9 text-start font-bold"
+                        />
+                        <div className="space-y-2">
+                            <Label className="text-xs font-bold text-start block">
+                                {locale === 'ar' ? 'خيارات التصويت (حد أقصى 12)' : 'Poll Options (max 12)'}
+                            </Label>
+                            {(part.pollOptions || []).map((opt, oIdx) => (
+                                <div key={oIdx} className="flex items-center gap-2">
+                                    <div className="w-5 h-5 rounded-md bg-pink-100 dark:bg-pink-900/30 flex items-center justify-center text-pink-600 text-[10px] font-bold shrink-0">{oIdx + 1}</div>
+                                    <Input
+                                        value={opt}
+                                        onChange={e => {
+                                            const updated = [...(part.pollOptions || [])];
+                                            updated[oIdx] = e.target.value;
+                                            onChange({ ...part, pollOptions: updated });
+                                        }}
+                                        placeholder={locale === 'ar' ? `الخيار ${oIdx + 1}` : `Option ${oIdx + 1}`}
+                                        className="text-xs h-8 text-start flex-1"
+                                    />
+                                    <button type="button" onClick={() => {
+                                        const updated = (part.pollOptions || []).filter((_, i) => i !== oIdx);
+                                        onChange({ ...part, pollOptions: updated });
+                                    }} className="w-6 h-6 flex items-center justify-center rounded hover:bg-red-100 text-slate-400 hover:text-red-500">
+                                        <X className="w-3 h-3" />
+                                    </button>
+                                </div>
+                            ))}
+                            {(part.pollOptions || []).length < 12 && (
+                                <button type="button" onClick={() => {
+                                    onChange({ ...part, pollOptions: [...(part.pollOptions || []), ''] });
+                                }} className="w-full py-1.5 border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-lg text-xs text-slate-500 hover:text-pink-600 hover:border-pink-400/50 transition-colors font-bold">
+                                    + {locale === 'ar' ? 'إضافة خيار' : 'Add Option'}
+                                </button>
+                            )}
+                        </div>
+                        <div className="flex items-center gap-3">
+                            <Label className="text-xs font-medium text-start shrink-0">
+                                {locale === 'ar' ? 'اختيارات مسموحة:' : 'Selectable:'}
+                            </Label>
+                            <Input
+                                type="number"
+                                min={1}
+                                max={Math.max(1, (part.pollOptions || []).length)}
+                                value={part.selectableCount || 1}
+                                onChange={e => onChange({ ...part, selectableCount: parseInt(e.target.value) || 1 })}
+                                className="w-20 text-xs h-8 text-center"
+                            />
+                            <span className="text-[10px] text-muted-foreground">
+                                {locale === 'ar' ? '(1 = اختيار واحد فقط)' : '(1 = single choice)'}
+                            </span>
+                        </div>
+                    </div>
                 ) : (
                     <>
                         {/* File upload / library area */}
@@ -404,7 +640,7 @@ function PartBlock({ part, index, onChange, onRemove, onMoveUp, onMoveDown, isFi
                                     <Check className="w-3.5 h-3.5" />
                                 </div>
                                 <span className="text-xs text-emerald-700 dark:text-emerald-300 font-medium truncate flex-1 text-start" title={part.media_url}>
-                                    {part.media_url.split('/').pop()}
+                                    {part.media_url?.split('/').pop()}
                                 </span>
                                 <div className="flex items-center gap-2 shrink-0">
                                     <button 
@@ -545,7 +781,10 @@ function TemplateEditor({ template, onSave, onCancel, t, locale, callRPC, daemon
         if (!name.trim()) return alert(t.templates.nameRequiredError);
         const validParts = parts.filter(p =>
             (p.type === 'text' && p.message?.trim()) ||
-            (p.type !== 'text' && p.media_url?.trim())
+            (p.type === 'buttons' && p.message?.trim() && (p.buttons || []).length > 0) ||
+            (p.type === 'list' && p.message?.trim() && (p.sections || []).length > 0) ||
+            (p.type === 'poll' && p.pollName?.trim() && (p.pollOptions || []).filter(o => o.trim()).length >= 2) ||
+            (!['text', 'buttons', 'list', 'poll'].includes(p.type) && p.media_url?.trim())
         );
         if (validParts.length === 0) return alert(t.templates.partRequiredError);
         setSaving(true);
