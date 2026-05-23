@@ -1,12 +1,12 @@
 import React from 'react';
 import {
     Users, Send, LayoutDashboard, Globe, MessageSquare,
-    FileText, UsersRound, BarChart3, Bot, Contact, FolderOpen, Radio
+    FileText, UsersRound, BarChart3, Bot, Contact, FolderOpen, Radio, Shield
 } from 'lucide-react';
 import { Button } from '@/Components/ui/button';
 import { Badge } from '@/Components/ui/badge';
 
-type TabId = 'accounts' | 'campaign' | 'groups' | 'group-campaign' | 'history' | 'report' | 'templates' | 'inbox' | 'auto-reply' | 'contacts' | 'dashboard' | 'media' | 'broadcast';
+type TabId = 'accounts' | 'campaign' | 'groups' | 'group-campaign' | 'history' | 'report' | 'templates' | 'inbox' | 'auto-reply' | 'contacts' | 'dashboard' | 'media' | 'broadcast' | 'deliverability';
 
 interface SidebarProps {
     activeTab: TabId;
@@ -19,6 +19,9 @@ interface SidebarProps {
     t: any;
     runningCampaignsCount?: number;
     unreadInboxCount?: number;
+    selectedAccount?: string;
+    setSelectedAccount?: (acc: string) => void;
+    sessions?: any[];
 }
 
 const NAV_ITEMS = [
@@ -29,9 +32,10 @@ const NAV_ITEMS = [
     { id: 'templates',      icon: FileText,    label: 'Templates',      group: 'main' },
     { id: 'inbox',          icon: MessageSquare, label: 'Inbox',        group: 'tools' },
     { id: 'auto-reply',     icon: Bot,         label: 'Auto-Reply',     group: 'tools' },
+    { id: 'deliverability',  icon: Shield,      label: 'Warmup & Health', group: 'tools' },
     { id: 'contacts',       icon: Contact,     label: 'Contacts',       group: 'tools' },
     { id: 'media',           icon: FolderOpen,  label: 'Media Library',  group: 'tools' },
-    { id: 'broadcast',       icon: Radio,       label: 'Broadcast Lists', group: 'tools' },
+    { id: 'broadcast',       icon: Radio,       label: 'Direct Send Lists', group: 'tools' },
     { id: 'groups',         icon: UsersRound,  label: 'My Groups',      group: 'tools' },
     { id: 'history',        icon: LayoutDashboard, label: 'Campaigns',  group: 'tools' },
 ];
@@ -62,7 +66,8 @@ export default function Sidebar({
     activeTab, setActiveTab, locale, setLocale,
     daemonConnected, isCampaignRunning, hasResult, t,
     runningCampaignsCount = 0,
-    unreadInboxCount = 0
+    unreadInboxCount = 0,
+    selectedAccount, setSelectedAccount, sessions
 }: SidebarProps) {
     const mainItems = NAV_ITEMS.filter(n => n.group === 'main');
     const toolItems = NAV_ITEMS.filter(n => n.group === 'tools');
@@ -97,6 +102,28 @@ export default function Sidebar({
                         <span className="truncate">{daemonConnected ? t.connected : t.disconnected}</span>
                     </a>
                 </div>
+
+                {/* Global Account Selector */}
+                {sessions && sessions.length > 0 && (
+                    <div className="p-4 border-b bg-muted/20">
+                        <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-2 flex items-center gap-1.5 px-1">
+                            <Users className="w-3 h-3" />
+                            {locale === 'ar' ? 'الحساب النشط' : 'Active Account'}
+                        </label>
+                        <select
+                            value={selectedAccount || ''}
+                            onChange={e => setSelectedAccount?.(e.target.value)}
+                            className="flex h-9 w-full rounded-xl border border-muted bg-background px-3 py-1 text-xs ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 font-bold text-foreground cursor-pointer shadow-sm hover:border-teal-500/50 transition-colors"
+                        >
+                            <option value="" className="text-muted-foreground font-medium">{locale === 'ar' ? 'كل الحسابات' : 'All Accounts'}</option>
+                            {sessions.map((s: any) => (
+                                <option key={s.accountId} value={s.accountId} className="font-medium text-foreground">
+                                    {s.pushName || s.phone_number || s.accountId}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                )}
 
                 {/* Navigation */}
                 <nav className="flex-1 p-4 space-y-1 overflow-y-auto">

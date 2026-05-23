@@ -14,8 +14,9 @@ import ContactsWorkspace from './WhatsApp/Workspaces/ContactsWorkspace';
 import DashboardWorkspace from './WhatsApp/Workspaces/DashboardWorkspace';
 import MediaLibraryWorkspace from './WhatsApp/Workspaces/MediaLibraryWorkspace';
 import BroadcastListsWorkspace from './WhatsApp/Workspaces/BroadcastListsWorkspace';
+import DeliverabilityWorkspace from './WhatsApp/Workspaces/DeliverabilityWorkspace';
 
-type TabId = 'accounts' | 'campaign' | 'groups' | 'group-campaign' | 'history' | 'report' | 'templates' | 'inbox' | 'auto-reply' | 'contacts' | 'dashboard' | 'media' | 'broadcast';
+type TabId = 'accounts' | 'campaign' | 'groups' | 'group-campaign' | 'history' | 'report' | 'templates' | 'inbox' | 'auto-reply' | 'contacts' | 'dashboard' | 'media' | 'broadcast' | 'deliverability';
 
 const translations = {
     en: {
@@ -37,7 +38,8 @@ const translations = {
             "auto-reply": "Auto-Reply",
             contacts: "Contacts",
             media: "Media Library",
-            broadcast: "Broadcast Lists",
+            broadcast: "Direct Send Lists",
+            deliverability: "Warmup & Health",
         },
         accounts: {
             qrRefreshes: "Refreshes in",
@@ -289,7 +291,8 @@ const translations = {
             "auto-reply": "الرد التلقائي",
             contacts: "جهات الاتصال",
             media: "مكتبة الوسائط",
-            broadcast: "قوائم البث",
+            broadcast: "قوائم الإرسال المباشر",
+            deliverability: "إحماء الحسابات",
         },
         accounts: {
             qrRefreshes: "تحديث خلال",
@@ -601,7 +604,7 @@ export default function WhatsAppSenderRunner({ tool, subscription, runtimePort, 
         if (typeof window !== 'undefined') {
             const params = new URLSearchParams(window.location.search);
             const path = params.get('path') as TabId;
-            if (path && ['dashboard', 'accounts', 'campaign', 'groups', 'group-campaign', 'history', 'report', 'templates', 'inbox', 'auto-reply', 'contacts', 'media', 'broadcast'].includes(path)) {
+            if (path && ['dashboard', 'accounts', 'campaign', 'groups', 'group-campaign', 'history', 'report', 'templates', 'inbox', 'auto-reply', 'contacts', 'media', 'broadcast', 'deliverability'].includes(path)) {
                 return path;
             }
         }
@@ -679,6 +682,8 @@ export default function WhatsAppSenderRunner({ tool, subscription, runtimePort, 
     const runningCampaignsCount = Object.keys(activeCampaigns).length;
     const [unreadInboxCount, setUnreadInboxCount] = useState(0);
     const inboxNewMessageCallbackRef = useRef<((data: any) => void) | null>(null);
+    const contactValidationCallbackRef = useRef<((event: string, data: any) => void) | null>(null);
+    const warmupActivityCallbackRef = useRef<((data: any) => void) | null>(null);
 
     const t = translations[locale];
 
@@ -748,6 +753,20 @@ export default function WhatsAppSenderRunner({ tool, subscription, runtimePort, 
             setUnreadInboxCount(prev => prev + 1);
             if (inboxNewMessageCallbackRef.current) {
                 inboxNewMessageCallbackRef.current(data);
+            }
+        }
+
+        // Real-time warmup activity
+        if (event === 'whatsapp.warmup.activity') {
+            if (warmupActivityCallbackRef.current) {
+                warmupActivityCallbackRef.current(data);
+            }
+        }
+
+        // Contact validation progress
+        if (event === 'whatsapp.contacts.validation_progress' || event === 'whatsapp.contacts.validation_complete') {
+            if (contactValidationCallbackRef.current) {
+                contactValidationCallbackRef.current(event, data);
             }
         }
     };
@@ -892,7 +911,7 @@ export default function WhatsAppSenderRunner({ tool, subscription, runtimePort, 
 
 
 
-    const handleLaunchCampaign = async () => {
+    const handleLaunchCampaign = async (dripSteps: any[] = [], scheduleOpts: any = null) => {
         const parsed = parseContacts();
         if (!selectedAccount) return alert(t.campaign.selectAccountError);
         if (parsed.length === 0)  return alert(t.campaign.noContactsError);
@@ -901,7 +920,7 @@ export default function WhatsAppSenderRunner({ tool, subscription, runtimePort, 
         const tpl = templates.find(t => t.id === selectedTemplateId);
         if (!tpl) return;
 
-        setIsCampaignRunning(true);
+        setIsCampaignRunning(!scheduleOpts?.scheduledAt);
         try {
             // Step 1: Create campaign record via RPC
             const res: any = await callRPC('createCampaign', {
@@ -921,11 +940,26 @@ export default function WhatsAppSenderRunner({ tool, subscription, runtimePort, 
                 bellCurve,
                 trackDelivery,
                 stopOnBlock,
-                maxBlockRate
+                maxBlockRate,
+                scheduledAt:       scheduleOpts?.scheduledAt || null,
+                isRecurring:       scheduleOpts?.isRecurring ? 1 : 0,
+                recurrencePattern: scheduleOpts?.recurrencePattern || 'none',
+                recurrenceDays:    scheduleOpts?.recurrenceDays || '',
+                // A/B Testing
+                abEnabled:         scheduleOpts?.abEnabled ? 1 : 0,
+                abSplitRatio:      scheduleOpts?.abSplitRatio || 50,
+                abVariantBMessage: scheduleOpts?.abVariantBMessage || ''
             });
 
-            // Step 2: Start it
-            await callRPC('startCampaign', { campaignId: res.campaignId, accountId: selectedAccount });
+            // Save Drip Steps if any exist (Milestone 3)
+            if (dripSteps && dripSteps.length > 0) {
+                await callRPC('saveCampaignSteps', { campaignId: res.campaignId, steps: dripSteps });
+            }
+
+            // Step 2: Start it ONLY if not scheduled
+            if (!scheduleOpts?.scheduledAt) {
+                await callRPC('startCampaign', { campaignId: res.campaignId, accountId: selectedAccount });
+            }
 
             // Switch to history tab to monitor
             setActiveTab('history');
@@ -986,6 +1020,9 @@ export default function WhatsAppSenderRunner({ tool, subscription, runtimePort, 
                     t={t}
                     runningCampaignsCount={runningCampaignsCount}
                     unreadInboxCount={unreadInboxCount}
+                    selectedAccount={selectedAccount}
+                    setSelectedAccount={setSelectedAccount}
+                    sessions={sessions}
                 />
             }
         >
@@ -996,12 +1033,15 @@ export default function WhatsAppSenderRunner({ tool, subscription, runtimePort, 
                     callRPC={callRPC}
                     daemonConnected={daemonConnected}
                     setActiveTab={setActiveTab}
+                    selectedAccount={selectedAccount}
                 />
             )}
 
             {activeTab === 'accounts' && (
                 <AccountsWorkspace
                     t={t}
+                    locale={locale}
+                    callRPC={callRPC}
                     activeQR={activeQR}
                     qrCountdown={qrCountdown}
                     qrSessionId={qrSessionId}
@@ -1117,6 +1157,9 @@ export default function WhatsAppSenderRunner({ tool, subscription, runtimePort, 
                     locale={locale}
                     callRPC={callRPC}
                     daemonConnected={daemonConnected}
+                    validationCallbackRef={contactValidationCallbackRef}
+                    sessions={sessions}
+                    selectedAccount={selectedAccount}
                 />
             )}
 
@@ -1150,6 +1193,7 @@ export default function WhatsAppSenderRunner({ tool, subscription, runtimePort, 
                     activeCampaigns={activeCampaigns}
                     campaignDelays={campaignDelays}
                     daemonConnected={daemonConnected}
+                    selectedAccount={selectedAccount}
                     onViewReport={(id: string, name: string) => {
                         setReportCampaignId(id);
                         setReportCampaignName(name);
@@ -1171,6 +1215,7 @@ export default function WhatsAppSenderRunner({ tool, subscription, runtimePort, 
                     campaignId={reportCampaignId}
                     campaignName={reportCampaignName}
                     daemonConnected={daemonConnected}
+                    selectedAccount={selectedAccount}
                     onBack={() => setActiveTab('history')}
                 />
             )}
@@ -1182,10 +1227,23 @@ export default function WhatsAppSenderRunner({ tool, subscription, runtimePort, 
                     callRPC={callRPC}
                     daemonConnected={daemonConnected}
                     sessions={sessions}
+                    selectedAccount={selectedAccount}
                     onNewMessageRef={inboxNewMessageCallbackRef}
                     onUnreadReset={() => {
                         callRPC('getUnreadCount', {}).then((res: any) => setUnreadInboxCount(res?.count || 0)).catch(() => {});
                     }}
+                />
+            )}
+
+            {activeTab === 'deliverability' && (
+                <DeliverabilityWorkspace
+                    t={t}
+                    locale={locale}
+                    callRPC={callRPC}
+                    daemonConnected={daemonConnected}
+                    sessions={sessions}
+                    selectedAccount={selectedAccount}
+                    onActivityRef={warmupActivityCallbackRef}
                 />
             )}
         </ToolShellLayout>

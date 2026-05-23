@@ -71,6 +71,7 @@ export default function CampaignWorkspace({
     callRPC, followUpData, clearFollowUpData
 }: any) {
     const [currentStep, setCurrentStep] = useState(0);
+    const [dripSteps, setDripSteps] = useState<any[]>([]);
     const [inputMethod, setInputMethod]   = useState<'paste' | 'file' | 'contacts'>('paste');
     const [uploadedFile, setUploadedFile] = useState<{ name: string; size: number; type: string } | null>(null);
     const [isDragging, setIsDragging]     = useState(false);
@@ -95,6 +96,16 @@ export default function CampaignWorkspace({
     const [scheduleDate, setScheduleDate] = useState('');
     const [scheduleTime, setScheduleTime] = useState('');
     const [isScheduling, setIsScheduling] = useState(false);
+
+    // Recurring state
+    const [isRecurring, setIsRecurring] = useState(false);
+    const [recurrencePattern, setRecurrencePattern] = useState('daily');
+    const [selectedDays, setSelectedDays] = useState<number[]>([]);
+
+    // A/B Testing state
+    const [abEnabled, setAbEnabled] = useState(false);
+    const [abSplitRatio, setAbSplitRatio] = useState(50);
+    const [abVariantBMessage, setAbVariantBMessage] = useState('');
 
     const isRtl = locale === 'ar';
 
@@ -363,6 +374,7 @@ export default function CampaignWorkspace({
     // ── Step definitions ─────────────────────────────────────────────────
     const steps = [
         { label: isRtl ? 'جهات الاتصال والقالب' : 'Contacts & Template', icon: Users },
+        { label: isRtl ? 'حملات المتابعة' : 'Drip Sequences',           icon: Timer },
         { label: isRtl ? 'سرعة الإرسال والأمان' : 'Pacing & Safety',     icon: ShieldCheck },
         { label: isRtl ? 'المراجعة والإطلاق' : 'Review & Launch',       icon: Rocket },
     ];
@@ -802,9 +814,202 @@ export default function CampaignWorkspace({
             )}
 
             {/* ══════════════════════════════════════════════════════════════════ */}
-            {/* STEP 2: Pacing & Safety                                          */}
+            {/* STEP 1.5: Drip sequences builder (Milestone 3)                    */}
             {/* ══════════════════════════════════════════════════════════════════ */}
             {currentStep === 1 && (
+                <div className="max-w-3xl mx-auto space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-400">
+                    <Card className="rounded-2xl overflow-hidden border-teal-500/20">
+                        <CardHeader className="pb-4 border-b bg-muted/20">
+                            <CardTitle className="text-base flex items-center justify-between">
+                                <span className="flex items-center gap-2">
+                                    <div className="size-8 rounded-xl bg-teal-100/60 dark:bg-teal-950/40 flex items-center justify-center">
+                                        <Timer className="w-4 h-4 text-teal-600" />
+                                    </div>
+                                    {isRtl ? 'بناء حملات المتابعة المتسلسلة (Drip)' : 'AI Drip Sequence & Follow-ups'}
+                                </span>
+                                <Badge variant="outline" className="border-teal-500/30 text-teal-600 bg-teal-50/50 dark:bg-teal-950/20 text-[10px] font-bold">
+                                    {isRtl ? 'حملات تفاعلية' : 'Autonomous Sequences'}
+                                </Badge>
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent className="pt-6 space-y-6 text-start">
+                            {/* Explanatory Info Card */}
+                            <div className="p-4 rounded-2xl bg-teal-50/40 dark:bg-teal-950/10 border border-teal-500/20 flex items-start gap-3">
+                                <Info className="w-4.5 h-4.5 text-teal-600 shrink-0 mt-0.5" />
+                                <div className="space-y-1">
+                                    <p className="text-xs font-bold text-teal-800 dark:text-teal-400">
+                                        {isRtl ? 'كيف تعمل المتابعة المتسلسلة التلقائية؟' : 'How does Automated Drip Sequences work?'}
+                                    </p>
+                                    <p className="text-[11px] text-slate-500 dark:text-slate-450 leading-relaxed font-semibold">
+                                        {isRtl
+                                            ? 'سيتم إرسال رسائل المتابعة تلقائياً في التواقيت المحددة للعملاء الذين لم يردوا على رسالتك الأساسية. يتم إيقاف وتجميد السلسلة فوراً بمجرد أن يقوم العميل بالرد لتجنب إزعاجه.'
+                                            : 'Follow-up messages are automatically sent to target contacts at specified intervals if they haven\'t replied to your main outreach. The sequence immediately halts the moment a reply is intercepted to preserve customer comfort.'
+                                        }
+                                    </p>
+                                </div>
+                            </div>
+
+                            {/* Opener message preview card */}
+                            <div className="p-4 rounded-2xl border border-slate-100 dark:border-slate-800 bg-slate-50/30 dark:bg-slate-900/10 space-y-2">
+                                <div className="flex items-center justify-between">
+                                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{isRtl ? 'الرسالة الافتتاحية الأساسية' : 'Opener Outreach Message'}</span>
+                                    <Badge variant="secondary" className="text-[9px] font-bold bg-slate-100 dark:bg-slate-800">
+                                        {isRtl ? 'الرسالة الافتتاحية' : 'Opener'}
+                                    </Badge>
+                                </div>
+                                <p className="text-xs font-semibold text-slate-700 dark:text-slate-300 line-clamp-2">
+                                    {selectedTemplate
+                                        ? ((selectedTemplate.parts || []).find((p: any) => p.type === 'text')?.message || selectedTemplate.message || '')
+                                        : (isRtl ? 'لم يتم تحديد قالب رسالة بعد.' : 'No template selected yet.')
+                                    }
+                                </p>
+                            </div>
+
+                            {/* Steps list flow */}
+                            {dripSteps.length > 0 && (
+                                <div className="space-y-5 relative pl-4 border-l-2 border-dashed border-teal-500/20 ml-2">
+                                    {dripSteps.map((step, index) => (
+                                        <div key={index} className="relative space-y-3 bg-white dark:bg-slate-950 p-4 border border-slate-100 dark:border-slate-800 rounded-2xl shadow-sm">
+                                            {/* Dotted indicator dot */}
+                                            <div className="absolute -left-[23px] top-7 w-3.5 h-3.5 rounded-full bg-teal-500 border-2 border-white dark:border-slate-950 flex items-center justify-center shadow" />
+                                            
+                                            <div className="flex items-center justify-between">
+                                                <div className="flex items-center gap-2">
+                                                    <Badge className="bg-teal-500 text-white font-bold text-[9px] px-2 py-0.5 rounded">
+                                                        {isRtl ? `خطوة المتابعة #${index + 1}` : `Follow-up Step #${index + 1}`}
+                                                    </Badge>
+                                                    <span className="text-[9px] uppercase font-bold text-rose-500 flex items-center gap-1">
+                                                        <Zap className="w-3 h-3 fill-current animate-pulse" />
+                                                        {isRtl ? 'إذا لم يرد العميل' : 'If No Reply'}
+                                                    </span>
+                                                </div>
+
+                                                <Button
+                                                    size="icon"
+                                                    variant="ghost"
+                                                    type="button"
+                                                    onClick={() => {
+                                                        const updated = dripSteps.filter((_, i) => i !== index).map((s, i) => ({ ...s, step_number: i + 1 }));
+                                                        setDripSteps(updated);
+                                                    }}
+                                                    className="size-7 text-slate-400 hover:text-rose-500 rounded-lg"
+                                                >
+                                                    <Trash2 className="size-4" />
+                                                </Button>
+                                            </div>
+
+                                            {/* Delay and type parameters */}
+                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                                <div className="space-y-1.5">
+                                                    <Label className="text-[10px] font-bold text-slate-500">{isRtl ? 'أرسل المتابعة بعد:' : 'Send follow-up after:'}</Label>
+                                                    <select
+                                                        value={step.delay_hours}
+                                                        onChange={(e) => {
+                                                            const val = Number(e.target.value);
+                                                            setDripSteps(prev => prev.map((s, i) => i === index ? { ...s, delay_hours: val } : s));
+                                                        }}
+                                                        className="flex h-9 w-full rounded-lg border border-slate-200 dark:border-slate-800 bg-background px-3 py-1 text-xs ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 font-bold"
+                                                    >
+                                                        <option value={1}>{isRtl ? 'ساعة واحدة' : '1 Hour'}</option>
+                                                        <option value={3}>{isRtl ? '3 ساعات' : '3 Hours'}</option>
+                                                        <option value={6}>{isRtl ? '6 ساعات' : '6 Hours'}</option>
+                                                        <option value={12}>{isRtl ? '12 ساعة' : '12 Hours'}</option>
+                                                        <option value={24}>{isRtl ? '24 ساعة (يوم 1)' : '24 Hours (1 Day)'}</option>
+                                                        <option value={48}>{isRtl ? '48 ساعة (يومين)' : '48 Hours (2 Days)'}</option>
+                                                        <option value={72}>{isRtl ? '72 ساعة (3 أيام)' : '72 Hours (3 Days)'}</option>
+                                                        <option value={120}>{isRtl ? '5 أيام' : '5 Days'}</option>
+                                                    </select>
+                                                </div>
+
+                                                <div className="space-y-1.5">
+                                                    <Label className="text-[10px] font-bold text-slate-500">{isRtl ? 'نوع الرسالة:' : 'Message Attachment:'}</Label>
+                                                    <select
+                                                        value={step.media_type}
+                                                        onChange={(e) => {
+                                                            const val = e.target.value;
+                                                            setDripSteps(prev => prev.map((s, i) => i === index ? { ...s, media_type: val, media_url: val === 'text' ? '' : s.media_url } : s));
+                                                        }}
+                                                        className="flex h-9 w-full rounded-lg border border-slate-200 dark:border-slate-800 bg-background px-3 py-1 text-xs ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 font-bold"
+                                                    >
+                                                        <option value="text">{isRtl ? 'نص فقط' : 'Text only'}</option>
+                                                        <option value="image">{isRtl ? 'صورة مرفقة' : 'Image attachment'}</option>
+                                                        <option value="video">{isRtl ? 'فيديو مرفق' : 'Video attachment'}</option>
+                                                        <option value="document">{isRtl ? 'ملف/مستند' : 'Document attachment'}</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                            {/* Message Content Textarea */}
+                                            <div className="space-y-1.5">
+                                                <div className="flex items-center justify-between">
+                                                    <Label className="text-[10px] font-bold text-slate-500">{isRtl ? 'محتوى رسالة المتابعة:' : 'Follow-up Message Content:'}</Label>
+                                                    <span className="text-[9px] text-muted-foreground font-semibold">
+                                                        {isRtl ? 'المتغيرات: {name}, {company}' : 'Variables: {name}, {company}'}
+                                                    </span>
+                                                </div>
+                                                <Textarea
+                                                    rows={3}
+                                                    value={step.message}
+                                                    onChange={(e) => {
+                                                        const val = e.target.value;
+                                                        setDripSteps(prev => prev.map((s, i) => i === index ? { ...s, message: val } : s));
+                                                    }}
+                                                    placeholder={isRtl ? 'أهلا {name}، أردت فقط التأكد من وصول عرضنا...' : 'Hey {name}, just checking in to see if you had any questions on our offer...'}
+                                                    className="text-xs resize-none rounded-xl focus-visible:ring-teal-500 font-medium"
+                                                />
+                                            </div>
+
+                                            {/* Media URL if not text */}
+                                            {step.media_type !== 'text' && (
+                                                <div className="space-y-1.5 animate-in slide-in-from-top-1 duration-200">
+                                                    <Label className="text-[10px] font-bold text-slate-500">{isRtl ? 'رابط ملف الميديا المرفق:' : 'Attached Media URL:'}</Label>
+                                                    <Input
+                                                        type="text"
+                                                        value={step.media_url}
+                                                        onChange={(e) => {
+                                                            const val = e.target.value;
+                                                            setDripSteps(prev => prev.map((s, i) => i === index ? { ...s, media_url: val } : s));
+                                                        }}
+                                                        placeholder="https://..."
+                                                        className="h-9 text-xs focus-visible:ring-teal-500 border-slate-200 rounded-xl"
+                                                    />
+                                                </div>
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+
+                            {/* Add follow up button */}
+                            <Button
+                                type="button"
+                                variant="outline"
+                                onClick={() => {
+                                    setDripSteps(prev => [
+                                        ...prev,
+                                        {
+                                            step_number: prev.length + 1,
+                                            delay_hours: 24,
+                                            message: '',
+                                            media_url: '',
+                                            media_type: 'text'
+                                        }
+                                    ]);
+                                }}
+                                className="w-full h-11 border-dashed hover:border-teal-500/50 hover:bg-teal-500/[0.02] text-teal-600 rounded-2xl flex items-center justify-center gap-1.5 text-xs font-extrabold transition-all duration-300"
+                            >
+                                <Timer className="w-4 h-4 text-teal-600" />
+                                {isRtl ? 'إضافة خطوة متابعة جديدة (Follow-up Step)' : 'Add Follow-up Drip Step'}
+                            </Button>
+                        </CardContent>
+                    </Card>
+                </div>
+            )}
+
+            {/* ══════════════════════════════════════════════════════════════════ */}
+            {/* STEP 2: Pacing & Safety                                          */}
+            {/* ══════════════════════════════════════════════════════════════════ */}
+            {currentStep === 2 && (
                 <div className="max-w-3xl mx-auto space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-400">
                     {/* Speed Preset Card */}
                     <Card className="rounded-2xl overflow-hidden">
@@ -1092,13 +1297,89 @@ export default function CampaignWorkspace({
                             )}
                         </CardContent>
                     </Card>
+                    {/* ── A/B Testing Card ──────────────────────────────────────── */}
+                    <Card className="rounded-2xl overflow-hidden">
+                        <CardHeader className="pb-4 border-b bg-muted/20">
+                            <CardTitle className="text-base flex items-center justify-between">
+                                <span className="flex items-center gap-2">
+                                    <div className="size-8 rounded-xl bg-indigo-100/60 dark:bg-indigo-950/40 flex items-center justify-center">
+                                        <Sparkles className="w-4 h-4 text-indigo-600" />
+                                    </div>
+                                    {isRtl ? 'اختبار A/B' : 'A/B Testing'}
+                                </span>
+                                <Switch
+                                    checked={abEnabled}
+                                    onCheckedChange={setAbEnabled}
+                                    className="data-checked:bg-indigo-600"
+                                />
+                            </CardTitle>
+                        </CardHeader>
+                        {abEnabled && (
+                            <CardContent className="pt-5 space-y-4">
+                                <div className="flex items-center gap-2 px-3 py-2 bg-indigo-50/80 dark:bg-indigo-950/20 border border-indigo-200/50 dark:border-indigo-800/30 rounded-lg">
+                                    <Info className="w-3.5 h-3.5 text-indigo-600 shrink-0" />
+                                    <p className="text-[10px] text-indigo-700 dark:text-indigo-400 font-medium">
+                                        {isRtl 
+                                            ? 'سيتم تقسيم جهات الاتصال عشوائياً بين نسختين من الرسالة لمعرفة أيهما يحقق أداءً أفضل.' 
+                                            : 'Contacts will be randomly split between two message variants to determine which performs better.'}
+                                    </p>
+                                </div>
+
+                                {/* Split Ratio Slider */}
+                                <div className="space-y-2">
+                                    <Label className="text-xs font-bold text-start block">
+                                        {isRtl ? 'نسبة التقسيم' : 'Split Ratio'}
+                                    </Label>
+                                    <div className="flex items-center gap-3">
+                                        <div className="flex items-center gap-1.5">
+                                            <div className="w-3 h-3 rounded-full bg-teal-500" />
+                                            <span className="text-xs font-bold text-teal-600">A: {abSplitRatio}%</span>
+                                        </div>
+                                        <Input 
+                                            type="range" 
+                                            min={10} max={90} 
+                                            value={abSplitRatio} 
+                                            onChange={e => setAbSplitRatio(Number(e.target.value))}
+                                            className="p-0 h-auto border-none cursor-pointer accent-indigo-600 flex-1" 
+                                        />
+                                        <div className="flex items-center gap-1.5">
+                                            <div className="w-3 h-3 rounded-full bg-orange-500" />
+                                            <span className="text-xs font-bold text-orange-600">B: {100 - abSplitRatio}%</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Variant B Message */}
+                                <div className="space-y-2">
+                                    <Label className="text-xs font-bold text-start block">
+                                        <span className="inline-flex items-center gap-1.5">
+                                            <div className="w-4 h-4 rounded bg-orange-500 flex items-center justify-center text-white text-[9px] font-black">B</div>
+                                            {isRtl ? 'رسالة النسخة B' : 'Variant B Message'}
+                                        </span>
+                                    </Label>
+                                    <Textarea
+                                        value={abVariantBMessage}
+                                        onChange={e => setAbVariantBMessage(e.target.value)}
+                                        placeholder={isRtl ? 'اكتب النسخة البديلة من الرسالة هنا...' : 'Write the alternative message variant here...'}
+                                        rows={3}
+                                        className="resize-none text-sm text-start"
+                                    />
+                                    <p className="text-[10px] text-muted-foreground">
+                                        {isRtl 
+                                            ? 'النسخة A ستكون الرسالة الأصلية من القالب المختار. هذه هي النسخة البديلة.' 
+                                            : 'Variant A will be the original template message. This is the alternative variant.'}
+                                    </p>
+                                </div>
+                            </CardContent>
+                        )}
+                    </Card>
                 </div>
             )}
 
             {/* ══════════════════════════════════════════════════════════════════ */}
             {/* STEP 3: Review & Launch                                          */}
             {/* ══════════════════════════════════════════════════════════════════ */}
-            {currentStep === 2 && (
+            {currentStep === 3 && (
                 <div className="max-w-3xl mx-auto space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-400">
                     {/* Campaign Identity */}
                     <Card className="rounded-2xl overflow-hidden border-teal-500/20">
@@ -1198,6 +1479,18 @@ export default function CampaignWorkspace({
                                         </span>
                                     </li>
 
+                                    {dripSteps.length > 0 && (
+                                        <li className="flex items-center justify-between pt-2 border-t border-dashed border-muted-foreground/10">
+                                            <span className="text-muted-foreground font-bold flex items-center gap-1">
+                                                <Timer className="size-3.5 text-teal-600" />
+                                                {isRtl ? 'خطوات المتابعة (Drip Steps):' : 'Scheduled Follow-ups (Drips):'}
+                                            </span>
+                                            <Badge className="bg-teal-500 text-white font-bold text-[10px] px-2 py-0.5 rounded-lg border-none">
+                                                {dripSteps.length} {isRtl ? 'خطوات متابعة' : 'steps'}
+                                            </Badge>
+                                        </li>
+                                    )}
+
                                     {getParsedRecipients.length > 0 && (
                                         <li className="flex items-center justify-between pt-2.5 mt-1 border-t border-dashed border-muted-foreground/10 text-xs">
                                             <span className="text-muted-foreground font-bold flex items-center gap-1">
@@ -1264,13 +1557,13 @@ export default function CampaignWorkspace({
                             {/* Schedule Section */}
                             <div className={`p-4 rounded-2xl border transition-all duration-300 text-start ${
                                 scheduleMode
-                                    ? 'border-amber-300 bg-amber-50/30 dark:bg-amber-950/10 dark:border-amber-800/30'
+                                    ? 'border-amber-300 bg-amber-50/30 dark:bg-amber-950/10 dark:border-amber-800/30 shadow-sm'
                                     : 'border-muted bg-muted/5'
                             }`}>
                                 <div className="flex items-center justify-between mb-3">
                                     <div className="flex items-center gap-2">
-                                        <CalendarClock className="w-4 h-4 text-amber-600" />
-                                        <span className="text-sm font-bold">{isRtl ? 'جدولة الحملة' : 'Schedule Campaign'}</span>
+                                        <CalendarClock className="w-4 h-4 text-amber-600 animate-pulse" />
+                                        <span className="text-sm font-black">{isRtl ? 'جدولة وإعداد تكرار الحملة' : 'Schedule & Recurrence Options'}</span>
                                     </div>
                                     <Switch
                                         checked={scheduleMode}
@@ -1278,26 +1571,100 @@ export default function CampaignWorkspace({
                                     />
                                 </div>
                                 {scheduleMode && (
-                                    <div className="flex gap-3 mt-3 animate-in slide-in-from-top-1 duration-200">
-                                        <div className="flex-1 space-y-1.5">
-                                            <Label className="text-xs">{isRtl ? 'التاريخ' : 'Date'}</Label>
-                                            <Input
-                                                type="date"
-                                                value={scheduleDate}
-                                                onChange={e => setScheduleDate(e.target.value)}
-                                                min={new Date().toISOString().split('T')[0]}
-                                                className="rounded-xl text-sm"
-                                            />
+                                    <div className="space-y-4 mt-3.5 animate-in slide-in-from-top-1 duration-300">
+                                        {/* Date and Time pickers */}
+                                        <div className="flex gap-3">
+                                            <div className="flex-1 space-y-1.5">
+                                                <Label className="text-[11px] font-bold text-muted-foreground">{isRtl ? 'تاريخ البدء' : 'Start Date'}</Label>
+                                                <Input
+                                                    type="date"
+                                                    value={scheduleDate}
+                                                    onChange={e => setScheduleDate(e.target.value)}
+                                                    min={new Date().toISOString().split('T')[0]}
+                                                    className="rounded-xl text-sm h-10 border-muted focus-visible:ring-amber-500 font-medium"
+                                                />
+                                            </div>
+                                            <div className="flex-1 space-y-1.5">
+                                                <Label className="text-[11px] font-bold text-muted-foreground">{isRtl ? 'وقت البدء' : 'Start Time'}</Label>
+                                                <Input
+                                                    type="time"
+                                                    value={scheduleTime}
+                                                    onChange={e => setScheduleTime(e.target.value)}
+                                                    className="rounded-xl text-sm h-10 border-muted focus-visible:ring-amber-500 font-medium"
+                                                />
+                                            </div>
                                         </div>
-                                        <div className="flex-1 space-y-1.5">
-                                            <Label className="text-xs">{isRtl ? 'الوقت' : 'Time'}</Label>
-                                            <Input
-                                                type="time"
-                                                value={scheduleTime}
-                                                onChange={e => setScheduleTime(e.target.value)}
-                                                className="rounded-xl text-sm"
-                                            />
+
+                                        {/* Recurrence Switch */}
+                                        <div className="pt-3 border-t border-dashed border-amber-300/40 dark:border-amber-800/40 flex items-start justify-between">
+                                            <div className="space-y-0.5 text-start max-w-[80%]">
+                                                <Label htmlFor="isRecurring" className="font-extrabold text-xs cursor-pointer flex items-center gap-1.5 text-foreground">
+                                                    <Timer className="w-3.5 h-3.5 text-amber-500" />
+                                                    {isRtl ? 'تكرار دوري تلقائي' : 'Recurring Campaign'}
+                                                </Label>
+                                                <p className="text-[10px] text-muted-foreground leading-normal">
+                                                    {isRtl 
+                                                        ? 'إعادة تشغيل الحملة دورياً بمجرد اكتمالها بعد جدولة وقت جديد للمستقبل.' 
+                                                        : 'Automatically reset, re-queue contacts, and schedule the next execution window on completion.'
+                                                    }
+                                                </p>
+                                            </div>
+                                            <Switch id="isRecurring" checked={isRecurring} onCheckedChange={setIsRecurring} className="data-[state=checked]:bg-amber-500" />
                                         </div>
+
+                                        {/* Recurrence Configuration Panels */}
+                                        {isRecurring && (
+                                            <div className="p-3.5 rounded-xl bg-background/50 border border-amber-200 dark:border-amber-900/30 space-y-3.5 animate-in slide-in-from-top-2 duration-300">
+                                                <div className="space-y-1.5">
+                                                    <Label className="text-[10px] font-bold text-muted-foreground">{isRtl ? 'نمط التكرار' : 'Recurrence Pattern'}</Label>
+                                                    <select
+                                                        value={recurrencePattern}
+                                                        onChange={e => setRecurrencePattern(e.target.value)}
+                                                        className="flex h-9 w-full rounded-xl border border-muted bg-background px-3 py-1 text-xs ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 font-bold"
+                                                    >
+                                                        <option value="daily">{isRtl ? 'يومياً' : 'Daily'}</option>
+                                                        <option value="weekly">{isRtl ? 'أسبوعياً' : 'Weekly'}</option>
+                                                        <option value="monthly">{isRtl ? 'شهرياً' : 'Monthly'}</option>
+                                                        <option value="weekdays">{isRtl ? 'أيام العمل فقط (Mon-Fri)' : 'Weekdays Only (Mon-Fri)'}</option>
+                                                        <option value="custom">{isRtl ? 'تخصيص أيام معينة' : 'Custom Days'}</option>
+                                                    </select>
+                                                </div>
+
+                                                {/* Weekday Checklist for Custom */}
+                                                {recurrencePattern === 'custom' && (
+                                                    <div className="space-y-2 animate-in fade-in duration-350">
+                                                        <Label className="text-[10px] font-bold text-muted-foreground">{isRtl ? 'اختر أيام الإرسال من الأسبوع:' : 'Select days of the week:'}</Label>
+                                                        <div className="flex flex-wrap gap-1.5 justify-center sm:justify-start">
+                                                            {[
+                                                                { label: isRtl ? 'أحد' : 'Sun', value: 0 },
+                                                                { label: isRtl ? 'اثنين' : 'Mon', value: 1 },
+                                                                { label: isRtl ? 'ثلاثاء' : 'Tue', value: 2 },
+                                                                { label: isRtl ? 'أربعاء' : 'Wed', value: 3 },
+                                                                { label: isRtl ? 'خميس' : 'Thu', value: 4 },
+                                                                { label: isRtl ? 'جمعة' : 'Fri', value: 5 },
+                                                                { label: isRtl ? 'سبت' : 'Sat', value: 6 }
+                                                            ].map(day => {
+                                                                const active = selectedDays.includes(day.value);
+                                                                return (
+                                                                    <button
+                                                                        type="button"
+                                                                        key={day.value}
+                                                                        onClick={() => setSelectedDays(prev => prev.includes(day.value) ? prev.filter(d => d !== day.value) : [...prev, day.value])}
+                                                                        className={`px-3 py-1.5 text-[10px] font-black rounded-lg border transition-all select-none ${
+                                                                            active
+                                                                                ? 'bg-amber-500 text-white border-amber-600 shadow shadow-amber-500/20'
+                                                                                : 'bg-background hover:bg-muted text-muted-foreground hover:text-foreground'
+                                                                        }`}
+                                                                    >
+                                                                        {day.label}
+                                                                    </button>
+                                                                );
+                                                            })}
+                                                        </div>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        )}
                                     </div>
                                 )}
                             </div>
@@ -1313,22 +1680,24 @@ export default function CampaignWorkspace({
                                             }
                                             setIsScheduling(true);
                                             try {
-                                                // Create campaign first, then schedule it
-                                                await handleLaunchCampaign();
-                                                // Wait briefly for campaign to be created, then schedule it
-                                                const scheduledAt = `${scheduleDate}T${scheduleTime}:00`;
-                                                // Get the latest campaign from DB and set its schedule
-                                                const res: any = await callRPC('getCampaigns', {});
-                                                const latest = res?.campaigns?.[0];
-                                                if (latest) {
-                                                    await callRPC('pauseCampaign', { campaignId: latest.id });
-                                                    // Set the schedule using direct DB update via store
-                                                    await callRPC('scheduleCampaign', { campaignId: latest.id, scheduledAt });
-                                                }
-                                                alert(isRtl ? `تم جدولة الحملة في ${scheduleDate} ${scheduleTime}` : `Campaign scheduled for ${scheduleDate} ${scheduleTime}`);
+                                                const scheduledAt = `${scheduleDate} ${scheduleTime}:00`;
+                                                await handleLaunchCampaign(dripSteps, {
+                                                    scheduledAt,
+                                                    isRecurring,
+                                                    recurrencePattern,
+                                                    recurrenceDays: selectedDays.join(','),
+                                                    abEnabled,
+                                                    abSplitRatio,
+                                                    abVariantBMessage
+                                                });
+                                                alert(isRtl 
+                                                    ? `تم جدولة الحملة بنجاح وتكرارها! ستنطلق في ${scheduleDate} ${scheduleTime}`
+                                                    : `Campaign scheduled and recurring successfully! Starts at ${scheduleDate} ${scheduleTime}`
+                                                );
                                                 setScheduleMode(false);
                                                 setScheduleDate('');
                                                 setScheduleTime('');
+                                                setIsRecurring(false);
                                             } catch (err: any) {
                                                 alert(`Schedule failed: ${err.message}`);
                                             }
@@ -1351,8 +1720,8 @@ export default function CampaignWorkspace({
                                         )}
                                     </Button>
                                 ) : (
-                                <Button
-                                    onClick={handleLaunchCampaign}
+                                 <Button
+                                     onClick={() => handleLaunchCampaign(dripSteps, { abEnabled, abSplitRatio, abVariantBMessage })}
                                     disabled={isCampaignRunning || getParsedRecipients.length === 0 || !selectedTemplateId || !selectedAccount}
                                     size="lg"
                                     className="flex-1 bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 active:scale-[0.98] transition-all duration-300 text-white font-bold h-12 shadow-md hover:shadow-teal-500/20 flex items-center justify-center gap-2 rounded-2xl group border-none"
