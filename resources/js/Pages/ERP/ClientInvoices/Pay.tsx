@@ -210,12 +210,12 @@ export default function Pay({
                                     <Wallet className="w-5 h-5" />
                                 </div>
                                 <div className="space-y-0.5 min-w-0">
-                                    <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider block">Bookkeeping Balance</span>
+                                    <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider block">Wallet Balance</span>
                                     <span className="text-lg font-bold text-slate-900 tracking-tight block">
                                         <CurrencyDisplay amount={client_balance} currency={wallet_currency} />
                                     </span>
                                     <span className="text-[10px] text-slate-500 leading-normal block">
-                                        Isolated Client-Bookkeeping Wallet
+                                        Platform Wallet
                                     </span>
                                 </div>
                             </div>
@@ -250,7 +250,7 @@ export default function Pay({
                                             <ShieldAlert className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
                                             <div className="text-xs leading-normal">
                                                 <span className="font-bold block mb-1">Insufficient Funds</span>
-                                                Your bookkeeping balance is not sufficient to settle this invoice. Please request the workspace administrator to load your wallet balance.
+                                                Your wallet balance is not sufficient to settle this invoice. Please top up your wallet balance.
                                             </div>
                                         </div>
                                     )}
@@ -265,7 +265,7 @@ export default function Pay({
                                     </Button>
 
                                     <p className="text-[10px] text-slate-400 text-center leading-normal">
-                                        By checking out, you authorize immediate debit of <span className="font-semibold">{invoice.remaining.toFixed(2)} {invoice.currency}</span> from your tenant bookkeeping balance ledger.
+                                        By checking out, you authorize immediate debit of <span className="font-semibold">{invoice.remaining.toFixed(2)} {invoice.currency}</span> from your platform wallet balance.
                                     </p>
                                 </div>
                             )}

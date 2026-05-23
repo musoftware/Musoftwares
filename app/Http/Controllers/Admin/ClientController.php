@@ -211,7 +211,7 @@ class ClientController extends Controller
 
                 // Fee processing via CostTransaction (legacy)
                 if ($fee > 0) {
-                    \App\Models\Finance\CostTransaction::create([
+                    \App\Models\CostTransaction::create([
                         'user_id' => $wallet->owner_id,
                         'amount' => $fee,
                         'currency' => $wallet->currency,
@@ -262,7 +262,7 @@ class ClientController extends Controller
             'description' => 'nullable|string'
         ]);
 
-        $task = \App\Models\Marketplace\Task::create([
+        $task = \App\Models\Task::create([
             'user_id' => $id,
             'task_name' => $request->title,
             'task_description' => $request->description,

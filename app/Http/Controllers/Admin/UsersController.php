@@ -108,14 +108,10 @@ class UsersController extends Controller
             ->take(2)
             ->implode('');
 
-        $walletData = null;
-        try {
-            $wallet     = $user->getWallet();
-            $walletData = [
-                'balance'  => (float) $wallet->balance,
-                'currency' => $wallet->currency,
-            ];
-        } catch (\Throwable $e) {}
+        $walletData = [
+            'balance'  => (float) $user->user_balance,
+            'currency' => $user->preferred_currency ?? 'USD',
+        ];
 
         $stats = [
             'tickets_total'  => $user->supportTickets()->count(),

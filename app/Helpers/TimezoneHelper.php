@@ -2,8 +2,8 @@
 
 namespace App\Helpers;
 
-use App\Models\Finance\CostTransaction;
-use App\Models\Finance\Transaction;
+use App\Models\CostTransaction;
+use App\Models\Transaction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;

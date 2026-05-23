@@ -74,13 +74,12 @@ class HandleInertiaRequests extends Middleware
                 return null;
             },
             'wallet' => function () use ($user) {
-                if ($user && \Illuminate\Support\Facades\Schema::hasTable('wallets')) {
-                    $wallet = $user->getWallet();
+                if ($user) {
                     return [
-                        'id' => $wallet->id,
-                        'balance' => $wallet->balance,
-                        'earned_balance' => $wallet->earned_balance ?? 0,
-                        'currency' => $wallet->currency ?? 'USD',
+                        'id' => null,
+                        'balance' => $user->user_balance,
+                        'earned_balance' => 0,
+                        'currency' => $user->preferred_currency ?? 'USD',
                     ];
                 }
                 return null;

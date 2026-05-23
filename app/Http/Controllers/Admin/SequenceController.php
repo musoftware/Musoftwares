@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Marketing\PlatformSequence;
-use App\Models\Marketing\PlatformSequenceStep;
+use App\Models\PlatformSequence;
+use App\Models\PlatformSequenceStep;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Http;

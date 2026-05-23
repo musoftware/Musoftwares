@@ -3,8 +3,7 @@
 namespace App\Services;
 
 use App\Models\User;
-use Modules\Core\Models\Wallet;
-use Modules\Core\Models\WalletTransaction;
+use App\Models\Transaction;
 use Modules\Core\Models\UserWithdrawal;
 use Modules\Core\Services\ExchangeRateService;
 use Illuminate\Support\Facades\DB;
@@ -12,7 +11,7 @@ use Illuminate\Support\Facades\DB;
 /**
  * Balance management service providing reconciliation and computation utilities.
  * Recovered from old project: App\Helpers\BalancesHelper
- * Modernized: Service-oriented, wallet-based (not user-field-based).
+ * Modernized: Service-oriented, legacy-based (user-field-based).
  */
 class BalanceService
 {
@@ -30,22 +29,20 @@ class BalanceService
      *
      * Recovered from old project: BalancesHelper::CalcBalance()
      */
-    public function recalculateWalletBalance(Wallet $wallet): float
+    public function recalculateUserBalance(User $user): float
     {
-        $wallet = Wallet::lockForUpdate()->find($wallet->id);
-
-        $credits = WalletTransaction::where('wallet_id', $wallet->id)
-            ->where('type', 'credit')
+        $credits = Transaction::where('user_id', $user->id)
+            ->whereIn('type', ['received', 'earned'])
             ->sum('amount');
 
-        $debits = WalletTransaction::where('wallet_id', $wallet->id)
-            ->where('type', 'debit')
+        $debits = Transaction::where('user_id', $user->id)
+            ->whereIn('type', ['paid', 'used', 'withdrawn'])
             ->sum('amount');
 
         $calculatedBalance = round($credits - $debits, 2);
 
-        if (abs($calculatedBalance - (float) $wallet->balance) > 0.01) {
-            $wallet->update(['balance' => $calculatedBalance]);
+        if (abs($calculatedBalance - (float) $user->user_balance) > 0.01) {
+            $user->update(['user_balance' => $calculatedBalance]);
         }
 
         return $calculatedBalance;
@@ -78,9 +75,8 @@ class BalanceService
      */
     public function availableBalance(User $user): float
     {
-        $wallet = $user->getWallet();
         $pending = $this->pendingWithdrawalAmount($user);
-        return max(0, round((float) $wallet->balance - $pending, 2));
+        return max(0, round((float) $user->user_balance - $pending, 2));
     }
 
     /**
@@ -88,9 +84,8 @@ class BalanceService
      */
     public function availableEarnedBalance(User $user): float
     {
-        $wallet = $user->getWallet();
         $pending = $this->pendingWithdrawalAmount($user);
-        return max(0, round((float) ($wallet->earned_balance ?? 0) - $pending, 2));
+        return max(0, round((float) ($user->pending_commission ?? 0) - $pending, 2));
     }
 
     /**
@@ -98,9 +93,8 @@ class BalanceService
      */
     public function totalDepositedThisMonth(User $user): float
     {
-        $wallet = $user->getWallet();
-        return (float) WalletTransaction::where('wallet_id', $wallet->id)
-            ->where('type', 'credit')
+        return (float) Transaction::where('user_id', $user->id)
+            ->whereIn('type', ['received', 'earned'])
             ->whereMonth('created_at', now()->month)
             ->whereYear('created_at', now()->year)
             ->sum('amount');
@@ -111,9 +105,8 @@ class BalanceService
      */
     public function totalSpentThisMonth(User $user): float
     {
-        $wallet = $user->getWallet();
-        return (float) WalletTransaction::where('wallet_id', $wallet->id)
-            ->where('type', 'debit')
+        return (float) Transaction::where('user_id', $user->id)
+            ->whereIn('type', ['paid', 'used', 'withdrawn'])
             ->whereMonth('created_at', now()->month)
             ->whereYear('created_at', now()->year)
             ->sum('amount');

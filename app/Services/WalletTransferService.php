@@ -3,7 +3,7 @@
 namespace App\Services;
 
 use App\Models\User;
-use App\Models\Finance\WalletTransfer;
+use App\Models\WalletTransfer;
 use Modules\Core\Services\WalletService;
 use Modules\Core\Services\ExchangeRateService;
 use Illuminate\Support\Facades\DB;
@@ -14,12 +14,10 @@ use Exception;
 
 class WalletTransferService
 {
-    protected WalletService $walletService;
     protected ExchangeRateService $exchangeRateService;
 
-    public function __construct(WalletService $walletService, ExchangeRateService $exchangeRateService)
+    public function __construct(ExchangeRateService $exchangeRateService)
     {
-        $this->walletService = $walletService;
         $this->exchangeRateService = $exchangeRateService;
     }
 
@@ -44,15 +42,11 @@ class WalletTransferService
         $sender = User::findOrFail($senderId);
         $receiver = User::findOrFail($receiverId);
 
-        $senderWallet = $sender->getWallet();
-        $receiverWallet = $receiver->getWallet();
+        $senderCurrency = $sender->preferred_currency ?? 'USD';
+        $receiverCurrency = $receiver->preferred_currency ?? 'USD';
 
-        // 2. Fetch exchange rate & calculate cross-currency conversion
-        $senderCurrency = $senderWallet->currency;
-        $receiverCurrency = $receiverWallet->currency;
-
-        // If sender tries to send a currency different than their wallet currency,
-        // we first validate and then handle it based on their wallet's preferred base currency.
+        // If sender tries to send a currency different than their preferred currency,
+        // we first validate and then handle it based on their preferred currency.
         if ($currency !== $senderCurrency) {
             throw ValidationException::withMessages([
                 'currency' => ['You can only send transfers using your wallet currency (' . $senderCurrency . ').'],
@@ -72,7 +66,7 @@ class WalletTransferService
         $totalDebitRequired = $amount + $fee;
 
         // Verify Sender balance
-        $senderBalance = (float) $senderWallet->balance;
+        $senderBalance = (float) $sender->available_balance();
         if ($senderBalance < $totalDebitRequired) {
             throw ValidationException::withMessages([
                 'amount' => ['Insufficient funds. You need ' . number_format($totalDebitRequired, 2) . ' ' . $senderCurrency . ' (including fees) but only have ' . number_format($senderBalance, 2) . ' ' . $senderCurrency . '.'],
@@ -122,15 +116,15 @@ class WalletTransferService
         $convertedAmount = round($amount * $finalExchangeRate, 2);
 
         try {
-            return DB::transaction(function () use ($sender, $receiver, $senderWallet, $receiverWallet, $amount, $fee, $convertedAmount, $senderCurrency, $receiverCurrency, $finalExchangeRate, $reason) {
+            return DB::transaction(function () use ($sender, $receiver, $amount, $fee, $convertedAmount, $senderCurrency, $receiverCurrency, $finalExchangeRate, $reason) {
                 
                 // Create pending transfer record first to bind reference IDs
                 $transfer = WalletTransfer::create([
                     'sender_id' => $sender->id,
                     'receiver_id' => $receiver->id,
                     'amount' => $amount,
-                    'currency' => $senderCurrency,
                     'fee_amount' => $fee,
+                    'currency' => $senderCurrency,
                     'exchange_rate' => $finalExchangeRate,
                     'converted_amount' => $convertedAmount,
                     'converted_currency' => $receiverCurrency,
@@ -139,37 +133,16 @@ class WalletTransferService
                     'processed_at' => now(),
                 ]);
 
-                // Debit Principal from Sender wallet
-                $this->walletService->debitAvailable(
-                    $senderWallet,
-                    $amount,
-                    $senderCurrency,
-                    'p2p_transfer_sent',
-                    (string) $transfer->id,
-                    "P2P transfer to " . $receiver->name
-                );
+                // Debit Principal from Sender balance
+                $sender->add_balance(-1 * $amount, "P2P transfer to " . $receiver->name, 'used');
 
-                // Debit Fee from Sender wallet (if any)
+                // Debit Fee from Sender balance (if any)
                 if ($fee > 0) {
-                    $this->walletService->debitAvailable(
-                        $senderWallet,
-                        $fee,
-                        $senderCurrency,
-                        'p2p_transfer_fee',
-                        (string) $transfer->id,
-                        "Transfer fee for P2P transaction to " . $receiver->name
-                    );
+                    $sender->add_balance(-1 * $fee, "P2P transfer fee", 'used');
                 }
 
-                // Credit Converted Principal to Receiver wallet
-                $this->walletService->creditAvailable(
-                    $receiverWallet,
-                    $convertedAmount,
-                    $receiverCurrency,
-                    'p2p_transfer_received',
-                    (string) $transfer->id,
-                    "P2P transfer from " . $sender->name
-                );
+                // Credit Converted Principal to Receiver balance
+                $receiver->add_balance($convertedAmount, "P2P transfer from " . $sender->name, 'received');
 
                 Log::info("Wallet P2P Transfer completed successfully.", [
                     'transfer_id' => $transfer->id,
@@ -203,11 +176,8 @@ class WalletTransferService
         $sender = User::findOrFail($senderId);
         $receiver = User::findOrFail($receiverId);
 
-        $senderWallet = $sender->getWallet();
-        $receiverWallet = $receiver->getWallet();
-
-        $senderCurrency = $senderWallet->currency;
-        $receiverCurrency = $receiverWallet->currency;
+        $senderCurrency = $sender->preferred_currency ?? 'USD';
+        $receiverCurrency = $receiver->preferred_currency ?? 'USD';
 
         $usdToSenderRate = (float) $this->exchangeRateService->getRate('USD', $senderCurrency);
         
