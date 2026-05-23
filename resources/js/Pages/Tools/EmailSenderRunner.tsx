@@ -382,7 +382,7 @@ export default function EmailSenderRunner({ tool, subscription, runtimePort, plu
                                 {tab.label}
                             </Button>
                         ))}
-                    </div>
+                    </nav>
                 </div>
 
                 <div className="flex items-center gap-3">
@@ -984,7 +984,6 @@ export default function EmailSenderRunner({ tool, subscription, runtimePort, plu
                                     Save Settings
                                 </Button>
                             </div>
-                        </div>
                         </div>
                     </div>
                 )}
