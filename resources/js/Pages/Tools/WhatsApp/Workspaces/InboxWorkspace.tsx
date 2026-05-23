@@ -22,7 +22,7 @@ function formatTime(dateStr: string) {
     } catch { return ''; }
 }
 
-export default function InboxWorkspace({ callRPC, daemonConnected, sessions, onNewMessageRef, onUnreadReset, t, locale }: any) {
+export default function InboxWorkspace({ callRPC, daemonConnected, sessions, selectedAccount, onNewMessageRef, onUnreadReset, t, locale }: any) {
     const isRtl = locale === 'ar';
     const [threads, setThreads] = useState<any[]>([]);
     const [selectedThread, setSelectedThread] = useState<any>(null);
@@ -77,7 +77,7 @@ export default function InboxWorkspace({ callRPC, daemonConnected, sessions, onN
     // Fetch threads
     const fetchThreads = async () => {
         try {
-            const res: any = await callRPCRef.current('getThreads', {});
+            const res: any = await callRPCRef.current('getThreads', { sessionId: selectedAccount || null });
             setThreads(res.threads || []);
         } catch (err) { /* silent */ }
     };
@@ -121,6 +121,11 @@ export default function InboxWorkspace({ callRPC, daemonConnected, sessions, onN
                             const msgTs = newMsgData.timestamp ? new Date(newMsgData.timestamp).getTime() : 0;
                             const pipelineDelay = msgTs ? Date.now() - msgTs : -1;
                             console.log(`[Inbox WS] 📩 ${newMsgData.direction === 'out' ? 'OUT' : 'IN'} | from=${newMsgData.phone} | pipeline=${pipelineDelay}ms | "${newMsgData.content?.substring(0, 40)}"`);
+                            
+                            // Explicit debug log for raw message payload
+                            if (newMsgData.rawMessage) {
+                                console.log('%c[RAW MESSAGE DATA - INBOX UI]', 'background: #0d9488; color: white; font-weight: bold; padding: 4px; border-radius: 4px;', newMsgData.rawMessage);
+                            }
                             
                             // 1. If this message belongs to the currently active thread, append it instantly to the messages list
                             const current = selectedThreadRef.current;
@@ -233,7 +238,7 @@ export default function InboxWorkspace({ callRPC, daemonConnected, sessions, onN
         if (daemonConnected) {
             fetchThreads();
         }
-    }, [daemonConnected]);
+    }, [daemonConnected, selectedAccount]);
 
     // Fetch initial messages for active thread when it is selected
     useEffect(() => {

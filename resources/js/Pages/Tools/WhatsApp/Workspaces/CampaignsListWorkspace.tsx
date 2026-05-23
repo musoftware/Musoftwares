@@ -134,7 +134,7 @@ function ProgressRing({ percent, size = 52, strokeWidth = 4, color = '#0d9488' }
     );
 }
 
-export default function CampaignsListWorkspace({ t, locale, callRPC, onViewReport, onCreateCampaign, activeCampaigns, campaignDelays, daemonConnected }: any) {
+export default function CampaignsListWorkspace({ t, locale, callRPC, onViewReport, onCreateCampaign, activeCampaigns, campaignDelays, daemonConnected, selectedAccount }: any) {
     const isRtl = locale === 'ar';
 
     const getStatusLabel = (status: string) => {
@@ -258,12 +258,16 @@ export default function CampaignsListWorkspace({ t, locale, callRPC, onViewRepor
     const pausedCount = mergedCampaigns.filter(c => c.status === 'paused').length;
 
     // ── Filtered campaigns ─────────────────────────────────────────────
-    const filteredCampaigns = statusFilter === 'all'
+    let filteredCampaigns = statusFilter === 'all'
         ? mergedCampaigns
         : mergedCampaigns.filter(c => {
             if (statusFilter === 'active') return c.status === 'running' || c.status === 'processing';
             return c.status === statusFilter;
         });
+
+    if (selectedAccount) {
+        filteredCampaigns = filteredCampaigns.filter(c => c.account_id === selectedAccount);
+    }
 
     // ── KPI config ─────────────────────────────────────────────────────
     const kpiCards = [

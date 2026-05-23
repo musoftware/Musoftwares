@@ -473,6 +473,12 @@ export default function AutoReplyWorkspace({ t, locale, callRPC, selectedAccount
                                                         🗳️ {isRtl ? 'تصويت' : 'Poll'}
                                                     </Badge>
                                                 )}
+                                                {rule.session_id && !sessions?.find((s: any) => s.accountId === rule.session_id) && (
+                                                    <Badge variant="destructive" className="text-[9px] font-bold px-1.5 py-0 h-4 flex items-center gap-1 animate-pulse">
+                                                        <AlertCircle className="w-2.5 h-2.5" />
+                                                        {isRtl ? 'حساب محذوف (يرجى التعديل)' : 'Deleted Account (Please Edit)'}
+                                                    </Badge>
+                                                )}
                                             </div>
                                             <div className="mt-2 space-y-1">
                                                 <p className="text-xs text-muted-foreground flex items-center gap-1.5">

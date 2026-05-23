@@ -3,7 +3,7 @@ import { BarChart3, Send, Users, MessageSquare, Bot, Contact, Clock, CheckCircle
 import { Card, CardHeader, CardTitle, CardContent } from '@/Components/ui/card';
 import { Badge } from '@/Components/ui/badge';
 
-export default function DashboardWorkspace({ t, locale, callRPC, daemonConnected, setActiveTab }: any) {
+export default function DashboardWorkspace({ t, locale, callRPC, daemonConnected, setActiveTab, selectedAccount }: any) {
     const isRtl = locale === 'ar';
     const [stats, setStats] = useState<any>(null);
     const [loading, setLoading] = useState(true);
@@ -12,7 +12,7 @@ export default function DashboardWorkspace({ t, locale, callRPC, daemonConnected
         if (!daemonConnected) return;
         setLoading(true);
         try {
-            const res: any = await callRPC('getDashboardStats', {});
+            const res: any = await callRPC('getDashboardStats', { accountId: selectedAccount || null });
             setStats(res);
         } catch (err: any) {
             console.error('Dashboard stats error:', err);
@@ -25,7 +25,7 @@ export default function DashboardWorkspace({ t, locale, callRPC, daemonConnected
         // Auto-refresh every 30s
         const interval = setInterval(() => { if (daemonConnected) fetchStats(); }, 30000);
         return () => clearInterval(interval);
-    }, [daemonConnected]);
+    }, [daemonConnected, selectedAccount]);
 
     const deliveryRate = stats?.messages?.total > 0
         ? Math.round(((stats.messages.delivered || 0) + (stats.messages.read_count || 0) + (stats.messages.replied || 0)) / stats.messages.total * 100)
