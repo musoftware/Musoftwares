@@ -7,7 +7,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Modules\Marketplace\Models\Service;
 use Modules\Marketplace\Models\ServicePackage;
 use Modules\Marketplace\Models\ServiceOrder;
-use Modules\Core\Models\Wallet;
+use App\Models\Wallet;
 use Tests\TestCase;
 
 class MarketplaceEscrowTest extends TestCase

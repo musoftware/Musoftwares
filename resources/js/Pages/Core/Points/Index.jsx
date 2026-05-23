@@ -184,7 +184,8 @@ export default function PointsIndex({ auth, tiers = [], quickPackages = [], tran
                                                     <FinancialAmount amount={pkg.full_price} currency={globalCurrency} />
                                                 </div>
                                             )}
-                                            <div className="text-xl font-semibold mb-1">
+                                            <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">You Pay</div>
+                                            <div className="text-3xl font-bold mb-1 text-slate-900">
                                                 <FinancialAmount amount={pkg.total_cost} currency={globalCurrency} />
                                             </div>
                                             <div className="text-xs text-muted-foreground mb-4">
@@ -204,9 +205,9 @@ export default function PointsIndex({ auth, tiers = [], quickPackages = [], tran
                                                 onClick={() => handleQuickBuy(pkg)}
                                             >
                                                 {canAfford ? (
-                                                    <span className="flex items-center gap-2">Wallet <Wallet className="w-4 h-4" /></span>
+                                                    <span className="flex items-center gap-2">Pay <FinancialAmount amount={pkg.total_cost} currency={globalCurrency} /> via Wallet <Wallet className="w-4 h-4" /></span>
                                                 ) : (
-                                                    <span className="flex items-center gap-2">Kashier <CreditCard className="w-4 h-4" /></span>
+                                                    <span className="flex items-center gap-2">Pay <FinancialAmount amount={pkg.total_cost} currency={globalCurrency} /> via Kashier <CreditCard className="w-4 h-4" /></span>
                                                 )}
                                             </Button>
                                         </CardFooter>
@@ -263,8 +264,8 @@ export default function PointsIndex({ auth, tiers = [], quickPackages = [], tran
 
                                         <div className="border-t border-border pt-3 mt-3 flex justify-between items-end">
                                             <div>
-                                                <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider">Total Cost</p>
-                                                <div className="text-2xl font-bold">
+                                                <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider mb-1">You Pay</p>
+                                                <div className="text-3xl font-bold text-slate-900">
                                                     <FinancialAmount amount={customPricing.totalCost} currency={globalCurrency} />
                                                 </div>
                                             </div>
@@ -299,9 +300,9 @@ export default function PointsIndex({ auth, tiers = [], quickPackages = [], tran
                                     onClick={handleCustomPurchase}
                                 >
                                     {customPricing && wallet_balance >= customPricing.totalCost ? (
-                                        <span className="flex items-center gap-2">Confirm Purchase <Wallet className="w-4 h-4" /></span>
+                                        <span className="flex items-center gap-2">Pay <FinancialAmount amount={customPricing.totalCost} currency={globalCurrency} /> via Wallet <Wallet className="w-4 h-4" /></span>
                                     ) : (
-                                        <span className="flex items-center gap-2">Proceed to Kashier <ArrowRight className="w-4 h-4" /></span>
+                                        <span className="flex items-center gap-2">Pay <FinancialAmount amount={customPricing?.totalCost || 0} currency={globalCurrency} /> via Kashier <CreditCard className="w-4 h-4" /></span>
                                     )}
                                 </Button>
                             </CardFooter>

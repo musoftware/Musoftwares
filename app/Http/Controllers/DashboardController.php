@@ -5,10 +5,9 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Modules\Core\Models\Wallet;
-use Modules\Core\Models\WalletTransaction;
-use Modules\Core\Models\SupportTicket;
-use Modules\Core\Models\UserWithdrawal;
+use App\Models\Transaction;
+use App\Models\Ticket;
+use App\Models\UserReferralRequestWithdraw;
 use Modules\ERP\Models\Invoice;
 use Modules\ERP\Models\TenantClient;
 use Modules\ERP\Models\RecurringEntry;
@@ -35,9 +34,8 @@ class DashboardController extends Controller
     private function clientDashboard($user)
     {
         // ── Wallet Data ──────────────────────────────────────────
-        $wallet = $user->getWallet();
-        $walletBalance = (float) ($wallet->balance ?? 0);
-        $earnedBalance = (float) ($wallet->earned_balance ?? 0);
+        $walletBalance = (float) ($user->user_balance ?? 0);
+        $earnedBalance = (float) ($user->pending_commission ?? 0);
 
         // ── Pending Invoices (via ERP tenant client link) ────────
         $pendingInvoices = collect();
@@ -75,28 +73,28 @@ class DashboardController extends Controller
         }
 
         // ── Recent Transactions ──────────────────────────────────
-        $recentTransactions = WalletTransaction::where('wallet_id', $wallet->id)
+        $recentTransactions = Transaction::where('user_id', $user->id)
             ->latest()
             ->limit(8)
             ->get()
             ->map(function ($txn) {
-                $isCredit = $txn->type === 'credit';
+                $isCredit = in_array($txn->type, ['received', 'earned']);
                 return [
-                    'id' => 'TXN-' . str_pad($txn->id, 3, '0', STR_PAD_LEFT),
+                    'id' => $txn->id,
                     'date' => $txn->created_at?->format('M d, Y') ?? '-',
                     'type' => $isCredit ? 'deposit' : 'withdrawal',
                     'amount' => $isCredit ? (float) $txn->amount : -1 * (float) $txn->amount,
-                    'method' => ucwords(str_replace('_', ' ', $txn->reference_type ?? 'Wallet')),
+                    'method' => ucwords(str_replace('_', ' ', $txn->reason ?? 'Wallet')),
                 ];
             });
 
         // ── Support Tickets ──────────────────────────────────────
-        $openTicketsCount = SupportTicket::where('client_id', $user->id)
-            ->where('status', '!=', 'resolved')
+        $openTicketsCount = Ticket::where('user_id', $user->id)
+            ->where('ticket_status', '!=', 'resolved')
             ->count();
 
         // ── Pending Withdrawals ──────────────────────────────────
-        $pendingWithdrawals = UserWithdrawal::where('user_id', $user->id)
+        $pendingWithdrawals = UserReferralRequestWithdraw::where('user_id', $user->id)
             ->where('status', 'pending')
             ->count();
 
@@ -129,7 +127,7 @@ class DashboardController extends Controller
 
         // ── Chart Data (Wallet 6 Months) ─────────────────────────
         $sixMonthsAgo = Carbon::now()->subMonths(5)->startOfMonth();
-        $chartTransactions = WalletTransaction::where('wallet_id', $wallet->id)
+        $chartTransactions = Transaction::where('user_id', $user->id)
             ->where('created_at', '>=', $sixMonthsAgo)
             ->select(
                 DB::raw("DATE_FORMAT(created_at, '%b') as month"),
@@ -169,7 +167,7 @@ class DashboardController extends Controller
             'totalMonthlySubscription' => $totalMonthlySubscription,
             'openTickets'         => $openTicketsCount,
             'pendingWithdrawals'  => $pendingWithdrawals,
-            'currency'            => $wallet->currency ?? 'USD',
+            'currency'            => $user->currency_name(),
         ];
 
         // ── Active Tool Licenses (Marketplace) ──────────────────
@@ -210,3 +208,4 @@ class DashboardController extends Controller
         return app(\App\Http\Controllers\Admin\DashboardController::class)->index();
     }
 }
+

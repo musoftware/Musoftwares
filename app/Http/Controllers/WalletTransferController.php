@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
-use App\Models\Finance\WalletTransfer;
+use App\Models\WalletTransfer;
 use App\Services\WalletTransferService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -28,8 +28,6 @@ class WalletTransferController extends Controller
     public function create()
     {
         $user = Auth::user();
-        $wallet = $user->getWallet();
-
         return Inertia::render('Financial/WalletTransfer/Create', [
             'user' => [
                 'id' => $user->id,
@@ -37,8 +35,8 @@ class WalletTransferController extends Controller
                 'email' => $user->email,
             ],
             'wallet' => [
-                'balance' => (float) $wallet->balance,
-                'currency' => $wallet->currency,
+                'balance' => (float) $user->user_balance,
+                'currency' => $user->preferred_currency ?? 'USD',
             ]
         ]);
     }
@@ -69,13 +67,11 @@ class WalletTransferController extends Controller
         }
 
         try {
-            $senderWallet = $sender->getWallet();
-            
             $transfer = $this->transferService->executeTransfer(
                 $sender->id,
                 $receiver->id,
                 (float) $request->amount,
-                $senderWallet->currency,
+                $sender->preferred_currency ?? 'USD',
                 $request->reason
             );
 
@@ -184,7 +180,6 @@ class WalletTransferController extends Controller
         try {
             $sender = Auth::user();
             $receiver = User::where('email', $request->receiver_email)->firstOrFail();
-            $senderWallet = $sender->getWallet();
 
             if ($sender->id === $receiver->id) {
                 return response()->json([
@@ -197,7 +192,7 @@ class WalletTransferController extends Controller
                 $sender->id,
                 $receiver->id,
                 (float) $request->amount,
-                $senderWallet->currency
+                $sender->preferred_currency ?? 'USD'
             );
 
             return response()->json([

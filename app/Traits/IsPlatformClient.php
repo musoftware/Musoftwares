@@ -22,9 +22,9 @@ trait IsPlatformClient
                     ->where('tenant_id', Tenant::platformId());
     }
 
-    public function supportTickets()
+    public function tickets()
     {
-        return $this->hasMany(\Modules\ERP\Models\SupportTicket::class, 'client_id')
+        return $this->hasMany(\App\Models\Ticket::class, 'user_id')
                     ->where('tenant_id', Tenant::platformId());
     }
 

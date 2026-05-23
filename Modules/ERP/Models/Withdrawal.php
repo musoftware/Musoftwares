@@ -7,6 +7,8 @@ use Modules\ERP\Models\TenantClient;
 
 class Withdrawal extends TenantModel
 {
+    protected $table = 'erp_withdrawals';
+
     protected $fillable = [
         'tenant_id', 'client_id', 'payment_method_id', 'amount', 'currency_code',
         'status', 'admin_notes', 'reference', 'proof_path'

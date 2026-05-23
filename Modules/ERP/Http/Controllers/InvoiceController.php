@@ -8,15 +8,15 @@ use Modules\ERP\Models\InvoiceItem;
 use Modules\ERP\Models\InvoiceCost;
 use Modules\ERP\Models\WalletTransaction;
 use Modules\ERP\Models\TenantClient;
-use Modules\Core\Models\Currency;
-use Modules\Core\Services\ExchangeRateService;
+use App\Models\Currency;
+use App\Services\ExchangeRateService;
 use Inertia\Inertia;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Modules\ERP\Models\Tenant;
-use Modules\Core\Services\ActivityService;
+use App\Services\ActivityService;
 use App\Events\InvoicePaid;
 
 class InvoiceController extends Controller
@@ -94,7 +94,7 @@ class InvoiceController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'client_id' => 'required|exists:tenant_clients,id',
+            'client_id' => 'required|exists:erp_tenant_clients,id',
             'project_id' => 'nullable|exists:projects,id',
             'invoice_number' => 'required|string',
             'issued_at' => 'required|date',
@@ -239,7 +239,7 @@ class InvoiceController extends Controller
     public function update(Request $request, Invoice $invoice)
     {
         $validated = $request->validate([
-            'client_id' => 'required|exists:tenant_clients,id',
+            'client_id' => 'required|exists:erp_tenant_clients,id',
             'project_id' => 'nullable|exists:projects,id',
             'issued_at' => 'required|date',
             'due_date' => 'required|date|after_or_equal:issued_at',

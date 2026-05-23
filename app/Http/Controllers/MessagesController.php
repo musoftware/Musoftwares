@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Modules\Core\Models\Conversation;
-use Modules\Core\Models\ConversationParticipant;
+use App\Models\Conversation;
+use App\Models\ConversationParticipant;
 use App\Models\User;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\DB;
@@ -124,3 +124,4 @@ class MessagesController extends Controller
         }
     }
 }
+

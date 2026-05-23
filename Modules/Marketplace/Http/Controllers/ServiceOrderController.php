@@ -6,9 +6,9 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Modules\Marketplace\Models\ServiceOrder;
 use Modules\Marketplace\Models\ServicePackage;
-use Modules\Core\Services\FinancialTransactionService;
-use Modules\Core\Models\Wallet;
-use Modules\Core\Models\Conversation;
+use App\Services\FinancialTransactionService;
+use App\Models\Wallet;
+use App\Models\Conversation;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use App\Events\MarketplaceOrderPlaced;
@@ -238,3 +238,4 @@ class ServiceOrderController extends Controller
         return redirect()->back()->with('success', 'Order is now in dispute.');
     }
 }
+

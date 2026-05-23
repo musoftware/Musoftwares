@@ -4,17 +4,39 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Modules\Core\Models\UserWithdrawal;
-use Modules\Core\Models\PayoutMethod;
-use Modules\Core\Models\WalletTransaction;
+use App\Models\UserReferralRequestWithdraw;
+use App\Models\PayoutMethod;
+use App\Models\Transaction;
 use Inertia\Inertia;
 
 class FinancialController extends Controller
 {
     public function transactions(Request $request)
     {
-        $wallet = $request->user()->getWallet();
-        $transactions = $wallet->transactions()->latest()->paginate(15);
+        $user = $request->user();
+        $wallet = [
+            'id' => null, 
+            'balance' => (float)$user->user_balance, 
+            'locked_balance' => (float)$user->locked_balance(),
+            'currency' => $user->currency_name()
+        ];
+        $transactions = $user->transactions()->latest()->paginate(15);
+
+        $transactions->getCollection()->transform(function ($tx) {
+            $balance_after = $tx->balance();
+            $balance_before = $balance_after - $tx->amount;
+
+            return [
+                'id' => $tx->id,
+                'type' => $tx->amount >= 0 ? 'credit' : 'debit',
+                'description' => $tx->reason,
+                'reference_type' => ucfirst($tx->type),
+                'amount' => abs($tx->amount),
+                'balance_before' => $balance_before,
+                'balance_after' => $balance_after,
+                'created_at' => $tx->created_at,
+            ];
+        });
 
         return Inertia::render('Financial/Transactions', [
             'transactions' => $transactions,
@@ -25,7 +47,12 @@ class FinancialController extends Controller
     public function withdrawals(Request $request)
     {
         $user = $request->user();
-        $wallet = $user->getWallet();
+        $wallet = [
+            'id' => null, 
+            'balance' => (float)$user->user_balance, 
+            'locked_balance' => (float)$user->locked_balance(),
+            'currency' => $user->currency_name()
+        ];
         $payoutMethods = $user->payoutMethods()->where('status', 'approved')->get();
         $withdrawals = $user->withdrawals()->with('payoutMethod')->latest()->paginate(15);
 
@@ -44,7 +71,7 @@ class FinancialController extends Controller
     public function requestWithdrawal(Request $request)
     {
         $user = $request->user();
-        $wallet = $user->getWallet();
+        $wallet = ['id' => null, 'balance' => (float)$user->user_balance, 'currency' => $user->currency_name()];
 
         $request->validate([
             'amount' => 'required|numeric|min:1',
@@ -68,32 +95,16 @@ class FinancialController extends Controller
         try {
             DB::transaction(function () use ($request, $user, $wallet, $payoutMethod) {
                 $amount = $request->amount;
-                $balanceBefore = $wallet->balance;
-                $balanceAfter = $balanceBefore - $amount;
+                $user->add_balance(-1 * $amount, 'Withdrawal request via ' . ucwords(str_replace('_', ' ', $payoutMethod->type)), 'used');
 
-                $wallet->balance = $balanceAfter;
-                $wallet->earned_balance = max(0, ($wallet->earned_balance ?? 0) - $amount);
-                $wallet->save();
-
-                WalletTransaction::create([
-                    'wallet_id' => $wallet->id,
-                    'type' => 'debit',
-                    'amount' => $amount,
-                    'balance_before' => $balanceBefore,
-                    'balance_after' => $balanceAfter,
-                    'reference_type' => 'withdrawal_request',
-                    'description' => 'Withdrawal request via ' . ucwords(str_replace('_', ' ', $payoutMethod->type)),
-                ]);
-
-                UserWithdrawal::create([
-                    'user_id' => $user->id,
-                    'payout_method_id' => $payoutMethod->id,
-                    'amount' => $amount,
-                    'currency' => $wallet->currency ?? 'USD',
-                    'status' => 'pending',
-                ]);
+                $withdrawal = new UserReferralRequestWithdraw();
+                $withdrawal->user_id = $user->id;
+                $withdrawal->amount = $amount;
+                $withdrawal->currency = $user->currency;
+                $withdrawal->user_payment_method_id = $payoutMethod->id;
+                $withdrawal->status = 'pending';
+                $withdrawal->save();
             });
-
             return back()->with('success', 'Withdrawal requested successfully.');
         } catch (\Exception $e) {
             return back()->withErrors(['amount' => 'An error occurred while processing your withdrawal request.']);
@@ -102,13 +113,9 @@ class FinancialController extends Controller
 
     public function addBalance(Request $request)
     {
-        $wallet = $request->user()->getWallet();
+        $wallet = ['id' => null, 'balance' => (float)$request->user()->user_balance, 'currency' => $request->user()->currency_name()];
         return Inertia::render('Financial/AddBalance', [
-            'wallet' => [
-                'id'       => $wallet->id,
-                'balance'  => (float) $wallet->balance,
-                'currency' => $wallet->currency ?? 'USD',
-            ],
+            'wallet' => $wallet,
         ]);
     }
 
@@ -119,14 +126,14 @@ class FinancialController extends Controller
         ]);
 
         $user = $request->user();
-        $wallet = $user->getWallet();
+        $wallet = ['id' => null, 'balance' => (float)$user->user_balance, 'currency' => $user->currency_name()];
 
         $paymentUrl = \App\Helpers\KashierHelper::buildBalancePaymentUrl(
             (float) $request->amount,
             $user->id,
             $user->name,
             $user->email,
-            $wallet->currency ?? 'USD'
+            $wallet['currency']
         );
 
         return Inertia::location($paymentUrl);
@@ -161,32 +168,16 @@ class FinancialController extends Controller
                 if ($userId && $trxId && $amountPaid > 0) {
                     $user = \App\Models\User::find($userId);
                     if ($user) {
-                        $wallet = $user->getWallet();
+                        $wallet = ['id' => null, 'balance' => (float)$user->user_balance, 'currency' => $user->currency_name()];
 
                         // Idempotency check
-                        $alreadyProcessed = WalletTransaction::where('reference_type', 'kashier_deposit')
-                            ->where('reference_id', $trxId)
+                        $reason = "Deposit via Kashier online payment (Trx: $trxId)";
+                        $alreadyProcessed = Transaction::where('user_id', $user->id)
+                            ->where('reason', $reason)
                             ->exists();
 
                         if (!$alreadyProcessed) {
-                            DB::transaction(function () use ($wallet, $amountPaid, $trxId) {
-                                $balanceBefore = $wallet->balance;
-                                $balanceAfter = $balanceBefore + $amountPaid;
-
-                                $wallet->balance = $balanceAfter;
-                                $wallet->save();
-
-                                WalletTransaction::create([
-                                    'wallet_id' => $wallet->id,
-                                    'type' => 'credit',
-                                    'amount' => $amountPaid,
-                                    'balance_before' => $balanceBefore,
-                                    'balance_after' => $balanceAfter,
-                                    'reference_type' => 'kashier_deposit',
-                                    'reference_id' => $trxId,
-                                    'description' => "Deposit via Kashier online payment (Trx: $trxId)",
-                                ]);
-                            });
+                            $user->add_balance($amountPaid, $reason, 'received');
 
                             \Illuminate\Support\Facades\Log::info("Kashier deposit processed successfully for User $userId, Amount: $amountPaid");
                             return response()->json(['status' => 'success', 'message' => 'Deposit processed successfully']);

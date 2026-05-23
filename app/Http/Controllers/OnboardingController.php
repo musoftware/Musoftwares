@@ -16,39 +16,61 @@ class OnboardingController extends Controller
             return redirect()->intended(route('dashboard', absolute: false));
         }
 
-        $currencies = [
-            ['code' => 'USD', 'name' => 'US Dollar', 'symbol' => '$'],
-            ['code' => 'EUR', 'name' => 'Euro', 'symbol' => '€'],
-            ['code' => 'GBP', 'name' => 'British Pound', 'symbol' => '£'],
-            ['code' => 'EGP', 'name' => 'Egyptian Pound', 'symbol' => 'EGP'],
-            ['code' => 'SAR', 'name' => 'Saudi Riyal', 'symbol' => 'SAR'],
-            ['code' => 'AED', 'name' => 'UAE Dirham', 'symbol' => 'AED'],
-            ['code' => 'CAD', 'name' => 'Canadian Dollar', 'symbol' => 'CA$'],
-            ['code' => 'AUD', 'name' => 'Australian Dollar', 'symbol' => 'AU$'],
-            ['code' => 'JPY', 'name' => 'Japanese Yen', 'symbol' => '¥'],
-        ];
 
-        $countries = [
-            'United States', 'United Kingdom', 'Canada', 'Australia', 'Germany',
-            'France', 'Egypt', 'Saudi Arabia', 'United Arab Emirates', 'Japan',
-            'Singapore', 'Netherlands', 'Switzerland', 'Sweden', 'Spain', 'Italy', 'Brazil', 'India'
-        ];
+
+        try {
+            $countries = \Illuminate\Support\Facades\DB::table('countries')->pluck('name')->toArray();
+            if (empty($countries)) {
+                \Illuminate\Support\Facades\Artisan::call('db:seed', [
+                    '--class' => 'Database\\Seeders\\CountrySeeder',
+                    '--force' => true,
+                ]);
+                $countries = \Illuminate\Support\Facades\DB::table('countries')->pluck('name')->toArray();
+            }
+        } catch (\Illuminate\Database\QueryException $e) {
+            // If table doesn't exist, run the migration and seeder automatically
+            if (str_contains($e->getMessage(), 'Base table or view not found')) {
+                \Illuminate\Support\Facades\Artisan::call('migrate', [
+                    '--path' => 'database/migrations/2026_05_23_150011_create_countries_table.php',
+                    '--force' => true,
+                ]);
+                \Illuminate\Support\Facades\Artisan::call('db:seed', [
+                    '--class' => 'Database\\Seeders\\CountrySeeder',
+                    '--force' => true,
+                ]);
+                $countries = \Illuminate\Support\Facades\DB::table('countries')->pluck('name')->toArray();
+            } else {
+                throw $e;
+            }
+        }
+
+        $detectedCountry = 'United States'; // Fallback
+        
+        try {
+            $reader = new \GeoIp2\Database\Reader(storage_path('app/geoip.mmdb'));
+            $ip = $request->ip();
+            if ($ip !== '127.0.0.1' && $ip !== '::1') {
+                $record = $reader->city($ip);
+                if ($record && $record->country->name) {
+                    $detectedCountry = $record->country->name;
+                }
+            }
+        } catch (\Exception $e) {
+            // Ignore if IP not found in DB or DB missing
+        }
 
         return Inertia::render('Auth/OnboardingWizard', [
             'user' => [
                 'id' => $user->id,
                 'name' => $user->name,
                 'email' => $user->email,
-                'country' => $user->country ?: '',
+                'country' => $user->country ?: $detectedCountry,
                 'city' => $user->city ?: '',
                 'mobile_1' => $user->mobile_1 ?: '',
                 'mobile_2' => $user->mobile_2 ?: '',
                 'telegram_username' => $user->telegram_username ?: '',
                 'whatsapp_number' => $user->whatsapp_number ?: '',
-                'preferred_currency' => $user->preferred_currency ?: '',
-                'preferred_currency_locked_at' => $user->preferred_currency_locked_at ? $user->preferred_currency_locked_at->toISOString() : null,
             ],
-            'currencies' => $currencies,
             'countries' => $countries,
         ]);
     }
@@ -56,7 +78,6 @@ class OnboardingController extends Controller
     public function store(Request $request)
     {
         $user = $request->user();
-        $isCurrencyLocked = $user->preferred_currency_locked_at !== null;
 
         $action = $request->input('action', 'autosave');
         $step = (int) $request->input('step', 1);
@@ -75,11 +96,7 @@ class OnboardingController extends Controller
             $rules['whatsapp_number'] = ['nullable', 'string', 'max:50'];
         }
 
-        if ($step === 3 || $action === 'complete') {
-            if (!$isCurrencyLocked) {
-                $rules['preferred_currency'] = ['required', 'string', 'size:3'];
-            }
-        }
+
 
         $validated = $request->validate($rules);
 
@@ -87,20 +104,25 @@ class OnboardingController extends Controller
             $validated['telegram_username'] = ltrim($validated['telegram_username'], '@');
         }
 
-        if ($isCurrencyLocked && isset($validated['preferred_currency'])) {
-            unset($validated['preferred_currency']);
-        }
-
         $user->fill($validated);
 
         if ($action === 'complete') {
             $user->onboarding_completed = true;
-            if (!$isCurrencyLocked && $user->preferred_currency) {
-                $user->preferred_currency_locked_at = now();
-            }
         }
 
-        $user->save();
+        try {
+            $user->save();
+        } catch (\Illuminate\Database\QueryException $e) {
+            if (str_contains($e->getMessage(), 'Column not found') || str_contains($e->getMessage(), 'Unknown column')) {
+                \Illuminate\Support\Facades\Artisan::call('migrate', [
+                    '--path' => 'database/migrations/2026_05_23_150449_add_onboarding_fields_to_users_table.php',
+                    '--force' => true,
+                ]);
+                $user->save();
+            } else {
+                throw $e;
+            }
+        }
 
         if ($action === 'complete') {
             return redirect()->intended(route('dashboard', absolute: false));
@@ -144,5 +166,53 @@ class OnboardingController extends Controller
         $user->save();
 
         return response()->json(['status' => 'success', 'user' => $user]);
+    }
+
+    public function getCities(Request $request, $countryName)
+    {
+        $country = \Illuminate\Support\Facades\DB::table('countries')
+            ->where('name', $countryName)
+            ->first();
+
+        if (!$country) {
+            return response()->json([]);
+        }
+
+        try {
+            $cities = \Illuminate\Support\Facades\DB::table('cities')
+                ->where('country_id', $country->id)
+                ->pluck('name')
+                ->toArray();
+                
+            if (\Illuminate\Support\Facades\DB::table('cities')->count() === 0) {
+                \Illuminate\Support\Facades\Artisan::call('db:seed', [
+                    '--class' => 'Database\\Seeders\\CitySeeder',
+                    '--force' => true,
+                ]);
+                $cities = \Illuminate\Support\Facades\DB::table('cities')
+                    ->where('country_id', $country->id)
+                    ->pluck('name')
+                    ->toArray();
+            }
+        } catch (\Illuminate\Database\QueryException $e) {
+            if (str_contains($e->getMessage(), 'Base table or view not found')) {
+                \Illuminate\Support\Facades\Artisan::call('migrate', [
+                    '--path' => 'database/migrations/2026_05_23_150824_create_cities_table.php',
+                    '--force' => true,
+                ]);
+                \Illuminate\Support\Facades\Artisan::call('db:seed', [
+                    '--class' => 'Database\\Seeders\\CitySeeder',
+                    '--force' => true,
+                ]);
+                $cities = \Illuminate\Support\Facades\DB::table('cities')
+                    ->where('country_id', $country->id)
+                    ->pluck('name')
+                    ->toArray();
+            } else {
+                throw $e;
+            }
+        }
+
+        return response()->json($cities);
     }
 }

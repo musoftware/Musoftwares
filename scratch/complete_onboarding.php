@@ -4,8 +4,8 @@ $app = require_once 'bootstrap/app.php';
 $app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
 
 use App\Models\User;
-use Modules\Core\Models\Wallet;
-use Modules\Core\Models\PointTransaction;
+
+use App\Models\PointTransaction;
 use Illuminate\Support\Facades\DB;
 
 try {
@@ -47,12 +47,11 @@ try {
             echo " - Assigned role: freelancer\n";
         }
 
-        // Initialize / Seed Wallet
-        $wallet = $user->getWallet();
-        $wallet->balance = 50000.00;
-        $wallet->earned_balance = 15000.00;
-        $wallet->save();
-        echo " - Wallet seeded. Balance: {$wallet->balance} {$wallet->currency}\n";
+        // Initialize / Seed Balance
+        $user->user_balance = 50000.00;
+        $user->pending_commission = 15000.00;
+        $user->save();
+        echo " - Balance seeded. Balance: {$user->user_balance}\n";
 
         // Seed some points/connects for bidding (e.g. 200 points)
         $currentPoints = $user->points_balance;

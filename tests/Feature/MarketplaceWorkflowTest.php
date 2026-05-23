@@ -8,7 +8,7 @@ use Modules\Marketplace\Models\ServiceCategory;
 use Modules\Marketplace\Models\Service;
 use Modules\Marketplace\Models\ServicePackage;
 use Modules\Marketplace\Models\ServiceOrder;
-use Modules\Core\Models\Wallet;
+use App\Models\Wallet;
 use Tests\TestCase;
 
 class MarketplaceWorkflowTest extends TestCase

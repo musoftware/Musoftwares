@@ -22,8 +22,8 @@ use Inertia\Inertia;
  * ║  (table: client_wallets / client_wallet_transactions).           ║
  * ║                                                                  ║
  * ║  It MUST NEVER touch:                                            ║
- * ║    • Modules\Core\Models\Wallet          (table: wallets)        ║
- * ║    • Modules\Core\Models\WalletTransaction (wallet_transactions) ║
+ * ║    • App\Models\Wallet          (table: wallets)        ║
+ * ║    • App\Models\WalletTransaction (wallet_transactions) ║
  * ║    • App\Http\Controllers\FinancialController (real money)       ║
  * ║                                                                  ║
  * ║  ERP client wallets are tenant-managed bookkeeping ledgers,      ║

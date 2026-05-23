@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class ExpenseTransaction extends TenantModel
 {
+    protected $table = 'erp_expense_transactions';
+
     protected $fillable = [
         'tenant_id', 'invoice_cost_id', 'invoice_id', 'client_id',
         'type', 'direction', 'amount', 'amount_currency', 'business_amount', 'business_currency',

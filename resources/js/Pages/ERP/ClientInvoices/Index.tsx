@@ -220,7 +220,7 @@ export default function Index({
                 <div>
                     <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Billing & Invoices</h1>
                     <p className="text-sm text-slate-500 mt-1">
-                        View outstanding statements and settle balances securely using your bookkeeping wallet.
+                        View outstanding statements and settle balances securely using your wallet.
                     </p>
                 </div>
 
@@ -229,12 +229,12 @@ export default function Index({
                     {/* wallet Balance */}
                     <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm flex items-center justify-between">
                         <div className="space-y-1.5">
-                            <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider block">Bookkeeping Wallet Balance</span>
+                            <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider block">Wallet Balance</span>
                             <span className="text-3xl font-bold text-slate-900 tracking-tight">
                                 <CurrencyDisplay amount={client_balance} currency={wallet_currency} />
                             </span>
                             <p className="text-xs text-slate-400 leading-normal">
-                                Direct tenant-loaded credit balance. Kept strictly isolated from platform-wide transaction assets.
+                                Your current available balance, which can be used to settle outstanding invoices and platform services.
                             </p>
                         </div>
                         <div className="w-12 h-12 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center">
@@ -250,7 +250,7 @@ export default function Index({
                                 <CurrencyDisplay amount={totalOutstanding} currency={wallet_currency} />
                             </span>
                             <p className="text-xs text-slate-400 leading-normal">
-                                Settle outstanding payments instantly with your bookkeeping wallet balance.
+                                Settle outstanding payments instantly with your wallet balance.
                             </p>
                         </div>
                         <div className="w-12 h-12 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center">

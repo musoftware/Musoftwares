@@ -11,7 +11,7 @@ use Modules\ERP\Models\Tenant;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
-use Modules\Core\Services\ActivityService;
+use App\Services\ActivityService;
 
 /**
  * ERP Task Controller — admin/tenant manages task boards for clients.
@@ -97,7 +97,7 @@ class TaskController extends Controller
             'task_name'       => 'sometimes|required|string|max:255',
             'title'           => 'sometimes|required|string|max:255',
             'task_description'=> 'nullable|string',
-            'client_id'       => 'nullable|exists:tenant_clients,id',
+            'client_id'       => 'nullable|exists:erp_tenant_clients,id',
             'project_id'      => 'nullable|exists:erp_projects,id',
             'priority'        => 'nullable|in:low,normal,high,urgent',
             'status'          => 'nullable|in:open,in_progress,review,completed,archived',
@@ -148,7 +148,7 @@ class TaskController extends Controller
         $validated = $request->validate([
             'task_name'       => 'sometimes|required|string|max:255',
             'task_description'=> 'nullable|string',
-            'client_id'       => 'nullable|exists:tenant_clients,id',
+            'client_id'       => 'nullable|exists:erp_tenant_clients,id',
             'project_id'      => 'nullable|exists:erp_projects,id',
             'priority'        => 'nullable|in:low,normal,high,urgent',
             'status'          => 'nullable|in:open,in_progress,review,completed,archived',

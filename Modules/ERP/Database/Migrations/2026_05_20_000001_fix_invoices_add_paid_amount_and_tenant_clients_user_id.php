@@ -19,7 +19,7 @@ return new class extends Migration
     {
         // ── Fix 1: paid_amount on invoices ──────────────────────────
         if (!Schema::hasColumn('invoices', 'paid_amount')) {
-            Schema::table('invoices', function (Blueprint $table) {
+            Schema::table('erp_invoices', function (Blueprint $table) {
                 $table->decimal('paid_amount', 15, 2)->default(0)->after('tax_amount');
             });
         }
@@ -28,7 +28,7 @@ return new class extends Migration
         // Links a platform user (who is also a client in the ERP) to their
         // TenantClient record without relying on email matching.
         if (!Schema::hasColumn('tenant_clients', 'user_id')) {
-            Schema::table('tenant_clients', function (Blueprint $table) {
+            Schema::table('erp_tenant_clients', function (Blueprint $table) {
                 $table->foreignId('user_id')
                      ->nullable()
                      ->after('tenant_id')
@@ -39,7 +39,7 @@ return new class extends Migration
 
         // ── Fix 3: locked_balance on client_wallets ──────────────────
         if (!Schema::hasColumn('client_wallets', 'locked_balance')) {
-            Schema::table('client_wallets', function (Blueprint $table) {
+            Schema::table('erp_client_wallets', function (Blueprint $table) {
                 $table->decimal('locked_balance', 15, 2)->default(0)->after('balance');
             });
         }
@@ -48,20 +48,20 @@ return new class extends Migration
     public function down(): void
     {
         if (Schema::hasColumn('client_wallets', 'locked_balance')) {
-            Schema::table('client_wallets', function (Blueprint $table) {
+            Schema::table('erp_client_wallets', function (Blueprint $table) {
                 $table->dropColumn('locked_balance');
             });
         }
 
         if (Schema::hasColumn('tenant_clients', 'user_id')) {
-            Schema::table('tenant_clients', function (Blueprint $table) {
+            Schema::table('erp_tenant_clients', function (Blueprint $table) {
                 $table->dropForeign(['user_id']);
                 $table->dropColumn('user_id');
             });
         }
 
         if (Schema::hasColumn('invoices', 'paid_amount')) {
-            Schema::table('invoices', function (Blueprint $table) {
+            Schema::table('erp_invoices', function (Blueprint $table) {
                 $table->dropColumn('paid_amount');
             });
         }
