@@ -590,4 +590,46 @@ Not copying content — copying the psychology.
         ],
         'version' => '1.0.0',
     ],
+    '123e4567-e89b-12d3-a456-426614174000' => [
+        'guid' => '123e4567-e89b-12d3-a456-426614174000',
+        'title' => 'Email Sender Pro',
+        'slug' => 'email-sender',
+        'short_description' => 'Bulk Email Campaigns & Marketing',
+        'description' => 'Send bulk emails locally with high deliverability using SMTP accounts and beautiful templates. Complete with bounce tracking and reporting.',
+        'category' => 'Marketing',
+        'supported_os' => [
+            'windows',
+            'mac',
+            'linux',
+        ],
+        'is_featured' => true,
+        'is_active' => true,
+        'is_free' => true,
+        'runner_component' => 'EmailSenderRunner',
+        'features' => [
+            'Campaigns & Broadcasting',
+            'Contact Lists',
+            'HTML Templates',
+            'SMTP Connection',
+        ],
+        'requirements' => [
+            'Musoftware Runtime Agent running locally',
+            'Internet connection',
+        ],
+        'plans' => [
+            '123e4567-e89b-12d3-a456-426614174001' => [
+                'guid' => '123e4567-e89b-12d3-a456-426614174001',
+                'name' => 'Free',
+                'price_monthly' => 0,
+                'price_yearly' => 0,
+                'is_popular' => true,
+                'features' => [
+                    'Unlimited Campaigns',
+                    'Unlimited Contacts',
+                    'Local DB Storage',
+                ],
+            ],
+        ],
+        'version' => '1.0.0',
+    ],
 ];

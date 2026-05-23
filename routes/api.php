@@ -54,3 +54,16 @@ Route::get('runtime/plugins', function (\Illuminate\Http\Request $request) {
     return response()->json(['plugins' => $tools]);
 })->name('api.runtime.plugins');
 
+// ── Email Tracker System ─────────────────────────────────────────────────────
+// Handles 1x1 image tracking for Email Sender Pro local plugin
+Route::get('t/open/{payload}.gif', [\App\Http\Controllers\TrackerController::class, 'pixel'])
+    ->name('api.tracker.pixel');
+
+Route::get('t/click/{payload}', [\App\Http\Controllers\TrackerController::class, 'click'])
+    ->name('api.tracker.click');
+
+Route::get('t/unsubscribe/{payload}', [\App\Http\Controllers\TrackerController::class, 'unsubscribe'])
+    ->name('api.tracker.unsubscribe');
+
+Route::post('tracker/sync', [\App\Http\Controllers\TrackerController::class, 'sync'])
+    ->name('api.tracker.sync');

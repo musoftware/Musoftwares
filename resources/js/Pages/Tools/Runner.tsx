@@ -14,6 +14,7 @@ import { Label } from '@/Components/ui/label';
 
 // Dynamic import for tool runner components based on the DB field `runner_component`
 const components: Record<string, React.ElementType> = {
+    'EmailSenderRunner':        lazy(() => import('./EmailSenderRunner')),
     'ScreenshotFeedbackRunner': lazy(() => import('./ScreenshotFeedbackRunner')),
     'WhatsAppSenderRunner':     lazy(() => import('./WhatsAppSenderRunner')),
     'whatsapp-sender-pro':      lazy(() => import('./WhatsAppSenderRunner')),

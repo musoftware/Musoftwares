@@ -20,6 +20,12 @@ interface Plan {
     included_tools: string[];
     features: string[];
     is_custom: boolean;
+    prices?: {
+        '3_months': number;
+        '6_months': number;
+        '1_year': number;
+        '3_years': number;
+    };
 }
 
 interface ServiceItem {
@@ -61,27 +67,9 @@ const TIER_STYLES: Record<string, { accent: string; gradient: string; badge: str
 };
 
 export default function Plans({ plans, serviceItems, activeSubscription, walletBalance, currency }: PlansProps) {
-    const [billing, setBilling] = useState<'monthly' | 'yearly'>('monthly');
-    const [selectedCustomItems, setSelectedCustomItems] = useState<string[]>([]);
-    const [isCustomExpanded, setIsCustomExpanded] = useState(false);
+    const [billing, setBilling] = useState<'3_months' | '6_months' | '1_year' | '3_years'>('3_months');
 
     const fixedPlans = plans.filter(p => !p.is_custom);
-    const customPlan = plans.find(p => p.is_custom);
-
-    const hasYearly = plans.some(p => p.yearly_price > 0);
-    const hasMonthly = plans.some(p => p.monthly_price > 0);
-
-    const customTotal = useMemo(() => {
-        return serviceItems
-            .filter(item => selectedCustomItems.includes(item.slug))
-            .reduce((sum, item) => sum + (billing === 'yearly' ? item.yearly_price : item.monthly_price), 0);
-    }, [selectedCustomItems, billing, serviceItems]);
-
-    const toggleCustomItem = (slug: string) => {
-        setSelectedCustomItems(prev =>
-            prev.includes(slug) ? prev.filter(s => s !== slug) : [...prev, slug]
-        );
-    };
 
     const handleSubscribeWallet = (planId: number) => {
         if (confirm('Subscribe using your wallet balance?')) {
@@ -93,14 +81,18 @@ export default function Plans({ plans, serviceItems, activeSubscription, walletB
         router.post(route('subscriptions.kashier.checkout'), { plan_id: planId, billing_cycle: billing });
     };
 
-    const handleSubscribeCustomWallet = () => {
-        if (selectedCustomItems.length === 0) return;
-        if (confirm(`Subscribe to a custom plan for ${currency} ${customTotal.toFixed(2)}/${billing === 'yearly' ? 'year' : 'month'}?`)) {
-            router.post(route('subscriptions.subscribe-custom'), { items: selectedCustomItems, billing_cycle: billing });
+    const getPrice = (plan: Plan) => {
+        if (plan.prices) {
+            return plan.prices[billing];
         }
+        const months = {
+            '3_months': 3,
+            '6_months': 6,
+            '1_year': 12,
+            '3_years': 36
+        }[billing] || 3;
+        return plan.monthly_price * months;
     };
-
-    const getPrice = (plan: Plan) => billing === 'yearly' ? plan.yearly_price : plan.monthly_price;
 
     return (
         <AuthenticatedLayout header={undefined}>
@@ -119,37 +111,27 @@ export default function Plans({ plans, serviceItems, activeSubscription, walletB
                 </p>
 
                 {/* ── Billing Toggle ── */}
-                {hasYearly && hasMonthly && (
-                    <div className="mt-8 inline-flex items-center gap-3 text-sm text-slate-500">
+                <div className="mt-8 inline-flex items-center bg-slate-100 p-1.5 rounded-full text-sm text-slate-500">
+                    {[
+                        { id: '3_months', label: '3 Months' },
+                        { id: '6_months', label: '6 Months' },
+                        { id: '1_year', label: '1 Year' },
+                        { id: '3_years', label: '3 Years' },
+                    ].map(option => (
                         <button
-                            onClick={() => setBilling('monthly')}
-                            className={cn('font-medium transition-colors', billing === 'monthly' ? 'text-slate-900' : 'hover:text-slate-700')}
-                        >
-                            Monthly
-                        </button>
-                        <button
-                            onClick={() => setBilling(billing === 'monthly' ? 'yearly' : 'monthly')}
+                            key={option.id}
+                            onClick={() => setBilling(option.id as any)}
                             className={cn(
-                                'relative w-10 h-5 rounded-full transition-colors',
-                                billing === 'yearly' ? 'bg-slate-900' : 'bg-slate-300'
+                                'px-5 py-2 rounded-full font-medium transition-all duration-200',
+                                billing === option.id
+                                    ? 'bg-white text-slate-900 shadow-sm ring-1 ring-slate-900/5'
+                                    : 'hover:text-slate-700 hover:bg-slate-200/50'
                             )}
                         >
-                            <span className={cn(
-                                'absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform',
-                                billing === 'yearly' ? 'translate-x-5' : ''
-                            )} />
+                            {option.label}
                         </button>
-                        <button
-                            onClick={() => setBilling('yearly')}
-                            className={cn('font-medium transition-colors', billing === 'yearly' ? 'text-slate-900' : 'hover:text-slate-700')}
-                        >
-                            Annual
-                            <span className="ml-1.5 text-[10px] font-semibold uppercase tracking-wider text-emerald-600 bg-emerald-50 border border-emerald-100 px-1.5 py-0.5 rounded-full">
-                                Save 2 mo
-                            </span>
-                        </button>
-                    </div>
-                )}
+                    ))}
+                </div>
             </div>
 
             {/* ── Active Subscription Banner ── */}
@@ -174,7 +156,7 @@ export default function Plans({ plans, serviceItems, activeSubscription, walletB
 
             {/* ── Plan Cards Grid ── */}
             <div className="max-w-6xl mx-auto px-4 pb-6">
-                {fixedPlans.length === 0 && !customPlan ? (
+                {fixedPlans.length === 0 ? (
                     <div className="text-center py-24 text-slate-400">
                         <p className="text-lg font-light">No plans available yet. Check back soon.</p>
                     </div>
@@ -246,8 +228,8 @@ export default function Plans({ plans, serviceItems, activeSubscription, walletB
                                                 </span>
                                                 <span className="text-sm text-slate-400 ml-0.5">{currency}</span>
                                             </div>
-                                            <p className="text-sm text-slate-400 mt-0.5">
-                                                per {billing === 'yearly' ? 'year' : 'month'}
+                                            <p className="text-sm text-slate-400 mt-0.5 capitalize">
+                                                billed every {billing.replace('_', ' ')}
                                             </p>
                                         </div>
 
@@ -316,192 +298,7 @@ export default function Plans({ plans, serviceItems, activeSubscription, walletB
                 )}
             </div>
 
-            {/* ── Custom Plan Builder ── */}
-            {customPlan && serviceItems.length > 0 && (
-                <div className="max-w-6xl mx-auto px-4 pb-20">
-                    <div className="mt-8 border border-dashed border-slate-300 rounded-3xl bg-gradient-to-br from-white to-slate-50/80 overflow-hidden">
-                        {/* Header */}
-                        <button
-                            onClick={() => setIsCustomExpanded(!isCustomExpanded)}
-                            className="w-full flex items-center justify-between p-8 text-left hover:bg-slate-50/50 transition-colors"
-                        >
-                            <div className="flex items-center gap-4">
-                                <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-fuchsia-500 to-purple-600 flex items-center justify-center shadow-sm">
-                                    <Sparkles className="w-5 h-5 text-white" />
-                                </div>
-                                <div>
-                                    <h3 className="text-lg font-semibold text-slate-900">Build Your Own Plan</h3>
-                                    <p className="text-sm text-slate-500 mt-0.5">
-                                        Pick only the modules and tools you need. Price updates in real-time.
-                                    </p>
-                                </div>
-                            </div>
-                            <div className="flex items-center gap-4">
-                                {selectedCustomItems.length > 0 && (
-                                    <div className="text-right mr-2">
-                                        <p className="text-2xl font-bold text-slate-900">
-                                            {customTotal.toFixed(2)} <span className="text-sm font-normal text-slate-400">{currency}</span>
-                                        </p>
-                                        <p className="text-xs text-slate-400">/{billing === 'yearly' ? 'year' : 'month'}</p>
-                                    </div>
-                                )}
-                                <div className={cn(
-                                    'w-8 h-8 rounded-full border border-slate-200 flex items-center justify-center transition-transform',
-                                    isCustomExpanded ? 'rotate-45 bg-slate-100' : 'bg-white'
-                                )}>
-                                    <Plus className="w-4 h-4 text-slate-500" />
-                                </div>
-                            </div>
-                        </button>
 
-                        {/* Expandable items */}
-                        {isCustomExpanded && (
-                            <div className="px-8 pb-8 border-t border-slate-100">
-                                {/* Modules */}
-                                {serviceItems.filter(i => i.type === 'module').length > 0 && (
-                                    <div className="mt-6">
-                                        <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-3 flex items-center gap-2">
-                                            <Building2 className="h-3.5 w-3.5" /> Platform Modules
-                                        </h4>
-                                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                                            {serviceItems.filter(i => i.type === 'module').map(item => {
-                                                const isSelected = selectedCustomItems.includes(item.slug);
-                                                const itemPrice = billing === 'yearly' ? item.yearly_price : item.monthly_price;
-                                                return (
-                                                    <button
-                                                        key={item.slug}
-                                                        onClick={() => toggleCustomItem(item.slug)}
-                                                        className={cn(
-                                                            'flex items-center justify-between p-4 rounded-xl border text-left transition-all',
-                                                            isSelected
-                                                                ? 'border-indigo-200 bg-indigo-50/50 ring-1 ring-indigo-100'
-                                                                : 'border-slate-200 bg-white hover:border-slate-300 hover:shadow-sm'
-                                                        )}
-                                                    >
-                                                        <div className="flex items-center gap-3">
-                                                            <div className={cn(
-                                                                'w-8 h-8 rounded-lg flex items-center justify-center transition-colors',
-                                                                isSelected ? 'bg-indigo-100' : 'bg-slate-100'
-                                                            )}>
-                                                                {isSelected
-                                                                    ? <Check className="w-4 h-4 text-indigo-600" />
-                                                                    : <Plus className="w-4 h-4 text-slate-400" />
-                                                                }
-                                                            </div>
-                                                            <div>
-                                                                <p className={cn('text-sm font-medium', isSelected ? 'text-indigo-900' : 'text-slate-900')}>
-                                                                    {item.name}
-                                                                </p>
-                                                                {item.description && (
-                                                                    <p className="text-xs text-slate-500 mt-0.5 line-clamp-1">{item.description}</p>
-                                                                )}
-                                                            </div>
-                                                        </div>
-                                                        <span className={cn(
-                                                            'text-sm font-semibold shrink-0 ml-3',
-                                                            isSelected ? 'text-indigo-600' : 'text-slate-500'
-                                                        )}>
-                                                            {itemPrice.toFixed(2)} {currency}
-                                                        </span>
-                                                    </button>
-                                                );
-                                            })}
-                                        </div>
-                                    </div>
-                                )}
-
-                                {/* Tools */}
-                                {serviceItems.filter(i => i.type === 'tool').length > 0 && (
-                                    <div className="mt-6">
-                                        <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-3 flex items-center gap-2">
-                                            <Wrench className="h-3.5 w-3.5" /> Tools & Plugins
-                                        </h4>
-                                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                                            {serviceItems.filter(i => i.type === 'tool').map(item => {
-                                                const isSelected = selectedCustomItems.includes(item.slug);
-                                                const itemPrice = billing === 'yearly' ? item.yearly_price : item.monthly_price;
-                                                return (
-                                                    <button
-                                                        key={item.slug}
-                                                        onClick={() => toggleCustomItem(item.slug)}
-                                                        className={cn(
-                                                            'flex items-center justify-between p-4 rounded-xl border text-left transition-all',
-                                                            isSelected
-                                                                ? 'border-fuchsia-200 bg-fuchsia-50/50 ring-1 ring-fuchsia-100'
-                                                                : 'border-slate-200 bg-white hover:border-slate-300 hover:shadow-sm'
-                                                        )}
-                                                    >
-                                                        <div className="flex items-center gap-3">
-                                                            <div className={cn(
-                                                                'w-8 h-8 rounded-lg flex items-center justify-center transition-colors',
-                                                                isSelected ? 'bg-fuchsia-100' : 'bg-slate-100'
-                                                            )}>
-                                                                {isSelected
-                                                                    ? <Check className="w-4 h-4 text-fuchsia-600" />
-                                                                    : <Plus className="w-4 h-4 text-slate-400" />
-                                                                }
-                                                            </div>
-                                                            <div>
-                                                                <p className={cn('text-sm font-medium', isSelected ? 'text-fuchsia-900' : 'text-slate-900')}>
-                                                                    {item.name}
-                                                                </p>
-                                                                {item.description && (
-                                                                    <p className="text-xs text-slate-500 mt-0.5 line-clamp-1">{item.description}</p>
-                                                                )}
-                                                            </div>
-                                                        </div>
-                                                        <span className={cn(
-                                                            'text-sm font-semibold shrink-0 ml-3',
-                                                            isSelected ? 'text-fuchsia-600' : 'text-slate-500'
-                                                        )}>
-                                                            {itemPrice.toFixed(2)} {currency}
-                                                        </span>
-                                                    </button>
-                                                );
-                                            })}
-                                        </div>
-                                    </div>
-                                )}
-
-                                {/* Custom Summary + CTA */}
-                                {selectedCustomItems.length > 0 && (
-                                    <div className="mt-8 flex items-center justify-between bg-white border border-slate-200 rounded-2xl p-5">
-                                        <div className="flex items-center gap-3">
-                                            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-fuchsia-100 to-purple-100 border border-fuchsia-200 flex items-center justify-center">
-                                                <Calculator className="h-5 w-5 text-fuchsia-600" />
-                                            </div>
-                                            <div>
-                                                <p className="text-sm font-medium text-slate-900">
-                                                    {selectedCustomItems.length} item{selectedCustomItems.length > 1 ? 's' : ''} selected
-                                                </p>
-                                                <p className="text-xs text-slate-500">
-                                                    Total: <strong className="text-slate-900">{customTotal.toFixed(2)} {currency}</strong>
-                                                    <span className="text-slate-400"> /{billing === 'yearly' ? 'year' : 'month'}</span>
-                                                </p>
-                                            </div>
-                                        </div>
-                                        <div className="flex items-center gap-2">
-                                            <Button
-                                                onClick={handleSubscribeCustomWallet}
-                                                disabled={walletBalance < customTotal}
-                                                className={cn(
-                                                    'h-10 rounded-xl text-sm font-medium gap-2',
-                                                    walletBalance >= customTotal
-                                                        ? 'bg-gradient-to-r from-fuchsia-600 to-purple-600 hover:from-fuchsia-700 hover:to-purple-700 text-white'
-                                                        : 'bg-slate-100 text-slate-400 cursor-not-allowed'
-                                                )}
-                                            >
-                                                <Wallet className="h-4 w-4" />
-                                                {walletBalance >= customTotal ? 'Subscribe with Wallet' : `Need ${currency} ${customTotal.toFixed(2)}`}
-                                            </Button>
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
-                        )}
-                    </div>
-                </div>
-            )}
 
             {/* ── Wallet balance + Trust ── */}
             <div className="max-w-6xl mx-auto px-4 pb-16">

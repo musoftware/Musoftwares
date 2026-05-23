@@ -42,6 +42,14 @@ The Plugin SDK handles IPC and WebSocket communication with the NodeJS Orchestra
 - [ ] Are advanced configurations hidden via progressive disclosure?
 - [ ] Are the UI interactions labeled with human, non-technical language?
 
+## 5. Tool Registration
+When adding a new tool to the Musoftware ecosystem, you MUST register it in `config/tools.php`. 
+Do not rely on database seeders or `register_tool.php` scripts as the single source of truth for runtime availability.
+To register a tool:
+1. Generate a new UUID for the tool and its plans.
+2. Add a new array item to the `config/tools.php` array.
+3. Define the `slug`, `runner_component` (React UI), `features`, `plans`, and display details.
+
 
 # Tool UI Architecture System
 
