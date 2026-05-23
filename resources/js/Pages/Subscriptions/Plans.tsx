@@ -60,10 +60,11 @@ interface PlansProps {
 }
 
 const TIER_STYLES: Record<string, { accent: string; gradient: string; badge: string; icon: React.ElementType }> = {
-    starter:        { accent: 'emerald',  gradient: 'from-emerald-500 to-teal-600',   badge: 'bg-emerald-100 text-emerald-700', icon: MessageSquare },
-    professional:   { accent: 'indigo',   gradient: 'from-indigo-500 to-violet-600',  badge: 'bg-indigo-100 text-indigo-700',   icon: Wrench },
-    business_suite: { accent: 'amber',    gradient: 'from-amber-500 to-orange-600',   badge: 'bg-amber-100 text-amber-700',     icon: Building2 },
-    custom:         { accent: 'fuchsia',  gradient: 'from-fuchsia-500 to-purple-600', badge: 'bg-fuchsia-100 text-fuchsia-700', icon: Sparkles },
+    trial:  { accent: 'slate',    gradient: 'from-slate-500 to-gray-600',     badge: 'bg-slate-100 text-slate-700',     icon: Zap },
+    go:     { accent: 'emerald',  gradient: 'from-emerald-500 to-teal-600',   badge: 'bg-emerald-100 text-emerald-700', icon: MessageSquare },
+    plus:   { accent: 'indigo',   gradient: 'from-indigo-500 to-violet-600',  badge: 'bg-indigo-100 text-indigo-700',   icon: Wrench },
+    pro:    { accent: 'amber',    gradient: 'from-amber-500 to-orange-600',   badge: 'bg-amber-100 text-amber-700',     icon: Building2 },
+    custom: { accent: 'fuchsia',  gradient: 'from-fuchsia-500 to-purple-600', badge: 'bg-fuchsia-100 text-fuchsia-700', icon: Sparkles },
 };
 
 export default function Plans({ plans, serviceItems, activeSubscription, walletBalance, currency }: PlansProps) {
@@ -82,8 +83,8 @@ export default function Plans({ plans, serviceItems, activeSubscription, walletB
     };
 
     const getPrice = (plan: Plan) => {
-        if (plan.prices) {
-            return plan.prices[billing];
+        if (plan.prices && plan.prices[billing] !== undefined) {
+            return Number(plan.prices[billing]) || 0;
         }
         const months = {
             '3_months': 3,
@@ -91,7 +92,7 @@ export default function Plans({ plans, serviceItems, activeSubscription, walletB
             '1_year': 12,
             '3_years': 36
         }[billing] || 3;
-        return plan.monthly_price * months;
+        return (Number(plan.monthly_price) || 0) * months;
     };
 
     return (
@@ -172,7 +173,7 @@ export default function Plans({ plans, serviceItems, activeSubscription, walletB
                             const price = getPrice(plan);
                             const isCurrentPlan = activeSubscription?.plan_slug === plan.slug;
                             const canAfford = walletBalance >= price;
-                            const isPopular = plan.slug === 'professional';
+                            const isPopular = plan.slug === 'plus';
 
                             return (
                                 <div
@@ -224,12 +225,12 @@ export default function Plans({ plans, serviceItems, activeSubscription, walletB
                                         <div className="mt-5 mb-6">
                                             <div className="flex items-baseline gap-1">
                                                 <span className="text-4xl font-semibold tracking-tight text-slate-900">
-                                                    {price % 1 === 0 ? Math.round(price) : price.toFixed(2)}
+                                                    {plan.slug === 'trial' ? '0' : (Number(price || 0) % 1 === 0 ? Math.round(Number(price || 0)) : Number(price || 0).toFixed(2))}
                                                 </span>
                                                 <span className="text-sm text-slate-400 ml-0.5">{currency}</span>
                                             </div>
                                             <p className="text-sm text-slate-400 mt-0.5 capitalize">
-                                                billed every {billing.replace('_', ' ')}
+                                                {plan.slug === 'trial' ? 'Valid for 1 Day' : `billed every ${billing.replace('_', ' ')}`}
                                             </p>
                                         </div>
 
@@ -253,6 +254,14 @@ export default function Plans({ plans, serviceItems, activeSubscription, walletB
                                             <div className="w-full h-11 rounded-xl bg-slate-100 flex items-center justify-center text-sm font-medium text-slate-400">
                                                 Active plan
                                             </div>
+                                        ) : plan.slug === 'trial' ? (
+                                            <Button
+                                                onClick={() => handleSubscribeWallet(plan.id)}
+                                                className="w-full h-11 rounded-xl text-sm font-medium gap-2 transition-all bg-slate-900 hover:bg-slate-800 text-white"
+                                            >
+                                                <Zap className="h-4 w-4" />
+                                                Start 1-Day Free Trial
+                                            </Button>
                                         ) : (
                                             <>
                                                 <Button

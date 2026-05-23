@@ -12,7 +12,7 @@ use App\Models\User;
 class ToolReseller extends Model
 {
     protected $fillable = [
-        'user_id', 'name', 'token', 'balance', 'currency', 'status', 'notes',
+        'user_id', 'name', 'token', 'balance', 'currency_id', 'status', 'notes',
     ];
 
     protected $casts = [
@@ -26,6 +26,11 @@ class ToolReseller extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function currency(): BelongsTo
+    {
+        return $this->belongsTo(\App\Models\Currency::class, 'currency_id');
     }
 
     public function resellerUsers(): HasMany
@@ -89,7 +94,7 @@ class ToolReseller extends Model
                 'type'          => $type,
                 'amount'        => $amount,
                 'balance_after' => $this->balance,
-                'currency'      => $this->currency,
+                'currency_id'   => $this->currency_id,
                 'description'   => $description,
             ]);
         });
@@ -117,7 +122,7 @@ class ToolReseller extends Model
                 'type'          => $type,
                 'amount'        => -$amount,
                 'balance_after' => $this->balance,
-                'currency'      => $this->currency,
+                'currency_id'   => $this->currency_id,
                 'description'   => $description,
                 'reference'     => $reference,
             ]);
@@ -147,7 +152,7 @@ class ToolReseller extends Model
             'type'          => 'suspension',
             'amount'        => 0,
             'balance_after' => $this->balance,
-            'currency'      => $this->currency,
+            'currency_id'   => $this->currency_id,
             'description'   => $auto ? 'Service auto-suspended: balance reached zero.' : 'Service manually suspended by admin.',
         ]);
     }

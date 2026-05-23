@@ -17,7 +17,7 @@ class ResellerPortalController extends Controller
      */
     public function show(string $token): Response
     {
-        $reseller = ToolReseller::where('token', $token)->firstOrFail();
+        $reseller = ToolReseller::with('currency')->where('token', $token)->firstOrFail();
 
         if ($reseller->status !== 'active') {
             return Inertia::render('Tools/ResellerSuspended', [
@@ -58,7 +58,7 @@ class ResellerPortalController extends Controller
             'reseller'      => [
                 'name'     => $reseller->name,
                 'token'    => $reseller->token,
-                'currency' => $reseller->currency,
+                'currency' => $reseller->currency ? $reseller->currency->currency : 'USD',
             ],
             'tools'         => $tools,
             'isAuthenticated' => auth()->check(),

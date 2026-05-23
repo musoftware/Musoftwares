@@ -23,7 +23,8 @@ class SubscriptionController extends Controller
      */
     public function billing(): Response
     {
-        $subscriptions = ToolSubscription::where('user_id', auth()->id())
+        $subscriptions = ToolSubscription::with('currency')
+            ->where('user_id', auth()->id())
             ->latest()
             ->get()
             ->map(function ($sub) {
@@ -41,7 +42,7 @@ class SubscriptionController extends Controller
                     'plan_name'    => $plan['name'] ?? 'N/A',
                     'billing_cycle' => $sub->billing_cycle,
                     'amount_paid'  => $sub->amount_paid,
-                    'currency'     => $sub->currency,
+                    'currency'     => $sub->currency ? $sub->currency->currency : 'USD',
                     'status'       => $sub->status,
                     'is_active'    => $sub->isActive(),
                     'starts_at'    => $sub->starts_at->toDateString(),
@@ -150,7 +151,7 @@ class SubscriptionController extends Controller
                 'plan_guid'            => $plan['guid'],
                 'billing_cycle'        => $request->billing_cycle,
                 'amount_paid'          => $price,
-                'currency'             => 'USD',
+                'currency_id'          => \App\Models\Currency::where('currency', 'USD')->first()?->id ?? 1,
                 // Free plans + wallet plans activate immediately; kashier waits for webhook
                 'status'               => ($isFree || $request->payment_method === 'wallet') ? 'active' : 'pending',
                 'payment_method'       => $isFree ? 'free' : $request->payment_method,

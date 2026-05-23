@@ -338,183 +338,193 @@ function AuthenticatedContent({
                                             </span>
                                         )}
                                     </div>
-                                    <DropdownMenuContent align="start" className="w-[320px] p-2 rounded-xl shadow-xl border border-slate-200 bg-white isolate z-50">
-                                        <div className="px-2 py-2 mb-1 border-b border-slate-50">
-                                            <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Connected Workspaces</p>
+                                    <DropdownMenuContent align="start" className="w-[640px] p-4 grid grid-cols-2 gap-4 rounded-xl shadow-xl border border-slate-200 bg-white isolate z-50">
+                                        {/* Column 1: Core Business OS */}
+                                        <div className="flex flex-col gap-1">
+                                            <div className="px-2 py-2 mb-1 border-b border-slate-50">
+                                                <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Core Business OS</p>
+                                            </div>
+                                            
+                                            <DropdownMenuItem 
+                                                className={cn(
+                                                    "p-0 outline-none border transition-colors duration-150 cursor-pointer",
+                                                    isErpActive ? "bg-indigo-50/80 border-indigo-100" : "hover:bg-slate-50 border-transparent"
+                                                )}
+                                                render={<Link href={activeModules.erp ? safeRoute('erp.dashboard') : safeRoute('subscriptions.plans', { module: 'erp' })} className="flex items-start gap-3 p-2.5 rounded-lg w-full" />}
+                                            >
+                                                <div className={cn(
+                                                    "w-8 h-8 rounded-md flex items-center justify-center shrink-0 transition-colors",
+                                                    isErpActive ? "bg-indigo-100" : "bg-slate-100 group-hover/dropdown-menu-item:bg-indigo-50"
+                                                )}>
+                                                    <Building2 className={cn("w-4 h-4", isErpActive ? "text-indigo-700" : "text-slate-500 group-hover/dropdown-menu-item:text-indigo-600")} />
+                                                </div>
+                                                <div className="flex-1 min-w-0">
+                                                    <div className="flex items-center justify-between">
+                                                        <p className={cn("text-sm font-medium", isErpActive ? "text-indigo-900" : "text-slate-900")}>Business OS</p>
+                                                        {isErpActive && <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-indigo-100 text-indigo-700">Active</span>}
+                                                        {!activeModules.erp && <Lock className="w-3.5 h-3.5 text-slate-400" />}
+                                                    </div>
+                                                    <p className={cn("text-xs truncate", isErpActive ? "text-indigo-700/70" : "text-slate-500")}>
+                                                        {!activeModules.erp ? 'Subscribe to access' : 'Clients, invoices, timers'}
+                                                    </p>
+                                                </div>
+                                            </DropdownMenuItem>
+
+                                            <DropdownMenuItem 
+                                                className={cn(
+                                                    "p-0 outline-none border transition-colors duration-150 cursor-pointer",
+                                                    isCrmActive ? "bg-indigo-50/80 border-indigo-100" : "hover:bg-slate-50 border-transparent"
+                                                )}
+                                                render={<Link href={safeRoute('crm.dashboard')} className="flex items-start gap-3 p-2.5 rounded-lg w-full" />}
+                                            >
+                                                <div className={cn(
+                                                    "w-8 h-8 rounded-md flex items-center justify-center shrink-0 transition-colors",
+                                                    isCrmActive ? "bg-indigo-100" : "bg-slate-100 group-hover/dropdown-menu-item:bg-indigo-50"
+                                                )}>
+                                                    <Megaphone className={cn("w-4 h-4", isCrmActive ? "text-indigo-700" : "text-slate-500 group-hover/dropdown-menu-item:text-indigo-600")} />
+                                                </div>
+                                                <div className="flex-1 min-w-0">
+                                                    <div className="flex items-center justify-between">
+                                                        <p className={cn("text-sm font-medium", isCrmActive ? "text-indigo-900" : "text-slate-900")}>Lead Gen CRM</p>
+                                                        {isCrmActive && <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-indigo-100 text-indigo-700">Active</span>}
+                                                    </div>
+                                                    <p className={cn("text-xs truncate", isCrmActive ? "text-indigo-700/70" : "text-slate-500")}>
+                                                        Capture leads and manage campaigns
+                                                    </p>
+                                                </div>
+                                            </DropdownMenuItem>
+
+                                            <DropdownMenuItem 
+                                                className={cn(
+                                                    "p-0 outline-none border transition-colors duration-150 cursor-pointer",
+                                                    isBookingActive ? "bg-amber-50/80 border-amber-100" : "hover:bg-slate-50 border-transparent"
+                                                )}
+                                                render={<Link href={activeModules.booking ? safeRoute('booking.index') : safeRoute('subscriptions.plans', { module: 'booking' })} className="flex items-start gap-3 p-2.5 rounded-lg w-full" />}
+                                            >
+                                                <div className={cn(
+                                                    "w-8 h-8 rounded-md flex items-center justify-center shrink-0 transition-colors",
+                                                    isBookingActive ? "bg-amber-100" : "bg-slate-100 group-hover/dropdown-menu-item:bg-amber-50"
+                                                )}>
+                                                    <Calendar className={cn("w-4 h-4", isBookingActive ? "text-amber-700" : "text-slate-500 group-hover/dropdown-menu-item:text-amber-600")} />
+                                                </div>
+                                                <div className="flex-1 min-w-0">
+                                                    <div className="flex items-center justify-between">
+                                                        <p className={cn("text-sm font-medium", isBookingActive ? "text-amber-900" : "text-slate-900")}>Booking</p>
+                                                        {isBookingActive && <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-amber-100 text-amber-700">Active</span>}
+                                                        {!activeModules.booking && <Lock className="w-3.5 h-3.5 text-slate-400" />}
+                                                    </div>
+                                                    <p className={cn("text-xs truncate", isBookingActive ? "text-amber-700/70" : "text-slate-500")}>
+                                                        {!activeModules.booking ? 'Subscribe to access' : 'Appointments & Availability'}
+                                                    </p>
+                                                </div>
+                                            </DropdownMenuItem>
                                         </div>
-                                        
-                                        <DropdownMenuItem 
-                                            className={cn(
-                                                "p-0 mb-1 outline-none border transition-colors duration-150 cursor-pointer",
-                                                isErpActive ? "bg-indigo-50/80 border-indigo-100" : "hover:bg-slate-50 border-transparent"
-                                            )}
-                                            render={<Link href={activeModules.erp ? safeRoute('erp.dashboard') : safeRoute('subscriptions.plans', { module: 'erp' })} className="flex items-start gap-3 p-2.5 rounded-lg w-full" />}
-                                        >
-                                            <div className={cn(
-                                                "w-8 h-8 rounded-md flex items-center justify-center shrink-0 transition-colors",
-                                                isErpActive ? "bg-indigo-100" : "bg-slate-100 group-hover/dropdown-menu-item:bg-indigo-50"
-                                            )}>
-                                                <Building2 className={cn("w-4 h-4", isErpActive ? "text-indigo-700" : "text-slate-500 group-hover/dropdown-menu-item:text-indigo-600")} />
-                                            </div>
-                                            <div className="flex-1 min-w-0">
-                                                <div className="flex items-center justify-between">
-                                                    <p className={cn("text-sm font-medium", isErpActive ? "text-indigo-900" : "text-slate-900")}>Business OS</p>
-                                                    {isErpActive && <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-indigo-100 text-indigo-700">Active</span>}
-                                                    {!activeModules.erp && <Lock className="w-3.5 h-3.5 text-slate-400" />}
-                                                </div>
-                                                <p className={cn("text-xs truncate", isErpActive ? "text-indigo-700/70" : "text-slate-500")}>
-                                                    {!activeModules.erp ? 'Subscribe to access' : 'Clients, invoices, timers'}
-                                                </p>
-                                            </div>
-                                        </DropdownMenuItem>
 
-                                        <DropdownMenuItem 
-                                            className={cn(
-                                                "p-0 mb-1 outline-none border transition-colors duration-150 cursor-pointer",
-                                                isCrmActive ? "bg-indigo-50/80 border-indigo-100" : "hover:bg-slate-50 border-transparent"
-                                            )}
-                                            render={<Link href={safeRoute('crm.dashboard')} className="flex items-start gap-3 p-2.5 rounded-lg w-full" />}
-                                        >
-                                            <div className={cn(
-                                                "w-8 h-8 rounded-md flex items-center justify-center shrink-0 transition-colors",
-                                                isCrmActive ? "bg-indigo-100" : "bg-slate-100 group-hover/dropdown-menu-item:bg-indigo-50"
-                                            )}>
-                                                <Megaphone className={cn("w-4 h-4", isCrmActive ? "text-indigo-700" : "text-slate-500 group-hover/dropdown-menu-item:text-indigo-600")} />
+                                        {/* Column 2: Intelligence & Tools */}
+                                        <div className="flex flex-col gap-1">
+                                            <div className="px-2 py-2 mb-1 border-b border-slate-50">
+                                                <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Intelligence & Tools</p>
                                             </div>
-                                            <div className="flex-1 min-w-0">
-                                                <div className="flex items-center justify-between">
-                                                    <p className={cn("text-sm font-medium", isCrmActive ? "text-indigo-900" : "text-slate-900")}>Lead Gen CRM</p>
-                                                    {isCrmActive && <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-indigo-100 text-indigo-700">Active</span>}
-                                                </div>
-                                                <p className={cn("text-xs truncate", isCrmActive ? "text-indigo-700/70" : "text-slate-500")}>
-                                                    Capture leads and manage campaigns
-                                                </p>
-                                            </div>
-                                        </DropdownMenuItem>
 
-                                        <DropdownMenuItem 
-                                            className={cn(
-                                                "p-0 mb-1 outline-none border transition-colors duration-150 cursor-pointer",
-                                                isBookingActive ? "bg-amber-50/80 border-amber-100" : "hover:bg-slate-50 border-transparent"
-                                            )}
-                                            render={<Link href={activeModules.booking ? safeRoute('booking.index') : safeRoute('subscriptions.plans', { module: 'booking' })} className="flex items-start gap-3 p-2.5 rounded-lg w-full" />}
-                                        >
-                                            <div className={cn(
-                                                "w-8 h-8 rounded-md flex items-center justify-center shrink-0 transition-colors",
-                                                isBookingActive ? "bg-amber-100" : "bg-slate-100 group-hover/dropdown-menu-item:bg-amber-50"
-                                            )}>
-                                                <Calendar className={cn("w-4 h-4", isBookingActive ? "text-amber-700" : "text-slate-500 group-hover/dropdown-menu-item:text-amber-600")} />
-                                            </div>
-                                            <div className="flex-1 min-w-0">
-                                                <div className="flex items-center justify-between">
-                                                    <p className={cn("text-sm font-medium", isBookingActive ? "text-amber-900" : "text-slate-900")}>Booking</p>
-                                                    {isBookingActive && <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-amber-100 text-amber-700">Active</span>}
-                                                    {!activeModules.booking && <Lock className="w-3.5 h-3.5 text-slate-400" />}
+                                            <DropdownMenuItem 
+                                                className={cn(
+                                                    "p-0 outline-none border transition-colors duration-150 cursor-pointer",
+                                                    isIntelligenceActive ? "bg-cyan-50/80 border-cyan-100" : "hover:bg-slate-50 border-transparent"
+                                                )}
+                                                render={<Link href={activeModules.intelligence ? safeRoute('intelligence.index') : safeRoute('subscriptions.plans', { module: 'intelligence' })} className="flex items-start gap-3 p-2.5 rounded-lg w-full" />}
+                                            >
+                                                <div className={cn(
+                                                    "w-8 h-8 rounded-md flex items-center justify-center shrink-0 transition-colors",
+                                                    isIntelligenceActive ? "bg-cyan-100" : "bg-slate-100 group-hover/dropdown-menu-item:bg-cyan-50"
+                                                )}>
+                                                    <Radar className={cn("w-4 h-4", isIntelligenceActive ? "text-cyan-700" : "text-slate-500 group-hover/dropdown-menu-item:text-cyan-600")} />
                                                 </div>
-                                                <p className={cn("text-xs truncate", isBookingActive ? "text-amber-700/70" : "text-slate-500")}>
-                                                    {!activeModules.booking ? 'Subscribe to access' : 'Appointments & Availability'}
-                                                </p>
-                                            </div>
-                                        </DropdownMenuItem>
+                                                <div className="flex-1 min-w-0">
+                                                    <div className="flex items-center justify-between">
+                                                        <p className={cn("text-sm font-medium", isIntelligenceActive ? "text-cyan-900" : "text-slate-900")}>Intelligence</p>
+                                                        {isIntelligenceActive && <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-cyan-100 text-cyan-700">Active</span>}
+                                                        {!activeModules.intelligence && <Lock className="w-3.5 h-3.5 text-slate-400" />}
+                                                        {activeModules.intelligence && !isIntelligenceActive && <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-cyan-100 text-cyan-700">Pro</span>}
+                                                    </div>
+                                                    <p className={cn("text-xs truncate", isIntelligenceActive ? "text-cyan-700/70" : "text-slate-500")}>
+                                                        {!activeModules.intelligence ? 'Subscribe to access' : 'Market & Ad Tracking'}
+                                                    </p>
+                                                </div>
+                                            </DropdownMenuItem>
 
-                                        <DropdownMenuItem 
-                                            className={cn(
-                                                "p-0 mb-1 outline-none border transition-colors duration-150 cursor-pointer",
-                                                isIntelligenceActive ? "bg-cyan-50/80 border-cyan-100" : "hover:bg-slate-50 border-transparent"
-                                            )}
-                                            render={<Link href={activeModules.intelligence ? safeRoute('intelligence.index') : safeRoute('subscriptions.plans', { module: 'intelligence' })} className="flex items-start gap-3 p-2.5 rounded-lg w-full" />}
-                                        >
-                                            <div className={cn(
-                                                "w-8 h-8 rounded-md flex items-center justify-center shrink-0 transition-colors",
-                                                isIntelligenceActive ? "bg-cyan-100" : "bg-slate-100 group-hover/dropdown-menu-item:bg-cyan-50"
-                                            )}>
-                                                <Radar className={cn("w-4 h-4", isIntelligenceActive ? "text-cyan-700" : "text-slate-500 group-hover/dropdown-menu-item:text-cyan-600")} />
-                                            </div>
-                                            <div className="flex-1 min-w-0">
-                                                <div className="flex items-center justify-between">
-                                                    <p className={cn("text-sm font-medium", isIntelligenceActive ? "text-cyan-900" : "text-slate-900")}>Intelligence</p>
-                                                    {isIntelligenceActive && <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-cyan-100 text-cyan-700">Active</span>}
-                                                    {!activeModules.intelligence && <Lock className="w-3.5 h-3.5 text-slate-400" />}
-                                                    {activeModules.intelligence && !isIntelligenceActive && <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-cyan-100 text-cyan-700">Pro</span>}
+                                            <DropdownMenuItem 
+                                                className={cn(
+                                                    "p-0 outline-none border transition-colors duration-150 cursor-pointer",
+                                                    isRouteActive('fbmb.index') ? "bg-teal-50/80 border-teal-100" : "hover:bg-slate-50 border-transparent"
+                                                )}
+                                                render={<Link href={safeRoute('fbmb.index')} className="flex items-start gap-3 p-2.5 rounded-lg w-full" />}
+                                            >
+                                                <div className={cn(
+                                                    "w-8 h-8 rounded-md flex items-center justify-center shrink-0 transition-colors",
+                                                    isRouteActive('fbmb.index') ? "bg-teal-100" : "bg-slate-100 group-hover/dropdown-menu-item:bg-teal-50"
+                                                )}>
+                                                    <Activity className={cn("w-4 h-4", isRouteActive('fbmb.index') ? "text-teal-700" : "text-slate-500 group-hover/dropdown-menu-item:text-teal-600")} />
                                                 </div>
-                                                <p className={cn("text-xs truncate", isIntelligenceActive ? "text-cyan-700/70" : "text-slate-500")}>
-                                                    {!activeModules.intelligence ? 'Subscribe to access' : 'Market & Ad Tracking'}
-                                                </p>
-                                            </div>
-                                        </DropdownMenuItem>
+                                                <div className="flex-1 min-w-0">
+                                                    <div className="flex items-center justify-between">
+                                                        <p className={cn("text-sm font-medium", isRouteActive('fbmb.index') ? "text-teal-900" : "text-slate-900")}>iSAAS FB Lookup</p>
+                                                        {isRouteActive('fbmb.index') && <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-teal-100 text-teal-700">Active</span>}
+                                                    </div>
+                                                    <p className={cn("text-xs truncate", isRouteActive('fbmb.index') ? "text-teal-700/70" : "text-slate-500")}>
+                                                        Search Mobile by FBID
+                                                    </p>
+                                                </div>
+                                            </DropdownMenuItem>
 
-                                        <DropdownMenuItem 
-                                            className={cn(
-                                                "p-0 mb-1 outline-none border transition-colors duration-150 cursor-pointer",
-                                                isRouteActive('fbmb.index') ? "bg-teal-50/80 border-teal-100" : "hover:bg-slate-50 border-transparent"
-                                            )}
-                                            render={<Link href={safeRoute('fbmb.index')} className="flex items-start gap-3 p-2.5 rounded-lg w-full" />}
-                                        >
-                                            <div className={cn(
-                                                "w-8 h-8 rounded-md flex items-center justify-center shrink-0 transition-colors",
-                                                isRouteActive('fbmb.index') ? "bg-teal-100" : "bg-slate-100 group-hover/dropdown-menu-item:bg-teal-50"
-                                            )}>
-                                                <Activity className={cn("w-4 h-4", isRouteActive('fbmb.index') ? "text-teal-700" : "text-slate-500 group-hover/dropdown-menu-item:text-teal-600")} />
-                                            </div>
-                                            <div className="flex-1 min-w-0">
-                                                <div className="flex items-center justify-between">
-                                                    <p className={cn("text-sm font-medium", isRouteActive('fbmb.index') ? "text-teal-900" : "text-slate-900")}>iSAAS FB Lookup</p>
-                                                    {isRouteActive('fbmb.index') && <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-teal-100 text-teal-700">Active</span>}
+                                            <DropdownMenuItem 
+                                                className={cn(
+                                                    "p-0 outline-none border transition-colors duration-150 cursor-pointer",
+                                                    isRouteActive('isaas.gold-savers.index') ? "bg-yellow-50/80 border-yellow-100" : "hover:bg-slate-50 border-transparent"
+                                                )}
+                                                render={<Link href={safeRoute('isaas.gold-savers.index')} className="flex items-start gap-3 p-2.5 rounded-lg w-full" />}
+                                            >
+                                                <div className={cn(
+                                                    "w-8 h-8 rounded-md flex items-center justify-center shrink-0 transition-colors",
+                                                    isRouteActive('isaas.gold-savers.index') ? "bg-yellow-100" : "bg-slate-100 group-hover/dropdown-menu-item:bg-yellow-50"
+                                                )}>
+                                                    <Coins className={cn("w-4 h-4", isRouteActive('isaas.gold-savers.index') ? "text-yellow-700" : "text-slate-500 group-hover/dropdown-menu-item:text-yellow-600")} />
                                                 </div>
-                                                <p className={cn("text-xs truncate", isRouteActive('fbmb.index') ? "text-teal-700/70" : "text-slate-500")}>
-                                                    Search Mobile by FBID
-                                                </p>
-                                            </div>
-                                        </DropdownMenuItem>
+                                                <div className="flex-1 min-w-0">
+                                                    <div className="flex items-center justify-between">
+                                                        <p className={cn("text-sm font-medium", isRouteActive('isaas.gold-savers.index') ? "text-yellow-900" : "text-slate-900")}>Gold Savers</p>
+                                                        {isRouteActive('isaas.gold-savers.index') && <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-yellow-100 text-yellow-700">Active</span>}
+                                                    </div>
+                                                    <p className={cn("text-xs truncate", isRouteActive('isaas.gold-savers.index') ? "text-yellow-700/70" : "text-slate-500")}>
+                                                        Track your gold value
+                                                    </p>
+                                                </div>
+                                            </DropdownMenuItem>
 
-                                        <DropdownMenuItem 
-                                            className={cn(
-                                                "p-0 mb-1 outline-none border transition-colors duration-150 cursor-pointer",
-                                                isRouteActive('isaas.gold-savers.index') ? "bg-yellow-50/80 border-yellow-100" : "hover:bg-slate-50 border-transparent"
-                                            )}
-                                            render={<Link href={safeRoute('isaas.gold-savers.index')} className="flex items-start gap-3 p-2.5 rounded-lg w-full" />}
-                                        >
-                                            <div className={cn(
-                                                "w-8 h-8 rounded-md flex items-center justify-center shrink-0 transition-colors",
-                                                isRouteActive('isaas.gold-savers.index') ? "bg-yellow-100" : "bg-slate-100 group-hover/dropdown-menu-item:bg-yellow-50"
-                                            )}>
-                                                <Coins className={cn("w-4 h-4", isRouteActive('isaas.gold-savers.index') ? "text-yellow-700" : "text-slate-500 group-hover/dropdown-menu-item:text-yellow-600")} />
-                                            </div>
-                                            <div className="flex-1 min-w-0">
-                                                <div className="flex items-center justify-between">
-                                                    <p className={cn("text-sm font-medium", isRouteActive('isaas.gold-savers.index') ? "text-yellow-900" : "text-slate-900")}>Gold Savers</p>
-                                                    {isRouteActive('isaas.gold-savers.index') && <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-yellow-100 text-yellow-700">Active</span>}
+                                            <DropdownMenuItem 
+                                                className={cn(
+                                                    "p-0 outline-none border transition-colors duration-150 cursor-pointer",
+                                                    isToolsActive ? "bg-fuchsia-50/80 border-fuchsia-100" : "hover:bg-slate-50 border-transparent"
+                                                )}
+                                                render={<Link href={safeRoute('tools.explore')} className="flex items-start gap-3 p-2.5 rounded-lg w-full" />}
+                                            >
+                                                <div className={cn(
+                                                    "w-8 h-8 rounded-md flex items-center justify-center shrink-0 transition-colors",
+                                                    isToolsActive ? "bg-fuchsia-100" : "bg-slate-100 group-hover/dropdown-menu-item:bg-fuchsia-50"
+                                                )}>
+                                                    <Wrench className={cn("w-4 h-4", isToolsActive ? "text-fuchsia-700" : "text-slate-500 group-hover/dropdown-menu-item:text-fuchsia-600")} />
                                                 </div>
-                                                <p className={cn("text-xs truncate", isRouteActive('isaas.gold-savers.index') ? "text-yellow-700/70" : "text-slate-500")}>
-                                                    Track your gold value
-                                                </p>
-                                            </div>
-                                        </DropdownMenuItem>
-
-                                        <DropdownMenuItem 
-                                            className={cn(
-                                                "p-0 outline-none border transition-colors duration-150 cursor-pointer",
-                                                isToolsActive ? "bg-fuchsia-50/80 border-fuchsia-100" : "hover:bg-slate-50 border-transparent"
-                                            )}
-                                            render={<Link href={safeRoute('tools.explore')} className="flex items-start gap-3 p-2.5 rounded-lg w-full" />}
-                                        >
-                                            <div className={cn(
-                                                "w-8 h-8 rounded-md flex items-center justify-center shrink-0 transition-colors",
-                                                isToolsActive ? "bg-fuchsia-100" : "bg-slate-100 group-hover/dropdown-menu-item:bg-fuchsia-50"
-                                            )}>
-                                                <Wrench className={cn("w-4 h-4", isToolsActive ? "text-fuchsia-700" : "text-slate-500 group-hover/dropdown-menu-item:text-fuchsia-600")} />
-                                            </div>
-                                            <div className="flex-1 min-w-0">
-                                                <div className="flex items-center justify-between">
-                                                    <p className={cn("text-sm font-medium", isToolsActive ? "text-fuchsia-900" : "text-slate-900")}>Tools &amp; Plugins</p>
-                                                    {isToolsActive && <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-fuchsia-100 text-fuchsia-700">Active</span>}
-                                                    {!isToolsActive && <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-slate-100 text-slate-500">Free Browse</span>}
+                                                <div className="flex-1 min-w-0">
+                                                    <div className="flex items-center justify-between">
+                                                        <p className={cn("text-sm font-medium", isToolsActive ? "text-fuchsia-900" : "text-slate-900")}>Tools &amp; Plugins</p>
+                                                        {isToolsActive && <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-fuchsia-100 text-fuchsia-700">Active</span>}
+                                                        {!isToolsActive && <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-slate-100 text-slate-500">Free Browse</span>}
+                                                    </div>
+                                                    <p className={cn("text-xs truncate", isToolsActive ? "text-fuchsia-700/70" : "text-slate-500")}>
+                                                        Extensions &amp; Licensing
+                                                    </p>
                                                 </div>
-                                                <p className={cn("text-xs truncate", isToolsActive ? "text-fuchsia-700/70" : "text-slate-500")}>
-                                                    Extensions &amp; Licensing
-                                                </p>
-                                            </div>
-                                        </DropdownMenuItem>
+                                            </DropdownMenuItem>
+                                        </div>
                                     </DropdownMenuContent>
                                 </DropdownMenu>
 
@@ -569,7 +579,7 @@ function AuthenticatedContent({
 
                                     {/* Points pill — locked geometry */}
                                     <Link
-                                        href={safeRoute('points.index')}
+                                        href={safeRoute('points.index', undefined, '/points')}
                                         className="inline-flex items-center gap-1.5 h-8 min-w-[60px] justify-center px-3 bg-amber-50 hover:bg-amber-100 border border-amber-100/80 rounded-full transition-colors duration-150 text-xs font-medium text-amber-700"
                                         title="Points/Connects Balance"
                                     >
@@ -736,7 +746,7 @@ function AuthenticatedContent({
             {header && (
                 <div className="bg-white border-b border-slate-200 py-4 px-4 sm:px-6 lg:px-8">
                     <div className="max-w-full mx-auto">
-                        <h1 className="text-xl font-semibold tracking-tight text-slate-900">{header}</h1>
+                        <div className="text-xl font-semibold tracking-tight text-slate-900">{header}</div>
                     </div>
                 </div>
             )}
