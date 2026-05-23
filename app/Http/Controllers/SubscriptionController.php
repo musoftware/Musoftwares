@@ -69,6 +69,12 @@ class SubscriptionController extends Controller
                 'description'      => $plan->description,
                 'monthly_price'    => (float) $plan->monthly_price,
                 'yearly_price'     => (float) $plan->yearly_price,
+                'prices'           => [
+                    '3_months' => $plan->priceFor('3_months'),
+                    '6_months' => $plan->priceFor('6_months'),
+                    '1_year'   => $plan->priceFor('1_year'),
+                    '3_years'  => $plan->priceFor('3_years'),
+                ],
                 'included_modules' => $plan->included_modules ?? [],
                 'included_tools'   => $plan->included_tools ?? [],
                 'features'         => $plan->features ?? [],
@@ -99,7 +105,7 @@ class SubscriptionController extends Controller
     {
         $request->validate([
             'plan_id'       => 'required|exists:platform_plans,id',
-            'billing_cycle' => 'required|in:monthly,yearly',
+            'billing_cycle' => 'required|in:3_months,6_months,1_year,3_years',
         ]);
 
         $user = Auth::user();
@@ -140,7 +146,13 @@ class SubscriptionController extends Controller
                     ->update(['status' => 'expired']);
 
                 // Create new subscription
-                $duration = $request->billing_cycle === 'yearly' ? 12 : 1;
+                $duration = match ($request->billing_cycle) {
+                    '3_months' => 3,
+                    '6_months' => 6,
+                    '1_year'   => 12,
+                    '3_years'  => 36,
+                    default    => 1,
+                };
 
                 PlatformSubscription::create([
                     'user_id'           => $user->id,
@@ -196,7 +208,7 @@ class SubscriptionController extends Controller
         $request->validate([
             'items'         => 'required|array|min:1',
             'items.*'       => 'string|exists:platform_service_items,slug',
-            'billing_cycle' => 'required|in:monthly,yearly',
+            'billing_cycle' => 'required|in:3_months,6_months,1_year,3_years',
         ]);
 
         $user = Auth::user();
@@ -243,7 +255,13 @@ class SubscriptionController extends Controller
                     ->where('status', 'active')
                     ->update(['status' => 'expired']);
 
-                $duration = $request->billing_cycle === 'yearly' ? 12 : 1;
+                $duration = match ($request->billing_cycle) {
+                    '3_months' => 3,
+                    '6_months' => 6,
+                    '1_year'   => 12,
+                    '3_years'  => 36,
+                    default    => 1,
+                };
 
                 PlatformSubscription::create([
                     'user_id'           => $user->id,
@@ -290,7 +308,7 @@ class SubscriptionController extends Controller
         $request->validate([
             'items'         => 'required|array|min:1',
             'items.*'       => 'string',
-            'billing_cycle' => 'required|in:monthly,yearly',
+            'billing_cycle' => 'required|in:3_months,6_months,1_year,3_years',
         ]);
 
         $result = $this->subscriptionService->calculateCustomPrice($request->items, $request->billing_cycle);
@@ -305,7 +323,7 @@ class SubscriptionController extends Controller
     {
         $request->validate([
             'plan_id'       => 'required|exists:platform_plans,id',
-            'billing_cycle' => 'required|in:monthly,yearly',
+            'billing_cycle' => 'required|in:3_months,6_months,1_year,3_years',
         ]);
 
         $user = Auth::user();
@@ -547,7 +565,13 @@ class SubscriptionController extends Controller
                     'description'    => "Subscription renewal: " . ($plan->name ?? 'Custom') . " ({$subscription->billing_cycle})",
                 ]);
 
-                $duration = $subscription->billing_cycle === 'yearly' ? 12 : 1;
+                $duration = match ($subscription->billing_cycle) {
+                    '3_months' => 3,
+                    '6_months' => 6,
+                    '1_year'   => 12,
+                    '3_years'  => 36,
+                    default    => 1,
+                };
                 $baseDate = ($subscription->status === 'active' && $subscription->expires_at?->isFuture())
                     ? $subscription->expires_at
                     : Carbon::now();
