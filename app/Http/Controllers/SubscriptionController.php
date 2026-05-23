@@ -106,7 +106,7 @@ class SubscriptionController extends Controller
                     $features = ['Complete business suite', '24/7 Priority support', 'API access', 'Custom integrations'];
                     $included_tools = ['*'];
                 } elseif ($slug === 'trial') {
-                    $features = ['Try all tools', '1 day limit'];
+                    $features = ['Try all tools', 'All business modules', '1 day limit'];
                     $included_tools = ['*'];
                 }
 
@@ -125,7 +125,7 @@ class SubscriptionController extends Controller
                         '1_year'   => $convertedPrice,
                         '3_years'  => $convertedPrice * 3,
                     ],
-                    'included_modules' => $slug === 'pro' ? ['*'] : [],
+                    'included_modules' => in_array($slug, ['pro', 'trial']) ? ['*'] : [],
                     'included_tools'   => $included_tools,
                     'features'         => $features,
                     'is_custom'        => false,

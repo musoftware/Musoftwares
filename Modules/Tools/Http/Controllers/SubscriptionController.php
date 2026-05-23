@@ -42,7 +42,7 @@ class SubscriptionController extends Controller
                     'plan_name'    => $plan['name'] ?? 'N/A',
                     'billing_cycle' => $sub->billing_cycle,
                     'amount_paid'  => $sub->amount_paid,
-                    'currency'     => $sub->currency ? $sub->currency->currency : 'USD',
+                    'currency'     => $sub->currency ? $sub->currency->currency : (is_numeric($sub->currency_id) ? 'USD' : ($sub->currency_id ?: 'USD')),
                     'status'       => $sub->status,
                     'is_active'    => $sub->isActive(),
                     'starts_at'    => $sub->starts_at->toDateString(),
@@ -151,7 +151,7 @@ class SubscriptionController extends Controller
                 'plan_guid'            => $plan['guid'],
                 'billing_cycle'        => $request->billing_cycle,
                 'amount_paid'          => $price,
-                'currency_id'          => \App\Models\Currency::where('currency', 'USD')->first()?->id ?? 1,
+                'currency_id'          => auth()->user()->currency_id ?: (\App\Models\Currency::where('currency', 'USD')->first()?->id ?? 1),
                 // Free plans + wallet plans activate immediately; kashier waits for webhook
                 'status'               => ($isFree || $request->payment_method === 'wallet') ? 'active' : 'pending',
                 'payment_method'       => $isFree ? 'free' : $request->payment_method,
