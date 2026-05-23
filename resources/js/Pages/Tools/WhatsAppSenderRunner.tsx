@@ -1135,6 +1135,10 @@ export default function WhatsAppSenderRunner({ tool, subscription, runtimePort, 
                     locale={locale}
                     callRPC={callRPC}
                     daemonConnected={daemonConnected}
+                    onSendCampaign={(phones: string[]) => {
+                        setContactsText(phones.join('\n'));
+                        setActiveTab('campaign');
+                    }}
                 />
             )}
 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Contact, Search, Plus, Trash2, Upload, Download, Tag, X, ChevronLeft, ChevronRight, Users, Building2, Phone, StickyNote, AlertCircle } from 'lucide-react';
+import { Contact, Search, Plus, Trash2, Upload, Download, Tag, X, ChevronLeft, ChevronRight, Users, Building2, Phone, StickyNote, AlertCircle, FolderOpen, Folder, FolderPlus } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/Components/ui/card';
 import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
@@ -15,6 +15,17 @@ interface ContactItem {
     tags: string[];
     notes: string;
     source: string;
+    folder_id: number | null;
+    created_at: string;
+}
+
+interface ContactFolder {
+    id: number;
+    name: string;
+    icon: string;
+    color: string;
+    source: string;
+    contact_count: number;
     created_at: string;
 }
 
@@ -29,6 +40,10 @@ export default function ContactsWorkspace({ t, locale, callRPC, daemonConnected 
     const [tags, setTags] = useState<{ name: string; count: number }[]>([]);
     const [loading, setLoading] = useState(false);
     const [selected, setSelected] = useState<Set<number>>(new Set());
+
+    // Folders
+    const [folders, setFolders] = useState<ContactFolder[]>([]);
+    const [activeFolder, setActiveFolder] = useState<number | null>(null);
 
     // Form state
     const [showForm, setShowForm] = useState(false);
@@ -48,7 +63,13 @@ export default function ContactsWorkspace({ t, locale, callRPC, daemonConnected 
         if (!daemonConnected) return;
         setLoading(true);
         try {
-            const res: any = await callRPC('getContacts', { search, tag: activeTag, page, limit: 50 });
+            const res: any = await callRPC('getContacts', { 
+                search, 
+                tag: activeTag, 
+                folderId: activeFolder,
+                page, 
+                limit: 50 
+            });
             setContacts(res.contacts || []);
             setTotal(res.total || 0);
             setPages(res.pages || 1);
@@ -65,9 +86,16 @@ export default function ContactsWorkspace({ t, locale, callRPC, daemonConnected 
         } catch (_) {}
     };
 
+    const fetchFolders = async () => {
+        try {
+            const res: any = await callRPC('getContactFolders', {});
+            setFolders(res.folders || []);
+        } catch (_) {}
+    };
+
     useEffect(() => {
-        if (daemonConnected) { fetchContacts(); fetchTags(); }
-    }, [daemonConnected, page, search, activeTag]);
+        if (daemonConnected) { fetchContacts(); fetchTags(); fetchFolders(); }
+    }, [daemonConnected, page, search, activeTag, activeFolder]);
 
     // Debounce search
     const searchTimeoutRef = useRef<any>(null);
@@ -143,6 +171,17 @@ export default function ContactsWorkspace({ t, locale, callRPC, daemonConnected 
         } catch (err: any) { alert(`Tag failed: ${err.message}`); }
     };
 
+    const handleDeleteFolder = async (folderId: number, e: React.MouseEvent) => {
+        e.stopPropagation();
+        if (!confirm(isRtl ? 'حذف المجلد؟ (جهات الاتصال لن تحذف)' : 'Delete folder? (contacts will be kept)')) return;
+        try {
+            await callRPC('deleteContactFolder', { folderId });
+            if (activeFolder === folderId) setActiveFolder(null);
+            fetchFolders();
+            fetchContacts();
+        } catch (err: any) { alert(`Delete failed: ${err.message}`); }
+    };
+
     const handleImport = async () => {
         if (!importText.trim()) return;
         const lines = importText.split('\n').filter(l => l.trim());
@@ -209,6 +248,8 @@ export default function ContactsWorkspace({ t, locale, callRPC, daemonConnected 
         }
     };
 
+    const activeFolderName = folders.find(f => f.id === activeFolder)?.name || null;
+
     return (
         <div className="space-y-6 animate-in fade-in duration-300">
             {/* Header */}
@@ -238,6 +279,81 @@ export default function ContactsWorkspace({ t, locale, callRPC, daemonConnected 
                     </Button>
                 </div>
             </div>
+
+            {/* ── Folders Strip ──────────────────────────────────────────── */}
+            {folders.length > 0 && (
+                <div className="space-y-2">
+                    <h3 className="text-xs font-bold text-muted-foreground flex items-center gap-1.5">
+                        <FolderOpen className="w-3.5 h-3.5" />
+                        {isRtl ? 'المجلدات' : 'Folders'}
+                    </h3>
+                    <div className="flex gap-2 flex-wrap">
+                        {/* All Contacts button */}
+                        <button
+                            onClick={() => { setActiveFolder(null); setPage(1); }}
+                            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl border text-xs font-bold transition-all duration-200 ${
+                                activeFolder === null 
+                                    ? 'bg-blue-600 text-white border-blue-600 shadow-md shadow-blue-600/20' 
+                                    : 'bg-muted/30 hover:bg-muted/60 border-border text-foreground'
+                            }`}
+                        >
+                            <Users className="w-4 h-4" />
+                            <span>{isRtl ? 'الكل' : 'All'}</span>
+                        </button>
+                        
+                        {folders.map(folder => (
+                            <div
+                                key={folder.id}
+                                role="button"
+                                tabIndex={0}
+                                onClick={() => { setActiveFolder(activeFolder === folder.id ? null : folder.id); setPage(1); }}
+                                className={`group flex items-center gap-2 px-4 py-2.5 rounded-xl border text-xs font-bold transition-all duration-200 relative cursor-pointer select-none ${
+                                    activeFolder === folder.id 
+                                        ? 'bg-emerald-600 text-white border-emerald-600 shadow-md shadow-emerald-600/20' 
+                                        : 'bg-muted/30 hover:bg-muted/60 border-border text-foreground'
+                                }`}
+                            >
+                                <span className="text-base">{folder.icon}</span>
+                                <span>{folder.name}</span>
+                                <Badge 
+                                    variant="secondary" 
+                                    className={`text-[9px] px-1.5 py-0 h-4 font-bold ${
+                                        activeFolder === folder.id 
+                                            ? 'bg-white/20 text-white' 
+                                            : 'bg-muted text-muted-foreground'
+                                    }`}
+                                >
+                                    {folder.contact_count}
+                                </Badge>
+                                <span
+                                    role="button"
+                                    onClick={(e) => handleDeleteFolder(folder.id, e)}
+                                    className={`ml-1 rounded-full p-0.5 transition-opacity cursor-pointer ${
+                                        activeFolder === folder.id 
+                                            ? 'opacity-60 hover:opacity-100 text-white' 
+                                            : 'opacity-0 group-hover:opacity-60 hover:!opacity-100 text-destructive'
+                                    }`}
+                                >
+                                    <X className="w-3 h-3" />
+                                </span>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
+
+            {/* Active folder indicator */}
+            {activeFolderName && (
+                <div className="flex items-center gap-2 px-3 py-2 bg-emerald-50/50 dark:bg-emerald-950/20 rounded-xl border border-emerald-200/50 dark:border-emerald-800/30">
+                    <Folder className="w-4 h-4 text-emerald-600" />
+                    <span className="text-xs font-bold text-emerald-700 dark:text-emerald-400">
+                        {isRtl ? `عرض مجلد: ${activeFolderName}` : `Viewing folder: ${activeFolderName}`}
+                    </span>
+                    <button onClick={() => { setActiveFolder(null); setPage(1); }} className="ml-auto">
+                        <X className="w-3.5 h-3.5 text-emerald-600 hover:text-emerald-800" />
+                    </button>
+                </div>
+            )}
 
             {/* Search & Tags */}
             <div className="flex flex-col sm:flex-row gap-3">
@@ -375,38 +491,55 @@ export default function ContactsWorkspace({ t, locale, callRPC, daemonConnected 
                                 <th className="p-3 text-start font-bold text-xs text-muted-foreground">{isRtl ? 'الهاتف' : 'Phone'}</th>
                                 <th className="p-3 text-start font-bold text-xs text-muted-foreground">{isRtl ? 'الاسم' : 'Name'}</th>
                                 <th className="p-3 text-start font-bold text-xs text-muted-foreground hidden md:table-cell">{isRtl ? 'الشركة' : 'Company'}</th>
+                                <th className="p-3 text-start font-bold text-xs text-muted-foreground hidden lg:table-cell">{isRtl ? 'المجلد' : 'Folder'}</th>
                                 <th className="p-3 text-start font-bold text-xs text-muted-foreground hidden lg:table-cell">{isRtl ? 'العلامات' : 'Tags'}</th>
                                 <th className="p-3 text-start font-bold text-xs text-muted-foreground w-20"></th>
                             </tr>
                         </thead>
                         <tbody>
-                            {contacts.map(c => (
-                                <tr key={c.id} className="border-b hover:bg-muted/20 transition-colors">
-                                    <td className="p-3">
-                                        <input type="checkbox" checked={selected.has(c.id)} onChange={() => toggleSelect(c.id)} className="rounded" />
-                                    </td>
-                                    <td className="p-3 font-mono text-xs">{c.phone_number}</td>
-                                    <td className="p-3 font-medium text-xs">{c.name || <span className="text-muted-foreground">—</span>}</td>
-                                    <td className="p-3 text-xs text-muted-foreground hidden md:table-cell">{c.company || '—'}</td>
-                                    <td className="p-3 hidden lg:table-cell">
-                                        <div className="flex gap-1 flex-wrap">
-                                            {c.tags?.map(tag => (
-                                                <Badge key={tag} variant="outline" className="text-[9px] px-1.5 py-0 h-4 rounded">{tag}</Badge>
-                                            ))}
-                                        </div>
-                                    </td>
-                                    <td className="p-3">
-                                        <div className="flex gap-1">
-                                            <Button variant="ghost" size="icon" className="h-7 w-7 rounded-lg" onClick={() => handleEdit(c)}>
-                                                <StickyNote className="w-3 h-3" />
-                                            </Button>
-                                            <Button variant="ghost" size="icon" className="h-7 w-7 rounded-lg text-destructive" onClick={() => handleDelete(c.id)}>
-                                                <Trash2 className="w-3 h-3" />
-                                            </Button>
-                                        </div>
-                                    </td>
-                                </tr>
-                            ))}
+                            {contacts.map(c => {
+                                const contactFolder = folders.find(f => f.id === c.folder_id);
+                                return (
+                                    <tr key={c.id} className="border-b hover:bg-muted/20 transition-colors">
+                                        <td className="p-3">
+                                            <input type="checkbox" checked={selected.has(c.id)} onChange={() => toggleSelect(c.id)} className="rounded" />
+                                        </td>
+                                        <td className="p-3 font-mono text-xs">{c.phone_number}</td>
+                                        <td className="p-3 font-medium text-xs">{c.name || <span className="text-muted-foreground">—</span>}</td>
+                                        <td className="p-3 text-xs text-muted-foreground hidden md:table-cell">{c.company || '—'}</td>
+                                        <td className="p-3 hidden lg:table-cell">
+                                            {contactFolder ? (
+                                                <Badge 
+                                                    variant="outline" 
+                                                    className="text-[9px] px-1.5 py-0 h-4 rounded gap-1 cursor-pointer hover:bg-emerald-50 dark:hover:bg-emerald-950/20 border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-400"
+                                                    onClick={() => { setActiveFolder(contactFolder.id); setPage(1); }}
+                                                >
+                                                    <span>{contactFolder.icon}</span> {contactFolder.name}
+                                                </Badge>
+                                            ) : (
+                                                <span className="text-muted-foreground text-[10px]">—</span>
+                                            )}
+                                        </td>
+                                        <td className="p-3 hidden lg:table-cell">
+                                            <div className="flex gap-1 flex-wrap">
+                                                {c.tags?.map(tag => (
+                                                    <Badge key={tag} variant="outline" className="text-[9px] px-1.5 py-0 h-4 rounded">{tag}</Badge>
+                                                ))}
+                                            </div>
+                                        </td>
+                                        <td className="p-3">
+                                            <div className="flex gap-1">
+                                                <Button variant="ghost" size="icon" className="h-7 w-7 rounded-lg" onClick={() => handleEdit(c)}>
+                                                    <StickyNote className="w-3 h-3" />
+                                                </Button>
+                                                <Button variant="ghost" size="icon" className="h-7 w-7 rounded-lg text-destructive" onClick={() => handleDelete(c.id)}>
+                                                    <Trash2 className="w-3 h-3" />
+                                                </Button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                );
+                            })}
                         </tbody>
                     </table>
                 </div>
@@ -417,7 +550,10 @@ export default function ContactsWorkspace({ t, locale, callRPC, daemonConnected 
                         </div>
                         <p className="text-sm font-bold">{isRtl ? 'لا توجد جهات اتصال' : 'No contacts yet'}</p>
                         <p className="text-xs text-muted-foreground mt-1">
-                            {isRtl ? 'أضف جهات اتصال يدوياً أو استورد ملف CSV' : 'Add contacts manually or import a CSV file'}
+                            {activeFolder 
+                                ? (isRtl ? 'هذا المجلد فارغ' : 'This folder is empty')
+                                : (isRtl ? 'أضف جهات اتصال يدوياً أو استورد ملف CSV' : 'Add contacts manually or import a CSV file')
+                            }
                         </p>
                     </div>
                 )}

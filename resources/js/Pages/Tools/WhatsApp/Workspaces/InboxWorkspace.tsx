@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import {
     MessageCircle, Send, Search, ArrowLeft, Phone, User,
     Image, Paperclip, Smile, ChevronRight, Clock, Check, CheckCheck,
-    RefreshCw, Inbox as InboxIcon
+    RefreshCw, Inbox as InboxIcon, Trash2
 } from 'lucide-react';
 import { Card } from '@/Components/ui/card';
 import { Button } from '@/Components/ui/button';
@@ -68,27 +68,105 @@ export default function InboxWorkspace({ callRPC, daemonConnected, sessions, onN
             : '127.0.0.1';
         let ws: WebSocket | null = null;
         let reconnectTimer: any = null;
+        let reconnectAttempt = 0;
 
         const connect = () => {
             try {
                 ws = new WebSocket(`ws://${host}:18401/ws`);
-                ws.onopen = () => console.log('[Inbox WS] ✅ Connected — listening for live messages');
+                ws.onopen = () => {
+                    reconnectAttempt = 0; // Reset backoff on successful connect
+                    console.log('[Inbox WS] ✅ Connected — listening for live messages');
+                };
                 ws.onmessage = (ev) => {
                     try {
                         const msg = JSON.parse(ev.data);
                         if (msg.event === 'whatsapp.inbox.new_message') {
-                            console.log('[Inbox WS] 📩 New message:', msg.data?.content?.substring(0, 30));
-                            // Use refs to call latest function versions
-                            fetchThreadsRef.current();
+                            const renderStart = performance.now();
+                            const newMsgData = msg.data;
+                            if (!newMsgData) return;
+
+                            // ── Latency diagnostic ──
+                            const msgTs = newMsgData.timestamp ? new Date(newMsgData.timestamp).getTime() : 0;
+                            const pipelineDelay = msgTs ? Date.now() - msgTs : -1;
+                            console.log(`[Inbox WS] 📩 ${newMsgData.direction === 'out' ? 'OUT' : 'IN'} | from=${newMsgData.phone} | pipeline=${pipelineDelay}ms | "${newMsgData.content?.substring(0, 40)}"`);
+                            
+                            // 1. If this message belongs to the currently active thread, append it instantly to the messages list
                             const current = selectedThreadRef.current;
-                            if (current && msg.data?.threadId === current.id) {
-                                fetchMessagesRef.current(current.id);
+                            if (current && newMsgData.threadId === current.id) {
+                                setMessages(prev => {
+                                    // 1. Filter out matching optimistic messages
+                                    const filtered = prev.filter(m => !(m.id.toString().startsWith('opt_') && m.content === newMsgData.content && m.direction === newMsgData.direction));
+                                    
+                                    // 2. Prevent duplicates by message_id
+                                    if (filtered.some(m => m.message_id === newMsgData.msgId && newMsgData.msgId)) return filtered;
+                                    
+                                    const formattedMsg = {
+                                        id: newMsgData.id || Math.random(),
+                                        thread_id: newMsgData.threadId,
+                                        session_id: newMsgData.sessionId,
+                                        contact_number: newMsgData.phone,
+                                        direction: newMsgData.direction || 'in',
+                                        message_type: newMsgData.messageType || 'text',
+                                        content: newMsgData.content,
+                                        media_url: newMsgData.mediaUrl || null,
+                                        message_id: newMsgData.msgId,
+                                        timestamp: newMsgData.timestamp || new Date().toISOString()
+                                    };
+                                    return [...filtered, formattedMsg];
+                                });
                             }
+
+                            // 2. Update the threads list state in real-time
+                            setThreads(prev => {
+                                const existingIdx = prev.findIndex(t => t.id === newMsgData.threadId);
+                                let updatedThreads = [...prev];
+                                let threadObj: any;
+                                
+                                // Format preview text
+                                const previewText = newMsgData.direction === 'out'
+                                    ? `You: ${newMsgData.content?.substring(0, 80) || ''}`
+                                    : (newMsgData.content?.substring(0, 100) || (newMsgData.messageType !== 'text' ? `📎 ${newMsgData.messageType}` : ''));
+                                
+                                if (existingIdx > -1) {
+                                    const existing = prev[existingIdx];
+                                    threadObj = {
+                                        ...existing,
+                                        last_message_preview: previewText,
+                                        last_message: newMsgData.content,
+                                        last_message_at: newMsgData.timestamp || new Date().toISOString(),
+                                        unread_count: (selectedThreadRef.current?.id === newMsgData.threadId || newMsgData.direction === 'out')
+                                            ? existing.unread_count
+                                            : (existing.unread_count || 0) + 1
+                                    };
+                                    updatedThreads.splice(existingIdx, 1);
+                                } else {
+                                    // Thread doesn't exist yet, construct dynamic placeholder
+                                    threadObj = {
+                                        id: newMsgData.threadId,
+                                        session_id: newMsgData.sessionId,
+                                        contact_number: newMsgData.phone,
+                                        contact_name: null,
+                                        unread_count: (selectedThreadRef.current?.id === newMsgData.threadId || newMsgData.direction === 'out') ? 0 : 1,
+                                        last_message_preview: previewText,
+                                        last_message: newMsgData.content,
+                                        last_message_at: newMsgData.timestamp || new Date().toISOString(),
+                                    };
+                                }
+                                return [threadObj, ...updatedThreads];
+                            });
+
+                            console.log(`[Inbox WS] ✅ UI RENDERED in ${(performance.now() - renderStart).toFixed(1)}ms`);
                         }
-                    } catch {}
+                    } catch (e) {
+                        console.error('[Inbox WS] Error processing message event:', e);
+                    }
                 };
                 ws.onclose = () => {
-                    reconnectTimer = setTimeout(connect, 3000);
+                    // Exponential backoff: 1s, 2s, 4s, 8s... max 15s
+                    const backoff = Math.min(1000 * Math.pow(2, reconnectAttempt), 15000);
+                    reconnectAttempt++;
+                    console.log(`[Inbox WS] 🔄 Reconnecting in ${backoff}ms (attempt #${reconnectAttempt})`);
+                    reconnectTimer = setTimeout(connect, backoff);
                 };
                 ws.onerror = () => ws?.close();
             } catch {}
@@ -101,20 +179,18 @@ export default function InboxWorkspace({ callRPC, daemonConnected, sessions, onN
         };
     }, []);
 
-    // Polling as reliable fallback — threads every 3s
+    // Initial threads load
     useEffect(() => {
-        if (!daemonConnected) return;
-        fetchThreads();
-        const interval = setInterval(fetchThreads, 3000);
-        return () => clearInterval(interval);
+        if (daemonConnected) {
+            fetchThreads();
+        }
     }, [daemonConnected]);
 
-    // Polling messages for active thread every 2s
+    // Fetch initial messages for active thread when it is selected
     useEffect(() => {
-        if (!selectedThread || !daemonConnected) return;
-        fetchMessages(selectedThread.id);
-        const interval = setInterval(() => fetchMessages(selectedThread.id), 2000);
-        return () => clearInterval(interval);
+        if (selectedThread?.id && daemonConnected) {
+            fetchMessages(selectedThread.id);
+        }
     }, [selectedThread?.id, daemonConnected]);
 
     // Scroll to bottom on new messages
@@ -129,7 +205,8 @@ export default function InboxWorkspace({ callRPC, daemonConnected, sessions, onN
         if (thread.unread_count > 0) {
             try {
                 await callRPC('markThreadRead', { threadId: thread.id });
-                fetchThreads();
+                // Update unread count locally for instant responsiveness
+                setThreads(prev => prev.map(t => t.id === thread.id ? { ...t, unread_count: 0 } : t));
                 onUnreadReset?.();
             } catch {}
         }
@@ -141,18 +218,67 @@ export default function InboxWorkspace({ callRPC, daemonConnected, sessions, onN
     const handleSendReply = async () => {
         if (!replyText.trim() || !selectedThread || sending) return;
         setSending(true);
+        const text = replyText.trim();
+        setReplyText(''); // Clear input instantly for immediate responsiveness
+
+        const optId = `opt_${Date.now()}`;
+        const tempMsg = {
+            id: optId,
+            thread_id: selectedThread.id,
+            session_id: selectedThread.session_id,
+            contact_number: selectedThread.contact_number,
+            direction: 'out',
+            message_type: 'text',
+            content: text,
+            media_url: null,
+            message_id: null,
+            timestamp: new Date().toISOString()
+        };
+
+        // 1. Instantly append the optimistic message to state
+        setMessages(prev => [...prev, tempMsg]);
+
+        // 2. Instantly bubble/reorder active thread to the top of the sidebar
+        setThreads(prev => {
+            const existingIdx = prev.findIndex(t => t.id === selectedThread.id);
+            let updatedThreads = [...prev];
+            let threadObj: any;
+            
+            const previewText = `You: ${text.substring(0, 80)}`;
+            
+            if (existingIdx > -1) {
+                const existing = prev[existingIdx];
+                threadObj = {
+                    ...existing,
+                    last_message_preview: previewText,
+                    last_message: text,
+                    last_message_at: new Date().toISOString(),
+                };
+                updatedThreads.splice(existingIdx, 1);
+            } else {
+                threadObj = {
+                    ...selectedThread,
+                    last_message_preview: previewText,
+                    last_message: text,
+                    last_message_at: new Date().toISOString(),
+                };
+            }
+            return [threadObj, ...updatedThreads];
+        });
+
         try {
             await callRPC('sendReply', {
                 sessionId: selectedThread.session_id,
                 phone: selectedThread.contact_number,
-                content: replyText.trim(),
+                content: text,
                 messageType: 'text'
             });
-            setReplyText('');
-            await fetchMessages(selectedThread.id);
-            await fetchThreads();
+            // The real-time WS payload will arrive and reconcile/replace the optimistic message, so we do not need to fetch or pull!
         } catch (err: any) {
+            // Clean up the optimistic message on failure
+            setMessages(prev => prev.filter(m => m.id !== optId));
             alert(`${t.inbox.replyFailed}${err.message}`);
+            setReplyText(text); // Restore text on failure
         }
         setSending(false);
     };
@@ -183,9 +309,24 @@ export default function InboxWorkspace({ callRPC, daemonConnected, sessions, onN
                                 </Badge>
                             )}
                         </div>
-                        <Button variant="ghost" size="icon" onClick={fetchThreads} className="text-white/70 hover:text-white hover:bg-white/10 h-8 w-8">
-                            <RefreshCw className="w-4 h-4" />
-                        </Button>
+                        <div className="flex items-center gap-1">
+                            <Button variant="ghost" size="icon" onClick={async () => {
+                                if (!confirm('Are you sure you want to clear all inbox conversations?')) return;
+                                try {
+                                    await callRPC('clearInbox', {});
+                                    setThreads([]);
+                                    setMessages([]);
+                                    setSelectedThread(null);
+                                } catch (err: any) {
+                                    alert('Failed to clear inbox: ' + err.message);
+                                }
+                            }} className="text-white/70 hover:text-red-300 hover:bg-white/10 h-8 w-8" title="Clear Inbox">
+                                <Trash2 className="w-4 h-4" />
+                            </Button>
+                            <Button variant="ghost" size="icon" onClick={fetchThreads} className="text-white/70 hover:text-white hover:bg-white/10 h-8 w-8">
+                                <RefreshCw className="w-4 h-4" />
+                            </Button>
+                        </div>
                     </div>
                     <div className="relative">
                         <Search className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-teal-200" />
@@ -322,7 +463,11 @@ export default function InboxWorkspace({ callRPC, daemonConnected, sessions, onN
                                             <div className="flex items-center justify-end gap-1 mt-1">
                                                 <span className="text-[10px] text-muted-foreground/70">{formatTime(msg.timestamp)}</span>
                                                 {msg.direction === 'out' && (
-                                                    <CheckCheck className="w-3.5 h-3.5 text-teal-500" />
+                                                    msg.id.toString().startsWith('opt_') ? (
+                                                        <Clock className="w-3.5 h-3.5 text-muted-foreground/50 animate-pulse" />
+                                                    ) : (
+                                                        <CheckCheck className="w-3.5 h-3.5 text-teal-500" />
+                                                    )
                                                 )}
                                             </div>
                                             {/* Bubble tail */}
