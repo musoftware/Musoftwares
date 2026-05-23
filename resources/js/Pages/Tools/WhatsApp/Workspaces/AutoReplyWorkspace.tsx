@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Bot, Plus, Trash2, Power, Zap, Hash, Type, Regex, MessageSquare, Clock, AlertCircle, Pencil, BarChart3 } from 'lucide-react';
+import { Bot, Plus, Trash2, Power, Zap, Hash, Type, Regex, MessageSquare, Clock, AlertCircle, Pencil, BarChart3, Vote, X, GitBranch, ArrowRight, ChevronDown, ChevronUp } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/Components/ui/card';
 import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
@@ -43,6 +43,20 @@ export default function AutoReplyWorkspace({ t, locale, callRPC, selectedAccount
     const [formResponse, setFormResponse] = useState('');
     const [formDelay, setFormDelay] = useState(3);
     const [formPriority, setFormPriority] = useState(0);
+    const [formResponseType, setFormResponseType] = useState<'text' | 'poll'>('text');
+    const [formPollName, setFormPollName] = useState('');
+    const [formPollOptions, setFormPollOptions] = useState<string[]>(['', '']);
+    const [formPollSelectable, setFormPollSelectable] = useState(1);
+
+    // Flow follow-up state
+    const [expandedFlows, setExpandedFlows] = useState<Record<string, boolean>>({});
+    const [flowEditing, setFlowEditing] = useState<{parentId: string, option: string} | null>(null);
+    const [flowResponseType, setFlowResponseType] = useState<'text' | 'poll'>('text');
+    const [flowResponse, setFlowResponse] = useState('');
+    const [flowPollName, setFlowPollName] = useState('');
+    const [flowPollOptions, setFlowPollOptions] = useState<string[]>(['', '']);
+    const [flowPollSelectable, setFlowPollSelectable] = useState(1);
+    const [flowDelay, setFlowDelay] = useState(2);
 
     const fetchRules = async () => {
         if (!daemonConnected) return;
@@ -69,26 +83,48 @@ export default function AutoReplyWorkspace({ t, locale, callRPC, selectedAccount
         setFormResponse('');
         setFormDelay(3);
         setFormPriority(0);
+        setFormResponseType('text');
+        setFormPollName('');
+        setFormPollOptions(['', '']);
+        setFormPollSelectable(1);
         setEditingRule(null);
         setShowForm(false);
     };
 
-    const handleEdit = (rule: AutoReplyRule) => {
+    const handleEdit = (rule: any) => {
         setFormName(rule.name);
         setFormTriggerType(rule.trigger_type);
         setFormTriggerValue(rule.trigger_value);
         setFormResponse(rule.response_message);
         setFormDelay(rule.delay_seconds);
         setFormPriority(rule.priority);
+        setFormResponseType(rule.response_type === 'poll' ? 'poll' : 'text');
+        setFormPollName(rule.response_poll_name || '');
+        try {
+            const opts = JSON.parse(rule.response_poll_options || '[]');
+            setFormPollOptions(opts.length >= 2 ? opts : ['', '']);
+        } catch { setFormPollOptions(['', '']); }
+        setFormPollSelectable(rule.response_poll_selectable || 1);
         setEditingRule(rule);
         setShowForm(true);
     };
 
     const handleSave = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!formTriggerValue.trim() || !formResponse.trim()) {
-            alert(isRtl ? 'الكلمة المفتاحية والرد مطلوبان' : 'Trigger and response are required');
+        if (!formTriggerValue.trim()) {
+            alert(isRtl ? 'الكلمة المفتاحية مطلوبة' : 'Trigger keyword is required');
             return;
+        }
+        if (formResponseType === 'text' && !formResponse.trim()) {
+            alert(isRtl ? 'رسالة الرد مطلوبة' : 'Response message is required');
+            return;
+        }
+        if (formResponseType === 'poll') {
+            const validOpts = formPollOptions.filter(o => o.trim());
+            if (!formPollName.trim() || validOpts.length < 2) {
+                alert(isRtl ? 'السؤال و خيارين على الأقل مطلوبين' : 'Poll question and at least 2 options required');
+                return;
+            }
         }
         try {
             await callRPC('saveAutoReply', {
@@ -98,10 +134,15 @@ export default function AutoReplyWorkspace({ t, locale, callRPC, selectedAccount
                     name: formName.trim() || (isRtl ? 'قاعدة بدون اسم' : 'Unnamed Rule'),
                     trigger_type: formTriggerType,
                     trigger_value: formTriggerValue.trim(),
-                    response_message: formResponse.trim(),
+                    response_message: formResponseType === 'poll' ? formPollName.trim() : formResponse.trim(),
+                    response_type: formResponseType,
                     delay_seconds: formDelay,
                     priority: formPriority,
-                    is_active: 1
+                    is_active: 1,
+                    // Poll fields
+                    response_poll_name: formResponseType === 'poll' ? formPollName.trim() : null,
+                    response_poll_options: formResponseType === 'poll' ? formPollOptions.filter(o => o.trim()) : null,
+                    response_poll_selectable: formResponseType === 'poll' ? formPollSelectable : 1
                 }
             });
             resetForm();
@@ -246,17 +287,98 @@ export default function AutoReplyWorkspace({ t, locale, callRPC, selectedAccount
                                 />
                             </div>
 
-                            {/* Response Message */}
+                            {/* Response Type Toggle */}
                             <div className="space-y-2 text-start">
-                                <Label>{isRtl ? 'رسالة الرد' : 'Response Message'}</Label>
-                                <Textarea
-                                    value={formResponse}
-                                    onChange={e => setFormResponse(e.target.value)}
-                                    placeholder={isRtl ? 'أهلاً وسهلاً! كيف نقدر نساعدك؟' : 'Hello! How can we help you?'}
-                                    className="h-28 resize-none rounded-xl text-start"
-                                    required
-                                />
+                                <Label>{isRtl ? 'نوع الرد' : 'Response Type'}</Label>
+                                <div className="flex gap-2">
+                                    <button type="button" onClick={() => setFormResponseType('text')}
+                                        className={`flex items-center gap-2 px-4 py-2.5 rounded-xl border text-sm font-bold transition-all ${
+                                            formResponseType === 'text'
+                                                ? 'border-violet-500 bg-violet-50 text-violet-700 dark:bg-violet-950/30 dark:text-violet-300'
+                                                : 'border-border text-muted-foreground hover:border-muted-foreground/30'
+                                        }`}>
+                                        <MessageSquare className="w-4 h-4" />
+                                        {isRtl ? 'نص' : 'Text'}
+                                    </button>
+                                    <button type="button" onClick={() => setFormResponseType('poll')}
+                                        className={`flex items-center gap-2 px-4 py-2.5 rounded-xl border text-sm font-bold transition-all ${
+                                            formResponseType === 'poll'
+                                                ? 'border-pink-500 bg-pink-50 text-pink-700 dark:bg-pink-950/30 dark:text-pink-300'
+                                                : 'border-border text-muted-foreground hover:border-muted-foreground/30'
+                                        }`}>
+                                        <Vote className="w-4 h-4" />
+                                        {isRtl ? 'تصويت' : 'Poll'}
+                                    </button>
+                                </div>
                             </div>
+
+                            {formResponseType === 'text' ? (
+                                /* Text Response */
+                                <div className="space-y-2 text-start">
+                                    <Label>{isRtl ? 'رسالة الرد' : 'Response Message'}</Label>
+                                    <Textarea
+                                        value={formResponse}
+                                        onChange={e => setFormResponse(e.target.value)}
+                                        placeholder={isRtl ? 'أهلاً وسهلاً! كيف نقدر نساعدك؟' : 'Hello! How can we help you?'}
+                                        className="h-28 resize-none rounded-xl text-start"
+                                    />
+                                </div>
+                            ) : (
+                                /* Poll Response Builder */
+                                <div className="space-y-3 p-4 rounded-xl border border-pink-200 dark:border-pink-800 bg-pink-50/50 dark:bg-pink-950/20">
+                                    <div className="space-y-2 text-start">
+                                        <Label className="flex items-center gap-1.5">
+                                            <Vote className="w-3.5 h-3.5 text-pink-500" />
+                                            {isRtl ? 'سؤال التصويت' : 'Poll Question'}
+                                        </Label>
+                                        <Input
+                                            value={formPollName}
+                                            onChange={e => setFormPollName(e.target.value)}
+                                            placeholder={isRtl ? 'ما رأيك في خدمتنا؟' : 'What do you think of our service?'}
+                                            className="rounded-xl text-start"
+                                        />
+                                    </div>
+                                    <div className="space-y-2 text-start">
+                                        <Label>{isRtl ? 'خيارات التصويت' : 'Poll Options'}</Label>
+                                        {formPollOptions.map((opt, idx) => (
+                                            <div key={idx} className="flex items-center gap-2">
+                                                <span className="text-xs font-bold text-muted-foreground w-5">{idx + 1}</span>
+                                                <Input
+                                                    value={opt}
+                                                    onChange={e => {
+                                                        const newOpts = [...formPollOptions];
+                                                        newOpts[idx] = e.target.value;
+                                                        setFormPollOptions(newOpts);
+                                                    }}
+                                                    placeholder={isRtl ? `خيار ${idx + 1}` : `Option ${idx + 1}`}
+                                                    className="flex-1 rounded-xl text-start text-sm"
+                                                />
+                                                {formPollOptions.length > 2 && (
+                                                    <button type="button" onClick={() => setFormPollOptions(formPollOptions.filter((_, i) => i !== idx))}
+                                                        className="p-1.5 rounded-lg text-red-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors">
+                                                        <X className="w-3.5 h-3.5" />
+                                                    </button>
+                                                )}
+                                            </div>
+                                        ))}
+                                        {formPollOptions.length < 12 && (
+                                            <button type="button" onClick={() => setFormPollOptions([...formPollOptions, ''])}
+                                                className="text-xs font-bold text-pink-600 hover:text-pink-700 dark:text-pink-400">
+                                                + {isRtl ? 'إضافة خيار' : 'Add Option'}
+                                            </button>
+                                        )}
+                                    </div>
+                                    <div className="space-y-2 text-start">
+                                        <Label>{isRtl ? 'عدد الاختيارات المسموح' : 'Selectable Options'}</Label>
+                                        <Input
+                                            type="number" min={1} max={formPollOptions.length || 2}
+                                            value={formPollSelectable}
+                                            onChange={e => setFormPollSelectable(parseInt(e.target.value) || 1)}
+                                            className="w-24 rounded-xl text-start"
+                                        />
+                                    </div>
+                                </div>
+                            )}
 
                             {/* Delay & Priority */}
                             <div className="grid grid-cols-2 gap-4">
@@ -319,8 +441,12 @@ export default function AutoReplyWorkspace({ t, locale, callRPC, selectedAccount
                 </CardHeader>
                 <CardContent className="pt-6">
                     <div className="space-y-3">
-                        {rules.map(rule => {
+                        {rules.filter((r: any) => !r.parent_rule_id).map(rule => {
                             const tt = triggerTypeInfo(rule.trigger_type);
+                            const childRules = rules.filter((r: any) => r.parent_rule_id === rule.id);
+                            let pollOptions: string[] = [];
+                            try { pollOptions = JSON.parse((rule as any).response_poll_options || '[]'); } catch {}
+                            const isFlowExpanded = expandedFlows[rule.id];
                             return (
                                 <div
                                     key={rule.id}
@@ -342,6 +468,17 @@ export default function AutoReplyWorkspace({ t, locale, callRPC, selectedAccount
                                                         {rule.match_count} {isRtl ? 'مطابقة' : 'matches'}
                                                     </Badge>
                                                 )}
+                                                {(rule as any).response_type === 'poll' && (
+                                                    <Badge className="text-[9px] font-bold px-1.5 py-0 h-4 bg-pink-50 text-pink-600 border-pink-200/50 dark:bg-pink-950/30 dark:text-pink-400">
+                                                        🗳️ {isRtl ? 'تصويت' : 'Poll'}
+                                                    </Badge>
+                                                )}
+                                                {rule.session_id && !sessions?.find((s: any) => s.accountId === rule.session_id) && (
+                                                    <Badge variant="destructive" className="text-[9px] font-bold px-1.5 py-0 h-4 flex items-center gap-1 animate-pulse">
+                                                        <AlertCircle className="w-2.5 h-2.5" />
+                                                        {isRtl ? 'حساب محذوف (يرجى التعديل)' : 'Deleted Account (Please Edit)'}
+                                                    </Badge>
+                                                )}
                                             </div>
                                             <div className="mt-2 space-y-1">
                                                 <p className="text-xs text-muted-foreground flex items-center gap-1.5">
@@ -350,7 +487,11 @@ export default function AutoReplyWorkspace({ t, locale, callRPC, selectedAccount
                                                 </p>
                                                 <p className="text-xs text-muted-foreground flex items-start gap-1.5">
                                                     <span className="font-bold text-foreground shrink-0">{isRtl ? 'رد:' : 'Reply:'}</span>
-                                                    <span className="line-clamp-2">{rule.response_message}</span>
+                                                    <span className="line-clamp-2">
+                                                        {(rule as any).response_type === 'poll' 
+                                                            ? `📊 ${(rule as any).response_poll_name || rule.response_message}`
+                                                            : rule.response_message}
+                                                    </span>
                                                 </p>
                                                 <p className="text-[10px] text-muted-foreground/60 flex items-center gap-2 mt-1">
                                                     <Clock className="w-3 h-3" /> {rule.delay_seconds}s delay
@@ -371,6 +512,215 @@ export default function AutoReplyWorkspace({ t, locale, callRPC, selectedAccount
                                             </Button>
                                         </div>
                                     </div>
+
+                                    {/* ── POLL FLOW: Follow-up per option ── */}
+                                    {(rule as any).response_type === 'poll' && pollOptions.length > 0 && (
+                                        <div className="mt-3 pt-3 border-t border-dashed">
+                                            <button
+                                                onClick={() => setExpandedFlows(prev => ({...prev, [rule.id]: !prev[rule.id]}))}
+                                                className="flex items-center gap-1.5 text-[11px] font-bold text-violet-600 dark:text-violet-400 hover:text-violet-700 transition-colors w-full"
+                                            >
+                                                <GitBranch className="w-3.5 h-3.5" />
+                                                {isRtl ? 'ردود المتابعة حسب التصويت' : 'Follow-up Flow by Vote'}
+                                                {childRules.length > 0 && (
+                                                    <Badge className="text-[8px] px-1 py-0 h-3.5 bg-violet-100 text-violet-600 dark:bg-violet-950/40 ms-1">
+                                                        {childRules.length}
+                                                    </Badge>
+                                                )}
+                                                {isFlowExpanded ? <ChevronUp className="w-3 h-3 ms-auto" /> : <ChevronDown className="w-3 h-3 ms-auto" />}
+                                            </button>
+
+                                            {isFlowExpanded && (
+                                                <div className="mt-2 space-y-2">
+                                                    {pollOptions.filter(o => o.trim()).map((option, idx) => {
+                                                        const child = childRules.find((r: any) => r.trigger_poll_option === option);
+                                                        const isEditingThis = flowEditing?.parentId === rule.id && flowEditing?.option === option;
+                                                        return (
+                                                            <div key={idx} className="ps-3 border-s-2 border-violet-300/50 dark:border-violet-700/50">
+                                                                <div className="flex items-center gap-2">
+                                                                    <ArrowRight className="w-3 h-3 text-violet-400 shrink-0" />
+                                                                    <span className="text-[11px] font-bold text-foreground">"{ option }"</span>
+                                                                    {child ? (
+                                                                        <div className="flex items-center gap-1.5 flex-1">
+                                                                            <Badge className="text-[8px] px-1.5 py-0 h-4 bg-emerald-50 text-emerald-600 border-emerald-200/50 dark:bg-emerald-950/30 dark:text-emerald-400">
+                                                                                {(child as any).response_type === 'poll' ? '🗳️' : '💬'} {isRtl ? 'مربوط' : 'Linked'}
+                                                                            </Badge>
+                                                                            <span className="text-[10px] text-muted-foreground truncate flex-1">
+                                                                                {(child as any).response_type === 'poll'
+                                                                                    ? `📊 ${(child as any).response_poll_name}`
+                                                                                    : child.response_message?.substring(0, 40)}
+                                                                            </span>
+                                                                            <Button
+                                                                                variant="ghost" size="icon"
+                                                                                className="h-5 w-5 rounded text-destructive hover:text-destructive"
+                                                                                onClick={async () => {
+                                                                                    await callRPC('deleteAutoReply', { id: child.id });
+                                                                                    fetchRules();
+                                                                                }}
+                                                                            >
+                                                                                <Trash2 className="w-2.5 h-2.5" />
+                                                                            </Button>
+                                                                        </div>
+                                                                    ) : (
+                                                                        <Button
+                                                                            variant="ghost"
+                                                                            size="sm"
+                                                                            className="h-5 text-[10px] font-bold text-violet-600 hover:text-violet-700 px-2 gap-1"
+                                                                            onClick={() => {
+                                                                                setFlowEditing({ parentId: rule.id, option });
+                                                                                setFlowResponseType('text');
+                                                                                setFlowResponse('');
+                                                                                setFlowPollName('');
+                                                                                setFlowPollOptions(['', '']);
+                                                                                setFlowPollSelectable(1);
+                                                                                setFlowDelay(2);
+                                                                            }}
+                                                                        >
+                                                                            <Plus className="w-3 h-3" />
+                                                                            {isRtl ? 'أضف متابعة' : 'Add follow-up'}
+                                                                        </Button>
+                                                                    )}
+                                                                </div>
+
+                                                                {/* Inline follow-up editor */}
+                                                                {isEditingThis && (
+                                                                    <div className="mt-2 p-3 rounded-xl bg-violet-50/50 dark:bg-violet-950/20 border border-violet-200/30 space-y-3">
+                                                                        <div className="flex items-center gap-2">
+                                                                            <button
+                                                                                onClick={() => setFlowResponseType('text')}
+                                                                                className={`px-3 py-1 rounded-lg text-[10px] font-bold transition-all ${
+                                                                                    flowResponseType === 'text'
+                                                                                        ? 'bg-violet-600 text-white shadow-sm'
+                                                                                        : 'bg-muted text-muted-foreground hover:bg-muted/80'
+                                                                                }`}
+                                                                            >
+                                                                                💬 {isRtl ? 'نص' : 'Text'}
+                                                                            </button>
+                                                                            <button
+                                                                                onClick={() => setFlowResponseType('poll')}
+                                                                                className={`px-3 py-1 rounded-lg text-[10px] font-bold transition-all ${
+                                                                                    flowResponseType === 'poll'
+                                                                                        ? 'bg-pink-600 text-white shadow-sm'
+                                                                                        : 'bg-muted text-muted-foreground hover:bg-muted/80'
+                                                                                }`}
+                                                                            >
+                                                                                🗳️ {isRtl ? 'تصويت' : 'Poll'}
+                                                                            </button>
+                                                                        </div>
+
+                                                                        {flowResponseType === 'text' ? (
+                                                                            <Textarea
+                                                                                value={flowResponse}
+                                                                                onChange={e => setFlowResponse(e.target.value)}
+                                                                                placeholder={isRtl ? 'رسالة المتابعة...' : 'Follow-up message...'}
+                                                                                className="text-xs rounded-lg min-h-[60px] text-start"
+                                                                            />
+                                                                        ) : (
+                                                                            <div className="space-y-2">
+                                                                                <Input
+                                                                                    value={flowPollName}
+                                                                                    onChange={e => setFlowPollName(e.target.value)}
+                                                                                    placeholder={isRtl ? 'سؤال التصويت...' : 'Poll question...'}
+                                                                                    className="text-xs rounded-lg h-8 text-start"
+                                                                                />
+                                                                                {flowPollOptions.map((opt, i) => (
+                                                                                    <div key={i} className="flex items-center gap-1.5">
+                                                                                        <span className="text-[10px] text-muted-foreground font-bold w-4">{i+1}.</span>
+                                                                                        <Input
+                                                                                            value={opt}
+                                                                                            onChange={e => {
+                                                                                                const c = [...flowPollOptions];
+                                                                                                c[i] = e.target.value;
+                                                                                                setFlowPollOptions(c);
+                                                                                            }}
+                                                                                            placeholder={isRtl ? `خيار ${i+1}` : `Option ${i+1}`}
+                                                                                            className="text-xs rounded-lg h-7 flex-1 text-start"
+                                                                                        />
+                                                                                        {flowPollOptions.length > 2 && (
+                                                                                            <Button
+                                                                                                type="button" variant="ghost" size="icon"
+                                                                                                className="h-5 w-5 text-muted-foreground"
+                                                                                                onClick={() => setFlowPollOptions(flowPollOptions.filter((_, j) => j !== i))}
+                                                                                            >
+                                                                                                <X className="w-3 h-3" />
+                                                                                            </Button>
+                                                                                        )}
+                                                                                    </div>
+                                                                                ))}
+                                                                                {flowPollOptions.length < 8 && (
+                                                                                    <Button
+                                                                                        type="button" variant="outline" size="sm"
+                                                                                        className="h-6 text-[10px] rounded-lg"
+                                                                                        onClick={() => setFlowPollOptions([...flowPollOptions, ''])}
+                                                                                    >
+                                                                                        <Plus className="w-3 h-3 me-1" />
+                                                                                        {isRtl ? 'خيار' : 'Option'}
+                                                                                    </Button>
+                                                                                )}
+                                                                            </div>
+                                                                        )}
+
+                                                                        <div className="flex items-center gap-2">
+                                                                            <Input
+                                                                                type="number" min={1} max={30}
+                                                                                value={flowDelay}
+                                                                                onChange={e => setFlowDelay(parseInt(e.target.value) || 2)}
+                                                                                className="w-16 h-7 text-xs rounded-lg text-start"
+                                                                            />
+                                                                            <span className="text-[10px] text-muted-foreground">{isRtl ? 'ثانية تأخير' : 'sec delay'}</span>
+                                                                        </div>
+
+                                                                        <div className="flex gap-2">
+                                                                            <Button
+                                                                                size="sm"
+                                                                                className="h-7 text-[10px] font-bold bg-violet-600 hover:bg-violet-700 text-white rounded-lg flex-1"
+                                                                                onClick={async () => {
+                                                                                    try {
+                                                                                        const flowRule: any = {
+                                                                                            session_id: rule.session_id || selectedAccount || null,
+                                                                                            name: `${rule.name} → ${option}`,
+                                                                                            trigger_type: 'contains',
+                                                                                            trigger_value: option,
+                                                                                            response_type: flowResponseType,
+                                                                                            response_message: flowResponseType === 'poll' ? flowPollName : flowResponse,
+                                                                                            delay_seconds: flowDelay,
+                                                                                            priority: 0,
+                                                                                            is_active: 1,
+                                                                                            parent_rule_id: rule.id,
+                                                                                            trigger_poll_option: option,
+                                                                                        };
+                                                                                        if (flowResponseType === 'poll') {
+                                                                                            flowRule.response_poll_name = flowPollName;
+                                                                                            flowRule.response_poll_options = flowPollOptions.filter(o => o.trim());
+                                                                                            flowRule.response_poll_selectable = flowPollSelectable;
+                                                                                        }
+                                                                                        await callRPC('saveAutoReply', { rule: flowRule });
+                                                                                        setFlowEditing(null);
+                                                                                        fetchRules();
+                                                                                    } catch (err: any) {
+                                                                                        alert(`Save failed: ${err.message}`);
+                                                                                    }
+                                                                                }}
+                                                                            >
+                                                                                {isRtl ? '💾 حفظ' : '💾 Save'}
+                                                                            </Button>
+                                                                            <Button
+                                                                                size="sm" variant="outline"
+                                                                                className="h-7 text-[10px] rounded-lg"
+                                                                                onClick={() => setFlowEditing(null)}
+                                                                            >
+                                                                                {isRtl ? 'إلغاء' : 'Cancel'}
+                                                                            </Button>
+                                                                        </div>
+                                                                    </div>
+                                                                )}
+                                                            </div>
+                                                        );
+                                                    })}
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
                                 </div>
                             );
                         })}

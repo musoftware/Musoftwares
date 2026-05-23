@@ -29,9 +29,56 @@ interface ContactFolder {
     created_at: string;
 }
 
-export default function ContactsWorkspace({ t, locale, callRPC, daemonConnected }: any) {
+export default function ContactsWorkspace({ t, locale, callRPC, daemonConnected, validationCallbackRef, sessions = [] }: any) {
     const isRtl = locale === 'ar';
     const [contacts, setContacts] = useState<ContactItem[]>([]);
+    const [validating, setValidating] = useState(false);
+    const [validationProgress, setValidationProgress] = useState<any>(null);
+    const [showValidationDialog, setShowValidationDialog] = useState(false);
+    const [validationSession, setValidationSession] = useState('');
+
+    useEffect(() => {
+        if (validationCallbackRef) {
+            validationCallbackRef.current = (event: string, data: any) => {
+                if (event === 'whatsapp.contacts.validation_progress') {
+                    setValidating(true);
+                    setValidationProgress(data);
+                    if (data.current % 3 === 0 || data.current === data.total) {
+                        fetchContacts();
+                    }
+                } else if (event === 'whatsapp.contacts.validation_complete') {
+                    setValidating(false);
+                    setValidationProgress(null);
+                    alert(isRtl
+                        ? `✅ اكتمل الفحص! صحيح: ${data.valid} · غير صحيح: ${data.invalid}`
+                        : `✅ Validation complete! Valid: ${data.valid} · Invalid: ${data.invalid}`
+                    );
+                    fetchContacts();
+                }
+            };
+        }
+        return () => {
+            if (validationCallbackRef) validationCallbackRef.current = null;
+        };
+    }, [validationCallbackRef, isRtl]);
+
+    const handleStartValidation = async () => {
+        if (selected.size === 0 || !validationSession) return;
+        setShowValidationDialog(false);
+        setValidating(true);
+        setValidationProgress({ current: 0, total: selected.size, percent: 0, valid: 0, invalid: 0 });
+        try {
+            await callRPC('validateContacts', {
+                ids: Array.from(selected),
+                sessionId: validationSession
+            });
+            setSelected(new Set());
+        } catch (err: any) {
+            alert(`Validation failed to start: ${err.message}`);
+            setValidating(false);
+            setValidationProgress(null);
+        }
+    };
     const [total, setTotal] = useState(0);
     const [pages, setPages] = useState(1);
     const [page, setPage] = useState(1);
@@ -355,6 +402,45 @@ export default function ContactsWorkspace({ t, locale, callRPC, daemonConnected 
                 </div>
             )}
 
+            {/* Real-time Validation Progress Card */}
+            {validating && validationProgress && (
+                <Card className="rounded-2xl border-cyan-200/50 dark:border-cyan-800/30 bg-cyan-50/20 dark:bg-cyan-950/10 p-5 animate-in slide-in-from-top-2 duration-300">
+                    <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 text-start">
+                        <div>
+                            <h3 className="font-bold text-sm text-cyan-800 dark:text-cyan-400 flex items-center gap-2">
+                                <span className="relative flex h-2 w-2">
+                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-450 opacity-75"></span>
+                                    <span className="relative inline-flex rounded-full h-2 w-2 bg-cyan-500"></span>
+                                </span>
+                                {isRtl ? 'جاري فحص صلاحية الأرقام...' : 'Validating JIDs...'}
+                            </h3>
+                            <p className="text-[11px] text-muted-foreground mt-0.5">
+                                {isRtl 
+                                    ? `يتم التحقق من الحسابات الفعالة لتفادي حظر حسابك أثناء الحملات.` 
+                                    : `Checking active accounts to protect your session from spam filters during campaigns.`}
+                            </p>
+                        </div>
+                        <div className="flex items-center gap-4 text-xs font-bold ml-auto md:ml-0 shrink-0">
+                            <span className="text-emerald-650">✅ {validationProgress.valid} {isRtl ? 'صحيح' : 'valid'}</span>
+                            <span className="text-rose-650">❌ {validationProgress.invalid} {isRtl ? 'غير متوفر' : 'invalid'}</span>
+                            <span className="text-muted-foreground">{validationProgress.current} / {validationProgress.total}</span>
+                        </div>
+                    </div>
+
+                    <div className="space-y-2 mt-4">
+                        <div className="w-full h-2.5 bg-muted rounded-full overflow-hidden border">
+                            <div 
+                                className="h-full bg-gradient-to-r from-cyan-500 to-teal-500 transition-all duration-300 rounded-full"
+                                style={{ width: `${validationProgress.percent}%` }}
+                            />
+                        </div>
+                        <div className="flex justify-between text-[10px] text-muted-foreground font-bold">
+                            <span>{validationProgress.percent}% {isRtl ? 'اكتمل' : 'completed'}</span>
+                        </div>
+                    </div>
+                </Card>
+            )}
+
             {/* Search & Tags */}
             <div className="flex flex-col sm:flex-row gap-3">
                 <div className="relative flex-1">
@@ -422,6 +508,49 @@ export default function ContactsWorkspace({ t, locale, callRPC, daemonConnected 
                 </Card>
             )}
 
+            {/* Validation Session Picker Modal */}
+            {showValidationDialog && (
+                <Card className="rounded-2xl border-cyan-200/50 dark:border-cyan-800/30 animate-in slide-in-from-top-2 duration-300">
+                    <CardHeader className="pb-3 border-b text-start">
+                        <CardTitle className="text-sm flex items-center gap-2">
+                            <Phone className="w-4 h-4 text-cyan-600" />
+                            {isRtl ? 'فحص وصلاحية الأرقام المحددة' : 'Verify Selected Numbers'}
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent className="pt-4 space-y-4 text-start">
+                        <p className="text-xs text-muted-foreground leading-relaxed">
+                            {isRtl 
+                                ? 'اختر حساب واتساب متصل ليقوم بعملية التحقق. سيقوم المحرك بفحص الأرقام المحددة والتأكد من وجود حسابات واتساب نشطة لها بشكل آمن.' 
+                                : 'Select a connected WhatsApp account to perform the scan. The engine will check the selected contacts and verify active WhatsApp JIDs with built-in speed pacing.'}
+                        </p>
+                        
+                        <div className="space-y-1.5">
+                            <Label className="text-xs font-bold">{isRtl ? 'اختر الحساب النشط' : 'Active Account'}</Label>
+                            <select
+                                value={validationSession}
+                                onChange={e => setValidationSession(e.target.value)}
+                                className="w-full rounded-xl border bg-background px-3 py-2 text-xs font-bold"
+                            >
+                                {sessions.filter((s: any) => s.state === 'connected').map((s: any) => (
+                                    <option key={s.accountId} value={s.accountId}>
+                                        {s.displayName || s.accountId} {s.phoneNumber ? `(${s.phoneNumber})` : ''}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+
+                        <div className="flex gap-2 pt-2">
+                            <Button onClick={handleStartValidation} className="bg-cyan-600 hover:bg-cyan-700 text-white font-bold rounded-xl text-xs flex-1">
+                                {isRtl ? 'بدء الفحص الآمن' : 'Start Safe Scan'}
+                            </Button>
+                            <Button variant="outline" onClick={() => setShowValidationDialog(false)} className="rounded-xl text-xs">
+                                {isRtl ? 'إلغاء' : 'Cancel'}
+                            </Button>
+                        </div>
+                    </CardContent>
+                </Card>
+            )}
+
             {/* Add/Edit Form */}
             {showForm && (
                 <Card className="rounded-2xl border-blue-200/50 dark:border-blue-800/30 animate-in slide-in-from-top-2 duration-300">
@@ -470,6 +599,17 @@ export default function ContactsWorkspace({ t, locale, callRPC, daemonConnected 
                     <Button variant="outline" size="sm" onClick={handleBulkTag} className="rounded-lg text-xs gap-1 font-bold">
                         <Tag className="w-3 h-3" /> {isRtl ? 'تصنيف' : 'Tag'}
                     </Button>
+                    <Button variant="outline" size="sm" onClick={() => {
+                        const connected = sessions.filter((s: any) => s.state === 'connected');
+                        if (connected.length === 0) {
+                            alert(isRtl ? 'الرجاء توصيل حساب واتساب أولاً لتتمكن من فحص صلاحية الأرقام' : 'Please connect a WhatsApp account first to verify numbers');
+                            return;
+                        }
+                        setValidationSession(connected[0].accountId);
+                        setShowValidationDialog(true);
+                    }} className="rounded-lg text-xs gap-1 font-bold bg-cyan-50 text-cyan-700 border-cyan-200 hover:bg-cyan-100 dark:bg-cyan-950/30 dark:border-cyan-900/50 dark:text-cyan-400">
+                        <Phone className="w-3 h-3" /> {isRtl ? 'فحص الأرقام' : 'Verify Numbers'}
+                    </Button>
                     <Button variant="outline" size="sm" onClick={handleBulkDelete} className="rounded-lg text-xs gap-1 font-bold text-destructive border-destructive/30 hover:bg-destructive/10">
                         <Trash2 className="w-3 h-3" /> {isRtl ? 'حذف' : 'Delete'}
                     </Button>
@@ -489,6 +629,7 @@ export default function ContactsWorkspace({ t, locale, callRPC, daemonConnected 
                                     <input type="checkbox" checked={selected.size === contacts.length && contacts.length > 0} onChange={toggleSelectAll} className="rounded" />
                                 </th>
                                 <th className="p-3 text-start font-bold text-xs text-muted-foreground">{isRtl ? 'الهاتف' : 'Phone'}</th>
+                                <th className="p-3 text-start font-bold text-xs text-muted-foreground">{isRtl ? 'الحالة' : 'Verification'}</th>
                                 <th className="p-3 text-start font-bold text-xs text-muted-foreground">{isRtl ? 'الاسم' : 'Name'}</th>
                                 <th className="p-3 text-start font-bold text-xs text-muted-foreground hidden md:table-cell">{isRtl ? 'الشركة' : 'Company'}</th>
                                 <th className="p-3 text-start font-bold text-xs text-muted-foreground hidden lg:table-cell">{isRtl ? 'المجلد' : 'Folder'}</th>
@@ -505,6 +646,25 @@ export default function ContactsWorkspace({ t, locale, callRPC, daemonConnected 
                                             <input type="checkbox" checked={selected.has(c.id)} onChange={() => toggleSelect(c.id)} className="rounded" />
                                         </td>
                                         <td className="p-3 font-mono text-xs">{c.phone_number}</td>
+                                        <td className="p-3">
+                                            {(c as any).validation_status === 'valid' ? (
+                                                <Badge variant="outline" className="text-[9px] bg-emerald-50 border-emerald-250 text-emerald-700 dark:bg-emerald-950/20 dark:border-emerald-900/50 dark:text-emerald-400 font-extrabold rounded-lg py-0 h-4.5">
+                                                    ✅ {isRtl ? 'نشط' : 'Valid'}
+                                                </Badge>
+                                            ) : (c as any).validation_status === 'invalid' ? (
+                                                <Badge variant="outline" className="text-[9px] bg-rose-50 border-rose-250 text-rose-700 dark:bg-rose-950/20 dark:border-rose-900/50 dark:text-rose-400 font-extrabold rounded-lg py-0 h-4.5">
+                                                    ❌ {isRtl ? 'غير متوفر' : 'Invalid'}
+                                                </Badge>
+                                            ) : (c as any).validation_status === 'pending' ? (
+                                                <Badge variant="outline" className="text-[9px] bg-blue-50 border-blue-250 text-blue-700 dark:bg-blue-950/20 dark:border-blue-900/50 dark:text-blue-400 font-extrabold rounded-lg py-0 h-4.5 animate-pulse">
+                                                    ⏳ {isRtl ? 'جاري الفحص' : 'Verifying'}
+                                                </Badge>
+                                            ) : (
+                                                <Badge variant="outline" className="text-[9px] bg-slate-50 border-slate-200 text-slate-400 dark:bg-slate-900/20 dark:border-slate-800 dark:text-slate-500 font-extrabold rounded-lg py-0 h-4.5">
+                                                    {isRtl ? 'غير مفحوص' : 'Unchecked'}
+                                                </Badge>
+                                            )}
+                                        </td>
                                         <td className="p-3 font-medium text-xs">{c.name || <span className="text-muted-foreground">—</span>}</td>
                                         <td className="p-3 text-xs text-muted-foreground hidden md:table-cell">{c.company || '—'}</td>
                                         <td className="p-3 hidden lg:table-cell">

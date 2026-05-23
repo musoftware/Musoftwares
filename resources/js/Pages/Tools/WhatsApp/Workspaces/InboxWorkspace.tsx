@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import {
     MessageCircle, Send, Search, ArrowLeft, Phone, User,
     Image, Paperclip, Smile, ChevronRight, Clock, Check, CheckCheck,
-    RefreshCw, Inbox as InboxIcon, Trash2
+    RefreshCw, Inbox as InboxIcon, Trash2, Bot, Loader2
 } from 'lucide-react';
 import { Card } from '@/Components/ui/card';
 import { Button } from '@/Components/ui/button';
@@ -22,7 +22,7 @@ function formatTime(dateStr: string) {
     } catch { return ''; }
 }
 
-export default function InboxWorkspace({ callRPC, daemonConnected, sessions, onNewMessageRef, onUnreadReset, t, locale }: any) {
+export default function InboxWorkspace({ callRPC, daemonConnected, sessions, selectedAccount, onNewMessageRef, onUnreadReset, t, locale }: any) {
     const isRtl = locale === 'ar';
     const [threads, setThreads] = useState<any[]>([]);
     const [selectedThread, setSelectedThread] = useState<any>(null);
@@ -33,6 +33,38 @@ export default function InboxWorkspace({ callRPC, daemonConnected, sessions, onN
     const [loading, setLoading] = useState(false);
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLInputElement>(null);
+    
+    // AI Copilot State Hooks
+    const [showCopilot, setShowCopilot] = useState(false);
+    const [copilotDraft, setCopilotDraft] = useState('');
+    const [draftLoading, setDraftLoading] = useState(false);
+    const [copilotClassification, setCopilotClassification] = useState<any>(null);
+
+    const fetchCopilotDraft = async () => {
+        if (!selectedThread) return;
+        setDraftLoading(true);
+        try {
+            const res: any = await callRPC('generateAICopilotDraft', {
+                sessionId: selectedThread.session_id,
+                phone: selectedThread.contact_number
+            });
+            setCopilotDraft(res.draft || '');
+            setCopilotClassification(res.classification || null);
+        } catch (err) {
+            console.error('Failed to generate AI Copilot draft:', err);
+        }
+        setDraftLoading(false);
+    };
+
+    const handleApplyCopilotDraft = () => {
+        setReplyText(copilotDraft);
+    };
+
+    useEffect(() => {
+        if (showCopilot && selectedThread?.id) {
+            fetchCopilotDraft();
+        }
+    }, [selectedThread?.id, showCopilot]);
     const selectedThreadRef = useRef<any>(null);
     const callRPCRef = useRef(callRPC);
     const fetchThreadsRef = useRef<() => void>(() => {});
@@ -45,7 +77,7 @@ export default function InboxWorkspace({ callRPC, daemonConnected, sessions, onN
     // Fetch threads
     const fetchThreads = async () => {
         try {
-            const res: any = await callRPCRef.current('getThreads', {});
+            const res: any = await callRPCRef.current('getThreads', { sessionId: selectedAccount || null });
             setThreads(res.threads || []);
         } catch (err) { /* silent */ }
     };
@@ -89,6 +121,11 @@ export default function InboxWorkspace({ callRPC, daemonConnected, sessions, onN
                             const msgTs = newMsgData.timestamp ? new Date(newMsgData.timestamp).getTime() : 0;
                             const pipelineDelay = msgTs ? Date.now() - msgTs : -1;
                             console.log(`[Inbox WS] 📩 ${newMsgData.direction === 'out' ? 'OUT' : 'IN'} | from=${newMsgData.phone} | pipeline=${pipelineDelay}ms | "${newMsgData.content?.substring(0, 40)}"`);
+                            
+                            // Explicit debug log for raw message payload
+                            if (newMsgData.rawMessage) {
+                                console.log('%c[RAW MESSAGE DATA - INBOX UI]', 'background: #0d9488; color: white; font-weight: bold; padding: 4px; border-radius: 4px;', newMsgData.rawMessage);
+                            }
                             
                             // 1. If this message belongs to the currently active thread, append it instantly to the messages list
                             const current = selectedThreadRef.current;
@@ -156,6 +193,23 @@ export default function InboxWorkspace({ callRPC, daemonConnected, sessions, onN
                             });
 
                             console.log(`[Inbox WS] ✅ UI RENDERED in ${(performance.now() - renderStart).toFixed(1)}ms`);
+                        } else if (msg.event === 'whatsapp.inbox.classification') {
+                            const classData = msg.data;
+                            if (classData) {
+                                const { threadId, classification } = classData;
+                                setSelectedThread(prev => {
+                                    if (prev && prev.id === threadId) {
+                                        return { ...prev, intent: classification.intent, sentiment: classification.sentiment };
+                                    }
+                                    return prev;
+                                });
+                                setThreads(prev => prev.map(t => {
+                                    if (t.id === threadId) {
+                                        return { ...t, intent: classification.intent, sentiment: classification.sentiment };
+                                    }
+                                    return t;
+                                }));
+                            }
                         }
                     } catch (e) {
                         console.error('[Inbox WS] Error processing message event:', e);
@@ -184,7 +238,7 @@ export default function InboxWorkspace({ callRPC, daemonConnected, sessions, onN
         if (daemonConnected) {
             fetchThreads();
         }
-    }, [daemonConnected]);
+    }, [daemonConnected, selectedAccount]);
 
     // Fetch initial messages for active thread when it is selected
     useEffect(() => {
@@ -367,8 +421,24 @@ export default function InboxWorkspace({ callRPC, daemonConnected, sessions, onN
                                 {/* Content */}
                                 <div className="flex-1 min-w-0">
                                     <div className="flex items-center justify-between">
-                                        <p className="font-bold text-sm truncate">
-                                            {thread.contact_name || `+${thread.contact_number}`}
+                                        <p className="font-bold text-sm truncate flex items-center gap-1.5">
+                                            <span>{thread.contact_name || `+${thread.contact_number}`}</span>
+                                            {thread.intent && thread.intent !== 'neutral' && (
+                                                <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded backdrop-blur-md shadow-sm shrink-0 border ${
+                                                    thread.intent === 'interested' 
+                                                        ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20' 
+                                                        : thread.intent === 'price_inquiry' 
+                                                        ? 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20' 
+                                                        : thread.intent === 'opt_out' 
+                                                        ? 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20' 
+                                                        : 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20'
+                                                }`}>
+                                                    {thread.intent === 'interested' ? (isRtl ? 'مهتم' : 'Interested') :
+                                                     thread.intent === 'price_inquiry' ? (isRtl ? 'سعر' : 'Price') :
+                                                     thread.intent === 'opt_out' ? (isRtl ? 'إيقاف' : 'Opt-out') :
+                                                     (isRtl ? 'غير مهتم' : 'Uninterested')}
+                                                </span>
+                                            )}
                                         </p>
                                         <span className="text-[10px] text-muted-foreground shrink-0 ms-2">
                                             {formatTime(thread.last_message_at)}
@@ -410,109 +480,248 @@ export default function InboxWorkspace({ callRPC, daemonConnected, sessions, onN
                                     {(selectedThread.contact_name || selectedThread.contact_number || '?')[0].toUpperCase()}
                                 </span>
                             </div>
-                            <div className="flex-1 min-w-0 text-start">
-                                <p className="font-bold text-sm">{selectedThread.contact_name || `+${selectedThread.contact_number}`}</p>
-                                <p className="text-[11px] text-muted-foreground font-mono">+{selectedThread.contact_number}</p>
+                            <div className="flex-1 min-w-0 text-start flex items-center justify-between gap-3">
+                                <div>
+                                    <p className="font-bold text-sm">{selectedThread.contact_name || `+${selectedThread.contact_number}`}</p>
+                                    <p className="text-[11px] text-muted-foreground font-mono">+{selectedThread.contact_number}</p>
+                                </div>
+                                <div className="flex flex-wrap gap-1.5 shrink-0">
+                                    {selectedThread.intent && selectedThread.intent !== 'neutral' && (
+                                        <Badge className={`text-[10px] font-bold shadow-sm backdrop-blur-md border ${
+                                            selectedThread.intent === 'interested' 
+                                                ? 'bg-emerald-500/10 text-emerald-600 border-emerald-500/25 hover:bg-emerald-500/15' 
+                                                : selectedThread.intent === 'price_inquiry' 
+                                                ? 'bg-blue-500/10 text-blue-600 border-blue-500/25 hover:bg-blue-500/15' 
+                                                : selectedThread.intent === 'opt_out' 
+                                                ? 'bg-rose-500/10 text-rose-600 border-rose-500/25 hover:bg-rose-500/15' 
+                                                : 'bg-amber-500/10 text-amber-600 border-amber-500/25 hover:bg-amber-500/15'
+                                        }`}>
+                                            ✨ {selectedThread.intent === 'interested' ? (isRtl ? 'عميل مهتم' : 'Interested Lead') :
+                                                 selectedThread.intent === 'price_inquiry' ? (isRtl ? 'استفسار عن السعر' : 'Price Inquiry') :
+                                                 selectedThread.intent === 'opt_out' ? (isRtl ? 'طلب إيقاف التواصل' : 'Opt-out Requested') :
+                                                 (isRtl ? 'غير مهتم' : 'Uninterested')}
+                                        </Badge>
+                                    )}
+                                    {selectedThread.sentiment && (
+                                        <Badge className={`text-[10px] font-bold shadow-sm backdrop-blur-md border ${
+                                            selectedThread.sentiment === 'positive' 
+                                                ? 'bg-teal-500/10 text-teal-600 border-teal-500/25 hover:bg-teal-500/15' 
+                                                : selectedThread.sentiment === 'negative' 
+                                                ? 'bg-red-500/10 text-red-600 border-red-500/25 hover:bg-red-500/15' 
+                                                : 'bg-slate-500/10 text-slate-600 border-slate-500/25 hover:bg-slate-500/15'
+                                        }`}>
+                                            {selectedThread.sentiment === 'positive' ? '😊 ' + (isRtl ? 'إيجابي' : 'Positive') :
+                                             selectedThread.sentiment === 'negative' ? '😠 ' + (isRtl ? 'سلبي' : 'Negative') :
+                                             '😐 ' + (isRtl ? 'محايد' : 'Neutral')}
+                                        </Badge>
+                                    )}
+                                </div>
                             </div>
-                            <div className="flex items-center gap-1">
-                                <Badge variant="outline" className="text-[10px] gap-1 text-teal-600">
+                            <div className="flex items-center gap-1.5 shrink-0">
+                                <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    onClick={() => setShowCopilot(!showCopilot)}
+                                    className={`h-8 w-8 rounded-full shrink-0 ${showCopilot ? 'bg-teal-500/10 text-teal-600 border border-teal-500/20' : 'text-muted-foreground'}`}
+                                    title="AI Copilot"
+                                >
+                                    <Bot className="w-4 h-4" />
+                                </Button>
+                                <Badge variant="outline" className="text-[10px] gap-1 text-teal-600 shrink-0">
                                     <Phone className="w-3 h-3" />
                                     {selectedThread.session_id}
                                 </Badge>
                             </div>
                         </div>
 
-                        {/* Messages Area */}
-                        <div
-                            className="flex-1 overflow-y-auto p-4 space-y-2"
-                            style={{ backgroundImage: 'radial-gradient(circle, rgba(0, 0, 0, 0.03) 1px, transparent 1px)', backgroundSize: '20px 20px' }}
-                        >
-                            {messages.length === 0 && (
-                                <div className="flex items-center justify-center h-full">
-                                    <p className="text-xs text-muted-foreground bg-white/80 dark:bg-black/30 px-4 py-2 rounded-lg">
-                                        {t.inbox.noMessages}
-                                    </p>
+                        <div className="flex-1 flex flex-row overflow-hidden relative">
+                            {/* Main Chat Flow */}
+                            <div className="flex-1 flex flex-col h-full overflow-hidden relative">
+                                {/* Messages Area */}
+                                <div
+                                    className="flex-1 overflow-y-auto p-4 space-y-2"
+                                    style={{ backgroundImage: 'radial-gradient(circle, rgba(0, 0, 0, 0.03) 1px, transparent 1px)', backgroundSize: '20px 20px' }}
+                                >
+                                    {messages.length === 0 && (
+                                        <div className="flex items-center justify-center h-full">
+                                            <p className="text-xs text-muted-foreground bg-white/80 dark:bg-black/30 px-4 py-2 rounded-lg">
+                                                {t.inbox.noMessages}
+                                            </p>
+                                        </div>
+                                    )}
+                                    {messages.map((msg, idx) => {
+                                        const justifyClass = msg.direction === 'out' 
+                                            ? (isRtl ? 'justify-start' : 'justify-end') 
+                                            : (isRtl ? 'justify-end' : 'justify-start');
+                                        return (
+                                            <div key={msg.id || idx} className={`flex ${justifyClass}`}>
+                                                <div className={`relative max-w-[75%] rounded-2xl px-3.5 py-2 shadow-sm text-[13px] ${
+                                                    msg.direction === 'out'
+                                                        ? 'bg-[#d9fdd3] text-[#111b21] dark:bg-[#005c4b] dark:text-[#e9edef]'
+                                                        : 'bg-white text-[#111b21] dark:bg-[#202c33] dark:text-[#e9edef]'
+                                                }`}>
+                                                    {/* Media indicator */}
+                                                    {msg.message_type !== 'text' && (
+                                                        <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground mb-1 bg-black/5 dark:bg-white/5 rounded-lg px-2 py-1.5">
+                                                            {msg.message_type === 'image' && <Image className="w-3.5 h-3.5" />}
+                                                            {msg.message_type === 'document' && <Paperclip className="w-3.5 h-3.5" />}
+                                                            {msg.message_type === 'audio' && <span>🎵</span>}
+                                                            {msg.message_type === 'video' && <span>🎬</span>}
+                                                            <span className="capitalize font-semibold">{msg.message_type}</span>
+                                                        </div>
+                                                    )}
+                                                    {/* Message content */}
+                                                    {msg.content && (
+                                                        <p className="whitespace-pre-wrap break-words leading-relaxed text-start">{msg.content}</p>
+                                                    )}
+                                                    {/* Timestamp */}
+                                                    <div className="flex items-center justify-end gap-1 mt-1">
+                                                        <span className="text-[10px] text-muted-foreground/70">{formatTime(msg.timestamp)}</span>
+                                                        {msg.direction === 'out' && (
+                                                            msg.id.toString().startsWith('opt_') ? (
+                                                                <Clock className="w-3.5 h-3.5 text-muted-foreground/50 animate-pulse" />
+                                                            ) : (
+                                                                <CheckCheck className="w-3.5 h-3.5 text-teal-500" />
+                                                            )
+                                                        )}
+                                                    </div>
+                                                    {/* Bubble tail */}
+                                                    {idx === 0 || messages[idx-1]?.direction !== msg.direction ? (
+                                                        <div className={`absolute top-0 w-3 h-3 ${
+                                                            msg.direction === 'out'
+                                                                ? 'right-[-5px] bg-[#d9fdd3] dark:bg-[#005c4b]'
+                                                                : 'left-[-5px] bg-white dark:bg-[#202c33]'
+                                                        } rotate-45 transform origin-top-${msg.direction === 'out' ? 'left' : 'right'}`}
+                                                        style={{ clipPath: msg.direction === 'out' ? 'polygon(100% 0, 0 0, 100% 100%)' : 'polygon(0 0, 100% 0, 0 100%)' }} />
+                                                    ) : null}
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
+                                    <div ref={messagesEndRef} />
                                 </div>
-                            )}
-                            {messages.map((msg, idx) => {
-                                const justifyClass = msg.direction === 'out' 
-                                    ? (isRtl ? 'justify-start' : 'justify-end') 
-                                    : (isRtl ? 'justify-end' : 'justify-start');
-                                return (
-                                    <div key={msg.id || idx} className={`flex ${justifyClass}`}>
-                                        <div className={`relative max-w-[75%] rounded-2xl px-3.5 py-2 shadow-sm text-[13px] ${
-                                            msg.direction === 'out'
-                                                ? 'bg-[#d9fdd3] text-[#111b21] dark:bg-[#005c4b] dark:text-[#e9edef]'
-                                                : 'bg-white text-[#111b21] dark:bg-[#202c33] dark:text-[#e9edef]'
-                                        }`}>
-                                            {/* Media indicator */}
-                                            {msg.message_type !== 'text' && (
-                                                <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground mb-1 bg-black/5 dark:bg-white/5 rounded-lg px-2 py-1.5">
-                                                    {msg.message_type === 'image' && <Image className="w-3.5 h-3.5" />}
-                                                    {msg.message_type === 'document' && <Paperclip className="w-3.5 h-3.5" />}
-                                                    {msg.message_type === 'audio' && <span>🎵</span>}
-                                                    {msg.message_type === 'video' && <span>🎬</span>}
-                                                    <span className="capitalize font-semibold">{msg.message_type}</span>
+
+                                {/* Reply Input */}
+                                <div className="p-3 bg-background border-t">
+                                    <div className="flex items-center gap-2">
+                                        <div className="flex-1 relative">
+                                            <Input
+                                                ref={inputRef}
+                                                value={replyText}
+                                                onChange={e => setReplyText(e.target.value)}
+                                                onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSendReply(); } }}
+                                                placeholder={t.inbox.typePlaceholder}
+                                                className="px-4 h-11 rounded-2xl bg-muted/50 border-0 text-sm focus:bg-muted text-start"
+                                                disabled={sending}
+                                            />
+                                        </div>
+                                        <Button
+                                            onClick={handleSendReply}
+                                            disabled={!replyText.trim() || sending}
+                                            className="h-11 w-11 rounded-full bg-teal-600 hover:bg-teal-700 text-white shrink-0 shadow-md"
+                                            size="icon"
+                                        >
+                                            {sending ? (
+                                                <RefreshCw className="w-4 h-4 animate-spin" />
+                                            ) : (
+                                                <Send className="w-4 h-4 rtl:rotate-180" />
+                                            )}
+                                        </Button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* AI Copilot Drawer Sidebar */}
+                            {showCopilot && (
+                                <div className="w-[280px] shrink-0 border-s bg-background flex flex-col h-full overflow-hidden animate-in slide-in-from-right duration-200">
+                                    <div className="p-3 border-b bg-gradient-to-r from-teal-600/5 to-teal-700/5 flex items-center justify-between">
+                                        <div className="flex items-center gap-1.5">
+                                            <Bot className="w-4 h-4 text-teal-600" />
+                                            <span className="font-bold text-xs text-foreground">{isRtl ? 'مساعد مبيعات الذكاء الاصطناعي' : 'AI Sales Copilot'}</span>
+                                        </div>
+                                        <Button
+                                            variant="ghost"
+                                            size="icon"
+                                            onClick={fetchCopilotDraft}
+                                            disabled={draftLoading}
+                                            className="h-7 w-7 text-muted-foreground hover:text-foreground"
+                                            title="Regenerate Draft"
+                                        >
+                                            <RefreshCw className={`w-3.5 h-3.5 ${draftLoading ? 'animate-spin' : ''}`} />
+                                        </Button>
+                                    </div>
+                                    
+                                    <div className="flex-1 overflow-y-auto p-4 space-y-4">
+                                        {/* Dynamic Lead Scoring & Sentiment summary */}
+                                        <div className="p-3 rounded-xl border bg-muted/40 text-start space-y-2">
+                                            <div className="flex justify-between items-center">
+                                                <span className="text-[10px] font-bold text-muted-foreground uppercase">{isRtl ? 'تحليل العميل الحالي' : 'Live Lead Analysis'}</span>
+                                                <Badge className="text-[9px] font-mono font-bold bg-teal-500/10 text-teal-600 border border-teal-500/20 px-1 py-0 h-4">Active Context</Badge>
+                                            </div>
+                                            <div className="grid grid-cols-2 gap-2 pt-1 font-sans">
+                                                <div className="p-2 rounded bg-background border text-center">
+                                                    <p className="text-[9px] text-muted-foreground font-medium">{isRtl ? 'النية المكتشفة' : 'Detected Intent'}</p>
+                                                    <p className="text-[10px] font-bold text-foreground mt-0.5 capitalize">
+                                                        {copilotClassification?.intent === 'interested' ? (isRtl ? '😍 مهتم' : 'Interested') :
+                                                         copilotClassification?.intent === 'price_inquiry' ? (isRtl ? '💰 سعر' : 'Price Inquiry') :
+                                                         copilotClassification?.intent === 'opt_out' ? (isRtl ? '🛑 إيقاف' : 'Opt-out') :
+                                                         copilotClassification?.intent === 'uninterested' ? (isRtl ? '😒 غير مهتم' : 'Uninterested') :
+                                                         (isRtl ? '💬 عام' : 'General')}
+                                                    </p>
+                                                </div>
+                                                <div className="p-2 rounded bg-background border text-center">
+                                                    <p className="text-[9px] text-muted-foreground font-medium">{isRtl ? 'نبرة العميل' : 'Sentiment'}</p>
+                                                    <p className="text-[10px] font-bold text-foreground mt-0.5 capitalize">
+                                                        {copilotClassification?.sentiment === 'positive' ? (isRtl ? '😊 إيجابي' : 'Positive') :
+                                                         copilotClassification?.sentiment === 'negative' ? (isRtl ? '😠 سلبي' : 'Negative') :
+                                                         (isRtl ? '😐 محايد' : 'Neutral')}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {/* Draft view */}
+                                        <div className="space-y-2 text-start">
+                                            <Label className="font-bold text-[11px] text-muted-foreground flex items-center gap-1.5">
+                                                <span>✨</span>
+                                                {isRtl ? 'مسودة الرد الذكية المقترحة' : 'AI Suggested Response Draft'}
+                                            </Label>
+                                            {draftLoading ? (
+                                                <div className="w-full h-32 rounded-xl border bg-muted/30 flex flex-col items-center justify-center gap-2 p-4">
+                                                    <Loader2 className="w-6 h-6 text-teal-600 animate-spin" />
+                                                    <span className="text-[10px] text-muted-foreground">{isRtl ? 'جارٍ صياغة الرد الذكي...' : 'AI is drafting response...'}</span>
+                                                </div>
+                                            ) : copilotDraft ? (
+                                                <div className="w-full rounded-xl border bg-gradient-to-br from-teal-50/50 to-emerald-50/20 dark:from-teal-950/10 dark:to-emerald-950/5 p-3.5 space-y-3">
+                                                    <p className="text-xs text-foreground leading-relaxed whitespace-pre-wrap select-all font-medium text-start">{copilotDraft}</p>
+                                                    <Button
+                                                        onClick={handleApplyCopilotDraft}
+                                                        className="w-full bg-teal-600 hover:bg-teal-700 text-white rounded-lg h-8 text-[11px] font-bold gap-1 shadow-sm"
+                                                    >
+                                                        <span>✍️</span>
+                                                        {isRtl ? 'إدراج الرد في صندوق الكتابة' : 'Insert Reply in Input Box'}
+                                                    </Button>
+                                                </div>
+                                            ) : (
+                                                <div className="w-full p-4 rounded-xl border border-dashed text-center text-xs text-muted-foreground">
+                                                    {isRtl ? 'لا توجد مسودة حالياً. أرسل العميل رسالة أولاً ليقوم الذكاء الاصطناعي بتحليلها وصياغتها.' : 'No draft available yet. The customer needs to message first for the AI to draft a response.'}
                                                 </div>
                                             )}
-                                            {/* Message content */}
-                                            {msg.content && (
-                                                <p className="whitespace-pre-wrap break-words leading-relaxed text-start">{msg.content}</p>
-                                            )}
-                                            {/* Timestamp */}
-                                            <div className="flex items-center justify-end gap-1 mt-1">
-                                                <span className="text-[10px] text-muted-foreground/70">{formatTime(msg.timestamp)}</span>
-                                                {msg.direction === 'out' && (
-                                                    msg.id.toString().startsWith('opt_') ? (
-                                                        <Clock className="w-3.5 h-3.5 text-muted-foreground/50 animate-pulse" />
-                                                    ) : (
-                                                        <CheckCheck className="w-3.5 h-3.5 text-teal-500" />
-                                                    )
-                                                )}
-                                            </div>
-                                            {/* Bubble tail */}
-                                            {idx === 0 || messages[idx-1]?.direction !== msg.direction ? (
-                                                <div className={`absolute top-0 w-3 h-3 ${
-                                                    msg.direction === 'out'
-                                                        ? 'right-[-5px] bg-[#d9fdd3] dark:bg-[#005c4b]'
-                                                        : 'left-[-5px] bg-white dark:bg-[#202c33]'
-                                                } rotate-45 transform origin-top-${msg.direction === 'out' ? 'left' : 'right'}`}
-                                                style={{ clipPath: msg.direction === 'out' ? 'polygon(100% 0, 0 0, 100% 100%)' : 'polygon(0 0, 100% 0, 0 100%)' }} />
-                                            ) : null}
+                                        </div>
+
+                                        {/* Guidelines overview */}
+                                        <div className="p-3 rounded-xl border bg-gradient-to-br from-violet-500/5 to-fuchsia-500/5 text-start space-y-1.5">
+                                            <p className="text-[10px] font-bold text-muted-foreground uppercase flex items-center gap-1">
+                                                <span>💡</span>
+                                                {isRtl ? 'توجيهات المبيعات النشطة' : 'AI Active Directives'}
+                                            </p>
+                                            <p className="text-[10px] text-muted-foreground leading-relaxed">
+                                                {isRtl ? 'يعتمد المساعد على قاعدة المعرفة الخاصة بحسابك، ويقوم بالصياغة الفورية للردود لتكون مقنعة، خلوقة، وبنبرة مبيعات ودية للغاية.' : 'The assistant coordinates using your account knowledge base, drafting highly concise FAQs to maximize conversion.'}
+                                            </p>
                                         </div>
                                     </div>
-                                );
-                            })}
-                            <div ref={messagesEndRef} />
-                        </div>
-
-                        {/* Reply Input */}
-                        <div className="p-3 bg-background border-t">
-                            <div className="flex items-center gap-2">
-                                <div className="flex-1 relative">
-                                    <Input
-                                        ref={inputRef}
-                                        value={replyText}
-                                        onChange={e => setReplyText(e.target.value)}
-                                        onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSendReply(); } }}
-                                        placeholder={t.inbox.typePlaceholder}
-                                        className="px-4 h-11 rounded-2xl bg-muted/50 border-0 text-sm focus:bg-muted text-start"
-                                        disabled={sending}
-                                    />
                                 </div>
-                                <Button
-                                    onClick={handleSendReply}
-                                    disabled={!replyText.trim() || sending}
-                                    className="h-11 w-11 rounded-full bg-teal-600 hover:bg-teal-700 text-white shrink-0 shadow-md"
-                                    size="icon"
-                                >
-                                    {sending ? (
-                                        <RefreshCw className="w-4 h-4 animate-spin" />
-                                    ) : (
-                                        <Send className="w-4 h-4 rtl:rotate-180" />
-                                    )}
-                                </Button>
-                            </div>
+                            )}
                         </div>
                     </>
                 ) : (
