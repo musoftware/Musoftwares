@@ -11,7 +11,7 @@ class FbmbServiceProvider extends ServiceProvider
     public function register()
     {
         $this->app->singleton(FbmbLookupService::class, function ($app) {
-            return new FbmbLookupService($app->make('\Modules\Core\Services\WalletService'));
+            return new FbmbLookupService($app->make('\App\Services\PointsService'));
         });
     }
 

@@ -18,11 +18,10 @@ class FbmbLookupController extends Controller
 
     public function index()
     {
-        $wallet = auth()->user()->wallet;
-
+        $user = auth()->user();
         return \Inertia\Inertia::render('Intelligence/ISaas/Index', [
-            'walletBalance' => $wallet ? (float) $wallet->balance : 0,
-            'currency' => $wallet?->currency ?? 'USD',
+            'pointsBalance' => $user->points_balance,
+            'currency' => $user->preferred_currency ?? 'USD',
         ]);
     }
 
@@ -33,11 +32,11 @@ class FbmbLookupController extends Controller
         ]);
 
         $user = auth()->user();
-        $wallet = $user->wallet;
+        $pointsBalance = $user->points_balance;
 
-        if (! $wallet || (float) $wallet->balance <= 0) {
+        if ($pointsBalance <= 0) {
             return response()->json([
-                'message' => 'Insufficient credit balance. Please top up your wallet first.',
+                'message' => 'Insufficient points balance. Please get points first.',
             ], 422);
         }
 
@@ -59,8 +58,8 @@ class FbmbLookupController extends Controller
                 'success' => true,
                 'total_ids' => $result['total_ids'],
                 'found_count' => $result['found_count'],
-                'credits_used' => $result['found_count'], // 1 credit per match
-                'remaining_balance' => $wallet->fresh()->balance,
+                'credits_used' => $result['found_count'], // 1 point per match
+                'remaining_balance' => $user->fresh()->points_balance,
                 'download_token' => $downloadToken,
             ]);
         } catch (Exception $e) {

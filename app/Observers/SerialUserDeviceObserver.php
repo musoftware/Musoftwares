@@ -2,8 +2,8 @@
 
 namespace App\Observers;
 
-use App\Models\Tools\SerialDevice;
-use App\Models\Tools\SerialUserDevice;
+use App\Models\SerialDevice;
+use App\Models\SerialUserDevice;
 
 /**
  * Syncs status from SerialUserDevice → SerialDevice.

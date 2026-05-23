@@ -4,7 +4,7 @@ namespace Modules\CRM\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\Traits\CleansLeadData;
+use App\Models\CleansLeadData;
 
 class Lead extends Model
 {

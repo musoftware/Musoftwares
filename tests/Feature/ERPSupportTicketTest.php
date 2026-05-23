@@ -76,7 +76,7 @@ class ERPSupportTicketTest extends TestCase
         $response->assertStatus(302);
 
         // Verify the client was auto-created under this tenant
-        $this->assertDatabaseHas('tenant_clients', [
+        $this->assertDatabaseHas('erp_tenant_clients', [
             'tenant_id' => $this->tenant->id,
             'name' => 'Dynamic Client LLC',
             'status' => 'lead',

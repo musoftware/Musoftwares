@@ -13,7 +13,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class TenantNote extends TenantModel
 {
-    protected $table = 'tenant_notes';
+    protected $table = 'erp_tenant_notes';
 
     protected $fillable = [
         'tenant_id',

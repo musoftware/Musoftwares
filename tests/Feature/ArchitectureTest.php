@@ -3,7 +3,7 @@
 namespace Tests\Feature;
 
 use Tests\TestCase;
-use Modules\Core\Services\FinancialTransactionService;
+use App\Services\FinancialTransactionService;
 
 class ArchitectureTest extends TestCase
 {

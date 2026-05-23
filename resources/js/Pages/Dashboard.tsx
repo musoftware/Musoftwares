@@ -94,10 +94,10 @@ export default function Dashboard({
     const recentTransactions = serverTransactions || [];
 
     const activityFeedItems = recentTransactions.map((txn) => ({
-        id: Number(txn.id.replace('TXN-', '')),
+        id: Number(String(txn.id).replace('TXN-', '')),
         user_id: null,
         subject_type: 'transaction',
-        subject_id: Number(txn.id.replace('TXN-', '')),
+        subject_id: Number(String(txn.id).replace('TXN-', '')),
         event: txn.type,
         description: `${txn.type.charAt(0).toUpperCase() + txn.type.slice(1)} of ${stats.currency} ${txn.amount.toLocaleString(undefined, {minimumFractionDigits: 2})} via ${txn.method}`,
         properties: null,

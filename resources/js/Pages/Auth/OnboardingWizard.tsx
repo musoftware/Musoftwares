@@ -2,8 +2,9 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Head, router, Link } from '@inertiajs/react';
 import { motion, AnimatePresence } from 'framer-motion';
 import confetti from 'canvas-confetti';
-import { 
-    Check, ChevronRight, Globe, Phone, DollarSign, Lock, AlertTriangle, 
+import axios from 'axios';
+import {
+    Check, ChevronRight, Globe, Phone, DollarSign, Lock, AlertTriangle,
     ArrowRight, ArrowLeft, Loader2, Sparkles, MapPin, Send, MessageSquare, Search
 } from 'lucide-react';
 import { Button } from '@/Components/ui/button';
@@ -25,19 +26,12 @@ interface UserData {
     preferred_currency_locked_at: string | null;
 }
 
-interface Currency {
-    code: string;
-    name: string;
-    symbol: string;
-}
-
 interface Props {
     user: UserData;
-    currencies: Currency[];
     countries: string[];
 }
 
-export default function OnboardingWizard({ user, currencies, countries }: Props) {
+export default function OnboardingWizard({ user, countries }: Props) {
     const [step, setStep] = useState(1);
     const [formData, setFormData] = useState({
         country: user.country || 'United States',
@@ -51,42 +45,55 @@ export default function OnboardingWizard({ user, currencies, countries }: Props)
 
     const [countrySearch, setCountrySearch] = useState('');
     const [isCountryOpen, setIsCountryOpen] = useState(false);
-    const [currencySearch, setCurrencySearch] = useState('');
 
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [saving, setSaving] = useState(false);
     const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
     const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
+    // Dynamic cities
+    const [cities, setCities] = useState<string[]>([]);
+    const [isLoadingCities, setIsLoadingCities] = useState(false);
+    const [citySearch, setCitySearch] = useState('');
+    const [isCityOpen, setIsCityOpen] = useState(false);
+
     const isCurrencyLocked = !!user.preferred_currency_locked_at;
 
-    // Sample dynamic cities mapping
-    const sampleCities: Record<string, string[]> = {
-        'United States': ['New York', 'San Francisco', 'Los Angeles', 'Chicago', 'Austin', 'Miami', 'Seattle'],
-        'United Kingdom': ['London', 'Manchester', 'Birmingham', 'Edinburgh', 'Bristol'],
-        'Canada': ['Toronto', 'Vancouver', 'Montreal', 'Calgary', 'Ottawa'],
-        'Australia': ['Sydney', 'Melbourne', 'Brisbane', 'Perth', 'Adelaide'],
-        'Germany': ['Berlin', 'Munich', 'Frankfurt', 'Hamburg', 'Cologne'],
-        'France': ['Paris', 'Lyon', 'Marseille', 'Toulouse', 'Bordeaux'],
-        'Egypt': ['Cairo', 'Alexandria', 'Giza', 'Sharm El-Sheikh', 'Luxor'],
-        'Saudi Arabia': ['Riyadh', 'Jeddah', 'Dammam', 'Mecca', 'Medina'],
-        'United Arab Emirates': ['Dubai', 'Abu Dhabi', 'Sharjah'],
-    };
+    useEffect(() => {
+        if (!formData.country) return;
 
-    const currentCities = sampleCities[formData.country] || ['Capital City', 'Metropolis', 'Central City', 'Other'];
+        let isMounted = true;
+        setIsLoadingCities(true);
+
+        axios.get(route('onboarding.cities', { countryName: formData.country }))
+            .then(res => {
+                if (isMounted) {
+                    setCities(res.data || []);
+                    setIsLoadingCities(false);
+                }
+            })
+            .catch(err => {
+                console.error('Failed to fetch cities:', err);
+                if (isMounted) {
+                    setIsLoadingCities(false);
+                }
+            });
+
+        return () => { isMounted = false; };
+    }, [formData.country]);
 
     // Auto-select first city if empty or country changes
     useEffect(() => {
-        if (!formData.city && currentCities.length > 0) {
-            setFormData(prev => ({ ...prev, city: currentCities[0] }));
+        if (!formData.city && cities.length > 0) {
+            setFormData(prev => ({ ...prev, city: cities[0] }));
         }
-    }, [formData.country]);
+    }, [formData.country, cities]);
 
     // Autosave functionality
     useEffect(() => {
         if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
         setSaveStatus('saving');
-        
+
         saveTimeoutRef.current = setTimeout(() => {
             router.post(route('onboarding.store'), {
                 ...formData,
@@ -125,7 +132,7 @@ export default function OnboardingWizard({ user, currencies, countries }: Props)
 
     const nextStep = () => {
         if (validateStep(step)) {
-            setStep(prev => Math.min(prev + 1, 3));
+            setStep(prev => Math.min(prev + 1, 2));
         }
     };
 
@@ -134,13 +141,13 @@ export default function OnboardingWizard({ user, currencies, countries }: Props)
     };
 
     const handleComplete = () => {
-        if (!validateStep(3)) return;
+        if (!validateStep(2)) return;
 
         setSaving(true);
         router.post(route('onboarding.store'), {
             ...formData,
             action: 'complete',
-            step: 3,
+            step: 2,
         }, {
             onSuccess: () => {
                 confetti({
@@ -153,11 +160,16 @@ export default function OnboardingWizard({ user, currencies, countries }: Props)
         });
     };
 
-    const filteredCountries = countries.filter(c => c.toLowerCase().includes(countrySearch.toLowerCase()));
-    const filteredCurrencies = currencies.filter(c => 
-        c.code.toLowerCase().includes(currencySearch.toLowerCase()) ||
-        c.name.toLowerCase().includes(currencySearch.toLowerCase())
-    );
+    const filteredCountries = (countries || []).filter(c => typeof c === 'string' && c.toLowerCase().includes((countrySearch || '').toLowerCase()));
+
+    // Default top 8 cities if empty
+    const defaultCities = ['New York', 'San Francisco', 'Los Angeles', 'Chicago', 'Austin', 'Miami', 'Seattle', 'Denver'];
+    const currentCitiesList = cities.length > 0 ? cities : defaultCities;
+
+    // For the custom dropdown
+    const filteredCities = currentCitiesList.filter(c => c.toLowerCase().includes(citySearch.toLowerCase()));
+    // Take first 20 to avoid massive DOM
+    const visibleCities = filteredCities.slice(0, 20);
 
     return (
         <div className="min-h-screen bg-muted/20 text-foreground flex flex-col font-sans">
@@ -172,10 +184,10 @@ export default function OnboardingWizard({ user, currencies, countries }: Props)
 
                 <div className="flex items-center space-x-4 text-xs text-muted-foreground">
                     <span className="hidden sm:inline-block">Logged in as <strong className="text-foreground">{user.email}</strong></span>
-                    <Link 
-                        href={route('logout')} 
-                        method="post" 
-                        as="button" 
+                    <Link
+                        href={route('logout')}
+                        method="post"
+                        as="button"
                         className="text-muted-foreground hover:text-foreground transition-colors"
                     >
                         Save & Exit
@@ -192,31 +204,28 @@ export default function OnboardingWizard({ user, currencies, countries }: Props)
                 {/* Progress Indicators */}
                 <div className="w-full max-w-xl mb-8 flex flex-col sm:flex-row items-center justify-between gap-4 z-10">
                     <div className="flex items-center space-x-2 text-xs font-medium">
-                        {[1, 2, 3].map((s) => (
+                        {[1, 2].map((s) => (
                             <div key={s} className="flex items-center space-x-2">
-                                <div className={`w-7 h-7 rounded-full flex items-center justify-center transition-all duration-300 font-semibold ${
-                                    s === step ? 'bg-primary text-primary-foreground shadow-sm ring-4 ring-primary/10' :
-                                    s < step ? 'bg-muted text-muted-foreground' :
-                                    'bg-background text-muted-foreground border border-border'
-                                }`}>
+                                <div className={`w-7 h-7 rounded-full flex items-center justify-center transition-all duration-300 font-semibold ${s === step ? 'bg-primary text-primary-foreground shadow-sm ring-4 ring-primary/10' :
+                                        s < step ? 'bg-muted text-muted-foreground' :
+                                            'bg-background text-muted-foreground border border-border'
+                                    }`}>
                                     {s < step ? <Check className="w-3.5 h-3.5" /> : s}
                                 </div>
                                 <span className={`hidden sm:inline-block text-xs font-medium ${s === step ? 'text-foreground font-semibold' : 'text-muted-foreground'}`}>
                                     {s === 1 && 'Location'}
                                     {s === 2 && 'Contact'}
-                                    {s === 3 && 'Currency'}
                                 </span>
-                                {s < 3 && <ChevronRight className="w-3.5 h-3.5 text-muted-foreground mx-1" />}
+                                {s < 2 && <ChevronRight className="w-3.5 h-3.5 text-muted-foreground mx-1" />}
                             </div>
                         ))}
                     </div>
 
                     {/* Autosave Status */}
                     <div className="flex items-center space-x-2 text-xs text-muted-foreground bg-background px-3 py-1.5 rounded-full border shadow-sm">
-                        <div className={`w-2 h-2 rounded-full ${
-                            saveStatus === 'saving' ? 'bg-amber-500 animate-pulse' :
-                            saveStatus === 'saved' ? 'bg-emerald-500' : 'bg-muted-foreground'
-                        }`} />
+                        <div className={`w-2 h-2 rounded-full ${saveStatus === 'saving' ? 'bg-amber-500 animate-pulse' :
+                                saveStatus === 'saved' ? 'bg-emerald-500' : 'bg-muted-foreground'
+                            }`} />
                         <span>{saveStatus === 'saving' ? 'Saving progress...' : saveStatus === 'saved' ? 'Saved' : 'Ready'}</span>
                     </div>
                 </div>
@@ -246,28 +255,29 @@ export default function OnboardingWizard({ user, currencies, countries }: Props)
                                     <div className="space-y-2">
                                         <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Country</label>
                                         <div className="relative">
-                                            <div 
+                                            <div
                                                 onClick={() => setIsCountryOpen(!isCountryOpen)}
                                                 className="w-full min-h-11 px-3.5 py-2.5 rounded-xl border bg-background hover:bg-muted/50 transition cursor-pointer flex items-center justify-between text-sm shadow-sm font-medium"
                                             >
                                                 <span>{formData.country || 'Select a country...'}</span>
                                                 <ChevronRight className={`w-4 h-4 text-muted-foreground transition-transform ${isCountryOpen ? 'rotate-90' : ''}`} />
                                             </div>
-                                            
+
                                             {isCountryOpen && (
                                                 <div className="absolute top-full left-0 right-0 mt-2 bg-background border rounded-xl shadow-xl z-50 p-2 max-h-60 overflow-y-auto">
                                                     <div className="relative mb-2">
                                                         <Search className="absolute left-3 top-2.5 w-4 h-4 text-muted-foreground" />
-                                                        <input 
-                                                            type="text" 
-                                                            placeholder="Search country..." 
+                                                        <input
+                                                            type="text"
+                                                            placeholder="Search country..."
                                                             value={countrySearch}
                                                             onChange={(e) => setCountrySearch(e.target.value)}
+                                                            onClick={(e) => e.stopPropagation()}
                                                             className="w-full bg-muted rounded-lg pl-9 pr-3 py-1.5 text-xs border-none outline-none focus:ring-2 focus:ring-primary/20"
                                                         />
                                                     </div>
                                                     {filteredCountries.map(c => (
-                                                        <div 
+                                                        <div
                                                             key={c}
                                                             onClick={() => {
                                                                 setFormData(prev => ({ ...prev, country: c, city: '' }));
@@ -285,34 +295,63 @@ export default function OnboardingWizard({ user, currencies, countries }: Props)
                                         {errors.country && <span className="text-xs text-destructive mt-1 block">{errors.country}</span>}
                                     </div>
 
-                                    {/* City Selector / Input */}
+                                    {/* City Combobox Selector */}
                                     <div className="space-y-2">
                                         <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">City / Operational Node</label>
-                                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                                            {currentCities.map(city => (
-                                                <div 
-                                                    key={city}
-                                                    onClick={() => setFormData(prev => ({ ...prev, city }))}
-                                                    className={`px-3.5 py-2.5 rounded-xl border text-xs font-medium cursor-pointer flex items-center space-x-2 transition ${
-                                                        city === formData.city ? 
-                                                        'border-primary bg-primary text-primary-foreground shadow-sm' : 
-                                                        'border-border hover:border-border/80 bg-background'
-                                                    }`}
-                                                >
-                                                    <MapPin className="w-3.5 h-3.5 shrink-0 opacity-70" />
-                                                    <span className="truncate">{city}</span>
+                                        <div className="relative">
+                                            <div
+                                                onClick={() => setIsCityOpen(!isCityOpen)}
+                                                className="w-full min-h-11 px-3.5 py-2.5 rounded-xl border bg-background hover:bg-muted/50 transition cursor-pointer flex items-center justify-between text-sm shadow-sm font-medium"
+                                            >
+                                                <div className="flex items-center space-x-2 truncate">
+                                                    <MapPin className="w-4 h-4 shrink-0 opacity-70" />
+                                                    <span className="truncate">{formData.city || 'Select a city...'}</span>
                                                 </div>
-                                            ))}
+                                                {isLoadingCities ? (
+                                                    <Loader2 className="w-4 h-4 text-muted-foreground animate-spin shrink-0" />
+                                                ) : (
+                                                    <ChevronRight className={`w-4 h-4 text-muted-foreground transition-transform shrink-0 ${isCityOpen ? 'rotate-90' : ''}`} />
+                                                )}
+                                            </div>
+
+                                            {isCityOpen && (
+                                                <div className="absolute top-full left-0 right-0 mt-2 bg-background border rounded-xl shadow-xl z-50 p-2 max-h-60 overflow-y-auto">
+                                                    <div className="relative mb-2">
+                                                        <Search className="absolute left-3 top-2.5 w-4 h-4 text-muted-foreground" />
+                                                        <input
+                                                            type="text"
+                                                            placeholder="Search or enter custom city..."
+                                                            value={citySearch}
+                                                            onChange={(e) => {
+                                                                setCitySearch(e.target.value);
+                                                                setFormData(prev => ({ ...prev, city: e.target.value }));
+                                                            }}
+                                                            onClick={(e) => e.stopPropagation()}
+                                                            className="w-full bg-muted rounded-lg pl-9 pr-3 py-1.5 text-xs border-none outline-none focus:ring-2 focus:ring-primary/20"
+                                                        />
+                                                    </div>
+                                                    {visibleCities.length > 0 ? visibleCities.map(city => (
+                                                        <div
+                                                            key={city}
+                                                            onClick={() => {
+                                                                setFormData(prev => ({ ...prev, city }));
+                                                                setIsCityOpen(false);
+                                                                setCitySearch('');
+                                                            }}
+                                                            className={`px-3 py-2 rounded-lg text-xs font-medium cursor-pointer transition flex items-center space-x-2 ${city === formData.city ? 'bg-primary text-primary-foreground font-semibold' : 'hover:bg-muted'}`}
+                                                        >
+                                                            <MapPin className="w-3.5 h-3.5 shrink-0 opacity-70" />
+                                                            <span className="truncate">{city}</span>
+                                                        </div>
+                                                    )) : (
+                                                        <div className="px-3 py-4 text-xs text-center text-muted-foreground">
+                                                            No cities found. Type above to use custom.
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            )}
                                         </div>
-                                        <div className="pt-2">
-                                            <Input 
-                                                placeholder="Or enter custom city name..." 
-                                                value={formData.city}
-                                                onChange={(e) => setFormData(prev => ({ ...prev, city: e.target.value }))}
-                                                className="h-10 text-sm font-medium"
-                                            />
-                                            {errors.city && <span className="text-xs text-destructive mt-1 block">{errors.city}</span>}
-                                        </div>
+                                        {errors.city && <span className="text-xs text-destructive mt-1 block">{errors.city}</span>}
                                     </div>
                                 </CardContent>
                                 <CardFooter className="border-t px-8 py-4 flex justify-end bg-muted/30">
@@ -346,7 +385,7 @@ export default function OnboardingWizard({ user, currencies, countries }: Props)
                                         {/* Mobile 1 */}
                                         <div className="space-y-2">
                                             <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Primary Mobile <span className="text-destructive">*</span></label>
-                                            <Input 
+                                            <Input
                                                 placeholder="+1 (555) 000-0000"
                                                 value={formData.mobile_1}
                                                 onChange={(e) => setFormData(prev => ({ ...prev, mobile_1: e.target.value }))}
@@ -358,7 +397,7 @@ export default function OnboardingWizard({ user, currencies, countries }: Props)
                                         {/* Mobile 2 */}
                                         <div className="space-y-2">
                                             <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Secondary Mobile <span className="text-muted-foreground/70 font-normal lowercase">(optional)</span></label>
-                                            <Input 
+                                            <Input
                                                 placeholder="+1 (555) 999-9999"
                                                 value={formData.mobile_2}
                                                 onChange={(e) => setFormData(prev => ({ ...prev, mobile_2: e.target.value }))}
@@ -376,7 +415,7 @@ export default function OnboardingWizard({ user, currencies, countries }: Props)
                                             </label>
                                             <div className="relative flex items-center">
                                                 <span className="absolute left-3 text-sm font-medium text-muted-foreground">@</span>
-                                                <Input 
+                                                <Input
                                                     placeholder="username"
                                                     value={formData.telegram_username}
                                                     onChange={(e) => setFormData(prev => ({ ...prev, telegram_username: e.target.value }))}
@@ -391,7 +430,7 @@ export default function OnboardingWizard({ user, currencies, countries }: Props)
                                                 <MessageSquare className="w-3.5 h-3.5 text-emerald-500" />
                                                 <span>WhatsApp Number</span>
                                             </label>
-                                            <Input 
+                                            <Input
                                                 placeholder="+1 (555) 123-4567"
                                                 value={formData.whatsapp_number}
                                                 onChange={(e) => setFormData(prev => ({ ...prev, whatsapp_number: e.target.value }))}
@@ -402,92 +441,6 @@ export default function OnboardingWizard({ user, currencies, countries }: Props)
                                 </CardContent>
                                 <CardFooter className="border-t px-8 py-4 flex items-center justify-between bg-muted/30">
                                     <Button onClick={prevStep} variant="outline" size="lg" className="h-11 px-5 rounded-xl font-medium">
-                                        <ArrowLeft className="w-4 h-4 mr-2" />
-                                        Back
-                                    </Button>
-                                    <Button onClick={nextStep} size="lg" className="h-11 px-6 rounded-xl font-medium shadow-sm">
-                                        Continue to Currency
-                                        <ArrowRight className="w-4 h-4 ml-2" />
-                                    </Button>
-                                </CardFooter>
-                            </motion.div>
-                        )}
-
-                        {step === 3 && (
-                            <motion.div
-                                key="step3"
-                                initial={{ opacity: 0, x: -10 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                exit={{ opacity: 0, x: 10 }}
-                                transition={{ duration: 0.2 }}
-                            >
-                                <CardHeader className="pb-6 border-b px-8 pt-8">
-                                    <div className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center mb-4 text-foreground">
-                                        <DollarSign className="w-5 h-5 text-amber-500" />
-                                    </div>
-                                    <CardTitle className="text-xl sm:text-2xl">Preferred Account Currency</CardTitle>
-                                    <CardDescription className="mt-1.5 leading-relaxed">
-                                        Select the primary base currency for your billing, client invoices, and internal wallet balances.
-                                    </CardDescription>
-                                </CardHeader>
-                                <CardContent className="space-y-6 px-8 py-6">
-                                    {/* Warning Banner */}
-                                    <div className="p-4 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 flex items-start space-x-3 text-xs sm:text-sm leading-relaxed">
-                                        <AlertTriangle className="w-5 h-5 shrink-0 mt-0.5 text-amber-500" />
-                                        <div>
-                                            <strong className="font-semibold block mb-0.5 tracking-tight">Permanent Operational Selection</strong>
-                                            Your account currency affects invoices, wallet balances, and financial operations. This can only be changed manually later by administrator support.
-                                        </div>
-                                    </div>
-
-                                    {/* Currency Fintech Selector */}
-                                    <div className="space-y-3">
-                                        <div className="flex items-center justify-between">
-                                            <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Select Currency</label>
-                                            {isCurrencyLocked && (
-                                                <span className="inline-flex items-center space-x-1 text-xs text-amber-600 font-medium">
-                                                    <Lock className="w-3 h-3" />
-                                                    <span>Permanently Locked</span>
-                                                </span>
-                                            )}
-                                        </div>
-
-                                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                                            {currencies.map(curr => (
-                                                <div
-                                                    key={curr.code}
-                                                    onClick={() => !isCurrencyLocked && setFormData(prev => ({ ...prev, preferred_currency: curr.code }))}
-                                                    className={`p-4 rounded-xl border text-left transition relative ${
-                                                        isCurrencyLocked ? 'opacity-70 cursor-not-allowed' : 'cursor-pointer'
-                                                    } ${
-                                                        formData.preferred_currency === curr.code ?
-                                                        'border-primary bg-primary text-primary-foreground shadow-sm ring-2 ring-primary/20 font-semibold' :
-                                                        'border-border hover:border-border/80 bg-background'
-                                                    }`}
-                                                >
-                                                    <div className="flex items-center justify-between mb-1">
-                                                        <span className="text-sm font-bold tracking-tight">{curr.code}</span>
-                                                        <span className={`w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold ${
-                                                            formData.preferred_currency === curr.code ? 'bg-primary-foreground/20 text-current' : 'bg-muted text-muted-foreground'
-                                                        }`}>
-                                                            {curr.symbol}
-                                                        </span>
-                                                    </div>
-                                                    <span className={`text-xs block truncate ${formData.preferred_currency === curr.code ? 'text-primary-foreground/80 font-medium' : 'text-muted-foreground'}`}>
-                                                        {curr.name}
-                                                    </span>
-                                                    
-                                                    {formData.preferred_currency === curr.code && (
-                                                        <div className="absolute top-2 right-2 w-2 h-2 rounded-full bg-emerald-400" />
-                                                    )}
-                                                </div>
-                                            ))}
-                                        </div>
-                                        {errors.preferred_currency && <span className="text-xs text-destructive block">{errors.preferred_currency}</span>}
-                                    </div>
-                                </CardContent>
-                                <CardFooter className="border-t px-8 py-4 flex items-center justify-between bg-muted/30">
-                                    <Button onClick={prevStep} variant="outline" size="lg" className="h-11 px-5 rounded-xl font-medium" disabled={saving}>
                                         <ArrowLeft className="w-4 h-4 mr-2" />
                                         Back
                                     </Button>
@@ -507,14 +460,9 @@ export default function OnboardingWizard({ user, currencies, countries }: Props)
                                 </CardFooter>
                             </motion.div>
                         )}
+
                     </AnimatePresence>
                 </Card>
-
-                {/* Minimalist Trust & Encryption Badge */}
-                <div className="mt-8 text-center text-xs text-muted-foreground flex items-center justify-center space-x-2 z-10 font-normal tracking-tight">
-                    <Lock className="w-3.5 h-3.5 opacity-70" />
-                    <span>256-bit SSL Operational Workspace Security</span>
-                </div>
             </main>
         </div>
     );

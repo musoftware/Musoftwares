@@ -24,7 +24,7 @@ return new class extends Migration
                 $table->text('task_description')->nullable();
 
                 // Client and project linkage — recovered from old Task model
-                $table->foreignId('client_id')->nullable()->constrained('tenant_clients')->nullOnDelete();
+                $table->foreignId('client_id')->nullable()->constrained('erp_tenant_clients')->nullOnDelete();
                 $table->foreignId('project_id')->nullable()->constrained('projects')->nullOnDelete();
 
                 // Status lifecycle: open | in_progress | completed | archived
@@ -102,7 +102,7 @@ return new class extends Migration
             Schema::create('erp_client_notes', function (Blueprint $table) {
                 $table->id();
                 $table->unsignedBigInteger('tenant_id')->index();
-                $table->foreignId('client_id')->constrained('tenant_clients')->cascadeOnDelete();
+                $table->foreignId('client_id')->constrained('erp_tenant_clients')->cascadeOnDelete();
                 $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
 
                 // Categories: password | anydesk | notes | archived

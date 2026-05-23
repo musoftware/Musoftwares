@@ -100,7 +100,7 @@ class UsersController extends Controller
      */
     public function show($id): InertiaResponse
     {
-        $user = User::with(['kycDocuments', 'kycVerifier:id,name', 'supportTickets'])
+        $user = User::with(['kycDocuments', 'kycVerifier:id,name', 'tickets'])
             ->findOrFail($id);
 
         $initials = collect(explode(' ', $user->name))
@@ -108,18 +108,14 @@ class UsersController extends Controller
             ->take(2)
             ->implode('');
 
-        $walletData = null;
-        try {
-            $wallet     = $user->getWallet();
-            $walletData = [
-                'balance'  => (float) $wallet->balance,
-                'currency' => $wallet->currency,
-            ];
-        } catch (\Throwable $e) {}
+        $walletData = [
+            'balance'  => (float) $user->user_balance,
+            'currency' => $user->preferred_currency ?? 'USD',
+        ];
 
         $stats = [
-            'tickets_total'  => $user->supportTickets()->count(),
-            'tickets_open'   => $user->supportTickets()->where('status', 'open')->count(),
+            'tickets_total'  => $user->tickets()->count(),
+            'tickets_open'   => $user->tickets()->where('ticket_status', 'open')->count(),
             'kyc_docs_count' => $user->kycDocuments()->count(),
         ];
 

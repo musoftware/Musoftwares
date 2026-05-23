@@ -7,5 +7,6 @@
     "Booking": true,
     "Intelligence": true,
     "Tools": true,
-    "fbmb": true
+    "fbmb": true,
+    "AutoSms": true
 }

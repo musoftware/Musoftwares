@@ -10,12 +10,12 @@ use Modules\ERP\Models\TenantClient;
 use Modules\ERP\Models\RecurringEntry;
 use Modules\ERP\Models\Tenant;
 use Modules\ERP\Models\Project;
-use Modules\ERP\Models\SupportTicket;
+use App\Models\Ticket;
 use Modules\ERP\Models\Activity;
 use Modules\ERP\Models\TenantFile;
 use Modules\ERP\Models\TenantNote;
 use Modules\ERP\Models\TenantStorageProvider;
-use Modules\Core\Services\ExchangeRateService;
+use App\Services\ExchangeRateService;
 use Inertia\Inertia;
 use Carbon\Carbon;
 
@@ -121,7 +121,7 @@ class ERPDashboardController extends Controller
                     ->whereBetween('paid_at', [$monthStart, $monthEnd])
                     ->sum('business_amount');
 
-                $costs = DB::table('invoice_costs')
+                $costs = DB::table('erp_invoice_costs')
                     ->where('tenant_id', $tenantId)
                     ->whereBetween('created_at', [$monthStart, $monthEnd])
                     ->sum('business_amount');
@@ -209,25 +209,10 @@ class ERPDashboardController extends Controller
                     ];
                 });
         }
-
         // ── Real Support Tickets ──────────────────────────────────
         $supportTickets = collect();
-        if ($tenantId) {
-            $supportTickets = SupportTicket::with(['tenantClient', 'platformClient'])
-                ->where('tenant_id', $tenantId)
-                ->latest()
-                ->limit(10)
-                ->get()
-                ->map(function ($ticket) {
-                    return [
-                        'id' => $ticket->id,
-                        'title' => $ticket->subject,
-                        'client' => $ticket->client?->name ?? 'Unknown',
-                        'priority' => ucfirst($ticket->priority),
-                        'status' => ucfirst($ticket->status),
-                        'date' => $ticket->created_at?->format('Y-m-d'),
-                    ];
-                });
+        if (class_exists(Ticket::class)) {
+            $supportTickets = Ticket::with(['user'])->latest()->take(5)->get();
         }
 
         // ── Real Activity Logs ────────────────────────────────────

@@ -4,7 +4,6 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use Modules\ERP\Models\UserSubscription;
-use Modules\Core\Services\WalletService;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Support\Facades\Log;
@@ -25,15 +24,9 @@ class RenewSubscriptions extends Command
      */
     protected $description = 'Automatically renew active subscriptions that have reached their expiration date';
 
-    protected WalletService $walletService;
-
-    /**
-     * Create a new command instance.
-     */
-    public function __construct(WalletService $walletService)
+    public function __construct()
     {
         parent::__construct();
-        $this->walletService = $walletService;
     }
 
     /**
@@ -60,35 +53,29 @@ class RenewSubscriptions extends Command
             try {
                 $user = $subscription->client;
                 $plan = $subscription->plan;
-                $wallet = $user->getWallet();
-
                 // Check plan price
                 $price = (float) $plan->price;
 
                 if ($price <= 0) {
-                    // Free plan - just renew without wallet transaction
+                    // Free plan - just renew without balance deduction
                     $this->renewSubscription($subscription, $plan);
                     $this->info("Subscription ID: {$subscription->id} renewed successfully (Free Plan).");
                     continue;
                 }
 
-                // Debit wallet
+                // Debit balance
                 try {
-                    $this->walletService->debitAvailable(
-                        $wallet,
-                        $price,
-                        'USD', // Assuming plan pricing is in USD
-                        'subscription_renewal',
-                        (string) $subscription->id,
-                        "Auto-renewal of subscription for plan: {$plan->name}"
-                    );
+                    if ((float) $user->available_balance() < $price) {
+                        throw new Exception("Insufficient balance");
+                    }
+                    $user->add_balance(-1 * $price, 'Subscription Renewal: ' . $plan->name, 'used');
 
                     // If debit succeeded, renew subscription
                     $this->renewSubscription($subscription, $plan);
-                    $this->info("Subscription ID: {$subscription->id} renewed successfully via wallet debit of {$price} USD.");
-                } catch (Exception $walletException) {
-                    // Insufficient funds or wallet error
-                    $this->warn("Failed to debit wallet for Subscription ID: {$subscription->id}. Reason: " . $walletException->getMessage());
+                    $this->info("Subscription ID: {$subscription->id} renewed successfully via balance debit of {$price} USD.");
+                } catch (Exception $balanceException) {
+                    // Insufficient funds or error
+                    $this->warn("Failed to debit balance for Subscription ID: {$subscription->id}. Reason: " . $balanceException->getMessage());
                     
                     // Mark subscription as expired
                     $subscription->update([

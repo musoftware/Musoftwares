@@ -2,18 +2,18 @@
 
 namespace Modules\fbmb\Services;
 
-use Modules\Core\Services\WalletService;
-use Modules\Core\Models\User;
+use App\Services\PointsService;
+use App\Models\User;
 use Exception;
 use PDO;
 
 class FbmbLookupService
 {
-    protected WalletService $walletService;
+    protected PointsService $pointsService;
 
-    public function __construct(WalletService $walletService)
+    public function __construct(PointsService $pointsService)
     {
-        $this->walletService = $walletService;
+        $this->pointsService = $pointsService;
     }
 
     /**
@@ -34,14 +34,9 @@ class FbmbLookupService
             throw new Exception("No valid IDs found in the uploaded file.");
         }
 
-        $wallet = $user->wallet;
-        if (! $wallet) {
-            throw new Exception("User does not have an active wallet.");
-        }
-
-        $availableBalance = (float) $wallet->balance - (float) ($wallet->locked_balance ?? 0);
-        if ($availableBalance <= 0) {
-            throw new Exception("Insufficient credit balance. Please top up your wallet first.");
+        $availablePoints = $this->pointsService->getBalance($user);
+        if ($availablePoints <= 0) {
+            throw new Exception("Insufficient points balance. Please get points first.");
         }
 
         $dbPath = storage_path('app/db/All Arab.db');
@@ -70,15 +65,14 @@ class FbmbLookupService
             $costPerMatch = 1;
             $totalCost = $foundCount * $costPerMatch;
 
-            // Verify balance covers actual matches
-            if ($availableBalance < $totalCost) {
-                throw new Exception("Insufficient credits. Found {$foundCount} matches requiring {$totalCost} credits, but you only have {$availableBalance} available.");
+            // Verify points cover actual matches
+            if ($availablePoints < $totalCost) {
+                throw new Exception("Insufficient points. Found {$foundCount} matches requiring {$totalCost} points, but you only have {$availablePoints} available.");
             }
 
-            $this->walletService->debitAvailable(
-                $wallet,
+            $this->pointsService->debit(
+                $user,
                 $totalCost,
-                $wallet->currency,
                 'fbmb_lookup',
                 null,
                 "iSAAS Facebook ID lookup: {$foundCount} matches from {$totalIds} IDs."

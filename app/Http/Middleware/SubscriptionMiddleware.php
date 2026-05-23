@@ -39,8 +39,8 @@ class SubscriptionMiddleware
             abort(401, 'Unauthorized access.');
         }
 
-        // Bypass subscription check for freelance module as it's point-based
-        if ($module === 'freelance') {
+        // Bypass subscription check for freelance and marketplace modules
+        if (in_array($module, ['freelance', 'marketplace'])) {
             return $next($request);
         }
 

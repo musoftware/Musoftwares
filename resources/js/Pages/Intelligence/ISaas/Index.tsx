@@ -14,7 +14,7 @@ import { useToast } from "@/Components/ui/use-toast";
 import { cn } from '@/lib/utils';
 
 interface PageProps {
-    walletBalance: number;
+    pointsBalance: number;
     currency: string;
 }
 
@@ -30,7 +30,7 @@ interface LookupResult {
 
 export default function ISaasIndex() {
     const { toast } = useToast();
-    const { walletBalance = 0, currency = 'USD' } = usePage<{ props: PageProps }>().props as any;
+    const { pointsBalance = 0, currency = 'USD' } = usePage<{ props: PageProps }>().props as any;
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const [file, setFile] = useState<File | null>(null);
@@ -41,7 +41,7 @@ export default function ISaasIndex() {
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const [estimatedIds, setEstimatedIds] = useState<number>(0);
 
-    const hasBalance = walletBalance > 0;
+    const hasBalance = pointsBalance > 0;
 
     // ── File parsing to estimate ID count ──────────────────────────────────
     const estimateIdCount = useCallback((f: File) => {
@@ -258,7 +258,7 @@ export default function ISaasIndex() {
                                 "text-2xl font-bold font-mono tracking-tight",
                                 hasBalance ? "text-emerald-700" : "text-amber-700"
                             )}>
-                                {walletBalance.toLocaleString()} <span className="text-sm font-normal text-slate-400">Pts</span>
+                                {Number(pointsBalance || 0).toLocaleString()} <span className="text-sm font-normal text-slate-400">Pts</span>
                             </p>
                             {!hasBalance && (
                                 <p className="text-xs text-amber-600 mt-1 flex items-center gap-1">
@@ -443,14 +443,14 @@ export default function ISaasIndex() {
                                                         <p>
                                                             <span className="font-medium text-slate-700">Max cost:</span>{' '}
                                                             <span className="font-mono">{estimatedIds.toLocaleString()}</span> points
-                                                            <span className="text-slate-400 ml-1">(only matched IDs are charged)</span>
+                                                        <span className="text-slate-400 ml-1">(only matched IDs are charged)</span>
+                                                    </p>
+                                                    {estimatedIds > pointsBalance && (
+                                                        <p className="text-amber-600 flex items-center gap-1 font-medium">
+                                                            <AlertCircle className="w-3 h-3" />
+                                                            Your points may not cover all matches. Partial results may be available.
                                                         </p>
-                                                        {estimatedIds > walletBalance && (
-                                                            <p className="text-amber-600 flex items-center gap-1 font-medium">
-                                                                <AlertCircle className="w-3 h-3" />
-                                                                Your points may not cover all matches. Partial results may be available.
-                                                            </p>
-                                                        )}
+                                                    )}
                                                     </div>
                                                 </div>
                                             </div>

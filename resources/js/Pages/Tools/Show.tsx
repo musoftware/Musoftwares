@@ -24,7 +24,7 @@ interface Props {
         id: number; slug: string; title: string; description: string;
         short_description: string; icon_url: string | null; category: string;
         category_label: string; supported_os: string[]; current_version: string;
-        active_users: number; is_featured: boolean; features: string[];
+        is_featured: boolean; features: string[];
         requirements: string[];
         screenshots: { id: number; url: string; caption: string | null }[];
         pricing_plans: PricingPlan[];
@@ -154,10 +154,6 @@ export default function Show({ tool, userSubscription }: Props) {
                                 <div className="flex justify-between text-xs">
                                     <span className="text-muted-foreground">Category</span>
                                     <span className="text-foreground capitalize">{tool.category_label}</span>
-                                </div>
-                                <div className="flex justify-between text-xs">
-                                    <span className="text-muted-foreground">Active Users</span>
-                                    <span className="text-foreground font-medium">{(tool.active_users || 0).toLocaleString()}</span>
                                 </div>
                             </div>
                         </Card>

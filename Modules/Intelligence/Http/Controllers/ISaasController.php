@@ -5,7 +5,7 @@ namespace Modules\Intelligence\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Modules\Intelligence\Services\ISaasLookupService;
-use Modules\Core\Services\WalletService;
+use App\Services\WalletService;
 use Illuminate\Support\Facades\Storage;
 use Exception;
 

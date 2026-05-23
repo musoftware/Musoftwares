@@ -10,7 +10,7 @@ return new class extends Migration
     {
         // 1. Add Status to tenant_clients (guard against re-run)
         if (!Schema::hasColumn('tenant_clients', 'status')) {
-            Schema::table('tenant_clients', function (Blueprint $table) {
+            Schema::table('erp_tenant_clients', function (Blueprint $table) {
                 $table->string('status')->default('lead')->after('name'); // lead, active, paying, retained, archived
             });
         }
@@ -19,8 +19,8 @@ return new class extends Migration
         if (!Schema::hasTable('projects')) {
             Schema::create('projects', function (Blueprint $table) {
                 $table->id();
-                $table->foreignId('tenant_id')->constrained()->cascadeOnDelete();
-                $table->foreignId('client_id')->constrained('tenant_clients')->cascadeOnDelete();
+                $table->foreignId('tenant_id')->constrained('erp_tenants')->cascadeOnDelete();
+                $table->foreignId('client_id')->constrained('erp_tenant_clients')->cascadeOnDelete();
                 $table->string('name');
                 $table->text('description')->nullable();
                 $table->string('status')->default('draft'); // draft, active, in_progress, review, completed
@@ -40,8 +40,8 @@ return new class extends Migration
         if (!Schema::hasTable('erp_support_tickets')) {
             Schema::create('erp_support_tickets', function (Blueprint $table) {
                 $table->id();
-                $table->foreignId('tenant_id')->constrained()->cascadeOnDelete();
-                $table->foreignId('client_id')->constrained('tenant_clients')->cascadeOnDelete();
+                $table->foreignId('tenant_id')->constrained('erp_tenants')->cascadeOnDelete();
+                $table->foreignId('client_id')->constrained('erp_tenant_clients')->cascadeOnDelete();
                 $table->foreignId('project_id')->nullable()->constrained('projects')->nullOnDelete();
 
                 $table->string('subject');
@@ -59,8 +59,8 @@ return new class extends Migration
         if (!Schema::hasTable('activities')) {
             Schema::create('activities', function (Blueprint $table) {
                 $table->id();
-                $table->foreignId('tenant_id')->constrained()->cascadeOnDelete();
-                $table->foreignId('client_id')->nullable()->constrained('tenant_clients')->cascadeOnDelete();
+                $table->foreignId('tenant_id')->constrained('erp_tenants')->cascadeOnDelete();
+                $table->foreignId('client_id')->nullable()->constrained('erp_tenant_clients')->cascadeOnDelete();
 
                 $table->string('subject_type')->nullable(); // Model class
                 $table->unsignedBigInteger('subject_id')->nullable(); // Model ID
@@ -78,8 +78,8 @@ return new class extends Migration
         }
 
         // 5. Update invoices table status column
-        if (Schema::hasTable('invoices')) {
-            Schema::table('invoices', function (Blueprint $table) {
+        if (Schema::hasTable('erp_invoices')) {
+            Schema::table('erp_invoices', function (Blueprint $table) {
                 // Change enum to string to support new workflow states flexibly.
                 $table->string('status')->default('draft')->change();
             });
@@ -93,7 +93,7 @@ return new class extends Migration
         Schema::dropIfExists('projects');
 
         if (Schema::hasColumn('tenant_clients', 'status')) {
-            Schema::table('tenant_clients', function (Blueprint $table) {
+            Schema::table('erp_tenant_clients', function (Blueprint $table) {
                 $table->dropColumn('status');
             });
         }

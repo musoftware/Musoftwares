@@ -8,8 +8,8 @@ use Modules\Freelance\Models\Skill;
 use Modules\Freelance\Models\Job;
 use Modules\Freelance\Models\Proposal;
 use Modules\Freelance\Models\Contract;
-use Modules\Core\Models\PointTransaction;
-use Modules\Core\Models\Wallet;
+use App\Models\PointTransaction;
+use App\Models\Wallet;
 use Tests\TestCase;
 
 class FreelanceWorkflowTest extends TestCase

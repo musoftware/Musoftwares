@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class TenantStorageProvider extends Model
 {
-    protected $table = 'tenant_storage_providers';
+    protected $table = 'erp_tenant_storage_providers';
 
     protected $fillable = [
         'tenant_id',

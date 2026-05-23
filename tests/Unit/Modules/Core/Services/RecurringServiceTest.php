@@ -1,9 +1,9 @@
 <?php
 
-namespace Tests\Unit\Modules\Core\Services;
+namespace Tests\Unit\App\Services;
 
 use Tests\TestCase;
-use Modules\Core\Services\RecurringService;
+use App\Services\RecurringService;
 use Modules\ERP\Models\RecurringEntry;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -31,7 +31,7 @@ class RecurringServiceTest extends TestCase
             'updated_at' => now(),
         ]);
 
-        $tenantId = DB::table('tenants')->insertGetId([
+        $tenantId = DB::table('erp_tenants')->insertGetId([
             'user_id' => $userId,
             'name' => 'Test',
             'status' => 'active',
@@ -39,7 +39,7 @@ class RecurringServiceTest extends TestCase
             'updated_at' => now(),
         ]);
 
-        $entryId = DB::table('recurring_entries')->insertGetId([
+        $entryId = DB::table('erp_recurring_entries')->insertGetId([
             'tenant_id' => $tenantId,
             'type' => 'expense',
             'title' => 'Test Expense',
@@ -74,7 +74,7 @@ class RecurringServiceTest extends TestCase
 
         $service->processDueEntries();
 
-        $entry = DB::table('recurring_entries')->find($entryId);
+        $entry = DB::table('erp_recurring_entries')->find($entryId);
         $this->assertEquals(1, $entry->is_active);
     }
 }

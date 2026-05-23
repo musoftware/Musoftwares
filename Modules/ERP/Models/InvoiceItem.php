@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class InvoiceItem extends TenantModel
 {
+    protected $table = 'erp_invoice_items';
+
     protected $fillable = [
         'invoice_id', 'tenant_id', 'type', 'title', 'description',
         'unit_price', 'quantity', 'total', 'sort_order'

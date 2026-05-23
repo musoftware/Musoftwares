@@ -55,7 +55,41 @@ class PlatformPlan extends Model
      */
     public function priceFor(string $cycle): float
     {
-        return (float) ($cycle === 'yearly' ? $this->yearly_price : $this->monthly_price);
+        $prices = [
+            'starter' => [
+                '3_months' => 20,
+                '6_months' => 39,
+                '1_year'   => 75,
+                '3_years'  => 199,
+            ],
+            'professional' => [
+                '3_months' => 42,
+                '6_months' => 80,
+                '1_year'   => 150,
+                '3_years'  => 399,
+            ],
+            'business_suite' => [
+                '3_months' => 85,
+                '6_months' => 160,
+                '1_year'   => 299,
+                '3_years'  => 799,
+            ],
+        ];
+
+        if (isset($prices[$this->slug][$cycle])) {
+            return (float) $prices[$this->slug][$cycle];
+        }
+
+        // Fallback for custom or unknown plans
+        $months = match ($cycle) {
+            '3_months' => 3,
+            '6_months' => 6,
+            '1_year'   => 12,
+            '3_years'  => 36,
+            default    => 1, // fallback to 1 month just in case
+        };
+
+        return (float) ($this->monthly_price * $months);
     }
 
     /**

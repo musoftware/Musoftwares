@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use Modules\ERP\Models\TenantClient;
 use Modules\ERP\Models\Invoice;
 use Modules\ERP\Models\Project;
-use Modules\ERP\Models\SupportTicket;
+use App\Models\Ticket;
 use Modules\ERP\Models\Activity;
 use Modules\ERP\Models\Tenant;
 use Modules\ERP\Services\ActivityLogger;
@@ -34,7 +34,7 @@ class ClientController extends Controller
         }
 
         // Load relationships
-        $client->load(['projects', 'supportTickets']);
+        $client->load(['projects', 'tickets']);
 
         // Fetch related operational data
         $invoices = Invoice::where('client_id', $client->id)->latest()->get();
@@ -55,7 +55,7 @@ class ClientController extends Controller
         return Inertia::render('ERP/Clients/Show', [
             'client' => $client,
             'projects' => $client->projects,
-            'tickets' => $client->supportTickets,
+            'tickets' => $client->tickets,
             'invoices' => $invoices,
             'activities' => $activities,
         ]);

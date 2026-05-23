@@ -7,7 +7,7 @@ use Modules\Freelance\Models\Contract;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\DB;
-use Modules\Core\Services\ActivityService;
+use App\Services\ActivityService;
 
 class ContractController extends Controller
 {
@@ -57,7 +57,7 @@ class ContractController extends Controller
         return Inertia::render('Freelance/Contracts/Show', ['contract' => $contract]);
     }
 
-    public function complete(Request $request, Contract $contract, \Modules\Core\Services\FinancialTransactionService $financialService)
+    public function complete(Request $request, Contract $contract, \App\Services\FinancialTransactionService $financialService)
     {
         if ($contract->client_id !== $request->user()->id) {
             abort(403);
@@ -72,12 +72,12 @@ class ContractController extends Controller
                 $contract->job->update(['status' => 'completed']);
 
                 // Retrieve or create wallets for double-entry ledger transactions
-                $clientWallet = \Modules\Core\Models\Wallet::firstOrCreate(
+                $clientWallet = \App\Models\Wallet::firstOrCreate(
                     ['owner_type' => \App\Models\User::class, 'owner_id' => $contract->client_id],
                     ['context' => 'user', 'balance' => 10000.00, 'currency' => 'USD']
                 );
 
-                $freelancerWallet = \Modules\Core\Models\Wallet::firstOrCreate(
+                $freelancerWallet = \App\Models\Wallet::firstOrCreate(
                     ['owner_type' => \App\Models\User::class, 'owner_id' => $contract->freelancer_id],
                     ['context' => 'user', 'balance' => 0.00, 'currency' => 'USD']
                 );

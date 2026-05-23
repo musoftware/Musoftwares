@@ -31,7 +31,6 @@ interface Tool {
     category_label: string;
     supported_os: string[];
     current_version: string;
-    active_users: number;
     is_featured: boolean;
     starting_price: number;
     is_free: boolean;

@@ -39,7 +39,7 @@ class WalletControllerTest extends TestCase
 
         session(['tenant_id' => $tenant->id]);
 
-        \Illuminate\Support\Facades\DB::table('tenant_clients')->insert([
+        \Illuminate\Support\Facades\DB::table('erp_tenant_clients')->insert([
             'tenant_id' => $tenant->id,
             'name' => 'John Doe',
             'email' => 'john@example.com',

@@ -24,7 +24,6 @@ interface Tool {
     category_label: string;
     supported_os: string[];
     current_version: string;
-    active_users: number;
     is_featured: boolean;
     starting_price: number;
     is_free: boolean;
@@ -78,11 +77,6 @@ export function ToolCard({ tool, isSubscribed = false }: ToolCardProps) {
                 <p className="text-xs text-slate-500 leading-relaxed line-clamp-1 sm:line-clamp-2 mb-1.5">{tool.short_description}</p>
                 <div className="flex items-center gap-3 text-[11px] font-medium">
                     <span className="text-slate-400 capitalize">{tool.category_label}</span>
-                    <span className="w-1 h-1 rounded-full bg-slate-200" />
-                    <span className={`flex items-center gap-1 text-slate-400`}>
-                        <Users className="h-3 w-3" />
-                        {(tool.active_users || 0).toLocaleString()}
-                    </span>
                 </div>
             </div>
 

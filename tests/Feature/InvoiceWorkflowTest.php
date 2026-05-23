@@ -7,7 +7,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Modules\ERP\Models\Tenant;
 use Modules\ERP\Models\TenantClient;
 use Modules\ERP\Models\Invoice;
-use Modules\Core\Models\Currency;
+use App\Models\Currency;
 use Tests\TestCase;
 
 class InvoiceWorkflowTest extends TestCase
@@ -115,7 +115,7 @@ class InvoiceWorkflowTest extends TestCase
         // Tax = 10% of 1550 = 155
         // Total = 1550 + 155 = 1705
 
-        $this->assertDatabaseHas('invoices', [
+        $this->assertDatabaseHas('erp_invoices', [
             'tenant_id' => $this->tenant->id,
             'client_id' => $this->client->id,
             'project_id' => $this->project->id,
@@ -129,13 +129,13 @@ class InvoiceWorkflowTest extends TestCase
 
         $invoice = Invoice::where('invoice_number', 'INV-2026-001')->first();
 
-        $this->assertDatabaseHas('invoice_items', [
+        $this->assertDatabaseHas('erp_invoice_items', [
             'invoice_id' => $invoice->id,
             'title' => 'Web Design Services',
             'total' => 1000.00,
         ]);
 
-        $this->assertDatabaseHas('invoice_costs', [
+        $this->assertDatabaseHas('erp_invoice_costs', [
             'invoice_id' => $invoice->id,
             'title' => 'Domain Purchase',
             'amount' => 15.00,

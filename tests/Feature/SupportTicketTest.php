@@ -4,9 +4,9 @@ namespace Tests\Feature;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Modules\Core\Models\SupportTicket;
-use Modules\Core\Models\Conversation;
-use Modules\Core\Models\Message;
+use App\Models\SupportTicket;
+use App\Models\Conversation;
+use App\Models\Message;
 use Tests\TestCase;
 
 class SupportTicketTest extends TestCase
@@ -116,3 +116,4 @@ class SupportTicketTest extends TestCase
         $this->assertEquals('closed', $conversation->fresh()->status);
     }
 }
+

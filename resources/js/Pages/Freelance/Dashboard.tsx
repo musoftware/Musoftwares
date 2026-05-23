@@ -56,10 +56,10 @@ export default function FreelanceDashboard({
     const recentActivities = initialActivities && initialActivities.length > 0 ? initialActivities : [
         {
             id: 'mock_1',
-            text: 'Welcome to your new fully operational workspace.',
-            time: 'Just now',
-            color: 'bg-indigo-100',
-            icon: Activity
+            description: 'Welcome to your new fully operational workspace.',
+            created_at: new Date().toISOString(),
+            color: 'indigo',
+            icon: 'activity'
         }
     ];
 
@@ -83,10 +83,10 @@ export default function FreelanceDashboard({
         : [
             {
                 id: 'mock_c1',
-                text: 'Welcome to your new client dashboard.',
-                time: 'Just now',
-                color: 'bg-indigo-100',
-                icon: Activity
+                description: 'Welcome to your new client dashboard.',
+                created_at: new Date().toISOString(),
+                color: 'indigo',
+                icon: 'activity'
             }
         ];
 
@@ -94,10 +94,10 @@ export default function FreelanceDashboard({
     const mapActivities = (list: any[]) => {
         return list.map((item: any) => ({
             ...item,
-            icon: item.type === 'proposal' || item.type === 'proposal_received' ? Clock 
-                : item.type === 'contract' ? Briefcase 
-                : item.type === 'job' ? Plus
-                : Activity
+            icon: item.type === 'proposal' || item.type === 'proposal_received' ? 'clock' 
+                : item.type === 'contract' ? 'check-square' 
+                : item.type === 'job' ? 'file-text'
+                : 'activity'
         }));
     };
 

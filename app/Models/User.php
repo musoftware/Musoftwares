@@ -49,7 +49,6 @@ class User extends Authenticatable
     ];
 
     protected $appends = [
-        'points_balance',
     ];
 
     protected function casts(): array
@@ -67,19 +66,19 @@ class User extends Authenticatable
         ];
     }
 
-    public function supportTickets(): HasMany
+    public function tickets(): HasMany
     {
-        return $this->hasMany(\Modules\Core\Models\SupportTicket::class, 'client_id');
+        return $this->hasMany(\App\Models\Ticket::class, 'user_id');
     }
 
     public function conversationParticipations(): HasMany
     {
-        return $this->hasMany(\Modules\Core\Models\ConversationParticipant::class, 'user_id');
+        return $this->hasMany(\App\Models\ConversationParticipant::class, 'user_id');
     }
 
     public function messages(): HasMany
     {
-        return $this->hasMany(\Modules\Core\Models\Message::class, 'sender_id');
+        return $this->hasMany(\App\Models\Message::class, 'sender_id');
     }
 
     public function freelanceSkills()
@@ -105,44 +104,211 @@ class User extends Authenticatable
         return \Modules\ERP\Models\TenantClient::where('user_id', $this->id)->first();
     }
 
-    public function pointTransactions()
+
+
+    public function invoices()
     {
-        return $this->hasMany(\Modules\Core\Models\PointTransaction::class);
+        return $this->hasMany(\App\Models\Invoice::class);
     }
 
-    public function getPointsBalanceAttribute()
+    public function locked_balance()
     {
-        $earned = $this->pointTransactions()->whereIn('type', ['earned', 'credit', 'purchased'])->sum('points');
-        $spent = $this->pointTransactions()->whereIn('type', ['spent', 'debit'])->sum('points');
-        return $earned - $spent;
+        $locked = 0;
+
+        // 1. Pending withdrawals
+        if (class_exists(\App\Models\UserReferralRequestWithdraw::class)) {
+            $locked += $this->withdraw()->where('status', 'pending')->sum('amount');
+        }
+
+        // 2. Active Freelance Contracts
+        if (class_exists(\Modules\Freelance\Models\Contract::class)) {
+            $contracts = \Modules\Freelance\Models\Contract::where('freelancer_id', $this->id)
+                ->where('status', 'active')
+                ->get();
+            foreach ($contracts as $contract) {
+                $locked += \App\Models\CurrenciesExchange::RateToday($contract->amount, $contract->currency_code, $this->currency);
+            }
+        }
+
+        // 3. Pending invoices
+        $unpaidInvoices = $this->invoices()
+            ->where('unpaid', '>', 0)
+            ->whereIn('status', ['unpaid', 'partially_paid'])
+            ->get();
+            
+        foreach ($unpaidInvoices as $invoice) {
+            $schedule = $invoice->getSchedule();
+            $invoiceTotal = \App\Models\CurrenciesExchange::RateToday($invoice->total(), $invoice->currency, $this->currency);
+            $invoicePaid = \App\Models\CurrenciesExchange::RateToday($invoice->paid, $invoice->currency, $this->currency);
+            $invoiceUnpaid = \App\Models\CurrenciesExchange::RateToday($invoice->unpaid, $invoice->currency, $this->currency);
+
+            if ($schedule) {
+                $startDate = \Carbon\Carbon::parse($schedule['start_date'] ?? $invoice->created_at);
+                if (now()->gte($startDate)) {
+                    $splits = (int)($schedule['months'] ?? 1);
+                    if ($splits < 1) $splits = 1;
+                    $monthsSinceStart = now()->diffInMonths($startDate);
+                    $paymentsDue = min($splits, $monthsSinceStart + 1);
+                    $totalDueByNow = ($invoiceTotal / $splits) * $paymentsDue;
+                    
+                    if ($invoicePaid < $totalDueByNow) {
+                        $deductionForInvoice = $totalDueByNow - $invoicePaid;
+                        $locked += min($deductionForInvoice, $invoiceUnpaid);
+                    }
+                }
+            } else {
+                $locked += $invoiceUnpaid;
+            }
+        }
+
+        return $locked;
     }
 
-    public function wallet()
+    public function available_balance($currency = null)
     {
-        return $this->morphOne(\Modules\Core\Models\Wallet::class, 'owner');
+        $currentBalance = $this->balance(); // Current Wallet Balance in User Currency
+
+        $unpaidInvoices = $this->invoices()
+            ->where('unpaid', '>', 0)
+            ->whereIn('status', ['unpaid', 'partially_paid'])
+            ->get();
+
+        $totalDeduction = 0;
+
+        foreach ($unpaidInvoices as $invoice) {
+            $schedule = $invoice->getSchedule();
+            $deductionForInvoice = 0;
+
+            // Convert everything to User Currency for calculation
+            $invoiceTotal = \App\Models\CurrenciesExchange::RateToday($invoice->total(), $invoice->currency, $this->currency);
+            $invoicePaid = \App\Models\CurrenciesExchange::RateToday($invoice->paid, $invoice->currency, $this->currency);
+            $invoiceUnpaid = \App\Models\CurrenciesExchange::RateToday($invoice->unpaid, $invoice->currency, $this->currency);
+
+            if ($schedule) {
+                // Parse schedule
+                $startDate = \Carbon\Carbon::parse($schedule['start_date'] ?? $invoice->created_at);
+                $splits = (int)($schedule['months'] ?? 1); // 1 or 12
+                if ($splits < 1) $splits = 1;
+
+                if (now()->lt($startDate)) {
+                    // Future schedule: No deduction yet
+                    $deductionForInvoice = 0;
+                } else {
+                    // Start date passed
+                    $monthsPassed = $startDate->diffInMonths(now()) + 1;
+
+                    if ($splits > 1) {
+                         // Split logic
+                         $monthlyAmount = $invoiceTotal / $splits;
+                         $totalExpected = $monthlyAmount * min($splits, $monthsPassed);
+
+                         // Due is what we EXPECT to have paid minus what we actually paid
+                         $due = max(0, $totalExpected - $invoicePaid);
+
+                         // Cannot invoke more than what is strictly unpaid on the invoice
+                         $deductionForInvoice = min($invoiceUnpaid, $due);
+                    } else {
+                        // Single payment, due now
+                        $deductionForInvoice = $invoiceUnpaid;
+                    }
+                }
+            } else {
+                 // No schedule, strictly due immediately
+                 $deductionForInvoice = $invoiceUnpaid;
+            }
+
+            $totalDeduction += $deductionForInvoice;
+        }
+
+        $available = round($currentBalance - $totalDeduction, 2);
+
+        if ($currency && $currency != $this->currency) {
+            return \App\Models\CurrenciesExchange::RateToday($available, $this->currency, $currency);
+        }
+
+        return $available;
     }
 
-    public function getWallet()
+    public function transactions()
     {
-        return $this->wallet()->firstOrCreate([
-            'owner_type' => self::class,
-            'owner_id' => $this->id,
-        ], [
-            'context' => 'default',
-            'balance' => 0,
-            'earned_balance' => 0,
-            'currency' => $this->preferred_currency ?? 'USD',
-        ]);
+        return $this->hasMany(Transaction::class);
     }
 
-    public function payoutMethods(): HasMany
+    public function withdraw()
     {
-        return $this->hasMany(\Modules\Core\Models\PayoutMethod::class, 'user_id');
+        return $this->hasMany(\App\Models\UserReferralRequestWithdraw::class);
     }
 
-    public function withdrawals(): HasMany
+    public function currency_name()
     {
-        return $this->hasMany(\Modules\Core\Models\UserWithdrawal::class, 'user_id');
+        return \App\Models\Currency::query()->find($this->currency)->currency;
+    }
+
+    public function client_balance()
+    {
+        return $this->hasMany(Transaction::class);
+    }
+
+    public function try_pay_unpaid_invoices()
+    {
+        foreach (
+            $this->invoices()
+                ->where('unpaid', '>', '0')
+                ->where('unpaid', '<=', $this->user_balance)
+                ->orderBy('id')
+                ->get()
+            as $invoice
+        ) {
+            $client_balance = $this->user_balance;
+            $invoice_total = $invoice->total();
+            if ((float) $client_balance >= (float) $invoice_total) {
+                $invoice->bill_invoice();
+            }
+        }
+    }
+
+    public function balance($currency = null)
+    {
+        return \App\Models\CurrenciesExchange::RateToday($this->user_balance, $this->currency, $currency);
+    }
+
+    public function add_balance($amount, $reason, $type, $currency = null, $project = null)
+    {
+        if ($amount == 0) {
+            return null;
+        }
+        if ($currency != null) {
+            $amount = \App\Models\CurrenciesExchange::RateToday($amount, $currency, $this->currency);
+        }
+        $currency = $this->currency;
+
+        $client_balance = new Transaction();
+        $client_balance->project_id = optional($project)->id;
+        $client_balance->user_id = $this->id;
+        $client_balance->amount = $amount;
+        $client_balance->type = $type;
+        if (!empty($reason)) {
+            $client_balance->reason = $reason;
+        }
+        $client_balance->currency = $currency;
+
+        \Illuminate\Support\Facades\DB::transaction(function () use ($client_balance, $project, $amount, $type, $currency) {
+            $client_balance->save();
+
+            if (in_array($type, ['received', 'sent', 'refunded'])) {
+                $this->increment('total_paid', $amount);
+                optional($project)->increment('total_paid', $amount);
+            }
+
+            $this->increment('user_balance', $amount);
+            optional($project)->increment('project_balance', $amount);
+
+            if ($type != 'used') {
+                // ActionHelper::add_action_coins(...) // Omitted for now unless requested
+            }
+        });
+
+        return $client_balance->id;
     }
 
     public function kycDocuments(): HasMany
@@ -164,4 +330,25 @@ class User extends Authenticatable
     {
         return $this->hasMany(SerialUserDevice::class, 'user_id');
     }
+
+    public function platformSubscriptions(): HasMany
+    {
+        return $this->hasMany(\App\Models\PlatformSubscription::class);
+    }
+
+    public function activePlatformSubscription()
+    {
+        return $this->hasOne(\App\Models\PlatformSubscription::class)->active()->latest();
+    }
+
+    public function hasSubscription(): bool
+    {
+        return $this->platformSubscriptions()->active()->exists();
+    }
+
+    public function getPlanAttribute()
+    {
+        return $this->activePlatformSubscription?->plan;
+    }
 }
+

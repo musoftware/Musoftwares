@@ -1,0 +1,11 @@
+{
+    "name": "AutoSms",
+    "alias": "autosms",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\AutoSms\\Providers\\AutoSmsServiceProvider"
+    ],
+    "files": []
+}
