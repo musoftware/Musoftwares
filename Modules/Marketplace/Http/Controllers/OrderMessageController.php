@@ -5,8 +5,8 @@ namespace Modules\Marketplace\Http\Controllers;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Modules\Marketplace\Models\ServiceOrder;
-use Modules\Core\Models\Message;
-use Modules\Core\Models\Conversation;
+use App\Models\Message;
+use App\Models\Conversation;
 
 class OrderMessageController extends Controller
 {
@@ -33,3 +33,4 @@ class OrderMessageController extends Controller
         return redirect()->back()->with('success', 'Message sent.');
     }
 }
+

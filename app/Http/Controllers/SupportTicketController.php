@@ -3,9 +3,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Modules\Core\Models\SupportTicket;
-use Modules\Core\Models\Conversation;
-use Modules\Core\Models\Message;
+use App\Models\SupportTicket;
+use App\Models\Conversation;
+use App\Models\Message;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -110,3 +110,4 @@ class SupportTicketController extends Controller
         return redirect()->back()->with('success', 'Ticket resolved.');
     }
 }
+

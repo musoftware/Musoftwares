@@ -2,8 +2,8 @@
 
 namespace App\Services;
 
-use Modules\Core\Models\Currency;
-use Modules\Core\Services\ExchangeRateService;
+use App\Models\Currency;
+use App\Services\ExchangeRateService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 

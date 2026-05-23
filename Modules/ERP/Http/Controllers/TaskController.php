@@ -11,7 +11,7 @@ use Modules\ERP\Models\Tenant;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
-use Modules\Core\Services\ActivityService;
+use App\Services\ActivityService;
 
 /**
  * ERP Task Controller — admin/tenant manages task boards for clients.

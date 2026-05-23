@@ -4,8 +4,8 @@ namespace App\Services;
 
 use App\Models\User;
 use App\Models\WalletTransfer;
-use Modules\Core\Services\WalletService;
-use Modules\Core\Services\ExchangeRateService;
+use App\Services\WalletService;
+use App\Services\ExchangeRateService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;

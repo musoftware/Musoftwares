@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 /**
  * WalletTransaction — ERP ledger entry on a TenantClient's wallet.
  *
- * ⚠️  FINANCIAL ISOLATION: Do NOT confuse with Modules\Core\Models\WalletTransaction
+ * ⚠️  FINANCIAL ISOLATION: Do NOT confuse with App\Models\WalletTransaction
  *     which tracks REAL platform money (table: wallet_transactions).
  *
  *     This model is ERP-internal ONLY (table: client_wallet_transactions).

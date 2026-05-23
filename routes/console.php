@@ -3,7 +3,7 @@
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Schedule;
-use Modules\Core\Console\FetchExchangeRates;
+use App\Console\Commands\FetchExchangeRates;
 use Modules\ERP\Console\ProcessRecurringEntries;
 use Modules\Freelance\Console\ExpireOldJobs;
 use App\Console\Commands\RenewSubscriptions;

@@ -38,6 +38,8 @@ class SubscriptionController extends Controller
             ->orderBy('sort_order')
             ->get();
 
+        $userCurrency = $user->preferred_currency ?? 'USD';
+
         // Fetch service items for the custom plan builder
         $serviceItems = PlatformServiceItem::active()
             ->orderBy('sort_order')
@@ -47,8 +49,8 @@ class SubscriptionController extends Controller
                 'name'          => $item->name,
                 'type'          => $item->type,
                 'description'   => $item->description,
-                'monthly_price' => (float) $item->monthly_price,
-                'yearly_price'  => (float) $item->yearly_price,
+                'monthly_price' => (float) \App\Models\CurrenciesExchange::RateToday($item->monthly_price, 'USD', $userCurrency),
+                'yearly_price'  => (float) \App\Models\CurrenciesExchange::RateToday($item->yearly_price, 'USD', $userCurrency),
                 'icon'          => $item->icon,
             ]);
 
@@ -58,7 +60,7 @@ class SubscriptionController extends Controller
             ->active()
             ->first();
 
-        $wallet = ['id' => null, 'balance' => (float)$user->user_balance, 'currency' => $user->preferred_currency ?? 'USD'];
+        $wallet = ['id' => null, 'balance' => (float)$user->user_balance, 'currency' => $userCurrency];
 
         return Inertia::render('Subscriptions/Plans', [
             'plans' => $plans->map(fn ($plan) => [
@@ -66,13 +68,13 @@ class SubscriptionController extends Controller
                 'slug'             => $plan->slug,
                 'name'             => $plan->name,
                 'description'      => $plan->description,
-                'monthly_price'    => (float) $plan->monthly_price,
-                'yearly_price'     => (float) $plan->yearly_price,
+                'monthly_price'    => (float) \App\Models\CurrenciesExchange::RateToday($plan->monthly_price, 'USD', $userCurrency),
+                'yearly_price'     => (float) \App\Models\CurrenciesExchange::RateToday($plan->yearly_price, 'USD', $userCurrency),
                 'prices'           => [
-                    '3_months' => $plan->priceFor('3_months'),
-                    '6_months' => $plan->priceFor('6_months'),
-                    '1_year'   => $plan->priceFor('1_year'),
-                    '3_years'  => $plan->priceFor('3_years'),
+                    '3_months' => \App\Models\CurrenciesExchange::RateToday($plan->priceFor('3_months'), 'USD', $userCurrency),
+                    '6_months' => \App\Models\CurrenciesExchange::RateToday($plan->priceFor('6_months'), 'USD', $userCurrency),
+                    '1_year'   => \App\Models\CurrenciesExchange::RateToday($plan->priceFor('1_year'), 'USD', $userCurrency),
+                    '3_years'  => \App\Models\CurrenciesExchange::RateToday($plan->priceFor('3_years'), 'USD', $userCurrency),
                 ],
                 'included_modules' => $plan->included_modules ?? [],
                 'included_tools'   => $plan->included_tools ?? [],

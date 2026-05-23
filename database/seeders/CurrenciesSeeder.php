@@ -3,7 +3,7 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Modules\Core\Models\Currency;
+use App\Models\Currency;
 
 class CurrenciesSeeder extends Seeder
 {

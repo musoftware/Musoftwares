@@ -6,7 +6,7 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Modules\ERP\Models\Tenant;
 use Modules\ERP\Models\Client;
-use Modules\Core\Models\AdminNote;
+use App\Models\AdminNote;
 use Tests\TestCase;
 
 class AdminNoteTest extends TestCase
@@ -138,3 +138,4 @@ class AdminNoteTest extends TestCase
         ]);
     }
 }
+

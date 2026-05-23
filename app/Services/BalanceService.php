@@ -4,8 +4,8 @@ namespace App\Services;
 
 use App\Models\User;
 use App\Models\Transaction;
-use Modules\Core\Models\UserWithdrawal;
-use Modules\Core\Services\ExchangeRateService;
+use App\Models\UserWithdrawal;
+use App\Services\ExchangeRateService;
 use Illuminate\Support\Facades\DB;
 
 /**

@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\User;
-use Modules\Core\Models\Wallet;
+use App\Models\Wallet;
 use Inertia\Inertia;
 
 class ClientController extends Controller
@@ -62,7 +62,7 @@ class ClientController extends Controller
         $user = User::findOrFail($id);
         
         // Retrieve currencies and plans safely (they might not exist in V2 yet, but we copied models)
-        $currencies = class_exists(\Modules\Core\Models\Currency::class) ? \Modules\Core\Models\Currency::all() : [];
+        $currencies = class_exists(\App\Models\Currency::class) ? \App\Models\Currency::all() : [];
         $plans = class_exists(\App\Models\Misc\Plan::class) ? \App\Models\Misc\Plan::all() : [];
 
         return Inertia::render('Admin/Clients/Edit', [
@@ -176,7 +176,7 @@ class ClientController extends Controller
             'description' => 'required|string|max:500'
         ]);
 
-        $wallet = \Modules\Core\Models\Wallet::findOrFail($request->wallet_id);
+        $wallet = \App\Models\Wallet::findOrFail($request->wallet_id);
         
         // Ensure wallet belongs to this user
         if ($wallet->owner_id != $id || $wallet->owner_type != User::class) {
@@ -198,7 +198,7 @@ class ClientController extends Controller
                 $balBefore = $wallet->balance;
                 $balAfter = $isCredit ? ($balBefore + $amount) : ($balBefore - $amount);
 
-                $wt = \Modules\Core\Models\WalletTransaction::create([
+                $wt = \App\Models\WalletTransaction::create([
                     'wallet_id' => $wallet->id,
                     'type' => $request->type,
                     'amount' => $amount,
@@ -221,7 +221,7 @@ class ClientController extends Controller
 
                 // Auto consume balance (is_used)
                 if ($isCredit && $isUsed) {
-                    \Modules\Core\Models\WalletTransaction::create([
+                    \App\Models\WalletTransaction::create([
                         'wallet_id' => $wallet->id,
                         'type' => 'debit',
                         'amount' => $amount,

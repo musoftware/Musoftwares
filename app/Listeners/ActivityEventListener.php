@@ -2,7 +2,7 @@
 
 namespace App\Listeners;
 
-use Modules\Core\Services\ActivityService;
+use App\Services\ActivityService;
 use App\Events\InvoicePaid;
 use App\Events\WalletCredited;
 use App\Events\WalletDebited;

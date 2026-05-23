@@ -4,9 +4,9 @@ namespace Tests\Feature;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Modules\Core\Models\PointPackage;
-use Modules\Core\Models\PointTransaction;
-use Modules\Core\Models\Wallet;
+use App\Models\PointPackage;
+use App\Models\PointTransaction;
+use App\Models\Wallet;
 use Tests\TestCase;
 use Illuminate\Support\Facades\DB;
 use App\Helpers\KashierHelper;
@@ -37,7 +37,7 @@ class PointPurchaseTest extends TestCase
         ]);
 
         // Seed EGP to USD exchange rate (1 EGP = 0.02 USD)
-        \Modules\Core\Models\ExchangeRate::create([
+        \App\Models\CurrenciesExchange::create([
             'from_currency' => 'EGP',
             'to_currency' => 'USD',
             'rate' => 0.02,

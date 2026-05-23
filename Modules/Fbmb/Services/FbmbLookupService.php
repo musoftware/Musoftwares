@@ -2,8 +2,8 @@
 
 namespace Modules\fbmb\Services;
 
-use Modules\Core\Services\PointsService;
-use Modules\Core\Models\User;
+use App\Services\PointsService;
+use App\Models\User;
 use Exception;
 use PDO;
 

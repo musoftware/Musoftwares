@@ -7,7 +7,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Modules\ERP\Models\Tenant;
 use Modules\ERP\Models\TenantClient;
 use Modules\ERP\Models\Invoice;
-use Modules\Core\Models\Currency;
+use App\Models\Currency;
 use Tests\TestCase;
 
 class InvoiceWorkflowTest extends TestCase

@@ -4,8 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Modules\Core\Models\UserWithdrawal;
-use Modules\Core\Models\PayoutMethod;
+use App\Models\UserWithdrawal;
+use App\Models\PayoutMethod;
 use App\Models\Transaction;
 use Inertia\Inertia;
 
@@ -13,8 +13,14 @@ class FinancialController extends Controller
 {
     public function transactions(Request $request)
     {
-        $wallet = ['id' => null, 'balance' => (float)$request->user()->user_balance, 'currency' => $request->user()->preferred_currency ?? 'USD'];
-        $transactions = $request->user()->transactions()->latest()->paginate(15);
+        $user = $request->user();
+        $wallet = [
+            'id' => null, 
+            'balance' => (float)$user->user_balance, 
+            'locked_balance' => (float)$user->locked_balance(),
+            'currency' => $user->preferred_currency ?? 'USD'
+        ];
+        $transactions = $user->transactions()->latest()->paginate(15);
 
         return Inertia::render('Financial/Transactions', [
             'transactions' => $transactions,
@@ -25,7 +31,12 @@ class FinancialController extends Controller
     public function withdrawals(Request $request)
     {
         $user = $request->user();
-        $wallet = ['id' => null, 'balance' => (float)$user->user_balance, 'currency' => $user->preferred_currency ?? 'USD'];
+        $wallet = [
+            'id' => null, 
+            'balance' => (float)$user->user_balance, 
+            'locked_balance' => (float)$user->locked_balance(),
+            'currency' => $user->preferred_currency ?? 'USD'
+        ];
         $payoutMethods = $user->payoutMethods()->where('status', 'approved')->get();
         $withdrawals = $user->withdrawals()->with('payoutMethod')->latest()->paginate(15);
 
@@ -66,17 +77,18 @@ class FinancialController extends Controller
         $payoutMethod = $user->payoutMethods()->where('id', $request->payout_method_id)->firstOrFail();
 
         try {
+            DB::transaction(function () use ($request, $user, $wallet, $payoutMethod) {
+                $amount = $request->amount;
                 $user->add_balance(-1 * $amount, 'Withdrawal request via ' . ucwords(str_replace('_', ' ', $payoutMethod->type)), 'used');
 
                 UserWithdrawal::create([
                     'user_id' => $user->id,
                     'payout_method_id' => $payoutMethod->id,
                     'amount' => $amount,
-                    'currency' => $wallet->currency ?? 'USD',
+                    'currency' => $wallet['currency'] ?? 'USD',
                     'status' => 'pending',
                 ]);
             });
-
             return back()->with('success', 'Withdrawal requested successfully.');
         } catch (\Exception $e) {
             return back()->withErrors(['amount' => 'An error occurred while processing your withdrawal request.']);

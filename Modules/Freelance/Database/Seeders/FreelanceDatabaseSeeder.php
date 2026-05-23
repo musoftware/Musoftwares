@@ -7,7 +7,7 @@ namespace Modules\Freelance\Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Modules\Freelance\Models\Skill;
-use Modules\Core\Models\PointPackage;
+use App\Models\PointPackage;
 
 class FreelanceDatabaseSeeder extends Seeder
 {

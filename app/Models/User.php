@@ -68,17 +68,17 @@ class User extends Authenticatable
 
     public function supportTickets(): HasMany
     {
-        return $this->hasMany(\Modules\Core\Models\SupportTicket::class, 'client_id');
+        return $this->hasMany(\App\Models\SupportTicket::class, 'client_id');
     }
 
     public function conversationParticipations(): HasMany
     {
-        return $this->hasMany(\Modules\Core\Models\ConversationParticipant::class, 'user_id');
+        return $this->hasMany(\App\Models\ConversationParticipant::class, 'user_id');
     }
 
     public function messages(): HasMany
     {
-        return $this->hasMany(\Modules\Core\Models\Message::class, 'sender_id');
+        return $this->hasMany(\App\Models\Message::class, 'sender_id');
     }
 
     public function freelanceSkills()
@@ -109,6 +109,59 @@ class User extends Authenticatable
     public function invoices()
     {
         return $this->hasMany(\App\Models\Invoice::class);
+    }
+
+    public function locked_balance()
+    {
+        $locked = 0;
+
+        // 1. Pending withdrawals
+        if (class_exists(\App\Models\UserWithdrawal::class)) {
+            $locked += $this->withdrawals()->where('status', 'pending')->sum('amount');
+        }
+
+        // 2. Active Freelance Contracts
+        if (class_exists(\Modules\Freelance\Models\Contract::class)) {
+            $contracts = \Modules\Freelance\Models\Contract::where('freelancer_id', $this->id)
+                ->where('status', 'active')
+                ->get();
+            foreach ($contracts as $contract) {
+                $locked += \App\Models\CurrenciesExchange::RateToday($contract->amount, $contract->currency_code ?? 'USD', $this->preferred_currency ?? 'USD');
+            }
+        }
+
+        // 3. Pending invoices
+        $unpaidInvoices = $this->invoices()
+            ->where('unpaid', '>', 0)
+            ->whereIn('status', ['unpaid', 'partially_paid'])
+            ->get();
+            
+        foreach ($unpaidInvoices as $invoice) {
+            $schedule = $invoice->getSchedule();
+            $invoiceTotal = \App\Models\CurrenciesExchange::RateToday($invoice->total(), $invoice->currency, $this->preferred_currency ?? 'USD');
+            $invoicePaid = \App\Models\CurrenciesExchange::RateToday($invoice->paid, $invoice->currency, $this->preferred_currency ?? 'USD');
+            $invoiceUnpaid = \App\Models\CurrenciesExchange::RateToday($invoice->unpaid, $invoice->currency, $this->preferred_currency ?? 'USD');
+
+            if ($schedule) {
+                $startDate = \Carbon\Carbon::parse($schedule['start_date'] ?? $invoice->created_at);
+                if (now()->gte($startDate)) {
+                    $splits = (int)($schedule['months'] ?? 1);
+                    if ($splits < 1) $splits = 1;
+                    $monthsSinceStart = now()->diffInMonths($startDate);
+                    $paymentsDue = min($splits, $monthsSinceStart + 1);
+                    $totalDueByNow = ($invoiceTotal / $splits) * $paymentsDue;
+                    
+                    if ($invoicePaid < $totalDueByNow) {
+                        $deductionForInvoice = $totalDueByNow - $invoicePaid;
+                        $locked += min($deductionForInvoice, $invoiceUnpaid);
+                    }
+                }
+            } else {
+                $locked += $invoiceUnpaid;
+            }
+        }
+
+        return $locked;
     }
 
     public function available_balance($currency = null)
@@ -268,3 +321,4 @@ class User extends Authenticatable
         return $this->hasMany(SerialUserDevice::class, 'user_id');
     }
 }
+

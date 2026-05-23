@@ -28,6 +28,7 @@ class Client extends TenantModel
 
     public function notes(): \Illuminate\Database\Eloquent\Relations\MorphMany
     {
-        return $this->morphMany(\Modules\Core\Models\AdminNote::class, 'noteable');
+        return $this->morphMany(\App\Models\AdminNote::class, 'noteable');
     }
 }
+
