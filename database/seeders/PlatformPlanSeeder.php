@@ -12,37 +12,31 @@ class PlatformPlanSeeder extends Seeder
     {
         // ── Fixed Plans ──────────────────────────────────────────────
 
-        PlatformPlan::updateOrCreate(['slug' => 'starter'], [
-            'name'             => 'Starter',
-            'description'      => 'Perfect for getting started with WhatsApp automation.',
-            'monthly_price'    => 7,
-            'yearly_price'     => 84, // 7 * 12
+        PlatformPlan::updateOrCreate(['slug' => 'go'], [
+            'name'             => 'Go',
+            'description'      => 'Perfect for getting started with one tool of your choice.',
+            'monthly_price'    => 20 / 3, // Roughly $6.66 per month
+            'yearly_price'     => 80,     // 20 * 4
             'included_modules' => [],
-            'included_tools'   => ['whatsapp'],
+            'included_tools'   => [],     // To be selected upon subscription
             'features'         => [
-                'WhatsApp Business Tool',
-                'Automated messaging',
-                'Contact management',
-                'Basic analytics',
-                'Email support',
+                '1 Tool of your choice',
+                'Basic support',
             ],
             'is_custom'  => false,
             'sort_order'  => 1,
             'is_active'   => true,
         ]);
 
-        PlatformPlan::updateOrCreate(['slug' => 'professional'], [
-            'name'             => 'Professional',
-            'description'      => 'All automation tools for growing businesses.',
-            'monthly_price'    => 15,
-            'yearly_price'     => 180, // 15 * 12
-            'included_modules' => ['crm'],
+        PlatformPlan::updateOrCreate(['slug' => 'plus'], [
+            'name'             => 'Plus',
+            'description'      => 'All automation tools included.',
+            'monthly_price'    => 50 / 3, // Roughly $16.66 per month
+            'yearly_price'     => 200,    // 50 * 4
+            'included_modules' => [],
             'included_tools'   => ['*'],
             'features'         => [
                 'All automation tools',
-                'WhatsApp, SMS & more',
-                'CRM lead management',
-                'Campaign automation',
                 'Priority support',
                 'API access',
             ],
@@ -51,22 +45,18 @@ class PlatformPlanSeeder extends Seeder
             'is_active'   => true,
         ]);
 
-        PlatformPlan::updateOrCreate(['slug' => 'business_suite'], [
-            'name'             => 'Business Suite',
-            'description'      => 'Complete business operating system — everything included.',
-            'monthly_price'    => 30,
-            'yearly_price'     => 360, // 30 * 12
-            'included_modules' => ['erp', 'crm', 'booking', 'intelligence'],
+        PlatformPlan::updateOrCreate(['slug' => 'pro'], [
+            'name'             => 'Pro',
+            'description'      => 'Complete business suite — everything included.',
+            'monthly_price'    => 90 / 3, // $30 per month
+            'yearly_price'     => 360,    // 90 * 4
+            'included_modules' => ['*'],
             'included_tools'   => ['*'],
             'features'         => [
-                'Full ERP system',
-                'CRM & lead gen',
-                'Booking & scheduling',
-                'Intelligence & analytics',
-                'All tools & plugins',
-                'Team members (up to 10)',
+                'All automation tools',
+                'All business modules',
+                'CRM & ERP included',
                 'Dedicated support',
-                'Custom integrations',
             ],
             'is_custom'  => false,
             'sort_order'  => 3,

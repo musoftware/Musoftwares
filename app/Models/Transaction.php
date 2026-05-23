@@ -26,7 +26,7 @@ class Transaction extends Model
         'reason',
         'type',
         'project_id',
-        'currency',
+        'currency_id',
         'reverse_transaction_id',
     ];
 
@@ -111,7 +111,7 @@ class Transaction extends Model
 
     public function amount_str()
     {
-        return FinanceHelper::instance()->format_money($this->amount, $this->currency);
+        return FinanceHelper::instance()->format_money($this->amount, $this->currency_id);
     }
 
     public function balance()
@@ -123,7 +123,7 @@ class Transaction extends Model
 
     public function balance_str()
     {
-        return FinanceHelper::instance()->format_money($this->balance(), $this->currency);
+        return FinanceHelper::instance()->format_money($this->balance(), $this->currency_id);
     }
 
     public function user()
@@ -202,7 +202,7 @@ class Transaction extends Model
         $reverseTransaction->reason = $reverseReason;
         $reverseTransaction->type = $reverseType;
         $reverseTransaction->project_id = $this->project_id;
-        $reverseTransaction->currency = $this->currency;
+        $reverseTransaction->currency_id = $this->currency_id;
         $reverseTransaction->reverse_transaction_id = $this->id;
 
         DB::transaction(function () use ($reverseTransaction, $user) {
@@ -241,7 +241,7 @@ class Transaction extends Model
         $c->type = 'received';
         $c->amount = $amount;
         $c->reason = $reason;
-        $c->currency = $currency;
+        $c->currency_id = $currency;
 
         DB::transaction(function () use ($c) {
             $c->save();

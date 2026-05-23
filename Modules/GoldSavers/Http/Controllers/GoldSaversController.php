@@ -29,6 +29,7 @@ class GoldSaversController extends Controller
                 'zakat' => $record->zakat,
                 'buyer_price' => $record->buyer_price(),
                 'buy2sell_rate' => $record->buy2sell_rate(),
+                'loss_percentage' => $record->loss_percentage(),
             ];
         });
 
@@ -66,5 +67,28 @@ class GoldSaversController extends Controller
         $goldSaver->delete();
 
         return redirect()->back()->with('success', 'Record deleted successfully.');
+    }
+
+    public function update(Request $request, GoldSaver $goldSaver)
+    {
+        if ($goldSaver->user_id !== Auth::id()) {
+            abort(403);
+        }
+
+        $validated = $request->validate([
+            'carat' => 'required|in:14,18,21,22,24',
+            'gram_price' => 'required|numeric|min:0',
+            'grams' => 'required|numeric|min:0',
+            'tax' => 'required|numeric|min:0',
+            'additional_price' => 'required|numeric|min:0',
+            'bought_date' => 'required|date',
+            'zakat' => 'boolean',
+        ]);
+
+        $validated['zakat'] = $request->boolean('zakat');
+
+        $goldSaver->update($validated);
+
+        return redirect()->back()->with('success', 'Gold saving record updated successfully.');
     }
 }

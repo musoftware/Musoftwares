@@ -10,7 +10,7 @@ class ToolResellerTransaction extends Model
 {
     protected $fillable = [
         'reseller_id', 'user_id', 'type', 'amount', 'balance_after',
-        'currency', 'description', 'reference',
+        'currency_id', 'description', 'reference',
     ];
 
     protected $casts = [

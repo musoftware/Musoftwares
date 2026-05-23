@@ -74,7 +74,6 @@ class FbmbLookupService
                 $user,
                 $totalCost,
                 'fbmb_lookup',
-                null,
                 "iSAAS Facebook ID lookup: {$foundCount} matches from {$totalIds} IDs."
             );
         }

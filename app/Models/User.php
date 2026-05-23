@@ -66,6 +66,16 @@ class User extends Authenticatable
         ];
     }
 
+    public function getCurrencyAttribute()
+    {
+        return $this->attributes['currency_id'] ?? null;
+    }
+
+    public function setCurrencyAttribute($value)
+    {
+        $this->attributes['currency_id'] = $value;
+    }
+
     public function tickets(): HasMany
     {
         return $this->hasMany(\App\Models\Ticket::class, 'user_id');
@@ -126,7 +136,7 @@ class User extends Authenticatable
                 ->where('status', 'active')
                 ->get();
             foreach ($contracts as $contract) {
-                $locked += \App\Models\CurrenciesExchange::RateToday($contract->amount, $contract->currency_code, $this->currency);
+                $locked += \App\Models\CurrenciesExchange::RateToday($contract->amount, $contract->currency_code, $this->currency_id);
             }
         }
 
@@ -138,9 +148,9 @@ class User extends Authenticatable
             
         foreach ($unpaidInvoices as $invoice) {
             $schedule = $invoice->getSchedule();
-            $invoiceTotal = \App\Models\CurrenciesExchange::RateToday($invoice->total(), $invoice->currency, $this->currency);
-            $invoicePaid = \App\Models\CurrenciesExchange::RateToday($invoice->paid, $invoice->currency, $this->currency);
-            $invoiceUnpaid = \App\Models\CurrenciesExchange::RateToday($invoice->unpaid, $invoice->currency, $this->currency);
+            $invoiceTotal = \App\Models\CurrenciesExchange::RateToday($invoice->total(), $invoice->currency, $this->currency_id);
+            $invoicePaid = \App\Models\CurrenciesExchange::RateToday($invoice->paid, $invoice->currency, $this->currency_id);
+            $invoiceUnpaid = \App\Models\CurrenciesExchange::RateToday($invoice->unpaid, $invoice->currency, $this->currency_id);
 
             if ($schedule) {
                 $startDate = \Carbon\Carbon::parse($schedule['start_date'] ?? $invoice->created_at);
@@ -180,9 +190,9 @@ class User extends Authenticatable
             $deductionForInvoice = 0;
 
             // Convert everything to User Currency for calculation
-            $invoiceTotal = \App\Models\CurrenciesExchange::RateToday($invoice->total(), $invoice->currency, $this->currency);
-            $invoicePaid = \App\Models\CurrenciesExchange::RateToday($invoice->paid, $invoice->currency, $this->currency);
-            $invoiceUnpaid = \App\Models\CurrenciesExchange::RateToday($invoice->unpaid, $invoice->currency, $this->currency);
+            $invoiceTotal = \App\Models\CurrenciesExchange::RateToday($invoice->total(), $invoice->currency, $this->currency_id);
+            $invoicePaid = \App\Models\CurrenciesExchange::RateToday($invoice->paid, $invoice->currency, $this->currency_id);
+            $invoiceUnpaid = \App\Models\CurrenciesExchange::RateToday($invoice->unpaid, $invoice->currency, $this->currency_id);
 
             if ($schedule) {
                 // Parse schedule
@@ -222,8 +232,8 @@ class User extends Authenticatable
 
         $available = round($currentBalance - $totalDeduction, 2);
 
-        if ($currency && $currency != $this->currency) {
-            return \App\Models\CurrenciesExchange::RateToday($available, $this->currency, $currency);
+        if ($currency && $currency != $this->currency_id) {
+            return \App\Models\CurrenciesExchange::RateToday($available, $this->currency_id, $currency);
         }
 
         return $available;
@@ -241,7 +251,17 @@ class User extends Authenticatable
 
     public function currency_name()
     {
-        return \App\Models\Currency::query()->find($this->currency)->currency;
+        $currency = \App\Models\Currency::query()->find($this->currency_id);
+        return $currency ? $currency->currency : '--';
+    }
+
+    public function getPreferredCurrencyAttribute($value)
+    {
+        if (!empty($value)) {
+            return strtoupper($value);
+        }
+
+        return strtoupper($this->currency_name());
     }
 
     public function client_balance()
@@ -269,7 +289,7 @@ class User extends Authenticatable
 
     public function balance($currency = null)
     {
-        return \App\Models\CurrenciesExchange::RateToday($this->user_balance, $this->currency, $currency);
+        return \App\Models\CurrenciesExchange::RateToday($this->user_balance, $this->currency_id, $currency);
     }
 
     public function add_balance($amount, $reason, $type, $currency = null, $project = null)
@@ -278,9 +298,9 @@ class User extends Authenticatable
             return null;
         }
         if ($currency != null) {
-            $amount = \App\Models\CurrenciesExchange::RateToday($amount, $currency, $this->currency);
+            $amount = \App\Models\CurrenciesExchange::RateToday($amount, $currency, $this->currency_id);
         }
-        $currency = $this->currency;
+        $currency = $this->currency_id;
 
         $client_balance = new Transaction();
         $client_balance->project_id = optional($project)->id;
@@ -290,7 +310,7 @@ class User extends Authenticatable
         if (!empty($reason)) {
             $client_balance->reason = $reason;
         }
-        $client_balance->currency = $currency;
+        $client_balance->currency_id = $currency;
 
         \Illuminate\Support\Facades\DB::transaction(function () use ($client_balance, $project, $amount, $type, $currency) {
             $client_balance->save();
@@ -319,6 +339,11 @@ class User extends Authenticatable
     public function kycVerifier()
     {
         return $this->belongsTo(User::class, 'kyc_verified_by');
+    }
+
+    public function payoutMethods(): HasMany
+    {
+        return $this->hasMany(\App\Models\PayoutMethod::class, 'user_id');
     }
 
     /**

@@ -6,7 +6,6 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Models\PointPackage;
 use App\Models\PointTransaction;
-use App\Models\Wallet;
 use Tests\TestCase;
 use Illuminate\Support\Facades\DB;
 use App\Helpers\KashierHelper;
@@ -17,7 +16,6 @@ class PointPurchaseTest extends TestCase
 
     protected User $user;
     protected PointPackage $package;
-    protected Wallet $wallet;
 
     protected function setUp(): void
     {
@@ -28,15 +26,22 @@ class PointPurchaseTest extends TestCase
         $this->user = User::factory()->create(['onboarding_completed' => true]);
         $this->user->assignRole('client');
 
-        $this->wallet = Wallet::create([
-            'owner_type' => User::class,
-            'owner_id' => $this->user->id,
-            'context' => 'user',
-            'balance' => 100.00,
-            'currency' => 'USD',
-        ]);
+        $this->user->update(['user_balance' => 100.00]);
 
         // Seed EGP to USD exchange rate (1 EGP = 0.02 USD)
+        // Also need to create Currency model for EGP and attach to user if user_balance expects it.
+        $egpCurrency = \App\Models\Currency::create(['currency' => 'EGP', 'symbol' => 'E£']);
+        $usdCurrency = \App\Models\Currency::create(['currency' => 'USD', 'symbol' => '$']);
+        $this->user->update(['currency' => $usdCurrency->id, 'preferred_currency' => 'USD']);
+
+        \App\Models\CurrenciesExchange::create([
+            'from_currency' => $egpCurrency->id,
+            'to_currency' => $usdCurrency->id,
+            'rate' => 0.02,
+            'effective_date' => '2020-01-01',
+            'source' => 'manual',
+        ]);
+
         \App\Models\CurrenciesExchange::create([
             'from_currency' => 'EGP',
             'to_currency' => 'USD',
@@ -66,7 +71,7 @@ class PointPurchaseTest extends TestCase
         $response->assertSessionHas('success');
 
         // Check wallet balance deducted: 100.00 - (100.00 EGP * 0.02) = 98.00 USD
-        $this->assertEquals(98.00, $this->wallet->fresh()->balance);
+        $this->assertEquals(98.00, $this->user->fresh()->user_balance);
 
         // Check Point Transaction created
         $this->assertDatabaseHas('point_transactions', [
@@ -84,7 +89,7 @@ class PointPurchaseTest extends TestCase
         $this->actingAs($this->user);
 
         // Set wallet balance below package price ($2.00 USD cost)
-        $this->wallet->update(['balance' => 1.50]);
+        $this->user->update(['user_balance' => 1.50]);
 
         $response = $this->post(route('freelance.point-purchases.store'), [
             'package_id' => $this->package->id,
@@ -98,7 +103,7 @@ class PointPurchaseTest extends TestCase
         $this->assertStringContainsString('payments.kashier.io', $location);
 
         // Wallet balance must not change
-        $this->assertEquals(1.50, $this->wallet->fresh()->balance);
+        $this->assertEquals(1.50, $this->user->fresh()->user_balance);
     }
 
     public function test_purchase_custom_points_via_wallet_success(): void
@@ -113,7 +118,7 @@ class PointPurchaseTest extends TestCase
         $response->assertSessionHas('success');
 
         // Check wallet balance deducted: 100.00 - 1.00 = 99.00 USD
-        $this->assertEquals(99.00, $this->wallet->fresh()->balance);
+        $this->assertEquals(99.00, $this->user->fresh()->user_balance);
 
         // Check Point Transaction created
         $this->assertDatabaseHas('point_transactions', [
@@ -131,7 +136,7 @@ class PointPurchaseTest extends TestCase
         $this->actingAs($this->user);
 
         // Set wallet balance below cost ($1.00 USD)
-        $this->wallet->update(['balance' => 0.50]);
+        $this->user->update(['user_balance' => 0.50]);
 
         $response = $this->post(route('freelance.point-purchases.store-wallet'), [
             'points' => 50, // Cost is $1.00 USD
@@ -144,6 +149,6 @@ class PointPurchaseTest extends TestCase
         $this->assertStringContainsString('payments.kashier.io', $location);
 
         // Wallet balance must not change
-        $this->assertEquals(0.50, $this->wallet->fresh()->balance);
+        $this->assertEquals(0.50, $this->user->fresh()->user_balance);
     }
 }

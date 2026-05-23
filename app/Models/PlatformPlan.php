@@ -56,23 +56,23 @@ class PlatformPlan extends Model
     public function priceFor(string $cycle): float
     {
         $prices = [
-            'starter' => [
+            'go' => [
                 '3_months' => 20,
-                '6_months' => 39,
-                '1_year'   => 75,
-                '3_years'  => 199,
+                '6_months' => 40,
+                '1_year'   => 80,
+                '3_years'  => 240,
             ],
-            'professional' => [
-                '3_months' => 42,
-                '6_months' => 80,
-                '1_year'   => 150,
-                '3_years'  => 399,
+            'plus' => [
+                '3_months' => 50,
+                '6_months' => 100,
+                '1_year'   => 200,
+                '3_years'  => 600,
             ],
-            'business_suite' => [
-                '3_months' => 85,
-                '6_months' => 160,
-                '1_year'   => 299,
-                '3_years'  => 799,
+            'pro' => [
+                '3_months' => 90,
+                '6_months' => 180,
+                '1_year'   => 360,
+                '3_years'  => 1080,
             ],
         ];
 

@@ -44,7 +44,7 @@ export default function PointsIndex({ auth, tiers = [], quickPackages = [], tran
             : `You'll be redirected to Kashier to securely pay ${formatMoney(pkg.total_cost, globalCurrency)}. Continue?`;
 
         if (confirm(msg)) {
-            router.post(route('point-purchases.store-wallet'), { points: pkg.points });
+            router.post(route('point-purchases.store'), { package_id: pkg.id });
         }
     };
 
@@ -63,7 +63,7 @@ export default function PointsIndex({ auth, tiers = [], quickPackages = [], tran
     };
 
     return (
-        <AuthenticatedLayout header={<h2 className="font-semibold text-xl text-gray-800 leading-tight">Buy Points</h2>}>
+        <AuthenticatedLayout header="Buy Points">
             <AppPage>
                 <PageHeader 
                     title="Buy Points" 

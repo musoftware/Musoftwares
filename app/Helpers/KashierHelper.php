@@ -130,7 +130,9 @@ class KashierHelper
         string $userName,
         string $userEmail,
         int $planId,
-        string $currency = 'USD'
+        string $currency = 'USD',
+        string $billingCycle = '1_year',
+        int $days = 365
     ): string {
         $orderId = 'sub_' . uniqid() . '-' . $userId;
         $merchantId = config('services.kashier.merchant_id', 'MID-12345');
@@ -172,6 +174,8 @@ class KashierHelper
                 'user_id' => $userId,
                 'source' => 'subscription-purchase',
                 'plan_id' => $planId,
+                'billing_cycle' => $billingCycle,
+                'days' => $days,
             ]),
         ];
 

@@ -11,7 +11,7 @@ class ToolSubscription extends Model
 {
     protected $fillable = [
         'user_id', 'tool_guid', 'plan_guid', 'billing_cycle',
-        'amount_paid', 'currency', 'status', 'payment_method',
+        'amount_paid', 'currency_id', 'status', 'payment_method',
         'payment_reference', 'starts_at', 'expires_at', 'cancelled_at',
     ];
 
@@ -28,6 +28,12 @@ class ToolSubscription extends Model
     {
         return $this->belongsTo(\App\Models\User::class);
     }
+
+    public function currency(): BelongsTo
+    {
+        return $this->belongsTo(\App\Models\Currency::class, 'currency_id');
+    }
+
 
     public function getToolAttribute()
     {
