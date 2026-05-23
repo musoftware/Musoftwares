@@ -469,6 +469,30 @@ function AuthenticatedContent({
 
                                         <DropdownMenuItem 
                                             className={cn(
+                                                "p-0 mb-1 outline-none border transition-colors duration-150 cursor-pointer",
+                                                isRouteActive('isaas.gold-savers.index') ? "bg-yellow-50/80 border-yellow-100" : "hover:bg-slate-50 border-transparent"
+                                            )}
+                                            render={<Link href={safeRoute('isaas.gold-savers.index')} className="flex items-start gap-3 p-2.5 rounded-lg w-full" />}
+                                        >
+                                            <div className={cn(
+                                                "w-8 h-8 rounded-md flex items-center justify-center shrink-0 transition-colors",
+                                                isRouteActive('isaas.gold-savers.index') ? "bg-yellow-100" : "bg-slate-100 group-hover/dropdown-menu-item:bg-yellow-50"
+                                            )}>
+                                                <Coins className={cn("w-4 h-4", isRouteActive('isaas.gold-savers.index') ? "text-yellow-700" : "text-slate-500 group-hover/dropdown-menu-item:text-yellow-600")} />
+                                            </div>
+                                            <div className="flex-1 min-w-0">
+                                                <div className="flex items-center justify-between">
+                                                    <p className={cn("text-sm font-medium", isRouteActive('isaas.gold-savers.index') ? "text-yellow-900" : "text-slate-900")}>Gold Savers</p>
+                                                    {isRouteActive('isaas.gold-savers.index') && <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-yellow-100 text-yellow-700">Active</span>}
+                                                </div>
+                                                <p className={cn("text-xs truncate", isRouteActive('isaas.gold-savers.index') ? "text-yellow-700/70" : "text-slate-500")}>
+                                                    Track your gold value
+                                                </p>
+                                            </div>
+                                        </DropdownMenuItem>
+
+                                        <DropdownMenuItem 
+                                            className={cn(
                                                 "p-0 outline-none border transition-colors duration-150 cursor-pointer",
                                                 isToolsActive ? "bg-fuchsia-50/80 border-fuchsia-100" : "hover:bg-slate-50 border-transparent"
                                             )}

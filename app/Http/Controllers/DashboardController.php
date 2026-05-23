@@ -6,8 +6,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use App\Models\Transaction;
-use Modules\Core\Models\SupportTicket;
-use Modules\Core\Models\UserWithdrawal;
+use App\Models\SupportTicket;
+use App\Models\UserWithdrawal;
 use Modules\ERP\Models\Invoice;
 use Modules\ERP\Models\TenantClient;
 use Modules\ERP\Models\RecurringEntry;
@@ -208,3 +208,4 @@ class DashboardController extends Controller
         return app(\App\Http\Controllers\Admin\DashboardController::class)->index();
     }
 }
+

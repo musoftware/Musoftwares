@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Modules\Freelance\Models\Contract;
 use Modules\Freelance\Models\Proposal;
-use Modules\Core\Models\PointTransaction;
+use App\Models\PointTransaction;
 use Modules\Freelance\Models\Job;
 use Carbon\Carbon;
 

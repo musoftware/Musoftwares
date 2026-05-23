@@ -4,7 +4,7 @@ namespace Modules\Marketplace\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Modules\Core\Models\WalletTransaction;
+use App\Models\WalletTransaction;
 
 class MarketplaceEscrow extends Model
 {

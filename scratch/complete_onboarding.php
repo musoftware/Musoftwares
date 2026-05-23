@@ -5,7 +5,7 @@ $app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
 
 use App\Models\User;
 
-use Modules\Core\Models\PointTransaction;
+use App\Models\PointTransaction;
 use Illuminate\Support\Facades\DB;
 
 try {

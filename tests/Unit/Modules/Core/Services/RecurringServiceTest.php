@@ -1,9 +1,9 @@
 <?php
 
-namespace Tests\Unit\Modules\Core\Services;
+namespace Tests\Unit\App\Services;
 
 use Tests\TestCase;
-use Modules\Core\Services\RecurringService;
+use App\Services\RecurringService;
 use Modules\ERP\Models\RecurringEntry;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;

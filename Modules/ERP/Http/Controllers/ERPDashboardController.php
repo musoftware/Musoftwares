@@ -15,7 +15,7 @@ use Modules\ERP\Models\Activity;
 use Modules\ERP\Models\TenantFile;
 use Modules\ERP\Models\TenantNote;
 use Modules\ERP\Models\TenantStorageProvider;
-use Modules\Core\Services\ExchangeRateService;
+use App\Services\ExchangeRateService;
 use Inertia\Inertia;
 use Carbon\Carbon;
 

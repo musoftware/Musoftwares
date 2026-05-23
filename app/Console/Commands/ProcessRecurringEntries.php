@@ -3,7 +3,7 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
-use Modules\Core\Services\RecurringService;
+use App\Services\RecurringService;
 
 class ProcessRecurringEntries extends Command
 {

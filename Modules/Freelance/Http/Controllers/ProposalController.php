@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use Modules\Freelance\Models\Job;
 use Modules\Freelance\Models\Proposal;
 use Modules\Freelance\Models\Contract;
-use Modules\Core\Models\PointTransaction;
+use App\Models\PointTransaction;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\DB;

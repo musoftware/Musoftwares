@@ -8,15 +8,15 @@ use Modules\ERP\Models\InvoiceItem;
 use Modules\ERP\Models\InvoiceCost;
 use Modules\ERP\Models\WalletTransaction;
 use Modules\ERP\Models\TenantClient;
-use Modules\Core\Models\Currency;
-use Modules\Core\Services\ExchangeRateService;
+use App\Models\Currency;
+use App\Services\ExchangeRateService;
 use Inertia\Inertia;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Modules\ERP\Models\Tenant;
-use Modules\Core\Services\ActivityService;
+use App\Services\ActivityService;
 use App\Events\InvoicePaid;
 
 class InvoiceController extends Controller

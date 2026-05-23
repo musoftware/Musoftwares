@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Modules\ERP\Models\RecurringEntry;
 use Modules\ERP\Models\Tenant;
-use Modules\Core\Services\ExchangeRateService;
+use App\Services\ExchangeRateService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;

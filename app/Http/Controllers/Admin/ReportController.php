@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\DB;
 use Modules\ERP\Models\Invoice;
 use Modules\ERP\Models\InvoiceCost;
 use Modules\ERP\Models\ReferralEarning;
-use Modules\Core\Models\UserWithdrawal;
+use App\Models\UserWithdrawal;
 use Inertia\Inertia;
 
 /**

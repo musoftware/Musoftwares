@@ -4,7 +4,7 @@ namespace Modules\Marketplace\Services;
 
 use Modules\Marketplace\Models\MarketplaceEscrow;
 use Modules\Marketplace\Models\Order;
-use Modules\Core\Services\WalletService;
+use App\Services\WalletService;
 use Illuminate\Support\Facades\DB;
 use Exception;
 

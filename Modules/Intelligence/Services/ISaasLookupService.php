@@ -2,8 +2,8 @@
 
 namespace Modules\Intelligence\Services;
 
-use Modules\Core\Services\WalletService;
-use Modules\Core\Models\User;
+use App\Services\WalletService;
+use App\Models\User;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
 use Exception;

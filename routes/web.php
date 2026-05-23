@@ -32,6 +32,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/onboarding-wizard', [\App\Http\Controllers\OnboardingController::class, 'show'])->name('onboarding.wizard');
     Route::post('/onboarding-wizard', [\App\Http\Controllers\OnboardingController::class, 'store'])->name('onboarding.store');
     Route::post('/product-tour/status', [\App\Http\Controllers\OnboardingController::class, 'updateTourStatus'])->name('product-tour.status');
+    Route::get('/onboarding-wizard/cities/{countryName}', [\App\Http\Controllers\OnboardingController::class, 'getCities'])->name('onboarding.cities');
+});
+
+Route::get('/fix-cities', function() {
+    \Illuminate\Support\Facades\DB::table('cities')->truncate();
+    \Illuminate\Support\Facades\Artisan::call('db:seed', ['--class' => 'Database\\Seeders\\CitySeeder', '--force' => true]);
+    return 'Done';
 });
 
 // Team Auth Routes
@@ -519,7 +526,7 @@ Route::middleware(['auth', 'verified'])->prefix('financial')->name('financial.')
 
 // Kashier Webhook (No Auth required)
 Route::post('/financial/add-balance/webhook', [\App\Http\Controllers\FinancialController::class, 'webhook'])->name('financial.add-balance.webhook');
-Route::post('/freelance/point-purchases/webhook', [\Modules\Core\Http\Controllers\PointPurchaseController::class, 'webhook'])->name('freelance.point-purchases.webhook');
+Route::post('/freelance/point-purchases/webhook', [\App\Http\Controllers\PointPurchaseController::class, 'webhook'])->name('freelance.point-purchases.webhook');
 Route::post('/subscriptions/kashier/webhook', [\App\Http\Controllers\SubscriptionController::class, 'webhook'])->name('subscriptions.kashier.webhook');
 
 // General Messages Route
@@ -533,30 +540,30 @@ Route::middleware(['auth', 'verified'])->get('/search', [\App\Http\Controllers\S
 
 // Chat API Routes
 Route::middleware(['auth', 'verified'])->prefix('api')->group(function () {
-    Route::get('/conversations/{id}', [\Modules\Core\Http\Controllers\ConversationController::class, 'show']);
-    Route::get('/conversations/{id}/messages', [\Modules\Core\Http\Controllers\ConversationController::class, 'messages']);
-    Route::post('/conversations/{id}/read', [\Modules\Core\Http\Controllers\ConversationController::class, 'markAsRead']);
-    Route::post('/conversations/{id}/messages', [\Modules\Core\Http\Controllers\MessageController::class, 'store']);
+    Route::get('/conversations/{id}', [\App\Http\Controllers\ConversationController::class, 'show']);
+    Route::get('/conversations/{id}/messages', [\App\Http\Controllers\ConversationController::class, 'messages']);
+    Route::post('/conversations/{id}/read', [\App\Http\Controllers\ConversationController::class, 'markAsRead']);
+    Route::post('/conversations/{id}/messages', [\App\Http\Controllers\MessageController::class, 'store']);
 
     // Admin Notes
-    Route::get('/admin-notes', [\Modules\Core\Http\Controllers\AdminNoteController::class, 'index']);
-    Route::post('/admin-notes', [\Modules\Core\Http\Controllers\AdminNoteController::class, 'store']);
-    Route::patch('/admin-notes/{note}/pin', [\Modules\Core\Http\Controllers\AdminNoteController::class, 'togglePin']);
-    Route::delete('/admin-notes/{note}', [\Modules\Core\Http\Controllers\AdminNoteController::class, 'destroy']);
+    Route::get('/admin-notes', [\App\Http\Controllers\AdminNoteController::class, 'index']);
+    Route::post('/admin-notes', [\App\Http\Controllers\AdminNoteController::class, 'store']);
+    Route::patch('/admin-notes/{note}/pin', [\App\Http\Controllers\AdminNoteController::class, 'togglePin']);
+    Route::delete('/admin-notes/{note}', [\App\Http\Controllers\AdminNoteController::class, 'destroy']);
 });
 
 // New API routes for polling
 Route::middleware(['auth', 'verified'])->prefix('api')->group(function () {
-    Route::get('/conversations', [\Modules\Core\Http\Controllers\ConversationController::class, 'index']);
+    Route::get('/conversations', [\App\Http\Controllers\ConversationController::class, 'index']);
     Route::get('/timer/{id}', [\App\Http\Controllers\TimerController::class, 'show']);
 
     // Activity Engine — widget API for dashboard feeds
-    Route::get('/activity', [\Modules\Core\Http\Controllers\ActivityController::class, 'feed'])->name('api.activity.feed');
+    Route::get('/activity', [\App\Http\Controllers\ActivityController::class, 'feed'])->name('api.activity.feed');
 });
 
 // ── Activity Engine ───────────────────────────────────────────────────────────
 // The heartbeat of the iSAAS ecosystem. Full-page operational activity log.
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('/activity', [\Modules\Core\Http\Controllers\ActivityController::class, 'index'])->name('activity.index');
+    Route::get('/activity', [\App\Http\Controllers\ActivityController::class, 'index'])->name('activity.index');
 });
 

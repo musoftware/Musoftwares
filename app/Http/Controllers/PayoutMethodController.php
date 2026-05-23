@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Modules\Core\Models\PayoutMethod;
+use App\Models\PayoutMethod;
 use Inertia\Inertia;
 
 /**
@@ -174,7 +174,7 @@ class PayoutMethodController extends Controller
 
         // Check if this method has pending withdrawals
         $hasPending = $payoutMethod->user_id === $request->user()->id
-            && \Modules\Core\Models\UserWithdrawal::where('payout_method_id', $payoutMethod->id)
+            && \App\Models\UserWithdrawal::where('payout_method_id', $payoutMethod->id)
                 ->whereIn('status', ['pending', 'approved'])
                 ->exists();
 
