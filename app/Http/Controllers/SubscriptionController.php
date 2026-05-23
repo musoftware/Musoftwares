@@ -11,8 +11,7 @@ use App\Models\PlatformSubscription;
 use App\Models\PlatformServiceItem;
 use Modules\ERP\Models\SubscriptionInvoice;
 use Modules\ERP\Models\Tenant;
-use Modules\Core\Models\Wallet;
-use Modules\Core\Models\WalletTransaction;
+use App\Models\Transaction;
 use App\Helpers\KashierHelper;
 use App\Services\SubscriptionService;
 use Carbon\Carbon;
@@ -59,7 +58,7 @@ class SubscriptionController extends Controller
             ->active()
             ->first();
 
-        $wallet = $user->getWallet();
+        $wallet = ['id' => null, 'balance' => (float)$user->user_balance, 'currency' => $user->preferred_currency ?? 'USD'];
 
         return Inertia::render('Subscriptions/Plans', [
             'plans' => $plans->map(fn ($plan) => [
@@ -117,28 +116,14 @@ class SubscriptionController extends Controller
             return back()->withErrors(['error' => 'Use the custom subscription endpoint for custom plans.']);
         }
 
-        if ($wallet->balance < $price) {
-            return back()->withErrors(['error' => 'Insufficient wallet balance. Please add funds or pay via Kashier.']);
+        if ((float) $user->available_balance() < $price) {
+            return back()->withErrors(['error' => 'Insufficient balance. Please add funds or pay via Kashier.']);
         }
 
         try {
-            DB::transaction(function () use ($user, $plan, $wallet, $price, $request) {
-                // Deduct from wallet
-                $balanceBefore = $wallet->balance;
-                $balanceAfter = $balanceBefore - $price;
-                $wallet->balance = $balanceAfter;
-                $wallet->save();
-
-                // Record wallet transaction
-                WalletTransaction::create([
-                    'wallet_id'      => $wallet->id,
-                    'type'           => 'debit',
-                    'amount'         => $price,
-                    'balance_before' => $balanceBefore,
-                    'balance_after'  => $balanceAfter,
-                    'reference_type' => 'platform_subscription',
-                    'description'    => "Platform subscription: {$plan->name} ({$request->billing_cycle})",
-                ]);
+            DB::transaction(function () use ($user, $plan, $price, $request) {
+                // Deduct from balance
+                $user->add_balance(-1 * $price, 'Subscription: ' . $plan->name . ' (' . $request->billing_cycle . ')', 'used');
 
                 // Expire any previous active subscription
                 PlatformSubscription::forUser($user->id)
@@ -159,7 +144,7 @@ class SubscriptionController extends Controller
                     'plan_id'           => $plan->id,
                     'billing_cycle'     => $request->billing_cycle,
                     'amount'            => $price,
-                    'currency'          => $wallet->currency ?? 'USD',
+                    'currency'          => $user->preferred_currency ?? 'USD',
                     'status'            => 'active',
                     'started_at'        => Carbon::now(),
                     'expires_at'        => Carbon::now()->addMonths($duration),
@@ -175,7 +160,7 @@ class SubscriptionController extends Controller
                     'plan_id'               => $plan->id,
                     'invoice_number'        => $invoiceNum,
                     'amount'                => $price,
-                    'currency'              => $wallet->currency ?? 'USD',
+                    'currency'              => $user->preferred_currency ?? 'USD',
                     'status'                => 'paid',
                     'payment_method'        => 'wallet',
                     'transaction_reference' => 'wallet_deduction',
@@ -212,7 +197,6 @@ class SubscriptionController extends Controller
         ]);
 
         $user = Auth::user();
-        $wallet = $user->getWallet();
 
         // Find the custom plan
         $customPlan = PlatformPlan::where('is_custom', true)->where('is_active', true)->first();
@@ -228,27 +212,14 @@ class SubscriptionController extends Controller
             return back()->withErrors(['error' => 'Invalid selection. Please choose at least one service.']);
         }
 
-        if ($wallet->balance < $price) {
-            return back()->withErrors(['error' => 'Insufficient wallet balance. Please add funds.']);
+        if ((float) $user->available_balance() < $price) {
+            return back()->withErrors(['error' => 'Insufficient balance. Please add funds.']);
         }
 
         try {
-            DB::transaction(function () use ($user, $customPlan, $wallet, $price, $request) {
-                // Deduct from wallet
-                $balanceBefore = $wallet->balance;
-                $balanceAfter = $balanceBefore - $price;
-                $wallet->balance = $balanceAfter;
-                $wallet->save();
-
-                WalletTransaction::create([
-                    'wallet_id'      => $wallet->id,
-                    'type'           => 'debit',
-                    'amount'         => $price,
-                    'balance_before' => $balanceBefore,
-                    'balance_after'  => $balanceAfter,
-                    'reference_type' => 'platform_subscription_custom',
-                    'description'    => "Custom platform subscription ({$request->billing_cycle}): " . implode(', ', $request->items),
-                ]);
+            DB::transaction(function () use ($user, $customPlan, $price, $request) {
+                // Deduct from balance
+                $user->add_balance(-1 * $price, 'Custom platform subscription (' . $request->billing_cycle . '): ' . implode(', ', $request->items), 'used');
 
                 // Expire previous active subscription
                 PlatformSubscription::forUser($user->id)
@@ -268,7 +239,7 @@ class SubscriptionController extends Controller
                     'plan_id'           => $customPlan->id,
                     'billing_cycle'     => $request->billing_cycle,
                     'amount'            => $price,
-                    'currency'          => $wallet->currency ?? 'USD',
+                    'currency'          => $user->preferred_currency ?? 'USD',
                     'status'            => 'active',
                     'started_at'        => Carbon::now(),
                     'expires_at'        => Carbon::now()->addMonths($duration),
@@ -284,7 +255,7 @@ class SubscriptionController extends Controller
                     'plan_id'               => $customPlan->id,
                     'invoice_number'        => $invoiceNum,
                     'amount'                => $price,
-                    'currency'              => $wallet->currency ?? 'USD',
+                    'currency'              => $user->preferred_currency ?? 'USD',
                     'status'                => 'paid',
                     'payment_method'        => 'wallet',
                     'transaction_reference' => 'wallet_deduction',
@@ -328,7 +299,6 @@ class SubscriptionController extends Controller
 
         $user = Auth::user();
         $plan = PlatformPlan::findOrFail($request->plan_id);
-        $wallet = $user->getWallet();
         $price = $plan->priceFor($request->billing_cycle);
 
         $paymentUrl = KashierHelper::buildSubscriptionPaymentUrl(
@@ -337,7 +307,7 @@ class SubscriptionController extends Controller
             $user->name,
             $user->email,
             $plan->id,
-            $wallet->currency ?? 'USD'
+            $user->preferred_currency ?? 'USD'
         );
 
         return Inertia::location($paymentUrl);
@@ -496,13 +466,11 @@ class SubscriptionController extends Controller
                 ];
             });
 
-        $wallet = $user->getWallet();
-
         return Inertia::render('Subscriptions/Manage', [
             'subscriptions' => $subscriptions,
             'invoices'      => $invoices,
-            'walletBalance' => (float) ($wallet->balance ?? 0),
-            'currency'      => $wallet->currency ?? 'USD',
+            'walletBalance' => (float) $user->user_balance,
+            'currency'      => $user->preferred_currency ?? 'USD',
         ]);
     }
 
@@ -541,29 +509,15 @@ class SubscriptionController extends Controller
             ->findOrFail($request->id);
 
         $plan = $subscription->plan;
-        $wallet = $user->getWallet();
         $price = $plan ? $plan->priceFor($subscription->billing_cycle) : (float) $subscription->amount;
 
-        if ($wallet->balance < $price) {
-            return back()->withErrors(['error' => 'Insufficient wallet balance to renew. Please add funds.']);
+        if ((float) $user->available_balance() < $price) {
+            return back()->withErrors(['error' => 'Insufficient balance to renew. Please add funds.']);
         }
 
         try {
-            DB::transaction(function () use ($user, $subscription, $plan, $wallet, $price) {
-                $balanceBefore = $wallet->balance;
-                $balanceAfter = $balanceBefore - $price;
-                $wallet->balance = $balanceAfter;
-                $wallet->save();
-
-                WalletTransaction::create([
-                    'wallet_id'      => $wallet->id,
-                    'type'           => 'debit',
-                    'amount'         => $price,
-                    'balance_before' => $balanceBefore,
-                    'balance_after'  => $balanceAfter,
-                    'reference_type' => 'platform_subscription_renewal',
-                    'description'    => "Subscription renewal: " . ($plan->name ?? 'Custom') . " ({$subscription->billing_cycle})",
-                ]);
+            DB::transaction(function () use ($user, $subscription, $plan, $price) {
+                $user->add_balance(-1 * $price, 'Renew Subscription: ' . ($plan ? $plan->name : 'Custom Plan'), 'used');
 
                 $duration = match ($subscription->billing_cycle) {
                     '3_months' => 3,
@@ -587,10 +541,10 @@ class SubscriptionController extends Controller
                     'plan_id'               => $plan?->id,
                     'invoice_number'        => $invoiceNum,
                     'amount'                => $price,
-                    'currency'              => $wallet->currency ?? 'USD',
+                    'currency'              => $user->preferred_currency ?? 'USD',
                     'status'                => 'paid',
-                    'payment_method'        => 'wallet',
-                    'transaction_reference' => 'wallet_renewal',
+                    'payment_method'        => 'balance',
+                    'transaction_reference' => 'balance_renewal',
                     'paid_at'               => Carbon::now(),
                 ]);
             });

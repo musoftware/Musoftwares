@@ -49,7 +49,6 @@ class User extends Authenticatable
     ];
 
     protected $appends = [
-        'points_balance',
     ];
 
     protected function casts(): array
@@ -105,44 +104,148 @@ class User extends Authenticatable
         return \Modules\ERP\Models\TenantClient::where('user_id', $this->id)->first();
     }
 
-    public function pointTransactions()
+
+
+    public function invoices()
     {
-        return $this->hasMany(\Modules\Core\Models\PointTransaction::class);
+        return $this->hasMany(\App\Models\Invoice::class);
     }
 
-    public function getPointsBalanceAttribute()
+    public function available_balance($currency = null)
     {
-        $earned = $this->pointTransactions()->whereIn('type', ['earned', 'credit', 'purchased'])->sum('points');
-        $spent = $this->pointTransactions()->whereIn('type', ['spent', 'debit'])->sum('points');
-        return $earned - $spent;
+        $currentBalance = $this->balance(); // Current Wallet Balance in User Currency
+
+        $unpaidInvoices = $this->invoices()
+            ->where('unpaid', '>', 0)
+            ->whereIn('status', ['unpaid', 'partially_paid'])
+            ->get();
+
+        $totalDeduction = 0;
+
+        foreach ($unpaidInvoices as $invoice) {
+            $schedule = $invoice->getSchedule();
+            $deductionForInvoice = 0;
+
+            // Convert everything to User Currency for calculation
+            $invoiceTotal = \App\Models\CurrenciesExchange::RateToday($invoice->total(), $invoice->currency, $this->preferred_currency ?? 'USD');
+            $invoicePaid = \App\Models\CurrenciesExchange::RateToday($invoice->paid, $invoice->currency, $this->preferred_currency ?? 'USD');
+            $invoiceUnpaid = \App\Models\CurrenciesExchange::RateToday($invoice->unpaid, $invoice->currency, $this->preferred_currency ?? 'USD');
+
+            if ($schedule) {
+                // Parse schedule
+                $startDate = \Carbon\Carbon::parse($schedule['start_date'] ?? $invoice->created_at);
+                $splits = (int)($schedule['months'] ?? 1); // 1 or 12
+                if ($splits < 1) $splits = 1;
+
+                if (now()->lt($startDate)) {
+                    // Future schedule: No deduction yet
+                    $deductionForInvoice = 0;
+                } else {
+                    // Start date passed
+                    $monthsPassed = $startDate->diffInMonths(now()) + 1;
+
+                    if ($splits > 1) {
+                         // Split logic
+                         $monthlyAmount = $invoiceTotal / $splits;
+                         $totalExpected = $monthlyAmount * min($splits, $monthsPassed);
+
+                         // Due is what we EXPECT to have paid minus what we actually paid
+                         $due = max(0, $totalExpected - $invoicePaid);
+
+                         // Cannot invoke more than what is strictly unpaid on the invoice
+                         $deductionForInvoice = min($invoiceUnpaid, $due);
+                    } else {
+                        // Single payment, due now
+                        $deductionForInvoice = $invoiceUnpaid;
+                    }
+                }
+            } else {
+                 // No schedule, strictly due immediately
+                 $deductionForInvoice = $invoiceUnpaid;
+            }
+
+            $totalDeduction += $deductionForInvoice;
+        }
+
+        $available = round($currentBalance - $totalDeduction, 2);
+
+        if ($currency && $currency != ($this->preferred_currency ?? 'USD')) {
+            return \App\Models\CurrenciesExchange::RateToday($available, $this->preferred_currency ?? 'USD', $currency);
+        }
+
+        return $available;
     }
 
-    public function wallet()
+    public function transactions()
     {
-        return $this->morphOne(\Modules\Core\Models\Wallet::class, 'owner');
+        return $this->hasMany(Transaction::class);
     }
 
-    public function getWallet()
+    public function client_balance()
     {
-        return $this->wallet()->firstOrCreate([
-            'owner_type' => self::class,
-            'owner_id' => $this->id,
-        ], [
-            'context' => 'default',
-            'balance' => 0,
-            'earned_balance' => 0,
-            'currency' => $this->preferred_currency ?? 'USD',
-        ]);
+        return $this->hasMany(Transaction::class);
     }
 
-    public function payoutMethods(): HasMany
+    public function try_pay_unpaid_invoices()
     {
-        return $this->hasMany(\Modules\Core\Models\PayoutMethod::class, 'user_id');
+        foreach (
+            $this->invoices()
+                ->where('unpaid', '>', '0')
+                ->where('unpaid', '<=', $this->user_balance)
+                ->orderBy('id')
+                ->get()
+            as $invoice
+        ) {
+            $client_balance = $this->user_balance;
+            $invoice_total = $invoice->total();
+            if ((float) $client_balance >= (float) $invoice_total) {
+                $invoice->bill_invoice();
+            }
+        }
     }
 
-    public function withdrawals(): HasMany
+    public function balance($currency = null)
     {
-        return $this->hasMany(\Modules\Core\Models\UserWithdrawal::class, 'user_id');
+        return \App\Models\CurrenciesExchange::RateToday($this->user_balance, $this->currency ?? $this->preferred_currency, $currency);
+    }
+
+    public function add_balance($amount, $reason, $type, $currency = null, $project = null)
+    {
+        if ($amount == 0) {
+            return null;
+        }
+        if ($currency != null) {
+            $amount = \App\Models\CurrenciesExchange::RateToday($amount, $currency, $this->currency ?? $this->preferred_currency);
+        }
+        $currency = $this->currency ?? $this->preferred_currency ?? 'USD';
+
+        $client_balance = new Transaction();
+        $client_balance->project_id = optional($project)->id;
+        $client_balance->user_id = $this->id;
+        $client_balance->amount = $amount;
+        $client_balance->type = $type;
+        if (!empty($reason)) {
+            $client_balance->reason = $reason;
+        }
+        $client_balance->currency = $currency;
+
+        \Illuminate\Support\Facades\DB::transaction(function () use ($client_balance, $project, $amount, $type, $currency) {
+            $client_balance->save();
+
+            if (in_array($type, ['received', 'sent', 'refunded'])) {
+                $this->increment('total_paid', $amount);
+                optional($project)->increment('total_paid', $amount);
+            }
+
+            $this->increment('user_balance', $amount);
+            optional($project)->increment('project_balance', $amount);
+
+            if ($type != 'used') {
+                // ActionHelper::add_action_coins(...) // Omitted for now unless requested
+            }
+        });
+
+        return $client_balance->id;
     }
 
     public function kycDocuments(): HasMany

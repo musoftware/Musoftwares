@@ -13,7 +13,7 @@ use Modules\Booking\Models\BookingProvider;
 use Modules\Booking\Models\BookingAvailabilityRule;
 use Modules\Booking\Models\BookingBlockedDate;
 use App\Models\User;
-use Modules\Core\Models\WalletTransaction;
+use App\Models\Transaction;
 use App\Helpers\KashierHelper;
 use Inertia\Inertia;
 use Carbon\Carbon;
@@ -316,7 +316,7 @@ class BookingController extends Controller
         }
 
         $user = Auth::user();
-        $walletBalance = $user ? ($user->getWallet()->balance ?? 0) : 0;
+        $walletBalance = $user ? (float)$user->user_balance : 0;
 
         return Inertia::render('Booking/Checkout', [
             'booking' => $booking,
@@ -325,46 +325,31 @@ class BookingController extends Controller
     }
 
     /**
-     * Pay with Wallet.
+     * Pay with Balance.
      */
-    public function payWithWallet(Request $request, $id)
+    public function payWithBalance(Request $request, $id)
     {
         $booking = Booking::with('eventType')->findOrFail($id);
         $user = Auth::user();
+        $price = $booking->price;
 
         if (!$user) {
             return back()->withErrors(['error' => 'You must be logged in to pay with wallet.']);
         }
 
-        $wallet = $user->getWallet();
-        $price = $booking->price;
-
-        if ($wallet->balance < $price) {
-            return back()->withErrors(['error' => 'Insufficient wallet balance.']);
+        if ((float) $user->available_balance() < $price) {
+            return back()->withErrors(['error' => 'Insufficient balance.']);
         }
 
         try {
-            DB::transaction(function () use ($user, $wallet, $booking, $price) {
-                $balanceBefore = $wallet->balance;
-                $balanceAfter = $balanceBefore - $price;
-
-                $wallet->balance = $balanceAfter;
-                $wallet->save();
-
-                WalletTransaction::create([
-                    'wallet_id' => $wallet->id,
-                    'type' => 'debit',
-                    'amount' => $price,
-                    'balance_before' => $balanceBefore,
-                    'balance_after' => $balanceAfter,
-                    'reference_type' => 'booking_payment',
-                    'description' => "Booking payment for {$booking->eventType->title}",
-                ]);
+            DB::transaction(function () use ($user, $booking, $price) {
+                // Deduct from balance
+                $user->add_balance(-1 * $price, 'Booking Payment: ' . $booking->id, 'used');
 
                 $booking->status = 'confirmed';
                 $booking->payment_status = 'paid';
-                $booking->payment_method = 'wallet';
-                $booking->transaction_id = 'wallet_' . time();
+                $booking->payment_method = 'balance';
+                $booking->transaction_id = 'balance_' . time();
                 $booking->save();
                 
                 $this->handlePostBookingOperations($booking);
@@ -372,7 +357,7 @@ class BookingController extends Controller
 
             return redirect()->route('booking.success', $booking->id);
         } catch (\Exception $e) {
-            Log::error('Booking wallet payment failed: ' . $e->getMessage());
+            Log::error('Booking balance payment failed: ' . $e->getMessage());
             return back()->withErrors(['error' => 'Payment failed.']);
         }
     }

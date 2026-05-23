@@ -4,7 +4,7 @@ namespace App\Helpers;
 
 use App\Models\ShopGovernorate;
 use App\Models\User;
-use App\Models\Finance\Currency;
+use App\Models\Currency;
 use Asantibanez\LivewireCharts\Models\ColumnChartModel;
 use Asantibanez\LivewireCharts\Models\LineChartModel;
 use Illuminate\Support\Facades\Auth;
