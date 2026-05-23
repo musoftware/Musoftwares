@@ -9,9 +9,9 @@ use Exception;
 
 class PointsService
 {
-    public function credit(User $user, int $points, string $type, ?string $reference = null)
+    public function credit(User $user, int $points, string $type, ?string $reference = null, ?string $description = null)
     {
-        return DB::transaction(function () use ($user, $points, $type, $reference) {
+        return DB::transaction(function () use ($user, $points, $type, $reference, $description) {
             $user = User::lockForUpdate()->find($user->id);
 
             $transaction = PointTransaction::create([
@@ -20,6 +20,7 @@ class PointsService
                 'points' => $points,
                 'reference_type' => $type,
                 'reference_id' => $reference,
+                'description' => $description,
             ]);
 
             $user->points_balance = ($user->points_balance ?? 0) + $points;
@@ -29,9 +30,9 @@ class PointsService
         });
     }
 
-    public function debit(User $user, int $points, string $type, ?string $reference = null)
+    public function debit(User $user, int $points, string $type, ?string $reference = null, ?string $description = null)
     {
-        return DB::transaction(function () use ($user, $points, $type, $reference) {
+        return DB::transaction(function () use ($user, $points, $type, $reference, $description) {
             $user = User::lockForUpdate()->find($user->id);
 
             if (($user->points_balance ?? 0) < $points) {
@@ -44,6 +45,7 @@ class PointsService
                 'points' => $points,
                 'reference_type' => $type,
                 'reference_id' => $reference,
+                'description' => $description,
             ]);
 
             $user->points_balance -= $points;
