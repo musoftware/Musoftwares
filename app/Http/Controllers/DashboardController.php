@@ -6,8 +6,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use App\Models\Transaction;
-use App\Models\SupportTicket;
-use App\Models\UserWithdrawal;
+use App\Models\Ticket;
+use App\Models\UserReferralRequestWithdraw;
 use Modules\ERP\Models\Invoice;
 use Modules\ERP\Models\TenantClient;
 use Modules\ERP\Models\RecurringEntry;
@@ -89,12 +89,12 @@ class DashboardController extends Controller
             });
 
         // ── Support Tickets ──────────────────────────────────────
-        $openTicketsCount = SupportTicket::where('client_id', $user->id)
-            ->where('status', '!=', 'resolved')
+        $openTicketsCount = Ticket::where('user_id', $user->id)
+            ->where('ticket_status', '!=', 'resolved')
             ->count();
 
         // ── Pending Withdrawals ──────────────────────────────────
-        $pendingWithdrawals = UserWithdrawal::where('user_id', $user->id)
+        $pendingWithdrawals = UserReferralRequestWithdraw::where('user_id', $user->id)
             ->where('status', 'pending')
             ->count();
 
@@ -167,7 +167,7 @@ class DashboardController extends Controller
             'totalMonthlySubscription' => $totalMonthlySubscription,
             'openTickets'         => $openTicketsCount,
             'pendingWithdrawals'  => $pendingWithdrawals,
-            'currency'            => $user->preferred_currency ?? 'USD',
+            'currency'            => $user->currency_name(),
         ];
 
         // ── Active Tool Licenses (Marketplace) ──────────────────

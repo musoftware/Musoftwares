@@ -18,7 +18,7 @@ return new class extends Migration
             $table->unsignedBigInteger('cost_transaction_id')->unique();
             $table->foreign('cost_transaction_id')->references('id')->on('cost_transactions')->cascadeOnDelete();
             $table->unsignedBigInteger('invoice_id');
-            $table->foreign('invoice_id')->references('id')->on('invoices');
+            $table->foreign('invoice_id')->references('id')->on('erp_invoices');
         });
     }
 

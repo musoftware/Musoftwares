@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use App\Helpers\BalancesHelper;
-use App\Helpers\FinanceHelper;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
@@ -23,6 +22,11 @@ class UserReferralRequestWithdraw extends Model
         return $this->belongsTo(UserPaymentMethod::class, 'user_payment_method_id');
     }
 
+    public function payoutMethod()
+    {
+        return $this->belongsTo(UserPaymentMethod::class, 'user_payment_method_id');
+    }
+
     public function cost_transaction()
     {
         return $this->belongsTo(CostTransaction::class);
@@ -34,18 +38,18 @@ class UserReferralRequestWithdraw extends Model
 
     public function icon()
     {
-        return $this->user_payment_method->icon();
+        return $this->user_payment_method ? $this->user_payment_method->icon() : null;
     }
 
     public function type_name()
     {
-        return $this->user_payment_method->type_name();
+        return $this->user_payment_method ? $this->user_payment_method->type_name() : null;
     }
 
 
     public function method_details()
     {
-        return $this->user_payment_method->method_details();
+        return $this->user_payment_method ? $this->user_payment_method->method_details() : null;
     }
 
     public function equivalent_amount()
@@ -81,6 +85,8 @@ class UserReferralRequestWithdraw extends Model
             $user = User::find($new_withdraw->user_id);
             $user->increment('withdrawing_commission', $new_withdraw->amount);
         });
+        
+        return $new_withdraw;
     }
 
     public function changeStatus($new_status)
@@ -89,11 +95,6 @@ class UserReferralRequestWithdraw extends Model
             $user = User::find($this->user_id);
 
             if ($this->transaction_id == null && $new_status == 'approved') {
-
-                //Wrong while SEND Status Already Decrease Income
-                // $this->cost_transaction_id = $this->user->add_cost_balance($this->amount, 'Withdraw', $this->currency, null);
-                // $this->save();
-
                 $this->transaction_id = $this->user->add_balance(
                     -1 * abs($this->amount),
                     'Withdraw',
@@ -119,7 +120,9 @@ class UserReferralRequestWithdraw extends Model
                 optional($this->cost_transaction)->delete();
                 optional($this->transaction)->delete();
             }
-            BalancesHelper::UpdateBalance($this->user);
+            if (class_exists(BalancesHelper::class)) {
+                BalancesHelper::UpdateBalance($this->user);
+            }
         });
     }
 

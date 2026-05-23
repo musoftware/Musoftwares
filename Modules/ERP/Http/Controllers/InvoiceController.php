@@ -94,7 +94,7 @@ class InvoiceController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'client_id' => 'required|exists:tenant_clients,id',
+            'client_id' => 'required|exists:erp_tenant_clients,id',
             'project_id' => 'nullable|exists:projects,id',
             'invoice_number' => 'required|string',
             'issued_at' => 'required|date',
@@ -239,7 +239,7 @@ class InvoiceController extends Controller
     public function update(Request $request, Invoice $invoice)
     {
         $validated = $request->validate([
-            'client_id' => 'required|exists:tenant_clients,id',
+            'client_id' => 'required|exists:erp_tenant_clients,id',
             'project_id' => 'nullable|exists:projects,id',
             'issued_at' => 'required|date',
             'due_date' => 'required|date|after_or_equal:issued_at',

@@ -109,7 +109,7 @@ class WithdrawalWorkflowTest extends TestCase
             ]);
 
         $response->assertStatus(302);
-        $this->assertDatabaseHas('withdrawals', [
+        $this->assertDatabaseHas('erp_withdrawals', [
             'client_id' => $this->client->id,
             'amount' => 500.00,
             'status' => 'pending',
@@ -127,7 +127,7 @@ class WithdrawalWorkflowTest extends TestCase
             ]);
 
         $response->assertSessionHasErrors();
-        $this->assertDatabaseMissing('withdrawals', [
+        $this->assertDatabaseMissing('erp_withdrawals', [
             'client_id' => $this->client->id,
             'amount' => 2500.00,
         ]);

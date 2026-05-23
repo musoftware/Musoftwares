@@ -66,9 +66,9 @@ class WithdrawalController extends Controller
         $tenant = $this->resolveTenant();
 
         $request->validate([
-            'client_id'         => 'required|exists:tenant_clients,id',
+            'client_id'         => 'required|exists:erp_tenant_clients,id',
             'amount'            => 'required|numeric|min:0.01',
-            'payment_method_id' => 'required|exists:payment_methods,id',
+            'payment_method_id' => 'required|exists:erp_payment_methods,id',
         ]);
 
         // Verify client belongs to this tenant

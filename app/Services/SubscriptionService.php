@@ -11,35 +11,14 @@ use Carbon\Carbon;
 class SubscriptionService
 {
     /**
-     * Get the user's active platform subscription (if any).
+     * Get the user's active plan (if any).
      */
-    public function getActiveSubscription(User $user, ?string $module = null): ?PlatformSubscription
+    public function getActiveSubscription(User $user, ?string $module = null)
     {
-        $query = PlatformSubscription::with('plan')
-            ->forUser($user->id)
-            ->active();
-
-        // If a module is specified, filter to subscriptions that include it
-        if ($module) {
-            $query->where(function ($q) use ($module) {
-                // Fixed plans: check plan's included_modules
-                $q->whereHas('plan', function ($planQ) use ($module) {
-                    $planQ->where('is_custom', false)
-                        ->where(function ($inner) use ($module) {
-                            $inner->whereJsonContains('included_modules', $module)
-                                  ->orWhereJsonContains('included_modules', '*');
-                        });
-                })
-                // Custom plans: check custom_items
-                ->orWhere(function ($customQ) use ($module) {
-                    $customQ->whereHas('plan', function ($planQ) {
-                        $planQ->where('is_custom', true);
-                    })->whereJsonContains('custom_items', $module);
-                });
-            });
+        if ($user->hasSubscription()) {
+            return $user->plan;
         }
-
-        return $query->first();
+        return null;
     }
 
     /**
@@ -52,7 +31,7 @@ class SubscriptionService
             return true;
         }
 
-        return $this->getActiveSubscription($user, $module) !== null;
+        return $user->hasSubscription();
     }
 
     /**
@@ -64,26 +43,7 @@ class SubscriptionService
             return true;
         }
 
-        $sub = PlatformSubscription::with('plan')
-            ->forUser($user->id)
-            ->active()
-            ->where(function ($q) use ($toolSlug) {
-                $q->whereHas('plan', function ($planQ) use ($toolSlug) {
-                    $planQ->where('is_custom', false)
-                        ->where(function ($inner) use ($toolSlug) {
-                            $inner->whereJsonContains('included_tools', $toolSlug)
-                                  ->orWhereJsonContains('included_tools', '*');
-                        });
-                })
-                ->orWhere(function ($customQ) use ($toolSlug) {
-                    $customQ->whereHas('plan', function ($planQ) {
-                        $planQ->where('is_custom', true);
-                    })->whereJsonContains('custom_items', $toolSlug);
-                });
-            })
-            ->first();
-
-        return $sub !== null;
+        return $user->hasSubscription();
     }
 
     /**
@@ -95,7 +55,7 @@ class SubscriptionService
             return true;
         }
 
-        return PlatformSubscription::forUser($user->id)->active()->exists();
+        return $user->hasSubscription();
     }
 
     /**
@@ -103,35 +63,16 @@ class SubscriptionService
      */
     public function calculateCustomPrice(array $itemSlugs, string $cycle = 'monthly'): array
     {
-        $items = PlatformServiceItem::active()
-            ->whereIn('slug', $itemSlugs)
-            ->orderBy('sort_order')
-            ->get();
-
-        $total = 0;
-        $breakdown = [];
-
-        foreach ($items as $item) {
-            $price = $item->priceFor($cycle);
-            $total += $price;
-            $breakdown[] = [
-                'slug'  => $item->slug,
-                'name'  => $item->name,
-                'type'  => $item->type,
-                'price' => $price,
-            ];
-        }
-
+        // Legacy system didn't have dynamic custom tool pricing like this.
         return [
-            'total'     => round($total, 2),
+            'total'     => 0,
             'cycle'     => $cycle,
-            'breakdown' => $breakdown,
+            'breakdown' => [],
         ];
     }
 
     /**
      * Get subscription limits for a user and module.
-     * Preserves the original behavior for backward compatibility.
      */
     public function getLimits(User $user, string $module): array
     {
@@ -144,9 +85,7 @@ class SubscriptionService
             ];
         }
 
-        $activeSub = $this->getActiveSubscription($user, $module);
-
-        if (!$activeSub) {
+        if (!$user->hasSubscription()) {
             if ($module === 'freelance') {
                 return ['connects' => 20, 'commission_rate' => 10.0];
             }
@@ -156,13 +95,8 @@ class SubscriptionService
             return ['projects' => 0, 'invoices' => 0, 'tasks' => 0, 'team_members' => 0];
         }
 
-        $planSlug = $activeSub->plan->slug ?? '';
-
         if ($module === 'erp') {
-            if (in_array($planSlug, ['business_suite', 'professional'])) {
-                return ['projects' => -1, 'invoices' => -1, 'tasks' => -1, 'team_members' => 10];
-            }
-            return ['projects' => 5, 'invoices' => 10, 'tasks' => 50, 'team_members' => 2];
+            return ['projects' => -1, 'invoices' => -1, 'tasks' => -1, 'team_members' => 10];
         }
 
         if ($module === 'freelance') {

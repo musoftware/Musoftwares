@@ -7,9 +7,11 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class TenantClient extends TenantModel
 {
+    protected $table = 'erp_tenant_clients';
+
     protected $fillable = [
         'tenant_id', 'user_id', 'name', 'email', 'phone', 'address', 'currency',
-        'country_code', 'referral_code', 'referred_by', 'status'
+        'country_code', 'status'
     ];
 
     public function tenant(): BelongsTo
@@ -20,11 +22,6 @@ class TenantClient extends TenantModel
     public function user(): BelongsTo
     {
         return $this->belongsTo(\App\Models\User::class, 'user_id');
-    }
-
-    public function referrer(): BelongsTo
-    {
-        return $this->belongsTo(TenantClient::class, 'referred_by');
     }
 
     public function invoices(): HasMany
@@ -40,11 +37,6 @@ class TenantClient extends TenantModel
     public function projects(): HasMany
     {
         return $this->hasMany(Project::class, 'client_id');
-    }
-
-    public function supportTickets(): HasMany
-    {
-        return $this->hasMany(SupportTicket::class, 'client_id');
     }
 
     public function activities(): HasMany

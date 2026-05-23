@@ -9,7 +9,7 @@ return new class extends Migration
     public function up(): void
     {
         if (!Schema::hasColumn('tenant_clients', 'address')) {
-            Schema::table('tenant_clients', function (Blueprint $table) {
+            Schema::table('erp_tenant_clients', function (Blueprint $table) {
                 $table->string('address')->nullable()->after('phone');
             });
         }
@@ -18,7 +18,7 @@ return new class extends Migration
     public function down(): void
     {
         if (Schema::hasColumn('tenant_clients', 'address')) {
-            Schema::table('tenant_clients', function (Blueprint $table) {
+            Schema::table('erp_tenant_clients', function (Blueprint $table) {
                 $table->dropColumn('address');
             });
         }

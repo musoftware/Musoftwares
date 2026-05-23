@@ -39,7 +39,7 @@ class BackfillTenantClientUserIds extends Command
         );
 
         // Fetch all tenant_clients where user_id is still NULL and email is set
-        $query = DB::table('tenant_clients')
+        $query = DB::table('erp_tenant_clients')
             ->whereNull('user_id')
             ->whereNotNull('email');
 
@@ -66,7 +66,7 @@ class BackfillTenantClientUserIds extends Command
                 $matched++;
 
                 if (!$dryRun) {
-                    DB::table('tenant_clients')
+                    DB::table('erp_tenant_clients')
                         ->where('id', $client->id)
                         ->update(['user_id' => $user]);
                 }

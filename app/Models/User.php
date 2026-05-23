@@ -66,9 +66,9 @@ class User extends Authenticatable
         ];
     }
 
-    public function supportTickets(): HasMany
+    public function tickets(): HasMany
     {
-        return $this->hasMany(\App\Models\SupportTicket::class, 'client_id');
+        return $this->hasMany(\App\Models\Ticket::class, 'user_id');
     }
 
     public function conversationParticipations(): HasMany
@@ -116,8 +116,8 @@ class User extends Authenticatable
         $locked = 0;
 
         // 1. Pending withdrawals
-        if (class_exists(\App\Models\UserWithdrawal::class)) {
-            $locked += $this->withdrawals()->where('status', 'pending')->sum('amount');
+        if (class_exists(\App\Models\UserReferralRequestWithdraw::class)) {
+            $locked += $this->withdraw()->where('status', 'pending')->sum('amount');
         }
 
         // 2. Active Freelance Contracts
@@ -126,7 +126,7 @@ class User extends Authenticatable
                 ->where('status', 'active')
                 ->get();
             foreach ($contracts as $contract) {
-                $locked += \App\Models\CurrenciesExchange::RateToday($contract->amount, $contract->currency_code ?? 'USD', $this->preferred_currency ?? 'USD');
+                $locked += \App\Models\CurrenciesExchange::RateToday($contract->amount, $contract->currency_code, $this->currency);
             }
         }
 
@@ -138,9 +138,9 @@ class User extends Authenticatable
             
         foreach ($unpaidInvoices as $invoice) {
             $schedule = $invoice->getSchedule();
-            $invoiceTotal = \App\Models\CurrenciesExchange::RateToday($invoice->total(), $invoice->currency, $this->preferred_currency ?? 'USD');
-            $invoicePaid = \App\Models\CurrenciesExchange::RateToday($invoice->paid, $invoice->currency, $this->preferred_currency ?? 'USD');
-            $invoiceUnpaid = \App\Models\CurrenciesExchange::RateToday($invoice->unpaid, $invoice->currency, $this->preferred_currency ?? 'USD');
+            $invoiceTotal = \App\Models\CurrenciesExchange::RateToday($invoice->total(), $invoice->currency, $this->currency);
+            $invoicePaid = \App\Models\CurrenciesExchange::RateToday($invoice->paid, $invoice->currency, $this->currency);
+            $invoiceUnpaid = \App\Models\CurrenciesExchange::RateToday($invoice->unpaid, $invoice->currency, $this->currency);
 
             if ($schedule) {
                 $startDate = \Carbon\Carbon::parse($schedule['start_date'] ?? $invoice->created_at);
@@ -180,9 +180,9 @@ class User extends Authenticatable
             $deductionForInvoice = 0;
 
             // Convert everything to User Currency for calculation
-            $invoiceTotal = \App\Models\CurrenciesExchange::RateToday($invoice->total(), $invoice->currency, $this->preferred_currency ?? 'USD');
-            $invoicePaid = \App\Models\CurrenciesExchange::RateToday($invoice->paid, $invoice->currency, $this->preferred_currency ?? 'USD');
-            $invoiceUnpaid = \App\Models\CurrenciesExchange::RateToday($invoice->unpaid, $invoice->currency, $this->preferred_currency ?? 'USD');
+            $invoiceTotal = \App\Models\CurrenciesExchange::RateToday($invoice->total(), $invoice->currency, $this->currency);
+            $invoicePaid = \App\Models\CurrenciesExchange::RateToday($invoice->paid, $invoice->currency, $this->currency);
+            $invoiceUnpaid = \App\Models\CurrenciesExchange::RateToday($invoice->unpaid, $invoice->currency, $this->currency);
 
             if ($schedule) {
                 // Parse schedule
@@ -222,8 +222,8 @@ class User extends Authenticatable
 
         $available = round($currentBalance - $totalDeduction, 2);
 
-        if ($currency && $currency != ($this->preferred_currency ?? 'USD')) {
-            return \App\Models\CurrenciesExchange::RateToday($available, $this->preferred_currency ?? 'USD', $currency);
+        if ($currency && $currency != $this->currency) {
+            return \App\Models\CurrenciesExchange::RateToday($available, $this->currency, $currency);
         }
 
         return $available;
@@ -232,6 +232,16 @@ class User extends Authenticatable
     public function transactions()
     {
         return $this->hasMany(Transaction::class);
+    }
+
+    public function withdraw()
+    {
+        return $this->hasMany(\App\Models\UserReferralRequestWithdraw::class);
+    }
+
+    public function currency_name()
+    {
+        return \App\Models\Currency::query()->find($this->currency)->currency;
     }
 
     public function client_balance()
@@ -259,7 +269,7 @@ class User extends Authenticatable
 
     public function balance($currency = null)
     {
-        return \App\Models\CurrenciesExchange::RateToday($this->user_balance, $this->currency ?? $this->preferred_currency, $currency);
+        return \App\Models\CurrenciesExchange::RateToday($this->user_balance, $this->currency, $currency);
     }
 
     public function add_balance($amount, $reason, $type, $currency = null, $project = null)
@@ -268,9 +278,9 @@ class User extends Authenticatable
             return null;
         }
         if ($currency != null) {
-            $amount = \App\Models\CurrenciesExchange::RateToday($amount, $currency, $this->currency ?? $this->preferred_currency);
+            $amount = \App\Models\CurrenciesExchange::RateToday($amount, $currency, $this->currency);
         }
-        $currency = $this->currency ?? $this->preferred_currency ?? 'USD';
+        $currency = $this->currency;
 
         $client_balance = new Transaction();
         $client_balance->project_id = optional($project)->id;
@@ -319,6 +329,26 @@ class User extends Authenticatable
     public function serialUserDevices(): HasMany
     {
         return $this->hasMany(SerialUserDevice::class, 'user_id');
+    }
+
+    public function platformSubscriptions(): HasMany
+    {
+        return $this->hasMany(\App\Models\PlatformSubscription::class);
+    }
+
+    public function activePlatformSubscription()
+    {
+        return $this->hasOne(\App\Models\PlatformSubscription::class)->active()->latest();
+    }
+
+    public function hasSubscription(): bool
+    {
+        return $this->platformSubscriptions()->active()->exists();
+    }
+
+    public function getPlanAttribute()
+    {
+        return $this->activePlatformSubscription?->plan;
     }
 }
 

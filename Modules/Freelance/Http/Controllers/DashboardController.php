@@ -71,10 +71,10 @@ class DashboardController extends Controller
             $activities[] = [
                 'id' => 'p_'.$prop->id,
                 'type' => 'proposal',
-                'text' => 'Submitted bid for "' . ($prop->job->title ?? 'Unknown') . '"',
-                'time' => $prop->created_at->diffForHumans(),
+                'description' => 'Submitted bid for "' . ($prop->job->title ?? 'Unknown') . '"',
+                'created_at' => $prop->created_at->toISOString(),
                 'timestamp' => $prop->created_at->timestamp,
-                'color' => 'text-blue-500 bg-blue-50'
+                'color' => 'blue'
             ];
         }
 
@@ -84,10 +84,10 @@ class DashboardController extends Controller
             $activities[] = [
                 'id' => 'c_'.$contract->id,
                 'type' => 'contract',
-                'text' => $statusText . ' "' . ($contract->job->title ?? 'Unknown') . '"',
-                'time' => $contract->updated_at->diffForHumans(),
+                'description' => $statusText . ' "' . ($contract->job->title ?? 'Unknown') . '"',
+                'created_at' => $contract->updated_at->toISOString(),
                 'timestamp' => $contract->updated_at->timestamp,
-                'color' => 'text-emerald-500 bg-emerald-50'
+                'color' => 'emerald'
             ];
         }
 
@@ -96,10 +96,10 @@ class DashboardController extends Controller
             $activities[] = [
                 'id' => 'pt_'.$pt->id,
                 'type' => 'connects',
-                'text' => $pt->description ?? 'Connects transaction',
-                'time' => $pt->created_at->diffForHumans(),
+                'description' => $pt->description ?? 'Connects transaction',
+                'created_at' => $pt->created_at->toISOString(),
                 'timestamp' => $pt->created_at->timestamp,
-                'color' => 'text-amber-500 bg-amber-50'
+                'color' => 'amber'
             ];
         }
 
@@ -199,10 +199,10 @@ class DashboardController extends Controller
             $clientActivitiesList[] = [
                 'id' => 'j_'.$job->id,
                 'type' => 'job',
-                'text' => 'Posted job "' . $job->title . '"',
-                'time' => $job->created_at->diffForHumans(),
+                'description' => 'Posted job "' . $job->title . '"',
+                'created_at' => $job->created_at->toISOString(),
                 'timestamp' => $job->created_at->timestamp,
-                'color' => 'text-indigo-500 bg-indigo-50'
+                'color' => 'indigo'
             ];
         }
 
@@ -213,10 +213,10 @@ class DashboardController extends Controller
             $clientActivitiesList[] = [
                 'id' => 'pr_'.$prop->id,
                 'type' => 'proposal_received',
-                'text' => ($prop->freelancer->name ?? 'A freelancer') . ' bid on "' . ($prop->job->title ?? 'Unknown') . '"',
-                'time' => $prop->created_at->diffForHumans(),
+                'description' => ($prop->freelancer->name ?? 'A freelancer') . ' bid on "' . ($prop->job->title ?? 'Unknown') . '"',
+                'created_at' => $prop->created_at->toISOString(),
                 'timestamp' => $prop->created_at->timestamp,
-                'color' => 'text-blue-500 bg-blue-50'
+                'color' => 'blue'
             ];
         }
 
@@ -226,10 +226,10 @@ class DashboardController extends Controller
             $clientActivitiesList[] = [
                 'id' => 'cc_'.$contract->id,
                 'type' => 'contract',
-                'text' => $statusText . ' "' . ($contract->job->title ?? 'Unknown') . '"',
-                'time' => $contract->updated_at->diffForHumans(),
+                'description' => $statusText . ' "' . ($contract->job->title ?? 'Unknown') . '"',
+                'created_at' => $contract->updated_at->toISOString(),
                 'timestamp' => $contract->updated_at->timestamp,
-                'color' => 'text-emerald-500 bg-emerald-50'
+                'color' => 'emerald'
             ];
         }
 

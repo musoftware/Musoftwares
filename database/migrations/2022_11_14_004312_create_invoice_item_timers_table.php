@@ -23,7 +23,7 @@ return new class extends Migration
             $table->foreign('project_id')->references('id')->on('projects')->onDelete('cascade');
 
             $table->bigInteger('invoice_item_id')->unsigned()->index();
-            $table->foreign('invoice_item_id')->references('id')->on('invoice_items')->onDelete('cascade');
+            $table->foreign('invoice_item_id')->references('id')->on('erp_invoice_items')->onDelete('cascade');
 
             $table->dateTime('date_start')->nullable();
             $table->dateTime('date_end')->nullable();

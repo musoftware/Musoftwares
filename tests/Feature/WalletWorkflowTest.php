@@ -73,7 +73,7 @@ class WalletWorkflowTest extends TestCase
 
         $response->assertStatus(302);
         $this->assertEquals(1250.00, $this->wallet->fresh()->balance);
-        $this->assertDatabaseHas('client_wallet_transactions', [
+        $this->assertDatabaseHas('erp_client_wallet_transactions', [
             'wallet_id' => $this->wallet->id,
             'type' => 'manual_credit',
             'amount' => 250.00,
@@ -92,7 +92,7 @@ class WalletWorkflowTest extends TestCase
 
         $response->assertStatus(302);
         $this->assertEquals(600.00, $this->wallet->fresh()->balance);
-        $this->assertDatabaseHas('client_wallet_transactions', [
+        $this->assertDatabaseHas('erp_client_wallet_transactions', [
             'wallet_id' => $this->wallet->id,
             'type' => 'manual_debit',
             'amount' => 400.00,
@@ -112,7 +112,7 @@ class WalletWorkflowTest extends TestCase
         $response->assertStatus(302);
         $this->assertEquals(800.00, $this->wallet->fresh()->balance);
         $this->assertEquals(300.00, $this->wallet->fresh()->locked_balance);
-        $this->assertDatabaseHas('client_wallet_transactions', [
+        $this->assertDatabaseHas('erp_client_wallet_transactions', [
             'wallet_id' => $this->wallet->id,
             'type' => 'manual_debit',
             'amount' => 200.00,
@@ -132,7 +132,7 @@ class WalletWorkflowTest extends TestCase
         $response->assertStatus(302);
         $this->assertEquals(1050.00, $this->wallet->fresh()->balance);
         $this->assertEquals(50.00, $this->wallet->fresh()->locked_balance);
-        $this->assertDatabaseHas('client_wallet_transactions', [
+        $this->assertDatabaseHas('erp_client_wallet_transactions', [
             'wallet_id' => $this->wallet->id,
             'type' => 'manual_credit',
             'amount' => 50.00,

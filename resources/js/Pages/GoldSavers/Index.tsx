@@ -7,7 +7,6 @@ import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/Components/ui/table';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/Components/ui/select';
-import { Checkbox } from '@/Components/ui/checkbox';
 import { Plus, Trash2, TrendingUp, Coins } from 'lucide-react';
 
 interface GoldSaverRecord {

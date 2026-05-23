@@ -10,6 +10,8 @@ use Laravel\Scout\Searchable;
 
 class Invoice extends TenantModel
 {
+    protected $table = 'erp_invoices';
+
     use Searchable;
     protected $fillable = [
         'tenant_id', 'invoice_number', 'client_id', 'project_id', 'status',

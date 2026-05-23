@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::create('invoice_cost_accruals', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('invoice_id')->constrained('invoices')->cascadeOnDelete();
+            $table->foreignId('invoice_id')->constrained('erp_invoices')->cascadeOnDelete();
             $table->unsignedBigInteger('user_id');
             $table->foreign('user_id')->references('id')->on('users')->cascadeOnDelete();
             $table->double('amount', 23, 3);

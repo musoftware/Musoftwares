@@ -25,7 +25,7 @@ class ProjectController extends Controller
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'client_id' => 'required|exists:tenant_clients,id',
+            'client_id' => 'required|exists:erp_tenant_clients,id',
             'status' => 'required|string|in:Planning,Active,On Hold,Completed,Cancelled',
             'budget' => 'nullable|numeric|min:0',
             'due_date' => 'nullable|date',
@@ -66,7 +66,7 @@ class ProjectController extends Controller
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'client_id' => 'required|exists:tenant_clients,id',
+            'client_id' => 'required|exists:erp_tenant_clients,id',
             'status' => 'required|string|in:Planning,Active,On Hold,Completed,Cancelled',
             'budget' => 'nullable|numeric|min:0',
             'due_date' => 'nullable|date',

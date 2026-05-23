@@ -24,9 +24,7 @@ return new class extends Migration
                 ->onDelete('cascade');
 
             // The approved task that triggered this earning
-            $table->foreignId('freelancer_task_id')
-                ->constrained('freelancer_tasks')
-                ->onDelete('cascade');
+            $table->foreignId('freelancer_task_id')->index();
 
             // Payment amount
             $table->decimal('amount', 10, 2)->default(0);
