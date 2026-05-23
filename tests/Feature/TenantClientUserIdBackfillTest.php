@@ -30,7 +30,7 @@ class TenantClientUserIdBackfillTest extends TestCase
         ]);
 
         // Insert a tenant_client with same email but no user_id
-        $clientId = DB::table('tenant_clients')->insertGetId([
+        $clientId = DB::table('erp_tenant_clients')->insertGetId([
             'tenant_id'  => $tenant->id,
             'name'       => 'Matched Client',
             'email'      => 'match@example.com',
@@ -45,7 +45,7 @@ class TenantClientUserIdBackfillTest extends TestCase
         $this->assertEquals(0, $exitCode);
 
         // user_id should now be populated
-        $this->assertDatabaseHas('tenant_clients', [
+        $this->assertDatabaseHas('erp_tenant_clients', [
             'id'      => $clientId,
             'user_id' => $user->id,
         ]);
@@ -61,7 +61,7 @@ class TenantClientUserIdBackfillTest extends TestCase
             'status'  => 'active',
         ]);
 
-        $clientId = DB::table('tenant_clients')->insertGetId([
+        $clientId = DB::table('erp_tenant_clients')->insertGetId([
             'tenant_id'  => $tenant->id,
             'name'       => 'Orphan Client',
             'email'      => 'nobody@nonexistent.com', // no user with this email
@@ -74,7 +74,7 @@ class TenantClientUserIdBackfillTest extends TestCase
         Artisan::call('erp:backfill-client-user-ids');
 
         // user_id should still be null
-        $this->assertDatabaseHas('tenant_clients', [
+        $this->assertDatabaseHas('erp_tenant_clients', [
             'id'      => $clientId,
             'user_id' => null,
         ]);
@@ -90,7 +90,7 @@ class TenantClientUserIdBackfillTest extends TestCase
             'status'  => 'active',
         ]);
 
-        $clientId = DB::table('tenant_clients')->insertGetId([
+        $clientId = DB::table('erp_tenant_clients')->insertGetId([
             'tenant_id'  => $tenant->id,
             'name'       => 'Dry Client',
             'email'      => 'dryrun@example.com',
@@ -103,7 +103,7 @@ class TenantClientUserIdBackfillTest extends TestCase
         Artisan::call('erp:backfill-client-user-ids', ['--dry-run' => true]);
 
         // user_id must remain null in dry-run mode
-        $this->assertDatabaseHas('tenant_clients', [
+        $this->assertDatabaseHas('erp_tenant_clients', [
             'id'      => $clientId,
             'user_id' => null,
         ]);
@@ -120,7 +120,7 @@ class TenantClientUserIdBackfillTest extends TestCase
         ]);
 
         // Client already has user_id set
-        DB::table('tenant_clients')->insertGetId([
+        DB::table('erp_tenant_clients')->insertGetId([
             'tenant_id'  => $tenant->id,
             'name'       => 'Already Linked Client',
             'email'      => 'already@example.com',

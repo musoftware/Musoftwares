@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class TimerSession extends Model
 {
+    protected $table = 'erp_timer_sessions';
+
     protected $fillable = [
         'invoice_item_id', 'started_at', 'stopped_at', 'duration_seconds',
         'started_by', 'stopped_by', 'note'

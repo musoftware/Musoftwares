@@ -33,7 +33,19 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/onboarding-wizard', [\App\Http\Controllers\OnboardingController::class, 'store'])->name('onboarding.store');
     Route::post('/product-tour/status', [\App\Http\Controllers\OnboardingController::class, 'updateTourStatus'])->name('product-tour.status');
     Route::get('/onboarding-wizard/cities/{countryName}', [\App\Http\Controllers\OnboardingController::class, 'getCities'])->name('onboarding.cities');
+
+    // Referral System
+    Route::get('/referrals', [\App\Http\Controllers\ReferralController::class, 'index'])->name('referrals.index');
+    Route::get('/referrals/earnings', [\App\Http\Controllers\ReferralController::class, 'earns'])->name('referrals.earns');
+    Route::get('/referrals/registers', [\App\Http\Controllers\ReferralController::class, 'registers'])->name('referrals.registers');
+    Route::post('/referrals', [\App\Http\Controllers\ReferralController::class, 'store_referral'])->name('referrals.store');
+    Route::post('/referrals/update-slug', [\App\Http\Controllers\ReferralController::class, 'update_slug'])->name('referrals.update_slug');
+    Route::post('/referrals/activate', [\App\Http\Controllers\ReferralController::class, 'activate_ref'])->name('referrals.activate');
+    Route::post('/referrals/reward', [\App\Http\Controllers\ReferralController::class, 'reward'])->name('referrals.reward');
 });
+
+// Public Referral Redirect Route
+Route::get('/r/{ref}', [\App\Http\Controllers\ReferralController::class, 'referral_redirect'])->name('ref');
 
 Route::get('/fix-cities', function() {
     \Illuminate\Support\Facades\DB::table('cities')->truncate();
@@ -103,10 +115,6 @@ Route::middleware(['auth', 'verified', 'onboarding', 'subscription:erp', 'erp.te
     Route::post('/payment-methods/{payment_method}/approve', [\Modules\ERP\Http\Controllers\PaymentMethodController::class, 'approve'])->name('payment-methods.approve');
     Route::post('/payment-methods/{payment_method}/reject', [\Modules\ERP\Http\Controllers\PaymentMethodController::class, 'reject'])->name('payment-methods.reject');
 
-    // Referrals
-    Route::get('/referrals', [\Modules\ERP\Http\Controllers\ReferralController::class, 'index'])->name('referrals.index');
-    Route::get('/referrals/tree/{client}', [\Modules\ERP\Http\Controllers\ReferralController::class, 'tree'])->name('referrals.tree');
-    Route::get('/referrals/earnings', [\Modules\ERP\Http\Controllers\ReferralController::class, 'earnings'])->name('referrals.earnings');
 
     // Recurring
     Route::resource('recurring', \Modules\ERP\Http\Controllers\RecurringController::class);
@@ -142,10 +150,10 @@ Route::middleware(['auth', 'verified', 'onboarding', 'subscription:erp', 'erp.te
     Route::post('/clients/{client}/notes/{note}/unarchive', [\Modules\ERP\Http\Controllers\ClientNoteController::class, 'unarchive'])->name('clients.notes.unarchive');
 
     // ── ERP Support Tickets ───────────────────────────────────────────
-    Route::post('/tickets', [\Modules\ERP\Http\Controllers\SupportTicketController::class, 'store'])->name('tickets.store');
-    Route::post('/tickets/{ticket}/resolve', [\Modules\ERP\Http\Controllers\SupportTicketController::class, 'resolve'])->name('tickets.resolve');
-    Route::post('/tickets/{ticket}/close', [\Modules\ERP\Http\Controllers\SupportTicketController::class, 'close'])->name('tickets.close');
-    Route::delete('/tickets/{ticket}', [\Modules\ERP\Http\Controllers\SupportTicketController::class, 'destroy'])->name('tickets.destroy');
+    Route::post('/tickets', [\App\Http\Controllers\SupportTicketController::class, 'store'])->name('tickets.store');
+    Route::post('/tickets/{ticket}/resolve', [\App\Http\Controllers\SupportTicketController::class, 'resolve'])->name('tickets.resolve');
+    Route::post('/tickets/{ticket}/close', [\App\Http\Controllers\SupportTicketController::class, 'close'])->name('tickets.close');
+    Route::delete('/tickets/{ticket}', [\App\Http\Controllers\SupportTicketController::class, 'destroy'])->name('tickets.destroy');
 
     // ── ERP Workspace Notes ───────────────────────────────────────────
     // Tenant-scoped scratchpad notes for the ERP dashboard.

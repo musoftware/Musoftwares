@@ -10,7 +10,7 @@ class TenantFile extends Model
 {
     use SoftDeletes;
 
-    protected $table = 'tenant_files';
+    protected $table = 'erp_tenant_files';
 
     protected $fillable = [
         'tenant_id',

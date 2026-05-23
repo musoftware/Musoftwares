@@ -10,7 +10,7 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::table('invoices', function (Blueprint $table) {
+        Schema::table('erp_invoices', function (Blueprint $table) {
             $table->json('schedule')->nullable()->after('job_status');
         });
     }
@@ -20,7 +20,7 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        Schema::table('invoices', function (Blueprint $table) {
+        Schema::table('erp_invoices', function (Blueprint $table) {
             $table->dropColumn('schedule');
         });
     }

@@ -9,6 +9,8 @@ use App\Models\User;
 
 class Tenant extends Model
 {
+    protected $table = 'erp_tenants';
+
     protected $fillable = ['user_id', 'name', 'status', 'trial_ends_at', 'subscription_ends_at'];
 
     protected $casts = [

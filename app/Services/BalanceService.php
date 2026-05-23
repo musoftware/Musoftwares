@@ -4,7 +4,7 @@ namespace App\Services;
 
 use App\Models\User;
 use App\Models\Transaction;
-use App\Models\UserWithdrawal;
+use App\Models\UserReferralRequestWithdraw;
 use App\Services\ExchangeRateService;
 use Illuminate\Support\Facades\DB;
 
@@ -54,8 +54,8 @@ class BalanceService
      */
     public function pendingWithdrawalAmount(User $user): float
     {
-        return (float) UserWithdrawal::where('user_id', $user->id)
-            ->whereIn('status', ['pending', 'approved'])
+        return (float) UserReferralRequestWithdraw::where('user_id', $user->id)
+            ->whereIn('status', ['pending', 'processing'])
             ->sum('amount');
     }
 
@@ -65,8 +65,8 @@ class BalanceService
      */
     public function totalWithdrawn(User $user): float
     {
-        return (float) UserWithdrawal::where('user_id', $user->id)
-            ->where('status', 'paid')
+        return (float) UserReferralRequestWithdraw::where('user_id', $user->id)
+            ->where('status', 'approved')
             ->sum('amount');
     }
 

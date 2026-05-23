@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class RecurringEntry extends TenantModel
 {
+    protected $table = 'erp_recurring_entries';
+
     protected $fillable = [
         'tenant_id', 'type', 'title', 'description',
         'amount', 'amount_currency', 'business_amount', 'business_currency',

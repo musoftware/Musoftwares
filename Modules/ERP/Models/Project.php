@@ -5,6 +5,7 @@ namespace Modules\ERP\Models;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use App\Models\User;
+use App\Models\Ticket;
 
 class Project extends TenantModel
 {
@@ -43,7 +44,7 @@ class Project extends TenantModel
 
     public function tickets(): HasMany
     {
-        return $this->hasMany(SupportTicket::class, 'project_id');
+        return $this->hasMany(Ticket::class, 'project_id');
     }
 
     public function activities()

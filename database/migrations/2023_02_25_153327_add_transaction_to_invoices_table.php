@@ -13,7 +13,7 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::table('invoices', function (Blueprint $table) {
+        Schema::table('erp_invoices', function (Blueprint $table) {
 
             $table->bigInteger('transaction_id')->unsigned()->nullable();
             $table->foreign('transaction_id')->references('id')->on('transactions')->onDelete('set null');
@@ -31,7 +31,7 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::table('invoices', function (Blueprint $table) {
+        Schema::table('erp_invoices', function (Blueprint $table) {
             //
         });
     }

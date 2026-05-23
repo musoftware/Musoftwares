@@ -36,7 +36,7 @@ class RecurringEntrySchedulerTest extends TestCase
     public function test_processes_due_recurring_entry_and_creates_log(): void
     {
         // Create a recurring entry that is due today
-        $entry = DB::table('recurring_entries')->insertGetId([
+        $entry = DB::table('erp_recurring_entries')->insertGetId([
             'tenant_id'         => $this->tenant->id,
             'type'              => 'income',
             'title'             => 'Monthly Retainer',
@@ -60,13 +60,13 @@ class RecurringEntrySchedulerTest extends TestCase
         $this->assertEquals(0, $exitCode);
 
         // An execution log must be created
-        $this->assertDatabaseHas('recurring_execution_logs', [
+        $this->assertDatabaseHas('erp_recurring_execution_logs', [
             'recurring_entry_id' => $entry,
             'status'             => 'success',
         ]);
 
         // next_run_at must be advanced by 1 month
-        $updated = DB::table('recurring_entries')->where('id', $entry)->first();
+        $updated = DB::table('erp_recurring_entries')->where('id', $entry)->first();
         $this->assertEquals(
             Carbon::today()->addMonth()->toDateString(),
             Carbon::parse($updated->next_run_at)->toDateString()
@@ -75,7 +75,7 @@ class RecurringEntrySchedulerTest extends TestCase
 
     public function test_skips_inactive_recurring_entries(): void
     {
-        DB::table('recurring_entries')->insertGetId([
+        DB::table('erp_recurring_entries')->insertGetId([
             'tenant_id'         => $this->tenant->id,
             'type'              => 'expense',
             'title'             => 'Office Rent',
@@ -103,7 +103,7 @@ class RecurringEntrySchedulerTest extends TestCase
 
     public function test_skips_future_entries(): void
     {
-        DB::table('recurring_entries')->insertGetId([
+        DB::table('erp_recurring_entries')->insertGetId([
             'tenant_id'         => $this->tenant->id,
             'type'              => 'income',
             'title'             => 'Future Revenue',
@@ -130,7 +130,7 @@ class RecurringEntrySchedulerTest extends TestCase
 
     public function test_dry_run_does_not_create_logs(): void
     {
-        DB::table('recurring_entries')->insertGetId([
+        DB::table('erp_recurring_entries')->insertGetId([
             'tenant_id'         => $this->tenant->id,
             'type'              => 'income',
             'title'             => 'Dry Run Revenue',

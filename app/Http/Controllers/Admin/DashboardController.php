@@ -8,7 +8,7 @@ use App\Models\User;
 use Modules\ERP\Models\Tenant;
 use Modules\ERP\Models\Invoice;
 use App\Models\WalletTransaction;
-use App\Models\UserWithdrawal;
+use App\Models\UserReferralRequestWithdraw;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Carbon\Carbon;
@@ -44,8 +44,8 @@ class DashboardController extends Controller
             : ($revenueThisMonth > 0 ? 100 : null);
 
         // ── Pending Withdrawals ──────────────────────────────────
-        $pendingWithdrawals = UserWithdrawal::whereIn('status', ['pending', 'approved'])->count();
-        $pendingWithdrawalAmount = (float) UserWithdrawal::whereIn('status', ['pending', 'approved'])->sum('amount');
+        $pendingWithdrawals = UserReferralRequestWithdraw::whereIn('status', ['pending', 'approved'])->count();
+        $pendingWithdrawalAmount = (float) UserReferralRequestWithdraw::whereIn('status', ['pending', 'approved'])->sum('amount');
 
         // ── Monthly Revenue Chart (12 months) ────────────────────
         // Recovered from old project: RevenueChartController::months_chart()
@@ -70,7 +70,7 @@ class DashboardController extends Controller
             ]);
 
         // ── Recent Withdrawals ───────────────────────────────────
-        $recentWithdrawals = UserWithdrawal::with(['user', 'payoutMethod'])
+        $recentWithdrawals = UserReferralRequestWithdraw::with(['user', 'payoutMethod'])
             ->latest()
             ->take(5)
             ->get()
@@ -123,22 +123,9 @@ class DashboardController extends Controller
      */
     private function getRevenueThisMonth(): float
     {
-        try {
-            $ledgerRevenue = DB::table('journal_entry_lines')
-                ->join('accounts', 'journal_entry_lines.account_id', '=', 'accounts.id')
-                ->join('ledgers', 'accounts.ledger_id', '=', 'ledgers.id')
-                ->where('ledgers.type', 'revenue')
-                ->whereMonth('journal_entry_lines.created_at', now()->month)
-                ->whereYear('journal_entry_lines.created_at', now()->year)
-                ->sum('journal_entry_lines.business_amount');
-            if ($ledgerRevenue > 0) return (float) $ledgerRevenue;
-        } catch (\Exception $e) {
-            // Ledger tables may not exist yet
-        }
-
-        return (float) Invoice::where('status', 'paid')
-            ->whereMonth('paid_at', now()->month)
-            ->whereYear('paid_at', now()->year)
+        return (float) \App\Models\Transaction::where('type', 'received')
+            ->whereMonth('created_at', now()->month)
+            ->whereYear('created_at', now()->year)
             ->sum('business_amount');
     }
 
@@ -149,20 +136,9 @@ class DashboardController extends Controller
     {
         $lastMonth = now()->subMonth();
 
-        try {
-            $ledgerRevenue = DB::table('journal_entry_lines')
-                ->join('accounts', 'journal_entry_lines.account_id', '=', 'accounts.id')
-                ->join('ledgers', 'accounts.ledger_id', '=', 'ledgers.id')
-                ->where('ledgers.type', 'revenue')
-                ->whereMonth('journal_entry_lines.created_at', $lastMonth->month)
-                ->whereYear('journal_entry_lines.created_at', $lastMonth->year)
-                ->sum('journal_entry_lines.business_amount');
-            if ($ledgerRevenue > 0) return (float) $ledgerRevenue;
-        } catch (\Exception $e) {}
-
-        return (float) Invoice::where('status', 'paid')
-            ->whereMonth('paid_at', $lastMonth->month)
-            ->whereYear('paid_at', $lastMonth->year)
+        return (float) \App\Models\Transaction::where('type', 'received')
+            ->whereMonth('created_at', $lastMonth->month)
+            ->whereYear('created_at', $lastMonth->year)
             ->sum('business_amount');
     }
 
@@ -181,21 +157,18 @@ class DashboardController extends Controller
             $month = $date->month;
             $year = $date->year;
 
-            // Income: paid invoices
-            $income = (float) Invoice::where('status', 'paid')
-                ->whereMonth('paid_at', $month)
-                ->whereYear('paid_at', $year)
+            // Income: received transactions
+            $income = (float) \App\Models\Transaction::where('type', 'received')
+                ->whereMonth('created_at', $month)
+                ->whereYear('created_at', $year)
                 ->sum('business_amount');
 
-            // Expenses: invoice costs for paid invoices
+            // Expenses: cost transactions
             $expenses = 0;
             try {
-                $expenses = (float) DB::table('invoice_costs')
-                    ->join('invoices', 'invoice_costs.invoice_id', '=', 'invoices.id')
-                    ->where('invoices.status', 'paid')
-                    ->whereMonth('invoices.paid_at', $month)
-                    ->whereYear('invoices.paid_at', $year)
-                    ->sum('invoice_costs.business_amount');
+                $expenses = (float) \App\Models\CostTransaction::whereMonth('created_at', $month)
+                    ->whereYear('created_at', $year)
+                    ->sum('business_amount');
             } catch (\Exception $e) {}
 
             $chartData[] = [
@@ -217,7 +190,7 @@ class DashboardController extends Controller
         $breakdown = [];
 
         // ERP Invoices
-        $erpRevenue = (float) Invoice::where('status', 'paid')->sum('business_amount');
+        $erpRevenue = (float) \App\Models\Transaction::where('type', 'received')->sum('business_amount');
         if ($erpRevenue > 0) {
             $breakdown[] = ['name' => 'ERP Invoices', 'value' => round($erpRevenue, 2), 'color' => '#4f46e5'];
         }

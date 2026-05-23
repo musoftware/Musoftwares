@@ -258,7 +258,7 @@ export default function ISaasIndex() {
                                 "text-2xl font-bold font-mono tracking-tight",
                                 hasBalance ? "text-emerald-700" : "text-amber-700"
                             )}>
-                                {pointsBalance.toLocaleString()} <span className="text-sm font-normal text-slate-400">Pts</span>
+                                {Number(pointsBalance || 0).toLocaleString()} <span className="text-sm font-normal text-slate-400">Pts</span>
                             </p>
                             {!hasBalance && (
                                 <p className="text-xs text-amber-600 mt-1 flex items-center gap-1">

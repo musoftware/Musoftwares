@@ -10,19 +10,19 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::table('invoices', function (Blueprint $table) {
+        Schema::table('erp_invoices', function (Blueprint $table) {
             $table->uuid('uuid')->nullable()->after('id');
         });
 
         // Populate existing records
-        $invoices = \Illuminate\Support\Facades\DB::table('invoices')->whereNull('uuid')->get();
+        $invoices = \Illuminate\Support\Facades\DB::table('erp_invoices')->whereNull('uuid')->get();
         foreach ($invoices as $invoice) {
-            \Illuminate\Support\Facades\DB::table('invoices')
+            \Illuminate\Support\Facades\DB::table('erp_invoices')
                 ->where('id', $invoice->id)
                 ->update(['uuid' => \Illuminate\Support\Str::uuid()]);
         }
 
-        Schema::table('invoices', function (Blueprint $table) {
+        Schema::table('erp_invoices', function (Blueprint $table) {
             $table->uuid('uuid')->nullable(false)->unique()->change();
         });
     }
@@ -32,7 +32,7 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        Schema::table('invoices', function (Blueprint $table) {
+        Schema::table('erp_invoices', function (Blueprint $table) {
             $table->dropColumn('uuid');
         });
     }

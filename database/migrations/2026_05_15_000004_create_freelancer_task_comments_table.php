@@ -16,9 +16,7 @@ return new class extends Migration
         Schema::create('freelancer_task_comments', function (Blueprint $table) {
             $table->id();
 
-            $table->foreignId('freelancer_task_id')
-                ->constrained('freelancer_tasks')
-                ->onDelete('cascade');
+            $table->foreignId('freelancer_task_id')->index();
 
             // Who wrote the comment (admin or freelancer)
             $table->foreignId('user_id')

@@ -223,7 +223,7 @@ class TeamAuthAndOversightTest extends TestCase
             ]);
 
         $response->assertRedirect();
-        $this->assertDatabaseHas('tenant_clients', [
+        $this->assertDatabaseHas('erp_tenant_clients', [
             'tenant_id' => $tenant->id,
             'name' => 'New Client',
             'email' => 'client@new.com',
@@ -262,7 +262,7 @@ class TeamAuthAndOversightTest extends TestCase
             ]);
 
         $response->assertStatus(403);
-        $this->assertDatabaseMissing('tenant_clients', [
+        $this->assertDatabaseMissing('erp_tenant_clients', [
             'email' => 'client@illegal.com',
         ]);
 

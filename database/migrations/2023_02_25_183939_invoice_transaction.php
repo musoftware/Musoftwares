@@ -21,7 +21,7 @@ return new class extends Migration
             $table->foreign('transaction_id')->references('id')->on('transactions')->cascadeOnDelete();
 
             $table->unsignedBigInteger('invoice_id');
-            $table->foreign('invoice_id')->references('id')->on('invoices');
+            $table->foreign('invoice_id')->references('id')->on('erp_invoices');
 
         });
     }

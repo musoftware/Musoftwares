@@ -13,7 +13,7 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::table('invoices', function (Blueprint $table) {
+        Schema::table('erp_invoices', function (Blueprint $table) {
             //
             $table->boolean('cost_calculated')->default(false);
         });
@@ -26,7 +26,7 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::table('invoices', function (Blueprint $table) {
+        Schema::table('erp_invoices', function (Blueprint $table) {
             //
         });
     }

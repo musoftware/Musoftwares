@@ -14,7 +14,7 @@ return new class extends Migration
         if (!Schema::hasTable('erp_team_members')) {
             Schema::create('erp_team_members', function (Blueprint $table) {
                 $table->id();
-                $table->foreignId('tenant_id')->constrained('tenants')->cascadeOnDelete();
+                $table->foreignId('tenant_id')->constrained('erp_tenants')->cascadeOnDelete();
                 $table->string('name');
                 $table->string('email');
                 $table->string('password');

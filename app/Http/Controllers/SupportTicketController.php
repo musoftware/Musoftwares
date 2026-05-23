@@ -3,9 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\SupportTicket;
+use App\Models\Ticket;
 use App\Models\Conversation;
-use App\Models\Message;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -16,10 +15,11 @@ class SupportTicketController extends Controller
     {
         $user = Auth::user();
         $isAdmin = $user->hasRole('admin');
-        $query = SupportTicket::with(['tenantClient', 'platformClient', 'conversation.messages.sender']);
+        
+        $query = Ticket::with(['user', 'conversation.messages.sender']);
 
         if (!$isAdmin) {
-            $query->where('client_id', $user->id);
+            $query->where('user_id', $user->id);
         }
 
         $tickets = $query->latest()->paginate(15);
@@ -43,17 +43,18 @@ class SupportTicketController extends Controller
         DB::beginTransaction();
 
         try {
-            // 1. Create the support ticket
-            $ticket = SupportTicket::create([
-                'client_id' => $user->id,
-                'subject' => $validated['subject'],
-                'status' => 'open',
+            // 1. Create the support ticket using legacy columns
+            $ticket = Ticket::create([
+                'user_id' => $user->id,
+                'ticket_subject' => $validated['subject'],
+                'ticket_message' => $validated['description'],
+                'ticket_status' => 'open',
                 'priority' => strtolower($validated['priority']),
             ]);
 
-            // 2. Create the associated chat conversation
+            // 2. Create the associated chat conversation (if using the new reply system)
             $conversation = Conversation::create([
-                'conversable_type' => SupportTicket::class,
+                'conversable_type' => Ticket::class,
                 'conversable_id' => $ticket->id,
                 'type' => 'support_ticket',
                 'status' => 'open',
@@ -74,13 +75,6 @@ class SupportTicketController extends Controller
                 ]);
             }
 
-            // 3. Create the description as the first message
-            Message::create([
-                'conversation_id' => $conversation->id,
-                'sender_id' => $user->id,
-                'body' => $validated['description'],
-            ]);
-
             DB::commit();
 
             return redirect()->back()->with('success', 'Support ticket opened successfully.');
@@ -92,15 +86,15 @@ class SupportTicketController extends Controller
 
     public function resolve($id)
     {
-        $ticket = SupportTicket::findOrFail($id);
+        $ticket = Ticket::findOrFail($id);
 
         // Authorize (only owner or admin)
-        if (Auth::id() !== $ticket->client_id && !Auth::user()->hasRole('admin')) {
+        if (Auth::id() !== $ticket->user_id && !Auth::user()->hasRole('admin')) {
             abort(403);
         }
 
         DB::transaction(function () use ($ticket) {
-            $ticket->update(['status' => 'resolved']);
+            $ticket->update(['ticket_status' => 'resolved']);
             
             if ($ticket->conversation) {
                 $ticket->conversation->update(['status' => 'closed']);
@@ -109,5 +103,36 @@ class SupportTicketController extends Controller
 
         return redirect()->back()->with('success', 'Ticket resolved.');
     }
-}
 
+    public function close($id)
+    {
+        $ticket = Ticket::findOrFail($id);
+
+        if (Auth::id() !== $ticket->user_id && !Auth::user()->hasRole('admin')) {
+            abort(403);
+        }
+
+        DB::transaction(function () use ($ticket) {
+            $ticket->update(['ticket_status' => 'closed']);
+            
+            if ($ticket->conversation) {
+                $ticket->conversation->update(['status' => 'closed']);
+            }
+        });
+
+        return redirect()->back()->with('success', 'Ticket closed.');
+    }
+
+    public function destroy($id)
+    {
+        $ticket = Ticket::findOrFail($id);
+
+        if (Auth::id() !== $ticket->user_id && !Auth::user()->hasRole('admin')) {
+            abort(403);
+        }
+
+        $ticket->delete();
+
+        return redirect()->back()->with('success', 'Ticket deleted.');
+    }
+}

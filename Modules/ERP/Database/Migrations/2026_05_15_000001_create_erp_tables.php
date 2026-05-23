@@ -8,32 +8,8 @@ return new class extends Migration
 {
     public function up()
     {
-        // 1. module_plans table
-        Schema::create('module_plans', function (Blueprint $table) {
-            $table->id();
-            $table->enum('module', ['erp', 'freelance', 'marketplace']);
-            $table->string('name');
-            $table->decimal('price', 10, 2);
-            $table->enum('billing', ['monthly', 'yearly']);
-            $table->json('features')->nullable();
-            $table->boolean('is_active')->default(true);
-            $table->timestamps();
-        });
-
-        // 2. user_subscriptions table
-        Schema::create('user_subscriptions', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('client_id')->constrained('users')->cascadeOnDelete();
-            $table->foreignId('plan_id')->constrained('module_plans')->cascadeOnDelete();
-            $table->enum('status', ['active', 'cancelled', 'expired']);
-            $table->timestamp('started_at');
-            $table->timestamp('expires_at')->nullable();
-            $table->boolean('auto_renew')->default(true);
-            $table->timestamps();
-        });
-
         // 3. tenants table
-        Schema::create('tenants', function (Blueprint $table) {
+        Schema::create('erp_tenants', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->unique()->constrained('users')->cascadeOnDelete();
             $table->string('name');
@@ -44,26 +20,25 @@ return new class extends Migration
         });
 
         // 4. tenant_clients table
-        Schema::create('tenant_clients', function (Blueprint $table) {
+        Schema::create('erp_tenant_clients', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('tenant_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('tenant_id')->constrained('erp_tenants')->cascadeOnDelete();
             $table->string('name');
             $table->string('email')->nullable();
             $table->string('phone')->nullable();
             $table->string('address')->nullable();
-            $table->string('currency', 3);
+            $table->string('currency', 3)->default('USD');
             $table->string('country_code', 2)->nullable();
-            $table->string('referral_code')->unique()->nullable();
-            $table->foreignId('referred_by')->nullable()->constrained('tenant_clients')->nullOnDelete();
+            $table->enum('status', ['active', 'inactive', 'banned'])->default('active');
             $table->timestamps();
         });
 
         // 5. invoices table
-        Schema::create('invoices', function (Blueprint $table) {
+        Schema::create('erp_invoices', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('tenant_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('tenant_id')->constrained('erp_tenants')->cascadeOnDelete();
             $table->string('invoice_number');
-            $table->foreignId('client_id')->constrained('tenant_clients')->cascadeOnDelete();
+            $table->foreignId('client_id')->constrained('erp_tenant_clients')->cascadeOnDelete();
             $table->enum('status', ['draft', 'sent', 'partial', 'paid', 'cancelled', 'refunded'])->default('draft');
 
             $table->decimal('amount', 15, 2)->default(0);
@@ -90,10 +65,10 @@ return new class extends Migration
         });
 
         // 6. invoice_items table
-        Schema::create('invoice_items', function (Blueprint $table) {
+        Schema::create('erp_invoice_items', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('invoice_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('tenant_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('invoice_id')->constrained('erp_invoices')->cascadeOnDelete();
+            $table->foreignId('tenant_id')->constrained('erp_tenants')->cascadeOnDelete();
             $table->enum('type', ['simple', 'quantity', 'timer']);
             $table->string('title');
             $table->text('description')->nullable();
@@ -105,9 +80,9 @@ return new class extends Migration
         });
 
         // 7. timer_sessions table
-        Schema::create('timer_sessions', function (Blueprint $table) {
+        Schema::create('erp_timer_sessions', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('invoice_item_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('invoice_item_id')->constrained('erp_invoice_items')->cascadeOnDelete();
             $table->timestamp('started_at');
             $table->timestamp('stopped_at')->nullable();
             $table->integer('duration_seconds')->nullable();
@@ -118,10 +93,10 @@ return new class extends Migration
         });
 
         // 8. invoice_costs table
-        Schema::create('invoice_costs', function (Blueprint $table) {
+        Schema::create('erp_invoice_costs', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('invoice_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('tenant_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('invoice_id')->constrained('erp_invoices')->cascadeOnDelete();
+            $table->foreignId('tenant_id')->constrained('erp_tenants')->cascadeOnDelete();
             $table->string('title');
             $table->text('description')->nullable();
 
@@ -142,10 +117,10 @@ return new class extends Migration
         });
 
         // 9. client_wallets table
-        Schema::create('client_wallets', function (Blueprint $table) {
+        Schema::create('erp_client_wallets', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('tenant_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('client_id')->constrained('tenant_clients')->cascadeOnDelete();
+            $table->foreignId('tenant_id')->constrained('erp_tenants')->cascadeOnDelete();
+            $table->foreignId('client_id')->constrained('erp_tenant_clients')->cascadeOnDelete();
             $table->decimal('balance', 15, 2)->default(0);
             $table->string('currency', 3);
             $table->timestamps();
@@ -154,10 +129,10 @@ return new class extends Migration
         });
 
         // 10. client_wallet_transactions table
-        Schema::create('client_wallet_transactions', function (Blueprint $table) {
+        Schema::create('erp_client_wallet_transactions', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('tenant_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('wallet_id')->constrained('client_wallets')->cascadeOnDelete();
+            $table->foreignId('tenant_id')->constrained('erp_tenants')->cascadeOnDelete();
+            $table->foreignId('wallet_id')->constrained('erp_client_wallets')->cascadeOnDelete();
 
             $table->enum('type', [
                 'invoice_issued', 'invoice_paid', 'invoice_refund',
@@ -190,12 +165,12 @@ return new class extends Migration
 
 
         // 11. expense_transactions table
-        Schema::create('expense_transactions', function (Blueprint $table) {
+        Schema::create('erp_expense_transactions', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('tenant_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('invoice_cost_id')->nullable()->constrained()->nullOnDelete();
-            $table->foreignId('invoice_id')->nullable()->constrained()->nullOnDelete();
-            $table->foreignId('client_id')->nullable()->constrained('tenant_clients')->nullOnDelete();
+            $table->foreignId('tenant_id')->constrained('erp_tenants')->cascadeOnDelete();
+            $table->foreignId('invoice_cost_id')->nullable()->constrained('erp_invoice_costs')->nullOnDelete();
+            $table->foreignId('invoice_id')->nullable()->constrained('erp_invoices')->nullOnDelete();
+            $table->foreignId('client_id')->nullable()->constrained('erp_tenant_clients')->nullOnDelete();
 
             $table->enum('type', ['cost_recorded', 'cost_paid_manual', 'cost_paid_from_balance']);
             $table->enum('direction', ['debit', 'credit']);
@@ -217,44 +192,10 @@ return new class extends Migration
             $table->timestamp('created_at')->nullable();
         });
 
-        // 12. client_referrals table
-        Schema::create('client_referrals', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('tenant_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('referrer_id')->constrained('tenant_clients')->cascadeOnDelete();
-            $table->foreignId('referee_id')->constrained('tenant_clients')->cascadeOnDelete();
-            $table->tinyInteger('level'); // 1 or 2
-            $table->enum('status', ['pending', 'active', 'cancelled'])->default('pending');
-            $table->timestamps();
-        });
-
-        // 13. client_referral_earnings table
-        Schema::create('client_referral_earnings', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('tenant_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('invoice_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('referrer_id')->constrained('tenant_clients')->cascadeOnDelete();
-            $table->foreignId('referee_id')->constrained('tenant_clients')->cascadeOnDelete();
-
-            $table->tinyInteger('level');
-
-            $table->decimal('amount', 15, 2);
-            $table->string('amount_currency', 3);
-            $table->decimal('business_amount', 15, 2);
-            $table->string('business_currency', 3);
-            $table->decimal('exchange_rate', 15, 6);
-            $table->date('exchange_rate_date');
-
-            $table->decimal('commission_rate', 5, 2);
-            $table->enum('status', ['pending', 'paid', 'cancelled'])->default('pending');
-
-            $table->timestamps();
-        });
-
         // 14. recurring_entries table
-        Schema::create('recurring_entries', function (Blueprint $table) {
+        Schema::create('erp_recurring_entries', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('tenant_id')->nullable()->constrained()->cascadeOnDelete(); // null = admin
+            $table->foreignId('tenant_id')->nullable()->constrained('erp_tenants')->cascadeOnDelete(); // null = admin
             $table->enum('type', ['income', 'expense']);
             $table->string('title');
             $table->text('description')->nullable();
@@ -283,9 +224,9 @@ return new class extends Migration
         });
 
         // 15. recurring_execution_logs table
-        Schema::create('recurring_execution_logs', function (Blueprint $table) {
+        Schema::create('erp_recurring_execution_logs', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('recurring_entry_id')->constrained('recurring_entries')->cascadeOnDelete();
+            $table->foreignId('recurring_entry_id')->constrained('erp_recurring_entries')->cascadeOnDelete();
             $table->timestamp('executed_at');
 
             $table->decimal('amount', 15, 2);
@@ -303,10 +244,10 @@ return new class extends Migration
         });
 
         // 16. payment_methods table
-        Schema::create('payment_methods', function (Blueprint $table) {
+        Schema::create('erp_payment_methods', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('tenant_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('client_id')->constrained('tenant_clients')->cascadeOnDelete();
+            $table->foreignId('tenant_id')->constrained('erp_tenants')->cascadeOnDelete();
+            $table->foreignId('client_id')->constrained('erp_tenant_clients')->cascadeOnDelete();
 
             $table->enum('type', ['bank_transfer']);
             $table->boolean('is_default')->default(false);
@@ -330,11 +271,11 @@ return new class extends Migration
         });
 
         // 17. withdrawals table
-        Schema::create('withdrawals', function (Blueprint $table) {
+        Schema::create('erp_withdrawals', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('tenant_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('client_id')->constrained('tenant_clients')->cascadeOnDelete();
-            $table->foreignId('payment_method_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('tenant_id')->constrained('erp_tenants')->cascadeOnDelete();
+            $table->foreignId('client_id')->constrained('erp_tenant_clients')->cascadeOnDelete();
+            $table->foreignId('payment_method_id')->constrained('erp_payment_methods')->cascadeOnDelete();
 
             $table->string('status')->default('pending'); // pending, approved, paid, rejected, cancelled
 
@@ -364,22 +305,18 @@ return new class extends Migration
 
     public function down()
     {
-        Schema::dropIfExists('withdrawal_requests');
-        Schema::dropIfExists('payment_methods');
-        Schema::dropIfExists('recurring_execution_logs');
-        Schema::dropIfExists('recurring_entries');
-        Schema::dropIfExists('client_referral_earnings');
-        Schema::dropIfExists('client_referrals');
-        Schema::dropIfExists('expense_transactions');
-        Schema::dropIfExists('client_wallet_transactions');
-        Schema::dropIfExists('client_wallets');
-        Schema::dropIfExists('invoice_costs');
-        Schema::dropIfExists('timer_sessions');
-        Schema::dropIfExists('invoice_items');
-        Schema::dropIfExists('invoices');
-        Schema::dropIfExists('tenant_clients');
-        Schema::dropIfExists('tenants');
-        Schema::dropIfExists('user_subscriptions');
-        Schema::dropIfExists('module_plans');
+        Schema::dropIfExists('erp_withdrawals');
+        Schema::dropIfExists('erp_payment_methods');
+        Schema::dropIfExists('erp_recurring_execution_logs');
+        Schema::dropIfExists('erp_recurring_entries');
+        Schema::dropIfExists('erp_expense_transactions');
+        Schema::dropIfExists('erp_client_wallet_transactions');
+        Schema::dropIfExists('erp_client_wallets');
+        Schema::dropIfExists('erp_invoice_costs');
+        Schema::dropIfExists('erp_timer_sessions');
+        Schema::dropIfExists('erp_invoice_items');
+        Schema::dropIfExists('erp_invoices');
+        Schema::dropIfExists('erp_tenant_clients');
+        Schema::dropIfExists('erp_tenants');
     }
 };

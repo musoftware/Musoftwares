@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class PaymentMethod extends TenantModel
 {
+    protected $table = 'erp_payment_methods';
+
     protected $fillable = [
         'tenant_id', 'client_id', 'type', 'is_default', 'status', 'rejection_note',
         'reviewed_by', 'reviewed_at', 'bank_name', 'account_holder_name',

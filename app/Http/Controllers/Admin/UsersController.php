@@ -100,7 +100,7 @@ class UsersController extends Controller
      */
     public function show($id): InertiaResponse
     {
-        $user = User::with(['kycDocuments', 'kycVerifier:id,name', 'supportTickets'])
+        $user = User::with(['kycDocuments', 'kycVerifier:id,name', 'tickets'])
             ->findOrFail($id);
 
         $initials = collect(explode(' ', $user->name))
@@ -114,8 +114,8 @@ class UsersController extends Controller
         ];
 
         $stats = [
-            'tickets_total'  => $user->supportTickets()->count(),
-            'tickets_open'   => $user->supportTickets()->where('status', 'open')->count(),
+            'tickets_total'  => $user->tickets()->count(),
+            'tickets_open'   => $user->tickets()->where('ticket_status', 'open')->count(),
             'kyc_docs_count' => $user->kycDocuments()->count(),
         ];
 
