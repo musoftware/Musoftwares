@@ -58,7 +58,7 @@ class ResellerPortalController extends Controller
             'reseller'      => [
                 'name'     => $reseller->name,
                 'token'    => $reseller->token,
-                'currency' => $reseller->currency ? $reseller->currency->currency : 'USD',
+                'currency' => $reseller->currency ? $reseller->currency->currency : (is_numeric($reseller->currency_id) ? 'USD' : ($reseller->currency_id ?: 'USD')),
             ],
             'tools'         => $tools,
             'isAuthenticated' => auth()->check(),

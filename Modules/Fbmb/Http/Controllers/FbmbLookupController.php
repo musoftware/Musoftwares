@@ -4,6 +4,7 @@ namespace Modules\fbmb\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Modules\fbmb\Models\FbmbLookupResult;
 use Modules\fbmb\Services\FbmbLookupService;
 use Exception;
 
@@ -19,9 +20,28 @@ class FbmbLookupController extends Controller
     public function index()
     {
         $user = auth()->user();
+
+        $history = FbmbLookupResult::where('user_id', $user->id)
+            ->orderByDesc('created_at')
+            ->limit(20)
+            ->get()
+            ->map(fn ($r) => [
+                'id'                => $r->id,
+                'total_ids'         => $r->total_ids,
+                'found_count'       => $r->found_count,
+                'credits_used'      => $r->credits_used,
+                'remaining_balance' => $r->remaining_balance,
+                'download_token'    => $r->download_token,
+                'expired'           => $r->isExpired(),
+                'file_exists'       => $r->fileExists(),
+                'created_at'        => $r->created_at->toISOString(),
+                'expires_at'        => $r->expires_at->toISOString(),
+            ]);
+
         return \Inertia\Inertia::render('Intelligence/ISaas/Index', [
             'pointsBalance' => $user->points_balance,
-            'currency' => $user->preferred_currency ?? 'USD',
+            'currency'      => $user->preferred_currency ?? 'USD',
+            'history'       => $history,
         ]);
     }
 
@@ -40,27 +60,37 @@ class FbmbLookupController extends Controller
             ], 422);
         }
 
-        $file = $request->file('file');
-        $path = $file->store('temp_isaas');
+        $file     = $request->file('file');
+        $path     = $file->store('temp_isaas');
         $fullPath = \Illuminate\Support\Facades\Storage::path($path);
 
         try {
             $result = $this->lookupService->processFile($user, $fullPath);
 
-            // Store result path in session so the download route can serve it
             $downloadToken = md5(uniqid(mt_rand(), true));
-            session()->put("isaas_download_{$downloadToken}", $result['result_path']);
 
-            // Clean up uploaded file
+            // Persist to database — survives page refresh indefinitely until cron cleans up
+            FbmbLookupResult::create([
+                'user_id'           => $user->id,
+                'download_token'    => $downloadToken,
+                'total_ids'         => $result['total_ids'],
+                'found_count'       => $result['found_count'],
+                'credits_used'      => $result['found_count'],
+                'remaining_balance' => $user->fresh()->points_balance,
+                'result_path'       => $result['result_path'],
+                'expires_at'        => now()->addHours(24),
+            ]);
+
+            // Clean up the uploaded (input) file — the result CSV stays
             @unlink($fullPath);
 
             return response()->json([
-                'success' => true,
-                'total_ids' => $result['total_ids'],
-                'found_count' => $result['found_count'],
-                'credits_used' => $result['found_count'], // 1 point per match
+                'success'           => true,
+                'total_ids'         => $result['total_ids'],
+                'found_count'       => $result['found_count'],
+                'credits_used'      => $result['found_count'],
                 'remaining_balance' => $user->fresh()->points_balance,
-                'download_token' => $downloadToken,
+                'download_token'    => $downloadToken,
             ]);
         } catch (Exception $e) {
             @unlink($fullPath);
@@ -76,12 +106,22 @@ class FbmbLookupController extends Controller
             abort(400, 'Missing download token.');
         }
 
-        $path = session()->pull("isaas_download_{$token}");
+        $record = FbmbLookupResult::where('download_token', $token)
+            ->where('user_id', auth()->id())
+            ->first();
 
-        if (! $path || ! file_exists($path)) {
-            abort(404, 'Download expired or not found.');
+        if (! $record) {
+            abort(404, 'Download link not found.');
         }
 
-        return response()->download($path, 'isaas_results.csv')->deleteFileAfterSend(true);
+        if ($record->isExpired()) {
+            abort(410, 'This download link has expired (24 hours). Please run a new lookup.');
+        }
+
+        if (! $record->fileExists()) {
+            abort(404, 'Result file not found. It may have been cleaned up.');
+        }
+
+        return response()->download($record->result_path, 'isaas_results.csv');
     }
 }
