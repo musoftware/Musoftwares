@@ -274,7 +274,7 @@ export default function BroadcastListsWorkspace({ t, locale, callRPC, daemonConn
                                 className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl gap-1.5 text-xs shadow-md shadow-emerald-600/20"
                             >
                                 <Send className="w-3.5 h-3.5" />
-                                {isRtl ? `إرسال برودكاست (${members.length})` : `Send Broadcast (${members.length})`}
+                                {isRtl ? `بدء الإرسال المباشر (${members.length})` : `Direct Send (${members.length})`}
                             </Button>
                         )}
                     </div>
@@ -286,7 +286,7 @@ export default function BroadcastListsWorkspace({ t, locale, callRPC, daemonConn
                         <div className="bg-gradient-to-r from-emerald-600 to-teal-600 px-5 py-3">
                             <h3 className="text-white font-bold text-sm flex items-center gap-2">
                                 <Send className="w-4 h-4" />
-                                {isRtl ? 'إرسال برودكاست' : 'Send Broadcast'}
+                                {isRtl ? 'إرسال جماعي مباشر' : 'Direct Send'}
                                 <Badge className="bg-white/20 text-white text-[10px]">{members.length} {isRtl ? 'عضو' : 'recipients'}</Badge>
                             </h3>
                         </div>
@@ -317,7 +317,7 @@ export default function BroadcastListsWorkspace({ t, locale, callRPC, daemonConn
                                 <Textarea
                                     value={broadcastMsg}
                                     onChange={e => setBroadcastMsg(e.target.value)}
-                                    placeholder={isRtl ? 'اكتب رسالتك هنا...' : 'Type your broadcast message here...'}
+                                    placeholder={isRtl ? 'اكتب رسالتك هنا... (سيتم إرسالها فردياً لكل عميل في القائمة)' : 'Type your message here... (Sent directly to each contact 1-to-1)'}
                                     className="h-28 resize-none rounded-xl text-sm text-start"
                                     disabled={sending}
                                 />
@@ -499,11 +499,11 @@ export default function BroadcastListsWorkspace({ t, locale, callRPC, daemonConn
                         <div className="size-9 rounded-xl bg-cyan-100/60 dark:bg-cyan-950/40 flex items-center justify-center">
                             <Radio className="w-5 h-5 text-cyan-600" />
                         </div>
-                        {isRtl ? 'قوائم البث' : 'Broadcast Lists'}
+                        {isRtl ? 'قوائم الإرسال المباشر' : 'Direct Send Lists'}
                         <Badge variant="secondary" className="text-xs font-bold">{lists.length}</Badge>
                     </h2>
                     <p className="text-sm text-muted-foreground mt-1">
-                        {isRtl ? 'أنشئ وأدر قوائم بث لحملاتك' : 'Create and manage broadcast lists for your campaigns'}
+                        {isRtl ? 'أنشئ وأدر قوائم إرسال مباشر لحملاتك' : 'Create and manage direct send lists for your campaigns'}
                     </p>
                 </div>
                 <Button onClick={() => { resetForm(); setShowForm(true); }} className="bg-cyan-600 hover:bg-cyan-700 text-white font-bold rounded-xl gap-2">
@@ -573,9 +573,9 @@ export default function BroadcastListsWorkspace({ t, locale, callRPC, daemonConn
                         <div className="size-16 rounded-2xl bg-cyan-50/50 dark:bg-cyan-950/20 flex items-center justify-center mb-4">
                             <Radio className="w-7 h-7 text-cyan-400/50" />
                         </div>
-                        <p className="text-sm font-bold">{isRtl ? 'لا توجد قوائم بث' : 'No broadcast lists yet'}</p>
+                        <p className="text-sm font-bold">{isRtl ? 'لا توجد قوائم إرسال مباشر بعد' : 'No direct send lists yet'}</p>
                         <p className="text-xs text-muted-foreground mt-1 max-w-xs">
-                            {isRtl ? 'أنشئ قوائم بث لتنظيم جهات اتصالك وإرسال حملات سريعة' : 'Create broadcast lists to organize contacts for quick campaigns'}
+                            {isRtl ? 'أنشئ قوائم لتنظيم جهات اتصالك وبدء الإرسال المباشر السريع' : 'Create lists to organize contacts for quick direct sending'}
                         </p>
                         <Button onClick={() => { resetForm(); setShowForm(true); }} className="mt-4 bg-cyan-600 hover:bg-cyan-700 text-white font-bold rounded-xl gap-2 text-xs">
                             <Plus className="w-3.5 h-3.5" />

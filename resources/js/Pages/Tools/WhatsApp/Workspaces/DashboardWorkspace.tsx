@@ -207,6 +207,141 @@ export default function DashboardWorkspace({ t, locale, callRPC, daemonConnected
                 </CardContent>
             </Card>
 
+            {/* AI Insights: Lead Intent & Sentiment Analysis */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Lead Intent Scoring Card */}
+                <Card className="rounded-2xl text-start border shadow-md bg-gradient-to-br from-background via-background to-teal-50/10 dark:to-teal-950/5">
+                    <CardHeader className="pb-4 border-b">
+                        <CardTitle className="text-base flex items-center gap-2">
+                            <span className="size-2 rounded-full bg-teal-500 animate-ping shrink-0" />
+                            {isRtl ? 'تصنيف واستهداف العملاء بالذكاء الاصطناعي' : 'AI Lead Intent Scoring'}
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent className="pt-6 space-y-4">
+                        {[
+                            { 
+                                label: isRtl ? 'عملاء مهتمون جداً' : 'Interested Leads', 
+                                value: stats?.intents?.interested || 0, 
+                                color: 'from-emerald-400 to-emerald-600', 
+                                bg: 'bg-emerald-500/10',
+                                text: 'text-emerald-600 dark:text-emerald-400',
+                                desc: isRtl ? 'أبدوا اهتماماً ويريدون التفاصيل' : 'Expressed interest and want more info'
+                            },
+                            { 
+                                label: isRtl ? 'استفسار عن الأسعار' : 'Price Inquiries', 
+                                value: stats?.intents?.price_inquiry || 0, 
+                                color: 'from-blue-400 to-blue-600',
+                                bg: 'bg-blue-500/10',
+                                text: 'text-blue-600 dark:text-blue-400',
+                                desc: isRtl ? 'يستفسرون عن التكلفة والأسعار' : 'Asking about pricing, costs, or plans'
+                            },
+                            { 
+                                label: isRtl ? 'طلب إيقاف اشتراك' : 'Opt-out Requests', 
+                                value: stats?.intents?.opt_out || 0, 
+                                color: 'from-rose-400 to-rose-600',
+                                bg: 'bg-rose-500/10',
+                                text: 'text-rose-600 dark:text-rose-400',
+                                desc: isRtl ? 'طلبوا إيقاف الحملات وعدم التواصل' : 'Requested to stop or unsubscribe'
+                            },
+                            { 
+                                label: isRtl ? 'غير مهتمين' : 'Uninterested', 
+                                value: stats?.intents?.uninterested || 0, 
+                                color: 'from-amber-400 to-amber-600',
+                                bg: 'bg-amber-500/10',
+                                text: 'text-amber-600 dark:text-amber-400',
+                                desc: isRtl ? 'استجابوا بالرفض أو عدم الحاجة' : 'Declined or currently not interested'
+                            }
+                        ].map((item, idx) => {
+                            const total = Object.values(stats?.intents || {}).reduce((a: any, b: any) => a + b, 0) || 1;
+                            const percentage = Math.round((item.value / total) * 100);
+                            return (
+                                <div key={idx} className="space-y-1.5 p-3 rounded-xl hover:bg-muted/40 transition-colors">
+                                    <div className="flex items-center justify-between">
+                                        <div className="flex items-center gap-2">
+                                            <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${item.bg} ${item.text}`}>
+                                                {item.label}
+                                            </span>
+                                            <span className="text-[10px] text-muted-foreground hidden sm:inline">
+                                                {item.desc}
+                                            </span>
+                                        </div>
+                                        <span className="text-xs font-black">{item.value} <span className="text-[10px] text-muted-foreground font-medium font-mono">({percentage}%)</span></span>
+                                    </div>
+                                    <div className="h-2 bg-muted/30 rounded-full overflow-hidden">
+                                        <div 
+                                            className={`h-full bg-gradient-to-r ${item.color} rounded-full transition-all duration-500`}
+                                            style={{ width: `${percentage}%` }}
+                                        />
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </CardContent>
+                </Card>
+
+                {/* Sentiment Analysis Card */}
+                <Card className="rounded-2xl text-start border shadow-md bg-gradient-to-br from-background via-background to-violet-50/10 dark:to-violet-950/5">
+                    <CardHeader className="pb-4 border-b">
+                        <CardTitle className="text-base flex items-center gap-2">
+                            <span className="size-2 rounded-full bg-violet-500 animate-pulse shrink-0" />
+                            {isRtl ? 'تحليل مشاعر وتفاعل العملاء' : 'Customer Sentiment Insights'}
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent className="pt-6 space-y-4">
+                        {[
+                            { 
+                                label: isRtl ? 'إيجابي (Positive)' : 'Positive', 
+                                icon: '😊',
+                                value: stats?.sentiments?.positive || 0, 
+                                color: 'bg-emerald-500', 
+                                bg: 'bg-emerald-500/10',
+                                text: 'text-emerald-600 dark:text-emerald-400',
+                                desc: isRtl ? 'محادثات ودية، رضا، ثناء أو شكر' : 'Friendly chats, satisfaction, or compliments'
+                            },
+                            { 
+                                label: isRtl ? 'محايد (Neutral)' : 'Neutral', 
+                                icon: '😐',
+                                value: stats?.sentiments?.neutral || 0, 
+                                color: 'bg-slate-400', 
+                                bg: 'bg-slate-500/10',
+                                text: 'text-slate-600 dark:text-slate-400',
+                                desc: isRtl ? 'استفسارات عامة أو ردود اعتيادية' : 'General inquiries or ordinary responses'
+                            },
+                            { 
+                                label: isRtl ? 'سلبي (Negative)' : 'Negative', 
+                                icon: '😠',
+                                value: stats?.sentiments?.negative || 0, 
+                                color: 'bg-rose-500', 
+                                bg: 'bg-rose-500/10',
+                                text: 'text-rose-600 dark:text-rose-400',
+                                desc: isRtl ? 'شكاوى، انزعاج، اعتراض أو رفض حاد' : 'Complaints, annoyance, or strong objections'
+                            }
+                        ].map((item, idx) => {
+                            const total = Object.values(stats?.sentiments || {}).reduce((a: any, b: any) => a + b, 0) || 1;
+                            const percentage = Math.round((item.value / total) * 100);
+                            return (
+                                <div key={idx} className="flex items-center gap-4 p-3.5 rounded-xl hover:bg-muted/40 transition-colors">
+                                    <div className="text-2xl shrink-0">{item.icon}</div>
+                                    <div className="flex-1 min-w-0">
+                                        <div className="flex items-center justify-between mb-1">
+                                            <span className="text-xs font-bold text-foreground">{item.label}</span>
+                                            <span className="text-xs font-black">{item.value} <span className="text-[10px] text-muted-foreground font-medium font-mono">({percentage}%)</span></span>
+                                        </div>
+                                        <div className="h-2 bg-muted/30 rounded-full overflow-hidden mb-1">
+                                            <div 
+                                                className={`h-full ${item.color} rounded-full transition-all duration-500`}
+                                                style={{ width: `${percentage}%` }}
+                                            />
+                                        </div>
+                                        <p className="text-[10px] text-muted-foreground truncate">{item.desc}</p>
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </CardContent>
+                </Card>
+            </div>
+
             {/* Recent Campaigns */}
             <Card className="rounded-2xl text-start">
                 <CardHeader className="pb-4 border-b flex flex-row items-center justify-between">
