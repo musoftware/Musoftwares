@@ -172,7 +172,6 @@ class MarketplaceController extends Controller
             'category_label'    => $categories[$tool['category']] ?? $tool['category'],
             'supported_os'      => $this->safeArray($tool['supported_os'] ?? []),
             'current_version'   => $tool['version'] ?? '1.0.0',
-            'active_users'      => $tool['active_users'] ?? rand(100, 5000), // Mocked
             'is_featured'       => $tool['is_featured'] ?? false,
             'starting_price'    => $lowestMonthly ?? 0,
             'is_free'           => ($lowestMonthly == 0),
@@ -194,7 +193,6 @@ class MarketplaceController extends Controller
             'category_label'    => $categories[$tool['category']] ?? $tool['category'],
             'supported_os'      => $this->safeArray($tool['supported_os'] ?? []),
             'current_version'   => $tool['version'] ?? '1.0.0',
-            'active_users'      => $tool['active_users'] ?? rand(100, 5000),
             'is_featured'       => $tool['is_featured'] ?? false,
             'features'          => $this->safeArray($tool['features'] ?? []),
             'requirements'      => $this->safeArray($tool['requirements'] ?? []),
