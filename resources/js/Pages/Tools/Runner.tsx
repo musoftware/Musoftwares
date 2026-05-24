@@ -43,6 +43,7 @@ const components: Record<string, React.ElementType> = {
     'WaAiAgentRunner':          lazy(() => import('./WaAiAgentRunner')),
     'WaFunnelEngineRunner':     lazy(() => import('./WaFunnelEngineRunner')),
     'WaWarmupRunner':           lazy(() => import('./WaWarmupRunner')),
+    'OlxB2CFinderRunner':       lazy(() => import('./OlxB2CFinderRunner')),
 };
 
 function SetupWizard({ currentHost, onLinked }: { currentHost: string; onLinked: (ip: string) => void }) {
