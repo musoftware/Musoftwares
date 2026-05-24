@@ -21,14 +21,12 @@ return new class extends Migration
             }
         });
 
-        // Update all services to have a slug
-        \App\Models\Service::chunk(100, function ($services) {
-            foreach ($services as $service) {
-                if(empty($service->slug)) {
-                    $service->save();
-                }
-            }
-        });
+        // Update all services to have a slug using raw DB (avoid model dependency)
+        $services = \Illuminate\Support\Facades\DB::table('services')->whereNull('slug')->orWhere('slug', '')->get();
+        foreach ($services as $service) {
+            $slug = \Illuminate\Support\Str::slug($service->title ?? 'service-' . $service->id);
+            \Illuminate\Support\Facades\DB::table('services')->where('id', $service->id)->update(['slug' => $slug]);
+        }
     }
 
     /**
