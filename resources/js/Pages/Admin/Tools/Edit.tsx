@@ -39,7 +39,7 @@ const menuItems = [
     { id: 'settings', label: 'Settings', icon: Settings, href: '/admin/settings', isActive: false },
 ];
 
-const OS_OPTIONS = ['windows', 'mac', 'linux'];
+const OS_OPTIONS = ['windows', 'mac'];
 
 export default function AdminToolEdit({ tool, categories }: Props) {
     // ─── Tool Update Form ───────────────────────────────────────────────────────
