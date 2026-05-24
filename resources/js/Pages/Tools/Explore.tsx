@@ -77,19 +77,40 @@ export default function Explore({ tools, categories, subscribedSlugs, filters }:
             {/* Hero section */}
             <div className="bg-white border-b border-slate-200/80">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-14">
-                    <div className="max-w-2xl">
-                        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 text-slate-600 text-xs font-medium mb-4">
-                            <Package className="h-3 w-3" />
-                            {tools.data.length} tools available
+                    <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-8">
+                        <div className="max-w-2xl">
+                            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 text-slate-600 text-xs font-medium mb-4">
+                                <Package className="h-3 w-3" />
+                                {tools.data.length} tools available
+                            </div>
+                            <h1 className="text-3xl md:text-4xl font-bold text-slate-900 tracking-tight leading-tight mb-3">
+                                Professional Automation Tools
+                                <br />
+                                <span className="text-slate-400 font-normal">for power users.</span>
+                            </h1>
+                            <p className="text-slate-500 text-base leading-relaxed max-w-xl">
+                                Scraping, automation, AI-powered workflows — run directly in your browser with a single subscription.
+                            </p>
                         </div>
-                        <h1 className="text-3xl md:text-4xl font-bold text-slate-900 tracking-tight leading-tight mb-3">
-                        Professional Automation Tools
-                        <br />
-                        <span className="text-slate-400 font-normal">for power users.</span>
-                    </h1>
-                        <p className="text-slate-500 text-base leading-relaxed max-w-xl">
-                            Scraping, automation, AI-powered workflows — run directly in your browser with a single subscription.
-                        </p>
+                        
+                        {/* Extension Banner */}
+                        <div className="hidden lg:block bg-emerald-50 border border-emerald-100 rounded-2xl p-5 max-w-[320px] shadow-sm shrink-0">
+                            <div className="flex items-center gap-2 mb-2">
+                                <div className="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center">
+                                    <Globe className="h-4 w-4 text-emerald-600" />
+                                </div>
+                                <h3 className="text-sm font-bold text-emerald-900">Browser Extension</h3>
+                                <span className="text-[10px] uppercase tracking-wider bg-emerald-600 text-white px-1.5 py-0.5 rounded-sm font-bold ml-auto">New</span>
+                            </div>
+                            <p className="text-xs text-emerald-700/80 leading-relaxed mb-4">
+                                Run automation tools seamlessly in your browser. A lightweight alternative to the desktop agent.
+                            </p>
+                            <a href={route('tools.download.agent', 'extension')}>
+                                <Button size="sm" className="w-full h-8 text-xs bg-emerald-600 hover:bg-emerald-500 text-white border-0 shadow-none">
+                                    Download Extension
+                                </Button>
+                            </a>
+                        </div>
                     </div>
 
                     {/* Search */}
