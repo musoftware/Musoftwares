@@ -123,7 +123,15 @@ class DownloadController extends Controller
      */
     public function downloadAgent(Request $request, string $type): StreamedResponse|RedirectResponse|\Illuminate\Http\JsonResponse|\Illuminate\Http\Response|\Symfony\Component\HttpFoundation\BinaryFileResponse
     {
-        abort_unless(in_array($type, ['node', 'python']), 404);
+        abort_unless(in_array($type, ['node', 'python', 'extension']), 404);
+
+        if ($type === 'extension') {
+            $publicFilePath = public_path('downloads/musoftware-browser-runtime.zip');
+            if (file_exists($publicFilePath)) {
+                return response()->download($publicFilePath, 'musoftware-browser-runtime.zip');
+            }
+            abort(404, 'Extension build not found. Please contact support.');
+        }
 
         $platform = match(true) {
             str_contains($request->userAgent() ?? '', 'Windows') => 'win',

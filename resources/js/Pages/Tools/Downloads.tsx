@@ -2,7 +2,7 @@ import React from 'react';
 import { Head, Link, router } from '@inertiajs/react';
 import ToolsPublicLayout from '@/Layouts/ToolsPublicLayout';
 import { Button } from '@/Components/ui/button';
-import { ExternalLink, Zap, Clock, ShoppingBag, CheckCircle2, Monitor } from 'lucide-react';
+import { ExternalLink, Zap, Clock, ShoppingBag, CheckCircle2, Monitor, Download, Globe } from 'lucide-react';
 
 interface AvailableTool {
     tool_slug: string;
@@ -123,21 +123,56 @@ export default function Downloads({ availableTools, downloads }: Props) {
                     </div>
                 )}
 
-                {/* Runtime notice */}
-                <div className="flex items-start gap-3 rounded-xl border border-indigo-100 dark:border-indigo-900/50 bg-indigo-50/50 dark:bg-indigo-950/20 p-4">
-                    <Monitor className="h-4 w-4 text-indigo-500 mt-0.5 shrink-0" />
-                    <div className="text-xs text-indigo-700 dark:text-indigo-300 leading-relaxed">
-                        <strong>How it works:</strong> Tools run locally on your computer via the Musoftware Runtime.
-                        The website is your control panel — no separate app needed.{' '}
-                        <Link
-                            href={`http://${host}:18400/setup`}
-                            target="_blank"
-                            className="underline underline-offset-2"
-                        >
-                            Check runtime status →
-                        </Link>
+                {/* Infrastructure Downloads */}
+                <section className="space-y-4">
+                    <h2 className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                        Infrastructure & Runtimes
+                    </h2>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        
+                        {/* Desktop Runtime */}
+                        <div className="flex flex-col p-5 rounded-xl border border-indigo-100 dark:border-indigo-900/50 bg-indigo-50/50 dark:bg-indigo-950/20">
+                            <div className="flex items-center gap-3 mb-2">
+                                <Monitor className="h-5 w-5 text-indigo-500" />
+                                <h3 className="text-sm font-semibold text-slate-900 dark:text-white">Desktop Runtime</h3>
+                            </div>
+                            <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mb-4 flex-1">
+                                The powerful background agent that executes tools directly on your computer. Required for heavy automation workflows.
+                            </p>
+                            <div className="flex items-center gap-2">
+                                <a href={route('tools.download.agent', 'node')}>
+                                    <Button size="sm" variant="outline" className="text-xs h-8 bg-white dark:bg-slate-900">
+                                        <Download className="h-3 w-3 mr-1.5" />
+                                        Download App
+                                    </Button>
+                                </a>
+                                <a href={`http://${host}:18400/setup`} target="_blank" className="text-xs text-indigo-600 hover:underline">
+                                    Check Status →
+                                </a>
+                            </div>
+                        </div>
+
+                        {/* Browser Extension */}
+                        <div className="flex flex-col p-5 rounded-xl border border-emerald-100 dark:border-emerald-900/50 bg-emerald-50/50 dark:bg-emerald-950/20">
+                            <div className="flex items-center gap-3 mb-2">
+                                <Globe className="h-5 w-5 text-emerald-500" />
+                                <h3 className="text-sm font-semibold text-slate-900 dark:text-white">Browser Extension <span className="ml-2 text-[10px] uppercase tracking-wider bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded-sm font-bold">New</span></h3>
+                            </div>
+                            <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mb-4 flex-1">
+                                A lightweight execution layer that runs tools securely inside your browser. Used for social media and web-based tools.
+                            </p>
+                            <div>
+                                <a href={route('tools.download.agent', 'extension')}>
+                                    <Button size="sm" className="text-xs h-8 bg-emerald-600 hover:bg-emerald-500 text-white border-0">
+                                        <Download className="h-3 w-3 mr-1.5" />
+                                        Download Extension
+                                    </Button>
+                                </a>
+                            </div>
+                        </div>
+
                     </div>
-                </div>
+                </section>
 
                 {/* Usage History */}
                 {downloads.data.length > 0 && (
