@@ -13,10 +13,10 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('erp_invoice_items', function (Blueprint $table) {
+        Schema::create('invoice_items', function (Blueprint $table) {
             $table->id();
             $table->bigInteger('invoice_id')->unsigned()->index();
-            $table->foreign('invoice_id')->references('id')->on('erp_invoices')->onDelete('cascade');
+            $table->foreign('invoice_id')->references('id')->on('invoices')->onDelete('cascade');
 
             $table->double('amount', 23, 3);
 
@@ -37,6 +37,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('erp_invoice_items');
+        Schema::dropIfExists('invoice_items');
     }
 };

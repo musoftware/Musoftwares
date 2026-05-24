@@ -12,12 +12,12 @@ return new class extends Migration {
     {
         // Update invoices that are fully paid to have job_status = 'done'
         // This ensures historical consistency
-        \Illuminate\Support\Facades\DB::table('erp_invoices')
+        \Illuminate\Support\Facades\DB::table('invoices')
             ->where('status', 'paid')
             ->update(['job_status' => 'done']);
 
         // Update invoices that are partially paid and pending to be processing
-        \Illuminate\Support\Facades\DB::table('erp_invoices')
+        \Illuminate\Support\Facades\DB::table('invoices')
             ->where('status', 'partially_paid')
             ->where('job_status', 'pending')
             ->update(['job_status' => 'processing']);

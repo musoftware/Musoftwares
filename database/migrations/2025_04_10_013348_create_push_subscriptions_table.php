@@ -13,7 +13,7 @@ class CreatePushSubscriptionsTable extends Migration
      */
     public function up()
     {
-        Schema::connection(config('webpush.database_connection'))->create(config('webpush.table_name'), function (Blueprint $table) {
+        Schema::connection(config('webpush.database_connection', null))->create(config('webpush.table_name', 'push_subscriptions'), function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->morphs('subscribable');
             $table->string('endpoint', 500)->unique();
@@ -31,6 +31,6 @@ class CreatePushSubscriptionsTable extends Migration
      */
     public function down()
     {
-        Schema::connection(config('webpush.database_connection'))->dropIfExists(config('webpush.table_name'));
+        Schema::connection(config('webpush.database_connection', null))->dropIfExists(config('webpush.table_name', 'push_subscriptions'));
     }
 }

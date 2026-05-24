@@ -11,9 +11,11 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::table('whatsapp_chats', function (Blueprint $table) {
-            $table->longText('raw_payload')->nullable()->after('ai_response');
-        });
+        if (Schema::hasTable('whatsapp_chats') && !Schema::hasColumn('whatsapp_chats', 'raw_payload')) {
+            Schema::table('whatsapp_chats', function (Blueprint $table) {
+                $table->longText('raw_payload')->nullable()->after('ai_response');
+            });
+        }
     }
 
     /**

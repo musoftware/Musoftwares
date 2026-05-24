@@ -11,7 +11,7 @@ return new class extends Migration
     {
         Schema::create('invoice_cost_lines', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('invoice_id')->constrained('erp_invoices')->cascadeOnDelete();
+            $table->foreignId('invoice_id')->constrained('invoices')->cascadeOnDelete();
             $table->enum('line_type', ['direct', 'user_credit']);
             $table->double('amount', 23, 3)->default(0);
             $table->string('description', 255)->nullable();
@@ -23,8 +23,8 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        if (Schema::hasTable('erp_invoices')) {
-            $rows = DB::table('erp_invoices')
+        if (Schema::hasTable('invoices')) {
+            $rows = DB::table('invoices')
                 ->where('cost', '>', 0)
                 ->whereIn('status', ['unpaid', 'partially_paid'])
                 ->get(['id', 'cost', 'cost_payable_user_id']);
