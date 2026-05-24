@@ -35,7 +35,7 @@ export default function Onboarding() {
 
     return (
         <AuthenticatedLayout header="ERP Setup Wizard">
-            <Head title="Configure Business OS" />
+            <Head title="Configure ERP" />
 
             <div className="py-12 px-4 max-w-2xl mx-auto">
                 <Card className="shadow-none border bg-card text-card-foreground">

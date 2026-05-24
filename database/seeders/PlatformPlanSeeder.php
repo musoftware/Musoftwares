@@ -112,16 +112,6 @@ class PlatformPlanSeeder extends Seeder
             'is_active'     => true,
         ]);
 
-        PlatformServiceItem::updateOrCreate(['slug' => 'intelligence'], [
-            'type'          => 'module',
-            'name'          => 'Intelligence & Analytics',
-            'description'   => 'Market tracking, ad monitoring, insights',
-            'monthly_price' => 19.99,
-            'yearly_price'  => 199.99,
-            'icon'          => 'Radar',
-            'sort_order'    => 4,
-            'is_active'     => true,
-        ]);
 
         // Tools
         PlatformServiceItem::updateOrCreate(['slug' => 'whatsapp'], [
@@ -143,6 +133,50 @@ class PlatformPlanSeeder extends Seeder
             'yearly_price'  => 49.99,
             'icon'          => 'MessageSquare',
             'sort_order'    => 11,
+            'is_active'     => true,
+        ]);
+
+        PlatformServiceItem::updateOrCreate(['slug' => 'competitor-tracker'], [
+            'type'          => 'tool',
+            'name'          => 'Competitor Tracker',
+            'description'   => 'Track competitor metrics and changes',
+            'monthly_price' => 9.99,
+            'yearly_price'  => 99.99,
+            'icon'          => 'Radar',
+            'sort_order'    => 12,
+            'is_active'     => true,
+        ]);
+
+        PlatformServiceItem::updateOrCreate(['slug' => 'ad-library-monitor'], [
+            'type'          => 'tool',
+            'name'          => 'Ad Library Monitor',
+            'description'   => 'Monitor ads across multiple platforms',
+            'monthly_price' => 14.99,
+            'yearly_price'  => 149.99,
+            'icon'          => 'Megaphone',
+            'sort_order'    => 13,
+            'is_active'     => true,
+        ]);
+
+        PlatformServiceItem::updateOrCreate(['slug' => 'ugc-creators-search'], [
+            'type'          => 'tool',
+            'name'          => 'UGC Creators Search',
+            'description'   => 'Find and connect with UGC creators',
+            'monthly_price' => 9.99,
+            'yearly_price'  => 99.99,
+            'icon'          => 'Users',
+            'sort_order'    => 14,
+            'is_active'     => true,
+        ]);
+
+        PlatformServiceItem::updateOrCreate(['slug' => 'swipe-vault'], [
+            'type'          => 'tool',
+            'name'          => 'Swipe Vault',
+            'description'   => 'Save and organize creative inspiration',
+            'monthly_price' => 4.99,
+            'yearly_price'  => 49.99,
+            'icon'          => 'Bookmark',
+            'sort_order'    => 15,
             'is_active'     => true,
         ]);
     }

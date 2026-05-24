@@ -38,7 +38,7 @@ class FbmbLookupController extends Controller
                 'expires_at'        => $r->expires_at->toISOString(),
             ]);
 
-        return \Inertia\Inertia::render('Intelligence/ISaas/Index', [
+        return \Inertia\Inertia::render('Fbmb/Index', [
             'pointsBalance' => $user->points_balance,
             'currency'      => $user->preferred_currency ?? 'USD',
             'history'       => $history,

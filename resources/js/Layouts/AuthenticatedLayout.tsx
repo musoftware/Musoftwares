@@ -78,7 +78,7 @@ function AuthenticatedContent({
     const isBookingActive = isRouteActive('booking');
     const isIntelligenceActive = isRouteActive('intelligence');
     const isToolsActive = isRouteActive('tools');
-    const activeModules = auth?.active_modules || { erp: true, freelance: true, marketplace: true, booking: true, intelligence: true, tools: true, fbmb: true };
+    const activeModules = auth?.active_modules || { erp: true, freelance: true, marketplace: true, booking: true, tools: true, fbmb: true };
 
     const [isTourOpen, setIsTourOpen] = useState(false);
     const [tourStep, setTourStep] = useState(1);
@@ -339,10 +339,10 @@ function AuthenticatedContent({
                                         )}
                                     </div>
                                     <DropdownMenuContent align="start" className="w-[640px] p-4 grid grid-cols-2 gap-4 rounded-xl shadow-xl border border-slate-200 bg-white isolate z-50">
-                                        {/* Column 1: Core Business OS */}
+                                        {/* Column 1: Core Systems */}
                                         <div className="flex flex-col gap-1">
                                             <div className="px-2 py-2 mb-1 border-b border-slate-50">
-                                                <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Core Business OS</p>
+                                                <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Core Systems</p>
                                             </div>
                                             
                                             <DropdownMenuItem 
@@ -360,7 +360,7 @@ function AuthenticatedContent({
                                                 </div>
                                                 <div className="flex-1 min-w-0">
                                                     <div className="flex items-center justify-between">
-                                                        <p className={cn("text-sm font-medium", isErpActive ? "text-indigo-900" : "text-slate-900")}>Business OS</p>
+                                                        <p className={cn("text-sm font-medium", isErpActive ? "text-indigo-900" : "text-slate-900")}>ERP</p>
                                                         {isErpActive && <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-indigo-100 text-indigo-700">Active</span>}
                                                         {!activeModules.erp && <Lock className="w-3.5 h-3.5 text-slate-400" />}
                                                     </div>
@@ -420,37 +420,11 @@ function AuthenticatedContent({
                                             </DropdownMenuItem>
                                         </div>
 
-                                        {/* Column 2: Intelligence & Tools */}
+                                        {/* Column 2: Tools */}
                                         <div className="flex flex-col gap-1">
                                             <div className="px-2 py-2 mb-1 border-b border-slate-50">
-                                                <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Intelligence & Tools</p>
+                                                <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Tools</p>
                                             </div>
-
-                                            <DropdownMenuItem 
-                                                className={cn(
-                                                    "p-0 outline-none border transition-colors duration-150 cursor-pointer",
-                                                    isIntelligenceActive ? "bg-cyan-50/80 border-cyan-100" : "hover:bg-slate-50 border-transparent"
-                                                )}
-                                                render={<Link href={activeModules.intelligence ? safeRoute('intelligence.index') : safeRoute('subscriptions.plans', { module: 'intelligence' })} className="flex items-start gap-3 p-2.5 rounded-lg w-full" />}
-                                            >
-                                                <div className={cn(
-                                                    "w-8 h-8 rounded-md flex items-center justify-center shrink-0 transition-colors",
-                                                    isIntelligenceActive ? "bg-cyan-100" : "bg-slate-100 group-hover/dropdown-menu-item:bg-cyan-50"
-                                                )}>
-                                                    <Radar className={cn("w-4 h-4", isIntelligenceActive ? "text-cyan-700" : "text-slate-500 group-hover/dropdown-menu-item:text-cyan-600")} />
-                                                </div>
-                                                <div className="flex-1 min-w-0">
-                                                    <div className="flex items-center justify-between">
-                                                        <p className={cn("text-sm font-medium", isIntelligenceActive ? "text-cyan-900" : "text-slate-900")}>Intelligence</p>
-                                                        {isIntelligenceActive && <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-cyan-100 text-cyan-700">Active</span>}
-                                                        {!activeModules.intelligence && <Lock className="w-3.5 h-3.5 text-slate-400" />}
-                                                        {activeModules.intelligence && !isIntelligenceActive && <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-cyan-100 text-cyan-700">Pro</span>}
-                                                    </div>
-                                                    <p className={cn("text-xs truncate", isIntelligenceActive ? "text-cyan-700/70" : "text-slate-500")}>
-                                                        {!activeModules.intelligence ? 'Subscribe to access' : 'Market & Ad Tracking'}
-                                                    </p>
-                                                </div>
-                                            </DropdownMenuItem>
 
                                             <DropdownMenuItem 
                                                 className={cn(
@@ -479,22 +453,22 @@ function AuthenticatedContent({
                                             <DropdownMenuItem 
                                                 className={cn(
                                                     "p-0 outline-none border transition-colors duration-150 cursor-pointer",
-                                                    isRouteActive('intelligence.isaas.autosms.index') ? "bg-rose-50/80 border-rose-100" : "hover:bg-slate-50 border-transparent"
+                                                    isRouteActive('text-payment-gateway.index') ? "bg-rose-50/80 border-rose-100" : "hover:bg-slate-50 border-transparent"
                                                 )}
-                                                render={<Link href={safeRoute('intelligence.isaas.autosms.index')} className="flex items-start gap-3 p-2.5 rounded-lg w-full" />}
+                                                render={<Link href={safeRoute('text-payment-gateway.index')} className="flex items-start gap-3 p-2.5 rounded-lg w-full" />}
                                             >
                                                 <div className={cn(
                                                     "w-8 h-8 rounded-md flex items-center justify-center shrink-0 transition-colors",
-                                                    isRouteActive('intelligence.isaas.autosms.index') ? "bg-rose-100" : "bg-slate-100 group-hover/dropdown-menu-item:bg-rose-50"
+                                                    isRouteActive('text-payment-gateway.index') ? "bg-rose-100" : "bg-slate-100 group-hover/dropdown-menu-item:bg-rose-50"
                                                 )}>
-                                                    <MessageSquare className={cn("w-4 h-4", isRouteActive('intelligence.isaas.autosms.index') ? "text-rose-700" : "text-slate-500 group-hover/dropdown-menu-item:text-rose-600")} />
+                                                    <MessageSquare className={cn("w-4 h-4", isRouteActive('text-payment-gateway.index') ? "text-rose-700" : "text-slate-500 group-hover/dropdown-menu-item:text-rose-600")} />
                                                 </div>
                                                 <div className="flex-1 min-w-0">
                                                     <div className="flex items-center justify-between">
-                                                        <p className={cn("text-sm font-medium", isRouteActive('intelligence.isaas.autosms.index') ? "text-rose-900" : "text-slate-900")}>Auto SMS</p>
-                                                        {isRouteActive('intelligence.isaas.autosms.index') && <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-rose-100 text-rose-700">Active</span>}
+                                                        <p className={cn("text-sm font-medium", isRouteActive('text-payment-gateway.index') ? "text-rose-900" : "text-slate-900")}>Text Payment Gateway</p>
+                                                        {isRouteActive('text-payment-gateway.index') && <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-rose-100 text-rose-700">Active</span>}
                                                     </div>
-                                                    <p className={cn("text-xs truncate", isRouteActive('intelligence.isaas.autosms.index') ? "text-rose-700/70" : "text-slate-500")}>
+                                                    <p className={cn("text-xs truncate", isRouteActive('text-payment-gateway.index') ? "text-rose-700/70" : "text-slate-500")}>
                                                         Android automated SMS
                                                     </p>
                                                 </div>

@@ -1,0 +1,14 @@
+{
+    "name": "WrittenCoursesEngine",
+    "alias": "writtencoursesengine",
+    "description": "Written Courses Engine Module",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\WrittenCoursesEngine\\App\\Providers\\WrittenCoursesEngineServiceProvider",
+        "Modules\\WrittenCoursesEngine\\App\\Providers\\RouteServiceProvider"
+    ],
+    "aliases": {},
+    "files": [],
+    "requires": []
+}

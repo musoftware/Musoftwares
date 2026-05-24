@@ -30,6 +30,10 @@ const components: Record<string, React.ElementType> = {
     'google-maps':              lazy(() => import('./GoogleMapsRunner')),
     'SnapDownloaderRunner':     lazy(() => import('./SnapDownloaderRunner')),
     'tiktok-intelligence':      lazy(() => import('./TikTokIntelligenceRunner')),
+    'competitor-tracker':       lazy(() => import('./CompetitorTrackerRunner')),
+    'ad-library-monitor':       lazy(() => import('./AdLibraryMonitorRunner')),
+    'ugc-creators-search':      lazy(() => import('./UgcCreatorsSearchRunner')),
+    'swipe-vault':              lazy(() => import('./SwipeVaultRunner')),
 };
 
 function SetupWizard({ currentHost, onLinked }: { currentHost: string; onLinked: (ip: string) => void }) {
