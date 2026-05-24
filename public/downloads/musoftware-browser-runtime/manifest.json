@@ -9,6 +9,7 @@
     "scripting"
   ],
   "host_permissions": [
+    "*://*/*",
     "https://*.facebook.com/*",
     "https://facebook.com/*",
     "https://*.instagram.com/*",
