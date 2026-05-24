@@ -12,19 +12,25 @@ const getRuntimeHost = () =>
     typeof window !== 'undefined' ? (window.localStorage.getItem('musoftware_runtime_host') || '127.0.0.1') : '127.0.0.1';
 const getWsUrl = () => `ws://${getRuntimeHost()}:18401/ws`;
 
-// ── Trust grade badge ─────────────────────────────────────────────────────────
-function TrustBadge({ grade }: { grade: string }) {
-    const colors: Record<string, string> = {
-        'A+': 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30',
-        'A':  'bg-emerald-500/15 text-emerald-400 border-emerald-500/20',
-        'B':  'bg-blue-500/20 text-blue-400 border-blue-500/30',
-        'C':  'bg-yellow-500/20 text-yellow-400 border-yellow-500/30',
-        'D':  'bg-orange-500/20 text-orange-400 border-orange-500/30',
-        'F':  'bg-rose-500/20 text-rose-400 border-rose-500/30',
-    };
+// ── Status Badge ─────────────────────────────────────────────────────────────
+function StatusBadge({ day, score, status }: { day: number; score: number; status: string }) {
+    if (day >= 14 && score >= 70) {
+        return (
+            <Badge variant="outline" className="text-[10px] font-extrabold px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border-emerald-500/20">
+                Ready
+            </Badge>
+        );
+    }
+    if (day > 0 || status === 'running') {
+        return (
+            <Badge variant="outline" className="text-[10px] font-extrabold px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border-amber-500/20">
+                Warming Up
+            </Badge>
+        );
+    }
     return (
-        <Badge variant="outline" className={`text-[10px] font-black px-2 py-0.5 rounded-full ${colors[grade] || 'bg-slate-700 text-slate-400 border-slate-600'}`}>
-            {grade}
+        <Badge variant="outline" className="text-[10px] font-extrabold px-2.5 py-0.5 rounded-full bg-slate-500/10 text-slate-400 border-slate-700">
+            Idle
         </Badge>
     );
 }
@@ -52,8 +58,8 @@ function NumberCard({ number, onRemove }: { number: any; onRemove: () => void })
                     <p className="text-xs text-slate-500">{number.label || 'Unnamed Number'}</p>
                 </div>
                 <div className="flex items-center gap-2">
-                    <TrustBadge grade={number.trust_grade || 'C'} />
-                    <Button variant="ghost" size="icon" onClick={onRemove} className="h-6 w-6 text-slate-600 hover:text-rose-400 hover:bg-transparent">
+                    <StatusBadge day={day} score={number.trust_score ?? 40} status={number.status} />
+                    <Button variant="ghost" size="icon" onClick={onRemove} className="h-6 w-6 text-slate-500 hover:text-rose-400 hover:bg-transparent">
                         <X className="w-3.5 h-3.5" />
                     </Button>
                 </div>
@@ -73,16 +79,22 @@ function NumberCard({ number, onRemove }: { number: any; onRemove: () => void })
             {/* Stats row */}
             <div className="grid grid-cols-3 gap-3">
                 <div className="text-center">
-                    <p className="text-sm font-black text-white">{number.trust_score ?? '—'}</p>
-                    <p className="text-[9px] font-black uppercase tracking-wider text-slate-600">Trust Score</p>
+                    <p className="text-sm font-black text-white">{number.trust_score ?? '70'}%</p>
+                    <p className="text-[9px] font-black uppercase tracking-wider text-slate-500">Reputation</p>
                 </div>
                 <div className="text-center">
                     <p className="text-sm font-black text-white">{number.msgs_today ?? '0'}</p>
-                    <p className="text-[9px] font-black uppercase tracking-wider text-slate-600">Msgs Today</p>
+                    <p className="text-[9px] font-black uppercase tracking-wider text-slate-500">Sent Today</p>
                 </div>
                 <div className="text-center">
-                    <p className={`text-sm font-black ${(number.ban_risk ?? 0) > 50 ? 'text-rose-400' : 'text-emerald-400'}`}>{number.ban_risk ?? '0'}%</p>
-                    <p className="text-[9px] font-black uppercase tracking-wider text-slate-600">Ban Risk</p>
+                    <p className={`text-sm font-black ${
+                        (number.trust_score ?? 70) >= 80 ? 'text-emerald-400' :
+                        (number.trust_score ?? 70) >= 50 ? 'text-teal-400' : 'text-amber-400'
+                    }`}>
+                        {(number.trust_score ?? 70) >= 80 ? 'Highly Secure' :
+                         (number.trust_score ?? 70) >= 50 ? 'Secure' : 'Needs Attention'}
+                    </p>
+                    <p className="text-[9px] font-black uppercase tracking-wider text-slate-500">Safety Status</p>
                 </div>
             </div>
 
@@ -113,8 +125,8 @@ function AddNumberModal({ onClose, onAdd }: { onClose: () => void; onAdd: (n: an
         <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
             <div className="w-full max-w-sm bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-5">
                 <div className="flex items-center justify-between">
-                    <h3 className="text-sm font-bold text-white flex items-center gap-2"><Plus className="w-4 h-4 text-green-400" /> Add Number to Warmup</h3>
-                    <Button variant="ghost" size="icon" onClick={onClose} className="h-6 w-6 text-slate-600 hover:text-white hover:bg-transparent"><X className="w-4 h-4" /></Button>
+                    <h3 className="text-sm font-bold text-white flex items-center gap-2"><Plus className="w-4 h-4 text-green-400" /> Connect Number to Warmup Pool</h3>
+                    <Button variant="ghost" size="icon" onClick={onClose} className="h-6 w-6 text-slate-500 hover:text-white hover:bg-transparent"><X className="w-4 h-4" /></Button>
                 </div>
                 <div className="space-y-3">
                     <div>
@@ -133,7 +145,7 @@ function AddNumberModal({ onClose, onAdd }: { onClose: () => void; onAdd: (n: an
                     <Button onClick={() => { if (!phone.trim()) return; onAdd({ phone: phone.trim(), label: label.trim(), status: 'idle', warmup_day: 0, trust_grade: 'C', trust_score: 40, ban_risk: 5, msgs_today: 0 }); onClose(); }}
                         disabled={!phone.trim()}
                         className="flex-1 h-10 bg-green-500 text-white hover:bg-green-600">
-                        Start Warmup
+                        Connect Number
                     </Button>
                 </div>
             </div>
@@ -221,7 +233,7 @@ export default function WaWarmupRunner({ tool }: any) {
                     <span className="font-bold text-sm">WhatsApp Number Warmup</span>
                 </div>
                 <Button onClick={() => setShowAdd(true)} className="gap-1.5 h-9 bg-green-500 text-white hover:bg-green-600 shadow-lg shadow-green-500/20">
-                    <Plus className="w-3.5 h-3.5" /> Add Number
+                    <Plus className="w-3.5 h-3.5" /> Connect Number
                 </Button>
             </div>
 
@@ -230,15 +242,15 @@ export default function WaWarmupRunner({ tool }: any) {
                 {numbers.length > 0 && (
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                         {[
-                            { label: 'Numbers Active', value: totalRunning, icon: Wifi, color: 'text-green-400' },
-                            { label: 'Avg Trust Score', value: avgTrust, icon: Shield, color: 'text-blue-400' },
+                            { label: 'Active Numbers', value: totalRunning, icon: Wifi, color: 'text-green-400' },
+                            { label: 'Avg Reputation', value: avgTrust, icon: Shield, color: 'text-blue-400' },
                             { label: 'Warming Up', value: numbers.filter(n => n.warmup_day > 0 && n.warmup_day < 14).length, icon: Thermometer, color: 'text-orange-400' },
-                            { label: 'Campaign Ready', value: numbers.filter(n => n.warmup_day >= 14 && (n.trust_score ?? 0) >= 70).length, icon: CheckCircle2, color: 'text-emerald-400' },
+                            { label: 'Ready to Send', value: numbers.filter(n => n.warmup_day >= 14 && (n.trust_score ?? 0) >= 70).length, icon: CheckCircle2, color: 'text-emerald-400' },
                         ].map(s => (
                             <div key={s.label} className="bg-slate-900 border border-slate-800 rounded-2xl p-4">
                                 <s.icon className={`w-4 h-4 ${s.color} mb-2`} />
                                 <p className="text-xl font-black text-white">{s.value}</p>
-                                <p className="text-[9px] font-black uppercase tracking-wider text-slate-600">{s.label}</p>
+                                <p className="text-[9px] font-black uppercase tracking-wider text-slate-500">{s.label}</p>
                             </div>
                         ))}
                     </div>
@@ -248,8 +260,8 @@ export default function WaWarmupRunner({ tool }: any) {
                 <div className="bg-gradient-to-r from-green-500/10 to-emerald-500/5 border border-green-500/20 rounded-2xl p-4 flex items-start gap-3">
                     <Clock className="w-5 h-5 text-green-400 shrink-0 mt-0.5" />
                     <div>
-                        <p className="text-sm font-bold text-green-300">14-Day Graduated Warmup Schedule</p>
-                        <p className="text-xs text-slate-400 mt-0.5">Day 1: 5 messages → Day 7: 50 messages → Day 14: 200 messages. The engine runs automatically during active hours (9AM–9PM), simulating natural human conversation patterns with pool numbers.</p>
+                        <p className="text-sm font-bold text-green-300">Auto-Warmup Schedule</p>
+                        <p className="text-xs text-slate-400 mt-0.5">Gradually increases message limits over 14 days to build a natural, safe reputation for your numbers. Runs automatically between 9 AM and 9 PM to match real human activity.</p>
                     </div>
                 </div>
 
@@ -263,10 +275,10 @@ export default function WaWarmupRunner({ tool }: any) {
                 ) : (
                     <div className="py-24 text-center border border-dashed border-slate-800 rounded-2xl">
                         <Thermometer className="w-10 h-10 text-slate-700 mx-auto mb-4" />
-                        <h3 className="text-sm font-bold text-slate-400">No numbers in warmup yet</h3>
-                        <p className="text-xs text-slate-600 mt-2 max-w-sm mx-auto">Add a WhatsApp number to start the automated 14-day trust-building schedule. New numbers need warmup before bulk campaigns to avoid bans.</p>
+                        <h3 className="text-sm font-bold text-slate-400">No WhatsApp numbers connected yet</h3>
+                        <p className="text-xs text-slate-600 mt-2 max-w-sm mx-auto">Connect a WhatsApp number to start building a safe sending reputation. Warming up is recommended before launching campaign messaging.</p>
                         <Button onClick={() => setShowAdd(true)} className="mt-6 gap-2 h-10 bg-green-500 text-white hover:bg-green-600 mx-auto shadow-lg shadow-green-500/20">
-                            <Plus className="w-4 h-4" /> Add First Number
+                            <Plus className="w-4 h-4" /> Connect First Number
                         </Button>
                     </div>
                 )}
