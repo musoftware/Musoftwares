@@ -766,16 +766,14 @@ export default function IPTVDownloaderRunner() {
                                 </div>
 
                                 <div className="flex items-center gap-3">
-                                    <Input
-                                        type="select"
-                                        as="select"
+                                    <select
                                         value={selectedPlaylistId}
                                         onChange={(e: any) => { setSelectedPlaylistId(e.target.value); setSelectedGroup(''); }}
-                                        className="w-48 bg-white font-bold"
+                                        className="h-9 w-48 min-w-0 rounded-lg border border-input bg-white px-2.5 py-1 text-sm font-bold transition-colors outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
                                     >
                                         <option value="">Select Playlist...</option>
                                         {playlists.map(pl => <option key={pl.id} value={pl.id}>{pl.name}</option>)}
-                                    </Input>
+                                    </select>
 
                                     <Button
                                         variant={bookmarkedOnly ? "destructive" : "outline"}

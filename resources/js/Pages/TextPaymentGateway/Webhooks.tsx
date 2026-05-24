@@ -51,7 +51,7 @@ export default function Webhooks({ webhook }: WebhooksProps) {
         <AuthenticatedLayout
             header={<h2 className="font-semibold text-xl text-gray-800 leading-tight">Webhook Configuration</h2>}
         >
-            <Head title="Webhooks - Text Payment Gateway" />
+            <Head title="Webhooks - Payment Gateway" />
 
             <div className="py-8 md:py-12">
                 <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
@@ -75,7 +75,7 @@ export default function Webhooks({ webhook }: WebhooksProps) {
                         <form onSubmit={handleSubmit}>
                             <CardHeader>
                                 <CardTitle>Endpoint Settings</CardTitle>
-                                <CardDescription>Configure where Text Payment Gateway should send HTTP POST requests when a transaction is detected.</CardDescription>
+                                <CardDescription>Configure where Payment Gateway should send HTTP POST requests when a payment is received.</CardDescription>
                             </CardHeader>
                             <CardContent className="space-y-4">
                                 <div className="space-y-2">

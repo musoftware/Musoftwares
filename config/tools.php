@@ -3,7 +3,7 @@
 return [
     '832b99f8-26dc-405b-b741-36c3b982a32e' => [
         'guid' => '832b99f8-26dc-405b-b741-36c3b982a32e',
-        'title' => 'TikTok Intelligence Engine',
+        'title' => 'TikTok Intelligence',
         'slug' => 'tiktok-intelligence',
         'short_description' => 'Discover viral creators, monitor competitors, track UGC trends, and build actionable market intelligence pipelines.',
         'description' => 'The TikTok Intelligence Engine is a production-grade intelligence platform that runs entirely locally on your machine.
@@ -191,7 +191,7 @@ return [
     ],
     '7a4af7e5-ea44-49af-8dbf-dac14c807120' => [
         'guid' => '7a4af7e5-ea44-49af-8dbf-dac14c807120',
-        'title' => 'WhatsApp Sender Pro',
+        'title' => 'WhatsApp Sender',
         'slug' => 'whatsapp-sender-pro',
         'short_description' => 'Enterprise-grade WhatsApp Operations tool supporting multi-session automation, bulk campaigns, and AI auto-replies.',
         'description' => 'WhatsApp Sender Pro is a complete enterprise operations platform running as a local runtime plugin.
@@ -379,7 +379,7 @@ Get a Viral Score (0-100) with detailed per-dimension breakdown.',
     ],
     '6212a6ac-477e-4b72-8610-b479a9bc92ac' => [
         'guid' => '6212a6ac-477e-4b72-8610-b479a9bc92ac',
-        'title' => 'Format DNA Extractor',
+        'title' => 'Format Extractor',
         'slug' => 'format-extractor',
         'short_description' => 'Extract the viral format blueprint from any TikTok video — reusable hook templates, structure patterns, and sound strategy.',
         'description' => 'Format DNA Extractor reverse-engineers viral TikTok formats into reusable blueprints.
@@ -441,7 +441,7 @@ Not copying content — copying the psychology.
     ],
     'ef4539db-2749-4df3-9dab-2f737a7200c9' => [
         'guid' => 'ef4539db-2749-4df3-9dab-2f737a7200c9',
-        'title' => 'IPTV Downloader & Recorder',
+        'title' => 'IPTV Downloader',
         'slug' => 'iptv-downloader',
         'short_description' => 'A professional-grade operational workspace for loading IPTV playlists, category-browsing channels, and recording live streams or downloading VOD assets locally.',
         'description' => 'IPTV Downloader & Recorder is a complete live stream capture and playlist management ecosystem running entirely inside your local runtime.
@@ -493,7 +493,7 @@ Not copying content — copying the psychology.
     ],
     '50dc5bff-8c85-423c-9d65-f66648c66e46' => [
         'guid' => '50dc5bff-8c85-423c-9d65-f66648c66e46',
-        'title' => 'Screenshot Feedback Workspace',
+        'title' => 'Screenshot Feedback',
         'slug' => 'screenshot-feedback',
         'short_description' => 'A clean, operational workspace for UI review, feedback pins, and screenshot organization.',
         'description' => 'Screenshot Feedback Workspace is a visual review tool that lets you drop pin-based comments directly on design screenshots.
@@ -542,7 +542,7 @@ Not copying content — copying the psychology.
     ],
     '2d142935-58f5-4bc3-bfce-d0e1af658e32' => [
         'guid' => '2d142935-58f5-4bc3-bfce-d0e1af658e32',
-        'title' => 'OpenSooq Lead Extractor',
+        'title' => 'OpenSooq Extractor',
         'slug' => 'opensooq',
         'short_description' => 'Extract real buyer and seller leads from OpenSooq listings — by keyword, category, and country.',
         'description' => 'OpenSooq Lead Extractor mines verified leads from OpenSooq.com, the largest classifieds marketplace in the Arab world.
@@ -592,7 +592,7 @@ Not copying content — copying the psychology.
     ],
     '123e4567-e89b-12d3-a456-426614174000' => [
         'guid' => '123e4567-e89b-12d3-a456-426614174000',
-        'title' => 'Email Sender Pro',
+        'title' => 'Email Sender',
         'slug' => 'email-sender',
         'short_description' => 'Bulk Email Campaigns & Marketing',
         'description' => 'Send bulk emails locally with high deliverability using SMTP accounts and beautiful templates. Complete with bounce tracking and reporting.',
@@ -634,7 +634,7 @@ Not copying content — copying the psychology.
     ],
     'fbe12345-0000-0000-0000-000000000000' => [
         'guid' => 'fbe12345-0000-0000-0000-000000000000',
-        'title' => 'AMC Facebook Extractor',
+        'title' => 'Facebook Extractor',
         'slug' => 'facebook-extractor',
         'short_description' => 'Extract members, comments, and likes directly from the Facebook UI without APIs.',
         'description' => 'A Runtime-First Browser Bridge extension that securely intercepts Facebook GraphQL responses without fragile DOM scraping. Extract group members, post comments, and post likes directly into local SQLite storage.',
@@ -668,6 +668,330 @@ Not copying content — copying the psychology.
                 'features' => [
                     'Unlimited Extractions',
                     'Local DB Storage'
+                ],
+            ],
+        ],
+        'version' => '1.0.0',
+    ],
+    '9e1c4824-345f-4a0b-9d47-66a70a831d68' => [
+        'guid' => '9e1c4824-345f-4a0b-9d47-66a70a831d68',
+        'title' => 'Content Researcher',
+        'slug' => 'content-researcher',
+        'short_description' => 'Scrape DuckDuckGo and analyze SEO data for any keyword.',
+        'description' => 'Content Researcher takes your target keyword, scrapes search engine results, and extracts the full SEO blueprint of top-ranking pages.
+
+- Extract Page Titles, Meta Descriptions, and Keywords
+- Analyze H1, H2, and H3 structures
+- Extract image sources and alt tags
+- Discover internal, external, social, and video links
+- 100% local execution and SQLite storage',
+        'category' => 'SEO',
+        'supported_os' => [
+            'windows',
+            'mac',
+            'linux'
+        ],
+        'is_featured' => true,
+        'is_active' => true,
+        'is_free' => true,
+        'runner_component' => 'ContentResearcherRunner',
+        'features' => [
+            'Keyword Search Scraping',
+            'SEO Meta Tag Extraction',
+            'Header Structure Analysis',
+            'Link & Image Discovery'
+        ],
+        'requirements' => [
+            'Musoftware Runtime Agent running locally',
+            'Internet connection'
+        ],
+        'plans' => [
+            '734d284a-d83a-4a5e-b2d9-1c94b79cfb72' => [
+                'guid' => '734d284a-d83a-4a5e-b2d9-1c94b79cfb72',
+                'name' => 'Free',
+                'price_monthly' => 0,
+                'price_yearly' => 0,
+                'is_popular' => true,
+                'features' => [
+                    'Unlimited Searches',
+                    'Local DB Storage'
+                ],
+            ],
+        ],
+        'version' => '1.0.0',
+    ],
+    '5c6d32f1-6789-4a0b-11c2-334455667788' => [
+        'guid' => '5c6d32f1-6789-4a0b-11c2-334455667788',
+        'title' => 'CSV Filter',
+        'slug' => 'data-filter',
+        'short_description' => 'Fast, local CSV processing for large datasets. Filter, combine, and remove duplicates without crashing.',
+        'description' => 'Process huge CSV datasets entirely locally with stream-based processing.
+
+- Deduplicate rows natively or by distinct column.
+- Extremely fast for multi-GB files.
+- 100% private local execution. No data leaves your machine.',
+        'category' => 'Productivity',
+        'supported_os' => [
+            'windows',
+            'mac',
+            'linux'
+        ],
+        'is_featured' => true,
+        'is_active' => true,
+        'is_free' => true,
+        'runner_component' => 'DataFilterRunner',
+        'features' => [
+            'Distinct Row Filtering',
+            'Distinct Column Deduplication',
+            'CSV Stream Engine'
+        ],
+        'requirements' => [
+            'Musoftware Runtime Agent running locally'
+        ],
+        'plans' => [
+            '2f2b3e44-1234-4a5b-9c76-26c2688e3d8f' => [
+                'guid' => '2f2b3e44-1234-4a5b-9c76-26c2688e3d8f',
+                'name' => 'Free',
+                'price_monthly' => 0,
+                'price_yearly' => 0,
+                'is_popular' => true,
+                'features' => [
+                    'Unlimited rows',
+                    'Local Stream Execution'
+                ],
+            ],
+        ],
+        'version' => '1.0.0',
+    ],
+    '2e9c48b2-1a2b-4c3d-8e5f-123456789abc' => [
+        'guid' => '2e9c48b2-1a2b-4c3d-8e5f-123456789abc',
+        'title' => 'Facebook Publisher',
+        'slug' => 'facebook-publisher',
+        'short_description' => 'Automate publishing of Reels, Stories, and Video Posts to Facebook Pages.',
+        'description' => 'Facebook Auto Publisher is a headless local engine designed to automate video publishing and media management to Facebook Pages without human intervention.
+
+- Support for Reels, Stories, and Video Posts
+- Automatic file uploads and scheduled publishing
+- Background local browser automation
+- Private local SQLite for queued media and delay schedules',
+        'category' => 'Marketing',
+        'supported_os' => [
+            'windows',
+            'mac',
+            'linux'
+        ],
+        'is_featured' => true,
+        'is_active' => true,
+        'is_free' => true,
+        'runner_component' => 'FacebookPublisher/Runner',
+        'features' => [
+            'Reels & Stories Publishing',
+            'Video Post Uploads',
+            'Right Manager Automation',
+            'Local Storage & Queue'
+        ],
+        'requirements' => [
+            'Musoftware Runtime Agent running locally',
+            'Internet connection'
+        ],
+        'plans' => [
+            '3f9c48b2-1a2b-4c3d-8e5f-123456789abc' => [
+                'guid' => '3f9c48b2-1a2b-4c3d-8e5f-123456789abc',
+                'name' => 'Pro Auto Publisher',
+                'price_monthly' => 0,
+                'price_yearly' => 0,
+                'is_popular' => true,
+                'features' => [
+                    'Unlimited Uploads',
+                    'Background Automation',
+                    'Local DB Storage'
+                ],
+            ],
+        ],
+        'version' => '1.0.0',
+    ],
+    '4c7a52e1-7e88-444f-8a43-9828557a2c6d' => [
+        'guid' => '4c7a52e1-7e88-444f-8a43-9828557a2c6d',
+        'title' => 'Domain Intelligence',
+        'slug' => 'domain-intelligence',
+        'short_description' => 'Scrape and analyze domain WHOIS, DNS, and technology stack information.',
+        'description' => 'Domain Intelligence provides an in-depth analysis of any domain name.
+
+- WHOIS lookups
+- DNS records (A, MX, TXT)
+- Technology stack identification
+- On-page SEO metrics
+- 100% local execution and SQLite storage',
+        'category' => 'SEO',
+        'supported_os' => [
+            'windows',
+            'mac',
+            'linux'
+        ],
+        'is_featured' => true,
+        'is_active' => true,
+        'is_free' => true,
+        'runner_component' => 'DomainIntelligenceRunner',
+        'features' => [
+            'WHOIS Lookup',
+            'DNS Record Parsing',
+            'Tech Stack Analyzer',
+            'On-page SEO Checker'
+        ],
+        'requirements' => [
+            'Musoftware Runtime Agent running locally',
+            'Internet connection'
+        ],
+        'plans' => [
+            'f7091a13-4c92-4840-89dc-555e88863f82' => [
+                'guid' => 'f7091a13-4c92-4840-89dc-555e88863f82',
+                'name' => 'Free',
+                'price_monthly' => 0,
+                'price_yearly' => 0,
+                'is_popular' => true,
+                'features' => [
+                    'Unlimited Domain Checks',
+                    'Local DB Storage'
+                ],
+            ],
+        ],
+        'version' => '1.0.0',
+    ],
+    '1d856d35-9502-4b2a-8869-7603c4cf7e72' => [
+        'guid' => '1d856d35-9502-4b2a-8869-7603c4cf7e72',
+        'title' => 'Domain Prospector',
+        'slug' => 'domain-prospector',
+        'short_description' => 'Find domain sellers and ownership contact information for acquisition.',
+        'description' => 'Domain Prospector is built to help you find the current owner or seller of a target domain.
+
+- Check domain availability and marketplace listings
+- Extract seller contact details when available
+- Batch check domains for acquisition
+- Organize prospects locally',
+        'category' => 'Marketing',
+        'supported_os' => [
+            'windows',
+            'mac',
+            'linux'
+        ],
+        'is_featured' => true,
+        'is_active' => true,
+        'is_free' => true,
+        'runner_component' => 'DomainProspectorRunner',
+        'features' => [
+            'Marketplace Scraping',
+            'Seller Contact Extraction',
+            'Batch Checking',
+            'Prospect Organization'
+        ],
+        'requirements' => [
+            'Musoftware Runtime Agent running locally',
+            'Internet connection'
+        ],
+        'plans' => [
+            '2a188f11-2e6b-4cf7-8d2a-43bc0e3d93b1' => [
+                'guid' => '2a188f11-2e6b-4cf7-8d2a-43bc0e3d93b1',
+                'name' => 'Free',
+                'price_monthly' => 0,
+                'price_yearly' => 0,
+                'is_popular' => true,
+                'features' => [
+                    'Unlimited Searches',
+                    'Local DB Storage'
+                ],
+            ],
+        ],
+        'version' => '1.0.0',
+    ],
+    '6f481ab0-00d5-4e31-8919-482f3dbf7b11' => [
+        'guid' => '6f481ab0-00d5-4e31-8919-482f3dbf7b11',
+        'title' => 'TikTok Booster',
+        'slug' => 'tiktok-booster',
+        'short_description' => 'Automated TikTok View, Share, and Favorite Booster using intelligent CAPTCHA bypass.',
+        'description' => 'TikTok Booster automates the process of increasing your TikTok metrics using local headless browser automation.
+
+- Bypass CAPTCHAs automatically with local OCR
+- Boost video views, shares, and favorites
+- Queue multiple campaigns and run them in the background
+- Zero-dependency architecture with Playwright and SQLite
+- 100% local execution ensuring privacy and security',
+        'category' => 'Marketing',
+        'supported_os' => [
+            'windows',
+            'mac',
+            'linux'
+        ],
+        'is_featured' => true,
+        'is_active' => true,
+        'is_free' => true,
+        'runner_component' => 'TikTokBoosterRunner',
+        'features' => [
+            'Automated Views & Shares',
+            'CAPTCHA Bypass Engine',
+            'Background Campaign Queue',
+            'Local Execution'
+        ],
+        'requirements' => [
+            'Musoftware Runtime Agent running locally',
+            'Internet connection'
+        ],
+        'plans' => [
+            '5c34e8d3-5a04-44b2-b430-8d594bbcd621' => [
+                'guid' => '5c34e8d3-5a04-44b2-b430-8d594bbcd621',
+                'name' => 'Free',
+                'price_monthly' => 0,
+                'price_yearly' => 0,
+                'is_popular' => true,
+                'features' => [
+                    'Unlimited Campaigns',
+                    'Local DB Storage'
+                ],
+            ],
+        ],
+        'version' => '1.0.0',
+    ],
+    'a3e23b1c-99f8-4e5c-a5b8-d2c6c3cfb8b9' => [
+        'guid' => 'a3e23b1c-99f8-4e5c-a5b8-d2c6c3cfb8b9',
+        'title' => 'Telegram Downloader',
+        'slug' => 'telegram-downloader',
+        'short_description' => 'Securely download media and metadata from Telegram channels locally.',
+        'description' => 'Telegram Downloader allows you to safely connect to your Telegram account and automate media downloading from channels.
+
+- Fast MTProto direct connection (no bots required)
+- Downloads videos and photos automatically
+- Captures message metadata into JSON for easy cataloging
+- 100% local execution and privacy',
+        'category' => 'Media',
+        'supported_os' => [
+            'windows',
+            'mac',
+            'linux'
+        ],
+        'is_featured' => true,
+        'is_active' => true,
+        'is_free' => true,
+        'runner_component' => 'TelegramDownloaderRunner',
+        'features' => [
+            'Secure MTProto Auth',
+            'Channel Listing',
+            'Media Downloading',
+            'JSON Metadata Extraction'
+        ],
+        'requirements' => [
+            'Musoftware Runtime Agent running locally',
+            'Internet connection',
+            'Telegram API ID and Hash'
+        ],
+        'plans' => [
+            'f2a24d5b-11c5-4a8f-b9b2-a4f6d4d1e7e4' => [
+                'guid' => 'f2a24d5b-11c5-4a8f-b9b2-a4f6d4d1e7e4',
+                'name' => 'Free Downloader',
+                'price_monthly' => 0,
+                'price_yearly' => 0,
+                'is_popular' => true,
+                'features' => [
+                    'Unlimited Downloads',
+                    'Local Storage'
                 ],
             ],
         ],

@@ -34,6 +34,15 @@ const components: Record<string, React.ElementType> = {
     'ad-library-monitor':       lazy(() => import('./AdLibraryMonitorRunner')),
     'ugc-creators-search':      lazy(() => import('./UgcCreatorsSearchRunner')),
     'swipe-vault':              lazy(() => import('./SwipeVaultRunner')),
+    'DataFilterRunner':         lazy(() => import('./DataFilterRunner')),
+    'ContentResearcherRunner':  lazy(() => import('./ContentResearcherRunner')),
+    'FacebookPublisher/Runner': lazy(() => import('./FacebookPublisher/Runner')),
+    'DomainIntelligenceRunner': lazy(() => import('./DomainIntelligenceRunner')),
+    'DomainProspectorRunner':   lazy(() => import('./DomainProspectorRunner')),
+    'HarajRunner':              lazy(() => import('./HarajRunner')),
+    'WaAiAgentRunner':          lazy(() => import('./WaAiAgentRunner')),
+    'WaFunnelEngineRunner':     lazy(() => import('./WaFunnelEngineRunner')),
+    'WaWarmupRunner':           lazy(() => import('./WaWarmupRunner')),
 };
 
 function SetupWizard({ currentHost, onLinked }: { currentHost: string; onLinked: (ip: string) => void }) {
