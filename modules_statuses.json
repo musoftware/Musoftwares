@@ -8,6 +8,7 @@
     "Intelligence": true,
     "Tools": true,
     "fbmb": true,
-    "AutoSms": true,
-    "GoldSavers": true
+    "TextPaymentGateway": true,
+    "GoldSavers": true,
+    "WrittenCoursesEngine": true
 }
