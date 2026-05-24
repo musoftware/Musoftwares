@@ -37,56 +37,82 @@ export default function DeliverabilityWorkspace({
 
     const isArabic = locale === 'ar';
 
+    const formatLogMessage = (log: WarmupActivityLog) => {
+        const partner = log.partnerPhone || '';
+        if (log.sessionId === 'SYSTEM') {
+            return log.text;
+        }
+        if (log.direction === 'out') {
+            if (log.state === 'starter') {
+                return isArabic 
+                    ? `تم بدء محادثة إحماء مع الرقم (${partner})`
+                    : `Initiated warm-up dialogue with (${partner})`;
+            }
+            if (log.state === 'completed') {
+                return isArabic
+                    ? `اكتملت سلسلة المحادثة مع الرقم (${partner})`
+                    : `Completed warm-up dialogue sequence with (${partner})`;
+            }
+            return isArabic
+                ? `تم إرسال رسالة إحماء إلى الرقم (${partner}): "${log.text}"`
+                : `Sent warm-up message to (${partner}): "${log.text}"`;
+        } else {
+            return isArabic
+                ? `تم استقبال رد من الرقم (${partner}): "${log.text}"`
+                : `Received response from (${partner}): "${log.text}"`;
+        }
+    };
+
     const translations = {
         en: {
-            title: "Account Warmup & Health Monitor",
-            subtitle: "Autonomous double-sided conversational dialogue engine to build trust and bypass WhatsApp spam filters.",
-            manualTrigger: "Trigger Quick Warmup Chat",
-            manualTriggerSub: "Forcibly initiate a contextual, bilingual conversation pair between two active warming accounts now.",
-            statusActive: "Active Warming Pool",
-            statusInactive: "Idle",
-            trustScore: "Deliverability Health Score",
-            warmupToggled: "Autonomous Warmup",
-            messagesWarmed: "Warmup Messages Sent",
-            poolDetails: "Warming Pool Status",
-            noAccounts: "No linked WhatsApp accounts. Please connect accounts first to build the warming pool.",
-            consoleTitle: "Live Autonomous Warmup Console",
-            consoleSub: "Real-time stream of inter-account warm-up activity and dialouge trees.",
-            consoleEmpty: "Waiting for warmup sequence to trigger. Warmup runs automatically every 20 minutes.",
-            intensityTitle: "Warming Intensity Control",
-            intensitySub: "Adjust the rate of interaction per account to match age and usage levels.",
-            intensityLow: "Conservative (Low)",
-            intensityMedium: "Recommended (Medium)",
-            intensityHigh: "Aggressive (High)",
-            trustTierExcellent: "Excellent Reputation",
-            trustTierGood: "Good Deliverability",
-            trustTierNeedsWarmup: "Needs Warming Up",
+            title: "Account Health & Safety",
+            subtitle: "Prepare your accounts for bulk campaigns by building a secure sending reputation.",
+            manualTrigger: "Send Test Warmup Message",
+            manualTriggerSub: "Send a quick verification message between your accounts to ensure the warmup system is running.",
+            statusActive: "Warming Up",
+            statusInactive: "Inactive",
+            trustScore: "Reputation Score",
+            warmupToggled: "Auto-Warmup",
+            messagesWarmed: "Warmup Messages",
+            poolDetails: "Account Status",
+            noAccounts: "No WhatsApp accounts connected. Connect your accounts to start warming them up.",
+            consoleTitle: "Recent Activity",
+            consoleSub: "Real-time updates of your warmup messages.",
+            consoleEmpty: "No activity yet. Warmup runs automatically in the background.",
+            intensityTitle: "Warmup Speed",
+            intensitySub: "Adjust how frequently warmup messages are sent to match your account usage.",
+            intensityLow: "Safe (For New Accounts)",
+            intensityMedium: "Normal (Recommended)",
+            intensityHigh: "Fast (For Active Accounts)",
+            trustTierExcellent: "Healthy & Ready",
+            trustTierGood: "Good Standing",
+            trustTierNeedsWarmup: "Needs Warmup",
             connected: "Connected",
             disconnected: "Disconnected"
         },
         ar: {
-            title: "إحماء الحسابات ومراقبة الأمان",
-            subtitle: "محرك محادثات تلقائي ثنائي الاتجاه لبناء موثوقية الأرقام وتخطي حجب مرشحات واتساب 스팸.",
-            manualTrigger: "بدء جلسة إحماء سريعة",
-            manualTriggerSub: "أطلق محادثة تفاعلية سياقية فوراً بين حسابين نشطين في حوض الإحماء لمراقبة الأداء.",
-            statusActive: "نشط في حوض الإحماء",
-            statusInactive: "خامل",
-            trustScore: "مستوى الأمان والتسليم",
-            warmupToggled: "أتمتة الإحماء التلقائي",
-            messagesWarmed: "رسائل الإحماء المرسلة",
-            poolDetails: "حالة حسابات حوض الإحماء",
-            noAccounts: "لا توجد حسابات واتساب مرتبطة حالياً. يرجى ربط حساباتك لبناء مجموعة الإحماء.",
-            consoleTitle: "شاشة مراقبة الأنشطة الحية (Console)",
-            consoleSub: "بث مباشر وتفصيلي للمحادثات التفاعلية وحوارات الذكاء الاصطناعي الجارية حالياً.",
-            consoleEmpty: "بانتظار بدء جلسات الإحماء التلقائية. يجري فحص وتدفق المحادثات كل 20 دقيقة.",
-            intensityTitle: "التحكم في كثافة وسرعة الإحماء",
-            intensitySub: "اضبط معدل وتكرار المحادثات اليومية لتناسب عمر الحساب ومستوى استخدامه.",
-            intensityLow: "محافظ (منخفض)",
-            intensityMedium: "موصى به (متوسط)",
-            intensityHigh: "مكثف وسريع (مرتفع)",
-            trustTierExcellent: "سمعة ممتازة وآمنة",
-            trustTierGood: "تسليم موثوق وجيد",
-            trustTierNeedsWarmup: "بحاجة إلى إحماء مستمر",
+            title: "صحة وأمان الحسابات",
+            subtitle: "جهّز حساباتك للإرسال الجماعي عبر بناء سمعة إرسال آمنة وتجنب الحظر.",
+            manualTrigger: "إرسال رسالة إحماء تجريبية",
+            manualTriggerSub: "أرسل رسالة تحقق سريعة بين حساباتك للتأكد من عمل نظام الإحماء بشكل صحيح.",
+            statusActive: "قيد الإحماء",
+            statusInactive: "غير نشط",
+            trustScore: "مستوى السمعة",
+            warmupToggled: "الإحماء التلقائي",
+            messagesWarmed: "رسائل الإحماء",
+            poolDetails: "حالة الحسابات",
+            noAccounts: "لا توجد حسابات واتساب مرتبطة حالياً. يرجى ربط حساباتك لبدء الإحماء.",
+            consoleTitle: "النشاط الأخير",
+            consoleSub: "تحديثات مباشرة لرسائل الإحماء الجارية حالياً.",
+            consoleEmpty: "لا يوجد نشاط بعد. يعمل نظام الإحماء تلقائياً في الخلفية.",
+            intensityTitle: "سرعة الإحماء",
+            intensitySub: "اضبط معدل وتكرار رسائل الإحماء لتناسب حجم استخدام حسابك.",
+            intensityLow: "آمن (للحسابات الجديدة)",
+            intensityMedium: "طبيعي (موصى به)",
+            intensityHigh: "سريع (للحسابات النشطة)",
+            trustTierExcellent: "نشط وجاهز",
+            trustTierGood: "سمعة جيدة",
+            trustTierNeedsWarmup: "بحاجة إلى إحماء",
             connected: "متصل",
             disconnected: "غير متصل"
         }
@@ -378,80 +404,74 @@ export default function DeliverabilityWorkspace({
                 </div>
             </div>
 
-            {/* ── LIVE WARMING ACTIVITY STREAM CONSOLE ── */}
-            <div className="bg-slate-950 border border-slate-900 rounded-3xl p-6 shadow-2xl relative overflow-hidden flex flex-col h-[400px]">
+            {/* ── RECENT WARMING ACTIVITY TIMELINE ── */}
+            <div className="bg-white dark:bg-slate-900/40 border border-slate-100 dark:border-slate-800 rounded-3xl p-6 shadow-sm flex flex-col h-[400px]">
                 
-                {/* Hackerish terminal grid overlays */}
-                <div className="absolute inset-0 bg-[linear-gradient(rgba(18,24,38,0)_95%,rgba(20,80,90,0.15)_95%)] bg-[length:100%_24px] pointer-events-none opacity-40" />
-
-                <div className="relative flex items-center justify-between border-b border-slate-900 pb-4 shrink-0 z-10">
+                <div className="relative flex items-center justify-between border-b pb-4 shrink-0 z-10">
                     <div className="space-y-1">
                         <div className="flex items-center gap-2">
-                            <div className="w-2.5 h-2.5 rounded-full bg-teal-500 animate-ping" />
-                            <h3 className="font-extrabold text-teal-400 text-xs tracking-wider uppercase font-mono flex items-center gap-2">
-                                <Terminal className="w-4 h-4" />
+                            <div className="w-2 h-2 rounded-full bg-teal-500 animate-pulse" />
+                            <h3 className="font-extrabold text-slate-800 dark:text-slate-200 text-sm flex items-center gap-2">
+                                <Activity className="w-4 h-4 text-teal-500" />
                                 {text.consoleTitle}
                             </h3>
                         </div>
-                        <p className="text-[10px] text-slate-500 font-mono font-medium">{text.consoleSub}</p>
+                        <p className="text-xs text-slate-450 font-medium">{text.consoleSub}</p>
                     </div>
-                    <Badge variant="outline" className="border-teal-500/30 text-teal-400 text-[9px] font-mono px-2 py-0.5 rounded-lg">
-                        SYSTEM WARMUP: {intensity.toUpperCase()}
+                    <Badge variant="outline" className="border-teal-500/30 text-teal-600 dark:text-teal-400 text-xs px-2.5 py-0.5 rounded-xl font-semibold">
+                        {text.warmupToggled}: {intensity.toUpperCase()}
                     </Badge>
                 </div>
 
-                <div className="relative flex-1 overflow-y-auto mt-4 font-mono text-[11px] text-slate-300 space-y-2.5 pr-2 z-10">
+                <div className="relative flex-1 overflow-y-auto mt-4 space-y-3.5 pr-2 z-10">
                     {logs.length === 0 ? (
-                        <div className="h-full flex flex-col items-center justify-center text-center p-6 text-slate-600">
-                            <Terminal className="w-8 h-8 text-slate-800 mb-2 stroke-[1.5]" />
-                            <p className="max-w-xs">{text.consoleEmpty}</p>
+                        <div className="h-full flex flex-col items-center justify-center text-center p-6 text-slate-400 dark:text-slate-650">
+                            <Activity className="w-8 h-8 mb-2 stroke-[1.5]" />
+                            <p className="text-xs font-medium max-w-xs">{text.consoleEmpty}</p>
                         </div>
                     ) : (
                         logs.map((log, index) => {
-                            const date = new Date(log.timestamp).toLocaleTimeString();
+                            const date = new Date(log.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
                             const isSystem = log.sessionId === 'SYSTEM';
 
                             return (
                                 <div 
                                     key={index}
-                                    className={`p-3 rounded-xl border border-transparent transition-all duration-300 ${
+                                    className={`p-4 rounded-2xl border transition-all duration-300 ${
                                         isSystem 
-                                            ? 'bg-amber-950/15 border-amber-900/30 text-amber-300/90' 
+                                            ? 'bg-amber-500/5 border-amber-500/10 text-amber-800 dark:text-amber-350' 
                                             : log.direction === 'out' 
-                                                ? 'bg-teal-950/20 border-teal-900/40 text-teal-350' 
-                                                : 'bg-emerald-950/10 border-emerald-900/30 text-emerald-350'
+                                                ? 'bg-teal-500/5 border-teal-500/10 text-teal-800 dark:text-teal-350' 
+                                                : 'bg-emerald-500/5 border-emerald-500/10 text-emerald-800 dark:text-emerald-350'
                                     }`}
                                 >
-                                    <div className="flex items-center justify-between text-[10px] text-slate-500 font-semibold mb-1">
+                                    <div className="flex items-center justify-between text-[10px] text-slate-400 dark:text-slate-500 font-bold mb-1.5">
                                         <div className="flex items-center gap-2">
-                                            <span className="text-slate-600 font-bold">{date}</span>
+                                            <span className="font-semibold">{date}</span>
                                             {!isSystem && (
                                                 <>
-                                                    <span className="text-slate-600">•</span>
-                                                    <span className="text-slate-400 font-black">
-                                                        {isArabic ? "حساب" : "Session"}: {log.sessionId}
+                                                    <span>•</span>
+                                                    <span>
+                                                        {isArabic ? "الحساب" : "Account"}: {log.sessionId}
                                                     </span>
                                                 </>
                                             )}
                                         </div>
-                                        <span className={`text-[9px] uppercase font-black tracking-wider px-1.5 py-0.2 rounded ${
-                                            log.state === 'starter' ? 'bg-teal-500/20 text-teal-400 border border-teal-500/30' :
-                                            log.state === 'completed' ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30' :
-                                            'bg-slate-800 text-slate-400'
+                                        <span className={`text-[9px] uppercase font-extrabold tracking-wider px-2 py-0.5 rounded-full border ${
+                                            log.state === 'starter' ? 'bg-teal-500/10 text-teal-600 border-teal-500/20' :
+                                            log.state === 'completed' ? 'bg-amber-500/10 text-amber-600 border-amber-500/20' :
+                                            'bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400 border-slate-200 dark:border-slate-700'
                                         }`}>
-                                            {log.state}
+                                            {log.state === 'starter' ? (isArabic ? 'بدء' : 'Initiated') :
+                                             log.state === 'completed' ? (isArabic ? 'اكتمل' : 'Completed') :
+                                             (isArabic ? 'محادثة' : 'Chatting')}
                                         </span>
                                     </div>
 
-                                    <div className="flex items-start gap-2 text-xs leading-relaxed">
-                                        {isSystem ? (
-                                            <span className="text-amber-500 font-black">⚡ [SYSTEM]</span>
-                                        ) : log.direction === 'out' ? (
-                                            <span className="text-teal-400 font-black">🤖 OUT➔({log.partnerPhone}) :</span>
-                                        ) : (
-                                            <span className="text-emerald-400 font-black">💬 IN ➔({log.partnerPhone}) :</span>
-                                        )}
-                                        <span className="flex-1 font-semibold break-words">"{log.text}"</span>
+                                    <div className="flex items-start gap-2.5 text-xs leading-relaxed font-medium">
+                                        <span className="flex-1 break-words">
+                                            {formatLogMessage(log)}
+                                        </span>
                                     </div>
                                 </div>
                             );
