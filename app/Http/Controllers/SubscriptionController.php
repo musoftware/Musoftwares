@@ -215,7 +215,7 @@ class SubscriptionController extends Controller
                 $user->subscription_plan = $plan->plan_name;
                 $user->subscription_date = date('Y-m-d', strtotime('+' . $days . ' day'));
                 $user->plan_id = $plan->id;
-                $user->subscription_force = 1;
+                $user->subscription_force = $plan->plan_name === 'Trial' ? 0 : 1;
                 $user->save();
 
                 // Cancel old platform subscriptions
@@ -233,7 +233,7 @@ class SubscriptionController extends Controller
                     'status' => 'active',
                     'started_at' => now(),
                     'expires_at' => now()->addDays($days),
-                    'auto_renew' => 1,
+                    'auto_renew' => $plan->plan_name === 'Trial' ? 0 : 1,
                     'custom_items' => ['*'],
                 ]);
             });
