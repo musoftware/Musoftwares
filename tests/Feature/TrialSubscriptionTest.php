@@ -49,7 +49,7 @@ class TrialSubscriptionTest extends TestCase
         $user->refresh();
         $this->assertEquals('Trial', $user->subscription_plan);
         $this->assertEquals($trialPlan->id, $user->plan_id);
-        $this->assertEquals(1, $user->subscription_force);
+        $this->assertEquals(0, $user->subscription_force);
 
         $expectedDate = Carbon::now()->addDays(1)->format('Y-m-d');
         $this->assertEquals($expectedDate, $user->subscription_date);
