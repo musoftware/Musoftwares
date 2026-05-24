@@ -9,6 +9,7 @@ use Modules\ERP\Models\Tenant;
 use Modules\ERP\Models\Invoice;
 use App\Models\WalletTransaction;
 use App\Models\UserReferralRequestWithdraw;
+use App\Models\AdminSettings;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Carbon\Carbon;
@@ -45,7 +46,21 @@ class DashboardController extends Controller
 
         // ── Pending Withdrawals ──────────────────────────────────
         $pendingWithdrawals = UserReferralRequestWithdraw::whereIn('status', ['pending', 'approved'])->count();
-        $pendingWithdrawalAmount = (float) UserReferralRequestWithdraw::whereIn('status', ['pending', 'approved'])->sum('amount');
+        
+        $pendingWithdrawalData = UserReferralRequestWithdraw::whereIn('status', ['pending', 'approved'])
+            ->select('amount', 'currency_id', 'created_at')
+            ->get();
+            
+        $pendingWithdrawalAmount = 0.0;
+        $businessCurrencyId = AdminSettings::business_currency();
+        foreach ($pendingWithdrawalData as $w) {
+            $pendingWithdrawalAmount += (float) \App\Models\CurrenciesExchange::RateByDate(
+                $w->created_at,
+                $w->amount,
+                $w->currency_id ?? $businessCurrencyId,
+                $businessCurrencyId
+            );
+        }
 
         // ── Monthly Revenue Chart (12 months) ────────────────────
         // Recovered from old project: RevenueChartController::months_chart()
@@ -108,6 +123,7 @@ class DashboardController extends Controller
                 'recentClients' => $recentClients,
                 'pendingWithdrawals' => $pendingWithdrawals,
                 'pendingWithdrawalAmount' => round($pendingWithdrawalAmount, 2),
+                'businessCurrency' => AdminSettings::business_currency_name(),
             ],
             'revenueChartData' => $revenueChartData,
             'moduleBreakdown' => $moduleBreakdown,

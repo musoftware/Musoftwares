@@ -36,6 +36,16 @@ class UserReferralRequestWithdraw extends Model
         return $this->belongsTo(Transaction::class);
     }
 
+    public function getCurrencyAttribute()
+    {
+        return $this->attributes['currency_id'] ?? null;
+    }
+
+    public function setCurrencyAttribute($value)
+    {
+        $this->attributes['currency_id'] = $value;
+    }
+
     public function icon()
     {
         return $this->user_payment_method ? $this->user_payment_method->icon() : null;

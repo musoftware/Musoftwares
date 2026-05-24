@@ -555,6 +555,13 @@ Route::middleware(['auth', 'verified'])->prefix('financial')->name('financial.')
     Route::get('/transfer/{id}', [\App\Http\Controllers\WalletTransferController::class, 'show'])->name('transfer.show');
 });
 
+// Chat API Routes
+Route::middleware(['auth', 'verified'])->prefix('api')->group(function () {
+    Route::get('/conversations/{id}/messages', [\App\Http\Controllers\ConversationController::class, 'messages']);
+    Route::post('/conversations/{id}/read', [\App\Http\Controllers\ConversationController::class, 'markAsRead']);
+    Route::post('/conversations/{id}/messages', [\App\Http\Controllers\ConversationController::class, 'storeMessage']);
+});
+
 // Kashier Webhook (No Auth required)
 Route::post('/financial/add-balance/webhook', [\App\Http\Controllers\FinancialController::class, 'webhook'])->name('financial.add-balance.webhook');
 Route::post('/freelance/point-purchases/webhook', [\App\Http\Controllers\PointPurchaseController::class, 'webhook'])->name('freelance.point-purchases.webhook');

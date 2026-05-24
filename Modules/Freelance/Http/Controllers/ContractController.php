@@ -57,39 +57,32 @@ class ContractController extends Controller
         return Inertia::render('Freelance/Contracts/Show', ['contract' => $contract]);
     }
 
-    public function complete(Request $request, Contract $contract, \App\Services\FinancialTransactionService $financialService)
+    public function complete(Request $request, Contract $contract)
     {
         if ($contract->client_id !== $request->user()->id) {
             abort(403);
         }
 
         try {
-            DB::transaction(function () use ($contract, $financialService) {
+            DB::transaction(function () use ($contract) {
                 $contract->update([
                     'status' => 'completed',
                     'completed_at' => now(),
                 ]);
                 $contract->job->update(['status' => 'completed']);
 
-                // Retrieve or create wallets for double-entry ledger transactions
-                $clientWallet = \App\Models\Wallet::firstOrCreate(
-                    ['owner_type' => \App\Models\User::class, 'owner_id' => $contract->client_id],
-                    ['context' => 'user', 'balance' => 10000.00, 'currency' => 'USD']
-                );
+                $client = \App\Models\User::findOrFail($contract->client_id);
+                $freelancer = \App\Models\User::findOrFail($contract->freelancer_id);
 
-                $freelancerWallet = \App\Models\Wallet::firstOrCreate(
-                    ['owner_type' => \App\Models\User::class, 'owner_id' => $contract->freelancer_id],
-                    ['context' => 'user', 'balance' => 0.00, 'currency' => 'USD']
-                );
+                if ($client->user_balance < $contract->amount) {
+                    throw new \Exception('Insufficient client balance.');
+                }
 
-                $financialService->transferWalletFunds(
-                    $clientWallet->id,
-                    $freelancerWallet->id,
-                    $contract->amount,
-                    "Payout for contract #{$contract->id}: {$contract->job->title}",
-                    Contract::class,
-                    (string)$contract->id
-                );
+                // Debit client using 'sent' type
+                $client->add_balance(-$contract->amount, "Payout for contract #{$contract->id}: {$contract->job->title}", 'sent', $contract->currency_code);
+
+                // Credit freelancer using 'received' type
+                $freelancer->add_balance($contract->amount, "Payment for contract #{$contract->id}: {$contract->job->title}", 'received', $contract->currency_code);
             });
 
             ActivityService::log(

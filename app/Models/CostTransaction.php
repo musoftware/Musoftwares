@@ -12,13 +12,40 @@ class CostTransaction extends Model
 {
     use HasFactory;
     use SoftDeletes;
+
+    protected static function booted(): void
+    {
+        static::saving(function ($costTransaction) {
+            $currency = $costTransaction->currency_id ?? \App\Models\AdminSettings::business_currency();
+            $businessCurrencyId = \App\Models\AdminSettings::business_currency();
+            
+            $costTransaction->business_amount = \App\Models\CurrenciesExchange::RateToday(
+                $costTransaction->amount,
+                $currency,
+                $businessCurrencyId
+            );
+            $costTransaction->business_calculated = true;
+        });
+    }
+
+    public function getCurrencyAttribute()
+    {
+        return $this->attributes['currency_id'] ?? null;
+    }
+
+    public function setCurrencyAttribute($value)
+    {
+        $this->attributes['currency_id'] = $value;
+    }
+
     public function user()
     {
         return $this->belongsTo(User::class);
     }
+
     public function amount_str()
     {
-        return FinanceHelper::instance()->format_money($this->amount, $this->currency);
+        return FinanceHelper::instance()->format_money($this->amount, $this->currency_id);
     }
 
     public static function add_cost_balance($user, $amount, $reason, $currency = null, $project = null)

@@ -95,7 +95,7 @@ class InvoiceController extends Controller
     {
         $validated = $request->validate([
             'client_id' => 'required|exists:erp_tenant_clients,id',
-            'project_id' => 'nullable|exists:projects,id',
+            'project_id' => 'nullable|exists:erp_projects,id',
             'invoice_number' => 'required|string',
             'issued_at' => 'required|date',
             'due_date' => 'required|date|after_or_equal:issued_at',
@@ -240,7 +240,7 @@ class InvoiceController extends Controller
     {
         $validated = $request->validate([
             'client_id' => 'required|exists:erp_tenant_clients,id',
-            'project_id' => 'nullable|exists:projects,id',
+            'project_id' => 'nullable|exists:erp_projects,id',
             'issued_at' => 'required|date',
             'due_date' => 'required|date|after_or_equal:issued_at',
             'amount_currency' => 'required|string|size:3',

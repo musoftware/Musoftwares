@@ -36,6 +36,18 @@ class Transaction extends Model
     protected static function booted(): void
     {
         static::observe(\App\Observers\TransactionObserver::class);
+
+        static::saving(function ($transaction) {
+            $currency = $transaction->currency_id ?? \App\Models\AdminSettings::business_currency();
+            $businessCurrencyId = \App\Models\AdminSettings::business_currency();
+            
+            $transaction->business_amount = \App\Models\CurrenciesExchange::RateToday(
+                $transaction->amount,
+                $currency,
+                $businessCurrencyId
+            );
+            $transaction->business_calculated = true;
+        });
     }
 
     public static function get_sum_balance($date)

@@ -28,6 +28,7 @@ const statusMap: Record<string, string> = {
 };
 
 export default function Dashboard({ stats, revenueChartData, moduleBreakdown, recentInvoices, recentWithdrawals, newTenants, auth }: any) {
+    const businessCurrency = stats?.businessCurrency || 'USD';
     const hasData = stats && (stats.totalClients > 0 || stats.activeTenants > 0 || (stats.revenueThisMonth || 0) > 0);
 
     const chartData = revenueChartData || [];
@@ -98,7 +99,7 @@ export default function Dashboard({ stats, revenueChartData, moduleBreakdown, re
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                             <MetricCard
                                 label="Revenue This Month"
-                                value={formatCurrency(stats.revenueThisMonth)}
+                                value={formatCurrency(stats.revenueThisMonth, businessCurrency)}
                                 icon={DollarSign}
                             />
                             <MetricCard
@@ -126,8 +127,8 @@ export default function Dashboard({ stats, revenueChartData, moduleBreakdown, re
                                             <LineChart data={chartData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
                                                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
                                                 <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#64748b' }} dy={10} />
-                                                <YAxis axisLine={false} tickLine={false} tickFormatter={(value) => `$${value}`} tick={{ fontSize: 12, fill: '#64748b' }} dx={-10} />
-                                                <RechartsTooltip formatter={(value: any) => [`$${value}`, undefined]} contentStyle={{ borderRadius: '8px', border: '1px solid #e2e8f0', boxShadow: '0 1px 2px 0 rgb(0 0 0 / 0.05)' }} />
+                                                <YAxis axisLine={false} tickLine={false} tickFormatter={(value) => new Intl.NumberFormat('en-US', { style: 'currency', currency: businessCurrency, maximumFractionDigits: 0 }).format(value)} tick={{ fontSize: 12, fill: '#64748b' }} dx={-10} />
+                                                <RechartsTooltip formatter={(value: any) => [formatCurrency(value, businessCurrency), undefined]} contentStyle={{ borderRadius: '8px', border: '1px solid #e2e8f0', boxShadow: '0 1px 2px 0 rgb(0 0 0 / 0.05)' }} />
                                                 <Legend wrapperStyle={{ paddingTop: '20px' }} />
                                                 <Line type="monotone" dataKey="income" name="Income" stroke="#4f46e5" strokeWidth={2} activeDot={{ r: 6 }} dot={false} />
                                                 <Line type="monotone" dataKey="expenses" name="Expenses" stroke="#ef4444" strokeWidth={2} dot={false} />
@@ -158,8 +159,8 @@ export default function Dashboard({ stats, revenueChartData, moduleBreakdown, re
                                                         <Cell key={`cell-${index}`} fill={entry.color} />
                                                     ))}
                                                 </Pie>
-                                                <RechartsTooltip formatter={(value: any) => [formatCurrency(value), undefined]} contentStyle={{ borderRadius: '8px', border: '1px solid #e2e8f0', boxShadow: '0 1px 2px 0 rgb(0 0 0 / 0.05)' }} />
-                                                <Legend verticalAlign="bottom" height={36} formatter={(value, entry: any) => <span className="text-xs font-medium text-slate-600">{value} ({formatCurrency(entry.payload.value)})</span>}/>
+                                                <RechartsTooltip formatter={(value: any) => [formatCurrency(value, businessCurrency), undefined]} contentStyle={{ borderRadius: '8px', border: '1px solid #e2e8f0', boxShadow: '0 1px 2px 0 rgb(0 0 0 / 0.05)' }} />
+                                                <Legend verticalAlign="bottom" height={36} formatter={(value, entry: any) => <span className="text-xs font-medium text-slate-600">{value} ({formatCurrency(entry.payload.value, businessCurrency)})</span>}/>
                                             </PieChart>
                                         </ResponsiveContainer>
                                     ) : (
