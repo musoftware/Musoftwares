@@ -13,7 +13,7 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('erp_invoices', function (Blueprint $table) {
+        Schema::create('invoices', function (Blueprint $table) {
             $table->id();
 
             $table->bigInteger('user_id')->unsigned()->index();

@@ -13,7 +13,7 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('erp_invoice_items', function (Blueprint $table) {
+        Schema::create('invoice_items', function (Blueprint $table) {
             $table->id();
             $table->bigInteger('invoice_id')->unsigned()->index();
             $table->foreign('invoice_id')->references('id')->on('erp_invoices')->onDelete('cascade');
