@@ -17,7 +17,6 @@ return [
         'supported_os' => array (
   0 => 'windows',
   1 => 'mac',
-  2 => 'linux',
 ),
         'is_featured' => true,
         'is_active' => true,
@@ -81,7 +80,6 @@ return [
         'supported_os' => array (
   0 => 'windows',
   1 => 'mac',
-  2 => 'linux',
 ),
         'is_featured' => true,
         'is_active' => true,
@@ -144,7 +142,6 @@ return [
         'supported_os' => array (
   0 => 'windows',
   1 => 'mac',
-  2 => 'linux',
 ),
         'is_featured' => true,
         'is_active' => false,
@@ -205,7 +202,6 @@ return [
         'supported_os' => array (
   0 => 'windows',
   1 => 'mac',
-  2 => 'linux',
 ),
         'is_featured' => true,
         'is_active' => true,
@@ -270,7 +266,6 @@ Get a Viral Score (0-100) with detailed per-dimension breakdown.',
         'supported_os' => array (
   0 => 'windows',
   1 => 'mac',
-  2 => 'linux',
 ),
         'is_featured' => true,
         'is_active' => true,
@@ -332,7 +327,6 @@ Get a Viral Score (0-100) with detailed per-dimension breakdown.',
         'supported_os' => array (
   0 => 'windows',
   1 => 'mac',
-  2 => 'linux',
 ),
         'is_featured' => true,
         'is_active' => true,
@@ -396,7 +390,6 @@ Not copying content — copying the psychology.
         'supported_os' => array (
   0 => 'windows',
   1 => 'mac',
-  2 => 'linux',
 ),
         'is_featured' => true,
         'is_active' => true,
@@ -456,7 +449,6 @@ Not copying content — copying the psychology.
         'supported_os' => array (
   0 => 'windows',
   1 => 'mac',
-  2 => 'linux',
 ),
         'is_featured' => true,
         'is_active' => true,
@@ -506,7 +498,6 @@ Not copying content — copying the psychology.
         'supported_os' => array (
   0 => 'windows',
   1 => 'mac',
-  2 => 'linux',
 ),
         'is_featured' => true,
         'is_active' => true,
@@ -556,7 +547,6 @@ Not copying content — copying the psychology.
         'supported_os' => array (
   0 => 'windows',
   1 => 'mac',
-  2 => 'linux',
 ),
         'is_featured' => true,
         'is_active' => true,
@@ -600,7 +590,6 @@ Not copying content — copying the psychology.
         'supported_os' => [
             'windows',
             'mac',
-            'linux',
         ],
         'is_featured' => true,
         'is_active' => true,
@@ -641,8 +630,7 @@ Not copying content — copying the psychology.
         'category' => 'Marketing',
         'supported_os' => [
             'windows',
-            'mac',
-            'linux'
+            'mac'
         ],
         'is_featured' => true,
         'is_active' => true,
@@ -688,8 +676,7 @@ Not copying content — copying the psychology.
         'category' => 'SEO',
         'supported_os' => [
             'windows',
-            'mac',
-            'linux'
+            'mac'
         ],
         'is_featured' => true,
         'is_active' => true,
@@ -733,8 +720,7 @@ Not copying content — copying the psychology.
         'category' => 'Productivity',
         'supported_os' => [
             'windows',
-            'mac',
-            'linux'
+            'mac'
         ],
         'is_featured' => true,
         'is_active' => true,
@@ -777,8 +763,7 @@ Not copying content — copying the psychology.
         'category' => 'Marketing',
         'supported_os' => [
             'windows',
-            'mac',
-            'linux'
+            'mac'
         ],
         'is_featured' => true,
         'is_active' => true,
@@ -825,8 +810,7 @@ Not copying content — copying the psychology.
         'category' => 'SEO',
         'supported_os' => [
             'windows',
-            'mac',
-            'linux'
+            'mac'
         ],
         'is_featured' => true,
         'is_active' => true,
@@ -871,8 +855,7 @@ Not copying content — copying the psychology.
         'category' => 'Marketing',
         'supported_os' => [
             'windows',
-            'mac',
-            'linux'
+            'mac'
         ],
         'is_featured' => true,
         'is_active' => true,
@@ -918,8 +901,7 @@ Not copying content — copying the psychology.
         'category' => 'Marketing',
         'supported_os' => [
             'windows',
-            'mac',
-            'linux'
+            'mac'
         ],
         'is_featured' => true,
         'is_active' => true,
@@ -964,8 +946,7 @@ Not copying content — copying the psychology.
         'category' => 'Media',
         'supported_os' => [
             'windows',
-            'mac',
-            'linux'
+            'mac'
         ],
         'is_featured' => true,
         'is_active' => true,
@@ -1011,8 +992,7 @@ Not copying content — copying the psychology.
         'category' => 'Marketing',
         'supported_os' => [
             'windows',
-            'mac',
-            'linux'
+            'mac'
         ],
         'is_featured' => true,
         'is_active' => true,

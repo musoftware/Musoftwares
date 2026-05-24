@@ -40,10 +40,11 @@ interface Props {
     tools: { data: Tool[]; links: any[] };
     categories: Record<string, string>;
     subscribedSlugs: string[];
+    hasBrowserSubscription: boolean;
     filters: { search?: string; category?: string };
 }
 
-export default function Explore({ tools, categories, subscribedSlugs, filters }: Props) {
+export default function Explore({ tools, categories, subscribedSlugs, hasBrowserSubscription, filters }: Props) {
     const [search, setSearch] = useState(filters.search || '');
     const [activeCategory, setActiveCategory] = useState(filters.category || '');
 
@@ -94,23 +95,25 @@ export default function Explore({ tools, categories, subscribedSlugs, filters }:
                         </div>
                         
                         {/* Extension Banner */}
-                        <div className="hidden lg:block bg-emerald-50 border border-emerald-100 rounded-2xl p-5 max-w-[320px] shadow-sm shrink-0">
-                            <div className="flex items-center gap-2 mb-2">
-                                <div className="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center">
-                                    <Globe className="h-4 w-4 text-emerald-600" />
+                        {hasBrowserSubscription && (
+                            <div className="hidden lg:block bg-emerald-50 border border-emerald-100 rounded-2xl p-5 max-w-[320px] shadow-sm shrink-0">
+                                <div className="flex items-center gap-2 mb-2">
+                                    <div className="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center">
+                                        <Globe className="h-4 w-4 text-emerald-600" />
+                                    </div>
+                                    <h3 className="text-sm font-bold text-emerald-900">Browser Extension</h3>
+                                    <span className="text-[10px] uppercase tracking-wider bg-emerald-600 text-white px-1.5 py-0.5 rounded-sm font-bold ml-auto">New</span>
                                 </div>
-                                <h3 className="text-sm font-bold text-emerald-900">Browser Extension</h3>
-                                <span className="text-[10px] uppercase tracking-wider bg-emerald-600 text-white px-1.5 py-0.5 rounded-sm font-bold ml-auto">New</span>
+                                <p className="text-xs text-emerald-700/80 leading-relaxed mb-4">
+                                    Run automation tools seamlessly in your browser. A lightweight alternative to the desktop agent.
+                                </p>
+                                <a href={route('tools.download.agent', 'extension')}>
+                                    <Button size="sm" className="w-full h-8 text-xs bg-emerald-600 hover:bg-emerald-500 text-white border-0 shadow-none">
+                                        Download Extension
+                                    </Button>
+                                </a>
                             </div>
-                            <p className="text-xs text-emerald-700/80 leading-relaxed mb-4">
-                                Run automation tools seamlessly in your browser. A lightweight alternative to the desktop agent.
-                            </p>
-                            <a href={route('tools.download.agent', 'extension')}>
-                                <Button size="sm" className="w-full h-8 text-xs bg-emerald-600 hover:bg-emerald-500 text-white border-0 shadow-none">
-                                    Download Extension
-                                </Button>
-                            </a>
-                        </div>
+                        )}
                     </div>
 
                     {/* Search */}
