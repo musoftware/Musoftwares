@@ -16,8 +16,8 @@ return new class extends Migration
         }
 
         // 2. Projects Table
-        if (!Schema::hasTable('projects')) {
-            Schema::create('projects', function (Blueprint $table) {
+        if (!Schema::hasTable('erp_projects')) {
+            Schema::create('erp_projects', function (Blueprint $table) {
                 $table->id();
                 $table->foreignId('tenant_id')->constrained('erp_tenants')->cascadeOnDelete();
                 $table->foreignId('client_id')->constrained('erp_tenant_clients')->cascadeOnDelete();
@@ -42,7 +42,7 @@ return new class extends Migration
                 $table->id();
                 $table->foreignId('tenant_id')->constrained('erp_tenants')->cascadeOnDelete();
                 $table->foreignId('client_id')->constrained('erp_tenant_clients')->cascadeOnDelete();
-                $table->foreignId('project_id')->nullable()->constrained('projects')->nullOnDelete();
+                $table->foreignId('project_id')->nullable()->constrained('erp_projects')->nullOnDelete();
 
                 $table->string('subject');
                 $table->text('description');
@@ -90,7 +90,7 @@ return new class extends Migration
     {
         Schema::dropIfExists('activities');
         Schema::dropIfExists('erp_support_tickets');
-        Schema::dropIfExists('projects');
+        Schema::dropIfExists('erp_projects');
 
         if (Schema::hasColumn('erp_tenant_clients', 'status')) {
             Schema::table('erp_tenant_clients', function (Blueprint $table) {

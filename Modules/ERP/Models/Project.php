@@ -9,6 +9,8 @@ use App\Models\Ticket;
 
 class Project extends TenantModel
 {
+    protected $table = 'erp_projects';
+
     protected $fillable = [
         'tenant_id', 'client_id', 'name', 'description', 'status',
         'budget', 'currency', 'due_date', 'completed_at', 'created_by'

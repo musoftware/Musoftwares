@@ -25,16 +25,14 @@ class ClientController extends Controller
 
         $clients = $query->paginate(15)->withQueryString();
 
-        // Eager load or manually fetch wallets
-        // Assuming wallet owner_type is App\Models\User
-        $clientIds = $clients->pluck('id');
-        $wallets = Wallet::where('owner_type', User::class)
-            ->whereIn('owner_id', $clientIds)
-            ->get()
-            ->keyBy('owner_id');
-
-        $clients->getCollection()->transform(function ($client) use ($wallets) {
-            $client->wallet = $wallets->get($client->id);
+        // Construct a mock wallet object on the fly using user_balance and preferred_currency
+        $clients->getCollection()->transform(function ($client) {
+            $client->wallet = (object)[
+                'id' => $client->id,
+                'balance' => (float)$client->user_balance,
+                'currency' => $client->preferred_currency ?: 'USD',
+                'context' => 'Platform Balance',
+            ];
             return $client;
         });
 
@@ -49,7 +47,32 @@ class ClientController extends Controller
     public function show($id)
     {
         $client = User::findOrFail($id);
-        $wallets = $client->wallet ? [$client->wallet] : [];
+        
+        // Mock wallet for frontend, using user_balance, preferred_currency and transactions list
+        $wallets = [
+            (object)[
+                'id' => $client->id,
+                'context' => 'Platform Balance',
+                'balance' => (float) $client->user_balance,
+                'currency' => $client->preferred_currency ?: 'USD',
+                'transactions' => $client->transactions()
+                    ->latest()
+                    ->take(50)
+                    ->get()
+                    ->map(function ($tx) {
+                        return (object)[
+                            'id' => $tx->id,
+                            'type' => $tx->type === 'received' ? 'credit' : ($tx->type === 'refunded' ? 'refund' : 'debit'),
+                            'amount' => (float) abs($tx->amount),
+                            'currency' => $tx->currency_id ?: 'USD',
+                            'balance_before' => null,
+                            'balance_after' => null,
+                            'description' => $tx->reason,
+                            'created_at' => $tx->created_at ? $tx->created_at->toIso8601String() : null,
+                        ];
+                    })
+            ]
+        ];
 
         return Inertia::render('Admin/Clients/Show', [
             'client' => $client,
@@ -170,86 +193,51 @@ class ClientController extends Controller
     public function walletTransaction(Request $request, $id)
     {
         $request->validate([
-            'wallet_id' => 'required|exists:wallets,id',
             'type' => 'required|in:credit,debit,refund',
             'amount' => 'required|numeric|min:0.01',
             'description' => 'required|string|max:500'
         ]);
 
-        $wallet = \App\Models\Wallet::findOrFail($request->wallet_id);
-        
-        // Ensure wallet belongs to this user
-        if ($wallet->owner_id != $id || $wallet->owner_type != User::class) {
-            abort(403, 'Unauthorized wallet access');
-        }
+        $user = User::findOrFail($id);
 
         try {
-            \Illuminate\Support\Facades\DB::transaction(function () use ($request, $wallet, $id) {
+            \Illuminate\Support\Facades\DB::transaction(function () use ($request, $user) {
                 $amount = (float)$request->amount;
                 $fee = (float)($request->fee ?? 0);
                 
                 $isCredit = in_array($request->type, ['credit', 'refund']);
                 $isUsed = $request->boolean('is_used');
                 
-                if (!$isCredit && $wallet->balance < $amount) {
+                if (!$isCredit && $user->user_balance < $amount) {
                     throw new \Exception('Insufficient wallet balance.');
                 }
 
-                $balBefore = $wallet->balance;
-                $balAfter = $isCredit ? ($balBefore + $amount) : ($balBefore - $amount);
+                $txType = $request->type === 'credit' ? 'received' : ($request->type === 'refund' ? 'refunded' : 'sent');
+                $txAmount = $isCredit ? $amount : -$amount;
 
-                $wt = \App\Models\WalletTransaction::create([
-                    'wallet_id' => $wallet->id,
-                    'type' => $request->type,
-                    'amount' => $amount,
-                    'currency' => $wallet->currency,
-                    'balance_before' => $balBefore,
-                    'balance_after' => $balAfter,
-                    'description' => $request->description,
-                    'created_by' => \Illuminate\Support\Facades\Auth::id(),
-                ]);
+                $user->add_balance($txAmount, $request->description, $txType, $user->currency_id);
 
                 // Fee processing via CostTransaction (legacy)
                 if ($fee > 0) {
-                    \App\Models\CostTransaction::create([
-                        'user_id' => $wallet->owner_id,
-                        'amount' => $fee,
-                        'currency' => $wallet->currency,
-                        'reason' => 'Fee for: ' . $request->description,
-                    ]);
+                    \App\Models\CostTransaction::add_cost_balance(
+                        $user,
+                        $fee,
+                        'Fee for: ' . $request->description,
+                        $user->currency_id
+                    );
                 }
 
                 // Auto consume balance (is_used)
                 if ($isCredit && $isUsed) {
-                    \App\Models\WalletTransaction::create([
-                        'wallet_id' => $wallet->id,
-                        'type' => 'debit',
-                        'amount' => $amount,
-                        'currency' => $wallet->currency,
-                        'balance_before' => $balAfter,
-                        'balance_after' => $balAfter - $amount,
-                        'description' => ($request->description ?? 'Used balance') . ' (Auto Used)',
-                        'created_by' => \Illuminate\Support\Facades\Auth::id(),
-                    ]);
-                    $balAfter -= $amount;
+                    $user->add_balance(-$amount, ($request->description ?? 'Used balance') . ' (Auto Used)', 'used', $user->currency_id);
                 }
 
-                $wallet->update(['balance' => $balAfter]);
-
-                $user = \App\Models\User::find($id);
-                if ($user && in_array($request->type, ['credit', 'refund'])) {
-                    if (\Illuminate\Support\Facades\Schema::hasColumn('users', 'total_paid')) {
-                        $user->increment('total_paid', $amount);
-                    }
-                    if (\Illuminate\Support\Facades\Schema::hasColumn('users', 'user_balance')) {
-                        $user->update(['user_balance' => $balAfter]);
-                    }
-                    
-                    event(new \App\Events\AmountReceived($user, $amount, $request->description, $wallet->currency));
+                if ($isCredit) {
+                    event(new \App\Events\AmountReceived($user, $amount, $request->description, $user->preferred_currency ?: 'USD'));
                 }
             });
 
-            return back()->with('success', 'Wallet transaction recorded successfully.');
+            return back()->with('success', 'Transaction recorded successfully.');
         } catch (\Exception $e) {
             return back()->withErrors(['amount' => $e->getMessage()]);
         }

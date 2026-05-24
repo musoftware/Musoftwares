@@ -16,7 +16,7 @@ return new class extends Migration
                 $table->foreignId('project_id')
                     ->nullable()
                     ->after('client_id')
-                    ->constrained('projects')
+                    ->constrained('erp_projects')
                     ->nullOnDelete();
             });
         }

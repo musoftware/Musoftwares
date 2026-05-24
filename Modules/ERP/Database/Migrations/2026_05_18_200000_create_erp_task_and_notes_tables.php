@@ -25,7 +25,7 @@ return new class extends Migration
 
                 // Client and project linkage — recovered from old Task model
                 $table->foreignId('client_id')->nullable()->constrained('erp_tenant_clients')->nullOnDelete();
-                $table->foreignId('project_id')->nullable()->constrained('projects')->nullOnDelete();
+                $table->foreignId('project_id')->nullable()->constrained('erp_projects')->nullOnDelete();
 
                 // Status lifecycle: open | in_progress | completed | archived
                 $table->string('status')->default('open');
