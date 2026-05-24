@@ -6,6 +6,7 @@ import {
 import { Button } from '@/Components/ui/button';
 import { Switch } from '@/Components/ui/switch';
 import { Badge } from '@/Components/ui/badge';
+import { Card, CardHeader, CardTitle, CardContent } from '@/Components/ui/card';
 
 interface WarmupSession {
     accountId: string;
@@ -215,101 +216,126 @@ export default function DeliverabilityWorkspace({
         return text.trustTierNeedsWarmup;
     };
 
-    return (
-        <div className="space-y-8 animate-in fade-in duration-300">
-            {/* ── HEADER ── */}
-            <div className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-teal-950 to-slate-900 text-white rounded-3xl p-6 md:p-8 shadow-2xl border border-teal-900/50">
-                {/* Glowing subtle micro-animation background orbits */}
-                <div className="absolute top-0 right-0 w-80 h-80 bg-teal-500/10 rounded-full blur-[100px] animate-pulse" />
-                <div className="absolute -bottom-10 -left-10 w-60 h-60 bg-emerald-500/10 rounded-full blur-[80px] animate-pulse" />
-                
-                <div className="relative flex flex-col md:flex-row items-start md:items-center justify-between gap-6 z-10">
-                    <div className="space-y-2 max-w-2xl">
-                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-teal-500/20 text-teal-400 border border-teal-500/30 text-xs font-semibold">
-                            <Sparkles className="w-3.5 h-3.5 animate-spin-slow" />
-                            {isArabic ? "أمن وموثوقية الأرقام" : "Anti-Ban Warmup Engine"}
-                        </div>
-                        <h2 className="text-2xl md:text-3xl font-extrabold tracking-tight">{text.title}</h2>
-                        <p className="text-xs md:text-sm text-teal-200/70 leading-relaxed font-medium">{text.subtitle}</p>
-                    </div>
+    const activeWarmers = sessions.filter((s: any) => s.warmupActive && s.state === 'connected').length;
+    const totalWarmers = sessions.length;
+    const totalSent = sessions.reduce((acc: number, s: any) => acc + (s.messagesCount || 0), 0);
 
-                    <div className="shrink-0 flex flex-col items-stretch md:items-end gap-3 w-full md:w-auto">
-                        <Button
-                            onClick={handleManualTrigger}
-                            disabled={triggering || !daemonConnected}
-                            className="bg-gradient-to-r from-teal-500 to-emerald-500 hover:from-teal-600 hover:to-emerald-600 text-slate-900 font-bold px-6 py-5 rounded-2xl shadow-lg shadow-teal-500/20 flex items-center justify-center gap-2 border border-teal-400/20 transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
-                        >
-                            <Flame className={`w-4 h-4 ${triggering ? 'animate-bounce' : 'animate-pulse text-amber-950'}`} />
-                            <span>{text.manualTrigger}</span>
-                        </Button>
-                        <p className="text-[10px] text-teal-300/50 text-center md:text-end font-semibold max-w-xs">{text.manualTriggerSub}</p>
-                    </div>
+    return (
+        <div className="space-y-6 animate-in fade-in duration-300">
+            {/* Header */}
+            <div className="flex items-center justify-between">
+                <div className="text-start">
+                    <h2 className="text-xl font-bold tracking-tight flex items-center gap-2">
+                        <div className="size-9 rounded-xl bg-teal-100/60 dark:bg-teal-955/40 flex items-center justify-center">
+                            <Flame className="w-5 h-5 text-teal-605" />
+                        </div>
+                        {text.title}
+                    </h2>
+                    <p className="text-sm text-muted-foreground mt-1">
+                        {text.subtitle}
+                    </p>
                 </div>
+                <Button
+                    onClick={handleManualTrigger}
+                    disabled={triggering || !daemonConnected}
+                    className="bg-teal-600 hover:bg-teal-700 text-white font-bold rounded-xl gap-2 shadow-lg shadow-teal-500/10"
+                >
+                    <Flame className={`w-4 h-4 ${triggering ? 'animate-bounce' : ''}`} />
+                    {text.manualTrigger}
+                </Button>
             </div>
 
-            {/* ── METRICS GRID & CONTROLS ── */}
+            {/* Stats Cards */}
+            <div className="grid grid-cols-3 gap-4">
+                <Card className="rounded-2xl">
+                    <CardContent className="p-4 text-center">
+                        <div className="text-2xl font-black text-teal-600">{activeWarmers}</div>
+                        <p className="text-[11px] text-muted-foreground font-medium mt-1">
+                            {isArabic ? 'الحسابات النشطة' : 'Active Accounts'}
+                        </p>
+                    </CardContent>
+                </Card>
+                <Card className="rounded-2xl">
+                    <CardContent className="p-4 text-center">
+                        <div className="text-2xl font-black text-blue-600">{totalWarmers}</div>
+                        <p className="text-[11px] text-muted-foreground font-medium mt-1">
+                            {isArabic ? 'إجمالي الحسابات' : 'Total Accounts'}
+                        </p>
+                    </CardContent>
+                </Card>
+                <Card className="rounded-2xl">
+                    <CardContent className="p-4 text-center">
+                        <div className="text-2xl font-black text-amber-600">{totalSent}</div>
+                        <p className="text-[11px] text-muted-foreground font-medium mt-1">
+                            {isArabic ? 'رسائل الإحماء' : 'Warmup Messages'}
+                        </p>
+                    </CardContent>
+                </Card>
+            </div>
+
+            {/* Grids & Controls */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 
                 {/* Intensity Controller Card */}
-                <div className="lg:col-span-1 bg-white dark:bg-slate-900/40 border border-slate-100 dark:border-slate-800 rounded-3xl p-6 shadow-sm flex flex-col justify-between space-y-6">
-                    <div className="space-y-2">
-                        <div className="flex items-center gap-2.5">
-                            <div className="p-2 rounded-xl bg-teal-50 text-teal-600 dark:bg-teal-950/40 dark:text-teal-400">
-                                <Settings className="w-4 h-4" />
+                <Card className="lg:col-span-1 rounded-2xl border-teal-200/50 dark:border-teal-800/30 flex flex-col justify-between">
+                    <CardHeader className="pb-4 border-b">
+                        <CardTitle className="text-base flex items-center gap-2">
+                            <Settings className="w-4 h-4 text-teal-600" />
+                            {text.intensityTitle}
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent className="pt-6 flex flex-col justify-between flex-1 space-y-6">
+                        <div className="space-y-4">
+                            <p className="text-xs text-muted-foreground leading-relaxed font-medium">{text.intensitySub}</p>
+                            
+                            <div className="space-y-2">
+                                {[
+                                    { key: 'low', label: text.intensityLow, desc: isArabic ? "دورة واحدة كل ساعتين" : "1 chat cycle every 2 hours" },
+                                    { key: 'medium', label: text.intensityMedium, desc: isArabic ? "دورة واحدة كل 20 دقيقة" : "1 chat cycle every 20 minutes" },
+                                    { key: 'high', label: text.intensityHigh, desc: isArabic ? "دورة واحدة كل 5 دقائق" : "1 chat cycle every 5 minutes" }
+                                ].map((level) => (
+                                    <button
+                                        key={level.key}
+                                        onClick={() => setIntensity(level.key as any)}
+                                        className={`w-full text-start p-3.5 rounded-2xl border transition-all duration-300 flex items-center justify-between ${
+                                            intensity === level.key 
+                                                ? 'bg-teal-50/50 dark:bg-teal-950/20 border-teal-500/40 text-teal-850 dark:text-teal-400 shadow-sm ring-1 ring-teal-500/20' 
+                                                : 'bg-transparent border-slate-100 hover:border-slate-200 dark:border-slate-800/80 text-slate-500 dark:text-slate-400'
+                                        }`}
+                                    >
+                                        <div className="space-y-0.5">
+                                            <span className="text-xs font-bold block">{level.label}</span>
+                                            <span className="text-[10px] text-muted-foreground block font-medium">{level.desc}</span>
+                                        </div>
+                                        <div className={`w-4.5 h-4.5 rounded-full border-2 flex items-center justify-center transition-colors ${
+                                            intensity === level.key ? 'border-teal-500 bg-teal-500' : 'border-slate-300 dark:border-slate-700'
+                                        }`}>
+                                            {intensity === level.key && <div className="w-1.5 h-1.5 bg-white rounded-full" />}
+                                        </div>
+                                    </button>
+                                ))}
                             </div>
-                            <h3 className="font-extrabold text-slate-800 dark:text-slate-200 text-sm">{text.intensityTitle}</h3>
                         </div>
-                        <p className="text-xs text-slate-400 leading-relaxed mt-1 font-medium">{text.intensitySub}</p>
-                    </div>
 
-                    <div className="space-y-2">
-                        {[
-                            { key: 'low', label: text.intensityLow, desc: isArabic ? "محادثة واحدة كل ساعتين" : "1 chat cycle every 2 hours" },
-                            { key: 'medium', label: text.intensityMedium, desc: isArabic ? "محادثة واحدة كل 20 دقيقة" : "1 chat cycle every 20 minutes" },
-                            { key: 'high', label: text.intensityHigh, desc: isArabic ? "محادثة واحدة كل 5 دقائق" : "1 chat cycle every 5 minutes" }
-                        ].map((level) => (
-                            <button
-                                key={level.key}
-                                onClick={() => setIntensity(level.key as any)}
-                                className={`w-full text-start p-3.5 rounded-2xl border transition-all duration-300 flex items-center justify-between ${
-                                    intensity === level.key 
-                                        ? 'bg-teal-50/50 dark:bg-teal-950/20 border-teal-500/40 text-teal-800 dark:text-teal-400 shadow-sm ring-1 ring-teal-500/20' 
-                                        : 'bg-transparent border-slate-100 hover:border-slate-200 dark:border-slate-800/80 text-slate-650 dark:text-slate-400'
-                                }`}
-                            >
-                                <div className="space-y-0.5">
-                                    <span className="text-xs font-bold block">{level.label}</span>
-                                    <span className="text-[10px] text-slate-400 dark:text-slate-500 block font-medium">{level.desc}</span>
-                                </div>
-                                <div className={`w-4.5 h-4.5 rounded-full border-2 flex items-center justify-center transition-colors ${
-                                    intensity === level.key ? 'border-teal-500 bg-teal-500' : 'border-slate-300 dark:border-slate-700'
-                                }`}>
-                                    {intensity === level.key && <div className="w-1.5 h-1.5 bg-white rounded-full" />}
-                                </div>
-                            </button>
-                        ))}
-                    </div>
-
-                    <div className="bg-slate-50 dark:bg-slate-900/60 rounded-2xl p-4 flex items-start gap-3 border border-slate-100/50 dark:border-slate-800/50">
-                        <AlertCircle className="w-4 h-4 text-teal-600 dark:text-teal-400 shrink-0 mt-0.5" />
-                        <p className="text-[10px] text-slate-500 dark:text-slate-450 leading-relaxed font-semibold">
-                            {isArabic 
-                                ? "تنبيه: نوصي بوضع الكثافة المتوسطة لبناء سمعة طبيعية وتجنب تنبيه فلاتر واتساب التلقائية."
-                                : "Recommendation: Keep warmup on Medium to build a natural conversational reputation gradually without raising filters."
-                            }
-                        </p>
-                    </div>
-                </div>
-
-                {/* Warming Pool Status (Sessions list) */}
-                <div className="lg:col-span-2 bg-white dark:bg-slate-900/40 border border-slate-100 dark:border-slate-800 rounded-3xl p-6 shadow-sm flex flex-col justify-between space-y-4">
-                    <div className="flex items-center justify-between border-b pb-4">
-                        <div className="space-y-1">
-                            <h3 className="font-extrabold text-slate-800 dark:text-slate-200 text-sm">{text.poolDetails}</h3>
-                            <p className="text-xs text-slate-400 font-medium">
-                                {isArabic ? `الأرقام المشاركة: ${sessions.length}` : `Participating linked accounts: ${sessions.length}`}
+                        <div className="bg-slate-50 dark:bg-slate-900/60 rounded-2xl p-4 flex items-start gap-3 border border-slate-100/50 dark:border-slate-800/50">
+                            <AlertCircle className="w-4 h-4 text-teal-600 dark:text-teal-400 shrink-0 mt-0.5" />
+                            <p className="text-[10px] text-slate-500 dark:text-slate-450 leading-relaxed font-semibold">
+                                {isArabic 
+                                    ? "نصيحة: نوصي باستخدام السرعة الطبيعية لبناء سمعة حسابك بأمان وبشكل طبيعي."
+                                    : "Tip: We recommend using the Normal speed to build your account's reputation safely and naturally."
+                                }
                             </p>
                         </div>
+                    </CardContent>
+                </Card>
+
+                {/* Warming Pool Status (Sessions list) */}
+                <Card className="lg:col-span-2 rounded-2xl flex flex-col justify-between">
+                    <CardHeader className="pb-4 border-b flex flex-row items-center justify-between space-y-0">
+                        <CardTitle className="text-base flex items-center gap-2">
+                            <Shield className="w-4 h-4 text-teal-650" />
+                            {text.poolDetails}
+                        </CardTitle>
                         <Button 
                             variant="ghost" 
                             size="sm" 
@@ -320,110 +346,103 @@ export default function DeliverabilityWorkspace({
                             <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
                             {isArabic ? 'تحديث' : 'Refresh'}
                         </Button>
-                    </div>
-
-                    <div className="overflow-y-auto max-h-[320px] pr-1 space-y-3 flex-1 min-h-[220px]">
-                        {sessions.length === 0 ? (
-                            <div className="h-full flex flex-col items-center justify-center text-center p-6 space-y-3">
-                                <ShieldAlert className="w-10 h-10 text-slate-350 dark:text-slate-700 stroke-[1.5]" />
-                                <p className="text-xs font-semibold text-slate-400 max-w-xs">{text.noAccounts}</p>
-                            </div>
-                        ) : (
-                            sessions.map((session) => (
-                                <div 
-                                    key={session.accountId}
-                                    className="p-4 rounded-2xl border border-slate-100 dark:border-slate-800 bg-slate-50/30 dark:bg-slate-900/20 hover:bg-slate-50/70 transition-all duration-300 flex flex-col md:flex-row items-start md:items-center justify-between gap-4"
-                                >
-                                    <div className="flex items-center gap-4 w-full md:w-auto">
-                                        {/* Circular Dial gauge representing Trust score */}
-                                        <div className="relative w-12 h-12 shrink-0 flex items-center justify-center">
-                                            <svg className="absolute w-full h-full transform -rotate-90" viewBox="0 0 36 36">
-                                                <path
-                                                    className="text-slate-100 dark:text-slate-800 stroke-current"
-                                                    strokeWidth="3"
-                                                    fill="none"
-                                                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                                                />
-                                                <path
-                                                    className={`transition-all duration-1000 ${getHealthColor(session.trustScore)}`}
-                                                    strokeWidth="3.2"
-                                                    strokeDasharray={`${session.trustScore}, 100`}
-                                                    strokeLinecap="round"
-                                                    fill="none"
-                                                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                                                />
-                                            </svg>
-                                            <span className="text-[10px] font-black text-slate-700 dark:text-slate-200 mt-0.5">{session.trustScore}%</span>
-                                        </div>
-
-                                        <div className="space-y-1 min-w-0 flex-1">
-                                            <div className="flex items-center gap-2">
-                                                <span className="font-bold text-xs text-slate-800 dark:text-slate-200 truncate">{session.displayName}</span>
-                                                <span className={`px-2 py-0.5 rounded-md text-[8px] font-bold ${
-                                                    session.state === 'connected' 
-                                                        ? 'bg-emerald-500/10 text-emerald-600 border border-emerald-500/20' 
-                                                        : 'bg-slate-200 text-slate-500 dark:bg-slate-800 dark:text-slate-500'
-                                                }`}>
-                                                    {session.state === 'connected' ? text.connected : text.disconnected}
-                                                </span>
-                                            </div>
-                                            <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[10px] text-slate-450 font-semibold">
-                                                <span>{session.phoneNumber || '—'}</span>
-                                                <span className="hidden md:inline">•</span>
-                                                <span className="flex items-center gap-1">
-                                                    <Flame className="w-3 h-3 text-amber-500" />
-                                                    {session.messagesCount} {isArabic ? "رسائل" : "messages"}
-                                                </span>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div className="flex items-center gap-3 w-full md:w-auto justify-between md:justify-end border-t md:border-t-0 pt-3 md:pt-0">
-                                        <div className="flex flex-col items-start md:items-end">
-                                            <span className="text-[9px] uppercase font-bold text-slate-400">{text.trustScore}</span>
-                                            <span className={`px-2 py-0.5 mt-0.5 rounded-full text-[9px] font-extrabold border ${getHealthBGColor(session.trustScore)}`}>
-                                                {getHealthText(session.trustScore)}
-                                            </span>
-                                        </div>
-                                        
-                                        <div className="flex items-center gap-2 border-l pl-3 dark:border-slate-800">
-                                            <span className="text-[10px] font-bold text-slate-500 hidden md:inline">
-                                                {session.warmupActive ? text.statusActive : text.statusInactive}
-                                            </span>
-                                            <Switch
-                                                checked={session.warmupActive}
-                                                onCheckedChange={(checked) => handleToggleWarmup(session.accountId, checked)}
-                                                className="data-[state=checked]:bg-teal-500"
-                                            />
-                                        </div>
-                                    </div>
+                    </CardHeader>
+                    <CardContent className="pt-6 flex-1 min-h-[220px] flex flex-col">
+                        <div className="overflow-y-auto max-h-[320px] pr-1 space-y-3 flex-1">
+                            {sessions.length === 0 ? (
+                                <div className="h-full flex flex-col items-center justify-center text-center p-6 space-y-3">
+                                    <ShieldAlert className="w-10 h-10 text-slate-350 dark:text-slate-700 stroke-[1.5]" />
+                                    <p className="text-xs font-semibold text-slate-400 max-w-xs">{text.noAccounts}</p>
                                 </div>
-                            ))
-                        )}
-                    </div>
-                </div>
+                            ) : (
+                                sessions.map((session: any) => (
+                                    <div 
+                                        key={session.accountId}
+                                        className="p-4 rounded-2xl border border-slate-100 dark:border-slate-800 bg-slate-50/30 dark:bg-slate-900/20 hover:bg-slate-50/70 transition-all duration-300 flex flex-col md:flex-row items-start md:items-center justify-between gap-4"
+                                    >
+                                        <div className="flex items-center gap-4 w-full md:w-auto">
+                                            {/* Circular Dial gauge representing Trust score */}
+                                            <div className="relative w-12 h-12 shrink-0 flex items-center justify-center">
+                                                <svg className="absolute w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+                                                    <path
+                                                        className="text-slate-100 dark:text-slate-800 stroke-current"
+                                                        strokeWidth="3"
+                                                        fill="none"
+                                                        d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                                                    />
+                                                    <path
+                                                        className={`transition-all duration-1000 ${getHealthColor(session.trustScore)}`}
+                                                        strokeWidth="3.2"
+                                                        strokeDasharray={`${session.trustScore}, 100`}
+                                                        strokeLinecap="round"
+                                                        fill="none"
+                                                        d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                                                    />
+                                                </svg>
+                                                <span className="text-[10px] font-black text-slate-700 dark:text-slate-200 mt-0.5">{session.trustScore}%</span>
+                                            </div>
+
+                                            <div className="space-y-1 min-w-0 flex-1">
+                                                <div className="flex items-center gap-2">
+                                                    <span className="font-bold text-xs text-slate-800 dark:text-slate-200 truncate">{session.displayName}</span>
+                                                    <span className={`px-2 py-0.5 rounded-md text-[8px] font-bold ${
+                                                        session.state === 'connected' 
+                                                            ? 'bg-emerald-500/10 text-emerald-600 border border-emerald-500/20' 
+                                                            : 'bg-slate-200 text-slate-500 dark:bg-slate-800 dark:text-slate-500'
+                                                    }`}>
+                                                        {session.state === 'connected' ? text.connected : text.disconnected}
+                                                    </span>
+                                                </div>
+                                                <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[10px] text-slate-450 font-semibold">
+                                                    <span>{session.phoneNumber || '—'}</span>
+                                                    <span className="hidden md:inline">•</span>
+                                                    <span className="flex items-center gap-1">
+                                                        <Flame className="w-3 h-3 text-amber-500" />
+                                                        {session.messagesCount} {isArabic ? "رسائل" : "messages"}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="flex items-center gap-3 w-full md:w-auto justify-between md:justify-end border-t md:border-t-0 pt-3 md:pt-0">
+                                            <div className="flex flex-col items-start md:items-end">
+                                                <span className="text-[9px] uppercase font-bold text-slate-400">{text.trustScore}</span>
+                                                <span className={`px-2 py-0.5 mt-0.5 rounded-full text-[9px] font-extrabold border ${getHealthBGColor(session.trustScore)}`}>
+                                                    {getHealthText(session.trustScore)}
+                                                </span>
+                                            </div>
+                                            
+                                            <div className="flex items-center gap-2 border-l pl-3 dark:border-slate-800">
+                                                <span className="text-[10px] font-bold text-slate-500 hidden md:inline">
+                                                    {session.warmupActive ? text.statusActive : text.statusInactive}
+                                                </span>
+                                                <Switch
+                                                    checked={session.warmupActive}
+                                                    onCheckedChange={(checked) => handleToggleWarmup(session.accountId, checked)}
+                                                    className="data-[state=checked]:bg-teal-50"
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))
+                            )}
+                        </div>
+                    </CardContent>
+                </Card>
             </div>
 
             {/* ── RECENT WARMING ACTIVITY TIMELINE ── */}
-            <div className="bg-white dark:bg-slate-900/40 border border-slate-100 dark:border-slate-800 rounded-3xl p-6 shadow-sm flex flex-col h-[400px]">
-                
-                <div className="relative flex items-center justify-between border-b pb-4 shrink-0 z-10">
-                    <div className="space-y-1">
-                        <div className="flex items-center gap-2">
-                            <div className="w-2 h-2 rounded-full bg-teal-500 animate-pulse" />
-                            <h3 className="font-extrabold text-slate-800 dark:text-slate-200 text-sm flex items-center gap-2">
-                                <Activity className="w-4 h-4 text-teal-500" />
-                                {text.consoleTitle}
-                            </h3>
-                        </div>
-                        <p className="text-xs text-slate-450 font-medium">{text.consoleSub}</p>
-                    </div>
+            <Card className="rounded-2xl flex flex-col h-[400px]">
+                <CardHeader className="pb-4 border-b flex flex-row items-center justify-between space-y-0">
+                    <CardTitle className="text-base flex items-center gap-2">
+                        <Activity className="w-4 h-4 text-teal-500" />
+                        {text.consoleTitle}
+                    </CardTitle>
                     <Badge variant="outline" className="border-teal-500/30 text-teal-600 dark:text-teal-400 text-xs px-2.5 py-0.5 rounded-xl font-semibold">
                         {text.warmupToggled}: {intensity.toUpperCase()}
                     </Badge>
-                </div>
-
-                <div className="relative flex-1 overflow-y-auto mt-4 space-y-3.5 pr-2 z-10">
+                </CardHeader>
+                <CardContent className="pt-6 flex-1 overflow-y-auto pr-2 space-y-3.5">
                     {logs.length === 0 ? (
                         <div className="h-full flex flex-col items-center justify-center text-center p-6 text-slate-400 dark:text-slate-650">
                             <Activity className="w-8 h-8 mb-2 stroke-[1.5]" />
@@ -477,8 +496,8 @@ export default function DeliverabilityWorkspace({
                             );
                         })
                     )}
-                </div>
-            </div>
+                </CardContent>
+            </Card>
         </div>
     );
 }
