@@ -465,7 +465,7 @@ function AuthenticatedContent({
                                                 </div>
                                                 <div className="flex-1 min-w-0">
                                                     <div className="flex items-center justify-between">
-                                                        <p className={cn("text-sm font-medium", isRouteActive('text-payment-gateway.index') ? "text-rose-900" : "text-slate-900")}>Text Payment Gateway</p>
+                                                        <p className={cn("text-sm font-medium", isRouteActive('text-payment-gateway.index') ? "text-rose-900" : "text-slate-900")}>Payment Gateway</p>
                                                         {isRouteActive('text-payment-gateway.index') && <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-rose-100 text-rose-700">Active</span>}
                                                     </div>
                                                     <p className={cn("text-xs truncate", isRouteActive('text-payment-gateway.index') ? "text-rose-700/70" : "text-slate-500")}>

@@ -17,8 +17,8 @@ export default function Devices({ devices }: DevicesProps) {
     };
 
     return (
-        <AuthenticatedLayout header={<h2 className="font-semibold text-xl text-gray-800 leading-tight">Terminal Fleet</h2>}>
-            <Head title="Devices - Text Payment Gateway" />
+        <AuthenticatedLayout header={<h2 className="font-semibold text-xl text-gray-800 leading-tight">Android Devices</h2>}>
+            <Head title="Devices - Payment Gateway" />
 
             <div className="py-8 md:py-12">
                 <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
@@ -26,9 +26,9 @@ export default function Devices({ devices }: DevicesProps) {
                         <div>
                             <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
                                 <Smartphone className="w-6 h-6 text-indigo-600" />
-                                Hardware Fleet
+                                Android Devices
                             </h1>
-                            <p className="text-slate-500 mt-1">Manage all Android terminals connected to your Text Payment Gateway gateway.</p>
+                            <p className="text-slate-500 mt-1">Manage all Android phones connected to your Payment Gateway to read SMS receipts.</p>
                         </div>
                         <Button variant="outline" onClick={() => router.visit(route('text-payment-gateway.index'))}>
                             <ArrowLeft className="w-4 h-4 mr-2" />
@@ -38,13 +38,13 @@ export default function Devices({ devices }: DevicesProps) {
 
                     <Card>
                         <CardHeader>
-                            <CardTitle>Connected Terminals</CardTitle>
+                            <CardTitle>Connected Devices</CardTitle>
                         </CardHeader>
                         <CardContent>
                             {devices.length === 0 ? (
                                 <div className="text-center py-8">
                                     <Smartphone className="w-12 h-12 text-slate-300 mx-auto mb-3" />
-                                    <p className="text-slate-500">No hardware units paired.</p>
+                                    <p className="text-slate-500">No Android devices connected.</p>
                                 </div>
                             ) : (
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

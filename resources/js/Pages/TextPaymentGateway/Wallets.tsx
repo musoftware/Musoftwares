@@ -36,7 +36,7 @@ export default function Wallets({ wallets }: WalletProps) {
         <AuthenticatedLayout
             header={<h2 className="font-semibold text-xl text-gray-800 leading-tight">Linked Wallets</h2>}
         >
-            <Head title="Wallets - Text Payment Gateway" />
+            <Head title="Wallets - Payment Gateway" />
 
             <div className="py-8 md:py-12">
                 <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
