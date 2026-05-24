@@ -48,6 +48,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('erp_invoices');
+        Schema::dropIfExists('invoices');
     }
 };

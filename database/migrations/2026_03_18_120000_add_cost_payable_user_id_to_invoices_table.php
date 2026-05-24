@@ -8,7 +8,7 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::table('erp_invoices', function (Blueprint $table) {
+        Schema::table('invoices', function (Blueprint $table) {
             $table->unsignedBigInteger('cost_payable_user_id')->nullable()->after('user_id');
             $table->foreign('cost_payable_user_id')->references('id')->on('users')->nullOnDelete();
         });
@@ -16,7 +16,7 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::table('erp_invoices', function (Blueprint $table) {
+        Schema::table('invoices', function (Blueprint $table) {
             $table->dropForeign(['cost_payable_user_id']);
             $table->dropColumn('cost_payable_user_id');
         });
