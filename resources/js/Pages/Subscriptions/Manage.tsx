@@ -206,7 +206,7 @@ export default function Manage({ subscriptions, invoices, walletBalance, currenc
                                             </div>
 
                                             <div className="flex justify-end gap-3 pt-1">
-                                                {isActive && (
+                                                {isActive && sub.auto_renew && walletBalance >= sub.amount && (
                                                     <Button
                                                         onClick={() => handleCancel(sub.id)}
                                                         variant="outline"
