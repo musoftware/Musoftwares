@@ -997,4 +997,50 @@ Not copying content — copying the psychology.
         ],
         'version' => '1.0.0',
     ],
+    'b7f0e6e9-3d14-46f3-8b7c-87d4c80327f3' => [
+        'guid' => 'b7f0e6e9-3d14-46f3-8b7c-87d4c80327f3',
+        'title' => 'OLX B2C Finder',
+        'slug' => 'olx-b2c-finder',
+        'short_description' => 'Extract high-fidelity B2C leads from OLX and Dubizzle directly from the network wire.',
+        'description' => 'OLX B2C Finder is an enterprise-grade extraction tool designed for Dubizzle and OLX marketplaces.
+
+- Extract buyer/seller leads and phone numbers
+- Network-level scraping (Anti-DOM Fragility)
+- Multi-country support (UAE, Egypt, Lebanon, etc.)
+- 100% local execution and SQLite storage',
+        'category' => 'Marketing',
+        'supported_os' => [
+            'windows',
+            'mac',
+            'linux'
+        ],
+        'is_featured' => true,
+        'is_active' => true,
+        'is_free' => true,
+        'runner_component' => 'OlxB2CFinderRunner',
+        'features' => [
+            'Network-level Extraction',
+            'Phone Number Extraction',
+            'Multi-Country Support',
+            'Local Storage'
+        ],
+        'requirements' => [
+            'Musoftware Runtime Agent running locally',
+            'Internet connection'
+        ],
+        'plans' => [
+            '5c1417a8-8e60-4e58-944a-3a3f5a54db52' => [
+                'guid' => '5c1417a8-8e60-4e58-944a-3a3f5a54db52',
+                'name' => 'Free',
+                'price_monthly' => 0,
+                'price_yearly' => 0,
+                'is_popular' => true,
+                'features' => [
+                    'Unlimited Searches',
+                    'Local DB Storage'
+                ],
+            ],
+        ],
+        'version' => '1.0.0',
+    ],
 ];
