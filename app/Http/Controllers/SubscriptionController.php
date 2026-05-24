@@ -203,12 +203,14 @@ class SubscriptionController extends Controller
         }
 
         try {
-            DB::transaction(function () use ($user, $plan, $plan_amount, $current_plan_remaining_price, $current_plan, $days) {
+            DB::transaction(function () use ($user, $plan, $plan_amount, $current_plan_remaining_price, $current_plan, $days, $billingCycle, $usdCurrencyId) {
                 if ($current_plan != null && $current_plan_remaining_price > 0) {
                     $user->add_balance($current_plan_remaining_price, 'Refund for remaining days of ' . $current_plan->plan_name . ' plan', 'refund', null);
                 }
 
-                \App\Helpers\TimerHelper::instance()->addUsed($user, $plan_amount, 'Subscribe to ' . $plan->plan_name . ' plan');
+                if ($plan_amount > 0) {
+                    $user->add_balance(-1 * $plan_amount, 'Subscribe to ' . $plan->plan_name . ' plan', 'used');
+                }
 
                 $user->subscription_plan = $plan->plan_name;
                 $user->subscription_date = date('Y-m-d', strtotime('+' . $days . ' day'));
