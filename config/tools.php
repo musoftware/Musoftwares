@@ -632,4 +632,45 @@ Not copying content — copying the psychology.
         ],
         'version' => '1.0.0',
     ],
+    'fbe12345-0000-0000-0000-000000000000' => [
+        'guid' => 'fbe12345-0000-0000-0000-000000000000',
+        'title' => 'AMC Facebook Extractor',
+        'slug' => 'facebook-extractor',
+        'short_description' => 'Extract members, comments, and likes directly from the Facebook UI without APIs.',
+        'description' => 'A Runtime-First Browser Bridge extension that securely intercepts Facebook GraphQL responses without fragile DOM scraping. Extract group members, post comments, and post likes directly into local SQLite storage.',
+        'category' => 'Marketing',
+        'supported_os' => [
+            'windows',
+            'mac',
+            'linux'
+        ],
+        'is_featured' => true,
+        'is_active' => true,
+        'is_free' => true,
+        'runner_component' => 'facebook-extractor',
+        'features' => [
+            'Group Member Extraction',
+            'Post Comments Extraction',
+            'Post Likes Extraction',
+            'Network GraphQL Interception'
+        ],
+        'requirements' => [
+            'Musoftware Runtime Agent running locally',
+            'Musoftware Browser Extension installed'
+        ],
+        'plans' => [
+            'fbe12345-0000-0000-0000-000000000001' => [
+                'guid' => 'fbe12345-0000-0000-0000-000000000001',
+                'name' => 'Free',
+                'price_monthly' => 0,
+                'price_yearly' => 0,
+                'is_popular' => true,
+                'features' => [
+                    'Unlimited Extractions',
+                    'Local DB Storage'
+                ],
+            ],
+        ],
+        'version' => '1.0.0',
+    ],
 ];
