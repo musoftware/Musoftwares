@@ -113,7 +113,9 @@ return new class extends Migration
         }
 
         // Drop the old tables
-        if (DB::getDriverName() !== 'sqlite') {
+        if (DB::getDriverName() === 'sqlite') {
+            DB::statement('PRAGMA foreign_keys = OFF;');
+        } else {
             DB::statement('SET FOREIGN_KEY_CHECKS=0;');
         }
         Schema::dropIfExists('service_orders');
@@ -133,6 +135,12 @@ return new class extends Migration
         
         foreach ($tablesToDrop as $tbl) {
             Schema::dropIfExists($tbl);
+        }
+
+        if (DB::getDriverName() === 'sqlite') {
+            DB::statement('PRAGMA foreign_keys = ON;');
+        } else {
+            DB::statement('SET FOREIGN_KEY_CHECKS=1;');
         }
     }
 
