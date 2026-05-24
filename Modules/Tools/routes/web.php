@@ -40,6 +40,9 @@ Route::prefix('tools')->name('tools.')->group(function () {
         // Tool runner — web UI to run a subscribed tool
         Route::get('/{slug}/run', [MarketplaceController::class, 'run'])->name('run');
 
+        // Tool tutorial — guide to setup/use the tool
+        Route::get('/{slug}/tutorial', [MarketplaceController::class, 'tutorial'])->name('tutorial');
+
         // Slug-based routes — AFTER all static routes
         Route::get('/{slug}/subscribe/{planId}', [SubscriptionController::class, 'checkout'])->name('checkout');
         Route::post('/{slug}/subscribe/{planId}', [SubscriptionController::class, 'subscribe'])->name('subscribe');
