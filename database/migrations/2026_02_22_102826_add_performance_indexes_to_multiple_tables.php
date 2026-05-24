@@ -33,7 +33,7 @@ return new class extends Migration
             $table->index('current_date', 'idx_recurring_incomes_date');
         });
 
-        Schema::table('erp_invoices', function (Blueprint $table) {
+        Schema::table('invoices', function (Blueprint $table) {
             $table->index(['status', 'archive', 'created_at'], 'idx_invoices_status_archive_created');
         });
 
@@ -77,7 +77,7 @@ return new class extends Migration
             $table->dropIndex('idx_recurring_incomes_date');
         });
 
-        Schema::table('erp_invoices', function (Blueprint $table) {
+        Schema::table('invoices', function (Blueprint $table) {
             $table->dropIndex('idx_invoices_status_archive_created');
         });
 
