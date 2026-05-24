@@ -26,9 +26,10 @@ class UsersController extends Controller
     public function index(Request $request): InertiaResponse
     {
         $query = User::query()
-            ->select('id', 'name', 'email', 'role', 'account_status', 'created_at',
+            ->select('id', 'name', 'email', 'account_status', 'created_at',
                      'whatsapp_number', 'preferred_currency', 'kyc_verified',
-                     'last_activity_at', 'onboarding_completed');
+                     'last_activity_at', 'onboarding_completed')
+            ->with('roles');
 
         // Full-text search across name, email, whatsapp
         if ($search = $request->get('search')) {
@@ -67,7 +68,7 @@ class UsersController extends Controller
                 'id'                   => $user->id,
                 'name'                 => $user->name,
                 'email'                => $user->email,
-                'role'                 => $user->role,
+                'role'                 => $user->roles->first()?->name ?? 'user',
                 'account_status'       => $user->account_status ?? 'active',
                 'kyc_verified'         => (bool) $user->kyc_verified,
                 'preferred_currency'   => $user->preferred_currency ?? 'USD',
@@ -100,7 +101,7 @@ class UsersController extends Controller
      */
     public function show($id): InertiaResponse
     {
-        $user = User::with(['kycDocuments', 'kycVerifier:id,name', 'tickets'])
+        $user = User::with(['kycDocuments', 'kycVerifier:id,name', 'tickets', 'roles'])
             ->findOrFail($id);
 
         $initials = collect(explode(' ', $user->name))
@@ -133,7 +134,7 @@ class UsersController extends Controller
             'name'                 => $user->name,
             'email'                => $user->email,
             'initials'             => $initials,
-            'role'                 => $user->role,
+            'role'                 => $user->roles->first()?->name ?? 'user',
             'account_status'       => $user->account_status ?? 'active',
             'block_reason'         => $user->block_reason,
             'email_verified_at'    => $user->email_verified_at,
@@ -209,14 +210,14 @@ class UsersController extends Controller
      */
     public function edit($id): InertiaResponse
     {
-        $user = User::with(['kycDocuments'])->findOrFail($id);
+        $user = User::with(['kycDocuments', 'roles'])->findOrFail($id);
 
         return Inertia::render('Admin/Users/Edit', [
             'user' => [
                 'id'                   => $user->id,
                 'name'                 => $user->name,
                 'email'                => $user->email,
-                'role'                 => $user->role,
+                'role'                 => $user->roles->first()?->name ?? 'user',
                 'phone'                => $user->phone,
                 'mobile_1'             => $user->mobile_1,
                 'mobile_2'             => $user->mobile_2,
@@ -332,7 +333,7 @@ class UsersController extends Controller
                 'created_at'     => $u->created_at,
             ]);
 
-        $noWhatsApp = User::where('role', 'client')
+        $noWhatsApp = User::role('client')
             ->where(fn($q) => $q->whereNull('whatsapp_number')->orWhere('whatsapp_number', ''))
             ->latest()
             ->get()

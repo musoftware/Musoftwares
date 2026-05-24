@@ -23,7 +23,7 @@ class DashboardController extends Controller
     public function index()
     {
         // ── Core Metrics ─────────────────────────────────────────
-        $totalClients = User::where('role', 'client')->count();
+        $totalClients = User::role('client')->count();
         $activeTenants = Tenant::where('status', 'active')->count();
 
         // Revenue this month (try ledger first, fallback to invoices)
@@ -31,9 +31,9 @@ class DashboardController extends Controller
         $revenueLastMonth = $this->getRevenueLastMonth();
 
         // Growth calculations recovered from old project: DashboardController::index()
-        $recentClients = User::where('role', 'client')
+        $recentClients = User::role('client')
             ->where('created_at', '>=', now()->subDays(30))->count();
-        $priorClients = User::where('role', 'client')
+        $priorClients = User::role('client')
             ->whereBetween('created_at', [now()->subDays(60), now()->subDays(30)])->count();
         $clientsGrowth = $priorClients > 0
             ? round((($recentClients - $priorClients) / $priorClients) * 100, 1)

@@ -37,10 +37,16 @@ class MessagesController extends Controller
         // Security: only expose admin/support accounts for direct chat.
         // Regular users must NOT see the full member directory.
         $users = User::where('id', '!=', $user->id)
-            ->whereIn('role', ['admin', 'support', 'super_admin'])
-            ->select('id', 'name', 'email', 'avatar', 'role')
+            ->role(['admin', 'support', 'super_admin'])
+            ->select('id', 'name', 'email', 'avatar')
+            ->with('roles')
             ->orderBy('name')
-            ->get();
+            ->get()
+            ->map(function ($u) {
+                $arr = $u->toArray();
+                $arr['role'] = $u->roles->first()?->name ?? 'user';
+                return $arr;
+            });
 
         return Inertia::render('Messages/Index', [
             'conversations' => $conversations,
@@ -57,7 +63,7 @@ class MessagesController extends Controller
                 // Server-side guard: users can only direct-message admins/support
                 function ($attribute, $value, $fail) use ($request) {
                     $recipient = User::find($value);
-                    if ($recipient && !in_array($recipient->role, ['admin', 'support', 'super_admin'])) {
+                    if ($recipient && !$recipient->hasAnyRole(['admin', 'support', 'super_admin'])) {
                         $fail('Direct messages can only be sent to support or admin accounts.');
                     }
                 },
