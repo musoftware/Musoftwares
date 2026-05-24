@@ -23,6 +23,7 @@ const components: Record<string, React.ElementType> = {
     'viral-autopsy':            lazy(() => import('./ViralAutopsyRunner')),
     'hook-analyzer':            lazy(() => import('./HookAnalyzerRunner')),
     'format-extractor':         lazy(() => import('./FormatExtractorRunner')),
+    'facebook-extractor':       lazy(() => import('./FacebookExtractorRunner')),
     'IPTVDownloaderRunner':     lazy(() => import('./IPTVDownloaderRunner')),
     'iptv-downloader':          lazy(() => import('./IPTVDownloaderRunner')),
     'opensooq':                 lazy(() => import('./OpensooqRunner')),

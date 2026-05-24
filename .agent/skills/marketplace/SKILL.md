@@ -52,6 +52,12 @@ There is **no "My Licenses" page, section, nav item, or concept** anywhere in th
 - **Update Channels**: The Runtime Orchestrator periodically polls the Marketplace API for updates.
 - **Changelogs**: The UI fetches and displays human-readable changelogs from the marketplace. Keep changelogs focused on user value, avoiding excessive developer jargon.
 
+## 5. Tool Registration (`config/tools.php`)
+When adding a new tool to the marketplace, you MUST register it directly in `config/tools.php`.
+- Do not rely on database seeders as the source of truth for available tools.
+- Open `config/tools.php`, generate a new UUID for the tool, and define its metadata, slug, features, plans, and `runner_component`.
+- The marketplace UI generates its listings dynamically based on this config file.
+
 ## Summary Checklist
 - [ ] Does the marketplace presentation feel like a premium ecosystem rather than a hacker script store?
 - [ ] Are plugin descriptions focused on outcomes and workflows rather than technical implementation details?

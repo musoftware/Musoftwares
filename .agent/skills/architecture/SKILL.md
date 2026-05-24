@@ -66,7 +66,13 @@ There is **ONE unified runtime agent**. We do not use separate Python agents and
 - **Workers**: Launched by NodeJS to handle heavy tasks (data processing, scraping, AI inference). They operate in isolated execution contexts.
 - **Plugin Orchestration**: Plugins are dynamically loaded packages. The Runtime downloads them, provisions them, and routes commands to them.
 
-## 5. Security Memory
+## 5. Tool Registration (`config/tools.php`)
+When adding a new tool to the Musoftware ecosystem, you MUST register it directly in `config/tools.php`.
+- Do not rely on database seeders or `register_tool.php` scripts as the source of truth.
+- Open `config/tools.php`, generate a new UUID for the tool, and define its metadata, slug, features, plans, and `runner_component` (React UI).
+- The Marketplace UI and backend routing generate their listings dynamically based strictly on this config file.
+
+## 6. Security Memory
 
 The runtime interacts closely with the user's local system. Strict security measures are enforced:
 - **Localhost-only Runtime**: The runtime only binds to localhost and cannot be accessed externally.
