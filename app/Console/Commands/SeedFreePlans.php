@@ -28,7 +28,7 @@ class SeedFreePlans extends Command
         $modules = ['erp', 'freelance', 'marketing', 'marketplace', 'booking', 'intelligence'];
 
         foreach ($modules as $module) {
-            \Modules\ERP\Models\ModulePlan::firstOrCreate(
+            \App\Models\ModulePlan::firstOrCreate(
                 ['module' => $module, 'name' => 'Free Trial'],
                 [
                     'price' => 0.00,

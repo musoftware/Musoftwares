@@ -3,7 +3,7 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
-use Modules\ERP\Models\UserSubscription;
+use App\Models\UserSubscription;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Support\Facades\Log;

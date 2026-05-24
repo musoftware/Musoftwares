@@ -3,7 +3,7 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Modules\ERP\Models\ModulePlan;
+use App\Models\ModulePlan;
 
 class ModulePlanSeeder extends Seeder
 {
