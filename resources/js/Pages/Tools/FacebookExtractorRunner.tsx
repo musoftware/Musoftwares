@@ -99,6 +99,60 @@ export default function FacebookExtractorRunner({ tool }: any) {
         }));
     };
 
+    const handleExport = (format: 'csv' | 'txt' | 'ids') => {
+        if (!extractionId || !ws || ws.readyState !== WebSocket.OPEN) return;
+        
+        const reqId = `export_${Date.now()}`;
+        
+        // Setup temporary listener for this specific request
+        const listener = (e: MessageEvent) => {
+            try {
+                const msg = JSON.parse(e.data);
+                if (msg.type === 'plugin_rpc_res' && msg.requestId === reqId) {
+                    ws.removeEventListener('message', listener);
+                    
+                    const payload = msg.payload;
+                    if (!payload || !payload.data) return;
+                    
+                    const { headers, rows } = payload.data;
+                    let fileContent = '';
+                    let mimeType = 'text/plain;charset=utf-8;';
+                    
+                    if (format === 'csv') {
+                        mimeType = 'text/csv;charset=utf-8;';
+                        fileContent = [
+                            headers.join(','),
+                            ...rows.map((row: string[]) => row.map((cell: string) => `"${String(cell).replace(/"/g, '""')}"`).join(','))
+                        ].join('\n');
+                    } else {
+                        // For txt and ids, rows is an array of strings
+                        fileContent = rows.join('\n');
+                    }
+                    
+                    const blob = new Blob(['\uFEFF' + fileContent], { type: mimeType });
+                    const link = document.createElement('a');
+                    link.href = URL.createObjectURL(blob);
+                    link.download = payload.filename || `facebook_export_${extractionId}.${format === 'csv' ? 'csv' : 'txt'}`;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                }
+            } catch (err) {}
+        };
+        
+        ws.addEventListener('message', listener);
+        
+        ws.send(JSON.stringify({
+            type: 'plugin_rpc',
+            requestId: reqId,
+            payload: {
+                plugin: 'facebook-extractor',
+                action: 'export_data',
+                data: { extractionId, format }
+            }
+        }));
+    };
+
     return (
         <div className="min-h-screen bg-slate-50 font-sans">
             {/* Top bar */}
@@ -229,9 +283,29 @@ export default function FacebookExtractorRunner({ tool }: any) {
                                 <p className="text-sm text-slate-600 font-medium text-center">
                                     {status === 'completed' ? 'Extraction completed successfully.' : 'Extraction stopped by user.'}
                                 </p>
-                                <Button variant="outline" className="h-11 w-full font-bold gap-2 text-[#1877F2] border-[#1877F2] hover:bg-blue-50" disabled>
-                                    <Download className="w-4 h-4" /> Download CSV (Coming soon)
-                                </Button>
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                                    <Button 
+                                        variant="outline" 
+                                        className="h-11 font-bold gap-2 text-[#1877F2] border-[#1877F2] hover:bg-blue-50"
+                                        onClick={() => handleExport('csv')}
+                                    >
+                                        <Download className="w-4 h-4" /> Download CSV
+                                    </Button>
+                                    <Button 
+                                        variant="outline" 
+                                        className="h-11 font-bold gap-2 text-slate-600 border-slate-300 hover:bg-slate-50"
+                                        onClick={() => handleExport('txt')}
+                                    >
+                                        <Download className="w-4 h-4" /> Download TXT
+                                    </Button>
+                                    <Button 
+                                        variant="outline" 
+                                        className="h-11 font-bold gap-2 text-emerald-600 border-emerald-300 hover:bg-emerald-50"
+                                        onClick={() => handleExport('ids')}
+                                    >
+                                        <Download className="w-4 h-4" /> Export IDs Only
+                                    </Button>
+                                </div>
                             </div>
                         )}
                     </div>
