@@ -47,7 +47,7 @@ function NavButton({ item, active, onClick, badge, label }: any) {
             onClick={onClick}
             className={`w-full justify-start gap-3 px-4 py-6 rounded-xl font-semibold transition-all relative ${
                 active
-                    ? 'bg-teal-50 text-teal-700 hover:bg-teal-100 hover:text-teal-800 dark:bg-teal-950/40 dark:text-teal-400'
+                    ? 'text-foreground'
                     : 'text-muted-foreground hover:text-foreground'
             }`}
         >
