@@ -1,0 +1,43 @@
+{
+  "manifest_version": 3,
+  "name": "Musoftware Browser Runtime",
+  "version": "1.0.0",
+  "description": "Browser Extension Execution Layer for the Musoftware Runtime Agent",
+  "permissions": [
+    "storage",
+    "activeTab",
+    "scripting"
+  ],
+  "host_permissions": [
+    "https://*.facebook.com/*",
+    "https://facebook.com/*",
+    "https://*.instagram.com/*",
+    "https://*.whatsapp.com/*"
+  ],
+  "background": {
+    "service_worker": "src/background.js",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://*.facebook.com/*",
+        "https://facebook.com/*",
+        "https://*.instagram.com/*",
+        "https://*.whatsapp.com/*"
+      ],
+      "js": ["src/content.js"]
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["src/inject.js"],
+      "matches": [
+        "https://*.facebook.com/*",
+        "https://facebook.com/*",
+        "https://*.instagram.com/*",
+        "https://*.whatsapp.com/*"
+      ]
+    }
+  ]
+}

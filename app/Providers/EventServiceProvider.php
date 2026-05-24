@@ -18,6 +18,8 @@ use App\Events\ProposalAccepted;
 use App\Events\ReferralCommissionEarned;
 use App\Events\MessageSent;
 use App\Events\TimerUpdated;
+use Modules\Booking\Events\BookingStatusChanged;
+use Modules\Booking\Listeners\SendBookingNotification;
 
 /**
  * EventServiceProvider — wires all domain events to the Activity Engine listener.
@@ -46,6 +48,9 @@ class EventServiceProvider extends ServiceProvider
         // Messaging & Timer
         MessageSent::class             => [ActivityEventListener::class],
         TimerUpdated::class            => [ActivityEventListener::class],
+
+        // Booking
+        BookingStatusChanged::class    => [SendBookingNotification::class],
     ];
 
     public function boot(): void

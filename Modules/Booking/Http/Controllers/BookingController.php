@@ -432,6 +432,7 @@ class BookingController extends Controller
     {
         $user = Auth::user();
         $search = $request->input('search');
+        $providerId = $request->input('provider_id');
 
         $bookings = Booking::with(['eventType', 'clientUser', 'provider'])
             ->whereHas('eventType', function($q) use ($user) {
@@ -443,13 +444,19 @@ class BookingController extends Controller
                        ->orWhere('guest_email', 'like', "%{$search}%");
                 });
             })
+            ->when($providerId, function ($q, $providerId) {
+                $q->where('booking_provider_id', $providerId);
+            })
             ->latest('starts_at')
             ->paginate(20)
             ->withQueryString();
             
+        $providers = BookingProvider::where('host_user_id', $user->id)->get();
+            
         return Inertia::render('Booking/Appointments', [
             'bookings' => $bookings,
-            'filters' => $request->only(['search'])
+            'providers' => $providers,
+            'filters' => $request->only(['search', 'provider_id'])
         ]);
     }
 
@@ -471,7 +478,36 @@ class BookingController extends Controller
         $booking->status = $request->status;
         $booking->save();
 
+        event(new \Modules\Booking\Events\BookingStatusChanged($booking, $booking->status));
+
         return back()->with('success', 'Booking status updated successfully.');
+    }
+
+    /**
+     * Reschedule a booking (Host).
+     */
+    public function reschedule(Request $request, $id)
+    {
+        $request->validate([
+            'starts_at' => 'required|date'
+        ]);
+
+        $booking = Booking::with('eventType')->findOrFail($id);
+        
+        if ($booking->eventType->user_id !== Auth::id()) {
+            abort(403);
+        }
+
+        $startsAt = Carbon::parse($request->starts_at);
+        $endsAt = $startsAt->copy()->addMinutes($booking->eventType->duration_minutes);
+
+        $booking->starts_at = $startsAt;
+        $booking->ends_at = $endsAt;
+        $booking->save();
+
+        event(new \Modules\Booking\Events\BookingStatusChanged($booking, $booking->status, true));
+
+        return back()->with('success', 'Booking rescheduled successfully.');
     }
 
     /**
@@ -559,12 +595,7 @@ class BookingController extends Controller
             );
         }
 
-        // 3. Email notifications
-        try {
-            \Illuminate\Support\Facades\Mail::to($booking->guest_email)
-                ->send(new \App\Mail\BookingConfirmed($booking));
-        } catch (\Exception $e) {
-            Log::warning('Could not send booking confirmation email: ' . $e->getMessage());
-        }
+        // 3. Email notifications via Event
+        event(new \Modules\Booking\Events\BookingStatusChanged($booking, 'confirmed'));
     }
 }

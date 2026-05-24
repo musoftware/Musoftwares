@@ -22,11 +22,22 @@ interface GoldSaverRecord {
     bought_date: string;
     zakat: boolean;
     buyer_price: number;
-    buy2sell_rate: number;
-    loss_percentage: number;
+    current_value: number;
+    profit: number;
+    profit_percentage: number;
 }
 
-export default function Index({ records }: { records: GoldSaverRecord[] }) {
+interface GoldPrice {
+    price_24k: number;
+    price_22k: number;
+    price_21k: number;
+    price_18k: number;
+    price_14k: number;
+    price_10k: number;
+    price_date: string;
+}
+
+export default function Index({ records, latestPrice }: { records: GoldSaverRecord[], latestPrice: GoldPrice | null }) {
     const [editingId, setEditingId] = useState<number | null>(null);
     const { data, setData, post, put, processing, reset, errors } = useForm({
         carat: '21',
@@ -82,13 +93,9 @@ export default function Index({ records }: { records: GoldSaverRecord[] }) {
     // Summaries
     const totalGrams = useMemo(() => records.reduce((sum, r) => sum + Number(r.grams), 0), [records]);
     const totalInvestment = useMemo(() => records.reduce((sum, r) => sum + Number(r.buyer_price), 0), [records]);
-    
-    // Weighted Average calculations
-    const weightedAvgLossRate = useMemo(() => {
-        if (totalInvestment === 0) return 0;
-        const totalWeightedRate = records.reduce((sum, r) => sum + (Number(r.loss_percentage) * Number(r.buyer_price)), 0);
-        return totalWeightedRate / totalInvestment;
-    }, [records, totalInvestment]);
+    const totalCurrentValue = useMemo(() => records.reduce((sum, r) => sum + Number(r.current_value), 0), [records]);
+    const totalProfit = totalCurrentValue - totalInvestment;
+    const totalProfitPercentage = totalInvestment > 0 ? (totalProfit / totalInvestment) * 100 : 0;
 
     // Zakat Calculation (24k equivalent)
     const zakatable24kGrams = useMemo(() => {
@@ -100,9 +107,18 @@ export default function Index({ records }: { records: GoldSaverRecord[] }) {
         }, 0);
     }, [records]);
     
+    const zakatableCurrentValue = useMemo(() => {
+        return records.reduce((sum, r) => {
+            if (r.zakat) {
+                return sum + Number(r.current_value);
+            }
+            return sum;
+        }, 0);
+    }, [records]);
+
     const nisabThreshold = 85.0; // 85 grams of 24k gold
     const isZakatDue = zakatable24kGrams >= nisabThreshold;
-    const zakatEstimate = isZakatDue ? totalInvestment * 0.025 : 0;
+    const zakatEstimate = isZakatDue ? zakatableCurrentValue * 0.025 : 0;
 
     return (
         <AuthenticatedLayout header="Gold Savers">
@@ -134,6 +150,35 @@ export default function Index({ records }: { records: GoldSaverRecord[] }) {
                     </Alert>
                 )}
 
+                {/* Today's Prices */}
+                {latestPrice && (
+                    <div className="mb-8">
+                        <div className="flex items-center gap-2 mb-4">
+                            <div className="p-2 bg-yellow-50 text-yellow-600 rounded-lg">
+                                <Coins className="w-5 h-5" />
+                            </div>
+                            <h3 className="text-lg font-bold text-slate-900">Today's Gold Price (EGP)</h3>
+                            <span className="text-xs text-slate-500 ml-2">Last updated: {new Date(latestPrice.price_date).toLocaleDateString()}</span>
+                        </div>
+                        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+                            {[
+                                { label: '24K', value: latestPrice.price_24k },
+                                { label: '22K', value: latestPrice.price_22k },
+                                { label: '21K', value: latestPrice.price_21k },
+                                { label: '18K', value: latestPrice.price_18k },
+                                { label: '14K', value: latestPrice.price_14k },
+                            ].map((item) => (
+                                <Card key={item.label} className="border-0 shadow-sm ring-1 ring-slate-200/50 bg-white">
+                                    <CardContent className="p-4 text-center">
+                                        <p className="text-sm font-medium text-slate-500 mb-1">{item.label}</p>
+                                        <p className="text-xl font-bold text-slate-900">{Number(item.value).toLocaleString()}</p>
+                                    </CardContent>
+                                </Card>
+                            ))}
+                        </div>
+                    </div>
+                )}
+
                 {/* Stat Cards */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
                     <Card className="border-0 shadow-sm ring-1 ring-slate-200/50 bg-white hover:shadow-md transition-shadow">
@@ -154,30 +199,35 @@ export default function Index({ records }: { records: GoldSaverRecord[] }) {
                     <Card className="border-0 shadow-sm ring-1 ring-slate-200/50 bg-white hover:shadow-md transition-shadow">
                         <CardContent className="p-6">
                             <div className="flex items-center justify-between">
-                                <p className="text-sm font-medium text-slate-500 uppercase tracking-wider">Total Weight</p>
-                                <div className="p-2 bg-yellow-50 text-yellow-600 rounded-lg">
-                                    <Scale className="w-5 h-5" />
+                                <p className="text-sm font-medium text-slate-500 uppercase tracking-wider">Current Value</p>
+                                <div className="p-2 bg-indigo-50 text-indigo-600 rounded-lg">
+                                    <Coins className="w-5 h-5" />
                                 </div>
                             </div>
                             <div className="mt-4">
-                                <h3 className="text-3xl font-bold text-slate-900">{totalGrams.toFixed(2)} <span className="text-sm font-normal text-slate-500">grams</span></h3>
+                                <h3 className="text-3xl font-bold text-slate-900">{totalCurrentValue.toLocaleString()} <span className="text-sm font-normal text-slate-500">EGP</span></h3>
                             </div>
-                            <p className="text-xs text-slate-400 mt-2">Physical gold weight across all your items.</p>
+                            <p className="text-xs text-slate-400 mt-2">Estimated market value of your portfolio today.</p>
                         </CardContent>
                     </Card>
 
                     <Card className="border-0 shadow-sm ring-1 ring-slate-200/50 bg-white hover:shadow-md transition-shadow">
                         <CardContent className="p-6">
                             <div className="flex items-center justify-between">
-                                <p className="text-sm font-medium text-slate-500 uppercase tracking-wider">Avg Loss Rate</p>
-                                <div className="p-2 bg-purple-50 text-purple-600 rounded-lg">
+                                <p className="text-sm font-medium text-slate-500 uppercase tracking-wider">Total Profit/Loss</p>
+                                <div className={`p-2 rounded-lg ${totalProfit >= 0 ? 'bg-emerald-50 text-emerald-600' : 'bg-red-50 text-red-600'}`}>
                                     <Percent className="w-5 h-5" />
                                 </div>
                             </div>
                             <div className="mt-4 flex items-baseline gap-2">
-                                <h3 className="text-3xl font-bold text-slate-900">{weightedAvgLossRate.toFixed(2)}%</h3>
+                                <h3 className={`text-3xl font-bold ${totalProfit >= 0 ? 'text-emerald-600' : 'text-red-600'}`}>
+                                    {totalProfit >= 0 ? '+' : ''}{totalProfit.toLocaleString()} <span className="text-sm font-normal opacity-80">EGP</span>
+                                </h3>
+                                <span className={`text-sm font-bold ${totalProfit >= 0 ? 'text-emerald-600' : 'text-red-600'}`}>
+                                    ({totalProfit >= 0 ? '+' : ''}{totalProfitPercentage.toFixed(2)}%)
+                                </span>
                             </div>
-                            <p className="text-xs text-slate-400 mt-2">Weighted average of the loss percentage.</p>
+                            <p className="text-xs text-slate-400 mt-2">Net change since purchase.</p>
                         </CardContent>
                     </Card>
 
@@ -318,7 +368,8 @@ export default function Index({ records }: { records: GoldSaverRecord[] }) {
                                                     <TableHead>Item Details</TableHead>
                                                     <TableHead className="text-right">Breakdown</TableHead>
                                                     <TableHead className="text-right">Total Paid</TableHead>
-                                                    <TableHead className="text-center">Loss %</TableHead>
+                                                    <TableHead className="text-right">Current Val</TableHead>
+                                                    <TableHead className="text-center">Profit/Loss</TableHead>
                                                     <TableHead className="w-[90px]"></TableHead>
                                                 </TableRow>
                                             </TableHeader>
@@ -351,14 +402,22 @@ export default function Index({ records }: { records: GoldSaverRecord[] }) {
                                                             <span className="font-bold text-slate-900">{record.buyer_price.toLocaleString()}</span>
                                                             <span className="text-xs text-slate-500 ml-1">EGP</span>
                                                         </TableCell>
+                                                        <TableCell className="text-right">
+                                                            <span className="font-bold text-indigo-600">{record.current_value.toLocaleString()}</span>
+                                                            <span className="text-xs text-slate-500 ml-1">EGP</span>
+                                                        </TableCell>
                                                         <TableCell className="text-center">
-                                                            <span className={`inline-flex items-center px-2 py-1 rounded-md text-xs font-semibold ${
-                                                                record.loss_percentage > 10 ? 'bg-red-50 text-red-700 ring-1 ring-inset ring-red-600/20' : 
-                                                                record.loss_percentage > 5 ? 'bg-amber-50 text-amber-700 ring-1 ring-inset ring-amber-600/20' : 
-                                                                'bg-emerald-50 text-emerald-700 ring-1 ring-inset ring-emerald-600/20'
-                                                            }`}>
-                                                                {Number(record.loss_percentage).toLocaleString(undefined, { maximumFractionDigits: 2 })}%
-                                                            </span>
+                                                            <div className="flex flex-col items-center">
+                                                                <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-semibold ${
+                                                                    record.profit >= 0 ? 'bg-emerald-50 text-emerald-700 ring-1 ring-inset ring-emerald-600/20' : 
+                                                                    'bg-red-50 text-red-700 ring-1 ring-inset ring-red-600/20'
+                                                                }`}>
+                                                                    {record.profit >= 0 ? '+' : ''}{record.profit.toLocaleString()}
+                                                                </span>
+                                                                <span className={`text-[10px] font-medium mt-1 ${record.profit >= 0 ? 'text-emerald-600' : 'text-red-600'}`}>
+                                                                    {record.profit >= 0 ? '+' : ''}{Number(record.profit_percentage).toLocaleString(undefined, { maximumFractionDigits: 2 })}%
+                                                                </span>
+                                                            </div>
                                                         </TableCell>
                                                         <TableCell className="text-right">
                                                             <div className="flex justify-end gap-1">
