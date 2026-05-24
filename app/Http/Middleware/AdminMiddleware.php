@@ -15,7 +15,7 @@ class AdminMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (!auth()->check() || auth()->user()->role !== 'admin') {
+        if (!auth()->check() || !auth()->user()->hasAnyRole(['admin', 'Admin', 'super_admin', 'superadmin'])) {
             abort(403, 'Unauthorized access.');
         }
 

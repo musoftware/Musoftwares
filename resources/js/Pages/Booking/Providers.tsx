@@ -77,14 +77,14 @@ export default function Providers({ providers, eventTypes }: { providers: Bookin
     });
 
     // Availability rules state
-    const [weeklyRules, setWeeklyRules] = useState<Record<number, { is_enabled: boolean; start_time: string; end_time: string }>>({
-        1: { is_enabled: true, start_time: '09:00', end_time: '17:00' },
-        2: { is_enabled: true, start_time: '09:00', end_time: '17:00' },
-        3: { is_enabled: true, start_time: '09:00', end_time: '17:00' },
-        4: { is_enabled: true, start_time: '09:00', end_time: '17:00' },
-        5: { is_enabled: true, start_time: '09:00', end_time: '17:00' },
-        6: { is_enabled: false, start_time: '09:00', end_time: '17:00' },
-        0: { is_enabled: false, start_time: '09:00', end_time: '17:00' },
+    const [weeklyRules, setWeeklyRules] = useState<Record<number, { is_enabled: boolean; shifts: Array<{ start_time: string; end_time: string }> }>>({
+        1: { is_enabled: true, shifts: [{ start_time: '09:00', end_time: '17:00' }] },
+        2: { is_enabled: true, shifts: [{ start_time: '09:00', end_time: '17:00' }] },
+        3: { is_enabled: true, shifts: [{ start_time: '09:00', end_time: '17:00' }] },
+        4: { is_enabled: true, shifts: [{ start_time: '09:00', end_time: '17:00' }] },
+        5: { is_enabled: true, shifts: [{ start_time: '09:00', end_time: '17:00' }] },
+        6: { is_enabled: false, shifts: [{ start_time: '09:00', end_time: '17:00' }] },
+        0: { is_enabled: false, shifts: [{ start_time: '09:00', end_time: '17:00' }] },
     });
 
     const [oneTimeRules, setOneTimeRules] = useState<Array<{ date: string; start_time: string; end_time: string; is_enabled: boolean }>>([]);
@@ -135,13 +135,13 @@ export default function Providers({ providers, eventTypes }: { providers: Bookin
         
         // Initialize weekly rules
         const defaultWeekly = {
-            1: { is_enabled: false, start_time: '09:00', end_time: '17:00' },
-            2: { is_enabled: false, start_time: '09:00', end_time: '17:00' },
-            3: { is_enabled: false, start_time: '09:00', end_time: '17:00' },
-            4: { is_enabled: false, start_time: '09:00', end_time: '17:00' },
-            5: { is_enabled: false, start_time: '09:00', end_time: '17:00' },
-            6: { is_enabled: false, start_time: '09:00', end_time: '17:00' },
-            0: { is_enabled: false, start_time: '09:00', end_time: '17:00' },
+            1: { is_enabled: false, shifts: [] as Array<{ start_time: string; end_time: string }> },
+            2: { is_enabled: false, shifts: [] as Array<{ start_time: string; end_time: string }> },
+            3: { is_enabled: false, shifts: [] as Array<{ start_time: string; end_time: string }> },
+            4: { is_enabled: false, shifts: [] as Array<{ start_time: string; end_time: string }> },
+            5: { is_enabled: false, shifts: [] as Array<{ start_time: string; end_time: string }> },
+            6: { is_enabled: false, shifts: [] as Array<{ start_time: string; end_time: string }> },
+            0: { is_enabled: false, shifts: [] as Array<{ start_time: string; end_time: string }> },
         };
 
         provider.availability_rules.forEach(rule => {
@@ -149,13 +149,18 @@ export default function Providers({ providers, eventTypes }: { providers: Bookin
                 // Strip seconds if present e.g. "09:00:00" -> "09:00"
                 const start = rule.start_time.substring(0, 5);
                 const end = rule.end_time.substring(0, 5);
-                defaultWeekly[rule.weekday as keyof typeof defaultWeekly] = {
-                    is_enabled: !!rule.is_enabled,
-                    start_time: start,
-                    end_time: end,
-                };
+                defaultWeekly[rule.weekday as keyof typeof defaultWeekly].is_enabled = !!rule.is_enabled;
+                defaultWeekly[rule.weekday as keyof typeof defaultWeekly].shifts.push({ start_time: start, end_time: end });
             }
         });
+        
+        // Ensure every day has at least one empty shift so UI doesn't break if enabled
+        Object.keys(defaultWeekly).forEach(day => {
+            if (defaultWeekly[day as any].shifts.length === 0) {
+                defaultWeekly[day as any].shifts.push({ start_time: '09:00', end_time: '17:00' });
+            }
+        });
+        
         setWeeklyRules(defaultWeekly);
 
         // Initialize one-time rules
@@ -193,11 +198,39 @@ export default function Providers({ providers, eventTypes }: { providers: Bookin
         }));
     };
 
-    const handleWeeklyTimeChange = (day: number, field: 'start_time' | 'end_time', value: string) => {
+    const handleWeeklyTimeChange = (day: number, shiftIndex: number, field: 'start_time' | 'end_time', value: string) => {
+        setWeeklyRules(prev => {
+            const newShifts = [...prev[day].shifts];
+            newShifts[shiftIndex] = { ...newShifts[shiftIndex], [field]: value };
+            return {
+                ...prev,
+                [day]: { ...prev[day], shifts: newShifts }
+            };
+        });
+    };
+
+    const addWeeklyShift = (day: number) => {
         setWeeklyRules(prev => ({
             ...prev,
-            [day]: { ...prev[day], [field]: value }
+            [day]: { ...prev[day], shifts: [...prev[day].shifts, { start_time: '09:00', end_time: '17:00' }] }
         }));
+    };
+
+    const removeWeeklyShift = (day: number, shiftIndex: number) => {
+        setWeeklyRules(prev => {
+            const newShifts = prev[day].shifts.filter((_, i) => i !== shiftIndex);
+            // Don't remove the last shift, just leave it or disable the day
+            if (newShifts.length === 0) {
+                return {
+                    ...prev,
+                    [day]: { is_enabled: false, shifts: [{ start_time: '09:00', end_time: '17:00' }] }
+                };
+            }
+            return {
+                ...prev,
+                [day]: { ...prev[day], shifts: newShifts }
+            };
+        });
     };
 
     // Handle custom overrides
@@ -235,14 +268,18 @@ export default function Providers({ providers, eventTypes }: { providers: Bookin
         // 1. Gather recurring weekly rules
         Object.entries(weeklyRules).forEach(([dayStr, data]) => {
             const day = parseInt(dayStr);
-            formattedRules.push({
-                type: 'recurring',
-                weekday: day,
-                date: null,
-                start_time: data.start_time,
-                end_time: data.end_time,
-                is_enabled: data.is_enabled,
-            });
+            if (data.is_enabled) {
+                data.shifts.forEach(shift => {
+                    formattedRules.push({
+                        type: 'recurring',
+                        weekday: day,
+                        date: null,
+                        start_time: shift.start_time,
+                        end_time: shift.end_time,
+                        is_enabled: true,
+                    });
+                });
+            }
         });
 
         // 2. Gather custom override rules
@@ -276,8 +313,9 @@ export default function Providers({ providers, eventTypes }: { providers: Bookin
             workspaceName="Booking Settings"
             tenantId="SYS-BOOKING"
             menuItems={[
+                { id: 'dashboard', label: 'Dashboard', icon: Calendar, href: '/booking', isActive: false },
                 { id: 'appointments', label: 'Appointments', icon: Clock, href: '/booking/appointments', isActive: false },
-                { id: 'availability', label: 'Availability', icon: Calendar, href: '/booking', isActive: false },
+                { id: 'events', label: 'Event Types', icon: Calendar, href: '/booking/events', isActive: false },
                 { id: 'providers', label: 'Providers', icon: Users, href: '/booking/providers', isActive: true },
             ]}
         >
@@ -585,21 +623,42 @@ export default function Providers({ providers, eventTypes }: { providers: Bookin
                                                         </div>
 
                                                         {dayRule.is_enabled ? (
-                                                            <div className="flex items-center gap-2 mt-3 sm:mt-0">
-                                                                <span className="text-xs text-slate-400 font-medium">Work hours:</span>
-                                                                <Input
-                                                                    type="time"
-                                                                    value={dayRule.start_time}
-                                                                    onChange={e => handleWeeklyTimeChange(value, 'start_time', e.target.value)}
-                                                                    className="w-28 text-sm text-slate-700 bg-white"
-                                                                />
-                                                                <span className="text-slate-400 text-sm">to</span>
-                                                                <Input
-                                                                    type="time"
-                                                                    value={dayRule.end_time}
-                                                                    onChange={e => handleWeeklyTimeChange(value, 'end_time', e.target.value)}
-                                                                    className="w-28 text-sm text-slate-700 bg-white"
-                                                                />
+                                                            <div className="flex flex-col gap-2 mt-3 sm:mt-0">
+                                                                {dayRule.shifts.map((shift, shiftIndex) => (
+                                                                    <div key={shiftIndex} className="flex items-center gap-2">
+                                                                        <span className="text-xs text-slate-400 font-medium">Work hours:</span>
+                                                                        <Input
+                                                                            type="time"
+                                                                            value={shift.start_time}
+                                                                            onChange={e => handleWeeklyTimeChange(value, shiftIndex, 'start_time', e.target.value)}
+                                                                            className="w-28 text-sm text-slate-700 bg-white"
+                                                                        />
+                                                                        <span className="text-slate-400 text-sm">to</span>
+                                                                        <Input
+                                                                            type="time"
+                                                                            value={shift.end_time}
+                                                                            onChange={e => handleWeeklyTimeChange(value, shiftIndex, 'end_time', e.target.value)}
+                                                                            className="w-28 text-sm text-slate-700 bg-white"
+                                                                        />
+                                                                        <Button 
+                                                                            type="button" 
+                                                                            variant="ghost" 
+                                                                            size="icon"
+                                                                            onClick={() => removeWeeklyShift(value, shiftIndex)}
+                                                                            className="text-red-500 hover:text-red-700 hover:bg-red-50 h-8 w-8"
+                                                                        >
+                                                                            <Trash2 className="w-4 h-4" />
+                                                                        </Button>
+                                                                    </div>
+                                                                ))}
+                                                                <Button 
+                                                                    type="button" 
+                                                                    variant="ghost" 
+                                                                    onClick={() => addWeeklyShift(value)}
+                                                                    className="text-xs text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 mt-1 w-max h-7 px-2"
+                                                                >
+                                                                    <Plus className="w-3 h-3 mr-1" /> Add Shift
+                                                                </Button>
                                                             </div>
                                                         ) : (
                                                             <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider mt-2 sm:mt-0">Unavailable / Off</span>

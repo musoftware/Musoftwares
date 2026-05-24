@@ -37,7 +37,10 @@ class HandleInertiaRequests extends Middleware
         return [
             ...parent::share($request),
             'auth' => [
-                'user' => $user,
+                'user' => $user ? array_merge($user->toArray(), [
+                    'role' => strtolower($user->roles->first()->name ?? 'user'),
+                    'roles' => $user->roles->pluck('name')->map(fn($r) => strtolower($r))->toArray(),
+                ]) : null,
                 'team_member' => \Illuminate\Support\Facades\Auth::guard('erp_team')->user(),
                 'is_impersonating' => session()->has('impersonator_id'),
                 'active_modules' => function () use ($user) {

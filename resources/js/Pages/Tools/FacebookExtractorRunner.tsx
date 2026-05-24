@@ -37,6 +37,10 @@ export default function FacebookExtractorRunner({ tool }: any) {
                     setCount(msg.data.total);
                     setStatus('completed');
                 }
+                if (msg.event === 'facebook_extractor.stopped' && msg.data?.extractionId === extractionId) {
+                    setCount(msg.data.total);
+                    setStatus('stopped');
+                }
                 
                 // Watch for general RPC responses
                 if (msg.type === 'plugin_rpc_res' && msg.payload?.status === 'started') {

@@ -25,25 +25,32 @@ import {
 } from "@/Components/ui/dialog";
 import { EmptyState } from '@/Components/ui/EmptyState';
 import { format } from 'date-fns';
-import { Calendar, Clock, CreditCard, ExternalLink, MoreVertical, Search, UserCircle2, Briefcase, FileText, CheckCircle, XCircle, Users } from 'lucide-react';
+import { Calendar, Clock, CreditCard, ExternalLink, MoreVertical, Search, UserCircle2, Briefcase, FileText, CheckCircle, XCircle, Users, LayoutList, CalendarDays } from 'lucide-react';
+import { SimpleCalendar } from '@/Components/Booking/SimpleCalendar';
 
-export default function Appointments({ bookings, filters }: any) {
+export default function Appointments({ bookings, providers, filters }: any) {
     const [search, setSearch] = useState(filters?.search || '');
+    const [providerId, setProviderId] = useState(filters?.provider_id || '');
+    const [viewMode, setViewMode] = useState<'list' | 'calendar'>('list');
     const [selectedBooking, setSelectedBooking] = useState<any>(null);
     const [isNotesModalOpen, setIsNotesModalOpen] = useState(false);
     
     useEffect(() => {
         const debounce = setTimeout(() => {
-            if (search !== (filters?.search || '')) {
+            if (search !== (filters?.search || '') || providerId !== (filters?.provider_id || '')) {
+                const params: any = {};
+                if (search) params.search = search;
+                if (providerId) params.provider_id = providerId;
+                
                 router.get(
                     route('booking.appointments'),
-                    { search },
+                    params,
                     { preserveState: true, replace: true }
                 );
             }
         }, 300);
         return () => clearTimeout(debounce);
-    }, [search, filters?.search]);
+    }, [search, providerId, filters?.search, filters?.provider_id]);
     
     const { data: notesData, setData: setNotesData, post: postNotes, processing: processingNotes } = useForm({
         internal_notes: ''
@@ -103,8 +110,9 @@ export default function Appointments({ bookings, filters }: any) {
             workspaceName="Booking Settings"
             tenantId="SYS-BOOKING"
             menuItems={[
+                { id: 'dashboard', label: 'Dashboard', icon: Calendar, href: '/booking', isActive: false },
                 { id: 'appointments', label: 'Appointments', icon: Clock, href: '/booking/appointments', isActive: true },
-                { id: 'availability', label: 'Availability', icon: Calendar, href: '/booking', isActive: false },
+                { id: 'events', label: 'Event Types', icon: Calendar, href: '/booking/events', isActive: false },
                 { id: 'providers', label: 'Providers', icon: Users, href: '/booking/providers', isActive: false },
             ]}
         >
@@ -117,14 +125,42 @@ export default function Appointments({ bookings, filters }: any) {
                         description="Manage your bookings, consultations, and operational pipeline."
                     />
                     
-                    <div className="relative w-full sm:w-72">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                        <Input 
-                            placeholder="Search by guest name or email..." 
-                            value={search}
-                            onChange={e => setSearch(e.target.value)}
-                            className="pl-9 bg-white"
-                        />
+                    <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+                        <select
+                            className="w-full sm:w-48 rounded-md border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                            value={providerId}
+                            onChange={(e) => setProviderId(e.target.value)}
+                        >
+                            <option value="">All Providers</option>
+                            {providers.map((p: any) => (
+                                <option key={p.id} value={p.id}>{p.name}</option>
+                            ))}
+                        </select>
+
+                        <div className="relative w-full sm:w-64">
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                            <Input 
+                                placeholder="Search guest name or email..." 
+                                value={search}
+                                onChange={e => setSearch(e.target.value)}
+                                className="pl-9 bg-white"
+                            />
+                        </div>
+
+                        <div className="flex bg-white rounded-md border border-slate-200 p-0.5">
+                            <button
+                                onClick={() => setViewMode('list')}
+                                className={`px-3 py-1.5 rounded-sm text-sm font-medium flex items-center transition-colors ${viewMode === 'list' ? 'bg-slate-100 text-slate-900' : 'text-slate-500 hover:text-slate-700'}`}
+                            >
+                                <LayoutList className="w-4 h-4 mr-1.5" /> List
+                            </button>
+                            <button
+                                onClick={() => setViewMode('calendar')}
+                                className={`px-3 py-1.5 rounded-sm text-sm font-medium flex items-center transition-colors ${viewMode === 'calendar' ? 'bg-slate-100 text-slate-900' : 'text-slate-500 hover:text-slate-700'}`}
+                            >
+                                <CalendarDays className="w-4 h-4 mr-1.5" /> Calendar
+                            </button>
+                        </div>
                     </div>
                 </div>
 
@@ -136,6 +172,15 @@ export default function Appointments({ bookings, filters }: any) {
                         action={{
                             label: "View Event Types",
                             href: route('booking.index')
+                        }}
+                    />
+                ) : viewMode === 'calendar' ? (
+                    <SimpleCalendar 
+                        bookings={bookings.data}
+                        onBookingClick={(booking: any) => {
+                            // You could open a detailed modal here, for now we just log or we can open notes
+                            console.log('Clicked booking', booking);
+                            openNotesModal(booking);
                         }}
                     />
                 ) : (
@@ -168,6 +213,13 @@ export default function Appointments({ bookings, filters }: any) {
                                                     <span className="font-medium mr-2">{booking.guest_name}</span>
                                                     <span className="text-sm text-slate-500">({booking.guest_email})</span>
                                                 </div>
+                                                
+                                                {booking.provider && (
+                                                    <div className="flex items-center text-sm text-slate-500 mb-2">
+                                                        <Users className="h-4 w-4 mr-2 text-slate-400" />
+                                                        Provider: <span className="font-medium ml-1 text-slate-700">{booking.provider.name}</span>
+                                                    </div>
+                                                )}
                                                 
                                                 {booking.notes && (
                                                     <div className="bg-slate-50 rounded-lg p-3 text-sm text-slate-600 border border-slate-100 mt-2">

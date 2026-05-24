@@ -39,7 +39,10 @@ export default function Create() {
             workspaceName="Booking Settings"
             tenantId="SYS-BOOKING"
             menuItems={[
-                { id: 'availability', label: 'Availability', icon: null, href: '/booking', isActive: true },
+                { id: 'dashboard', label: 'Dashboard', icon: Calendar, href: '/booking', isActive: false },
+                { id: 'appointments', label: 'Appointments', icon: Clock, href: '/booking/appointments', isActive: false },
+                { id: 'events', label: 'Event Types', icon: Calendar, href: '/booking/events', isActive: true },
+                { id: 'providers', label: 'Providers', icon: Users, href: '/booking/providers', isActive: false },
             ]}
         >
             <Head title="Create Event Type" />

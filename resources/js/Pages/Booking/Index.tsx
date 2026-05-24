@@ -34,8 +34,9 @@ export default function Index({ events }: { events: EventType[] }) {
             workspaceName="Booking Settings"
             tenantId="SYS-BOOKING"
             menuItems={[
+                { id: 'dashboard', label: 'Dashboard', icon: Calendar, href: '/booking', isActive: false },
                 { id: 'appointments', label: 'Appointments', icon: Clock, href: '/booking/appointments', isActive: false },
-                { id: 'availability', label: 'Availability', icon: Calendar, href: '/booking', isActive: true },
+                { id: 'events', label: 'Event Types', icon: Calendar, href: '/booking/events', isActive: true },
                 { id: 'providers', label: 'Providers', icon: Users, href: '/booking/providers', isActive: false },
             ]}
         >

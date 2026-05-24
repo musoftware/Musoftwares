@@ -16,8 +16,15 @@ class GoldSaversController extends Controller
             ->orderBy('bought_date', 'desc')
             ->get();
             
+        $latestPrice = \App\Models\GoldPrice::orderBy('price_date', 'desc')->first();
+
         // Map the calculations for the frontend
-        $records->transform(function ($record) {
+        $records->transform(function ($record) use ($latestPrice) {
+            $buyer_price = $record->buyer_price();
+            $current_value = $record->seller_price($latestPrice);
+            $profit = round($current_value - $buyer_price);
+            $profit_percentage = $buyer_price > 0 ? round(($profit / $buyer_price) * 100, 2) : 0;
+
             return [
                 'id' => $record->id,
                 'carat' => $record->carat,
@@ -27,14 +34,16 @@ class GoldSaversController extends Controller
                 'tax' => $record->tax,
                 'bought_date' => $record->bought_date,
                 'zakat' => $record->zakat,
-                'buyer_price' => $record->buyer_price(),
-                'buy2sell_rate' => $record->buy2sell_rate(),
-                'loss_percentage' => $record->loss_percentage(),
+                'buyer_price' => $buyer_price,
+                'current_value' => $current_value,
+                'profit' => $profit,
+                'profit_percentage' => $profit_percentage,
             ];
         });
 
         return Inertia::render('GoldSavers/Index', [
-            'records' => $records
+            'records' => $records,
+            'latestPrice' => $latestPrice
         ]);
     }
 
