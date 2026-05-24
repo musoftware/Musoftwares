@@ -46,17 +46,20 @@ class OnboardingController extends Controller
 
         $detectedCountry = 'United States'; // Fallback
         
-        try {
-            $reader = new \GeoIp2\Database\Reader(storage_path('app/geoip.mmdb'));
-            $ip = $request->ip();
-            if ($ip !== '127.0.0.1' && $ip !== '::1') {
-                $record = $reader->city($ip);
-                if ($record && $record->country->name) {
-                    $detectedCountry = $record->country->name;
+        $geoDbPath = storage_path('app/geoip.mmdb');
+        if (file_exists($geoDbPath)) {
+            try {
+                $reader = new \GeoIp2\Database\Reader($geoDbPath);
+                $ip = $request->ip();
+                if ($ip !== '127.0.0.1' && $ip !== '::1') {
+                    $record = $reader->city($ip);
+                    if ($record && $record->country->name) {
+                        $detectedCountry = $record->country->name;
+                    }
                 }
+            } catch (\Exception $e) {
+                // Ignore if IP not found in DB or DB missing
             }
-        } catch (\Exception $e) {
-            // Ignore if IP not found in DB or DB missing
         }
 
         return Inertia::render('Auth/OnboardingWizard', [
