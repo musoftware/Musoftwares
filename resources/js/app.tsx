@@ -11,6 +11,43 @@ import { MarketplaceModeProvider } from '@/Components/Marketplace/MarketplaceMod
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
+// Global Scroll Animation Observer
+const initScrollObserver = () => {
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('is-visible');
+            }
+        });
+    }, {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+    });
+
+    const observeElements = () => {
+        document.querySelectorAll('.animate-on-scroll:not(.is-observed)').forEach((el) => {
+            el.classList.add('is-observed');
+            observer.observe(el);
+        });
+    };
+
+    // Initial check
+    observeElements();
+
+    // Re-check when DOM changes (useful for React/Inertia dynamic rendering)
+    const mutationObserver = new MutationObserver(() => {
+        observeElements();
+    });
+    mutationObserver.observe(document.body, { childList: true, subtree: true });
+};
+
+// Start the observer
+if (typeof window !== 'undefined') {
+    window.addEventListener('load', initScrollObserver);
+    if (document.readyState === 'complete') {
+        initScrollObserver();
+    }
+}
 createInertiaApp({
     title: (title) => `${title} - ${appName}`,
     resolve: (name) =>
