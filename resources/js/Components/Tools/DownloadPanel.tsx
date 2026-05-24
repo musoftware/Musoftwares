@@ -83,7 +83,11 @@ export function DownloadPanel({
                             Open {toolTitle}
                         </Button>
                     </Link>
-
+                    <Link href={route('tools.tutorial', toolSlug)} className="block">
+                        <Button variant="outline" className="w-full gap-2 border-slate-200 text-slate-700 hover:bg-slate-50">
+                            Help & Tutorial
+                        </Button>
+                    </Link>
                 </div>
 
                 {/* Expiry */}

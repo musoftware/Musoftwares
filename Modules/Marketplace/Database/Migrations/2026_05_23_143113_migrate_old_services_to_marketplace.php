@@ -113,7 +113,9 @@ return new class extends Migration
         }
 
         // Drop the old tables
-        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+        if (DB::getDriverName() !== 'sqlite') {
+            DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+        }
         Schema::dropIfExists('service_orders');
         Schema::dropIfExists('service_packages');
         Schema::dropIfExists('service_categories');
