@@ -44,6 +44,8 @@ const components: Record<string, React.ElementType> = {
     'WaFunnelEngineRunner':     lazy(() => import('./WaFunnelEngineRunner')),
     'WaWarmupRunner':           lazy(() => import('./WaWarmupRunner')),
     'OlxB2CFinderRunner':       lazy(() => import('./OlxB2CFinderRunner')),
+    'TikTokBoosterRunner':      lazy(() => import('./TikTokBoosterRunner')),
+    'TelegramDownloaderRunner': lazy(() => import('./TelegramDownloaderRunner')),
 };
 
 function SetupWizard({ currentHost, onLinked }: { currentHost: string; onLinked: (ip: string) => void }) {
