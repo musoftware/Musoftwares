@@ -226,8 +226,8 @@ export default function DeliverabilityWorkspace({
             <div className="flex items-center justify-between">
                 <div className="text-start">
                     <h2 className="text-xl font-bold tracking-tight flex items-center gap-2">
-                        <div className="size-9 rounded-xl bg-teal-100/60 dark:bg-teal-955/40 flex items-center justify-center">
-                            <Flame className="w-5 h-5 text-teal-605" />
+                        <div className="size-9 rounded-xl bg-violet-100/60 dark:bg-violet-950/40 flex items-center justify-center">
+                            <Flame className="w-5 h-5 text-violet-600" />
                         </div>
                         {text.title}
                     </h2>
@@ -238,7 +238,7 @@ export default function DeliverabilityWorkspace({
                 <Button
                     onClick={handleManualTrigger}
                     disabled={triggering || !daemonConnected}
-                    className="bg-teal-600 hover:bg-teal-700 text-white font-bold rounded-xl gap-2 shadow-lg shadow-teal-500/10"
+                    className="bg-violet-600 hover:bg-violet-700 text-white font-bold rounded-xl gap-2 shadow-lg shadow-violet-500/10"
                 >
                     <Flame className={`w-4 h-4 ${triggering ? 'animate-bounce' : ''}`} />
                     {text.manualTrigger}
@@ -249,7 +249,7 @@ export default function DeliverabilityWorkspace({
             <div className="grid grid-cols-3 gap-4">
                 <Card className="rounded-2xl">
                     <CardContent className="p-4 text-center">
-                        <div className="text-2xl font-black text-teal-600">{activeWarmers}</div>
+                        <div className="text-2xl font-black text-violet-600">{activeWarmers}</div>
                         <p className="text-[11px] text-muted-foreground font-medium mt-1">
                             {isArabic ? 'الحسابات النشطة' : 'Active Accounts'}
                         </p>
@@ -257,7 +257,7 @@ export default function DeliverabilityWorkspace({
                 </Card>
                 <Card className="rounded-2xl">
                     <CardContent className="p-4 text-center">
-                        <div className="text-2xl font-black text-blue-600">{totalWarmers}</div>
+                        <div className="text-2xl font-black text-emerald-600">{totalWarmers}</div>
                         <p className="text-[11px] text-muted-foreground font-medium mt-1">
                             {isArabic ? 'إجمالي الحسابات' : 'Total Accounts'}
                         </p>
@@ -277,10 +277,10 @@ export default function DeliverabilityWorkspace({
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 
                 {/* Intensity Controller Card */}
-                <Card className="lg:col-span-1 rounded-2xl border-teal-200/50 dark:border-teal-800/30 flex flex-col justify-between">
+                <Card className="lg:col-span-1 rounded-2xl border-violet-200/50 dark:border-violet-800/30 flex flex-col justify-between">
                     <CardHeader className="pb-4 border-b">
                         <CardTitle className="text-base flex items-center gap-2">
-                            <Settings className="w-4 h-4 text-teal-600" />
+                            <Settings className="w-4 h-4 text-violet-600" />
                             {text.intensityTitle}
                         </CardTitle>
                     </CardHeader>
@@ -299,7 +299,7 @@ export default function DeliverabilityWorkspace({
                                         onClick={() => setIntensity(level.key as any)}
                                         className={`w-full text-start p-3.5 rounded-2xl border transition-all duration-300 flex items-center justify-between ${
                                             intensity === level.key 
-                                                ? 'bg-teal-50/50 dark:bg-teal-950/20 border-teal-500/40 text-teal-850 dark:text-teal-400 shadow-sm ring-1 ring-teal-500/20' 
+                                                ? 'bg-violet-50/50 dark:bg-violet-950/20 border-violet-500/40 text-violet-850 dark:text-violet-400 shadow-sm ring-1 ring-violet-500/20' 
                                                 : 'bg-transparent border-slate-100 hover:border-slate-200 dark:border-slate-800/80 text-slate-500 dark:text-slate-400'
                                         }`}
                                     >
@@ -308,7 +308,7 @@ export default function DeliverabilityWorkspace({
                                             <span className="text-[10px] text-muted-foreground block font-medium">{level.desc}</span>
                                         </div>
                                         <div className={`w-4.5 h-4.5 rounded-full border-2 flex items-center justify-center transition-colors ${
-                                            intensity === level.key ? 'border-teal-500 bg-teal-500' : 'border-slate-300 dark:border-slate-700'
+                                            intensity === level.key ? 'border-violet-500 bg-violet-500' : 'border-slate-300 dark:border-slate-700'
                                         }`}>
                                             {intensity === level.key && <div className="w-1.5 h-1.5 bg-white rounded-full" />}
                                         </div>
@@ -318,7 +318,7 @@ export default function DeliverabilityWorkspace({
                         </div>
 
                         <div className="bg-slate-50 dark:bg-slate-900/60 rounded-2xl p-4 flex items-start gap-3 border border-slate-100/50 dark:border-slate-800/50">
-                            <AlertCircle className="w-4 h-4 text-teal-600 dark:text-teal-400 shrink-0 mt-0.5" />
+                            <AlertCircle className="w-4 h-4 text-violet-600 dark:text-violet-400 shrink-0 mt-0.5" />
                             <p className="text-[10px] text-slate-500 dark:text-slate-450 leading-relaxed font-semibold">
                                 {isArabic 
                                     ? "نصيحة: نوصي باستخدام السرعة الطبيعية لبناء سمعة حسابك بأمان وبشكل طبيعي."
@@ -333,7 +333,7 @@ export default function DeliverabilityWorkspace({
                 <Card className="lg:col-span-2 rounded-2xl flex flex-col justify-between">
                     <CardHeader className="pb-4 border-b flex flex-row items-center justify-between space-y-0">
                         <CardTitle className="text-base flex items-center gap-2">
-                            <Shield className="w-4 h-4 text-teal-650" />
+                            <Shield className="w-4 h-4 text-violet-600" />
                             {text.poolDetails}
                         </CardTitle>
                         <Button 
@@ -419,7 +419,7 @@ export default function DeliverabilityWorkspace({
                                                 <Switch
                                                     checked={session.warmupActive}
                                                     onCheckedChange={(checked) => handleToggleWarmup(session.accountId, checked)}
-                                                    className="data-[state=checked]:bg-teal-50"
+                                                    className="data-[state=checked]:bg-violet-50"
                                                 />
                                             </div>
                                         </div>
@@ -435,10 +435,10 @@ export default function DeliverabilityWorkspace({
             <Card className="rounded-2xl flex flex-col h-[400px]">
                 <CardHeader className="pb-4 border-b flex flex-row items-center justify-between space-y-0">
                     <CardTitle className="text-base flex items-center gap-2">
-                        <Activity className="w-4 h-4 text-teal-500" />
+                        <Activity className="w-4 h-4 text-violet-600" />
                         {text.consoleTitle}
                     </CardTitle>
-                    <Badge variant="outline" className="border-teal-500/30 text-teal-600 dark:text-teal-400 text-xs px-2.5 py-0.5 rounded-xl font-semibold">
+                    <Badge variant="outline" className="border-violet-500/30 text-violet-600 dark:text-violet-400 text-xs px-2.5 py-0.5 rounded-xl font-semibold">
                         {text.warmupToggled}: {intensity.toUpperCase()}
                     </Badge>
                 </CardHeader>
@@ -460,7 +460,7 @@ export default function DeliverabilityWorkspace({
                                         isSystem 
                                             ? 'bg-amber-500/5 border-amber-500/10 text-amber-800 dark:text-amber-350' 
                                             : log.direction === 'out' 
-                                                ? 'bg-teal-500/5 border-teal-500/10 text-teal-800 dark:text-teal-350' 
+                                                ? 'bg-violet-500/5 border-violet-500/10 text-violet-800 dark:text-violet-350' 
                                                 : 'bg-emerald-500/5 border-emerald-500/10 text-emerald-800 dark:text-emerald-350'
                                     }`}
                                 >
@@ -477,7 +477,7 @@ export default function DeliverabilityWorkspace({
                                             )}
                                         </div>
                                         <span className={`text-[9px] uppercase font-extrabold tracking-wider px-2 py-0.5 rounded-full border ${
-                                            log.state === 'starter' ? 'bg-teal-500/10 text-teal-600 border-teal-500/20' :
+                                            log.state === 'starter' ? 'bg-violet-500/10 text-violet-600 border-violet-500/20' :
                                             log.state === 'completed' ? 'bg-amber-500/10 text-amber-600 border-amber-500/20' :
                                             'bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400 border-slate-200 dark:border-slate-700'
                                         }`}>

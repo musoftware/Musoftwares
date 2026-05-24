@@ -274,35 +274,22 @@ export default function CampaignsListWorkspace({ t, locale, callRPC, onViewRepor
         {
             label: isRtl ? 'إجمالي الحملات' : 'Total Campaigns',
             value: totalCampaigns,
-            icon: LayoutDashboard,
-            color: 'text-slate-600 dark:text-slate-400',
-            bg: 'bg-slate-100/80 dark:bg-slate-900/40',
-            iconBg: 'bg-slate-200/50 dark:bg-slate-800/50',
+            color: 'text-violet-600',
         },
         {
             label: isRtl ? 'حملات نشطة' : 'Active Now',
             value: activeCampaignCount,
-            icon: TrendingUp,
-            color: 'text-blue-600 dark:text-blue-400',
-            bg: 'bg-blue-50/80 dark:bg-blue-950/30',
-            iconBg: 'bg-blue-100/60 dark:bg-blue-900/40',
-            pulse: activeCampaignCount > 0,
+            color: 'text-blue-600',
         },
         {
             label: isRtl ? 'مكتملة' : 'Completed',
             value: completedCount,
-            icon: CheckCircle2,
-            color: 'text-emerald-600 dark:text-emerald-400',
-            bg: 'bg-emerald-50/80 dark:bg-emerald-950/30',
-            iconBg: 'bg-emerald-100/60 dark:bg-emerald-900/40',
+            color: 'text-emerald-600',
         },
         {
             label: isRtl ? 'فاشلة' : 'Failed',
             value: failedCount,
-            icon: XCircle,
-            color: 'text-red-600 dark:text-red-400',
-            bg: 'bg-red-50/80 dark:bg-red-950/30',
-            iconBg: 'bg-red-100/60 dark:bg-red-900/40',
+            color: 'text-red-600',
         },
     ];
 
@@ -346,19 +333,15 @@ export default function CampaignsListWorkspace({ t, locale, callRPC, onViewRepor
             </div>
 
             {/* ── KPI Cards ────────────────────────────────────────────── */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                 {kpiCards.map((kpi) => {
-                    const Icon = kpi.icon;
                     return (
-                        <Card key={kpi.label} className={`border-none shadow-none ${kpi.bg} rounded-2xl overflow-hidden transition-all duration-300 hover:scale-[1.02]`}>
-                            <CardContent className="p-4 flex items-center gap-3.5">
-                                <div className={`size-11 rounded-xl ${kpi.iconBg} flex items-center justify-center shrink-0 ${kpi.pulse ? 'animate-pulse' : ''}`}>
-                                    <Icon className={`w-5 h-5 ${kpi.color}`} />
-                                </div>
-                                <div className="min-w-0">
-                                    <p className={`text-2xl font-black tracking-tight leading-none ${kpi.color}`}>{kpi.value}</p>
-                                    <p className="text-[10px] font-bold text-muted-foreground mt-1 uppercase tracking-wider truncate">{kpi.label}</p>
-                                </div>
+                        <Card key={kpi.label} className="rounded-2xl">
+                            <CardContent className="p-4 text-center">
+                                <div className={`text-2xl font-black ${kpi.color}`}>{kpi.value}</div>
+                                <p className="text-[11px] text-muted-foreground font-medium mt-1">
+                                    {kpi.label}
+                                </p>
                             </CardContent>
                         </Card>
                     );
