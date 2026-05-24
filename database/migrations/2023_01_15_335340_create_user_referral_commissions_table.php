@@ -23,7 +23,7 @@ class CreateUserReferralCommissionsTable extends Migration
             $table->foreign('referred_user_id')->references('id')->on('users')->onDelete('cascade');
 
             $table->bigInteger('referred_invoice_id')->unsigned()->nullable();
-            $table->foreign('referred_invoice_id')->references('id')->on('erp_invoices')->onDelete('cascade');
+            $table->foreign('referred_invoice_id')->references('id')->on('invoices')->onDelete('cascade');
 
             $table->bigInteger('currency')->unsigned()->index();
             $table->foreign('currency')->references('id')->on('currencies')->onDelete('cascade');

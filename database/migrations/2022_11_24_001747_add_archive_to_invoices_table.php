@@ -13,7 +13,7 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::table('erp_invoices', function (Blueprint $table) {
+        Schema::table('invoices', function (Blueprint $table) {
 
             $table->boolean('archive')->default(0);
             $table->double('second_discount', 23, 3)->default(0);
@@ -28,7 +28,7 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::table('erp_invoices', function (Blueprint $table) {
+        Schema::table('invoices', function (Blueprint $table) {
             //
         });
     }
