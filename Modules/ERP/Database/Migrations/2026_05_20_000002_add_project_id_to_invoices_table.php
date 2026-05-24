@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (Schema::hasTable('erp_invoices') && !Schema::hasColumn('invoices', 'project_id')) {
+        if (Schema::hasTable('erp_invoices') && !Schema::hasColumn('erp_invoices', 'project_id')) {
             Schema::table('erp_invoices', function (Blueprint $table) {
                 $table->foreignId('project_id')
                     ->nullable()
@@ -27,7 +27,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        if (Schema::hasTable('erp_invoices') && Schema::hasColumn('invoices', 'project_id')) {
+        if (Schema::hasTable('erp_invoices') && Schema::hasColumn('erp_invoices', 'project_id')) {
             Schema::table('erp_invoices', function (Blueprint $table) {
                 $table->dropForeign(['project_id']);
                 $table->dropColumn('project_id');

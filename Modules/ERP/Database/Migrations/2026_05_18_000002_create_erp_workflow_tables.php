@@ -9,7 +9,7 @@ return new class extends Migration
     public function up(): void
     {
         // 1. Add Status to tenant_clients (guard against re-run)
-        if (!Schema::hasColumn('tenant_clients', 'status')) {
+        if (!Schema::hasColumn('erp_tenant_clients', 'status')) {
             Schema::table('erp_tenant_clients', function (Blueprint $table) {
                 $table->string('status')->default('lead')->after('name'); // lead, active, paying, retained, archived
             });
@@ -92,7 +92,7 @@ return new class extends Migration
         Schema::dropIfExists('erp_support_tickets');
         Schema::dropIfExists('projects');
 
-        if (Schema::hasColumn('tenant_clients', 'status')) {
+        if (Schema::hasColumn('erp_tenant_clients', 'status')) {
             Schema::table('erp_tenant_clients', function (Blueprint $table) {
                 $table->dropColumn('status');
             });
