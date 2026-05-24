@@ -34,7 +34,7 @@ class PlatformSubscription extends Model
 
     public function plan(): BelongsTo
     {
-        return $this->belongsTo(PlatformPlan::class, 'plan_id');
+        return $this->belongsTo(Plan::class, 'plan_id');
     }
 
     /* ─── Status Helpers ─── */
