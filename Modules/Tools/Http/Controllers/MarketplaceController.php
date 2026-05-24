@@ -50,6 +50,7 @@ class MarketplaceController extends Controller
         );
 
         $subscribedSlugs = [];
+        $hasBrowserSubscription = false;
         if (auth()->check()) {
             $subscribedSlugs = ToolSubscription::where('user_id', auth()->id())
                 ->where('status', 'active')
@@ -61,13 +62,31 @@ class MarketplaceController extends Controller
                 ->filter()
                 ->values()
                 ->toArray();
+
+            $browserToolSlugs = collect(config('tools'))
+                ->filter(function ($tool) {
+                    $requirements = $tool['requirements'] ?? [];
+                    foreach ($requirements as $req) {
+                        if (str_contains(strtolower($req), 'browser extension')) {
+                            return true;
+                        }
+                    }
+                    return false;
+                })
+                ->pluck('slug')
+                ->toArray();
+
+            $hasBrowserSubscription = collect($subscribedSlugs)
+                ->intersect($browserToolSlugs)
+                ->isNotEmpty();
         }
 
         return Inertia::render('Tools/Explore', [
-            'tools'          => $paginatedTools,
-            'categories'     => ['intelligence' => 'Intelligence', 'monitoring' => 'Monitoring', 'automation' => 'Automation', 'Media' => 'Media', 'Productivity' => 'Productivity'], // Hardcoded or from config
-            'subscribedSlugs' => $subscribedSlugs,
-            'filters'        => $request->only(['search', 'category']),
+            'tools'                  => $paginatedTools,
+            'categories'             => ['intelligence' => 'Intelligence', 'monitoring' => 'Monitoring', 'automation' => 'Automation', 'Media' => 'Media', 'Productivity' => 'Productivity'], // Hardcoded or from config
+            'subscribedSlugs'        => $subscribedSlugs,
+            'hasBrowserSubscription' => $hasBrowserSubscription,
+            'filters'                => $request->only(['search', 'category']),
         ]);
     }
 
@@ -150,6 +169,48 @@ class MarketplaceController extends Controller
             ],
             'runtimePort'  => 18400,
             'pluginSlug'   => $tool['slug'],
+        ]);
+    }
+
+    /**
+     * Tool tutorial page — instructions to run/set up the tool.
+     */
+    public function tutorial(string $slug): Response|\Illuminate\Http\RedirectResponse
+    {
+        $tool = collect(config('tools'))->firstWhere('slug', $slug);
+        
+        if (!$tool || !($tool['is_active'] ?? false)) {
+            abort(404);
+        }
+
+        $subscription = ToolSubscription::where('user_id', auth()->id())
+            ->where('tool_guid', $tool['guid'])
+            ->where('status', 'active')
+            ->latest()
+            ->first();
+
+        if (!$subscription) {
+            return redirect()->route('tools.show', $slug)
+                ->with('error', 'You need an active subscription to view the tutorial.');
+        }
+
+        $requirements = $tool['requirements'] ?? [];
+        $isBrowserTool = false;
+        foreach ($requirements as $req) {
+            if (str_contains(strtolower($req), 'browser extension')) {
+                $isBrowserTool = true;
+                break;
+            }
+        }
+
+        return Inertia::render('Tools/Tutorial', [
+            'tool' => [
+                'slug'             => $tool['slug'],
+                'title'            => $tool['title'],
+                'icon_url'         => $tool['icon_url'] ?? null,
+                'short_description' => $tool['short_description'] ?? null,
+                'is_browser_tool'  => $isBrowserTool,
+            ]
         ]);
     }
 

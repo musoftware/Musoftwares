@@ -164,10 +164,10 @@ class SubscriptionController extends Controller
             }
         });
 
-        return redirect()->route('tools.show', $slug)
+        return redirect()->route('tools.tutorial', $slug)
             ->with('success', $isFree
-                ? '✓ Access granted! The runtime will sync this tool automatically.'
-                : '✓ Subscription activated! Your license key is ready.');
+                ? '✓ Access granted! Follow the steps below to get started.'
+                : '✓ Subscription activated! Follow the steps below to get started.');
     }
 
 
