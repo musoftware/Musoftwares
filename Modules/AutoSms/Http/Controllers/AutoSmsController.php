@@ -68,7 +68,7 @@ class AutoSmsController extends Controller
         // or use the token ID to reference it (but that won't work for API calls)
         // For now, we'll set it to null and show a message to create one
 
-        return \Inertia\Inertia::render('Intelligence/ISaas/AutoSms', [
+        return \Inertia\Inertia::render('AutoSms', [
             'devices' => $devices,
             'webhook' => $webhook,
             'token' => $token,
@@ -158,7 +158,7 @@ class AutoSmsController extends Controller
                 ]);
             }
 
-            return redirect()->route('client.auto-sms.index')
+            return redirect()->route('autosms.index')
                 ->with('qr_code', $qrCodeDataUri)
                 ->with('connection_code', $connectionCode)
                 ->with('qr_expires_at', $expiresAt);
@@ -170,7 +170,7 @@ class AutoSmsController extends Controller
                 ], 500);
             }
 
-            return redirect()->route('client.auto-sms.index')
+            return redirect()->route('autosms.index')
                 ->with('error', __('messages.failed_to_generate_qr_code') . ': ' . $e->getMessage());
         }
     }
@@ -192,7 +192,7 @@ class AutoSmsController extends Controller
             ->orderByRaw('COALESCE(sms_timestamp, UNIX_TIMESTAMP(transaction_date) * 1000, UNIX_TIMESTAMP(created_at) * 1000) DESC')
             ->paginate(20);
 
-        return view('client.auto-sms.device', compact('device', 'transactions'));
+        return \Inertia\Inertia::render('AutoSms/Device', compact('device', 'transactions'));
     }
 
     /**
@@ -205,7 +205,7 @@ class AutoSmsController extends Controller
 
         $device->delete();
 
-        return redirect()->route('client.auto-sms.index')
+        return redirect()->route('autosms.index')
             ->with('success', __('messages.device_disconnected_success'));
     }
 
@@ -237,7 +237,7 @@ class AutoSmsController extends Controller
 
         $deletedCount = AutoSmsTransaction::where('device_id', $device->id)->delete();
 
-        return redirect()->route('client.auto-sms.device', $device->id)
+        return redirect()->route('autosms.device', $device->id)
             ->with('success', __('messages.all_transactions_cleared_success', ['count' => $deletedCount]));
     }
 
@@ -259,7 +259,7 @@ class AutoSmsController extends Controller
 
         $statusText = $newStatus ? __('messages.enabled') : __('messages.disabled');
 
-        return redirect()->route('client.auto-sms.device', $device->id)
+        return redirect()->route('autosms.device', $device->id)
             ->with('success', __('messages.spoof_detection_status_updated', ['status' => $statusText]));
     }
 
@@ -287,7 +287,7 @@ class AutoSmsController extends Controller
                 'webhook_secret' => $request->webhook_secret ?? $existingWebhook->webhook_secret ?? Str::random(32),
             ]);
 
-            return redirect()->route('client.auto-sms.index')
+            return redirect()->route('autosms.index')
                 ->with('success', __('messages.webhook_updated_success'));
         }
 
@@ -299,7 +299,7 @@ class AutoSmsController extends Controller
             'is_active' => true,
         ]);
 
-        return redirect()->route('client.auto-sms.index')
+        return redirect()->route('autosms.index')
             ->with('success', __('messages.webhook_registered_success_v2'));
     }
 
@@ -314,7 +314,7 @@ class AutoSmsController extends Controller
 
         $webhook->delete();
 
-        return redirect()->route('client.auto-sms.index')
+        return redirect()->route('autosms.index')
             ->with('success', __('messages.webhook_deleted_success'));
     }
 
@@ -330,7 +330,7 @@ class AutoSmsController extends Controller
             ->first();
 
         if (!$webhook) {
-            return redirect()->route('client.auto-sms.index')
+            return redirect()->route('autosms.index')
                 ->with('error', __('messages.no_active_webhook_configured'));
         }
 
@@ -364,16 +364,16 @@ class AutoSmsController extends Controller
             if ($success) {
                 $webhook->increment('success_count');
                 $webhook->update(['last_triggered_at' => now()]);
-                return redirect()->route('client.auto-sms.index')
+                return redirect()->route('autosms.index')
                     ->with('success', __('messages.test_webhook_sent_success'));
             } else {
                 $webhook->increment('failure_count');
-                return redirect()->route('client.auto-sms.index')
+                return redirect()->route('autosms.index')
                     ->with('error', __('messages.webhook_endpoint_returned_error') . ': ' . $statusCode);
             }
         } catch (\Exception $e) {
             $webhook->increment('failure_count');
-            return redirect()->route('client.auto-sms.index')
+            return redirect()->route('autosms.index')
                 ->with('error', __('messages.failed_to_send_test_webhook') . ': ' . $e->getMessage());
         }
     }
@@ -395,7 +395,7 @@ class AutoSmsController extends Controller
             ]);
         }
 
-        return redirect()->route('client.auto-sms.verification-secret-page')
+        return redirect()->route('autosms.verification-secret-page')
             ->with('verification_secret', $secret)
             ->with('success', __('messages.verification_secret_retrieved_success'));
     }
@@ -417,7 +417,7 @@ class AutoSmsController extends Controller
             ]);
         }
 
-        return redirect()->route('client.auto-sms.verification-secret-page')
+        return redirect()->route('autosms.verification-secret-page')
             ->with('verification_secret', $newSecret)
             ->with('success', __('messages.verification_secret_regenerated_success'));
     }
@@ -434,7 +434,7 @@ class AutoSmsController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
-        return view('client.auto-sms.devices', compact('devices'));
+        return \Inertia\Inertia::render('AutoSms/Devices', compact('devices'));
     }
 
     /**
@@ -449,7 +449,7 @@ class AutoSmsController extends Controller
             ->where('is_active', true)
             ->first();
 
-        return view('client.auto-sms.webhooks', compact('webhook'));
+        return \Inertia\Inertia::render('AutoSms/Webhooks', compact('webhook'));
     }
 
     /**
@@ -474,7 +474,7 @@ class AutoSmsController extends Controller
                 ->first();
         }
 
-        return view('client.auto-sms.verification', compact('token'));
+        return \Inertia\Inertia::render('AutoSms/Verification', compact('token'));
     }
 
     /**
@@ -483,7 +483,7 @@ class AutoSmsController extends Controller
      */
     public function documentation()
     {
-        return view('client.auto-sms.documentation');
+        return \Inertia\Inertia::render('AutoSms/Documentation');
     }
 
     /**
@@ -510,7 +510,7 @@ class AutoSmsController extends Controller
 
         $verificationSecret = $user->getAutoSmsVerificationSecret();
 
-        return view('client.auto-sms.integration-tester', compact('webhook', 'token', 'verificationSecret'));
+        return \Inertia\Inertia::render('AutoSms/IntegrationTester', compact('webhook', 'token', 'verificationSecret'));
     }
 
     /**
@@ -585,7 +585,7 @@ class AutoSmsController extends Controller
         // Otherwise, get from database
         $secret = session('verification_secret') ?? $user->getAutoSmsVerificationSecret();
 
-        return view('client.auto-sms.verification-secret', compact('secret'));
+        return \Inertia\Inertia::render('AutoSms/VerificationSecret', compact('secret'));
     }
 
     /**
@@ -600,7 +600,7 @@ class AutoSmsController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
-        return view('client.auto-sms.wallets', compact('wallets'));
+        return \Inertia\Inertia::render('AutoSms/Wallets', compact('wallets'));
     }
 
     /**
@@ -631,7 +631,7 @@ class AutoSmsController extends Controller
             ]);
         }
 
-        return redirect()->route('client.auto-sms.wallets')
+        return redirect()->route('autosms.wallets')
             ->with('success', __('messages.wallet_added_success'));
     }
 
@@ -653,7 +653,7 @@ class AutoSmsController extends Controller
             ]);
         }
 
-        return redirect()->route('client.auto-sms.wallets')
+        return redirect()->route('autosms.wallets')
             ->with('success', __('messages.wallet_deleted_success'));
     }
 
@@ -687,7 +687,7 @@ class AutoSmsController extends Controller
             ->limit(10)
             ->get();
 
-        return view('client.auto-sms.test-mode', compact(
+        return \Inertia\Inertia::render('AutoSms/TestMode', compact(
             'testModeEnabled',
             'webhook',
             'testTransactionsCount',
@@ -711,7 +711,7 @@ class AutoSmsController extends Controller
             ? __('messages.test_mode_enabled')
             : __('messages.test_mode_disabled');
 
-        return redirect()->route('client.auto-sms.test-mode')
+        return redirect()->route('autosms.test-mode')
             ->with('success', $message);
     }
 
@@ -728,7 +728,7 @@ class AutoSmsController extends Controller
         $user = Auth::user();
 
         if (!$user->auto_sms_test_mode) {
-            return redirect()->route('client.auto-sms.test-mode')
+            return redirect()->route('autosms.test-mode')
                 ->with('error', __('messages.test_mode_required_for_transaction'));
         }
 
@@ -767,7 +767,7 @@ class AutoSmsController extends Controller
         // Prepare request for API controller simulation
         // We act exactly as the mobile app would
         try {
-            $apiController = app(\App\Http\Controllers\Api\AutoSmsPaymentHubController::class);
+            $apiController = app(\Modules\AutoSms\Http\Controllers\Api\AutoSmsPaymentHubController::class);
 
             $allowedSenders = config('auto-sms.allowed_senders', ['Test-Sender']);
             $defaultSender = !empty($allowedSenders) ? $allowedSenders[array_rand($allowedSenders)] : 'Test-Sender';
@@ -798,10 +798,10 @@ class AutoSmsController extends Controller
                     $msg = __('messages.sms_processed_transaction_created');
                     if (isset($data->duplicate) && $data->duplicate) {
                         $msg = __('messages.sms_processed_duplicate', ['id' => $data->existing_transaction_id ?? '']);
-                        return redirect()->route('client.auto-sms.test-mode')
+                        return redirect()->route('autosms.test-mode')
                             ->with('warning', $msg);
                     }
-                    return redirect()->route('client.auto-sms.test-mode')
+                    return redirect()->route('autosms.test-mode')
                         ->with('success', $msg);
                 } else {
                     // Transaction not detected (parsing failed or filtered)
@@ -810,11 +810,11 @@ class AutoSmsController extends Controller
                         $reasons = isset($data->debug->reasons) ? implode(', ', $data->debug->reasons) : 'Unknown reason';
                         $debugMsg = "Reason: $reasons";
                     }
-                    return redirect()->route('client.auto-sms.test-mode')
+                    return redirect()->route('autosms.test-mode')
                         ->with('warning', __('messages.sms_received_no_transaction') . ' ' . $debugMsg);
                 }
             } else {
-                return redirect()->route('client.auto-sms.test-mode')
+                return redirect()->route('autosms.test-mode')
                     ->with('error', __('messages.processing_failed') . ': ' . ($data->message ?? 'Unknown error'));
             }
 
@@ -824,7 +824,7 @@ class AutoSmsController extends Controller
             exit();
 
 
-            return redirect()->route('client.auto-sms.test-mode')
+            return redirect()->route('autosms.test-mode')
                 ->with('error', __('messages.system_error') . ': ' . $e->getMessage());
         }
     }
@@ -838,7 +838,7 @@ class AutoSmsController extends Controller
         $user = Auth::user();
 
         if (!$user->auto_sms_test_mode) {
-            return redirect()->route('client.auto-sms.test-mode')
+            return redirect()->route('autosms.test-mode')
                 ->with('error', __('messages.test_mode_required_for_webhook'));
         }
 
@@ -847,7 +847,7 @@ class AutoSmsController extends Controller
             ->first();
 
         if (!$webhook) {
-            return redirect()->route('client.auto-sms.test-mode')
+            return redirect()->route('autosms.test-mode')
                 ->with('error', __('messages.no_webhook_configured'));
         }
 
@@ -880,10 +880,10 @@ class AutoSmsController extends Controller
             // Increment test events counter
             $webhook->increment('test_events_sent');
 
-            return redirect()->route('client.auto-sms.test-mode')
+            return redirect()->route('autosms.test-mode')
                 ->with('success', __('messages.test_webhook_sent_success_v2'));
         } catch (\Exception $e) {
-            return redirect()->route('client.auto-sms.test-mode')
+            return redirect()->route('autosms.test-mode')
                 ->with('error', __('messages.webhook_send_failed') . ': ' . $e->getMessage());
         }
     }
@@ -910,7 +910,7 @@ class AutoSmsController extends Controller
         AutoSmsWebhook::where('user_id', $user->id)
             ->update(['test_events_sent' => 0]);
 
-        return redirect()->route('client.auto-sms.test-mode')
+        return redirect()->route('autosms.test-mode')
             ->with('success', __('messages.all_test_data_cleared_success'));
     }
 
@@ -956,4 +956,6 @@ class AutoSmsController extends Controller
         return true;
     }
 }
+
+
 

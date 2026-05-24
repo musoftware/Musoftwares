@@ -46,6 +46,7 @@ class User extends Authenticatable
     protected $hidden = [
         'password',
         'remember_token',
+        'autosms_verification_secret',
     ];
 
     protected $appends = [
@@ -374,6 +375,32 @@ class User extends Authenticatable
     public function getPlanAttribute()
     {
         return $this->activePlatformSubscription?->plan;
+    }
+
+    /**
+     * Get or generate AutoSMS verification secret for HMAC signing
+     * @return string
+     */
+    public function getAutoSmsVerificationSecret(): string
+    {
+        if (!$this->autosms_verification_secret) {
+            $this->autosms_verification_secret = bin2hex(random_bytes(32)); // 64 character hex string
+            $this->save();
+        }
+
+        return $this->autosms_verification_secret;
+    }
+
+    /**
+     * Regenerate AutoSMS verification secret
+     * @return string The new secret
+     */
+    public function regenerateAutoSmsVerificationSecret(): string
+    {
+        $this->autosms_verification_secret = bin2hex(random_bytes(32));
+        $this->save();
+
+        return $this->autosms_verification_secret;
     }
 }
 
