@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {
-    Search, Target, Play, Square, Download, Sparkles,
-    AlertCircle, CheckCircle, RefreshCw, ChevronDown, ChevronUp, Settings
+    Search, Target, Play, Square, Download, Sparkles, Database,
+    AlertCircle, CheckCircle, RefreshCw, ChevronDown, ChevronUp, Settings, List, Trash2, ExternalLink
 } from 'lucide-react';
 import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
 import { Badge } from '@/Components/ui/badge';
 import { Label } from '@/Components/ui/label';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/Components/ui/tabs';
 
 const getRuntimeHost = () => typeof window !== 'undefined' ? (window.localStorage.getItem('musoftware_runtime_host') || '127.0.0.1') : '127.0.0.1';
 const getRuntimeHttp = () => `http://${getRuntimeHost()}:18400`;
@@ -14,7 +15,7 @@ const getWsUrl       = () => `ws://${getRuntimeHost()}:18401/ws`;
 
 export default function ContentResearcherRunner({ tool }: any) {
     const [keyword, setKeyword] = useState('');
-    const [engine, setEngine] = useState<'duckduckgo' | 'google'>('duckduckgo');
+    const [engine, setEngine] = useState<'duckduckgo' | 'google' | 'bing'>('duckduckgo');
     const [recursive, setRecursive] = useState(false);
     
     const [status, setStatus]   = useState<'idle' | 'running' | 'done' | 'error'>('idle');
@@ -29,6 +30,11 @@ export default function ContentResearcherRunner({ tool }: any) {
     const wsRef = useRef<WebSocket | null>(null);
 
     const [showAdvanced, setShowAdvanced] = useState(false);
+    
+    // DB History State
+    const [campaigns, setCampaigns] = useState<any[]>([]);
+    const [selectedCampaign, setSelectedCampaign] = useState<any>(null);
+    const [campaignData, setCampaignData] = useState<any>(null);
 
     useEffect(() => {
         const ws = new WebSocket(getWsUrl());
@@ -36,8 +42,6 @@ export default function ContentResearcherRunner({ tool }: any) {
         ws.onmessage = (e) => {
             try {
                 const msg = JSON.parse(e.data);
-                
-                // Realtime task progress
                 if (msg.event === 'task.progress' && msg.data?.taskId === taskId) {
                     if (msg.data.percent !== undefined) setProgress(msg.data.percent);
                     if (msg.data.message) {
@@ -45,287 +49,346 @@ export default function ContentResearcherRunner({ tool }: any) {
                         setLogs(prev => [msg.data.message, ...prev].slice(0, 50));
                     }
                 }
-                
-                // Realtime result push (custom event via wa_event pipeline)
                 if (msg.event === 'link_scraped') {
-                    if (msg.data?.result) {
-                        setResults(prev => [msg.data.result, ...prev]);
-                    }
+                    setResults(prev => [msg.data.result, ...prev]);
                 }
-
                 if (msg.event === 'task.done' && msg.data?.taskId === taskId) {
                     setStatus('done');
+                    loadCampaigns();
                 }
-                if (msg.event === 'task.error' && msg.data?.taskId === taskId) {
-                    setError(msg.data.error ?? 'Unknown error'); setStatus('error');
+                if (msg.event === 'task.failed' && msg.data?.taskId === taskId) {
+                    setStatus('error');
+                    setError(msg.data?.error || 'Task failed unexpectedly.');
                 }
-            } catch {}
+            } catch (_) {}
         };
         return () => ws.close();
     }, [taskId]);
 
-    const handleStart = async () => {
-        if (!keyword.trim()) return;
+    useEffect(() => {
+        loadCampaigns();
+    }, []);
 
-        setStatus('running'); setProgress(0); setProgressMsg('Initializing Search...'); setResults([]); setLogs([]); setError('');
-
+    const loadCampaigns = async () => {
         try {
+            const res = await fetch(`${getRuntimeHttp()}/plugins/content-researcher/rpc`, {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'get_campaigns', params: { limit: 100 } })
+            });
+            const data = await res.json();
+            if (data.campaigns) setCampaigns(data.campaigns);
+        } catch(e) {
+            console.error(e);
+        }
+    };
+
+    const loadCampaignData = async (id: number) => {
+        try {
+            const res = await fetch(`${getRuntimeHttp()}/plugins/content-researcher/rpc`, {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'get_campaign_data', params: { id } })
+            });
+            const data = await res.json();
+            setSelectedCampaign(data.campaign);
+            setCampaignData(data);
+        } catch(e) {
+            console.error(e);
+        }
+    };
+
+    const deleteCampaign = async (id: number, e: React.MouseEvent) => {
+        e.stopPropagation();
+        if(!confirm('Are you sure you want to delete this campaign?')) return;
+        try {
+            await fetch(`${getRuntimeHttp()}/plugins/content-researcher/rpc`, {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'delete_campaign', params: { id } })
+            });
+            if(selectedCampaign?.id === id) {
+                setSelectedCampaign(null);
+                setCampaignData(null);
+            }
+            loadCampaigns();
+        } catch(e) {
+            console.error(e);
+        }
+    };
+
+    const handleStart = async () => {
+        if (!keyword.trim()) { setError('Keyword is required'); setStatus('error'); return; }
+        try {
+            setStatus('running');
+            setProgress(0);
+            setProgressMsg('Initializing...');
+            setResults([]);
+            setError('');
+            
             const res = await fetch(`${getRuntimeHttp()}/plugins/content-researcher/run`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ params: { keyword: keyword.trim(), engine, recursive } }),
+                body: JSON.stringify({ params: { keyword, engine, recursive } }),
             });
-            const json = await res.json();
-            if (!res.ok) throw new Error(json.error ?? 'Failed to start');
-            setTaskId(json.taskId);
-        } catch (err: any) {
-            setError(err.message); setStatus('error');
+            
+            const data = await res.json();
+            if (res.ok && data.taskId) {
+                setTaskId(data.taskId);
+            } else {
+                setStatus('error');
+                setError(data.error || 'Failed to start task.');
+            }
+        } catch (e: any) {
+            setStatus('error');
+            setError('Runtime disconnected or error occurred.');
         }
     };
 
     const handleStop = async () => {
         if (!taskId) return;
         try {
-            await fetch(`${getRuntimeHttp()}/tasks/${taskId}/kill`, { method: 'POST' });
+            await fetch(`${getRuntimeHttp()}/tasks/${taskId}/stop`, { method: 'POST' });
             setStatus('done');
             setProgressMsg('Stopped by user');
-        } catch (err) {
-            console.error('Failed to stop task', err);
-        }
-    };
-
-    const exportCsv = () => {
-        if (results.length === 0) return;
-        const headers = ["URL", "Domain", "Title", "Meta Description", "Meta Keywords", "H1", "H2", "H3", "Images", "Internal Links", "Social Links", "Video Links"];
-        
-        let csvContent = "data:text/csv;charset=utf-8," 
-            + headers.join(",") + "\n"
-            + results.map(r => {
-                return [
-                    r.url, r.domain, r.title, r.description, r.keywords,
-                    r.h1, r.h2, r.h3, r.images, r.internal_links, r.social_links, r.video_links
-                ].map(field => `"${(field || '').toString().replace(/"/g, '""')}"`).join(",");
-            }).join("\n");
-
-        const encodedUri = encodeURI(csvContent);
-        const link = document.createElement("a");
-        link.setAttribute("href", encodedUri);
-        link.setAttribute("download", `${keyword.replace(/\s+/g, '_')}_seo_research.csv`);
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+            loadCampaigns();
+        } catch(e) { console.error(e); }
     };
 
     return (
-        <div className="min-h-screen bg-slate-50 font-sans flex flex-col">
-            {/* Top bar */}
-            <div className="h-14 bg-white border-b border-slate-200 flex items-center justify-between px-6 sticky top-0 z-10 shrink-0">
-                <div className="flex items-center gap-2.5">
-                    <div className="w-7 h-7 bg-gradient-to-br from-indigo-600 to-blue-600 rounded-lg flex items-center justify-center shadow-sm">
-                        <Target className="w-4 h-4 text-white" />
+        <div className="flex h-screen bg-slate-50 overflow-hidden font-sans antialiased text-slate-900">
+            {/* Sidebar */}
+            <div className="w-80 bg-white border-r border-slate-200 shadow-[2px_0_10px_rgba(0,0,0,0.02)] flex flex-col z-10 overflow-y-auto">
+                <div className="px-6 py-8">
+                    <div className="w-12 h-12 bg-indigo-500 rounded-2xl flex items-center justify-center shadow-inner mb-6 shadow-indigo-200">
+                        <Search className="w-6 h-6 text-white" />
                     </div>
-                    <span className="font-bold text-sm text-slate-800 tracking-tight">Content Researcher</span>
-                </div>
-                <div className="flex items-center gap-3">
-                    <Button variant="outline" onClick={exportCsv} disabled={results.length === 0} className="h-8 text-xs font-bold gap-1.5">
-                        <Download className="w-3.5 h-3.5" /> Export CSV
-                    </Button>
-                    <Badge variant="outline" className={`gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase ${status === 'running' ? 'bg-amber-50 border-amber-200 text-amber-700' : status === 'done' ? 'bg-emerald-50 border-emerald-200 text-emerald-700' : 'bg-slate-100 border-slate-200 text-slate-500'}`}>
-                        <div className={`w-1.5 h-1.5 rounded-full ${status === 'running' ? 'bg-amber-500 animate-pulse' : status === 'done' ? 'bg-emerald-500' : 'bg-slate-400'}`} />
-                        {status === 'running' ? 'Scraping...' : status === 'done' ? 'Finished' : 'Ready'}
-                    </Badge>
-                </div>
-            </div>
+                    <h1 className="text-xl font-black tracking-tight text-slate-900 mb-2">Content Researcher</h1>
+                    <p className="text-sm font-medium text-slate-500 mb-8 leading-relaxed">
+                        Deep SERP analysis and intelligent SEO data extraction.
+                    </p>
 
-            <div className="flex flex-1 overflow-hidden">
-                {/* Sidebar Configuration */}
-                <div className="w-80 bg-white border-r border-slate-200 flex flex-col shrink-0 overflow-y-auto">
-                    <div className="p-5 space-y-6">
-                        <div>
-                            <h2 className="text-lg font-bold tracking-tight text-slate-900">Campaign Setup</h2>
-                            <p className="text-xs text-slate-500 mt-1">Configure your search scraping parameters.</p>
-                        </div>
+                    <Tabs defaultValue="new" className="w-full">
+                        <TabsList className="w-full grid grid-cols-2 mb-6 p-1 bg-slate-100 rounded-xl">
+                            <TabsTrigger value="new" className="rounded-lg text-xs font-bold data-[state=active]:bg-white data-[state=active]:shadow-sm">New Campaign</TabsTrigger>
+                            <TabsTrigger value="history" className="rounded-lg text-xs font-bold data-[state=active]:bg-white data-[state=active]:shadow-sm">Database</TabsTrigger>
+                        </TabsList>
 
-                        <div className="space-y-4">
-                            <div className="space-y-1.5">
-                                <Label className="text-xs font-bold text-slate-700">Target Keyword</Label>
-                                <div className="relative">
-                                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                                    <Input
-                                        value={keyword}
-                                        onChange={e => setKeyword(e.target.value)}
-                                        onKeyDown={e => e.key === 'Enter' && handleStart()}
-                                        placeholder="e.g. digital marketing tips"
-                                        className="pl-9 h-11 text-sm bg-slate-50 font-medium"
-                                        disabled={status === 'running'}
-                                    />
-                                </div>
+                        <TabsContent value="new" className="space-y-6">
+                            <div className="space-y-2">
+                                <Label className="text-xs font-bold uppercase tracking-wider text-slate-500 ml-1">Target Keyword</Label>
+                                <Input 
+                                    placeholder="e.g. 'Best SEO tools 2026'" 
+                                    value={keyword}
+                                    onChange={(e) => setKeyword(e.target.value)}
+                                    className="bg-slate-50/50 border-slate-200 focus-visible:ring-indigo-500/20 shadow-sm h-11 text-sm font-medium"
+                                />
                             </div>
 
-                            {/* Progressive Disclosure: Advanced Settings */}
-                            <div className="pt-2">
-                                <Button 
-                                    variant="ghost" 
-                                    onClick={() => setShowAdvanced(!showAdvanced)}
-                                    className="w-full justify-between h-9 px-3 text-xs font-bold text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg"
+                            <div className="space-y-2">
+                                <Label className="text-xs font-bold uppercase tracking-wider text-slate-500 ml-1">Search Engine</Label>
+                                <select 
+                                    value={engine}
+                                    onChange={(e) => setEngine(e.target.value as any)}
+                                    className="w-full h-11 px-3 rounded-lg border border-slate-200 bg-slate-50/50 text-sm font-medium focus:outline-none focus:ring-4 focus:ring-indigo-500/20"
                                 >
-                                    <div className="flex items-center gap-2">
-                                        <Settings className="w-3.5 h-3.5" />
-                                        Advanced Configuration
-                                    </div>
-                                    {showAdvanced ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-                                </Button>
+                                    <option value="google">Google</option>
+                                    <option value="bing">Bing</option>
+                                    <option value="duckduckgo">DuckDuckGo</option>
+                                </select>
+                            </div>
+
+                            <div className="space-y-2">
+                                <button
+                                    onClick={() => setShowAdvanced(!showAdvanced)}
+                                    className="flex items-center gap-2 text-xs font-bold text-slate-600 hover:text-slate-900 transition-colors w-full p-2 bg-slate-50 rounded-lg border border-slate-100"
+                                >
+                                    <Settings className="w-3.5 h-3.5" />
+                                    Advanced Crawl Options
+                                    {showAdvanced ? <ChevronUp className="w-3.5 h-3.5 ml-auto" /> : <ChevronDown className="w-3.5 h-3.5 ml-auto" />}
+                                </button>
                                 
                                 {showAdvanced && (
-                                    <div className="mt-3 p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-4 animate-in fade-in slide-in-from-top-2 duration-200">
-                                        <div className="space-y-2">
-                                            <Label className="text-[11px] font-bold text-slate-600 uppercase tracking-wider">Search Engine</Label>
-                                            <div className="flex border border-slate-200 rounded-lg overflow-hidden p-0.5 bg-white">
-                                                {(['duckduckgo', 'google'] as const).map(m => (
-                                                    <Button
-                                                        variant="ghost"
-                                                        key={m}
-                                                        onClick={() => setEngine(m)}
-                                                        disabled={status === 'running'}
-                                                        className={`flex-1 h-7 text-[11px] font-bold transition-all rounded-md ${engine === m ? 'bg-indigo-600 text-white shadow-sm hover:bg-indigo-700 hover:text-white' : 'text-slate-500 hover:text-slate-900'}`}
-                                                    >
-                                                        {m === 'duckduckgo' ? 'DuckDuckGo' : 'Google'}
-                                                    </Button>
-                                                ))}
+                                    <div className="p-4 bg-slate-50 rounded-xl border border-slate-100 space-y-4 animate-in slide-in-from-top-2 fade-in duration-200 mt-2">
+                                        <label className="flex items-start gap-3 cursor-pointer group">
+                                            <div className="relative flex items-center justify-center mt-0.5">
+                                                <input 
+                                                    type="checkbox" 
+                                                    checked={recursive}
+                                                    onChange={(e) => setRecursive(e.target.checked)}
+                                                    className="peer sr-only" 
+                                                />
+                                                <div className="w-5 h-5 rounded border border-slate-300 bg-white peer-checked:bg-indigo-500 peer-checked:border-indigo-500 transition-colors"></div>
+                                                <CheckCircle className="w-3.5 h-3.5 text-white absolute opacity-0 peer-checked:opacity-100 transition-opacity" />
                                             </div>
-                                        </div>
-
-                                        <div className="space-y-2">
-                                            <Label className="text-[11px] font-bold text-slate-600 uppercase tracking-wider">Scraping Mode</Label>
-                                            <Button 
-                                                variant="outline" 
-                                                onClick={() => setRecursive(!recursive)}
-                                                disabled={status === 'running'}
-                                                className={`w-full justify-start h-auto p-3 text-left ${recursive ? 'border-indigo-600 bg-indigo-50/50' : 'border-slate-200 bg-white'}`}
-                                            >
-                                                <div>
-                                                    <p className={`text-xs font-bold ${recursive ? 'text-indigo-900' : 'text-slate-700'}`}>Recursive Scraping</p>
-                                                    <p className={`text-[10px] mt-0.5 leading-snug ${recursive ? 'text-indigo-600' : 'text-slate-500'}`}>Automatically search related keywords discovered during extraction.</p>
-                                                </div>
-                                            </Button>
-                                        </div>
+                                            <div className="flex flex-col">
+                                                <span className="text-sm font-bold text-slate-800 group-hover:text-indigo-600 transition-colors">Recursive Discovery</span>
+                                                <span className="text-xs font-medium text-slate-500 leading-relaxed mt-0.5">Automatically crawl PAA and related searches.</span>
+                                            </div>
+                                        </label>
                                     </div>
                                 )}
                             </div>
 
                             {status === 'running' ? (
-                                <Button
+                                <Button 
                                     onClick={handleStop}
                                     variant="destructive"
-                                    className="w-full h-11 rounded-xl text-sm font-bold shadow-md gap-2"
+                                    className="w-full h-12 rounded-xl font-bold shadow-lg shadow-rose-500/20 gap-2 mt-4"
                                 >
                                     <Square className="w-4 h-4 fill-current" />
-                                    Stop Campaign
+                                    Stop Crawler
                                 </Button>
                             ) : (
-                                <Button
+                                <Button 
                                     onClick={handleStart}
-                                    disabled={!keyword.trim()}
-                                    className="w-full h-11 bg-gradient-to-r from-indigo-600 to-blue-600 text-white rounded-xl text-sm font-bold hover:opacity-90 shadow-md gap-2"
+                                    className="w-full h-12 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold shadow-lg shadow-indigo-500/25 gap-2 mt-4 transition-all"
                                 >
                                     <Play className="w-4 h-4 fill-current" />
                                     Start Campaign
                                 </Button>
                             )}
 
-                            {/* Error */}
                             {status === 'error' && (
                                 <div className="flex items-start gap-2.5 bg-rose-50 border border-rose-200 rounded-xl p-3">
                                     <AlertCircle className="w-4 h-4 text-rose-500 mt-0.5 shrink-0" />
                                     <p className="text-xs text-rose-700 font-medium leading-relaxed">{errorMsg}</p>
                                 </div>
                             )}
+                        </TabsContent>
+
+                        <TabsContent value="history">
+                            <div className="space-y-3">
+                                {campaigns.length === 0 ? (
+                                    <p className="text-xs text-slate-500 text-center py-8">No campaigns found.</p>
+                                ) : campaigns.map((c) => (
+                                    <div 
+                                        key={c.id} 
+                                        onClick={() => loadCampaignData(c.id)}
+                                        className={`p-3 rounded-xl border cursor-pointer transition-all ${
+                                            selectedCampaign?.id === c.id 
+                                            ? 'bg-indigo-50 border-indigo-200 shadow-sm' 
+                                            : 'bg-white border-slate-200 hover:border-indigo-300 hover:shadow-sm'
+                                        }`}
+                                    >
+                                        <div className="flex justify-between items-start mb-2">
+                                            <p className="text-xs font-bold text-slate-800 line-clamp-1 flex-1 pr-2">{c.name}</p>
+                                            <Badge variant="outline" className="text-[9px] px-1.5 py-0 h-4">{c.engine}</Badge>
+                                        </div>
+                                        <div className="flex justify-between items-center">
+                                            <p className="text-[10px] text-slate-500">{new Date(c.created_at).toLocaleDateString()}</p>
+                                            <button 
+                                                onClick={(e) => deleteCampaign(c.id, e)}
+                                                className="text-slate-400 hover:text-rose-500 transition-colors p-1"
+                                            >
+                                                <Trash2 className="w-3.5 h-3.5" />
+                                            </button>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </TabsContent>
+                    </Tabs>
+                </div>
+            </div>
+
+            {/* Main Workspace Area */}
+            <div className="flex-1 flex flex-col min-w-0 bg-slate-50">
+                {/* Live Progress Bar */}
+                {status === 'running' && (
+                    <div className="bg-white border-b border-slate-200 px-6 py-3 shrink-0 flex items-center gap-4 animate-in fade-in slide-in-from-top-2 duration-300">
+                        <div className="w-8 h-8 rounded-full bg-indigo-50 border border-indigo-100 flex items-center justify-center shrink-0">
+                            <RefreshCw className="w-4 h-4 text-indigo-600 animate-spin" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                            <div className="flex justify-between items-end mb-1.5">
+                                <p className="text-xs font-bold text-slate-800 truncate">{progressMsg || 'Processing...'}</p>
+                                <span className="text-[10px] font-black text-indigo-600">{progress}%</span>
+                            </div>
+                            <div className="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                                <div 
+                                    className="h-full bg-gradient-to-r from-indigo-500 to-blue-500 transition-all duration-300 rounded-full" 
+                                    style={{ width: `${progress}%` }} 
+                                />
+                            </div>
                         </div>
                     </div>
-                </div>
+                )}
 
-                {/* Main Workspace Area */}
-                <div className="flex-1 flex flex-col min-w-0 bg-slate-50">
-                    {/* Live Progress Bar */}
-                    {status === 'running' && (
-                        <div className="bg-white border-b border-slate-200 px-6 py-3 shrink-0 flex items-center gap-4 animate-in fade-in slide-in-from-top-2 duration-300">
-                            <div className="w-8 h-8 rounded-full bg-indigo-50 border border-indigo-100 flex items-center justify-center shrink-0">
-                                <RefreshCw className="w-4 h-4 text-indigo-600 animate-spin" />
+                {/* DB Viewer / Live Viewer */}
+                <div className="flex-1 overflow-auto p-6">
+                    {(status !== 'idle' && status !== 'running' && !selectedCampaign && results.length === 0) ? (
+                        <div className="h-full flex flex-col items-center justify-center text-slate-400 space-y-4">
+                            <div className="w-16 h-16 rounded-2xl bg-white border border-slate-200 shadow-sm flex items-center justify-center">
+                                <Database className="w-8 h-8 text-slate-300" />
                             </div>
-                            <div className="flex-1 min-w-0">
-                                <div className="flex justify-between items-end mb-1.5">
-                                    <p className="text-xs font-bold text-slate-800 truncate">{progressMsg || 'Processing...'}</p>
-                                    <span className="text-[10px] font-black text-indigo-600">{progress}%</span>
-                                </div>
-                                <div className="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
-                                    <div 
-                                        className="h-full bg-gradient-to-r from-indigo-500 to-blue-500 transition-all duration-300 rounded-full" 
-                                        style={{ width: `${progress}%` }} 
-                                    />
-                                </div>
-                            </div>
+                            <p className="text-sm font-medium">Select a campaign from the database or start a new run.</p>
                         </div>
-                    )}
-
-                    {/* Data Table */}
-                    <div className="flex-1 overflow-auto p-6">
-                        {results.length === 0 ? (
-                            <div className="h-full flex flex-col items-center justify-center text-slate-400 space-y-4">
-                                <div className="w-16 h-16 rounded-2xl bg-white border border-slate-200 shadow-sm flex items-center justify-center">
-                                    <Target className="w-8 h-8 text-slate-300" />
+                    ) : (
+                        <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden flex flex-col h-full animate-in fade-in duration-500">
+                            
+                            {/* DB View Header */}
+                            {selectedCampaign && status === 'idle' && (
+                                <div className="bg-slate-50 border-b border-slate-200 px-6 py-4 flex justify-between items-center">
+                                    <div>
+                                        <h2 className="text-lg font-black text-slate-900">{selectedCampaign.name}</h2>
+                                        <p className="text-xs text-slate-500 mt-1">
+                                            {campaignData?.pages?.length || 0} pages • Engine: {selectedCampaign.engine}
+                                        </p>
+                                    </div>
+                                    <Button variant="outline" size="sm" className="gap-2 font-bold h-9 bg-white shadow-sm">
+                                        <Download className="w-3.5 h-3.5" />
+                                        Export CSV
+                                    </Button>
                                 </div>
-                                <p className="text-sm font-medium">No results yet. Start a campaign to see live data.</p>
-                            </div>
-                        ) : (
-                            <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden flex flex-col h-full animate-in fade-in duration-500">
-                                <div className="overflow-x-auto flex-1">
-                                    <table className="w-full text-left border-collapse min-w-[1200px]">
-                                        <thead>
-                                            <tr className="bg-slate-50 border-b border-slate-200 text-[10px] uppercase tracking-wider font-black text-slate-500 sticky top-0 z-10">
-                                                <th className="px-4 py-3 whitespace-nowrap">Domain</th>
-                                                <th className="px-4 py-3 whitespace-nowrap">Page Title</th>
-                                                <th className="px-4 py-3 w-64">Meta Description</th>
-                                                <th className="px-4 py-3 whitespace-nowrap">H1 Header</th>
-                                                <th className="px-4 py-3 whitespace-nowrap text-right">Metrics</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody className="divide-y divide-slate-100">
-                                            {results.map((r, i) => (
-                                                <tr key={i} className="hover:bg-slate-50/50 transition-colors group">
+                            )}
+
+                            <div className="overflow-x-auto flex-1">
+                                <table className="w-full text-left border-collapse min-w-[1200px]">
+                                    <thead>
+                                        <tr className="bg-slate-50 border-b border-slate-200 text-[10px] uppercase tracking-wider font-black text-slate-500 sticky top-0 z-10">
+                                            <th className="px-4 py-3 whitespace-nowrap">Domain</th>
+                                            <th className="px-4 py-3 whitespace-nowrap">Page Title</th>
+                                            <th className="px-4 py-3 w-64">H1 & Snippet</th>
+                                            <th className="px-4 py-3 whitespace-nowrap text-right">Metrics</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-slate-100">
+                                        {/* Display DB results if a campaign is selected, else display live results */}
+                                        {(selectedCampaign ? campaignData?.pages || [] : results).map((r: any, i: number) => {
+                                            const metrics = r.metrics || r;
+                                            return (
+                                                <tr key={i} className="hover:bg-slate-50/50 transition-colors group cursor-pointer">
                                                     <td className="px-4 py-3 align-top">
                                                         <p className="text-xs font-bold text-slate-900 truncate max-w-[150px]" title={r.domain}>{r.domain}</p>
-                                                        <a href={r.url} target="_blank" rel="noopener noreferrer" className="text-[10px] text-blue-600 hover:underline truncate max-w-[150px] block mt-0.5" title={r.url}>Open Link</a>
+                                                        <a href={r.url} target="_blank" rel="noopener noreferrer" className="text-[10px] text-blue-600 hover:underline truncate max-w-[150px] flex items-center gap-1 mt-1">
+                                                            Open Link <ExternalLink className="w-3 h-3" />
+                                                        </a>
                                                     </td>
                                                     <td className="px-4 py-3 align-top">
-                                                        <p className="text-xs font-medium text-slate-800 line-clamp-2" title={r.title}>{r.title || '-'}</p>
+                                                        <p className="text-xs font-medium text-slate-800 line-clamp-2" title={metrics.title}>{metrics.title || '-'}</p>
                                                     </td>
                                                     <td className="px-4 py-3 align-top">
-                                                        <p className="text-[11px] text-slate-600 line-clamp-3" title={r.description}>{r.description || '-'}</p>
-                                                    </td>
-                                                    <td className="px-4 py-3 align-top">
-                                                        <p className="text-[11px] font-medium text-slate-700 line-clamp-2" title={r.h1}>{r.h1 || '-'}</p>
+                                                        <p className="text-[11px] font-bold text-slate-700 line-clamp-1 mb-1">{(metrics.h1 || r.h1 || '[]').replace(/[\[\]"]/g, '') || 'No H1'}</p>
+                                                        <p className="text-[10px] text-slate-500 line-clamp-2">{r.snippet || metrics.meta_description || '-'}</p>
                                                     </td>
                                                     <td className="px-4 py-3 align-top text-right">
-                                                        <div className="flex flex-col items-end gap-1">
-                                                            <Badge variant="secondary" className="bg-indigo-50 text-indigo-700 hover:bg-indigo-50 text-[9px] font-bold px-1.5 py-0">
-                                                                {r.internal_links?.split(',').filter(Boolean).length || 0} Links
+                                                        <div className="flex flex-col items-end gap-1.5">
+                                                            <Badge variant="secondary" className="bg-indigo-50 text-indigo-700 hover:bg-indigo-50 text-[9px] font-bold px-1.5 py-0 h-5 border border-indigo-100 shadow-sm">
+                                                                {metrics.word_count || 0} Words
                                                             </Badge>
-                                                            <Badge variant="secondary" className="bg-emerald-50 text-emerald-700 hover:bg-emerald-50 text-[9px] font-bold px-1.5 py-0">
-                                                                {r.images?.split(',').filter(Boolean).length || 0} Images
-                                                            </Badge>
+                                                            {(metrics.has_faq_schema || (r.schemas && r.schemas.includes('FAQ'))) && (
+                                                                <Badge variant="secondary" className="bg-emerald-50 text-emerald-700 hover:bg-emerald-50 text-[9px] font-bold px-1.5 py-0 h-5 border border-emerald-100 shadow-sm">
+                                                                    FAQ Schema
+                                                                </Badge>
+                                                            )}
                                                         </div>
                                                     </td>
                                                 </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
-                                </div>
-                                <div className="bg-slate-50 border-t border-slate-200 px-4 py-2 flex items-center justify-between text-[11px] font-bold text-slate-500">
-                                    <span>Total Discovered: <span className="text-slate-900">{results.length}</span></span>
-                                </div>
+                                            );
+                                        })}
+                                    </tbody>
+                                </table>
                             </div>
-                        )}
-                    </div>
+                        </div>
+                    )}
                 </div>
             </div>
         </div>

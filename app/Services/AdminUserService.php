@@ -84,11 +84,7 @@ class AdminUserService
             $roleName = $request->input('role');
             // Sync a single role (replaces any previous role)
             $user->syncRoles([$roleName]);
-            // Also keep the role column consistent
-            if (in_array($roleName, ['admin', 'client'])) {
-                $user->role = $roleName;
-                $user->saveQuietly();
-            }
+            // The role column doesn't exist, we only use Spatie roles.
         }
     }
 }
