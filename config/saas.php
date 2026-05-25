@@ -37,7 +37,7 @@ return [
         'booking-wa-confirm' => ['price' => 500, 'name' => 'WhatsApp Confirmations', 'desc' => 'Interactive confirm/cancel buttons', 'icon' => 'MessageSquare', 'parent' => 'booking'],
         'booking-follow-ups' => ['price' => 500, 'name' => 'Automated Follow-Ups', 'desc' => 'Post-appointment surveys', 'icon' => 'MessageSquare', 'parent' => 'booking'],
         'booking-resource-utilization' => ['price' => 500, 'name' => 'Resource Utilization', 'desc' => 'Detailed staff performance metrics', 'icon' => 'BarChart', 'parent' => 'booking'],
-        'booking-white-label' => ['price' => 500, 'name' => 'White Label', 'desc' => 'Remove all system branding', 'icon' => 'Star', 'parent' => 'booking'],
+        'booking-white-label' => ['price' => 500, 'name' => 'White Label', 'desc' => 'Remove all system branding', 'icon' => 'Star', 'parent' => 'booking', 'limits' => ['max_custom_brands' => 1, 'max_custom_domains' => 1, 'max_white_label_assets' => 5, 'max_custom_templates' => 10]],
         'booking-api' => ['price' => 500, 'name' => 'API Access', 'desc' => 'Full programmatic access', 'icon' => 'Code', 'parent' => 'booking'],
         'booking-advanced-rules' => ['price' => 500, 'name' => 'Advanced Rules', 'desc' => 'Buffers & conditional schedules', 'icon' => 'Settings', 'parent' => 'booking'],
         'booking-priority-support' => ['price' => 500, 'name' => 'Priority Support', 'desc' => 'Skip the line support', 'icon' => 'Headset', 'parent' => 'booking'],

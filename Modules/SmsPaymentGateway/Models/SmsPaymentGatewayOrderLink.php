@@ -11,7 +11,8 @@ class SmsPaymentGatewayOrderLink extends Model
     use HasFactory;
 
     protected $table = 'sms_payment_gateway_order_links';
-protected $fillable = [
+    protected $fillable = [
+        'tenant_id',
         'user_id',
         'order_id',
         'phone_number',

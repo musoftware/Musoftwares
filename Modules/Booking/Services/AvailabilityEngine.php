@@ -36,7 +36,7 @@ class AvailabilityEngine
         $slots = [];
 
         foreach ($providers as $provider) {
-            $providerSlots = $this->calculateProviderSlots($provider, $start, $end, $duration, $buffer, $timezone);
+            $providerSlots = $this->calculateProviderSlots($provider, $eventType, $start, $end, $duration, $buffer, $timezone);
             foreach ($providerSlots as $slot) {
                 $dateKey = $slot['start']->format('Y-m-d');
                 if (!isset($slots[$dateKey])) {
@@ -57,7 +57,7 @@ class AvailabilityEngine
         return $slots;
     }
 
-    private function calculateProviderSlots($provider, $startDate, $endDate, $duration, $buffer, $timezone)
+    private function calculateProviderSlots($provider, $eventType, $startDate, $endDate, $duration, $buffer, $timezone)
     {
         $rules = BookingAvailabilityRule::where('booking_provider_id', $provider->id)
             ->where('is_enabled', true)
@@ -101,7 +101,7 @@ class AvailabilityEngine
                 while ($slotStart->copy()->addMinutes($duration) <= $ruleEnd) {
                     $slotEnd = $slotStart->copy()->addMinutes($duration);
                     
-                    if ($this->isSlotAvailable($slotStart, $slotEnd, $exceptions, $existingBookings, $buffer, $provider->id)) {
+                    if ($this->isSlotAvailable($slotStart, $slotEnd, $exceptions, $existingBookings, $buffer, $provider->id, $eventType)) {
                         $slots[] = [
                             'start' => $slotStart->copy(),
                             'end' => $slotEnd->copy(),
@@ -118,7 +118,7 @@ class AvailabilityEngine
         return $slots;
     }
 
-    private function isSlotAvailable($start, $end, $exceptions, $bookings, $buffer, $providerId)
+    private function isSlotAvailable($start, $end, $exceptions, $bookings, $buffer, $providerId, $eventType)
     {
         // Check temporary locks
         $lockKey = "booking_slot_{$providerId}_" . $start->timestamp;
@@ -149,13 +149,22 @@ class AvailabilityEngine
         }
 
         // Check Bookings
+        $overlappingBookings = 0;
         foreach ($bookings as $booking) {
             $bStart = Carbon::parse($booking->starts_at)->subMinutes($buffer);
             $bEnd = Carbon::parse($booking->ends_at)->addMinutes($buffer);
             
             if ($this->overlaps($start, $end, $bStart, $bEnd)) {
-                return false;
+                $overlappingBookings++;
             }
+        }
+
+        if ($overlappingBookings > 0) {
+            if ($eventType->is_group_session && $overlappingBookings < $eventType->capacity) {
+                // Allow booking for group session up to capacity
+                return true;
+            }
+            return false;
         }
 
         return true;
