@@ -2,24 +2,15 @@ import React, { useState, useEffect } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head } from '@inertiajs/react';
 import { Play, Pause, List, CheckCircle, Clock, Plus, Upload, User, HardDrive } from 'lucide-react';
-function useRuntime(pluginSlug: string) {
-    const [isConnected, setIsConnected] = useState(false);
-    const [lastEvent, setLastEvent] = useState<any>(null);
-
-    // Dummy hook implementation for now to prevent build failure
-    const sendRpc = async (action: string, payload: any) => {
-        return null;
-    };
-
-    return { isConnected, sendRpc, lastEvent };
-}
+import { useRuntimeWS } from '@/hooks/useRuntimeWS';
+import { RuntimePluginModals } from '@/Components/Tools/RuntimePluginModals';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/Components/ui/card';
 import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/Components/ui/tabs';
 
 export default function Runner({ tool, userPlan }: { tool: any; userPlan: any }) {
-    const { isConnected, sendRpc, lastEvent } = useRuntime('facebook-publisher');
+    const { connected: isConnected, callRPC: sendRpc, installingPlugin, loginRequired, setLoginRequired } = useRuntimeWS('facebook-publisher');
     const [activeTab, setActiveTab] = useState('queue');
     const [accounts, setAccounts] = useState<any[]>([]);
     const [queues, setQueues] = useState<any[]>([]);
@@ -32,11 +23,11 @@ export default function Runner({ tool, userPlan }: { tool: any; userPlan: any })
 
     const refreshData = async () => {
         try {
-            const accRes = await sendRpc('get_accounts', {});
-            setAccounts(accRes?.accounts || []);
+            const accRes = await sendRpc('get_accounts', {}) as { accounts: any[] };
+            setAccounts(accRes.accounts || []);
             
-            const qRes = await sendRpc('get_queues', {});
-            setQueues(qRes?.queues || []);
+            const qRes = await sendRpc('get_queues', {}) as { queues: any[] };
+            setQueues(qRes.queues || []);
         } catch (e) {
             console.error(e);
         }
@@ -64,6 +55,11 @@ export default function Runner({ tool, userPlan }: { tool: any; userPlan: any })
     return (
         <AuthenticatedLayout>
             <Head title={tool.title} />
+            <RuntimePluginModals 
+                installingPlugin={installingPlugin} 
+                loginRequired={loginRequired} 
+                setLoginRequired={setLoginRequired} 
+            />
 
             <div className="flex h-[calc(100vh-4rem)]">
                 {/* Sidebar */}
