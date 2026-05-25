@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Users, MessageCircle, Heart, Play, Square, Download, Activity, ExternalLink } from 'lucide-react';
+import { Search, Users, MessageCircle, Heart, Play, Square, Download, Activity, ExternalLink, UserCheck, UserPlus } from 'lucide-react';
 import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
 import { Badge } from '@/Components/ui/badge';
@@ -173,34 +173,50 @@ export default function FacebookExtractorRunner({ tool }: any) {
                 <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-6">
                     <div>
                         <h1 className="text-xl font-bold tracking-tight text-slate-900">Facebook Data Extractor</h1>
-                        <p className="text-sm text-slate-500 mt-1">Extract members, comments, and likes directly from the Facebook UI without APIs.</p>
+                        <p className="text-sm text-slate-500 mt-1">Extract members, followers, following, comments, and likes directly from the Facebook UI without APIs.</p>
                     </div>
 
                     <div className="space-y-4">
-                        <div className="grid grid-cols-3 gap-3">
+                        <div className="grid grid-cols-2 md:grid-cols-5 gap-2.5">
                             <Button 
                                 variant={type === 'members' ? 'default' : 'outline'} 
-                                className={`h-12 flex flex-col items-center justify-center gap-1 ${type === 'members' ? 'bg-[#1877F2] hover:bg-[#166FE5] text-white' : ''}`}
+                                className={`h-12 flex flex-col items-center justify-center gap-1 p-2 ${type === 'members' ? 'bg-[#1877F2] hover:bg-[#166FE5] text-white' : ''}`}
                                 onClick={() => setType('members')}
                             >
-                                <Users className="w-4 h-4" />
-                                <span className="text-xs">Group Members</span>
+                                <Users className="w-4 h-4 shrink-0" />
+                                <span className="text-[10px] md:text-xs text-center font-medium leading-none">Group Members</span>
+                            </Button>
+                            <Button 
+                                variant={type === 'followers' ? 'default' : 'outline'} 
+                                className={`h-12 flex flex-col items-center justify-center gap-1 p-2 ${type === 'followers' ? 'bg-[#1877F2] hover:bg-[#166FE5] text-white' : ''}`}
+                                onClick={() => setType('followers')}
+                            >
+                                <UserPlus className="w-4 h-4 shrink-0" />
+                                <span className="text-[10px] md:text-xs text-center font-medium leading-none">Followers</span>
+                            </Button>
+                            <Button 
+                                variant={type === 'following' ? 'default' : 'outline'} 
+                                className={`h-12 flex flex-col items-center justify-center gap-1 p-2 ${type === 'following' ? 'bg-[#1877F2] hover:bg-[#166FE5] text-white' : ''}`}
+                                onClick={() => setType('following')}
+                            >
+                                <UserCheck className="w-4 h-4 shrink-0" />
+                                <span className="text-[10px] md:text-xs text-center font-medium leading-none">Following</span>
                             </Button>
                             <Button 
                                 variant={type === 'comments' ? 'default' : 'outline'} 
-                                className={`h-12 flex flex-col items-center justify-center gap-1 ${type === 'comments' ? 'bg-[#1877F2] hover:bg-[#166FE5] text-white' : ''}`}
+                                className={`h-12 flex flex-col items-center justify-center gap-1 p-2 ${type === 'comments' ? 'bg-[#1877F2] hover:bg-[#166FE5] text-white' : ''}`}
                                 onClick={() => setType('comments')}
                             >
-                                <MessageCircle className="w-4 h-4" />
-                                <span className="text-xs">Post Comments</span>
+                                <MessageCircle className="w-4 h-4 shrink-0" />
+                                <span className="text-[10px] md:text-xs text-center font-medium leading-none">Post Comments</span>
                             </Button>
                             <Button 
                                 variant={type === 'likes' ? 'default' : 'outline'} 
-                                className={`h-12 flex flex-col items-center justify-center gap-1 ${type === 'likes' ? 'bg-[#1877F2] hover:bg-[#166FE5] text-white' : ''}`}
+                                className={`h-12 flex flex-col items-center justify-center gap-1 p-2 ${type === 'likes' ? 'bg-[#1877F2] hover:bg-[#166FE5] text-white' : ''}`}
                                 onClick={() => setType('likes')}
                             >
-                                <Heart className="w-4 h-4" />
-                                <span className="text-xs">Post Likes</span>
+                                <Heart className="w-4 h-4 shrink-0" />
+                                <span className="text-[10px] md:text-xs text-center font-medium leading-none">Post Likes</span>
                             </Button>
                         </div>
 
@@ -211,7 +227,11 @@ export default function FacebookExtractorRunner({ tool }: any) {
                                     type="url"
                                     value={url}
                                     onChange={e => setUrl(e.target.value)}
-                                    placeholder={type === 'members' ? "https://www.facebook.com/groups/..." : "https://www.facebook.com/post/..."}
+                                    placeholder={
+                                        type === 'members' ? "https://www.facebook.com/groups/..." :
+                                        (type === 'followers' || type === 'following') ? "https://www.facebook.com/profile.php?id=... OR username" :
+                                        "https://www.facebook.com/post/..."
+                                    }
                                     className="pl-9 h-11 text-sm bg-slate-50 font-mono"
                                     disabled={status === 'running'}
                                 />
