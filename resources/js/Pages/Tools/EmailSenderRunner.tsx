@@ -7,64 +7,12 @@ import { Label } from '@/Components/ui/label';
 import { Textarea } from '@/Components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/Components/ui/select';
 
-function useRuntimeWS(pluginSlug: string) {
-    const [ws, setWs] = useState<WebSocket | null>(null);
-    const [connected, setConnected] = useState(false);
-    const pendingRequests = useRef(new Map());
-
-    useEffect(() => {
-        const host = typeof window !== 'undefined' ? (window.localStorage.getItem('musoftware_runtime_host') || '127.0.0.1') : '127.0.0.1';
-        const socket = new WebSocket(`ws://${host}:18401/ws`);
-        
-        socket.onopen = () => setConnected(true);
-        socket.onclose = () => setConnected(false);
-        
-        socket.onmessage = (event) => {
-            try {
-                const msg = JSON.parse(event.data);
-                if (msg.type === 'plugin_rpc_res' || msg.type === 'plugin_rpc_error') {
-                    const resolver = pendingRequests.current.get(msg.requestId);
-                    if (resolver) {
-                        if (msg.type === 'plugin_rpc_error') resolver.reject(new Error(msg.payload.error));
-                        else resolver.resolve(msg.payload);
-                        pendingRequests.current.delete(msg.requestId);
-                    }
-                }
-            } catch (err) {}
-        };
-        
-        setWs(socket);
-        return () => socket.close();
-    }, []);
-
-    const callRPC = async (action: string, data: any = {}) => {
-        if (!ws || ws.readyState !== WebSocket.OPEN) throw new Error('Not connected to runtime');
-        
-        return new Promise((resolve, reject) => {
-            const requestId = Math.random().toString(36).substring(7);
-            pendingRequests.current.set(requestId, { resolve, reject });
-            
-            ws.send(JSON.stringify({
-                type: 'plugin_rpc',
-                requestId,
-                payload: { plugin: pluginSlug, action, data }
-            }));
-            
-            setTimeout(() => {
-                if (pendingRequests.current.has(requestId)) {
-                    pendingRequests.current.get(requestId).reject(new Error('RPC Timeout'));
-                    pendingRequests.current.delete(requestId);
-                }
-            }, 15000);
-        });
-    };
-
-    return { connected, callRPC };
-}
+import { useRuntimeWS } from '@/hooks/useRuntimeWS';
+import { RuntimePluginModals } from '@/Components/Tools/RuntimePluginModals';
 
 export default function EmailSenderRunner({ tool, subscription, runtimePort, pluginSlug = 'email-sender' }: any) {
     const [activeTab, setActiveTab] = useState('dashboard');
-    const { connected, callRPC } = useRuntimeWS(pluginSlug);
+    const { connected, callRPC, installingPlugin, loginRequired, setLoginRequired } = useRuntimeWS(pluginSlug);
     
     // Data States
     const [globalStats, setGlobalStats] = useState({ campaigns: 0, sent: 0, opens: 0, clicks: 0, unsubscribes: 0 });
@@ -351,6 +299,11 @@ export default function EmailSenderRunner({ tool, subscription, runtimePort, plu
 
     return (
         <div className="min-h-screen bg-[#FAFAFA] text-slate-900 font-sans flex flex-col selection:bg-black selection:text-white">
+            <RuntimePluginModals 
+                installingPlugin={installingPlugin} 
+                loginRequired={loginRequired} 
+                setLoginRequired={setLoginRequired} 
+            />
             {/* Top Navigation */}
             <div className="h-14 border-b border-slate-200 bg-white flex items-center justify-between px-6 sticky top-0 z-10">
                 <div className="flex items-center gap-6">
