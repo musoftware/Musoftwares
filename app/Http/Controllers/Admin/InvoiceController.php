@@ -70,7 +70,7 @@ class InvoiceController extends Controller
      */
     public function show(Invoice $invoice)
     {
-        $invoice->load(['user.projects', 'project', 'items.timers']);
+        $invoice->load(['user.projects', 'project', 'items.timers', 'costLines.creditUser']);
         
         return Inertia::render('Admin/Invoices/Show', [
             'invoice' => new InvoiceResource($invoice)

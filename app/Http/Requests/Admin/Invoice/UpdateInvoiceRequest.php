@@ -22,7 +22,15 @@ class UpdateInvoiceRequest extends FormRequest
             'items.*.qty'        => 'required|numeric|min:1',
             'items.*.item_type'  => 'required|in:quantity,simple,timer',
             'deleted_items'      => 'nullable|array',
-            'deleted_items.*'    => 'exists:invoice_items,id'
+            'deleted_items.*'    => 'exists:invoice_items,id',
+            'cost_lines'         => 'nullable|array',
+            'cost_lines.*.id'    => 'nullable|exists:invoice_cost_lines,id',
+            'cost_lines.*.line_type' => 'required|in:direct,user_credit',
+            'cost_lines.*.amount'    => 'required|numeric|min:0',
+            'cost_lines.*.description' => 'nullable|string|max:500',
+            'cost_lines.*.credit_user_id' => 'nullable|exists:users,id',
+            'deleted_cost_lines' => 'nullable|array',
+            'deleted_cost_lines.*' => 'exists:invoice_cost_lines,id'
         ];
     }
 }

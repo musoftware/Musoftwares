@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Invoice;
 use App\Models\InvoiceItem;
+use App\Models\InvoiceCostLine;
 use Illuminate\Support\Facades\DB;
 
 class InvoiceService
@@ -44,6 +45,36 @@ class InvoiceService
                             'qty'        => $itemData['qty'],
                             'item_type'  => $itemData['item_type'],
                             'currency'   => $invoice->currency
+                        ]);
+                    }
+                }
+            }
+
+            if (!empty($data['deleted_cost_lines'])) {
+                InvoiceCostLine::whereIn('id', $data['deleted_cost_lines'])->where('invoice_id', $invoice->id)->delete();
+            }
+
+            if (!empty($data['cost_lines'])) {
+                foreach ($data['cost_lines'] as $lineData) {
+                    if (!empty($lineData['id'])) {
+                        // Update existing
+                        $costLine = InvoiceCostLine::where('id', $lineData['id'])->where('invoice_id', $invoice->id)->first();
+                        if ($costLine) {
+                            $costLine->update([
+                                'line_type'      => $lineData['line_type'],
+                                'amount'         => $lineData['amount'],
+                                'description'    => $lineData['description'] ?? null,
+                                'credit_user_id' => $lineData['credit_user_id'] ?? null,
+                            ]);
+                        }
+                    } else {
+                        // Create new
+                        InvoiceCostLine::create([
+                            'invoice_id'     => $invoice->id,
+                            'line_type'      => $lineData['line_type'],
+                            'amount'         => $lineData['amount'],
+                            'description'    => $lineData['description'] ?? null,
+                            'credit_user_id' => $lineData['credit_user_id'] ?? null,
                         ]);
                     }
                 }
