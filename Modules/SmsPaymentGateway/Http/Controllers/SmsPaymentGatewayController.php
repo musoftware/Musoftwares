@@ -109,38 +109,16 @@ class SmsPaymentGatewayController extends Controller
     /**
      * Generate QR code for device connection
      */
-    public function generateQrCode(Request $request)
+    public function generateQrCode(Request $request, \Modules\SmsPaymentGateway\Services\DeviceManagementService $deviceService)
     {
         $user = Auth::user();
 
-        // Generate unique connection code
-        $connectionCode = Str::random(32);
-        $expiresAt = Carbon::now()->addMinutes(10);
-
-        // Create or update device record
-        $device = SmsPaymentGatewayDevice::updateOrCreate(
-            [
-                'user_id' => $user->id,
-                'status' => 'pending'
-            ],
-            [
-                'connection_code' => $connectionCode,
-                'connection_code_expires_at' => $expiresAt,
-                'status' => 'pending',
-            ]
-        );
-
-        // Generate QR code data
-        $qrData = json_encode([
-            'type' => 'sms_payment_gateway_connection',
-            'connection_code' => $connectionCode,
-            'user_id' => $user->id,
-            'api_url' => url('/api/sms-payment-gateway/connect'),
-            'expires_at' => $expiresAt->toIso8601String(),
-        ]);
-
-        // Generate QR code image
         try {
+            $connectionData = $deviceService->generateConnectionData($user);
+            $connectionCode = $connectionData['connection_code'];
+            $expiresAt = $connectionData['expires_at'];
+            $qrData = json_encode($connectionData['qr_data']);
+            
             $qrCodeImage = $this->qrCodeService->generateQrCodePng($qrData, [
                 'size' => 300,
                 'error_correction' => 'M',
@@ -162,16 +140,17 @@ class SmsPaymentGatewayController extends Controller
                 ->with('qr_code', $qrCodeDataUri)
                 ->with('connection_code', $connectionCode)
                 ->with('qr_expires_at', $expiresAt);
+                
         } catch (\Exception $e) {
             if ($request->expectsJson()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Failed to generate QR code: ' . $e->getMessage()
-                ], 500);
+                    'message' => $e->getMessage()
+                ], 403);
             }
 
             return redirect()->route('sms-payment-gateway.index')
-                ->with('error', __('messages.failed_to_generate_qr_code') . ': ' . $e->getMessage());
+                ->with('error', $e->getMessage());
         }
     }
 
@@ -198,12 +177,12 @@ class SmsPaymentGatewayController extends Controller
     /**
      * Delete/disconnect a device
      */
-    public function deleteDevice($id)
+    public function deleteDevice($id, \Modules\SmsPaymentGateway\Services\DeviceManagementService $deviceService)
     {
         $device = SmsPaymentGatewayDevice::where('user_id', Auth::id())
             ->findOrFail($id);
 
-        $device->delete();
+        $deviceService->deleteDevice($device);
 
         return redirect()->route('sms-payment-gateway.index')
             ->with('success', __('messages.device_disconnected_success'));
@@ -230,12 +209,12 @@ class SmsPaymentGatewayController extends Controller
     /**
      * Clear all transactions for a device
      */
-    public function clearTransactions($id)
+    public function clearTransactions($id, \Modules\SmsPaymentGateway\Services\DeviceManagementService $deviceService)
     {
         $device = SmsPaymentGatewayDevice::where('user_id', Auth::id())
             ->findOrFail($id);
 
-        $deletedCount = SmsPaymentGatewayTransaction::where('device_id', $device->id)->delete();
+        $deletedCount = $deviceService->clearDeviceTransactions($device);
 
         return redirect()->route('sms-payment-gateway.device', $device->id)
             ->with('success', __('messages.all_transactions_cleared_success', ['count' => $deletedCount]));
@@ -244,18 +223,12 @@ class SmsPaymentGatewayController extends Controller
     /**
      * Toggle spoof detection for device
      */
-    public function toggleSpoofDetection($id)
+    public function toggleSpoofDetection($id, \Modules\SmsPaymentGateway\Services\DeviceManagementService $deviceService)
     {
         $device = SmsPaymentGatewayDevice::where('user_id', Auth::id())
             ->findOrFail($id);
 
-        // Toggle the spoof detection setting
-        $currentStatus = $device->enable_spoof_detection ?? true;
-        $newStatus = !$currentStatus;
-
-        $device->update([
-            'enable_spoof_detection' => $newStatus
-        ]);
+        $newStatus = $deviceService->toggleSpoofDetection($device);
 
         $statusText = $newStatus ? __('messages.enabled') : __('messages.disabled');
 
