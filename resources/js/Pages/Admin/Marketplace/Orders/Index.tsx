@@ -2,14 +2,10 @@ import React from 'react';
 import { Head, Link } from '@inertiajs/react';
 import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
 import { Badge } from '@/Components/ui/badge';
+import { formatMoney as formatCurrency } from '@/lib/utils';
 
 export default function Index({ orders }) {
-    const formatCurrency = (amount, currency = 'USD') => {
-        return new Intl.NumberFormat('en-US', {
-            style: 'currency',
-            currency,
-        }).format(amount || 0);
-    };
+
 
     const getStatusBadge = (status) => {
         switch (status) {

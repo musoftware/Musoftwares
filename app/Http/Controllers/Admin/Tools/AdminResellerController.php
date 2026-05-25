@@ -4,6 +4,13 @@ namespace App\Http\Controllers\Admin\Tools;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Services\Tools\AdminResellerService;
+use App\Http\Requests\Admin\Tools\StoreResellerRequest;
+use App\Http\Requests\Admin\Tools\UpdateResellerRequest;
+use App\Http\Requests\Admin\Tools\AdjustResellerBalanceRequest;
+use App\Http\Resources\Tools\ToolResellerResource;
+use App\Http\Resources\Tools\ToolResellerUserResource;
+use App\Http\Resources\Tools\ToolResellerTransactionResource;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -14,6 +21,9 @@ use Modules\Tools\Models\ToolResellerUser;
 
 class AdminResellerController extends Controller
 {
+    public function __construct(
+        protected AdminResellerService $adminResellerService
+    ) {}
     // ─── Index ────────────────────────────────────────────────────────────────
 
     public function index(): Response
@@ -25,7 +35,7 @@ class AdminResellerController extends Controller
             ->paginate(20);
 
         return Inertia::render('Admin/Resellers/Index', [
-            'resellers' => $resellers->through(fn ($r) => $this->formatReseller($r)),
+            'resellers' => clone (new ToolResellerResource($resellers))->resolve(),
             'meta'      => $resellers->toArray(),
         ]);
     }
@@ -39,26 +49,13 @@ class AdminResellerController extends Controller
 
     // ─── Store ────────────────────────────────────────────────────────────────
 
-    public function store(Request $request): RedirectResponse
+    public function store(StoreResellerRequest $request): RedirectResponse
     {
-        $data = $request->validate([
-            'user_id'  => ['required', 'exists:users,id'],
-            'name'     => ['required', 'string', 'max:191'],
-            'currency' => ['required', 'string', 'max:10'],
-            'notes'    => ['nullable', 'string'],
-        ]);
-
-        // Prevent duplicate resellers for the same user
-        if (ToolReseller::where('user_id', $data['user_id'])->exists()) {
-            return back()->withErrors(['user_id' => 'This user already has a reseller account.']);
+        try {
+            $this->adminResellerService->createReseller($request->validated());
+        } catch (\Exception $e) {
+            return back()->withErrors(['user_id' => $e->getMessage()]);
         }
-
-        ToolReseller::create([
-            ...$data,
-            'token'   => ToolReseller::generateToken(),
-            'balance' => 0,
-            'status'  => 'active',
-        ]);
 
         return redirect()->route('admin.resellers.index')
             ->with('success', 'Reseller account created successfully.');
@@ -86,35 +83,21 @@ class AdminResellerController extends Controller
             ->get();
 
         return Inertia::render('Admin/Resellers/Show', [
-            'reseller'       => $this->formatReseller($reseller),
-            'subUsers'       => $subUsers->through(fn ($u) => $this->formatSubUser($u)),
-            'transactions'   => $transactions->through(fn ($t) => $this->formatTransaction($t)),
-            'sharingFlagged' => $sharingFlagged->map(fn ($u) => $this->formatSubUser($u)),
+            'reseller'       => clone (new ToolResellerResource($reseller))->resolve(),
+            'subUsers'       => $subUsers->through(fn ($u) => clone (new ToolResellerUserResource($u))->resolve()),
+            'transactions'   => $transactions->through(fn ($t) => clone (new ToolResellerTransactionResource($t))->resolve()),
+            'sharingFlagged' => ToolResellerUserResource::collection($sharingFlagged)->resolve(),
             'iframeUrl'      => url("/reseller/{$reseller->token}"),
         ]);
     }
 
     // ─── Update ───────────────────────────────────────────────────────────────
 
-    public function update(Request $request, int $id): RedirectResponse
+    public function update(UpdateResellerRequest $request, int $id): RedirectResponse
     {
         $reseller = ToolReseller::findOrFail($id);
 
-        $data = $request->validate([
-            'name'     => ['required', 'string', 'max:191'],
-            'currency' => ['required', 'string', 'max:10'],
-            'status'   => ['required', 'in:active,suspended,inactive'],
-            'notes'    => ['nullable', 'string'],
-        ]);
-
-        // Handle status change: suspend/activate sub-users accordingly
-        if ($data['status'] === 'suspended' && $reseller->status !== 'suspended') {
-            $reseller->suspend(auto: false);
-        } elseif ($data['status'] === 'active' && $reseller->status !== 'active') {
-            $reseller->activate();
-        }
-
-        $reseller->update($data);
+        $this->adminResellerService->updateReseller($reseller, $request->validated());
 
         return back()->with('success', 'Reseller updated.');
     }
@@ -124,7 +107,7 @@ class AdminResellerController extends Controller
     public function destroy(int $id): RedirectResponse
     {
         $reseller = ToolReseller::findOrFail($id);
-        $reseller->update(['status' => 'inactive']);
+        $this->adminResellerService->deleteReseller($reseller);
 
         return redirect()->route('admin.resellers.index')
             ->with('success', 'Reseller deactivated.');
@@ -132,29 +115,11 @@ class AdminResellerController extends Controller
 
     // ─── Adjust Balance ───────────────────────────────────────────────────────
 
-    public function adjustBalance(Request $request, int $id): RedirectResponse
+    public function adjustBalance(AdjustResellerBalanceRequest $request, int $id): RedirectResponse
     {
         $reseller = ToolReseller::findOrFail($id);
 
-        $data = $request->validate([
-            'type'        => ['required', 'in:top_up,manual_credit,manual_debit'],
-            'amount'      => ['required', 'numeric', 'min:0.01'],
-            'description' => ['nullable', 'string', 'max:512'],
-        ]);
-
-        if ($data['type'] === 'manual_debit') {
-            $reseller->deductBalance(
-                amount:      $data['amount'],
-                description: $data['description'] ?? 'Manual debit by admin',
-                type:        'manual_debit',
-            );
-        } else {
-            $reseller->creditBalance(
-                amount:      $data['amount'],
-                description: $data['description'] ?? 'Admin top-up',
-                type:        $data['type'],
-            );
-        }
+        $this->adminResellerService->adjustBalance($reseller, $request->validated());
 
         return back()->with('success', 'Balance adjusted successfully.');
     }
@@ -163,22 +128,14 @@ class AdminResellerController extends Controller
 
     public function suspendUser(int $resellerId, int $userId): RedirectResponse
     {
-        $ru = ToolResellerUser::where('reseller_id', $resellerId)
-            ->where('user_id', $userId)
-            ->firstOrFail();
-
-        $ru->update(['status' => 'suspended']);
+        $this->adminResellerService->suspendUser($resellerId, $userId);
 
         return back()->with('success', 'Sub-user suspended.');
     }
 
     public function activateUser(int $resellerId, int $userId): RedirectResponse
     {
-        $ru = ToolResellerUser::where('reseller_id', $resellerId)
-            ->where('user_id', $userId)
-            ->firstOrFail();
-
-        $ru->update(['status' => 'active']);
+        $this->adminResellerService->activateUser($resellerId, $userId);
 
         return back()->with('success', 'Sub-user re-activated.');
     }
@@ -187,24 +144,14 @@ class AdminResellerController extends Controller
 
     public function clearSharingFlag(int $resellerId, int $userId): RedirectResponse
     {
-        $ru = ToolResellerUser::where('reseller_id', $resellerId)
-            ->where('user_id', $userId)
-            ->firstOrFail();
-
-        $ru->clearSharingFlag();
+        $this->adminResellerService->clearSharingFlag($resellerId, $userId);
 
         return back()->with('success', 'Sharing flag cleared. Sessions reset. User can log in again.');
     }
 
     public function toggleSharingCheck(Request $request, int $resellerId, int $userId): RedirectResponse
     {
-        $ru = ToolResellerUser::where('reseller_id', $resellerId)
-            ->where('user_id', $userId)
-            ->firstOrFail();
-
-        $ru->update(['sharing_check_enabled' => !$ru->sharing_check_enabled]);
-
-        $state = $ru->sharing_check_enabled ? 'disabled' : 'enabled';
+        $state = $this->adminResellerService->toggleSharingCheck($resellerId, $userId);
         return back()->with('success', "Sharing detection {$state} for this user.");
     }
 
@@ -219,54 +166,5 @@ class AdminResellerController extends Controller
             ->get(['id', 'name', 'email']);
 
         return response()->json($users);
-    }
-
-    // ─── Formatters ───────────────────────────────────────────────────────────
-
-    private function formatReseller(ToolReseller $r): array
-    {
-        return [
-            'id'                  => $r->id,
-            'name'                => $r->name,
-            'token'               => $r->token,
-            'balance'             => $r->balance,
-            'currency'            => $r->currency,
-            'status'              => $r->status,
-            'notes'               => $r->notes,
-            'user'                => $r->user ? ['id' => $r->user->id, 'name' => $r->user->name, 'email' => $r->user->email] : null,
-            'total_users'         => $r->reseller_users_count ?? 0,
-            'active_users'        => $r->active_users_count ?? 0,
-            'sharing_flagged'     => $r->sharing_flagged_count ?? 0,
-            'created_at'          => $r->created_at?->toDateString(),
-        ];
-    }
-
-    private function formatSubUser(ToolResellerUser $u): array
-    {
-        return [
-            'id'                    => $u->id,
-            'user_id'               => $u->user_id,
-            'user'                  => $u->user ? ['id' => $u->user->id, 'name' => $u->user->name, 'email' => $u->user->email] : null,
-            'status'                => $u->status,
-            'sharing_check_enabled' => $u->sharing_check_enabled,
-            'is_sharing_flagged'    => $u->is_sharing_flagged,
-            'flagged_ips'           => $u->flagged_ips,
-            'sharing_flagged_at'    => $u->sharing_flagged_at?->diffForHumans(),
-            'joined_at'             => $u->joined_at?->toDateString(),
-        ];
-    }
-
-    private function formatTransaction(object $t): array
-    {
-        return [
-            'id'          => $t->id,
-            'type'        => $t->type,
-            'amount'      => $t->amount,
-            'balance_after' => $t->balance_after,
-            'currency'    => $t->currency,
-            'description' => $t->description,
-            'user'        => $t->user ? ['name' => $t->user->name, 'email' => $t->user->email] : null,
-            'created_at'  => $t->created_at->format('M d, Y H:i'),
-        ];
     }
 }

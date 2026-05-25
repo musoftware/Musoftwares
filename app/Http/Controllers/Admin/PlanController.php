@@ -4,69 +4,43 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\ModulePlan;
+use App\Services\PlanService;
+use App\Http\Requests\Admin\Plan\StorePlanRequest;
+use App\Http\Requests\Admin\Plan\UpdatePlanRequest;
+use App\Http\Resources\PlanResource;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class PlanController extends Controller
 {
+    public function __construct(
+        protected PlanService $planService
+    ) {}
     public function index()
     {
         $plans = ModulePlan::orderBy('module')->orderBy('price')->get();
         return Inertia::render('Admin/Plans/Index', [
-            'plans' => $plans,
+            'plans' => PlanResource::collection($plans)->resolve(),
         ]);
     }
 
-    public function store(Request $request)
+    public function store(StorePlanRequest $request)
     {
-        $validated = $request->validate([
-            'module' => 'required|string|max:50',
-            'name' => 'required|string|max:255',
-            'price' => 'required|numeric|min:0',
-            'billing' => 'required|string|max:50',
-            'features' => 'nullable|array',
-            'is_active' => 'boolean',
-        ]);
-
-        $plan = new ModulePlan();
-        $plan->module = $validated['module'];
-        $plan->name = $validated['name'];
-        $plan->price = $validated['price'];
-        $plan->billing = $validated['billing'];
-        $plan->features = $validated['features'] ?? [];
-        $plan->is_active = $validated['is_active'] ?? true;
-        $plan->save();
+        $this->planService->createPlan($request->validated());
 
         return redirect()->back()->with('success', 'Plan created successfully.');
     }
 
-    public function update(Request $request, $id)
+    public function update(UpdatePlanRequest $request, $id)
     {
-        $validated = $request->validate([
-            'module' => 'required|string|max:50',
-            'name' => 'required|string|max:255',
-            'price' => 'required|numeric|min:0',
-            'billing' => 'required|string|max:50',
-            'features' => 'nullable|array',
-            'is_active' => 'boolean',
-        ]);
-
-        $plan = ModulePlan::findOrFail($id);
-        $plan->module = $validated['module'];
-        $plan->name = $validated['name'];
-        $plan->price = $validated['price'];
-        $plan->billing = $validated['billing'];
-        $plan->features = $validated['features'] ?? [];
-        $plan->is_active = $validated['is_active'] ?? true;
-        $plan->save();
+        $this->planService->updatePlan($id, $request->validated());
 
         return redirect()->back()->with('success', 'Plan updated successfully.');
     }
 
     public function destroy($id)
     {
-        $plan = ModulePlan::findOrFail($id);
-        $plan->delete();
+        $this->planService->deletePlan($id);
 
         return redirect()->back()->with('success', 'Plan deleted.');
     }

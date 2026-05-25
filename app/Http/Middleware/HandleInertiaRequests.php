@@ -53,6 +53,7 @@ class HandleInertiaRequests extends Middleware
                             'booking' => $service->hasActiveSubscription($user, 'booking'),
                             'intelligence' => $service->hasActiveSubscription($user, 'intelligence'),
                             'tools' => $service->hasActiveSubscription($user, 'tools'),
+                            'crm' => $service->hasActiveSubscription($user, 'crm'),
                             'marketplace' => true,
                         ];
                     } catch (\Throwable $e) {
@@ -62,6 +63,7 @@ class HandleInertiaRequests extends Middleware
                             'booking' => true,
                             'intelligence' => true,
                             'tools' => true,
+                            'crm' => true,
                             'marketplace' => true
                         ];
                     }

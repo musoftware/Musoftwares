@@ -10,8 +10,12 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
+use App\Http\Requests\Admin\User\StoreUserRequest;
+use App\Http\Requests\Admin\User\UpdateUserRequest;
+use App\Http\Requests\Admin\User\ToggleBlockUserRequest;
+use App\Http\Requests\Admin\User\AddTaskRequest;
+use App\Http\Resources\UserResource;
 use Inertia\Inertia;
-use Inertia\Response as InertiaResponse;
 
 class UsersController extends Controller
 {
@@ -63,21 +67,7 @@ class UsersController extends Controller
         $direction = $request->get('direction') === 'asc' ? 'asc' : 'desc';
         $query->orderBy($sort, $direction);
 
-        $users = $query->paginate(25)->withQueryString()->through(function ($user) {
-            return [
-                'id'                   => $user->id,
-                'name'                 => $user->name,
-                'email'                => $user->email,
-                'role'                 => $user->roles->first()?->name ?? 'user',
-                'account_status'       => $user->account_status ?? 'active',
-                'kyc_verified'         => (bool) $user->kyc_verified,
-                'preferred_currency'   => $user->preferred_currency ?? 'USD',
-                'whatsapp_number'      => $user->whatsapp_number,
-                'created_at'           => $user->created_at,
-                'last_activity_at'     => $user->last_activity_at,
-                'onboarding_completed' => (bool) $user->onboarding_completed,
-            ];
-        });
+        $users = $query->paginate(25)->withQueryString()->through(fn ($user) => (new UserResource($user))->resolve());
 
         $stats = [
             'total'           => User::count(),
@@ -99,7 +89,7 @@ class UsersController extends Controller
      * Show full user profile with stats.
      * Recovered from old UsersController::show()
      */
-    public function show($id): InertiaResponse
+    public function show(Request $request, $id)
     {
         $user = User::with(['kycDocuments', 'kycVerifier:id,name', 'tickets', 'roles'])
             ->findOrFail($id);
@@ -129,49 +119,37 @@ class UsersController extends Controller
             }
         } catch (\Throwable $e) {}
 
-        $userDetail = [
-            'id'                   => $user->id,
-            'name'                 => $user->name,
-            'email'                => $user->email,
-            'initials'             => $initials,
-            'role'                 => $user->roles->first()?->name ?? 'user',
-            'account_status'       => $user->account_status ?? 'active',
-            'block_reason'         => $user->block_reason,
-            'email_verified_at'    => $user->email_verified_at,
-            'created_at'           => $user->created_at,
-            'last_activity_at'     => $user->last_activity_at,
-            'phone'                => $user->phone,
-            'mobile_1'             => $user->mobile_1,
-            'mobile_2'             => $user->mobile_2,
-            'whatsapp_number'      => $user->whatsapp_number,
-            'telegram_username'    => $user->telegram_username,
-            'country'              => $user->country,
-            'city'                 => $user->city,
-            'preferred_currency'   => $user->preferred_currency ?? 'USD',
-            'onboarding_completed' => (bool) $user->onboarding_completed,
-            'kyc_verified'         => (bool) $user->kyc_verified,
-            'kyc_verified_at'      => $user->kyc_verified_at,
-            'kyc_verified_by'      => $user->kycVerifier?->name,
-            'kyc_notes'            => $user->kyc_notes,
-            'kyc_documents'        => $user->kycDocuments->map(fn($d) => [
-                'id'          => $d->id,
-                'type'        => $d->document_type,
-                'status'      => $d->status,
-                'uploaded_at' => $d->created_at,
-            ]),
-        ];
+        $userDetail = (new UserResource($user))->resolve();
+
+        $transactions = $user->transactions()->latest()->take(10)->get()->map(function($tx) {
+            return [
+                'id' => $tx->id,
+                'type' => $tx->type,
+                'amount' => $tx->amount,
+                'description' => $tx->reason ?? $tx->type,
+                'created_at' => $tx->created_at,
+            ];
+        });
 
         return Inertia::render('Admin/Users/Show', [
-            'user'   => $userDetail,
+            'client' => $userDetail,
             'stats'  => $stats,
-            'wallet' => $walletData,
+            'wallets' => [
+                [
+                    'id' => 'main',
+                    'context' => 'Main Wallet',
+                    'balance' => $walletData['balance'],
+                    'currency' => $walletData['currency'],
+                    'transactions' => $transactions,
+                ]
+            ],
         ]);
     }
 
     /**
      * Show create user form.
      */
-    public function create(): InertiaResponse
+    public function create()
     {
         return Inertia::render('Admin/Users/Create', [
             'roles'      => ['admin', 'client'],
@@ -183,21 +161,8 @@ class UsersController extends Controller
      * Store a new user.
      * Business rule: name must include a last name.
      */
-    public function store(Request $request)
+    public function store(StoreUserRequest $request)
     {
-        $request->validate([
-            'name'               => 'required|string|max:255',
-            'email'              => 'required|email|unique:users,email',
-            'role'               => 'required|in:admin,client',
-            'preferred_currency' => 'nullable|string|size:3',
-        ]);
-
-        // Enforce last-name requirement (recovered from old project)
-        if (!str_contains(trim($request->input('name')), ' ')) {
-            throw ValidationException::withMessages([
-                'name' => ['Full name must include a last name.'],
-            ]);
-        }
 
         $this->adminUserService->createFromRequest($request);
 
@@ -208,7 +173,7 @@ class UsersController extends Controller
     /**
      * Show edit form for an existing user.
      */
-    public function edit($id): InertiaResponse
+    public function edit($id)
     {
         $user = User::with(['kycDocuments', 'roles'])->findOrFail($id);
 
@@ -240,13 +205,8 @@ class UsersController extends Controller
     /**
      * Update an existing user.
      */
-    public function update(Request $request, $id)
+    public function update(UpdateUserRequest $request, $id)
     {
-        $request->validate([
-            'name'  => 'required|string|max:255',
-            'email' => ['required', 'email', Rule::unique('users')->ignore($id)],
-            'role'  => 'nullable|in:admin,client',
-        ]);
 
         $user = User::findOrFail($id);
         $this->adminUserService->updateFromRequest($user, $request);
@@ -277,20 +237,11 @@ class UsersController extends Controller
      * Toggle block/unblock a user.
      * Recovered from old project's account_status workflow.
      */
-    public function toggleBlock(Request $request, $id)
+    public function toggleBlock(ToggleBlockUserRequest $request, $id)
     {
         $user = User::findOrFail($id);
 
-        if ($user->account_status === 'blocked') {
-            $user->account_status = 'active';
-            $user->block_reason   = null;
-        } else {
-            $request->validate(['reason' => 'nullable|string|max:500']);
-            $user->account_status = 'blocked';
-            $user->block_reason   = $request->input('reason');
-        }
-
-        $user->save();
+        $this->adminUserService->toggleBlock($user, $request->input('reason'));
 
         return back()->with('success', $user->account_status === 'active'
             ? 'User unblocked.'
@@ -349,5 +300,47 @@ class UsersController extends Controller
             'blocked_users'       => $blocked,
             'no_whatsapp_users'   => $noWhatsApp,
         ]);
+    }
+    public function reset_password($id)
+    {
+        $user = User::findOrFail($id);
+        $newPassword = $this->adminUserService->resetPassword($user);
+
+        return response()->json([
+            'new_password' => $newPassword,
+            'message' => 'Password reset successfully.'
+        ]);
+    }
+
+    public function referrals($id)
+    {
+        $client = User::findOrFail($id);
+        return Inertia::render('Admin/Users/Referrals', [
+            'client' => $client,
+        ]);
+    }
+
+    public function files($id)
+    {
+        $client = User::findOrFail($id);
+        return Inertia::render('Admin/Users/Files', [
+            'client' => $client,
+        ]);
+    }
+
+    public function reports($id)
+    {
+        $client = User::findOrFail($id);
+        return Inertia::render('Admin/Users/Reports', [
+            'client' => $client,
+        ]);
+    }
+
+    public function add_task(AddTaskRequest $request, $id)
+    {
+        $user = User::findOrFail($id);
+        $this->adminUserService->addTask($user, $request->input('title'), $request->input('description'));
+
+        return back()->with('success', 'Task created successfully.');
     }
 }

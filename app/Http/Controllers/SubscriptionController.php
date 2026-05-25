@@ -52,15 +52,15 @@ class SubscriptionController extends Controller
         );
         Plan::updateOrCreate(
             ['plan_name' => 'Go'],
-            ['plan_price' => 40, 'plan_duration' => 365, 'plan_status' => true, 'plan_currency' => $usdCurrencyId]
+            ['plan_price' => 99, 'plan_duration' => 365, 'plan_status' => true, 'plan_currency' => $usdCurrencyId]
         );
         Plan::updateOrCreate(
             ['plan_name' => 'Plus'],
-            ['plan_price' => 80, 'plan_duration' => 365, 'plan_status' => true, 'plan_currency' => $usdCurrencyId]
+            ['plan_price' => 199, 'plan_duration' => 365, 'plan_status' => true, 'plan_currency' => $usdCurrencyId]
         );
         Plan::updateOrCreate(
             ['plan_name' => 'Pro'],
-            ['plan_price' => 150, 'plan_duration' => 365, 'plan_status' => true, 'plan_currency' => $usdCurrencyId]
+            ['plan_price' => 299, 'plan_duration' => 365, 'plan_status' => true, 'plan_currency' => $usdCurrencyId]
         );
 
         $plans = Plan::where('plan_status', true)
@@ -219,23 +219,10 @@ class SubscriptionController extends Controller
                 $user->save();
 
                 // Cancel old platform subscriptions
-                \App\Models\PlatformSubscription::where('user_id', $user->id)
-                    ->where('status', 'active')
-                    ->update(['status' => 'cancelled']);
-
+                // (Removed PlatformSubscription usage)
+                
                 // Create new platform subscription
-                \App\Models\PlatformSubscription::create([
-                    'user_id' => $user->id,
-                    'plan_id' => $plan->id,
-                    'billing_cycle' => $billingCycle,
-                    'amount' => $plan_amount,
-                    'currency' => \App\Models\Currency::find($usdCurrencyId)?->currency ?? 'USD',
-                    'status' => 'active',
-                    'started_at' => now(),
-                    'expires_at' => now()->addDays($days),
-                    'auto_renew' => $plan->plan_name === 'Trial' ? 0 : 1,
-                    'custom_items' => ['*'],
-                ]);
+                // (Removed PlatformSubscription usage)
             });
 
             return redirect()->route('subscriptions.manage')->with('success', "Subscribed to {$plan->plan_name} successfully!");

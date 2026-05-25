@@ -59,7 +59,7 @@ class BlogArticle extends Model
 
     public function service()
     {
-        return $this->belongsTo(Service::class);
+        return $this->belongsTo(\Modules\Marketplace\Models\Service::class);
     }
 
     public function translations()
