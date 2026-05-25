@@ -1,0 +1,86 @@
+import React from 'react';
+import { Card, CardHeader, CardTitle, CardContent } from '@/Components/ui/card';
+import { Button } from '@/Components/ui/button';
+import { Badge } from '@/Components/ui/badge';
+import { Activity, LayoutGrid, BarChart3, Zap } from 'lucide-react';
+
+interface Log {
+    id: number;
+    description: string;
+    created_at: string;
+    action: string;
+}
+
+interface Metrics {
+    avgFragmentationScore: number;
+    avgUtilization: number;
+    optimizationCount: number;
+    recentLogs: Log[];
+}
+
+export default function OptimizationDashboard({ metrics }: { metrics: Metrics }) {
+    return (
+        <div className="p-6 max-w-7xl mx-auto space-y-8">
+            <div className="flex justify-between items-center">
+                <div>
+                    <h1 className="text-3xl font-bold tracking-tight">Smart Slots Optimization</h1>
+                    <p className="text-muted-foreground mt-2">AI-driven gap reduction and dynamic load balancing.</p>
+                </div>
+                <Button>
+                    <Zap className="mr-2 h-4 w-4" /> Run Manual Optimization
+                </Button>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <Card>
+                    <CardHeader className="flex flex-row items-center justify-between pb-2">
+                        <CardTitle className="text-sm font-medium">Avg Fragmentation Score</CardTitle>
+                        <LayoutGrid className="h-4 w-4 text-amber-500" />
+                    </CardHeader>
+                    <CardContent>
+                        <div className="text-2xl font-bold">{metrics.avgFragmentationScore}/100</div>
+                        <p className="text-xs text-muted-foreground mt-1">Lower is better. Represents scattered gaps.</p>
+                    </CardContent>
+                </Card>
+                <Card>
+                    <CardHeader className="flex flex-row items-center justify-between pb-2">
+                        <CardTitle className="text-sm font-medium">Resource Utilization</CardTitle>
+                        <BarChart3 className="h-4 w-4 text-emerald-500" />
+                    </CardHeader>
+                    <CardContent>
+                        <div className="text-2xl font-bold">{metrics.avgUtilization}%</div>
+                        <p className="text-xs text-muted-foreground mt-1">Total booked vs available hours.</p>
+                    </CardContent>
+                </Card>
+                <Card>
+                    <CardHeader className="flex flex-row items-center justify-between pb-2">
+                        <CardTitle className="text-sm font-medium">Optimizations Ran (30d)</CardTitle>
+                        <Activity className="h-4 w-4 text-blue-500" />
+                    </CardHeader>
+                    <CardContent>
+                        <div className="text-2xl font-bold">{metrics.optimizationCount}</div>
+                    </CardContent>
+                </Card>
+            </div>
+
+            <Card>
+                <CardHeader>
+                    <CardTitle>Recent Optimizations</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <div className="space-y-4">
+                        {metrics.recentLogs.map((log) => (
+                            <div key={log.id} className="flex items-center justify-between p-4 border rounded-lg">
+                                <div>
+                                    <div className="font-medium">{log.description}</div>
+                                    <div className="text-sm text-muted-foreground">{new Date(log.created_at).toLocaleString()}</div>
+                                </div>
+                                <Badge variant="outline">{log.action}</Badge>
+                            </div>
+                        ))}
+                    </div>
+                </CardContent>
+            </Card>
+        </div>
+    );
+}
