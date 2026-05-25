@@ -84,25 +84,10 @@ Route::prefix('tools')->name('api.tools.')->group(function () {
             $subscribedSlugs = $paidPlugins->pluck('tool_slug')->all();
 
             // ── 2. Free tools — no subscription needed ──────────────────────
-            $freePlugins = collect(config('tools'))
-                ->filter(fn($t) => ($t['is_active'] ?? false) && !in_array($t['slug'], $subscribedSlugs))
-                ->map(fn($t) => (object) $t)
-                ->values()
-                ->filter(function ($tool) use ($agentType, $pluginFileExists) {
-                    $runtime = $tool->metadata['runtime'] ?? 'nodejs';
-                    return $runtime === $agentType && $pluginFileExists($tool->slug, null);
-                })
-                ->map(fn($tool) => [
-                    'tool_slug'      => $tool->slug,
-                    'name'           => $tool->title,
-                    'version'        => $tool->version ?? '1.0.0',
-                    'download_url'   => url()->temporarySignedRoute('api.tools.plugin.download', now()->addHour(), ['slug' => $tool->slug]),
-                    'is_subscribed'  => false,
-                    'license_status' => 'active', // free tools are always active
-                    'expires_at'     => null,
-                ]);
-
-            $plugins = collect($paidPlugins->all())->merge($freePlugins->all())->values();
+            // REMOVED: Do not auto-download all free plugins to save space and increase security.
+            // Users must explicitly subscribe to a tool to get it downloaded.
+            
+            $plugins = collect($paidPlugins->all())->values();
 
             return response()->json(['plugins' => $plugins]);
         })->name('agent.plugins');
