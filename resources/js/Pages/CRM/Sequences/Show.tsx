@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Head, Link, router } from '@inertiajs/react';
-import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
+import { Head, Link, router, usePage } from '@inertiajs/react';
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Button } from '@/Components/ui/button';
 import { Clock, Mail, MessageCircle, Trash2, ArrowRight, Plus, Sparkles, Loader2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/Components/ui/card';
@@ -10,6 +10,7 @@ import { Label } from "@/Components/ui/label";
 import { Textarea } from "@/Components/ui/textarea";
 
 export default function Show({ sequence }) {
+    const { auth } = usePage().props as any;
     const [isAiOpen, setIsAiOpen] = useState(false);
     const [aiForm, setAiForm] = useState({ context: '', num_steps: 3, tone: 'professional' });
     const [isGenerating, setIsGenerating] = useState(false);
@@ -45,7 +46,11 @@ export default function Show({ sequence }) {
     };
 
     return (
-        <AdminSidebarLayout title={`Sequence: ${sequence.name}`} header="Sequence Builder">
+        <AuthenticatedLayout 
+            user={auth.user} 
+            header={<h2 className="font-semibold text-xl text-slate-800 leading-tight">Sequence Builder: {sequence.name}</h2>}
+        >
+            <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
             <div className="mb-6 flex items-center justify-between">
                 <div>
                     <h2 className="text-2xl font-bold text-gray-900">{sequence.name}</h2>
@@ -199,6 +204,7 @@ export default function Show({ sequence }) {
                     )}
                 </div>
             </div>
-        </AdminSidebarLayout>
+            </div>
+        </AuthenticatedLayout>
     );
 }

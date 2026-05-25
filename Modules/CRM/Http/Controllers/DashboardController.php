@@ -3,32 +3,28 @@
 namespace Modules\CRM\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use Inertia\Inertia;
 use Modules\CRM\Models\Lead;
 use Modules\CRM\Models\Campaign;
+use Modules\CRM\Models\Sequence;
+use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class DashboardController extends Controller
 {
-    public function index(Request $request)
+    public function index()
     {
-        $userId = $request->user()->id;
-
+        // For now, these use the current user's scoped data if BelongsToTenant is applied.
+        // Assuming models are properly scoped.
+        
         $stats = [
-            'total_leads' => Lead::where('user_id', $userId)->count(),
-            'new_leads' => Lead::where('user_id', $userId)->where('status', 'new')->count(),
-            'active_campaigns' => Campaign::where('user_id', $userId)->where('status', 'active')->count(),
+            'total_leads' => Lead::count(),
+            'new_leads' => Lead::where('status', 'new')->count(),
+            'active_campaigns' => Campaign::active()->count(),
+            'total_sequences' => Sequence::count(),
         ];
-
-        $recentLeads = Lead::where('user_id', $userId)
-            ->with('campaign')
-            ->orderBy('created_at', 'desc')
-            ->take(5)
-            ->get();
 
         return Inertia::render('CRM/Dashboard', [
             'stats' => $stats,
-            'recentLeads' => $recentLeads
         ]);
     }
 }

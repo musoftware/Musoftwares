@@ -1,0 +1,9 @@
+{
+    "name": "CRM",
+    "alias": "crm",
+    "description": "Customer Relationship Management Module",
+    "keywords": [],
+    "priority": 0,
+    "providers": [],
+    "files": []
+}

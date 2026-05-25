@@ -3,59 +3,87 @@
 namespace Modules\CRM\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use Modules\CRM\Models\Campaign;
+use App\Services\CampaignService;
+use App\Http\Requests\Admin\Campaign\StoreCampaignRequest;
+use App\Http\Requests\Admin\Campaign\UpdateCampaignRequest;
+use App\Http\Requests\Admin\Campaign\GenerateAICampaignRequest;
+use App\Http\Resources\CampaignResource;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use Modules\CRM\Models\Campaign;
-use Illuminate\Support\Str;
 
 class CampaignController extends Controller
 {
-    public function index(Request $request)
+    public function __construct(
+        protected CampaignService $campaignService
+    ) {}
+    public function index()
     {
-        $campaigns = Campaign::where('user_id', $request->user()->id)
-            ->withCount('leads')
-            ->orderBy('created_at', 'desc')
-            ->paginate(10);
-
+        $campaigns = Campaign::withCount('recipients')->latest()->paginate(20)->through(fn($c) => (new CampaignResource($c))->resolve());
         return Inertia::render('CRM/Campaigns/Index', [
             'campaigns' => $campaigns
         ]);
     }
 
-    public function store(Request $request)
+    public function store(StoreCampaignRequest $request)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'form_title' => 'nullable|string|max:255',
-            'form_description' => 'nullable|string',
-            'button_text' => 'nullable|string|max:50',
-        ]);
-
-        $campaign = new Campaign();
-        $campaign->user_id = $request->user()->id;
-        $campaign->embed_token = (string) Str::uuid();
-        $campaign->name = $validated['name'];
-        $campaign->description = $validated['description'];
-        $campaign->form_title = $validated['form_title'];
-        $campaign->form_description = $validated['form_description'];
-        $campaign->button_text = $validated['button_text'];
-        $campaign->status = 'active';
-        $campaign->save();
-
-        return redirect()->back()->with('success', 'Campaign created successfully.');
+        $campaign = $this->campaignService->createCampaign($request->validated());
+        
+        return redirect()->route('admin.campaigns.show', $campaign->id)->with('success', 'Campaign created successfully.');
     }
 
-    public function show(Request $request, Campaign $campaign)
+    public function show(Campaign $campaign)
     {
-        if ($campaign->user_id !== $request->user()->id) {
-            abort(403);
-        }
-
-        $campaign->load('leads');
-
+        $campaign->loadCount('recipients');
         return Inertia::render('CRM/Campaigns/Show', [
-            'campaign' => $campaign
+            'campaign' => (new CampaignResource($campaign))->resolve()
         ]);
+    }
+
+    public function update(UpdateCampaignRequest $request, Campaign $campaign)
+    {
+        $this->campaignService->updateCampaign($campaign, $request->validated());
+
+        return redirect()->back()->with('success', 'Campaign content saved.');
+    }
+
+    public function destroy(Campaign $campaign)
+    {
+        $this->campaignService->deleteCampaign($campaign);
+        return redirect()->route('admin.campaigns.index')->with('success', 'Campaign deleted.');
+    }
+
+    // -- AI Generation --
+    public function generateAIContent(GenerateAICampaignRequest $request)
+    {
+        try {
+            $generated = $this->campaignService->generateAIContent(
+                $request->input('context'),
+                $request->input('tone'),
+                $request->input('type')
+            );
+            return response()->json(['content' => $generated]);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    // -- Status Management --
+    public function schedule(Request $request, Campaign $campaign)
+    {
+        $this->campaignService->scheduleCampaign($campaign);
+        return redirect()->back()->with('success', 'Campaign scheduled.');
+    }
+
+    public function pause(Campaign $campaign)
+    {
+        $this->campaignService->pauseCampaign($campaign);
+        return redirect()->back()->with('success', 'Campaign paused.');
+    }
+
+    public function resume(Campaign $campaign)
+    {
+        $this->campaignService->resumeCampaign($campaign);
+        return redirect()->back()->with('success', 'Campaign resumed.');
     }
 }

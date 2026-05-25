@@ -3,50 +3,72 @@
 namespace Modules\CRM\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use Modules\CRM\Models\Lead;
+use App\Services\LeadService;
+use App\Http\Requests\CRM\Lead\UpdateLeadStatusRequest;
+use App\Http\Resources\LeadResource;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use Modules\CRM\Models\Lead;
 
 class LeadController extends Controller
 {
+    public function __construct(
+        protected LeadService $leadService
+    ) {}
     public function index(Request $request)
     {
-        $leads = Lead::where('user_id', $request->user()->id)
-            ->with('campaign')
-            ->orderBy('created_at', 'desc')
-            ->paginate(15);
+        $status = $request->query('status', 'all');
+
+        $query = Lead::query();
+
+        if ($status !== 'all') {
+            $query->where('status', $status);
+        }
+
+        $leads = $query->with(['assignable'])->latest()->paginate(20)->through(fn($l) => (new LeadResource($l))->resolve());
 
         return Inertia::render('CRM/Leads/Index', [
-            'leads' => $leads
+            'leads' => $leads,
+            'currentTab' => $status,
         ]);
     }
 
-    public function show(Request $request, Lead $lead)
+    public function show(Lead $lead, \Modules\CRM\app\Core\TimelineEngine $timeline)
     {
-        if ($lead->user_id !== $request->user()->id) {
-            abort(403);
-        }
-
-        $lead->load('campaign');
-
-        return Inertia::render('CRM/Leads/Show', [
-            'lead' => $lead
+        $lead->load(['notes.author', 'tags', 'assignee']);
+        
+        return response()->json([
+            'lead' => (new LeadResource($lead))->resolve(),
+            'timeline' => $timeline->getFeed($lead),
         ]);
     }
 
-    public function updateStatus(Request $request, Lead $lead)
+    public function updateStatus(UpdateLeadStatusRequest $request, Lead $lead)
     {
-        if ($lead->user_id !== $request->user()->id) {
-            abort(403);
-        }
-
-        $validated = $request->validate([
-            'status' => 'required|string|max:50'
-        ]);
-
-        $lead->status = $validated['status'];
-        $lead->save();
+        $this->leadService->updateStatus($lead, $request->validated('status'));
 
         return redirect()->back()->with('success', 'Lead status updated.');
+    }
+
+    public function assign(Request $request, Lead $lead)
+    {
+        $validated = $request->validate([
+            'assignable_id' => 'required|integer',
+            'assignable_type' => 'required|string|in:App\Models\User,Modules\ERP\Models\TeamMember',
+        ]);
+
+        $lead->update([
+            'assignable_id' => $validated['assignable_id'],
+            'assignable_type' => $validated['assignable_type'],
+        ]);
+
+        return redirect()->back()->with('success', 'Lead assignment updated.');
+    }
+
+    public function destroy(Lead $lead)
+    {
+        $this->leadService->deleteLead($lead);
+
+        return redirect()->back()->with('success', 'Lead deleted successfully.');
     }
 }

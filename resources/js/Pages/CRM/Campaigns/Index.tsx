@@ -1,6 +1,6 @@
 import React from 'react';
-import { Head, Link, router } from '@inertiajs/react';
-import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
+import { Head, Link, router, usePage } from '@inertiajs/react';
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Button } from '@/Components/ui/button';
 import { Trash2, Edit, Plus, Users, Send, PauseCircle, PlayCircle, Clock } from 'lucide-react';
 import {
@@ -16,6 +16,7 @@ import { Input } from "@/Components/ui/input";
 import { Label } from "@/Components/ui/label";
 
 export default function Index({ campaigns }) {
+    const { auth } = usePage().props as any;
     const [isCreateOpen, setIsCreateOpen] = React.useState(false);
     const [newCampaign, setNewCampaign] = React.useState({ name: '', type: 'email', target_audience: 'all_leads' });
 
@@ -47,7 +48,11 @@ export default function Index({ campaigns }) {
     };
 
     return (
-        <AdminSidebarLayout title="Marketing Campaigns" header="Broadcast Campaigns">
+        <AuthenticatedLayout 
+            user={auth.user} 
+            header={<h2 className="font-semibold text-xl text-slate-800 leading-tight">Broadcast Campaigns</h2>}
+        >
+            <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
             <div className="mb-6 flex justify-end">
                 <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
                     <DialogTrigger asChild>
@@ -154,6 +159,7 @@ export default function Index({ campaigns }) {
                     </div>
                 )}
             </div>
-        </AdminSidebarLayout>
+            </div>
+        </AuthenticatedLayout>
     );
 }

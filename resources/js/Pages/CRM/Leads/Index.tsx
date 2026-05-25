@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Head, Link, router, usePage } from '@inertiajs/react';
-import ClientLayout from '@/Layouts/ClientLayout';
+import CrmLayout from '@/Layouts/CrmLayout';
 import { Button } from '@/Components/ui/button';
 import { MoreHorizontal, Trash2, Edit2, Mail, Phone, Users } from 'lucide-react';
 import {
@@ -11,9 +11,12 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/Components/ui/dropdown-menu';
+import { LeadSlideOver } from '@/Components/CRM/LeadSlideOver';
 
 export default function Index({ leads, currentTab }) {
     const { auth } = usePage().props;
+    const [selectedLeadId, setSelectedLeadId] = useState<number | null>(null);
+    const [isSlideOverOpen, setIsSlideOverOpen] = useState(false);
 
     const handleStatusUpdate = (id, status) => {
         router.post(route('crm.leads.update-status', id), { status });
@@ -23,6 +26,11 @@ export default function Index({ leads, currentTab }) {
         if (confirm('Are you sure you want to delete this lead?')) {
             router.delete(route('crm.leads.destroy', id));
         }
+    };
+
+    const openLead = (id: number) => {
+        setSelectedLeadId(id);
+        setIsSlideOverOpen(true);
     };
 
     const getStatusBadge = (status) => {
@@ -40,12 +48,7 @@ export default function Index({ leads, currentTab }) {
     };
 
     return (
-        <ClientLayout 
-            user={auth.user} 
-            hasErpSubscription={auth.active_modules?.erp}
-            hasCrmSubscription={auth.active_modules?.crm}
-        >
-            <Head title="CRM Leads" />
+        <CrmLayout title="Leads" activeMenu="leads">
             <div className="mb-6 flex items-center justify-between">
                 <div>
                     <h2 className="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight flex items-center">
@@ -98,7 +101,7 @@ export default function Index({ leads, currentTab }) {
                     </thead>
                     <tbody className="divide-y divide-gray-200">
                         {leads.data.map((lead) => (
-                            <tr key={lead.id} className="hover:bg-gray-50">
+                            <tr key={lead.id} className="hover:bg-gray-50 cursor-pointer transition-colors" onClick={() => openLead(lead.id)}>
                                 <td className="p-4 font-medium text-gray-900">{lead.name || 'Unknown'}</td>
                                 <td className="p-4">
                                     <div className="flex flex-col space-y-1">
@@ -130,7 +133,12 @@ export default function Index({ leads, currentTab }) {
                                             </Button>
                                         </DropdownMenuTrigger>
                                         <DropdownMenuContent align="end">
-                                            <DropdownMenuLabel>Update Status</DropdownMenuLabel>
+                                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                                            <DropdownMenuItem onClick={() => openLead(lead.id)}>
+                                                <Edit2 className="mr-2 h-4 w-4" />
+                                                View / Edit
+                                            </DropdownMenuItem>
+                                            <DropdownMenuSeparator />
                                             {['new', 'contacted', 'converted', 'dead'].map((status) => (
                                                 lead.status !== status && (
                                                     <DropdownMenuItem key={status} onClick={() => handleStatusUpdate(lead.id, status)}>
@@ -174,6 +182,12 @@ export default function Index({ leads, currentTab }) {
                     </div>
                 </div>
             )}
-        </ClientLayout>
+            
+            <LeadSlideOver 
+                leadId={selectedLeadId} 
+                isOpen={isSlideOverOpen} 
+                onClose={() => setIsSlideOverOpen(false)} 
+            />
+        </CrmLayout>
     );
 }

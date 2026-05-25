@@ -24,6 +24,7 @@ import {
 } from 'lucide-react';
 import CommandPalette from '@/Components/CommandPalette';
 import ProductTourModal from '@/Components/ProductTourModal';
+import { FloatingQuickAdd } from '@/Components/CRM/FloatingQuickAdd';
 import axios from 'axios';
 import FreelanceModeToggle from '@/Components/Freelance/FreelanceModeToggle';
 import MarketplaceModeToggle from '@/Components/Marketplace/MarketplaceModeToggle';
@@ -763,6 +764,7 @@ function AuthenticatedContent({
             />
 
             <CommandPalette />
+            <FloatingQuickAdd />
             <Toaster />
         </div>
     );

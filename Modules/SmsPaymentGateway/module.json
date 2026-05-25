@@ -1,0 +1,11 @@
+{
+    "name": "SmsPaymentGateway",
+    "alias": "sms-payment-gateway",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\SmsPaymentGateway\\Providers\\SmsPaymentGatewayServiceProvider"
+    ],
+    "files": []
+}

@@ -67,7 +67,19 @@ class HandleInertiaRequests extends Middleware
                             'marketplace' => true
                         ];
                     }
-                }
+                },
+                'crm_features' => function () {
+                    if (class_exists(\Modules\CRM\app\Core\FeatureManager::class)) {
+                        return app(\Modules\CRM\app\Core\FeatureManager::class)->getAll();
+                    }
+                    return [];
+                },
+                'crm_limits' => function () {
+                    if (class_exists(\Modules\CRM\app\Core\LimitManager::class)) {
+                        return app(\Modules\CRM\app\Core\LimitManager::class)->getAllLimits();
+                    }
+                    return [];
+                },
             ],
             'notifications' => function () use ($user) {
                 if ($user) {
