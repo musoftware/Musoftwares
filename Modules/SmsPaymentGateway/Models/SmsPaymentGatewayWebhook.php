@@ -11,7 +11,8 @@ class SmsPaymentGatewayWebhook extends Model
     use HasFactory;
 
     protected $table = 'sms_payment_gateway_webhooks';
-protected $fillable = [
+    protected $fillable = [
+        'tenant_id',
         'user_id',
         'webhook_url',
         'webhook_secret',

@@ -1,0 +1,346 @@
+<?php
+
+namespace Modules\SmsPaymentGateway\Services;
+
+use Modules\SmsPaymentGateway\Models\SmsPaymentGatewayDevice;
+use Modules\SmsPaymentGateway\Models\SmsPaymentGatewayTransaction;
+use Modules\SmsPaymentGateway\Models\SmsPaymentGatewayOrderLink;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
+use Carbon\Carbon;
+
+class TransactionIngestionService
+{
+    protected SmsPaymentGatewayParserService $parserService;
+
+    public function __construct(SmsPaymentGatewayParserService $parserService)
+    {
+        $this->parserService = $parserService;
+    }
+
+    /**
+     * Ingest an incoming SMS message
+     */
+    public function ingestSms(SmsPaymentGatewayDevice $device, array $smsData, string $senderName): array
+    {
+        $message = $smsData['message'] ?? '';
+        $isTest = $smsData['is_test'] ?? false;
+
+        // Check for duplicate by message_id if provided
+        if (!empty($smsData['message_id'])) {
+            $existingTransaction = SmsPaymentGatewayTransaction::where('message_id', $smsData['message_id'])
+                ->where('device_id', $device->id)
+                ->first();
+
+            if ($existingTransaction) {
+                Log::info('AutoSMS Payment Hub - Duplicate SMS detected by message_id', [
+                    'device_id' => $device->id,
+                    'user_id' => $device->user_id,
+                    'message_id' => $smsData['message_id'],
+                    'existing_transaction_id' => $existingTransaction->id,
+                ]);
+
+                return [
+                    'success' => true,
+                    'message' => 'SMS already processed (duplicate)',
+                    'transaction_detected' => true,
+                    'duplicate' => true,
+                    'existing_transaction_id' => $existingTransaction->id,
+                ];
+            }
+        }
+
+        // Check for duplicate by exact SMS message content within 5 minutes
+        if (!$isTest) {
+            $existingMessageTransaction = SmsPaymentGatewayTransaction::where('sms_message', $message)
+                ->where('device_id', $device->id)
+                ->where('created_at', '>=', now()->subMinutes(5))
+                ->first();
+
+            if ($existingMessageTransaction) {
+                Log::info('AutoSMS Payment Hub - Duplicate SMS detected by exact message content', [
+                    'device_id' => $device->id,
+                    'user_id' => $device->user_id,
+                    'message_preview' => substr($message, 0, 100),
+                    'existing_transaction_id' => $existingMessageTransaction->id,
+                ]);
+
+                return [
+                    'success' => true,
+                    'message' => 'SMS already processed (duplicate message within 5 minutes)',
+                    'transaction_detected' => true,
+                    'duplicate' => true,
+                    'existing_transaction_id' => $existingMessageTransaction->id,
+                ];
+            }
+        }
+
+        // Check if sender is in allowed list
+        if (!$isTest) {
+            $allowedSenders = config('sms-payment-gateway.allowed_senders', []);
+            $isAllowedSender = empty($allowedSenders) || in_array(strtolower($senderName), array_map('strtolower', $allowedSenders));
+
+            if (!$isAllowedSender) {
+                Log::info('SMS received from non-allowed sender', [
+                    'sender' => $senderName,
+                    'device_id' => $device->id,
+                    'user_id' => $device->user_id,
+                ]);
+
+                return [
+                    'success' => true,
+                    'message' => 'SMS received but sender not in allowed list',
+                    'processed' => false,
+                ];
+            }
+        }
+
+        // Process SMS for transaction detection using the parser service
+        $transactionData = $this->parserService->detectTransaction($message, $senderName, $device);
+
+        $debugInfo = null;
+        if ($transactionData === null) {
+            $debugInfo = $this->parserService->getDebugInfo($message, $senderName, $device);
+        }
+
+        Log::info('AutoSMS Payment Hub - SMS Received', [
+            'device_id' => $device->id,
+            'user_id' => $device->user_id,
+            'sender' => $senderName,
+            'transaction_detected' => $transactionData !== null,
+            'transaction_data' => $transactionData,
+            'debug_info' => $debugInfo,
+        ]);
+
+        // If transaction detected, process it
+        if ($transactionData) {
+            $this->processTransaction($device, $transactionData, $smsData);
+        }
+
+        $response = [
+            'success' => true,
+            'message' => 'SMS received and processed',
+            'transaction_detected' => $transactionData !== null,
+            'transaction_data' => $transactionData,
+        ];
+
+        if ($transactionData === null && $debugInfo) {
+            $response['debug'] = $debugInfo;
+        }
+
+        return $response;
+    }
+
+    /**
+     * Process detected transaction
+     */
+    protected function processTransaction(SmsPaymentGatewayDevice $device, array $transactionData, array $smsData): void
+    {
+        try {
+            $user = $device->user;
+
+            $transactionDate = null;
+            if (isset($transactionData['date']) && $transactionData['date']) {
+                try {
+                    $transactionDate = Carbon::parse($transactionData['date']);
+                } catch (\Exception $e) {
+                    $transactionDate = now();
+                }
+            } else {
+                $transactionDate = now();
+            }
+
+            $orderId = null;
+            $phoneNumber = $transactionData['phone_number'] ?? null;
+
+            if ($phoneNumber) {
+                $normalizedPhoneNumber = $this->normalizePhoneNumber($phoneNumber);
+                
+                // Use lockForUpdate to prevent race conditions when multiple SMS come at once
+                $orderLink = SmsPaymentGatewayOrderLink::where('user_id', $user->id)
+                    ->where('phone_number', $normalizedPhoneNumber)
+                    ->where('status', 'pending')
+                    ->lockForUpdate()
+                    ->orderBy('created_at', 'desc')
+                    ->first();
+
+                if ($orderLink) {
+                    $orderId = $orderLink->order_id;
+                    $orderLink->update(['status' => 'matched']);
+
+                    Log::info('AutoSMS Payment Hub - Order Link Matched', [
+                        'user_id' => $user->id,
+                        'order_link_id' => $orderLink->id,
+                        'order_id' => $orderId,
+                        'phone_number' => $normalizedPhoneNumber,
+                    ]);
+                }
+            }
+
+            $smsTimestamp = isset($smsData['timestamp']) ? intval($smsData['timestamp']) : null;
+            $spoofDetectionEnabled = $device->enable_spoof_detection ?? true;
+
+            if ($spoofDetectionEnabled) {
+                $spoofingCheck = $this->checkForSpoofing(
+                    $transactionData['sender'] ?? '',
+                    $transactionData['balance'] ?? null,
+                    $transactionData['amount'],
+                    $user->id,
+                    $smsTimestamp
+                );
+            } else {
+                $spoofingCheck = [
+                    'is_spoofed' => false,
+                    'reason' => null,
+                ];
+            }
+
+            $metadata = [
+                'name' => $smsData['name'] ?? null,
+                'phoneNumber' => $smsData['phoneNumber'] ?? null,
+                'simSlot' => $smsData['simSlot'] ?? null,
+                'timestamp' => $smsData['timestamp'] ?? null,
+            ];
+
+            if ($orderId) {
+                $metadata['order_id'] = $orderId;
+            }
+
+            if (isset($transactionData['reference_number']) && $transactionData['reference_number']) {
+                $metadata['reference_number'] = $transactionData['reference_number'];
+            }
+
+            $transactionCreateData = [
+                'tenant_id' => $device->tenant_id ?? $user->id, // Use tenant_id or fallback to user_id
+                'device_id' => $device->id,
+                'user_id' => $user->id,
+                'amount' => $transactionData['amount'],
+                'currency' => $transactionData['currency'],
+                'sender' => $transactionData['sender'],
+                'phone_number' => $phoneNumber,
+                'reference_number' => $transactionData['reference_number'] ?? null,
+                'sender_name' => $transactionData['sender_name'] ?? null,
+                'transaction_date' => $transactionDate,
+                'sms_message' => $smsData['message'] ?? '',
+                'message_id' => $smsData['message_id'] ?? null,
+                'sms_timestamp' => isset($smsData['timestamp']) ? intval($smsData['timestamp']) : null,
+                'status' => 'pending',
+                'metadata' => $metadata,
+                'is_test' => $smsData['is_test'] ?? false,
+                'balance' => $transactionData['balance'] ?? null,
+                'is_spoofed' => $spoofingCheck['is_spoofed'],
+                'spoofing_reason' => $spoofingCheck['reason'],
+            ];
+
+            $autoSmsTransaction = SmsPaymentGatewayTransaction::create($transactionCreateData);
+
+            Log::info('AutoSMS Payment Hub - Transaction Created', [
+                'user_id' => $user->id,
+                'device_id' => $device->id,
+                'sms_payment_gateway_transaction_id' => $autoSmsTransaction->id,
+                'amount' => $transactionData['amount'],
+                'is_spoofed' => $spoofingCheck['is_spoofed'],
+            ]);
+
+            // Dispatch webhook asynchronously using the dedicated service
+            $webhookService = app(\Modules\SmsPaymentGateway\Services\WebhookDispatchService::class);
+            $webhookService->dispatchTransactionWebhook($autoSmsTransaction);
+
+        } catch (\Exception $e) {
+            Log::error('AutoSMS Payment Hub - Transaction Processing Failed', [
+                'device_id' => $device->id,
+                'user_id' => $device->user_id ?? null,
+                'error' => $e->getMessage(),
+                'transaction_data' => $transactionData,
+            ]);
+            if (config('app.debug')) {
+                throw $e;
+            }
+        }
+    }
+
+    protected function checkForSpoofing(string $sender, ?float $currentBalance, float $currentAmount, int $userId, ?int $smsTimestamp = null): array
+    {
+        if ($currentBalance === null) {
+            return ['is_spoofed' => false, 'reason' => null];
+        }
+
+        $tolerance = config('sms-payment-gateway.spoofing_tolerance', 100.00);
+        $reasons = [];
+
+        $previousTransaction = null;
+        if ($smsTimestamp) {
+            $timestampSeconds = intval($smsTimestamp / 1000);
+            $timestampDate = Carbon::createFromTimestamp($timestampSeconds);
+
+            $previousTransaction = SmsPaymentGatewayTransaction::where('sender', $sender)
+                ->where('user_id', $userId)
+                ->where('balance', '!=', null)
+                ->where('is_spoofed', false)
+                ->where(function ($query) use ($smsTimestamp, $timestampDate) {
+                    $query->where('sms_timestamp', '<', $smsTimestamp)
+                        ->orWhere(function ($q) use ($timestampDate) {
+                            $q->whereNull('sms_timestamp')
+                                ->where('transaction_date', '<', $timestampDate);
+                        });
+                })
+                ->orderByRaw('COALESCE(sms_timestamp, UNIX_TIMESTAMP(transaction_date) * 1000) DESC')
+                ->first();
+        }
+
+        if (!$previousTransaction) {
+            $previousTransaction = SmsPaymentGatewayTransaction::where('sender', $sender)
+                ->where('user_id', $userId)
+                ->where('balance', '!=', null)
+                ->where('is_spoofed', false)
+                ->orderBy('transaction_date', 'desc')
+                ->orderBy('created_at', 'desc')
+                ->first();
+        }
+
+        if ($previousTransaction) {
+            $previousBalance = floatval($previousTransaction->balance);
+            $expectedBalance = $previousBalance + $currentAmount;
+            $balanceDifference = abs($currentBalance - $expectedBalance);
+
+            if ($balanceDifference > $tolerance) {
+                // Determine if we should flag it. Sometimes an intermediate transaction is missed.
+                // But for robust anti-spoofing, we flag it for manual review.
+                if ($currentBalance >= $previousBalance) {
+                     $reasons[] = sprintf(
+                         'Balance mismatch: Expected %.2f (previous %.2f + amount %.2f), got %.2f. Diff: %.2f',
+                         $expectedBalance, $previousBalance, $currentAmount, $currentBalance, $balanceDifference
+                     );
+                }
+            }
+        }
+
+        if (!empty($reasons)) {
+            $reason = implode(' | ', $reasons);
+            Log::warning('AutoSMS Payment Hub - Potential SMS Spoofing Detected', [
+                'user_id' => $userId,
+                'sender' => $sender,
+                'current_balance' => $currentBalance,
+                'reasons' => $reasons,
+            ]);
+            return ['is_spoofed' => true, 'reason' => $reason];
+        }
+
+        return ['is_spoofed' => false, 'reason' => null];
+    }
+
+    protected function normalizePhoneNumber(string $phone): string
+    {
+        $phone = preg_replace('/[^0-9]/', '', $phone);
+        if (str_starts_with($phone, '00')) {
+            $phone = substr($phone, 2);
+        }
+        if (str_starts_with($phone, '20') && strlen($phone) >= 12) {
+            $phone = '0' . substr($phone, 2);
+        }
+        if (!str_starts_with($phone, '0') && strlen($phone) == 10) {
+            $phone = '0' . $phone;
+        }
+        return $phone;
+    }
+}

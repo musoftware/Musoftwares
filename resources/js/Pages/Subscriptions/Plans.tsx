@@ -214,7 +214,7 @@ export default function Plans({ serviceItems, activeSubscription, walletBalance,
                             )}
                             {item.type === 'tool' && (
                                 <a 
-                                    href={`https://musoftwares.com/programs`}
+                                    href={route('tools.show', item.slug)}
                                     target="_blank" 
                                     rel="noopener noreferrer"
                                     className="text-xs font-medium text-indigo-600 hover:text-indigo-700 hover:underline mt-1.5 inline-block"

@@ -130,17 +130,17 @@ class SubscriptionController extends Controller
         }
 
         try {
-            $dbTools = \App\Models\SoftwareProgram::all();
-            foreach ($dbTools as $tool) {
-                // Ensure tool price is strictly 1000 yearly
-                $toolYearly = 1000; 
-                $toolMonthly = 100;
-                
+            $configTools = config('tools', []);
+            foreach ($configTools as $guid => $tool) {
+                if (!isset($tool['is_active']) || !$tool['is_active']) {
+                    continue;
+                }
+
                 $serviceItems[] = [
-                    'id' => 'tool-' . $tool->id,
-                    'slug' => 'tool-' . $tool->id,
-                    'tool_id' => $tool->id,
-                    'name' => $tool->name,
+                    'id' => 'tool-' . $guid,
+                    'slug' => $tool['slug'] ?? $guid,
+                    'tool_id' => $guid,
+                    'name' => $tool['title'] ?? 'Unknown Tool',
                     'type' => 'tool',
                     'description' => null, // User requested to hide description
                     'monthly_price' => $convertPrice($basePricesEGP['tool'] / 10),
@@ -149,13 +149,13 @@ class SubscriptionController extends Controller
                 ];
             }
         } catch (\Exception $e) {
-            // Fallback if table doesn't exist
+            // Fallback if something fails
             $serviceItems[] = [
                 'id' => 'tool-wa',
                 'slug' => 'tool-wa',
                 'name' => 'WhatsApp Sender Pro',
                 'type' => 'tool',
-                'description' => 'Bulk WhatsApp sending tool.',
+                'description' => null,
                 'monthly_price' => $convertPrice($basePricesEGP['tool'] / 10),
                 'yearly_price' => $convertPrice($basePricesEGP['tool']),
                 'icon' => 'Wrench'
@@ -165,7 +165,7 @@ class SubscriptionController extends Controller
                 'slug' => 'tool-extractor',
                 'name' => 'Data Extractor',
                 'type' => 'tool',
-                'description' => 'Extract leads from various sources.',
+                'description' => null,
                 'monthly_price' => $convertPrice($basePricesEGP['tool'] / 10),
                 'yearly_price' => $convertPrice($basePricesEGP['tool']),
                 'icon' => 'Wrench'
