@@ -18,7 +18,7 @@ class GoldWallet extends Model
         'target_amount',
         'balance_grams',
         'balance_amount',
-        'currency',
+        'currency_id',
         'is_active',
     ];
 

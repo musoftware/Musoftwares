@@ -23,7 +23,10 @@ This is the base or global currency used for internal accounting, cross-currency
 
 ## Core Rules
 
-### Rule 1: Never Mix Currencies
+### Rule 1: Never Hardcode Currency Strings
+NEVER use hardcoded string values like `'currency' => 'EGP'` in your migrations, factories, or models. The main system has a `currencies` table and a corresponding `App\Models\Currency` model. You MUST always use a `currency_id` column that references the main currencies table instead of a raw string.
+
+### Rule 2: Never Mix Currencies
 Never sum raw `amount` values across different invoices or transactions without ensuring they share the same `currency_id`. If you need to sum data across multiple clients, you MUST use the `business_amount` or `business_total` fields.
 
 ### Rule 2: Always Expose Both Sets to the Frontend

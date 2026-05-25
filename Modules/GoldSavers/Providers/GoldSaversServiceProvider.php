@@ -4,6 +4,8 @@ namespace Modules\GoldSavers\Providers;
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
+use Modules\GoldSavers\Console\Commands\FetchGoldPrices;
+use Modules\GoldSavers\Console\Commands\FetchWorldGoldPrices;
 
 class GoldSaversServiceProvider extends ServiceProvider
 {
@@ -21,6 +23,14 @@ class GoldSaversServiceProvider extends ServiceProvider
         if (file_exists(module_path('GoldSavers', 'routes/web.php'))) {
             Route::middleware('web')
                 ->group(module_path('GoldSavers', 'routes/web.php'));
+        }
+
+        // Register Artisan commands
+        if ($this->app->runningInConsole()) {
+            $this->commands([
+                FetchGoldPrices::class,
+                FetchWorldGoldPrices::class,
+            ]);
         }
     }
 }

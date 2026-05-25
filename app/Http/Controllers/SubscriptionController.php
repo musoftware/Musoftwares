@@ -381,7 +381,7 @@ class SubscriptionController extends Controller
                         \App\Models\TenantFeature::updateOrCreate(
                             ['tenant_id' => $user->tenant_id, 'feature_key' => $item],
                             [
-                                'module' => str_starts_with($item, 'crm') ? 'crm' : (str_starts_with($item, 'erp') ? 'erp' : 'booking'),
+                                'module' => str_starts_with($item, 'crm') ? 'crm' : (str_starts_with($item, 'erp') ? 'erp' : (str_starts_with($item, 'tool') ? 'tools' : 'booking')),
                                 'plan_id' => $plan->id,
                                 'expires_at' => \Carbon\Carbon::parse($user->subscription_date)
                             ]
@@ -531,7 +531,7 @@ class SubscriptionController extends Controller
                                             \App\Models\TenantFeature::updateOrCreate(
                                                 ['tenant_id' => $user->tenant_id, 'feature_key' => $item],
                                                 [
-                                                    'module' => str_starts_with($item, 'crm') ? 'crm' : (str_starts_with($item, 'erp') ? 'erp' : 'booking'),
+                                                    'module' => str_starts_with($item, 'crm') ? 'crm' : (str_starts_with($item, 'erp') ? 'erp' : (str_starts_with($item, 'tool') ? 'tools' : 'booking')),
                                                     'plan_id' => $plan->id,
                                                     'expires_at' => \Carbon\Carbon::parse($user->subscription_date)
                                                 ]

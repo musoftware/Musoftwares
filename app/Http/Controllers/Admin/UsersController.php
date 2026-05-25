@@ -16,6 +16,7 @@ use App\Http\Requests\Admin\User\ToggleBlockUserRequest;
 use App\Http\Requests\Admin\User\AddTaskRequest;
 use App\Http\Resources\UserResource;
 use Inertia\Inertia;
+use Inertia\Response as InertiaResponse;
 
 class UsersController extends Controller
 {
@@ -95,7 +96,7 @@ class UsersController extends Controller
             ->findOrFail($id);
 
         $initials = collect(explode(' ', $user->name))
-            ->map(fn($w) => strtoupper(substr($w, 0, 1)))
+            ->map(fn($w) => mb_strtoupper(mb_substr($w, 0, 1, 'UTF-8'), 'UTF-8'))
             ->take(2)
             ->implode('');
 
@@ -131,9 +132,12 @@ class UsersController extends Controller
             ];
         });
 
+        $modulePlans = \App\Models\ModulePlan::where('is_active', true)->get();
+
         return Inertia::render('Admin/Users/Show', [
             'client' => $userDetail,
             'stats'  => $stats,
+            'modulePlans' => $modulePlans,
             'wallets' => [
                 [
                     'id' => 'main',
@@ -342,5 +346,28 @@ class UsersController extends Controller
         $this->adminUserService->addTask($user, $request->input('title'), $request->input('description'));
 
         return back()->with('success', 'Task created successfully.');
+    }
+
+    public function activateMembership(Request $request, $id)
+    {
+        $user = User::findOrFail($id);
+        
+        $request->validate([
+            'plan_id' => 'required|exists:module_plans,id',
+            'duration_days' => 'required|integer|min:1',
+        ]);
+
+        $plan = \App\Models\ModulePlan::findOrFail($request->plan_id);
+
+        \App\Models\UserSubscription::create([
+            'client_id' => $user->id,
+            'plan_id' => $plan->id,
+            'status' => 'active',
+            'started_at' => now(),
+            'expires_at' => now()->addDays($request->duration_days),
+            'auto_renew' => false,
+        ]);
+
+        return back()->with('success', "Membership ({$plan->name}) activated successfully for {$request->duration_days} days.");
     }
 }

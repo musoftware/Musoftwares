@@ -25,7 +25,7 @@ import { Label } from '@/Components/ui/label';
 import AdminNotesPanel from '@/Components/AdminNotesPanel';
 import { formatMoney as formatCurrency } from '@/lib/utils';
 
-export default function Show({ client, wallets }) {
+export default function Show({ client, wallets, modulePlans = [] }) {
     const [isLoginAsLoading, setIsLoginAsLoading] = useState(false);
     const [isResetPassOpen, setIsResetPassOpen] = useState(false);
     const [newPassword, setNewPassword] = useState('');
@@ -101,13 +101,16 @@ export default function Show({ client, wallets }) {
         });
     };
 
-    const [membershipForm, setMembershipForm] = useState({ plan_id: '1' });
+    const [membershipForm, setMembershipForm] = useState({ 
+        plan_id: modulePlans.length > 0 ? modulePlans[0].id : '', 
+        duration_days: '1' 
+    });
     const submitActivateMembership = (e) => {
         e.preventDefault();
         router.post(`/admin/users/${client.id}/membership`, membershipForm, {
             onSuccess: () => {
                 setIsActivateMembershipOpen(false);
-                setMembershipForm({ plan_id: '1' });
+                setMembershipForm({ plan_id: modulePlans.length > 0 ? modulePlans[0].id : '', duration_days: '1' });
                 alert("Membership activated successfully!");
             }
         });
@@ -289,12 +292,32 @@ export default function Show({ client, wallets }) {
                                 Manually assign a subscription plan to this user.
                             </DialogDescription>
                         </DialogHeader>
-                        <div className="py-4">
-                            <p className="text-sm text-gray-500 mb-2">Select a plan from the list below:</p>
-                            <select className="border-gray-300 rounded-md w-full">
-                                <option>Premium Monthly ($19.99)</option>
-                                <option>Enterprise Annual ($499.00)</option>
-                            </select>
+                        <div className="py-4 space-y-4">
+                            <div>
+                                <Label>Select Plan</Label>
+                                <select 
+                                    className="border-gray-300 rounded-md w-full mt-1"
+                                    value={membershipForm.plan_id}
+                                    onChange={e => setMembershipForm({...membershipForm, plan_id: e.target.value})}
+                                    required
+                                >
+                                    {modulePlans.map(plan => (
+                                        <option key={plan.id} value={plan.id}>{plan.name} - {plan.module}</option>
+                                    ))}
+                                </select>
+                            </div>
+                            <div>
+                                <Label>Duration (Days)</Label>
+                                <Input 
+                                    type="number" 
+                                    min="1" 
+                                    value={membershipForm.duration_days}
+                                    onChange={e => setMembershipForm({...membershipForm, duration_days: e.target.value})}
+                                    required 
+                                    className="mt-1"
+                                />
+                                <p className="text-xs text-gray-500 mt-1">E.g., enter 1 for a 1-day test.</p>
+                            </div>
                         </div>
                         <DialogFooter>
                             <Button type="button" variant="outline" onClick={() => setIsActivateMembershipOpen(false)}>Cancel</Button>

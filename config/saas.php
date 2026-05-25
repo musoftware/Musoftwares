@@ -13,6 +13,7 @@ return [
         'gold-saver' => 1000,
         'booking' => 3000,
         'tool' => 1000,
+        'affiliate-pos' => 4000,
     ],
 
     /*
@@ -109,5 +110,19 @@ return [
         'gold-multi-wallets'    => ['price' => 500, 'name' => 'Multi Wallets',        'desc' => 'Separate goals & funds',             'icon' => 'Wallet',       'parent' => 'gold-saver'],
         'gold-goal-tracking'    => ['price' => 500, 'name' => 'Goal Tracking',        'desc' => 'Target-based saving system',         'icon' => 'Target',       'parent' => 'gold-saver'],
         'gold-shop-integration' => ['price' => 500, 'name' => 'Gold Shop Integration','desc' => 'Connect with local vendors',         'icon' => 'Store',        'parent' => 'gold-saver'],
+        
+        // ── AFFILIATE + POS ──
+        'affiliate-storefront'      => ['price' => 500, 'name' => 'Online Storefront',    'desc' => 'Public branded e-commerce page',       'icon' => 'Globe',           'parent' => 'affiliate-pos'],
+        'affiliate-multi-vendor'    => ['price' => 500, 'name' => 'Multi-Vendor Portal',  'desc' => 'Allow vendors to list products',       'icon' => 'Users',           'parent' => 'affiliate-pos'],
+        'affiliate-moderators'      => ['price' => 500, 'name' => 'Team Moderators',      'desc' => 'Sub-accounts for affiliates',          'icon' => 'Shield',          'parent' => 'affiliate-pos'],
+        'affiliate-advanced-returns'=> ['price' => 500, 'name' => 'Advanced Returns',     'desc' => 'Automated returning & replacing',      'icon' => 'RefreshCcw',      'parent' => 'affiliate-pos'],
+        'affiliate-custom-domain'   => ['price' => 500, 'name' => 'Custom Domain',        'desc' => 'Use your own domain for the store',    'icon' => 'Link',            'parent' => 'affiliate-pos'],
+        'affiliate-pos'             => ['price' => 500, 'name' => 'POS System',           'desc' => 'Cashier, barcode, & receipts',         'icon' => 'MonitorSmartphone', 'parent' => 'affiliate-pos'],
+        'affiliate-whatsapp'        => ['price' => 500, 'name' => 'WhatsApp Alerts',      'desc' => 'Order & shipping notifications',       'icon' => 'MessageSquare',   'parent' => 'affiliate-pos'],
+        'affiliate-analytics'       => ['price' => 500, 'name' => 'Advanced Analytics',   'desc' => 'Conversion rates & ROI tracking',      'icon' => 'BarChart',        'parent' => 'affiliate-pos'],
+        'affiliate-wallet'          => ['price' => 500, 'name' => 'Advanced Wallet',      'desc' => 'Payment requests & withdrawals',       'icon' => 'Wallet',          'parent' => 'affiliate-pos'],
+        'affiliate-api'             => ['price' => 500, 'name' => 'API Access',           'desc' => 'Programmatic store access',            'icon' => 'Code',            'parent' => 'affiliate-pos'],
+        'affiliate-white-label'     => ['price' => 500, 'name' => 'White Label',          'desc' => 'Remove all system branding',           'icon' => 'Star',            'parent' => 'affiliate-pos'],
+        'affiliate-multi-language'  => ['price' => 500, 'name' => 'Multi Language',       'desc' => 'Multiple storefront languages',        'icon' => 'Globe',           'parent' => 'affiliate-pos'],
     ],
 ];

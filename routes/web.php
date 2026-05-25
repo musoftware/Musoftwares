@@ -364,6 +364,7 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
     Route::put('/users/{id}', [\App\Http\Controllers\Admin\UsersController::class, 'update'])->name('users.update');
     Route::delete('/users/{id}', [\App\Http\Controllers\Admin\UsersController::class, 'destroy'])->name('users.destroy');
     Route::post('/users/{id}/toggle-block', [\App\Http\Controllers\Admin\UsersController::class, 'toggleBlock'])->name('users.toggleBlock');
+    Route::post('/users/{id}/membership', [\App\Http\Controllers\Admin\UsersController::class, 'activateMembership'])->name('users.membership.activate');
 
     // ── User Notes ───────────────────────────────────────────────────
     // Recovered from old project: Admin/UserNotesController

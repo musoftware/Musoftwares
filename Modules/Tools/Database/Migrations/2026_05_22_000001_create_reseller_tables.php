@@ -15,7 +15,7 @@ return new class extends Migration
             $table->string('name');
             $table->string('token', 64)->unique(); // iframe embed token
             $table->decimal('balance', 12, 2)->default(0);
-            $table->string('currency', 10)->default('USD');
+            $table->foreignId('currency_id')->default(1)->constrained('currencies');
             $table->string('status', 20)->default('active'); // active|suspended|inactive
             $table->text('notes')->nullable();
             $table->timestamps();
@@ -72,7 +72,7 @@ return new class extends Migration
             $table->string('type', 30); // top_up|charge|manual_credit|manual_debit|suspension
             $table->decimal('amount', 12, 2);       // positive = credit, negative = debit
             $table->decimal('balance_after', 12, 2); // balance snapshot after transaction
-            $table->string('currency', 10)->default('USD');
+            $table->foreignId('currency_id')->default(1)->constrained('currencies');
             $table->string('description')->nullable();
             $table->string('reference')->nullable();  // subscription_id, etc.
             $table->timestamps();
