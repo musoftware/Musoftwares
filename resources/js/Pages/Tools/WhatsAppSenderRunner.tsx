@@ -527,60 +527,8 @@ const translations = {
     }
 };
 
-// ── Runtime WebSocket Hook ────────────────────────────────────────────────────
-
-function useRuntimeWS(pluginSlug: string, onBroadcast?: ((event: string, data: any) => void) | null) {
-    const [ws, setWs]           = useState<WebSocket | null>(null);
-    const [connected, setConnected] = useState(false);
-    const pending = useRef<Map<string, { resolve: Function; reject: Function }>>(new Map());
-    const onBroadcastRef = useRef<((event: string, data: any) => void) | null>(null);
-    onBroadcastRef.current = onBroadcast || null;
-
-    useEffect(() => {
-        const host   = typeof window !== 'undefined' ? (window.localStorage.getItem('musoftware_runtime_host') || '127.0.0.1') : '127.0.0.1';
-        const socket = new WebSocket(`ws://${host}:18401/ws`);
-
-        socket.onopen  = () => setConnected(true);
-        socket.onclose = () => { setConnected(false); };
-
-        socket.onmessage = (ev) => {
-            try {
-                const msg = JSON.parse(ev.data);
-                // RPC response/error routing
-                if (msg.type === 'plugin_rpc_res' || msg.type === 'plugin_rpc_error') {
-                    const r = pending.current.get(msg.requestId);
-                    if (r) {
-                        if (msg.type === 'plugin_rpc_error') r.reject(new Error(msg.payload?.error || 'RPC Error'));
-                        else r.resolve(msg.payload);
-                        pending.current.delete(msg.requestId);
-                    }
-                }
-                // Broadcast events
-                if (msg.event && onBroadcastRef.current) {
-                    onBroadcastRef.current(msg.event, msg.data);
-                }
-            } catch (_) {}
-        };
-
-        setWs(socket);
-        return () => socket.close();
-    }, []);
-
-    const callRPC = async (action: string, data: any = {}) => {
-        if (!ws || ws.readyState !== WebSocket.OPEN) throw new Error('Not connected to runtime — is the Musoftware Runtime running?');
-        return new Promise((resolve, reject) => {
-            const requestId = Math.random().toString(36).substring(2, 9);
-            pending.current.set(requestId, { resolve, reject });
-            ws.send(JSON.stringify({ type: 'plugin_rpc', requestId, payload: { plugin: pluginSlug, action, data } }));
-            setTimeout(() => {
-                const r = pending.current.get(requestId);
-                if (r) { r.reject(new Error('RPC timeout')); pending.current.delete(requestId); }
-            }, 30_000);
-        });
-    };
-
-    return { connected, callRPC };
-}
+import { useRuntimeWS } from '@/hooks/useRuntimeWS';
+import { RuntimePluginModals } from '@/Components/Tools/RuntimePluginModals';
 
 // ── Main Component ────────────────────────────────────────────────────────────
 
@@ -771,7 +719,7 @@ export default function WhatsAppSenderRunner({ tool, subscription, runtimePort, 
         }
     };
 
-    const { connected: daemonConnected, callRPC } = useRuntimeWS(pluginSlug || 'whatsapp-sender', onBroadcast);
+    const { connected: daemonConnected, callRPC, installingPlugin, loginRequired, setLoginRequired } = useRuntimeWS(pluginSlug || 'whatsapp-sender', onBroadcast);
 
     // ── Session & Template management ────────────────────────────────────────────────────
 
@@ -822,7 +770,9 @@ export default function WhatsAppSenderRunner({ tool, subscription, runtimePort, 
             setSessions(res.sessions || []);
             const firstConnected = res.sessions?.find((s: any) => s.state === 'connected');
             if (firstConnected && !selectedAccount) setSelectedAccount(firstConnected.accountId);
-        } catch (err) { console.error('fetchSessions failed:', err); }
+        } catch (err: any) { 
+            console.error('fetchSessions failed:', err);
+        }
     };
 
     const handleConnectSession = async (e: React.FormEvent) => {
@@ -841,7 +791,9 @@ export default function WhatsAppSenderRunner({ tool, subscription, runtimePort, 
                 { accountId, state: 'connecting', health: { trustScore: 50 } }
             ]);
         } catch (err: any) {
-            alert(`Connect Error: ${err.message}`);
+            if (!err.message?.includes('RUNTIME_NOT_CONFIGURED')) {
+                alert(`Connect Error: ${err.message}`);
+            }
         }
     };
 
@@ -1026,6 +978,13 @@ export default function WhatsAppSenderRunner({ tool, subscription, runtimePort, 
                 />
             }
         >
+            <RuntimePluginModals 
+                installingPlugin={installingPlugin} 
+                loginRequired={loginRequired} 
+                setLoginRequired={setLoginRequired} 
+                locale={locale} 
+            />
+
             {activeTab === 'dashboard' && (
                 <DashboardWorkspace
                     t={t}

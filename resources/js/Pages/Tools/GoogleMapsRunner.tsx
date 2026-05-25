@@ -13,57 +13,8 @@ import { Badge } from '@/Components/ui/badge';
 import { Switch } from '@/Components/ui/switch';
 import { Textarea } from '@/Components/ui/textarea';
 
-// ── Unified WebSocket RPC client ──────────────────────────────────────────────
-function useRuntimeWS(pluginSlug: string, onBroadcast?: ((event: string, data: any) => void) | null) {
-    const [ws, setWs] = useState<WebSocket | null>(null);
-    const [connected, setConnected] = useState(false);
-    const pendingRequests = useRef<Map<string, { resolve: Function; reject: Function }>>(new Map());
-    const onBroadcastRef  = useRef<((event: string, data: any) => void) | null>(null);
-    onBroadcastRef.current = onBroadcast || null;
-
-    useEffect(() => {
-        const host   = typeof window !== 'undefined' ? (window.localStorage.getItem('musoftware_runtime_host') || '127.0.0.1') : '127.0.0.1';
-        const socket = new WebSocket(`ws://${host}:18401/ws`);
-
-        socket.onopen  = () => setConnected(true);
-        socket.onclose = () => setConnected(false);
-
-        socket.onmessage = (event) => {
-            try {
-                const msg = JSON.parse(event.data);
-                if (msg.type === 'plugin_rpc_res' || msg.type === 'plugin_rpc_error') {
-                    const resolver = pendingRequests.current.get(msg.requestId);
-                    if (resolver) {
-                        if (msg.type === 'plugin_rpc_error') resolver.reject(new Error(msg.payload?.error || 'RPC error'));
-                        else resolver.resolve(msg.payload);
-                        pendingRequests.current.delete(msg.requestId);
-                    }
-                }
-                if (msg.event && onBroadcastRef.current) {
-                    onBroadcastRef.current(msg.event, msg.data);
-                }
-            } catch (_) {}
-        };
-
-        setWs(socket);
-        return () => socket.close();
-    }, []);
-
-    const callRPC = useCallback(async (action: string, data: any = {}): Promise<any> => {
-        if (!ws || ws.readyState !== WebSocket.OPEN) throw new Error('Not connected to runtime');
-        return new Promise((resolve, reject) => {
-            const requestId = Math.random().toString(36).substring(2, 9);
-            pendingRequests.current.set(requestId, { resolve, reject });
-            ws.send(JSON.stringify({ type: 'plugin_rpc', requestId, payload: { plugin: pluginSlug, action, data } }));
-            setTimeout(() => {
-                const r = pendingRequests.current.get(requestId);
-                if (r) { r.reject(new Error('Request timed out')); pendingRequests.current.delete(requestId); }
-            }, 45_000);
-        });
-    }, [ws, pluginSlug]);
-
-    return { connected, callRPC };
-}
+import { useRuntimeWS } from '@/hooks/useRuntimeWS';
+import { RuntimePluginModals } from '@/Components/Tools/RuntimePluginModals';
 
 // ── Helper: status badge style ────────────────────────────────────────────────
 function statusStyle(status: string) {
@@ -440,7 +391,7 @@ export default function GoogleMapsRunner({ tool, subscription, runtimePort, plug
         }
     }, [resultsLimit]);
 
-    const { connected, callRPC } = useRuntimeWS('google-maps', onBroadcast);
+    const { connected, callRPC, installingPlugin, loginRequired, setLoginRequired } = useRuntimeWS('google-maps', onBroadcast);
 
     // ── Initial data fetch ────────────────────────────────────────────────────
     const fetchCampaigns = useCallback(async () => {
@@ -551,6 +502,11 @@ export default function GoogleMapsRunner({ tool, subscription, runtimePort, plug
 
     return (
         <div className="min-h-screen bg-[#F8FAFC] text-slate-900 font-sans flex flex-col antialiased">
+            <RuntimePluginModals 
+                installingPlugin={installingPlugin} 
+                loginRequired={loginRequired} 
+                setLoginRequired={setLoginRequired} 
+            />
 
             {/* ── Topbar ── */}
             <header className="h-14 border-b border-slate-200 bg-white/80 backdrop-blur-md flex items-center justify-between px-6 sticky top-0 z-30 shrink-0">

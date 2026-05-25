@@ -6,76 +6,8 @@ import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
 import { Badge } from '@/Components/ui/badge';
 
-function useRuntimeWS(pluginSlug: string, onBroadcast?: ((event: string, data: any) => void) | null) {
-    const [ws, setWs] = useState<WebSocket | null>(null);
-    const [connected, setConnected] = useState(false);
-    const pendingRequests = useRef<Map<string, { resolve: Function, reject: Function }>>(new Map());
-    const onBroadcastRef = useRef<((event: string, data: any) => void) | null>(null);
-
-    onBroadcastRef.current = onBroadcast || null;
-
-    useEffect(() => {
-        const host = typeof window !== 'undefined' ? (window.localStorage.getItem('musoftware_runtime_host') || '127.0.0.1') : '127.0.0.1';
-        const socket = new WebSocket(`ws://${host}:18401/ws`);
-        
-        socket.onopen = () => setConnected(true);
-        socket.onclose = () => setConnected(false);
-        
-        socket.onmessage = (event) => {
-            try {
-                const msg = JSON.parse(event.data);
-                if (msg.type === 'plugin_rpc_res' || msg.type === 'plugin_rpc_error') {
-                    const resolver = pendingRequests.current.get(msg.requestId);
-                    if (resolver) {
-                        if (msg.type === 'plugin_rpc_error') resolver.reject(new Error(msg.payload.error));
-                        else resolver.resolve(msg.payload);
-                        pendingRequests.current.delete(msg.requestId);
-                    }
-                }
-                if (msg.event && onBroadcastRef.current) {
-                    onBroadcastRef.current(msg.event, msg.data);
-                }
-            } catch (err) {}
-        };
-        
-        setWs(socket);
-        return () => socket.close();
-    }, []);
-
-    const callRPC = async (action: string, data: any = {}) => {
-        if (!ws || ws.readyState !== WebSocket.OPEN) throw new Error('Not connected to runtime agent');
-        
-        return new Promise((resolve, reject) => {
-            const requestId = Math.random().toString(36).substring(7);
-            pendingRequests.current.set(requestId, { resolve, reject });
-            
-            ws.send(JSON.stringify({
-                type: 'plugin_rpc',
-                requestId,
-                payload: { plugin: pluginSlug, action, data }
-            }));
-            
-            setTimeout(() => {
-                const resolver = pendingRequests.current.get(requestId);
-                if (resolver) {
-                    resolver.reject(new Error('RPC request timed out'));
-                    pendingRequests.current.delete(requestId);
-                }
-            }, 30000);
-        });
-    };
-
-    const emitEvent = (event: string, data: any) => {
-        if (ws && ws.readyState === WebSocket.OPEN) {
-            ws.send(JSON.stringify({
-                type: 'plugin_event',
-                payload: { plugin: pluginSlug, event, data }
-            }));
-        }
-    }
-
-    return { connected, callRPC, emitEvent };
-}
+import { useRuntimeWS } from '@/hooks/useRuntimeWS';
+import { RuntimePluginModals } from '@/Components/Tools/RuntimePluginModals';
 
 export default function TelegramDownloaderRunner({ tool, subscription, runtimePort, pluginSlug }: any) {
     const [activeTab, setActiveTab] = useState<'auth' | 'channels'>('auth');
@@ -146,7 +78,7 @@ export default function TelegramDownloaderRunner({ tool, subscription, runtimePo
         }
     };
 
-    const { connected: agentConnected, callRPC, emitEvent } = useRuntimeWS('telegram-downloader', onBroadcast);
+    const { connected: agentConnected, callRPC, emitEvent, installingPlugin, loginRequired, setLoginRequired } = useRuntimeWS('telegram-downloader', onBroadcast);
 
     useEffect(() => {
         if (agentConnected) {
@@ -212,6 +144,12 @@ export default function TelegramDownloaderRunner({ tool, subscription, runtimePo
 
     return (
         <div className="min-h-screen bg-[#F8FAFC] text-slate-900 font-sans flex flex-col antialiased">
+            <RuntimePluginModals 
+                installingPlugin={installingPlugin} 
+                loginRequired={loginRequired} 
+                setLoginRequired={setLoginRequired} 
+            />
+
             <header className="h-16 border-b border-slate-200 bg-white/80 backdrop-blur-md flex items-center justify-between px-8 sticky top-0 z-30">
                 <div className="flex items-center gap-6">
                     <div className="flex items-center gap-2.5">

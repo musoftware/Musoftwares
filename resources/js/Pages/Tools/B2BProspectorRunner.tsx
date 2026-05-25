@@ -8,68 +8,8 @@ import { Badge } from '@/Components/ui/badge';
 import { Switch } from '@/Components/ui/switch';
 import { Textarea } from '@/Components/ui/textarea';
 
-// Unified WebSocket client connecting to the Musoftware Runtime
-function useRuntimeWS(pluginSlug: string, onBroadcast?: ((event: string, data: any) => void) | null) {
-    const [ws, setWs] = useState<WebSocket | null>(null);
-    const [connected, setConnected] = useState(false);
-    const pendingRequests = useRef<Map<string, { resolve: Function, reject: Function }>>(new Map());
-    const onBroadcastRef = useRef<((event: string, data: any) => void) | null>(null);
-
-    onBroadcastRef.current = onBroadcast || null;
-
-    useEffect(() => {
-        const host = typeof window !== 'undefined' ? (window.localStorage.getItem('musoftware_runtime_host') || '127.0.0.1') : '127.0.0.1';
-        const socket = new WebSocket(`ws://${host}:18401/ws`);
-        
-        socket.onopen = () => setConnected(true);
-        socket.onclose = () => setConnected(false);
-        
-        socket.onmessage = (event) => {
-            try {
-                const msg = JSON.parse(event.data);
-                if (msg.type === 'plugin_rpc_res' || msg.type === 'plugin_rpc_error') {
-                    const resolver = pendingRequests.current.get(msg.requestId);
-                    if (resolver) {
-                        if (msg.type === 'plugin_rpc_error') resolver.reject(new Error(msg.payload.error));
-                        else resolver.resolve(msg.payload);
-                        pendingRequests.current.delete(msg.requestId);
-                    }
-                }
-                if (msg.event && onBroadcastRef.current) {
-                    onBroadcastRef.current(msg.event, msg.data);
-                }
-            } catch (err) {}
-        };
-        
-        setWs(socket);
-        return () => socket.close();
-    }, []);
-
-    const callRPC = async (action: string, data: any = {}) => {
-        if (!ws || ws.readyState !== WebSocket.OPEN) throw new Error('Not connected to runtime agent');
-        
-        return new Promise((resolve, reject) => {
-            const requestId = Math.random().toString(36).substring(7);
-            pendingRequests.current.set(requestId, { resolve, reject });
-            
-            ws.send(JSON.stringify({
-                type: 'plugin_rpc',
-                requestId,
-                payload: { plugin: pluginSlug, action, data }
-            }));
-            
-            setTimeout(() => {
-                const resolver = pendingRequests.current.get(requestId);
-                if (resolver) {
-                    resolver.reject(new Error('RPC request timed out'));
-                    pendingRequests.current.delete(requestId);
-                }
-            }, 30000);
-        });
-    };
-
-    return { connected, callRPC };
-}
+import { useRuntimeWS } from '@/hooks/useRuntimeWS';
+import { RuntimePluginModals } from '@/Components/Tools/RuntimePluginModals';
 
 export default function B2BProspectorRunner({ tool, subscription, runtimePort, pluginSlug }: any) {
     const [activeTab, setActiveTab] = useState<'campaigns' | 'leads' | 'inboxes' | 'outreach' | 'linked-profiles'>('campaigns');
@@ -209,7 +149,7 @@ export default function B2BProspectorRunner({ tool, subscription, runtimePort, p
         setRealtimeLogs(prev => [{ id: Math.random().toString(), message, time: new Date().toLocaleTimeString() }, ...prev].slice(0, 50));
     };
 
-    const { connected: agentConnected, callRPC } = useRuntimeWS('b2b-prospector', onBroadcast);
+    const { connected: agentConnected, callRPC, installingPlugin, loginRequired, setLoginRequired } = useRuntimeWS('b2b-prospector', onBroadcast);
 
     // Initial Fetching
     useEffect(() => {
@@ -529,6 +469,12 @@ export default function B2BProspectorRunner({ tool, subscription, runtimePort, p
 
     return (
         <div className="min-h-screen bg-[#F8FAFC] text-slate-900 font-sans flex flex-col antialiased selection:bg-teal-500 selection:text-white">
+            <RuntimePluginModals 
+                installingPlugin={installingPlugin} 
+                loginRequired={loginRequired} 
+                setLoginRequired={setLoginRequired} 
+            />
+
             {/* Topbar Navigation Bar - Clean, Glassmorphism aesthetic */}
             <header className="h-16 border-b border-slate-200 bg-white/80 backdrop-blur-md flex items-center justify-between px-8 sticky top-0 z-30">
                 <div className="flex items-center gap-6">
