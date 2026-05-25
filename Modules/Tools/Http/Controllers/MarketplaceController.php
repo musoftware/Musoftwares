@@ -111,10 +111,10 @@ class MarketplaceController extends Controller
                 ->first();
         }
 
-        $mockedSubscription = null;
+        $formattedSubscription = null;
         if ($userSubscription) {
             $plan = collect($tool['plans'] ?? [])->firstWhere('guid', $userSubscription->plan_guid);
-            $mockedSubscription = [
+            $formattedSubscription = [
                 'id'           => $userSubscription->id,
                 'plan_name'    => $plan['name'] ?? 'N/A',
                 'billing_cycle' => $userSubscription->billing_cycle,
@@ -125,7 +125,7 @@ class MarketplaceController extends Controller
 
         return Inertia::render('Tools/Show', [
             'tool'             => $this->serializeToolFull($tool),
-            'userSubscription' => $mockedSubscription,
+            'userSubscription' => $formattedSubscription,
         ]);
     }
 

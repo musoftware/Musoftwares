@@ -5,11 +5,17 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\KycDocument;
+use App\Services\KycService;
+use App\Http\Requests\Admin\Kyc\RejectKycRequest;
+use App\Http\Resources\KycUserResource;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class KycController extends Controller
 {
+    public function __construct(
+        protected KycService $kycService
+    ) {}
     public function index()
     {
         // Get users with pending KYC documents or pending review note
@@ -24,23 +30,7 @@ class KycController extends Controller
                 $q->latest();
             }])
             ->paginate(15)
-            ->through(function($user) {
-                return [
-                    'id' => $user->id,
-                    'name' => $user->name,
-                    'email' => $user->email,
-                    'kyc_status' => $user->kyc_verified ? 'verified' : ($user->kyc_notes ? 'pending_review' : 'unverified'),
-                    'submitted_at' => clone $user->updated_at,
-                    'documents' => $user->kycDocuments->map(function($doc) {
-                        return [
-                            'id' => $doc->id,
-                            'type' => $doc->document_type,
-                            'status' => $doc->status,
-                            'filename' => $doc->original_filename,
-                        ];
-                    }),
-                ];
-            });
+            ->through(fn($u) => clone (new KycUserResource($u))->resolve());
 
         return Inertia::render('Admin/Kyc/Index', [
             'users' => $users,
@@ -51,38 +41,16 @@ class KycController extends Controller
     {
         $user = User::findOrFail($id);
         
-        $user->update([
-            'kyc_verified' => true,
-            'kyc_verified_at' => now(),
-            'kyc_verified_by' => $request->user()->id,
-            'kyc_notes' => 'KYC approved by Admin on ' . now()->format('Y-m-d H:i:s'),
-        ]);
-
-        // Mark all pending docs as approved
-        $user->kycDocuments()->where('status', 'pending')->update(['status' => 'approved']);
+        $this->kycService->approveKyc($user, $request->user()->id);
 
         return back()->with('success', "User {$user->name} has been KYC verified successfully.");
     }
 
-    public function reject(Request $request, $id)
+    public function reject(RejectKycRequest $request, $id)
     {
-        $request->validate([
-            'reason' => 'required|string|max:500',
-        ]);
-
         $user = User::findOrFail($id);
         
-        $user->update([
-            'kyc_verified' => false,
-            'kyc_verified_at' => null,
-            'kyc_notes' => 'KYC rejected: ' . $request->reason,
-        ]);
-
-        // Mark all pending docs as rejected
-        $user->kycDocuments()->where('status', 'pending')->update([
-            'status' => 'rejected',
-            'rejection_reason' => $request->reason
-        ]);
+        $this->kycService->rejectKyc($user, $request->validated('reason'));
 
         return back()->with('success', "User {$user->name} KYC has been rejected.");
     }

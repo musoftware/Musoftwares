@@ -53,6 +53,7 @@ class HandleInertiaRequests extends Middleware
                             'booking' => $service->hasActiveSubscription($user, 'booking'),
                             'intelligence' => $service->hasActiveSubscription($user, 'intelligence'),
                             'tools' => $service->hasActiveSubscription($user, 'tools'),
+                            'crm' => $service->hasActiveSubscription($user, 'crm'),
                             'marketplace' => true,
                         ];
                     } catch (\Throwable $e) {
@@ -62,10 +63,23 @@ class HandleInertiaRequests extends Middleware
                             'booking' => true,
                             'intelligence' => true,
                             'tools' => true,
+                            'crm' => true,
                             'marketplace' => true
                         ];
                     }
-                }
+                },
+                'crm_features' => function () {
+                    if (class_exists(\Modules\CRM\app\Core\FeatureManager::class)) {
+                        return app(\Modules\CRM\app\Core\FeatureManager::class)->getAll();
+                    }
+                    return [];
+                },
+                'crm_limits' => function () {
+                    if (class_exists(\Modules\CRM\app\Core\LimitManager::class)) {
+                        return app(\Modules\CRM\app\Core\LimitManager::class)->getAllLimits();
+                    }
+                    return [];
+                },
             ],
             'notifications' => function () use ($user) {
                 if ($user) {

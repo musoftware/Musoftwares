@@ -6,6 +6,12 @@ use App\Http\Controllers\Controller;
 use App\Models\SerialDevice;
 use App\Models\SerialUserDevice;
 use App\Models\User;
+use App\Services\SerialUserDeviceService;
+use App\Http\Requests\Admin\SerialUserDevice\StoreSerialUserDeviceRequest;
+use App\Http\Requests\Admin\SerialUserDevice\UpdateSerialUserDeviceStatusRequest;
+use App\Http\Requests\Admin\SerialUserDevice\UpdateUserSerialStatusRequest;
+use App\Http\Requests\Admin\SerialUserDevice\UpdateUserTempValidRequest;
+use App\Http\Resources\SerialUserDeviceResource;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -22,6 +28,10 @@ use Inertia\Response;
  */
 class SerialUserDeviceController extends Controller
 {
+    public function __construct(
+        protected SerialUserDeviceService $serialUserDeviceService
+    ) {}
+
     /**
      * All assignments with search/filter/sort.
      */
@@ -67,7 +77,7 @@ class SerialUserDeviceController extends Controller
             };
         });
 
-        $userDevices = $query->paginate($filters['per_page'])->withQueryString();
+        $userDevices = $query->paginate($filters['per_page'])->withQueryString()->through(fn($d) => (new SerialUserDeviceResource($d))->resolve());
 
         $stats = [
             'total'    => SerialUserDevice::count(),
@@ -109,16 +119,9 @@ class SerialUserDeviceController extends Controller
     /**
      * Assign a device to a user.
      */
-    public function store(Request $request): RedirectResponse
+    public function store(StoreSerialUserDeviceRequest $request): RedirectResponse
     {
-        $data = $request->validate([
-            'user_id'   => ['required', 'exists:users,id'],
-            'device_id' => ['required', 'string', 'unique:serial_user_devices,device_id'],
-            'status'    => ['required', 'string', Rule::in(SerialUserDevice::statuses())],
-            'notes'     => ['nullable', 'string', 'max:1000'],
-        ]);
-
-        SerialUserDevice::create($data);
+        $this->serialUserDeviceService->assignDevice($request->validated());
 
         return redirect()
             ->route('admin.serial-user-devices.index')
@@ -129,13 +132,9 @@ class SerialUserDeviceController extends Controller
      * Update status of a single assignment.
      * Observer triggers sync to SerialDevice.
      */
-    public function updateStatus(Request $request, SerialUserDevice $serialUserDevice): RedirectResponse
+    public function updateStatus(UpdateSerialUserDeviceStatusRequest $request, SerialUserDevice $serialUserDevice): RedirectResponse
     {
-        $data = $request->validate([
-            'status' => ['required', 'string', Rule::in(SerialUserDevice::statuses())],
-        ]);
-
-        $serialUserDevice->update(['status' => $data['status']]);
+        $this->serialUserDeviceService->updateStatus($serialUserDevice, $request->validated('status'));
 
         return back()->with('success', 'Assignment status updated.');
     }
@@ -145,7 +144,7 @@ class SerialUserDeviceController extends Controller
      */
     public function destroy(SerialUserDevice $serialUserDevice): RedirectResponse
     {
-        $serialUserDevice->delete();
+        $this->serialUserDeviceService->unassignDevice($serialUserDevice);
 
         return back()->with('success', 'Assignment removed.');
     }
@@ -188,16 +187,9 @@ class SerialUserDeviceController extends Controller
      * Uses get()->each() to trigger Observer per record (not bulk ->update()).
      * Copied from old project: SerialUserDeviceController::updateUserStatus()
      */
-    public function updateUserStatus(Request $request, User $user): RedirectResponse
+    public function updateUserStatus(UpdateUserSerialStatusRequest $request, User $user): RedirectResponse
     {
-        $validated = $request->validate([
-            'status' => ['required', 'string', Rule::in(SerialUserDevice::statuses())],
-        ]);
-
-        // Iterate individually so the Observer fires for each device
-        $user->serialUserDevices()->get()->each(
-            fn($device) => $device->update(['status' => $validated['status']])
-        );
+        $this->serialUserDeviceService->updateUserStatus($user, $request->validated('status'));
 
         return back()->with('success', "All devices for {$user->name} set to {$validated['status']}.");
     }
@@ -207,13 +199,9 @@ class SerialUserDeviceController extends Controller
      * Allows temporary license override without touching device status.
      * Copied from old project: SerialUserDeviceController::updateUserTempValid()
      */
-    public function updateUserTempValid(Request $request, User $user): RedirectResponse
+    public function updateUserTempValid(UpdateUserTempValidRequest $request, User $user): RedirectResponse
     {
-        $validated = $request->validate([
-            'temp_valid_until' => ['nullable', 'date'],
-        ]);
-
-        $user->update(['temp_valid_until' => $validated['temp_valid_until']]);
+        $this->serialUserDeviceService->updateUserTempValid($user, $request->validated('temp_valid_until'));
 
         return back()->with('success', "Temporary validity updated for {$user->name}.");
     }

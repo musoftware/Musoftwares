@@ -40,7 +40,6 @@ export default function OnboardingWizard({ user, countries }: Props) {
         mobile_2: user.mobile_2 || '',
         telegram_username: user.telegram_username || '',
         whatsapp_number: user.whatsapp_number || '',
-        preferred_currency: user.preferred_currency || 'USD',
     });
 
     const [countrySearch, setCountrySearch] = useState('');
@@ -56,8 +55,6 @@ export default function OnboardingWizard({ user, countries }: Props) {
     const [isLoadingCities, setIsLoadingCities] = useState(false);
     const [citySearch, setCitySearch] = useState('');
     const [isCityOpen, setIsCityOpen] = useState(false);
-
-    const isCurrencyLocked = !!user.preferred_currency_locked_at;
 
     useEffect(() => {
         if (!formData.country) return;

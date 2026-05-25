@@ -12,19 +12,28 @@ import {
 } from '@/Components/ui/dialog';
 import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
+import ProjectActionsSheet from './ProjectActionsSheet';
 
 export default function Index({ projects, clients, currentTab }) {
     const [isCreateOpen, setIsCreateOpen] = useState(false);
     const [isEditOpen, setIsEditOpen] = useState(false);
     const [editingProject, setEditingProject] = useState(null);
-    const [formData, setFormData] = useState({ name: '', budget: '', client_id: '' });
+    const [formData, setFormData] = useState({ project_name: '', project_balance: '', user_id: '' });
+
+    const [isSheetOpen, setIsSheetOpen] = useState(false);
+    const [selectedProject, setSelectedProject] = useState(null);
+
+    const openProjectSheet = (project) => {
+        setSelectedProject(project);
+        setIsSheetOpen(true);
+    };
 
     const handleCreateSubmit = (e) => {
         e.preventDefault();
         router.post(route('admin.projects.store'), formData, {
             onSuccess: () => {
                 setIsCreateOpen(false);
-                setFormData({ name: '', budget: '', client_id: '' });
+                setFormData({ project_name: '', project_balance: '', user_id: '' });
             },
         });
     };
@@ -35,7 +44,7 @@ export default function Index({ projects, clients, currentTab }) {
             onSuccess: () => {
                 setIsEditOpen(false);
                 setEditingProject(null);
-                setFormData({ name: '', budget: '', client_id: '' });
+                setFormData({ project_name: '', project_balance: '', user_id: '' });
             },
         });
     };
@@ -43,9 +52,9 @@ export default function Index({ projects, clients, currentTab }) {
     const openEditModal = (project) => {
         setEditingProject(project);
         setFormData({
-            name: project.name,
-            budget: project.budget || '',
-            client_id: project.client_id,
+            project_name: project.project_name,
+            project_balance: project.project_balance || '',
+            user_id: project.user_id,
         });
         setIsEditOpen(true);
     };
@@ -97,10 +106,10 @@ export default function Index({ projects, clients, currentTab }) {
                             <div>
                                 <Label htmlFor="client_id">Client</Label>
                                 <select
-                                    id="client_id"
+                                    id="user_id"
                                     className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-                                    value={formData.client_id}
-                                    onChange={(e) => setFormData({ ...formData, client_id: e.target.value })}
+                                    value={formData.user_id}
+                                    onChange={(e) => setFormData({ ...formData, user_id: e.target.value })}
                                     required
                                 >
                                     <option value="">Select a client...</option>
@@ -112,22 +121,22 @@ export default function Index({ projects, clients, currentTab }) {
                                 </select>
                             </div>
                             <div>
-                                <Label htmlFor="name">Project Name</Label>
+                                <Label htmlFor="project_name">Project Name</Label>
                                 <Input
-                                    id="name"
-                                    value={formData.name}
-                                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                                    id="project_name"
+                                    value={formData.project_name}
+                                    onChange={(e) => setFormData({ ...formData, project_name: e.target.value })}
                                     required
                                 />
                             </div>
                             <div>
-                                <Label htmlFor="budget">Budget (Optional)</Label>
+                                <Label htmlFor="project_balance">Budget (Optional)</Label>
                                 <Input
-                                    id="budget"
+                                    id="project_balance"
                                     type="number"
                                     step="0.01"
-                                    value={formData.budget}
-                                    onChange={(e) => setFormData({ ...formData, budget: e.target.value })}
+                                    value={formData.project_balance}
+                                    onChange={(e) => setFormData({ ...formData, project_balance: e.target.value })}
                                 />
                             </div>
                             <DialogFooter>
@@ -155,21 +164,28 @@ export default function Index({ projects, clients, currentTab }) {
                     <tbody>
                         {projects.map((project) => (
                             <tr key={project.id} className="border-b hover:bg-gray-50">
-                                <td className="p-4 font-medium text-gray-900">{project.name}</td>
-                                <td className="p-4">
-                                    {project.platform_client?.name || project.tenant_client?.name || 'Unknown'}
+                                <td className="p-4 font-medium text-gray-900">
+                                    <button 
+                                        onClick={() => openProjectSheet(project)}
+                                        className="hover:text-blue-600 hover:underline text-left font-semibold cursor-pointer outline-none focus:ring-2 focus:ring-blue-500 rounded"
+                                    >
+                                        {project.project_name}
+                                    </button>
                                 </td>
-                                <td className="p-4">{project.budget ? `$${parseFloat(project.budget).toFixed(2)}` : '-'}</td>
                                 <td className="p-4">
-                                    <span className={`inline-flex rounded-full px-2 text-xs font-semibold leading-5 ${project.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
-                                        {project.status}
+                                    {project.client?.name || 'Unknown'}
+                                </td>
+                                <td className="p-4">{project.project_balance ? `$${parseFloat(project.project_balance).toFixed(2)}` : '-'}</td>
+                                <td className="p-4">
+                                    <span className={`inline-flex rounded-full px-2 text-xs font-semibold leading-5 ${project.archived === 0 ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
+                                        {project.archived === 0 ? project.status : 'Archived'}
                                     </span>
                                 </td>
                                 <td className="p-4 space-x-2 text-right">
                                     <Button variant="outline" size="sm" onClick={() => openEditModal(project)}>
                                         Edit
                                     </Button>
-                                    {project.status === 'active' ? (
+                                    {project.archived === 0 ? (
                                         <Button variant="outline" size="sm" onClick={() => handleArchive(project.id)}>
                                             Archive
                                         </Button>
@@ -206,8 +222,8 @@ export default function Index({ projects, clients, currentTab }) {
                             <Label htmlFor="edit_name">Project Name</Label>
                             <Input
                                 id="edit_name"
-                                value={formData.name}
-                                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                                value={formData.project_name}
+                                onChange={(e) => setFormData({ ...formData, project_name: e.target.value })}
                                 required
                             />
                         </div>
@@ -217,8 +233,8 @@ export default function Index({ projects, clients, currentTab }) {
                                 id="edit_budget"
                                 type="number"
                                 step="0.01"
-                                value={formData.budget}
-                                onChange={(e) => setFormData({ ...formData, budget: e.target.value })}
+                                value={formData.project_balance}
+                                onChange={(e) => setFormData({ ...formData, project_balance: e.target.value })}
                             />
                         </div>
                         <DialogFooter>
@@ -230,6 +246,12 @@ export default function Index({ projects, clients, currentTab }) {
                     </form>
                 </DialogContent>
             </Dialog>
+
+            <ProjectActionsSheet 
+                project={selectedProject} 
+                isOpen={isSheetOpen} 
+                onClose={() => setIsSheetOpen(false)} 
+            />
         </AdminSidebarLayout>
     );
 }

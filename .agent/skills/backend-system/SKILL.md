@@ -45,15 +45,19 @@ When porting code from older projects (e.g., legacy `Helpers` into modern `Servi
 - **Do Not Blindly Copy**: Methods that use `$this->model->relation()` will throw `BadMethodCallException` if you forget to port the relationship declaration to the Model.
 - **Modernize Constraints**: Update legacy generic queries to strictly typed relationships (`HasMany`, `BelongsTo`, etc.).
 
-## 7. Strict Code Quality & Architecture Standards
-To prevent "garbage code" and maintain a unified, premium backend architecture:
-- **No Inline Validation**: Never use `$request->validate([...])` inside a Controller. Always create dedicated `FormRequest` classes (e.g., `app/Http/Requests`) to encapsulate authorization and validation rules.
-- **Service Layer Isolation**: Controllers must NEVER contain business logic (e.g., calculating tiers, converting currencies, executing DB transactions). All such logic MUST be handled by dedicated `Service` classes injected into the Controller.
-- **Unified Models (No `class_exists` Garbage)**: Never use conditional `class_exists()` checks to toggle between module-specific models and main models (e.g., `App\Models\PointTransaction` vs `Modules\Freelance\...`). Always unify and use the core models directly from `App\Models`. If a model needs to be shared, it belongs in the core namespace.
+## 7. Strict Code Quality & Architecture Standards (Especially for Admin Panel)
+To prevent "garbage code" and maintain a unified, premium backend architecture, every controller action MUST follow the strict tripartite pattern: Requests, Services, and Resources.
+
+- **1. Form Requests (Validation)**: Never use inline `$request->validate([...])` inside a Controller. ALWAYS create dedicated `FormRequest` classes in `app/Http/Requests` to encapsulate all authorization and validation rules.
+- **2. Service Layer (Business Logic)**: Controllers must NEVER contain business logic (e.g., calculating tiers, converting currencies, executing DB transactions). All complex logic, database mutations, and external integrations MUST be handled by dedicated `Service` classes (in `app/Services`).
+- **3. API Resources (Data Transformation)**: NEVER return raw Eloquent models to the frontend or manually map arrays in the controller (e.g., using `private function map(...)`). You MUST ALWAYS use Laravel API Resources (`app/Http/Resources`) to format data. 
+    - **Inertia.js Note**: When paginating with Inertia, use the exact unwrap pattern to maintain pagination structures: `->through(fn($item) => (new MyResource($item))->resolve())`.
+- **Unified Models**: Never use conditional `class_exists()` checks to toggle between module-specific models and main models. Always unify and use the core models directly from `App\Models`.
 
 ## Summary Checklist
-- [ ] Is the business logic extracted from the Controller into a Service or Action?
 - [ ] Is request validation handled by a dedicated `FormRequest` class?
+- [ ] Is the business logic extracted from the Controller into a `Service` or Action?
+- [ ] Is the output data formatted securely using an `API Resource` instead of raw arrays?
 - [ ] Are core models unified without conditional `class_exists()` namespace hopping?
 - [ ] Are long-running tasks dispatched to the Queue?
 - [ ] Are runtime interactions managed via asynchronous events and WebSocket broadcasts?

@@ -16,6 +16,7 @@ Route files (such as `routes/api.php`, `routes/web.php`, `routes/console.php`) a
 3. **No File System Operations:** Checking for files, reading files, or downloading files must be handled by a Controller.
 4. **Use Controllers:** All routes must point to a specific Controller method using the tuple syntax: `[ControllerName::class, 'methodName']`.
 5. **No Inline Authorization:** Do not write custom authorization logic or token validation inside the route file. Use standard Middleware or Form Requests inside the Controller.
+6. **Use Module Routes:** Never place module-specific routes in the main `routes/web.php` or `routes/api.php` files. Every module must define its own routes in `Modules/<ModuleName>/routes/web.php` (or `api.php`), and the system will automatically load them via the module's Service Provider.
 
 ## Anti-Pattern (What to Avoid)
 

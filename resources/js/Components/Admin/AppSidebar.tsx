@@ -26,7 +26,7 @@ const items = [
     url: "/admin/users-content", 
     icon: Users,
     subItems: [
-        { title: "Users", url: "/admin/clients" },
+        { title: "Users", url: "/admin/users" },
 
         { title: "Projects", url: "/admin/projects" },
         { title: "Plans", url: "/admin/plans" },
@@ -42,15 +42,24 @@ const items = [
         { title: "Unpaid Invoices", url: "/admin/invoices/unpaid" },
         { title: "Archived Invoices", url: "/admin/invoices/archive" },
         { title: "All Invoices", url: "/admin/invoices" },
-        { title: "Leads", url: "/admin/leads" },
+
         { title: "Contracts Manager", url: "/admin/contracts" },
         { title: "Create Quotation", url: "/admin/contracts/create" },
         { title: "Price Calculator", url: "/admin/calculator" },
-        { title: "Sequences", url: "/admin/sequences" },
-        { title: "Campaigns", url: "/admin/campaigns" },
         { title: "Financial Operations", url: "/admin/finance" },
         { title: "Hours Calendar", url: "/admin/hours-calendar" },
         { title: "Reports", url: "/admin/reports" },
+    ]
+  },
+  { 
+    title: "CRM System", 
+    url: "/crm/dashboard", 
+    icon: Users,
+    subItems: [
+        { title: "CRM Dashboard", url: "/crm/dashboard" },
+        { title: "Leads", url: "/crm/leads" },
+        { title: "Sequences", url: "/crm/sequences" },
+        { title: "Campaigns", url: "/crm/campaigns" },
     ]
   },
   { 
@@ -138,13 +147,14 @@ export function AppSidebar() {
               {items.map((item) => {
                 const isActive = url === item.url || url.startsWith(item.url + '/');
                 const hasSubItems = item.subItems && item.subItems.length > 0;
+                const isGroupActive = isActive || (hasSubItems && item.subItems.some(subItem => url === subItem.url || url.startsWith(subItem.url + '/')));
 
                 if (hasSubItems) {
                     return (
                         <Collapsible
                             key={item.title}
                             asChild
-                            defaultOpen={isActive}
+                            defaultOpen={isGroupActive}
                             className="group/collapsible"
                         >
                             <SidebarMenuItem>

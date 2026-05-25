@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Head, Link, router, useForm } from '@inertiajs/react';
-import AdminLayout from "@/Layouts/AdminLayout";
+import AdminSidebarLayout from "@/Layouts/AdminSidebarLayout";
 import { ShieldCheck, Check, X, Eye, FileText, Search, User } from 'lucide-react';
 import { Button } from '@/Components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/Components/ui/card';
@@ -46,8 +46,7 @@ export default function AdminKycIndex({ auth, users }) {
     };
 
     return (
-        <AdminLayout user={auth?.user}>
-            <Head title="KYC Applications" />
+        <AdminSidebarLayout user={auth?.user} title="KYC Applications" header="KYC Applications">
             <div className="space-y-6 pb-20 p-6">
                 <div className="flex justify-between items-center mb-6">
                     <div>
@@ -207,6 +206,6 @@ export default function AdminKycIndex({ auth, users }) {
                     </DialogContent>
                 </Dialog>
             </div>
-        </AdminLayout>
+        </AdminSidebarLayout>
     );
 }

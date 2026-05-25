@@ -2,6 +2,8 @@ import React from 'react';
 import { Head, Link, router } from '@inertiajs/react';
 import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
 import { Button } from '@/Components/ui/button';
+import { formatMoney as formatCurrency } from '@/lib/utils';
+import ClientActionsSheet from '@/Pages/Admin/Users/ClientActionsSheet';
 import { MoreHorizontal, FileText, CheckCircle, XCircle } from 'lucide-react';
 import {
     DropdownMenu,
@@ -13,6 +15,16 @@ import {
 } from '@/Components/ui/dropdown-menu';
 
 export default function Index({ invoices, currentTab }) {
+    const [selectedClient, setSelectedClient] = React.useState(null);
+    const paginationLinks = invoices.meta?.links || invoices.links;
+
+    const handleLoginAs = (id) => {
+        router.post(route('admin.users.login-as', id));
+    };
+
+    const handleResetPassword = (id) => {
+        router.post(route('admin.users.reset-password', id));
+    };
 
     const handleMarkPaid = (id) => {
         if (confirm('Are you sure you want to mark this invoice as paid manually? This will adjust balances directly.')) {
@@ -29,14 +41,25 @@ export default function Index({ invoices, currentTab }) {
     const getStatusBadge = (status) => {
         switch (status) {
             case 'paid':
-                return <span className="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800">Paid</span>;
+                return <span className="inline-flex items-center rounded-full bg-green-500 px-2.5 py-0.5 text-xs font-medium text-white">Paid</span>;
             case 'partially_paid':
-                return <span className="inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800">Partially Paid</span>;
+                return <span className="inline-flex items-center rounded-full bg-yellow-400 px-2.5 py-0.5 text-xs font-medium text-black">Partially Paid</span>;
             case 'cancelled':
-                return <span className="inline-flex items-center rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-medium text-red-800">Cancelled</span>;
+                return <span className="inline-flex items-center rounded-full bg-gray-500 px-2.5 py-0.5 text-xs font-medium text-white">Cancelled</span>;
             case 'unpaid':
             default:
-                return <span className="inline-flex items-center rounded-full bg-yellow-100 px-2.5 py-0.5 text-xs font-medium text-yellow-800">Unpaid</span>;
+                return <span className="inline-flex items-center rounded-full bg-red-500 px-2.5 py-0.5 text-xs font-medium text-white">Unpaid</span>;
+        }
+    };
+
+    const getJobStatusBadge = (status) => {
+        switch (status) {
+            case 'done':
+                return <span className="inline-flex items-center rounded bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800">Done</span>;
+            case 'processing':
+                return <span className="inline-flex items-center rounded bg-yellow-100 px-2 py-0.5 text-xs font-medium text-yellow-800">Processing</span>;
+            default:
+                return <span className="inline-flex items-center rounded bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-800">Pending</span>;
         }
     };
 
@@ -69,36 +92,60 @@ export default function Index({ invoices, currentTab }) {
                 <table className="w-full text-left text-sm">
                     <thead className="border-b bg-gray-50">
                         <tr>
-                            <th className="p-4 font-medium text-gray-600">Invoice #</th>
-                            <th className="p-4 font-medium text-gray-600">User</th>
-                            <th className="p-4 font-medium text-gray-600">Title</th>
-                            <th className="p-4 font-medium text-gray-600 text-right">Amount</th>
-                            <th className="p-4 font-medium text-gray-600 text-right">Paid Amount</th>
-                            <th className="p-4 font-medium text-gray-600 text-center">Status</th>
-                            <th className="p-4 font-medium text-gray-600 text-center">Due Date</th>
+                            <th className="p-4 font-medium text-gray-600">ID</th>
+                            <th className="p-4 font-medium text-gray-600">Customer</th>
+                            <th className="p-4 font-medium text-gray-600">Project</th>
+                            <th className="p-4 font-medium text-gray-600">Date</th>
+                            <th className="p-4 font-medium text-gray-600 text-right">Total</th>
+                            <th className="p-4 font-medium text-gray-600 text-center">Job Status</th>
+                            <th className="p-4 font-medium text-gray-600 text-center">Invoice Status</th>
                             <th className="p-4 font-medium text-gray-600 text-right">Actions</th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-200">
                         {invoices.data.map((invoice) => (
                             <tr key={invoice.id} className="hover:bg-gray-50">
-                                <td className="p-4 font-medium text-gray-900">{invoice.invoice_number}</td>
+                                <td className="p-4 font-medium text-blue-600">
+                                    <Link href={route('admin.invoices.show', invoice.id)} className="hover:underline">
+                                        {invoice.invoice_number}
+                                    </Link>
+                                </td>
                                 <td className="p-4">
-                                    <div className="font-medium text-gray-900">{invoice.user?.name || 'Unknown'}</div>
-                                    <div className="text-xs text-gray-500">{invoice.user?.email}</div>
+                                    {invoice.user ? (
+                                        <button
+                                            type="button"
+                                            onClick={() => setSelectedClient(invoice.user)}
+                                            className="text-left font-medium text-gray-900 hover:text-blue-600 hover:underline focus:outline-none flex items-center gap-1"
+                                        >
+                                            {invoice.user.name}
+                                            <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
+                                        </button>
+                                    ) : (
+                                        <div className="font-medium text-gray-900">Unknown</div>
+                                    )}
+                                    {invoice.user?.email && <div className="text-xs text-gray-500">{invoice.user.email}</div>}
                                 </td>
-                                <td className="p-4 text-gray-700">{invoice.title}</td>
+                                <td className="p-4 font-medium text-gray-700">
+                                    {invoice.project ? invoice.project.project_name : '-'}
+                                </td>
+                                <td className="p-4 text-gray-500 text-sm">
+                                    {new Date(invoice.created_at).toLocaleDateString()}
+                                </td>
                                 <td className="p-4 text-right font-medium text-gray-900">
-                                    {invoice.amount ? `${parseFloat(invoice.amount).toFixed(2)} ${invoice.currency}` : '-'}
+                                    <div className="flex flex-col items-end gap-1">
+                                        <span>{formatCurrency(invoice.amount, invoice.currency)}</span>
+                                        {invoice.status === 'partially_paid' && (
+                                            <span className="text-xs text-blue-600 bg-blue-50 px-2 py-0.5 rounded border border-blue-200">
+                                                Paid {formatCurrency(invoice.paid_amount, invoice.currency)}
+                                            </span>
+                                        )}
+                                    </div>
                                 </td>
-                                <td className="p-4 text-right text-gray-600">
-                                    {invoice.paid_amount ? `${parseFloat(invoice.paid_amount).toFixed(2)} ${invoice.currency}` : '0.00 ' + invoice.currency}
+                                <td className="p-4 text-center">
+                                    {getJobStatusBadge(invoice.job_status)}
                                 </td>
                                 <td className="p-4 text-center">
                                     {getStatusBadge(invoice.status)}
-                                </td>
-                                <td className="p-4 text-center text-gray-500">
-                                    {invoice.due_date ? new Date(invoice.due_date).toLocaleDateString() : '-'}
                                 </td>
                                 <td className="p-4 text-right">
                                     <DropdownMenu>
@@ -110,9 +157,11 @@ export default function Index({ invoices, currentTab }) {
                                         </DropdownMenuTrigger>
                                         <DropdownMenuContent align="end">
                                             <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                            <DropdownMenuItem onClick={() => alert('View Details coming soon.')}>
-                                                <FileText className="mr-2 h-4 w-4" />
-                                                View Details
+                                            <DropdownMenuItem asChild>
+                                                <Link href={route('admin.invoices.show', invoice.id)} className="flex w-full items-center">
+                                                    <FileText className="mr-2 h-4 w-4" />
+                                                    View Details
+                                                </Link>
                                             </DropdownMenuItem>
                                             <DropdownMenuSeparator />
                                             {invoice.status !== 'paid' && invoice.status !== 'cancelled' && (
@@ -144,20 +193,28 @@ export default function Index({ invoices, currentTab }) {
             </div>
 
             {/* Pagination Controls */}
-            {invoices.links && invoices.links.length > 3 && (
+            {Array.isArray(paginationLinks) && paginationLinks.length > 3 && (
                 <div className="mt-4 flex justify-center">
                     <div className="inline-flex -space-x-px rounded-md shadow-sm">
-                        {invoices.links.map((link, i) => (
+                        {paginationLinks.map((link, i) => (
                             <Link
                                 key={i}
                                 href={link.url || '#'}
-                                className={`px-4 py-2 text-sm font-medium border ${link.active ? 'z-10 bg-blue-50 border-blue-500 text-blue-600' : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'} ${i === 0 ? 'rounded-l-md' : ''} ${i === invoices.links.length - 1 ? 'rounded-r-md' : ''}`}
+                                className={`px-4 py-2 text-sm font-medium border ${link.active ? 'z-10 bg-blue-50 border-blue-500 text-blue-600' : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'} ${i === 0 ? 'rounded-l-md' : ''} ${i === paginationLinks.length - 1 ? 'rounded-r-md' : ''}`}
                                 dangerouslySetInnerHTML={{ __html: link.label }}
                             />
                         ))}
                     </div>
                 </div>
             )}
+
+            <ClientActionsSheet
+                client={selectedClient}
+                isOpen={!!selectedClient}
+                onClose={() => setSelectedClient(null)}
+                onLoginAs={handleLoginAs}
+                onResetPassword={handleResetPassword}
+            />
         </AdminSidebarLayout>
     );
 }

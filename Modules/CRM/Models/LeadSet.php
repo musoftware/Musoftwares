@@ -6,9 +6,28 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+use Illuminate\Database\Eloquent\Builder;
+
 class LeadSet extends Model
 {
     use HasFactory, SoftDeletes;
+
+    protected static function boot()
+    {
+        parent::boot();
+        
+        static::addGlobalScope('creator', function (Builder $builder) {
+            if (auth()->check()) {
+                $builder->where('created_by', auth()->id());
+            }
+        });
+
+        static::creating(function ($model) {
+            if (auth()->check() && empty($model->created_by)) {
+                $model->created_by = auth()->id();
+            }
+        });
+    }
 
     protected $fillable = [
         'name',
