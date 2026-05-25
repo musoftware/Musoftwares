@@ -16,6 +16,7 @@ class Booking extends Model
     protected $fillable = [
         'booking_event_type_id',
         'client_user_id',
+        'branch_id',
         'guest_name',
         'guest_email',
         'guest_phone',
@@ -52,6 +53,11 @@ class Booking extends Model
     public function clientUser()
     {
         return $this->belongsTo(\App\Models\User::class, 'client_user_id');
+    }
+
+    public function branch()
+    {
+        return $this->belongsTo(BookingBranch::class, 'branch_id');
     }
 
     // Optional: link to project if applicable

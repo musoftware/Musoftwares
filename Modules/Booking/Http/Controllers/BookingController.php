@@ -266,6 +266,7 @@ class BookingController extends Controller
             'guest_phone' => 'nullable|string|max:255',
             'starts_at' => 'required|date',
             'timezone' => 'required|string',
+            'branch_id' => 'nullable|exists:booking_branches,id',
             'notes' => 'nullable|string'
         ]);
 
@@ -273,6 +274,13 @@ class BookingController extends Controller
         
         $startsAt = Carbon::parse($request->starts_at);
         $endsAt = $startsAt->copy()->addMinutes($eventType->duration_minutes);
+
+        // Enforce capacity to prevent double booking race conditions
+        $remainingCapacity = app(\Modules\Booking\Services\GroupSessionCapacityService::class)->enforceCapacity(
+            $eventType, 
+            $startsAt, 
+            $request->booking_provider_id
+        );
 
         // Convert guest to client if they don't exist
         $clientUser = User::where('email', $request->guest_email)->first();
@@ -287,12 +295,17 @@ class BookingController extends Controller
             'starts_at' => $startsAt,
             'ends_at' => $endsAt,
             'timezone' => $request->timezone,
+            'branch_id' => $request->branch_id,
             'status' => $eventType->requires_payment ? 'pending' : 'confirmed',
             'payment_status' => $eventType->requires_payment ? 'pending' : 'free',
             'price' => $eventType->price,
             'currency' => $eventType->currency,
             'notes' => $request->notes,
         ]);
+
+        if ($eventType->is_group_session) {
+            event(new \Modules\Booking\Events\BookingCapacityUpdated($eventType, $startsAt->toIso8601String(), $remainingCapacity - 1));
+        }
 
         if ($eventType->requires_payment && $eventType->price > 0) {
             return redirect()->route('booking.checkout', $booking->id);

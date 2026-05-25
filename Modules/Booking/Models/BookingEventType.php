@@ -18,6 +18,8 @@ class BookingEventType extends Model
         'title',
         'slug',
         'description',
+        'is_group_session',
+        'capacity',
         'duration_minutes',
         'price',
         'currency',
@@ -32,6 +34,8 @@ class BookingEventType extends Model
         'price' => 'decimal:2',
         'requires_payment' => 'boolean',
         'is_active' => 'boolean',
+        'is_group_session' => 'boolean',
+        'capacity' => 'integer',
     ];
 
     public function user()
