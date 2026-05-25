@@ -13,6 +13,19 @@ export function useRuntimeWS(pluginSlug: string, onBroadcast?: ((event: string, 
     }, [onBroadcast]);
 
     useEffect(() => {
+        if (typeof window !== 'undefined') {
+            const originalAlert = window.alert;
+            window.alert = function (message) {
+                if (message && typeof message === 'string' && (message.includes('RUNTIME_NOT_CONFIGURED') || message.includes('runtime_not_configured'))) {
+                    console.warn('Blocked RUNTIME_NOT_CONFIGURED alert:', message);
+                    return;
+                }
+                return originalAlert.apply(this, arguments as any);
+            };
+        }
+    }, []);
+
+    useEffect(() => {
         const host = typeof window !== 'undefined' ? (window.localStorage.getItem('musoftware_runtime_host') || '127.0.0.1') : '127.0.0.1';
         const socket = new WebSocket(`ws://${host}:18401/ws`);
 
@@ -46,6 +59,15 @@ export function useRuntimeWS(pluginSlug: string, onBroadcast?: ((event: string, 
                 }
                 if (msg.event === 'plugin.installed' || msg.event === 'plugin.install_failed') {
                     setInstallingPlugin(false);
+                    if (msg.event === 'plugin.installed' && typeof window !== 'undefined') {
+                        window.location.reload();
+                    }
+                }
+                if (msg.event === 'auth.connected') {
+                    setLoginRequired(false);
+                    if (typeof window !== 'undefined') {
+                        window.location.reload();
+                    }
                 }
 
                 // General broadcast events

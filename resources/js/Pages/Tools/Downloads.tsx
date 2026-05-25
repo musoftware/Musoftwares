@@ -2,6 +2,8 @@ import React from 'react';
 import { Head, Link, router } from '@inertiajs/react';
 import ToolsPublicLayout from '@/Layouts/ToolsPublicLayout';
 import { Button } from '@/Components/ui/button';
+import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/Components/ui/card';
+import { Badge } from '@/Components/ui/badge';
 import { ExternalLink, Zap, Clock, ShoppingBag, CheckCircle2, Monitor, Download, Globe } from 'lucide-react';
 
 interface AvailableTool {
@@ -131,15 +133,19 @@ export default function Downloads({ availableTools, downloads }: Props) {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         
                         {/* Desktop Runtime */}
-                        <div className="flex flex-col p-5 rounded-xl border border-indigo-100 dark:border-indigo-900/50 bg-indigo-50/50 dark:bg-indigo-950/20">
-                            <div className="flex items-center gap-3 mb-2">
-                                <Monitor className="h-5 w-5 text-indigo-500" />
-                                <h3 className="text-sm font-semibold text-slate-900 dark:text-white">Desktop Runtime</h3>
-                            </div>
-                            <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mb-4 flex-1">
-                                The powerful background agent that executes tools directly on your computer. Required for heavy automation workflows.
-                            </p>
-                            <div className="flex items-center gap-2">
+                        <Card className="flex flex-col border-indigo-100 dark:border-indigo-900/50 bg-indigo-50/50 dark:bg-indigo-950/20 shadow-none">
+                            <CardHeader className="pb-2">
+                                <CardTitle className="flex items-center gap-3 text-sm">
+                                    <Monitor className="h-5 w-5 text-indigo-500" />
+                                    Desktop Runtime
+                                </CardTitle>
+                            </CardHeader>
+                            <CardContent className="flex-1">
+                                <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+                                    The powerful background agent that executes tools directly on your computer. Required for heavy automation workflows.
+                                </p>
+                            </CardContent>
+                            <CardFooter className="flex items-center gap-2 pt-0">
                                 <a href={route('tools.download.agent', 'node')}>
                                     <Button size="sm" variant="outline" className="text-xs h-8 bg-white dark:bg-slate-900">
                                         <Download className="h-3 w-3 mr-1.5" />
@@ -149,27 +155,34 @@ export default function Downloads({ availableTools, downloads }: Props) {
                                 <a href={`http://${host}:18400/setup`} target="_blank" className="text-xs text-indigo-600 hover:underline">
                                     Check Status →
                                 </a>
-                            </div>
-                        </div>
+                            </CardFooter>
+                        </Card>
 
                         {/* Browser Extension */}
-                        <div className="flex flex-col p-5 rounded-xl border border-emerald-100 dark:border-emerald-900/50 bg-emerald-50/50 dark:bg-emerald-950/20">
-                            <div className="flex items-center gap-3 mb-2">
-                                <Globe className="h-5 w-5 text-emerald-500" />
-                                <h3 className="text-sm font-semibold text-slate-900 dark:text-white">Browser Extension <span className="ml-2 text-[10px] uppercase tracking-wider bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded-sm font-bold">New</span></h3>
-                            </div>
-                            <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mb-4 flex-1">
-                                A lightweight execution layer that runs tools securely inside your browser. Used for social media and web-based tools.
-                            </p>
-                            <div>
+                        <Card className="flex flex-col border-emerald-100 dark:border-emerald-900/50 bg-emerald-50/50 dark:bg-emerald-950/20 shadow-none">
+                            <CardHeader className="pb-2">
+                                <CardTitle className="flex items-center gap-3 text-sm">
+                                    <Globe className="h-5 w-5 text-emerald-500" />
+                                    Browser Extension
+                                    <Badge className="ml-2 text-[10px] uppercase tracking-wider bg-emerald-100 text-emerald-700 hover:bg-emerald-200 dark:bg-emerald-900 dark:text-emerald-300 dark:hover:bg-emerald-800 shadow-none">
+                                        New
+                                    </Badge>
+                                </CardTitle>
+                            </CardHeader>
+                            <CardContent className="flex-1">
+                                <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+                                    A lightweight execution layer that runs tools securely inside your browser. Used for social media and web-based tools.
+                                </p>
+                            </CardContent>
+                            <CardFooter className="pt-0">
                                 <a href={route('tools.download.agent', 'extension')}>
                                     <Button size="sm" className="text-xs h-8 bg-emerald-600 hover:bg-emerald-500 text-white border-0">
                                         <Download className="h-3 w-3 mr-1.5" />
                                         Download Extension
                                     </Button>
                                 </a>
-                            </div>
-                        </div>
+                            </CardFooter>
+                        </Card>
 
                     </div>
                 </section>
