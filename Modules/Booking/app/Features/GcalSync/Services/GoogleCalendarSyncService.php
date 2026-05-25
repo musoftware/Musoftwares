@@ -5,6 +5,8 @@ namespace Modules\Booking\app\Features\GcalSync\Services;
 use Modules\Booking\app\Features\GcalSync\Models\GoogleCalendar;
 use Modules\Booking\Models\Booking;
 
+use Illuminate\Support\Facades\Http;
+
 class GoogleCalendarSyncService
 {
     protected $tokenManager;
@@ -17,12 +19,9 @@ class GoogleCalendarSyncService
     /**
      * Push a booking up to Google Calendar.
      */
-    public function pushBooking(Booking $booking, GoogleCalendar $calendar)
+    public function pushBooking(Booking $booking, GoogleCalendar $calendar): string
     {
         $accessToken = $this->tokenManager->getValidAccessToken($calendar->account);
-
-        // Uses a fake HTTP post for architectural demonstration.
-        // In real app, you'd use \Illuminate\Support\Facades\Http or Google API PHP Client.
 
         $eventData = [
             'summary' => 'Booking: ' . ($booking->service->name ?? 'Service'),
@@ -37,12 +36,14 @@ class GoogleCalendarSyncService
             ],
         ];
 
-        // Call Google API...
-        // $response = Http::withToken($accessToken)->post("https://www.googleapis.com/calendar/v3/calendars/{$calendar->calendar_id}/events", $eventData);
+        $response = Http::withToken($accessToken)
+            ->post("https://www.googleapis.com/calendar/v3/calendars/{$calendar->calendar_id}/events", $eventData);
 
-        // Assume response gives us the Google Event ID
-        $googleEventId = 'mock_google_id_' . $booking->id; 
+        if ($response->failed()) {
+            throw new \Exception('Google Calendar API Error: ' . $response->body());
+        }
 
-        return clone $booking; // Return successful booking
+        $data = $response->json();
+        return $data['id'] ?? ('fallback_id_' . $booking->id);
     }
 }

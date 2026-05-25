@@ -38,12 +38,12 @@ class PushBookingToGoogleJob implements ShouldQueue
 
         foreach ($calendars as $calendar) {
             try {
-                $syncService->pushBooking($this->booking, $calendar);
+                $googleEventId = $syncService->pushBooking($this->booking, $calendar);
                 
                 // Track in db
                 GoogleSyncEvent::updateOrCreate(
                     ['tenant_id' => $this->booking->tenant_id, 'booking_id' => $this->booking->id],
-                    ['calendar_id' => $calendar->id, 'google_event_id' => 'mock_google_id_' . $this->booking->id]
+                    ['calendar_id' => $calendar->id, 'google_event_id' => $googleEventId]
                 );
 
                 GoogleSyncLog::create([
