@@ -1,0 +1,65 @@
+import React from 'react';
+import { Card, CardHeader, CardTitle, CardContent } from '@/Components/ui/card';
+import { Button } from '@/Components/ui/button';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/Components/ui/table';
+import { Badge } from '@/Components/ui/badge';
+import { Plus } from 'lucide-react';
+
+interface Rule {
+    id: number;
+    name: string;
+    target_metric: string;
+    is_active: boolean;
+}
+
+export default function SmartRules({ rules }: { rules: Rule[] }) {
+    return (
+        <div className="p-6 max-w-7xl mx-auto space-y-6">
+            <div className="flex justify-between items-center">
+                <div>
+                    <h1 className="text-3xl font-bold tracking-tight">Smart Rules Engine</h1>
+                    <p className="text-muted-foreground mt-2">Configure rules for gap reduction and load balancing.</p>
+                </div>
+                <Button>
+                    <Plus className="mr-2 h-4 w-4" /> Add Rule
+                </Button>
+            </div>
+
+            <Card>
+                <CardHeader>
+                    <CardTitle>Active Optimization Rules</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <Table>
+                        <TableHeader>
+                            <TableRow>
+                                <TableHead>Rule Name</TableHead>
+                                <TableHead>Target Metric</TableHead>
+                                <TableHead>Status</TableHead>
+                                <TableHead className="text-right">Actions</TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            {rules.map((rule) => (
+                                <TableRow key={rule.id}>
+                                    <TableCell className="font-medium">{rule.name}</TableCell>
+                                    <TableCell>
+                                        <Badge variant="outline">{rule.target_metric}</Badge>
+                                    </TableCell>
+                                    <TableCell>
+                                        <Badge variant={rule.is_active ? 'default' : 'secondary'}>
+                                            {rule.is_active ? 'Active' : 'Inactive'}
+                                        </Badge>
+                                    </TableCell>
+                                    <TableCell className="text-right">
+                                        <Button variant="ghost" size="sm">Edit</Button>
+                                    </TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                </CardContent>
+            </Card>
+        </div>
+    );
+}
