@@ -5,14 +5,14 @@ namespace Modules\CRM\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\CleansLeadData;
-use App\Traits\BelongsToTenant;
+use Modules\CRM\app\Traits\BelongsToWorkspace;
 
 class Lead extends Model
 {
-    use HasFactory, \Illuminate\Database\Eloquent\SoftDeletes, CleansLeadData, BelongsToTenant;
+    use HasFactory, \Illuminate\Database\Eloquent\SoftDeletes, CleansLeadData, BelongsToWorkspace;
 
     protected $fillable = [
-        'user_id',
+        'workspace_id',
         'campaign_id',
         'source',
         'name',
@@ -24,7 +24,26 @@ class Lead extends Model
         'phone',
         'ip_address',
         'user_agent',
+        'custom_data',
+        'assigned_to',
     ];
+
+    protected $casts = [
+        'custom_data' => 'array',
+    ];
+
+    /**
+     * The "booted" method of the model.
+     */
+    protected static function booted()
+    {
+        static::deleted(function ($lead) {
+            // Stop/Delete any sequence states associated with this lead when it's deleted
+            SequenceState::where('assignable_type', Lead::class)
+                ->where('assignable_id', $lead->id)
+                ->delete();
+        });
+    }
 
     /**
      * Get the campaigns for this lead
@@ -44,5 +63,29 @@ class Lead extends Model
         return $this->belongsToMany(LeadSet::class, 'lead_set_memberships')
             ->withTimestamps()
             ->withPivot('id');
+    }
+
+    /**
+     * Get the notes for this lead
+     */
+    public function notes()
+    {
+        return $this->hasMany(LeadNote::class)->orderBy('is_pinned', 'desc')->latest();
+    }
+
+    /**
+     * Get the tags for this lead
+     */
+    public function tags()
+    {
+        return $this->belongsToMany(LeadTag::class, 'lead_tag', 'lead_id', 'tag_id');
+    }
+
+    /**
+     * Get the user this lead is assigned to
+     */
+    public function assignee()
+    {
+        return $this->belongsTo(\App\Models\User::class, 'assigned_to');
     }
 }

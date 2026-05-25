@@ -101,6 +101,29 @@ export default function CommandPalette() {
                                 ))}
                             </Command.Group>
                         )}
+                        
+                        {!loading && !query && (
+                            <Command.Group heading="CRM Quick Actions">
+                                <Command.Item
+                                    onSelect={() => { setOpen(false); /* Emit or navigate to Add Lead */ }}
+                                    className="flex cursor-pointer items-center rounded-md px-3 py-2 text-sm text-gray-900 select-none aria-selected:bg-gray-100"
+                                >
+                                    <span className="font-medium">Create New Lead</span>
+                                </Command.Item>
+                                <Command.Item
+                                    onSelect={() => { setOpen(false); /* Emit or navigate to Add Task */ }}
+                                    className="flex cursor-pointer items-center rounded-md px-3 py-2 text-sm text-gray-900 select-none aria-selected:bg-gray-100"
+                                >
+                                    <span className="font-medium">Create New Task</span>
+                                </Command.Item>
+                                <Command.Item
+                                    onSelect={() => { setOpen(false); router.visit(route('crm.dashboard')); }}
+                                    className="flex cursor-pointer items-center rounded-md px-3 py-2 text-sm text-gray-900 select-none aria-selected:bg-gray-100"
+                                >
+                                    <span className="font-medium">Go to CRM Dashboard</span>
+                                </Command.Item>
+                            </Command.Group>
+                        )}
                     </Command.List>
                 </Command>
             </div>

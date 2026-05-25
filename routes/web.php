@@ -251,36 +251,7 @@ Route::middleware(['auth', 'verified'])->prefix('settings')->name('settings.')->
     Route::post('/backup/import', [\App\Http\Controllers\TenantBackupController::class, 'import'])->name('backup.import');
 });
 
-// ── CRM Module Routes ──────────────────────────────────────────────
-Route::middleware(['auth', 'verified', 'onboarding', 'subscription:crm'])->prefix('crm')->name('crm.')->group(function () {
-    Route::get('/dashboard', [\App\Http\Controllers\CRM\DashboardController::class, 'index'])->name('dashboard');
-    
-    Route::get('/leads', [\App\Http\Controllers\CRM\LeadController::class, 'index'])->name('leads.index');
-    Route::post('/leads/{lead}/status', [\App\Http\Controllers\CRM\LeadController::class, 'updateStatus'])->name('leads.update-status');
-    Route::delete('/leads/{lead}', [\App\Http\Controllers\CRM\LeadController::class, 'destroy'])->name('leads.destroy');
-
-    // ── CRM Sequences ───────────────────────────────────────────
-    Route::get('/sequences', [\App\Http\Controllers\CRM\SequenceController::class, 'index'])->name('sequences.index');
-    Route::post('/sequences', [\App\Http\Controllers\CRM\SequenceController::class, 'store'])->name('sequences.store');
-    Route::get('/sequences/{sequence}', [\App\Http\Controllers\CRM\SequenceController::class, 'show'])->name('sequences.show');
-    Route::delete('/sequences/{sequence}', [\App\Http\Controllers\CRM\SequenceController::class, 'destroy'])->name('sequences.destroy');
-    Route::post('/sequences/{sequence}/steps', [\App\Http\Controllers\CRM\SequenceController::class, 'storeStep'])->name('sequences.steps.store');
-    Route::put('/sequences/steps/{step}', [\App\Http\Controllers\CRM\SequenceController::class, 'updateStep'])->name('sequences.steps.update');
-    Route::delete('/sequences/steps/{step}', [\App\Http\Controllers\CRM\SequenceController::class, 'deleteStep'])->name('sequences.steps.destroy');
-    Route::post('/sequences/{sequence}/generate-ai', [\App\Http\Controllers\CRM\SequenceController::class, 'generateStepsWithAI'])->name('sequences.generate-ai');
-    Route::post('/sequences/{sequence}/apply-ai', [\App\Http\Controllers\CRM\SequenceController::class, 'applyGeneratedSteps'])->name('sequences.apply-ai');
-
-    // ── CRM Campaigns ───────────────────────────────────────────
-    Route::get('/campaigns', [\App\Http\Controllers\CRM\CampaignController::class, 'index'])->name('campaigns.index');
-    Route::post('/campaigns', [\App\Http\Controllers\CRM\CampaignController::class, 'store'])->name('campaigns.store');
-    Route::get('/campaigns/{campaign}', [\App\Http\Controllers\CRM\CampaignController::class, 'show'])->name('campaigns.show');
-    Route::put('/campaigns/{campaign}', [\App\Http\Controllers\CRM\CampaignController::class, 'update'])->name('campaigns.update');
-    Route::delete('/campaigns/{campaign}', [\App\Http\Controllers\CRM\CampaignController::class, 'destroy'])->name('campaigns.destroy');
-    Route::post('/campaigns/generate-ai-content', [\App\Http\Controllers\CRM\CampaignController::class, 'generateAIContent'])->name('campaigns.generate-ai');
-    Route::post('/campaigns/{campaign}/schedule', [\App\Http\Controllers\CRM\CampaignController::class, 'schedule'])->name('campaigns.schedule');
-    Route::post('/campaigns/{campaign}/pause', [\App\Http\Controllers\CRM\CampaignController::class, 'pause'])->name('campaigns.pause');
-    Route::post('/campaigns/{campaign}/resume', [\App\Http\Controllers\CRM\CampaignController::class, 'resume'])->name('campaigns.resume');
-});
+// ── CRM Module Routes are loaded automatically from Modules/CRM/routes/web.php ──
 
 // Admin Routes
 Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')->name('admin.')->group(function () {

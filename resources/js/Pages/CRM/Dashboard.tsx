@@ -1,6 +1,6 @@
 import React from 'react';
 import { Head, Link, usePage } from '@inertiajs/react';
-import ClientLayout from '@/Layouts/ClientLayout';
+import CrmLayout from '@/Layouts/CrmLayout';
 import { Users, Mail, PlayCircle, BarChart3, ArrowRight } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/Components/ui/card';
 
@@ -38,12 +38,7 @@ export default function Dashboard({ stats }) {
     ];
 
     return (
-        <ClientLayout 
-            user={auth.user} 
-            hasErpSubscription={auth.active_modules?.erp}
-            hasCrmSubscription={auth.active_modules?.crm}
-        >
-            <Head title="CRM Dashboard" />
+        <CrmLayout title="Dashboard" activeMenu="dashboard">
             <div className="mb-8">
                 <h2 className="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight flex items-center">
                     <BarChart3 className="mr-3 h-8 w-8 text-indigo-600" />
@@ -82,6 +77,6 @@ export default function Dashboard({ stats }) {
                     </Card>
                 ))}
             </div>
-        </ClientLayout>
+        </CrmLayout>
     );
 }
