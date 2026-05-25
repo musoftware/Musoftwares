@@ -14,7 +14,8 @@ class TransactionResource extends JsonResource
             'type'            => $this->type,
             'amount'          => (float) $this->amount,
             'currency_id'     => $this->currency,
-            'business_amount' => (float) $this->business_amount,
+            'business_amount'      => (float) $this->business_amount,
+            'business_currency_id' => 1,
             'reason'          => $this->reason,
             'status'          => $this->status ?? 'completed', // fallback if status doesn't exist
             'is_reversed'     => $this->is_reversed ?? false,

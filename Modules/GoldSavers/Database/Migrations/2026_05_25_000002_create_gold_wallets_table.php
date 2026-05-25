@@ -25,7 +25,7 @@ return new class extends Migration
             $table->decimal('balance_grams', 10, 2)->default(0);
             $table->decimal('balance_amount', 12, 2)->default(0); // Value in local currency
             
-            $table->string('currency', 3)->default('EGP');
+            $table->foreignId('currency_id')->default(1)->constrained('currencies')->onDelete('restrict');
             $table->boolean('is_active')->default(true);
 
             $table->timestamps();

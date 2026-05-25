@@ -52,15 +52,14 @@ class MarketplaceController extends Controller
         $subscribedSlugs = [];
         $hasBrowserSubscription = false;
         if (auth()->check()) {
-            $subscribedSlugs = ToolSubscription::where('user_id', auth()->id())
-                ->where('status', 'active')
-                ->get()
-                ->map(function ($sub) {
-                    $tool = collect(config('tools'))->firstWhere('guid', $sub->tool_guid);
-                    return $tool ? $tool['slug'] : null;
+            $user = auth()->user();
+            $subscriptionService = app(\App\Services\SubscriptionService::class);
+            
+            $subscribedSlugs = collect(config('tools'))
+                ->filter(function ($t) use ($user, $subscriptionService) {
+                    return $subscriptionService->hasAccessToTool($user, $t['slug']);
                 })
-                ->filter()
-                ->values()
+                ->pluck('slug')
                 ->toArray();
 
             $browserToolSlugs = collect(config('tools'))
@@ -101,25 +100,20 @@ class MarketplaceController extends Controller
             abort(404);
         }
 
-        $userSubscription = null;
-
+        $hasAccess = false;
         if (auth()->check()) {
-            $userSubscription = ToolSubscription::where('user_id', auth()->id())
-                ->where('tool_guid', $tool['guid'])
-                ->where('status', 'active')
-                ->latest()
-                ->first();
+            $hasAccess = app(\App\Services\SubscriptionService::class)->hasAccessToTool(auth()->user(), $tool['slug']);
         }
 
         $formattedSubscription = null;
-        if ($userSubscription) {
-            $plan = collect($tool['plans'] ?? [])->firstWhere('guid', $userSubscription->plan_guid);
+        if ($hasAccess) {
+            $plan = collect($tool['plans'] ?? [])->first();
             $formattedSubscription = [
-                'id'           => $userSubscription->id,
-                'plan_name'    => $plan['name'] ?? 'N/A',
-                'billing_cycle' => $userSubscription->billing_cycle,
-                'status'       => $userSubscription->status,
-                'expires_at'   => $userSubscription->expires_at?->toDateString(),
+                'id'           => 1, // Generic ID since access is managed centrally
+                'plan_name'    => $plan['name'] ?? 'Platform Plan',
+                'billing_cycle' => 'platform',
+                'status'       => 'active',
+                'expires_at'   => null,
             ];
         }
 
@@ -140,19 +134,15 @@ class MarketplaceController extends Controller
             abort(404);
         }
 
-        $subscription = ToolSubscription::where('user_id', auth()->id())
-            ->where('tool_guid', $tool['guid'])
-            ->where('status', 'active')
-            ->latest()
-            ->first();
+        $hasAccess = app(\App\Services\SubscriptionService::class)->hasAccessToTool(auth()->user(), $tool['slug']);
 
-        if (!$subscription) {
+        if (!$hasAccess) {
             return redirect()->route('tools.show', $slug)
-                ->with('error', 'You need an active subscription to run this tool.');
+                ->with('error', 'You need an active Fully Genius subscription or tool pass to access this.');
         }
 
-        $plan = collect($tool['plans'] ?? [])->firstWhere('guid', $subscription->plan_guid);
-        $planName = $plan['name'] ?? 'N/A';
+        $plan = collect($tool['plans'] ?? [])->first();
+        $planName = $plan['name'] ?? 'Platform Plan';
 
         return Inertia::render('Tools/Runner', [
             'tool'         => [
@@ -165,7 +155,7 @@ class MarketplaceController extends Controller
             ],
             'subscription' => [
                 'plan_name'    => $planName,
-                'expires_at'   => $subscription ? $subscription->expires_at?->toDateString() : null,
+                'expires_at'   => null,
             ],
             'runtimePort'  => 18400,
             'pluginSlug'   => $tool['slug'],
@@ -183,15 +173,11 @@ class MarketplaceController extends Controller
             abort(404);
         }
 
-        $subscription = ToolSubscription::where('user_id', auth()->id())
-            ->where('tool_guid', $tool['guid'])
-            ->where('status', 'active')
-            ->latest()
-            ->first();
+        $hasAccess = app(\App\Services\SubscriptionService::class)->hasAccessToTool(auth()->user(), $tool['slug']);
 
-        if (!$subscription) {
+        if (!$hasAccess) {
             return redirect()->route('tools.show', $slug)
-                ->with('error', 'You need an active subscription to view the tutorial.');
+                ->with('error', 'You need an active Fully Genius subscription or tool pass to access this.');
         }
 
         $requirements = $tool['requirements'] ?? [];

@@ -15,7 +15,7 @@ class UserResource extends JsonResource
     public function toArray(Request $request): array
     {
         $initials = collect(explode(' ', $this->name))
-            ->map(fn($w) => strtoupper(substr($w, 0, 1)))
+            ->map(fn($w) => mb_strtoupper(mb_substr($w, 0, 1, 'UTF-8'), 'UTF-8'))
             ->take(2)
             ->implode('');
 

@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('tool_pricing_plan_id')->index(); // References plan GUID
             $table->string('billing_cycle')->default('monthly'); // monthly|yearly
             $table->decimal('amount_paid', 10, 2)->default(0);
-            $table->string('currency')->default('USD');
+            $table->foreignId('currency_id')->default(1)->constrained('currencies');
             $table->string('status')->default('active');   // active|cancelled|expired|suspended
             $table->string('payment_method')->nullable();  // wallet|kashier
             $table->string('payment_reference')->nullable();

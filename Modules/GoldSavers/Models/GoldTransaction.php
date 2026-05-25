@@ -17,7 +17,7 @@ class GoldTransaction extends Model
         'price_per_gram',
         'total_amount',
         'fees',
-        'currency',
+        'currency_id',
         'transaction_date',
         'vendor_name',
         'invoice_path',
