@@ -11,46 +11,54 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('booking_recurring_series', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedBigInteger('tenant_id')->index();
-            $table->unsignedBigInteger('customer_id')->index();
-            $table->unsignedBigInteger('resource_id')->index()->nullable();
-            $table->unsignedBigInteger('service_id')->index()->nullable();
-            $table->string('rrule'); // The iCal recurrence rule string
-            $table->dateTime('starts_at');
-            $table->dateTime('ends_at')->nullable();
-            $table->integer('duration_minutes')->default(30);
-            $table->enum('status', ['active', 'paused', 'completed', 'cancelled'])->default('active');
-            $table->timestamps();
-        });
+        if (!Schema::hasTable('booking_recurring_series')) {
+            Schema::create('booking_recurring_series', function (Blueprint $table) {
+                $table->id();
+                $table->unsignedBigInteger('tenant_id')->index();
+                $table->unsignedBigInteger('customer_id')->index();
+                $table->unsignedBigInteger('resource_id')->index()->nullable();
+                $table->unsignedBigInteger('service_id')->index()->nullable();
+                $table->string('rrule'); // The iCal recurrence rule string
+                $table->dateTime('starts_at');
+                $table->dateTime('ends_at')->nullable();
+                $table->integer('duration_minutes')->default(30);
+                $table->enum('status', ['active', 'paused', 'completed', 'cancelled'])->default('active');
+                $table->timestamps();
+            });
+        }
 
-        Schema::create('booking_recurring_exceptions', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedBigInteger('tenant_id')->index();
-            $table->unsignedBigInteger('series_id')->index();
-            $table->date('exception_date');
-            $table->string('reason')->nullable(); // holiday, manually skipped, moved
-            $table->enum('status', ['skipped', 'rescheduled'])->default('skipped');
-            $table->timestamps();
+        if (!Schema::hasTable('booking_recurring_exceptions')) {
+            Schema::create('booking_recurring_exceptions', function (Blueprint $table) {
+                $table->id();
+                $table->unsignedBigInteger('tenant_id')->index();
+                $table->unsignedBigInteger('series_id')->index();
+                $table->date('exception_date');
+                $table->string('reason')->nullable(); // holiday, manually skipped, moved
+                $table->enum('status', ['skipped', 'rescheduled'])->default('skipped');
+                $table->timestamps();
 
-            $table->foreign('series_id')->references('id')->on('booking_recurring_series')->onDelete('cascade');
-        });
+                $table->foreign('series_id')->references('id')->on('booking_recurring_series')->onDelete('cascade');
+            });
+        }
 
-        Schema::create('booking_recurring_logs', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedBigInteger('tenant_id')->index();
-            $table->unsignedBigInteger('series_id')->index();
-            $table->string('action');
-            $table->text('description')->nullable();
-            $table->timestamps();
+        if (!Schema::hasTable('booking_recurring_logs')) {
+            Schema::create('booking_recurring_logs', function (Blueprint $table) {
+                $table->id();
+                $table->unsignedBigInteger('tenant_id')->index();
+                $table->unsignedBigInteger('series_id')->index();
+                $table->string('action');
+                $table->text('description')->nullable();
+                $table->timestamps();
 
-            $table->foreign('series_id')->references('id')->on('booking_recurring_series')->onDelete('cascade');
-        });
+                $table->foreign('series_id')->references('id')->on('booking_recurring_series')->onDelete('cascade');
+            });
+        }
 
         // Add series_id to the core bookings table
         Schema::table('bookings', function (Blueprint $table) {
-            $table->unsignedBigInteger('recurring_series_id')->nullable()->index()->after('tenant_id');
+            if (!Schema::hasColumn('bookings', 'recurring_series_id')) {
+                $table->unsignedBigInteger('recurring_series_id')->nullable()->index();
+            }
         });
     }
 
