@@ -50,7 +50,10 @@ class EventServiceProvider extends ServiceProvider
         TimerUpdated::class            => [ActivityEventListener::class],
 
         // Booking
-        BookingStatusChanged::class    => [SendBookingNotification::class],
+        BookingStatusChanged::class    => [
+            SendBookingNotification::class,
+            \Modules\Booking\Features\Analytics\Listeners\UpdateDailyMetricsListener::class,
+        ],
     ];
 
     public function boot(): void
