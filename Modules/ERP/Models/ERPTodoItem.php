@@ -24,9 +24,28 @@ use App\Models\User;
  */
 class ERPTodoItem extends Model
 {
-    use SoftDeletes;
+    use HasFactory, SoftDeletes;
 
     protected $table = 'erp_todo_items';
+
+    protected static function booted(): void
+    {
+        static::addGlobalScope('tenant', function (\Illuminate\Database\Eloquent\Builder $builder) {
+            $tenantId = app()->bound('currentTenant') ? app('currentTenant')->id : null;
+            if (!$tenantId && auth()->check()) {
+                $tenantId = auth()->user()->tenant_id;
+            }
+            if ($tenantId) {
+                $builder->where('tenant_id', $tenantId);
+            }
+        });
+
+        static::creating(function ($model) {
+            if (!$model->tenant_id && auth()->check()) {
+                $model->tenant_id = auth()->user()->tenant_id;
+            }
+        });
+    }
 
     protected $fillable = [
         'tenant_id', 'task_id', 'title', 'description',

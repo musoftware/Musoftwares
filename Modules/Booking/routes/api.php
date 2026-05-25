@@ -63,11 +63,19 @@ Route::middleware(['auth:sanctum'])->prefix('v1')->group(function () {
     // SMS Notifications
     Route::apiResource('sms-templates', \Modules\Booking\app\Features\SmsNotifications\Http\Controllers\SmsTemplateController::class)->only(['index', 'store']);
     Route::apiResource('sms-settings', \Modules\Booking\app\Features\SmsNotifications\Http\Controllers\SmsSettingController::class)->only(['index', 'store']);
+
+    // Booking Widgets (Admin)
+    Route::apiResource('widgets', \Modules\Booking\app\Features\Widget\Http\Controllers\BookingWidgetController::class)->only(['index', 'store']);
 });
 
 // Unauthenticated Webhooks & Public Routes
-Route::prefix('webhooks')->group(function () {
-    Route::post('whatsapp', [\Modules\Booking\app\Features\WaReminders\Http\Controllers\WaWebhookController::class, 'handle'])->name('webhook.whatsapp');
+Route::post('/webhooks/whatsapp', [\Modules\Booking\app\Features\WhatsAppReminders\Http\Controllers\WaWebhookController::class, 'handleWebhook'])->name('webhook.whatsapp');
+
+// Booking Widgets (Public CORS Guarded)
+Route::group(['prefix' => 'public/widgets/{uuid}', 'middleware' => [\Modules\Booking\app\Features\Widget\Http\Middleware\ValidateWidgetDomain::class]], function () {
+    Route::get('embed.js', [\Modules\Booking\app\Features\Widget\Http\Controllers\PublicWidgetController::class, 'embed']);
+    Route::post('view', [\Modules\Booking\app\Features\Widget\Http\Controllers\PublicWidgetController::class, 'view']);
+    Route::post('book', [\Modules\Booking\app\Features\Widget\Http\Controllers\PublicWidgetController::class, 'book']);
 });
 
 Route::prefix('public')->group(function () {
