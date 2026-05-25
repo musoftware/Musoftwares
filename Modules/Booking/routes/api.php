@@ -59,6 +59,10 @@ Route::middleware(['auth:sanctum'])->prefix('v1')->group(function () {
     // Recurring Appointments
     Route::apiResource('recurring-series', \Modules\Booking\app\Features\Recurring\Http\Controllers\RecurringSeriesController::class)->only(['index', 'store']);
     Route::post('recurring-series/{id}/cancel', [\Modules\Booking\app\Features\Recurring\Http\Controllers\RecurringSeriesController::class, 'cancel']);
+
+    // SMS Notifications
+    Route::apiResource('sms-templates', \Modules\Booking\app\Features\SmsNotifications\Http\Controllers\SmsTemplateController::class)->only(['index', 'store']);
+    Route::apiResource('sms-settings', \Modules\Booking\app\Features\SmsNotifications\Http\Controllers\SmsSettingController::class)->only(['index', 'store']);
 });
 
 // Unauthenticated Webhooks & Public Routes
