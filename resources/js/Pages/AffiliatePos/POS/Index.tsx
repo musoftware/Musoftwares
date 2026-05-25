@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { Head } from '@inertiajs/react';
+import { Button } from '@/Components/ui/button';
+import { Input } from '@/Components/ui/input';
 import { ShoppingCart, Search, Plus, Minus, Trash2, CreditCard, ArrowLeft } from 'lucide-react';
 
 export default function PosIndex({ initialProducts, categories }: any) {
@@ -42,18 +44,18 @@ export default function PosIndex({ initialProducts, categories }: any) {
                 {/* Header */}
                 <header className="bg-white border-b px-6 py-4 flex items-center justify-between shadow-sm">
                     <div className="flex items-center gap-4">
-                        <button className="p-2 hover:bg-gray-100 rounded-full transition-colors">
+                        <Button variant="ghost" size="icon" className="rounded-full">
                             <ArrowLeft className="w-5 h-5 text-gray-600" />
-                        </button>
+                        </Button>
                         <h1 className="text-xl font-semibold text-gray-800 tracking-tight">Affiliate POS</h1>
                     </div>
                     <div className="flex-1 max-w-xl mx-8">
                         <div className="relative">
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                            <input 
+                            <Input 
                                 type="text"
                                 placeholder="Search by name, SKU, or scan barcode..."
-                                className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all shadow-sm"
+                                className="w-full pl-10 pr-4 py-6 rounded-xl border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all shadow-sm"
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                             />
@@ -63,13 +65,13 @@ export default function PosIndex({ initialProducts, categories }: any) {
 
                 {/* Categories */}
                 <div className="bg-white border-b px-6 py-3 flex gap-2 overflow-x-auto no-scrollbar">
-                    <button className="px-5 py-2 rounded-full bg-blue-600 text-white font-medium text-sm whitespace-nowrap shadow-sm hover:bg-blue-700 transition-colors">
+                    <Button variant="default" className="rounded-full px-5">
                         All Categories
-                    </button>
+                    </Button>
                     {categories.map((cat: any) => (
-                        <button key={cat.id} className="px-5 py-2 rounded-full bg-gray-100 text-gray-700 font-medium text-sm whitespace-nowrap hover:bg-gray-200 transition-colors">
+                        <Button key={cat.id} variant="secondary" className="rounded-full px-5 text-gray-700 bg-gray-100 hover:bg-gray-200">
                             {cat.name}
-                        </button>
+                        </Button>
                     ))}
                 </div>
 
@@ -130,26 +132,32 @@ export default function PosIndex({ initialProducts, categories }: any) {
                                     <div className="text-blue-600 font-semibold mt-1">EGP {item.price}</div>
                                 </div>
                                 <div className="flex flex-col items-end justify-between gap-3">
-                                    <button 
+                                    <Button 
+                                        variant="ghost"
+                                        size="icon"
                                         onClick={() => removeItem(item.id)}
-                                        className="text-red-400 hover:text-red-500 hover:bg-red-50 p-1.5 rounded-lg transition-colors"
+                                        className="text-red-400 hover:text-red-500 hover:bg-red-50 h-8 w-8"
                                     >
                                         <Trash2 className="w-4 h-4" />
-                                    </button>
+                                    </Button>
                                     <div className="flex items-center gap-3 bg-gray-50 rounded-lg p-1 border">
-                                        <button 
+                                        <Button 
+                                            variant="ghost"
+                                            size="icon"
                                             onClick={() => updateQty(item.id, -1)}
-                                            className="p-1 hover:bg-white rounded shadow-sm transition-colors text-gray-600"
+                                            className="h-6 w-6 bg-white shadow-sm"
                                         >
                                             <Minus className="w-3 h-3" />
-                                        </button>
+                                        </Button>
                                         <span className="font-medium w-4 text-center text-sm">{item.qty}</span>
-                                        <button 
+                                        <Button 
+                                            variant="ghost"
+                                            size="icon"
                                             onClick={() => updateQty(item.id, 1)}
-                                            className="p-1 hover:bg-white rounded shadow-sm transition-colors text-gray-600"
+                                            className="h-6 w-6 bg-white shadow-sm"
                                         >
                                             <Plus className="w-3 h-3" />
-                                        </button>
+                                        </Button>
                                     </div>
                                 </div>
                             </div>
@@ -174,13 +182,13 @@ export default function PosIndex({ initialProducts, categories }: any) {
                         </div>
                     </div>
                     
-                    <button 
+                    <Button 
                         disabled={cart.length === 0}
-                        className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed text-white py-4 rounded-xl font-semibold text-lg flex items-center justify-center gap-2 shadow-lg shadow-blue-600/20 transition-all active:scale-[0.98]"
+                        className="w-full bg-blue-600 hover:bg-blue-700 h-14 rounded-xl font-semibold text-lg flex items-center justify-center gap-2 shadow-lg shadow-blue-600/20"
                     >
                         <CreditCard className="w-5 h-5" />
                         Charge EGP {total}
-                    </button>
+                    </Button>
                 </div>
             </div>
         </div>

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Inertia\Inertia;
 use App\Models\User;
 
 class ModeratorController extends Controller
@@ -20,7 +21,14 @@ class ModeratorController extends Controller
             ->latest()
             ->paginate(20);
             
-        return response()->json($moderators);
+        return Inertia::render('AffiliatePos/Affiliate/Moderators/Index', [
+            'moderators' => $moderators
+        ]);
+    }
+
+    public function create()
+    {
+        return Inertia::render('AffiliatePos/Affiliate/Moderators/Create');
     }
 
     public function store(Request $request)
@@ -42,7 +50,7 @@ class ModeratorController extends Controller
         // Assumes spatie/laravel-permission or similar is used in Musoftwares core
         $moderator->assignRole('moderator');
 
-        return response()->json(['message' => 'Moderator created successfully', 'data' => $moderator]);
+        return back()->with('success', 'Moderator created successfully');
     }
 
     public function destroy(User $moderator)
@@ -53,6 +61,6 @@ class ModeratorController extends Controller
 
         $moderator->delete();
         
-        return response()->json(['message' => 'Moderator deleted successfully']);
+        return back()->with('success', 'Moderator deleted successfully');
     }
 }

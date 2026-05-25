@@ -5,6 +5,7 @@ namespace Modules\AffiliatePos\app\Features\AffiliateNetwork\Controllers;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Inertia\Inertia;
 use Modules\AffiliatePos\Models\PaymentRequest;
 use Modules\AffiliatePos\app\Features\OrderManagement\Services\PaymentService;
 
@@ -19,12 +20,14 @@ class AffiliatePayoutController extends Controller
 
     public function index()
     {
-        return response()->json(
-            PaymentRequest::with('payment_method')
-                ->where('user_id', Auth::id())
-                ->latest()
-                ->paginate(20)
-        );
+        $payouts = PaymentRequest::with('payment_method')
+            ->where('user_id', Auth::id())
+            ->latest()
+            ->paginate(20);
+
+        return Inertia::render('AffiliatePos/Affiliate/Payouts/Index', [
+            'payouts' => $payouts
+        ]);
     }
 
     public function requestPayout(Request $request)
@@ -42,6 +45,6 @@ class AffiliatePayoutController extends Controller
             $request->amount
         );
 
-        return response()->json(['message' => 'Payout requested successfully', 'data' => $payout]);
+        return back()->with('success', 'Payout requested successfully');
     }
 }

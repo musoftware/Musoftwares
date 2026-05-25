@@ -4,6 +4,7 @@ namespace Modules\AffiliatePos\app\Features\OrderManagement\Controllers;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 use Modules\AffiliatePos\Models\PaymentRequest;
 use Modules\AffiliatePos\app\Features\OrderManagement\Services\PaymentService;
 
@@ -24,7 +25,26 @@ class AdminPayoutController extends Controller
             $query->where('status', $request->status);
         }
 
-        return response()->json($query->paginate(50));
+        $payouts = $query->paginate(50)->through(fn($item) => [
+            'id' => $item->id,
+            'user' => [
+                'name' => $item->user->name,
+                'email' => $item->user->email,
+            ],
+            'payment_method' => [
+                'name' => $item->payment_method->name,
+            ],
+            'amount' => $item->amount,
+            'account_number' => $item->account_number,
+            'account_name' => $item->account_name,
+            'status' => $item->status,
+            'created_at' => $item->created_at->format('Y-m-d H:i:s')
+        ]);
+
+        return Inertia::render('AffiliatePos/Admin/Payouts/Index', [
+            'payouts' => $payouts,
+            'filters' => $request->only(['status'])
+        ]);
     }
 
     public function process(Request $request, PaymentRequest $paymentRequest)
@@ -35,6 +55,6 @@ class AdminPayoutController extends Controller
 
         $this->paymentService->processPayout($paymentRequest, $request->status);
         
-        return response()->json(['message' => 'Payout processed successfully', 'data' => $paymentRequest]);
+        return back()->with('success', 'Payout processed successfully');
     }
 }
