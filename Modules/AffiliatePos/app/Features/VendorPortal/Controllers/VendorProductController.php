@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Inertia\Inertia;
 use Modules\AffiliatePos\Models\Product;
 use Modules\AffiliatePos\Models\ProductSku;
 use Modules\AffiliatePos\Models\Option;
@@ -21,7 +22,23 @@ class VendorProductController extends Controller
             ->latest()
             ->paginate(20);
             
-        return response()->json($products);
+        return Inertia::render('AffiliatePos/Vendor/Products/Index', [
+            'products' => $products
+        ]);
+    }
+
+    public function create()
+    {
+        return Inertia::render('AffiliatePos/Vendor/Products/Create');
+    }
+
+    public function edit(Product $product)
+    {
+        if ($product->user_id !== Auth::id()) abort(403);
+        
+        return Inertia::render('AffiliatePos/Vendor/Products/Edit', [
+            'product' => $product->load('skus', 'category')
+        ]);
     }
 
     public function storeSimple(Request $request)
@@ -60,7 +77,7 @@ class VendorProductController extends Controller
                 'reference_id' => $product->id
             ]);
 
-            return response()->json(['message' => 'Simple product created', 'data' => $product]);
+            return back()->with('success', 'Simple product created successfully');
         });
     }
 
@@ -83,6 +100,6 @@ class VendorProductController extends Controller
             $sku->decreaseStock(abs($request->quantity), ['description' => 'Vendor manual stock decrease']);
         }
 
-        return response()->json(['message' => 'Stock updated', 'current_stock' => $sku->stock()]);
+        return back()->with('success', 'Stock updated successfully. Current stock: ' . $sku->stock());
     }
 }

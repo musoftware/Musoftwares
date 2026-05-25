@@ -5,6 +5,7 @@ namespace Modules\AffiliatePos\app\Features\AffiliateNetwork\Controllers;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Inertia\Inertia;
 use Modules\AffiliatePos\Models\Order;
 use Modules\AffiliatePos\app\Features\OrderManagement\Resources\OrderResource;
 
@@ -24,8 +25,11 @@ class AffiliateOrderController extends Controller
             $query->where('status', $request->status);
         }
 
-        $orders = $query->paginate(50);
+        $orders = $query->paginate(50)->through(fn($order) => (new OrderResource($order))->resolve());
         
-        return OrderResource::collection($orders);
+        return Inertia::render('AffiliatePos/Affiliate/Orders/Index', [
+            'orders' => $orders,
+            'filters' => $request->only(['status'])
+        ]);
     }
 }

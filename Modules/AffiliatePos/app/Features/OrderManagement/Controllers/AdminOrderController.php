@@ -4,6 +4,7 @@ namespace Modules\AffiliatePos\app\Features\OrderManagement\Controllers;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 use Modules\AffiliatePos\Models\Order;
 use Modules\AffiliatePos\Models\ShippingCompany;
 use Modules\AffiliatePos\app\Features\OrderManagement\Requests\UpdateOrderStatusRequest;
@@ -25,20 +26,27 @@ class AdminOrderController extends Controller
     public function index(Request $request)
     {
         $query = $this->queryService->buildQuery($request);
-        $orders = $query->paginate($request->get('page_result', 50));
-        return OrderResource::collection($orders);
+        $orders = $query->paginate($request->get('page_result', 50))
+            ->through(fn ($order) => (new OrderResource($order))->resolve());
+            
+        return Inertia::render('AffiliatePos/Admin/Orders/Index', [
+            'orders' => $orders,
+            'filters' => $request->all()
+        ]);
     }
 
     public function show(Order $order)
     {
         $order->load('items.product', 'items.sku', 'comments', 'user', 'shippingCompany');
-        return new OrderResource($order);
+        return Inertia::render('AffiliatePos/Admin/Orders/Show', [
+            'order' => (new OrderResource($order))->resolve()
+        ]);
     }
 
     public function updateStatus(UpdateOrderStatusRequest $request, Order $order)
     {
         $this->orderService->changeStatus($order, $request->status);
-        return new OrderResource($order->load('items.product', 'items.sku'));
+        return back()->with('success', 'Order status updated successfully');
     }
 
     public function updatePartialDelivery(Request $request, Order $order)
@@ -49,7 +57,7 @@ class AdminOrderController extends Controller
         ]);
 
         $this->orderService->partialDelivery($order, $request->order_item);
-        return new OrderResource($order->load('items.product', 'items.sku'));
+        return back()->with('success', 'Partial delivery applied successfully');
     }
 
     public function bulkUpdateStatus(Request $request)
@@ -60,7 +68,7 @@ class AdminOrderController extends Controller
         ]);
 
         $this->orderService->bulkChangeStatus($request->ids, $request->status);
-        return response()->json(['message' => 'Status updated successfully']);
+        return back()->with('success', 'Status updated successfully');
     }
 
     public function bulkAssignShipping(Request $request)
@@ -76,6 +84,6 @@ class AdminOrderController extends Controller
         }
 
         $this->orderService->bulkAssignShippingCompany($request->ids, $request->shipping_company_id, $companyName);
-        return response()->json(['message' => 'Shipping company assigned successfully']);
+        return back()->with('success', 'Shipping company assigned successfully');
     }
 }
