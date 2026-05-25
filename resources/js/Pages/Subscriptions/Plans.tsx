@@ -94,6 +94,24 @@ export default function Plans({ serviceItems, activeSubscription, walletBalance,
         }
     };
 
+    const handleSelectAllTools = () => {
+        const toolIds = tools.map(t => t.id);
+        if (toolIds.length === 0) return;
+        
+        const allSelected = toolIds.every(id => selectedItems.includes(id));
+        
+        if (allSelected) {
+            // Deselect all tools
+            setSelectedItems(prev => prev.filter(id => !toolIds.includes(id)));
+        } else {
+            // Select all tools
+            setSelectedItems(prev => {
+                const nonTools = prev.filter(id => !toolIds.includes(id));
+                return [...nonTools, ...toolIds];
+            });
+        }
+    };
+
     const multiplier = useMemo(() => {
         if (billing === '1_month') return 1;
         if (billing === '6_months') return 6;
@@ -101,8 +119,15 @@ export default function Plans({ serviceItems, activeSubscription, walletBalance,
         return 1;
     }, [billing]);
 
+    const months = useMemo(() => {
+        if (billing === '1_month') return 1;
+        if (billing === '6_months') return 6;
+        if (billing === '1_year') return 12;
+        return 1;
+    }, [billing]);
+
     const calculateItemPrice = (item: ServiceItem) => {
-        return item.monthly_price * multiplier;
+        return item.monthly_price * months;
     };
 
     const subtotal = useMemo(() => {
@@ -151,13 +176,13 @@ export default function Plans({ serviceItems, activeSubscription, walletBalance,
         const originalToolsPrice = toolBaseMonthly * toolsCount;
         const discountedToolsPrice = originalToolsPrice * (1 - (discountPercent / 100));
         
-        return (originalToolsPrice - discountedToolsPrice) * multiplier;
-    }, [selectedItems, serviceItems, multiplier]);
+        return (originalToolsPrice - discountedToolsPrice) * months;
+    }, [selectedItems, serviceItems, months]);
 
     const total = subtotal * multiplier;
     
-    // Original total without discount (if 1 year selected, it would be * 12)
-    const originalTotal = subtotal * (billing === '1_year' ? 12 : (billing === '6_months' ? 6 : 1));
+    // Original total without discount
+    const originalTotal = subtotal * months;
     const discount = originalTotal - total;
 
     const handleSubscribeWallet = () => {
@@ -337,9 +362,20 @@ export default function Plans({ serviceItems, activeSubscription, walletBalance,
                         <div className="border-t border-slate-100" />
 
                         <section>
-                            <div className="mb-4">
-                                <h2 className="text-xl font-semibold text-slate-900">Automation Tools</h2>
-                                <p className="text-sm text-slate-500">Standalone tools to boost your productivity.</p>
+                            <div className="mb-4 flex items-center justify-between">
+                                <div>
+                                    <h2 className="text-xl font-semibold text-slate-900">Automation Tools</h2>
+                                    <p className="text-sm text-slate-500">Standalone tools to boost your productivity.</p>
+                                </div>
+                                {tools.length > 0 && (
+                                    <Button 
+                                        variant="outline" 
+                                        size="sm" 
+                                        onClick={handleSelectAllTools}
+                                    >
+                                        {tools.every(t => selectedItems.includes(t.id)) ? 'Deselect All' : 'Select All Tools'}
+                                    </Button>
+                                )}
                             </div>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 {tools.map(renderItemCard)}
