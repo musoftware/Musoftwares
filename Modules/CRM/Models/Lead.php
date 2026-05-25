@@ -5,10 +5,11 @@ namespace Modules\CRM\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\CleansLeadData;
+use App\Traits\BelongsToTenant;
 
 class Lead extends Model
 {
-    use HasFactory, \Illuminate\Database\Eloquent\SoftDeletes, CleansLeadData;
+    use HasFactory, \Illuminate\Database\Eloquent\SoftDeletes, CleansLeadData, BelongsToTenant;
 
     protected $fillable = [
         'user_id',

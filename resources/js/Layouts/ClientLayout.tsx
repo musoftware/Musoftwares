@@ -29,18 +29,21 @@ import {
     Moon,
     ShoppingCart,
     Wallet,
+    Users,
 } from 'lucide-react';
 import { PropsWithChildren, useState } from 'react';
 
 interface ClientLayoutProps extends PropsWithChildren {
     user: User;
     hasErpSubscription?: boolean;
+    hasCrmSubscription?: boolean;
     walletBalance?: number;
 }
 
 export default function ClientLayout({
     user,
     hasErpSubscription = false,
+    hasCrmSubscription = false,
     walletBalance = 0,
     children,
 }: ClientLayoutProps) {
@@ -63,9 +66,19 @@ export default function ClientLayout({
         route: 'erp.dashboard',
     };
 
-    const modules = hasErpSubscription
-        ? [defaultModules[0], erpModule, ...defaultModules.slice(1)]
-        : defaultModules;
+    const crmModule = {
+        name: 'CRM Module',
+        icon: Users,
+        route: 'crm.dashboard',
+    };
+
+    let modules = [...defaultModules];
+    if (hasErpSubscription) {
+        modules.splice(1, 0, erpModule);
+    }
+    if (hasCrmSubscription) {
+        modules.splice(1, 0, crmModule);
+    }
 
     return (
         <div className="min-h-screen bg-gray-50">

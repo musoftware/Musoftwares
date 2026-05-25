@@ -1,0 +1,74 @@
+<?php
+
+namespace App\Services;
+
+use App\Models\Invoice;
+use App\Models\InvoiceItem;
+use Illuminate\Support\Facades\DB;
+
+class InvoiceService
+{
+    public function updateInvoice(Invoice $invoice, array $data): void
+    {
+        if ($invoice->status !== 'unpaid') {
+            throw new \Exception('Cannot edit items on a paid/cancelled invoice.');
+        }
+
+        DB::transaction(function () use ($invoice, $data) {
+            if (isset($data['discount'])) {
+                $invoice->update(['discount' => $data['discount']]);
+            }
+
+            if (!empty($data['deleted_items'])) {
+                InvoiceItem::whereIn('id', $data['deleted_items'])->where('invoice_id', $invoice->id)->delete();
+            }
+
+            if (!empty($data['items'])) {
+                foreach ($data['items'] as $itemData) {
+                    if (!empty($itemData['id'])) {
+                        // Update existing
+                        $item = InvoiceItem::where('id', $itemData['id'])->where('invoice_id', $invoice->id)->first();
+                        if ($item) {
+                            $item->update([
+                                'item_title' => $itemData['item_title'],
+                                'amount'     => $itemData['amount'],
+                                'qty'        => $itemData['qty']
+                            ]);
+                        }
+                    } else {
+                        // Create new
+                        InvoiceItem::create([
+                            'invoice_id' => $invoice->id,
+                            'item_title' => $itemData['item_title'],
+                            'amount'     => $itemData['amount'],
+                            'qty'        => $itemData['qty'],
+                            'item_type'  => $itemData['item_type'],
+                            'currency'   => $invoice->currency
+                        ]);
+                    }
+                }
+            }
+
+            // Recalculate invoice totals via helper or model methods if necessary
+            $invoice->fresh()->update_total(); // assuming update_total or similar exists on Invoice
+        });
+    }
+
+    public function markPaid(Invoice $invoice): void
+    {
+        if ($invoice->status === 'paid') {
+            throw new \Exception('Invoice is already paid.');
+        }
+
+        $invoice->mark_as_paid();
+    }
+
+    public function cancelInvoice(Invoice $invoice): void
+    {
+        if ($invoice->status === 'cancelled') {
+            throw new \Exception('Invoice is already cancelled.');
+        }
+
+        $invoice->cancel_invoice();
+    }
+}

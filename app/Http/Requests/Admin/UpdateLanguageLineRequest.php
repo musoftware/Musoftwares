@@ -1,0 +1,24 @@
+<?php
+
+namespace App\Http\Requests\Admin;
+
+use Illuminate\Foundation\Http\FormRequest;
+
+class UpdateLanguageLineRequest extends FormRequest
+{
+    public function authorize(): bool
+    {
+        return true;
+    }
+
+    public function rules(): array
+    {
+        $id = $this->route('language_line')->id;
+        
+        return [
+            'group' => 'required|string|max:255',
+            'key'   => 'required|string|max:255|unique:language_lines,key,' . $id . ',id,group,' . $this->group,
+            'text'  => 'required|array',
+        ];
+    }
+}

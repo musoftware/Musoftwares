@@ -251,6 +251,37 @@ Route::middleware(['auth', 'verified'])->prefix('settings')->name('settings.')->
     Route::post('/backup/import', [\App\Http\Controllers\TenantBackupController::class, 'import'])->name('backup.import');
 });
 
+// ── CRM Module Routes ──────────────────────────────────────────────
+Route::middleware(['auth', 'verified', 'onboarding', 'subscription:crm'])->prefix('crm')->name('crm.')->group(function () {
+    Route::get('/dashboard', [\App\Http\Controllers\CRM\DashboardController::class, 'index'])->name('dashboard');
+    
+    Route::get('/leads', [\App\Http\Controllers\CRM\LeadController::class, 'index'])->name('leads.index');
+    Route::post('/leads/{lead}/status', [\App\Http\Controllers\CRM\LeadController::class, 'updateStatus'])->name('leads.update-status');
+    Route::delete('/leads/{lead}', [\App\Http\Controllers\CRM\LeadController::class, 'destroy'])->name('leads.destroy');
+
+    // ── CRM Sequences ───────────────────────────────────────────
+    Route::get('/sequences', [\App\Http\Controllers\CRM\SequenceController::class, 'index'])->name('sequences.index');
+    Route::post('/sequences', [\App\Http\Controllers\CRM\SequenceController::class, 'store'])->name('sequences.store');
+    Route::get('/sequences/{sequence}', [\App\Http\Controllers\CRM\SequenceController::class, 'show'])->name('sequences.show');
+    Route::delete('/sequences/{sequence}', [\App\Http\Controllers\CRM\SequenceController::class, 'destroy'])->name('sequences.destroy');
+    Route::post('/sequences/{sequence}/steps', [\App\Http\Controllers\CRM\SequenceController::class, 'storeStep'])->name('sequences.steps.store');
+    Route::put('/sequences/steps/{step}', [\App\Http\Controllers\CRM\SequenceController::class, 'updateStep'])->name('sequences.steps.update');
+    Route::delete('/sequences/steps/{step}', [\App\Http\Controllers\CRM\SequenceController::class, 'deleteStep'])->name('sequences.steps.destroy');
+    Route::post('/sequences/{sequence}/generate-ai', [\App\Http\Controllers\CRM\SequenceController::class, 'generateStepsWithAI'])->name('sequences.generate-ai');
+    Route::post('/sequences/{sequence}/apply-ai', [\App\Http\Controllers\CRM\SequenceController::class, 'applyGeneratedSteps'])->name('sequences.apply-ai');
+
+    // ── CRM Campaigns ───────────────────────────────────────────
+    Route::get('/campaigns', [\App\Http\Controllers\CRM\CampaignController::class, 'index'])->name('campaigns.index');
+    Route::post('/campaigns', [\App\Http\Controllers\CRM\CampaignController::class, 'store'])->name('campaigns.store');
+    Route::get('/campaigns/{campaign}', [\App\Http\Controllers\CRM\CampaignController::class, 'show'])->name('campaigns.show');
+    Route::put('/campaigns/{campaign}', [\App\Http\Controllers\CRM\CampaignController::class, 'update'])->name('campaigns.update');
+    Route::delete('/campaigns/{campaign}', [\App\Http\Controllers\CRM\CampaignController::class, 'destroy'])->name('campaigns.destroy');
+    Route::post('/campaigns/generate-ai-content', [\App\Http\Controllers\CRM\CampaignController::class, 'generateAIContent'])->name('campaigns.generate-ai');
+    Route::post('/campaigns/{campaign}/schedule', [\App\Http\Controllers\CRM\CampaignController::class, 'schedule'])->name('campaigns.schedule');
+    Route::post('/campaigns/{campaign}/pause', [\App\Http\Controllers\CRM\CampaignController::class, 'pause'])->name('campaigns.pause');
+    Route::post('/campaigns/{campaign}/resume', [\App\Http\Controllers\CRM\CampaignController::class, 'resume'])->name('campaigns.resume');
+});
+
 // Admin Routes
 Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [\App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard');
@@ -258,25 +289,15 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
     // Reports
     Route::get('/reports/pnl', [\App\Http\Controllers\Admin\ReportController::class, 'pnl'])->name('reports.pnl');
 
-    // Clients (thin ERP-linked view)
-    Route::get('/clients', [\App\Http\Controllers\Admin\ClientController::class, 'index'])->name('clients.index');
-    Route::get('/clients/{id}', [\App\Http\Controllers\Admin\ClientController::class, 'show'])->name('clients.show');
-    Route::get('/clients/{id}/edit', [\App\Http\Controllers\Admin\ClientController::class, 'edit'])->name('clients.edit');
-    Route::patch('/clients/{id}', [\App\Http\Controllers\Admin\ClientController::class, 'update'])->name('clients.update');
-    Route::post('/clients/{id}/login-as', [\App\Http\Controllers\Admin\ClientController::class, 'loginAs'])->name('clients.login-as');
-    Route::post('/clients/{id}/reset-password', [\App\Http\Controllers\Admin\ClientController::class, 'resetPassword'])->name('clients.reset-password');
-    Route::post('/clients/{id}/wallet-transaction', [\App\Http\Controllers\Admin\ClientController::class, 'walletTransaction'])->name('clients.wallet-transaction');
-    Route::post('/clients/{id}/tasks', [\App\Http\Controllers\Admin\ClientController::class, 'storeTask'])->name('clients.tasks.store');
-    Route::post('/clients/{id}/swap-budget', [\App\Http\Controllers\Admin\ClientController::class, 'swapBudget'])->name('clients.swap-budget');
-    Route::post('/clients/{id}/memberships', [\App\Http\Controllers\Admin\ClientController::class, 'activateMembership'])->name('clients.memberships.store');
-    Route::get('/clients/{id}/referrals', [\App\Http\Controllers\Admin\ClientController::class, 'referrals'])->name('clients.referrals');
-    Route::get('/clients/{id}/files', [\App\Http\Controllers\Admin\ClientController::class, 'files'])->name('clients.files');
-    Route::get('/clients/{id}/reports', [\App\Http\Controllers\Admin\ClientController::class, 'reports'])->name('clients.reports');
+    // Clients (thin ERP-linked view) - removed as per request
 
     // KYC Review
     Route::get('/kyc', [\App\Http\Controllers\Admin\KycController::class, 'index'])->name('kyc.index');
     Route::post('/kyc/{id}/approve', [\App\Http\Controllers\Admin\KycController::class, 'approve'])->name('kyc.approve');
     Route::post('/kyc/{id}/reject', [\App\Http\Controllers\Admin\KycController::class, 'reject'])->name('kyc.reject');
+
+    // ── Admin Blog Articles ─────────────────────────────────────────
+    Route::resource('/blog-articles', \App\Http\Controllers\Admin\AdminBlogArticleController::class)->only(['index']);
 
     // ── Admin Projects ──────────────────────────────────────────────
     Route::resource('/projects', \App\Http\Controllers\Admin\ProjectController::class)->except(['create', 'edit', 'show']);
@@ -290,16 +311,16 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
     Route::get('/invoices', [\App\Http\Controllers\Admin\InvoiceController::class, 'index'])->name('invoices.index');
     Route::get('/invoices/unpaid', [\App\Http\Controllers\Admin\InvoiceController::class, 'unpaid'])->name('invoices.unpaid');
     Route::get('/invoices/archive', [\App\Http\Controllers\Admin\InvoiceController::class, 'archive'])->name('invoices.archive');
+    Route::get('/invoices/{invoice}', [\App\Http\Controllers\Admin\InvoiceController::class, 'show'])->name('invoices.show');
+    Route::put('/invoices/{invoice}', [\App\Http\Controllers\Admin\InvoiceController::class, 'update'])->name('invoices.update');
     Route::post('/invoices/{invoice}/mark-paid', [\App\Http\Controllers\Admin\InvoiceController::class, 'markPaid'])->name('invoices.mark-paid');
     Route::post('/invoices/{invoice}/cancel', [\App\Http\Controllers\Admin\InvoiceController::class, 'cancel'])->name('invoices.cancel');
 
-    // ── Admin Leads ───────────────────────────────────────────────
-    Route::get('/leads', [\App\Http\Controllers\Admin\LeadController::class, 'index'])->name('leads.index');
-    Route::post('/leads/{lead}/status', [\App\Http\Controllers\Admin\LeadController::class, 'updateStatus'])->name('leads.update-status');
-    Route::delete('/leads/{lead}', [\App\Http\Controllers\Admin\LeadController::class, 'destroy'])->name('leads.destroy');
+
 
     // ── Admin Contracts ───────────────────────────────────────────
     Route::get('/contracts', [\App\Http\Controllers\Admin\ContractController::class, 'index'])->name('contracts.index');
+    Route::get('/contracts/create', [\App\Http\Controllers\Admin\ContractController::class, 'create'])->name('contracts.create');
     Route::post('/contracts/{contract}/status', [\App\Http\Controllers\Admin\ContractController::class, 'updateStatus'])->name('contracts.update-status');
     Route::delete('/contracts/{contract}', [\App\Http\Controllers\Admin\ContractController::class, 'destroy'])->name('contracts.destroy');
 
@@ -309,27 +330,7 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
     Route::post('/calculator/save', [\App\Http\Controllers\Admin\PriceCalculatorController::class, 'saveProposal'])->name('calculator.save');
     Route::post('/calculator/{proposal}/convert', [\App\Http\Controllers\Admin\PriceCalculatorController::class, 'convertToContract'])->name('calculator.convert');
 
-    // ── Admin Sequences ───────────────────────────────────────────
-    Route::get('/sequences', [\App\Http\Controllers\Admin\SequenceController::class, 'index'])->name('sequences.index');
-    Route::post('/sequences', [\App\Http\Controllers\Admin\SequenceController::class, 'store'])->name('sequences.store');
-    Route::get('/sequences/{sequence}', [\App\Http\Controllers\Admin\SequenceController::class, 'show'])->name('sequences.show');
-    Route::delete('/sequences/{sequence}', [\App\Http\Controllers\Admin\SequenceController::class, 'destroy'])->name('sequences.destroy');
-    Route::post('/sequences/{sequence}/steps', [\App\Http\Controllers\Admin\SequenceController::class, 'storeStep'])->name('sequences.steps.store');
-    Route::put('/sequences/steps/{step}', [\App\Http\Controllers\Admin\SequenceController::class, 'updateStep'])->name('sequences.steps.update');
-    Route::delete('/sequences/steps/{step}', [\App\Http\Controllers\Admin\SequenceController::class, 'deleteStep'])->name('sequences.steps.destroy');
-    Route::post('/sequences/{sequence}/generate-ai', [\App\Http\Controllers\Admin\SequenceController::class, 'generateStepsWithAI'])->name('sequences.generate-ai');
-    Route::post('/sequences/{sequence}/apply-ai', [\App\Http\Controllers\Admin\SequenceController::class, 'applyGeneratedSteps'])->name('sequences.apply-ai');
 
-    // ── Admin Campaigns ───────────────────────────────────────────
-    Route::get('/campaigns', [\App\Http\Controllers\Admin\CampaignController::class, 'index'])->name('campaigns.index');
-    Route::post('/campaigns', [\App\Http\Controllers\Admin\CampaignController::class, 'store'])->name('campaigns.store');
-    Route::get('/campaigns/{campaign}', [\App\Http\Controllers\Admin\CampaignController::class, 'show'])->name('campaigns.show');
-    Route::put('/campaigns/{campaign}', [\App\Http\Controllers\Admin\CampaignController::class, 'update'])->name('campaigns.update');
-    Route::delete('/campaigns/{campaign}', [\App\Http\Controllers\Admin\CampaignController::class, 'destroy'])->name('campaigns.destroy');
-    Route::post('/campaigns/generate-ai-content', [\App\Http\Controllers\Admin\CampaignController::class, 'generateAIContent'])->name('campaigns.generate-ai');
-    Route::post('/campaigns/{campaign}/schedule', [\App\Http\Controllers\Admin\CampaignController::class, 'schedule'])->name('campaigns.schedule');
-    Route::post('/campaigns/{campaign}/pause', [\App\Http\Controllers\Admin\CampaignController::class, 'pause'])->name('campaigns.pause');
-    Route::post('/campaigns/{campaign}/resume', [\App\Http\Controllers\Admin\CampaignController::class, 'resume'])->name('campaigns.resume');
 
     // ── Admin Financial Operations ────────────────────────────────
     Route::get('/finance', [\App\Http\Controllers\Admin\FinancialOperationsController::class, 'index'])->name('finance.index');
@@ -338,18 +339,60 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
     Route::delete('/finance/{entry}', [\App\Http\Controllers\Admin\FinancialOperationsController::class, 'destroy'])->name('finance.destroy');
     Route::post('/finance/{entry}/mark-paid', [\App\Http\Controllers\Admin\FinancialOperationsController::class, 'markAsPaid'])->name('finance.mark-paid');
 
+    // ── Admin Phase 3 (Support & Communication) ───────────────────
+    Route::resource('tickets', \App\Http\Controllers\Admin\AdminTicketController::class)->only(['index', 'show', 'update']);
+    Route::post('tickets/{ticket}/reply', [\App\Http\Controllers\Admin\AdminTicketController::class, 'reply'])->name('tickets.reply');
+    
+    Route::resource('vouchers', \App\Http\Controllers\Admin\AdminVoucherController::class);
+    
+    Route::resource('payment-methods', \App\Http\Controllers\Admin\AdminPaymentMethodController::class)->only(['index', 'show', 'update']);
+    
+    // ── Admin Phase 4 (Settings & Localization) ───────────────────
+    Route::get('settings', [\App\Http\Controllers\Admin\AdminSettingController::class, 'index'])->name('settings.index');
+    Route::post('settings', [\App\Http\Controllers\Admin\AdminSettingController::class, 'store'])->name('settings.store');
+    Route::get('settings/update-prices', [\App\Http\Controllers\Admin\AdminSettingController::class, 'updatePrices'])->name('settings.update-prices');
+    Route::post('settings/update-prices', [\App\Http\Controllers\Admin\AdminSettingController::class, 'doUpdatePrices'])->name('settings.do-update-prices');
+    
+    Route::resource('language-lines', \App\Http\Controllers\Admin\AdminLanguageLineController::class)->except(['create', 'show', 'edit']);
+    Route::post('language-lines/auto-translate', [\App\Http\Controllers\Admin\AdminLanguageLineController::class, 'autoTranslate'])->name('language-lines.auto-translate');
+    Route::post('language-lines/import', [\App\Http\Controllers\Admin\AdminLanguageLineController::class, 'import'])->name('language-lines.import');
+    
+    Route::get('quotations/{contract}/print', [\App\Http\Controllers\Admin\AdminQuotationController::class, 'print'])->name('quotations.print');
+    
+    Route::resource('free-downloads', \App\Http\Controllers\Admin\AdminFreeDownloadController::class)->except(['create', 'show', 'edit']);
+    
+    Route::get('whatsapp/ai-playground', [\App\Http\Controllers\Admin\AdminWhatsappAiPlaygroundController::class, 'index'])->name('whatsapp.ai-playground.index');
+    Route::post('whatsapp/ai-playground/chat', [\App\Http\Controllers\Admin\AdminWhatsappAiPlaygroundController::class, 'chat'])->name('whatsapp.ai-playground.chat');
+    Route::post('whatsapp/ai-playground/clear', [\App\Http\Controllers\Admin\AdminWhatsappAiPlaygroundController::class, 'clearHistory'])->name('whatsapp.ai-playground.clear');
+    
+    Route::get('whatsapp-balance', [\App\Http\Controllers\Admin\AdminWhatsAppBalanceController::class, 'index'])->name('whatsapp-balance.index');
+    Route::get('whatsapp-balance/{user}', [\App\Http\Controllers\Admin\AdminWhatsAppBalanceController::class, 'show'])->name('whatsapp-balance.show');
+    Route::post('whatsapp-balance/{user}/add', [\App\Http\Controllers\Admin\AdminWhatsAppBalanceController::class, 'addBalance'])->name('whatsapp-balance.add');
+    Route::post('whatsapp-balance/{user}/reset', [\App\Http\Controllers\Admin\AdminWhatsAppBalanceController::class, 'resetBalance'])->name('whatsapp-balance.reset');
+    Route::post('whatsapp-balance/bulk-reset', [\App\Http\Controllers\Admin\AdminWhatsAppBalanceController::class, 'bulkReset'])->name('whatsapp-balance.bulk-reset');
+
     // ── User Management (Full Admin Control) ────────────────────────
     // Recovered from old project: Admin/UsersController
     Route::get('/users', [\App\Http\Controllers\Admin\UsersController::class, 'index'])->name('users.index');
     Route::get('/users/create', [\App\Http\Controllers\Admin\UsersController::class, 'create'])->name('users.create');
     Route::post('/users', [\App\Http\Controllers\Admin\UsersController::class, 'store'])->name('users.store');
     Route::get('/users/problematic', [\App\Http\Controllers\Admin\UsersController::class, 'problematic'])->name('users.problematic');
+    
+    // Matches exact old links
+    Route::get('/users/loginas/{id}', [\App\Http\Controllers\Admin\UsersController::class, 'loginAs'])->name('users.loginas');
+    Route::post('/users/loginas/{id}', [\App\Http\Controllers\Admin\UsersController::class, 'loginAs']); // Allows POST for React compatibility
+    Route::get('/users/reset-password/{id}', [\App\Http\Controllers\Admin\UsersController::class, 'reset_password'])->name('users.reset-password');
+    Route::post('/users/{id}/generate-password', [\App\Http\Controllers\Admin\UsersController::class, 'reset_password'])->name('users.generate-password');
+    Route::get('/users/{id}/referrals', [\App\Http\Controllers\Admin\UsersController::class, 'referrals'])->name('users.referrals');
+    Route::get('/users/files/{id}', [\App\Http\Controllers\Admin\UsersController::class, 'files'])->name('users.files');
+    Route::get('/users/reports/{id}', [\App\Http\Controllers\Admin\UsersController::class, 'reports'])->name('users.reports');
+    Route::get('/users/{id}/tasks/add', [\App\Http\Controllers\Admin\UsersController::class, 'add_task'])->name('users.tasks.add');
+    
     Route::get('/users/{id}', [\App\Http\Controllers\Admin\UsersController::class, 'show'])->name('users.show');
     Route::get('/users/{id}/edit', [\App\Http\Controllers\Admin\UsersController::class, 'edit'])->name('users.edit');
     Route::put('/users/{id}', [\App\Http\Controllers\Admin\UsersController::class, 'update'])->name('users.update');
     Route::delete('/users/{id}', [\App\Http\Controllers\Admin\UsersController::class, 'destroy'])->name('users.destroy');
     Route::post('/users/{id}/toggle-block', [\App\Http\Controllers\Admin\UsersController::class, 'toggleBlock'])->name('users.toggleBlock');
-    Route::get('/users/{id}/login-as', [\App\Http\Controllers\Admin\UsersController::class, 'loginAs'])->name('users.loginAs');
 
     // ── User Notes ───────────────────────────────────────────────────
     // Recovered from old project: Admin/UserNotesController
