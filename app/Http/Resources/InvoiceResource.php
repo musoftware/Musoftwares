@@ -52,6 +52,62 @@ class InvoiceResource extends JsonResource
                 'locked' => $line->isProcessed(),
                 'cost_transaction_id' => $line->cost_transaction_id,
             ])),
+
+            // Affiliate Data
+            'affiliate_data' => $this->whenLoaded('user', function () {
+                if (!$this->user || !$this->user->relationLoaded('ref_user') || !$this->user->ref_user) {
+                    return null;
+                }
+
+                $affiliate = $this->user->ref_user;
+                $commissionMultiplier = method_exists($affiliate, 'getAffiliateCommissionPercentageForReferredUser') 
+                    ? $affiliate->getAffiliateCommissionPercentageForReferredUser($this->user) 
+                    : 1.10;
+                $commissionPercent = round(($commissionMultiplier - 1) * 100, 2);
+                $addsToTotal = method_exists($affiliate, 'shouldAddCommissionToTotal') && $affiliate->shouldAddCommissionToTotal();
+
+                $isPaid = in_array($this->status, ['paid', 'partially_paid']);
+                $actualAmount = 0;
+                $actualAmountStr = '';
+
+                if ($isPaid) {
+                    $actualEarnings = \App\Models\Earning::where('referred_invoice_id', $this->id)
+                        ->where('user_id', $affiliate->id)
+                        ->get();
+                    $actualAmount = $actualEarnings->sum('amount');
+                    $earningCurrency = $actualEarnings->first()?->currency ?? $affiliate->currency;
+                    $actualAmountStr = \App\Helper\FinanceHelper::instance()->format_money($actualAmount, $earningCurrency);
+                }
+
+                $estimatedBase = method_exists($this->resource, 'total_min_cost') ? $this->total_min_cost() : $this->sub_total();
+                $estimatedFull = round($estimatedBase - $estimatedBase / $commissionMultiplier, 2);
+                
+                $upperRef = $affiliate->relationLoaded('ref_user') ? $affiliate->ref_user : null;
+                if ($upperRef) {
+                    $rateDecimal = (float) $commissionMultiplier - 1;
+                    if ($rateDecimal > 0.10) {
+                        $estimatedDirect = round($estimatedBase * ($rateDecimal - 0.01), 2);
+                    } else {
+                        $estimatedDirect = round($estimatedFull * 0.90, 2);
+                    }
+                } else {
+                    $estimatedDirect = $estimatedFull;
+                }
+                
+                $estimatedInAffiliateCurrency = \App\Models\CurrenciesExchange::RateToday($estimatedDirect, $this->currency, $affiliate->currency);
+                $estimatedStr = \App\Helper\FinanceHelper::instance()->format_money(round($estimatedInAffiliateCurrency, 2), $affiliate->currency);
+
+                return [
+                    'affiliate_id' => $affiliate->id,
+                    'name' => $affiliate->name,
+                    'email' => $affiliate->email,
+                    'commission_percent' => $commissionPercent,
+                    'adds_to_total' => $addsToTotal,
+                    'is_paid' => $isPaid,
+                    'actual_earned_str' => $actualAmountStr,
+                    'estimated_amount_str' => $estimatedStr,
+                ];
+            }),
         ];
     }
 
