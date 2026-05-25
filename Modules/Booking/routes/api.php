@@ -66,6 +66,15 @@ Route::middleware(['auth:sanctum'])->prefix('v1')->group(function () {
 
     // Booking Widgets (Admin)
     Route::apiResource('widgets', \Modules\Booking\app\Features\Widget\Http\Controllers\BookingWidgetController::class)->only(['index', 'store']);
+
+    // White Label Feature
+    Route::prefix('white-label')->group(function () {
+        Route::get('settings', [\Modules\Booking\app\Features\WhiteLabel\Http\Controllers\BrandingController::class, 'getSettings']);
+        Route::put('settings', [\Modules\Booking\app\Features\WhiteLabel\Http\Controllers\BrandingController::class, 'updateSettings']);
+        
+        Route::apiResource('assets', \Modules\Booking\app\Features\WhiteLabel\Http\Controllers\AssetController::class)->only(['index', 'store', 'destroy']);
+        Route::apiResource('domains', \Modules\Booking\app\Features\WhiteLabel\Http\Controllers\DomainController::class)->only(['index', 'store', 'destroy']);
+    });
 });
 
 // Unauthenticated Webhooks & Public Routes

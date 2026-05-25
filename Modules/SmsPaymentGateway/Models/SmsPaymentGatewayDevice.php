@@ -12,7 +12,8 @@ class SmsPaymentGatewayDevice extends Model
     use HasFactory;
 
     protected $table = 'sms_payment_gateway_devices';
-protected $fillable = [
+    protected $fillable = [
+        'tenant_id',
         'user_id',
         'device_token',
         'device_name',

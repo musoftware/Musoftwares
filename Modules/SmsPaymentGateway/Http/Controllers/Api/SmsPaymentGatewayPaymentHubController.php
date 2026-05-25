@@ -144,8 +144,6 @@ class SmsPaymentGatewayPaymentHubController extends Controller
             ->where('status', 'connected')
             ->first();
 
-
-
         if (!$device) {
             return response()->json([
                 'success' => false,
@@ -156,131 +154,11 @@ class SmsPaymentGatewayPaymentHubController extends Controller
         // Update device last seen
         $device->updateLastSeen();
 
-        // Check for duplicate by message_id if provided
-        if ($request->has('message_id') && !empty($request->message_id)) {
-            $existingTransaction = SmsPaymentGatewayTransaction::where('message_id', $request->message_id)
-                ->where('device_id', $device->id)
-                ->first();
-
-            if ($existingTransaction) {
-                Log::info('AutoSMS Payment Hub - Duplicate SMS detected by message_id', [
-                    'device_id' => $device->id,
-                    'user_id' => $device->user_id,
-                    'message_id' => $request->message_id,
-                    'existing_transaction_id' => $existingTransaction->id,
-                ]);
-
-                return response()->json([
-                    'success' => true,
-                    'message' => 'SMS already processed (duplicate)',
-                    'transaction_detected' => true,
-                    'duplicate' => true,
-                    'existing_transaction_id' => $existingTransaction->id,
-                ]);
-            }
-        }
-
-
-
-        // Check for duplicate by exact SMS message content within 5 minutes
-        // Skip check if in test mode
-        if (!$request->is_test) {
-            $existingMessageTransaction = SmsPaymentGatewayTransaction::where('sms_message', $request->message)
-                ->where('device_id', $device->id)
-                ->where('created_at', '>=', now()->subMinutes(5))
-                ->first();
-
-            if ($existingMessageTransaction) {
-                Log::info('AutoSMS Payment Hub - Duplicate SMS detected by exact message content', [
-                    'device_id' => $device->id,
-                    'user_id' => $device->user_id,
-                    'message_preview' => substr($request->message, 0, 100),
-                    'existing_transaction_id' => $existingMessageTransaction->id,
-                    'time_difference_seconds' => now()->diffInSeconds($existingMessageTransaction->created_at),
-                ]);
-
-                return response()->json([
-                    'success' => true,
-                    'message' => 'SMS already processed (duplicate message within 5 minutes)',
-                    'transaction_detected' => true,
-                    'duplicate' => true,
-                    'existing_transaction_id' => $existingMessageTransaction->id,
-                ]);
-            }
-        }
-
-
-
-
-        // Check if sender is in allowed list
-        // Bypass if in test mode
-        if (!$request->is_test) {
-            $allowedSenders = config('sms-payment-gateway.allowed_senders', [
-            ]);
-
-            $senderName = $request->name ?? $request->sender;
-            $isAllowedSender = in_array(strtolower($senderName), array_map('strtolower', $allowedSenders));
-
-            if (!$isAllowedSender) {
-                Log::info('SMS received from non-allowed sender', [
-                    'sender' => $senderName,
-                    'device_id' => $device->id,
-                    'user_id' => $device->user_id,
-                ]);
-
-                // Still return success but don't process as payment
-                return response()->json([
-                    'success' => true,
-                    'message' => 'SMS received but sender not in allowed list',
-                    'processed' => false,
-                ]);
-            }
-        }
-
-
-
-        // Ensure senderName is set for logic below
         $senderName = $request->name ?? $request->sender;
 
-        // Process SMS for transaction detection using the parser service
-        $parserService = app(SmsPaymentGatewayParserService::class);
-        $transactionData = $parserService->detectTransaction($request->message, $senderName, $device);
-
-        // Prepare debug information
-        $debugInfo = null;
-        if ($transactionData === null) {
-            $debugInfo = $parserService->getDebugInfo($request->message, $senderName, $device);
-        }
-
-
-
-        // Log SMS message
-        Log::info('AutoSMS Payment Hub - SMS Received', [
-            'device_id' => $device->id,
-            'user_id' => $device->user_id,
-            'sender' => $senderName,
-            'message' => $request->message,
-            'transaction_detected' => $transactionData !== null,
-            'transaction_data' => $transactionData,
-            'debug_info' => $debugInfo,
-        ]);
-
-        // If transaction detected, process it
-        if ($transactionData) {
-            $this->processTransaction($device, $transactionData, $request->all());
-        }
-
-        $response = [
-            'success' => true,
-            'message' => 'SMS received and processed',
-            'transaction_detected' => $transactionData !== null,
-            'transaction_data' => $transactionData,
-        ];
-
-        // Add debug info when transaction not detected
-        if ($transactionData === null && $debugInfo) {
-            $response['debug'] = $debugInfo;
-        }
+        // Delegate entire ingestion and processing logic to the dedicated service
+        $ingestionService = app(\Modules\SmsPaymentGateway\Services\TransactionIngestionService::class);
+        $response = $ingestionService->ingestSms($device, $request->all(), $senderName);
 
         // Sanitize response to ensure valid JSON
         $response = $this->sanitizeForJson($response);
