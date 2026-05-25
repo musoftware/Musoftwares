@@ -45,28 +45,132 @@ class SubscriptionController extends Controller
             $rate = \App\Models\CurrenciesExchange::RateToday(1, $usdCurrency->id, $userCurrencyId);
         }
 
-        // Ensure new plans exist in the DB
-        Plan::updateOrCreate(
-            ['plan_name' => 'Trial'],
-            ['plan_price' => 0, 'plan_duration' => 1, 'plan_status' => true, 'plan_currency' => $usdCurrencyId]
-        );
-        Plan::updateOrCreate(
-            ['plan_name' => 'Go'],
-            ['plan_price' => 40, 'plan_duration' => 365, 'plan_status' => true, 'plan_currency' => $usdCurrencyId]
-        );
-        Plan::updateOrCreate(
-            ['plan_name' => 'Plus'],
-            ['plan_price' => 80, 'plan_duration' => 365, 'plan_status' => true, 'plan_currency' => $usdCurrencyId]
-        );
-        Plan::updateOrCreate(
-            ['plan_name' => 'Pro'],
-            ['plan_price' => 150, 'plan_duration' => 365, 'plan_status' => true, 'plan_currency' => $usdCurrencyId]
-        );
+        $egpRate = 50; // Fallback
+        if ($usdCurrency && $egpCurrencyId) {
+            $egpRate = \App\Models\CurrenciesExchange::RateToday(1, $usdCurrency->id, $egpCurrencyId) ?: 50;
+        }
 
-        $plans = Plan::where('plan_status', true)
-            ->whereIn('plan_name', ['Trial', 'Go', 'Plus', 'Pro'])
-            ->orderByRaw("FIELD(plan_name, 'Trial', 'Go', 'Plus', 'Pro')")
-            ->get();
+        // Base prices are given in EGP
+        $basePricesEGP = config('saas.modules', []);
+
+        // Convert EGP to user's currency: (EGP / EGP_Rate) * User_Rate
+        $convertPrice = function($egpPrice) use ($egpRate, $rate) {
+            $usdPrice = $egpPrice / $egpRate;
+            return round($usdPrice * $rate, 2);
+        };
+
+        $serviceItems = [
+            [
+                'id' => 'erp',
+                'slug' => 'erp',
+                'name' => 'ERP',
+                'type' => 'module',
+                'description' => 'Enterprise Resource Planning system for full business management.',
+                'monthly_price' => $convertPrice($basePricesEGP['erp'] / 10),
+                'yearly_price' => $convertPrice($basePricesEGP['erp']),
+                'icon' => 'Building2'
+            ],
+            [
+                'id' => 'crm',
+                'slug' => 'crm',
+                'name' => 'CRM',
+                'type' => 'module',
+                'description' => 'Customer Relationship Management for leads and tickets.',
+                'monthly_price' => $convertPrice($basePricesEGP['crm'] / 10),
+                'yearly_price' => $convertPrice($basePricesEGP['crm']),
+                'icon' => 'MessageSquare'
+            ],
+            [
+                'id' => 'sms-payment-gateway',
+                'slug' => 'sms-payment-gateway',
+                'name' => 'SMS Payment Gateway',
+                'type' => 'module',
+                'description' => 'Automated SMS marketing and gateway integration.',
+                'monthly_price' => $convertPrice($basePricesEGP['sms-payment-gateway'] / 10),
+                'yearly_price' => $convertPrice($basePricesEGP['sms-payment-gateway']),
+                'icon' => 'Zap'
+            ],
+            [
+                'id' => 'gold-saver',
+                'slug' => 'gold-saver',
+                'name' => 'Gold Saver',
+                'type' => 'module',
+                'description' => 'Gold savings and investment tracking system.',
+                'monthly_price' => $convertPrice($basePricesEGP['gold-saver'] / 10),
+                'yearly_price' => $convertPrice($basePricesEGP['gold-saver']),
+                'icon' => 'Sparkles'
+            ],
+            [
+                'id' => 'booking',
+                'slug' => 'booking',
+                'name' => 'Booking',
+                'type' => 'module',
+                'description' => 'Appointment and reservation booking engine.',
+                'monthly_price' => $convertPrice($basePricesEGP['booking'] / 10),
+                'yearly_price' => $convertPrice($basePricesEGP['booking']),
+                'icon' => 'Check'
+            ]
+        ];
+
+        // ADD-ONS INJECTION
+        $addonsConfig = config('saas.addons', []);
+
+        foreach ($addonsConfig as $id => $configItem) {
+            $serviceItems[] = [
+                'id' => $id,
+                'slug' => $id,
+                'name' => $configItem['name'],
+                'type' => 'addon',
+                'parent_id' => $configItem['parent'],
+                'description' => $configItem['desc'],
+                'monthly_price' => $convertPrice($configItem['price'] / 10),
+                'yearly_price' => $convertPrice($configItem['price']),
+                'icon' => $configItem['icon']
+            ];
+        }
+
+        try {
+            $dbTools = \App\Models\SoftwareProgram::all();
+            foreach ($dbTools as $tool) {
+                // Ensure tool price is strictly 1000 yearly
+                $toolYearly = 1000; 
+                $toolMonthly = 100;
+                
+                $serviceItems[] = [
+                    'id' => 'tool-' . $tool->id,
+                    'slug' => 'tool-' . $tool->id,
+                    'tool_id' => $tool->id,
+                    'name' => $tool->name,
+                    'type' => 'tool',
+                    'description' => null, // User requested to hide description
+                    'monthly_price' => $convertPrice($basePricesEGP['tool'] / 10),
+                    'yearly_price' => $convertPrice($basePricesEGP['tool']),
+                    'icon' => 'Wrench'
+                ];
+            }
+        } catch (\Exception $e) {
+            // Fallback if table doesn't exist
+            $serviceItems[] = [
+                'id' => 'tool-wa',
+                'slug' => 'tool-wa',
+                'name' => 'WhatsApp Sender Pro',
+                'type' => 'tool',
+                'description' => 'Bulk WhatsApp sending tool.',
+                'monthly_price' => $convertPrice($basePricesEGP['tool'] / 10),
+                'yearly_price' => $convertPrice($basePricesEGP['tool']),
+                'icon' => 'Wrench'
+            ];
+            $serviceItems[] = [
+                'id' => 'tool-extractor',
+                'slug' => 'tool-extractor',
+                'name' => 'Data Extractor',
+                'type' => 'tool',
+                'description' => 'Extract leads from various sources.',
+                'monthly_price' => $convertPrice($basePricesEGP['tool'] / 10),
+                'yearly_price' => $convertPrice($basePricesEGP['tool']),
+                'icon' => 'Wrench'
+            ];
+        }
 
         $wallet = ['id' => null, 'balance' => (float)$user->user_balance, 'currency' => $user->currency_name()];
 
@@ -89,53 +193,98 @@ class SubscriptionController extends Controller
         }
 
         return Inertia::render('Subscriptions/Plans', [
-            'plans' => $plans->map(function ($plan) use ($rate) {
-                $slug = \Str::slug($plan->plan_name);
-                
-                // Defaults
-                $features = [];
-                $included_tools = [];
-                
-                if ($slug === 'go') {
-                    $features = ['1 Tool of your choice', 'Basic support'];
-                    $included_tools = [];
-                } elseif ($slug === 'plus') {
-                    $features = ['All automation tools', 'Priority support', 'API access'];
-                    $included_tools = ['*'];
-                } elseif ($slug === 'pro') {
-                    $features = ['Complete business suite', '24/7 Priority support', 'API access', 'Custom integrations'];
-                    $included_tools = ['*'];
-                } elseif ($slug === 'trial') {
-                    $features = ['Try all tools', 'All business modules', '1 day limit'];
-                    $included_tools = ['*'];
-                }
-
-                $convertedPrice = $plan->current_plan_price();
-
-                return [
-                    'id'               => $plan->id,
-                    'slug'             => $slug,
-                    'name'             => $plan->plan_name,
-                    'description'      => 'Standard Subscription Plan',
-                    'monthly_price'    => $convertedPrice / 12,
-                    'yearly_price'     => $convertedPrice,
-                    'prices'           => [
-                        '3_months' => $convertedPrice / 4,
-                        '6_months' => $convertedPrice / 2,
-                        '1_year'   => $convertedPrice,
-                        '3_years'  => $convertedPrice * 3,
-                    ],
-                    'included_modules' => in_array($slug, ['pro', 'trial']) ? ['*'] : [],
-                    'included_tools'   => $included_tools,
-                    'features'         => $features,
-                    'is_custom'        => false,
-                ];
-            }),
-            'serviceItems' => [],
+            'plans' => [],
+            'serviceItems' => $serviceItems,
             'activeSubscription' => $activeSub,
             'walletBalance' => (float) $user->available_balance(),
             'currency' => $currencyCode,
         ]);
+    }
+
+    private function calculateCustomPriceBackend($selectedItems, $billingCycle, $currencyId)
+    {
+        $usdCurrency = \App\Models\Currency::where('currency', 'USD')->first();
+        $usdCurrencyId = $usdCurrency ? $usdCurrency->id : 1;
+        
+        $egpCurrency = \App\Models\Currency::where('currency', 'EGP')->first();
+        $egpCurrencyId = $egpCurrency ? $egpCurrency->id : 1;
+        
+        $rate = 1.0;
+        if ($usdCurrency && $currencyId && $usdCurrency->id != $currencyId) {
+            $rate = \App\Models\CurrenciesExchange::RateToday(1, $usdCurrency->id, $currencyId);
+        }
+
+        $egpRate = 50;
+        if ($usdCurrency && $egpCurrencyId) {
+            $egpRate = \App\Models\CurrenciesExchange::RateToday(1, $usdCurrency->id, $egpCurrencyId) ?: 50;
+        }
+
+        // EGP Base prices per year
+        $basePricesEGP = array_merge(
+            config('saas.modules', []),
+            array_map(fn($addon) => $addon['price'], config('saas.addons', []))
+        );
+        
+        $totalUsd = 0;
+        $toolsCount = 0;
+        
+        foreach ($selectedItems as $item) {
+            if (isset($basePricesEGP[$item])) {
+                $totalUsd += ($basePricesEGP[$item] / 10) / $egpRate; // Convert Monthly EGP to USD
+            } elseif (str_starts_with($item, 'tool-')) {
+                $toolsCount++;
+            }
+        }
+
+        // Apply tool volume discount
+        if ($toolsCount > 0) {
+            $toolBaseMonthlyEGP = 100; // 1000 yearly / 10
+            $discountPercent = min(50, ($toolsCount - 1) * 10);
+            $toolsTotalEGP = ($toolBaseMonthlyEGP * $toolsCount) * (1 - ($discountPercent / 100));
+            $totalUsd += ($toolsTotalEGP / $egpRate); // Convert discounted total EGP to USD
+        }
+
+        $multiplier = 1;
+        if ($billingCycle === '6_months') {
+            $multiplier = 6;
+        } elseif ($billingCycle === '1_year') {
+            $multiplier = 10; // 2 months free
+        } elseif ($billingCycle === '1_month') {
+            $multiplier = 1;
+        }
+
+        $totalUsd = $totalUsd * $multiplier;
+        
+        return $totalUsd * $rate;
+    }
+
+    private function getOrCreateCustomPlan($selectedItems, $billingCycle, $currencyId)
+    {
+        sort($selectedItems);
+        $signature = md5(implode(',', $selectedItems) . '-' . $billingCycle . '-' . $currencyId);
+        $planName = 'Custom Plan - ' . strtoupper(substr($signature, 0, 6));
+
+        $price = $this->calculateCustomPriceBackend($selectedItems, $billingCycle, $currencyId);
+
+        $days = 30;
+        if ($billingCycle === '6_months') $days = 180;
+        if ($billingCycle === '1_year') $days = 365;
+
+        $plan = Plan::firstOrCreate(
+            ['plan_name' => $planName],
+            [
+                'plan_price' => $price,
+                'plan_duration' => $days,
+                'plan_status' => true,
+                'plan_currency' => $currencyId
+            ]
+        );
+        
+        $plan->plan_price = $price;
+        $plan->plan_duration = $days;
+        $plan->save();
+
+        return $plan;
     }
 
     /**
@@ -144,10 +293,11 @@ class SubscriptionController extends Controller
     public function subscribe(Request $request)
     {
         $request->validate([
-            'plan_id'       => 'required|exists:plans,id',
+            'plan_id'       => 'nullable|exists:plans,id',
+            'items'         => 'nullable|array',
+            'billing_cycle' => 'required|string',
         ]);
 
-        $plan = Plan::findOrFail($request->plan_id);
         $user = Auth::user();
         
         $usdCurrency = \App\Models\Currency::where('currency', 'USD')->first();
@@ -158,6 +308,13 @@ class SubscriptionController extends Controller
         
         $userCurrencyId = $user->currency_id ?: $egpCurrencyId;
         
+        if ($request->has('items') && count($request->items) > 0) {
+            $plan = $this->getOrCreateCustomPlan($request->items, $request->input('billing_cycle', '1_year'), $userCurrencyId);
+        } else {
+            if (!$request->plan_id) return back()->withErrors(['error' => 'No plan or items selected.']);
+            $plan = Plan::findOrFail($request->plan_id);
+        }
+        
         $rate = 1.0;
         if ($usdCurrency && $userCurrencyId && $usdCurrency->id != $userCurrencyId) {
             $rate = \App\Models\CurrenciesExchange::RateToday(1, $usdCurrency->id, $userCurrencyId);
@@ -165,9 +322,9 @@ class SubscriptionController extends Controller
 
         $billingCycle = $request->input('billing_cycle', '1_year');
         $multiplier = 1;
-        $days = $plan->plan_duration; 
+        $days = $plan->plan_duration;
         
-        if ($plan->plan_name !== 'Trial') {
+        if ($plan->plan_name !== 'Trial' && !str_starts_with($plan->plan_name, 'Custom Plan')) {
             if ($billingCycle === '3_months') {
                 $multiplier = 0.25;
                 $days = 90;
@@ -218,24 +375,25 @@ class SubscriptionController extends Controller
                 $user->subscription_force = $plan->plan_name === 'Trial' ? 0 : 1;
                 $user->save();
 
-                // Cancel old platform subscriptions
-                \App\Models\PlatformSubscription::where('user_id', $user->id)
-                    ->where('status', 'active')
-                    ->update(['status' => 'cancelled']);
+                // Save capabilities
+                if (isset($request->items) && is_array($request->items) && $user->tenant_id) {
+                    foreach ($request->items as $item) {
+                        \App\Models\TenantFeature::updateOrCreate(
+                            ['tenant_id' => $user->tenant_id, 'feature_key' => $item],
+                            [
+                                'module' => str_starts_with($item, 'crm') ? 'crm' : (str_starts_with($item, 'erp') ? 'erp' : 'booking'),
+                                'plan_id' => $plan->id,
+                                'expires_at' => \Carbon\Carbon::parse($user->subscription_date)
+                            ]
+                        );
+                    }
+                }
 
+                // Cancel old platform subscriptions
+                // (Removed PlatformSubscription usage)
+                
                 // Create new platform subscription
-                \App\Models\PlatformSubscription::create([
-                    'user_id' => $user->id,
-                    'plan_id' => $plan->id,
-                    'billing_cycle' => $billingCycle,
-                    'amount' => $plan_amount,
-                    'currency' => \App\Models\Currency::find($usdCurrencyId)?->currency ?? 'USD',
-                    'status' => 'active',
-                    'started_at' => now(),
-                    'expires_at' => now()->addDays($days),
-                    'auto_renew' => $plan->plan_name === 'Trial' ? 0 : 1,
-                    'custom_items' => ['*'],
-                ]);
+                // (Removed PlatformSubscription usage)
             });
 
             return redirect()->route('subscriptions.manage')->with('success', "Subscribed to {$plan->plan_name} successfully!");
@@ -259,10 +417,11 @@ class SubscriptionController extends Controller
     public function checkoutKashier(Request $request)
     {
         $request->validate([
-            'plan_id'       => 'required|exists:plans,id',
+            'plan_id'       => 'nullable|exists:plans,id',
+            'items'         => 'nullable|array',
+            'billing_cycle' => 'required|string',
         ]);
 
-        $plan = Plan::findOrFail($request->plan_id);
         $user = Auth::user();
         
         $usdCurrency = \App\Models\Currency::where('currency', 'USD')->first();
@@ -274,6 +433,13 @@ class SubscriptionController extends Controller
         $userCurrencyId = $user->currency_id ?: $egpCurrencyId;
         $userCurrency = \App\Models\Currency::find($userCurrencyId);
         $currencyCode = $userCurrency ? $userCurrency->currency : 'USD';
+
+        if ($request->has('items') && count($request->items) > 0) {
+            $plan = $this->getOrCreateCustomPlan($request->items, $request->input('billing_cycle', '1_year'), $userCurrencyId);
+        } else {
+            if (!$request->plan_id) return back()->withErrors(['error' => 'No plan or items selected.']);
+            $plan = Plan::findOrFail($request->plan_id);
+        }
         
         $rate = 1.0;
         if ($usdCurrency && $userCurrencyId && $usdCurrency->id != $userCurrencyId) {
@@ -284,7 +450,7 @@ class SubscriptionController extends Controller
         $multiplier = 1;
         $days = $plan->plan_duration; 
         
-        if ($plan->plan_name !== 'Trial') {
+        if ($plan->plan_name !== 'Trial' && !str_starts_with($plan->plan_name, 'Custom Plan')) {
             if ($billingCycle === '3_months') {
                 $multiplier = 0.25;
                 $days = 90;
@@ -308,7 +474,8 @@ class SubscriptionController extends Controller
             $plan->id,
             $currencyCode,
             $billingCycle,
-            $days
+            $days,
+            $request->items ?? []
         );
 
         return Inertia::location($paymentUrl);
@@ -356,6 +523,21 @@ class SubscriptionController extends Controller
                                     $user->plan_id = $plan->id;
                                     $user->subscription_force = 1;
                                     $user->save();
+
+                                    // Save capabilities
+                                    $items = $metadata['items'] ?? [];
+                                    if (is_array($items) && $user->tenant_id) {
+                                        foreach ($items as $item) {
+                                            \App\Models\TenantFeature::updateOrCreate(
+                                                ['tenant_id' => $user->tenant_id, 'feature_key' => $item],
+                                                [
+                                                    'module' => str_starts_with($item, 'crm') ? 'crm' : (str_starts_with($item, 'erp') ? 'erp' : 'booking'),
+                                                    'plan_id' => $plan->id,
+                                                    'expires_at' => \Carbon\Carbon::parse($user->subscription_date)
+                                                ]
+                                            );
+                                        }
+                                    }
                                 });
                                 \Illuminate\Support\Facades\Log::info("Kashier subscription processed successfully for User $userId, Plan: $plan->plan_name");
                                 return response()->json(['status' => 'success', 'message' => 'Subscription processed successfully']);

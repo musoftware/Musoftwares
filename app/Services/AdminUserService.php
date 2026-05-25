@@ -87,4 +87,35 @@ class AdminUserService
             // The role column doesn't exist, we only use Spatie roles.
         }
     }
+
+    public function resetPassword(User $user): string
+    {
+        $newPassword = Str::random(10);
+        $user->password = Hash::make($newPassword);
+        $user->save();
+
+        return $newPassword;
+    }
+
+    public function toggleBlock(User $user, ?string $reason): void
+    {
+        if ($user->account_status === 'blocked') {
+            $user->account_status = 'active';
+            $user->block_reason   = null;
+        } else {
+            $user->account_status = 'blocked';
+            $user->block_reason   = $reason;
+        }
+
+        $user->save();
+    }
+
+    public function addTask(User $user, string $title, ?string $description): \App\Models\Task
+    {
+        return \App\Models\Task::create([
+            'user_id' => $user->id,
+            'task_name' => $title,
+            'task_description' => $description,
+        ]);
+    }
 }

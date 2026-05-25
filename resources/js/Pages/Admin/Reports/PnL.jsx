@@ -1,4 +1,5 @@
 import { Head, useForm } from '@inertiajs/react';
+import { formatMoney as formatCurrency } from '@/lib/utils';
 
 export default function PnL({
     filters,
@@ -19,12 +20,7 @@ export default function PnL({
         get('/admin/reports/pnl');
     };
 
-    const formatCurrency = (amount) => {
-        return new Intl.NumberFormat('en-US', {
-            style: 'currency',
-            currency: 'USD',
-        }).format(amount || 0);
-    };
+
 
     return (
         <div className="mx-auto max-w-4xl p-6">

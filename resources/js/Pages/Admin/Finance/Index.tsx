@@ -163,22 +163,6 @@ export default function Index({ entries, categories, users, currentTab, stats })
                                         </select>
                                     </div>
                                 )}
-
-                                <div className="flex items-center space-x-2 pt-2">
-                                    <input type="checkbox" id="recurring" checked={newEntry.is_recurring} onChange={e => setNewEntry({...newEntry, is_recurring: e.target.checked})} className="rounded border-gray-300 text-indigo-600 focus:ring-indigo-600" />
-                                    <Label htmlFor="recurring" className="font-medium text-gray-700">This is a Recurring Payment</Label>
-                                </div>
-
-                                {newEntry.is_recurring && (
-                                    <div className="space-y-2 pl-6">
-                                        <Label>Interval</Label>
-                                        <select className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm" value={newEntry.recurrence_interval} onChange={e => setNewEntry({...newEntry, recurrence_interval: e.target.value})}>
-                                            <option value="weekly">Weekly</option>
-                                            <option value="monthly">Monthly</option>
-                                            <option value="yearly">Yearly</option>
-                                        </select>
-                                    </div>
-                                )}
                             </div>
                             <DialogFooter>
                                 <Button type="submit">Save Record</Button>
@@ -196,7 +180,7 @@ export default function Index({ entries, categories, users, currentTab, stats })
                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type / Next Due</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                             <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                         </tr>
@@ -209,24 +193,15 @@ export default function Index({ entries, categories, users, currentTab, stats })
                                     {entry.user && <div className="text-xs text-gray-500 mt-1">For: {entry.user.name}</div>}
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap">
-                                    <div className="text-sm font-bold text-gray-900">{parseFloat(entry.amount).toLocaleString()} EGP</div>
+                                    <div className="text-sm font-bold text-gray-900">{parseFloat(entry.amount).toLocaleString()} {entry.currency || 'EGP'}</div>
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap">
                                     <div className="text-sm text-gray-500">{entry.category?.name || 'Uncategorized'}</div>
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap">
-                                    {entry.is_recurring ? (
-                                        <div>
-                                            <span className="inline-flex items-center rounded-full bg-purple-100 px-2 py-0.5 text-xs font-medium text-purple-800 capitalize">
-                                                Recurring {entry.recurrence_interval}
-                                            </span>
-                                            <div className="text-xs text-gray-500 mt-1">Due: {new Date(entry.next_due_date).toLocaleDateString()}</div>
-                                        </div>
-                                    ) : (
-                                        <span className="inline-flex items-center rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-800">
-                                            One-time
-                                        </span>
-                                    )}
+                                    <span className="text-sm text-gray-900">
+                                        {new Date(entry.created_at).toLocaleDateString()}
+                                    </span>
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap">
                                     {getStatusBadge(entry.status)}

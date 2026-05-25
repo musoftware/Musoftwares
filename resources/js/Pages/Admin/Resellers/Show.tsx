@@ -15,9 +15,7 @@ import {
     TrendingUp, TrendingDown, Store, RefreshCw, ToggleLeft, ToggleRight, Wifi
 } from 'lucide-react';
 
-function formatCurrency(amount: number, currency = 'USD') {
-    return new Intl.NumberFormat('en-US', { style: 'currency', currency }).format(amount || 0);
-}
+import { formatMoney as formatCurrency } from '@/lib/utils';
 
 const statusMap: Record<string, string> = {
     active: 'success', suspended: 'danger', suspended_by_reseller: 'danger',

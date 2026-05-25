@@ -6,27 +6,58 @@ export function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs));
 }
 
+const CURRENCY_FORMATS: Record<string, string> = {
+    'USD': '$%v',
+    'EGP': 'e£%v',
+    'EUR': '€%v',
+    'GBP': '£%v',
+    'AED': '%v د.إ',
+    'MAD': '%v MAD',
+    'SAR': '%v SAR',
+    'IQD': '%v IQD'
+};
+
 export function formatMoney(amount: number | string, currency = 'USD') {
-    const numericAmount =
-        typeof amount === 'string' ? parseFloat(amount) : amount;
+    const numericAmount = typeof amount === 'string' ? parseFloat(amount) : amount;
     if (isNaN(numericAmount)) return `${currency} 0.00`;
-    return new Intl.NumberFormat('en-US', {
-        style: 'currency',
-        currency: currency,
+    
+    const curCode = (typeof currency === 'string' ? currency : 'USD').toUpperCase();
+    
+    const numberPart = new Intl.NumberFormat('en-US', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
     }).format(numericAmount);
+
+    if (CURRENCY_FORMATS[curCode]) {
+        return CURRENCY_FORMATS[curCode].replace('%v', numberPart);
+    }
+    
+    try {
+        return new Intl.NumberFormat('en-US', {
+            style: 'currency',
+            currency: curCode,
+        }).format(numericAmount);
+    } catch (e) {
+        return `${curCode} ${numberPart}`;
+    }
 }
 
 export function formatCompactCurrency(amount: number | string, currency = 'USD') {
     const numericAmount =
         typeof amount === 'string' ? parseFloat(amount) : amount;
     if (isNaN(numericAmount)) return `${currency} 0`;
+    
     if (Math.abs(numericAmount) >= 1_000_000) {
-        return new Intl.NumberFormat('en-US', {
-            style: 'currency',
-            currency,
-            notation: 'compact',
-            maximumFractionDigits: 1,
-        }).format(numericAmount);
+        try {
+            return new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: typeof currency === 'string' && currency.trim() !== '' ? currency : 'USD',
+                notation: 'compact',
+                maximumFractionDigits: 1,
+            }).format(numericAmount);
+        } catch (e) {
+            return `${currency} ${(numericAmount / 1_000_000).toFixed(1)}M`;
+        }
     }
     return formatMoney(numericAmount, currency);
 }

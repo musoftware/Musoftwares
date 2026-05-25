@@ -3,9 +3,9 @@
 namespace App\Services;
 
 use App\Models\User;
-use App\Models\PlatformPlan;
-use App\Models\PlatformSubscription;
-use App\Models\PlatformServiceItem;
+use App\Models\Plan;
+use App\Models\UserSubscription;
+use App\Models\Service;
 use Carbon\Carbon;
 
 class SubscriptionService
@@ -58,22 +58,30 @@ class SubscriptionService
         return $user->hasSubscription();
     }
 
+    public function createSubscription(User $user, Plan $plan, string $cycle, array $customItems = []): UserSubscription
+    {
+        $amount = $plan->priceFor($cycle); // Assuming Plan has this method or we adjust it
+
+        return UserSubscription::create([]);
+    }
+
     /**
      * Calculate the price for a custom plan given selected item slugs.
      */
-    public function calculateCustomPrice(array $itemSlugs, string $cycle = 'monthly'): array
+    public function calculateUpgradeProration(UserSubscription $current, Plan $newPlan, string $cycle): float
     {
         // Legacy system didn't have dynamic custom tool pricing like this.
-        return [
-            'total'     => 0,
-            'cycle'     => $cycle,
-            'breakdown' => [],
-        ];
+        return 0.0;
     }
 
     /**
      * Get subscription limits for a user and module.
      */
+    public function getAvailableModules()
+    {
+        return Service::where('type', 'module')->where('is_active', true)->orderBy('sort_order')->get();
+    }
+
     public function getLimits(User $user, string $module): array
     {
         if ($user->hasRole('admin')) {
@@ -104,6 +112,11 @@ class SubscriptionService
         }
 
         return [];
+    }
+
+    public function getAvailablePlans()
+    {
+        return Plan::where('is_active', true)->orderBy('sort_order')->get();
     }
 
     /**

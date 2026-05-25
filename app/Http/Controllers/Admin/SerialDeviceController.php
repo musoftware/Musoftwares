@@ -5,6 +5,9 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\SerialDevice;
 use App\Models\SerialSoftware;
+use App\Services\SerialDeviceService;
+use App\Http\Requests\Admin\SerialDevice\UpdateSerialDeviceStatusRequest;
+use App\Http\Resources\SerialDeviceResource;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -20,6 +23,10 @@ use Inertia\Response;
  */
 class SerialDeviceController extends Controller
 {
+    public function __construct(
+        protected SerialDeviceService $serialDeviceService
+    ) {}
+
     public function index(Request $request): Response
     {
         $validPerPageOptions = [10, 20, 50, 100];
@@ -87,7 +94,7 @@ class SerialDeviceController extends Controller
 
         $query->orderBy($filters['sort_by'], $filters['direction']);
 
-        $devices = $query->paginate($filters['per_page'])->withQueryString();
+        $devices = $query->paginate($filters['per_page'])->withQueryString()->through(fn($d) => (new SerialDeviceResource($d))->resolve());
 
         $softwares = SerialSoftware::orderBy('name')->get(['id', 'name']);
 
@@ -107,20 +114,16 @@ class SerialDeviceController extends Controller
         ]);
     }
 
-    public function updateStatus(Request $request, SerialDevice $serialDevice): RedirectResponse
+    public function updateStatus(UpdateSerialDeviceStatusRequest $request, SerialDevice $serialDevice): RedirectResponse
     {
-        $data = $request->validate([
-            'status' => ['required', 'string', Rule::in(SerialDevice::statuses())],
-        ]);
-
-        $serialDevice->update(['status' => $data['status']]);
+        $this->serialDeviceService->updateStatus($serialDevice, $request->validated('status'));
 
         return back()->with('success', 'Device status updated.');
     }
 
     public function destroy(SerialDevice $serialDevice): RedirectResponse
     {
-        $serialDevice->delete();
+        $this->serialDeviceService->deleteDevice($serialDevice);
 
         return back()->with('success', 'Device deleted.');
     }

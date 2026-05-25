@@ -357,24 +357,24 @@ class User extends Authenticatable
         return $this->hasMany(SerialUserDevice::class, 'user_id');
     }
 
-    public function platformSubscriptions(): HasMany
+    public function subscriptions(): HasMany
     {
-        return $this->hasMany(\App\Models\PlatformSubscription::class);
+        return $this->hasMany(\App\Models\UserSubscription::class, 'client_id');
     }
 
-    public function activePlatformSubscription()
+    public function activeSubscription()
     {
-        return $this->hasOne(\App\Models\PlatformSubscription::class)->active()->latest();
+        return $this->hasOne(\App\Models\UserSubscription::class, 'client_id')->where('status', 'active')->latest();
     }
 
     public function hasSubscription(): bool
     {
-        return $this->platformSubscriptions()->active()->exists();
+        return $this->subscriptions()->where('status', 'active')->exists();
     }
 
     public function getPlanAttribute()
     {
-        return $this->activePlatformSubscription?->plan;
+        return $this->activeSubscription?->plan;
     }
 
     /**

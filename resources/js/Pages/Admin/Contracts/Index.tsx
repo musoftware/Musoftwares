@@ -67,9 +67,11 @@ export default function Index({ contracts, currentTab }) {
                         Signed
                     </Link>
                 </div>
-                <Button onClick={() => alert('Contract creation wizard coming soon!')}>
-                    + Create Contract
-                </Button>
+                <Link href={route('admin.contracts.create')}>
+                    <Button>
+                        + Create Contract
+                    </Button>
+                </Link>
             </div>
 
             <div className="overflow-hidden rounded-lg bg-white shadow">

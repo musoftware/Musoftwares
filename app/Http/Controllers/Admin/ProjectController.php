@@ -3,94 +3,73 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use Modules\ERP\Models\Project;
+use App\Models\Project;
 use App\Models\User;
+use App\Services\ProjectService;
+use App\Http\Requests\Admin\Project\StoreProjectRequest;
+use App\Http\Requests\Admin\Project\UpdateProjectRequest;
+use App\Http\Resources\ProjectResource;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class ProjectController extends Controller
 {
+    public function __construct(
+        protected ProjectService $projectService
+    ) {}
     public function index(Request $request)
     {
         $status = $request->get('status', 'active');
         
-        $query = Project::with(['creator', 'platformClient', 'tenantClient']);
+        $query = Project::with(['client']);
         
         if ($status === 'archived') {
-            $query->where('status', 'archived');
+            $query->where('archived', 1);
         } else {
-            $query->where('status', '!=', 'archived');
+            $query->where('archived', 0);
         }
 
         $projects = $query->latest()->get();
         $clients = User::select('id', 'name', 'email')->orderBy('name')->get();
 
         return Inertia::render('Admin/Projects/Index', [
-            'projects' => $projects,
+            'projects' => ProjectResource::collection($projects)->resolve(),
             'clients' => $clients,
             'currentTab' => $status,
         ]);
     }
 
-    public function store(Request $request)
+    public function store(StoreProjectRequest $request)
     {
-        $validated = $request->validate([
-            'client_id' => 'required|exists:users,id',
-            'name' => 'required|string|max:255',
-            'budget' => 'nullable|numeric',
-        ]);
-
-        $project = new Project();
-        $project->tenant_id = 1; // Assuming 1 is platform tenant, or get from config
-        $project->client_id = $validated['client_id'];
-        $project->name = $validated['name'];
-        $project->budget = $validated['budget'] ?? null;
-        $project->status = 'active';
-        $project->created_by = auth()->id();
-        $project->save();
+        $this->projectService->createProject($request->validated());
 
         return redirect()->back()->with('success', 'Project created successfully.');
     }
 
-    public function update(Request $request, $id)
+    public function update(UpdateProjectRequest $request, $id)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'budget' => 'nullable|numeric',
-        ]);
-
-        $project = Project::findOrFail($id);
-        $project->name = $validated['name'];
-        if (isset($validated['budget'])) {
-            $project->budget = $validated['budget'];
-        }
-        $project->save();
+        $this->projectService->updateProject($id, $request->validated());
 
         return redirect()->back()->with('success', 'Project updated successfully.');
     }
 
     public function archive($id)
     {
-        $project = Project::findOrFail($id);
-        $project->status = 'archived';
-        $project->save();
+        $this->projectService->archiveProject($id);
 
         return redirect()->back()->with('success', 'Project archived.');
     }
 
     public function restore($id)
     {
-        $project = Project::findOrFail($id);
-        $project->status = 'active';
-        $project->save();
+        $this->projectService->restoreProject($id);
 
         return redirect()->back()->with('success', 'Project restored.');
     }
 
     public function destroy($id)
     {
-        $project = Project::findOrFail($id);
-        $project->delete();
+        $this->projectService->deleteProject($id);
 
         return redirect()->back()->with('success', 'Project deleted.');
     }

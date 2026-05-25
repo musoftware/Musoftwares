@@ -19,9 +19,7 @@ const statusMap: Record<string, string> = {
     inactive: 'neutral',
 };
 
-function formatCurrency(amount: number, currency = 'USD') {
-    return new Intl.NumberFormat('en-US', { style: 'currency', currency }).format(amount || 0);
-}
+import { formatMoney as formatCurrency } from '@/lib/utils';
 
 const menuItems = [
     { id: 'dashboard', label: 'Dashboard', icon: BarChart3, href: '/admin', isActive: false },

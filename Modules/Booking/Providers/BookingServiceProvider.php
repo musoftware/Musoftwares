@@ -39,8 +39,12 @@ class BookingServiceProvider extends ModuleServiceProvider
      * 
      * @param $schedule
      */
-    // protected function configureSchedules(Schedule $schedule): void
-    // {
-    //     $schedule->command('inspire')->hourly();
-    // }
+    protected function configureSchedules(Schedule $schedule): void
+    {
+        // Run the WA Reminder job every minute to dispatch due reminders
+        $schedule->job(new \Modules\Booking\app\Features\Reminders\Jobs\ProcessDueWaRemindersJob)->everyMinute();
+
+        // Check pending custom domain verifications hourly
+        $schedule->job(new \Modules\Booking\app\Features\CustomDomains\Jobs\VerifyCustomDomainJob)->hourly();
+    }
 }

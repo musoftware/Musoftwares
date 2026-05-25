@@ -5,33 +5,28 @@ import { Button } from '@/Components/ui/button';
 import {
     Check, Wallet, CreditCard, ArrowRight, ShieldCheck,
     Sparkles, Building2, Wrench, MessageSquare, Zap,
-    Crown, Plus, Minus, Calculator,
+    Crown, Layers, ArrowLeft,
+    Globe, Link as LinkIcon, Calendar, Users, Repeat,
+    BarChart, List, Star, Code, Settings, Headset,
+    Send, GitMerge, Database, Mail, Filter, Webhook,
+    Download, Brain, Inbox, History, Shield,
+    Package, MonitorSmartphone, Calculator, Banknote,
+    ShoppingCart, Truck, Warehouse, CheckSquare, Coins,
+    Receipt, Files, ScanLine, Clock, Bell, UserCircle,
+    Laptop, Smartphone, Lightbulb,
+    TrendingUp, Activity, Target, FileText, Trophy, 
+    UserPlus, Store, LineChart, Rss, WifiOff, Umbrella, 
+    RefreshCw, PieChart
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-interface Plan {
-    id: number;
-    slug: string;
-    name: string;
-    description: string | null;
-    monthly_price: number;
-    yearly_price: number;
-    included_modules: string[];
-    included_tools: string[];
-    features: string[];
-    is_custom: boolean;
-    prices?: {
-        '3_months': number;
-        '6_months': number;
-        '1_year': number;
-        '3_years': number;
-    };
-}
-
 interface ServiceItem {
+    id: string;
     slug: string;
+    tool_id?: number;
+    parent_id?: string;
     name: string;
-    type: 'module' | 'tool';
+    type: 'module' | 'tool' | 'addon';
     description: string | null;
     monthly_price: number;
     yearly_price: number;
@@ -52,277 +47,419 @@ interface ActiveSub {
 }
 
 interface PlansProps {
-    plans: Plan[];
     serviceItems: ServiceItem[];
     activeSubscription: ActiveSub | null;
     walletBalance: number;
     currency: string;
 }
 
-const TIER_STYLES: Record<string, { accent: string; gradient: string; badge: string; icon: React.ElementType }> = {
-    trial:  { accent: 'slate',    gradient: 'from-slate-500 to-gray-600',     badge: 'bg-slate-100 text-slate-700',     icon: Zap },
-    go:     { accent: 'emerald',  gradient: 'from-emerald-500 to-teal-600',   badge: 'bg-emerald-100 text-emerald-700', icon: MessageSquare },
-    plus:   { accent: 'indigo',   gradient: 'from-indigo-500 to-violet-600',  badge: 'bg-indigo-100 text-indigo-700',   icon: Wrench },
-    pro:    { accent: 'amber',    gradient: 'from-amber-500 to-orange-600',   badge: 'bg-amber-100 text-amber-700',     icon: Building2 },
-    custom: { accent: 'fuchsia',  gradient: 'from-fuchsia-500 to-purple-600', badge: 'bg-fuchsia-100 text-fuchsia-700', icon: Sparkles },
+const ICON_MAP: Record<string, React.ElementType> = {
+    Building2, MessageSquare, Zap, Sparkles, Check, Wrench,
+    Globe, Link: LinkIcon, Calendar, Users, Repeat,
+    BarChart, List, Star, Code, Settings, Headset,
+    Send, GitMerge, Database, Mail, Filter, Webhook,
+    Download, Brain, Inbox, History, Shield,
+    Package, MonitorSmartphone, Calculator, Banknote,
+    ShoppingCart, Truck, Warehouse, CheckSquare, Coins,
+    Receipt, Files, ScanLine, Clock, Bell, UserCircle,
+    Laptop, Smartphone, Lightbulb,
+    TrendingUp, Activity, Target, FileText, Trophy, 
+    UserPlus, Store, LineChart, Rss, WifiOff, Umbrella, 
+    RefreshCw, PieChart
 };
 
-export default function Plans({ plans, serviceItems, activeSubscription, walletBalance, currency }: PlansProps) {
-    const [billing, setBilling] = useState<'3_months' | '6_months' | '1_year' | '3_years'>('3_months');
+export default function Plans({ serviceItems, activeSubscription, walletBalance, currency }: PlansProps) {
+    const [billing, setBilling] = useState<'1_month' | '6_months' | '1_year'>('1_month');
+    const [selectedItems, setSelectedItems] = useState<string[]>([]);
 
-    const fixedPlans = plans.filter(p => !p.is_custom);
+    const modules = serviceItems.filter(item => item.type === 'module');
+    const tools = serviceItems.filter(item => item.type === 'tool');
+    const addons = serviceItems.filter(item => item.type === 'addon');
 
-    const handleSubscribeWallet = (planId: number) => {
-        if (confirm('Subscribe using your wallet balance?')) {
-            router.post(route('subscriptions.subscribe'), { plan_id: planId, billing_cycle: billing });
+    const toggleItem = (id: string) => {
+        const item = serviceItems.find(i => i.id === id);
+        
+        if (item?.type === 'module') {
+            setSelectedItems(prev => {
+                if (prev.includes(id)) {
+                    // Deselect module AND all its nested addons
+                    return prev.filter(i => i !== id && serviceItems.find(si => si.id === i)?.parent_id !== id);
+                }
+                return [...prev, id];
+            });
+        } else {
+            setSelectedItems(prev =>
+                prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
+            );
         }
     };
 
-    const handleSubscribeKashier = (planId: number) => {
-        router.post(route('subscriptions.kashier.checkout'), { plan_id: planId, billing_cycle: billing });
+    const multiplier = useMemo(() => {
+        if (billing === '1_month') return 1;
+        if (billing === '6_months') return 6;
+        if (billing === '1_year') return 10; // 2 months free
+        return 1;
+    }, [billing]);
+
+    const calculateItemPrice = (item: ServiceItem) => {
+        return item.monthly_price * multiplier;
     };
 
-    const getPrice = (plan: Plan) => {
-        if (plan.prices && plan.prices[billing] !== undefined) {
-            return Number(plan.prices[billing]) || 0;
+    const subtotal = useMemo(() => {
+        let baseSubtotal = 0;
+        let toolsCount = 0;
+
+        selectedItems.forEach((id) => {
+            const item = serviceItems.find((i) => i.id === id);
+            if (item) {
+                if (item.type === 'tool') {
+                    toolsCount++;
+                } else {
+                    baseSubtotal += item.monthly_price;
+                }
+            }
+        });
+
+        let toolsSubtotal = 0;
+        if (toolsCount > 0) {
+            const firstToolId = selectedItems.find(id => serviceItems.find(i => i.id === id)?.type === 'tool');
+            const toolBaseMonthly = serviceItems.find(i => i.id === firstToolId)?.monthly_price || 0;
+            const discountPercent = Math.min(50, (toolsCount - 1) * 10);
+            toolsSubtotal = (toolBaseMonthly * toolsCount) * (1 - (discountPercent / 100));
         }
-        const months = {
-            '3_months': 3,
-            '6_months': 6,
-            '1_year': 12,
-            '3_years': 36
-        }[billing] || 3;
-        return (Number(plan.monthly_price) || 0) * months;
+
+        return baseSubtotal + toolsSubtotal;
+    }, [selectedItems, serviceItems]);
+
+    // Calculate how much discount they got from tools volume
+    const toolsDiscount = useMemo(() => {
+        let toolsCount = 0;
+        let firstToolId: string | null = null;
+        
+        selectedItems.forEach((id) => {
+            const item = serviceItems.find((i) => i.id === id);
+            if (item && item.type === 'tool') {
+                toolsCount++;
+                if (!firstToolId) firstToolId = id;
+            }
+        });
+
+        if (toolsCount <= 1) return 0;
+        
+        const toolBaseMonthly = serviceItems.find(i => i.id === firstToolId)?.monthly_price || 0;
+        const discountPercent = Math.min(50, (toolsCount - 1) * 10);
+        const originalToolsPrice = toolBaseMonthly * toolsCount;
+        const discountedToolsPrice = originalToolsPrice * (1 - (discountPercent / 100));
+        
+        return (originalToolsPrice - discountedToolsPrice) * multiplier;
+    }, [selectedItems, serviceItems, multiplier]);
+
+    const total = subtotal * multiplier;
+    
+    // Original total without discount (if 1 year selected, it would be * 12)
+    const originalTotal = subtotal * (billing === '1_year' ? 12 : (billing === '6_months' ? 6 : 1));
+    const discount = originalTotal - total;
+
+    const handleSubscribeWallet = () => {
+        if (selectedItems.length === 0) return;
+        if (confirm(`Subscribe to these ${selectedItems.length} items using your wallet balance?`)) {
+            router.post(route('subscriptions.subscribe'), { items: selectedItems, billing_cycle: billing });
+        }
+    };
+
+    const handleSubscribeKashier = () => {
+        if (selectedItems.length === 0) return;
+        router.post(route('subscriptions.kashier.checkout'), { items: selectedItems, billing_cycle: billing });
+    };
+
+    const canAfford = walletBalance >= total;
+
+    const renderItemCard = (item: ServiceItem, isAddon: boolean = false) => {
+        const isSelected = selectedItems.includes(item.id);
+        const Icon = item.icon && ICON_MAP[item.icon] ? ICON_MAP[item.icon] : Layers;
+
+        return (
+            <div
+                key={item.id}
+                onClick={() => toggleItem(item.id)}
+                className={cn(
+                    'relative flex items-start gap-4 rounded-2xl border transition-all duration-300 cursor-pointer group',
+                    isAddon ? 'p-4 bg-white/50 hover:bg-white' : 'p-5 bg-white hover:shadow-sm',
+                    isSelected
+                        ? (isAddon ? 'border-indigo-400 bg-indigo-50/50' : 'border-indigo-600 bg-indigo-50/50 shadow-md shadow-indigo-100/50')
+                        : 'border-slate-200 hover:border-indigo-300'
+                )}
+            >
+                <div className={cn(
+                    'flex items-center justify-center rounded-md border mt-0.5 shrink-0 transition-colors',
+                    isAddon ? 'w-5 h-5' : 'w-6 h-6',
+                    isSelected ? 'bg-indigo-600 border-indigo-600 text-white' : 'bg-slate-50 border-slate-300 text-transparent group-hover:border-indigo-400'
+                )}>
+                    <Check className={isAddon ? "w-3 h-3" : "w-4 h-4"} />
+                </div>
+                
+                <div className="flex-1">
+                    <div className="flex justify-between items-start">
+                        <div>
+                            <div className="flex items-center gap-2">
+                                <Icon className={cn("w-4 h-4", isSelected ? 'text-indigo-600' : 'text-slate-400')} />
+                                <h3 className={cn("font-semibold", isSelected ? 'text-indigo-900' : 'text-slate-900')}>
+                                    {item.name}
+                                </h3>
+                            </div>
+                            {item.description && (
+                                <p className="text-sm text-slate-500 mt-1 leading-relaxed">
+                                    {item.description}
+                                </p>
+                            )}
+                            {item.type === 'tool' && (
+                                <a 
+                                    href={`https://musoftwares.com/programs`}
+                                    target="_blank" 
+                                    rel="noopener noreferrer"
+                                    className="text-xs font-medium text-indigo-600 hover:text-indigo-700 hover:underline mt-1.5 inline-block"
+                                    onClick={(e) => e.stopPropagation()}
+                                >
+                                    View Details
+                                </a>
+                            )}
+                        </div>
+                        <div className="text-right">
+                            <span className="text-lg font-bold text-slate-900">
+                                {calculateItemPrice(item).toFixed(2)}
+                            </span>
+                            <span className="text-xs text-slate-500 ml-1">{currency}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
     };
 
     return (
         <AuthenticatedLayout header={undefined}>
-            <Head title="Subscription Plans" />
+            <Head title="Build Your Plan" />
 
             {/* ── Hero ── */}
-            <div className="max-w-6xl mx-auto px-4 pt-16 pb-8 text-center">
-                <div className="inline-flex items-center gap-2 bg-gradient-to-r from-indigo-50 to-violet-50 border border-indigo-100 text-indigo-700 text-xs font-semibold px-4 py-1.5 rounded-full mb-6">
-                    <Crown className="h-3.5 w-3.5" /> Unified Platform Plans
-                </div>
-                <h1 className="text-[2.6rem] font-semibold tracking-tight text-slate-900 leading-tight">
-                    One plan. Everything you need.
-                </h1>
-                <p className="mt-3 text-lg text-slate-500 font-light max-w-xl mx-auto">
-                    Choose a plan that fits your business. Upgrade, downgrade, or build your own — anytime.
-                </p>
+            <div className="max-w-7xl mx-auto px-4 pt-10 pb-6">
+                <Link href={route('subscriptions.manage')} className="inline-flex items-center text-sm text-slate-500 hover:text-slate-800 mb-6 transition-colors">
+                    <ArrowLeft className="w-4 h-4 mr-1.5" /> Back to My Subscriptions
+                </Link>
+                <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+                    <div>
+                        <div className="inline-flex items-center gap-2 bg-indigo-50 border border-indigo-100 text-indigo-700 text-xs font-semibold px-3 py-1 rounded-full mb-3">
+                            <Crown className="h-3.5 w-3.5" /> Fully Genius System
+                        </div>
+                        <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-slate-900">
+                            Build Your Perfect Plan
+                        </h1>
+                        <p className="mt-2 text-lg text-slate-500 font-light">
+                            Select exactly what you need. No more, no less.
+                        </p>
+                    </div>
 
-                {/* ── Billing Toggle ── */}
-                <div className="mt-8 inline-flex items-center bg-slate-100 p-1.5 rounded-full text-sm text-slate-500">
-                    {[
-                        { id: '3_months', label: '3 Months' },
-                        { id: '6_months', label: '6 Months' },
-                        { id: '1_year', label: '1 Year' },
-                        { id: '3_years', label: '3 Years' },
-                    ].map(option => (
-                        <button
-                            key={option.id}
-                            onClick={() => setBilling(option.id as any)}
-                            className={cn(
-                                'px-5 py-2 rounded-full font-medium transition-all duration-200',
-                                billing === option.id
-                                    ? 'bg-white text-slate-900 shadow-sm ring-1 ring-slate-900/5'
-                                    : 'hover:text-slate-700 hover:bg-slate-200/50'
-                            )}
-                        >
-                            {option.label}
-                        </button>
-                    ))}
+                    {/* ── Billing Toggle ── */}
+                    <div className="inline-flex items-center bg-slate-100 p-1 rounded-xl text-sm text-slate-500 shrink-0">
+                        {[
+                            { id: '1_month', label: '1 Month' },
+                            { id: '6_months', label: '6 Months' },
+                            { id: '1_year', label: '1 Year (Save 16%)' },
+                        ].map(option => (
+                            <button
+                                key={option.id}
+                                onClick={() => setBilling(option.id as any)}
+                                className={cn(
+                                    'px-4 py-2 rounded-lg font-medium transition-all duration-200',
+                                    billing === option.id
+                                        ? 'bg-white text-slate-900 shadow-sm ring-1 ring-slate-900/5'
+                                        : 'hover:text-slate-700 hover:bg-slate-200/50'
+                                )}
+                            >
+                                {option.label}
+                            </button>
+                        ))}
+                    </div>
                 </div>
             </div>
 
             {/* ── Active Subscription Banner ── */}
             {activeSubscription && (
-                <div className="max-w-6xl mx-auto px-4 mb-6">
+                <div className="max-w-7xl mx-auto px-4 mb-6">
                     <div className="flex items-center justify-between bg-emerald-50 border border-emerald-100 rounded-2xl px-6 py-3.5">
                         <div className="flex items-center gap-2.5 text-sm text-emerald-800">
                             <ShieldCheck className="h-4 w-4 text-emerald-500" />
                             <span>
-                                You're subscribed to <strong>{activeSubscription.plan_name}</strong>
+                                You have an active subscription: <strong>{activeSubscription.plan_name}</strong>
                                 {activeSubscription.expires_at && ` · renews ${activeSubscription.expires_at}`}
                             </span>
                         </div>
-                        <Link href={route('subscriptions.manage')}>
-                            <Button variant="ghost" size="sm" className="text-emerald-700 hover:bg-emerald-100 h-8 text-xs gap-1.5">
-                                Manage <ArrowRight className="h-3.5 w-3.5" />
-                            </Button>
-                        </Link>
                     </div>
                 </div>
             )}
 
-            {/* ── Plan Cards Grid ── */}
-            <div className="max-w-6xl mx-auto px-4 pb-6">
-                {fixedPlans.length === 0 ? (
-                    <div className="text-center py-24 text-slate-400">
-                        <p className="text-lg font-light">No plans available yet. Check back soon.</p>
-                    </div>
-                ) : (
-                    <div className={cn(
-                        'grid gap-5',
-                        fixedPlans.length <= 2 ? 'grid-cols-1 md:grid-cols-2 max-w-3xl mx-auto' :
-                        'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'
-                    )}>
-                        {fixedPlans.map((plan) => {
-                            const style = TIER_STYLES[plan.slug] || TIER_STYLES.starter;
-                            const TierIcon = style.icon;
-                            const price = getPrice(plan);
-                            const isCurrentPlan = activeSubscription?.plan_slug === plan.slug;
-                            const canAfford = walletBalance >= price;
-                            const isPopular = plan.slug === 'plus';
+            <div className="max-w-7xl mx-auto px-4 pb-20">
+                <div className="flex flex-col lg:flex-row gap-8 items-start">
+                    
+                    {/* ── Products List (Left) ── */}
+                    <div className="flex-1 w-full space-y-10">
+                        
+                        <section>
+                            <div className="mb-4">
+                                <h2 className="text-xl font-semibold text-slate-900">Core Modules</h2>
+                                <p className="text-sm text-slate-500">The foundation for your business operations.</p>
+                            </div>
+                            <div className="grid grid-cols-1 gap-6">
+                                {modules.map(module => {
+                                    const moduleAddons = addons.filter(a => a.parent_id === module.id);
+                                    const isModuleSelected = selectedItems.includes(module.id);
+                                    return (
+                                        <div key={module.id} className="flex flex-col">
+                                            {renderItemCard(module)}
+                                            
+                                            {/* Add-ons Section */}
+                                            {moduleAddons.length > 0 && isModuleSelected && (
+                                                <div className="mt-4 pl-4 md:pl-8 border-l-[3px] border-indigo-100 ml-4 md:ml-6 pb-2 animate-in slide-in-from-top-4 fade-in duration-300">
+                                                    <h4 className="text-sm font-bold text-slate-800 mb-3 flex items-center gap-2 tracking-tight">
+                                                        <Sparkles className="w-4 h-4 text-indigo-500" /> 
+                                                        Power up {module.name}
+                                                    </h4>
+                                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                                        {moduleAddons.map(addon => renderItemCard(addon, true))}
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        </section>
 
-                            return (
-                                <div
-                                    key={plan.id}
+                        <div className="border-t border-slate-100" />
+
+                        <section>
+                            <div className="mb-4">
+                                <h2 className="text-xl font-semibold text-slate-900">Automation Tools</h2>
+                                <p className="text-sm text-slate-500">Standalone tools to boost your productivity.</p>
+                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                {tools.map(renderItemCard)}
+                            </div>
+                        </section>
+
+                    </div>
+
+                    {/* ── Sticky Summary Cart (Right) ── */}
+                    <div className="w-full lg:w-[380px] shrink-0 sticky top-24">
+                        <div className="bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-sm">
+                            <div className="p-6 bg-slate-50/50 border-b border-slate-100">
+                                <h3 className="text-lg font-semibold text-slate-900">Your Plan Summary</h3>
+                                <p className="text-sm text-slate-500">
+                                    Billed {billing.replace('_', ' ')}
+                                </p>
+                            </div>
+                            
+                            <div className="p-6">
+                                {selectedItems.length === 0 ? (
+                                    <div className="text-center py-8">
+                                        <div className="w-12 h-12 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-3">
+                                            <Layers className="w-6 h-6 text-slate-300" />
+                                        </div>
+                                        <p className="text-slate-500 text-sm">Select products to build your plan.</p>
+                                    </div>
+                                ) : (
+                                    <div className="space-y-4">
+                                        {selectedItems.map(id => {
+                                            const item = serviceItems.find(i => i.id === id);
+                                            if (!item) return null;
+                                            
+                                            // Group Addons visually under their parents in the cart
+                                            const isAddon = item.type === 'addon';
+                                            
+                                            return (
+                                                <div key={id} className={cn("flex justify-between text-sm", isAddon ? "pl-4 text-slate-500" : "text-slate-700 font-medium")}>
+                                                    <span className="flex items-center gap-1.5">
+                                                        {isAddon && <span className="text-slate-300">↳</span>}
+                                                        {item.name}
+                                                    </span>
+                                                    <span className={cn(isAddon ? "text-slate-500" : "text-slate-900")}>
+                                                        {calculateItemPrice(item).toFixed(2)}
+                                                    </span>
+                                                </div>
+                                            );
+                                        })}
+                                        
+                                        <div className="border-t border-slate-100 pt-4 mt-4" />
+                                        
+                                        {toolsDiscount > 0 && (
+                                            <div className="flex justify-between text-sm text-indigo-600 font-medium">
+                                                <span>Tools Volume Discount</span>
+                                                <span>-{toolsDiscount.toFixed(2)}</span>
+                                            </div>
+                                        )}
+
+                                        {discount > 0 && (
+                                            <div className="flex justify-between text-sm text-emerald-600 font-medium">
+                                                <span>Discount (Annual)</span>
+                                                <span>-{discount.toFixed(2)}</span>
+                                            </div>
+                                        )}
+
+                                        <div className="flex justify-between items-end">
+                                            <span className="text-base font-medium text-slate-900">Total</span>
+                                            <div className="text-right">
+                                                <span className="text-3xl font-bold tracking-tight text-indigo-600">
+                                                    {total.toFixed(2)}
+                                                </span>
+                                                <span className="text-sm text-slate-400 ml-1">{currency}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+
+                            <div className="p-6 pt-0 space-y-3">
+                                <Button
+                                    onClick={handleSubscribeWallet}
+                                    disabled={selectedItems.length === 0 || !canAfford}
                                     className={cn(
-                                        'relative flex flex-col rounded-3xl border bg-white overflow-hidden transition-all duration-300',
-                                        isCurrentPlan
-                                            ? 'border-slate-900 shadow-lg shadow-slate-900/10 ring-1 ring-slate-900/5'
-                                            : isPopular
-                                                ? 'border-indigo-200 shadow-md shadow-indigo-100/50 hover:shadow-lg'
-                                                : 'border-slate-200 hover:shadow-md hover:shadow-slate-100'
+                                        'w-full h-12 rounded-xl text-sm font-medium gap-2 transition-all',
+                                        canAfford && selectedItems.length > 0
+                                            ? 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm'
+                                            : 'bg-slate-100 text-slate-400 cursor-not-allowed'
                                     )}
                                 >
-                                    {/* Popular / Current badge */}
-                                    {isPopular && !isCurrentPlan && (
-                                        <div className={cn('absolute top-0 inset-x-0 h-1 bg-gradient-to-r', style.gradient)} />
-                                    )}
-                                    {isCurrentPlan && (
-                                        <div className="absolute top-0 inset-x-0 h-1 bg-slate-900" />
-                                    )}
+                                    <Wallet className="h-4 w-4" />
+                                    {canAfford || selectedItems.length === 0 ? 'Subscribe with Wallet' : `Need ${currency} ${total.toFixed(2)}`}
+                                </Button>
 
-                                    <div className="p-8 flex-1">
-                                        {/* Header */}
-                                        <div className="flex items-start justify-between gap-2">
-                                            <div className="flex items-center gap-2.5">
-                                                <div className={cn('w-9 h-9 rounded-xl flex items-center justify-center bg-gradient-to-br', style.gradient)}>
-                                                    <TierIcon className="w-4.5 h-4.5 text-white" />
-                                                </div>
-                                                <h2 className="text-base font-semibold text-slate-900">{plan.name}</h2>
-                                            </div>
-                                            {isCurrentPlan && (
-                                                <span className="shrink-0 text-[10px] font-bold uppercase tracking-wider text-slate-600 bg-slate-100 px-2 py-1 rounded-full">
-                                                    Current
-                                                </span>
-                                            )}
-                                            {isPopular && !isCurrentPlan && (
-                                                <span className={cn('shrink-0 text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-full', style.badge)}>
-                                                    Popular
-                                                </span>
-                                            )}
-                                        </div>
+                                <Button
+                                    onClick={handleSubscribeKashier}
+                                    disabled={selectedItems.length === 0}
+                                    variant="outline"
+                                    className="w-full h-12 rounded-xl text-sm font-medium gap-2 border-slate-200 hover:bg-slate-50 text-slate-700"
+                                >
+                                    <CreditCard className="h-4 w-4 text-slate-400" />
+                                    Pay by Card
+                                </Button>
 
-                                        {/* Description */}
-                                        {plan.description && (
-                                            <p className="mt-3 text-sm text-slate-500 leading-relaxed">{plan.description}</p>
-                                        )}
+                                {!canAfford && selectedItems.length > 0 && (
+                                    <Link
+                                        href={route('financial.add-balance')}
+                                        className="flex items-center justify-center gap-1 text-xs text-slate-500 hover:text-slate-700 pt-2"
+                                    >
+                                        Add funds to wallet <ArrowRight className="h-3 w-3" />
+                                    </Link>
+                                )}
+                            </div>
+                        </div>
 
-                                        {/* Price */}
-                                        <div className="mt-5 mb-6">
-                                            <div className="flex items-baseline gap-1">
-                                                <span className="text-4xl font-semibold tracking-tight text-slate-900">
-                                                    {plan.slug === 'trial' ? '0' : (Number(price || 0) % 1 === 0 ? Math.round(Number(price || 0)) : Number(price || 0).toFixed(2))}
-                                                </span>
-                                                <span className="text-sm text-slate-400 ml-0.5">{currency}</span>
-                                            </div>
-                                            <p className="text-sm text-slate-400 mt-0.5 capitalize">
-                                                {plan.slug === 'trial' ? 'Valid for 1 Day' : `billed every ${billing.replace('_', ' ')}`}
-                                            </p>
-                                        </div>
-
-                                        {/* Divider */}
-                                        <div className="border-t border-slate-100 mb-5" />
-
-                                        {/* Features */}
-                                        <ul className="space-y-2.5">
-                                            {plan.features.map((f, i) => (
-                                                <li key={i} className="flex items-start gap-2.5 text-sm text-slate-600">
-                                                    <Check className="h-4 w-4 text-emerald-500 shrink-0 mt-0.5" />
-                                                    <span>{f}</span>
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    </div>
-
-                                    {/* CTA */}
-                                    <div className="px-8 pb-8 space-y-2.5">
-                                        {isCurrentPlan ? (
-                                            <div className="w-full h-11 rounded-xl bg-slate-100 flex items-center justify-center text-sm font-medium text-slate-400">
-                                                Active plan
-                                            </div>
-                                        ) : plan.slug === 'trial' ? (
-                                            <Button
-                                                onClick={() => handleSubscribeWallet(plan.id)}
-                                                className="w-full h-11 rounded-xl text-sm font-medium gap-2 transition-all bg-slate-900 hover:bg-slate-800 text-white"
-                                            >
-                                                <Zap className="h-4 w-4" />
-                                                Start 1-Day Free Trial
-                                            </Button>
-                                        ) : (
-                                            <>
-                                                <Button
-                                                    onClick={() => handleSubscribeWallet(plan.id)}
-                                                    disabled={!canAfford}
-                                                    className={cn(
-                                                        'w-full h-11 rounded-xl text-sm font-medium gap-2 transition-all',
-                                                        canAfford
-                                                            ? isPopular
-                                                                ? 'bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white shadow-sm'
-                                                                : 'bg-slate-900 hover:bg-slate-800 text-white'
-                                                            : 'bg-slate-100 text-slate-400 cursor-not-allowed'
-                                                    )}
-                                                >
-                                                    <Wallet className="h-4 w-4" />
-                                                    {canAfford ? 'Subscribe with Wallet' : `Need ${currency} ${price}`}
-                                                </Button>
-
-                                                <Button
-                                                    onClick={() => handleSubscribeKashier(plan.id)}
-                                                    variant="outline"
-                                                    className="w-full h-11 rounded-xl text-sm font-medium gap-2 border-slate-200 hover:bg-slate-50 text-slate-700"
-                                                >
-                                                    <CreditCard className="h-4 w-4 text-slate-400" />
-                                                    Pay by Card
-                                                </Button>
-
-                                                {!canAfford && (
-                                                    <Link
-                                                        href={route('financial.add-balance')}
-                                                        className="flex items-center justify-center gap-1 text-xs text-slate-500 hover:text-slate-700 pt-0.5"
-                                                    >
-                                                        Add funds to wallet <ArrowRight className="h-3 w-3" />
-                                                    </Link>
-                                                )}
-                                            </>
-                                        )}
-                                    </div>
-                                </div>
-                            );
-                        })}
+                        <div className="mt-6 flex items-center justify-center gap-2 text-sm text-slate-400">
+                            <Wallet className="h-3.5 w-3.5" />
+                            <span>Wallet balance: <strong className="text-slate-600">{walletBalance} {currency}</strong></span>
+                        </div>
                     </div>
-                )}
-            </div>
 
-
-
-            {/* ── Wallet balance + Trust ── */}
-            <div className="max-w-6xl mx-auto px-4 pb-16">
-                <div className="flex items-center justify-center gap-2 text-sm text-slate-400">
-                    <Wallet className="h-3.5 w-3.5" />
-                    <span>Wallet balance: <strong className="text-slate-600">{walletBalance} {currency}</strong></span>
-                    <span className="text-slate-200">·</span>
-                    <Link href={route('financial.add-balance')} className="text-slate-500 hover:text-slate-800 underline underline-offset-2">
-                        Add funds
-                    </Link>
                 </div>
-                <p className="mt-3 text-center text-xs text-slate-400 flex items-center justify-center gap-1.5">
-                    <ShieldCheck className="h-3.5 w-3.5" />
-                    Cancel anytime · Instant activation · 7-day money-back guarantee
-                </p>
             </div>
         </AuthenticatedLayout>
     );

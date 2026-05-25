@@ -4,18 +4,14 @@ import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
 import { Badge } from '@/Components/ui/badge';
 import { Button } from '@/Components/ui/button';
 import { AlertTriangle, CheckCircle, ShieldAlert } from 'lucide-react';
+import { formatMoney as formatCurrency } from '@/lib/utils';
 
 export default function Show({ order }) {
     const { post, processing } = useForm({
         action: '',
     });
 
-    const formatCurrency = (amount, currency = 'USD') => {
-        return new Intl.NumberFormat('en-US', {
-            style: 'currency',
-            currency,
-        }).format(amount || 0);
-    };
+
 
     const handleAction = (actionType) => {
         if (!confirm(`Are you sure you want to ${actionType.replace('_', ' ')}? This action cannot be undone.`)) {
