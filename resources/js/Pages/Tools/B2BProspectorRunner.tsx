@@ -755,33 +755,29 @@ export default function B2BProspectorRunner({ tool, subscription, runtimePort, p
 
                                 <div className="flex items-center gap-3.5 w-full md:w-auto shrink-0">
                                     {/* Campaign Selector */}
-                                    <Input 
-                                        type="select"
-                                        as="select"
+                                    <select 
                                         value={selectedCampaignId}
-                                        onChange={(e: any) => { setSelectedCampaignId(e.target.value); setLeadsOffset(0); }}
-                                        className="md:w-44 bg-slate-50 border-slate-200 h-10 text-xs"
+                                        onChange={(e) => { setSelectedCampaignId(e.target.value); setLeadsOffset(0); }}
+                                        className="md:w-44 bg-slate-50 border border-slate-200 h-10 text-xs rounded-lg px-2.5 outline-none focus:border-ring focus:ring-3 focus:ring-ring/50 transition-colors"
                                     >
                                         <option value="">All Campaigns</option>
                                         {campaigns.map(c => (
                                             <option key={c.id} value={c.id}>{c.name}</option>
                                         ))}
-                                    </Input>
+                                    </select>
 
                                     {/* Email Health Status Selector */}
-                                    <Input 
-                                        type="select"
-                                        as="select"
+                                    <select 
                                         value={leadsEmailFilter}
-                                        onChange={(e: any) => { setLeadsEmailFilter(e.target.value); setLeadsOffset(0); }}
-                                        className="md:w-44 bg-slate-50 border-slate-200 h-10 text-xs"
+                                        onChange={(e) => { setLeadsEmailFilter(e.target.value); setLeadsOffset(0); }}
+                                        className="md:w-44 bg-slate-50 border border-slate-200 h-10 text-xs rounded-lg px-2.5 outline-none focus:border-ring focus:ring-3 focus:ring-ring/50 transition-colors"
                                     >
                                         <option value="">All Verification States</option>
                                         <option value="valid">Verified Clean</option>
                                         <option value="invalid">Risky Bounce</option>
                                         <option value="catchall">Accept All</option>
                                         <option value="unverified">Unverified</option>
-                                    </Input>
+                                    </select>
                                 </div>
                             </div>
 
