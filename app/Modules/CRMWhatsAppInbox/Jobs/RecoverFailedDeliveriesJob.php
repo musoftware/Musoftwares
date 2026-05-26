@@ -14,7 +14,11 @@ class RecoverFailedDeliveriesJob implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     public $tries = 1;
-    public $queue = 'whatsapp-retry';
+
+    public function __construct()
+    {
+        $this->onQueue('whatsapp-retry');
+    }
 
     public function handle(): void
     {

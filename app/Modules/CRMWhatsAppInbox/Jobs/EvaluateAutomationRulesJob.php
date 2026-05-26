@@ -16,13 +16,14 @@ class EvaluateAutomationRulesJob implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     public $tries = 1;
-    public $queue = 'whatsapp-automation';
 
     public function __construct(
         public WhatsAppConversation $conversation,
         public string $triggerEvent,
         public ?WhatsAppMessage $message = null,
-    ) {}
+    ) {
+        $this->onQueue('whatsapp-automation');
+    }
 
     public function handle(WhatsAppAutomationEngine $engine): void
     {

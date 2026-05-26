@@ -14,11 +14,12 @@ class RetryFailedMessageJob implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     public $tries = 1;
-    public $queue = 'whatsapp-retry';
 
     public function __construct(
         public WhatsAppMessage $message,
-    ) {}
+    ) {
+        $this->onQueue('whatsapp-retry');
+    }
 
     public function handle(): void
     {

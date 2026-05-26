@@ -17,11 +17,12 @@ class SendWhatsAppMessageJob implements ShouldQueue
 
     public $tries = 3;
     public $backoff = [10, 30, 60];
-    public $queue = 'whatsapp-outgoing';
 
     public function __construct(
         public WhatsAppMessage $message,
-    ) {}
+    ) {
+        $this->onQueue('whatsapp-outgoing');
+    }
 
     public function handle(WhatsAppProviderInterface $provider, MessageDeliveryService $deliveryService): void
     {

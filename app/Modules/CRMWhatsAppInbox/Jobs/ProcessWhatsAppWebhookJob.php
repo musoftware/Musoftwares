@@ -17,13 +17,14 @@ class ProcessWhatsAppWebhookJob implements ShouldQueue
 
     public $tries = 3;
     public $backoff = [5, 15, 30];
-    public $queue = 'whatsapp-incoming';
 
     public function __construct(
         public WhatsAppAccount $account,
         public array $payload,
         public string $eventType,
-    ) {}
+    ) {
+        $this->onQueue('whatsapp-incoming');
+    }
 
     public function handle(WhatsAppInboxService $inboxService): void
     {

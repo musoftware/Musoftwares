@@ -16,12 +16,13 @@ class ProcessWhatsAppMediaJob implements ShouldQueue
 
     public $tries = 2;
     public $backoff = [30, 60];
-    public $queue = 'whatsapp-media';
 
     public function __construct(
         public WhatsAppMessage $message,
         public string $providerMediaUrl,
-    ) {}
+    ) {
+        $this->onQueue('whatsapp-media');
+    }
 
     public function handle(WhatsAppMediaService $mediaService): void
     {
