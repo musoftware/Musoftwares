@@ -1,11 +1,9 @@
-<?php
-require 'vendor/autoload.php';
-$app = require_once 'bootstrap/app.php';
-$app->make('Illuminate\Contracts\Console\Kernel')->bootstrap();
-
-$sub = \Modules\Tools\Models\ToolSubscription::first();
-echo json_encode($sub);
-echo "\n\n";
-
-$db = \Illuminate\Support\Facades\DB::select('DESCRIBE tool_subscriptions');
-echo json_encode($db);
+<?php 
+require __DIR__.'/vendor/autoload.php'; 
+$app = require_once __DIR__.'/bootstrap/app.php'; 
+$app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap(); 
+$users = App\Models\User::where('name', 'like', '%Hossam%')->take(1)->get();
+$request = Illuminate\Http\Request::create('/admin/users', 'GET');
+foreach($users as $user) {
+    echo json_encode((new App\Http\Resources\UserResource($user))->toArray($request));
+}

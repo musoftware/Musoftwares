@@ -1,0 +1,95 @@
+import React, { useState } from 'react';
+import { Head, router, Link } from '@inertiajs/react';
+import { Badge } from '@/Components/ui/badge';
+import { Button } from '@/Components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/Components/ui/card';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/Components/ui/table';
+import { Input } from '@/Components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/Components/ui/select';
+import { Package, Truck, CheckCircle2, Clock, XCircle, Eye } from 'lucide-react';
+
+export default function VendorOrdersIndex({ orders, filters }: any) {
+    const [status, setStatus] = useState(filters?.status || 'all');
+
+    const handleSearch = () => {
+        router.get(route('affiliate_pos.vendor.orders.index'), { status: status !== 'all' ? status : undefined }, { preserveState: true });
+    };
+
+    return (
+        <div className="p-6 max-w-[1600px] mx-auto space-y-6">
+            <Head title="Vendor Orders" />
+
+            <div className="flex items-center justify-between">
+                <div>
+                    <h1 className="text-2xl font-semibold text-gray-900 tracking-tight">Sales Orders</h1>
+                    <p className="text-sm text-gray-500 mt-1">Track orders containing your products.</p>
+                </div>
+            </div>
+
+            <Card className="shadow-sm border-gray-200">
+                <CardHeader className="bg-gray-50/50 border-b p-4">
+                    <div className="flex gap-4">
+                        <Select value={status} onValueChange={(val) => { setStatus(val); handleSearch(); }}>
+                            <SelectTrigger className="w-[200px] bg-white">
+                                <SelectValue placeholder="Filter by status" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="all">All Orders</SelectItem>
+                                <SelectItem value="new">New</SelectItem>
+                                <SelectItem value="preparing">Preparing</SelectItem>
+                                <SelectItem value="shipping">Shipping</SelectItem>
+                                <SelectItem value="delivered">Delivered</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
+                </CardHeader>
+                <CardContent className="p-0">
+                    <Table>
+                        <TableHeader>
+                            <TableRow className="bg-gray-50/80">
+                                <TableHead className="font-semibold text-gray-600">Order ID</TableHead>
+                                <TableHead className="font-semibold text-gray-600">Customer</TableHead>
+                                <TableHead className="font-semibold text-gray-600">Location</TableHead>
+                                <TableHead className="font-semibold text-gray-600 text-right">Items</TableHead>
+                                <TableHead className="font-semibold text-gray-600">Status</TableHead>
+                                <TableHead className="font-semibold text-gray-600">Date</TableHead>
+                                <TableHead className="font-semibold text-gray-600 text-right">Action</TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            {orders.data.length === 0 ? (
+                                <TableRow>
+                                    <TableCell colSpan={7} className="h-32 text-center text-gray-500">No orders found.</TableCell>
+                                </TableRow>
+                            ) : (
+                                orders.data.map((order: any) => (
+                                    <TableRow key={order.id}>
+                                        <TableCell className="font-mono text-sm">#{order.unique_id}</TableCell>
+                                        <TableCell>
+                                            <div className="font-medium text-gray-900">{order.customer_name}</div>
+                                        </TableCell>
+                                        <TableCell className="text-sm text-gray-600">{order.customer_governorate}</TableCell>
+                                        <TableCell className="text-right font-medium">{order.items?.length || 0} items</TableCell>
+                                        <TableCell>
+                                            <Badge variant="outline" className="capitalize">{order.status}</Badge>
+                                        </TableCell>
+                                        <TableCell className="text-sm text-gray-500">
+                                            {new Date(order.created_at).toLocaleDateString()}
+                                        </TableCell>
+                                        <TableCell className="text-right">
+                                            <Link href={route('affiliate_pos.vendor.orders.show', order.id)}>
+                                                <Button variant="ghost" size="sm" className="text-blue-600 hover:text-blue-800 hover:bg-blue-50">
+                                                    <Eye className="w-4 h-4 mr-1" /> View
+                                                </Button>
+                                            </Link>
+                                        </TableCell>
+                                    </TableRow>
+                                ))
+                            )}
+                        </TableBody>
+                    </Table>
+                </CardContent>
+            </Card>
+        </div>
+    );
+}

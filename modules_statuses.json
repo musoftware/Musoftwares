@@ -10,5 +10,7 @@
     "fbmb": true,
     "TextPaymentGateway": true,
     "GoldSavers": true,
-    "WrittenCoursesEngine": true
+    "WrittenCoursesEngine": true,
+    "ISaas": true,
+    "AffiliatePos": true
 }

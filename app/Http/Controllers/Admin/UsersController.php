@@ -16,6 +16,7 @@ use App\Http\Requests\Admin\User\ToggleBlockUserRequest;
 use App\Http\Requests\Admin\User\AddTaskRequest;
 use App\Http\Resources\UserResource;
 use Inertia\Inertia;
+use Inertia\Response as InertiaResponse;
 
 class UsersController extends Controller
 {
@@ -29,11 +30,7 @@ class UsersController extends Controller
      */
     public function index(Request $request): InertiaResponse
     {
-        $query = User::query()
-            ->select('id', 'name', 'email', 'account_status', 'created_at',
-                     'whatsapp_number', 'preferred_currency', 'kyc_verified',
-                     'last_activity_at', 'onboarding_completed')
-            ->with('roles');
+        $query = User::query()->with('roles');
 
         // Full-text search across name, email, whatsapp
         if ($search = $request->get('search')) {
@@ -64,7 +61,8 @@ class UsersController extends Controller
         // Sorting
         $sortable  = ['name', 'email', 'created_at', 'id', 'last_activity_at'];
         $sort      = in_array($request->get('sort'), $sortable) ? $request->get('sort') : 'id';
-        $direction = $request->get('direction') === 'asc' ? 'asc' : 'desc';
+        // The old system defaulted to ASC sorting for users
+        $direction = $request->get('direction', 'asc') === 'desc' ? 'desc' : 'asc';
         $query->orderBy($sort, $direction);
 
         $users = $query->paginate(25)->withQueryString()->through(fn ($user) => (new UserResource($user))->resolve());
@@ -79,7 +77,7 @@ class UsersController extends Controller
         ];
 
         return Inertia::render('Admin/Users/Index', [
-            'users'   => $users,
+            'clients' => $users,
             'filters' => $request->only(['search', 'role', 'status', 'kyc', 'sort', 'direction']),
             'stats'   => $stats,
         ]);
@@ -95,13 +93,13 @@ class UsersController extends Controller
             ->findOrFail($id);
 
         $initials = collect(explode(' ', $user->name))
-            ->map(fn($w) => strtoupper(substr($w, 0, 1)))
+            ->map(fn($w) => mb_strtoupper(mb_substr($w, 0, 1, 'UTF-8'), 'UTF-8'))
             ->take(2)
             ->implode('');
 
         $walletData = [
-            'balance'  => (float) $user->user_balance,
-            'currency' => $user->preferred_currency ?? 'USD',
+            'balance'  => (float) $user->available_balance(),
+            'currency' => $user->currency_name(),
         ];
 
         $stats = [
@@ -110,12 +108,28 @@ class UsersController extends Controller
             'kyc_docs_count' => $user->kycDocuments()->count(),
         ];
 
-        // Try ERP stats if ERP module exists
+        // Try ERP stats if ERP module exists, fallback to User model relations
         try {
             $erpClient = $user->client;
             if ($erpClient) {
                 $stats['invoices_total'] = $erpClient->invoices()->count();
                 $stats['invoices_paid']  = $erpClient->invoices()->where('status', 'paid')->count();
+                $stats['invoices_unpaid_sum'] = $erpClient->invoices()->where('status', 'unpaid')->sum('amount');
+            } else {
+                $stats['invoices_total'] = $user->invoices()->count();
+                $stats['invoices_paid']  = $user->invoices()->where('status', 'paid')->count();
+                $stats['invoices_unpaid_sum'] = $user->invoices()->where('status', 'unpaid')->sum('amount');
+            }
+        } catch (\Throwable $e) {}
+
+        // Try Marketplace stats
+        try {
+            if (class_exists('\Modules\Marketplace\Models\Order')) {
+                $stats['orders_total'] = \Modules\Marketplace\Models\Order::where('buyer_id', $user->id)->count();
+            }
+            if (class_exists('\Modules\Marketplace\Models\Service')) {
+                $stats['services_total'] = \Modules\Marketplace\Models\Service::where('seller_id', $user->id)->count();
+                $stats['services_approved'] = \Modules\Marketplace\Models\Service::where('seller_id', $user->id)->where('status', 'approved')->count();
             }
         } catch (\Throwable $e) {}
 
@@ -131,9 +145,12 @@ class UsersController extends Controller
             ];
         });
 
+        $modulePlans = \App\Models\ModulePlan::where('is_active', true)->get();
+
         return Inertia::render('Admin/Users/Show', [
             'client' => $userDetail,
             'stats'  => $stats,
+            'modulePlans' => $modulePlans,
             'wallets' => [
                 [
                     'id' => 'main',
@@ -190,7 +207,7 @@ class UsersController extends Controller
                 'telegram_username'    => $user->telegram_username,
                 'country'              => $user->country,
                 'city'                 => $user->city,
-                'preferred_currency'   => $user->preferred_currency ?? 'USD',
+                'currency'             => $user->currency_id,
                 'account_status'       => $user->account_status ?? 'active',
                 'block_reason'         => $user->block_reason,
                 'kyc_verified'         => (bool) $user->kyc_verified,
@@ -315,9 +332,54 @@ class UsersController extends Controller
     public function referrals($id)
     {
         $client = User::findOrFail($id);
+        $referrals = $client->my_ref_users()->paginate(20);
+
+        // Calculate commissions
+        $referrals->getCollection()->transform(function ($referral) use ($client) {
+            $earnings = \App\Models\Earning::where('user_id', $client->id)
+                ->where('referred_user_id', $referral->id)
+                ->get();
+            
+            $total_commission = 0;
+            foreach ($earnings as $earning) {
+                // If the app has CurrenciesExchange::RateToday, we use it, otherwise fallback
+                if (class_exists(\App\Models\CurrenciesExchange::class)) {
+                    $total_commission += \App\Models\CurrenciesExchange::RateToday($earning->amount, $earning->currency, $client->currency);
+                } else {
+                    $total_commission += $earning->amount; // Fallback
+                }
+            }
+            
+            return [
+                'id' => $referral->id,
+                'name' => $referral->name,
+                'email' => $referral->email,
+                'slug' => $referral->slug,
+                'created_at' => $referral->created_at,
+                'email_verified_at' => $referral->email_verified_at,
+                'commission_earned' => $total_commission,
+            ];
+        });
+
         return Inertia::render('Admin/Users/Referrals', [
-            'client' => $client,
+            'client' => (new \App\Http\Resources\UserResource($client))->resolve(),
+            'referrals' => $referrals,
         ]);
+    }
+
+    public function unlink_referral($user_id, $referred_user_id)
+    {
+        $user = User::findOrFail($user_id);
+        $referred_user = User::findOrFail($referred_user_id);
+
+        if ($referred_user->ref_user_id == $user->id) {
+            $referred_user->ref_user_id = null;
+            $referred_user->save();
+
+            return back()->with('success', 'Referral removed successfully.');
+        }
+
+        return back()->with('error', 'User is not referred by this user.');
     }
 
     public function files($id)
@@ -331,8 +393,14 @@ class UsersController extends Controller
     public function reports($id)
     {
         $client = User::findOrFail($id);
+        $dates = $client->timer_report()->get();
+        $invoices = $client->invoices()->whereIn('status', ['unpaid', 'partially_paid'])->get();
+        $unpaid = $client->unpaid_invoices_amount();
+
         return Inertia::render('Admin/Users/Reports', [
-            'client' => $client,
+            'client' => (new \App\Http\Resources\UserResource($client))->resolve(),
+            'dates' => $dates,
+            'unpaid' => $unpaid,
         ]);
     }
 
@@ -342,5 +410,28 @@ class UsersController extends Controller
         $this->adminUserService->addTask($user, $request->input('title'), $request->input('description'));
 
         return back()->with('success', 'Task created successfully.');
+    }
+
+    public function activateMembership(Request $request, $id)
+    {
+        $user = User::findOrFail($id);
+        
+        $request->validate([
+            'plan_id' => 'required|exists:module_plans,id',
+            'duration_days' => 'required|integer|min:1',
+        ]);
+
+        $plan = \App\Models\ModulePlan::findOrFail($request->plan_id);
+
+        \App\Models\UserSubscription::create([
+            'client_id' => $user->id,
+            'plan_id' => $plan->id,
+            'status' => 'active',
+            'started_at' => now(),
+            'expires_at' => now()->addDays($request->duration_days),
+            'auto_renew' => false,
+        ]);
+
+        return back()->with('success', "Membership ({$plan->name}) activated successfully for {$request->duration_days} days.");
     }
 }

@@ -22,7 +22,7 @@ return new class extends Migration
             $table->decimal('total_amount', 12, 2); // grams * price_per_gram + fees
             $table->decimal('fees', 10, 2)->default(0); // workmanship/stamp fees
             
-            $table->string('currency', 3)->default('EGP');
+            $table->foreignId('currency_id')->default(1)->constrained('currencies')->onDelete('restrict');
             $table->date('transaction_date');
             
             $table->string('vendor_name')->nullable();

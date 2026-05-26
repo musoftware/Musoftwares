@@ -23,13 +23,17 @@ export function formatMoney(amount: number | string, currency = 'USD') {
     
     const curCode = (typeof currency === 'string' ? currency : 'USD').toUpperCase();
     
+    const isNegative = numericAmount < 0;
+    const absoluteAmount = Math.abs(numericAmount);
+    
     const numberPart = new Intl.NumberFormat('en-US', {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2,
-    }).format(numericAmount);
+    }).format(absoluteAmount);
 
     if (CURRENCY_FORMATS[curCode]) {
-        return CURRENCY_FORMATS[curCode].replace('%v', numberPart);
+        const formatted = CURRENCY_FORMATS[curCode].replace('%v', numberPart);
+        return isNegative ? `-${formatted}` : formatted;
     }
     
     try {

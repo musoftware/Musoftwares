@@ -23,7 +23,7 @@ return new class extends Migration
                 $table->string('status')->default('draft'); // draft, active, in_progress, review, completed
 
                 $table->decimal('budget', 15, 2)->nullable();
-                $table->string('currency', 3)->nullable();
+                $table->foreignId('currency_id')->nullable()->constrained('currencies')->onDelete('set null');
 
                 $table->date('due_date')->nullable();
                 $table->timestamp('completed_at')->nullable();

@@ -17,7 +17,7 @@ return new class extends Migration
             $table->unsignedBigInteger('plan_id')->nullable();
             $table->string('billing_cycle')->default('monthly');
             $table->decimal('amount', 10, 2)->default(0);
-            $table->string('currency', 3)->default('USD');
+            $table->foreignId('currency_id')->default(1)->constrained('currencies');
             $table->enum('status', ['active', 'cancelled', 'expired', 'suspended'])->default('active');
             $table->timestamp('started_at')->useCurrent();
             $table->timestamp('expires_at')->nullable();
