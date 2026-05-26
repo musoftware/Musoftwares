@@ -332,9 +332,54 @@ class UsersController extends Controller
     public function referrals($id)
     {
         $client = User::findOrFail($id);
+        $referrals = $client->my_ref_users()->paginate(20);
+
+        // Calculate commissions
+        $referrals->getCollection()->transform(function ($referral) use ($client) {
+            $earnings = \App\Models\Earning::where('user_id', $client->id)
+                ->where('referred_user_id', $referral->id)
+                ->get();
+            
+            $total_commission = 0;
+            foreach ($earnings as $earning) {
+                // If the app has CurrenciesExchange::RateToday, we use it, otherwise fallback
+                if (class_exists(\App\Models\CurrenciesExchange::class)) {
+                    $total_commission += \App\Models\CurrenciesExchange::RateToday($earning->amount, $earning->currency, $client->currency);
+                } else {
+                    $total_commission += $earning->amount; // Fallback
+                }
+            }
+            
+            return [
+                'id' => $referral->id,
+                'name' => $referral->name,
+                'email' => $referral->email,
+                'slug' => $referral->slug,
+                'created_at' => $referral->created_at,
+                'email_verified_at' => $referral->email_verified_at,
+                'commission_earned' => $total_commission,
+            ];
+        });
+
         return Inertia::render('Admin/Users/Referrals', [
-            'client' => $client,
+            'client' => (new \App\Http\Resources\UserResource($client))->resolve(),
+            'referrals' => $referrals,
         ]);
+    }
+
+    public function unlink_referral($user_id, $referred_user_id)
+    {
+        $user = User::findOrFail($user_id);
+        $referred_user = User::findOrFail($referred_user_id);
+
+        if ($referred_user->ref_user_id == $user->id) {
+            $referred_user->ref_user_id = null;
+            $referred_user->save();
+
+            return back()->with('success', 'Referral removed successfully.');
+        }
+
+        return back()->with('error', 'User is not referred by this user.');
     }
 
     public function files($id)
@@ -348,8 +393,14 @@ class UsersController extends Controller
     public function reports($id)
     {
         $client = User::findOrFail($id);
+        $dates = $client->timer_report()->get();
+        $invoices = $client->invoices()->whereIn('status', ['unpaid', 'partially_paid'])->get();
+        $unpaid = $client->unpaid_invoices_amount();
+
         return Inertia::render('Admin/Users/Reports', [
-            'client' => $client,
+            'client' => (new \App\Http\Resources\UserResource($client))->resolve(),
+            'dates' => $dates,
+            'unpaid' => $unpaid,
         ]);
     }
 
