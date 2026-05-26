@@ -15,7 +15,11 @@ class SyncWhatsAppSessionJob implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     public $tries = 1;
-    public $queue = 'whatsapp-session';
+
+    public function __construct()
+    {
+        $this->onQueue('whatsapp-session');
+    }
 
     public function handle(WhatsAppSessionManager $sessionManager): void
     {

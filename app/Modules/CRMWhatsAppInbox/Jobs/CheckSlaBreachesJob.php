@@ -14,7 +14,11 @@ class CheckSlaBreachesJob implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     public $tries = 1;
-    public $queue = 'whatsapp-sla';
+
+    public function __construct()
+    {
+        $this->onQueue('whatsapp-sla');
+    }
 
     public function handle(WhatsAppSlaEngine $slaEngine): void
     {
