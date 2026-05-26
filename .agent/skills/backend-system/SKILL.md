@@ -53,6 +53,7 @@ To prevent "garbage code" and maintain a unified, premium backend architecture, 
 - **3. API Resources (Data Transformation)**: NEVER return raw Eloquent models to the frontend or manually map arrays in the controller (e.g., using `private function map(...)`). You MUST ALWAYS use Laravel API Resources (`app/Http/Resources`) to format data. 
     - **Inertia.js Note**: When paginating with Inertia, use the exact unwrap pattern to maintain pagination structures: `->through(fn($item) => (new MyResource($item))->resolve())`.
 - **Unified Models**: Never use conditional `class_exists()` checks to toggle between module-specific models and main models. Always unify and use the core models directly from `App\Models`.
+- **4. Database Modifications (Migrations Only)**: NEVER create standalone PHP scripts (e.g., `create_table.php`, `update_db.php`) to modify the database schema or data. ALWAYS use Laravel Migrations for schema changes and Database Seeders for data changes. Do things the right way.
 
 ## Summary Checklist
 - [ ] Is request validation handled by a dedicated `FormRequest` class?

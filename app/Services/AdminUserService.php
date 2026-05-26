@@ -49,7 +49,7 @@ class AdminUserService
         $user->telegram_username   = $request->input('telegram_username');
         $user->country             = $request->input('country');
         $user->city                = $request->input('city');
-        $user->preferred_currency  = $request->input('preferred_currency') ?? $user->preferred_currency ?? 'USD';
+        $user->currency_id         = $request->input('currency') ?? $user->currency_id ?? 2;
 
         // Account control
         if ($request->has('account_status')) {

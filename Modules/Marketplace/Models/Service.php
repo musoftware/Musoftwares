@@ -40,4 +40,9 @@ class Service extends Model
     {
         return $this->hasMany(ServicePackage::class, 'service_id');
     }
+
+    public function landingPage()
+    {
+        return $this->hasOne(ServiceLandingPage::class, 'service_id');
+    }
 }
