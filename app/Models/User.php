@@ -257,6 +257,18 @@ class User extends Authenticatable
         return $this->hasMany(\App\Models\UserReferral::class, 'user_id');
     }
 
+    public function invoice_item_timers()
+    {
+        return $this->hasMany(\App\Models\InvoiceItemTimer::class);
+    }
+
+    public function timer_report()
+    {
+        return $this->invoice_item_timers()
+            ->select(\Illuminate\Support\Facades\DB::raw('DATE(date_start) as ds, min(date_end) as min_date, max(date_end) as max_date, sum(amount) as sum_amount, SUM(TIMESTAMPDIFF(SECOND, date_start, date_end)) as sum_seconds'))
+            ->groupBy(\Illuminate\Support\Facades\DB::raw('ds'));
+    }
+
     public function currency_name()
     {
         $currency = \App\Models\Currency::query()->find($this->currency_id);

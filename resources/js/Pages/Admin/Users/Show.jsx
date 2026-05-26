@@ -59,7 +59,7 @@ export default function Show({ client, stats = {}, wallets, modulePlans = [] }) 
 
     const handleResetPassword = async () => {
         try {
-            const res = await window.axios.post(`/admin/users/${client.id}/reset-password`);
+            const res = await window.axios.post(`/admin/users/${client.id}/generate-password`);
             setNewPassword(res.data.new_password);
         } catch (e) {
             alert('Failed to reset password.');
