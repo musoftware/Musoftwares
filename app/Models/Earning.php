@@ -23,19 +23,19 @@ class Earning extends Model
 
     public function currencyModel()
     {
-        return $this->belongsTo(Currency::class, 'currency');
+        return $this->belongsTo(Currency::class, 'currency_id');
     }
 
     public static function clearing_balance()
     {
-        $query = Earning::query()->select(DB::raw('sum(amount) as amount, currency, FROM_UNIXTIME(AVG(UNIX_TIMESTAMP(created_at))) AS avg_date'));
+        $query = Earning::query()->select(DB::raw('sum(amount) as amount, currency_id, FROM_UNIXTIME(AVG(UNIX_TIMESTAMP(created_at))) AS avg_date'));
         if (Schema::hasColumn('earnings', 'transaction_id')) {
             $query->whereNull('transaction_id');
         }
-        $data = $query->groupBy('currency')->get();
+        $data = $query->groupBy('currency_id')->get();
         $amount = 0;
         foreach ($data as $commission) {
-            $user_amount = CurrenciesExchange::RateByDate($commission->avg_date, $commission->amount, $commission->currency, \App\Models\CurrenciesExchange::BusinessCurrency());
+            $user_amount = CurrenciesExchange::RateByDate($commission->avg_date, $commission->amount, $commission->currency_id, \App\Models\CurrenciesExchange::BusinessCurrency());
             $amount += $user_amount;
         }
         return $amount;
@@ -73,11 +73,11 @@ class Earning extends Model
 
     public static function total_balance()
     {
-        $data = Earning::query()->select(DB::raw('sum(amount) as amount, currency'))->groupBy('currency')->get();
+        $data = Earning::query()->select(DB::raw('sum(amount) as amount, currency_id, FROM_UNIXTIME(AVG(UNIX_TIMESTAMP(created_at))) AS avg_date'))->groupBy('currency_id')->get();
 
         $amount = 0;
         foreach ($data as $commission) {
-            $user_amount = CurrenciesExchange::RateByDate($commission->created_at, $commission->amount, $commission->currency, \App\Models\CurrenciesExchange::BusinessCurrency());
+            $user_amount = CurrenciesExchange::RateByDate($commission->avg_date, $commission->amount, $commission->currency_id, \App\Models\CurrenciesExchange::BusinessCurrency());
             $amount += $user_amount;
         }
         return $amount;
@@ -111,10 +111,16 @@ class Earning extends Model
             return '100';
         }
 
-        $start_time = strtotime($this->created_at); // Assuming `start_date` is the beginning of the period.
+        $start_time = strtotime($this->created_at); // Beginning of the clearing period.
 
         // Calculate total duration in seconds
         $total_duration = abs($end_time - $start_time);
+
+        // Guard: if start and end are the same moment, treat as fully elapsed
+        if ($total_duration === 0) {
+            return '100';
+        }
+
         $elapsed_duration = abs($current_time - $start_time);
 
         // Calculate percentage of elapsed time

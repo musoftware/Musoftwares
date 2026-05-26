@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Coupon;
 use App\Models\CouponRedemption;
+use App\Models\Currency;
 use App\Services\PromotionService;
 use App\Http\Resources\CouponResource;
 use App\Http\Requests\Admin\StoreCouponRequest;
@@ -23,10 +24,13 @@ class AdminCouponController extends Controller
         $coupons = Coupon::with('currencyRelation')
                          ->orderBy('created_at', 'desc')
                          ->paginate(15)
-                         ->through(fn($c) => clone (new CouponResource($c))->resolve());
+                         ->through(fn($c) => (new CouponResource($c))->resolve());
+
+        $currencies = Currency::select('id', 'currency')->get();
 
         return Inertia::render('Admin/Coupons/Index', [
-            'coupons' => $coupons,
+            'coupons'    => $coupons,
+            'currencies' => $currencies,
         ]);
     }
 
@@ -47,8 +51,8 @@ class AdminCouponController extends Controller
                                        ->paginate(20);
 
         return Inertia::render('Admin/Coupons/Show', [
-            'coupon'      => clone (new CouponResource($coupon))->resolve(),
-            'redemptions' => $redemptions, // Simplification for now, usually would have a Resource
+            'coupon'      => (new CouponResource($coupon))->resolve(),
+            'redemptions' => $redemptions,
         ]);
     }
 

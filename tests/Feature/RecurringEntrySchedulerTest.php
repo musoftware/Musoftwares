@@ -98,7 +98,7 @@ class RecurringEntrySchedulerTest extends TestCase
         $this->assertEquals(0, $exitCode);
 
         // No execution logs should be created
-        $this->assertDatabaseEmpty('recurring_execution_logs');
+        $this->assertDatabaseEmpty('erp_recurring_execution_logs');
     }
 
     public function test_skips_future_entries(): void
@@ -125,7 +125,7 @@ class RecurringEntrySchedulerTest extends TestCase
         $exitCode = Artisan::call('erp:recurring:process');
         $this->assertEquals(0, $exitCode);
 
-        $this->assertDatabaseEmpty('recurring_execution_logs');
+        $this->assertDatabaseEmpty('erp_recurring_execution_logs');
     }
 
     public function test_dry_run_does_not_create_logs(): void
@@ -153,6 +153,6 @@ class RecurringEntrySchedulerTest extends TestCase
         $this->assertEquals(0, $exitCode);
 
         // Dry run must not create any execution logs
-        $this->assertDatabaseEmpty('recurring_execution_logs');
+        $this->assertDatabaseEmpty('erp_recurring_execution_logs');
     }
 }

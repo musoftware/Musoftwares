@@ -47,6 +47,25 @@ class UserNoteController extends Controller
     }
 
     /**
+     * Return notes as JSON for AJAX (AdminNotesPanel).
+     */
+    public function indexJson(Request $request, int $userId): JsonResponse
+    {
+        User::findOrFail($userId);
+
+        $notes = UserNote::where('user_id', $userId)
+            ->orderByDesc('is_pinned')
+            ->orderByDesc('created_at')
+            ->get()
+            ->map(fn($note) => (new UserNoteResource($note))->resolve());
+
+        return response()->json([
+            'data'  => $notes,
+            'stats' => $this->userNoteService->getStats($userId),
+        ]);
+    }
+
+    /**
      * Create a new note for a user.
      * Recovered from old project: UserNotesController::addNote()
      */

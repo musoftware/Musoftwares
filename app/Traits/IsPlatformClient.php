@@ -13,24 +13,36 @@ trait IsPlatformClient
     public function invoices()
     {
         return $this->hasMany(\Modules\ERP\Models\Invoice::class, 'client_id')
-                    ->where('tenant_id', Tenant::platformId());
+                    ->where(function ($q) {
+                        $q->whereNull('tenant_id')
+                          ->orWhere('tenant_id', Tenant::platformId());
+                    });
     }
 
     public function platformWallet()
     {
         return $this->hasOne(\Modules\ERP\Models\ClientWallet::class, 'client_id')
-                    ->where('tenant_id', Tenant::platformId());
+                    ->where(function ($q) {
+                        $q->whereNull('tenant_id')
+                          ->orWhere('tenant_id', Tenant::platformId());
+                    });
     }
 
     public function tickets()
     {
         return $this->hasMany(\App\Models\Ticket::class, 'user_id')
-                    ->where('tenant_id', Tenant::platformId());
+                    ->where(function ($q) {
+                        $q->whereNull('tenant_id')
+                          ->orWhere('tenant_id', Tenant::platformId());
+                    });
     }
 
     public function projects()
     {
         return $this->hasMany(\Modules\ERP\Models\Project::class, 'client_id')
-                    ->where('tenant_id', Tenant::platformId());
+                    ->where(function ($q) {
+                        $q->whereNull('tenant_id')
+                          ->orWhere('tenant_id', Tenant::platformId());
+                    });
     }
 }

@@ -46,6 +46,14 @@ class Lead extends Model
     }
 
     /**
+     * Create a new factory instance for the model.
+     */
+    protected static function newFactory()
+    {
+        return \Modules\CRM\Database\Factories\LeadFactory::new();
+    }
+
+    /**
      * Get the campaigns for this lead
      */
     public function campaigns()

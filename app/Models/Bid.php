@@ -11,7 +11,6 @@ class Bid extends Model
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
-        'job_listing_id',
         'user_id',
         'name',
         'email',
@@ -26,10 +25,6 @@ class Bid extends Model
         'price' => 'decimal:2',
     ];
 
-    public function jobListing()
-    {
-        return $this->belongsTo(JobListing::class);
-    }
 
     public function user()
     {

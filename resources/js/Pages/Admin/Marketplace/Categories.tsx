@@ -1,4 +1,4 @@
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
 import { Head, router } from '@inertiajs/react';
 import { useState } from 'react';
 
@@ -27,13 +27,7 @@ export default function Categories({ categories }: any) {
     };
 
     return (
-        <AuthenticatedLayout
-            header={
-                <h2 className="text-xl leading-tight font-semibold text-gray-800">
-                    Manage Categories
-                </h2>
-            }
-        >
+        <AdminSidebarLayout title="Marketplace Categories" header="Marketplace Categories">
             <Head title="Marketplace Categories" />
             <div className="py-12">
                 <div className="mx-auto flex max-w-7xl gap-6 sm:px-6 lg:px-8">
@@ -127,6 +121,6 @@ export default function Categories({ categories }: any) {
                     </div>
                 </div>
             </div>
-        </AuthenticatedLayout>
+        </AdminSidebarLayout>
     );
 }

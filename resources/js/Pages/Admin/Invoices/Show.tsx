@@ -213,7 +213,7 @@ export default function Show({ invoice }) {
                             {new Date(invoice.created_at).toLocaleDateString()}
                         </span>
                         <span className="flex items-center gap-1">
-                            <span className="font-bold opacity-70">$</span>
+                            <span className="font-bold opacity-70">{invoice.currency_symbol || '$'}</span>
                             {invoice.currency}
                         </span>
                     </div>

@@ -41,7 +41,9 @@ class Transaction extends Model
             $currency = $transaction->currency_id ?? \App\Models\AdminSettings::business_currency();
             $businessCurrencyId = \App\Models\AdminSettings::business_currency();
             
-            $transaction->business_amount = \App\Models\CurrenciesExchange::RateToday(
+            $date = $transaction->created_at ?? now();
+            $transaction->business_amount = \App\Models\CurrenciesExchange::RateByDate(
+                $date,
                 $transaction->amount,
                 $currency,
                 $businessCurrencyId

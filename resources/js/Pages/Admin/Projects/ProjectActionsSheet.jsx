@@ -1,12 +1,12 @@
 import React from 'react';
 import { Link } from '@inertiajs/react';
 import {
-    Sheet,
-    SheetContent,
-    SheetHeader,
-    SheetTitle,
-    SheetDescription,
-} from '@/Components/ui/sheet';
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogDescription,
+} from '@/Components/ui/dialog';
 import { Button } from '@/Components/ui/button';
 import { Avatar, AvatarFallback } from '@/Components/ui/avatar';
 import { Separator } from '@/Components/ui/separator';
@@ -25,18 +25,16 @@ import {
     ListTodo,
     ClipboardEdit,
     Folder,
-    User,
-    LogIn,
-    Key
+    User
 } from 'lucide-react';
 
-export default function ProjectActionsSheet({ project, isOpen, onClose }) {
+export default function ProjectActionsSheet({ project, isOpen, onClose, onEdit }) {
     if (!project) return null;
 
     return (
-        <Sheet open={isOpen} onOpenChange={(open) => !open && onClose()}>
-            <SheetContent side="right" className="w-full sm:max-w-md overflow-y-auto p-0 flex flex-col bg-slate-50/50">
-                <SheetHeader className="bg-slate-950 p-6 text-left space-y-0 border-b-0 shadow-none">
+        <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+            <DialogContent className="sm:max-w-xl p-0 overflow-hidden bg-slate-50 border-slate-200 shadow-2xl rounded-xl">
+                <DialogHeader className="bg-slate-950 p-6 text-left space-y-0 border-b border-slate-800">
                     <div className="flex items-center gap-4">
                         <Avatar className="h-12 w-12 bg-white/10 text-white">
                             <AvatarFallback className="bg-transparent text-lg font-bold">
@@ -44,17 +42,17 @@ export default function ProjectActionsSheet({ project, isOpen, onClose }) {
                             </AvatarFallback>
                         </Avatar>
                         <div className="min-w-0 flex-1">
-                            <SheetTitle className="text-white text-lg font-semibold truncate">
+                            <DialogTitle className="text-white text-lg font-semibold truncate">
                                 {project.project_name}
-                            </SheetTitle>
-                            <SheetDescription className="text-slate-400 text-sm truncate">
+                            </DialogTitle>
+                            <DialogDescription className="text-slate-400 text-sm truncate">
                                 {project.client?.name || 'No Client'}
-                            </SheetDescription>
+                            </DialogDescription>
                         </div>
                     </div>
-                </SheetHeader>
+                </DialogHeader>
 
-                <div className="p-6 space-y-8 flex-1">
+                <div className="p-6 space-y-6 max-h-[80vh] overflow-y-auto">
                     {/* Finance & Billing */}
                     <div className="space-y-4">
                         <div className="flex items-center gap-2">
@@ -69,13 +67,13 @@ export default function ProjectActionsSheet({ project, isOpen, onClose }) {
                             <p className="text-sm font-medium text-slate-600">Invoices</p>
                             <div className="grid grid-cols-2 gap-3">
                                 <Button variant="outline" className="flex-col items-start h-auto py-3 px-4 gap-2 bg-white hover:bg-slate-50 shadow-sm" asChild>
-                                    <Link href={`/admin/invoices?search=${encodeURIComponent(project.project_name)}`}>
+                                    <Link href={`/admin/invoices?project_id=${project.id}`}>
                                         <FileText className="h-4 w-4 text-blue-500" /> 
                                         <span className="font-normal text-slate-700">All Invoices</span>
                                     </Link>
                                 </Button>
                                 <Button variant="outline" className="flex-col items-start h-auto py-3 px-4 gap-2 bg-white hover:bg-slate-50 shadow-sm" asChild>
-                                    <Link href="/admin/invoices/create">
+                                    <Link href={`/admin/invoices/create?user=${project.user_id}&project=${project.id}`}>
                                         <FilePlus className="h-4 w-4 text-emerald-500" /> 
                                         <span className="font-normal text-slate-700">Create Invoice</span>
                                     </Link>
@@ -85,49 +83,49 @@ export default function ProjectActionsSheet({ project, isOpen, onClose }) {
                             <p className="text-sm font-medium text-slate-600 pt-2">Timer Transactions</p>
                             <div className="grid grid-cols-2 gap-3">
                                 <Button variant="outline" className="flex-col items-start h-auto py-3 px-4 gap-2 bg-white hover:bg-slate-50 shadow-sm" asChild>
-                                    <Link href="#">
+                                    <Link href={`/admin/transactions/create?user=${project.user_id}&project=${project.id}&type=send-money`}>
                                         <Banknote className="h-4 w-4 text-sky-500" /> 
                                         <span className="font-normal text-slate-700">Send</span>
                                     </Link>
                                 </Button>
                                 <Button variant="outline" className="flex-col items-start h-auto py-3 px-4 gap-2 bg-white hover:bg-slate-50 shadow-sm" asChild>
-                                    <Link href="#">
+                                    <Link href={`/admin/transactions/create?user=${project.user_id}&project=${project.id}&type=receive`}>
                                         <Coins className="h-4 w-4 text-sky-500" /> 
                                         <span className="font-normal text-slate-700">Receive</span>
                                     </Link>
                                 </Button>
                                 <Button variant="outline" className="flex-col items-start h-auto py-3 px-4 gap-2 bg-white hover:bg-slate-50 shadow-sm" asChild>
-                                    <Link href="#">
+                                    <Link href={`/admin/transactions/create?user=${project.user_id}&project=${project.id}&type=earned`}>
                                         <Trophy className="h-4 w-4 text-amber-500" /> 
                                         <span className="font-normal text-slate-700">Earned</span>
                                     </Link>
                                 </Button>
                                 <Button variant="outline" className="flex-col items-start h-auto py-3 px-4 gap-2 bg-white hover:bg-slate-50 shadow-sm" asChild>
-                                    <Link href="#">
+                                    <Link href={`/admin/transactions/create?user=${project.user_id}&project=${project.id}&type=charge`}>
                                         <Receipt className="h-4 w-4 text-slate-500" /> 
                                         <span className="font-normal text-slate-700">Charge</span>
                                     </Link>
                                 </Button>
                                 <Button variant="outline" className="flex-col items-start h-auto py-3 px-4 gap-2 bg-white hover:bg-slate-50 shadow-sm" asChild>
-                                    <Link href="#">
+                                    <Link href={`/admin/transactions/create?user=${project.user_id}&project=${project.id}&type=refund`}>
                                         <RotateCcw className="h-4 w-4 text-slate-500" /> 
                                         <span className="font-normal text-slate-700">Refund</span>
                                     </Link>
                                 </Button>
                                 <Button variant="outline" className="flex-col items-start h-auto py-3 px-4 gap-2 bg-white hover:bg-slate-50 shadow-sm" asChild>
-                                    <Link href="#">
+                                    <Link href={`/admin/transactions/transfer?user=${project.user_id}&project=${project.id}`}>
                                         <Shuffle className="h-4 w-4 text-blue-500" /> 
                                         <span className="font-normal text-slate-700">Swap Budgets</span>
                                     </Link>
                                 </Button>
                                 <Button variant="outline" className="flex-col items-start h-auto py-3 px-4 gap-2 bg-white hover:bg-slate-50 shadow-sm" asChild>
-                                    <Link href="#">
+                                    <Link href={`/admin/transactions?user=${project.user_id}&project=${project.id}`}>
                                         <Wallet className="h-4 w-4 text-blue-500" /> 
                                         <span className="font-normal text-slate-700">Transactions</span>
                                     </Link>
                                 </Button>
                                 <Button variant="outline" className="flex-col items-start h-auto py-3 px-4 gap-2 bg-white hover:bg-slate-50 shadow-sm" asChild>
-                                    <Link href="#">
+                                    <Link href={`/admin/users/reports/${project.user_id}`}>
                                         <Download className="h-4 w-4 text-emerald-500" /> 
                                         <span className="font-normal text-slate-700">Due Balance PDF</span>
                                     </Link>
@@ -147,19 +145,19 @@ export default function ProjectActionsSheet({ project, isOpen, onClose }) {
                         </div>
                         <div className="grid grid-cols-2 gap-3">
                             <Button variant="outline" className="flex-col items-start h-auto py-3 px-4 gap-2 bg-white hover:bg-slate-50 shadow-sm" asChild>
-                                <Link href="#">
+                                <Link href={`/admin/users/${project.user_id}/projects`}>
                                     <LayoutDashboard className="h-4 w-4 text-blue-500" /> 
                                     <span className="font-normal text-slate-700">Projects</span>
                                 </Link>
                             </Button>
                             <Button variant="outline" className="flex-col items-start h-auto py-3 px-4 gap-2 bg-white hover:bg-slate-50 shadow-sm" asChild>
-                                <Link href="#">
+                                <Link href={`/admin/users/${project.user_id}/tasks/assign`}>
                                     <ListTodo className="h-4 w-4 text-emerald-500" /> 
                                     <span className="font-normal text-slate-700">Assign Tasks</span>
                                 </Link>
                             </Button>
                             <Button variant="outline" className="flex-col items-start h-auto py-3 px-4 gap-2 bg-white hover:bg-slate-50 shadow-sm" asChild>
-                                <Link href="#">
+                                <Link href={`/admin/users/${project.user_id}/notes`}>
                                     <ClipboardEdit className="h-4 w-4 text-amber-500" /> 
                                     <span className="font-normal text-slate-700">Notes</span>
                                 </Link>
@@ -189,16 +187,22 @@ export default function ProjectActionsSheet({ project, isOpen, onClose }) {
                                     <span className="font-normal text-slate-700">View Project</span>
                                 </Link>
                             </Button>
-                            <Button variant="outline" className="flex-col items-start h-auto py-3 px-4 gap-2 bg-white hover:bg-slate-50 shadow-sm" asChild>
-                                <Link href="#">
-                                    <ClipboardEdit className="h-4 w-4 text-emerald-500" /> 
-                                    <span className="font-normal text-slate-700">Edit Project</span>
-                                </Link>
+                            <Button 
+                                variant="outline" 
+                                className="flex-col items-start h-auto py-3 px-4 gap-2 bg-white hover:bg-slate-50 shadow-sm cursor-pointer" 
+                                onClick={() => {
+                                    onClose();
+                                    if (onEdit) onEdit(project);
+                                }}
+                            >
+                                <ClipboardEdit className="h-4 w-4 text-emerald-500" /> 
+                                <span className="font-normal text-slate-700">Edit Project</span>
                             </Button>
                         </div>
                     </div>
                 </div>
-            </SheetContent>
-        </Sheet>
+            </DialogContent>
+        </Dialog>
     );
 }
+

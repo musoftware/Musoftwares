@@ -1,6 +1,6 @@
 import React from "react";
 import { Head, Link, router } from "@inertiajs/react";
-import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
+import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/Components/ui/table";
 import { Button } from "@/Components/ui/button";
 import { Switch } from "@/Components/ui/switch";
@@ -28,9 +28,12 @@ interface Props {
         links: any[];
     };
     filters: any;
+    auth: {
+        user: any;
+    };
 }
 
-export default function Index({ servicesWithLandingPages, filters }: Props) {
+export default function Index({ servicesWithLandingPages, filters, auth }: Props) {
     const toggleStatus = (id: number) => {
         router.post(route("admin.service-landing-pages.toggle-status", id), {}, { preserveScroll: true });
     };
@@ -42,20 +45,24 @@ export default function Index({ servicesWithLandingPages, filters }: Props) {
     };
 
     return (
-        <AuthenticatedLayout
-            header={<h2 className="font-semibold text-xl text-gray-800 leading-tight">Service Landing Pages</h2>}
-        >
+        <AdminSidebarLayout title="Service Landing Pages" header="Service Landing Pages">
             <Head title="Service Landing Pages" />
 
-            <div className="py-12">
-                <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                    <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
-                        <div className="flex justify-between items-center mb-6">
-                            <h3 className="text-lg font-medium text-gray-900">Manage Landing Pages</h3>
-                            {/* You can add a search input here utilizing the `filters` prop */}
-                        </div>
+            <div className="space-y-6">
+                <div>
+                    <h1 className="text-2xl font-bold tracking-tight text-slate-900">Service Landing Pages</h1>
+                    <p className="text-sm text-slate-500 mt-1">
+                        Manage all service landing pages on the platform.
+                    </p>
+                </div>
 
-                        <div className="border rounded-md">
+                <div className="bg-white shadow-sm sm:rounded-xl border border-slate-200 p-6">
+                    <div className="flex justify-between items-center mb-6">
+                        <h3 className="text-lg font-medium text-gray-900">Manage Landing Pages</h3>
+                        {/* You can add a search input here utilizing the `filters` prop */}
+                    </div>
+
+                    <div className="border rounded-md">
                             <Table>
                                 <TableHeader>
                                     <TableRow>
@@ -75,7 +82,7 @@ export default function Index({ servicesWithLandingPages, filters }: Props) {
                                                 <TableCell className="font-medium">
                                                     {service.title}
                                                     <br />
-                                                    <a href={`/l/${service.landing_page.slug}`} target="_blank" className="text-xs text-blue-500 hover:underline">
+                                                    <a href={`/l/${service.landing_page.slug}`} target="_blank" className="text-xs text-blue-500 hover:underline" rel="noreferrer">
                                                         /l/{service.landing_page.slug}
                                                     </a>
                                                 </TableCell>
@@ -104,7 +111,7 @@ export default function Index({ servicesWithLandingPages, filters }: Props) {
                                                 </TableCell>
                                                 <TableCell className="text-right">
                                                     <div className="flex justify-end gap-2">
-                                                        <a href={`/l/${service.landing_page.slug}`} target="_blank">
+                                                        <a href={`/l/${service.landing_page.slug}`} target="_blank" rel="noreferrer">
                                                             <Button variant="outline" size="icon">
                                                                 <Eye className="w-4 h-4" />
                                                             </Button>
@@ -128,7 +135,6 @@ export default function Index({ servicesWithLandingPages, filters }: Props) {
                         </div>
                     </div>
                 </div>
-            </div>
-        </AuthenticatedLayout>
+        </AdminSidebarLayout>
     );
 }

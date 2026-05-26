@@ -20,10 +20,10 @@ class WithdrawRequestResource extends JsonResource
                     'email' => $this->user->email,
                 ];
             }),
-            'method'        => $this->whenLoaded('method', function () {
+            'method'        => $this->whenLoaded('user_payment_method', function () {
                 return [
-                    'id'   => $this->method->id,
-                    'name' => $this->method->name,
+                    'id'   => $this->user_payment_method->id,
+                    'name' => $this->user_payment_method->type_name(),
                 ];
             }),
             'notes'         => $this->notes,

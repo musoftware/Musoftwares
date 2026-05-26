@@ -36,9 +36,9 @@ class InvoiceController extends Controller
         if (!empty($search)) {
             $query->where(function ($q) use ($filterBy, $search) {
                 $decodedSearch = $search;
-                if (in_array($filterBy, ['all', 'id']) && class_exists(\App\Helper\TextHelper::class)) {
+                if (in_array($filterBy, ['all', 'id']) && class_exists(\App\Helpers\TextHelper::class)) {
                     try {
-                        $decodedSearch = \App\Helper\TextHelper::instance()->crockford_decode2($search);
+                        $decodedSearch = \App\Helpers\TextHelper::instance()->crockford_decode2($search);
                     } catch (\Exception $e) {
                         // Ignore
                     }

@@ -40,7 +40,7 @@ class CartHelper
     public static function getVendors()
     {
         $vendors = [];
-        foreach (\App\Helper\CartHelper::UserCart()->getContent() as $content) {
+        foreach (\App\Helpers\CartHelper::UserCart()->getContent() as $content) {
             if (isset($content['attributes']['vendor'])){
                 $vendors[] = $content['attributes']['vendor'];
             }

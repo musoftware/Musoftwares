@@ -156,7 +156,7 @@ export default function InboxWorkspace({ callRPC, daemonConnected, sessions, sel
                             // 2. Update the threads list state in real-time
                             setThreads(prev => {
                                 const existingIdx = prev.findIndex(t => t.id === newMsgData.threadId);
-                                let updatedThreads = [...prev];
+                                const updatedThreads = [...prev];
                                 let threadObj: any;
                                 
                                 // Format preview text
@@ -295,7 +295,7 @@ export default function InboxWorkspace({ callRPC, daemonConnected, sessions, sel
         // 2. Instantly bubble/reorder active thread to the top of the sidebar
         setThreads(prev => {
             const existingIdx = prev.findIndex(t => t.id === selectedThread.id);
-            let updatedThreads = [...prev];
+            const updatedThreads = [...prev];
             let threadObj: any;
             
             const previewText = `You: ${text.substring(0, 80)}`;

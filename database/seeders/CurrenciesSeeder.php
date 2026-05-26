@@ -10,15 +10,15 @@ class CurrenciesSeeder extends Seeder
     public function run(): void
     {
         $currencies = [
-            ['code' => 'USD', 'name' => 'US Dollar', 'symbol' => '$'],
-            ['code' => 'EGP', 'name' => 'Egyptian Pound', 'symbol' => '£'],
-            ['code' => 'EUR', 'name' => 'Euro', 'symbol' => '€'],
-            ['code' => 'GBP', 'name' => 'British Pound', 'symbol' => '£'],
-            ['code' => 'SAR', 'name' => 'Saudi Riyal', 'symbol' => 'ر.س'],
+            ['currency' => 'USD', 'symbol' => '$', 'string_format' => '$%01.2f'],
+            ['currency' => 'EGP', 'symbol' => 'e£', 'string_format' => 'e£%01.2f'],
+            ['currency' => 'EUR', 'symbol' => '€', 'string_format' => 'e£%01.2f'],
+            ['currency' => 'GBP', 'symbol' => '£', 'string_format' => '£%01.2f'],
+            ['currency' => 'AED', 'symbol' => 'د.إ', 'string_format' => '%01.2f د.إ'],
         ];
 
         foreach ($currencies as $currency) {
-            Currency::firstOrCreate(['code' => $currency['code']], $currency);
+            Currency::firstOrCreate(['currency' => $currency['currency']], $currency);
         }
     }
 }

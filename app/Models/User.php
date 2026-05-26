@@ -74,6 +74,20 @@ class User extends Authenticatable
         $this->attributes['currency_id'] = $value;
     }
 
+    public function getPreferredCurrencyAttribute(): ?string
+    {
+        $name = $this->currency_name();
+        return $name === '--' ? null : $name;
+    }
+
+    public function setPreferredCurrencyAttribute($value)
+    {
+        $currency = \App\Models\Currency::where('currency', $value)->first();
+        if ($currency) {
+            $this->attributes['currency_id'] = $currency->id;
+        }
+    }
+
     public function tickets(): HasMany
     {
         return $this->hasMany(\App\Models\Ticket::class, 'user_id');
@@ -235,6 +249,23 @@ class User extends Authenticatable
         }
 
         return $available;
+    }
+
+    public function unpaid_invoices_amount($include_pending = false)
+    {
+        $invoices = $this->invoices()
+            ->whereIn('status', ['unpaid', 'partially_paid']);
+
+        if (!$include_pending) {
+            $invoices->whereIn('job_status', ['processing', 'done']);
+        }
+
+        $invoices = $invoices->get();
+        $unpaid = 0;
+        foreach ($invoices as $invoice) {
+            $unpaid += \App\Models\CurrenciesExchange::RateToday($invoice->unpaid_total(), $invoice->currency, $this->currency_id);
+        }
+        return $unpaid;
     }
 
     public function transactions()

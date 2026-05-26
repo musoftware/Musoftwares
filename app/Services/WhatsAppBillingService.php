@@ -6,7 +6,7 @@ use App\Models\WhatsAppMessage;
 use App\Models\WhatsAppDailyBatch;
 use App\Models\Transaction;
 use App\Models\User;
-use App\Helper\BalancesHelper;
+use App\Helpers\BalancesHelper;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
@@ -316,7 +316,7 @@ class WhatsAppBillingService
             'egp' => $costInEgp,
             'user_currency' => $costInUserCurrency,
             'currency_code' => $userCurrency,
-            'display' => \App\Helper\FinanceHelper::instance()->format_money($costInUserCurrency, $userCurrency)
+            'display' => \App\Helpers\FinanceHelper::instance()->format_money($costInUserCurrency, $userCurrency)
         ];
     }
 

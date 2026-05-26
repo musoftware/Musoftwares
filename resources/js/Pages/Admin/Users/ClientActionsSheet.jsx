@@ -1,12 +1,12 @@
 import React from 'react';
 import { Link } from '@inertiajs/react';
 import {
-    Sheet,
-    SheetContent,
-    SheetHeader,
-    SheetTitle,
-    SheetDescription,
-} from '@/Components/ui/sheet';
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogDescription,
+} from '@/Components/ui/dialog';
 import { Button } from '@/Components/ui/button';
 import { Avatar, AvatarFallback } from '@/Components/ui/avatar';
 import { Separator } from '@/Components/ui/separator';
@@ -34,9 +34,9 @@ export default function ClientActionsSheet({ client, isOpen, onClose, onLoginAs,
     if (!client) return null;
 
     return (
-        <Sheet open={isOpen} onOpenChange={(open) => !open && onClose()}>
-            <SheetContent side="right" className="w-full sm:max-w-md overflow-y-auto p-0 flex flex-col bg-slate-50/50">
-                <SheetHeader className="bg-slate-950 p-6 text-left space-y-0 border-b-0 shadow-none">
+        <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+            <DialogContent className="sm:max-w-xl p-0 overflow-hidden bg-slate-50 border-slate-200 shadow-2xl rounded-xl">
+                <DialogHeader className="bg-slate-950 p-6 text-left space-y-0 border-b border-slate-800">
                     <div className="flex items-center gap-4">
                         <Avatar className="h-12 w-12 bg-white/10 text-white">
                             <AvatarFallback className="bg-transparent text-lg font-bold">
@@ -44,17 +44,17 @@ export default function ClientActionsSheet({ client, isOpen, onClose, onLoginAs,
                             </AvatarFallback>
                         </Avatar>
                         <div className="min-w-0 flex-1">
-                            <SheetTitle className="text-white text-lg font-semibold truncate">
+                            <DialogTitle className="text-white text-lg font-semibold truncate">
                                 {client.name}
-                            </SheetTitle>
-                            <SheetDescription className="text-slate-400 text-sm truncate">
+                            </DialogTitle>
+                            <DialogDescription className="text-slate-400 text-sm truncate">
                                 {client.email}
-                            </SheetDescription>
+                            </DialogDescription>
                         </div>
                     </div>
-                </SheetHeader>
+                </DialogHeader>
 
-                <div className="p-6 space-y-8 flex-1">
+                <div className="p-6 space-y-6 max-h-[85vh] overflow-y-auto">
                     {/* Finance & Billing */}
                     <div className="space-y-4">
                         <div className="flex items-center gap-2">
@@ -181,7 +181,7 @@ export default function ClientActionsSheet({ client, isOpen, onClose, onLoginAs,
                         </div>
                     </div>
                 </div>
-            </SheetContent>
-        </Sheet>
+            </DialogContent>
+        </Dialog>
     );
 }

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import AdminLayout from '@/Layouts/AdminLayout';
+import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
 import { Head, Link, router } from '@inertiajs/react';
 import { 
     Building2, 
@@ -86,7 +86,7 @@ export default function Show({ tenant, clients, invoices, teamMembers, tasks, au
     };
 
     return (
-        <AdminLayout user={auth.user}>
+        <AdminSidebarLayout title="ERP Client" header="ERP Client">
             <Head title={`Oversight — ${tenant.name}`} />
 
             <div className="space-y-6">
@@ -408,6 +408,6 @@ export default function Show({ tenant, clients, invoices, teamMembers, tasks, au
                     )}
                 </Card>
             </div>
-        </AdminLayout>
+        </AdminSidebarLayout>
     );
 }

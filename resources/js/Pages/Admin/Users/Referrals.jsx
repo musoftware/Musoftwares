@@ -1,6 +1,6 @@
 import React from 'react';
 import { Head, Link, router } from '@inertiajs/react';
-import AdminLayout from '@/Layouts/AdminLayout';
+import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
 import { ArrowLeft, CheckCircle2, Clock, Settings, User, Unlink, Trash2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/Components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/Components/ui/table';
@@ -31,7 +31,7 @@ export default function Referrals({ client, referrals }) {
     };
 
     return (
-        <AdminLayout>
+        <AdminSidebarLayout title="User Referrals" header="User Referrals">
             <Head title={`Referrals - ${client.name}`} />
 
             <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
@@ -148,6 +148,6 @@ export default function Referrals({ client, referrals }) {
                     </CardContent>
                 </Card>
             </div>
-        </AdminLayout>
+        </AdminSidebarLayout>
     );
 }

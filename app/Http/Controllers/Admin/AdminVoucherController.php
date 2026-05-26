@@ -22,7 +22,7 @@ class AdminVoucherController extends Controller
         $vouchers = Voucher::with(['spendCurrency', 'rewardCurrency'])
                            ->orderBy('created_at', 'desc')
                            ->paginate(15)
-                           ->through(fn($v) => clone (new VoucherResource($v))->resolve());
+                           ->through(fn($v) => (new VoucherResource($v))->resolve());
 
         return Inertia::render('Admin/Vouchers/Index', [
             'vouchers' => $vouchers,
@@ -46,7 +46,7 @@ class AdminVoucherController extends Controller
                                         ->paginate(20);
 
         return Inertia::render('Admin/Vouchers/Show', [
-            'voucher'     => clone (new VoucherResource($voucher))->resolve(),
+            'voucher'     => (new VoucherResource($voucher))->resolve(),
             'redemptions' => $redemptions, // Usually would have its own resource
         ]);
     }

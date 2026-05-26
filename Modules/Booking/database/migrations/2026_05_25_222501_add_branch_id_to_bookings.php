@@ -10,8 +10,11 @@ return new class extends Migration
     {
         if (Schema::hasTable('bookings') && !Schema::hasColumn('bookings', 'branch_id')) {
             Schema::table('bookings', function (Blueprint $table) {
-                $table->unsignedBigInteger('branch_id')->nullable()->index()->after('tenant_id');
-                // The foreign key constraint could be added here, but for module loosely-coupled design we often omit strict FKs
+                if (Schema::hasColumn('bookings', 'tenant_id')) {
+                    $table->unsignedBigInteger('branch_id')->nullable()->index()->after('tenant_id');
+                } else {
+                    $table->unsignedBigInteger('branch_id')->nullable()->index();
+                }
             });
         }
     }

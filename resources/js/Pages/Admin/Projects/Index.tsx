@@ -251,6 +251,7 @@ export default function Index({ projects, clients, currentTab }) {
                 project={selectedProject} 
                 isOpen={isSheetOpen} 
                 onClose={() => setIsSheetOpen(false)} 
+                onEdit={(proj) => openEditModal(proj)}
             />
         </AdminSidebarLayout>
     );

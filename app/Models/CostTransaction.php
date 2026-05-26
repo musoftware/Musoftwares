@@ -19,7 +19,9 @@ class CostTransaction extends Model
             $currency = $costTransaction->currency_id ?? \App\Models\AdminSettings::business_currency();
             $businessCurrencyId = \App\Models\AdminSettings::business_currency();
             
-            $costTransaction->business_amount = \App\Models\CurrenciesExchange::RateToday(
+            $date = $costTransaction->created_at ?? now();
+            $costTransaction->business_amount = \App\Models\CurrenciesExchange::RateByDate(
+                $date,
                 $costTransaction->amount,
                 $currency,
                 $businessCurrencyId
@@ -41,6 +43,11 @@ class CostTransaction extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function project()
+    {
+        return $this->belongsTo(Project::class);
     }
 
     public function amount_str()

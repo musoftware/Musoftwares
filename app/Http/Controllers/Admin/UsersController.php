@@ -318,6 +318,58 @@ class UsersController extends Controller
             'no_whatsapp_users'   => $noWhatsApp,
         ]);
     }
+    /**
+     * Co-Work page — two tabs:
+     *  1. Freelancer System: users with skills from the Freelance module
+     *  2. Legacy CoWorkers: old co_workers table records
+     */
+    public function coWork(): InertiaResponse
+    {
+        // Tab 1: Users registered in the Freelance system (have at least one skill)
+        // freelanceSkills() is a belongsToMany → Skill, so items are Skill models directly.
+        $freelancers = \App\Models\User::query()
+            ->whereHas('freelanceSkills')
+            ->with(['roles', 'freelanceSkills'])
+            ->latest()
+            ->get()
+            ->map(fn($user) => [
+                'id'         => $user->id,
+                'name'       => $user->name,
+                'email'      => $user->email,
+                'created_at' => $user->created_at,
+                'skills'     => $user->freelanceSkills->map(fn($skill) => [
+                    'id'   => $skill->id,
+                    'name' => $skill->name ?? '—',
+                ])->values(),
+            ]);
+
+        // Tab 2: Legacy CoWorkers
+        $legacyCoWorkers = \App\Models\CoWorker::with('techTags')
+            ->latest()
+            ->get()
+            ->map(fn($cw) => [
+                'id'          => $cw->id,
+                'person_name' => $cw->person_name,
+                'email'       => $cw->email,
+                'mobile'      => $cw->mobile,
+                'facebook'    => $cw->facebook,
+                'linked_in'   => $cw->linked_in,
+                'whatsapp'    => $cw->whatsapp,
+                'time_from'   => $cw->time_from,
+                'time_to'     => $cw->time_to,
+                'flag_path'   => $cw->getFlagPath(),
+                'tech_tags'   => $cw->techTags->map(fn($t) => [
+                    'id'   => $t->id,
+                    'name' => $t->tag_name ?? '?',
+                ])->values(),
+            ]);
+
+        return Inertia::render('Admin/Users/CoWork', [
+            'freelancers'     => $freelancers,
+            'legacyCoWorkers' => $legacyCoWorkers,
+        ]);
+    }
+
     public function reset_password($id)
     {
         $user = User::findOrFail($id);
@@ -434,4 +486,16 @@ class UsersController extends Controller
 
         return back()->with('success', "Membership ({$plan->name}) activated successfully for {$request->duration_days} days.");
     }
+
+    /**
+     * Platform-wide Earning Analysis.
+     * All business logic is delegated to EarningAnalyzeService.
+     */
+    public function earningAnalyze(Request $request): InertiaResponse
+    {
+        $data = app(\App\Services\EarningAnalyzeService::class)->pageData();
+
+        return Inertia::render('Admin/Users/EarningAnalyze', $data);
+    }
 }
+

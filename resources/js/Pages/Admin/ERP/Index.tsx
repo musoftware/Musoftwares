@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import AdminLayout from '@/Layouts/AdminLayout';
+import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
 import { Head, Link, router } from '@inertiajs/react';
 import { 
     Building2, 
@@ -69,7 +69,7 @@ export default function Index({ tenants, filters, stats, auth }: IndexProps) {
     };
 
     return (
-        <AdminLayout user={auth.user}>
+        <AdminSidebarLayout title="ERP Overview" header="ERP Overview">
             <Head title="ERP Admin Oversight" />
 
             <div className="space-y-6">
@@ -269,6 +269,6 @@ export default function Index({ tenants, filters, stats, auth }: IndexProps) {
                     )}
                 </Card>
             </div>
-        </AdminLayout>
+        </AdminSidebarLayout>
     );
 }

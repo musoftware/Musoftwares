@@ -45,4 +45,14 @@ class Service extends Model
     {
         return $this->hasOne(ServiceLandingPage::class, 'service_id');
     }
+
+    public function orders()
+    {
+        return $this->hasManyThrough(ServiceOrder::class, ServicePackage::class, 'service_id', 'package_id');
+    }
+
+    public function reviews()
+    {
+        return $this->hasMany(ServiceReview::class, 'service_id');
+    }
 }

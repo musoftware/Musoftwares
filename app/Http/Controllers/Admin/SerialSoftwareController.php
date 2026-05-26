@@ -35,7 +35,7 @@ class SerialSoftwareController extends Controller
             ->withCount('devices')
             ->orderByDesc('created_at')
             ->paginate(20)
-            ->through(fn($sw) => clone (new SerialSoftwareResource($sw))->resolve());
+            ->through(fn($sw) => (new SerialSoftwareResource($sw))->resolve());
 
         return Inertia::render('Admin/SerialSoftwares/Index', [
             'softwares' => $softwares,

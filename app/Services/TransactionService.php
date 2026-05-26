@@ -6,8 +6,8 @@ use App\Models\Transaction;
 use App\Models\CostTransaction;
 use App\Models\User;
 use App\Models\Project;
-use App\Helper\TimerHelper;
-use App\Helper\BalancesHelper;
+use App\Helpers\TimerHelper;
+use App\Helpers\BalancesHelper;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 

@@ -66,6 +66,13 @@ class SupportTicketController extends Controller
                 'role' => 'client',
             ]);
 
+            // Create the first message in the conversation representing the ticket description
+            $conversation->messages()->create([
+                'sender_id' => $user->id,
+                'body' => $validated['description'],
+                'is_system' => false,
+            ]);
+
             // Add all admin users as participants so they can view and reply
             $admins = \App\Models\User::role('admin')->get();
             foreach ($admins as $admin) {
@@ -94,7 +101,7 @@ class SupportTicketController extends Controller
         }
 
         DB::transaction(function () use ($ticket) {
-            $ticket->update(['ticket_status' => 'resolved']);
+            $ticket->update(['ticket_status' => 'closed']);
             
             if ($ticket->conversation) {
                 $ticket->conversation->update(['status' => 'closed']);

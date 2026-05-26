@@ -1,6 +1,6 @@
 import React from 'react';
 import { Head, Link } from '@inertiajs/react';
-import AdminLayout from '@/Layouts/AdminLayout';
+import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
 import { ArrowLeft } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/Components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/Components/ui/table';
@@ -22,7 +22,7 @@ export default function Reports({ client, dates = [], unpaid = 0 }) {
     const currency = client.currency || 'USD';
 
     return (
-        <AdminLayout>
+        <AdminSidebarLayout title="User Reports" header="User Reports">
             <Head title={`Reports - ${client.name}`} />
 
             <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
@@ -110,6 +110,6 @@ export default function Reports({ client, dates = [], unpaid = 0 }) {
                     </CardContent>
                 </Card>
             </div>
-        </AdminLayout>
+        </AdminSidebarLayout>
     );
 }

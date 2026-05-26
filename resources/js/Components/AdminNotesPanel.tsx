@@ -45,8 +45,8 @@ export default function AdminNotesPanel({ noteableType, noteableId, initialNotes
 
     const fetchNotes = async () => {
         try {
-            const res = await axios.get(`/api/admin-notes?noteable_type=${noteableType}&noteable_id=${noteableId}`);
-            setNotes(res.data.data || []);
+            const res = await axios.get(`/admin/users/${noteableId}/notes/json`);
+            setNotes(res.data.data || res.data || []);
         } catch (err) {
             console.error("Failed to load notes", err);
         }
@@ -58,17 +58,15 @@ export default function AdminNotesPanel({ noteableType, noteableId, initialNotes
         setError(null);
 
         try {
-            const res = await axios.post('/api/admin-notes', {
-                noteable_type: noteableType,
-                noteable_id: noteableId,
+            const res = await axios.post(`/admin/users/${noteableId}/notes`, {
                 content,
                 type,
                 visibility,
                 risk_level: riskLevel
             });
 
-            if (res.data && res.data.note) {
-                setNotes(prev => [res.data.note, ...prev]);
+            if (res.data && (res.data.note || res.data.id)) {
+                setNotes(prev => [res.data.note || res.data, ...prev]);
             }
             setContent('');
         } catch (err) {
@@ -82,7 +80,7 @@ export default function AdminNotesPanel({ noteableType, noteableId, initialNotes
         // Optimistic update
         setNotes(prev => prev.map(n => n.id === noteId ? { ...n, is_pinned: !n.is_pinned } : n));
         try {
-            await axios.patch(`/api/admin-notes/${noteId}/pin`);
+            await axios.post(`/admin/users/${noteableId}/notes/${noteId}/archive`);
         } catch (err) {
             // Revert
             setNotes(prev => prev.map(n => n.id === noteId ? { ...n, is_pinned: !n.is_pinned } : n));
@@ -96,7 +94,7 @@ export default function AdminNotesPanel({ noteableType, noteableId, initialNotes
         setNotes(prev => prev.filter(n => n.id !== noteId));
 
         try {
-            await axios.delete(`/api/admin-notes/${noteId}`);
+            await axios.delete(`/admin/users/${noteableId}/notes/${noteId}`);
         } catch (err) {
             setNotes(previousNotes);
         }

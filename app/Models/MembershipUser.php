@@ -52,9 +52,9 @@ class MembershipUser extends Model
     public function price_str()
     {
         if (Auth::check()) {
-            return \App\Helper\FinanceHelper::instance()->format_money($this->current_price(), Auth::user()->currency);
+            return \App\Helpers\FinanceHelper::instance()->format_money($this->current_price(), Auth::user()->currency);
         } else {
-            return \App\Helper\FinanceHelper::instance()->format_money($this->current_price(), $this->currency);
+            return \App\Helpers\FinanceHelper::instance()->format_money($this->current_price(), $this->currency);
         }
     }
 

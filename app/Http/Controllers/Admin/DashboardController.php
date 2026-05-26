@@ -22,13 +22,11 @@ class DashboardController extends Controller
     {
         return Inertia::render('Admin/Dashboard', [
             'stats'             => $this->dashboardService->getCoreMetrics(),
+            'operationalStats'  => $this->dashboardService->getOperationalMetrics(),
+            'systemHealth'      => $this->dashboardService->getSystemHealth(),
             'revenueChartData'  => $this->dashboardService->getMonthlyRevenueChart(),
             'moduleBreakdown'   => $this->dashboardService->getModuleBreakdown(),
-            'recentInvoices'    => $this->dashboardService->getRecentInvoices(),
-            'recentWithdrawals' => $this->dashboardService->getRecentWithdrawals(),
-            'newTenants'        => $this->dashboardService->getNewTenants(),
+            'recentActivities'  => $this->dashboardService->getRecentActivities(),
         ]);
     }
-
-
 }

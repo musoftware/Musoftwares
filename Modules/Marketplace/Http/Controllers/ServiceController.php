@@ -139,28 +139,4 @@ class ServiceController extends Controller
             ->with('success', 'Service submitted for review. It will be visible once approved.');
     }
 
-    // Admin Actions
-    public function approve($id)
-    {
-        $service = Service::findOrFail($id);
-        $service->update(['status' => 'active']);
-
-        return redirect()->back()->with('success', 'Service approved.');
-    }
-
-    public function reject($id)
-    {
-        $service = Service::findOrFail($id);
-        $service->update(['status' => 'rejected']);
-
-        return redirect()->back()->with('success', 'Service rejected.');
-    }
-
-    public function feature($id)
-    {
-        $service = Service::findOrFail($id);
-        $service->update(['is_featured' => !$service->is_featured]);
-
-        return redirect()->back()->with('success', 'Service feature status toggled.');
-    }
 }

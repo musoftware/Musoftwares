@@ -23,9 +23,17 @@ class Ticket extends Model
         'closed_at',
     ];
 
-    public function close()
+    public function close(): void
     {
         $this->ticket_status = 'closed';
+        $this->closed_at     = now();
+        $this->save();
+    }
+
+    public function reopen(): void
+    {
+        $this->ticket_status = 'open';
+        $this->closed_at     = null;
         $this->save();
     }
 
@@ -125,6 +133,11 @@ class Ticket extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function assignedEmployee()
+    {
+        return $this->belongsTo(User::class, 'assigned_employee_id');
     }
 
     public function isAnonymous()

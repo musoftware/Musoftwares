@@ -3,7 +3,7 @@
 namespace App\Services;
 
 use App\Models\Billing\PlatformContract;
-use App\Models\Billing\PlatformProposal;
+use App\Models\ProjectProposal;
 use Illuminate\Support\Facades\Http;
 
 class PriceCalculatorService
@@ -98,11 +98,11 @@ Return ONLY valid JSON in this exact format:
         ];
     }
 
-    public function saveProposal(int $userId, array $data): PlatformProposal
+    public function saveProposal(int $userId, array $data): ProjectProposal
     {
         $parsed = $data['parsed_data'];
 
-        return PlatformProposal::create([
+        return ProjectProposal::create([
             'user_id' => $userId,
             'project_name' => $parsed['project_name'] ?? 'Untitled Proposal',
             'project_details' => $data['project_details'],
@@ -111,11 +111,10 @@ Return ONLY valid JSON in this exact format:
             'cost_breakdown' => $parsed['cost_breakdown'] ?? [],
             'proposal_data' => $parsed,
             'ascii_table' => $data['ascii_table'],
-            'status' => 'draft'
         ]);
     }
 
-    public function convertToContract(PlatformProposal $proposal): PlatformContract
+    public function convertToContract(ProjectProposal $proposal): PlatformContract
     {
         $contract = PlatformContract::create([
             'user_id' => $proposal->user_id,
@@ -124,13 +123,11 @@ Return ONLY valid JSON in this exact format:
             'reference' => 'CTR-' . strtoupper(uniqid()),
             'duration' => $proposal->total_duration_days . ' Days',
             'total_amount' => $proposal->total_cost_egp,
-            'currency' => 'EGP',
+            'currency_id' => 2,
             'items' => $proposal->cost_breakdown,
             'content' => $proposal->proposal_data,
             'status' => 'draft',
         ]);
-
-        $proposal->update(['status' => 'converted_to_contract']);
 
         return $contract;
     }

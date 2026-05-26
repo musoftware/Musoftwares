@@ -49,11 +49,14 @@ class ReportService
         $totalExpenses = $invoiceCosts;
 
         // Tenant stats
-        $tenantStats = Invoice::where('status', 'paid')
-            ->whereBetween('paid_at', [$from, $to])
-            ->join('erp_tenants', 'invoices.tenant_id', '=', 'tenants.id')
-            ->select('tenants.name as tenant_name', DB::raw('SUM(invoices.paid) as revenue'))
-            ->groupBy('tenants.id', 'tenants.name')
+        $tenantStats = Invoice::where('erp_invoices.status', 'paid')
+            ->whereBetween('erp_invoices.paid_at', [$from, $to])
+            ->leftJoin('erp_tenants', 'erp_invoices.tenant_id', '=', 'erp_tenants.id')
+            ->select(
+                DB::raw("COALESCE(erp_tenants.name, 'System/Main') as tenant_name"),
+                DB::raw('SUM(erp_invoices.paid_amount) as revenue')
+            )
+            ->groupBy('erp_invoices.tenant_id', 'erp_tenants.name')
             ->get();
 
         return [

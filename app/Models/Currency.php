@@ -11,6 +11,8 @@ class Currency extends Model
 
     public $timestamps = false;
 
+    protected $fillable = ['currency', 'symbol', 'string_format'];
+
     public static function as_array()
     {
         $as_array = array();

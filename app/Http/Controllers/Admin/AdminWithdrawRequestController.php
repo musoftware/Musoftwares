@@ -12,7 +12,7 @@ class AdminWithdrawRequestController extends Controller
 {
     public function index(Request $request)
     {
-        $query = UserReferralRequestWithdraw::with(['user', 'method']);
+        $query = UserReferralRequestWithdraw::with(['user', 'user_payment_method']);
 
         if ($request->filled('status')) {
             $query->where('status', $request->status);
@@ -21,7 +21,7 @@ class AdminWithdrawRequestController extends Controller
         $requests = $query->orderBy('created_at', 'desc')
                           ->paginate(15)
                           ->withQueryString()
-                          ->through(fn($w) => clone (new WithdrawRequestResource($w))->resolve());
+                          ->through(fn($w) => (new WithdrawRequestResource($w))->resolve());
 
         return Inertia::render('Admin/WithdrawRequests/Index', [
             'requests' => $requests,
@@ -31,7 +31,7 @@ class AdminWithdrawRequestController extends Controller
 
     public function show(UserReferralRequestWithdraw $withdrawRequest)
     {
-        $withdrawRequest->load(['user', 'method']);
+        $withdrawRequest->load(['user', 'user_payment_method']);
 
         // Mark as reviewing if it was pending
         if ($withdrawRequest->status === 'pending') {
@@ -39,7 +39,7 @@ class AdminWithdrawRequestController extends Controller
         }
 
         return Inertia::render('Admin/WithdrawRequests/Show', [
-            'withdrawRequest' => clone (new WithdrawRequestResource($withdrawRequest))->resolve(),
+            'withdrawRequest' => (new WithdrawRequestResource($withdrawRequest))->resolve(),
         ]);
     }
 

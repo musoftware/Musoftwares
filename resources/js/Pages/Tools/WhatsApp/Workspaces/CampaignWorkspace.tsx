@@ -252,7 +252,7 @@ export default function CampaignWorkspace({
             const text = event.target?.result as string;
             if (!text) return;
 
-            let parsedRows: string[] = [];
+            const parsedRows: string[] = [];
             const lines = text.split(/\r?\n/);
 
             if (file.name.endsWith('.csv')) {
