@@ -25,9 +25,10 @@ class InvoiceResource extends JsonResource
             'discount' => $this->discount,
             'tax' => $this->tax(),
             'paid_amount' => $this->paid,
-            'currency' => $this->currency,
+            'currency' => \App\Models\Currency::find($this->currency)?->currency ?? 'USD',
+            'currency_symbol' => \App\Models\Currency::find($this->currency)?->symbol ?? '$',
             'business_amount' => $this->business_total(),
-            'business_currency' => \App\Models\AdminSettings::GetValue('business_currency', 2),
+            'business_currency' => \App\Models\Currency::find(\App\Models\AdminSettings::GetValue('business_currency', 2))?->currency ?? 'EGP',
             'status' => $this->status,
             'job_status' => $this->job_status ?? 'pending',
             'created_at' => $this->created_at,
@@ -76,7 +77,7 @@ class InvoiceResource extends JsonResource
                         ->get();
                     $actualAmount = $actualEarnings->sum('amount');
                     $earningCurrency = $actualEarnings->first()?->currency ?? $affiliate->currency;
-                    $actualAmountStr = \App\Helper\FinanceHelper::instance()->format_money($actualAmount, $earningCurrency);
+                    $actualAmountStr = \App\Helpers\FinanceHelper::instance()->format_money($actualAmount, $earningCurrency);
                 }
 
                 $estimatedBase = method_exists($this->resource, 'total_min_cost') ? $this->total_min_cost() : $this->sub_total();
@@ -95,7 +96,7 @@ class InvoiceResource extends JsonResource
                 }
                 
                 $estimatedInAffiliateCurrency = \App\Models\CurrenciesExchange::RateToday($estimatedDirect, $this->currency, $affiliate->currency);
-                $estimatedStr = \App\Helper\FinanceHelper::instance()->format_money(round($estimatedInAffiliateCurrency, 2), $affiliate->currency);
+                $estimatedStr = \App\Helpers\FinanceHelper::instance()->format_money(round($estimatedInAffiliateCurrency, 2), $affiliate->currency);
 
                 return [
                     'affiliate_id' => $affiliate->id,

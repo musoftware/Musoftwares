@@ -12,5 +12,6 @@
     "GoldSavers": true,
     "WrittenCoursesEngine": true,
     "ISaas": true,
-    "AffiliatePos": true
+    "AffiliatePos": true,
+    "PaymentGateway": true
 }

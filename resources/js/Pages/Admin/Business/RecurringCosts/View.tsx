@@ -1,0 +1,208 @@
+import React, { useState } from 'react';
+import { Head, Link, router } from '@inertiajs/react';
+import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
+import { Button } from '@/Components/ui/button';
+import { ArrowLeft, Calendar, Clock, DollarSign, List, History, AlertCircle, Edit, Trash2 } from 'lucide-react';
+
+export default function View({ cost, transactions, upcomingSchedule, total_stat }) {
+    const [activeTab, setActiveTab] = useState<'history' | 'schedule'>('history');
+
+    const handleDelete = () => {
+        if (confirm('Are you sure you want to delete this recurring cost?')) {
+            router.delete(route('admin.recurring_costs.delete', cost.id));
+        }
+    };
+
+    const handleDeleteWithTransactions = () => {
+        if (confirm('Are you sure you want to delete this recurring cost AND all its generated transactions? This cannot be undone.')) {
+            router.delete(route('admin.recurring_costs.delete_with_transaction', cost.id));
+        }
+    };
+
+    return (
+        <AdminSidebarLayout title={`${cost.title} - Recurring Details`} header="Business Operations">
+            <Head title={`View Recurring Cost - ${cost.title}`} />
+
+            <div className="mb-4 flex justify-between items-center">
+                <Link href={route('admin.recurring_costs.index')} className="text-sm text-gray-500 hover:text-black flex items-center gap-1">
+                    <ArrowLeft className="w-4 h-4" /> Back to Recurring Costs
+                </Link>
+                <div className="flex gap-2">
+                    <Link href={route('admin.recurring_costs.edit', cost.id)}>
+                        <Button variant="outline" size="sm" className="flex items-center gap-1.5">
+                            <Edit className="w-4 h-4" /> Edit
+                        </Button>
+                    </Link>
+                    <Button variant="outline" size="sm" className="text-orange-600 hover:text-orange-900 flex items-center gap-1.5" onClick={handleDelete}>
+                        <Trash2 className="w-4 h-4" /> Delete Schedule
+                    </Button>
+                    <Button variant="destructive" size="sm" className="flex items-center gap-1.5" onClick={handleDeleteWithTransactions}>
+                        <Trash2 className="w-4 h-4" /> Delete All
+                    </Button>
+                </div>
+            </div>
+
+            {/* Overview Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                {/* Cost Details Card */}
+                <div className="bg-white p-6 rounded-xl border shadow-sm md:col-span-2">
+                    <h3 className="text-lg font-bold text-slate-900 mb-4 pb-2 border-b">Recurrence Overview</h3>
+                    <div className="grid grid-cols-2 gap-4">
+                        <div>
+                            <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider block">Description</span>
+                            <span className="text-sm font-medium text-slate-800">{cost.title}</span>
+                        </div>
+                        <div>
+                            <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider block">Amount</span>
+                            <span className="text-sm font-bold text-slate-900">{parseFloat(cost.amount).toLocaleString()} {cost.currency} ({cost.currency_symbol})</span>
+                        </div>
+                        <div className="mt-2">
+                            <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider block">Recurrence Pattern</span>
+                            <span className="text-sm font-medium text-slate-800 capitalize">{cost.details}</span>
+                        </div>
+                        <div className="mt-2">
+                            <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider block">Category / Reason</span>
+                            <span className="text-sm font-medium text-slate-800 bg-slate-100 border px-2 py-0.5 rounded inline-block mt-0.5">{cost.reason || 'None'}</span>
+                        </div>
+                        <div className="mt-2">
+                            <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider block">Start Date</span>
+                            <span className="text-sm font-medium text-slate-800">{new Date(cost.start_date).toLocaleDateString()}</span>
+                        </div>
+                        <div className="mt-2">
+                            <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider block">Next Execution Date</span>
+                            <span className="text-sm font-medium text-slate-800 flex items-center gap-1 mt-0.5">
+                                <Clock className="w-4 h-4 text-slate-500" /> {new Date(cost.current_date).toLocaleDateString()}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Performance Stats Card */}
+                <div className="bg-white p-6 rounded-xl border shadow-sm flex flex-col justify-between">
+                    <div>
+                        <h3 className="text-lg font-bold text-slate-900 mb-4 pb-2 border-b">Ledger Stats</h3>
+                        <div className="space-y-4">
+                            <div className="flex justify-between items-center">
+                                <span className="text-sm text-gray-500">Total Runs Executed:</span>
+                                <span className="text-sm font-bold text-slate-900">{total_stat.entries_count} times</span>
+                            </div>
+                            <div className="flex justify-between items-center">
+                                <span className="text-sm text-gray-500">Cumulative Cost:</span>
+                                <span className="text-sm font-bold text-red-600 bg-red-50 px-2 py-0.5 border border-red-100 rounded">
+                                    {total_stat.total_cost}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="mt-4 pt-4 border-t text-xs text-gray-400 flex items-start gap-1">
+                        <AlertCircle className="w-4 h-4 text-gray-400 shrink-0" />
+                        <span>The cumulative cost is calculated based on generated cost transactions associated with this schedule.</span>
+                    </div>
+                </div>
+            </div>
+
+            {/* Tabs & Tab Contents */}
+            <div className="bg-white border rounded-xl shadow-sm overflow-hidden">
+                <div className="flex border-b bg-slate-50">
+                    <button
+                        className={`flex items-center gap-2 px-6 py-3 text-sm font-medium border-b-2 transition-all ${
+                            activeTab === 'history'
+                                ? 'border-black text-black bg-white font-semibold'
+                                : 'border-transparent text-gray-500 hover:text-black'
+                        }`}
+                        onClick={() => setActiveTab('history')}
+                    >
+                        <History className="w-4 h-4" /> Generated Transactions ({transactions.length})
+                    </button>
+                    <button
+                        className={`flex items-center gap-2 px-6 py-3 text-sm font-medium border-b-2 transition-all ${
+                            activeTab === 'schedule'
+                                ? 'border-black text-black bg-white font-semibold'
+                                : 'border-transparent text-gray-500 hover:text-black'
+                        }`}
+                        onClick={() => setActiveTab('schedule')}
+                    >
+                        <Calendar className="w-4 h-4" /> Next 15 Scheduled Runs
+                    </button>
+                </div>
+
+                <div className="p-6">
+                    {activeTab === 'history' && (
+                        <div>
+                            {transactions.length === 0 ? (
+                                <div className="text-center py-8 text-gray-500">
+                                    <List className="w-8 h-8 mx-auto text-gray-300 mb-2" />
+                                    <p className="text-sm">No transactions have been recorded yet for this recurring cost.</p>
+                                </div>
+                            ) : (
+                                <div className="overflow-x-auto">
+                                    <table className="min-w-full divide-y divide-gray-200">
+                                        <thead className="bg-slate-50">
+                                            <tr>
+                                                <th className="px-4 py-2 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Date Recorded</th>
+                                                <th className="px-4 py-2 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Transaction ID</th>
+                                                <th className="px-4 py-2 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Reason</th>
+                                                <th className="px-4 py-2 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Amount</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody className="divide-y divide-gray-200">
+                                            {transactions.map((tx: any) => (
+                                                <tr key={tx.id} className="hover:bg-slate-50">
+                                                    <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-700">
+                                                        {new Date(tx.created_at).toLocaleString()}
+                                                    </td>
+                                                    <td className="px-4 py-3 whitespace-nowrap text-sm font-mono text-slate-500">
+                                                        #{tx.id}
+                                                    </td>
+                                                    <td className="px-4 py-3 text-sm text-gray-900">
+                                                        {tx.reason}
+                                                    </td>
+                                                    <td className="px-4 py-3 whitespace-nowrap text-sm font-bold text-red-600 text-right">
+                                                        -{parseFloat(tx.amount).toLocaleString()} {tx.currency}
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            )}
+                        </div>
+                    )}
+
+                    {activeTab === 'schedule' && (
+                        <div className="overflow-x-auto">
+                            <table className="min-w-full divide-y divide-gray-200">
+                                <thead className="bg-slate-50">
+                                    <tr>
+                                        <th className="px-4 py-2 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Projected Date</th>
+                                        <th className="px-4 py-2 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
+                                        <th className="px-4 py-2 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Estimated Amount</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-gray-200">
+                                    {upcomingSchedule.map((run: any, idx: number) => (
+                                        <tr key={idx} className="hover:bg-slate-50">
+                                            <td className="px-4 py-3 whitespace-nowrap text-sm font-medium text-slate-800">
+                                                {new Date(run.date).toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+                                            </td>
+                                            <td className="px-4 py-3 whitespace-nowrap text-sm">
+                                                {run.recorded ? (
+                                                    <span className="text-xs bg-amber-50 text-amber-700 border border-amber-200 px-2 py-0.5 rounded">Recorded (Historical)</span>
+                                                ) : (
+                                                    <span className="text-xs bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded font-medium">Pending Execution</span>
+                                                )}
+                                            </td>
+                                            <td className="px-4 py-3 whitespace-nowrap text-sm font-bold text-slate-700 text-right">
+                                                {run.amount_str}
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    )}
+                </div>
+            </div>
+        </AdminSidebarLayout>
+    );
+}

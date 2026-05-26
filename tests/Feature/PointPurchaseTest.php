@@ -26,28 +26,34 @@ class PointPurchaseTest extends TestCase
         $this->user = User::factory()->create(['onboarding_completed' => true]);
         $this->user->assignRole('client');
 
-        $this->user->update(['user_balance' => 100.00]);
+        $this->user->user_balance = 100.00;
+        $this->user->save();
 
         // Seed EGP to USD exchange rate (1 EGP = 0.02 USD)
         // Also need to create Currency model for EGP and attach to user if user_balance expects it.
-        $egpCurrency = \App\Models\Currency::create(['currency' => 'EGP', 'symbol' => 'E£']);
-        $usdCurrency = \App\Models\Currency::create(['currency' => 'USD', 'symbol' => '$']);
-        $this->user->update(['currency' => $usdCurrency->id, 'preferred_currency' => 'USD']);
+        $egpCurrency = \App\Models\Currency::firstOrCreate(
+            ['currency' => 'EGP'],
+            ['symbol' => 'e£', 'string_format' => 'e£%01.2f']
+        );
+        $usdCurrency = \App\Models\Currency::firstOrCreate(
+            ['currency' => 'USD'],
+            ['symbol' => '$', 'string_format' => '$%01.2f']
+        );
+        $this->user->currency_id = $usdCurrency->id;
+        $this->user->save();
 
         \App\Models\CurrenciesExchange::create([
-            'from_currency' => $egpCurrency->id,
-            'to_currency' => $usdCurrency->id,
+            'currency1' => $egpCurrency->id,
+            'currency2' => $usdCurrency->id,
             'rate' => 0.02,
-            'effective_date' => '2020-01-01',
-            'source' => 'manual',
+            'date_string' => '2020-01-01',
         ]);
 
         \App\Models\CurrenciesExchange::create([
-            'from_currency' => 'EGP',
-            'to_currency' => 'USD',
-            'rate' => 0.02,
-            'effective_date' => '2020-01-01',
-            'source' => 'manual',
+            'currency1' => $usdCurrency->id,
+            'currency2' => $egpCurrency->id,
+            'rate' => 50.00,
+            'date_string' => '2020-01-01',
         ]);
 
         // Points package: Starter Pack (100 points, 100 EGP price)
@@ -89,7 +95,8 @@ class PointPurchaseTest extends TestCase
         $this->actingAs($this->user);
 
         // Set wallet balance below package price ($2.00 USD cost)
-        $this->user->update(['user_balance' => 1.50]);
+        $this->user->user_balance = 1.50;
+        $this->user->save();
 
         $response = $this->post(route('freelance.point-purchases.store'), [
             'package_id' => $this->package->id,
@@ -136,7 +143,8 @@ class PointPurchaseTest extends TestCase
         $this->actingAs($this->user);
 
         // Set wallet balance below cost ($1.00 USD)
-        $this->user->update(['user_balance' => 0.50]);
+        $this->user->user_balance = 0.50;
+        $this->user->save();
 
         $response = $this->post(route('freelance.point-purchases.store-wallet'), [
             'points' => 50, // Cost is $1.00 USD

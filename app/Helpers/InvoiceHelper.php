@@ -234,7 +234,7 @@ class InvoiceHelper
 
                 $data_keys_date[$invoice_table[$key]['date']]['index'] = $index;
                 $data_keys_date[$invoice_table[$key]['date']]['date'] = $invoice_table[$key]['date'];
-                $data_keys_date[$invoice_table[$key]['date']]['work_time'] = \App\Helper\FinanceHelper::secondsToTimeHTML($invoice_table[$key]['work_time']);
+                $data_keys_date[$invoice_table[$key]['date']]['work_time'] = \App\Helpers\FinanceHelper::secondsToTimeHTML($invoice_table[$key]['work_time']);
 
 
                 if (isset($invoice_table[$key]['client_name'])) {

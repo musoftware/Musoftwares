@@ -11,19 +11,34 @@ class SupportDeskService
 {
     public function getTickets(array $filters, int $perPage = 15)
     {
-        $query = Ticket::with('user')->orderBy('created_at', 'desc');
+        $query = Ticket::with('user');
 
-        if (!empty($filters['status'])) {
-            if ($filters['status'] === 'closed') {
-                $query->where('ticket_status', 'closed');
-            } else {
-                $query->where('ticket_status', $filters['status']);
-            }
+        // Search
+        if (!empty($filters['search'])) {
+            $search = $filters['search'];
+            $query->where(function ($q) use ($search) {
+                $q->where('ticket_subject', 'like', "%{$search}%")
+                  ->orWhere('ticket_message', 'like', "%{$search}%")
+                  ->orWhereHas('user', fn ($u) => $u->where('name', 'like', "%{$search}%")
+                                                    ->orWhere('email', 'like', "%{$search}%"));
+            });
         }
 
+        // Status filter
+        if (!empty($filters['status'])) {
+            $query->where('ticket_status', $filters['status']);
+        }
+
+        // Priority filter
         if (!empty($filters['priority'])) {
             $query->where('priority', $filters['priority']);
         }
+
+        // Dynamic sort
+        $allowedSorts = ['id', 'created_at', 'ticket_subject', 'priority', 'ticket_status'];
+        $sort      = in_array($filters['sort'] ?? '', $allowedSorts) ? $filters['sort'] : 'created_at';
+        $direction = ($filters['direction'] ?? 'desc') === 'asc' ? 'asc' : 'desc';
+        $query->orderBy($sort, $direction);
 
         return $query->paginate($perPage);
     }
@@ -56,7 +71,13 @@ class SupportDeskService
 
     public function closeTicket(Ticket $ticket): void
     {
-        $ticket->close();
+        DB::transaction(function () use ($ticket) {
+            $ticket->close(); // sets ticket_status=closed and closed_at=now()
+
+            if ($ticket->conversation) {
+                $ticket->conversation->update(['status' => 'closed']);
+            }
+        });
     }
     
     public function getTicketStats(): array

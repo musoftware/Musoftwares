@@ -45,3 +45,57 @@ return [
 
 ### Rule 3: Transactions always have two sets
 The `Transaction` model automatically calculates `business_amount` and flags `business_calculated = true` via its boot events. Always rely on these pre-calculated fields rather than re-calculating them on the fly to preserve historical exchange rates.
+
+### Rule 4: Always Display Currency Next to Every Monetary Amount (CRITICAL)
+**Any number that represents money MUST always be displayed with its currency symbol or code directly next to it.** A bare number like `4,907.64` displayed without a currency label is FORBIDDEN in any UI — admin or client-facing.
+
+**Why:** A number without a currency is ambiguous. `4,907.64` could be USD, EGP, EUR, or any other currency. This causes misreading of financial data and is a UX failure.
+
+#### Frontend Rule
+Never render a monetary amount using a plain number formatter:
+```jsx
+// ❌ WRONG — currency not shown
+<span>{amount.toLocaleString()}</span>
+<span>{new Intl.NumberFormat('en-US').format(amount)}</span>
+
+// ✅ CORRECT — always include currency
+<span>$ {amount.toLocaleString()}</span>
+<span>{amount.toLocaleString()} EGP</span>
+```
+
+When building formatters, always accept and use the currency symbol/code:
+```jsx
+// ✅ CORRECT pattern for a shared formatter
+function fmtBiz(amount, biz = null) {
+    const formatted = new Intl.NumberFormat('en-US', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+    }).format(parseFloat(amount));
+    const symbol = biz?.symbol ?? '';
+    const code   = biz?.code   ?? '';
+    // Symbol before number (e.g. "$ 4,907.64"), code after if no symbol (e.g. "4,907.64 EGP")
+    return symbol ? `${symbol} ${formatted}` : code ? `${formatted} ${code}` : formatted;
+}
+```
+
+#### Backend Rule
+When passing financial data to the frontend via Inertia or API Resources, always include the currency info alongside the amount:
+```php
+// ✅ CORRECT — always send currency data with the amount
+return [
+    'amount'          => $this->amount,
+    'currency_code'   => $this->currencyModel?->currency ?? '—',
+    'currency_symbol' => $this->currencyModel?->symbol   ?? '',
+    // For business-currency-normalized amounts, also send the business currency:
+    'business_amount'   => $this->business_amount,
+    'business_currency' => [
+        'code'   => $currencyMap[$bizId]['code'],
+        'symbol' => $currencyMap[$bizId]['symbol'],
+    ],
+];
+```
+
+#### Summary Checklist
+- [ ] Is every monetary number accompanied by a currency symbol or code in the UI?
+- [ ] Are aggregate/normalized amounts (e.g., page-wide KPIs in business currency) sent with `business_currency` containing `code` and `symbol`?
+- [ ] Is the frontend formatter receiving the currency info, not just the raw number?

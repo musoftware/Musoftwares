@@ -8,6 +8,7 @@ return new class extends Migration
 {
     public function up(): void
     {
+        Schema::disableForeignKeyConstraints();
         Schema::create('gold_live_prices', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('tenant_id')->index();
@@ -56,6 +57,7 @@ return new class extends Migration
                   ->on('gold_market_sources')
                   ->nullOnDelete();
         });
+        Schema::enableForeignKeyConstraints();
     }
 
     public function down(): void

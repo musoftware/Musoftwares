@@ -18,11 +18,11 @@ class AdminTicketController extends Controller
 
     public function index(Request $request)
     {
-        $filters = $request->only(['status', 'priority']);
-        
+        $filters = $request->only(['status', 'priority', 'search', 'sort', 'direction']);
+
         $tickets = $this->supportDeskService->getTickets($filters)
                         ->withQueryString()
-                        ->through(fn($t) => clone (new TicketResource($t))->resolve());
+                        ->through(fn($t) => (new TicketResource($t))->resolve());
 
         $stats = $this->supportDeskService->getTicketStats();
 
@@ -38,7 +38,7 @@ class AdminTicketController extends Controller
         $ticket->load(['user', 'conversation.messages.sender']);
 
         return Inertia::render('Admin/Tickets/Show', [
-            'ticket' => clone (new TicketResource($ticket))->resolve(),
+            'ticket' => (new TicketResource($ticket))->resolve(),
         ]);
     }
 
@@ -52,7 +52,12 @@ class AdminTicketController extends Controller
             $this->supportDeskService->closeTicket($ticket);
             $message = 'Ticket closed successfully.';
         } else {
-            $ticket->update(['ticket_status' => 'open']);
+            $ticket->reopen();
+
+            if ($ticket->conversation) {
+                $ticket->conversation->update(['status' => 'open']);
+            }
+
             $message = 'Ticket reopened successfully.';
         }
 

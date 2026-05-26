@@ -50,7 +50,7 @@ export default function Index({ articles, filters }) {
                                 <tr key={article.id} className="border-b hover:bg-gray-50 transition-colors">
                                     <td className="p-4 font-medium text-gray-900">#{article.id}</td>
                                     <td className="p-4">
-                                        <a href={`https://musoftwares.com/blog/${article.slug}`} target="_blank" rel="noopener noreferrer" className="hover:underline font-semibold text-gray-800">
+                                        <a href={route('blog.show', { slug: article.slug })} target="_blank" rel="noopener noreferrer" className="hover:underline font-semibold text-gray-800">
                                             {article.title?.length > 50 ? article.title.substring(0, 50) + '...' : article.title}
                                         </a>
                                     </td>
@@ -81,7 +81,7 @@ export default function Index({ articles, filters }) {
                                         )}
                                     </td>
                                     <td className="p-4 text-right">
-                                        <a href={`https://musoftwares.com/blog/${article.slug}`} target="_blank" rel="noopener noreferrer">
+                                        <a href={route('blog.show', { slug: article.slug })} target="_blank" rel="noopener noreferrer">
                                             <Button variant="ghost" size="sm" className="gap-2 text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50">
                                                 <ExternalLink className="h-4 w-4" />
                                                 View

@@ -1,0 +1,11 @@
+{
+    "name": "PaymentGateway",
+    "alias": "payment-gateway",
+    "description": "Musoftware Payment Gateway — iSAAS service powering Kashier payments for external clients with 40% commission.",
+    "keywords": ["payment", "kashier", "gateway", "isaas"],
+    "priority": 0,
+    "providers": [
+        "Modules\\PaymentGateway\\Providers\\PaymentGatewayServiceProvider"
+    ],
+    "files": []
+}

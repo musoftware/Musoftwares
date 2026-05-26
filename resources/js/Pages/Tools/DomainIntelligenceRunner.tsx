@@ -116,7 +116,7 @@ export default function DomainIntelligenceRunner({ tool }: any) {
             ];
         });
 
-        let csvContent = "data:text/csv;charset=utf-8," 
+        const csvContent = "data:text/csv;charset=utf-8," 
             + headers.join(",") + "\n"
             + csvRows.map(row => row.map(field => `"${(field || '').toString().replace(/"/g, '""')}"`).join(",")).join("\n");
 

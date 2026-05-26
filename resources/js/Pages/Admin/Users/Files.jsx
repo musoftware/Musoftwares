@@ -1,12 +1,12 @@
 import React from 'react';
 import { Head, Link } from '@inertiajs/react';
-import AdminLayout from '@/Layouts/AdminLayout';
+import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
 import { ArrowLeft, FolderOpen } from 'lucide-react';
 import { Card, CardContent } from '@/Components/ui/card';
 
 export default function Files({ client }) {
     return (
-        <AdminLayout>
+        <AdminSidebarLayout title="User Files" header="User Files">
             <Head title={`Files - ${client.name}`} />
 
             <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
@@ -36,6 +36,6 @@ export default function Files({ client }) {
                     </CardContent>
                 </Card>
             </div>
-        </AdminLayout>
+        </AdminSidebarLayout>
     );
 }

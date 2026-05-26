@@ -49,10 +49,10 @@
                                         @if($d->discount_type === 'percent')
                                             {{ $d->discount_value }}%
                                         @else
-                                            {{ \App\Helper\FinanceHelper::instance()->format_money($d->discount_value, $service->currency) }} {{ __('fixed') }}
+                                            {{ \App\Helpers\FinanceHelper::instance()->format_money($d->discount_value, $service->currency) }} {{ __('fixed') }}
                                         @endif
                                         @if($d->min_price_until !== null)
-                                            <br><small class="text-muted">{{ __('Min. price') }}: {{ \App\Helper\FinanceHelper::instance()->format_money($d->min_price_until, $service->currency) }}</small>
+                                            <br><small class="text-muted">{{ __('Min. price') }}: {{ \App\Helpers\FinanceHelper::instance()->format_money($d->min_price_until, $service->currency) }}</small>
                                         @endif
                                     </td>
                                     <td>

@@ -41,6 +41,7 @@ foreach ($helperFiles as $file) {
 $directoriesToScan = [
     __DIR__ . '/app',
     __DIR__ . '/Modules',
+    __DIR__ . '/resources',
 ];
 
 function scanAndReplace($dir) {

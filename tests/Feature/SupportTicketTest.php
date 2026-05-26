@@ -4,7 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use App\Models\SupportTicket;
+use App\Models\Ticket;
 use App\Models\Conversation;
 use App\Models\Message;
 use Tests\TestCase;
@@ -49,18 +49,18 @@ class SupportTicketTest extends TestCase
         $response->assertStatus(302);
 
         // Assert support ticket is created in the database
-        $this->assertDatabaseHas('support_tickets', [
-            'client_id' => $this->client->id,
-            'subject' => 'Cannot update billing method',
-            'status' => 'open',
+        $this->assertDatabaseHas('tickets', [
+            'user_id' => $this->client->id,
+            'ticket_subject' => 'Cannot update billing method',
+            'ticket_status' => 'open',
             'priority' => 'high',
         ]);
 
-        $ticket = SupportTicket::where('subject', 'Cannot update billing method')->first();
+        $ticket = Ticket::where('ticket_subject', 'Cannot update billing method')->first();
 
         // Assert conversation is automatically created and morphed
         $this->assertDatabaseHas('conversations', [
-            'conversable_type' => SupportTicket::class,
+            'conversable_type' => Ticket::class,
             'conversable_id' => $ticket->id,
             'type' => 'support_ticket',
             'status' => 'open',
@@ -79,10 +79,11 @@ class SupportTicketTest extends TestCase
     public function test_admin_can_view_all_tickets(): void
     {
         // Create a ticket for client
-        $ticket = SupportTicket::create([
-            'client_id' => $this->client->id,
-            'subject' => 'Database issue',
-            'status' => 'open',
+        $ticket = Ticket::create([
+            'user_id' => $this->client->id,
+            'ticket_subject' => 'Database issue',
+            'ticket_message' => 'Database connection issues.',
+            'ticket_status' => 'open',
             'priority' => 'medium',
         ]);
 
@@ -94,15 +95,16 @@ class SupportTicketTest extends TestCase
 
     public function test_can_resolve_ticket(): void
     {
-        $ticket = SupportTicket::create([
-            'client_id' => $this->client->id,
-            'subject' => 'Resolved issue',
-            'status' => 'open',
+        $ticket = Ticket::create([
+            'user_id' => $this->client->id,
+            'ticket_subject' => 'Resolved issue',
+            'ticket_message' => 'This issue will be resolved.',
+            'ticket_status' => 'open',
             'priority' => 'low',
         ]);
 
         $conversation = Conversation::create([
-            'conversable_type' => SupportTicket::class,
+            'conversable_type' => Ticket::class,
             'conversable_id' => $ticket->id,
             'type' => 'support_ticket',
             'status' => 'open',
@@ -112,7 +114,7 @@ class SupportTicketTest extends TestCase
             ->post(route('tickets.resolve', $ticket->id));
 
         $response->assertStatus(302);
-        $this->assertEquals('resolved', $ticket->fresh()->status);
+        $this->assertEquals('closed', $ticket->fresh()->ticket_status);
         $this->assertEquals('closed', $conversation->fresh()->status);
     }
 }

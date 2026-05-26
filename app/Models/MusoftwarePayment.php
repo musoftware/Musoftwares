@@ -24,15 +24,38 @@ class MusoftwarePayment extends Model
         'status',
         'kashier_payment_url',
         'kashier_transaction_id',
+        'commission_rate',
+        'commission_amount',
+        'net_amount',
     ];
 
     protected $casts = [
-        'customer_data' => 'array',
-        'metadata' => 'array',
+        'customer_data'     => 'array',
+        'metadata'          => 'array',
+        'amount'            => 'decimal:2',
+        'commission_amount' => 'decimal:2',
+        'net_amount'        => 'decimal:2',
+        'commission_rate'   => 'decimal:2',
     ];
 
-    public function client()
+    public function client(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(MusoftwareClient::class, 'client_id');
+    }
+
+    /**
+     * Check if this payment is completed successfully.
+     */
+    public function isSuccessful(): bool
+    {
+        return $this->status === 'success';
+    }
+
+    /**
+     * Get formatted amount with currency.
+     */
+    public function getFormattedAmountAttribute(): string
+    {
+        return number_format((float) $this->amount, 2) . ' ' . $this->currency;
     }
 }

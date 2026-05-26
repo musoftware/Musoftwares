@@ -1,6 +1,6 @@
 import React from 'react';
 import { Head, Link, router } from '@inertiajs/react';
-import AdminLayout from '@/Layouts/AdminLayout';
+import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
 import { Badge } from '@/Components/ui/badge';
 import { Button } from '@/Components/ui/button';
 import { Card, CardContent } from '@/Components/ui/card';
@@ -38,7 +38,7 @@ export default function SerialUserDevicesByUser({ users, filters }: Props) {
     };
 
     return (
-        <AdminLayout user={auth.user}>
+        <AdminSidebarLayout title="Devices By User" header="Devices By User">
             <Head title="Devices By User" />
             <div className="min-h-screen bg-zinc-950 p-6 space-y-6">
                 <div className="flex items-center gap-4">
@@ -113,6 +113,6 @@ export default function SerialUserDevicesByUser({ users, filters }: Props) {
                     ))}
                 </div>
             </div>
-        </AdminLayout>
+        </AdminSidebarLayout>
     );
 }

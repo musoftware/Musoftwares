@@ -113,10 +113,24 @@ class CurrenciesExchange extends Model
         }
 
         if ($ex == null) {
-            Artisan::call('fetch:currencies');
+            try {
+                Artisan::call('currency:fetch-rates');
+                $ex = CurrenciesExchange::where('currency1', trim($cur1))
+                    ->where('currency2', trim($cur2))
+                    ->where('date_string', trim($date_str))
+                    ->first();
+                if ($ex == null) {
+                    $ex = CurrenciesExchange::where('currency1', trim($cur1))
+                        ->where('currency2', trim($cur2))
+                        ->orderByDesc('date_string')->first();
+                }
+            } catch (\Exception $e) {
+                // Ignore command failure
+            }
         }
 
-        return round($ex->rate * $amount, 2);
+        $rate = $ex ? $ex->rate : 1.0;
+        return round($rate * $amount, 2);
     }
 
 
@@ -132,6 +146,12 @@ class CurrenciesExchange extends Model
             ->first();
 
         if ($ex == null) {
+            $ex = CurrenciesExchange::where('currency1', trim($cur1))
+                ->where('currency2', trim($cur2))
+                ->orderByDesc('date_string')->first();
+        }
+
+        if ($ex == null) {
             if ($date_str == '1970-01-01') {
                 $ex = CurrenciesExchange::where('currency1', trim($cur1))
                     ->where('currency2', trim($cur2))
@@ -139,7 +159,8 @@ class CurrenciesExchange extends Model
             }
         }
 
-        return number_format(round($ex->rate * $amount, 11), 11, '.', '');
+        $rate = $ex ? $ex->rate : 1.0;
+        return number_format(round($rate * $amount, 11), 11, '.', '');
     }
 
     //

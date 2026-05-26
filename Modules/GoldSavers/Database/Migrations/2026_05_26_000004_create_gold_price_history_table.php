@@ -25,13 +25,19 @@ return new class extends Migration
             $table->unsignedInteger('tick_count')->default(0);
 
             $table->string('currency', 3)->default('EGP');
-            $table->timestamp('period_start');
-            $table->timestamp('period_end');
+            $table->timestamp('period_start')->nullable();
+            $table->timestamp('period_end')->nullable();
             $table->timestamps();
 
             // One candle per tenant+market+interval+karat+period
-            $table->unique(['tenant_id', 'market_key', 'interval', 'karat', 'period_start']);
-            $table->index(['tenant_id', 'market_key', 'interval', 'period_start']);
+            $table->unique(
+                ['tenant_id', 'market_key', 'interval', 'karat', 'period_start'],
+                'gph_tenant_market_interval_karat_period_unique'
+            );
+            $table->index(
+                ['tenant_id', 'market_key', 'interval', 'period_start'],
+                'gph_tenant_market_interval_period_index'
+            );
         });
     }
 

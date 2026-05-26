@@ -152,7 +152,7 @@ export default function Downloads({ availableTools, downloads }: Props) {
                                         Download App
                                     </Button>
                                 </a>
-                                <a href={`http://${host}:18400/setup`} target="_blank" className="text-xs text-indigo-600 hover:underline">
+                                <a href={`http://${host}:18400/setup`} target="_blank" className="text-xs text-indigo-600 hover:underline" rel="noreferrer">
                                     Check Status →
                                 </a>
                             </CardFooter>

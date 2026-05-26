@@ -10,8 +10,9 @@ class SerialDevice extends Model
 {
     use HasFactory;
 
-    public const STATUS_ACTIVE = 'active';
+    public const STATUS_ACTIVE   = 'active';
     public const STATUS_INACTIVE = 'inactive';
+    public const STATUS_BLOCKED  = 'blocked';
 
     protected $fillable = [
         'serial_software_id',
@@ -42,6 +43,7 @@ class SerialDevice extends Model
         return [
             self::STATUS_ACTIVE,
             self::STATUS_INACTIVE,
+            self::STATUS_BLOCKED,
         ];
     }
 

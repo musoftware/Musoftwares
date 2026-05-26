@@ -66,6 +66,70 @@ class TaskController extends Controller
         ]);
     }
 
+    public function asList(Request $request)
+    {
+        $tenant = $this->resolveTenant();
+
+        $todos = ERPTodoItem::query()
+            ->where('tenant_id', $tenant->id)
+            ->where('completed', false)
+            ->where('paused', false)
+            ->whereNull('parent_id')
+            ->whereHas('task', function ($q) {
+                $q->where('archived', false);
+            })
+            ->with(['task.client', 'task.creator', 'children' => function($q) {
+                $q->orderBy('sort_index')->orderBy('id');
+            }])
+            ->orderBy('id')
+            ->get();
+
+        $data = [];
+
+        foreach ($todos as $todo) {
+            $task = $todo->task;
+            if (!$task || !$task->client) {
+                continue;
+            }
+
+            $clientId = $task->client->id;
+            $taskId = $task->id;
+
+            if (!isset($data[$clientId])) {
+                $data[$clientId] = [
+                    'client' => [
+                        'id' => $task->client->id,
+                        'name' => $task->client->name,
+                        'email' => $task->client->email,
+                    ],
+                    'tasks' => []
+                ];
+            }
+
+            if (!isset($data[$clientId]['tasks'][$taskId])) {
+                $data[$clientId]['tasks'][$taskId] = [
+                    'id' => $task->id,
+                    'task_name' => $task->task_name,
+                    'status' => $task->status,
+                    'client_id' => $task->client_id,
+                    'todos' => []
+                ];
+            }
+
+            $data[$clientId]['tasks'][$taskId]['todos'][] = $this->shapeTodo($todo);
+        }
+
+        // Clean up associative arrays to indexed arrays for JSON mapping
+        $result = array_values($data);
+        foreach ($result as &$clientData) {
+            $clientData['tasks'] = array_values($clientData['tasks']);
+        }
+
+        return Inertia::render('ERP/Tasks/AsList', [
+            'arrangedClients' => $result,
+        ]);
+    }
+
     public function show(ERPTask $task)
     {
         $tenant = $this->resolveTenant();

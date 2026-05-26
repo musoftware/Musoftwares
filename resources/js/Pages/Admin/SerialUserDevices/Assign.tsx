@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Head, Link, router, usePage } from '@inertiajs/react';
-import AdminLayout from '@/Layouts/AdminLayout';
+import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
 import { Button } from '@/Components/ui/button';
 import { Card, CardContent } from '@/Components/ui/card';
 import { Input } from '@/Components/ui/input';
@@ -38,7 +38,7 @@ export default function SerialUserDevicesAssign({ users, availableDevices }: Pro
     const selectedDevice = availableDevices.find(d => d.device_id === form.device_id);
 
     return (
-        <AdminLayout user={auth.user}>
+        <AdminSidebarLayout title="Assign Device" header="Assign Device">
             <Head title="Assign Device" />
             <div className="max-w-2xl mx-auto px-4 py-8 space-y-6">
                 <div className="flex items-center gap-3">
@@ -141,6 +141,6 @@ export default function SerialUserDevicesAssign({ users, availableDevices }: Pro
                     </CardContent>
                 </Card>
             </div>
-        </AdminLayout>
+        </AdminSidebarLayout>
     );
 }

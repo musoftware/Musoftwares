@@ -91,7 +91,7 @@ export default function DomainProspectorRunner({ tool }: any) {
         if (results.length === 0) return;
         const headers = ["Domain", "Status", "Registered", "For Sale", "Emails", "Title"];
         
-        let csvContent = "data:text/csv;charset=utf-8," 
+        const csvContent = "data:text/csv;charset=utf-8," 
             + headers.join(",") + "\n"
             + results.map(r => {
                 return [

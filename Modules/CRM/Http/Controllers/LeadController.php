@@ -25,7 +25,7 @@ class LeadController extends Controller
             $query->where('status', $status);
         }
 
-        $leads = $query->with(['assignable'])->latest()->paginate(20)->through(fn($l) => (new LeadResource($l))->resolve());
+        $leads = $query->with(['assignee'])->latest()->paginate(20)->through(fn($l) => (new LeadResource($l))->resolve());
 
         return Inertia::render('CRM/Leads/Index', [
             'leads' => $leads,
@@ -53,13 +53,11 @@ class LeadController extends Controller
     public function assign(Request $request, Lead $lead)
     {
         $validated = $request->validate([
-            'assignable_id' => 'required|integer',
-            'assignable_type' => 'required|string|in:App\Models\User,Modules\ERP\Models\TeamMember',
+            'assigned_to' => 'nullable|integer|exists:users,id',
         ]);
 
         $lead->update([
-            'assignable_id' => $validated['assignable_id'],
-            'assignable_type' => $validated['assignable_type'],
+            'assigned_to' => $validated['assigned_to'],
         ]);
 
         return redirect()->back()->with('success', 'Lead assignment updated.');

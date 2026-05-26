@@ -68,9 +68,9 @@ class Membership extends Model
     public function price_str()
     {
         if (Auth::check()) {
-            return \App\Helper\FinanceHelper::instance()->format_money($this->current_price(), Auth::user()->currency);
+            return \App\Helpers\FinanceHelper::instance()->format_money($this->current_price(), Auth::user()->currency);
         } else {
-            return \App\Helper\FinanceHelper::instance()->format_money($this->current_price(), $this->currency);
+            return \App\Helpers\FinanceHelper::instance()->format_money($this->current_price(), $this->currency);
         }
     }
 
@@ -91,9 +91,9 @@ class Membership extends Model
     public function price_str_annual()
     {
         if (Auth::check()) {
-            return \App\Helper\FinanceHelper::instance()->format_money($this->current_price_annual(), Auth::user()->currency);
+            return \App\Helpers\FinanceHelper::instance()->format_money($this->current_price_annual(), Auth::user()->currency);
         } else {
-            return \App\Helper\FinanceHelper::instance()->format_money($this->current_price_annual(), $this->currency);
+            return \App\Helpers\FinanceHelper::instance()->format_money($this->current_price_annual(), $this->currency);
         }
     }
 

@@ -1368,7 +1368,7 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                                                         <td className="px-6 py-4 font-mono text-xs text-slate-400">{doc.size}</td>
                                                         <td className="px-6 py-4 text-right">
                                                             <div className="flex items-center justify-end gap-2 text-slate-400">
-                                                                <a href={route('erp.files.show', doc.id)} target="_blank" className={cn(buttonVariants({ variant: 'ghost', size: 'icon' }), "h-8 w-8 text-slate-400 hover:text-indigo-600")}><Cloud className="h-4 w-4" /></a>
+                                                                <a href={route('erp.files.show', doc.id)} target="_blank" className={cn(buttonVariants({ variant: 'ghost', size: 'icon' }), "h-8 w-8 text-slate-400 hover:text-indigo-600")} rel="noreferrer"><Cloud className="h-4 w-4" /></a>
                                                                 {!isReadOnlyMember && (
                                                                     <Button variant="ghost" size="icon" onClick={() => handleDeleteDoc(doc.id)} className="h-8 w-8 text-slate-400 hover:text-rose-600"><Trash2 className="h-4 w-4" /></Button>
                                                                 )}

@@ -35,6 +35,9 @@ return new class extends Migration
 
         // Helper function to check if foreign key exists in MySQL
         $dropForeignKeyIfExists = function (string $tableName, string $constraintName) {
+            if (DB::getDriverName() === 'sqlite') {
+                return;
+            }
             $exists = DB::select("
                 SELECT CONSTRAINT_NAME 
                 FROM information_schema.TABLE_CONSTRAINTS 
@@ -135,6 +138,9 @@ return new class extends Migration
     public function down(): void
     {
         $dropForeignKeyIfExists = function (string $tableName, string $constraintName) {
+            if (DB::getDriverName() === 'sqlite') {
+                return;
+            }
             $exists = DB::select("
                 SELECT CONSTRAINT_NAME 
                 FROM information_schema.TABLE_CONSTRAINTS 

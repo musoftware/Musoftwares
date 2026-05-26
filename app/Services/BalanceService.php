@@ -42,7 +42,8 @@ class BalanceService
         $calculatedBalance = round($credits - $debits, 2);
 
         if (abs($calculatedBalance - (float) $user->user_balance) > 0.01) {
-            $user->update(['user_balance' => $calculatedBalance]);
+            $user->user_balance = $calculatedBalance;
+            $user->save();
         }
 
         return $calculatedBalance;

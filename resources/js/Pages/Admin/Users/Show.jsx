@@ -133,10 +133,10 @@ export default function Show({ client, stats = {}, wallets, modulePlans = [] }) 
                 
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                        <Button className="bg-indigo-600 text-white px-4 py-2 rounded-[8px] hover:bg-indigo-700 transition shadow-sm flex items-center gap-2">
-                            Quick Actions <ChevronDown size={16} />
-                        </Button>
-                    </DropdownMenuTrigger>
+                    <div role="button" className="inline-flex cursor-pointer items-center gap-2 bg-slate-900 text-white px-4 py-2 rounded-[8px] hover:bg-slate-800 transition shadow-sm text-sm font-semibold select-none">
+                        Quick Actions <ChevronDown size={16} />
+                    </div>
+                </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-56">
                         <DropdownMenuGroup>
                             <DropdownMenuLabel>Account & Tools</DropdownMenuLabel>

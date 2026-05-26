@@ -87,7 +87,7 @@
     $userReferral = $isLoggedIn ? \App\Models\UserReferral::where('user_id', $user->id)->first() : null;
     $serviceRefPath = 'services/' . $service->slug;
     $displayCurrencyId = $isLoggedIn ? $user->currency : $service->getGuestCurrencyId();
-    $estimatedCommissionStr = \App\Helper\FinanceHelper::instance()->format_money(
+    $estimatedCommissionStr = \App\Helpers\FinanceHelper::instance()->format_money(
         $service->getEstimatedReferralCommissionPerSale($displayCurrencyId), 
         $displayCurrencyId
     );
@@ -489,7 +489,7 @@
                                         @if($service->isFree())
                                             <span class="text-success">{{ __('services.free.price_free') }}</span>
                                         @else
-                                            {{ \App\Helper\FinanceHelper::instance()->format_money($pkg->price, $service->currency) }}
+                                            {{ \App\Helpers\FinanceHelper::instance()->format_money($pkg->price, $service->currency) }}
                                         @endif
                                     </div>
                                 </div>
@@ -631,7 +631,7 @@
                                             <label class="form-check">
                                                 <input type="radio" class="form-check-input payment-method-radio" name="payment_method" value="balance" {{ $hasSufficientBalance ? 'checked' : '' }}>
                                                 <span class="form-check-label">
-                                                    {{ __('Use Balance') }} ({{ \App\Helper\FinanceHelper::instance()->format_money($userBalance, $user->currency) }})
+                                                    {{ __('Use Balance') }} ({{ \App\Helpers\FinanceHelper::instance()->format_money($userBalance, $user->currency) }})
                                                 </span>
                                             </label>
                                         </div>

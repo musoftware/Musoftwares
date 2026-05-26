@@ -53,7 +53,7 @@ class Invoice extends TenantModel
 
     public function getClientAttribute()
     {
-        return $this->tenant_id === Tenant::platformId() 
+        return (empty($this->tenant_id) || $this->tenant_id === Tenant::platformId())
             ? $this->platformClient 
             : $this->tenantClient;
     }

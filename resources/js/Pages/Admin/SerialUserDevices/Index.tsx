@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Head, Link, router, usePage } from '@inertiajs/react';
-import AdminLayout from '@/Layouts/AdminLayout';
+import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
 import { Badge } from '@/Components/ui/badge';
 import { Button } from '@/Components/ui/button';
 import { Card, CardContent } from '@/Components/ui/card';
@@ -52,7 +52,7 @@ export default function SerialUserDevicesIndex({ userDevices, filters, statuses,
     };
 
     return (
-        <AdminLayout user={auth.user}>
+        <AdminSidebarLayout title="Serial User Devices" header="Serial User Devices">
             <Head title="User Device Assignments" />
             <div className="min-h-screen bg-zinc-950 p-6 space-y-6">
                 {/* Header */}
@@ -171,6 +171,6 @@ export default function SerialUserDevicesIndex({ userDevices, filters, statuses,
                     </CardContent>
                 </Card>
             </div>
-        </AdminLayout>
+        </AdminSidebarLayout>
     );
 }

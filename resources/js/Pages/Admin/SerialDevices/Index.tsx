@@ -1,13 +1,16 @@
-import React from 'react';
-import { Head, Link, router, usePage } from '@inertiajs/react';
-import AdminLayout from '@/Layouts/AdminLayout';
+import React, { useState } from 'react';
+import { Head, Link, router } from '@inertiajs/react';
+import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
 import { Badge } from '@/Components/ui/badge';
 import { Button } from '@/Components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/Components/ui/card';
+import { Card, CardContent } from '@/Components/ui/card';
 import { Input } from '@/Components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/Components/ui/select';
-import { Monitor, Search, Trash2, ToggleLeft, ToggleRight, Cpu } from 'lucide-react';
-import { useState } from 'react';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/Components/ui/table';
+import { Separator } from '@/Components/ui/separator';
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/Components/ui/sheet';
+import Pagination from '@/Components/Pagination';
+import { Search, Trash2, ToggleLeft, ToggleRight, ArrowUpDown, ChevronUp, ChevronDown, Monitor } from 'lucide-react';
 
 interface Device {
     id: number;
@@ -16,10 +19,18 @@ interface Device {
     user_name: string;
     user_domain: string;
     status: string;
-    last_check_date: string;
-    created_at: string;
-    software?: { id: number; name: string };
-    userDeviceAssignment?: { user?: { id: number; name: string; email: string } };
+    os_version: string | null;
+    framework_version: string | null;
+    is_64bit_os: boolean | null;
+    is_64bit_process: boolean | null;
+    current_directory: string | null;
+    current_culture: string | null;
+    current_ui_culture: string | null;
+    last_check_date: string | null;
+    last_check_date_full: string | null;
+    created_at: string | null;
+    software?: { id: number; name: string } | null;
+    userDeviceAssignment?: { user?: { id: number; name: string; email: string } } | null;
 }
 
 interface Software { id: number; name: string; }
@@ -34,22 +45,50 @@ interface Props {
     perPageOptions: number[];
 }
 
-const statusColor: Record<string, string> = {
-    active:   'bg-emerald-500/15 text-emerald-400 border-emerald-500/30',
-    inactive: 'bg-zinc-700/50 text-zinc-400 border-zinc-600',
-    blocked:  'bg-red-500/15 text-red-400 border-red-500/30',
+const statusVariant: Record<string, 'default' | 'secondary' | 'destructive' | 'outline'> = {
+    active:   'default',
+    inactive: 'secondary',
+    blocked:  'destructive',
 };
 
-export default function SerialDevicesIndex({ devices, filters, statuses, softwares, stats, perPageOptions }: Props) {
-    const { auth } = usePage().props as any;
-    const [search, setSearch] = useState(filters.search ?? '');
+function SortIcon({ column, currentSort, direction }: { column: string; currentSort: string; direction: string }) {
+    if (currentSort !== column) return <ArrowUpDown className="w-3 h-3 ml-1 text-muted-foreground/50" />;
+    return direction === 'asc'
+        ? <ChevronUp className="w-3 h-3 ml-1" />
+        : <ChevronDown className="w-3 h-3 ml-1" />;
+}
 
-    const applyFilter = (key: string, value: string | null) => {
-        router.get(route('admin.serial-devices.index'), { ...filters, [key]: value || undefined }, { preserveState: true, replace: true });
+export default function SerialDevicesIndex({ devices, filters, statuses, softwares, stats, perPageOptions }: Props) {
+    const [search, setSearch]     = useState(filters.search ?? '');
+    const [user, setUser]         = useState(filters.user ?? '');
+    const [detail, setDetail]     = useState<Device | null>(null);
+
+    const applyFilter = (key: string, value: string | number | null) => {
+        router.get(
+            route('admin.serial-devices.index'),
+            { ...filters, [key]: value || undefined },
+            { preserveState: true, replace: true }
+        );
+    };
+
+    const applySort = (column: string) => {
+        const isSame = filters.sort_by === column;
+        const newDir = isSame && filters.direction === 'asc' ? 'desc' : 'asc';
+        router.get(
+            route('admin.serial-devices.index'),
+            { ...filters, sort_by: column, direction: newDir, sort: undefined },
+            { preserveState: true, replace: true }
+        );
     };
 
     const updateStatus = (device: Device, status: string) => {
         router.patch(route('admin.serial-devices.status', device.id), { status });
+    };
+
+    const nextStatus = (current: string): string => {
+        if (current === 'active') return 'inactive';
+        if (current === 'inactive') return 'active';
+        return 'active'; // blocked → active
     };
 
     const destroy = (device: Device) => {
@@ -57,126 +96,265 @@ export default function SerialDevicesIndex({ devices, filters, statuses, softwar
         router.delete(route('admin.serial-devices.destroy', device.id));
     };
 
+    const SortTh = ({ column, children }: { column: string; children: React.ReactNode }) => (
+        <TableHead
+            className="cursor-pointer select-none hover:bg-muted/50 transition-colors"
+            onClick={() => applySort(column)}
+        >
+            <span className="flex items-center">
+                {children}
+                <SortIcon column={column} currentSort={filters.sort_by ?? ''} direction={filters.direction ?? 'desc'} />
+            </span>
+        </TableHead>
+    );
+
     return (
-        <AdminLayout user={auth.user}>
+        <AdminSidebarLayout title="Serial Devices" header="Serial Devices">
             <Head title="Serial Devices" />
-            <div className="min-h-screen bg-zinc-950 p-6 space-y-6">
+
+            <div className="p-6 space-y-6">
+
                 {/* Header */}
                 <div>
-                    <h1 className="text-2xl font-bold text-white tracking-tight">Serial Devices</h1>
-                    <p className="text-zinc-400 text-sm mt-1">All registered client machines</p>
+                    <h1 className="text-2xl font-bold tracking-tight">Serial Devices</h1>
+                    <p className="text-muted-foreground text-sm mt-1">All registered client machines</p>
                 </div>
+
+                <Separator />
 
                 {/* Stats */}
                 <div className="grid grid-cols-3 gap-4">
                     {[
-                        { label: 'Total Devices', value: stats.total, color: 'text-zinc-300' },
-                        { label: 'Active', value: stats.active, color: 'text-emerald-400' },
-                        { label: 'Inactive', value: stats.inactive, color: 'text-zinc-400' },
-                    ].map(({ label, value, color }) => (
-                        <Card key={label} className="bg-zinc-900 border-zinc-800">
+                        { label: 'Total Devices', value: stats.total,    className: 'text-foreground' },
+                        { label: 'Active',         value: stats.active,   className: 'text-green-600' },
+                        { label: 'Inactive',       value: stats.inactive, className: 'text-muted-foreground' },
+                    ].map(({ label, value, className }) => (
+                        <Card key={label}>
                             <CardContent className="p-4">
-                                <p className={`text-2xl font-bold ${color}`}>{value}</p>
-                                <p className="text-xs text-zinc-500 mt-0.5">{label}</p>
+                                <p className={`text-2xl font-bold ${className}`}>{value}</p>
+                                <p className="text-xs text-muted-foreground mt-0.5">{label}</p>
                             </CardContent>
                         </Card>
                     ))}
                 </div>
 
-                {/* Filters */}
+                {/* Filters Row */}
                 <div className="flex flex-wrap gap-3">
+                    {/* Device/Machine search */}
                     <div className="relative flex-1 min-w-48">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                         <Input
-                            className="pl-9 bg-zinc-900 border-zinc-700 text-white placeholder:text-zinc-500"
-                            placeholder="Search device ID, machine..."
+                            className="pl-9"
+                            placeholder="Device ID or machine name..."
                             value={search}
                             onChange={e => setSearch(e.target.value)}
                             onKeyDown={e => e.key === 'Enter' && applyFilter('search', search)}
                         />
                     </div>
-                    <Select onValueChange={v => applyFilter('status', v)} defaultValue={filters.status ?? 'all'}>
-                        <SelectTrigger className="w-36 bg-zinc-900 border-zinc-700 text-white">
+                    {/* User search — was missing */}
+                    <div className="relative min-w-40">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                        <Input
+                            className="pl-9"
+                            placeholder="Username..."
+                            value={user}
+                            onChange={e => setUser(e.target.value)}
+                            onKeyDown={e => e.key === 'Enter' && applyFilter('user', user)}
+                        />
+                    </div>
+                    {/* Status */}
+                    <Select onValueChange={v => applyFilter('status', v === 'all' ? null : v)} defaultValue={filters.status ?? 'all'}>
+                        <SelectTrigger className="w-36">
                             <SelectValue placeholder="Status" />
                         </SelectTrigger>
-                        <SelectContent className="bg-zinc-900 border-zinc-700">
+                        <SelectContent>
                             <SelectItem value="all">All Statuses</SelectItem>
-                            {statuses.map(s => <SelectItem key={s} value={s} className="capitalize">{s}</SelectItem>)}
+                            {statuses.map(s => (
+                                <SelectItem key={s} value={s} className="capitalize">{s}</SelectItem>
+                            ))}
                         </SelectContent>
                     </Select>
+                    {/* Software */}
                     <Select onValueChange={v => applyFilter('software_id', v)} defaultValue={String(filters.software_id ?? '')}>
-                        <SelectTrigger className="w-48 bg-zinc-900 border-zinc-700 text-white">
+                        <SelectTrigger className="w-48">
                             <SelectValue placeholder="All Software" />
                         </SelectTrigger>
-                        <SelectContent className="bg-zinc-900 border-zinc-700">
+                        <SelectContent>
                             <SelectItem value="">All Software</SelectItem>
-                            {softwares.map(sw => <SelectItem key={sw.id} value={String(sw.id)}>{sw.name}</SelectItem>)}
+                            {softwares.map(sw => (
+                                <SelectItem key={sw.id} value={String(sw.id)}>{sw.name}</SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                    {/* Per page — was missing */}
+                    <Select
+                        onValueChange={v => applyFilter('per_page', Number(v))}
+                        defaultValue={String(filters.per_page ?? 20)}
+                    >
+                        <SelectTrigger className="w-24">
+                            <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {perPageOptions.map(n => (
+                                <SelectItem key={n} value={String(n)}>{n} / page</SelectItem>
+                            ))}
                         </SelectContent>
                     </Select>
                 </div>
 
                 {/* Table */}
-                <Card className="bg-zinc-900 border-zinc-800">
+                <Card>
                     <CardContent className="p-0">
-                        <div className="overflow-x-auto">
-                            <table className="w-full text-sm">
-                                <thead>
-                                    <tr className="border-b border-zinc-800">
-                                        <th className="text-left px-4 py-3 text-zinc-400 font-medium">Device ID</th>
-                                        <th className="text-left px-4 py-3 text-zinc-400 font-medium">Machine</th>
-                                        <th className="text-left px-4 py-3 text-zinc-400 font-medium">User</th>
-                                        <th className="text-left px-4 py-3 text-zinc-400 font-medium">Software</th>
-                                        <th className="text-left px-4 py-3 text-zinc-400 font-medium">Last Check</th>
-                                        <th className="text-left px-4 py-3 text-zinc-400 font-medium">Status</th>
-                                        <th className="text-right px-4 py-3 text-zinc-400 font-medium">Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {devices.data.length === 0 && (
-                                        <tr><td colSpan={7} className="text-center py-12 text-zinc-500">No devices found.</td></tr>
-                                    )}
-                                    {devices.data.map(device => (
-                                        <tr key={device.id} className="border-b border-zinc-800/50 hover:bg-zinc-800/30 transition-colors">
-                                            <td className="px-4 py-3 font-mono text-xs text-violet-300">{device.device_id}</td>
-                                            <td className="px-4 py-3">
-                                                <p className="text-white text-sm">{device.machine_name}</p>
-                                                <p className="text-zinc-500 text-xs">{device.user_domain}</p>
-                                            </td>
-                                            <td className="px-4 py-3">
-                                                <p className="text-zinc-300 text-sm">{device.user_name}</p>
-                                                {device.userDeviceAssignment?.user && (
-                                                    <p className="text-zinc-500 text-xs">{device.userDeviceAssignment.user.email}</p>
-                                                )}
-                                            </td>
-                                            <td className="px-4 py-3 text-zinc-400 text-xs">{device.software?.name ?? '—'}</td>
-                                            <td className="px-4 py-3 text-zinc-400 text-xs">{device.last_check_date}</td>
-                                            <td className="px-4 py-3">
-                                                <Badge className={`text-xs border capitalize ${statusColor[device.status] ?? 'bg-zinc-700/50 text-zinc-400'}`}>
-                                                    {device.status}
-                                                </Badge>
-                                            </td>
-                                            <td className="px-4 py-3">
-                                                <div className="flex items-center justify-end gap-1">
-                                                    <Button size="sm" variant="ghost"
-                                                        className="text-zinc-400 hover:text-emerald-400 hover:bg-emerald-500/10 h-8 px-2 text-xs"
-                                                        onClick={() => updateStatus(device, device.status === 'active' ? 'inactive' : 'active')}>
-                                                        {device.status === 'active' ? <ToggleRight className="w-4 h-4" /> : <ToggleLeft className="w-4 h-4" />}
-                                                    </Button>
-                                                    <Button size="sm" variant="ghost"
-                                                        className="text-red-400 hover:text-red-300 hover:bg-red-500/10 w-8 h-8 p-0"
-                                                        onClick={() => destroy(device)}>
-                                                        <Trash2 className="w-3.5 h-3.5" />
-                                                    </Button>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
+                        <Table>
+                            <TableHeader>
+                                <TableRow>
+                                    <SortTh column="device_id">Device ID</SortTh>
+                                    <SortTh column="machine_name">Machine</SortTh>
+                                    <SortTh column="user_name">User</SortTh>
+                                    <SortTh column="serial_software_id">Software</SortTh>
+                                    <SortTh column="last_check_date">Last Check</SortTh>
+                                    <SortTh column="status">Status</SortTh>
+                                    <TableHead className="text-right">Actions</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {devices.data.length === 0 && (
+                                    <TableRow>
+                                        <TableCell colSpan={7} className="text-center py-12 text-muted-foreground">
+                                            No devices found.
+                                        </TableCell>
+                                    </TableRow>
+                                )}
+                                {devices.data.map(device => (
+                                    <TableRow
+                                        key={device.id}
+                                        className="cursor-pointer"
+                                        onClick={() => setDetail(device)}
+                                    >
+                                        <TableCell className="font-mono text-xs">
+                                            {device.device_id}
+                                        </TableCell>
+                                        <TableCell>
+                                            <p className="text-sm font-medium">{device.machine_name}</p>
+                                            <p className="text-xs text-muted-foreground">{device.user_domain}</p>
+                                        </TableCell>
+                                        <TableCell>
+                                            <p className="text-sm">{device.user_name}</p>
+                                            {device.userDeviceAssignment?.user && (
+                                                <Link
+                                                    href={route('admin.users.show', device.userDeviceAssignment.user.id)}
+                                                    className="text-xs text-blue-600 hover:underline"
+                                                    onClick={e => e.stopPropagation()}
+                                                >
+                                                    {device.userDeviceAssignment.user.email}
+                                                </Link>
+                                            )}
+                                        </TableCell>
+                                        <TableCell className="text-muted-foreground text-xs">
+                                            {device.software?.name ?? '—'}
+                                        </TableCell>
+                                        <TableCell className="text-muted-foreground text-xs" title={device.last_check_date_full ?? ''}>
+                                            {device.last_check_date ?? '—'}
+                                        </TableCell>
+                                        <TableCell>
+                                            <Badge variant={statusVariant[device.status] ?? 'outline'} className="capitalize text-xs">
+                                                {device.status}
+                                            </Badge>
+                                        </TableCell>
+                                        <TableCell onClick={e => e.stopPropagation()}>
+                                            <div className="flex items-center justify-end gap-1">
+                                                <Button
+                                                    size="sm"
+                                                    variant="ghost"
+                                                    className="h-8 px-2 text-xs"
+                                                    title={`Set ${nextStatus(device.status)}`}
+                                                    onClick={() => updateStatus(device, nextStatus(device.status))}
+                                                >
+                                                    {device.status === 'active'
+                                                        ? <ToggleRight className="w-4 h-4 text-green-600" />
+                                                        : <ToggleLeft className="w-4 h-4 text-muted-foreground" />
+                                                    }
+                                                </Button>
+                                                <Button
+                                                    size="sm"
+                                                    variant="ghost"
+                                                    className="text-red-600 hover:text-red-700 hover:bg-red-50 w-8 h-8 p-0"
+                                                    onClick={() => destroy(device)}
+                                                >
+                                                    <Trash2 className="w-3.5 h-3.5" />
+                                                </Button>
+                                            </div>
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
                     </CardContent>
                 </Card>
+
+                {/* Pagination — was missing */}
+                <Pagination links={devices.links} />
+
             </div>
-        </AdminLayout>
+
+            {/* Device Detail Sheet */}
+            <Sheet open={!!detail} onOpenChange={open => !open && setDetail(null)}>
+                <SheetContent className="w-[420px] sm:w-[480px] overflow-y-auto">
+                    <SheetHeader>
+                        <SheetTitle className="flex items-center gap-2">
+                            <Monitor className="w-4 h-4" />
+                            Device Details
+                        </SheetTitle>
+                    </SheetHeader>
+                    {detail && (
+                        <div className="mt-6 space-y-4 text-sm">
+                            <Row label="Device ID"        value={<span className="font-mono text-xs">{detail.device_id}</span>} />
+                            <Row label="Machine Name"     value={detail.machine_name} />
+                            <Row label="User Name"        value={detail.user_name} />
+                            <Row label="User Domain"      value={detail.user_domain} />
+                            <Row label="Software"         value={detail.software?.name ?? '—'} />
+                            <Row label="Status"           value={
+                                <Badge variant={statusVariant[detail.status] ?? 'outline'} className="capitalize text-xs">
+                                    {detail.status}
+                                </Badge>
+                            } />
+                            <Separator />
+                            <Row label="OS Version"       value={detail.os_version ?? '—'} />
+                            <Row label="Framework"        value={detail.framework_version ?? '—'} />
+                            <Row label="64-bit OS"        value={detail.is_64bit_os == null ? '—' : detail.is_64bit_os ? 'Yes' : 'No'} />
+                            <Row label="64-bit Process"   value={detail.is_64bit_process == null ? '—' : detail.is_64bit_process ? 'Yes' : 'No'} />
+                            <Row label="Culture"          value={detail.current_culture ?? '—'} />
+                            <Row label="UI Culture"       value={detail.current_ui_culture ?? '—'} />
+                            <Row label="Directory"        value={<span className="font-mono text-xs break-all">{detail.current_directory ?? '—'}</span>} />
+                            <Separator />
+                            <Row label="Last Check"       value={detail.last_check_date_full ?? '—'} />
+                            <Row label="Registered"       value={detail.created_at ?? '—'} />
+                            {detail.userDeviceAssignment?.user && (
+                                <>
+                                    <Separator />
+                                    <Row label="Linked User" value={
+                                        <Link
+                                            href={route('admin.users.show', detail.userDeviceAssignment.user.id)}
+                                            className="text-blue-600 hover:underline"
+                                        >
+                                            {detail.userDeviceAssignment.user.name} ({detail.userDeviceAssignment.user.email})
+                                        </Link>
+                                    } />
+                                </>
+                            )}
+                        </div>
+                    )}
+                </SheetContent>
+            </Sheet>
+        </AdminSidebarLayout>
+    );
+}
+
+function Row({ label, value }: { label: string; value: React.ReactNode }) {
+    return (
+        <div className="flex justify-between gap-4">
+            <span className="text-muted-foreground shrink-0">{label}</span>
+            <span className="text-right font-medium">{value}</span>
+        </div>
     );
 }

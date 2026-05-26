@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
-import { Head, router, usePage } from '@inertiajs/react';
-import AdminLayout from '@/Layouts/AdminLayout';
+import { Head, router } from '@inertiajs/react';
+import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
 import { Badge } from '@/Components/ui/badge';
 import { Button } from '@/Components/ui/button';
-import { Card, CardContent } from '@/Components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/Components/ui/card';
 import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/Components/ui/select';
-import { Layers, Plus, Trash2, ToggleLeft, ToggleRight } from 'lucide-react';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/Components/ui/table';
+import { Separator } from '@/Components/ui/separator';
+import { Layers, Plus, Trash2 } from 'lucide-react';
 
 interface Software {
     id: number;
@@ -25,12 +27,13 @@ interface Props {
 }
 
 export default function SerialSoftwaresIndex({ softwares, filters }: Props) {
-    const { auth } = usePage().props as any;
     const [form, setForm] = useState({ name: '', default_status: 'active' });
 
     const store = (e: React.FormEvent) => {
         e.preventDefault();
-        router.post(route('admin.serial-softwares.store'), form, { onSuccess: () => setForm({ name: '', default_status: 'active' }) });
+        router.post(route('admin.serial-softwares.store'), form, {
+            onSuccess: () => setForm({ name: '', default_status: 'active' }),
+        });
     };
 
     const updateStatus = (sw: Software, status: string) => {
@@ -43,23 +46,31 @@ export default function SerialSoftwaresIndex({ softwares, filters }: Props) {
     };
 
     return (
-        <AdminLayout user={auth.user}>
+        <AdminSidebarLayout title="Serial Softwares" header="Serial Softwares">
             <Head title="Serial Softwares" />
-            <div className="min-h-screen bg-zinc-950 p-6 space-y-6">
+
+            <div className="p-6 space-y-6">
+
+                {/* Header */}
                 <div>
-                    <h1 className="text-2xl font-bold text-white tracking-tight">Serial Softwares</h1>
-                    <p className="text-zinc-400 text-sm mt-1">Software registry — auto-created on first API check-in</p>
+                    <h1 className="text-2xl font-bold tracking-tight">Serial Softwares</h1>
+                    <p className="text-muted-foreground text-sm mt-1">
+                        Software registry — auto-created on first API check-in
+                    </p>
                 </div>
 
+                <Separator />
+
                 {/* Add Software */}
-                <Card className="bg-zinc-900 border-zinc-800">
-                    <CardContent className="p-4">
-                        <p className="text-sm font-semibold text-white mb-3">Add Software Manually</p>
+                <Card>
+                    <CardHeader className="pb-3">
+                        <CardTitle className="text-sm font-semibold">Add Software Manually</CardTitle>
+                    </CardHeader>
+                    <CardContent>
                         <form onSubmit={store} className="flex flex-wrap gap-3 items-end">
                             <div className="flex-1 min-w-48">
-                                <Label className="text-zinc-400 text-xs mb-1 block">Software Name</Label>
+                                <Label className="text-xs mb-1 block">Software Name</Label>
                                 <Input
-                                    className="bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-500"
                                     placeholder="e.g. MyApp.exe"
                                     value={form.name}
                                     onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
@@ -67,18 +78,21 @@ export default function SerialSoftwaresIndex({ softwares, filters }: Props) {
                                 />
                             </div>
                             <div className="w-40">
-                                <Label className="text-zinc-400 text-xs mb-1 block">Default Status</Label>
-                                <Select value={form.default_status} onValueChange={v => setForm(f => ({ ...f, default_status: v || 'active' }))}>
-                                    <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white">
+                                <Label className="text-xs mb-1 block">Default Status</Label>
+                                <Select
+                                    value={form.default_status}
+                                    onValueChange={v => setForm(f => ({ ...f, default_status: v || 'active' }))}
+                                >
+                                    <SelectTrigger>
                                         <SelectValue />
                                     </SelectTrigger>
-                                    <SelectContent className="bg-zinc-900 border-zinc-700">
+                                    <SelectContent>
                                         <SelectItem value="active">Active</SelectItem>
                                         <SelectItem value="inactive">Inactive</SelectItem>
                                     </SelectContent>
                                 </Select>
                             </div>
-                            <Button type="submit" className="bg-violet-600 hover:bg-violet-500 text-white gap-2">
+                            <Button type="submit" className="gap-2">
                                 <Plus className="w-4 h-4" /> Add
                             </Button>
                         </form>
@@ -86,63 +100,80 @@ export default function SerialSoftwaresIndex({ softwares, filters }: Props) {
                 </Card>
 
                 {/* Table */}
-                <Card className="bg-zinc-900 border-zinc-800">
+                <Card>
                     <CardContent className="p-0">
-                        <div className="overflow-x-auto">
-                            <table className="w-full text-sm">
-                                <thead>
-                                    <tr className="border-b border-zinc-800">
-                                        <th className="text-left px-4 py-3 text-zinc-400 font-medium">Software</th>
-                                        <th className="text-center px-4 py-3 text-zinc-400 font-medium">Total Devices</th>
-                                        <th className="text-center px-4 py-3 text-zinc-400 font-medium">Active</th>
-                                        <th className="text-center px-4 py-3 text-zinc-400 font-medium">Inactive</th>
-                                        <th className="text-left px-4 py-3 text-zinc-400 font-medium">Default Status</th>
-                                        <th className="text-left px-4 py-3 text-zinc-400 font-medium">Registered</th>
-                                        <th className="text-right px-4 py-3 text-zinc-400 font-medium">Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {softwares.data.length === 0 && (
-                                        <tr><td colSpan={7} className="text-center py-12 text-zinc-500">No software registered yet.</td></tr>
-                                    )}
-                                    {softwares.data.map(sw => (
-                                        <tr key={sw.id} className="border-b border-zinc-800/50 hover:bg-zinc-800/30 transition-colors">
-                                            <td className="px-4 py-3 flex items-center gap-3">
-                                                <div className="w-8 h-8 rounded-lg bg-zinc-800 flex items-center justify-center">
-                                                    <Layers className="w-4 h-4 text-violet-400" />
+                        <Table>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead>Software</TableHead>
+                                    <TableHead className="text-center">Total Devices</TableHead>
+                                    <TableHead className="text-center">Active</TableHead>
+                                    <TableHead className="text-center">Inactive</TableHead>
+                                    <TableHead>Default Status</TableHead>
+                                    <TableHead>Registered</TableHead>
+                                    <TableHead className="text-right">Actions</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {softwares.data.length === 0 && (
+                                    <TableRow>
+                                        <TableCell colSpan={7} className="text-center py-12 text-muted-foreground">
+                                            No software registered yet.
+                                        </TableCell>
+                                    </TableRow>
+                                )}
+                                {softwares.data.map(sw => (
+                                    <TableRow key={sw.id}>
+                                        <TableCell>
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-8 h-8 rounded-lg border flex items-center justify-center bg-muted">
+                                                    <Layers className="w-4 h-4 text-muted-foreground" />
                                                 </div>
-                                                <span className="text-white font-medium">{sw.name}</span>
-                                            </td>
-                                            <td className="px-4 py-3 text-center text-zinc-300">{sw.total_licenses}</td>
-                                            <td className="px-4 py-3 text-center text-emerald-400">{sw.active_count}</td>
-                                            <td className="px-4 py-3 text-center text-zinc-500">{sw.inactive_count}</td>
-                                            <td className="px-4 py-3">
-                                                <Select value={sw.default_status} onValueChange={v => updateStatus(sw, v || 'active')}>
-                                                    <SelectTrigger className="w-28 h-7 text-xs bg-zinc-800 border-zinc-700 text-white">
-                                                        <SelectValue />
-                                                    </SelectTrigger>
-                                                    <SelectContent className="bg-zinc-900 border-zinc-700">
-                                                        <SelectItem value="active">Active</SelectItem>
-                                                        <SelectItem value="inactive">Inactive</SelectItem>
-                                                    </SelectContent>
-                                                </Select>
-                                            </td>
-                                            <td className="px-4 py-3 text-zinc-500 text-xs">{sw.created_at}</td>
-                                            <td className="px-4 py-3 text-right">
-                                                <Button size="sm" variant="ghost"
-                                                    className="text-red-400 hover:text-red-300 hover:bg-red-500/10 w-8 h-8 p-0"
-                                                    onClick={() => destroy(sw)}>
-                                                    <Trash2 className="w-3.5 h-3.5" />
-                                                </Button>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
+                                                <span className="font-medium">{sw.name}</span>
+                                            </div>
+                                        </TableCell>
+                                        <TableCell className="text-center">{sw.total_licenses}</TableCell>
+                                        <TableCell className="text-center">
+                                            <span className="text-green-600 font-medium">{sw.active_count}</span>
+                                        </TableCell>
+                                        <TableCell className="text-center text-muted-foreground">
+                                            {sw.inactive_count}
+                                        </TableCell>
+                                        <TableCell>
+                                            <Select
+                                                value={sw.default_status}
+                                                onValueChange={v => updateStatus(sw, v || 'active')}
+                                            >
+                                                <SelectTrigger className="w-28 h-7 text-xs">
+                                                    <SelectValue />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    <SelectItem value="active">Active</SelectItem>
+                                                    <SelectItem value="inactive">Inactive</SelectItem>
+                                                </SelectContent>
+                                            </Select>
+                                        </TableCell>
+                                        <TableCell className="text-muted-foreground text-xs">
+                                            {sw.created_at}
+                                        </TableCell>
+                                        <TableCell className="text-right">
+                                            <Button
+                                                size="sm"
+                                                variant="ghost"
+                                                className="text-red-600 hover:text-red-700 hover:bg-red-50 w-8 h-8 p-0"
+                                                onClick={() => destroy(sw)}
+                                            >
+                                                <Trash2 className="w-3.5 h-3.5" />
+                                            </Button>
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
                     </CardContent>
                 </Card>
+
             </div>
-        </AdminLayout>
+        </AdminSidebarLayout>
     );
 }

@@ -1,23 +1,31 @@
-import DangerButton from '@/Components/DangerButton';
-import Modal from '@/Components/Modal';
-import SecondaryButton from '@/Components/SecondaryButton';
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
 import { Head, router } from '@inertiajs/react';
 import { useState } from 'react';
+import Modal from '@/Components/Modal';
+import { Button } from '@/Components/ui/button';
+import { Input } from '@/Components/ui/input';
+import { Search, FilterX, Check, X, Eye, FileWarning } from 'lucide-react';
+import { DateDisplay } from '@/Components/ui/DateDisplay';
+import { Badge } from '@/Components/ui/badge';
 
-export default function Pending({ services }: any) {
-    const [rejectingServiceId, setRejectingServiceId] = useState<number | null>(
-        null,
-    );
+export default function Pending({ auth, services, filters }: any) {
+    const [search, setSearch] = useState(filters?.search || '');
+    const [rejectingServiceId, setRejectingServiceId] = useState<number | null>(null);
     const [rejectionNote, setRejectionNote] = useState('');
 
+    const applySearch = () => {
+        const query = { search };
+        if (!query.search) delete query.search;
+        router.get(route('admin.marketplace.services.pending'), query, {
+            preserveState: true,
+            preserveScroll: true,
+            replace: true
+        });
+    };
+
     const handleApprove = (id: number) => {
-        if (
-            confirm(
-                'Are you sure you want to approve this service? It will become publicly available immediately.',
-            )
-        ) {
-            router.post(route('admin.marketplace.services.approve', id));
+        if (confirm('Are you sure you want to approve this service? It will become publicly available immediately.')) {
+            router.post(route('admin.marketplace.services.approve', id), {}, { preserveScroll: true });
         }
     };
 
@@ -33,67 +41,69 @@ export default function Pending({ services }: any) {
                 route('admin.marketplace.services.reject', rejectingServiceId),
                 { note: rejectionNote },
                 {
+                    preserveScroll: true,
                     onSuccess: () => setRejectingServiceId(null),
                 },
             );
         }
     };
 
-    return (
-        <AuthenticatedLayout
-            header={
-                <h2 className="text-2xl leading-tight font-bold text-gray-800">
-                    Pending Services Review
-                </h2>
-            }
-        >
-            <Head title="Pending Services Review" />
+    const clearSearch = () => {
+        setSearch('');
+        router.get(route('admin.marketplace.services.pending'));
+    };
 
-            <div className="min-h-screen bg-gray-50 py-12">
-                <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
-                    <div className="mb-6 flex items-center justify-between">
-                        <p className="text-sm text-gray-600">
-                            Review newly submitted services to ensure they meet
-                            platform quality guidelines.
-                        </p>
-                        <span className="rounded-full bg-indigo-100 px-3 py-1 text-xs font-bold text-indigo-800">
-                            {services.total || 0} Pending
-                        </span>
+    return (
+        <AdminSidebarLayout user={auth?.user} title="Pending Services" header="Pending Services">
+            <div className="py-8 bg-slate-50 min-h-screen">
+                <div className="mx-auto max-w-7xl sm:px-6 lg:px-8 space-y-6">
+                    
+                    <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                        <div className="flex-1 max-w-md w-full">
+                            <div className="relative flex items-center">
+                                <Search className="absolute left-3 h-4 w-4 text-slate-400" />
+                                <Input
+                                    placeholder="Search by title or seller..."
+                                    value={search}
+                                    onChange={(e) => setSearch(e.target.value)}
+                                    onKeyDown={(e) => e.key === 'Enter' && applySearch()}
+                                    className="pl-9 bg-white"
+                                />
+                                {search && (
+                                    <Button variant="ghost" size="icon" onClick={clearSearch} className="absolute right-1 h-7 w-7 text-slate-400 hover:text-black">
+                                        <X className="h-4 w-4" />
+                                    </Button>
+                                )}
+                            </div>
+                        </div>
+                        <div className="shrink-0">
+                            <Badge variant="secondary" className="bg-slate-200 text-slate-800 text-sm px-3 py-1">
+                                {services.total || 0} Pending
+                            </Badge>
+                        </div>
                     </div>
 
                     {services.data && services.data.length > 0 ? (
-                        <div className="flex flex-col gap-6">
+                        <div className="grid gap-6">
                             {services.data.map((service: any) => (
                                 <div
                                     key={service.id}
-                                    className="flex flex-col overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition hover:shadow-md md:flex-row"
+                                    className="flex flex-col md:flex-row overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition-all hover:shadow-md"
                                 >
                                     {/* Left: Image/Preview */}
-                                    <div className="relative flex-shrink-0 bg-gray-100 md:w-64">
-                                        {service.cover_image ? (
+                                    <div className="relative flex-shrink-0 bg-slate-100 md:w-64 border-b md:border-b-0 md:border-r border-slate-200">
+                                        {service.gallery && service.gallery.length > 0 ? (
                                             <img
-                                                src={service.cover_image}
+                                                src={`/storage/${service.gallery[0]}`}
                                                 alt={service.title}
                                                 className="h-48 w-full object-cover md:h-full"
                                             />
                                         ) : (
-                                            <div className="flex h-48 w-full items-center justify-center text-gray-400 md:h-full">
-                                                <svg
-                                                    className="h-12 w-12"
-                                                    fill="none"
-                                                    stroke="currentColor"
-                                                    viewBox="0 0 24 24"
-                                                >
-                                                    <path
-                                                        strokeLinecap="round"
-                                                        strokeLinejoin="round"
-                                                        strokeWidth="2"
-                                                        d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-                                                    ></path>
-                                                </svg>
+                                            <div className="flex h-48 w-full items-center justify-center text-slate-300 md:h-full bg-slate-50">
+                                                <FileWarning className="h-12 w-12" />
                                             </div>
                                         )}
-                                        <div className="absolute top-3 left-3 rounded bg-white/90 px-2 py-1 text-xs font-bold text-gray-700 shadow-sm">
+                                        <div className="absolute top-3 left-3 rounded bg-white/90 px-2 py-1 text-xs font-bold text-slate-700 shadow-sm border border-slate-200">
                                             ID: {service.id}
                                         </div>
                                     </div>
@@ -102,40 +112,35 @@ export default function Pending({ services }: any) {
                                     <div className="flex flex-1 flex-col justify-between p-6">
                                         <div>
                                             <div className="mb-2 flex items-center gap-3">
-                                                <span className="rounded-full border border-indigo-100 bg-indigo-50 px-2.5 py-0.5 text-xs font-medium text-indigo-700">
-                                                    {service.category?.name ||
-                                                        'Uncategorized'}
-                                                </span>
-                                                <span className="text-xs text-gray-500">
-                                                    Submitted:{' '}
-                                                    {new Date(
-                                                        service.created_at,
-                                                    ).toLocaleDateString()}
+                                                <Badge variant="outline" className="bg-slate-50 text-slate-700 border-slate-200">
+                                                    {service.category?.name || 'Uncategorized'}
+                                                </Badge>
+                                                <span className="text-xs text-slate-500 flex items-center gap-1">
+                                                    Submitted: <DateDisplay date={service.created_at} format="MMM D, YYYY" />
                                                 </span>
                                             </div>
-                                            <h3 className="mb-2 text-xl font-bold text-gray-900">
+                                            
+                                            <h3 className="mb-2 text-xl font-bold text-slate-900 truncate max-w-xl" title={service.title}>
                                                 {service.title}
                                             </h3>
 
                                             <div className="mb-4 flex items-center gap-2">
-                                                <div className="flex h-6 w-6 items-center justify-center rounded-full bg-indigo-100 text-xs font-bold text-indigo-700">
-                                                    {service.seller?.name?.charAt(
-                                                        0,
-                                                    ) || '?'}
+                                                <div className="flex h-6 w-6 items-center justify-center rounded-full bg-slate-100 text-xs font-bold text-slate-700 border border-slate-200">
+                                                    {service.seller?.name?.charAt(0) || '?'}
                                                 </div>
-                                                <span className="text-sm font-medium text-gray-700">
+                                                <span className="text-sm text-slate-500">
                                                     Seller:{' '}
-                                                    <span className="text-gray-900">
-                                                        {service.seller?.name}
+                                                    <span className="font-medium text-slate-900">
+                                                        {service.seller?.name || <span className="italic text-slate-400">Unknown</span>}
                                                     </span>
                                                 </span>
                                             </div>
 
-                                            <div className="mb-4 rounded-lg border border-gray-100 bg-gray-50 p-4">
-                                                <h4 className="mb-2 text-xs font-bold tracking-wider text-gray-500 uppercase">
+                                            <div className="mb-4 rounded-lg border border-slate-100 bg-slate-50/50 p-4">
+                                                <h4 className="mb-2 text-xs font-bold tracking-wider text-slate-500 uppercase">
                                                     Description Preview
                                                 </h4>
-                                                <p className="line-clamp-3 text-sm text-gray-700">
+                                                <p className="line-clamp-3 text-sm text-slate-700">
                                                     {service.description}
                                                 </p>
                                             </div>
@@ -143,86 +148,51 @@ export default function Pending({ services }: any) {
                                     </div>
 
                                     {/* Right: Actions */}
-                                    <div className="flex flex-col justify-center gap-3 border-t border-gray-100 bg-gray-50 p-6 md:w-56 md:border-t-0 md:border-l">
-                                        <button
-                                            onClick={() =>
-                                                handleApprove(service.id)
-                                            }
-                                            className="flex w-full items-center justify-center gap-2 rounded-lg bg-green-600 px-4 py-2.5 font-bold text-white transition hover:bg-green-700"
+                                    <div className="flex flex-col justify-center gap-3 bg-slate-50 p-6 md:w-56 border-t md:border-t-0 md:border-l border-slate-100">
+                                        <Button
+                                            onClick={() => handleApprove(service.id)}
+                                            className="w-full bg-green-600 hover:bg-green-700 text-white font-bold gap-2 shadow-sm"
                                         >
-                                            <svg
-                                                className="h-5 w-5"
-                                                fill="none"
-                                                stroke="currentColor"
-                                                viewBox="0 0 24 24"
-                                            >
-                                                <path
-                                                    strokeLinecap="round"
-                                                    strokeLinejoin="round"
-                                                    strokeWidth="2"
-                                                    d="M5 13l4 4L19 7"
-                                                ></path>
-                                            </svg>
+                                            <Check className="h-4 w-4" />
                                             Approve
-                                        </button>
-                                        <button
-                                            onClick={() =>
-                                                confirmReject(service.id)
-                                            }
-                                            className="flex w-full items-center justify-center gap-2 rounded-lg border border-red-200 bg-white px-4 py-2.5 font-bold text-red-600 transition hover:border-red-300 hover:bg-red-50"
+                                        </Button>
+                                        
+                                        <Button
+                                            variant="outline"
+                                            onClick={() => confirmReject(service.id)}
+                                            className="w-full border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 font-bold gap-2 bg-white"
                                         >
-                                            <svg
-                                                className="h-5 w-5"
-                                                fill="none"
-                                                stroke="currentColor"
-                                                viewBox="0 0 24 24"
-                                            >
-                                                <path
-                                                    strokeLinecap="round"
-                                                    strokeLinejoin="round"
-                                                    strokeWidth="2"
-                                                    d="M6 18L18 6M6 6l12 12"
-                                                ></path>
-                                            </svg>
+                                            <X className="h-4 w-4" />
                                             Reject
-                                        </button>
+                                        </Button>
 
                                         <a
-                                            href={route(
-                                                'marketplace.services.show',
-                                                service.id,
-                                            )}
+                                            href={route('marketplace.services.show', service.id)}
                                             target="_blank"
                                             rel="noreferrer"
-                                            className="mt-2 text-center text-sm font-medium text-indigo-600 hover:text-indigo-800"
+                                            className="mt-2 flex items-center justify-center gap-1 text-sm font-medium text-slate-600 hover:text-black transition-colors"
                                         >
-                                            View Full Service &rarr;
+                                            <Eye className="h-4 w-4" />
+                                            View Full Service
                                         </a>
                                     </div>
                                 </div>
                             ))}
                         </div>
                     ) : (
-                        <div className="rounded-xl border border-gray-200 bg-white p-12 text-center shadow-sm">
-                            <svg
-                                className="mx-auto mb-4 h-16 w-16 text-gray-300"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                            >
-                                <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth="2"
-                                    d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"
-                                ></path>
-                            </svg>
-                            <h3 className="mb-1 text-lg font-medium text-gray-900">
-                                All Caught Up!
+                        <div className="rounded-xl border border-slate-200 bg-white p-12 text-center shadow-sm">
+                            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-slate-50">
+                                {search ? (
+                                    <Search className="h-8 w-8 text-slate-400" />
+                                ) : (
+                                    <Check className="h-8 w-8 text-green-500" />
+                                )}
+                            </div>
+                            <h3 className="mb-1 text-lg font-medium text-slate-900">
+                                {search ? 'No matches found' : 'All Caught Up!'}
                             </h3>
-                            <p className="text-gray-500">
-                                There are no pending services requiring review
-                                at this time.
+                            <p className="text-slate-500">
+                                {search ? 'Try adjusting your search query.' : 'There are no pending services requiring review at this time.'}
                             </p>
                         </div>
                     )}
@@ -234,13 +204,17 @@ export default function Pending({ services }: any) {
                                 <button
                                     key={idx}
                                     onClick={() => {
-                                        if (link.url) router.get(link.url);
+                                        if (link.url) router.get(link.url, {}, { preserveScroll: true });
                                     }}
                                     disabled={!link.url}
-                                    className={`rounded-md border px-4 py-2 text-sm font-medium transition ${link.active ? 'border-indigo-600 bg-indigo-600 text-white' : 'border-gray-300 bg-white text-gray-700 hover:bg-gray-50'} ${!link.url ? 'cursor-not-allowed opacity-50' : ''}`}
-                                    dangerouslySetInnerHTML={{
-                                        __html: link.label,
-                                    }}
+                                    className={`rounded-md px-4 py-2 text-sm font-medium transition ${
+                                        link.active 
+                                            ? 'bg-slate-900 text-white shadow-sm' 
+                                            : !link.url 
+                                                ? 'cursor-not-allowed text-slate-300' 
+                                                : 'border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 hover:text-slate-900'
+                                    }`}
+                                    dangerouslySetInnerHTML={{ __html: link.label }}
                                 />
                             ))}
                         </div>
@@ -249,32 +223,15 @@ export default function Pending({ services }: any) {
             </div>
 
             {/* Rejection Modal */}
-            <Modal
-                show={rejectingServiceId !== null}
-                onClose={() => setRejectingServiceId(null)}
-            >
+            <Modal show={rejectingServiceId !== null} onClose={() => setRejectingServiceId(null)}>
                 <form onSubmit={submitReject} className="p-6">
-                    <h2 className="mb-4 flex items-center gap-2 text-lg font-medium text-gray-900">
-                        <svg
-                            className="h-6 w-6 text-red-500"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                        >
-                            <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth="2"
-                                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-                            ></path>
-                        </svg>
+                    <h2 className="mb-4 flex items-center gap-2 text-lg font-medium text-slate-900">
+                        <X className="h-6 w-6 text-red-500" />
                         Reject Service
                     </h2>
 
-                    <p className="mt-1 mb-4 text-sm text-gray-600">
-                        Please provide a reason for rejecting this service. This
-                        note will be visible to the seller so they can correct
-                        the issues and resubmit.
+                    <p className="mt-1 mb-4 text-sm text-slate-600">
+                        Please provide a reason for rejecting this service. This note will be visible to the seller so they can correct the issues and resubmit.
                     </p>
 
                     <div className="mt-4">
@@ -286,7 +243,7 @@ export default function Pending({ services }: any) {
                             name="rejectionNote"
                             value={rejectionNote}
                             onChange={(e) => setRejectionNote(e.target.value)}
-                            className="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                            className="w-full rounded-md border-slate-300 shadow-sm focus:border-slate-500 focus:ring-slate-500 text-sm"
                             rows={4}
                             placeholder="e.g., Description is too vague, cover image violates guidelines..."
                             required
@@ -294,17 +251,15 @@ export default function Pending({ services }: any) {
                     </div>
 
                     <div className="mt-6 flex justify-end gap-3">
-                        <SecondaryButton
-                            onClick={() => setRejectingServiceId(null)}
-                        >
+                        <Button type="button" variant="outline" onClick={() => setRejectingServiceId(null)}>
                             Cancel
-                        </SecondaryButton>
-                        <DangerButton type="submit">
+                        </Button>
+                        <Button type="submit" className="bg-red-600 hover:bg-red-700 text-white">
                             Confirm Rejection
-                        </DangerButton>
+                        </Button>
                     </div>
                 </form>
             </Modal>
-        </AuthenticatedLayout>
+        </AdminSidebarLayout>
     );
 }

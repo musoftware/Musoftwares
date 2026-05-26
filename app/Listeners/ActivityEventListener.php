@@ -23,6 +23,7 @@ class ActivityEventListener
 {
     public function handle(object $event): void
     {
+        try {
         match (true) {
 
             $event instanceof InvoicePaid => ActivityService::log(
@@ -93,6 +94,11 @@ class ActivityEventListener
 
             default => null,
         };
+        } catch (\Throwable $e) {
+            // Activity logging must never break the main event flow.
+            // Swallow exceptions silently to allow subsequent listeners (e.g. NotificationEventListener) to run.
+            logger()->warning('ActivityEventListener silently failed: ' . $e->getMessage(), ['exception' => $e]);
+        }
     }
 
     private function invoiceProps($invoice): array
