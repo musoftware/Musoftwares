@@ -33,3 +33,27 @@ Route::middleware('web')
         // ── Wildcard — always last ─────────────────────────────────────────
         Route::get('/services/{id}', [ServiceController::class, 'show'])->name('services.show');
     });
+
+// -- Seller Landing Pages ------------------------------------------
+Route::middleware(['web', 'auth'])
+    ->prefix('marketplace')
+    ->name('marketplace.')
+    ->group(function () {
+        Route::get('/landing-pages', [\Modules\Marketplace\Http\Controllers\Seller\ServiceLandingPageController::class, 'index'])->name('landing-pages.index');
+        Route::get('/landing-pages/create/{service}', [\Modules\Marketplace\Http\Controllers\Seller\ServiceLandingPageController::class, 'create'])->name('landing-pages.create');
+        Route::post('/landing-pages/{service}', [\Modules\Marketplace\Http\Controllers\Seller\ServiceLandingPageController::class, 'store'])->name('landing-pages.store');
+        Route::get('/landing-pages/{service}/edit/{landingPage?}', [\Modules\Marketplace\Http\Controllers\Seller\ServiceLandingPageController::class, 'edit'])->name('landing-pages.edit');
+        Route::put('/landing-pages/{service}/{landingPage?}', [\Modules\Marketplace\Http\Controllers\Seller\ServiceLandingPageController::class, 'update'])->name('landing-pages.update');
+        Route::get('/landing-pages/{service}/submissions', [\Modules\Marketplace\Http\Controllers\Seller\ServiceLandingPageController::class, 'submissions'])->name('landing-pages.submissions');
+        Route::get('/landing-pages/{service}/analytics', [\Modules\Marketplace\Http\Controllers\Seller\ServiceLandingPageController::class, 'analytics'])->name('landing-pages.analytics');
+    });
+
+// -- Admin Routes --------------------------------------------------
+Route::middleware(['web', 'auth', 'admin'])
+    ->prefix('admin')
+    ->name('admin.')
+    ->group(function () {
+        Route::get('/service-landing-pages', [\Modules\Marketplace\Http\Controllers\Admin\AdminServiceLandingPageController::class, 'index'])->name('service-landing-pages.index');
+        Route::post('/service-landing-pages/{landingPage}/toggle-status', [\Modules\Marketplace\Http\Controllers\Admin\AdminServiceLandingPageController::class, 'toggleStatus'])->name('service-landing-pages.toggle-status');
+        Route::delete('/service-landing-pages/{landingPage}', [\Modules\Marketplace\Http\Controllers\Admin\AdminServiceLandingPageController::class, 'destroy'])->name('service-landing-pages.destroy');
+    });

@@ -30,11 +30,7 @@ class UsersController extends Controller
      */
     public function index(Request $request): InertiaResponse
     {
-        $query = User::query()
-            ->select('id', 'name', 'email', 'account_status', 'created_at',
-                     'whatsapp_number', 'preferred_currency', 'kyc_verified',
-                     'last_activity_at', 'onboarding_completed')
-            ->with('roles');
+        $query = User::query()->with('roles');
 
         // Full-text search across name, email, whatsapp
         if ($search = $request->get('search')) {
@@ -65,7 +61,8 @@ class UsersController extends Controller
         // Sorting
         $sortable  = ['name', 'email', 'created_at', 'id', 'last_activity_at'];
         $sort      = in_array($request->get('sort'), $sortable) ? $request->get('sort') : 'id';
-        $direction = $request->get('direction') === 'asc' ? 'asc' : 'desc';
+        // The old system defaulted to ASC sorting for users
+        $direction = $request->get('direction', 'asc') === 'desc' ? 'desc' : 'asc';
         $query->orderBy($sort, $direction);
 
         $users = $query->paginate(25)->withQueryString()->through(fn ($user) => (new UserResource($user))->resolve());
@@ -80,7 +77,7 @@ class UsersController extends Controller
         ];
 
         return Inertia::render('Admin/Users/Index', [
-            'users'   => $users,
+            'clients' => $users,
             'filters' => $request->only(['search', 'role', 'status', 'kyc', 'sort', 'direction']),
             'stats'   => $stats,
         ]);
@@ -101,8 +98,8 @@ class UsersController extends Controller
             ->implode('');
 
         $walletData = [
-            'balance'  => (float) $user->user_balance,
-            'currency' => $user->preferred_currency ?? 'USD',
+            'balance'  => (float) $user->available_balance(),
+            'currency' => $user->currency_name(),
         ];
 
         $stats = [
@@ -111,12 +108,28 @@ class UsersController extends Controller
             'kyc_docs_count' => $user->kycDocuments()->count(),
         ];
 
-        // Try ERP stats if ERP module exists
+        // Try ERP stats if ERP module exists, fallback to User model relations
         try {
             $erpClient = $user->client;
             if ($erpClient) {
                 $stats['invoices_total'] = $erpClient->invoices()->count();
                 $stats['invoices_paid']  = $erpClient->invoices()->where('status', 'paid')->count();
+                $stats['invoices_unpaid_sum'] = $erpClient->invoices()->where('status', 'unpaid')->sum('amount');
+            } else {
+                $stats['invoices_total'] = $user->invoices()->count();
+                $stats['invoices_paid']  = $user->invoices()->where('status', 'paid')->count();
+                $stats['invoices_unpaid_sum'] = $user->invoices()->where('status', 'unpaid')->sum('amount');
+            }
+        } catch (\Throwable $e) {}
+
+        // Try Marketplace stats
+        try {
+            if (class_exists('\Modules\Marketplace\Models\Order')) {
+                $stats['orders_total'] = \Modules\Marketplace\Models\Order::where('buyer_id', $user->id)->count();
+            }
+            if (class_exists('\Modules\Marketplace\Models\Service')) {
+                $stats['services_total'] = \Modules\Marketplace\Models\Service::where('seller_id', $user->id)->count();
+                $stats['services_approved'] = \Modules\Marketplace\Models\Service::where('seller_id', $user->id)->where('status', 'approved')->count();
             }
         } catch (\Throwable $e) {}
 
@@ -194,7 +207,7 @@ class UsersController extends Controller
                 'telegram_username'    => $user->telegram_username,
                 'country'              => $user->country,
                 'city'                 => $user->city,
-                'preferred_currency'   => $user->preferred_currency ?? 'USD',
+                'currency'             => $user->currency_id,
                 'account_status'       => $user->account_status ?? 'active',
                 'block_reason'         => $user->block_reason,
                 'kyc_verified'         => (bool) $user->kyc_verified,

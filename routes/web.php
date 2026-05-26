@@ -342,6 +342,11 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
     Route::post('whatsapp-balance/{user}/reset', [\App\Http\Controllers\Admin\AdminWhatsAppBalanceController::class, 'resetBalance'])->name('whatsapp-balance.reset');
     Route::post('whatsapp-balance/bulk-reset', [\App\Http\Controllers\Admin\AdminWhatsAppBalanceController::class, 'bulkReset'])->name('whatsapp-balance.bulk-reset');
 
+    // ── Service Landing Pages ───────────────────────────────────────
+    Route::get('/service-landing-pages', [\Modules\Marketplace\Http\Controllers\Admin\AdminServiceLandingPageController::class, 'index'])->name('service-landing-pages.index');
+    Route::post('/service-landing-pages/{landingPage}/toggle-status', [\Modules\Marketplace\Http\Controllers\Admin\AdminServiceLandingPageController::class, 'toggleStatus'])->name('service-landing-pages.toggle-status');
+    Route::delete('/service-landing-pages/{landingPage}', [\Modules\Marketplace\Http\Controllers\Admin\AdminServiceLandingPageController::class, 'destroy'])->name('service-landing-pages.destroy');
+
     // ── User Management (Full Admin Control) ────────────────────────
     // Recovered from old project: Admin/UsersController
     Route::get('/users', [\App\Http\Controllers\Admin\UsersController::class, 'index'])->name('users.index');
