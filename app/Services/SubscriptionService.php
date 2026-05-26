@@ -26,8 +26,13 @@ class SubscriptionService
      */
     public function hasActiveSubscription(User $user, string $module): bool
     {
-        // Admins have access to everything
-        if ($user->hasRole('admin')) {
+        // Points-based modules are never free
+        if (in_array($module, ['freelance', 'facebook-publisher'])) {
+            return $user->hasSubscription();
+        }
+
+        // Admins and moderators have access to everything else
+        if ($user->hasRole('admin') || $user->hasRole('moderator')) {
             return true;
         }
 
@@ -39,11 +44,28 @@ class SubscriptionService
      */
     public function hasAccessToTool(User $user, string $toolSlug): bool
     {
-        if ($user->hasRole('admin')) {
+        // Points-based tools are never free
+        if (in_array($toolSlug, ['freelance', 'facebook-publisher'])) {
+            return false;
+        }
+
+        if ($user->hasRole('admin') || $user->hasRole('moderator')) {
             return true;
         }
 
-        return $user->hasSubscription();
+        if ($user->hasSubscription()) {
+            return true;
+        }
+
+        $tool = collect(config('tools'))->firstWhere('slug', $toolSlug);
+        if ($tool && class_exists(\Modules\Tools\Models\ToolSubscription::class)) {
+            return \Modules\Tools\Models\ToolSubscription::where('user_id', $user->id)
+                ->where('tool_guid', $tool['guid'])
+                ->where('status', 'active')
+                ->exists();
+        }
+
+        return false;
     }
 
     /**
@@ -51,7 +73,7 @@ class SubscriptionService
      */
     public function hasAnySubscription(User $user): bool
     {
-        if ($user->hasRole('admin')) {
+        if ($user->hasRole('admin') || $user->hasRole('moderator')) {
             return true;
         }
 
@@ -84,13 +106,15 @@ class SubscriptionService
 
     public function getLimits(User $user, string $module): array
     {
-        if ($user->hasRole('admin')) {
-            return [
-                'projects'     => -1,
-                'invoices'     => -1,
-                'tasks'        => -1,
-                'team_members' => -1,
-            ];
+        if ($user->hasRole('admin') || $user->hasRole('moderator')) {
+            if (!in_array($module, ['freelance'])) {
+                return [
+                    'projects'     => -1,
+                    'invoices'     => -1,
+                    'tasks'        => -1,
+                    'team_members' => -1,
+                ];
+            }
         }
 
         if (!$user->hasSubscription()) {

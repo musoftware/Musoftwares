@@ -39,7 +39,7 @@ class GoldWalletService
                 'price_per_gram' => $data['price_per_gram'],
                 'total_amount' => $data['total_amount'],
                 'fees' => $data['fees'] ?? 0,
-                'currency' => $data['currency'] ?? 'EGP',
+                'currency_id' => $data['currency_id'] ?? 1,
                 'transaction_date' => $data['transaction_date'] ?? now()->toDateString(),
                 'vendor_name' => $data['vendor_name'] ?? null,
                 'notes' => $data['notes'] ?? null,

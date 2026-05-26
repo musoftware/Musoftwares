@@ -18,7 +18,7 @@ import { useToast } from '@/Components/ui/use-toast';
 import axios from 'axios';
 import { formatMoney as formatCurrency } from '@/lib/utils';
 
-export default function Index({ clients, filters }) {
+export default function Index({ clients, filters, stats }) {
     const { toast } = useToast();
     const [selectedClient, setSelectedClient] = useState(null);
     const [isSheetOpen, setIsSheetOpen] = useState(false);
@@ -26,7 +26,24 @@ export default function Index({ clients, filters }) {
     const handleSearch = (search) => {
         router.get(
             '/admin/users',
-            { search },
+            { ...filters, search, page: 1 },
+            { preserveState: true, replace: true }
+        );
+    };
+
+    const handleFilter = (key, value) => {
+        router.get(
+            '/admin/users',
+            { ...filters, [key]: value, page: 1 },
+            { preserveState: true, replace: true }
+        );
+    };
+
+    const handleSort = (key) => {
+        const direction = filters.sort === key && filters.direction === 'asc' ? 'desc' : 'asc';
+        router.get(
+            '/admin/users',
+            { ...filters, sort: key, direction },
             { preserveState: true, replace: true }
         );
     };
@@ -64,8 +81,16 @@ export default function Index({ clients, filters }) {
 
     const columns = [
         {
+            key: 'id',
+            label: 'ID',
+            sortable: true,
+            className: 'w-[60px]',
+            render: (client) => <span className="text-slate-500 font-mono text-xs">#{client.id}</span>
+        },
+        {
             key: 'name',
             label: 'Name',
+            sortable: true,
             render: (client) => (
                 <button 
                     onClick={() => {
@@ -82,6 +107,7 @@ export default function Index({ clients, filters }) {
         {
             key: 'email',
             label: 'Email',
+            sortable: true,
             render: (client) => <span className="text-slate-600">{client.email}</span>,
         },
         {
@@ -90,13 +116,21 @@ export default function Index({ clients, filters }) {
             render: (client) => <span className="text-slate-600">{client.phone_number || client.phone || '—'}</span>,
         },
         {
+            key: 'created_at',
+            label: 'Joined',
+            sortable: true,
+            render: (client) => (
+                <span className="text-slate-600 whitespace-nowrap">
+                    {new Date(client.created_at).toLocaleDateString()}
+                </span>
+            ),
+        },
+        {
             key: 'wallet',
             label: 'Wallet Balance',
             render: (client) => (
                 <span className="font-medium">
-                    {client.wallet
-                        ? formatCurrency(client.wallet.balance, client.wallet.currency)
-                        : formatCurrency(0, 'USD')}
+                    {formatCurrency(client.available_balance || 0, client.currency || 'USD')}
                 </span>
             ),
         },
@@ -163,15 +197,77 @@ export default function Index({ clients, filters }) {
         },
     ];
 
+    const advancedFilters = (
+        <div className="flex items-center gap-2">
+            <select 
+                className="h-9 rounded-md border border-slate-200 bg-white px-3 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                value={filters.role || ''}
+                onChange={(e) => handleFilter('role', e.target.value)}
+            >
+                <option value="">All Roles</option>
+                <option value="user">Users</option>
+                <option value="admin">Admins</option>
+            </select>
+            <select 
+                className="h-9 rounded-md border border-slate-200 bg-white px-3 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                value={filters.status || ''}
+                onChange={(e) => handleFilter('status', e.target.value)}
+            >
+                <option value="">All Statuses</option>
+                <option value="active">Active</option>
+                <option value="blocked">Blocked</option>
+            </select>
+            <select 
+                className="h-9 rounded-md border border-slate-200 bg-white px-3 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                value={filters.kyc || ''}
+                onChange={(e) => handleFilter('kyc', e.target.value)}
+            >
+                <option value="">All KYC</option>
+                <option value="verified">Verified</option>
+                <option value="unverified">Unverified</option>
+            </select>
+        </div>
+    );
+
     return (
         <AdminSidebarLayout title="Clients" header="Platform Users">
+            {stats && (
+                <div className="mb-6 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+                    <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm flex flex-col items-center justify-center">
+                        <span className="text-2xl font-semibold text-slate-800">{stats.total}</span>
+                        <span className="text-xs text-slate-500 font-medium uppercase tracking-wider mt-1">Total Users</span>
+                    </div>
+                    <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm flex flex-col items-center justify-center">
+                        <span className="text-2xl font-semibold text-green-600">{stats.active}</span>
+                        <span className="text-xs text-slate-500 font-medium uppercase tracking-wider mt-1">Active</span>
+                    </div>
+                    <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm flex flex-col items-center justify-center">
+                        <span className="text-2xl font-semibold text-red-600">{stats.blocked}</span>
+                        <span className="text-xs text-slate-500 font-medium uppercase tracking-wider mt-1">Blocked</span>
+                    </div>
+                    <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm flex flex-col items-center justify-center">
+                        <span className="text-2xl font-semibold text-indigo-600">{stats.kyc_verified}</span>
+                        <span className="text-xs text-slate-500 font-medium uppercase tracking-wider mt-1">KYC Verified</span>
+                    </div>
+                    <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm flex flex-col items-center justify-center">
+                        <span className="text-2xl font-semibold text-blue-600">{stats.new_this_week}</span>
+                        <span className="text-xs text-slate-500 font-medium uppercase tracking-wider mt-1">New This Week</span>
+                    </div>
+                    <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm flex flex-col items-center justify-center">
+                        <span className="text-2xl font-semibold text-purple-600">{stats.new_this_month}</span>
+                        <span className="text-xs text-slate-500 font-medium uppercase tracking-wider mt-1">New This Month</span>
+                    </div>
+                </div>
+            )}
+
             <div className="mb-6">
                 <DataTable
                     columns={columns}
                     data={clients.data}
                     pagination={clients}
-                    filters={filters}
+                    filters={{ ...filters, extra: advancedFilters }}
                     onSearch={handleSearch}
+                    onSort={handleSort}
                     emptyTitle="No clients found"
                     emptyDescription="Try adjusting your search filters."
                 />

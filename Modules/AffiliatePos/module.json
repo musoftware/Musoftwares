@@ -1,0 +1,11 @@
+{
+    "name": "AffiliatePos",
+    "alias": "affiliatepos",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\AffiliatePos\\Providers\\AffiliatePosServiceProvider"
+    ],
+    "files": []
+}
