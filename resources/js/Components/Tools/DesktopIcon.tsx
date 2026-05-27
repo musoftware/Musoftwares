@@ -39,6 +39,7 @@ export function DesktopIcon({
     onDoubleClick,
     draggable = false,
     onDragStart,
+    onDragEnd,
     onDragOver,
     onDrop,
     onDragLeave,
