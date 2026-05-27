@@ -140,6 +140,10 @@ export default function Explore({ tools, categories, subscribedSlugs, hasBrowser
     const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
     const [wallpaperUrl, setWallpaperUrl] = useState(workspaceSettings?.wallpaperUrl || DEFAULT_WALLPAPER_URL);
     
+    // Window Manager State
+    const [activeWindows, setActiveWindows] = useState<{ id: string; slug: string; title: string; iconUrl?: string | null; isMinimized: boolean; isMaximized: boolean; zIndex: number }[]>([]);
+    const [maxZIndex, setMaxZIndex] = useState(10);
+    
     // Advanced Desktop Features State
     const [selectedItemIds, setSelectedItemIds] = useState<string[]>([]);
     const [contextMenu, setContextMenu] = useState<ContextMenuState | null>(null);
@@ -462,11 +466,51 @@ export default function Explore({ tools, categories, subscribedSlugs, hasBrowser
 
         const isOwned = subscribedSlugs.includes(tool.slug);
         if (isOwned) {
-            router.visit(route('tools.run', tool.slug));
+            const existingWindow = activeWindows.find(w => w.slug === tool.slug);
+            if (existingWindow) {
+                setActiveWindows(prev => prev.map(w => 
+                    w.id === existingWindow.id 
+                    ? { ...w, isMinimized: false, zIndex: maxZIndex + 1 } 
+                    : w
+                ));
+                setMaxZIndex(prev => prev + 1);
+            } else {
+                const newZIndex = maxZIndex + 1;
+                setMaxZIndex(newZIndex);
+                setActiveWindows(prev => [...prev, {
+                    id: `win-${Date.now()}`,
+                    slug: tool.slug,
+                    title: tool.title,
+                    iconUrl: tool.icon_url,
+                    isMinimized: false,
+                    isMaximized: false,
+                    zIndex: newZIndex
+                }]);
+            }
         } else {
             setSelectedTool(tool);
             setSubscribeModalOpen(true);
         }
+    };
+
+    const handleWindowFocus = (id: string) => {
+        setMaxZIndex(prev => {
+            const nextZ = prev + 1;
+            setActiveWindows(windows => windows.map(w => w.id === id ? { ...w, zIndex: nextZ } : w));
+            return nextZ;
+        });
+    };
+
+    const handleWindowClose = (id: string) => {
+        setActiveWindows(prev => prev.filter(w => w.id !== id));
+    };
+
+    const handleWindowToggleMinimize = (id: string) => {
+        setActiveWindows(prev => prev.map(w => w.id === id ? { ...w, isMinimized: !w.isMinimized } : w));
+    };
+
+    const handleWindowToggleMaximize = (id: string) => {
+        setActiveWindows(prev => prev.map(w => w.id === id ? { ...w, isMaximized: !w.isMaximized } : w));
     };
 
     const handleSubscribeAction = () => {
@@ -551,21 +595,22 @@ export default function Explore({ tools, categories, subscribedSlugs, hasBrowser
             const targetItem = items[targetIndex];
 
             if (sourceItem.type === 'tool' && targetItem.type === 'tool') {
-                const newFolder: DesktopItem = {
-                    id: `folder-${Date.now()}`,
+                items.splice(sourceIndex, 1);
+                const targetIndexUpdated = items.findIndex(i => i.id === targetId);
+                items[targetIndexUpdated] = {
+                    ...items[targetIndexUpdated],
                     type: 'folder',
-                    name: 'Folder',
-                    childrenSlugs: [targetItem.toolSlug!, sourceItem.toolSlug!],
-                    x: targetItem.x,
-                    y: targetItem.y
+                    name: 'New Folder',
+                    childrenSlugs: [sourceItem.toolSlug!, items[targetIndexUpdated].toolSlug!]
                 };
-                items.splice(Math.max(sourceIndex, targetIndex), 1);
-                items.splice(Math.min(sourceIndex, targetIndex), 1, newFolder);
             } else if (sourceItem.type === 'tool' && targetItem.type === 'folder') {
                 items.splice(sourceIndex, 1);
-                targetItem.childrenSlugs = [...(targetItem.childrenSlugs || []), sourceItem.toolSlug!];
+                const targetIndexUpdated = items.findIndex(i => i.id === targetId);
+                items[targetIndexUpdated] = {
+                    ...items[targetIndexUpdated],
+                    childrenSlugs: [...(items[targetIndexUpdated].childrenSlugs || []), sourceItem.toolSlug!]
+                };
             } else {
-                // Just swap positions
                 const tempX = targetItem.x;
                 const tempY = targetItem.y;
                 targetItem.x = sourceItem.x;
@@ -586,7 +631,6 @@ export default function Explore({ tools, categories, subscribedSlugs, hasBrowser
         const container = e.currentTarget as HTMLElement;
         const rect = container.getBoundingClientRect();
         
-        // Calculate Grid Position
         const dropX = e.clientX - rect.left;
         const dropY = e.clientY - rect.top;
         const gridX = Math.max(0, Math.floor(dropX / CELL_WIDTH));
@@ -598,13 +642,17 @@ export default function Explore({ tools, categories, subscribedSlugs, hasBrowser
             const [, folderId, toolSlug] = payload.split(':');
             setDesktopItems(prevItems => {
                 const items = [...prevItems];
-                const sourceFolder = items.find(i => i.id === folderId);
+                const sourceFolderIndex = items.findIndex(i => i.id === folderId);
                 
-                if (sourceFolder && sourceFolder.childrenSlugs) {
-                    sourceFolder.childrenSlugs = sourceFolder.childrenSlugs.filter(s => s !== toolSlug);
+                if (sourceFolderIndex > -1) {
+                    const sourceFolder = items[sourceFolderIndex];
+                    items[sourceFolderIndex] = {
+                        ...sourceFolder,
+                        childrenSlugs: (sourceFolder.childrenSlugs || []).filter(s => s !== toolSlug)
+                    };
+                    
                     const toolData = tools.data.find(t => t.slug === toolSlug);
                     
-                    // Collision check
                     let finalX = gridX, finalY = gridY;
                     const occupantIndex = items.findIndex(i => i.x === finalX && i.y === finalY);
                     if (occupantIndex > -1) {
@@ -825,7 +873,7 @@ export default function Explore({ tools, categories, subscribedSlugs, hasBrowser
                 <div className="flex items-center h-full">
                     {/* Start Button */}
                     <button 
-                        onClick={() => setIsStartMenuOpen(!isStartMenuOpen)}
+                        onClick={(e) => { e.stopPropagation(); setIsStartMenuOpen(!isStartMenuOpen); }}
                         className={`h-full px-3 flex items-center justify-center hover:bg-white/10 transition-colors group ${isStartMenuOpen ? 'bg-white/10' : ''}`}
                     >
                         <div className="w-6 h-6 rounded bg-blue-500 flex items-center justify-center group-hover:bg-blue-400 transition-colors">
@@ -844,13 +892,33 @@ export default function Explore({ tools, categories, subscribedSlugs, hasBrowser
                     </div>
 
                     {/* Running Apps */}
-                    <div className="flex items-center h-full space-x-1">
-                        <Link href={route('dashboard')} className="h-10 px-3 flex items-center justify-center text-slate-300 hover:bg-white/10 rounded transition-colors text-xs font-medium">
-                            Dashboard
-                        </Link>
-                        <Link href={route('tools.downloads')} className="h-10 px-3 flex items-center justify-center text-slate-300 hover:bg-white/10 rounded transition-colors text-xs font-medium">
-                            Downloads
-                        </Link>
+                    <div className="flex items-center h-full space-x-1 flex-1 overflow-x-auto px-2">
+                        {activeWindows.map(win => (
+                            <button
+                                key={win.id}
+                                onClick={() => {
+                                    if (win.isMinimized) {
+                                        handleWindowToggleMinimize(win.id);
+                                        handleWindowFocus(win.id);
+                                    } else {
+                                        // If it's not minimized but not focused, focus it. Otherwise minimize it.
+                                        if (win.zIndex !== maxZIndex) {
+                                            handleWindowFocus(win.id);
+                                        } else {
+                                            handleWindowToggleMinimize(win.id);
+                                        }
+                                    }
+                                }}
+                                className={`h-10 px-3 flex items-center justify-center rounded transition-colors text-xs font-medium gap-2 border-b-2 ${!win.isMinimized && win.zIndex === maxZIndex ? 'bg-white/20 border-blue-400 text-white' : 'hover:bg-white/10 border-transparent text-slate-300'}`}
+                            >
+                                {win.iconUrl ? (
+                                    <img src={win.iconUrl} alt={win.title} className="w-4 h-4 object-contain" draggable={false} />
+                                ) : (
+                                    <span className="w-4 h-4 flex items-center justify-center">📦</span>
+                                )}
+                                <span className="max-w-[100px] truncate">{win.title}</span>
+                            </button>
+                        ))}
                     </div>
                 </div>
 
@@ -1032,6 +1100,34 @@ export default function Explore({ tools, categories, subscribedSlugs, hasBrowser
                 onClose={() => setContextMenu(null)}
                 onAction={handleContextMenuAction}
             />
+            {/* Active Windows */}
+            {activeWindows.map((win, index) => (
+                <WindowModal
+                    key={win.id}
+                    isOpen={!win.isMinimized}
+                    onClose={() => handleWindowClose(win.id)}
+                    title={win.title}
+                    iconUrl={win.iconUrl}
+                    isMaximized={win.isMaximized}
+                    onMinimize={() => handleWindowToggleMinimize(win.id)}
+                    onMaximize={() => handleWindowToggleMaximize(win.id)}
+                    onNewTab={() => {
+                        window.open(route('tools.run', win.slug), '_blank');
+                        handleWindowClose(win.id);
+                    }}
+                    zIndex={win.zIndex}
+                    onFocus={() => handleWindowFocus(win.id)}
+                    initialX={100 + (index * 30)}
+                    initialY={50 + (index * 30)}
+                >
+                    <iframe 
+                        src={route('tools.run', win.slug)} 
+                        className="w-full h-full border-none bg-white"
+                        title={win.title}
+                    />
+                </WindowModal>
+            ))}
+
         </div>
     );
 }

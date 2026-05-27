@@ -12,6 +12,8 @@ interface SettingsModalProps {
     prayerCountry: string;
     prayerMethod: string;
     onPrayerSettingsChange: (city: string, country: string, method: string) => void;
+    openWithOneClick: boolean;
+    onToggleOneClick: () => void;
 }
 
 const DEFAULT_WALLPAPERS = [
