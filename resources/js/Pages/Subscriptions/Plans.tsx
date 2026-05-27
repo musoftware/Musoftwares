@@ -43,7 +43,11 @@ interface ActiveSub {
     amount: number;
     expires_at: string;
     auto_renew: boolean;
-    custom_items: string[] | null;
+    owned_features: {
+        id: string;
+        status: 'active' | 'expired';
+        expires_at: string;
+    }[] | null;
 }
 
 interface PlansProps {
@@ -70,7 +74,21 @@ const ICON_MAP: Record<string, React.ElementType> = {
 
 export default function Plans({ serviceItems, activeSubscription, walletBalance, currency }: PlansProps) {
     const [billing, setBilling] = useState<'1_month' | '6_months' | '1_year'>('1_month');
-    const [selectedItems, setSelectedItems] = useState<string[]>(activeSubscription?.custom_items || []);
+    const [isNewSystem, setIsNewSystem] = useState<boolean>(false);
+    
+    const activeItems = useMemo(() => {
+        if (isNewSystem) return [];
+        return activeSubscription?.owned_features
+            ?.filter(f => f.status === 'active')
+            .map(f => f.id) || [];
+    }, [activeSubscription, isNewSystem]);
+    
+    // Update selected items automatically when switching modes
+    useEffect(() => {
+        setSelectedItems(activeItems);
+    }, [isNewSystem]);
+
+    const [selectedItems, setSelectedItems] = useState<string[]>(activeItems);
 
     const modules = serviceItems.filter(item => item.type === 'module');
     const tools = serviceItems.filter(item => item.type === 'tool');
@@ -187,14 +205,17 @@ export default function Plans({ serviceItems, activeSubscription, walletBalance,
 
     const handleSubscribeWallet = () => {
         if (selectedItems.length === 0) return;
-        if (confirm(`Subscribe to these ${selectedItems.length} items using your wallet balance?`)) {
-            router.post(route('subscriptions.subscribe'), { items: selectedItems, billing_cycle: billing });
+        const msg = isNewSystem 
+            ? `Create a NEW workspace with these ${selectedItems.length} items?`
+            : `Subscribe to these ${selectedItems.length} items using your wallet balance?`;
+        if (confirm(msg)) {
+            router.post(route('subscriptions.subscribe'), { items: selectedItems, billing_cycle: billing, is_new_system: isNewSystem });
         }
     };
 
     const handleSubscribeKashier = () => {
         if (selectedItems.length === 0) return;
-        router.post(route('subscriptions.kashier.checkout'), { items: selectedItems, billing_cycle: billing });
+        router.post(route('subscriptions.kashier.checkout'), { items: selectedItems, billing_cycle: billing, is_new_system: isNewSystem });
     };
 
     const canAfford = walletBalance >= total;
@@ -202,6 +223,7 @@ export default function Plans({ serviceItems, activeSubscription, walletBalance,
     const renderItemCard = (item: ServiceItem, isAddon: boolean = false) => {
         const isSelected = selectedItems.includes(item.id);
         const Icon = item.icon && ICON_MAP[item.icon] ? ICON_MAP[item.icon] : Layers;
+        const ownedFeature = isNewSystem ? undefined : activeSubscription?.owned_features?.find(f => f.id === item.id);
 
         return (
             <div
@@ -231,10 +253,29 @@ export default function Plans({ serviceItems, activeSubscription, walletBalance,
                                 <h3 className={cn("font-semibold", isSelected ? 'text-indigo-900' : 'text-slate-900')}>
                                     {item.name}
                                 </h3>
+                                {ownedFeature && (
+                                    <span className={cn(
+                                        "ml-2 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded-full",
+                                        ownedFeature.status === 'active' 
+                                            ? "bg-emerald-100 text-emerald-700" 
+                                            : "bg-red-100 text-red-700"
+                                    )}>
+                                        {ownedFeature.status === 'active' ? 'Active' : 'Expired'}
+                                    </span>
+                                )}
                             </div>
                             {item.description && (
                                 <p className="text-sm text-slate-500 mt-1 leading-relaxed">
                                     {item.description}
+                                </p>
+                            )}
+                            {ownedFeature && (
+                                <p className={cn(
+                                    "text-xs mt-1.5 font-medium",
+                                    ownedFeature.status === 'active' ? "text-emerald-600" : "text-red-500"
+                                )}>
+                                    {ownedFeature.status === 'active' ? 'Renews / Expires on' : 'Expired on'} {ownedFeature.expires_at}
+                                    {ownedFeature.status === 'expired' && " - Select to Renew"}
                                 </p>
                             )}
                             {item.type === 'tool' && (
@@ -392,6 +433,29 @@ export default function Plans({ serviceItems, activeSubscription, walletBalance,
                                 <p className="text-sm text-slate-500">
                                     Billed {billing.replace('_', ' ')}
                                 </p>
+                                
+                                {activeSubscription?.owned_features && activeSubscription.owned_features.length > 0 && (
+                                    <div className="mt-4 flex flex-col gap-2 p-3 bg-white border border-slate-200 rounded-xl">
+                                        <label className="flex items-center gap-3 cursor-pointer">
+                                            <input 
+                                                type="radio" 
+                                                className="text-indigo-600 focus:ring-indigo-500" 
+                                                checked={!isNewSystem} 
+                                                onChange={() => setIsNewSystem(false)}
+                                            />
+                                            <span className="text-sm font-medium text-slate-700">Upgrade Current System</span>
+                                        </label>
+                                        <label className="flex items-center gap-3 cursor-pointer">
+                                            <input 
+                                                type="radio" 
+                                                className="text-indigo-600 focus:ring-indigo-500" 
+                                                checked={isNewSystem} 
+                                                onChange={() => setIsNewSystem(true)}
+                                            />
+                                            <span className="text-sm font-medium text-slate-700">Create New System (Side Business)</span>
+                                        </label>
+                                    </div>
+                                )}
                             </div>
                             
                             <div className="p-6">

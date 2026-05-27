@@ -42,35 +42,33 @@ class DashboardController extends Controller
         $unpaidAmount = 0;
         $unpaidCount = 0;
 
-        $tenantClient = $user->client;
-        if ($tenantClient) {
-            $pendingInvoices = Invoice::where('client_id', $tenantClient->id)
-                ->whereIn('status', ['sent', 'partial'])
-                ->orderBy('due_date', 'asc')
-                ->limit(5)
-                ->get()
-                ->map(function ($invoice) {
-                    $unpaid = $invoice->status === 'partial'
-                        ? max(0, $invoice->amount - ($invoice->paid_amount ?? 0))
-                        : $invoice->amount;
-                    return [
-                        'id' => $invoice->invoice_number,
-                        'dbId' => $invoice->id,
-                        'date' => $invoice->due_date?->format('M d, Y') ?? '-',
-                        'amount' => round($unpaid, 2),
-                        'status' => $invoice->due_date && $invoice->due_date->isPast() ? 'overdue' : 'due',
-                        'description' => $invoice->notes ?? ('Invoice ' . $invoice->invoice_number),
-                        'currency' => $invoice->amount_currency ?? 'USD',
-                    ];
-                });
+        $pendingInvoices = $this->getClientErpInvoicesQuery($user)
+            ->whereIn('status', ['sent', 'partial'])
+            ->orderBy('due_date', 'asc')
+            ->limit(5)
+            ->get()
+            ->map(function ($invoice) {
+                $unpaid = $invoice->status === 'partial'
+                    ? max(0, $invoice->amount - ($invoice->paid_amount ?? 0))
+                    : $invoice->amount;
+                return [
+                    'id' => $invoice->invoice_number,
+                    'dbId' => $invoice->id,
+                    'date' => $invoice->due_date?->format('M d, Y') ?? '-',
+                    'amount' => round($unpaid, 2),
+                    'status' => $invoice->due_date && $invoice->due_date->isPast() ? 'overdue' : 'due',
+                    'description' => $invoice->notes ?? ('Invoice ' . $invoice->invoice_number),
+                    'currency' => $invoice->amount_currency ?? 'USD',
+                ];
+            });
 
-            $unpaidStats = Invoice::where('client_id', $tenantClient->id)
-                ->whereIn('status', ['sent', 'partial'])
-                ->selectRaw('COUNT(*) as cnt, COALESCE(SUM(amount), 0) as total')
-                ->first();
-            $unpaidCount = $unpaidStats->cnt ?? 0;
-            $unpaidAmount = round($unpaidStats->total ?? 0, 2);
-        }
+        $unpaidStats = $this->getClientErpInvoicesQuery($user)
+            ->whereIn('status', ['sent', 'partial'])
+            ->selectRaw('COUNT(*) as cnt, COALESCE(SUM(amount), 0) as total')
+            ->first();
+        
+        $unpaidCount = $unpaidStats->cnt ?? 0;
+        $unpaidAmount = round($unpaidStats->total ?? 0, 2);
 
         // ── Recent Transactions ──────────────────────────────────
         $recentTransactions = Transaction::where('user_id', $user->id)
@@ -206,6 +204,30 @@ class DashboardController extends Controller
     private function adminDashboard($user)
     {
         return app(\App\Http\Controllers\Admin\DashboardController::class)->index();
+    }
+
+    /**
+     * Build the query to get all ERP invoices across all tenants where this user is a client.
+     */
+    private function getClientErpInvoicesQuery($user)
+    {
+        $tenantClientIds = \Modules\ERP\Models\TenantClient::where('user_id', $user->id)->pluck('id')->toArray();
+        $platformTenantId = \Modules\ERP\Models\Tenant::platformId();
+
+        return \Modules\ERP\Models\Invoice::where(function ($query) use ($user, $tenantClientIds, $platformTenantId) {
+            $query->where(function ($q) use ($user, $platformTenantId) {
+                $q->where(function ($q2) use ($platformTenantId) {
+                    $q2->where('tenant_id', $platformTenantId)->orWhereNull('tenant_id');
+                })->where('client_id', $user->id);
+            });
+            if (!empty($tenantClientIds)) {
+                $query->orWhere(function ($q) use ($tenantClientIds, $platformTenantId) {
+                    $q->where('tenant_id', '!=', $platformTenantId)
+                      ->whereNotNull('tenant_id')
+                      ->whereIn('client_id', $tenantClientIds);
+                });
+            }
+        });
     }
 }
 

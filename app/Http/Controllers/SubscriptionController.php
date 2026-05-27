@@ -148,12 +148,16 @@ class SubscriptionController extends Controller
 
         $wallet = ['id' => null, 'balance' => (float)$user->user_balance, 'currency' => $user->currency_name()];
 
-        $customItems = [];
+        $ownedFeatures = [];
         if ($user->tenant_id) {
-            $customItems = \App\Models\TenantFeature::where('tenant_id', $user->tenant_id)
-                ->where('expires_at', '>', Carbon::now())
-                ->pluck('feature_key')
-                ->toArray();
+            $features = \App\Models\TenantFeature::where('tenant_id', $user->tenant_id)->get();
+            foreach ($features as $f) {
+                $ownedFeatures[] = [
+                    'id' => $f->feature_key,
+                    'status' => \Carbon\Carbon::parse($f->expires_at)->isFuture() ? 'active' : 'expired',
+                    'expires_at' => \Carbon\Carbon::parse($f->expires_at)->format('M d, Y')
+                ];
+            }
         }
 
         $hasSub = $user->hasSubscription();
@@ -170,7 +174,7 @@ class SubscriptionController extends Controller
                 'amount'        => $user->plan->current_plan_price(),
                 'expires_at'    => Carbon::parse($user->subscription_date)->format('M d, Y'),
                 'auto_renew'    => (bool) $user->subscription_force,
-                'custom_items'  => $customItems,
+                'owned_features' => $ownedFeatures,
             ];
         }
 
@@ -295,6 +299,7 @@ class SubscriptionController extends Controller
             'plan_id'       => 'nullable|exists:plans,id',
             'items'         => 'nullable|array',
             'billing_cycle' => 'required|string',
+            'is_new_system' => 'nullable|boolean',
         ]);
 
         $this->validateAddonParents($request->items);
@@ -342,8 +347,9 @@ class SubscriptionController extends Controller
         $base_plan_amount = $plan->current_plan_price() * $multiplier;
         $plan_amount = $base_plan_amount;
         $current_plan_remaining_price = 0;
+        $isNewSystem = $request->input('is_new_system', false);
         
-        if ($user->plan_id != null) {
+        if (!$isNewSystem && $user->plan_id != null) {
             $current_plan = Plan::find($user->plan_id);
             if ($current_plan) {
                 // calc the remaining days
@@ -361,7 +367,19 @@ class SubscriptionController extends Controller
         }
 
         try {
-            DB::transaction(function () use ($user, $plan, $plan_amount, $current_plan_remaining_price, $current_plan, $days, $billingCycle, $usdCurrencyId) {
+            DB::transaction(function () use ($user, $plan, $plan_amount, $current_plan_remaining_price, $current_plan, $days, $billingCycle, $usdCurrencyId, $isNewSystem) {
+                if ($isNewSystem) {
+                    $tenantName = explode(' ', $user->name)[0] . ' Workspace ' . substr(uniqid(), -4);
+                    $tenant = \Modules\ERP\Models\Tenant::create([
+                        'user_id' => $user->id,
+                        'name' => $tenantName,
+                        'status' => 'active',
+                        'base_currency_id' => $user->currency_id ?: $usdCurrencyId,
+                    ]);
+                    $user->tenant_id = $tenant->id;
+                    $user->save();
+                }
+
                 if ($current_plan != null && $current_plan_remaining_price > 0) {
                     $user->add_balance($current_plan_remaining_price, 'Refund for remaining days of ' . $current_plan->plan_name . ' plan', 'refund', null);
                 }
@@ -425,9 +443,11 @@ class SubscriptionController extends Controller
             'plan_id'       => 'nullable|exists:plans,id',
             'items'         => 'nullable|array',
             'billing_cycle' => 'required|string',
+            'is_new_system' => 'nullable|boolean',
         ]);
 
         $this->validateAddonParents($request->items);
+        $isNewSystem = $request->input('is_new_system', false);
 
         $user = Auth::user();
         
@@ -482,7 +502,8 @@ class SubscriptionController extends Controller
             $currencyCode,
             $billingCycle,
             $days,
-            $request->items ?? []
+            $request->items ?? [],
+            $isNewSystem
         );
 
         return Inertia::location($paymentUrl);
@@ -505,6 +526,7 @@ class SubscriptionController extends Controller
                 $amountPaid = floatval($data['amount'] ?? 0);
                 $planId = $metadata['plan_id'] ?? null;
                 $days = $metadata['days'] ?? 365;
+                $isNewSystem = $metadata['is_new_system'] ?? false;
 
                 if ($userId && $trxId && $amountPaid > 0 && $planId) {
                     $user = \App\Models\User::find($userId);
@@ -519,7 +541,19 @@ class SubscriptionController extends Controller
 
                         if (!$alreadyProcessed) {
                             try {
-                                DB::transaction(function () use ($user, $plan, $amountPaid, $reason, $days) {
+                                DB::transaction(function () use ($user, $plan, $amountPaid, $reason, $days, $isNewSystem, $metadata) {
+                                    if ($isNewSystem) {
+                                        $tenantName = explode(' ', $user->name)[0] . ' Workspace ' . substr(uniqid(), -4);
+                                        $tenant = \Modules\ERP\Models\Tenant::create([
+                                            'user_id' => $user->id,
+                                            'name' => $tenantName,
+                                            'status' => 'active',
+                                            'base_currency_id' => $user->currency_id ?: 1, // fallback to USD
+                                        ]);
+                                        $user->tenant_id = $tenant->id;
+                                        $user->save();
+                                    }
+
                                     $user->add_balance($amountPaid, $reason, 'received');
                                     
                                     // Deduct balance for plan

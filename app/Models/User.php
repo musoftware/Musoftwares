@@ -109,24 +109,6 @@ class User extends Authenticatable
             ->withTimestamps();
     }
 
-    public function client()
-    {
-        // Uses user_id FK (added in fix migration 2026_05_20_000001).
-        // Falls back to email match for legacy records that pre-date the FK.
-        return $this->hasOne(\Modules\ERP\Models\TenantClient::class, 'user_id');
-    }
-
-    /**
-     * Resolve the ERP client profile for this user.
-     * Legacy method - retained for backward compatibility with older controllers.
-     * For platform billing, we now use the User model directly via IsPlatformClient trait.
-     */
-    public function resolveClient()
-    {
-        return \Modules\ERP\Models\TenantClient::where('user_id', $this->id)->first();
-    }
-
-
 
     public function invoices()
     {
