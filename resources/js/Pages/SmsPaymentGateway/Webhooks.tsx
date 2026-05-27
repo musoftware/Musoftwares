@@ -31,18 +31,18 @@ export default function Webhooks({ webhook }: WebhooksProps) {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        post(route('text-payment-gateway.webhook.update'));
+        post(route('sms-payment-gateway.webhook.update'));
     };
 
     const handleDelete = () => {
         if (webhook && confirm('Are you sure you want to remove this webhook?')) {
-            router.delete(route('text-payment-gateway.webhook.delete', webhook.id));
+            router.delete(route('sms-payment-gateway.webhook.delete', webhook.id));
         }
     };
 
     const handleTest = () => {
         setTesting(true);
-        router.post(route('text-payment-gateway.webhook.test'), {}, {
+        router.post(route('sms-payment-gateway.webhook.test'), {}, {
             onFinish: () => setTesting(false)
         });
     };
@@ -65,7 +65,7 @@ export default function Webhooks({ webhook }: WebhooksProps) {
                             </h1>
                             <p className="text-slate-500 mt-1">Receive real-time payment notifications on your server.</p>
                         </div>
-                        <Button variant="outline" onClick={() => router.visit(route('text-payment-gateway.index'))}>
+                        <Button variant="outline" onClick={() => router.visit(route('sms-payment-gateway.index'))}>
                             <ArrowLeft className="w-4 h-4 mr-2" />
                             Back to Dashboard
                         </Button>

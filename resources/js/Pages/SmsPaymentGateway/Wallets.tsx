@@ -21,14 +21,14 @@ export default function Wallets({ wallets }: WalletProps) {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        post(route('text-payment-gateway.wallets.store'), {
+        post(route('sms-payment-gateway.wallets.store'), {
             onSuccess: () => reset('phone_number'),
         });
     };
 
     const handleDelete = (id: number) => {
         if (confirm('Are you sure you want to remove this wallet?')) {
-            router.delete(route('text-payment-gateway.wallets.delete', id));
+            router.delete(route('sms-payment-gateway.wallets.delete', id));
         }
     };
 
@@ -50,7 +50,7 @@ export default function Wallets({ wallets }: WalletProps) {
                             </h1>
                             <p className="text-slate-500 mt-1">Register the phone numbers or aliases where you receive money.</p>
                         </div>
-                        <Button variant="outline" onClick={() => router.visit(route('text-payment-gateway.index'))}>
+                        <Button variant="outline" onClick={() => router.visit(route('sms-payment-gateway.index'))}>
                             <ArrowLeft className="w-4 h-4 mr-2" />
                             Back to Dashboard
                         </Button>

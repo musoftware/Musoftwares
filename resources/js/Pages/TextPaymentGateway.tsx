@@ -113,7 +113,7 @@ export default function TextPaymentGateway({ devices, webhook, token, stats, rec
                                 <CardDescription>Connect Android phones to instantly read SMS receipts from local mobile wallets (e.g., Vodafone Cash).</CardDescription>
                             </CardHeader>
                             <CardContent>
-                                <Button className="w-full bg-slate-900 hover:bg-slate-800" onClick={() => router.visit(route('text-payment-gateway.devices'))}>
+                                <Button className="w-full bg-slate-900 hover:bg-slate-800" onClick={() => router.visit(route('sms-payment-gateway.devices'))}>
                                     Manage Devices <ArrowRight className="w-4 h-4 ml-2" />
                                 </Button>
                             </CardContent>
@@ -127,10 +127,10 @@ export default function TextPaymentGateway({ devices, webhook, token, stats, rec
                                 <CardDescription>Integrate your website or app. Get real-time webhook notifications for new payments.</CardDescription>
                             </CardHeader>
                             <CardContent className="flex gap-2">
-                                <Button variant="outline" className="w-full" onClick={() => router.visit(route('text-payment-gateway.webhooks'))}>
+                                <Button variant="outline" className="w-full" onClick={() => router.visit(route('sms-payment-gateway.webhooks'))}>
                                     Webhooks
                                 </Button>
-                                <Button variant="outline" className="w-full" onClick={() => router.visit(route('text-payment-gateway.verification'))}>
+                                <Button variant="outline" className="w-full" onClick={() => router.visit(route('sms-payment-gateway.verification'))}>
                                     API Keys
                                 </Button>
                             </CardContent>
@@ -145,7 +145,7 @@ export default function TextPaymentGateway({ devices, webhook, token, stats, rec
                                     <CardTitle className="text-lg">Recent Payments</CardTitle>
                                     <CardDescription>Real-time payment receipts captured from your devices.</CardDescription>
                                 </div>
-                                <Button variant="ghost" size="sm" onClick={() => router.visit(route('text-payment-gateway.wallets'))} className="text-indigo-600 hover:text-indigo-700">
+                                <Button variant="ghost" size="sm" onClick={() => router.visit(route('sms-payment-gateway.wallets'))} className="text-indigo-600 hover:text-indigo-700">
                                     View All Payments <ArrowRight className="w-4 h-4 ml-1" />
                                 </Button>
                             </div>

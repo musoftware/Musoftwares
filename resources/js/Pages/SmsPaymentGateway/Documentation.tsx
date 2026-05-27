@@ -20,7 +20,7 @@ export default function Documentation() {
                             </h1>
                             <p className="text-slate-500 mt-1">Learn how to connect and automate your systems with Text Payment Gateway.</p>
                         </div>
-                        <Button variant="outline" onClick={() => router.visit(route('text-payment-gateway.index'))}>
+                        <Button variant="outline" onClick={() => router.visit(route('sms-payment-gateway.index'))}>
                             <ArrowLeft className="w-4 h-4 mr-2" />
                             Back to Dashboard
                         </Button>
@@ -59,7 +59,7 @@ export default function Documentation() {
                                 - <code>redirect_url</code>: (Optional) URL to redirect the user after a successful payment
                             </p>
 
-                            <Button className="mt-6 bg-indigo-600 hover:bg-indigo-700" onClick={() => router.visit(route('text-payment-gateway.integration-tester'))}>
+                            <Button className="mt-6 bg-indigo-600 hover:bg-indigo-700" onClick={() => router.visit(route('sms-payment-gateway.integration-tester'))}>
                                 Go to Integration Tester
                             </Button>
                         </CardContent>

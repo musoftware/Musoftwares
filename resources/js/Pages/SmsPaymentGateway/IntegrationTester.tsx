@@ -29,7 +29,7 @@ export default function IntegrationTester({ webhook, token, verificationSecret }
         setResult(null);
 
         try {
-            const response = await fetch(route('text-payment-gateway.integration-tester.run'), {
+            const response = await fetch(route('sms-payment-gateway.integration-tester.run'), {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -68,7 +68,7 @@ export default function IntegrationTester({ webhook, token, verificationSecret }
                             </h1>
                             <p className="text-slate-500 mt-1">Simulate API calls to verify your application's handling of Text Payment Gateway payloads.</p>
                         </div>
-                        <Button variant="outline" onClick={() => router.visit(route('text-payment-gateway.index'))}>
+                        <Button variant="outline" onClick={() => router.visit(route('sms-payment-gateway.index'))}>
                             <ArrowLeft className="w-4 h-4 mr-2" />
                             Back to Dashboard
                         </Button>

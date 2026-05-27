@@ -31,12 +31,12 @@ export default function Device({ device, transactions }: DeviceProps) {
 
     const handleClearTransactions = () => {
         if (confirm('Wipe all logs for this terminal?')) {
-            router.delete(route('text-payment-gateway.clear-transactions', device.id));
+            router.delete(route('sms-payment-gateway.clear-transactions', device.id));
         }
     };
 
     const handleToggleSpoof = () => {
-        router.patch(route('text-payment-gateway.toggle-spoof-detection', device.id));
+        router.patch(route('sms-payment-gateway.toggle-spoof-detection', device.id));
     };
 
     const mask = (value: string | null | undefined, type: string) => {
@@ -87,7 +87,7 @@ export default function Device({ device, transactions }: DeviceProps) {
                                 {maskData ? <EyeOff className="w-4 h-4 mr-2" /> : <Eye className="w-4 h-4 mr-2" />}
                                 {maskData ? 'Show Stats' : 'Hide Stats'}
                             </Button>
-                            <Button variant="outline" onClick={() => router.visit(route('text-payment-gateway.index'))}>
+                            <Button variant="outline" onClick={() => router.visit(route('sms-payment-gateway.index'))}>
                                 <ArrowLeft className="w-4 h-4 mr-2" />
                                 Back
                             </Button>

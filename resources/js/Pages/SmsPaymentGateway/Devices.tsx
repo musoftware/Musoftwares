@@ -12,7 +12,7 @@ interface DevicesProps {
 export default function Devices({ devices }: DevicesProps) {
     const handleDelete = (id: number) => {
         if (confirm('Are you sure you want to disconnect and remove this device?')) {
-            router.delete(route('text-payment-gateway.delete-device', id));
+            router.delete(route('sms-payment-gateway.delete-device', id));
         }
     };
 
@@ -30,7 +30,7 @@ export default function Devices({ devices }: DevicesProps) {
                             </h1>
                             <p className="text-slate-500 mt-1">Manage all Android phones connected to your Payment Gateway to read SMS receipts.</p>
                         </div>
-                        <Button variant="outline" onClick={() => router.visit(route('text-payment-gateway.index'))}>
+                        <Button variant="outline" onClick={() => router.visit(route('sms-payment-gateway.index'))}>
                             <ArrowLeft className="w-4 h-4 mr-2" />
                             Back to Dashboard
                         </Button>
@@ -59,7 +59,7 @@ export default function Devices({ devices }: DevicesProps) {
                                                 </div>
                                             </div>
                                             <div className="flex sm:flex-col gap-2 mt-4 sm:mt-0 items-end">
-                                                <Button size="sm" variant="outline" className="w-full" onClick={() => router.visit(route('text-payment-gateway.device', device.id))}>
+                                                <Button size="sm" variant="outline" className="w-full" onClick={() => router.visit(route('sms-payment-gateway.device', device.id))}>
                                                     <Eye className="w-4 h-4 mr-2" /> Inspect
                                                 </Button>
                                                 <Button size="sm" variant="destructive" className="w-full" onClick={() => handleDelete(device.id)}>

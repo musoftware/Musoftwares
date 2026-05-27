@@ -30,23 +30,23 @@ export default function TestMode({ testModeEnabled, webhook, testTransactionsCou
     });
 
     const handleToggle = () => {
-        router.post(route('text-payment-gateway.test-mode.toggle'));
+        router.post(route('sms-payment-gateway.test-mode.toggle'));
     };
 
     const handleClear = () => {
         if (confirm('Delete all mock transactions generated in Test Mode?')) {
-            router.delete(route('text-payment-gateway.test-mode.clear-data'));
+            router.delete(route('sms-payment-gateway.test-mode.clear-data'));
         }
     };
 
     const handleSmsSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        postSms(route('text-payment-gateway.test-mode.create-transaction'));
+        postSms(route('sms-payment-gateway.test-mode.create-transaction'));
     };
 
     const handleHookSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        postHook(route('text-payment-gateway.test-mode.send-webhook'));
+        postHook(route('sms-payment-gateway.test-mode.send-webhook'));
     };
 
     return (
@@ -63,7 +63,7 @@ export default function TestMode({ testModeEnabled, webhook, testTransactionsCou
                             </h1>
                             <p className="text-slate-500 mt-1">Safely simulate incoming SMS payloads and test your application integrations.</p>
                         </div>
-                        <Button variant="outline" onClick={() => router.visit(route('text-payment-gateway.index'))}>
+                        <Button variant="outline" onClick={() => router.visit(route('sms-payment-gateway.index'))}>
                             <ArrowLeft className="w-4 h-4 mr-2" />
                             Back to Dashboard
                         </Button>

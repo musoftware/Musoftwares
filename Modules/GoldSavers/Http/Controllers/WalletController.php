@@ -49,4 +49,39 @@ class WalletController extends Controller
 
         return redirect()->back()->with('success', 'Wallet created successfully.');
     }
+    public function show(GoldWallet $wallet)
+    {
+        if ($wallet->user_id !== Auth::id()) {
+            abort(403);
+        }
+
+        $wallet->load('transactions');
+
+        return Inertia::render('GoldSavers/Wallets/Show', [
+            'wallet' => $wallet
+        ]);
+    }
+
+    public function addTransaction(Request $request, GoldWallet $wallet)
+    {
+        if ($wallet->user_id !== Auth::id()) {
+            abort(403);
+        }
+
+        $validated = $request->validate([
+            'type' => 'required|in:buy,sell',
+            'grams' => 'required|numeric|min:0.01',
+            'karat' => 'required|integer',
+            'price_per_gram' => 'required|numeric|min:0.01',
+            'fees' => 'nullable|numeric|min:0',
+            'transaction_date' => 'nullable|date',
+            'notes' => 'nullable|string',
+        ]);
+
+        $validated['total_amount'] = ($validated['grams'] * $validated['price_per_gram']) + ($validated['fees'] ?? 0);
+        
+        $this->walletService->addTransaction($wallet, $validated);
+
+        return redirect()->back()->with('success', 'Transaction added successfully.');
+    }
 }

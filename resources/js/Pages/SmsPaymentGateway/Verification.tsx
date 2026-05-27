@@ -25,7 +25,7 @@ export default function Verification({ token }: VerificationProps) {
                             </h1>
                             <p className="text-slate-500 mt-1">Manage Personal Access Tokens used to authenticate API requests.</p>
                         </div>
-                        <Button variant="outline" onClick={() => router.visit(route('text-payment-gateway.index'))}>
+                        <Button variant="outline" onClick={() => router.visit(route('sms-payment-gateway.index'))}>
                             <ArrowLeft className="w-4 h-4 mr-2" />
                             Back to Dashboard
                         </Button>
