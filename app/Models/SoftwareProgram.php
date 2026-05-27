@@ -109,13 +109,5 @@ class SoftwareProgram extends Model
         return preg_replace("/[\r|\n]{3,}/", "\n\n", $this->description);
     }
 
-    /**
-     * Get the memberships that include this software program.
-     */
-    public function memberships()
-    {
-        return $this->belongsToMany(Membership::class, 'membership_programs', 'software_program_id', 'membership_id')
-                    ->withTimestamps();
-    }
 }
 

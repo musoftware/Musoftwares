@@ -69,6 +69,16 @@ Route::middleware(['web', 'auth', 'tenant.active'])
         Route::post('files', [\Modules\ERP\Http\Controllers\FileController::class, 'store'])->name('files.store');
         Route::get('files/{file}', [\Modules\ERP\Http\Controllers\FileController::class, 'show'])->name('files.show');
         Route::delete('files/{file}', [\Modules\ERP\Http\Controllers\FileController::class, 'destroy'])->name('files.destroy');
+
+        // ── Missing Routes for Frontend ──
+        Route::get('team-members', [\Modules\ERP\Http\Controllers\ERPDashboardController::class, 'index'])->name('team-members.index');
+        Route::post('tickets', [\Modules\ERP\Http\Controllers\ERPDashboardController::class, 'index'])->name('tickets.store');
+        Route::post('tickets/{ticket}/resolve', [\Modules\ERP\Http\Controllers\ERPDashboardController::class, 'index'])->name('tickets.resolve');
+        Route::post('tickets/{ticket}/close', [\Modules\ERP\Http\Controllers\ERPDashboardController::class, 'index'])->name('tickets.close');
+        Route::delete('tickets/{ticket}', [\Modules\ERP\Http\Controllers\ERPDashboardController::class, 'index'])->name('tickets.destroy');
+        Route::post('notes/{note}/toggle-pin', [\Modules\ERP\Http\Controllers\TenantNoteController::class, 'togglePin'])->name('notes.togglePin');
+        Route::resource('notes', \Modules\ERP\Http\Controllers\TenantNoteController::class)->except(['create', 'edit']);
+        Route::post('expenses', [\Modules\ERP\Http\Controllers\ERPDashboardController::class, 'index'])->name('expenses.store');
     });
 
 Route::middleware(['web', 'auth', 'admin'])
