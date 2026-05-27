@@ -110,7 +110,8 @@ export default function Explore({ tools, categories, subscribedSlugs, hasBrowser
         newWallpaper: string,
         city = prayerCity,
         country = prayerCountry,
-        method = prayerMethod
+        method = prayerMethod,
+        oneClick = openWithOneClick
     ) => {
         axios.post(route('tools.workspace.settings.save'), {
             settings: {
@@ -119,7 +120,8 @@ export default function Explore({ tools, categories, subscribedSlugs, hasBrowser
                 wallpaperUrl: newWallpaper,
                 prayerCity: city,
                 prayerCountry: country,
-                prayerMethod: method
+                prayerMethod: method,
+                openWithOneClick: oneClick
             }
         }).catch(err => console.error("Failed to save workspace settings:", err));
     };
@@ -131,6 +133,12 @@ export default function Explore({ tools, categories, subscribedSlugs, hasBrowser
         saveSettings(desktopItems, showPrayerTimes, wallpaperUrl, city, country, method);
     };
 
+    const handleToggleOneClick = () => {
+        const newValue = !openWithOneClick;
+        setOpenWithOneClick(newValue);
+        saveSettings(desktopItems, showPrayerTimes, wallpaperUrl, prayerCity, prayerCountry, prayerMethod, newValue);
+    };
+
     // Desktop State
     const [desktopItems, setDesktopItems] = useState<DesktopItem[]>(workspaceSettings?.desktopItems || []);
     const [draggedItemId, setDraggedItemId] = useState<string | null>(null);
@@ -139,6 +147,7 @@ export default function Explore({ tools, categories, subscribedSlugs, hasBrowser
     const [isStartMenuOpen, setIsStartMenuOpen] = useState(false);
     const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
     const [wallpaperUrl, setWallpaperUrl] = useState(workspaceSettings?.wallpaperUrl || DEFAULT_WALLPAPER_URL);
+    const [openWithOneClick, setOpenWithOneClick] = useState(workspaceSettings?.openWithOneClick || false);
     
     // Window Manager State
     const [activeWindows, setActiveWindows] = useState<{ id: string; slug: string; title: string; iconUrl?: string | null; isMinimized: boolean; isMaximized: boolean; zIndex: number }[]>([]);
@@ -216,6 +225,20 @@ export default function Explore({ tools, categories, subscribedSlugs, hasBrowser
             fetchPrayerTimes();
         }
     }, [prayerCity, prayerCountry, prayerMethod]);
+
+    // Fetch Bing image if using default Unsplash wallpaper
+    useEffect(() => {
+        if (wallpaperUrl === DEFAULT_WALLPAPER_URL) {
+            fetch('/api/bing-daily-images')
+                .then(res => res.json())
+                .then(data => {
+                    if (data && data.length > 0) {
+                        setWallpaperUrl(data[0]);
+                    }
+                })
+                .catch(err => console.error("Failed to fetch bing images", err));
+        }
+    }, []);
 
     // Next Prayer Logic
     const nextPrayer = React.useMemo(() => {
@@ -744,10 +767,17 @@ export default function Explore({ tools, categories, subscribedSlugs, hasBrowser
                                     if (e.ctrlKey) {
                                         setSelectedItemIds(prev => prev.includes(item.id) ? prev.filter(i => i !== item.id) : [...prev, item.id]);
                                     } else {
-                                        setSelectedItemIds([item.id]);
+                                        if (openWithOneClick) {
+                                            handleToolClick(toolData.slug);
+                                            setSelectedItemIds([item.id]);
+                                        } else {
+                                            setSelectedItemIds([item.id]);
+                                        }
                                     }
                                 }}
-                                onDoubleClick={() => handleToolClick(toolData.slug)}
+                                onDoubleClick={() => {
+                                    if (!openWithOneClick) handleToolClick(toolData.slug);
+                                }}
                                 onDragStart={(e) => handleDragStart(e, item.id)}
                                 onDragEnd={() => setDraggedItemId(null)}
                                 style={style}
@@ -784,10 +814,17 @@ export default function Explore({ tools, categories, subscribedSlugs, hasBrowser
                                     if (e.ctrlKey) {
                                         setSelectedItemIds(prev => prev.includes(item.id) ? prev.filter(i => i !== item.id) : [...prev, item.id]);
                                     } else {
-                                        setSelectedItemIds([item.id]);
+                                        if (openWithOneClick) {
+                                            setOpenFolderId(item.id);
+                                            setSelectedItemIds([item.id]);
+                                        } else {
+                                            setSelectedItemIds([item.id]);
+                                        }
                                     }
                                 }}
-                                onDoubleClick={() => setOpenFolderId(item.id)}
+                                onDoubleClick={() => {
+                                    if (!openWithOneClick) setOpenFolderId(item.id);
+                                }}
                                 onDragStart={(e) => handleDragStart(e, item.id)}
                                 onDragEnd={() => setDraggedItemId(null)}
                                 onDragOver={(e) => handleDragOver(e, item.id)}
@@ -975,7 +1012,12 @@ export default function Explore({ tools, categories, subscribedSlugs, hasBrowser
                             emojiFallback={SLUG_EMOJI_MAP[toolData.slug] ?? '📦'}
                             isOwned={subscribedSlugs.includes(toolData.slug)}
                             isFeatured={toolData.is_featured}
-                            onClick={() => handleToolClick(toolData.slug)}
+                            onClick={() => {
+                                if (openWithOneClick) handleToolClick(toolData.slug);
+                            }}
+                            onDoubleClick={() => {
+                                if (!openWithOneClick) handleToolClick(toolData.slug);
+                            }}
                             draggable
                             onDragStart={(e) => handleDragStart(e, slug, openFolder.id)}
                             onDragEnd={() => setDraggedItemId(null)}
@@ -1086,13 +1128,22 @@ export default function Explore({ tools, categories, subscribedSlugs, hasBrowser
                 isOpen={isSettingsModalOpen}
                 onClose={() => setIsSettingsModalOpen(false)}
                 showPrayerTimes={showPrayerTimes}
-                onTogglePrayerTimes={togglePrayerTimes}
+                onTogglePrayerTimes={() => {
+                    const newValue = !showPrayerTimes;
+                    setShowPrayerTimes(newValue);
+                    saveSettings(desktopItems, newValue, wallpaperUrl);
+                }}
                 wallpaperUrl={wallpaperUrl}
-                onWallpaperChange={handleWallpaperChange}
+                onWallpaperChange={(url) => {
+                    setWallpaperUrl(url);
+                    saveSettings(desktopItems, showPrayerTimes, url);
+                }}
                 prayerCity={prayerCity}
                 prayerCountry={prayerCountry}
                 prayerMethod={prayerMethod}
                 onPrayerSettingsChange={handlePrayerSettingsChange}
+                openWithOneClick={openWithOneClick}
+                onToggleOneClick={handleToggleOneClick}
             />
 
             <ContextMenu 
