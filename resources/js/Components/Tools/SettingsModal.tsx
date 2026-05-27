@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, Image as ImageIcon, Settings as SettingsIcon } from 'lucide-react';
 
 interface SettingsModalProps {
@@ -23,8 +23,25 @@ const DEFAULT_WALLPAPERS = [
     'https://images.unsplash.com/photo-1493246507139-91e8fad9978e?q=80&w=2560&auto=format&fit=crop',
 ];
 
-export function SettingsModal({ isOpen, onClose, showPrayerTimes, onTogglePrayerTimes, wallpaperUrl, onWallpaperChange, prayerCity, prayerCountry, prayerMethod, onPrayerSettingsChange }: SettingsModalProps) {
+export function SettingsModal({ isOpen, onClose, showPrayerTimes, onTogglePrayerTimes, wallpaperUrl, onWallpaperChange, prayerCity, prayerCountry, prayerMethod, onPrayerSettingsChange, openWithOneClick, onToggleOneClick }: SettingsModalProps) {
+    const [wallpapers, setWallpapers] = useState<string[]>([]);
+
+    useEffect(() => {
+        if (isOpen && wallpapers.length === 0) {
+            fetch('/api/bing-daily-images')
+                .then(res => res.json())
+                .then(data => {
+                    if (data && data.length > 0) {
+                        setWallpapers(data.slice(0, 4));
+                    }
+                })
+                .catch(err => console.error("Failed to fetch bing images", err));
+        }
+    }, [isOpen]);
+
     if (!isOpen) return null;
+
+    const displayWallpapers = wallpapers.length > 0 ? wallpapers : DEFAULT_WALLPAPERS;
 
     return (
         <div 
@@ -49,10 +66,21 @@ export function SettingsModal({ isOpen, onClose, showPrayerTimes, onTogglePrayer
                     {/* Widget Settings */}
                     <div>
                         <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                            <span className="text-blue-400">#</span> Widgets
+                            <span className="text-blue-400">#</span> Widgets & Behavior
                         </h3>
                         <div className="flex flex-col gap-3 bg-white/5 p-4 rounded-xl border border-white/5">
                             <div className="flex items-center justify-between">
+                                <div>
+                                    <h4 className="font-medium">Open with Single Click</h4>
+                                    <p className="text-xs text-slate-400 mt-1">Open tools and folders with a single click instead of double click</p>
+                                </div>
+                                <label className="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" className="sr-only peer" checked={openWithOneClick} onChange={onToggleOneClick} />
+                                    <div className="w-11 h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
+                                </label>
+                            </div>
+                            
+                            <div className="flex items-center justify-between mt-2 pt-3 border-t border-white/10">
                                 <div>
                                     <h4 className="font-medium">Prayer Times</h4>
                                     <p className="text-xs text-slate-400 mt-1">Display local prayer times in the taskbar</p>
@@ -119,7 +147,7 @@ export function SettingsModal({ isOpen, onClose, showPrayerTimes, onTogglePrayer
                             <ImageIcon className="w-5 h-5 text-purple-400" /> Wallpaper
                         </h3>
                         <div className="grid grid-cols-2 gap-4">
-                            {DEFAULT_WALLPAPERS.map((url, idx) => (
+                            {displayWallpapers.map((url, idx) => (
                                 <div 
                                     key={idx}
                                     onClick={() => onWallpaperChange(url)}

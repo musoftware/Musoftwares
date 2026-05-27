@@ -67,3 +67,31 @@ Route::get('t/unsubscribe/{payload}', [\App\Http\Controllers\TrackerController::
 
 Route::post('tracker/sync', [\App\Http\Controllers\TrackerController::class, 'sync'])
     ->name('api.tracker.sync');
+
+// ── Public: Bing daily images ────────────────────────────────────────────────
+// Fetches daily images from Bing for backgrounds (e.g. desktop wallpapers)
+Route::get('bing-daily-images', function () {
+    $images = \Illuminate\Support\Facades\Cache::remember('auth_bing_images', 3600, function () {
+        try {
+            $response = \Illuminate\Support\Facades\Http::timeout(5)->get('https://www.bing.com/HPImageArchive.aspx', [
+                'format' => 'js',
+                'idx' => 0,
+                'n' => 8,
+                'mkt' => 'en-US',
+            ]);
+            if (!$response->successful()) {
+                return [];
+            }
+            $data = $response->json();
+            $list = $data['images'] ?? [];
+            return array_values(array_filter(array_map(function ($img) {
+                $url = $img['url'] ?? '';
+                return $url ? 'https://www.bing.com' . $url : null;
+            }, $list)));
+        } catch (\Throwable $e) {
+            return [];
+        }
+    });
+    return response()->json($images ?: []);
+})->name('api.bing-daily-images');
+
