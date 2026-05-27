@@ -328,6 +328,7 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
     Route::prefix('business/recurring')->group(function () {
         // Costs
         Route::get('costs', [\App\Http\Controllers\Admin\RecurringBusinessController::class, 'recurring_costs'])->name('recurring_costs.index');
+        Route::get('costs/create', [\App\Http\Controllers\Admin\RecurringBusinessController::class, 'create_recurring_costs'])->name('recurring_costs.create');
         Route::post('costs', [\App\Http\Controllers\Admin\RecurringBusinessController::class, 'store_recurring_costs'])->name('recurring_costs.store');
         Route::get('costs/edit/{id}', [\App\Http\Controllers\Admin\RecurringBusinessController::class, 'edit_recurring_costs'])->name('recurring_costs.edit');
         Route::put('costs/{id}', [\App\Http\Controllers\Admin\RecurringBusinessController::class, 'update_recurring_costs'])->name('recurring_costs.update');
@@ -400,10 +401,7 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
         Route::post('contracts/{contract}/status', [\App\Http\Controllers\Admin\FreelanceContractController::class, 'updateStatus'])->name('contracts.status');
     });
 
-    // ── Service Landing Pages ───────────────────────────────────────
-    Route::get('/service-landing-pages', [\Modules\Marketplace\Http\Controllers\Admin\AdminServiceLandingPageController::class, 'index'])->name('service-landing-pages.index');
-    Route::post('/service-landing-pages/{landingPage}/toggle-status', [\Modules\Marketplace\Http\Controllers\Admin\AdminServiceLandingPageController::class, 'toggleStatus'])->name('service-landing-pages.toggle-status');
-    Route::delete('/service-landing-pages/{landingPage}', [\Modules\Marketplace\Http\Controllers\Admin\AdminServiceLandingPageController::class, 'destroy'])->name('service-landing-pages.destroy');
+
 
     // ── User Management (Full Admin Control) ────────────────────────
     // Recovered from old project: Admin/UsersController

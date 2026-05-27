@@ -15,7 +15,7 @@
                     </p>
                 </div>
                 <div>
-                    <a href="{{ route('client.service-landing-pages.index') }}" class="btn btn-outline-secondary">
+                    <a href="{{ route('marketplace.landing-pages.index') }}" class="btn btn-outline-secondary">
                         <i class="fas fa-arrow-left me-1"></i> Back to Landing Pages
                     </a>
                     <a href="{{ route('services.landing-page.edit', ['service' => $service, 'landingPage' => $landingPage]) }}" class="btn btn-primary">

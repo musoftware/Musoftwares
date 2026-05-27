@@ -46,6 +46,29 @@ class RecurringBusinessController extends Controller
         ]);
     }
 
+    public function create_recurring_costs()
+    {
+        $currencies = Currency::all();
+        
+        $costReasons = CostTransaction::select('reason')->distinct()->pluck('reason');
+        $recurringReasons = RecurringCost::select('reason')->distinct()->pluck('reason');
+        $categories = $costReasons->concat($recurringReasons)->unique()->filter()->values();
+
+        $bCurrencyId = \App\Models\AdminSettings::business_currency();
+        $bCurrency = Currency::find($bCurrencyId);
+
+        $stats = [
+            'business_currency_code' => $bCurrency ? $bCurrency->currency : 'EGP',
+            'business_currency_symbol' => $bCurrency ? $bCurrency->symbol : 'e£',
+        ];
+
+        return Inertia::render('Admin/Business/RecurringCosts/Create', [
+            'currencies' => $currencies,
+            'categories' => $categories,
+            'stats' => $stats,
+        ]);
+    }
+
     public function store_recurring_costs(Request $request)
     {
         $request->validate([

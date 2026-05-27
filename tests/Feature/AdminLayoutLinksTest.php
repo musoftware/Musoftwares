@@ -40,6 +40,7 @@ class AdminLayoutLinksTest extends TestCase
             route('admin.serial-user-devices.index'),
             route('admin.resellers.index'),        // was: admin.tools.reseller.index
             route('admin.marketplace.orders.index'),
+            route('admin.tasks.client-tasks'),
         ];
 
         $failedUrls = [];

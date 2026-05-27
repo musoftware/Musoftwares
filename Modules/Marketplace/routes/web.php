@@ -50,8 +50,8 @@ Route::middleware(['web', 'auth'])
 
 // -- Admin Routes --------------------------------------------------
 Route::middleware(['web', 'auth', 'admin'])
-    ->prefix('admin')
-    ->name('admin.')
+    ->prefix('admin/marketplace')
+    ->name('admin.marketplace.')
     ->group(function () {
         Route::get('/service-landing-pages', [\Modules\Marketplace\Http\Controllers\Admin\AdminServiceLandingPageController::class, 'index'])->name('service-landing-pages.index');
         Route::post('/service-landing-pages/{landingPage}/toggle-status', [\Modules\Marketplace\Http\Controllers\Admin\AdminServiceLandingPageController::class, 'toggleStatus'])->name('service-landing-pages.toggle-status');

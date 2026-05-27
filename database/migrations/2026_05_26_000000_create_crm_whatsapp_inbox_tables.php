@@ -127,7 +127,9 @@ return new class extends Migration
         });
 
         // Add fulltext index for message search
-        DB::statement('ALTER TABLE crm_whatsapp_messages ADD FULLTEXT INDEX crm_wa_messages_body_fulltext (body)');
+        if (\Illuminate\Support\Facades\DB::connection()->getDriverName() === 'mysql') {
+            \Illuminate\Support\Facades\DB::statement('ALTER TABLE crm_whatsapp_messages ADD FULLTEXT INDEX crm_wa_messages_body_fulltext (body)');
+        }
 
         // ── 5. Participants ──────────────────────────────────────────
         Schema::create('crm_whatsapp_participants', function (Blueprint $table) {

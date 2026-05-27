@@ -200,11 +200,9 @@ export default function Index({ tickets, filters, stats }: Props) {
             className: 'w-[50px] text-right',
             render: (t: Ticket) => (
                 <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0 hover:bg-slate-100">
-                            <span className="sr-only">Actions</span>
-                            <MoreHorizontal className="h-4 w-4 text-slate-400" />
-                        </Button>
+                    <DropdownMenuTrigger render={<Button variant="ghost" className="h-8 w-8 p-0 hover:bg-slate-100" />}>
+                        <span className="sr-only">Actions</span>
+                        <MoreHorizontal className="h-4 w-4 text-slate-400" />
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-44">
                         <DropdownMenuLabel className="text-xs text-slate-500">Actions</DropdownMenuLabel>

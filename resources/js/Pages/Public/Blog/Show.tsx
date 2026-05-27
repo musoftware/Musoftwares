@@ -71,8 +71,8 @@ export default function Show({ article }: ShowProps) {
     return (
         <PublicLayout>
             <Head>
-                <title>{article.title} — musoftware Blog</title>
-                <meta name="description" content={article.excerpt || article.title} />
+                <title>{`${article?.title || ''} — musoftware Blog`}</title>
+                <meta name="description" content={article?.excerpt || article?.title || ''} />
             </Head>
 
             {/* Reading progress indicator */}

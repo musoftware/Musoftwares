@@ -114,17 +114,11 @@ class DashboardService
 
     public function getSystemHealth(): array
     {
-        $whatsappUsers = User::where('whatsapp_balance_egp', '>', 0)->count();
-        $totalWhatsappBalance = User::sum('whatsapp_balance_egp');
-
         return [
             'database' => 'Connected',
             'serverLoad' => function_exists('sys_getloadavg') ? implode(', ', sys_getloadavg()) : 'N/A',
             'diskUsage' => function_exists('disk_free_space') ? round((disk_free_space("/") / max(disk_total_space("/"), 1)) * 100, 1) . '% free' : 'N/A',
             'memoryUsage' => round(memory_get_usage() / 1048576, 2) . ' MB',
-            
-            'whatsappUsers' => $whatsappUsers,
-            'totalWhatsappBalance' => round($totalWhatsappBalance, 2),
         ];
     }
 

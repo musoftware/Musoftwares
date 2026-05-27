@@ -31,7 +31,6 @@ const items = [
         { title: "Projects", url: "/admin/projects" },
         { title: "Plans", url: "/admin/plans" },
         { title: "Blog Articles", url: "/admin/blog-articles" },
-        { title: "Landing Pages", url: "/admin/service-landing-pages" },
     ]
   },
   { 
@@ -69,6 +68,7 @@ const items = [
         { title: "Tickets", url: "/admin/tickets" },
         { title: "Tasks List", url: "/admin/tasks/as_list" },
         { title: "Task Calendar", url: "/admin/tasks/calendar" },
+        { title: "Client Tasks", url: "/admin/tasks/client-tasks" },
         { title: "Busy Times", url: "/admin/busy-times" },
         { title: "Employee Todos", url: "/admin/employee-todos" },
         { title: "Job Center", url: "/admin/job-tasks" },
@@ -87,6 +87,7 @@ const items = [
         { title: "Pending Services", url: "/admin/marketplace/pending-services" },
         { title: "Categories", url: "/admin/marketplace/categories" },
         { title: "Orders", url: "/admin/marketplace/orders" },
+        { title: "Landing Pages", url: "/admin/marketplace/service-landing-pages" },
     ]
   },
   { 

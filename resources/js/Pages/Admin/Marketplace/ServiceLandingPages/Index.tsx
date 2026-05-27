@@ -35,12 +35,12 @@ interface Props {
 
 export default function Index({ servicesWithLandingPages, filters, auth }: Props) {
     const toggleStatus = (id: number) => {
-        router.post(route("admin.service-landing-pages.toggle-status", id), {}, { preserveScroll: true });
+        router.post(route("admin.marketplace.service-landing-pages.toggle-status", id), {}, { preserveScroll: true });
     };
 
     const deletePage = (id: number) => {
         if (confirm("Are you sure you want to delete this landing page?")) {
-            router.delete(route("admin.service-landing-pages.destroy", id), { preserveScroll: true });
+            router.delete(route("admin.marketplace.service-landing-pages.destroy", id), { preserveScroll: true });
         }
     };
 
