@@ -185,15 +185,15 @@ class Task extends Model
         return $this->hasMany(Todo::class);
     }
 
-    public function todo_swimlane()
+    /* public function todo_swimlane()
     {
         return $this->belongsTo(TodoSwimlane::class, 'swimlane_id');
-    }
+    } */
 
-    public function todo_swimlane_team()
+    /* public function todo_swimlane_team()
     {
         return optional($this->todo_swimlane)->title ?? 'None';
-    }
+    } */
 
     public function sharedUsers()
     {

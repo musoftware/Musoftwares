@@ -59,58 +59,32 @@ class SubscriptionController extends Controller
             return round($usdPrice * $rate, 2);
         };
 
-        $serviceItems = [
-            [
-                'id' => 'erp',
-                'slug' => 'erp',
-                'name' => 'ERP',
-                'type' => 'module',
-                'description' => 'Enterprise Resource Planning system for full business management.',
-                'monthly_price' => $convertPrice($basePricesEGP['erp'] / 10),
-                'yearly_price' => $convertPrice($basePricesEGP['erp']),
-                'icon' => 'Building2'
-            ],
-            [
-                'id' => 'crm',
-                'slug' => 'crm',
-                'name' => 'CRM',
-                'type' => 'module',
-                'description' => 'Customer Relationship Management for leads and tickets.',
-                'monthly_price' => $convertPrice($basePricesEGP['crm'] / 10),
-                'yearly_price' => $convertPrice($basePricesEGP['crm']),
-                'icon' => 'MessageSquare'
-            ],
-            [
-                'id' => 'sms-payment-gateway',
-                'slug' => 'sms-payment-gateway',
-                'name' => 'SMS Payment Gateway',
-                'type' => 'module',
-                'description' => 'Automated SMS marketing and gateway integration.',
-                'monthly_price' => $convertPrice($basePricesEGP['sms-payment-gateway'] / 10),
-                'yearly_price' => $convertPrice($basePricesEGP['sms-payment-gateway']),
-                'icon' => 'Zap'
-            ],
-            [
-                'id' => 'gold-saver',
-                'slug' => 'gold-saver',
-                'name' => 'Gold Saver',
-                'type' => 'module',
-                'description' => 'Gold savings and investment tracking system.',
-                'monthly_price' => $convertPrice($basePricesEGP['gold-saver'] / 10),
-                'yearly_price' => $convertPrice($basePricesEGP['gold-saver']),
-                'icon' => 'Sparkles'
-            ],
-            [
-                'id' => 'booking',
-                'slug' => 'booking',
-                'name' => 'Booking',
-                'type' => 'module',
-                'description' => 'Appointment and reservation booking engine.',
-                'monthly_price' => $convertPrice($basePricesEGP['booking'] / 10),
-                'yearly_price' => $convertPrice($basePricesEGP['booking']),
-                'icon' => 'Check'
-            ]
+        $moduleMetadata = [
+            'erp' => ['name' => 'ERP', 'description' => 'Enterprise Resource Planning system for full business management.', 'icon' => 'Building2'],
+            'crm' => ['name' => 'CRM', 'description' => 'Customer Relationship Management for leads and tickets.', 'icon' => 'MessageSquare'],
+            'sms-payment-gateway' => ['name' => 'SMS Payment Gateway', 'description' => 'Automated SMS marketing and gateway integration.', 'icon' => 'Zap'],
+            'gold-saver' => ['name' => 'Gold Saver', 'description' => 'Gold savings and investment tracking system.', 'icon' => 'Sparkles'],
+            'booking' => ['name' => 'Booking', 'description' => 'Appointment and reservation booking engine.', 'icon' => 'Check'],
+            'affiliate-pos' => ['name' => 'Affiliate & POS', 'description' => 'Online Storefront and Point of Sale system.', 'icon' => 'Store'],
         ];
+
+        $serviceItems = [];
+
+        foreach ($basePricesEGP as $slug => $price) {
+            if ($slug === 'tool') continue; // Handled separately
+            $meta = $moduleMetadata[$slug] ?? ['name' => ucfirst(str_replace('-', ' ', $slug)), 'description' => '', 'icon' => 'Layers'];
+            
+            $serviceItems[] = [
+                'id' => $slug,
+                'slug' => $slug,
+                'name' => $meta['name'],
+                'type' => 'module',
+                'description' => $meta['description'],
+                'monthly_price' => $convertPrice($price / 10),
+                'yearly_price' => $convertPrice($price),
+                'icon' => $meta['icon']
+            ];
+        }
 
         // ADD-ONS INJECTION
         $addonsConfig = config('saas.addons', []);

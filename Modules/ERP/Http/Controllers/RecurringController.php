@@ -31,8 +31,9 @@ class RecurringController extends Controller
         $income  = $entries->where('type', 'income');
         $expense = $entries->where('type', 'expense');
 
-        // H4 fix: resolve business currency from user preference, not session
-        $businessCurrency = Auth::user()->preferred_currency ?? config('app.business_currency', 'USD');
+        // H4 fix: resolve business currency from tenant's currency
+        $currency = \App\Models\Currency::find($tenant->currency_id);
+        $businessCurrency = $currency ? $currency->currency : config('app.business_currency', 'USD');
 
         $stats = [
             'income' => [
@@ -80,8 +81,9 @@ class RecurringController extends Controller
 
     public function create()
     {
-        // H4 fix: business currency from user preference
-        $businessCurrency = Auth::user()->preferred_currency ?? config('app.business_currency', 'USD');
+        $tenant = Tenant::where('user_id', Auth::id())->firstOrFail();
+        $currency = \App\Models\Currency::find($tenant->currency_id);
+        $businessCurrency = $currency ? $currency->currency : config('app.business_currency', 'USD');
         return Inertia::render('ERP/Recurring/Create', [
             'business_currency' => $businessCurrency,
         ]);
@@ -102,8 +104,10 @@ class RecurringController extends Controller
             'ends_at' => 'nullable|date|after_or_equal:starts_at',
         ]);
 
-        // H4 fix: resolve business currency from user preference
-        $businessCurrency = Auth::user()->preferred_currency ?? config('app.business_currency', 'USD');
+        // H4 fix: resolve business currency from tenant
+        $tenant = Tenant::where('user_id', Auth::id())->firstOrFail();
+        $currency = \App\Models\Currency::find($tenant->currency_id);
+        $businessCurrency = $currency ? $currency->currency : config('app.business_currency', 'USD');
         $conversion = $this->exchangeRateService->convertAmount(
             (float)$validated['amount'],
             $validated['amount_currency'],
@@ -116,7 +120,7 @@ class RecurringController extends Controller
         $validated['exchange_rate']      = $conversion[4];
         $validated['exchange_rate_date'] = $conversion[5];
         $validated['status']             = 'active';
-        $validated['tenant_id']          = Tenant::where('user_id', Auth::id())->firstOrFail()->id;
+        $validated['tenant_id']          = $tenant->id;
         $validated['created_by']         = Auth::id();
 
         $validated['next_run_at'] = $this->calculateFirstRun(
@@ -174,7 +178,9 @@ class RecurringController extends Controller
     {
         $this->authorizeTenantRecurringEntry($recurring);
 
-        $businessCurrency = Auth::user()->preferred_currency ?? config('app.business_currency', 'USD');
+        $tenant = Tenant::where('user_id', Auth::id())->firstOrFail();
+        $currency = \App\Models\Currency::find($tenant->currency_id);
+        $businessCurrency = $currency ? $currency->currency : config('app.business_currency', 'USD');
         return Inertia::render('ERP/Recurring/Edit', [
             'entry' => $recurring,
             'business_currency' => $businessCurrency,
@@ -199,7 +205,9 @@ class RecurringController extends Controller
             'status' => 'required|in:active,paused,cancelled',
         ]);
 
-        $businessCurrency = Auth::user()->preferred_currency ?? config('app.business_currency', 'USD');
+        $tenant = Tenant::where('user_id', Auth::id())->firstOrFail();
+        $currency = \App\Models\Currency::find($tenant->currency_id);
+        $businessCurrency = $currency ? $currency->currency : config('app.business_currency', 'USD');
         $conversion = $this->exchangeRateService->convertAmount(
             (float)$validated['amount'],
             $validated['amount_currency'],

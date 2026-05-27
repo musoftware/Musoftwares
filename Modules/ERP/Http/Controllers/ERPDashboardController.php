@@ -28,13 +28,14 @@ class ERPDashboardController extends Controller
     public function index()
     {
         $user = Auth::user();
-        $businessCurrency = $user->preferred_currency ?? config('app.business_currency', 'USD');
-
         // Resolve tenant for the user, redirect to onboarding if not existing
         $tenant = Tenant::where('user_id', $user->id)->first();
         if (!$tenant) {
             return redirect()->route('erp.onboarding');
         }
+
+        $currency = \App\Models\Currency::find($tenant->currency_id);
+        $businessCurrency = $currency ? $currency->currency : config('app.business_currency', 'USD');
         $tenantId = $tenant->id;
 
         // ── Revenue Statistics ─────────────────────────────────────
@@ -67,8 +68,8 @@ class ERPDashboardController extends Controller
                 ->limit(10)
                 ->get()
                 ->map(function ($client) {
-                    $totalInvoiced = Invoice::where('client_id', $client->id)->sum('amount');
-                    $totalPaid = Invoice::where('client_id', $client->id)->where('status', 'paid')->sum('amount');
+                    $totalInvoiced = Invoice::where('client_id', $client->id)->sum('business_amount');
+                    $totalPaid = Invoice::where('client_id', $client->id)->where('status', 'paid')->sum('business_amount');
                     return [
                         'id' => $client->id,
                         'name' => $client->name,
@@ -450,16 +451,15 @@ class ERPDashboardController extends Controller
 
         try {
             DB::transaction(function () use ($request, $user) {
-                // 1. Create the Tenant
                 $tenant = Tenant::create([
                     'user_id' => $user->id,
                     'name' => $request->businessName,
                     'status' => 'active',
+                    'currency_id' => \App\Models\Currency::where('currency', $request->baseCurrency)->value('id'),
                 ]);
 
-                // 2. Set user global currency preference
-                $user->preferred_currency = $request->baseCurrency;
-                $user->save();
+                // 2. We no longer set user global currency preference here.
+                // The currency is tied strictly to the tenant above.
 
                 // 3. Create first client if provided
                 if ($request->clientName) {
@@ -535,8 +535,14 @@ class ERPDashboardController extends Controller
         $tenant->name = $validated['workspaceName'];
         $tenant->save();
 
-        // Optionally save taxRate and defaultCurrency to user profile or meta if required
-        // For now, we update the primary workspace brand name
+        // Update tenant's default currency if provided
+        if (isset($validated['defaultCurrency'])) {
+            $currency = \App\Models\Currency::where('currency', $validated['defaultCurrency'])->first();
+            if ($currency) {
+                $tenant->currency_id = $currency->id;
+                $tenant->save();
+            }
+        }
 
         return redirect()->back()->with('success', 'Workspace settings updated successfully.');
     }

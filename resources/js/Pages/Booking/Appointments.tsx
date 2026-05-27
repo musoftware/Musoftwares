@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import WorkspaceLayout from '@/Layouts/WorkspaceLayout';
 import { Head, useForm, router } from '@inertiajs/react';
-import { ModulePageHeader } from '@/Components/ui/ModulePageHeader';
 import { Card, CardContent } from '@/Components/ui/card';
 import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
@@ -25,7 +24,7 @@ import {
 } from "@/Components/ui/dialog";
 import { EmptyState } from '@/Components/ui/EmptyState';
 import { format } from 'date-fns';
-import { Calendar, Clock, CreditCard, ExternalLink, MoreVertical, Search, UserCircle2, Briefcase, FileText, CheckCircle, XCircle, Users, LayoutList, CalendarDays } from 'lucide-react';
+import { Calendar, Clock, CreditCard, ExternalLink, MoreVertical, Search, UserCircle2, Briefcase, FileText, CheckCircle, XCircle, Users, LayoutList, CalendarDays, CalendarOff } from 'lucide-react';
 import { SimpleCalendar } from '@/Components/Booking/SimpleCalendar';
 
 export default function Appointments({ bookings, providers, filters }: any) {
@@ -114,16 +113,17 @@ export default function Appointments({ bookings, providers, filters }: any) {
                 { id: 'appointments', label: 'Appointments', icon: Clock, href: '/booking/appointments', isActive: true },
                 { id: 'events', label: 'Event Types', icon: Calendar, href: '/booking/events', isActive: false },
                 { id: 'providers', label: 'Providers', icon: Users, href: '/booking/providers', isActive: false },
+                { id: 'exceptions', label: 'Exceptions', icon: CalendarOff, href: '/booking/exceptions', isActive: false },
             ]}
         >
             <Head title="Appointments" />
 
             <div className="max-w-6xl mx-auto py-8 px-4 sm:px-6 lg:px-8 space-y-8">
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                    <ModulePageHeader 
-                        title="Appointments" 
-                        description="Manage your bookings, consultations, and operational pipeline."
-                    />
+                    <div>
+                        <h1 className="text-2xl font-bold tracking-tight">Appointments</h1>
+                        <p className="text-muted-foreground">Manage your bookings, consultations, and operational pipeline.</p>
+                    </div>
                     
                     <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
                         <select

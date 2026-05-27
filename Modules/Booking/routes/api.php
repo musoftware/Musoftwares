@@ -78,7 +78,6 @@ Route::middleware(['auth:sanctum'])->prefix('v1')->group(function () {
 });
 
 // Unauthenticated Webhooks & Public Routes
-Route::post('/webhooks/whatsapp', [\Modules\Booking\app\Features\WhatsAppReminders\Http\Controllers\WaWebhookController::class, 'handleWebhook'])->name('webhook.whatsapp');
 
 // Booking Widgets (Public CORS Guarded)
 Route::group(['prefix' => 'public/widgets/{uuid}', 'middleware' => [\Modules\Booking\app\Features\Widget\Http\Middleware\ValidateWidgetDomain::class]], function () {

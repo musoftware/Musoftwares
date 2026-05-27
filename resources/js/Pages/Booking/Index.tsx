@@ -1,12 +1,10 @@
 import React from 'react';
 import { Head, Link } from '@inertiajs/react';
 import WorkspaceLayout from '@/Layouts/WorkspaceLayout';
-import { ModulePageHeader } from '@/Components/ui/ModulePageHeader';
-import { OperationalCard } from '@/Components/ui/OperationalCard';
 import { EmptyState } from '@/Components/ui/EmptyState';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/Components/ui/card';
 import { Badge } from '@/Components/ui/badge';
-import { Calendar, Clock, Copy, Plus, MoreHorizontal, Users } from 'lucide-react';
+import { Calendar, Clock, Copy, Plus, MoreHorizontal, Users, CalendarOff } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/Components/ui/dropdown-menu';
 import { CurrencyDisplay } from '@/Components/ui/CurrencyDisplay';
 
@@ -38,15 +36,18 @@ export default function Index({ events }: { events: EventType[] }) {
                 { id: 'appointments', label: 'Appointments', icon: Clock, href: '/booking/appointments', isActive: false },
                 { id: 'events', label: 'Event Types', icon: Calendar, href: '/booking/events', isActive: true },
                 { id: 'providers', label: 'Providers', icon: Users, href: '/booking/providers', isActive: false },
+                { id: 'exceptions', label: 'Exceptions', icon: CalendarOff, href: '/booking/exceptions', isActive: false },
             ]}
         >
             <Head title="Booking Events" />
             
             <div className="space-y-8">
-                <ModulePageHeader
-                    title="Event Types"
-                    description="Create and manage your booking event types."
-                    actions={
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center">
+                    <div>
+                        <h1 className="text-2xl font-bold tracking-tight">Event Types</h1>
+                        <p className="text-muted-foreground">Create and manage your booking event types.</p>
+                    </div>
+                    <div className="mt-4 sm:mt-0">
                         <Link 
                             href={route('booking.events.create')} 
                             className="inline-flex items-center justify-center rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800 transition-colors shadow-sm"
@@ -54,8 +55,8 @@ export default function Index({ events }: { events: EventType[] }) {
                             <Plus className="w-4 h-4 mr-2" />
                             New Event Type
                         </Link>
-                    }
-                />
+                    </div>
+                </div>
 
             <div className="mt-6">
                 {events.length === 0 ? (
@@ -76,7 +77,7 @@ export default function Index({ events }: { events: EventType[] }) {
                                     <div className="flex justify-between items-start">
                                         <CardTitle className="text-lg">{event.title}</CardTitle>
                                         <DropdownMenu>
-                                            <DropdownMenuTrigger className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 hover:bg-slate-100 hover:text-slate-900 h-8 w-8 p-0">
+                                            <DropdownMenuTrigger className="touch-target inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 hover:bg-slate-100 hover:text-slate-900 h-8 w-8 p-0">
                                                 <MoreHorizontal className="h-4 w-4 text-slate-500" />
                                             </DropdownMenuTrigger>
                                             <DropdownMenuContent align="end">

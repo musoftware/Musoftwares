@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { Head, Link, useForm, router } from '@inertiajs/react';
 import WorkspaceLayout from '@/Layouts/WorkspaceLayout';
-import { ModulePageHeader } from '@/Components/ui/ModulePageHeader';
-import { OperationalCard } from '@/Components/ui/OperationalCard';
+
 import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
@@ -11,7 +10,7 @@ import { Switch } from '@/Components/ui/switch';
 import { Badge } from '@/Components/ui/badge';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/Components/ui/card';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/Components/ui/tabs';
-import { Calendar, Clock, Plus, Users, User, Mail, Phone, Stethoscope, Settings, Check, X, ShieldAlert, ArrowRight, Save, Trash2, Edit2, ToggleLeft, ToggleRight } from 'lucide-react';
+import { Calendar, Clock, Plus, Users, User, Mail, Phone, Stethoscope, Settings, Check, X, ShieldAlert, ArrowRight, Save, Trash2, Edit2, ToggleLeft, ToggleRight, CalendarOff } from 'lucide-react';
 
 interface EventType {
     id: number;
@@ -317,23 +316,26 @@ export default function Providers({ providers, eventTypes }: { providers: Bookin
                 { id: 'appointments', label: 'Appointments', icon: Clock, href: '/booking/appointments', isActive: false },
                 { id: 'events', label: 'Event Types', icon: Calendar, href: '/booking/events', isActive: false },
                 { id: 'providers', label: 'Providers', icon: Users, href: '/booking/providers', isActive: true },
+                { id: 'exceptions', label: 'Exceptions', icon: CalendarOff, href: '/booking/exceptions', isActive: false },
             ]}
         >
             <Head title="Booking Providers & Schedules" />
 
             <div className="max-w-6xl mx-auto py-8 px-4 sm:px-6 lg:px-8 space-y-8">
-                <ModulePageHeader
-                    title="Providers & Schedules"
-                    description="Configure doctors, consultants, multi-host rosters, and availability calendars."
-                    actions={
-                        activeTab === 'registry' && !isFormOpen && (
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center">
+                    <div>
+                        <h1 className="text-2xl font-bold tracking-tight">Providers & Schedules</h1>
+                        <p className="text-muted-foreground">Configure doctors, consultants, multi-host rosters, and availability calendars.</p>
+                    </div>
+                    <div className="mt-4 sm:mt-0">
+                        {activeTab === 'registry' && !isFormOpen && (
                             <Button onClick={handleAddProviderClick} className="bg-slate-900 hover:bg-slate-800 text-white shadow-sm">
                                 <Plus className="w-4 h-4 mr-2" />
                                 Add Provider
                             </Button>
-                        )
-                    }
-                />
+                        )}
+                    </div>
+                </div>
 
                 <Tabs value={activeTab} onValueChange={(val) => setActiveTab(val as any)} className="w-full">
                     <TabsList className="bg-slate-100 border border-slate-200/60 p-1">
@@ -355,7 +357,7 @@ export default function Providers({ providers, eventTypes }: { providers: Bookin
                                 <CardHeader className="border-b border-slate-100 pb-4">
                                     <div className="flex justify-between items-center">
                                         <CardTitle className="text-xl font-semibold flex items-center gap-2">
-                                            <User className="h-5 w-5 text-indigo-600" />
+                                            <User className="h-5 w-5 text-slate-800" />
                                             {isEditing ? 'Edit Provider Profile' : 'Register New Provider'}
                                         </CardTitle>
                                         <Button variant="ghost" size="sm" onClick={() => setIsFormOpen(false)} className="h-8 w-8 p-0 rounded-full">
@@ -453,7 +455,7 @@ export default function Providers({ providers, eventTypes }: { providers: Bookin
                                                                             profileForm.setData('event_type_ids', ids);
                                                                         }
                                                                     }}
-                                                                    className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 h-4 w-4"
+                                                                    className="rounded border-slate-300 text-slate-900 focus:ring-slate-500 h-4 w-4"
                                                                 />
                                                                 <div className="text-sm">
                                                                     <span className="font-medium text-slate-900 block leading-tight">{event.title}</span>
@@ -481,7 +483,7 @@ export default function Providers({ providers, eventTypes }: { providers: Bookin
                                         <Button type="button" variant="outline" onClick={() => setIsFormOpen(false)}>
                                             Cancel
                                         </Button>
-                                        <Button type="submit" disabled={profileForm.processing} className="bg-indigo-600 text-white hover:bg-indigo-700">
+                                        <Button type="submit" disabled={profileForm.processing} className="bg-slate-900 text-white hover:bg-slate-800">
                                             {isEditing ? 'Save Changes' : 'Register Provider'}
                                         </Button>
                                     </CardFooter>
@@ -509,14 +511,14 @@ export default function Providers({ providers, eventTypes }: { providers: Bookin
                                                 <CardContent className="p-6 flex-1">
                                                     <div className="flex justify-between items-start gap-3">
                                                         <div className="flex items-center gap-3">
-                                                            <div className="h-12 w-12 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-500 flex items-center justify-center text-white font-semibold text-lg shadow-sm">
+                                                            <div className="h-12 w-12 rounded-full bg-slate-900 flex items-center justify-center text-white font-semibold text-lg shadow-sm">
                                                                 {provider.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase()}
                                                             </div>
                                                             <div>
                                                                 <h4 className="font-semibold text-slate-900 flex items-center gap-1.5 leading-snug">
                                                                     {provider.name}
                                                                 </h4>
-                                                                <p className="text-xs font-medium text-indigo-600 flex items-center mt-0.5">
+                                                                <p className="text-xs font-medium text-slate-700 flex items-center mt-0.5">
                                                                     <Stethoscope className="w-3.5 h-3.5 mr-1" />
                                                                     {provider.specialty || 'General Practitioner'}
                                                                 </p>
@@ -525,7 +527,7 @@ export default function Providers({ providers, eventTypes }: { providers: Bookin
 
                                                         <button 
                                                             onClick={() => toggleProviderActive(provider)}
-                                                            className={`p-1 rounded-md transition-colors ${provider.is_active ? 'text-emerald-600 hover:bg-emerald-50' : 'text-slate-400 hover:bg-slate-100'}`}
+                                                            className={`touch-target p-1 rounded-md transition-colors flex items-center justify-center ${provider.is_active ? 'text-emerald-600 hover:bg-emerald-50' : 'text-slate-400 hover:bg-slate-100'}`}
                                                             title={provider.is_active ? 'Set Inactive' : 'Set Active'}
                                                         >
                                                             {provider.is_active ? <ToggleRight className="w-7 h-7" /> : <ToggleLeft className="w-7 h-7" />}
@@ -582,7 +584,7 @@ export default function Providers({ providers, eventTypes }: { providers: Bookin
                                                     <Button 
                                                         size="sm" 
                                                         onClick={() => handleManageScheduleClick(provider)}
-                                                        className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white"
+                                                        className="flex-1 bg-slate-900 hover:bg-slate-800 text-white"
                                                     >
                                                         <Calendar className="w-3.5 h-3.5 mr-1.5" />
                                                         Schedules
@@ -603,19 +605,24 @@ export default function Providers({ providers, eventTypes }: { providers: Bookin
                             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
                                 {/* Left column: Weekly recurring shifts */}
                                 <div className="lg:col-span-2 space-y-6">
-                                    <OperationalCard title="Recurring Weekly Schedules" description="Specify recurring weekly shifts that repeat indefinitely. Enabled days are rendered as dynamic booking windows.">
+                                    <Card>
+                                        <CardHeader>
+                                            <CardTitle>Recurring Weekly Schedules</CardTitle>
+                                            <CardDescription>Specify recurring weekly shifts that repeat indefinitely. Enabled days are rendered as dynamic booking windows.</CardDescription>
+                                        </CardHeader>
+                                        <CardContent>
                                         <div className="space-y-4">
                                             {WEEKDAYS.map(({ value, label }) => {
                                                 const dayRule = weeklyRules[value];
                                                 return (
-                                                    <div key={value} className={`flex flex-col sm:flex-row sm:items-center justify-between p-4 border rounded-xl transition-all ${dayRule.is_enabled ? 'bg-white border-indigo-200 shadow-xs' : 'bg-slate-50 border-slate-200 opacity-60'}`}>
+                                                    <div key={value} className={`flex flex-col sm:flex-row sm:items-center justify-between p-4 border rounded-xl transition-all ${dayRule.is_enabled ? 'bg-white border-slate-200 shadow-xs' : 'bg-slate-50 border-slate-200 opacity-60'}`}>
                                                         <div className="flex items-center gap-3">
                                                             <input
                                                                 id={`day-chk-${value}`}
                                                                 type="checkbox"
                                                                 checked={dayRule.is_enabled}
                                                                 onChange={() => handleWeeklyCheckToggle(value)}
-                                                                className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 h-4.5 w-4.5 shrink-0"
+                                                                className="rounded border-slate-300 text-slate-900 focus:ring-slate-500 h-4.5 w-4.5 shrink-0"
                                                             />
                                                             <label htmlFor={`day-chk-${value}`} className="font-semibold text-slate-800 cursor-pointer min-w-28 text-sm sm:text-base select-none">
                                                                 {label}
@@ -655,7 +662,7 @@ export default function Providers({ providers, eventTypes }: { providers: Bookin
                                                                     type="button" 
                                                                     variant="ghost" 
                                                                     onClick={() => addWeeklyShift(value)}
-                                                                    className="text-xs text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 mt-1 w-max h-7 px-2"
+                                                                    className="text-xs text-slate-700 hover:text-slate-900 hover:bg-slate-100 mt-1 w-max h-7 px-2"
                                                                 >
                                                                     <Plus className="w-3 h-3 mr-1" /> Add Shift
                                                                 </Button>
@@ -672,18 +679,24 @@ export default function Providers({ providers, eventTypes }: { providers: Bookin
                                             <Button variant="outline" onClick={() => setActiveTab('registry')}>
                                                 Back to Roster
                                             </Button>
-                                            <Button onClick={handleSaveSchedule} className="bg-indigo-600 text-white hover:bg-indigo-700">
+                                            <Button onClick={handleSaveSchedule} className="bg-slate-900 text-white hover:bg-slate-800">
                                                 <Save className="w-4 h-4 mr-2" />
                                                 Save All Schedules
                                             </Button>
                                         </div>
-                                    </OperationalCard>
+                                        </CardContent>
+                                    </Card>
                                 </div>
 
                                 {/* Right column: Overrides and holidays */}
                                 <div className="space-y-6">
                                     {/* Add Override Form */}
-                                    <OperationalCard title="Custom Override Date" description="Configure vacation periods, holidays, or temporary schedule shifts. Set custom hours or uncheck enabled to block completely.">
+                                    <Card>
+                                        <CardHeader>
+                                            <CardTitle>Custom Override Date</CardTitle>
+                                            <CardDescription>Configure vacation periods, holidays, or temporary schedule shifts. Set custom hours or uncheck enabled to block completely.</CardDescription>
+                                        </CardHeader>
+                                        <CardContent>
                                         <form onSubmit={handleAddOverride} className="space-y-4">
                                             <div className="space-y-2">
                                                 <Label htmlFor="override-date">Target Date</Label>
@@ -716,7 +729,8 @@ export default function Providers({ providers, eventTypes }: { providers: Bookin
                                                             type="time"
                                                             value={newOverride.start_time}
                                                             onChange={e => setNewOverride(prev => ({ ...prev, start_time: e.target.value }))}
-                                                            className="text-sm bg-white"
+                                                            required
+                                                            className="w-full text-sm bg-white"
                                                         />
                                                     </div>
                                                     <div className="space-y-1">
@@ -725,21 +739,26 @@ export default function Providers({ providers, eventTypes }: { providers: Bookin
                                                             type="time"
                                                             value={newOverride.end_time}
                                                             onChange={e => setNewOverride(prev => ({ ...prev, end_time: e.target.value }))}
-                                                            className="text-sm bg-white"
+                                                            required
+                                                            className="w-full text-sm bg-white"
                                                         />
                                                     </div>
                                                 </div>
                                             )}
 
-                                            <Button type="submit" variant="outline" className="w-full border-indigo-200 text-indigo-700 bg-indigo-50/50 hover:bg-indigo-50">
-                                                <Plus className="w-4 h-4 mr-2" />
-                                                Add Date Override
+                                            <Button type="submit" variant="outline" className="w-full border-slate-200 text-slate-900 bg-slate-50/50 hover:bg-slate-100">
+                                                <Plus className="w-4 h-4 mr-2" /> Add Date Override
                                             </Button>
                                         </form>
-                                    </OperationalCard>
+                                        </CardContent>
+                                    </Card>
 
                                     {/* Overrides List */}
-                                    <OperationalCard title="Configured Overrides">
+                                    <Card>
+                                        <CardHeader>
+                                            <CardTitle>Configured Overrides</CardTitle>
+                                        </CardHeader>
+                                        <CardContent>
                                         {oneTimeRules.length === 0 ? (
                                             <div className="text-center py-6 text-xs text-slate-400 italic">
                                                 No date overrides defined. The weekly schedule will apply consistently.
@@ -776,7 +795,8 @@ export default function Providers({ providers, eventTypes }: { providers: Bookin
                                                 ))}
                                             </div>
                                         )}
-                                    </OperationalCard>
+                                        </CardContent>
+                                    </Card>
                                 </div>
                             </div>
                         )}
