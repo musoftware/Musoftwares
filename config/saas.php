@@ -67,6 +67,7 @@ return [
         'crm-advanced-permissions' => ['price' => 500, 'name' => 'Advanced Permissions', 'desc' => 'View only own leads', 'icon' => 'Shield', 'parent' => 'crm'],
 
         // ── ERP ──
+        'erp-backup' => ['price' => 500, 'name' => 'ERP Backup', 'desc' => 'Download and restore full tenant data backups', 'icon' => 'HardDrive', 'parent' => 'erp'],
         'erp-multi-branch' => ['price' => 500, 'name' => 'Multi Branch', 'desc' => 'Branch inventory & staff', 'icon' => 'Building2', 'parent' => 'erp'],
         'erp-inventory' => ['price' => 500, 'name' => 'Advanced Inventory', 'desc' => 'Warehouses & stock alerts', 'icon' => 'Package', 'parent' => 'erp'],
         'erp-pos' => ['price' => 500, 'name' => 'POS System', 'desc' => 'Cashier, barcode, receipts', 'icon' => 'MonitorSmartphone', 'parent' => 'erp'],
