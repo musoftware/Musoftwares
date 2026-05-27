@@ -122,7 +122,8 @@ export default function Show({ ticket }: Props) {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const bottomRef = useRef<HTMLDivElement>(null);
 
-    const messages = ticket.conversation?.messages ?? [];
+    const rawMessages = ticket.conversation?.messages;
+    const messages = Array.isArray(rawMessages) ? rawMessages : (rawMessages?.data ?? []);
     const statusMeta   = STATUS_STYLES[ticket.ticket_status]  ?? STATUS_STYLES.open;
     const priorityMeta = PRIORITY_STYLES[ticket.priority]     ?? PRIORITY_STYLES.low;
     const isClosed = ticket.ticket_status === 'closed';
