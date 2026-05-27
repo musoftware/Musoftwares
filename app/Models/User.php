@@ -394,12 +394,15 @@ class User extends Authenticatable
 
     public function hasSubscription(): bool
     {
+        if ($this->plan_id && $this->subscription_date) {
+            return \Carbon\Carbon::parse($this->subscription_date)->isFuture();
+        }
         return $this->subscriptions()->where('status', 'active')->exists();
     }
 
-    public function getPlanAttribute()
+    public function plan()
     {
-        return $this->activeSubscription?->plan;
+        return $this->belongsTo(\App\Models\Plan::class, 'plan_id');
     }
 
     /**

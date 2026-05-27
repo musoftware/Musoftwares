@@ -14,7 +14,7 @@ class ServicePackage extends Model
         'name',
         'description',
         'price',
-        'currency_code',
+        'currency_id',
         'delivery_days',
         'revisions',
         'features',

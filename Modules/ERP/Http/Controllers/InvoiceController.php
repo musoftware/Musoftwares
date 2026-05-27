@@ -67,7 +67,7 @@ class InvoiceController extends Controller
             'paid'              => Invoice::where('tenant_id', $tenant->id)->where('status', 'paid')->sum('business_amount'),
             'pending'           => Invoice::where('tenant_id', $tenant->id)->where('status', 'sent')->sum('business_amount'),
             'overdue'           => Invoice::where('tenant_id', $tenant->id)->where('status', 'sent')->where('due_date', '<', now())->sum('business_amount'),
-            'currency_id'       => $tenant->currency_id,
+            'currency_id'       => $tenant->base_currency_id,
         ];
 
         return Inertia::render('ERP/Invoices/Index', [
@@ -84,7 +84,7 @@ class InvoiceController extends Controller
             'clients'           => TenantClient::with('currency')->where('tenant_id', $tenant->id)->get(),
             'projects'          => \Modules\ERP\Models\Project::where('tenant_id', $tenant->id)->get(),
             'currencies'        => Currency::all(),
-            'currency_id'       => $tenant->currency_id,
+            'currency_id'       => $tenant->base_currency_id,
         ]);
     }
 
@@ -117,7 +117,7 @@ class InvoiceController extends Controller
         $validated['amount_currency'] = $client->currency ? $client->currency->currency : 'USD';
 
         return DB::transaction(function () use ($validated, $tenant, $client) {
-            $currency = \App\Models\Currency::find($tenant->currency_id);
+            $currency = \App\Models\Currency::find($tenant->base_currency_id);
             $businessCurrency = $currency ? $currency->currency : 'USD';
             $rate = $this->exchangeRateService->getRate($validated['amount_currency'], $businessCurrency, $validated['issued_at']);
 
@@ -170,7 +170,7 @@ class InvoiceController extends Controller
                         'amount' => $costData['amount'],
                         'currency_id' => $client->currency_id,
                         'business_amount' => $costData['amount'] * $costRate,
-                        'business_currency_id' => $tenant->currency_id,
+                        'business_currency_id' => $tenant->base_currency_id,
                         'exchange_rate' => $costRate,
                         'exchange_rate_date' => $validated['issued_at'],
                         'payment_status' => 'unpaid',
@@ -231,7 +231,7 @@ class InvoiceController extends Controller
             'clients'           => TenantClient::with('currency')->where('tenant_id', $tenant->id)->get(),
             'projects'          => \Modules\ERP\Models\Project::where('tenant_id', $tenant->id)->get(),
             'currencies'        => Currency::all(),
-            'currency_id'       => $tenant->currency_id,
+            'currency_id'       => $tenant->base_currency_id,
         ]);
     }
 
@@ -269,7 +269,7 @@ class InvoiceController extends Controller
         $validated['amount_currency'] = $client->currency ? $client->currency->currency : 'USD';
 
         return DB::transaction(function () use ($validated, $invoice, $tenant) {
-            $currency = \App\Models\Currency::find($tenant->currency_id);
+            $currency = \App\Models\Currency::find($tenant->base_currency_id);
             $businessCurrency = $currency ? $currency->currency : 'USD';
             $rate = $this->exchangeRateService->getRate($validated['amount_currency'], $businessCurrency, $validated['issued_at']);
 
@@ -330,7 +330,7 @@ class InvoiceController extends Controller
                             'amount' => $costData['amount'],
                             'currency_id' => $client->currency_id,
                             'business_amount' => $costData['amount'] * $costRate,
-                            'business_currency_id' => $tenant->currency_id,
+                            'business_currency_id' => $tenant->base_currency_id,
                             'exchange_rate' => $costRate,
                             'exchange_rate_date' => $validated['issued_at'],
                             'payment_status' => $costData['payment_status'] ?? 'unpaid',
