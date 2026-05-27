@@ -77,7 +77,7 @@ class GatewayPayment extends Model
 
     public function getFormattedAmountAttribute(): string
     {
-        return number_format((float) $this->amount, 2) . ' ' . $this->currency;
+        return \App\Helpers\FinanceHelper::instance()->format_money($this->amount, $this->currency_id ?? $this->currency);
     }
 
     public function getStatusBadgeAttribute(): array

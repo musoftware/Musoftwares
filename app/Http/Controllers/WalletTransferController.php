@@ -77,7 +77,7 @@ class WalletTransferController extends Controller
 
             return redirect()
                 ->route('financial.transfer.show', $transfer->id)
-                ->with('success', 'Transfer completed successfully! ' . number_format($transfer->amount, 2) . ' ' . $transfer->currency . ' was sent.');
+                ->with('success', 'Transfer completed successfully! ' . \App\Helpers\FinanceHelper::instance()->format_money($transfer->amount, $transfer->currency_id ?? $transfer->currency) . ' was sent.');
 
         } catch (ValidationException $e) {
             throw $e;
