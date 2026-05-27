@@ -8,6 +8,10 @@ interface SettingsModalProps {
     onTogglePrayerTimes: () => void;
     wallpaperUrl: string;
     onWallpaperChange: (url: string) => void;
+    prayerCity: string;
+    prayerCountry: string;
+    prayerMethod: string;
+    onPrayerSettingsChange: (city: string, country: string, method: string) => void;
 }
 
 const DEFAULT_WALLPAPERS = [
@@ -17,7 +21,7 @@ const DEFAULT_WALLPAPERS = [
     'https://images.unsplash.com/photo-1493246507139-91e8fad9978e?q=80&w=2560&auto=format&fit=crop',
 ];
 
-export function SettingsModal({ isOpen, onClose, showPrayerTimes, onTogglePrayerTimes, wallpaperUrl, onWallpaperChange }: SettingsModalProps) {
+export function SettingsModal({ isOpen, onClose, showPrayerTimes, onTogglePrayerTimes, wallpaperUrl, onWallpaperChange, prayerCity, prayerCountry, prayerMethod, onPrayerSettingsChange }: SettingsModalProps) {
     if (!isOpen) return null;
 
     return (
@@ -45,15 +49,65 @@ export function SettingsModal({ isOpen, onClose, showPrayerTimes, onTogglePrayer
                         <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
                             <span className="text-blue-400">#</span> Widgets
                         </h3>
-                        <div className="flex items-center justify-between bg-white/5 p-4 rounded-xl border border-white/5">
-                            <div>
-                                <h4 className="font-medium">Prayer Times</h4>
-                                <p className="text-xs text-slate-400 mt-1">Display local prayer times in the taskbar</p>
+                        <div className="flex flex-col gap-3 bg-white/5 p-4 rounded-xl border border-white/5">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <h4 className="font-medium">Prayer Times</h4>
+                                    <p className="text-xs text-slate-400 mt-1">Display local prayer times in the taskbar</p>
+                                </div>
+                                <label className="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" className="sr-only peer" checked={showPrayerTimes} onChange={onTogglePrayerTimes} />
+                                    <div className="w-11 h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
+                                </label>
                             </div>
-                            <label className="relative inline-flex items-center cursor-pointer">
-                                <input type="checkbox" className="sr-only peer" checked={showPrayerTimes} onChange={onTogglePrayerTimes} />
-                                <div className="w-11 h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
-                            </label>
+                            
+                            {showPrayerTimes && (
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mt-3 pt-4 border-t border-white/10">
+                                    <div>
+                                        <label className="text-xs text-slate-400 mb-1 block">City</label>
+                                        <input 
+                                            type="text"
+                                            value={prayerCity}
+                                            onChange={(e) => onPrayerSettingsChange(e.target.value, prayerCountry, prayerMethod)}
+                                            className="w-full bg-[#1c1c1c] border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500 transition-colors"
+                                            placeholder="Cairo"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="text-xs text-slate-400 mb-1 block">Country</label>
+                                        <input 
+                                            type="text"
+                                            value={prayerCountry}
+                                            onChange={(e) => onPrayerSettingsChange(prayerCity, e.target.value, prayerMethod)}
+                                            className="w-full bg-[#1c1c1c] border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500 transition-colors"
+                                            placeholder="Egypt"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="text-xs text-slate-400 mb-1 block">Calculation Method</label>
+                                        <select 
+                                            value={prayerMethod}
+                                            onChange={(e) => onPrayerSettingsChange(prayerCity, prayerCountry, e.target.value)}
+                                            className="w-full bg-[#1c1c1c] border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500 transition-colors"
+                                        >
+                                            <option value="1">University of Islamic Sciences, Karachi</option>
+                                            <option value="2">Islamic Society of North America</option>
+                                            <option value="3">Muslim World League</option>
+                                            <option value="4">Umm Al-Qura University, Makkah</option>
+                                            <option value="5">Egyptian General Authority of Survey</option>
+                                            <option value="8">Gulf Region</option>
+                                            <option value="9">Kuwait</option>
+                                            <option value="10">Qatar</option>
+                                            <option value="11">Majlis Ugama Islam Singapura</option>
+                                            <option value="12">Union Organization islamic de France</option>
+                                            <option value="13">Diyanet İşleri Başkanlığı, Turkey</option>
+                                            <option value="14">Spiritual Administration of Muslims of Russia</option>
+                                            <option value="15">Moonsighting Committee Worldwide</option>
+                                            <option value="16">Dubai</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     </div>
 
