@@ -39,6 +39,7 @@ class User extends Authenticatable
         'kyc_provider',
         'kyc_reference_id',
         'kyc_notes',
+        'workspace_settings',
     ];
 
     protected $hidden = [
@@ -61,6 +62,7 @@ class User extends Authenticatable
             'current_tour_step' => 'integer',
             'kyc_verified' => 'boolean',
             'kyc_verified_at' => 'datetime',
+            'workspace_settings' => 'array',
         ];
     }
 
