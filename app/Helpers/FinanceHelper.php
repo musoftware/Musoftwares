@@ -27,12 +27,27 @@ class FinanceHelper
     }
 
 
-    public function format_money($amount, $currency): string
+    public function format_money($amount, $currency_id): string
     {
-        $currencyModel = Currency::find($currency);
-        $code = optional($currencyModel)->currency ?? 'USD';
+        $currencyModel = is_numeric($currency_id) 
+            ? Currency::find($currency_id) 
+            : Currency::where('currency', $currency_id)->first();
 
-        return number_format((float)$amount, 2, '.', '') . ' ' . $code;
+        $formattedAmount = number_format((float)$amount, 2, '.', ',');
+
+        if ($currencyModel) {
+            $symbol = $currencyModel->symbol ?? $currencyModel->currency;
+            if ($currencyModel->string_format) {
+                return str_replace(
+                    ['{symbol}', '{amount}', '{code}'],
+                    [$symbol, $formattedAmount, $currencyModel->currency],
+                    $currencyModel->string_format
+                );
+            }
+            return $symbol . $formattedAmount;
+        }
+
+        return $formattedAmount . ' USD';
     }
 
 

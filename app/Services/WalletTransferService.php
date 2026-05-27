@@ -69,7 +69,7 @@ class WalletTransferService
         $senderBalance = (float) $sender->available_balance();
         if ($senderBalance < $totalDebitRequired) {
             throw ValidationException::withMessages([
-                'amount' => ['Insufficient funds. You need ' . number_format($totalDebitRequired, 2) . ' ' . $senderCurrency . ' (including fees) but only have ' . number_format($senderBalance, 2) . ' ' . $senderCurrency . '.'],
+                'amount' => ['Insufficient funds. You need ' . \App\Helpers\FinanceHelper::instance()->format_money($totalDebitRequired, $senderCurrencyId ?? $senderCurrency) . ' (including fees) but only have ' . \App\Helpers\FinanceHelper::instance()->format_money($senderBalance, $senderCurrencyId ?? $senderCurrency) . '.'],
             ]);
         }
 
@@ -88,7 +88,7 @@ class WalletTransferService
 
         if (($dailyTotal + $amount) > $dailyLimitSenderCurrency) {
             throw ValidationException::withMessages([
-                'amount' => ['Daily transfer limit exceeded. Remaining daily limit: ' . number_format($dailyLimitSenderCurrency - $dailyTotal, 2) . ' ' . $senderCurrency . '.'],
+                'amount' => ['Daily transfer limit exceeded. Remaining daily limit: ' . \App\Helpers\FinanceHelper::instance()->format_money($dailyLimitSenderCurrency - $dailyTotal, $senderCurrencyId ?? $senderCurrency) . '.'],
             ]);
         }
 
@@ -100,7 +100,7 @@ class WalletTransferService
 
         if (($monthlyTotal + $amount) > $monthlyLimitSenderCurrency) {
             throw ValidationException::withMessages([
-                'amount' => ['Monthly transfer limit exceeded. Remaining monthly limit: ' . number_format($monthlyLimitSenderCurrency - $monthlyTotal, 2) . ' ' . $senderCurrency . '.'],
+                'amount' => ['Monthly transfer limit exceeded. Remaining monthly limit: ' . \App\Helpers\FinanceHelper::instance()->format_money($monthlyLimitSenderCurrency - $monthlyTotal, $senderCurrencyId ?? $senderCurrency) . '.'],
             ]);
         }
 

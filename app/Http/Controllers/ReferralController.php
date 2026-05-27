@@ -49,7 +49,7 @@ class ReferralController extends Controller
                 // If a global finance helper format method exists, we could use it here.
                 // For now, we return a generic format or the original if no helper exists.
             }
-            return number_format((float)$amount, 2) . ' ' . strtoupper($currency);
+            return \App\Helpers\FinanceHelper::instance()->format_money($amount, $currency);
         };
 
         // Use the exact database columns that are synced by BalancesHelper

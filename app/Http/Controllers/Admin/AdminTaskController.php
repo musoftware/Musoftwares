@@ -683,7 +683,7 @@ class AdminTaskController extends Controller
                 $amountInUserCurrency = \App\Models\CurrenciesExchange::RateToday((float) $finalCost, $currencyId, (int)$client->currency);
                 
                 if ($client->available_balance() < $amountInUserCurrency) {
-                    return back()->withErrors(['error' => 'Client has insufficient balance (' . number_format($client->available_balance(), 2) . ' ' . $client->currency_name() . ' available, ' . number_format($amountInUserCurrency, 2) . ' required).']);
+                    return back()->withErrors(['error' => 'Client has insufficient balance (' . \App\Helpers\FinanceHelper::instance()->format_money($client->available_balance(), $client->currency) . ' available, ' . \App\Helpers\FinanceHelper::instance()->format_money($amountInUserCurrency, $client->currency) . ' required).']);
                 }
 
                 \Illuminate\Support\Facades\DB::beginTransaction();

@@ -335,7 +335,7 @@
 
                             {{-- Timer sessions handling --}}
                             @if($item->type === 'timer' || ($item->quantity > 0 && $item->unit_price > 0 && strpos($item->description, 'min') !== false))
-                                <div class="item-desc money-code" style="margin-top: 4px;">{{ $item->quantity }} min &times; {{ number_format($item->unit_price, 2) }} {{ $invoice->currency?->currency ?? 'USD' }}</div>
+                                <div class="item-desc money-code" style="margin-top: 4px;">{{ $item->quantity }} min &times; {{ \App\Helpers\FinanceHelper::instance()->format_money($item->unit_price, $invoice->currency_id) }}</div>
                             @endif
                         </td>
                         <td class="text-center">
@@ -347,12 +347,12 @@
                         </td>
                         <td class="text-right money-code">
                             @if($item->type === 'timer')
-                                {{ number_format($item->unit_price, 2) }}/min
+                                {{ \App\Helpers\FinanceHelper::instance()->format_money($item->unit_price, $invoice->currency_id) }}/min
                             @else
-                                {{ number_format($item->unit_price, 2) }}
+                                {{ \App\Helpers\FinanceHelper::instance()->format_money($item->unit_price, $invoice->currency_id) }}
                             @endif
                         </td>
-                        <td class="text-right money-code">{{ number_format($item->total, 2) }}</td>
+                        <td class="text-right money-code">{{ \App\Helpers\FinanceHelper::instance()->format_money($item->total, $invoice->currency_id) }}</td>
                     </tr>
                 @empty
                     <tr>
@@ -370,32 +370,28 @@
                 @endphp
                 <tr>
                     <td>Subtotal:</td>
-                    <td class="money-code">{{ number_format($subtotal, 2) }}</td>
+                    <td class="money-code">{{ \App\Helpers\FinanceHelper::instance()->format_money($subtotal, $invoice->currency_id) }}</td>
                 </tr>
                 @if($invoice->discount_amount > 0)
                     <tr>
                         <td>Discount:</td>
-                        <td class="money-code">-{{ number_format($invoice->discount_amount, 2) }}</td>
+                        <td class="money-code">-{{ \App\Helpers\FinanceHelper::instance()->format_money($invoice->discount_amount, $invoice->currency_id) }}</td>
                     </tr>
                 @endif
                 @if($invoice->tax_amount > 0)
                     <tr>
                         <td>Tax ({{ number_format($invoice->tax_rate, 0) }}%):</td>
-                        <td class="money-code">{{ number_format($invoice->tax_amount, 2) }}</td>
+                        <td class="money-code">{{ \App\Helpers\FinanceHelper::instance()->format_money($invoice->tax_amount, $invoice->currency_id) }}</td>
                     </tr>
                 @endif
                 <tr class="total-row">
                     <td>TOTAL:</td>
-                    <td class="money-code">{{ number_format($invoice->amount, 2) }}</td>
-                </tr>
-                <tr class="currency-row">
-                    <td>Currency:</td>
-                    <td>{{ $invoice->currency?->currency ?? 'USD' }}</td>
+                    <td class="money-code">{{ \App\Helpers\FinanceHelper::instance()->format_money($invoice->amount, $invoice->currency_id) }}</td>
                 </tr>
                 @if($invoice->business_amount && $invoice->currency_id !== $invoice->business_currency_id)
                     <tr class="currency-row">
                         <td>In {{ $invoice->businessCurrency?->currency ?? 'USD' }}:</td>
-                        <td class="money-code">{{ number_format($invoice->business_amount, 2) }}</td>
+                        <td class="money-code">{{ \App\Helpers\FinanceHelper::instance()->format_money($invoice->business_amount, $invoice->business_currency_id) }}</td>
                     </tr>
                 @endif
             </table>
