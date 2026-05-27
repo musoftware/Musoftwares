@@ -10,9 +10,19 @@ class TenantClient extends TenantModel
     protected $table = 'erp_tenant_clients';
 
     protected $fillable = [
-        'tenant_id', 'user_id', 'name', 'email', 'phone', 'address', 'currency',
-        'country_code', 'status'
+        'tenant_id', 'user_id', 'name', 'email', 'phone', 'address', 'currency_id',
+        'country_id', 'status'
     ];
+
+    public function currency()
+    {
+        return $this->belongsTo(\App\Models\Currency::class, 'currency_id');
+    }
+
+    public function country()
+    {
+        return $this->belongsTo(\App\Models\Country::class, 'country_id');
+    }
 
     public function tenant(): BelongsTo
     {

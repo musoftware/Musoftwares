@@ -39,16 +39,14 @@ class NotifyFreelancersForJob implements ShouldQueue
             return;
         }
 
-        // Find users who have all the required skills
+        // Find users who have ANY of the required skills
         $matchingUsers = User::whereHas('freelanceSkills', function ($query) use ($requiredSkillIds) {
             $query->whereIn('freelance_skills.id', $requiredSkillIds);
-        }, '=', count($requiredSkillIds))->get();
+        })->get();
 
-        // Send a notification to each matching user (simulation)
+        // Send a notification to each matching user
         foreach ($matchingUsers as $user) {
-            // In a real application, you would dispatch a notification here:
-            // $user->notify(new JobMatchedNotification($this->freelanceJob));
-            // For now, we will just log it or handle it silently.
+            $user->notify(new \Modules\Freelance\Notifications\JobMatchedNotification($this->freelanceJob));
             \Log::info("Notification dispatched to user {$user->id} for job {$this->freelanceJob->id}");
         }
     }

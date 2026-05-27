@@ -337,14 +337,14 @@ class ERPDashboardController extends Controller
             'email'     => $validated['email'] ?? null,
             'phone'     => $validated['phone'] ?? null,
             'address'   => $validated['address'] ?? null,
-            'currency'  => $validated['currency'],
+            'currency_id' => \App\Models\Currency::where('currency', $validated['currency'])->value('id'),
             'status'    => $validated['status'] ?? 'lead',  // H9 fix: default to lead
         ]);
 
         // Auto-create client wallet
         \Modules\ERP\Models\ClientWallet::firstOrCreate(
             ['tenant_id' => $tenant->id, 'client_id' => $client->id],
-            ['balance' => 0, 'currency' => $client->currency]
+            ['balance' => 0, 'currency_id' => $client->currency_id]
         );
 
         \Modules\ERP\Services\ActivityLogger::log(
@@ -422,6 +422,7 @@ class ERPDashboardController extends Controller
 
         return Inertia::render('ERP/Onboarding', [
             'user' => $user,
+            'currencies' => \App\Models\Currency::all(),
         ]);
     }
 
@@ -468,13 +469,13 @@ class ERPDashboardController extends Controller
                         'tenant_id' => $tenant->id,
                         'name' => $request->clientName,
                         'email' => $request->clientEmail,
-                        'currency' => $clientCurrency,
+                        'currency_id' => \App\Models\Currency::where('currency', $clientCurrency)->value('id'),
                     ]);
 
                     // Auto-create client wallet
                     \Modules\ERP\Models\ClientWallet::firstOrCreate(
                         ['tenant_id' => $tenant->id, 'client_id' => $client->id],
-                        ['balance' => 0, 'currency' => $clientCurrency]
+                        ['balance' => 0, 'currency_id' => \App\Models\Currency::where('currency', $clientCurrency)->value('id')]
                     );
 
                     // 4. Create first invoice if provided

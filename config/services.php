@@ -41,4 +41,8 @@ return [
         'mode' => env('KASHIER_MODE', 'live'),
     ],
 
+    'fcm' => [
+        'project_id' => env('FCM_PROJECT_ID'),
+    ],
+
 ];

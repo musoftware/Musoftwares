@@ -68,7 +68,7 @@ return new class extends Migration
             $table->string('phone');
             $table->string('name')->nullable();
             $table->string('email')->nullable();
-            $table->morphs('contactable');               // lead_id, customer_id, etc.
+            $table->morphs('contactable', 'audience_members_contactable_idx'); // lead_id, customer_id, etc.
             $table->json('merge_data')->nullable();       // Personalization data for placeholders
             $table->boolean('is_opted_out')->default(false);
             $table->boolean('is_suppressed')->default(false);

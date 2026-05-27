@@ -139,4 +139,94 @@ class ServiceController extends Controller
             ->with('success', 'Service submitted for review. It will be visible once approved.');
     }
 
+    public function edit(Service $service)
+    {
+        if (auth()->id() !== $service->seller_id) {
+            abort(403);
+        }
+
+        $categories = ServiceCategory::orderBy('name')->get(['id', 'name', 'slug']);
+        $service->load('packages');
+
+        return Inertia::render('Marketplace/Services/Edit', [
+            'categories' => $categories,
+            'service' => $service,
+        ]);
+    }
+
+    public function update(Request $request, Service $service)
+    {
+        if (auth()->id() !== $service->seller_id) {
+            abort(403);
+        }
+
+        $validated = $request->validate([
+            'title'                    => 'required|string|max:255',
+            'description'              => 'required|string|min:100',
+            'category_id'              => 'required|exists:marketplace_service_categories,id',
+            'tags'                     => 'nullable|array|max:5',
+            'tags.*'                   => 'string|max:40',
+            'video_url'                => 'nullable|url|max:255',
+            'packages'                 => 'required|array|min:1|max:3',
+            'packages.*.name'          => 'required|string|max:80',
+            'packages.*.description'   => 'required|string|max:500',
+            'packages.*.price'         => 'required|numeric|min:1',
+            'packages.*.currency_code' => 'required|string|size:3',
+            'packages.*.delivery_days' => 'required|integer|min:1|max:365',
+            'packages.*.revisions'     => 'nullable|integer|min:-1',
+            'packages.*.features'      => 'nullable|array',
+            'packages.*.features.*'    => 'string|max:60',
+            'faq'                      => 'nullable|array|max:10',
+            'faq.*.question'           => 'required|string|max:200',
+            'faq.*.answer'             => 'required|string|max:1000',
+            'requirements'             => 'nullable|array|max:10',
+            'requirements.*'           => 'string|max:300',
+            'gallery'                  => 'nullable|array|max:5',
+            'gallery.*'                => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
+            'kept_gallery'             => 'nullable|array',
+            'kept_gallery.*'           => 'string'
+        ]);
+
+        DB::transaction(function () use ($validated, $request, $service) {
+            $galleryPaths = $validated['kept_gallery'] ?? [];
+
+            if ($request->hasFile('gallery')) {
+                foreach ($request->file('gallery') as $image) {
+                    $path = $image->store('services/' . auth()->id(), 'public');
+                    $galleryPaths[] = $path;
+                }
+            }
+
+            $service->update([
+                'title'        => $validated['title'],
+                'description'  => $validated['description'],
+                'category_id'  => $validated['category_id'],
+                'tags'         => $validated['tags'] ?? [],
+                'faq'          => $validated['faq'] ?? [],
+                'requirements' => $validated['requirements'] ?? [],
+                'gallery'      => $galleryPaths,
+                'video_url'    => $validated['video_url'] ?? null,
+                'status'       => 'draft', // Requires re-approval
+            ]);
+
+            $service->packages()->delete();
+
+            foreach ($validated['packages'] as $pkg) {
+                ServicePackage::create([
+                    'service_id'    => $service->id,
+                    'name'          => $pkg['name'],
+                    'description'   => $pkg['description'],
+                    'price'         => $pkg['price'],
+                    'currency_code' => $pkg['currency_code'],
+                    'delivery_days' => $pkg['delivery_days'],
+                    'revisions'     => $pkg['revisions'] ?? 2,
+                    'features'      => $pkg['features'] ?? [],
+                ]);
+            }
+        });
+
+        return redirect()->route('marketplace.services.show', $service->id)
+            ->with('success', 'Service updated successfully and submitted for re-approval.');
+    }
+
 }

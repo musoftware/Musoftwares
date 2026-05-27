@@ -90,7 +90,16 @@ class ServiceOrderController extends Controller
             ]);
 
             // Escrow Lock: Deduct from Buyer balance using type 'used'
-            $buyer->add_balance(-$package->price, "Escrow lock for service order #{$order->id}", 'used', $package->currency_code);
+            $transactionId = $buyer->add_balance(-$package->price, "Escrow lock for service order #{$order->id}", 'used', $package->currency_code);
+
+            // Create Escrow record
+            \Modules\Marketplace\Models\MarketplaceEscrow::create([
+                'order_id' => $order->id,
+                'buyer_wallet_transaction_id' => $transactionId,
+                'amount' => $package->price,
+                'amount_currency' => $package->currency_code,
+                'status' => 'held'
+            ]);
 
             // Seller does NOT get credited yet. Funds are in Escrow.
 
@@ -118,15 +127,27 @@ class ServiceOrderController extends Controller
         }
     }
 
-    public function deliver(ServiceOrder $order)
+    public function deliver(Request $request, ServiceOrder $order)
     {
         if (auth()->id() !== $order->seller_id) {
             abort(403);
         }
 
+        $validated = $request->validate([
+            'message' => 'nullable|string',
+            'links' => 'nullable|string'
+        ]);
+
+        $payload = [
+            'message' => $validated['message'] ?? '',
+            'links' => $validated['links'] ?? ''
+        ];
+
         $order->update([
             'status' => 'delivered',
             'delivered_at' => now(),
+            'auto_complete_at' => now()->addDays(3),
+            'delivery_payload' => $payload
         ]);
 
         return redirect()->back()->with('success', 'Order marked as delivered.');
@@ -153,7 +174,17 @@ class ServiceOrderController extends Controller
             $seller = \App\Models\User::findOrFail($order->seller_id);
             $sellerCredit = $order->amount - $order->commission_amount;
 
-            $seller->add_balance($sellerCredit, "Earnings from service order #{$order->id} (Escrow Released)", 'received', $order->currency_code);
+            $transactionId = $seller->add_balance($sellerCredit, "Earnings from service order #{$order->id} (Escrow Released)", 'received', $order->currency_code);
+
+            // Update Escrow Record
+            $escrow = \Modules\Marketplace\Models\MarketplaceEscrow::where('order_id', $order->id)->first();
+            if ($escrow) {
+                $escrow->update([
+                    'status' => 'released',
+                    'seller_wallet_transaction_id' => $transactionId,
+                    'released_at' => now(),
+                ]);
+            }
 
             DB::commit();
         } catch (\Exception $e) {

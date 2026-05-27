@@ -24,3 +24,6 @@ Schedule::command(CleanupExpiredFbmbResults::class)->dailyAt('04:00');
 // Process matured referral earnings every minute
 Schedule::command(ProcessEarningsClearing::class)->everyMinute();
 
+// Auto-complete delivered marketplace orders hourly
+Schedule::command(\App\Console\Commands\CompleteDeliveredMarketplaceOrders::class)->hourly();
+

@@ -19,12 +19,16 @@ class ServiceOrder extends Model
         'commission_amount',
         'status',
         'delivered_at',
-        'completed_at'
+        'completed_at',
+        'delivery_payload',
+        'auto_complete_at'
     ];
 
     protected $casts = [
         'delivered_at' => 'datetime',
         'completed_at' => 'datetime',
+        'auto_complete_at' => 'datetime',
+        'delivery_payload' => 'array',
     ];
 
     public function buyer(): BelongsTo

@@ -445,5 +445,16 @@ class User extends Authenticatable
 
         return $this->autosms_verification_secret;
     }
+
+    /**
+     * Route notifications for the FCM channel.
+     *
+     * @param  \Illuminate\Notifications\Notification  $notification
+     * @return string|array|null
+     */
+    public function routeNotificationForFcm($notification)
+    {
+        return $this->fcm_token;
+    }
 }
 

@@ -210,6 +210,8 @@ Route::prefix('marketplace')->name('marketplace.')->group(function () {
 
         Route::get('/services/create', [\Modules\Marketplace\Http\Controllers\ServiceController::class, 'create'])->name('services.create');
         Route::post('/services', [\Modules\Marketplace\Http\Controllers\ServiceController::class, 'store'])->name('services.store');
+        Route::get('/services/{service}/edit', [\Modules\Marketplace\Http\Controllers\ServiceController::class, 'edit'])->name('services.edit');
+        Route::put('/services/{service}', [\Modules\Marketplace\Http\Controllers\ServiceController::class, 'update'])->name('services.update');
 
         // Packages
         Route::post('/services/{service}/packages', [\Modules\Marketplace\Http\Controllers\ServicePackageController::class, 'store'])->name('packages.store');
@@ -245,6 +247,8 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin/ma
     Route::delete('/categories/{category}', [\Modules\Marketplace\Http\Controllers\ServiceCategoryController::class, 'destroy'])->name('categories.destroy');
 
     // Services Admin Actions
+    Route::get('/services/{id}/edit', [\App\Http\Controllers\Admin\MarketplaceServiceController::class, 'edit'])->name('services.edit');
+    Route::put('/services/{id}', [\App\Http\Controllers\Admin\MarketplaceServiceController::class, 'update'])->name('services.update');
     Route::post('/services/{id}/approve', [\App\Http\Controllers\Admin\MarketplaceServiceController::class, 'approve'])->name('services.approve');
     Route::post('/services/{id}/reject', [\App\Http\Controllers\Admin\MarketplaceServiceController::class, 'reject'])->name('services.reject');
     Route::post('/services/{id}/feature', [\App\Http\Controllers\Admin\MarketplaceServiceController::class, 'feature'])->name('services.feature');
@@ -430,14 +434,6 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
     Route::post('/users/{id}/toggle-block', [\App\Http\Controllers\Admin\UsersController::class, 'toggleBlock'])->name('users.toggleBlock');
     Route::post('/users/{id}/membership', [\App\Http\Controllers\Admin\UsersController::class, 'activateMembership'])->name('users.membership.activate');
 
-    // ── Admin Job Tasks ──────────────────────────────────────────────
-    Route::resource('job-tasks', \App\Http\Controllers\Admin\AdminJobTaskController::class);
-    Route::post('/job-tasks/{job_task}/pause', [\App\Http\Controllers\Admin\AdminJobTaskController::class, 'pause'])->name('job-tasks.pause');
-    Route::post('/job-tasks/{job_task}/stop', [\App\Http\Controllers\Admin\AdminJobTaskController::class, 'stop'])->name('job-tasks.stop');
-    Route::get('/job-tasks/{job_task}/feedback', [\App\Http\Controllers\Admin\AdminJobTaskController::class, 'feedback'])->name('job-tasks.feedback');
-    Route::put('/job-tasks/approve-feedback/{id}', [\App\Http\Controllers\Admin\AdminJobTaskController::class, 'approveFeedback'])->name('job-tasks.approve-feedback');
-    Route::delete('/job-tasks/reject-feedback/{id}', [\App\Http\Controllers\Admin\AdminJobTaskController::class, 'rejectFeedback'])->name('job-tasks.reject-feedback');
-
     // ── Points Control ───────────────────────────────────────────────
     Route::get('/points_controller', [\App\Http\Controllers\Admin\AdminPointsController::class, 'index'])->name('points.index');
     Route::post('/points_controller/{user}/adjust', [\App\Http\Controllers\Admin\AdminPointsController::class, 'adjustPoints'])->name('points.adjust');
@@ -538,7 +534,9 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
     Route::post('/tasks/todos/{todo}/complete', [\App\Http\Controllers\Admin\AdminTaskController::class, 'completeTodo'])->name('tasks.todos.complete');
     Route::get('/tasks/calendar', [\App\Http\Controllers\Admin\AdminTaskController::class, 'calendar'])->name('tasks.calendar');
     Route::get('/tasks/client-tasks', [\App\Http\Controllers\Admin\AdminTaskController::class, 'clientTasks'])->name('tasks.client-tasks');
+    Route::post('/tasks/client-tasks/{client}/todos', [\App\Http\Controllers\Admin\AdminTaskController::class, 'storeClientTodo'])->name('tasks.client-tasks.store');
     Route::post('/tasks/todos/{todo}/refund', [\App\Http\Controllers\Admin\AdminTaskController::class, 'refundTodo'])->name('tasks.todos.refund');
+    Route::post('/tasks/todos/{todo}/schedule', [\App\Http\Controllers\Admin\AdminTaskController::class, 'scheduleTodo'])->name('tasks.todos.schedule');
 
     Route::get('/erp/{id}/impersonate', [\App\Http\Controllers\ImpersonateController::class, 'impersonate'])->name('erp.impersonate');
 });
