@@ -35,7 +35,7 @@ class ERPDashboardController extends Controller
             return redirect()->route('erp.onboarding');
         }
 
-        $currency = \App\Models\Currency::find($tenant->currency_id);
+        $currency = \App\Models\Currency::find($tenant->base_currency_id);
         $businessCurrency = $currency ? $currency->currency : config('app.business_currency', 'USD');
         $tenantId = $tenant->id;
 
@@ -483,7 +483,7 @@ class ERPDashboardController extends Controller
                     'user_id' => $user->id,
                     'name' => $request->businessName,
                     'status' => 'active',
-                    'currency_id' => \App\Models\Currency::where('currency', $request->baseCurrency)->value('id'),
+                    'base_currency_id' => \App\Models\Currency::where('currency', $request->baseCurrency)->value('id'),
                 ]);
 
                 // 2. We no longer set user global currency preference here.
@@ -518,7 +518,7 @@ class ERPDashboardController extends Controller
                             'amount' => $amount,
                             'currency_id' => $client->currency_id,
                             'business_amount' => $amount,
-                            'business_currency_id' => $tenant->currency_id,
+                            'business_currency_id' => $tenant->base_currency_id,
                             'exchange_rate' => 1.0,
                             'exchange_rate_date' => Carbon::now(),
                             'due_date' => Carbon::now()->addDays(14),
@@ -567,7 +567,7 @@ class ERPDashboardController extends Controller
         if (isset($validated['defaultCurrency'])) {
             $currency = \App\Models\Currency::where('currency', $validated['defaultCurrency'])->first();
             if ($currency) {
-                $tenant->currency_id = $currency->id;
+                $tenant->base_currency_id = $currency->id;
                 $tenant->save();
             }
         }

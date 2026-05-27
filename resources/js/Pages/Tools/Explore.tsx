@@ -1,25 +1,22 @@
-import React, { useState } from 'react';
-import { Head, router } from '@inertiajs/react';
-import ToolsPublicLayout from '@/Layouts/ToolsPublicLayout';
-import { Input } from '@/Components/ui/input';
+import React, { useState, useEffect } from 'react';
+import { Head, router, Link } from '@inertiajs/react';
 import { Button } from '@/Components/ui/button';
-import { ToolCard } from '@/Components/Tools/ToolCard';
-import { PlatformBadges } from '@/Components/Tools/PlatformBadge';
-import {
-    Search, ShoppingBag, Zap,
-    Globe, Eye, Database, Bot, Monitor, Activity, Package, MessageCircle
-} from 'lucide-react';
+import { DesktopIcon } from '@/Components/Tools/DesktopIcon';
+import { WindowModal } from '@/Components/Tools/WindowModal';
+import { CheckCircle2, Shield, Play } from 'lucide-react';
+import ApplicationLogo from '@/Components/ApplicationLogo';
 
-const CATEGORY_ICONS: Record<string, React.ElementType> = {
-    scraper:    Globe,
-    automation: Zap,
-    whatsapp:   MessageCircle,
-    ocr:        Eye,
-    ai:         Bot,
-    data:       Database,
-    browser:    Monitor,
-    monitoring: Activity,
-};
+const WALLPAPER_URL = 'https://images.unsplash.com/photo-1506744626753-143d63428987?q=80&w=2560&auto=format&fit=crop';
+
+interface PricingPlan {
+    id: string;
+    name: string;
+    price_monthly: number;
+    price_yearly: number;
+    features: string[];
+    is_popular: boolean;
+    yearly_savings: number;
+}
 
 interface Tool {
     id: number;
@@ -34,6 +31,7 @@ interface Tool {
     is_featured: boolean;
     starting_price: number;
     is_free: boolean;
+    pricing_plans: PricingPlan[];
 }
 
 interface Props {
@@ -45,191 +43,187 @@ interface Props {
 }
 
 export default function Explore({ tools, categories, subscribedSlugs, hasBrowserSubscription, filters }: Props) {
-    const [search, setSearch] = useState(filters.search || '');
-    const [activeCategory, setActiveCategory] = useState(filters.category || '');
+    const [currentTime, setCurrentTime] = useState(new Date());
+    const [selectedTool, setSelectedTool] = useState<Tool | null>(null);
+    const [isSubscribeModalOpen, setSubscribeModalOpen] = useState(false);
 
-    const applyFilter = (params: { search?: string; category?: string }) => {
-        router.get(route('tools.explore'), { ...filters, ...params }, {
-            preserveState: true, replace: true
-        });
+    useEffect(() => {
+        const timer = setInterval(() => setCurrentTime(new Date()), 1000);
+        return () => clearInterval(timer);
+    }, []);
+
+    const handleToolClick = (tool: Tool) => {
+        const isOwned = subscribedSlugs.includes(tool.slug);
+        if (isOwned) {
+            router.visit(route('tools.run', tool.slug));
+        } else {
+            setSelectedTool(tool);
+            setSubscribeModalOpen(true);
+        }
     };
 
-    const handleSearch = (value: string) => {
-        setSearch(value);
-        clearTimeout((window as any).__toolsSearchDebounce);
-        (window as any).__toolsSearchDebounce = setTimeout(() => {
-            applyFilter({ search: value, category: activeCategory });
-        }, 320);
+    const handleSubscribeAction = () => {
+        if (!selectedTool) return;
+        const plan = selectedTool.pricing_plans[0];
+        if (plan) {
+            router.visit(route('tools.checkout', { slug: selectedTool.slug, planId: plan.id }));
+        } else {
+            router.visit(route('tools.show', selectedTool.slug));
+        }
     };
 
-    const handleCategory = (cat: string) => {
-        const next = activeCategory === cat ? '' : cat;
-        setActiveCategory(next);
-        applyFilter({ search, category: next });
+    const formatTime = (date: Date) => {
+        return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     };
 
-    const featuredTools = tools.data.filter(t => t.is_featured);
-    const regularTools  = tools.data.filter(t => !t.is_featured);
+    const formatDate = (date: Date) => {
+        return date.toLocaleDateString([], { month: 'numeric', day: 'numeric', year: 'numeric' });
+    };
 
     return (
-        <ToolsPublicLayout title="Tools Marketplace" activeNav="explore">
-            <Head title="Tools Marketplace" />
+        <div 
+            className="h-screen w-screen overflow-hidden bg-slate-900 bg-cover bg-center flex flex-col font-['Inter',sans-serif]"
+            style={{ backgroundImage: `url(${WALLPAPER_URL})` }}
+        >
+            <Head title="Tools Workspace" />
 
-            {/* Hero section */}
-            <div className="bg-white border-b border-slate-200/80">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-14">
-                    <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-8">
-                        <div className="max-w-2xl">
-                            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 text-slate-600 text-xs font-medium mb-4">
-                                <Package className="h-3 w-3" />
-                                {tools.data.length} tools available
+            {/* Desktop Area */}
+            <div className="flex-1 p-4 md:p-6 overflow-hidden flex flex-col flex-wrap gap-4 content-start">
+                {tools.data.map((tool) => (
+                    <DesktopIcon
+                        key={tool.id}
+                        title={tool.title}
+                        iconUrl={tool.icon_url}
+                        isOwned={subscribedSlugs.includes(tool.slug)}
+                        isFeatured={tool.is_featured}
+                        onClick={() => handleToolClick(tool)}
+                    />
+                ))}
+            </div>
+
+            {/* Taskbar */}
+            <div className="h-12 bg-[#1c1c1c]/90 backdrop-blur-md border-t border-white/10 flex items-center justify-between px-2 shrink-0 select-none z-40">
+                <div className="flex items-center h-full">
+                    {/* Start Button */}
+                    <Link 
+                        href="/" 
+                        className="h-full px-3 flex items-center justify-center hover:bg-white/10 transition-colors group"
+                    >
+                        <div className="w-6 h-6 rounded bg-blue-500 flex items-center justify-center group-hover:bg-blue-400 transition-colors">
+                            <ApplicationLogo className="w-3.5 h-3.5 text-white fill-current" />
+                        </div>
+                    </Link>
+                    
+                    {/* Running Apps (Mocked as shortcuts to Dashboard/Downloads) */}
+                    <div className="flex items-center h-full ml-2 space-x-1">
+                        <Link href={route('dashboard')} className="h-10 px-3 flex items-center justify-center text-slate-300 hover:bg-white/10 rounded transition-colors text-xs font-medium">
+                            Dashboard
+                        </Link>
+                        <Link href={route('tools.downloads')} className="h-10 px-3 flex items-center justify-center text-slate-300 hover:bg-white/10 rounded transition-colors text-xs font-medium">
+                            Downloads
+                        </Link>
+                    </div>
+                </div>
+
+                <div className="flex items-center h-full text-white text-xs">
+                    <div className="flex flex-col items-end justify-center px-3 hover:bg-white/10 h-full transition-colors cursor-default">
+                        <span>{formatTime(currentTime)}</span>
+                        <span>{formatDate(currentTime)}</span>
+                    </div>
+                </div>
+            </div>
+
+            {/* Subscribe Modal / App Window */}
+            <WindowModal
+                isOpen={isSubscribeModalOpen}
+                onClose={() => {
+                    setSubscribeModalOpen(false);
+                    setSelectedTool(null);
+                }}
+                title={selectedTool ? `Subscribe to ${selectedTool.title}` : 'Subscribe'}
+                icon={
+                    selectedTool?.icon_url ? 
+                    <img src={selectedTool.icon_url} alt="" className="w-full h-full object-contain" /> : 
+                    <span className="text-[10px]">📦</span>
+                }
+                width="w-[500px]"
+            >
+                {selectedTool && (
+                    <div className="flex flex-col h-full bg-slate-50">
+                        {/* Header Info */}
+                        <div className="p-6 bg-white border-b border-slate-200 flex gap-4 items-start">
+                            <div className="w-16 h-16 rounded-xl bg-slate-100 flex items-center justify-center flex-shrink-0 border border-slate-200">
+                                {selectedTool.icon_url ? (
+                                    <img src={selectedTool.icon_url} alt={selectedTool.title} className="w-10 h-10 object-contain" />
+                                ) : (
+                                    <span className="text-3xl">📦</span>
+                                )}
                             </div>
-                            <h1 className="text-3xl md:text-4xl font-bold text-slate-900 tracking-tight leading-tight mb-3">
-                                Professional Automation Tools
-                                <br />
-                                <span className="text-slate-400 font-normal">for power users.</span>
-                            </h1>
-                            <p className="text-slate-500 text-base leading-relaxed max-w-xl">
-                                Scraping, automation, AI-powered workflows — run directly in your browser with a single subscription.
+                            <div>
+                                <h2 className="text-xl font-bold text-slate-900">{selectedTool.title}</h2>
+                                <p className="text-sm text-slate-500 mt-1">{selectedTool.short_description}</p>
+                                <div className="mt-2 flex items-center gap-2">
+                                    <span className="px-2 py-0.5 bg-blue-50 text-blue-700 border border-blue-200 rounded text-xs font-medium capitalize">
+                                        {selectedTool.category_label}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Plan Info */}
+                        <div className="p-6 space-y-4 flex-1">
+                            {selectedTool.pricing_plans && selectedTool.pricing_plans.length > 0 ? (
+                                <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
+                                    <div className="bg-slate-900 px-4 py-3 flex items-center justify-between">
+                                        <span className="text-white font-semibold">{selectedTool.pricing_plans[0].name} Plan</span>
+                                        <span className="text-white text-lg font-bold">
+                                            {selectedTool.pricing_plans[0].price_monthly <= 0 
+                                                ? 'Free' 
+                                                : `$${selectedTool.pricing_plans[0].price_monthly}/mo`}
+                                        </span>
+                                    </div>
+                                    <div className="p-4">
+                                        <ul className="space-y-2">
+                                            {selectedTool.pricing_plans[0].features.slice(0, 4).map((f, i) => (
+                                                <li key={i} className="flex items-start gap-2 text-sm text-slate-600">
+                                                    <CheckCircle2 className="h-4 w-4 text-emerald-500 flex-shrink-0 mt-0.5" />
+                                                    {f}
+                                                </li>
+                                            ))}
+                                            {selectedTool.pricing_plans[0].features.length > 4 && (
+                                                <li className="text-xs text-slate-400 pl-6">
+                                                    + {selectedTool.pricing_plans[0].features.length - 4} more features
+                                                </li>
+                                            )}
+                                        </ul>
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="bg-white rounded-xl border border-slate-200 p-4 flex items-center justify-between">
+                                    <span className="font-semibold text-slate-900">Starting at</span>
+                                    <span className="text-lg font-bold text-slate-900">
+                                        {selectedTool.starting_price <= 0 ? 'Free' : `$${selectedTool.starting_price}/mo`}
+                                    </span>
+                                </div>
+                            )}
+                            
+                            <div className="pt-2">
+                                <Button 
+                                    onClick={handleSubscribeAction}
+                                    className="w-full h-11 bg-slate-900 hover:bg-slate-800 text-white"
+                                >
+                                    Proceed to Subscribe
+                                </Button>
+                            </div>
+
+                            <p className="text-xs text-slate-400 text-center flex items-center justify-center gap-1 mt-2">
+                                <Shield className="h-3 w-3" />
+                                Safe & Secure Checkout
                             </p>
                         </div>
-                        
-                        {/* Extension Banner */}
-                        {hasBrowserSubscription && (
-                            <div className="hidden lg:block bg-emerald-50 border border-emerald-100 rounded-2xl p-5 max-w-[320px] shadow-sm shrink-0">
-                                <div className="flex items-center gap-2 mb-2">
-                                    <div className="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center">
-                                        <Globe className="h-4 w-4 text-emerald-600" />
-                                    </div>
-                                    <h3 className="text-sm font-bold text-emerald-900">Browser Extension</h3>
-                                    <span className="text-[10px] uppercase tracking-wider bg-emerald-600 text-white px-1.5 py-0.5 rounded-sm font-bold ml-auto">New</span>
-                                </div>
-                                <p className="text-xs text-emerald-700/80 leading-relaxed mb-4">
-                                    Run automation tools seamlessly in your browser. A lightweight alternative to the desktop agent.
-                                </p>
-                                <a href={route('tools.download.agent', 'extension')}>
-                                    <Button size="sm" className="w-full h-8 text-xs bg-emerald-600 hover:bg-emerald-500 text-white border-0 shadow-none">
-                                        Download Extension
-                                    </Button>
-                                </a>
-                            </div>
-                        )}
-                    </div>
-
-                    {/* Search */}
-                    <div className="mt-6 relative max-w-sm">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                        <Input
-                            placeholder="Search tools..."
-                            value={search}
-                            onChange={e => handleSearch(e.target.value)}
-                            className="pl-9 h-10 bg-white border-slate-200 text-sm placeholder:text-slate-400 focus-visible:ring-slate-900 focus-visible:ring-1"
-                        />
-                    </div>
-                </div>
-            </div>
-
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-
-                {/* Category filter strip */}
-                <div className="flex flex-wrap gap-1.5">
-                    <Button
-                        variant={activeCategory === '' ? 'default' : 'outline'}
-                        size="sm"
-                        onClick={() => handleCategory('')}
-                        className="rounded-lg text-xs"
-                    >
-                        All Tools
-                    </Button>
-                    {Object.entries(categories).map(([key, label]) => {
-                        const Icon = CATEGORY_ICONS[key] ?? Zap;
-                        return (
-                            <Button
-                                key={key}
-                                variant={activeCategory === key ? 'default' : 'outline'}
-                                size="sm"
-                                onClick={() => handleCategory(key)}
-                                className="rounded-lg text-xs gap-1.5"
-                            >
-                                <Icon className="h-3 w-3" />
-                                {label}
-                            </Button>
-                        );
-                    })}
-                </div>
-
-                {/* Tool grid */}
-                {tools.data.length === 0 ? (
-                    <div className="text-center py-20">
-                        <div className="w-14 h-14 rounded-2xl bg-secondary flex items-center justify-center mx-auto mb-4">
-                            <ShoppingBag className="h-7 w-7 text-muted-foreground" />
-                        </div>
-                        <p className="text-base font-semibold mb-1">No tools found</p>
-                        <p className="text-sm text-muted-foreground">Try adjusting your search or category.</p>
-                    </div>
-                ) : (
-                    <>
-                        {/* Featured section */}
-                        {featuredTools.length > 0 && activeCategory === '' && !filters.search && (
-                            <div className="space-y-3">
-                                <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Featured</h2>
-                                <div className="flex flex-col gap-3">
-                                    {featuredTools.map(tool => (
-                                        <ToolCard
-                                            key={tool.id}
-                                            tool={tool}
-                                            isSubscribed={subscribedSlugs.includes(tool.slug)}
-                                        />
-                                    ))}
-                                </div>
-                            </div>
-                        )}
-
-                        {/* All tools */}
-                        {(activeCategory !== '' || !!filters.search || featuredTools.length === 0) ? (
-                            <div className="flex flex-col gap-3">
-                                {tools.data.map(tool => (
-                                    <ToolCard
-                                        key={tool.id}
-                                        tool={tool}
-                                        isSubscribed={subscribedSlugs.includes(tool.slug)}
-                                    />
-                                ))}
-                            </div>
-                        ) : regularTools.length > 0 ? (
-                            <div className="space-y-3">
-                                <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">All Tools</h2>
-                                <div className="flex flex-col gap-3">
-                                    {regularTools.map(tool => (
-                                        <ToolCard
-                                            key={tool.id}
-                                            tool={tool}
-                                            isSubscribed={subscribedSlugs.includes(tool.slug)}
-                                        />
-                                    ))}
-                                </div>
-                            </div>
-                        ) : null}
-                    </>
-                )}
-
-                {/* Pagination */}
-                {tools.links.length > 3 && (
-                    <div className="flex justify-center gap-1 pt-4">
-                        {tools.links.map((link: any, i: number) => (
-                            <Button
-                                key={i}
-                                variant={link.active ? 'default' : 'outline'}
-                                size="sm"
-                                disabled={!link.url || link.active}
-                                onClick={() => link.url && router.visit(link.url)}
-                                className="rounded-lg text-xs min-w-8"
-                                dangerouslySetInnerHTML={{ __html: link.label }}
-                            />
-                        ))}
                     </div>
                 )}
-            </div>
-        </ToolsPublicLayout>
+            </WindowModal>
+        </div>
     );
 }

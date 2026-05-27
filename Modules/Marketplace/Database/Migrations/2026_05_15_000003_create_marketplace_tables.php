@@ -25,7 +25,12 @@ return new class extends Migration
             $table->string('title');
             $table->text('description');
             $table->string('status'); // draft, active, paused, banned
-            $table->boolean('is_featured')->default(false);
+            $table->timestamp('approved_at')->nullable();
+            $table->foreignId('approved_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->timestamp('rejected_at')->nullable();
+            $table->text('rejection_reason')->nullable();
+            $table->timestamp('suspended_at')->nullable();
+            $table->foreignId('suspended_by')->nullable()->constrained('users')->nullOnDelete();
             $table->softDeletes();
             $table->timestamps();
         });
@@ -37,7 +42,7 @@ return new class extends Migration
             $table->string('name');
             $table->text('description');
             $table->decimal('price', 20, 8);
-            $table->string('currency_code', 3);
+            $table->foreignId('currency_id')->nullable()->constrained('currencies')->nullOnDelete();
             $table->integer('delivery_days');
             $table->timestamps();
         });
@@ -50,7 +55,9 @@ return new class extends Migration
             $table->foreignId('package_id')->constrained('marketplace_packages')->cascadeOnDelete();
 
             $table->decimal('amount', 20, 8);
-            $table->string('currency_code', 3);
+            $table->foreignId('currency_id')->nullable()->constrained('currencies')->nullOnDelete();
+            $table->decimal('business_amount', 20, 8)->nullable();
+            $table->foreignId('business_currency_id')->nullable()->constrained('currencies')->nullOnDelete();
             $table->decimal('commission_amount', 20, 8);
 
             $table->string('status'); // pending, processing, delivered, completed, cancelled, disputed

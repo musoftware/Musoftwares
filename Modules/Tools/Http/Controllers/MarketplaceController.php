@@ -222,6 +222,15 @@ class MarketplaceController extends Controller
             'is_featured'       => $tool['is_featured'] ?? false,
             'starting_price'    => $lowestMonthly ?? 0,
             'is_free'           => ($lowestMonthly == 0),
+            'pricing_plans'     => collect($tool['plans'] ?? [])->map(fn($p) => [
+                'id'              => $p['guid'],
+                'name'            => $p['name'],
+                'price_monthly'   => $p['price_monthly'],
+                'price_yearly'    => $p['price_yearly'],
+                'features'        => $this->safeArray($p['features'] ?? []),
+                'is_popular'      => $p['is_popular'] ?? false,
+                'yearly_savings'  => 0,
+            ])->values()->toArray(),
         ];
     }
 

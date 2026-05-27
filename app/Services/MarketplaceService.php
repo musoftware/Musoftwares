@@ -18,14 +18,13 @@ class MarketplaceService
 
         if ($status === 'active') {
             $updateData['approved_at'] = now();
-            // In a real system, you would record who approved it
-            // 'approved_by' => Auth::id(),
+            $updateData['approved_by'] = Auth::id();
         } elseif ($status === 'rejected') {
             $updateData['rejection_reason'] = $rejectionReason;
             $updateData['rejected_at'] = now();
         } elseif ($status === 'suspended') {
             $updateData['suspended_at'] = now();
-            // 'suspended_by' => Auth::id(),
+            $updateData['suspended_by'] = Auth::id();
         }
 
         $service->update($updateData);
@@ -43,7 +42,19 @@ class MarketplaceService
 
         $status = $statusMap[$action] ?? 'pending';
 
-        $updatedCount = Service::whereIn('id', $ids)->update(['status' => $status]);
+        $updateData = ['status' => $status];
+        if ($status === 'active') {
+            $updateData['approved_at'] = now();
+            $updateData['approved_by'] = Auth::id();
+        } elseif ($status === 'declined') {
+            $updateData['rejected_at'] = now();
+            // Rejection reason left empty for bulk decline unless passed
+        } elseif ($status === 'suspended') {
+            $updateData['suspended_at'] = now();
+            $updateData['suspended_by'] = Auth::id();
+        }
+
+        $updatedCount = Service::whereIn('id', $ids)->update($updateData);
 
         // TODO: Fire bulk events if needed
 

@@ -14,8 +14,10 @@ class Service extends Model
     protected $table = 'marketplace_services';
 
     protected $fillable = [
-        'seller_id', 'category_id', 'title', 'description', 'status', 'is_featured',
+        'seller_id', 'category_id', 'title', 'description', 'status',
         'tags', 'faq', 'requirements', 'gallery', 'video_url',
+        'approved_at', 'approved_by', 'rejected_at', 'rejection_reason',
+        'suspended_at', 'suspended_by'
     ];
 
     protected $casts = [

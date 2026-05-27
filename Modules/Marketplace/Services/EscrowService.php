@@ -23,7 +23,9 @@ class EscrowService
             // Check if user has wallet, etc. Assuming buyer has wallet linked.
             // Simplified logic: locking funds from buyer's wallet
 
-            $currencyId = \App\Models\Currency::where('currency', $currency)->value('id') ?? 1;
+            $defaultCurrency = config('app.business_currency', 'USD');
+            $defaultCurrencyId = \App\Models\Currency::where('currency', $defaultCurrency)->value('id');
+            $currencyId = \App\Models\Currency::where('currency', $currency)->value('id') ?? $defaultCurrencyId;
             $buyerWallet = $order->buyer->wallets()->firstOrCreate(['currency_id' => $currencyId]); // Assuming wallets exist
 
             $this->walletService->lockFunds(
@@ -35,13 +37,20 @@ class EscrowService
                 "Escrow hold for order #{$order->id}"
             );
 
+            $businessCurrencyStr = \App\Models\CurrenciesExchange::BusinessCurrency();
+            $businessCurrencyId = \App\Models\Currency::where('currency', $businessCurrencyStr)->value('id');
+
+            // Calculate the exact exchange rate
+            $exchangeRate = \App\Models\CurrenciesExchange::Rate(now()->toDateString(), $currency, $businessCurrencyStr);
+            $businessAmount = $amount * $exchangeRate;
+
             $escrow = MarketplaceEscrow::create([
                 'order_id' => $order->id,
                 'amount' => $amount,
                 'currency_id' => $currencyId,
-                'business_amount' => $amount, // Simplify exchange logic here for now
-                'business_currency_id' => $currencyId,
-                'exchange_rate' => 1.0,
+                'business_amount' => $businessAmount,
+                'business_currency_id' => $businessCurrencyId,
+                'exchange_rate' => $exchangeRate,
                 'exchange_rate_date' => now(),
                 'status' => 'held'
             ]);

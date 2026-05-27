@@ -47,13 +47,14 @@ class FinanceHelper
             return $symbol . $formattedAmount;
         }
 
-        return $formattedAmount . ' USD';
+        $fallbackCurrency = is_string($currency_id) ? strtoupper($currency_id) : config('app.business_currency', 'USD');
+        return $formattedAmount . ' ' . $fallbackCurrency;
     }
 
 
     public function format_money_egp($amount): string
     {
-        return number_format((float)$amount, 2, '.', '') . ' EGP';
+        return $this->format_money($amount, 'EGP');
     }
 
     public static function secondsToTimeHTML($init)
