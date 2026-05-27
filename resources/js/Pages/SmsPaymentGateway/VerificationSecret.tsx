@@ -21,7 +21,7 @@ export default function VerificationSecret({ secret }: VerificationSecretProps) 
 
     const handleRegenerate = () => {
         if (confirm('Are you sure you want to regenerate this secret? This will break existing webhook verifications until you update them.')) {
-            router.post(route('text-payment-gateway.verification-secret.regenerate'));
+            router.post(route('sms-payment-gateway.verification-secret.regenerate'));
         }
     };
 
@@ -39,7 +39,7 @@ export default function VerificationSecret({ secret }: VerificationSecretProps) 
                             </h1>
                             <p className="text-slate-500 mt-1">Used to verify that webhook requests actually originated from Text Payment Gateway.</p>
                         </div>
-                        <Button variant="outline" onClick={() => router.visit(route('text-payment-gateway.index'))}>
+                        <Button variant="outline" onClick={() => router.visit(route('sms-payment-gateway.index'))}>
                             <ArrowLeft className="w-4 h-4 mr-2" />
                             Back to Dashboard
                         </Button>

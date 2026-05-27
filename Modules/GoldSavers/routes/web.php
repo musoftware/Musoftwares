@@ -10,5 +10,7 @@ Route::middleware(['auth', 'verified'])->prefix('isaas/gold-savers')->name('isaa
     Route::prefix('wallets')->name('wallets.')->group(function () {
         Route::get('/', [WalletController::class, 'index'])->name('index');
         Route::post('/', [WalletController::class, 'store'])->name('store');
+        Route::get('/{wallet}', [WalletController::class, 'show'])->name('show');
+        Route::post('/{wallet}/transactions', [WalletController::class, 'addTransaction'])->name('transactions.store');
     });
 });

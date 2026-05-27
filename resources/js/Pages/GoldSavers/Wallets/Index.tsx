@@ -107,7 +107,8 @@ export default function WalletsIndex({ wallets }: WalletsProps) {
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {wallets.map(wallet => (
-                            <Card key={wallet.id} className="hover:shadow-md transition">
+                            <div key={wallet.id} onClick={() => router.get(route('isaas.gold-savers.wallets.show', wallet.id))} className="cursor-pointer">
+                            <Card className="hover:shadow-md transition">
                                 <CardHeader className="pb-3 border-b border-slate-100">
                                     <div className="flex justify-between items-start">
                                         <div>
@@ -151,6 +152,7 @@ export default function WalletsIndex({ wallets }: WalletsProps) {
 
                                 </CardContent>
                             </Card>
+                            </div>
                         ))}
 
                         {wallets.length === 0 && !isCreating && (
