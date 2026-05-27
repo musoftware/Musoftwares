@@ -30,7 +30,7 @@ export default function Onboarding({ currencies = [] }) {
             origin: { y: 0.6 }
         });
 
-        post(route('erp.onboarding.store'));
+        post(route('erp.onboarding.complete'));
     };
 
     return (

@@ -318,10 +318,10 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
         e.preventDefault();
         if (!selectedClient) return;
 
-        let endpoint = route('erp.wallet.credit', selectedClient.id);
-        if (walletForm.type === 'debit') endpoint = route('erp.wallet.debit', selectedClient.id);
-        else if (walletForm.type === 'lock') endpoint = route('erp.wallet.lock', selectedClient.id);
-        else if (walletForm.type === 'unlock') endpoint = route('erp.wallet.unlock', selectedClient.id);
+        let endpoint = route('erp.clients.wallet.credit', selectedClient.id);
+        if (walletForm.type === 'debit') endpoint = route('erp.clients.wallet.debit', selectedClient.id);
+        else if (walletForm.type === 'lock') endpoint = route('erp.clients.wallet.lock', selectedClient.id);
+        else if (walletForm.type === 'unlock') endpoint = route('erp.clients.wallet.unlock', selectedClient.id);
 
         router.post(endpoint, {
             amount: parseFloat(walletForm.amount),
@@ -635,6 +635,20 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                 setNoteEditor({ title: '', content: '', category: 'Internal' });
                 toast({ description: 'Note deleted.' });
                 prependActivity('Note Deleted', 'A workspace note was deleted.');
+            }
+        });
+    };
+
+    // Update Settings
+    const handleUpdateSettings = () => {
+        router.put(route('erp.settings.update'), settingsForm, {
+            preserveScroll: true,
+            onSuccess: () => {
+                prependActivity('Settings Updated', `Modified workspace branded title and VAT ratios to ${settingsForm.taxRate}%`);
+                toast({ description: 'Workspace parameters successfully configured.' });
+            },
+            onError: (errors) => {
+                toast({ variant: 'destructive', description: Object.values(errors)[0] as string });
             }
         });
     };
@@ -1901,10 +1915,7 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                                                 <CheckCircle2 className="h-4 w-4 text-emerald-500" />
                                                 Workspace settings live-audited under PCI protocols.
                                             </div>
-                                            <Button size="sm" className="shadow-none" onClick={() => {
-                                                prependActivity('Settings Updated', `Modified workspace branded title and VAT ratios to ${settingsForm.taxRate}%`);
-                                                toast({ description: 'Workspace parameters successfully configured.' });
-                                            }}>
+                                            <Button size="sm" className="shadow-none" onClick={handleUpdateSettings}>
                                                 Save Settings
                                             </Button>
                                         </div>
