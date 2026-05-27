@@ -15,7 +15,7 @@ class Invoice extends TenantModel
     use Searchable;
     protected $fillable = [
         'tenant_id', 'invoice_number', 'client_id', 'project_id', 'status',
-        'amount', 'amount_currency', 'business_amount', 'business_currency',
+        'amount', 'currency_id', 'business_amount',
         'exchange_rate', 'exchange_rate_date', 'discount_amount', 'tax_rate', 'tax_amount',
         'paid_amount', 'due_date', 'issued_at', 'paid_at', 'notes', 'created_by'
     ];
@@ -39,6 +39,11 @@ class Invoice extends TenantModel
     public function tenant(): BelongsTo
     {
         return $this->belongsTo(Tenant::class);
+    }
+
+    public function currency(): BelongsTo
+    {
+        return $this->belongsTo(\App\Models\Currency::class, 'currency_id');
     }
 
     public function platformClient(): BelongsTo
@@ -178,7 +183,6 @@ class Invoice extends TenantModel
                 'tenant_id' => $this->tenant_id,
                 'client_id' => $client->id,
                 'balance' => 0,
-                'currency' => $this->amount_currency ?? 'USD',
             ]);
         }
 
@@ -205,9 +209,9 @@ class Invoice extends TenantModel
                 'type' => 'invoice_paid',
                 'direction' => 'debit',
                 'amount' => $amountDue,
-                'amount_currency' => $this->amount_currency,
+                'currency_id' => $this->currency_id,
                 'business_amount' => (float) $this->business_amount,
-                'business_currency' => $this->business_currency ?? 'USD',
+                'business_currency_id' => $this->tenant->base_currency_id,
                 'exchange_rate' => (float) $this->exchange_rate,
                 'exchange_rate_date' => $this->exchange_rate_date ?? now()->toDateString(),
                 'balance_before' => $balanceBefore,
@@ -291,9 +295,9 @@ class Invoice extends TenantModel
                 'type' => 'invoice_paid',
                 'direction' => 'debit',
                 'amount' => $amount,
-                'amount_currency' => $this->amount_currency,
+                'currency_id' => $this->currency_id,
                 'business_amount' => $businessAmount,
-                'business_currency' => $this->business_currency ?? 'USD',
+                'business_currency_id' => $this->tenant->base_currency_id,
                 'exchange_rate' => (float) $this->exchange_rate,
                 'exchange_rate_date' => $this->exchange_rate_date ?? now()->toDateString(),
                 'balance_before' => $balanceBefore,
@@ -357,9 +361,9 @@ class Invoice extends TenantModel
                         'type' => 'invoice_refund',
                         'direction' => 'credit',
                         'amount' => $paidAmount,
-                        'amount_currency' => $this->amount_currency,
+                        'currency_id' => $this->currency_id,
                         'business_amount' => $businessAmount,
-                        'business_currency' => $this->business_currency ?? 'USD',
+                        'business_currency_id' => $this->tenant->base_currency_id,
                         'exchange_rate' => (float) $this->exchange_rate,
                         'exchange_rate_date' => $this->exchange_rate_date ?? now()->toDateString(),
                         'balance_before' => $balanceBefore,
@@ -448,9 +452,9 @@ class Invoice extends TenantModel
                 'type' => 'commission_earned',
                 'direction' => 'credit',
                 'amount' => $commissionAmount,
-                'amount_currency' => $this->amount_currency,
+                'currency_id' => $this->currency_id,
                 'business_amount' => $businessCommission,
-                'business_currency' => $this->business_currency ?? 'USD',
+                'business_currency_id' => $this->tenant->base_currency_id,
                 'exchange_rate' => (float) $this->exchange_rate,
                 'exchange_rate_date' => $this->exchange_rate_date ?? now()->toDateString(),
                 'balance_before' => $balanceBefore,

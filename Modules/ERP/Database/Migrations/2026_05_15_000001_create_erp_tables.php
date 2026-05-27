@@ -14,6 +14,7 @@ return new class extends Migration
             $table->foreignId('user_id')->unique()->constrained('users')->cascadeOnDelete();
             $table->string('name');
             $table->enum('status', ['active', 'suspended', 'cancelled'])->default('active');
+            $table->foreignId('base_currency_id')->nullable()->constrained('currencies')->nullOnDelete();
             $table->timestamp('trial_ends_at')->nullable();
             $table->timestamp('subscription_ends_at')->nullable();
             $table->timestamps();
@@ -23,12 +24,13 @@ return new class extends Migration
         Schema::create('erp_tenant_clients', function (Blueprint $table) {
             $table->id();
             $table->foreignId('tenant_id')->constrained('erp_tenants')->cascadeOnDelete();
+            $table->foreignId('user_id')->nullable()->constrained('users')->nullOnDelete();
             $table->string('name');
             $table->string('email')->nullable();
             $table->string('phone')->nullable();
             $table->string('address')->nullable();
-            $table->string('currency', 3)->default('USD');
-            $table->string('country_code', 2)->nullable();
+            $table->foreignId('currency_id')->nullable()->constrained('currencies')->nullOnDelete();
+            $table->foreignId('country_id')->nullable()->constrained('countries')->nullOnDelete();
             $table->enum('status', ['active', 'inactive', 'banned'])->default('active');
             $table->timestamps();
         });
@@ -36,21 +38,22 @@ return new class extends Migration
         // 5. invoices table
         Schema::create('erp_invoices', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('tenant_id')->constrained('erp_tenants')->cascadeOnDelete();
+            $table->foreignId('tenant_id')->nullable()->constrained('erp_tenants')->cascadeOnDelete();
             $table->string('invoice_number');
-            $table->foreignId('client_id')->constrained('erp_tenant_clients')->cascadeOnDelete();
+            $table->foreignId('client_id')->nullable()->constrained('erp_tenant_clients')->cascadeOnDelete();
+            $table->foreignId('project_id')->nullable();
             $table->enum('status', ['draft', 'sent', 'partial', 'paid', 'cancelled', 'refunded'])->default('draft');
 
             $table->decimal('amount', 15, 2)->default(0);
-            $table->string('amount_currency', 3);
+            $table->foreignId('currency_id')->nullable()->constrained('currencies')->nullOnDelete();
             $table->decimal('business_amount', 15, 2)->default(0);
-            $table->string('business_currency', 3);
             $table->decimal('exchange_rate', 15, 6)->default(1);
             $table->date('exchange_rate_date');
 
             $table->decimal('discount_amount', 15, 2)->default(0);
             $table->decimal('tax_rate', 5, 2)->default(0);
             $table->decimal('tax_amount', 15, 2)->default(0);
+            $table->decimal('paid_amount', 15, 2)->default(0);
 
             $table->date('due_date');
             $table->timestamp('issued_at')->nullable();
@@ -68,7 +71,7 @@ return new class extends Migration
         Schema::create('erp_invoice_items', function (Blueprint $table) {
             $table->id();
             $table->foreignId('invoice_id')->constrained('erp_invoices')->cascadeOnDelete();
-            $table->foreignId('tenant_id')->constrained('erp_tenants')->cascadeOnDelete();
+            $table->foreignId('tenant_id')->nullable()->constrained('erp_tenants')->cascadeOnDelete();
             $table->enum('type', ['simple', 'quantity', 'timer']);
             $table->string('title');
             $table->text('description')->nullable();
@@ -101,9 +104,9 @@ return new class extends Migration
             $table->text('description')->nullable();
 
             $table->decimal('amount', 15, 2);
-            $table->string('amount_currency', 3);
+            $table->foreignId('currency_id')->nullable()->constrained('currencies')->nullOnDelete();
             $table->decimal('business_amount', 15, 2);
-            $table->string('business_currency', 3);
+            $table->foreignId('business_currency_id')->nullable()->constrained('currencies')->nullOnDelete();
             $table->decimal('exchange_rate', 15, 6);
             $table->date('exchange_rate_date');
 
@@ -122,7 +125,8 @@ return new class extends Migration
             $table->foreignId('tenant_id')->constrained('erp_tenants')->cascadeOnDelete();
             $table->foreignId('client_id')->constrained('erp_tenant_clients')->cascadeOnDelete();
             $table->decimal('balance', 15, 2)->default(0);
-            $table->string('currency', 3);
+            $table->decimal('locked_balance', 15, 2)->default(0);
+            $table->foreignId('currency_id')->nullable()->constrained('currencies')->nullOnDelete();
             $table->timestamps();
 
             $table->unique(['tenant_id', 'client_id']);
@@ -131,7 +135,7 @@ return new class extends Migration
         // 10. client_wallet_transactions table
         Schema::create('erp_client_wallet_transactions', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('tenant_id')->constrained('erp_tenants')->cascadeOnDelete();
+            $table->foreignId('tenant_id')->nullable()->constrained('erp_tenants')->cascadeOnDelete();
             $table->foreignId('wallet_id')->constrained('erp_client_wallets')->cascadeOnDelete();
 
             $table->enum('type', [
@@ -144,9 +148,9 @@ return new class extends Migration
             $table->enum('direction', ['debit', 'credit']);
 
             $table->decimal('amount', 15, 2);
-            $table->string('amount_currency', 3);
+            $table->foreignId('currency_id')->nullable()->constrained('currencies')->nullOnDelete();
             $table->decimal('business_amount', 15, 2);
-            $table->string('business_currency', 3);
+            $table->foreignId('business_currency_id')->nullable()->constrained('currencies')->nullOnDelete();
             $table->decimal('exchange_rate', 15, 6);
             $table->date('exchange_rate_date');
 
@@ -167,7 +171,7 @@ return new class extends Migration
         // 11. expense_transactions table
         Schema::create('erp_expense_transactions', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('tenant_id')->constrained('erp_tenants')->cascadeOnDelete();
+            $table->foreignId('tenant_id')->nullable()->constrained('erp_tenants')->cascadeOnDelete();
             $table->foreignId('invoice_cost_id')->nullable()->constrained('erp_invoice_costs')->nullOnDelete();
             $table->foreignId('invoice_id')->nullable()->constrained('erp_invoices')->nullOnDelete();
             $table->foreignId('client_id')->nullable()->constrained('erp_tenant_clients')->nullOnDelete();
@@ -176,9 +180,9 @@ return new class extends Migration
             $table->enum('direction', ['debit', 'credit']);
 
             $table->decimal('amount', 15, 2);
-            $table->string('amount_currency', 3);
+            $table->foreignId('currency_id')->nullable()->constrained('currencies')->nullOnDelete();
             $table->decimal('business_amount', 15, 2);
-            $table->string('business_currency', 3);
+            $table->foreignId('business_currency_id')->nullable()->constrained('currencies')->nullOnDelete();
             $table->decimal('exchange_rate', 15, 6);
             $table->date('exchange_rate_date');
 
@@ -201,9 +205,9 @@ return new class extends Migration
             $table->text('description')->nullable();
 
             $table->decimal('amount', 15, 2);
-            $table->string('amount_currency', 3);
+            $table->foreignId('currency_id')->nullable()->constrained('currencies')->nullOnDelete();
             $table->decimal('business_amount', 15, 2);
-            $table->string('business_currency', 3);
+            $table->foreignId('business_currency_id')->nullable()->constrained('currencies')->nullOnDelete();
             $table->decimal('exchange_rate', 15, 6);
             $table->date('exchange_rate_date');
 
@@ -230,9 +234,9 @@ return new class extends Migration
             $table->timestamp('executed_at');
 
             $table->decimal('amount', 15, 2);
-            $table->string('amount_currency', 3);
+            $table->foreignId('currency_id')->nullable()->constrained('currencies')->nullOnDelete();
             $table->decimal('business_amount', 15, 2);
-            $table->string('business_currency', 3);
+            $table->foreignId('business_currency_id')->nullable()->constrained('currencies')->nullOnDelete();
             $table->decimal('exchange_rate', 15, 6);
             $table->date('exchange_rate_date');
 
@@ -262,8 +266,8 @@ return new class extends Migration
             $table->string('account_number');
             $table->string('iban')->nullable();
             $table->string('swift_code')->nullable();
-            $table->string('bank_country');
-            $table->string('bank_currency');
+            $table->string('bank_country')->nullable();
+            $table->foreignId('bank_currency_id')->nullable()->constrained('currencies')->nullOnDelete();
             $table->string('branch_name')->nullable();
 
             $table->text('notes')->nullable();
@@ -280,9 +284,9 @@ return new class extends Migration
             $table->string('status')->default('pending'); // pending, approved, paid, rejected, cancelled
 
             $table->decimal('amount', 15, 2);
-            $table->string('currency_code', 3)->default('USD');
+            $table->foreignId('currency_id')->nullable()->constrained('currencies')->nullOnDelete();
             $table->decimal('business_amount', 15, 2)->nullable();
-            $table->string('business_currency', 3)->nullable();
+            $table->foreignId('business_currency_id')->nullable()->constrained('currencies')->nullOnDelete();
             $table->decimal('exchange_rate', 15, 6)->nullable();
             $table->date('exchange_rate_date')->nullable();
 

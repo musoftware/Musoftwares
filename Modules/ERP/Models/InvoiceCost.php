@@ -2,6 +2,7 @@
 
 namespace Modules\ERP\Models;
 
+
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class InvoiceCost extends TenantModel
@@ -10,7 +11,7 @@ class InvoiceCost extends TenantModel
 
     protected $fillable = [
         'invoice_id', 'tenant_id', 'title', 'description',
-        'amount', 'amount_currency', 'business_amount', 'business_currency',
+        'amount', 'currency_id', 'business_amount', 'business_currency_id',
         'exchange_rate', 'exchange_rate_date', 'payment_status', 'payment_source',
         'paid_at', 'paid_by', 'note'
     ];
@@ -36,5 +37,15 @@ class InvoiceCost extends TenantModel
     public function payer(): BelongsTo
     {
         return $this->belongsTo(\App\Models\User::class, 'paid_by');
+    }
+
+    public function currency(): BelongsTo
+    {
+        return $this->belongsTo(\App\Models\Currency::class, 'currency_id');
+    }
+
+    public function businessCurrency(): BelongsTo
+    {
+        return $this->belongsTo(\App\Models\Currency::class, 'business_currency_id');
     }
 }

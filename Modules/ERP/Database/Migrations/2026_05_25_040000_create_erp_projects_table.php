@@ -16,8 +16,8 @@ return new class extends Migration
         if (!Schema::hasTable('erp_projects')) {
             Schema::create('erp_projects', function (Blueprint $table) {
                 $table->id();
-                $table->foreignId('tenant_id')->constrained('erp_tenants')->cascadeOnDelete();
-                $table->foreignId('client_id')->constrained('erp_tenant_clients')->cascadeOnDelete();
+                $table->foreignId('tenant_id')->nullable()->constrained('erp_tenants')->cascadeOnDelete();
+                $table->foreignId('client_id')->nullable()->constrained('erp_tenant_clients')->cascadeOnDelete();
                 $table->string('name');
                 $table->text('description')->nullable();
                 $table->string('status')->default('draft'); // draft, active, in_progress, review, completed

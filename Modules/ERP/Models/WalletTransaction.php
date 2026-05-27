@@ -19,7 +19,7 @@ class WalletTransaction extends TenantModel
 
     protected $fillable = [
         'tenant_id', 'wallet_id', 'type', 'direction',
-        'amount', 'amount_currency', 'business_amount', 'business_currency',
+        'amount', 'currency_id', 'business_amount', 'business_currency_id',
         'exchange_rate', 'exchange_rate_date', 'balance_before', 'balance_after',
         'reference_type', 'reference_id', 'note', 'created_by'
     ];
@@ -49,5 +49,15 @@ class WalletTransaction extends TenantModel
     public function creator(): BelongsTo
     {
         return $this->belongsTo(\App\Models\User::class, 'created_by');
+    }
+
+    public function currency(): BelongsTo
+    {
+        return $this->belongsTo(\App\Models\Currency::class, 'currency_id');
+    }
+
+    public function businessCurrency(): BelongsTo
+    {
+        return $this->belongsTo(\App\Models\Currency::class, 'business_currency_id');
     }
 }

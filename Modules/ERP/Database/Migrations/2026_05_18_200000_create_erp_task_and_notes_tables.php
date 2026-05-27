@@ -18,7 +18,7 @@ return new class extends Migration
         if (!Schema::hasTable('erp_tasks')) {
             Schema::create('erp_tasks', function (Blueprint $table) {
                 $table->id();
-                $table->unsignedBigInteger('tenant_id')->index();
+                $table->unsignedBigInteger('tenant_id')->nullable()->index();
 
                 $table->string('task_name');
                 $table->text('task_description')->nullable();
@@ -52,7 +52,7 @@ return new class extends Migration
         if (!Schema::hasTable('erp_todo_items')) {
             Schema::create('erp_todo_items', function (Blueprint $table) {
                 $table->id();
-                $table->unsignedBigInteger('tenant_id')->index();
+                $table->unsignedBigInteger('tenant_id')->nullable()->index();
                 $table->foreignId('task_id')->constrained('erp_tasks')->cascadeOnDelete();
 
                 $table->string('title');
@@ -101,7 +101,7 @@ return new class extends Migration
         if (!Schema::hasTable('erp_client_notes')) {
             Schema::create('erp_client_notes', function (Blueprint $table) {
                 $table->id();
-                $table->unsignedBigInteger('tenant_id')->index();
+                $table->unsignedBigInteger('tenant_id')->nullable()->index();
                 $table->foreignId('client_id')->constrained('erp_tenant_clients')->cascadeOnDelete();
                 $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
 
