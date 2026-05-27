@@ -3,6 +3,7 @@
 namespace Modules\ERP\Models;
 
 use Illuminate\Database\Eloquent\Model;
+
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class RecurringExecutionLog extends Model
@@ -10,8 +11,8 @@ class RecurringExecutionLog extends Model
     protected $table = 'erp_recurring_execution_logs';
 
     protected $fillable = [
-        'recurring_entry_id', 'executed_at', 'amount', 'amount_currency',
-        'business_amount', 'business_currency', 'exchange_rate', 'exchange_rate_date',
+        'recurring_entry_id', 'executed_at', 'amount', 'currency_id',
+        'business_amount', 'business_currency_id', 'exchange_rate', 'exchange_rate_date',
         'status', 'note'
     ];
 
@@ -29,5 +30,15 @@ class RecurringExecutionLog extends Model
     public function recurringEntry(): BelongsTo
     {
         return $this->belongsTo(RecurringEntry::class);
+    }
+
+    public function currency(): BelongsTo
+    {
+        return $this->belongsTo(\App\Models\Currency::class, 'currency_id');
+    }
+
+    public function businessCurrency(): BelongsTo
+    {
+        return $this->belongsTo(\App\Models\Currency::class, 'business_currency_id');
     }
 }
