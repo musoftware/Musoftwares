@@ -36,9 +36,22 @@ export function WindowModal({
     zIndex,
     onFocus
 }: WindowModalProps) {
-    const [position, setPosition] = useState({ x: initialX, y: initialY });
+    const parseDim = (val: string | number | undefined, defaultVal: number) => {
+        if (typeof val === 'number') return val;
+        if (!val) return defaultVal;
+        const match = val.match(/\d+/);
+        return match ? parseInt(match[0], 10) : defaultVal;
+    };
+
+    const modalRef = useRef<HTMLDivElement>(null);
+    const posRef = useRef({ x: initialX, y: initialY });
+    const sizeRef = useRef({ width: parseDim(width, 800), height: parseDim(height, 600) });
+
     const [isDragging, setIsDragging] = useState(false);
+    const [isResizing, setIsResizing] = useState(false);
+    
     const dragOffset = useRef({ x: 0, y: 0 });
+    const resizeData = useRef({ startW: 0, startH: 0, startX: 0, startY: 0, dir: '' });
 
     if (!isOpen) return null;
 
@@ -47,18 +60,20 @@ export function WindowModal({
         setIsDragging(true);
         onFocus();
         dragOffset.current = {
-            x: e.clientX - position.x,
-            y: e.clientY - position.y
+            x: e.clientX - posRef.current.x,
+            y: e.clientY - posRef.current.y
         };
         (e.target as HTMLElement).setPointerCapture(e.pointerId);
     };
 
     const handlePointerMove = (e: React.PointerEvent) => {
         if (!isDragging || isMaximized) return;
-        setPosition({
-            x: Math.max(0, e.clientX - dragOffset.current.x),
-            y: Math.max(0, e.clientY - dragOffset.current.y)
-        });
+        posRef.current.x = Math.max(0, e.clientX - dragOffset.current.x);
+        posRef.current.y = Math.max(0, e.clientY - dragOffset.current.y);
+        
+        if (modalRef.current) {
+            modalRef.current.style.transform = `translate3d(${posRef.current.x}px, ${posRef.current.y}px, 0)`;
+        }
     };
 
     const handlePointerUp = (e: React.PointerEvent) => {
@@ -66,19 +81,69 @@ export function WindowModal({
         (e.target as HTMLElement).releasePointerCapture(e.pointerId);
     };
 
+    const handleResizePointerDown = (e: React.PointerEvent, dir: string) => {
+        if (isMaximized) return;
+        e.stopPropagation();
+        setIsResizing(true);
+        onFocus();
+        resizeData.current = {
+            startW: sizeRef.current.width,
+            startH: sizeRef.current.height,
+            startX: e.clientX,
+            startY: e.clientY,
+            dir
+        };
+        (e.target as HTMLElement).setPointerCapture(e.pointerId);
+    };
+
+    const handleResizePointerMove = (e: React.PointerEvent) => {
+        if (!isResizing || isMaximized) return;
+        const dx = e.clientX - resizeData.current.startX;
+        const dy = e.clientY - resizeData.current.startY;
+        
+        if (resizeData.current.dir.includes('e')) {
+            sizeRef.current.width = Math.max(300, resizeData.current.startW + dx);
+        }
+        if (resizeData.current.dir.includes('s')) {
+            sizeRef.current.height = Math.max(200, resizeData.current.startH + dy);
+        }
+
+        if (modalRef.current) {
+            modalRef.current.style.width = `${sizeRef.current.width}px`;
+            modalRef.current.style.height = `${sizeRef.current.height}px`;
+        }
+    };
+
+    const handleResizePointerUp = (e: React.PointerEvent) => {
+        setIsResizing(false);
+        (e.target as HTMLElement).releasePointerCapture(e.pointerId);
+    };
+
     return (
         <div 
-            className={`fixed flex flex-col bg-white rounded-lg shadow-2xl overflow-hidden border border-slate-300 transition-all ${isMaximized ? 'inset-0 w-full h-full rounded-none' : `${width} ${height}`}`}
-            style={{ 
-                left: isMaximized ? 0 : position.x, 
-                top: isMaximized ? 0 : position.y,
-                zIndex 
+            ref={modalRef}
+            className={`fixed flex flex-col bg-white rounded-lg shadow-2xl overflow-hidden border border-slate-300 ${isMaximized ? 'inset-0 rounded-none' : ''}`}
+            style={isMaximized ? {
+                left: 0,
+                top: 0,
+                width: '100%',
+                height: '100%',
+                zIndex,
+                transform: 'translate3d(0,0,0)'
+            } : {
+                left: 0,
+                top: 0,
+                width: `${sizeRef.current.width}px`,
+                height: `${sizeRef.current.height}px`,
+                zIndex,
+                transform: `translate3d(${posRef.current.x}px, ${posRef.current.y}px, 0)`,
+                willChange: 'transform, width, height'
             }}
             onPointerDown={onFocus}
         >
             {/* Windows-like Title Bar */}
             <div 
-                className={`bg-[#f0f0f0] flex items-center justify-between px-3 h-10 border-b border-slate-300 select-none ${!isMaximized ? 'cursor-move' : ''}`}
+                className={`bg-[#f0f0f0] flex items-center justify-between px-3 h-10 border-b border-slate-300 select-none touch-none ${!isMaximized ? 'cursor-move' : ''}`}
                 onPointerDown={handlePointerDown}
                 onPointerMove={handlePointerMove}
                 onPointerUp={handlePointerUp}
@@ -130,9 +195,33 @@ export function WindowModal({
             {/* Content Area */}
             <div className="flex-1 overflow-hidden bg-white relative">
                 {/* Pointer events none overlay while dragging iframe prevents iframe from swallowing drag events */}
-                {isDragging && <div className="absolute inset-0 z-10" />}
+                {(isDragging || isResizing) && <div className="absolute inset-0 z-10" />}
                 {children}
             </div>
+
+            {/* Resize Handles */}
+            {!isMaximized && (
+                <>
+                    <div 
+                        className="absolute right-0 top-0 bottom-0 w-3 cursor-e-resize z-20 touch-none"
+                        onPointerDown={(e) => handleResizePointerDown(e, 'e')}
+                        onPointerMove={handleResizePointerMove}
+                        onPointerUp={handleResizePointerUp}
+                    />
+                    <div 
+                        className="absolute left-0 right-0 bottom-0 h-3 cursor-s-resize z-20 touch-none"
+                        onPointerDown={(e) => handleResizePointerDown(e, 's')}
+                        onPointerMove={handleResizePointerMove}
+                        onPointerUp={handleResizePointerUp}
+                    />
+                    <div 
+                        className="absolute right-0 bottom-0 w-5 h-5 cursor-se-resize z-30 touch-none"
+                        onPointerDown={(e) => handleResizePointerDown(e, 'se')}
+                        onPointerMove={handleResizePointerMove}
+                        onPointerUp={handleResizePointerUp}
+                    />
+                </>
+            )}
         </div>
     );
 }
