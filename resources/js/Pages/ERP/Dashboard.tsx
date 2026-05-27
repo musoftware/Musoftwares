@@ -667,9 +667,10 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
         { id: 'notes', label: 'Notes', icon: Pin },
         { id: 'calendar', label: 'Calendar', icon: CalendarIcon },
         { id: 'team', label: 'Team', icon: UserCheck },
+        { id: 'backup', label: 'Backup', icon: HardDrive },
         { id: 'settings', label: 'Settings', icon: Settings },
     ].filter(item => {
-        if (isTeamMember && (item.id === 'team' || item.id === 'settings')) {
+        if (isTeamMember && (item.id === 'team' || item.id === 'settings' || item.id === 'backup')) {
             return false;
         }
         return true;
@@ -687,8 +688,8 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
             menuItems={menuItems.map(m => ({
                 ...m,
                 isActive: currentSection === m.id,
-                href: m.id === 'team' ? route('erp.team-members.index') : route('erp.dashboard', { section: m.id }),
-                onClick: m.id === 'team' ? undefined : (e: any) => {
+                href: m.id === 'team' ? route('erp.team-members.index') : (m.id === 'backup' ? route('erp.backup.index') : route('erp.dashboard', { section: m.id })),
+                onClick: (m.id === 'team' || m.id === 'backup') ? undefined : (e: any) => {
                     e.preventDefault();
                     handleSetSection(m.id);
                 }

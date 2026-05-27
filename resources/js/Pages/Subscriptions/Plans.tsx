@@ -70,7 +70,7 @@ const ICON_MAP: Record<string, React.ElementType> = {
 
 export default function Plans({ serviceItems, activeSubscription, walletBalance, currency }: PlansProps) {
     const [billing, setBilling] = useState<'1_month' | '6_months' | '1_year'>('1_month');
-    const [selectedItems, setSelectedItems] = useState<string[]>([]);
+    const [selectedItems, setSelectedItems] = useState<string[]>(activeSubscription?.custom_items || []);
 
     const modules = serviceItems.filter(item => item.type === 'module');
     const tools = serviceItems.filter(item => item.type === 'tool');

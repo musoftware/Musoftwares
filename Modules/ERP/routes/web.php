@@ -69,6 +69,10 @@ Route::middleware(['web', 'auth', 'tenant.active'])
         Route::post('files', [\Modules\ERP\Http\Controllers\FileController::class, 'store'])->name('files.store');
         Route::get('files/{file}', [\Modules\ERP\Http\Controllers\FileController::class, 'show'])->name('files.show');
         Route::delete('files/{file}', [\Modules\ERP\Http\Controllers\FileController::class, 'destroy'])->name('files.destroy');
+        // ── Backup ──
+        Route::get('backup', [\Modules\ERP\Http\Controllers\BackupController::class, 'index'])->name('backup.index');
+        Route::get('backup/download', [\Modules\ERP\Http\Controllers\BackupController::class, 'download'])->name('backup.download');
+        Route::post('backup/restore', [\Modules\ERP\Http\Controllers\BackupController::class, 'restore'])->name('backup.restore');
 
         // ── Missing Routes for Frontend ──
         Route::get('team-members', [\Modules\ERP\Http\Controllers\ERPDashboardController::class, 'index'])->name('team-members.index');

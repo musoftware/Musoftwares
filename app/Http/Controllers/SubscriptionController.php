@@ -148,6 +148,14 @@ class SubscriptionController extends Controller
 
         $wallet = ['id' => null, 'balance' => (float)$user->user_balance, 'currency' => $user->currency_name()];
 
+        $customItems = [];
+        if ($user->tenant_id) {
+            $customItems = \App\Models\TenantFeature::where('tenant_id', $user->tenant_id)
+                ->where('expires_at', '>', Carbon::now())
+                ->pluck('feature_key')
+                ->toArray();
+        }
+
         $hasSub = $user->hasSubscription();
         $activeSub = null;
 
@@ -162,7 +170,7 @@ class SubscriptionController extends Controller
                 'amount'        => $user->plan->current_plan_price(),
                 'expires_at'    => Carbon::parse($user->subscription_date)->format('M d, Y'),
                 'auto_renew'    => (bool) $user->subscription_force,
-                'custom_items'  => [],
+                'custom_items'  => $customItems,
             ];
         }
 
@@ -232,6 +240,23 @@ class SubscriptionController extends Controller
         return $totalUsd * $rate;
     }
 
+    private function validateAddonParents($items)
+    {
+        if (!$items || !is_array($items)) return;
+
+        $addonsConfig = config('saas.addons', []);
+        foreach ($items as $item) {
+            if (isset($addonsConfig[$item])) {
+                $parent = $addonsConfig[$item]['parent'];
+                if (!in_array($parent, $items)) {
+                    throw \Illuminate\Validation\ValidationException::withMessages([
+                        'error' => "You cannot subscribe to {$addonsConfig[$item]['name']} without its parent module."
+                    ]);
+                }
+            }
+        }
+    }
+
     private function getOrCreateCustomPlan($selectedItems, $billingCycle, $currencyId)
     {
         sort($selectedItems);
@@ -271,6 +296,8 @@ class SubscriptionController extends Controller
             'items'         => 'nullable|array',
             'billing_cycle' => 'required|string',
         ]);
+
+        $this->validateAddonParents($request->items);
 
         $user = Auth::user();
         
@@ -351,6 +378,10 @@ class SubscriptionController extends Controller
 
                 // Save capabilities
                 if (isset($request->items) && is_array($request->items) && $user->tenant_id) {
+                    \App\Models\TenantFeature::where('tenant_id', $user->tenant_id)
+                        ->whereNotIn('feature_key', $request->items)
+                        ->delete();
+
                     foreach ($request->items as $item) {
                         \App\Models\TenantFeature::updateOrCreate(
                             ['tenant_id' => $user->tenant_id, 'feature_key' => $item],
@@ -395,6 +426,8 @@ class SubscriptionController extends Controller
             'items'         => 'nullable|array',
             'billing_cycle' => 'required|string',
         ]);
+
+        $this->validateAddonParents($request->items);
 
         $user = Auth::user();
         
@@ -500,7 +533,11 @@ class SubscriptionController extends Controller
 
                                     // Save capabilities
                                     $items = $metadata['items'] ?? [];
-                                    if (is_array($items) && $user->tenant_id) {
+                                    if (is_array($items) && !empty($items) && $user->tenant_id) {
+                                        \App\Models\TenantFeature::where('tenant_id', $user->tenant_id)
+                                            ->whereNotIn('feature_key', $items)
+                                            ->delete();
+
                                         foreach ($items as $item) {
                                             \App\Models\TenantFeature::updateOrCreate(
                                                 ['tenant_id' => $user->tenant_id, 'feature_key' => $item],
