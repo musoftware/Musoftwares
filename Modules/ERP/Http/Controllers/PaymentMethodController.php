@@ -25,7 +25,7 @@ class PaymentMethodController extends Controller
      */
     private function resolveClient(): TenantClient
     {
-        $client = Auth::user()->resolveClient();
+        $client = TenantClient::where('user_id', Auth::id())->first();
 
         if (!$client) {
             abort(403, 'No client record is linked to your account.');

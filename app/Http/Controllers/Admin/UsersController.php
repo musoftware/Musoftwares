@@ -108,18 +108,11 @@ class UsersController extends Controller
             'kyc_docs_count' => $user->kycDocuments()->count(),
         ];
 
-        // Try ERP stats if ERP module exists, fallback to User model relations
+        // Fetch ERP stats using User model relations directly (IsPlatformClient trait)
         try {
-            $erpClient = $user->client;
-            if ($erpClient) {
-                $stats['invoices_total'] = $erpClient->invoices()->count();
-                $stats['invoices_paid']  = $erpClient->invoices()->where('status', 'paid')->count();
-                $stats['invoices_unpaid_sum'] = $erpClient->invoices()->where('status', 'unpaid')->sum('amount');
-            } else {
-                $stats['invoices_total'] = $user->invoices()->count();
-                $stats['invoices_paid']  = $user->invoices()->where('status', 'paid')->count();
-                $stats['invoices_unpaid_sum'] = $user->invoices()->where('status', 'unpaid')->sum('amount');
-            }
+            $stats['invoices_total'] = $user->invoices()->count();
+            $stats['invoices_paid']  = $user->invoices()->where('status', 'paid')->count();
+            $stats['invoices_unpaid_sum'] = $user->invoices()->where('status', 'unpaid')->sum('amount');
         } catch (\Throwable $e) {}
 
         // Try Marketplace stats

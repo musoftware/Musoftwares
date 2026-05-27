@@ -133,7 +133,8 @@ class KashierHelper
         string $currency = 'USD',
         string $billingCycle = '1_year',
         int $days = 365,
-        array $items = []
+        array $items = [],
+        bool $isNewSystem = false
     ): string {
         $orderId = 'sub_' . uniqid() . '-' . $userId;
         $merchantId = config('services.kashier.merchant_id', 'MID-12345');
@@ -178,6 +179,7 @@ class KashierHelper
                 'billing_cycle' => $billingCycle,
                 'days' => $days,
                 'items' => $items,
+                'is_new_system' => $isNewSystem,
             ]),
         ];
 
