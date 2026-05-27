@@ -13,5 +13,6 @@
     "WrittenCoursesEngine": true,
     "ISaas": true,
     "AffiliatePos": true,
-    "PaymentGateway": true
+    "PaymentGateway": true,
+    "MusoftwarePayments": true
 }
