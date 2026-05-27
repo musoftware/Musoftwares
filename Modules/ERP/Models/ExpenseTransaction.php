@@ -10,7 +10,7 @@ class ExpenseTransaction extends TenantModel
 
     protected $fillable = [
         'tenant_id', 'invoice_cost_id', 'invoice_id', 'client_id',
-        'type', 'direction', 'amount', 'amount_currency', 'business_amount', 'business_currency',
+        'type', 'direction', 'amount', 'currency_id', 'business_amount', 'business_currency_id',
         'exchange_rate', 'exchange_rate_date', 'balance_before', 'balance_after',
         'note', 'created_by'
     ];
@@ -50,5 +50,15 @@ class ExpenseTransaction extends TenantModel
     public function creator(): BelongsTo
     {
         return $this->belongsTo(\App\Models\User::class, 'created_by');
+    }
+
+    public function currency(): BelongsTo
+    {
+        return $this->belongsTo(\App\Models\Currency::class, 'currency_id');
+    }
+
+    public function businessCurrency(): BelongsTo
+    {
+        return $this->belongsTo(\App\Models\Currency::class, 'business_currency_id');
     }
 }

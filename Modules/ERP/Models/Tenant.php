@@ -11,7 +11,7 @@ class Tenant extends Model
 {
     protected $table = 'erp_tenants';
 
-    protected $fillable = ['user_id', 'name', 'status', 'currency_id', 'trial_ends_at', 'subscription_ends_at'];
+    protected $fillable = ['user_id', 'name', 'status', 'base_currency_id', 'trial_ends_at', 'subscription_ends_at'];
 
     protected $casts = [
         'trial_ends_at' => 'datetime',
@@ -44,9 +44,9 @@ class Tenant extends Model
         return $this->hasMany(TeamMember::class);
     }
 
-    public function currency(): BelongsTo
+    public function baseCurrency()
     {
-        return $this->belongsTo(\App\Models\Currency::class, 'currency_id');
+        return $this->belongsTo(\App\Models\Currency::class, 'base_currency_id');
     }
 
     /**

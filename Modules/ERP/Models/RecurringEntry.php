@@ -11,7 +11,7 @@ class RecurringEntry extends TenantModel
 
     protected $fillable = [
         'tenant_id', 'type', 'title', 'description',
-        'amount', 'amount_currency', 'business_amount', 'business_currency',
+        'amount', 'currency_id', 'business_amount', 'business_currency_id',
         'exchange_rate', 'exchange_rate_date', 'frequency', 'frequency_day', 'frequency_month',
         'starts_at', 'ends_at', 'next_run_at', 'last_run_at', 'next_date', 'end_date',
         'status', 'is_active', 'created_by'
@@ -41,6 +41,16 @@ class RecurringEntry extends TenantModel
     public function creator(): BelongsTo
     {
         return $this->belongsTo(\App\Models\User::class, 'created_by');
+    }
+
+    public function currency(): BelongsTo
+    {
+        return $this->belongsTo(\App\Models\Currency::class, 'currency_id');
+    }
+
+    public function businessCurrency(): BelongsTo
+    {
+        return $this->belongsTo(\App\Models\Currency::class, 'business_currency_id');
     }
 
     public function executionLogs(): HasMany
