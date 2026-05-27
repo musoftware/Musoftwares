@@ -9,12 +9,16 @@ import { CheckCircle2, Shield, Maximize, Minimize, FolderPlus } from 'lucide-rea
 import ApplicationLogo from '@/Components/ApplicationLogo';
 
 import { SettingsModal } from '@/Components/Tools/SettingsModal';
+import { ContextMenu, ContextMenuState } from '@/Components/Tools/ContextMenu';
 import axios from 'axios';
 
 const DEFAULT_WALLPAPER_URL = 'https://images.unsplash.com/photo-1506744626753-143d63428987?q=80&w=2560&auto=format&fit=crop';
 const CELL_WIDTH = 100; // Pixels per grid column
 const CELL_HEIGHT = 110; // Pixels per grid row
 const MAX_ROWS = 6; // Rough estimate, could calculate dynamically
+
+const formatTime = (date: Date) => date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+const formatDate = (date: Date) => date.toISOString().split('T')[0];
 
 const SLUG_EMOJI_MAP: Record<string, string> = {
     'tiktok-intelligence': '📱',
@@ -88,15 +92,36 @@ export default function Explore({ tools, categories, subscribedSlugs, hasBrowser
     const [isSubscribeModalOpen, setSubscribeModalOpen] = useState(false);
     const [isFullscreen, setIsFullscreen] = useState(false);
 
+    const [prayerCity, setPrayerCity] = useState(workspaceSettings?.prayerCity || 'Cairo');
+    const [prayerCountry, setPrayerCountry] = useState(workspaceSettings?.prayerCountry || 'Egypt');
+    const [prayerMethod, setPrayerMethod] = useState(workspaceSettings?.prayerMethod || '5');
+
     // Desktop Settings Sync Wrapper
-    const saveSettings = (newItems: DesktopItem[], prayerTimes: boolean, newWallpaper: string) => {
+    const saveSettings = (
+        newItems: DesktopItem[], 
+        prayerTimes: boolean, 
+        newWallpaper: string,
+        city = prayerCity,
+        country = prayerCountry,
+        method = prayerMethod
+    ) => {
         axios.post(route('tools.workspace.settings.save'), {
             settings: {
                 desktopItems: newItems,
                 showPrayerTimes: prayerTimes,
-                wallpaperUrl: newWallpaper
+                wallpaperUrl: newWallpaper,
+                prayerCity: city,
+                prayerCountry: country,
+                prayerMethod: method
             }
         }).catch(err => console.error("Failed to save workspace settings:", err));
+    };
+
+    const handlePrayerSettingsChange = (city: string, country: string, method: string) => {
+        setPrayerCity(city);
+        setPrayerCountry(country);
+        setPrayerMethod(method);
+        saveSettings(desktopItems, showPrayerTimes, wallpaperUrl, city, country, method);
     };
 
     // Desktop State
@@ -108,6 +133,12 @@ export default function Explore({ tools, categories, subscribedSlugs, hasBrowser
     const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
     const [wallpaperUrl, setWallpaperUrl] = useState(workspaceSettings?.wallpaperUrl || DEFAULT_WALLPAPER_URL);
     
+    // Advanced Desktop Features State
+    const [selectedItemIds, setSelectedItemIds] = useState<string[]>([]);
+    const [contextMenu, setContextMenu] = useState<ContextMenuState | null>(null);
+    const [editingItemId, setEditingItemId] = useState<string | null>(null);
+    const [clipboard, setClipboard] = useState<DesktopItem[]>([]);
+
     // Prayer Times State
     const [showPrayerTimes, setShowPrayerTimes] = useState(() => {
         if (workspaceSettings && workspaceSettings.showPrayerTimes !== undefined) {
@@ -116,6 +147,7 @@ export default function Explore({ tools, categories, subscribedSlugs, hasBrowser
         return true;
     });
     const [prayerTimes, setPrayerTimes] = useState<Record<string, string> | null>(null);
+    const [lastFetchedDate, setLastFetchedDate] = useState<string | null>(null);
 
     const toggleFullscreen = () => {
         if (!document.fullscreenElement) {
@@ -136,10 +168,9 @@ export default function Explore({ tools, categories, subscribedSlugs, hasBrowser
         return () => clearInterval(timer);
     }, []);
 
-    // Fetch Prayer Times
-    useEffect(() => {
-        if (!showPrayerTimes) return;
-        fetch('https://api.aladhan.com/v1/timingsByCity?city=Cairo&country=Egypt&method=5')
+    const fetchPrayerTimes = () => {
+        if (!prayerCity || !prayerCountry) return;
+        fetch(`https://api.aladhan.com/v1/timingsByCity?city=${encodeURIComponent(prayerCity)}&country=${encodeURIComponent(prayerCountry)}&method=${prayerMethod}`)
             .then(res => res.json())
             .then(data => {
                 if (data.code === 200) {
@@ -152,7 +183,56 @@ export default function Explore({ tools, categories, subscribedSlugs, hasBrowser
                     });
                 }
             }).catch(err => console.error("Failed to fetch prayer times", err));
-    }, [showPrayerTimes]);
+    };
+
+    useEffect(() => {
+        if (!showPrayerTimes) return;
+        const checkMidnight = () => {
+            const dateStr = formatDate(new Date());
+            if (dateStr !== lastFetchedDate) {
+                fetchPrayerTimes();
+                setLastFetchedDate(dateStr);
+            }
+        };
+
+        checkMidnight();
+        const interval = setInterval(checkMidnight, 60000);
+        return () => clearInterval(interval);
+    }, [showPrayerTimes, lastFetchedDate, prayerCity, prayerCountry, prayerMethod]);
+
+    useEffect(() => {
+        if (showPrayerTimes) {
+            fetchPrayerTimes();
+        }
+    }, [prayerCity, prayerCountry, prayerMethod]);
+
+    // Next Prayer Logic
+    const nextPrayer = React.useMemo(() => {
+        if (!prayerTimes) return null;
+        const currentHours = currentTime.getHours();
+        const currentMinutes = currentTime.getMinutes();
+        const currentTotalMinutes = currentHours * 60 + currentMinutes;
+
+        const parseTime = (timeStr: string) => {
+            const [h, m] = timeStr.split(':').map(Number);
+            return h * 60 + m;
+        };
+
+        const prayers = [
+            { name: 'الفجر', time: prayerTimes.Fajr },
+            { name: 'الظهر', time: prayerTimes.Dhuhr },
+            { name: 'العصر', time: prayerTimes.Asr },
+            { name: 'المغرب', time: prayerTimes.Maghrib },
+            { name: 'العشاء', time: prayerTimes.Isha }
+        ];
+
+        for (const prayer of prayers) {
+            if (parseTime(prayer.time) > currentTotalMinutes) {
+                return prayer;
+            }
+        }
+        return { name: 'الفجر (غداً)', time: prayerTimes.Fajr };
+    }, [prayerTimes, currentTime]);
 
     const handleHidePrayerTimes = (e: React.MouseEvent) => {
         e.preventDefault();
@@ -169,6 +249,131 @@ export default function Explore({ tools, categories, subscribedSlugs, hasBrowser
     const handleWallpaperChange = (url: string) => {
         setWallpaperUrl(url);
         saveSettings(desktopItems, showPrayerTimes, url);
+    };
+
+    // Keyboard Shortcuts
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (isStartMenuOpen || isSubscribeModalOpen || selectedTool || isSettingsModalOpen || editingItemId) return;
+
+            // Delete
+            if (e.key === 'Delete' && selectedItemIds.length > 0) {
+                const newItems = desktopItems.filter(item => !selectedItemIds.includes(item.id));
+                setDesktopItems(newItems);
+                setSelectedItemIds([]);
+            }
+
+            // Select All (Ctrl+A)
+            if (e.ctrlKey && e.key === 'a') {
+                e.preventDefault();
+                setSelectedItemIds(desktopItems.map(i => i.id));
+            }
+
+            // Copy (Ctrl+C)
+            if (e.ctrlKey && e.key === 'c' && selectedItemIds.length > 0) {
+                const copied = desktopItems.filter(i => selectedItemIds.includes(i.id));
+                setClipboard(copied);
+            }
+
+            // Paste (Ctrl+V)
+            if (e.ctrlKey && e.key === 'v' && clipboard.length > 0) {
+                const newItems = [...desktopItems];
+                const pastedIds: string[] = [];
+                clipboard.forEach(item => {
+                    const { x, y } = findNextAvailableCell(newItems);
+                    const newItem = { ...item, id: `${item.type}-${Date.now()}-${Math.random()}`, x, y };
+                    if (item.type === 'tool' && item.name) newItem.name = item.name + ' - Copy';
+                    if (item.type === 'folder' && item.name) newItem.name = item.name + ' - Copy';
+                    newItems.push(newItem);
+                    pastedIds.push(newItem.id);
+                });
+                setDesktopItems(newItems);
+                setSelectedItemIds(pastedIds);
+            }
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [desktopItems, selectedItemIds, clipboard, isStartMenuOpen, isSubscribeModalOpen, selectedTool, isSettingsModalOpen, editingItemId]);
+
+    // Context Menu Logic
+    const handleDesktopContextMenu = (e: React.MouseEvent) => {
+        e.preventDefault();
+        setContextMenu({
+            x: e.clientX,
+            y: e.clientY,
+            type: 'desktop',
+            targetId: null
+        });
+    };
+
+    const handleIconContextMenu = (e: React.MouseEvent, id: string, type: 'icon' | 'folder') => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (!selectedItemIds.includes(id)) {
+            setSelectedItemIds([id]);
+        }
+        setContextMenu({
+            x: e.clientX,
+            y: e.clientY,
+            type,
+            targetId: id
+        });
+    };
+
+    const handleContextMenuAction = (action: string, targetId: string | null) => {
+        switch (action) {
+            case 'new_folder':
+                handleCreateFolder();
+                break;
+            case 'auto_arrange':
+                handleAutoArrange();
+                break;
+            case 'settings':
+                setIsSettingsModalOpen(true);
+                break;
+            case 'open':
+                if (targetId) {
+                    const item = desktopItems.find(i => i.id === targetId);
+                    if (item?.type === 'folder') setOpenFolderId(targetId);
+                    else if (item?.type === 'tool' && item.toolSlug) handleToolClick(item.toolSlug);
+                }
+                break;
+            case 'rename':
+                if (targetId) setEditingItemId(targetId);
+                break;
+            case 'duplicate':
+                if (targetId) {
+                    const item = desktopItems.find(i => i.id === targetId);
+                    if (item) {
+                        const { x, y } = findNextAvailableCell(desktopItems);
+                        const newItem = { ...item, id: `${item.type}-${Date.now()}`, x, y, name: item.name + ' - Copy' };
+                        setDesktopItems([...desktopItems, newItem]);
+                    }
+                }
+                break;
+            case 'delete':
+                if (selectedItemIds.length > 0) {
+                    setDesktopItems(desktopItems.filter(i => !selectedItemIds.includes(i.id)));
+                    setSelectedItemIds([]);
+                }
+                break;
+            case 'move_to_desktop':
+                // Handled specifically inside FolderModal right-click, but keeping placeholder
+                break;
+        }
+    };
+
+    const handleAutoArrange = () => {
+        const sorted = [...desktopItems].sort((a, b) => {
+            if (a.type !== b.type) return a.type === 'folder' ? -1 : 1;
+            return a.name.localeCompare(b.name);
+        });
+        const rearranged = sorted.map((item, index) => {
+            const x = Math.floor(index / MAX_ROWS);
+            const y = index % MAX_ROWS;
+            return { ...item, x, y };
+        });
+        setDesktopItems(rearranged);
     };
 
     // Helper: Find first empty grid cell
@@ -439,16 +644,19 @@ export default function Explore({ tools, categories, subscribedSlugs, hasBrowser
         setDesktopItems(prev => prev.map(item => item.id === folderId ? { ...item, name: newName } : item));
     };
 
-    const formatTime = (date: Date) => date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    const formatDate = (date: Date) => date.toLocaleDateString([], { month: 'numeric', day: 'numeric', year: 'numeric' });
-
     const openFolder = desktopItems.find(i => i.id === openFolderId);
 
     return (
         <div 
             className="h-screen w-screen overflow-hidden bg-slate-900 bg-cover bg-center flex flex-col font-['Inter',sans-serif]"
             style={{ backgroundImage: `url(${wallpaperUrl})` }}
-            onClick={() => setIsStartMenuOpen(false)}
+            onClick={() => {
+                setIsStartMenuOpen(false);
+                setSelectedItemIds([]);
+                setContextMenu(null);
+                setEditingItemId(null);
+            }}
+            onContextMenu={handleDesktopContextMenu}
         >
             <Head title="Tools Workspace" />
 
@@ -471,20 +679,32 @@ export default function Explore({ tools, categories, subscribedSlugs, hasBrowser
                         return (
                             <DesktopIcon
                                 key={item.id}
-                                id={item.id}
-                                title={item.name}
-                                iconUrl={toolData.icon_url}
-                                emojiFallback={SLUG_EMOJI_MAP[toolData.slug] ?? '📦'}
-                                isOwned={subscribedSlugs.includes(toolData.slug)}
-                                isFeatured={toolData.is_featured}
-                                onClick={() => handleToolClick(toolData.slug)}
+                                tool={toolData}
+                                icon={SLUG_EMOJI_MAP[toolData.slug] || '⚡'}
+                                onClick={(e) => {
+                                    if (e.ctrlKey) {
+                                        setSelectedItemIds(prev => prev.includes(item.id) ? prev.filter(i => i !== item.id) : [...prev, item.id]);
+                                    } else {
+                                        setSelectedItemIds([item.id]);
+                                    }
+                                }}
+                                onDoubleClick={() => handleToolClick(toolData.slug)}
+                                onDragStart={() => setDraggedItemId(item.id)}
+                                onDragEnd={() => setDraggedItemId(null)}
+                                style={style}
+                                className={draggedItemId === item.id ? 'opacity-50 scale-95' : 'hover:scale-105 transition-transform'}
+                                isSelected={selectedItemIds.includes(item.id)}
+                                isEditing={editingItemId === item.id}
+                                onRenameSubmit={(newName) => {
+                                    setDesktopItems(desktopItems.map(i => i.id === item.id ? { ...i, name: newName } : i));
+                                    setEditingItemId(null);
+                                }}
+                                onContextMenu={(e) => handleIconContextMenu(e, item.id, 'icon')}
                                 draggable
-                                onDragStart={handleDragStart}
                                 onDragOver={handleDragOver}
                                 onDragLeave={handleDragLeave}
                                 onDrop={handleDropOnItem}
                                 isDragOver={dragOverItemId === item.id}
-                                style={style}
                             />
                         );
                     } else if (item.type === 'folder') {
@@ -501,13 +721,29 @@ export default function Explore({ tools, categories, subscribedSlugs, hasBrowser
                                 id={item.id}
                                 name={item.name}
                                 childrenTools={childrenTools}
-                                onClick={() => setOpenFolderId(item.id)}
-                                onDragStart={handleDragStart}
-                                onDragOver={handleDragOver}
+                                onClick={(e) => {
+                                    if (e.ctrlKey) {
+                                        setSelectedItemIds(prev => prev.includes(item.id) ? prev.filter(i => i !== item.id) : [...prev, item.id]);
+                                    } else {
+                                        setSelectedItemIds([item.id]);
+                                    }
+                                }}
+                                onDoubleClick={() => setOpenFolderId(item.id)}
+                                onDragStart={(e) => handleDragStart(e, item.id)}
+                                onDragEnd={() => setDraggedItemId(null)}
+                                onDragOver={(e) => handleDragOver(e, item.id)}
                                 onDragLeave={handleDragLeave}
-                                onDrop={handleDropOnItem}
+                                onDrop={(e) => handleDropOnItem(e, item.id)}
                                 isDragOver={dragOverItemId === item.id}
                                 style={style}
+                                className={draggedItemId === item.id ? 'opacity-50 scale-95' : 'hover:scale-105 transition-transform'}
+                                isSelected={selectedItemIds.includes(item.id)}
+                                isEditing={editingItemId === item.id}
+                                onRenameSubmit={(newName) => {
+                                    setDesktopItems(desktopItems.map(i => i.id === item.id ? { ...i, name: newName } : i));
+                                    setEditingItemId(null);
+                                }}
+                                onContextMenu={(e) => handleIconContextMenu(e, item.id, 'folder')}
                             />
                         );
                     }
@@ -608,31 +844,19 @@ export default function Explore({ tools, categories, subscribedSlugs, hasBrowser
                 </div>
 
                 <div className="flex items-center h-full text-white text-xs">
-                    {showPrayerTimes && prayerTimes && (
+                    {showPrayerTimes && nextPrayer && (
                         <div 
                             onContextMenu={handleHidePrayerTimes}
-                            className="flex items-center gap-3 px-3 border-r border-white/10 mr-2 h-full cursor-pointer hover:bg-white/5 transition-colors"
+                            className="flex items-center gap-3 px-4 border-r border-white/10 mr-2 h-full cursor-pointer hover:bg-white/5 transition-colors"
                             title="Right-click to hide"
                         >
-                            <div className="flex flex-col items-center justify-center">
-                                <span className="text-[9px] text-slate-400">الفجر</span>
-                                <span className="font-semibold text-emerald-400">{prayerTimes.Fajr}</span>
-                            </div>
-                            <div className="flex flex-col items-center justify-center">
-                                <span className="text-[9px] text-slate-400">الظهر</span>
-                                <span className="font-semibold">{prayerTimes.Dhuhr}</span>
-                            </div>
-                            <div className="flex flex-col items-center justify-center">
-                                <span className="text-[9px] text-slate-400">العصر</span>
-                                <span className="font-semibold">{prayerTimes.Asr}</span>
-                            </div>
-                            <div className="flex flex-col items-center justify-center">
-                                <span className="text-[9px] text-slate-400">المغرب</span>
-                                <span className="font-semibold text-amber-400">{prayerTimes.Maghrib}</span>
-                            </div>
-                            <div className="flex flex-col items-center justify-center">
-                                <span className="text-[9px] text-slate-400">العشاء</span>
-                                <span className="font-semibold">{prayerTimes.Isha}</span>
+                            <span className="text-lg">🕌</span>
+                            <div className="flex flex-col items-start justify-center">
+                                <span className="text-[10px] text-slate-400 font-medium tracking-wide uppercase">Next Prayer</span>
+                                <div className="flex items-center gap-2">
+                                    <span className="font-bold text-amber-400">{nextPrayer.name}</span>
+                                    <span className="text-white font-semibold">{nextPrayer.time}</span>
+                                </div>
                             </div>
                         </div>
                     )}
@@ -667,14 +891,12 @@ export default function Explore({ tools, categories, subscribedSlugs, hasBrowser
                         <DesktopIcon
                             key={slug}
                             id={slug}
-                            title={toolData.title}
-                            iconUrl={toolData.icon_url}
-                            emojiFallback={SLUG_EMOJI_MAP[toolData.slug] ?? '📦'}
-                            isOwned={subscribedSlugs.includes(toolData.slug)}
-                            isFeatured={toolData.is_featured}
+                            tool={toolData}
+                            icon={SLUG_EMOJI_MAP[toolData.slug] ?? '📦'}
                             onClick={() => handleToolClick(toolData.slug)}
                             draggable
                             onDragStart={(e) => handleDragStart(e, slug, openFolder.id)}
+                            onContextMenu={(e) => handleIconContextMenu(e, slug, 'icon')}
                         />
                     );
                 })}
@@ -784,6 +1006,16 @@ export default function Explore({ tools, categories, subscribedSlugs, hasBrowser
                 onTogglePrayerTimes={togglePrayerTimes}
                 wallpaperUrl={wallpaperUrl}
                 onWallpaperChange={handleWallpaperChange}
+                prayerCity={prayerCity}
+                prayerCountry={prayerCountry}
+                prayerMethod={prayerMethod}
+                onPrayerSettingsChange={handlePrayerSettingsChange}
+            />
+
+            <ContextMenu 
+                menu={contextMenu}
+                onClose={() => setContextMenu(null)}
+                onAction={handleContextMenuAction}
             />
         </div>
     );
