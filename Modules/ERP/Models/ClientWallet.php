@@ -9,7 +9,7 @@ class ClientWallet extends TenantModel
 {
     protected $table = 'erp_client_wallets';
 
-    protected $fillable = ['tenant_id', 'client_id', 'balance', 'currency', 'locked_balance'];
+    protected $fillable = ['tenant_id', 'client_id', 'balance', 'currency_id', 'locked_balance'];
 
     protected $casts = [
         'balance' => 'decimal:2',

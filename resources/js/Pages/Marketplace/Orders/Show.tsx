@@ -8,6 +8,7 @@ export default function Show({ order, conversation }: any) {
     const isBuyer = auth.user.id === order.buyer_id;
     const isSeller = auth.user.id === order.seller_id;
     const [deliveryNote, setDeliveryNote] = useState('');
+    const [deliveryLinks, setDeliveryLinks] = useState('');
 
     const handleDeliver = (e: React.FormEvent) => {
         e.preventDefault();
@@ -15,7 +16,8 @@ export default function Show({ order, conversation }: any) {
             confirm('Are you sure you want to submit delivery for this order?')
         ) {
             router.post(route('marketplace.orders.deliver', order.id), {
-                note: deliveryNote,
+                message: deliveryNote,
+                links: deliveryLinks,
             });
         }
     };
@@ -181,52 +183,22 @@ export default function Show({ order, conversation }: any) {
                                             Message:
                                         </h5>
                                         <p className="rounded-lg border border-gray-100 bg-gray-50 p-4 text-sm text-gray-600">
-                                            Here is the final delivery. I've
-                                            included all the requested files.
-                                            Let me know if you need any
-                                            revisions!
+                                            {order.delivery_payload?.message || "No message provided."}
                                         </p>
                                     </div>
 
+                                    {order.delivery_payload?.links && (
                                     <div className="mb-6">
                                         <h5 className="mb-2 text-sm font-medium text-gray-700">
-                                            Attached Files:
+                                            Delivery Links:
                                         </h5>
                                         <div className="flex cursor-pointer items-center rounded-lg border border-gray-200 p-3 transition hover:bg-gray-50">
-                                            <svg
-                                                className="mr-3 h-8 w-8 text-indigo-500"
-                                                fill="currentColor"
-                                                viewBox="0 0 20 20"
-                                            >
-                                                <path
-                                                    fillRule="evenodd"
-                                                    d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z"
-                                                    clipRule="evenodd"
-                                                ></path>
-                                            </svg>
-                                            <div className="flex-1">
-                                                <p className="text-sm font-medium text-gray-900">
-                                                    final_delivery_files.zip
-                                                </p>
-                                                <p className="text-xs text-gray-500">
-                                                    12.4 MB
-                                                </p>
-                                            </div>
-                                            <svg
-                                                className="h-5 w-5 text-gray-400"
-                                                fill="none"
-                                                stroke="currentColor"
-                                                viewBox="0 0 24 24"
-                                            >
-                                                <path
-                                                    strokeLinecap="round"
-                                                    strokeLinejoin="round"
-                                                    strokeWidth="2"
-                                                    d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
-                                                ></path>
-                                            </svg>
+                                            <a href={order.delivery_payload.links} target="_blank" rel="noopener noreferrer" className="text-indigo-600 hover:underline">
+                                                {order.delivery_payload.links}
+                                            </a>
                                         </div>
                                     </div>
+                                    )}
 
                                     {isBuyer && (
                                         <div className="flex gap-4 border-t border-gray-100 pt-6">
@@ -642,6 +614,18 @@ export default function Show({ order, conversation }: any) {
                                                             }
                                                             required
                                                         ></textarea>
+                                                    </div>
+                                                    <div className="mb-6">
+                                                        <label className="mb-2 block text-sm font-medium text-gray-700">
+                                                            Delivery Links (Google Drive, Figma, etc.)
+                                                        </label>
+                                                        <input
+                                                            type="url"
+                                                            className="w-full rounded-lg border-gray-300 text-sm shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                                            placeholder="https://..."
+                                                            value={deliveryLinks}
+                                                            onChange={(e) => setDeliveryLinks(e.target.value)}
+                                                        />
                                                     </div>
                                                     <div className="mb-6">
                                                         <label className="mb-2 block text-sm font-medium text-gray-700">

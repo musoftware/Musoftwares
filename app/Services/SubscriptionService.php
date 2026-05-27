@@ -26,14 +26,14 @@ class SubscriptionService
      */
     public function hasActiveSubscription(User $user, string $module): bool
     {
+        // Admins and moderators have access to everything
+        if ($user->hasRole(['admin', 'Admin', 'moderator', 'Moderator'])) {
+            return true;
+        }
+
         // Points-based modules are never free
         if (in_array($module, ['freelance', 'facebook-publisher'])) {
             return $user->hasSubscription();
-        }
-
-        // Admins and moderators have access to everything else
-        if ($user->hasRole('admin') || $user->hasRole('moderator')) {
-            return true;
         }
 
         return $user->hasSubscription();
@@ -44,13 +44,14 @@ class SubscriptionService
      */
     public function hasAccessToTool(User $user, string $toolSlug): bool
     {
+        // Admins and moderators have access to everything
+        if ($user->hasRole(['admin', 'Admin', 'moderator', 'Moderator'])) {
+            return true;
+        }
+
         // Points-based tools are never free
         if (in_array($toolSlug, ['freelance', 'facebook-publisher'])) {
             return false;
-        }
-
-        if ($user->hasRole('admin') || $user->hasRole('moderator')) {
-            return true;
         }
 
         if ($user->hasSubscription()) {
@@ -73,7 +74,7 @@ class SubscriptionService
      */
     public function hasAnySubscription(User $user): bool
     {
-        if ($user->hasRole('admin') || $user->hasRole('moderator')) {
+        if ($user->hasRole(['admin', 'Admin', 'moderator', 'Moderator'])) {
             return true;
         }
 
@@ -106,7 +107,7 @@ class SubscriptionService
 
     public function getLimits(User $user, string $module): array
     {
-        if ($user->hasRole('admin') || $user->hasRole('moderator')) {
+        if ($user->hasRole(['admin', 'Admin', 'moderator', 'Moderator'])) {
             if (!in_array($module, ['freelance'])) {
                 return [
                     'projects'     => -1,
@@ -148,7 +149,7 @@ class SubscriptionService
      */
     public function isWithinLimit(User $user, string $module, string $limitKey, int $currentCount): bool
     {
-        if ($user->hasRole('admin')) {
+        if ($user->hasRole(['admin', 'Admin'])) {
             return true;
         }
 

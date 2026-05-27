@@ -63,6 +63,9 @@ class ProposalController extends Controller
                 'status' => 'pending',
             ]);
 
+            $user->points_balance -= $proposalCost;
+            $user->save();
+
             PointTransaction::create([
                 'user_id' => $user->id,
                 'points' => $proposalCost,
@@ -86,8 +89,25 @@ class ProposalController extends Controller
             $proposal->update(['status' => 'accepted']);
             $job->update(['status' => 'in_progress']);
 
-            // Reject other pending proposals
+            // Refund and reject other pending proposals
+            $rejectedProposals = $job->proposals()->where('id', '!=', $proposal->id)->where('status', 'pending')->get();
             $job->proposals()->where('id', '!=', $proposal->id)->where('status', 'pending')->update(['status' => 'rejected']);
+
+            $proposalCost = 2; // Fixed cost of proposal submission
+            foreach ($rejectedProposals as $rejected) {
+                $freelancer = $rejected->freelancer;
+                if ($freelancer) {
+                    $freelancer->points_balance += $proposalCost;
+                    $freelancer->save();
+
+                    PointTransaction::create([
+                        'user_id' => $freelancer->id,
+                        'points' => $proposalCost,
+                        'type' => 'credit',
+                        'description' => "Refunded staked points for job: {$job->title}",
+                    ]);
+                }
+            }
 
             Contract::create([
                 'job_id' => $job->id,
@@ -112,7 +132,24 @@ class ProposalController extends Controller
             abort(403);
         }
 
-        $proposal->update(['status' => 'rejected']);
+        DB::transaction(function () use ($proposal) {
+            if ($proposal->status === 'pending') {
+                $proposal->update(['status' => 'rejected']);
+
+                $freelancer = $proposal->freelancer;
+                $proposalCost = 2; // Fixed cost of proposal submission
+                $freelancer->points_balance += $proposalCost;
+                $freelancer->save();
+
+                PointTransaction::create([
+                    'user_id' => $freelancer->id,
+                    'points' => $proposalCost,
+                    'type' => 'credit',
+                    'description' => "Refunded staked points for job: {$proposal->job->title}",
+                ]);
+            }
+        });
+
         return back()->with('success', 'Proposal rejected.');
     }
 
@@ -126,7 +163,22 @@ class ProposalController extends Controller
             return back()->withErrors(['proposal' => 'Cannot withdraw a non-pending proposal.']);
         }
 
-        $proposal->delete();
+        DB::transaction(function () use ($proposal) {
+            $freelancer = $proposal->freelancer;
+            $proposalCost = 2; // Fixed cost of proposal submission
+            $freelancer->points_balance += $proposalCost;
+            $freelancer->save();
+
+            PointTransaction::create([
+                'user_id' => $freelancer->id,
+                'points' => $proposalCost,
+                'type' => 'credit',
+                'description' => "Refunded staked points (withdrawn) for job: {$proposal->job->title}",
+            ]);
+
+            $proposal->delete();
+        });
+
         return back()->with('success', 'Proposal withdrawn.');
     }
 }

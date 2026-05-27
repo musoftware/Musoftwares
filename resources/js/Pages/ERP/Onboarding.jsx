@@ -7,7 +7,7 @@ import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
 
-export default function Onboarding() {
+export default function Onboarding({ currencies = [] }) {
     const [step, setStep] = useState(1);
 
     const { data, setData, post, processing, errors } = useForm({
@@ -92,10 +92,17 @@ export default function Onboarding() {
                                             }}
                                             className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
                                         >
-                                            <option value="USD">USD ($)</option>
-                                            <option value="EUR">EUR (€)</option>
-                                            <option value="GBP">GBP (£)</option>
-                                            <option value="EGP">EGP (E£)</option>
+                                            {currencies.map(c => (
+                                                <option key={c.id} value={c.currency}>{c.currency} ({c.symbol})</option>
+                                            ))}
+                                            {currencies.length === 0 && (
+                                                <>
+                                                    <option value="USD">USD ($)</option>
+                                                    <option value="EUR">EUR (€)</option>
+                                                    <option value="GBP">GBP (£)</option>
+                                                    <option value="EGP">EGP (E£)</option>
+                                                </>
+                                            )}
                                         </select>
                                         {errors.baseCurrency && <p className="text-xs text-destructive">{errors.baseCurrency}</p>}
                                     </div>
@@ -159,10 +166,17 @@ export default function Onboarding() {
                                             onChange={e => setData('clientCurrency', e.target.value)}
                                             className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
                                         >
-                                            <option value="USD">USD ($)</option>
-                                            <option value="EUR">EUR (€)</option>
-                                            <option value="GBP">GBP (£)</option>
-                                            <option value="EGP">EGP (E£)</option>
+                                            {currencies.map(c => (
+                                                <option key={c.id} value={c.currency}>{c.currency} ({c.symbol})</option>
+                                            ))}
+                                            {currencies.length === 0 && (
+                                                <>
+                                                    <option value="USD">USD ($)</option>
+                                                    <option value="EUR">EUR (€)</option>
+                                                    <option value="GBP">GBP (£)</option>
+                                                    <option value="EGP">EGP (E£)</option>
+                                                </>
+                                            )}
                                         </select>
                                     </div>
                                 </div>

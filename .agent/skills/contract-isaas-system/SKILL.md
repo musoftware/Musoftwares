@@ -62,3 +62,14 @@ When working on this iSAAS transformation, ensure the following:
 - [ ] Public-facing routes for Clients (viewing/signing contracts) use secure UUIDs or signed URLs, NOT sequential IDs.
 - [ ] The feature is completely removed from the restricted `Admin` namespace and made available in the freelancer's main dashboard.
 - [ ] Onboarding flow is smooth: A new user can sign up and generate an AI proposal in under 60 seconds.
+
+## 6. Financial Paradigm: NO Escrow System
+
+**CRITICAL RULE:** The freelancer system must **NEVER** implement or utilize an escrow system. 
+
+- **We Provide Software, Not Financial Intermediation:** Musoftware operates purely as a software provider (iSAAS) giving freelancers the tools to generate proposals, contracts, and invoices. We do not act as a financial middleman holding client funds in escrow.
+- **Direct Payments:** Freelancers arrange payments directly with their clients (e.g., via their own Stripe, PayPal, or bank transfers). 
+- **No Platform Liability:** By completely avoiding escrow logic in the freelancer module, we eliminate the legal, financial, and regulatory liabilities associated with holding third-party funds, dispute resolution, and payout delays.
+- **Zero Friction:** Clients can sign a contract and pay the freelancer instantly without having to fund an escrow account on our platform. 
+
+Do NOT write code that locks client funds, delays freelancer payouts, or tracks dispute-based escrow releases within the freelance iSAAS ecosystem.

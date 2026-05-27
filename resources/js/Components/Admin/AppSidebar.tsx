@@ -71,7 +71,6 @@ const items = [
         { title: "Client Tasks", url: "/admin/tasks/client-tasks" },
         { title: "Busy Times", url: "/admin/busy-times" },
         { title: "Employee Todos", url: "/admin/employee-todos" },
-        { title: "Job Center", url: "/admin/job-tasks" },
         { title: "Points Control", url: "/admin/points_controller" },
         { title: "Charity", url: "/admin/charity-counter" },
         { title: "KYC Verification", url: "/admin/kyc" },

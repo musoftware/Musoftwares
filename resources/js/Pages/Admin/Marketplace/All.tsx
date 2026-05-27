@@ -32,7 +32,7 @@ import {
     Eye, Check, X, Search, FilterX, Trash2, Star, StarOff,
     Ban, ChevronUp, ChevronDown, MoreVertical, ShoppingBag,
     Activity, Clock, FileWarning, Package, CheckCircle2,
-    AlertCircle, XCircle
+    AlertCircle, XCircle, Pencil
 } from 'lucide-react';
 import { DateDisplay } from '@/Components/ui/DateDisplay';
 import { CurrencyDisplay } from '@/Components/ui/CurrencyDisplay';
@@ -535,6 +535,15 @@ export default function All({ auth, services, categories, filters, stats }: any)
                                                         >
                                                             <Eye className="h-4 w-4" />
                                                             View Service
+                                                        </DropdownMenuItem>
+
+                                                        {/* Edit */}
+                                                        <DropdownMenuItem
+                                                            onClick={() => router.get(route('admin.marketplace.services.edit', service.id))}
+                                                            className="gap-2 cursor-pointer"
+                                                        >
+                                                            <Pencil className="h-4 w-4" />
+                                                            Edit Service
                                                         </DropdownMenuItem>
 
                                                         {/* Feature toggle */}

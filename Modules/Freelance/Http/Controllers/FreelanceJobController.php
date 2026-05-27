@@ -94,6 +94,9 @@ class FreelanceJobController extends Controller
 
             $job->skills()->syncWithPivotValues($validated['skills'], ['is_required' => true]);
 
+            $user->points_balance -= $postCost;
+            $user->save();
+
             PointTransaction::create([
                 'user_id' => $user->id,
                 'points' => $postCost,
