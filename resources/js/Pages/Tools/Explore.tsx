@@ -17,7 +17,14 @@ const CELL_WIDTH = 100; // Pixels per grid column
 const CELL_HEIGHT = 110; // Pixels per grid row
 const MAX_ROWS = 6; // Rough estimate, could calculate dynamically
 
-const formatTime = (date: Date) => date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+const formatTime = (date: Date) => date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+const formatPrayerTime = (timeStr: string) => {
+    if (!timeStr) return '';
+    const [h, m] = timeStr.split(':').map(Number);
+    const ampm = h >= 12 ? 'PM' : 'AM';
+    const hours12 = h % 12 || 12;
+    return `${hours12}:${m.toString().padStart(2, '0')} ${ampm}`;
+};
 const formatDate = (date: Date) => date.toISOString().split('T')[0];
 
 const SLUG_EMOJI_MAP: Record<string, string> = {
@@ -679,8 +686,12 @@ export default function Explore({ tools, categories, subscribedSlugs, hasBrowser
                         return (
                             <DesktopIcon
                                 key={item.id}
-                                tool={toolData}
-                                icon={SLUG_EMOJI_MAP[toolData.slug] || '⚡'}
+                                id={item.id}
+                                title={item.name || toolData.title}
+                                iconUrl={toolData.icon_url}
+                                emojiFallback={SLUG_EMOJI_MAP[toolData.slug] ?? '📦'}
+                                isOwned={subscribedSlugs.includes(toolData.slug)}
+                                isFeatured={toolData.is_featured}
                                 onClick={(e) => {
                                     if (e.ctrlKey) {
                                         setSelectedItemIds(prev => prev.includes(item.id) ? prev.filter(i => i !== item.id) : [...prev, item.id]);
@@ -689,7 +700,7 @@ export default function Explore({ tools, categories, subscribedSlugs, hasBrowser
                                     }
                                 }}
                                 onDoubleClick={() => handleToolClick(toolData.slug)}
-                                onDragStart={() => setDraggedItemId(item.id)}
+                                onDragStart={(e) => handleDragStart(e, item.id)}
                                 onDragEnd={() => setDraggedItemId(null)}
                                 style={style}
                                 className={draggedItemId === item.id ? 'opacity-50 scale-95' : 'hover:scale-105 transition-transform'}
@@ -855,7 +866,7 @@ export default function Explore({ tools, categories, subscribedSlugs, hasBrowser
                                 <span className="text-[10px] text-slate-400 font-medium tracking-wide uppercase">Next Prayer</span>
                                 <div className="flex items-center gap-2">
                                     <span className="font-bold text-amber-400">{nextPrayer.name}</span>
-                                    <span className="text-white font-semibold">{nextPrayer.time}</span>
+                                    <span className="text-white font-semibold">{formatPrayerTime(nextPrayer.time)}</span>
                                 </div>
                             </div>
                         </div>
@@ -891,11 +902,15 @@ export default function Explore({ tools, categories, subscribedSlugs, hasBrowser
                         <DesktopIcon
                             key={slug}
                             id={slug}
-                            tool={toolData}
-                            icon={SLUG_EMOJI_MAP[toolData.slug] ?? '📦'}
+                            title={toolData.title}
+                            iconUrl={toolData.icon_url}
+                            emojiFallback={SLUG_EMOJI_MAP[toolData.slug] ?? '📦'}
+                            isOwned={subscribedSlugs.includes(toolData.slug)}
+                            isFeatured={toolData.is_featured}
                             onClick={() => handleToolClick(toolData.slug)}
                             draggable
                             onDragStart={(e) => handleDragStart(e, slug, openFolder.id)}
+                            onDragEnd={() => setDraggedItemId(null)}
                             onContextMenu={(e) => handleIconContextMenu(e, slug, 'icon')}
                         />
                     );
