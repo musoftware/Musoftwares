@@ -11,7 +11,7 @@ class Tenant extends Model
 {
     protected $table = 'erp_tenants';
 
-    protected $fillable = ['user_id', 'name', 'status', 'trial_ends_at', 'subscription_ends_at'];
+    protected $fillable = ['user_id', 'name', 'status', 'currency_id', 'trial_ends_at', 'subscription_ends_at'];
 
     protected $casts = [
         'trial_ends_at' => 'datetime',
@@ -33,6 +33,7 @@ class Tenant extends Model
         return $this->hasMany(Invoice::class);
     }
 
+
     public function wallets(): HasMany
     {
         return $this->hasMany(ClientWallet::class);
@@ -43,6 +44,11 @@ class Tenant extends Model
         return $this->hasMany(TeamMember::class);
     }
 
+    public function currency(): BelongsTo
+    {
+        return $this->belongsTo(\App\Models\Currency::class, 'currency_id');
+    }
+
     /**
      * Get the designated Platform (Master) Tenant ID.
      */
@@ -51,4 +57,3 @@ class Tenant extends Model
         return (int) config('erp.platform_tenant_id', 1);
     }
 }
-

@@ -48,10 +48,10 @@ class Project extends Model
         return $this->hasMany(Task::class, 'project_id');
     }
 
-    public function swimlanes()
+    /* public function swimlanes()
     {
         return $this->hasMany(TodoSwimlane::class, 'project_id');
-    }
+    } */
 
     public function hour_rate_client()
     {

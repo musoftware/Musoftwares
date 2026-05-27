@@ -257,9 +257,9 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
     const [activityLogs, setActivityLogs] = useState<Array<any>>(serverActivityLogs || []);
 
     const [settingsForm, setSettingsForm] = useState({
-        workspaceName: stats.clientCount > 0 ? "Musoftware Enterprise Workspace" : "Quiet SaaS Operations Hub",
+        workspaceName: serverTenant?.name || "Musoftware Enterprise Workspace",
         taxRate: '14.00',
-        defaultCurrency: 'USD',
+        defaultCurrency: stats.businessCurrency || 'USD',
         autoReminder: true,
         strictPCI: true
     });
@@ -949,10 +949,10 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                                                             </td>
                                                             <td className="px-6 py-4 text-slate-500 text-xs truncate max-w-[150px]">{client.address}</td>
                                                             <td className="px-6 py-4 text-right font-semibold text-slate-950 font-mono">
-                                                                <CurrencyDisplay amount={client.totalInvoiced} currency={client.currency || 'USD'} />
+                                                                <CurrencyDisplay amount={client.totalInvoiced} currency={currency} />
                                                             </td>
                                                             <td className="px-6 py-4 text-right font-bold text-emerald-600 font-mono">
-                                                                <CurrencyDisplay amount={client.totalPaid} currency={client.currency || 'USD'} />
+                                                                <CurrencyDisplay amount={client.totalPaid} currency={currency} />
                                                             </td>
                                                             {!isReadOnlyMember && (
                                                                 <td className="px-6 py-4 text-center">

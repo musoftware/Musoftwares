@@ -62,13 +62,12 @@ class InvoiceController extends Controller
         $invoices = $query->latest()->paginate(15)->withQueryString();
 
         // Stats scoped to this tenant only
-        $businessCurrency = Auth::user()->preferred_currency ?? config('app.business_currency', 'USD');
         $stats = [
             'total'             => Invoice::where('tenant_id', $tenant->id)->sum('business_amount'),
             'paid'              => Invoice::where('tenant_id', $tenant->id)->where('status', 'paid')->sum('business_amount'),
             'pending'           => Invoice::where('tenant_id', $tenant->id)->where('status', 'sent')->sum('business_amount'),
             'overdue'           => Invoice::where('tenant_id', $tenant->id)->where('status', 'sent')->where('due_date', '<', now())->sum('business_amount'),
-            'business_currency' => $businessCurrency,
+            'currency_id'       => $tenant->currency_id,
         ];
 
         return Inertia::render('ERP/Invoices/Index', [
@@ -81,13 +80,11 @@ class InvoiceController extends Controller
     public function create()
     {
         $tenant           = $this->resolveTenant();
-        $businessCurrency = Auth::user()->preferred_currency ?? config('app.business_currency', 'USD');
-
         return Inertia::render('ERP/Invoices/Create', [
-            'clients'           => TenantClient::where('tenant_id', $tenant->id)->get(),
+            'clients'           => TenantClient::with('currency')->where('tenant_id', $tenant->id)->get(),
             'projects'          => \Modules\ERP\Models\Project::where('tenant_id', $tenant->id)->get(),
             'currencies'        => Currency::where('is_active', true)->get(),
-            'business_currency' => $businessCurrency,
+            'currency_id'       => $tenant->currency_id,
         ]);
     }
 
@@ -99,7 +96,7 @@ class InvoiceController extends Controller
             'invoice_number' => 'required|string',
             'issued_at' => 'required|date',
             'due_date' => 'required|date|after_or_equal:issued_at',
-            'amount_currency' => 'required|string|size:3',
+            'amount_currency' => 'nullable|string|size:3',
             'items' => 'required|array|min:1',
             'items.*.type' => 'required|in:simple,quantity,timer',
             'items.*.title' => 'required|string',
@@ -114,11 +111,14 @@ class InvoiceController extends Controller
         $tenant = $this->resolveTenant();
 
         // Ensure client belongs to this tenant
-        $client = TenantClient::where('tenant_id', $tenant->id)
+        $client = TenantClient::with('currency')->where('tenant_id', $tenant->id)
             ->findOrFail($validated['client_id']);
 
+        $validated['amount_currency'] = $client->currency ? $client->currency->currency : 'USD';
+
         return DB::transaction(function () use ($validated, $tenant, $client) {
-            $businessCurrency = Auth::user()->preferred_currency ?? config('app.business_currency', 'USD');
+            $currency = \App\Models\Currency::find($tenant->currency_id);
+            $businessCurrency = $currency ? $currency->currency : 'USD';
             $rate = $this->exchangeRateService->getRate($validated['amount_currency'], $businessCurrency, $validated['issued_at']);
 
             $subtotal = collect($validated['items'])->sum(fn($i) => $i['unit_price'] * $i['quantity']);
@@ -229,10 +229,10 @@ class InvoiceController extends Controller
         $invoice->load(['items', 'costs']);
         return Inertia::render('ERP/Invoices/Edit', [
             'invoice'           => $invoice,
-            'clients'           => TenantClient::where('tenant_id', $tenant->id)->get(),
+            'clients'           => TenantClient::with('currency')->where('tenant_id', $tenant->id)->get(),
             'projects'          => \Modules\ERP\Models\Project::where('tenant_id', $tenant->id)->get(),
             'currencies'        => Currency::where('is_active', true)->get(),
-            'business_currency' => Auth::user()->preferred_currency ?? config('app.business_currency', 'USD'),
+            'currency_id'       => $tenant->currency_id,
         ]);
     }
 
@@ -243,7 +243,7 @@ class InvoiceController extends Controller
             'project_id' => 'nullable|exists:erp_projects,id',
             'issued_at' => 'required|date',
             'due_date' => 'required|date|after_or_equal:issued_at',
-            'amount_currency' => 'required|string|size:3',
+            'amount_currency' => 'nullable|string|size:3',
             'items' => 'required|array|min:1',
             'items.*.id' => 'nullable',
             'items.*.type' => 'required|in:simple,quantity,timer',
@@ -266,8 +266,12 @@ class InvoiceController extends Controller
             abort(403, 'Unauthorized access to invoice.');
         }
 
+        $client = TenantClient::with('currency')->where('tenant_id', $tenant->id)->findOrFail($validated['client_id']);
+        $validated['amount_currency'] = $client->currency ? $client->currency->currency : 'USD';
+
         return DB::transaction(function () use ($validated, $invoice, $tenant) {
-            $businessCurrency = Auth::user()->preferred_currency ?? config('app.business_currency', 'USD');
+            $currency = \App\Models\Currency::find($tenant->currency_id);
+            $businessCurrency = $currency ? $currency->currency : 'USD';
             $rate = $this->exchangeRateService->getRate($validated['amount_currency'], $businessCurrency, $validated['issued_at']);
 
             $subtotal = collect($validated['items'])->sum(fn($i) => $i['unit_price'] * $i['quantity']);

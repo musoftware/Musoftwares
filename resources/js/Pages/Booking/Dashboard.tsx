@@ -1,10 +1,9 @@
 import React from 'react';
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 import WorkspaceLayout from '@/Layouts/WorkspaceLayout';
-import { ModulePageHeader } from '@/Components/ui/ModulePageHeader';
-import { OperationalCard } from '@/Components/ui/OperationalCard';
+
 import { Card, CardHeader, CardTitle, CardContent } from '@/Components/ui/card';
-import { Calendar, Clock, Users, ArrowUpRight, CheckCircle2, XCircle } from 'lucide-react';
+import { Calendar, Clock, Users, ArrowUpRight, CheckCircle2, XCircle, CalendarOff } from 'lucide-react';
 import { CurrencyDisplay } from '@/Components/ui/CurrencyDisplay';
 
 interface DashboardProps {
@@ -18,6 +17,9 @@ interface DashboardProps {
 }
 
 export default function Dashboard({ stats, upcoming_bookings }: DashboardProps) {
+    const { wallet, settings } = usePage<any>().props;
+    const currency = wallet?.currency || settings?.base_currency || 'USD';
+
     return (
         <WorkspaceLayout
             title="Booking Dashboard"
@@ -28,49 +30,60 @@ export default function Dashboard({ stats, upcoming_bookings }: DashboardProps) 
                 { id: 'appointments', label: 'Appointments', icon: Clock, href: '/booking/appointments', isActive: false },
                 { id: 'events', label: 'Event Types', icon: Calendar, href: '/booking/events', isActive: false },
                 { id: 'providers', label: 'Providers', icon: Users, href: '/booking/providers', isActive: false },
+                { id: 'exceptions', label: 'Exceptions', icon: CalendarOff, href: '/booking/exceptions', isActive: false },
             ]}
         >
             <Head title="Booking Dashboard" />
             
             <div className="space-y-8">
-                <ModulePageHeader
-                    title="Dashboard"
-                    description="Overview of your booking statistics and upcoming appointments."
-                />
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center">
+                    <div>
+                        <h1 className="text-2xl font-bold tracking-tight">Dashboard</h1>
+                        <p className="text-muted-foreground">Overview of your booking statistics and upcoming appointments.</p>
+                    </div>
+                </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                    <OperationalCard
-                        title="Today's Appointments"
-                        value={stats.today_appointments.toString()}
-                        description="Bookings for today"
-                        icon={Clock}
-                        trend="neutral"
-                        trendValue="Live"
-                    />
-                    <OperationalCard
-                        title="Total Bookings"
-                        value={stats.total_bookings.toString()}
-                        description="All time appointments"
-                        icon={Calendar}
-                        trend="positive"
-                        trendValue="Active"
-                    />
-                    <OperationalCard
-                        title="Revenue"
-                        value={<CurrencyDisplay amount={stats.total_revenue} currency="USD" hideSymbol={false} />}
-                        description="Paid appointments"
-                        icon={ArrowUpRight}
-                        trend="neutral"
-                        trendValue="Total"
-                    />
-                    <OperationalCard
-                        title="Cancellations"
-                        value={stats.cancelled_bookings.toString()}
-                        description="Total cancelled"
-                        icon={XCircle}
-                        trend="negative"
-                        trendValue="Lost"
-                    />
+                    <Card>
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                            <CardTitle className="text-sm font-medium">Today's Appointments</CardTitle>
+                            <Clock className="h-4 w-4 text-muted-foreground" />
+                        </CardHeader>
+                        <CardContent>
+                            <div className="text-2xl font-bold">{stats.today_appointments.toString()}</div>
+                            <p className="text-xs text-muted-foreground">Bookings for today</p>
+                        </CardContent>
+                    </Card>
+                    <Card>
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                            <CardTitle className="text-sm font-medium">Total Bookings</CardTitle>
+                            <Calendar className="h-4 w-4 text-muted-foreground" />
+                        </CardHeader>
+                        <CardContent>
+                            <div className="text-2xl font-bold">{stats.total_bookings.toString()}</div>
+                            <p className="text-xs text-muted-foreground">All time appointments</p>
+                        </CardContent>
+                    </Card>
+                    <Card>
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                            <CardTitle className="text-sm font-medium">Revenue</CardTitle>
+                            <ArrowUpRight className="h-4 w-4 text-muted-foreground" />
+                        </CardHeader>
+                        <CardContent>
+                            <div className="text-2xl font-bold"><CurrencyDisplay amount={stats.total_revenue} currency={currency} hideSymbol={false} /></div>
+                            <p className="text-xs text-muted-foreground">Paid appointments</p>
+                        </CardContent>
+                    </Card>
+                    <Card>
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                            <CardTitle className="text-sm font-medium">Cancellations</CardTitle>
+                            <XCircle className="h-4 w-4 text-muted-foreground" />
+                        </CardHeader>
+                        <CardContent>
+                            <div className="text-2xl font-bold">{stats.cancelled_bookings.toString()}</div>
+                            <p className="text-xs text-muted-foreground">Total cancelled</p>
+                        </CardContent>
+                    </Card>
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

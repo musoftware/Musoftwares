@@ -1,8 +1,7 @@
 import React from 'react';
-import { Head, Link, useForm } from '@inertiajs/react';
+import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import WorkspaceLayout from '@/Layouts/WorkspaceLayout';
-import { ModulePageHeader } from '@/Components/ui/ModulePageHeader';
-import { OperationalCard } from '@/Components/ui/OperationalCard';
+import { Card, CardHeader, CardTitle, CardContent } from '@/Components/ui/card';
 import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
@@ -27,12 +26,15 @@ interface Props {
 }
 
 export default function Edit({ event }: Props) {
+    const { wallet, settings } = usePage<any>().props;
+    const baseCurrency = wallet?.currency || settings?.base_currency || 'USD';
+
     const { data, setData, put, processing, errors } = useForm({
         title: event.title,
         duration_minutes: event.duration_minutes,
         description: event.description || '',
         price: event.price || '',
-        currency: event.currency || 'USD',
+        currency: event.currency || baseCurrency,
         requires_payment: !!event.requires_payment,
         is_active: !!event.is_active,
     });
@@ -52,23 +54,30 @@ export default function Edit({ event }: Props) {
                 { id: 'appointments', label: 'Appointments', icon: Clock, href: '/booking/appointments', isActive: false },
                 { id: 'events', label: 'Event Types', icon: Calendar, href: '/booking/events', isActive: true },
                 { id: 'providers', label: 'Providers', icon: Users, href: '/booking/providers', isActive: false },
+                { id: 'exceptions', label: 'Exceptions', icon: CalendarOff, href: '/booking/exceptions', isActive: false },
             ]}
         >
             <Head title="Edit Event Type" />
             
             <div className="max-w-2xl mx-auto space-y-8">
-                <ModulePageHeader
-                    title="Edit Event Type"
-                    description="Update your booking event details and settings."
-                    actions={
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center">
+                    <div>
+                        <h1 className="text-2xl font-bold tracking-tight">Edit Event Type</h1>
+                        <p className="text-muted-foreground">Update your booking event details and settings.</p>
+                    </div>
+                    <div className="mt-4 sm:mt-0">
                         <Link href={route('booking.events.index')} className="text-sm font-medium text-slate-500 hover:text-slate-900">
                             Back
                         </Link>
-                    }
-                />
+                    </div>
+                </div>
 
                 <form onSubmit={submit} className="mt-6 space-y-6">
-                    <OperationalCard title="Basic Details">
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Basic Details</CardTitle>
+                        </CardHeader>
+                        <CardContent>
                         <div className="space-y-4">
                             <div className="space-y-2">
                                 <Label htmlFor="title">Event Name</Label>
@@ -108,9 +117,14 @@ export default function Edit({ event }: Props) {
                                 {errors.description && <p className="text-sm text-red-500">{errors.description}</p>}
                             </div>
                         </div>
-                    </OperationalCard>
+                        </CardContent>
+                    </Card>
 
-                    <OperationalCard title="Scheduling & Status">
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Scheduling & Status</CardTitle>
+                        </CardHeader>
+                        <CardContent>
                         <div className="space-y-6">
                             <div className="space-y-2">
                                 <Label htmlFor="duration_minutes">Duration (Minutes)</Label>
@@ -138,9 +152,14 @@ export default function Edit({ event }: Props) {
                                 />
                             </div>
                         </div>
-                    </OperationalCard>
+                        </CardContent>
+                    </Card>
 
-                    <OperationalCard title="Payment Options">
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Payment Options</CardTitle>
+                        </CardHeader>
+                        <CardContent>
                         <div className="space-y-4">
                             <div className="flex items-center justify-between p-4 border rounded-lg bg-slate-50/50">
                                 <div className="space-y-0.5">
@@ -182,7 +201,8 @@ export default function Edit({ event }: Props) {
                                 </div>
                             )}
                         </div>
-                    </OperationalCard>
+                        </CardContent>
+                    </Card>
 
                     <div className="flex justify-end gap-3">
                         <Link 

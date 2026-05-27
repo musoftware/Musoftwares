@@ -100,10 +100,10 @@ class Contract extends Model
         return $this->belongsTo(Project::class);
     }
 
-    public function projectProposal()
+    /* public function projectProposal()
     {
         return $this->belongsTo(ProjectProposal::class);
-    }
+    } */
 
     public function invoices()
     {

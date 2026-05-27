@@ -1,8 +1,7 @@
 import React from 'react';
-import { Head, Link, useForm } from '@inertiajs/react';
+import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import WorkspaceLayout from '@/Layouts/WorkspaceLayout';
-import { ModulePageHeader } from '@/Components/ui/ModulePageHeader';
-import { OperationalCard } from '@/Components/ui/OperationalCard';
+import { Card, CardHeader, CardTitle, CardContent } from '@/Components/ui/card';
 import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
@@ -11,13 +10,16 @@ import { LoadingButton } from '@/Components/ui/LoadingButton';
 import { Switch } from '@/Components/ui/switch';
 
 export default function Create() {
+    const { wallet, settings } = usePage<any>().props;
+    const baseCurrency = wallet?.currency || settings?.base_currency || 'USD';
+
     const { data, setData, post, processing, errors } = useForm({
         title: '',
         slug: '',
         duration_minutes: 30,
         description: '',
         price: '',
-        currency: 'USD',
+        currency: baseCurrency,
         requires_payment: false,
     });
 
@@ -43,23 +45,30 @@ export default function Create() {
                 { id: 'appointments', label: 'Appointments', icon: Clock, href: '/booking/appointments', isActive: false },
                 { id: 'events', label: 'Event Types', icon: Calendar, href: '/booking/events', isActive: true },
                 { id: 'providers', label: 'Providers', icon: Users, href: '/booking/providers', isActive: false },
+                { id: 'exceptions', label: 'Exceptions', icon: CalendarOff, href: '/booking/exceptions', isActive: false },
             ]}
         >
             <Head title="Create Event Type" />
             
             <div className="max-w-2xl mx-auto space-y-8">
-                <ModulePageHeader
-                    title="New Event Type"
-                    description="Set up a new type of booking event for your clients."
-                    actions={
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center">
+                    <div>
+                        <h1 className="text-2xl font-bold tracking-tight">New Event Type</h1>
+                        <p className="text-muted-foreground">Set up a new type of booking event for your clients.</p>
+                    </div>
+                    <div className="mt-4 sm:mt-0">
                         <Link href={route('booking.index')} className="text-sm font-medium text-slate-500 hover:text-slate-900">
                             Back
                         </Link>
-                    }
-                />
+                    </div>
+                </div>
 
                 <form onSubmit={submit} className="mt-6 space-y-6">
-                    <OperationalCard title="Basic Details">
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Basic Details</CardTitle>
+                        </CardHeader>
+                        <CardContent>
                         <div className="space-y-4">
                             <div className="space-y-2">
                                 <Label htmlFor="title">Event Name</Label>
@@ -102,9 +111,14 @@ export default function Create() {
                                 {errors.description && <p className="text-sm text-red-500">{errors.description}</p>}
                             </div>
                         </div>
-                    </OperationalCard>
+                        </CardContent>
+                    </Card>
 
-                    <OperationalCard title="Scheduling Settings">
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Scheduling Settings</CardTitle>
+                        </CardHeader>
+                        <CardContent>
                         <div className="space-y-4">
                             <div className="space-y-2">
                                 <Label htmlFor="duration_minutes">Duration (Minutes)</Label>
@@ -121,9 +135,14 @@ export default function Create() {
                                 {errors.duration_minutes && <p className="text-sm text-red-500">{errors.duration_minutes}</p>}
                             </div>
                         </div>
-                    </OperationalCard>
+                        </CardContent>
+                    </Card>
 
-                    <OperationalCard title="Payment Options">
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Payment Options</CardTitle>
+                        </CardHeader>
+                        <CardContent>
                         <div className="space-y-4">
                             <div className="flex items-center justify-between p-4 border rounded-lg bg-slate-50/50">
                                 <div className="space-y-0.5">
@@ -165,7 +184,8 @@ export default function Create() {
                                 </div>
                             )}
                         </div>
-                    </OperationalCard>
+                        </CardContent>
+                    </Card>
 
                     <div className="flex justify-end gap-3">
                         <Link 

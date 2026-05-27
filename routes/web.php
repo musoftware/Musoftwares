@@ -19,27 +19,6 @@ Route::get('/blog/{slug}', [\App\Http\Controllers\BlogController::class, 'show']
 Route::get('/dashboard', [DashboardController::class, 'index'])
     ->middleware(['auth', 'verified', 'onboarding'])->name('dashboard');
 
-// iSaaS Contracts & Price Calculator Routes
-Route::middleware(['auth', 'verified', 'onboarding'])->prefix('app')->name('isaas.')->group(function () {
-    // Contracts
-    Route::get('/contracts/search-users', [\App\Http\Controllers\iSaaS\ContractController::class, 'searchUsers'])->name('contracts.search-users');
-    Route::post('/contracts/ai/generate', [\App\Http\Controllers\iSaaS\ContractController::class, 'aiGenerate'])->name('contracts.ai.generate');
-    Route::post('/contracts/ai/review', [\App\Http\Controllers\iSaaS\ContractController::class, 'aiReview'])->name('contracts.ai.review');
-    Route::get('/contracts', [\App\Http\Controllers\iSaaS\ContractController::class, 'index'])->name('contracts.index');
-    Route::get('/contracts/create', [\App\Http\Controllers\iSaaS\ContractController::class, 'create'])->name('contracts.create');
-    Route::post('/contracts', [\App\Http\Controllers\iSaaS\ContractController::class, 'store'])->name('contracts.store');
-    Route::get('/contracts/{contract}/edit', [\App\Http\Controllers\iSaaS\ContractController::class, 'edit'])->name('contracts.edit');
-    Route::put('/contracts/{contract}', [\App\Http\Controllers\iSaaS\ContractController::class, 'update'])->name('contracts.update');
-    Route::post('/contracts/{contract}/status', [\App\Http\Controllers\iSaaS\ContractController::class, 'updateStatus'])->name('contracts.update-status');
-    Route::delete('/contracts/{contract}', [\App\Http\Controllers\iSaaS\ContractController::class, 'destroy'])->name('contracts.destroy');
-
-    // Price Calculator & AI proposals
-    Route::get('/calculator', [\App\Http\Controllers\iSaaS\PriceCalculatorController::class, 'index'])->name('calculator.index');
-    Route::post('/calculator/calculate-ai', [\App\Http\Controllers\iSaaS\PriceCalculatorController::class, 'calculateAI'])->name('calculator.calculate-ai');
-    Route::post('/calculator/save', [\App\Http\Controllers\iSaaS\PriceCalculatorController::class, 'saveProposal'])->name('calculator.save');
-    Route::post('/calculator/{proposal}/convert', [\App\Http\Controllers\iSaaS\PriceCalculatorController::class, 'convertToContract'])->name('calculator.convert');
-});
-
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
@@ -83,7 +62,7 @@ Route::middleware(['web'])->group(function () {
     Route::post('erp/team/logout', [\Modules\ERP\Http\Controllers\Team\TeamAuthController::class, 'logout'])->name('erp.team.logout');
 });
 
-// ERP Routes
+/* // ERP Routes (Migrated to Modules/ERP/routes/web.php)
 Route::middleware(['auth', 'verified', 'onboarding', 'subscription:erp', 'erp.team.permissions'])->prefix('erp')->name('erp.')->group(function () {
     // Team Member Management (Tenant Owner Only)
     Route::get('/team-members', [\Modules\ERP\Http\Controllers\Team\TeamMemberController::class, 'index'])->name('team-members.index');
@@ -92,7 +71,6 @@ Route::middleware(['auth', 'verified', 'onboarding', 'subscription:erp', 'erp.te
     Route::delete('/team-members/{id}', [\Modules\ERP\Http\Controllers\Team\TeamMemberController::class, 'destroy'])->name('team-members.destroy');
 
     Route::get('/dashboard', [\Modules\ERP\Http\Controllers\ERPDashboardController::class, 'index'])->name('dashboard');
-    Route::post('/settings', [\Modules\ERP\Http\Controllers\ERPDashboardController::class, 'updateSettings'])->name('settings.update');
     Route::post('/clients', [\Modules\ERP\Http\Controllers\ERPDashboardController::class, 'storeClient'])->name('clients.store');
     Route::put('/clients/{client}', [\Modules\ERP\Http\Controllers\ERPDashboardController::class, 'updateClient'])->name('clients.update');
     Route::delete('/clients/{client}', [\Modules\ERP\Http\Controllers\ERPDashboardController::class, 'destroyClient'])->name('clients.destroy');
@@ -185,7 +163,7 @@ Route::middleware(['auth', 'verified', 'onboarding', 'subscription:erp', 'erp.te
     Route::put('/notes/{note}', [\Modules\ERP\Http\Controllers\TenantNoteController::class, 'update'])->name('notes.update');
     Route::post('/notes/{note}/toggle-pin', [\Modules\ERP\Http\Controllers\TenantNoteController::class, 'togglePin'])->name('notes.togglePin');
     Route::delete('/notes/{note}', [\Modules\ERP\Http\Controllers\TenantNoteController::class, 'destroy'])->name('notes.destroy');
-});
+}); */
 
 // ── Client-Facing ERP Routes ─────────────────────────────────────────
 // Platform users (subscribers) view their invoices and tasks created by admin/tenants.
@@ -247,13 +225,6 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin/ma
     Route::delete('/categories/{category}', [\Modules\Marketplace\Http\Controllers\ServiceCategoryController::class, 'destroy'])->name('categories.destroy');
 
     // Services Admin Actions
-    Route::get('/services/{id}/edit', [\App\Http\Controllers\Admin\MarketplaceServiceController::class, 'edit'])->name('services.edit');
-    Route::put('/services/{id}', [\App\Http\Controllers\Admin\MarketplaceServiceController::class, 'update'])->name('services.update');
-    Route::post('/services/{id}/approve', [\App\Http\Controllers\Admin\MarketplaceServiceController::class, 'approve'])->name('services.approve');
-    Route::post('/services/{id}/reject', [\App\Http\Controllers\Admin\MarketplaceServiceController::class, 'reject'])->name('services.reject');
-    Route::post('/services/{id}/feature', [\App\Http\Controllers\Admin\MarketplaceServiceController::class, 'feature'])->name('services.feature');
-    Route::post('/services/{id}/suspend', [\App\Http\Controllers\Admin\MarketplaceServiceController::class, 'suspend'])->name('services.suspend');
-    Route::delete('/services/{id}', [\App\Http\Controllers\Admin\MarketplaceServiceController::class, 'destroy'])->name('services.destroy');
 
     // Orders
     Route::get('/orders', [\App\Http\Controllers\Admin\MarketplaceOrderController::class, 'index'])->name('orders.index');
@@ -261,8 +232,6 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin/ma
     Route::post('/orders/{order}/dispute', [\App\Http\Controllers\Admin\MarketplaceOrderController::class, 'resolveDispute'])->name('orders.dispute.resolve');
 
     // Admin Views
-    Route::get('/pending-services', [\App\Http\Controllers\Admin\MarketplaceServiceController::class, 'pending'])->name('services.pending');
-    Route::get('/all-services', [\App\Http\Controllers\Admin\MarketplaceServiceController::class, 'index'])->name('services.all');
 });
 
 // Settings & Account Routes
@@ -292,10 +261,6 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
     Route::resource('/blog-articles', \App\Http\Controllers\Admin\AdminBlogArticleController::class)->only(['index']);
 
     // ── Admin Employee Todos ────────────────────────────────────────
-    Route::get('/employee-todos', [\App\Http\Controllers\Admin\AdminEmployeeTodoController::class, 'index'])->name('employee-todos.index');
-    Route::post('/employee-todos', [\App\Http\Controllers\Admin\AdminEmployeeTodoController::class, 'store'])->name('employee-todos.store');
-    Route::put('/employee-todos/{employeeTodo}', [\App\Http\Controllers\Admin\AdminEmployeeTodoController::class, 'update'])->name('employee-todos.update');
-    Route::delete('/employee-todos/{employeeTodo}', [\App\Http\Controllers\Admin\AdminEmployeeTodoController::class, 'destroy'])->name('employee-todos.destroy');
 
     // ── Admin Projects ──────────────────────────────────────────────
     Route::resource('/projects', \App\Http\Controllers\Admin\ProjectController::class)->except(['create', 'edit', 'show']);
@@ -382,8 +347,6 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
     // ── Admin Phase 4 (Settings & Localization) ───────────────────
     Route::get('settings', [\App\Http\Controllers\Admin\AdminSettingController::class, 'index'])->name('settings.index');
     Route::post('settings', [\App\Http\Controllers\Admin\AdminSettingController::class, 'store'])->name('settings.store');
-    Route::get('settings/update-prices', [\App\Http\Controllers\Admin\AdminSettingController::class, 'updatePrices'])->name('settings.update-prices');
-    Route::post('settings/update-prices', [\App\Http\Controllers\Admin\AdminSettingController::class, 'doUpdatePrices'])->name('settings.do-update-prices');
     
     Route::resource('language-lines', \App\Http\Controllers\Admin\AdminLanguageLineController::class)->except(['create', 'show', 'edit']);
     Route::post('language-lines/auto-translate', [\App\Http\Controllers\Admin\AdminLanguageLineController::class, 'autoTranslate'])->name('language-lines.auto-translate');
@@ -400,7 +363,6 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
         Route::resource('skills', \App\Http\Controllers\Admin\FreelanceSkillController::class)->except(['show']);
         Route::resource('jobs', \App\Http\Controllers\Admin\FreelanceJobController::class)->only(['index', 'show', 'destroy']);
         Route::post('jobs/{job}/status', [\App\Http\Controllers\Admin\FreelanceJobController::class, 'updateStatus'])->name('jobs.status');
-        Route::resource('proposals', \App\Http\Controllers\Admin\FreelanceProposalController::class)->only(['index', 'destroy']);
         Route::resource('contracts', \App\Http\Controllers\Admin\FreelanceContractController::class)->only(['index', 'show', 'destroy']);
         Route::post('contracts/{contract}/status', [\App\Http\Controllers\Admin\FreelanceContractController::class, 'updateStatus'])->name('contracts.status');
     });

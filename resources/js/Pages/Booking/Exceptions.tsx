@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { Head, useForm, router } from '@inertiajs/react';
 import WorkspaceLayout from '@/Layouts/WorkspaceLayout';
-import { ModulePageHeader } from '@/Components/ui/ModulePageHeader';
+
 import { Card, CardHeader, CardTitle, CardContent } from '@/Components/ui/card';
 import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
-import { Label } from '@/Components/ui/Label';
+import { Label } from '@/Components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/Components/ui/select';
 import { Calendar, Clock, Users, CalendarOff, Plus, Trash2 } from 'lucide-react';
 
@@ -58,19 +58,21 @@ export default function Exceptions({ providers, exceptions }: ExceptionsProps) {
             <Head title="Exceptions & Days Off" />
             
             <div className="space-y-8">
-                <ModulePageHeader
-                    title="Exceptions & Days Off"
-                    description="Manage holidays, vacations, and custom overrides for your providers."
-                    actions={
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center">
+                    <div>
+                        <h1 className="text-2xl font-bold tracking-tight">Exceptions & Days Off</h1>
+                        <p className="text-muted-foreground">Manage holidays, vacations, and custom overrides for your providers.</p>
+                    </div>
+                    <div className="mt-4 sm:mt-0">
                         <Button onClick={() => setIsAdding(!isAdding)} className="bg-slate-900 text-white hover:bg-slate-800">
                             <Plus className="w-4 h-4 mr-2" />
                             Add Exception
                         </Button>
-                    }
-                />
+                    </div>
+                </div>
 
                 {isAdding && (
-                    <Card className="border-indigo-100 shadow-sm">
+                    <Card className="border-slate-200 shadow-sm">
                         <CardHeader>
                             <CardTitle className="text-lg">Add New Exception</CardTitle>
                         </CardHeader>
@@ -108,7 +110,7 @@ export default function Exceptions({ providers, exceptions }: ExceptionsProps) {
                                 </div>
                                 <div className="flex justify-end gap-2 pt-4">
                                     <Button type="button" variant="outline" onClick={() => setIsAdding(false)}>Cancel</Button>
-                                    <Button type="submit" disabled={processing} className="bg-indigo-600 hover:bg-indigo-700 text-white">Save Exception</Button>
+                                    <Button type="submit" disabled={processing} className="bg-slate-900 hover:bg-slate-800 text-white">Save Exception</Button>
                                 </div>
                             </form>
                         </CardContent>
