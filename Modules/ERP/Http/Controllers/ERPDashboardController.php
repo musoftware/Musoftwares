@@ -15,6 +15,7 @@ use Modules\ERP\Models\Activity;
 use Modules\ERP\Models\TenantFile;
 use Modules\ERP\Models\TenantNote;
 use Modules\ERP\Models\TenantStorageProvider;
+use Modules\ERP\Models\WalletTransaction;
 use App\Services\ExchangeRateService;
 use Inertia\Inertia;
 use Carbon\Carbon;
@@ -77,7 +78,7 @@ class ERPDashboardController extends Controller
                         'email' => $client->email ?? '-',
                         'phone' => $client->phone ?? '-',
                         'address' => $client->address ?? '-',
-                        'currency' => $client->currency ?? 'USD',
+                        'currency' => $client->currency?->currency ?? 'USD',
                         'totalInvoiced' => round($totalInvoiced, 2),
                         'totalPaid' => round($totalPaid, 2),
                     ];
@@ -298,6 +299,32 @@ class ERPDashboardController extends Controller
                 ->get();
         }
 
+        // ── Transactions (Wallet Ledger) ──────────────────────────
+        $transactions = collect();
+        if ($tenantId) {
+            $transactions = WalletTransaction::with(['creator', 'wallet.client'])
+                ->where('tenant_id', $tenantId)
+                ->latest()
+                ->take(15)
+                ->get()
+                ->map(function ($txn) {
+                    $title = 'Manual ' . ucfirst($txn->type);
+                    if ($txn->reference_type === 'invoice') $title = 'Invoice Settlement';
+                    else if ($txn->reference_type === 'withdrawal') $title = 'Withdrawal Settlement';
+                    
+                    return [
+                        'id' => $txn->id,
+                        'reference_id' => '#TXN-' . str_pad($txn->id, 4, '0', STR_PAD_LEFT),
+                        'title' => $title,
+                        'note' => $txn->note ?? 'No details provided',
+                        'direction' => strtoupper($txn->direction),
+                        'amount' => round($txn->business_amount ?? $txn->amount, 2),
+                        'authorizer' => $txn->creator?->name ?? 'System Core',
+                        'date' => $txn->created_at?->format('Y-m-d H:i'),
+                    ];
+                });
+        }
+
         return Inertia::render('ERP/Dashboard', [
             'tenant' => $tenant,
             'stats' => $stats,
@@ -312,6 +339,7 @@ class ERPDashboardController extends Controller
             'documents' => $documents ?? [],
             'tasks' => $tasks,
             'notes' => $notes,
+            'transactions' => $transactions,
         ]);
     }
 
@@ -488,9 +516,9 @@ class ERPDashboardController extends Controller
                             'client_id' => $client->id,
                             'status' => 'sent',
                             'amount' => $amount,
-                            'amount_currency' => $clientCurrency,
+                            'currency_id' => $client->currency_id,
                             'business_amount' => $amount,
-                            'business_currency' => $request->baseCurrency,
+                            'business_currency_id' => $tenant->currency_id,
                             'exchange_rate' => 1.0,
                             'exchange_rate_date' => Carbon::now(),
                             'due_date' => Carbon::now()->addDays(14),

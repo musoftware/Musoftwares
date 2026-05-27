@@ -19,9 +19,9 @@ return new class extends Migration
             $table->unsignedBigInteger('seller_wallet_transaction_id')->nullable();
 
             $table->decimal('amount', 20, 8);
-            $table->string('amount_currency', 3);
+            $table->foreignId('currency_id')->nullable()->constrained('currencies')->nullOnDelete();
             $table->decimal('business_amount', 20, 8);
-            $table->string('business_currency', 3);
+            $table->foreignId('business_currency_id')->nullable()->constrained('currencies')->nullOnDelete();
             $table->decimal('exchange_rate', 20, 8);
             $table->date('exchange_rate_date');
 

@@ -335,7 +335,7 @@
 
                             {{-- Timer sessions handling --}}
                             @if($item->type === 'timer' || ($item->quantity > 0 && $item->unit_price > 0 && strpos($item->description, 'min') !== false))
-                                <div class="item-desc money-code" style="margin-top: 4px;">{{ $item->quantity }} min &times; {{ number_format($item->unit_price, 2) }} {{ $invoice->amount_currency }}</div>
+                                <div class="item-desc money-code" style="margin-top: 4px;">{{ $item->quantity }} min &times; {{ number_format($item->unit_price, 2) }} {{ $invoice->currency?->currency ?? 'USD' }}</div>
                             @endif
                         </td>
                         <td class="text-center">
@@ -390,11 +390,11 @@
                 </tr>
                 <tr class="currency-row">
                     <td>Currency:</td>
-                    <td>{{ $invoice->amount_currency }}</td>
+                    <td>{{ $invoice->currency?->currency ?? 'USD' }}</td>
                 </tr>
-                @if($invoice->business_amount && $invoice->amount_currency !== $invoice->business_currency)
+                @if($invoice->business_amount && $invoice->currency_id !== $invoice->business_currency_id)
                     <tr class="currency-row">
-                        <td>In {{ $invoice->business_currency }}:</td>
+                        <td>In {{ $invoice->businessCurrency?->currency ?? 'USD' }}:</td>
                         <td class="money-code">{{ number_format($invoice->business_amount, 2) }}</td>
                     </tr>
                 @endif

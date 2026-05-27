@@ -10,6 +10,6 @@ class WalletCredited {
     public function __construct($transaction, $amount = null, $currency = null) { 
         $this->transaction = $transaction; 
         $this->amount = $amount ?? ($transaction->amount ?? null);
-        $this->currency = $currency ?? ($transaction->amount_currency ?? 'USD');
+        $this->currency = $currency ?? ($transaction->currency?->currency ?? 'USD');
     }
 }

@@ -36,8 +36,11 @@ class UsersController extends Controller
         if ($search = $request->get('search')) {
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%")
-                  ->orWhere('whatsapp_number', 'like', "%{$search}%");
+                  ->orWhere('email', 'like', "%{$search}%");
+                
+                if (\Illuminate\Support\Facades\Schema::hasColumn('users', 'whatsapp_number')) {
+                    $q->orWhere('whatsapp_number', 'like', "%{$search}%");
+                }
             });
         }
 
@@ -294,17 +297,20 @@ class UsersController extends Controller
                 'created_at'     => $u->created_at,
             ]);
 
-        $noWhatsApp = User::role('client')
-            ->where(fn($q) => $q->whereNull('whatsapp_number')->orWhere('whatsapp_number', ''))
-            ->latest()
-            ->get()
-            ->map(fn($u) => [
-                'id'             => $u->id,
-                'name'           => $u->name,
-                'email'          => $u->email,
-                'whatsapp_number'=> $u->whatsapp_number,
-                'created_at'     => $u->created_at,
-            ]);
+        $noWhatsApp = collect();
+        if (\Illuminate\Support\Facades\Schema::hasColumn('users', 'whatsapp_number')) {
+            $noWhatsApp = User::role('client')
+                ->where(fn($q) => $q->whereNull('whatsapp_number')->orWhere('whatsapp_number', ''))
+                ->latest()
+                ->get()
+                ->map(fn($u) => [
+                    'id'             => $u->id,
+                    'name'           => $u->name,
+                    'email'          => $u->email,
+                    'whatsapp_number'=> $u->whatsapp_number,
+                    'created_at'     => $u->created_at,
+                ]);
+        }
 
         return Inertia::render('Admin/Users/Problematic', [
             'blocked_users'       => $blocked,
