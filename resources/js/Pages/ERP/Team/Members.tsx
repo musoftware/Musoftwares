@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import WorkspaceLayout from '@/Layouts/WorkspaceLayout';
+import ERPLayout from '@/Layouts/ERPLayout';
 import { Head, useForm, Link } from '@inertiajs/react';
 import { 
     LayoutDashboard, 
@@ -143,8 +143,8 @@ export default function Members({ members, auth }: MembersProps) {
     const workspaceName = auth.user ? `${auth.user.name}'s Workspace` : 'ERP Workspace';
 
     return (
-        <WorkspaceLayout 
-            title="Team Management"
+        <ERPLayout 
+            title="Team Members"
             workspaceName={workspaceName}
             tenantId="ACTIVE"
             menuItems={mappedMenuItems}
@@ -420,6 +420,6 @@ export default function Members({ members, auth }: MembersProps) {
                 onConfirm={confirmDelete}
                 onCancel={() => setDeleteConfirm({ open: false, member: null })}
             />
-        </WorkspaceLayout>
+        </ERPLayout>
     );
 }

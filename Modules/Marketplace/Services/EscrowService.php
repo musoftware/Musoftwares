@@ -23,7 +23,8 @@ class EscrowService
             // Check if user has wallet, etc. Assuming buyer has wallet linked.
             // Simplified logic: locking funds from buyer's wallet
 
-            $buyerWallet = $order->buyer->wallets()->firstOrCreate(['currency' => $currency]); // Assuming wallets exist
+            $currencyId = \App\Models\Currency::where('currency', $currency)->value('id') ?? 1;
+            $buyerWallet = $order->buyer->wallets()->firstOrCreate(['currency_id' => $currencyId]); // Assuming wallets exist
 
             $this->walletService->lockFunds(
                 $buyerWallet,
@@ -37,9 +38,9 @@ class EscrowService
             $escrow = MarketplaceEscrow::create([
                 'order_id' => $order->id,
                 'amount' => $amount,
-                'amount_currency' => $currency,
+                'currency_id' => $currencyId,
                 'business_amount' => $amount, // Simplify exchange logic here for now
-                'business_currency' => $currency,
+                'business_currency_id' => $currencyId,
                 'exchange_rate' => 1.0,
                 'exchange_rate_date' => now(),
                 'status' => 'held'
@@ -58,13 +59,13 @@ class EscrowService
 
             $order = $escrow->order;
             $buyerWallet = $order->buyer->wallets()->first();
-            $sellerWallet = $order->seller->wallets()->firstOrCreate(['currency' => $escrow->amount_currency]);
+            $sellerWallet = $order->seller->wallets()->firstOrCreate(['currency_id' => $escrow->currency_id]);
 
             // Transfer locked to spent from buyer
             $buyerTx = $this->walletService->transferLockedToSpent(
                 $buyerWallet,
                 $escrow->amount,
-                $escrow->amount_currency,
+                $escrow->currency_id,
                 'marketplace_escrow_release',
                 $order->id,
                 "Release escrow for order #{$order->id}"
@@ -76,7 +77,7 @@ class EscrowService
             $sellerTx = $this->walletService->creditAvailable(
                 $sellerWallet,
                 $sellerAmount,
-                $escrow->amount_currency,
+                $escrow->currency_id,
                 'marketplace_order_earning',
                 $order->id,
                 "Earnings for order #{$order->id}"
@@ -106,7 +107,7 @@ class EscrowService
             $this->walletService->unlockFunds(
                 $buyerWallet,
                 $escrow->amount,
-                $escrow->amount_currency,
+                $escrow->currency_id,
                 'marketplace_escrow_refund',
                 $order->id,
                 "Refund escrow for order #{$order->id}"

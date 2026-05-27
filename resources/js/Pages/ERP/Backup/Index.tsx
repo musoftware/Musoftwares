@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Head, router, usePage } from '@inertiajs/react';
-import WorkspaceLayout from '@/Layouts/WorkspaceLayout';
+import ERPLayout from '@/Layouts/ERPLayout';
 import { HardDrive, Download, UploadCloud, AlertTriangle, Lock, ArrowRight, Loader2 } from 'lucide-react';
 import { Button } from '@/Components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/Components/ui/card';
@@ -47,7 +47,7 @@ export default function BackupIndex() {
     };
 
     return (
-        <WorkspaceLayout title="ERP Backup & Restore" workspaceName="Workspace" tenantId="9012" menuItems={[]}>
+        <ERPLayout title="ERP Backup & Restore" workspaceName="Workspace" tenantId="9012" menuItems={[]}>
             <Head title="ERP Backup Service" />
             
             <div className="max-w-4xl mx-auto space-y-6">
@@ -157,6 +157,6 @@ export default function BackupIndex() {
                 onConfirm={performRestore}
                 onCancel={() => setConfirmRestore(false)}
             />
-        </WorkspaceLayout>
+        </ERPLayout>
     );
 }

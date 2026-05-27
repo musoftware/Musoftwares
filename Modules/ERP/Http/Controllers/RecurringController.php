@@ -115,8 +115,10 @@ class RecurringController extends Controller
             now()
         );
 
+        $currencyModel = \App\Models\Currency::where('currency', $validated['amount_currency'])->first();
+        $validated['currency_id']        = $currencyModel ? $currencyModel->id : $tenant->currency_id;
         $validated['business_amount']    = $conversion[2];
-        $validated['business_currency']  = $conversion[3];
+        $validated['business_currency_id']= $tenant->currency_id;
         $validated['exchange_rate']      = $conversion[4];
         $validated['exchange_rate_date'] = $conversion[5];
         $validated['status']             = 'active';
@@ -215,8 +217,10 @@ class RecurringController extends Controller
             now()
         );
 
+        $currencyModel = \App\Models\Currency::where('currency', $validated['amount_currency'])->first();
+        $validated['currency_id']        = $currencyModel ? $currencyModel->id : $tenant->currency_id;
         $validated['business_amount'] = $conversion[2];
-        $validated['business_currency'] = $conversion[3];
+        $validated['business_currency_id'] = $tenant->currency_id;
         $validated['exchange_rate'] = $conversion[4];
         $validated['exchange_rate_date'] = $conversion[5];
 

@@ -58,7 +58,7 @@ class WalletController extends Controller
 
         $wallet = ClientWallet::firstOrCreate(
             ['tenant_id' => $tenant->id, 'client_id' => $clientModel->id],
-            ['balance' => 0, 'currency' => $clientModel->currency ?? 'USD']
+            ['balance' => 0, 'currency_id' => $clientModel->currency_id]
         );
 
         $transactions = ClientWalletTransaction::where('wallet_id', $wallet->id)
@@ -125,9 +125,9 @@ class WalletController extends Controller
                     'type'             => 'manual_credit',
                     'direction'        => 'credit',
                     'amount'           => $amount,
-                    'amount_currency'  => $wallet->currency,
+                    'currency_id'      => $clientModel->currency_id,
                     'business_amount'  => $amount,
-                    'business_currency'=> $wallet->currency,
+                    'business_currency_id'=> $clientModel->currency_id,
                     'exchange_rate'    => 1.0,
                     'exchange_rate_date'=> now()->toDateString(),
                     'balance_before'   => $balBefore,
@@ -180,9 +180,9 @@ class WalletController extends Controller
                     'type'             => 'manual_debit',
                     'direction'        => 'debit',
                     'amount'           => $amount,
-                    'amount_currency'  => $wallet->currency,
+                    'currency_id'      => $clientModel->currency_id,
                     'business_amount'  => $amount,
-                    'business_currency'=> $wallet->currency,
+                    'business_currency_id'=> $clientModel->currency_id,
                     'exchange_rate'    => 1.0,
                     'exchange_rate_date'=> now()->toDateString(),
                     'balance_before'   => $balBefore,
@@ -237,9 +237,9 @@ class WalletController extends Controller
                     'type'             => 'manual_debit',
                     'direction'        => 'debit',
                     'amount'           => $amount,
-                    'amount_currency'  => $wallet->currency,
+                    'currency_id'      => $clientModel->currency_id,
                     'business_amount'  => $amount,
-                    'business_currency'=> $wallet->currency,
+                    'business_currency_id'=> $clientModel->currency_id,
                     'exchange_rate'    => 1.0,
                     'exchange_rate_date'=> now()->toDateString(),
                     'balance_before'   => $balBefore,
@@ -297,9 +297,9 @@ class WalletController extends Controller
                     'type'             => 'manual_credit',
                     'direction'        => 'credit',
                     'amount'           => $amount,
-                    'amount_currency'  => $wallet->currency,
+                    'currency_id'      => $clientModel->currency_id,
                     'business_amount'  => $amount,
-                    'business_currency'=> $wallet->currency,
+                    'business_currency_id'=> $clientModel->currency_id,
                     'exchange_rate'    => 1.0,
                     'exchange_rate_date'=> now()->toDateString(),
                     'balance_before'   => $balBefore,

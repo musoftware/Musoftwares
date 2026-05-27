@@ -21,7 +21,7 @@ class MarketplaceOrderService
             if ($escrow) {
                 $buyer = \App\Models\User::find($order->buyer_id);
                 if ($buyer) {
-                    $transactionId = $buyer->add_balance($escrow->amount, "Refund for cancelled service order #{$order->id} (Dispute)", 'refunded', $escrow->amount_currency);
+                    $transactionId = $buyer->add_balance($escrow->amount, "Refund for cancelled service order #{$order->id} (Dispute)", 'refunded', $escrow->currency?->currency ?? 'USD');
                     
                     $escrow->update([
                         'status' => 'refunded',

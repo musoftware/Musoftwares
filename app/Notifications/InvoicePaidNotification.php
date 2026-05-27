@@ -28,7 +28,7 @@ class InvoicePaidNotification extends Notification implements ShouldQueue
         return (new MailMessage)
                     ->subject('Payment Received: ' . ($this->invoice->invoice_number ?? 'Invoice'))
                     ->greeting('Hello ' . ($notifiable->name ?? 'Customer') . ',')
-                    ->line('We have successfully received your payment of ' . ($this->invoice->amount ?? '') . ' ' . ($this->invoice->amount_currency ?? '') . '.')
+                    ->line('We have successfully received your payment of ' . ($this->invoice->amount ?? '') . ' ' . ($this->invoice->currency?->currency ?? '') . '.')
                     ->line('Thank you for your business!');
     }
 
@@ -37,7 +37,7 @@ class InvoicePaidNotification extends Notification implements ShouldQueue
         return [
             'invoice_id' => $this->invoice->id ?? null,
             'amount' => $this->invoice->amount ?? null,
-            'currency' => $this->invoice->amount_currency ?? null,
+            'currency' => $this->invoice->currency?->currency ?? null,
             'message' => 'Invoice ' . ($this->invoice->invoice_number ?? '') . ' has been marked as paid.',
         ];
     }

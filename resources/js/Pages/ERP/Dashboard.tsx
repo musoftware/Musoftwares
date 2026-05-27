@@ -1,4 +1,4 @@
-import WorkspaceLayout from '@/Layouts/WorkspaceLayout';
+import ERPLayout from '@/Layouts/ERPLayout';
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import React, { useState, useMemo, useEffect } from 'react';
 import {
@@ -139,9 +139,19 @@ interface ERPDashboardProps {
         pinned: boolean;
         date: string;
     }>;
+    transactions?: Array<{
+        id: number;
+        reference_id: string;
+        title: string;
+        note: string;
+        direction: string;
+        amount: number;
+        authorizer: string;
+        date: string;
+    }>;
 }
 
-export default function ERPDashboard({ tenant: serverTenant, stats: serverStats, clients: serverClients, invoices: serverInvoices, chartData: serverChartData, projects: serverProjects, supportTickets: serverTickets, activityLogs: serverActivityLogs, upcomingBookings: serverBookings, storageProviders: serverStorageProviders, documents: serverDocuments, tasks: serverTasks, notes: serverNotes }: ERPDashboardProps) {
+export default function ERPDashboard({ tenant: serverTenant, stats: serverStats, clients: serverClients, invoices: serverInvoices, chartData: serverChartData, projects: serverProjects, supportTickets: serverTickets, activityLogs: serverActivityLogs, upcomingBookings: serverBookings, storageProviders: serverStorageProviders, documents: serverDocuments, tasks: serverTasks, notes: serverNotes, transactions: serverTransactions }: ERPDashboardProps) {
     const { toast } = useToast();
     const { auth } = usePage().props as any;
     const isTeamMember = !!auth?.team_member;
@@ -249,6 +259,8 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
     const [supportTickets, setSupportTickets] = useState<Array<any>>(serverTickets || []);
     const [newTicketForm, setNewTicketForm] = useState({ title: '', client_id: '', client_name: '', priority: 'medium', description: '' });
     const [showAddTicketModal, setShowAddTicketModal] = useState(false);
+
+    const [transactions, setTransactions] = useState<Array<any>>(serverTransactions || []);
 
     const [teamMembers] = useState<Array<any>>([
         { id: 1, name: 'Owner', email: 'owner@workspace', role: 'Owner', status: 'Active', activities: 0 }
@@ -681,7 +693,7 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
     }, [currentSection, menuItems]);
 
     return (
-        <WorkspaceLayout 
+        <ERPLayout 
             title={activeMenuLabel}
             workspaceName={settingsForm.workspaceName}
             tenantId={serverStats ? '9012' : 'DRAFT'}
@@ -1460,63 +1472,60 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                                     description="View all wallet activity, payments, and balance adjustments."
                                 />
 
-                                <OperationalCard>
-                                    <div className="overflow-x-auto">
-                                        <table className="w-full text-left text-sm border-collapse">
-                                            <thead>
-                                                <tr className="bg-slate-50 border-b border-slate-100 text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                                                    <th className="px-6 py-3.5">Reference ID</th>
-                                                    <th className="px-6 py-3.5">Transaction Type</th>
-                                                    <th className="px-6 py-3.5">Direction</th>
-                                                    <th className="px-6 py-3.5 text-right">Sum</th>
-                                                    <th className="px-6 py-3.5 text-right">Authorized</th>
-                                                    <th className="px-6 py-3.5 text-right">Timestamp</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody className="divide-y divide-slate-100 font-sans text-[13px] text-slate-700">
-                                                {/* Prepopulated with realistic corporate transaction models */}
-                                                <tr className="hover:bg-slate-50 transition">
-                                                    <td className="px-6 py-4 font-mono font-bold text-indigo-600">#TXN-901</td>
-                                                    <td className="px-6 py-4">
-                                                        <span className="font-semibold text-slate-900 block">Invoice Payment Captured</span>
-                                                        <span className="text-slate-400 text-xs block">Settled invoice #INV-4929 from wallet balance</span>
-                                                    </td>
-                                                    <td className="px-6 py-4">
+                                <OperationalCard noPadding>
+                                    <DataTable
+                                        data={transactions}
+                                        columns={[
+                                            {
+                                                key: 'reference_id',
+                                                label: 'Reference ID',
+                                                className: 'font-mono font-bold text-indigo-600',
+                                            },
+                                            {
+                                                key: 'title',
+                                                label: 'Transaction Type',
+                                                render: (txn) => (
+                                                    <>
+                                                        <span className="font-semibold text-slate-900 block">{txn.title}</span>
+                                                        <span className="text-slate-400 text-xs block">{txn.note}</span>
+                                                    </>
+                                                )
+                                            },
+                                            {
+                                                key: 'direction',
+                                                label: 'Direction',
+                                                render: (txn) => (
+                                                    txn.direction === 'CREDIT' ? (
                                                         <Badge className="bg-emerald-50 text-emerald-700 rounded font-bold text-[10px]">CREDIT</Badge>
-                                                    </td>
-                                                    <td className="px-6 py-4 text-right"><FinancialAmount amount={1500} colorize={true} /></td>
-                                                    <td className="px-6 py-4 text-right font-medium text-slate-600">System Core</td>
-                                                    <td className="px-6 py-4 text-right text-slate-400 font-mono text-xs">2026-05-17 10:14</td>
-                                                </tr>
-                                                <tr className="hover:bg-slate-50 transition">
-                                                    <td className="px-6 py-4 font-mono font-bold text-indigo-600">#TXN-900</td>
-                                                    <td className="px-6 py-4">
-                                                        <span className="font-semibold text-slate-900 block">Manual Credit Allocation</span>
-                                                        <span className="text-slate-400 text-xs block">Authorized compensation adjustment</span>
-                                                    </td>
-                                                    <td className="px-6 py-4">
-                                                        <Badge className="bg-emerald-50 text-emerald-700 rounded font-bold text-[10px]">CREDIT</Badge>
-                                                    </td>
-                                                    <td className="px-6 py-4 text-right"><FinancialAmount amount={350} colorize={true} /></td>
-                                                    <td className="px-6 py-4 text-right font-medium text-slate-600">Sarah Lin</td>
-                                                    <td className="px-6 py-4 text-right text-slate-400 font-mono text-xs">2026-05-16 14:22</td>
-                                                </tr>
-                                                <tr className="hover:bg-slate-50 transition">
-                                                    <td className="px-6 py-4 font-mono font-bold text-indigo-600">#TXN-899</td>
-                                                    <td className="px-6 py-4">
-                                                        <span className="font-semibold text-slate-900 block">Withdrawal Settlement</span>
-                                                        <span className="text-slate-400 text-xs block">Wired client earnings payout</span>
-                                                    </td>
-                                                    <td className="px-6 py-4">
+                                                    ) : (
                                                         <Badge className="bg-rose-50 text-rose-700 rounded font-bold text-[10px]">DEBIT</Badge>
-                                                    </td>
-                                                    <td className="px-6 py-4 text-right"><FinancialAmount amount={-4200} colorize={true} /></td>
-                                                    <td className="px-6 py-4 text-right font-medium text-slate-600">Jane Doe</td>
-                                                    <td className="px-6 py-4 text-right text-slate-400 font-mono text-xs">2026-05-12 09:30</td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
+                                                    )
+                                                )
+                                            },
+                                            {
+                                                key: 'amount',
+                                                label: 'Sum',
+                                                className: 'text-right',
+                                                render: (txn) => (
+                                                    <FinancialAmount amount={txn.direction === 'DEBIT' ? -txn.amount : txn.amount} colorize={true} />
+                                                )
+                                            },
+                                            {
+                                                key: 'authorizer',
+                                                label: 'Authorized',
+                                                className: 'text-right font-medium text-slate-600',
+                                            },
+                                            {
+                                                key: 'date',
+                                                label: 'Timestamp',
+                                                className: 'text-right text-slate-400 font-mono text-xs',
+                                            }
+                                        ]}
+                                        emptyTitle="No transactions found"
+                                        emptyDescription="No transactions found in this workspace's ledger."
+                                        emptyIcon={History}
+                                        className="border-0 shadow-none rounded-none"
+                                    />
                                 </OperationalCard>
                             </div>
                         )}
@@ -2503,6 +2512,6 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
             )}
 
         </div>
-        </WorkspaceLayout>
+        </ERPLayout>
     );
 }

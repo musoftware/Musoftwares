@@ -13,9 +13,9 @@ class MarketplaceEscrow extends Model
         'buyer_wallet_transaction_id',
         'seller_wallet_transaction_id',
         'amount',
-        'amount_currency',
+        'currency_id',
         'business_amount',
-        'business_currency',
+        'business_currency_id',
         'exchange_rate',
         'exchange_rate_date',
         'status',
@@ -45,5 +45,15 @@ class MarketplaceEscrow extends Model
     public function sellerTransaction(): BelongsTo
     {
         return $this->belongsTo(WalletTransaction::class, 'seller_wallet_transaction_id');
+    }
+
+    public function currency(): BelongsTo
+    {
+        return $this->belongsTo(\App\Models\Currency::class, 'currency_id');
+    }
+
+    public function businessCurrency(): BelongsTo
+    {
+        return $this->belongsTo(\App\Models\Currency::class, 'business_currency_id');
     }
 }
