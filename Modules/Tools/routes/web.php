@@ -34,6 +34,9 @@ Route::prefix('tools')->name('tools.')->group(function () {
         Route::get('/my/downloads', [DownloadController::class, 'index'])->name('downloads');
 
 
+        // Workspace settings (static path)
+        Route::post('/workspace-settings', [MarketplaceController::class, 'saveWorkspaceSettings'])->name('workspace.settings.save');
+
         // Cancel subscription (static prefix — before wildcard)
         Route::post('/subscriptions/{id}/cancel', [SubscriptionController::class, 'cancel'])->name('subscriptions.cancel');
 

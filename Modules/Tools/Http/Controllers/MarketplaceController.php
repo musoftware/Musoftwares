@@ -80,13 +80,38 @@ class MarketplaceController extends Controller
                 ->isNotEmpty();
         }
 
+        $workspaceSettings = [];
+        if ($user) {
+            $workspaceSettings = $user->workspace_settings ?? [];
+        }
+
         return Inertia::render('Tools/Explore', [
             'tools'                  => $paginatedTools,
+            'workspaceSettings'      => $workspaceSettings,
             'categories'             => ['intelligence' => 'Intelligence', 'monitoring' => 'Monitoring', 'automation' => 'Automation', 'Media' => 'Media', 'Productivity' => 'Productivity'], // Hardcoded or from config
             'subscribedSlugs'        => $subscribedSlugs,
             'hasBrowserSubscription' => $hasBrowserSubscription,
             'filters'                => $request->only(['search', 'category']),
         ]);
+    }
+
+    /**
+     * Save workspace settings (desktop layout, wallpaper, prayer times).
+     */
+    public function saveWorkspaceSettings(\Illuminate\Http\Request $request): \Illuminate\Http\JsonResponse
+    {
+        $user = auth()->user();
+        if (!$user) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+
+        $settings = $request->input('settings', []);
+        
+        $user->update([
+            'workspace_settings' => $settings
+        ]);
+
+        return response()->json(['status' => 'success']);
     }
 
     /**
