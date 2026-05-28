@@ -132,7 +132,7 @@ class User extends Authenticatable
                 ->where('status', 'active')
                 ->get();
             foreach ($contracts as $contract) {
-                $locked += \App\Models\CurrenciesExchange::RateToday($contract->amount, $contract->currency_code, $this->currency_id);
+                $locked += \App\Models\CurrenciesExchange::RateToday($contract->amount, $contract->currency_id, $this->currency_id);
             }
         }
 

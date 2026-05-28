@@ -19,7 +19,7 @@ class ServicePackageController extends Controller
             'name' => 'required|string|max:255',
             'description' => 'required|string',
             'price' => 'required|numeric|min:0',
-            'currency_code' => 'required|string|size:3',
+            'currency_id' => 'required|integer|exists:currencies,id',
             'delivery_days' => 'required|integer|min:1',
         ]);
 
@@ -38,7 +38,7 @@ class ServicePackageController extends Controller
             'name' => 'required|string|max:255',
             'description' => 'required|string',
             'price' => 'required|numeric|min:0',
-            'currency_code' => 'required|string|size:3',
+            'currency_id' => 'required|integer|exists:currencies,id',
             'delivery_days' => 'required|integer|min:1',
         ]);
 

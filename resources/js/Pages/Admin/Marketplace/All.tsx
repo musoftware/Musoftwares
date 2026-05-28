@@ -90,8 +90,8 @@ function getBasePrice(packages: any[]) {
     if (!packages || packages.length === 0) return null;
     const prices = packages.map((p: any) => parseFloat(p.price));
     const minPrice = Math.min(...prices);
-    const currency = packages[0].currency_code || 'USD';
-    return <CurrencyDisplay amount={minPrice} currency={currency} />;
+    const currencyId = packages[0].currency_id || 1;
+    return <CurrencyDisplay amount={minPrice} currency={currencyId} />;
 }
 
 function ServiceThumb({ gallery, title }: { gallery: string[] | null; title: string }) {

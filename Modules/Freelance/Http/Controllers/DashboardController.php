@@ -135,7 +135,7 @@ class DashboardController extends Controller
                     'title' => $job->title,
                     'status' => $job->status,
                     'budget' => $job->budget ?? 0,
-                    'currency' => $job->currency_code ?? 'USD',
+                    'currency' => $job->currency_id ?? 1,
                     'proposalsCount' => $job->proposals_count ?? 0,
                     'createdAt' => $job->created_at->format('Y-m-d'),
                 ];

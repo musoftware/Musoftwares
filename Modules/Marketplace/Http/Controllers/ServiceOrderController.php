@@ -84,20 +84,20 @@ class ServiceOrderController extends Controller
                 'seller_id' => $seller_id,
                 'package_id' => $package->id,
                 'amount' => $package->price,
-                'currency_code' => $package->currency_code,
+                'currency_id' => $package->currency_id,
                 'commission_amount' => $commissionAmount,
                 'status' => 'pending'
             ]);
 
             // Escrow Lock: Deduct from Buyer balance using type 'used'
-            $transactionId = $buyer->add_balance(-$package->price, "Escrow lock for service order #{$order->id}", 'used', $package->currency_code);
+            $transactionId = $buyer->add_balance(-$package->price, "Escrow lock for service order #{$order->id}", 'used', $package->currency_id);
 
             // Create Escrow record
             \Modules\Marketplace\Models\MarketplaceEscrow::create([
                 'order_id' => $order->id,
                 'buyer_wallet_transaction_id' => $transactionId,
                 'amount' => $package->price,
-                'amount_currency' => $package->currency_code,
+                'amount_currency' => $package->currency_id,
                 'status' => 'held'
             ]);
 
@@ -174,7 +174,7 @@ class ServiceOrderController extends Controller
             $seller = \App\Models\User::findOrFail($order->seller_id);
             $sellerCredit = $order->amount - $order->commission_amount;
 
-            $transactionId = $seller->add_balance($sellerCredit, "Earnings from service order #{$order->id} (Escrow Released)", 'received', $order->currency_code);
+            $transactionId = $seller->add_balance($sellerCredit, "Earnings from service order #{$order->id} (Escrow Released)", 'received', $order->currency_id);
 
             // Update Escrow Record
             $escrow = \Modules\Marketplace\Models\MarketplaceEscrow::where('order_id', $order->id)->first();

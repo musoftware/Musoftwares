@@ -393,7 +393,7 @@ class ServiceLandingPageController extends Controller
                         'plan_name' => $pricingData['plan_name'],
                         'description' => $pricingData['description'] ?? null,
                         'price' => $pricingData['price'] ?? 0,
-                        'currency_code' => $pricingData['currency_code'] ?? 'USD',
+                        'currency_id' => $pricingData['currency_id'] ?? 1,
                         'period' => $pricingData['period'] ?? null,
                         'features' => $this->parseFeatures($pricingData['features'] ?? null),
                         'is_popular' => isset($pricingData['is_popular']),
@@ -1084,7 +1084,7 @@ class ServiceLandingPageController extends Controller
             $prompt .= "    \"plan_name\": \"Starter Plan\",\n";
             $prompt .= "    \"description\": \"Perfect for individuals getting started\",\n";
             $prompt .= "    \"price\": 29.99,\n";
-            $prompt .= "    \"currency_code\": \"USD\",\n";
+            $prompt .= "    \"currency_id\": 1,\n";
             $prompt .= "    \"period\": \"per month\",\n";
             $prompt .= "    \"features\": [\"Feature 1\", \"Feature 2\", \"Feature 3\"],\n";
             $prompt .= "    \"is_popular\": false,\n";
@@ -1094,7 +1094,7 @@ class ServiceLandingPageController extends Controller
             $prompt .= "    \"plan_name\": \"Professional Plan\",\n";
             $prompt .= "    \"description\": \"Best for growing businesses\",\n";
             $prompt .= "    \"price\": 99.99,\n";
-            $prompt .= "    \"currency_code\": \"USD\",\n";
+            $prompt .= "    \"currency_id\": 1,\n";
             $prompt .= "    \"period\": \"per month\",\n";
             $prompt .= "    \"features\": [\"All Starter features\", \"Advanced Feature 1\", \"Advanced Feature 2\"],\n";
             $prompt .= "    \"is_popular\": true,\n";
@@ -1149,7 +1149,7 @@ class ServiceLandingPageController extends Controller
                         'plan_name' => $pricing['plan_name'],
                         'description' => $pricing['description'] ?? null,
                         'price' => $pricing['price'] ?? 0,
-                        'currency_code' => $pricing['currency_code'] ?? 'USD',
+                        'currency_id' => $pricing['currency_id'] ?? 1,
                         'period' => $pricing['period'] ?? null,
                         'features' => $pricing['features'] ?? [],
                         'is_popular' => $pricing['is_popular'] ?? false,
@@ -1676,7 +1676,7 @@ class ServiceLandingPageController extends Controller
                 'plan_name' => 'Starter',
                 'description' => 'For individuals',
                 'price' => 29,
-                'currency_code' => 'USD',
+                'currency_id' => 1,
                 'features' => ['Basic Feature 1', 'Basic Feature 2', 'Community Support'],
                 'cta_text' => 'Start Free',
                 'sort_order' => 0
@@ -1685,7 +1685,7 @@ class ServiceLandingPageController extends Controller
                 'plan_name' => 'Professional',
                 'description' => 'For growing teams',
                 'price' => 79,
-                'currency_code' => 'USD',
+                'currency_id' => 1,
                 'period' => '/month',
                 'features' => ['All Starter Features', 'Advanced Analytics', 'Priority Support', 'Custom Branding'],
                 'cta_text' => 'Get Pro',
@@ -1696,7 +1696,7 @@ class ServiceLandingPageController extends Controller
                 'plan_name' => 'Enterprise',
                 'description' => 'For large organizations',
                 'price' => 199,
-                'currency_code' => 'USD',
+                'currency_id' => 1,
                 'period' => '/month',
                 'features' => ['All Pro Features', 'Dedicated Account Manager', 'SSO Integration', 'SLA Agreement'],
                 'cta_text' => 'Contact Sales',

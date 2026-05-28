@@ -499,10 +499,7 @@ export default function Show({ order, conversation }: any) {
                                                     <div className="flex justify-between text-gray-500">
                                                         <span>Price</span>
                                                         <span>
-                                                            $
-                                                            {order.amount.toFixed(
-                                                                2,
-                                                            )}
+                                                            {order.formatted_amount}
                                                         </span>
                                                     </div>
                                                     <div className="flex justify-between text-red-500">
@@ -510,7 +507,7 @@ export default function Show({ order, conversation }: any) {
                                                             Platform Fee (10%)
                                                         </span>
                                                         <span>
-                                                            -${fee.toFixed(2)}
+                                                            -{order.formatted_commission_amount}
                                                         </span>
                                                     </div>
                                                     <div className="flex justify-between border-t border-gray-100 pt-2 font-bold text-gray-900">
@@ -518,10 +515,7 @@ export default function Show({ order, conversation }: any) {
                                                             Your Earnings
                                                         </span>
                                                         <span>
-                                                            $
-                                                            {sellerEarnings.toFixed(
-                                                                2,
-                                                            )}
+                                                            {order.formatted_seller_earnings}
                                                         </span>
                                                     </div>
                                                 </div>
@@ -529,11 +523,7 @@ export default function Show({ order, conversation }: any) {
                                                 <div className="flex justify-between text-lg font-bold text-gray-900">
                                                     <span>Total Paid</span>
                                                     <span>
-                                                        $
-                                                        {order.amount.toFixed(
-                                                            2,
-                                                        )}{' '}
-                                                        {order.currency_code}
+                                                        {order.formatted_amount}
                                                     </span>
                                                 </div>
                                             )}

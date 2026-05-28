@@ -90,10 +90,7 @@ export default function IndexAdmin({ auth, withdrawals }) {
                                                     {withdrawal.client?.name}
                                                 </td>
                                                 <td className="px-6 py-4 text-sm font-medium whitespace-nowrap text-gray-900">
-                                                    {Number(
-                                                        withdrawal.amount,
-                                                    ).toFixed(2)}{' '}
-                                                    {withdrawal.currency_code}
+                                                    {withdrawal.formatted_amount}
                                                 </td>
                                                 <td className="px-6 py-4 text-sm text-gray-500">
                                                     <div>

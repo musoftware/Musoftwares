@@ -78,7 +78,7 @@ export default function Index({ proposals, filters }) {
                                     <div>{proposal.freelancer?.name || 'Unknown'}</div>
                                     <div className="text-xs text-gray-500">{proposal.freelancer?.email}</div>
                                 </td>
-                                <td className="p-4 font-medium text-gray-900">{proposal.bid_amount} {proposal.currency_code}</td>
+                                <td className="p-4 font-medium text-gray-900">{proposal.formatted_bid_amount}</td>
                                 <td className="p-4 capitalize">
                                     <span className={`inline-flex rounded-full px-2 text-xs font-semibold leading-5 
                                         ${proposal.status === 'accepted' ? 'bg-green-100 text-green-800' : 

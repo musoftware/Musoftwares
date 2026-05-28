@@ -26,7 +26,7 @@ function ShowJobContent({ auth, job, pointsCost }: any) {
         bid_amount: '',
         delivery_days: '',
         cover_letter: '',
-        currency_code: job.currency_code
+        currency_id: job.currency_id
     });
 
     const submitProposal = (e: React.FormEvent) => {

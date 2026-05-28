@@ -3,7 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use App\Models\PointPackage;
 use App\Models\PointTransaction;
 use Tests\TestCase;
@@ -12,7 +12,7 @@ use App\Helpers\KashierHelper;
 
 class PointPurchaseTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     protected User $user;
     protected PointPackage $package;
@@ -61,7 +61,7 @@ class PointPurchaseTest extends TestCase
             'name' => 'Starter Pack',
             'points' => 100,
             'price' => 100.00,
-            'currency_code' => 'EGP',
+            'currency_id' => 2,
         ]);
     }
 

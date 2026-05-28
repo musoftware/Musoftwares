@@ -19,7 +19,7 @@ class ContractController extends Controller
                 $q->where('client_id', $user->id)
                   ->orWhere('freelancer_id', $user->id);
             })
-            ->with(['job:id,title,type,budget,currency_code', 'client:id,name', 'freelancer:id,name'])
+            ->with(['job:id,title,type,budget,currency_id', 'client:id,name', 'freelancer:id,name'])
             ->latest()
             ->paginate(15);
 
@@ -79,10 +79,10 @@ class ContractController extends Controller
                 }
 
                 // Debit client using 'sent' type
-                $client->add_balance(-$contract->amount, "Payout for contract #{$contract->id}: {$contract->job->title}", 'sent', $contract->currency_code);
+                $client->add_balance(-$contract->amount, "Payout for contract #{$contract->id}: {$contract->job->title}", 'sent', $contract->currency_id);
 
                 // Credit freelancer using 'received' type
-                $freelancer->add_balance($contract->amount, "Payment for contract #{$contract->id}: {$contract->job->title}", 'received', $contract->currency_code);
+                $freelancer->add_balance($contract->amount, "Payment for contract #{$contract->id}: {$contract->job->title}", 'received', $contract->currency_id);
             });
 
             ActivityService::log(

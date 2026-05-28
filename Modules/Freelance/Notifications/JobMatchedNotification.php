@@ -90,7 +90,7 @@ class JobMatchedNotification extends Notification implements ShouldQueue
             'job_id' => $this->job->id,
             'title' => $this->job->title,
             'budget' => $this->job->budget,
-            'currency_code' => $this->job->currency_code,
+            'currency_id' => $this->job->currency_id,
             'message' => 'A new job matched your skills: ' . $this->job->title,
         ];
     }

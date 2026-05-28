@@ -3,7 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Modules\Marketplace\Models\ServiceCategory;
 use Modules\Marketplace\Models\Service;
 use Modules\Marketplace\Models\ServicePackage;
@@ -13,7 +13,7 @@ use Tests\TestCase;
 
 class MarketplaceWorkflowTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     protected User $buyer;
     protected User $seller;
@@ -61,7 +61,7 @@ class MarketplaceWorkflowTest extends TestCase
                         'name' => 'Basic Package',
                         'description' => 'Basic web development services',
                         'price' => 100.00,
-                        'currency_code' => 'USD',
+                        'currency_id' => 1,
                         'delivery_days' => 5,
                     ]
                 ]
@@ -99,7 +99,7 @@ class MarketplaceWorkflowTest extends TestCase
             'name' => 'Premium Pack',
             'description' => 'Complete Laravel SaaS application',
             'price' => 500.00,
-            'currency_code' => 'USD',
+            'currency_id' => 1,
             'delivery_days' => 10,
         ]);
 
@@ -134,7 +134,7 @@ class MarketplaceWorkflowTest extends TestCase
             'seller_id' => $this->seller->id,
             'package_id' => $package->id,
             'amount' => 500.00,
-            'currency_code' => 'USD',
+            'currency_id' => 1,
             'commission_amount' => 50.00, // 10% commission
             'status' => 'pending',
         ]);

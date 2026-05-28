@@ -107,7 +107,7 @@ class ActivityEventListener
         return array_filter([
             'invoice_id' => $invoice->id ?? null,
             'amount'     => $invoice->total ?? $invoice->amount ?? null,
-            'currency'   => $invoice->currency_code ?? null,
+            'currency'   => $invoice->currency_id ?? null,
             'client'     => $invoice->client->name ?? null,
         ]);
     }

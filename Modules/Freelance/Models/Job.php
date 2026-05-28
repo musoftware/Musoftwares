@@ -13,7 +13,14 @@ class Job extends Model
 
     protected $table = 'freelance_jobs';
 
-    protected $fillable = ['client_id', 'title', 'description', 'budget', 'currency_code', 'type', 'duration', 'status'];
+    protected $fillable = ['client_id', 'title', 'description', 'budget', 'currency_id', 'type', 'duration', 'status'];
+
+    protected $appends = ['formatted_budget'];
+
+    public function getFormattedBudgetAttribute()
+    {
+        return \App\Helpers\FinanceHelper::instance()->format_money($this->budget, $this->currency_id);
+    }
 
     public function client()
     {
@@ -30,5 +37,10 @@ class Job extends Model
         return $this->belongsToMany(Skill::class, 'freelance_job_skills')
             ->withPivot('is_required')
             ->withTimestamps();
+    }
+
+    public function currency()
+    {
+        return $this->belongsTo(\App\Models\Currency::class, 'currency_id');
     }
 }

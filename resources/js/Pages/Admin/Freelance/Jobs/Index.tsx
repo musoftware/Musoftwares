@@ -79,7 +79,7 @@ export default function Index({ jobs, filters }: any) {
                                     <div>{job.client?.name || 'Unknown'}</div>
                                     <div className="text-xs text-gray-500">{job.client?.email}</div>
                                 </td>
-                                <td className="p-4 font-medium text-slate-900">{job.budget} {job.currency_code}</td>
+                                <td className="p-4 font-medium text-slate-900">{job.formatted_budget}</td>
                                 <td className="p-4">{job.proposals_count || 0}</td>
                                 <td className="p-4 capitalize">
                                     <span className={`inline-flex rounded-full px-2 text-xs font-semibold leading-5 

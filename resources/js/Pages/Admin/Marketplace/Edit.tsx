@@ -24,7 +24,7 @@ interface Package {
     name: string;
     description: string;
     price: number | string;
-    currency_code: string;
+    currency_id: number;
     delivery_days: number | string;
 }
 
@@ -50,7 +50,7 @@ export default function Edit({ auth, service, categories }: Props) {
         category_id: service.category_id ? String(service.category_id) : '',
         status: service.status || 'draft',
         packages: service.packages && service.packages.length > 0 ? service.packages : [{
-            name: '', description: '', price: '', currency_code: 'USD', delivery_days: ''
+            name: '', description: '', price: '', currency_id: 1, delivery_days: ''
         }],
     });
 
@@ -62,7 +62,7 @@ export default function Edit({ auth, service, categories }: Props) {
     const addPackage = () => {
         if (data.packages.length >= 3) return;
         setData('packages', [...data.packages, {
-            name: '', description: '', price: '', currency_code: 'USD', delivery_days: ''
+            name: '', description: '', price: '', currency_id: 1, delivery_days: ''
         }]);
     };
 

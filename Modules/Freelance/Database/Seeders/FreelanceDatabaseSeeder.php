@@ -34,10 +34,10 @@ class FreelanceDatabaseSeeder extends Seeder
 
         // Default Point Packages (1 Point = 1 EGP)
         $packages = [
-            ['name' => 'Basic Pack', 'points' => 50, 'price' => 50.00, 'currency_code' => 'EGP'],
-            ['name' => 'Standard Pack', 'points' => 120, 'price' => 120.00, 'currency_code' => 'EGP'],
-            ['name' => 'Pro Pack', 'points' => 300, 'price' => 300.00, 'currency_code' => 'EGP'],
-            ['name' => 'Enterprise Pack', 'points' => 1000, 'price' => 1000.00, 'currency_code' => 'EGP'],
+            ['name' => 'Basic Pack', 'points' => 50, 'price' => 50.00, 'currency_id' => 2],
+            ['name' => 'Standard Pack', 'points' => 120, 'price' => 120.00, 'currency_id' => 2],
+            ['name' => 'Pro Pack', 'points' => 300, 'price' => 300.00, 'currency_id' => 2],
+            ['name' => 'Enterprise Pack', 'points' => 1000, 'price' => 1000.00, 'currency_id' => 2],
         ];
 
         foreach ($packages as $package) {

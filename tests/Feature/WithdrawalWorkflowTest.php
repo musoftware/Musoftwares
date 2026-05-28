@@ -3,7 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Modules\ERP\Models\Tenant;
@@ -15,7 +15,7 @@ use Tests\TestCase;
 
 class WithdrawalWorkflowTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     protected User $user;
     protected User $admin;
@@ -144,7 +144,7 @@ class WithdrawalWorkflowTest extends TestCase
             'client_id' => $this->client->id,
             'payment_method_id' => $this->paymentMethod->id,
             'amount' => 500.00,
-            'currency_code' => 'USD',
+            'currency_id' => 1,
             'status' => 'pending',
         ]);
 
@@ -184,7 +184,7 @@ class WithdrawalWorkflowTest extends TestCase
             'client_id' => $this->client->id,
             'payment_method_id' => $this->paymentMethod->id,
             'amount' => 300.00,
-            'currency_code' => 'USD',
+            'currency_id' => 1,
             'status' => 'pending',
         ]);
 
@@ -206,7 +206,7 @@ class WithdrawalWorkflowTest extends TestCase
             'client_id' => $this->client->id,
             'payment_method_id' => $this->paymentMethod->id,
             'amount' => 200.00,
-            'currency_code' => 'USD',
+            'currency_id' => 1,
             'status' => 'pending',
         ]);
 
