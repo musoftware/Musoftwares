@@ -6,15 +6,26 @@ import { Button } from '@/Components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/Components/ui/card';
 import { Input } from '@/Components/ui/input';
 import { Textarea } from '@/Components/ui/textarea';
-import { ArrowLeft, DollarSign } from 'lucide-react';
+import { ArrowLeft, Edit2 } from 'lucide-react';
 
-export default function CreateExpense() {
+interface EditExpenseProps {
+    expense: {
+        id: number;
+        title: string;
+        amount: string | number;
+        category: string;
+        date: string;
+        description: string;
+    };
+}
+
+export default function EditExpense({ expense }: EditExpenseProps) {
     const [form, setForm] = useState({
-        title: '',
-        amount: '',
-        category: '',
-        date: new Date().toISOString().split('T')[0],
-        description: ''
+        title: expense.title,
+        amount: expense.amount.toString(),
+        category: expense.category,
+        date: expense.date,
+        description: expense.description === '-' ? '' : expense.description
     });
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -22,7 +33,7 @@ export default function CreateExpense() {
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         setIsSubmitting(true);
-        router.post(route('erp.expenses.store'), form, {
+        router.put(route('erp.expenses.update', expense.id), form, {
             onSuccess: () => setIsSubmitting(false),
             onError: (errs) => {
                 setErrors(errs);
@@ -34,26 +45,26 @@ export default function CreateExpense() {
     const { menuItems, lockedAddons, workspaceName, tenantId } = useERPMenu('expenses');
 
     return (
-        <ERPLayout title="Log Expense" workspaceName={workspaceName} tenantId={tenantId} menuItems={menuItems} lockedAddons={lockedAddons}>
-            <Head title="Log Expense" />
+        <ERPLayout title="Edit Expense" workspaceName={workspaceName} tenantId={tenantId} menuItems={menuItems} lockedAddons={lockedAddons}>
+            <Head title="Edit Expense" />
             <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8 space-y-6">
                 <div className="flex items-center gap-4">
                     <Link href={route('erp.dashboard', { section: 'expenses' })} className="text-slate-400 hover:text-slate-900 transition-colors">
                         <ArrowLeft className="w-5 h-5" />
                     </Link>
                     <div>
-                        <h1 className="text-2xl font-bold text-slate-900">Log Expense</h1>
-                        <p className="text-slate-500 text-sm mt-0.5">Record a new business expense.</p>
+                        <h1 className="text-2xl font-bold text-slate-900">Edit Expense</h1>
+                        <p className="text-slate-500 text-sm mt-0.5">Modify the details of this business expense.</p>
                     </div>
                 </div>
 
                 <Card className="bg-white border border-slate-200 shadow-sm">
                     <CardHeader>
                         <CardTitle className="text-slate-900 flex items-center gap-2">
-                            <DollarSign className="w-5 h-5 text-indigo-600" /> Expense Details
+                            <Edit2 className="w-5 h-5 text-indigo-600" /> Expense Details
                         </CardTitle>
                         <CardDescription className="text-slate-500">
-                            Enter the details of the expense you want to log.
+                            Update the details of the expense and save changes.
                         </CardDescription>
                     </CardHeader>
                     <CardContent>
@@ -124,7 +135,7 @@ export default function CreateExpense() {
                                     </Button>
                                 </Link>
                                 <Button type="submit" disabled={isSubmitting}>
-                                    {isSubmitting ? 'Saving...' : 'Log Expense'}
+                                    {isSubmitting ? 'Saving...' : 'Save Changes'}
                                 </Button>
                             </div>
                         </form>

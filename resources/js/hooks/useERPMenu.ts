@@ -65,6 +65,7 @@ export function useERPMenu(
         { id: 'tasks', label: 'Tasks', icon: CheckSquare },
         { id: 'invoices', label: 'Invoices', icon: FileText },
         { id: 'transactions', label: 'Transactions', icon: History },
+        { id: 'expenses', label: 'Expenses', icon: Receipt },
         { id: 'referrals', label: 'Referrals', icon: Users },
         { id: 'documents', label: 'Files', icon: Folder },
         { id: 'notes', label: 'Notes', icon: Pin },

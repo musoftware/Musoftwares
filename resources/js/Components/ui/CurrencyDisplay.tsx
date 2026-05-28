@@ -3,9 +3,9 @@ import { cn, formatMoney } from '@/lib/utils';
 
 export interface CurrencyDisplayProps {
     amount: number | string;
-    currency?: string;
+    currency?: string | { id: number; currency: string; symbol?: string; string_format?: string } | any;
     businessAmount?: number | string;
-    businessCurrency?: string;
+    businessCurrency?: string | { id: number; currency: string; symbol?: string; string_format?: string } | any;
     size?: 'sm' | 'md' | 'lg';
     colorize?: boolean;
     className?: string;

@@ -34,6 +34,10 @@ export default function Show({ auth, wallet, transactions, client, errors }: Wal
     const activeClient = client || { id: 0, name: 'Unknown Client', email: 'N/A', phone: '', address: '' };
     const activeWallet = wallet || { id: 0, balance: 0, currency: 'USD', locked_balance: 0 };
     const activeTransactions = transactions?.data || [];
+    
+    const walletCurrencyCode = typeof activeWallet.currency === 'string'
+        ? activeWallet.currency
+        : (activeWallet.currency as any)?.currency || 'USD';
 
     const safeRoute = (name: string, params?: any, fallbackUrl?: string) => {
         try {
@@ -147,7 +151,7 @@ export default function Show({ auth, wallet, transactions, client, errors }: Wal
                     <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm flex flex-col justify-center">
                         <div className="text-sm font-medium text-slate-500 mb-1">Available Balance</div>
                         <div className="text-3xl font-bold tracking-tight text-slate-900">
-                            <CurrencyDisplay amount={activeWallet.balance} currency={activeWallet.currency} />
+                            <CurrencyDisplay amount={activeWallet.balance} currency={walletCurrencyCode} />
                         </div>
                         <p className="text-xs text-slate-400 mt-2">Ready for purchases</p>
                     </div>
@@ -156,14 +160,14 @@ export default function Show({ auth, wallet, transactions, client, errors }: Wal
                             Locked Balance <Lock className="h-3 w-3" />
                         </div>
                         <div className="text-3xl font-bold tracking-tight text-slate-900">
-                            <CurrencyDisplay amount={activeWallet.locked_balance ?? 0} currency={activeWallet.currency} />
+                            <CurrencyDisplay amount={activeWallet.locked_balance ?? 0} currency={walletCurrencyCode} />
                         </div>
                         <p className="text-xs text-slate-400 mt-2">Held securely on-hold</p>
                     </div>
                     <div className="bg-slate-50 p-6 rounded-2xl border border-slate-100 shadow-sm flex flex-col justify-center">
                         <div className="text-sm font-medium text-slate-500 mb-1">Total Ledger</div>
                         <div className="text-3xl font-bold tracking-tight text-slate-900">
-                            <CurrencyDisplay amount={activeWallet.balance + (activeWallet.locked_balance ?? 0)} currency={activeWallet.currency} />
+                            <CurrencyDisplay amount={activeWallet.balance + (activeWallet.locked_balance ?? 0)} currency={walletCurrencyCode} />
                         </div>
                         <p className="text-xs text-slate-400 mt-2">Calculated from immutable events</p>
                     </div>
@@ -216,10 +220,10 @@ export default function Show({ auth, wallet, transactions, client, errors }: Wal
                                             <form onSubmit={(e) => handleActionSubmit(e, actionType)} className="space-y-4">
                                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
                                                     <div className="space-y-2">
-                                                        <Label className="text-xs font-semibold">Amount ({activeWallet.currency})</Label>
+                                                        <Label className="text-xs font-semibold">Amount ({walletCurrencyCode})</Label>
                                                         <div className="relative">
                                                             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                                                <span className="text-muted-foreground font-medium text-xs">{activeWallet.currency}</span>
+                                                                <span className="text-muted-foreground font-medium text-xs">{walletCurrencyCode}</span>
                                                             </div>
                                                             <Input
                                                                 type="number"
@@ -317,8 +321,8 @@ export default function Show({ auth, wallet, transactions, client, errors }: Wal
                                 <ResponsiveContainer width="100%" height="100%">
                                     <AreaChart data={chartData} margin={{ top: 5, right: 0, left: -25, bottom: 0 }}>
                                         <XAxis dataKey="date" stroke="#94a3b8" fontSize={12} tickLine={false} axisLine={false} />
-                                        <YAxis stroke="#94a3b8" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(val) => formatMoney(val, activeWallet.currency)} />
-                                        <Tooltip formatter={(value: any) => [formatMoney(value, activeWallet.currency), 'Balance']} labelStyle={{ color: '#0f172a' }} contentStyle={{ borderRadius: '12px', border: '1px solid #f1f5f9', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} />
+                                        <YAxis stroke="#94a3b8" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(val) => formatMoney(val, walletCurrencyCode)} />
+                                        <Tooltip formatter={(value: any) => [formatMoney(value, walletCurrencyCode), 'Balance']} labelStyle={{ color: '#0f172a' }} contentStyle={{ borderRadius: '12px', border: '1px solid #f1f5f9', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} />
                                         <Area type="monotone" dataKey="balance" stroke="#4f46e5" strokeWidth={2} fill="#4f46e5" fillOpacity={0.05} />
                                     </AreaChart>
                                 </ResponsiveContainer>
@@ -357,14 +361,14 @@ export default function Show({ auth, wallet, transactions, client, errors }: Wal
                                                     <TableCell className="font-semibold text-slate-900 py-4">
                                                         <div className="flex items-center gap-0.5">
                                                             <span>{tx.type === 'credit' ? '+' : '-'}</span>
-                                                            <CurrencyDisplay amount={tx.amount} currency={tx.currency || activeWallet.currency} />
+                                                            <CurrencyDisplay amount={tx.amount} currency={tx.currency || walletCurrencyCode} />
                                                         </div>
                                                     </TableCell>
                                                     <TableCell className="text-slate-500 text-sm py-4">
                                                         <div className="flex items-center gap-1.5">
-                                                            <CurrencyDisplay amount={tx.balance_before} currency={tx.currency || activeWallet.currency} />
+                                                            <CurrencyDisplay amount={tx.balance_before} currency={tx.currency || walletCurrencyCode} />
                                                             <span>&rarr;</span>
-                                                            <CurrencyDisplay amount={tx.balance_after} currency={tx.currency || activeWallet.currency} />
+                                                            <CurrencyDisplay amount={tx.balance_after} currency={tx.currency || walletCurrencyCode} />
                                                         </div>
                                                     </TableCell>
                                                     <TableCell className="max-w-[200px] truncate text-sm text-slate-700 py-4" title={tx.description}>
@@ -433,7 +437,7 @@ export default function Show({ auth, wallet, transactions, client, errors }: Wal
                                                     <span className="text-slate-400 text-xs mt-0.5">{inv.date}</span>
                                                 </div>
                                                 <div className="text-right">
-                                                    <span className="font-semibold text-slate-900 block"><CurrencyDisplay amount={inv.amount} currency={activeWallet.currency} /></span>
+                                                     <span className="font-semibold text-slate-900 block"><CurrencyDisplay amount={inv.amount} currency={walletCurrencyCode} /></span>
                                                     <span className={`text-xs capitalize mt-0.5 ${inv.status === 'paid' ? 'text-emerald-600' : 'text-amber-600'}`}>{inv.status}</span>
                                                 </div>
                                             </div>

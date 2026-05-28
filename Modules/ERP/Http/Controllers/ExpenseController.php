@@ -13,6 +13,17 @@ use Inertia\Inertia;
 class ExpenseController extends Controller
 {
     /**
+     * Resolve the active tenant, supporting both owner and team guards.
+     */
+    private function resolveTenant(): ?Tenant
+    {
+        if (Auth::guard('erp_team')->check()) {
+            return Auth::guard('erp_team')->user()->tenant;
+        }
+        return Tenant::where('user_id', Auth::id())->first();
+    }
+
+    /**
      * Display a listing of the resource.
      */
     public function index()
@@ -34,7 +45,7 @@ class ExpenseController extends Controller
     public function store(Request $request)
     {
         $user = Auth::user();
-        $tenant = Tenant::where('user_id', $user->id)->first();
+        $tenant = $this->resolveTenant();
 
         if (!$tenant) {
             return back()->withErrors(['error' => 'No active workspace found.']);
@@ -72,8 +83,10 @@ class ExpenseController extends Controller
      */
     public function edit($id)
     {
-        $user = Auth::user();
-        $tenant = Tenant::where('user_id', $user->id)->firstOrFail();
+        $tenant = $this->resolveTenant();
+        if (!$tenant) {
+            abort(404, 'No active workspace found.');
+        }
         $expense = Expense::findOrFail($id);
 
         if ($expense->tenant_id !== $tenant->id) {
@@ -97,8 +110,7 @@ class ExpenseController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $user = Auth::user();
-        $tenant = Tenant::where('user_id', $user->id)->first();
+        $tenant = $this->resolveTenant();
         $expense = Expense::findOrFail($id);
 
         if (!$tenant || $expense->tenant_id !== $tenant->id) {
@@ -135,8 +147,7 @@ class ExpenseController extends Controller
      */
     public function destroy($id)
     {
-        $user = Auth::user();
-        $tenant = Tenant::where('user_id', $user->id)->first();
+        $tenant = $this->resolveTenant();
         $expense = Expense::findOrFail($id);
 
         if (!$tenant || $expense->tenant_id !== $tenant->id) {
