@@ -1,4 +1,5 @@
 import ERPLayout from '@/Layouts/ERPLayout';
+import { useERPMenu } from '@/hooks/useERPMenu';
 import { Head, Link, router } from '@inertiajs/react';
 import React from 'react';
 import { 
@@ -43,10 +44,17 @@ interface Props {
 }
 
 export default function ShowTransaction({ transaction }: Props) {
+    const { menuItems, lockedAddons, workspaceName, tenantId } = useERPMenu('transactions');
     const isCredit = transaction.direction === 'CREDIT';
 
     return (
-        <ERPLayout>
+        <ERPLayout
+            title={`Transaction ${transaction.reference_id}`}
+            workspaceName={workspaceName}
+            tenantId={tenantId}
+            menuItems={menuItems}
+            lockedAddons={lockedAddons}
+        >
             <Head title={`Transaction ${transaction.reference_id}`} />
 
             <div className="max-w-5xl mx-auto space-y-6">

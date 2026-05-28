@@ -18,10 +18,10 @@ export default function BackupIndex({ hasBackupFeature }: { hasBackupFeature: bo
     const [restoreFile, setRestoreFile] = useState<File | null>(null);
     const [confirmRestore, setConfirmRestore] = useState(false);
 
-    const { menuItems, lockedAddons } = useERPMenu('backup');
+    const { menuItems, lockedAddons, workspaceName, tenantId } = useERPMenu('backup');
 
     const handleUpgradeSimulate = () => {
-        router.visit(route('subscriptions.plans', { module: 'erp' }));
+        router.visit(route('subscriptions.plans', { module: 'erp-backup' }));
     };
 
     const handleRestoreSubmit = () => {
@@ -40,7 +40,6 @@ export default function BackupIndex({ hasBackupFeature }: { hasBackupFeature: bo
         router.post(route('erp.backup.restore'), formData, {
             forceFormData: true,
             onSuccess: () => {
-                toast({ description: 'Backup restored successfully. Your workspace data has been updated.' });
                 setRestoreFile(null);
             },
             onError: (errors) => {
@@ -51,7 +50,13 @@ export default function BackupIndex({ hasBackupFeature }: { hasBackupFeature: bo
     };
 
     return (
-        <ERPLayout title="Backup" menuItems={menuItems} lockedAddons={lockedAddons}>
+        <ERPLayout 
+            title="Backup" 
+            menuItems={menuItems} 
+            lockedAddons={lockedAddons}
+            workspaceName={workspaceName}
+            tenantId={tenantId}
+        >
             <Head title="ERP Backup Service" />
             
             <div className="max-w-4xl mx-auto space-y-6">
