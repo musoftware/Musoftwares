@@ -21,7 +21,7 @@ function FieldError({ message }) {
     );
 }
 
-export default function CreateEdit({ invoice, clients, projects = [], currencies, business_currency }) {
+export default function CreateEdit({ invoice, clients, projects = [], currencies, business_currency, pre_selected_client_id }) {
     const isEdit = !!invoice;
     const [showCosts, setShowCosts] = useState(false);
     const [clientError, setClientError] = useState('');
@@ -29,7 +29,7 @@ export default function CreateEdit({ invoice, clients, projects = [], currencies
     const { toast } = useToast();
 
     const { data, setData, post, put, processing, errors } = useForm({
-        client_id: invoice?.client_id || '',
+        client_id: invoice?.client_id || pre_selected_client_id || '',
         project_id: invoice?.project_id || '',
         invoice_number: invoice?.invoice_number || `INV-${Date.now()}`,
         issued_at: invoice?.issued_at?.split('T')[0] || new Date().toISOString().split('T')[0],
@@ -50,7 +50,7 @@ export default function CreateEdit({ invoice, clients, projects = [], currencies
         if (data.client_id) {
             const client = clients.find(c => String(c.id) === String(data.client_id));
             if (client && client.currency && !isEdit) {
-                setData('amount_currency', client.currency);
+                setData('amount_currency', client.currency?.currency || client.currency);
             }
 
             if (data.project_id) {
@@ -234,7 +234,7 @@ export default function CreateEdit({ invoice, clients, projects = [], currencies
                                     <option value="">Select a client...</option>
                                     {clients.map((c) => (
                                         <option key={c.id} value={c.id}>
-                                            {c.name} ({c.currency})
+                                            {c.name} ({c.currency?.currency || c.currency_code || 'N/A'})
                                         </option>
                                     ))}
                                 </select>

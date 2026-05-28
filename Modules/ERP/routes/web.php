@@ -14,6 +14,7 @@ Route::middleware(['web', 'auth', 'tenant.active'])
         Route::put('settings', [\Modules\ERP\Http\Controllers\ERPDashboardController::class, 'updateSettings'])->name('settings.update');
 
         // ── Clients ──
+        Route::get('clients/search', [\Modules\ERP\Http\Controllers\ClientController::class, 'search'])->name('clients.search');
         Route::get('clients/create', [\Modules\ERP\Http\Controllers\ClientController::class, 'create'])->name('clients.create');
         Route::get('clients/{client}/edit', [\Modules\ERP\Http\Controllers\ClientController::class, 'edit'])->name('clients.edit');
         Route::post('clients', [\Modules\ERP\Http\Controllers\ClientController::class, 'store'])->name('clients.store');
@@ -23,11 +24,11 @@ Route::middleware(['web', 'auth', 'tenant.active'])
         
         // ── Client Wallet ──
         Route::get('clients/{client}/wallet/adjust', [\Modules\ERP\Http\Controllers\WalletController::class, 'adjust'])->name('clients.wallet.adjust');
-        Route::get('clients/{client}/wallet', [\Modules\ERP\Http\Controllers\WalletController::class, 'index'])->name('clients.wallet.index');
-        Route::post('clients/{client}/wallet/credit', [\Modules\ERP\Http\Controllers\WalletController::class, 'credit'])->name('clients.wallet.credit');
-        Route::post('clients/{client}/wallet/debit', [\Modules\ERP\Http\Controllers\WalletController::class, 'debit'])->name('clients.wallet.debit');
-        Route::post('clients/{client}/wallet/lock', [\Modules\ERP\Http\Controllers\WalletController::class, 'lock'])->name('clients.wallet.lock');
-        Route::post('clients/{client}/wallet/unlock', [\Modules\ERP\Http\Controllers\WalletController::class, 'unlock'])->name('clients.wallet.unlock');
+        Route::get('clients/{client}/wallet', [\Modules\ERP\Http\Controllers\WalletController::class, 'show'])->name('clients.wallet.index');
+        Route::post('clients/{client}/wallet/credit', [\Modules\ERP\Http\Controllers\WalletController::class, 'manualCredit'])->name('clients.wallet.credit');
+        Route::post('clients/{client}/wallet/debit', [\Modules\ERP\Http\Controllers\WalletController::class, 'manualDebit'])->name('clients.wallet.debit');
+        Route::post('clients/{client}/wallet/lock', [\Modules\ERP\Http\Controllers\WalletController::class, 'lockFunds'])->name('clients.wallet.lock');
+        Route::post('clients/{client}/wallet/unlock', [\Modules\ERP\Http\Controllers\WalletController::class, 'unlockFunds'])->name('clients.wallet.unlock');
 
         // ── Tasks & Todos ──
         Route::resource('tasks', \Modules\ERP\Http\Controllers\TaskController::class);

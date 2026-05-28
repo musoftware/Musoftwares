@@ -79,7 +79,7 @@ export default function ClientShow({ client, projects, tickets, invoices, activi
                 {/* Stats */}
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                     {[
-                        { label: 'Total Revenue', value: <CurrencyDisplay amount={totalRevenue} currency="USD" />, icon: DollarSign, color: 'text-emerald-600' },
+                        { label: 'Total Revenue', value: <CurrencyDisplay amount={totalRevenue} currency={(client as any).currency?.currency || 'USD'} />, icon: DollarSign, color: 'text-emerald-600' },
                         { label: 'Invoices', value: invoices.length, icon: FileText, color: 'text-blue-600' },
                         { label: 'Projects', value: projects.length, icon: FolderOpen, color: 'text-primary' },
                         { label: 'Tickets', value: tickets.length, icon: MessageSquare, color: 'text-amber-600' },
@@ -122,7 +122,7 @@ export default function ClientShow({ client, projects, tickets, invoices, activi
                                                     </div>
                                                 </div>
                                                 <div className="flex items-center gap-3">
-                                                    <span className="text-slate-900 font-medium text-sm"><CurrencyDisplay amount={inv.total} currency="USD" /></span>
+                                                    <span className="text-slate-900 font-medium text-sm"><CurrencyDisplay amount={inv.total} currency={(client as any).currency?.currency || 'USD'} /></span>
                                                     <StatusBadge status={inv.status} size="sm" />
                                                 </div>
                                             </Link>
