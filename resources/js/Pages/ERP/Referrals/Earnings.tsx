@@ -1,88 +1,87 @@
 import ERPLayout from '@/Layouts/ERPLayout';
 import { useERPMenu } from '@/hooks/useERPMenu';
 import { Head, Link } from '@inertiajs/react';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/Components/ui/card';
+import { EmptyState } from '@/Components/ui/EmptyState';
+import { StatusBadge } from '@/Components/ui/StatusBadge';
+import { CurrencyDisplay } from '@/Components/ui/CurrencyDisplay';
+import { ArrowLeft, TrendingUp, Users } from 'lucide-react';
+
+const __ = (key: string) => key;
 
 export default function Earnings({ earnings }: { earnings: any }) {
     const { menuItems, lockedAddons, workspaceName, tenantId } = useERPMenu('overview');
 
     return (
-        <ERPLayout title="Referral Earnings" workspaceName={workspaceName} tenantId={tenantId} menuItems={menuItems} lockedAddons={lockedAddons}>
-
-            <div className="py-12">
-                <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
-                    <div className="overflow-hidden bg-white p-6 shadow-sm sm:rounded-lg">
-                        <div className="mb-4">
-                            <Link
-                                href={route('erp.referrals.index')}
-                                className="text-indigo-600 hover:text-indigo-900"
-                            >
-                                &larr; Back to Referrals
-                            </Link>
-                        </div>
-
-                        <div className="overflow-x-auto">
-                            <table className="min-w-full divide-y divide-gray-200">
-                                <thead className="bg-gray-50">
-                                    <tr>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                                            Date
-                                        </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                                            Client (Earner)
-                                        </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                                            Referred Client
-                                        </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                                            Amount
-                                        </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                                            Status
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y divide-gray-200 bg-white">
-                                    {earnings.data.map((earning: any) => (
-                                        <tr key={earning.id}>
-                                            <td className="px-6 py-4 text-sm whitespace-nowrap text-gray-500">
-                                                {new Date(
-                                                    earning.created_at,
-                                                ).toLocaleDateString()}
-                                            </td>
-                                            <td className="px-6 py-4 text-sm font-medium whitespace-nowrap text-gray-900">
-                                                {earning.client?.name}
-                                            </td>
-                                            <td className="px-6 py-4 text-sm whitespace-nowrap text-gray-500">
-                                                {earning.referred_client?.name}
-                                            </td>
-                                            <td className="px-6 py-4 text-sm font-medium whitespace-nowrap text-green-600">
-                                                {earning.amount}{' '}
-                                                {earning.currency}
-                                            </td>
-                                            <td className="px-6 py-4 text-sm whitespace-nowrap">
-                                                <span
-                                                    className={`inline-flex rounded-full px-2 text-xs leading-5 font-semibold ${earning.status === 'paid' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}`}
-                                                >
-                                                    {earning.status}
-                                                </span>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                    {earnings.data.length === 0 && (
-                                        <tr>
-                                            <td
-                                                colSpan={5}
-                                                className="px-6 py-4 text-center text-sm text-gray-500"
-                                            >
-                                                No earnings recorded.
-                                            </td>
-                                        </tr>
-                                    )}
-                                </tbody>
-                            </table>
+        <ERPLayout title={__("Referral Earnings")} workspaceName={workspaceName} tenantId={tenantId} menuItems={menuItems} lockedAddons={lockedAddons}>
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-6 dashboard-container at-mobile-scroll-fix">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 pb-5">
+                    <div className="flex items-center gap-4">
+                        <Link href={route('erp.referrals.index')} className="text-slate-400 hover:text-slate-900 transition-colors">
+                            <ArrowLeft className="w-5 h-5" />
+                        </Link>
+                        <div>
+                            <h1 className="text-2xl font-bold text-slate-900">{__("Referral Earnings")}</h1>
+                            <p className="text-slate-500 text-sm mt-1">{__("Track commissions earned from referrals.")}</p>
                         </div>
                     </div>
                 </div>
+
+                <Card className="bg-white border border-slate-200 shadow-sm overflow-hidden">
+                    <CardHeader className="bg-slate-50/50 border-b border-slate-100 pb-4">
+                        <CardTitle className="text-slate-900 text-sm font-semibold">{__("Earnings History")}</CardTitle>
+                    </CardHeader>
+                    <CardContent className="p-0">
+                        {earnings && earnings.data && earnings.data.length > 0 ? (
+                            <div className="overflow-x-auto">
+                                <table className="w-full text-left text-sm border-collapse">
+                                    <thead>
+                                        <tr className="bg-slate-50 border-b border-slate-100 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                                            <th className="px-6 py-3">{__("Date")}</th>
+                                            <th className="px-6 py-3">{__("Client (Earner)")}</th>
+                                            <th className="px-6 py-3">{__("Referred Client")}</th>
+                                            <th className="px-6 py-3 text-right">{__("Amount")}</th>
+                                            <th className="px-6 py-3 text-center">{__("Status")}</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-slate-100 text-[13px] text-slate-600">
+                                        {earnings.data.map((earning: any) => (
+                                            <tr key={earning.id} className="hover:bg-slate-50/50 transition-colors">
+                                                <td className="px-6 py-4 whitespace-nowrap">
+                                                    {new Date(earning.created_at).toLocaleDateString()}
+                                                </td>
+                                                <td className="px-6 py-4 font-medium text-slate-900">
+                                                    <div className="flex items-center gap-2">
+                                                        <div className="w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center shrink-0 border border-slate-200">
+                                                            <Users className="w-3 h-3 text-slate-500" />
+                                                        </div>
+                                                        {earning.client?.name}
+                                                    </div>
+                                                </td>
+                                                <td className="px-6 py-4">
+                                                    {earning.referred_client?.name}
+                                                </td>
+                                                <td className="px-6 py-4 text-right font-mono font-medium text-emerald-600">
+                                                    <CurrencyDisplay amount={earning.amount} currency={earning.currency} />
+                                                </td>
+                                                <td className="px-6 py-4 text-center">
+                                                    <StatusBadge status={earning.status} size="sm" />
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        ) : (
+                            <EmptyState 
+                                icon={TrendingUp} 
+                                title={__("No earnings recorded")} 
+                                description={__("Commissions will appear here once referrals start paying invoices.")} 
+                                className="border-0 rounded-none py-12" 
+                            />
+                        )}
+                    </CardContent>
+                </Card>
             </div>
         </ERPLayout>
     );

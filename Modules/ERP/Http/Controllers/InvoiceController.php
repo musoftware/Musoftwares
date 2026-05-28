@@ -247,7 +247,7 @@ class InvoiceController extends Controller
 
     public function show(Invoice $invoice)
     {
-        $invoice->load(['client.wallet', 'client.currency', 'items.timerSessions', 'costs', 'creator', 'project']);
+        $invoice->load(['client.currency', 'items.timerSessions', 'costs', 'creator', 'project']);
 
         // This is a simplified timeline, in real app it might be a separate table
         $timeline = [
@@ -441,27 +441,22 @@ class InvoiceController extends Controller
         // Create a wallet transaction record for the issued invoice
         $client = $invoice->client;
         if ($client) {
-            $wallet = $client->wallet;
-            if ($wallet) {
-                WalletTransaction::create([
-                    'tenant_id' => $invoice->tenant_id,
-                    'wallet_id' => $wallet->id,
-                    'type' => 'invoice_issued',
-                    'direction' => 'debit',
-                    'amount' => $invoice->amount,
-                    'currency_id' => $invoice->currency_id,
-                    'business_amount' => $invoice->business_amount,
-                    'business_currency_id' => $invoice->tenant->base_currency_id,
-                    'exchange_rate' => $invoice->exchange_rate,
-                    'exchange_rate_date' => $invoice->exchange_rate_date ?? now()->toDateString(),
-                    'balance_before' => $wallet->balance,
-                    'balance_after' => $wallet->balance, // No actual balance change on issue
-                    'reference_type' => Invoice::class,
-                    'reference_id' => $invoice->id,
-                    'note' => 'Invoice #' . $invoice->invoice_number . ' issued',
-                    'created_by' => Auth::id(),
-                ]);
-            }
+            WalletTransaction::create([
+                'tenant_id' => $invoice->tenant_id,
+                'client_id' => $client->id,
+                'type' => 'invoice_issued',
+                'direction' => 'debit',
+                'amount' => $invoice->amount,
+                'currency_id' => $invoice->currency_id,
+                'business_amount' => $invoice->business_amount,
+                'business_currency_id' => $invoice->tenant->base_currency_id,
+                'exchange_rate' => $invoice->exchange_rate,
+                'exchange_rate_date' => $invoice->exchange_rate_date ?? now()->toDateString(),
+                'reference_type' => Invoice::class,
+                'reference_id' => $invoice->id,
+                'note' => 'Invoice #' . $invoice->invoice_number . ' issued',
+                'created_by' => Auth::id(),
+            ]);
         }
 
         return back()->with('success', __('erp.invoice_issued_success'));

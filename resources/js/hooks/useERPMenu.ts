@@ -21,6 +21,7 @@ import {
     Receipt,
     Lock,
     Building2,
+    MonitorSmartphone,
 } from 'lucide-react';
 
 interface MenuItem {
@@ -65,10 +66,12 @@ export function useERPMenu(
         { id: 'projects', label: 'Projects', icon: Briefcase },
         { id: 'tasks', label: 'Tasks', icon: CheckSquare },
         { id: 'invoices', label: 'Invoices', icon: FileText },
+        { id: 'pos', label: 'POS System', icon: MonitorSmartphone },
         { id: 'transactions', label: 'Transactions', icon: History },
         { id: 'expenses', label: 'Expenses', icon: Receipt },
         { id: 'referrals', label: 'Referrals', icon: Users },
         { id: 'branches', label: 'Branches', icon: Building2 },
+        { id: 'inventory', label: 'Inventory', icon: Package },
         { id: 'documents', label: 'Files', icon: Folder },
         { id: 'notes', label: 'Notes', icon: Pin },
         { id: 'calendar', label: 'Calendar', icon: Calendar },
@@ -89,6 +92,7 @@ export function useERPMenu(
         { id: 'erp-permissions', label: 'Permissions', icon: Shield, description: 'Fine-grained permission controls for team members across all modules.', features: ['Granular roles', 'Module-level access', 'Audit trail'] },
         { id: 'erp-payroll', label: 'Payroll', icon: Banknote, description: 'Automate salary calculations, deductions, and payment tracking for your team.', features: ['Salary management', 'Deduction rules', 'Payment history'] },
         { id: 'erp-inventory', label: 'Inventory', icon: Package, description: 'Track stock levels, manage products, and automate reorder alerts.', features: ['Stock tracking', 'Product catalog', 'Reorder alerts'] },
+        { id: 'erp-pos', label: 'POS System', icon: MonitorSmartphone, description: 'Cashier, barcode, and receipt management interface for in-store sales.', features: ['Barcode scanning', 'Print receipts', 'Quick checkout'] },
         { id: 'erp-tax-engine', label: 'Tax Engine', icon: Receipt, description: 'Automated tax calculation, VAT management, and tax-ready invoice generation.', features: ['Auto tax calc', 'VAT support', 'Tax reports'] },
         { id: 'erp-smtp', label: 'Custom SMTP', icon: Settings, description: 'Send emails (invoices, receipts, etc) to clients from your own domain and custom email address.', features: ['Custom Sender Identity', 'White-labeled Emails', 'Increased Deliverability'] },
     ];
@@ -99,6 +103,12 @@ export function useERPMenu(
             return false;
         }
         if (item.id === 'referrals' && !activeAddons.includes('erp-referrals')) {
+            return false;
+        }
+        if (item.id === 'inventory' && !activeAddons.includes('erp-inventory')) {
+            return false;
+        }
+        if (item.id === 'pos' && !activeAddons.includes('erp-pos')) {
             return false;
         }
         if (item.id === 'branches' && !activeAddons.includes('erp-multi-branch')) {
@@ -117,7 +127,13 @@ export function useERPMenu(
                   ? route('erp.backup.index')
                   : m.id === 'referrals'
                     ? route('erp.referrals.index')
-                    : route('erp.dashboard', { section: m.id }),
+                    : m.id === 'inventory'
+                      ? route('erp.inventory.index')
+                      : m.id === 'pos'
+                        ? route('erp.pos.index')
+                        : m.id === 'branches'
+                          ? route('erp.branches.index')
+                          : route('erp.dashboard', { section: m.id }),
     }));
 
     // Build locked addon items — only show addons the user DOESN'T have

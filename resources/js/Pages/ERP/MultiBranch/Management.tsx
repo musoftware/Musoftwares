@@ -3,14 +3,23 @@ import ERPLayout from '@/Layouts/ERPLayout';
 import { Head } from '@inertiajs/react';
 import { Button } from '@/Components/ui/button';
 import { Plus } from 'lucide-react';
+import { useERPMenu } from '@/hooks/useERPMenu';
 
 interface Props {
     branches: Array<any>;
 }
 
 export default function BranchManagement({ branches }: Props) {
+    const { menuItems, lockedAddons, workspaceName, tenantId } = useERPMenu('branches');
+
     return (
-        <ERPLayout title="Branch Management">
+        <ERPLayout 
+            title="Branch Management"
+            menuItems={menuItems}
+            lockedAddons={lockedAddons}
+            workspaceName={workspaceName}
+            tenantId={tenantId}
+        >
             <Head title="Branch Management - ERP" />
 
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">

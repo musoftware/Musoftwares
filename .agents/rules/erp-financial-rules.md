@@ -63,26 +63,28 @@ $transaction->business_amount = \App\Models\CurrenciesExchange::RateByDate(
 ### 3. Transactions as the Single Source of Truth for Income
 - **Metric Source**: Monthly income and overall income metrics must be compiled solely from the **transactions** system, never directly from invoices.
 - **Transaction Types**: Transactions must belong to one of these types:
-  - `Credit`
-  - `Refund`
-  - `Send`
-  - `Used`
+  - `received`
+  - `refunded`
+  - `sent`
+  - `used`
+  - `earned`
 - **Income Formula**:
-  - If Refund and Send transactions are stored as negative values:
-    $$\text{Income} = \sum \text{Transactions(Credit).business\_amount} + \sum (\text{Transactions(Refund).business\_amount} + \text{Transactions(Send).business\_amount})$$
+  - If `refunded` and `sent` transactions are stored as negative values:
+    $$\text{Income} = \sum \text{Transactions(received).business\_amount} + \sum (\text{Transactions(refunded).business\_amount} + \text{Transactions(sent).business\_amount})$$
   - **Multi-Currency Normalization**: You **MUST** sum the `business_amount` (normalized base currency amount) rather than the local/client `amount`. Summing different raw currencies (e.g. adding EGP directly to USD) is strictly forbidden.
-  - **Caution**: Since Refund and Send amounts are stored as negative values, adding them to the Credit sum correctly decreases the income. Do not subtract them directly (i.e. `Credit - (Refund + Send)`) because subtracting a negative value results in addition (`minus minus is plus`).
-- **Exclusion of `Used`**: Do NOT sum or include transactions of type `Used` in the monthly/profit calculations. The `Used` type tracks internal wallet utilization (e.g. paying invoices using wallet balance) and including it would cause double-counting.
+  - **Caution**: Since `refunded` and `sent` amounts are stored as negative values, adding them to the `received` sum correctly decreases the income. Do not subtract them directly (i.e. `received - (refunded + sent)`) because subtracting a negative value results in addition (`minus minus is plus`).
+- **Exclusion of `used`**: Do NOT sum or include transactions of type `used` in the monthly/profit calculations. The `used` type tracks internal wallet utilization (e.g. paying invoices using wallet balance) and including it would cause double-counting.
+- **Inclusion of `earned`**: Transactions of type `earned` should also be added to income.
 
 #### Income Calculation Example:
 ```php
 // ✅ CORRECT: Summing business_amount (normalized base currency)
-$credits = Transaction::where('type', 'Credit')
+$credits = Transaction::whereIn('type', ['received', 'earned'])
     ->whereMonth('created_at', $month)
     ->sum('business_amount');
 
-// Note: Refund and Send transactions have negative amounts (e.g., -150.00 in business currency)
-$deductions = Transaction::whereIn('type', ['Refund', 'Send'])
+// Note: refunded and sent transactions have negative amounts (e.g., -150.00 in business currency)
+$deductions = Transaction::whereIn('type', ['refunded', 'sent'])
     ->whereMonth('created_at', $month)
     ->sum('business_amount');
 
@@ -93,7 +95,7 @@ $monthlyIncome = $credits + $deductions;
 ---
 
 ### 4. Expense & Cost Summation
-- **No Sub-types**: Expenses do not have sub-type classifications (like Credit, Refund, etc.) in the same transaction sense.
+- **No Type or Direction**: Cost transactions (expenses) must have no `type` and no `direction` columns or properties. They do not have sub-type classifications in the same transaction sense.
 - **Cost Calculation**: Simply sum all entries using `business_amount` to compute the total cost/expenditures:
   ```php
   // ✅ CORRECT: Summing business_amount for currency consistency

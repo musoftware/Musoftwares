@@ -10,7 +10,7 @@ class ExpenseTransaction extends TenantModel
 
     protected $fillable = [
         'tenant_id', 'invoice_cost_id', 'invoice_id', 'client_id',
-        'type', 'direction', 'amount', 'currency_id', 'business_amount', 'business_currency_id',
+        'amount', 'currency_id', 'business_amount', 'business_currency_id',
         'exchange_rate', 'exchange_rate_date', 'balance_before', 'balance_after',
         'note', 'created_by'
     ];

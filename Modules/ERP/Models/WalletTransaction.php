@@ -15,7 +15,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class WalletTransaction extends TenantModel
 {
-    protected $table = 'erp_client_wallet_transactions';
+    protected $table = 'erp_client_transactions';
 
     protected $fillable = [
         'tenant_id', 'client_id', 'project_id', 'type', 'direction',
