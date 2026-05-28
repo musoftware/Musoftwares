@@ -192,15 +192,7 @@ export default function CreateEdit({ invoice, clients = [], projects = [], curre
                         >
                             {processing ? 'Saving...' : isEdit ? 'Update Invoice' : 'Save Draft'}
                         </Button>
-                        {!isEdit && (
-                            <Button
-                                type="button"
-                                disabled={processing}
-                                className="shadow-sm bg-indigo-600 text-white hover:bg-indigo-700"
-                            >
-                                <Send className="mr-2 h-4 w-4" /> Save & Send
-                            </Button>
-                        )}
+
                     </div>
                 </div>
 

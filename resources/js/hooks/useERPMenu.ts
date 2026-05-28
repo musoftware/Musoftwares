@@ -20,6 +20,7 @@ import {
     Coins,
     Receipt,
     Lock,
+    Building2,
 } from 'lucide-react';
 
 interface MenuItem {
@@ -67,6 +68,7 @@ export function useERPMenu(
         { id: 'transactions', label: 'Transactions', icon: History },
         { id: 'expenses', label: 'Expenses', icon: Receipt },
         { id: 'referrals', label: 'Referrals', icon: Users },
+        { id: 'branches', label: 'Branches', icon: Building2 },
         { id: 'documents', label: 'Files', icon: Folder },
         { id: 'notes', label: 'Notes', icon: Pin },
         { id: 'calendar', label: 'Calendar', icon: Calendar },
@@ -96,6 +98,9 @@ export function useERPMenu(
             return false;
         }
         if (item.id === 'referrals' && !activeAddons.includes('erp-referrals')) {
+            return false;
+        }
+        if (item.id === 'branches' && !activeAddons.includes('erp-multi-branch')) {
             return false;
         }
         return true;

@@ -401,6 +401,21 @@ class ERPDashboardController extends Controller
                     ];
                 });
         }
+        
+        // ── Real Branches List ─────────────────────────────────────
+        $branches = collect();
+        if ($tenantId && $ownerUser && $ownerUser->hasModuleSubscription('erp-multi-branch')) {
+            $branches = \Modules\ERP\Models\Branch::where('tenant_id', $tenantId)->latest()->get()->map(function($b) {
+                return [
+                    'id' => $b->id,
+                    'name' => $b->name,
+                    'type' => $b->type,
+                    'timezone' => $b->timezone,
+                    'status' => $b->status,
+                    'created_at' => $b->created_at?->format('Y-m-d')
+                ];
+            });
+        }
 
         return Inertia::render('ERP/Dashboard', [
             'tenant' => $tenant,
@@ -419,6 +434,7 @@ class ERPDashboardController extends Controller
             'notes' => $notes,
             'transactions' => $transactions,
             'transactionStats' => $transactionStats,
+            'branches' => $branches,
 
             'hasMultiCurrency' => $ownerUser ? $ownerUser->hasModuleSubscription('erp-multi-currency') : false,
             'currencies' => \App\Models\Currency::all(),
@@ -552,9 +568,14 @@ class ERPDashboardController extends Controller
             if ($currency) {
                 $tenant->base_currency_id = $currency->id;
                 $tenant->save();
+
+                // If user doesn't have multi-currency addon, update all clients' currency
+                if (!$user->hasModuleSubscription('erp-multi-currency')) {
+                    $tenant->clients()->update(['currency_id' => $currency->id]);
+                }
             }
         }
 
-        return redirect()->back()->with('success', 'Workspace settings updated successfully.');
+        return redirect()->back()->with('success', __('erp.workspace_settings_updated_success'));
     }
 }
