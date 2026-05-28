@@ -57,9 +57,16 @@ class TenantClient extends TenantModel
 
     public function balance(): float
     {
-        $credits = $this->transactions()->where('direction', 'credit')->sum('amount');
-        $debits = $this->transactions()->where('direction', 'debit')->sum('amount');
-        return round((float) $credits - (float) $debits, 2);
+        $credits = $this->transactions()
+            ->whereIn('type', ['received', 'earned'])
+            ->sum('amount');
+
+        $deductions = $this->transactions()
+            ->whereIn('type', ['refunded', 'sent'])
+            ->sum('amount');
+
+        // refunded & sent are stored as negative values, so adding them correctly subtracts
+        return round((float) $credits + (float) $deductions, 2);
     }
 
     public function getBalanceAttribute(): float

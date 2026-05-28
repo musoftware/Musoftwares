@@ -24,13 +24,12 @@ Route::middleware(['web', 'auth', 'tenant.active'])
         Route::delete('clients/{client}', [\Modules\ERP\Http\Controllers\ClientController::class, 'destroy'])->name('clients.destroy');
         Route::get('clients/{client}', [\Modules\ERP\Http\Controllers\ClientController::class, 'show'])->name('clients.show');
         
-        // ── Client Wallet ──
+        // ── Client Transactions ──
         Route::get('clients/{client}/wallet/adjust', [\Modules\ERP\Http\Controllers\WalletController::class, 'adjust'])->name('clients.wallet.adjust');
         Route::get('clients/{client}/wallet', [\Modules\ERP\Http\Controllers\WalletController::class, 'show'])->name('clients.wallet.index');
-        Route::post('clients/{client}/wallet/credit', [\Modules\ERP\Http\Controllers\WalletController::class, 'manualCredit'])->name('clients.wallet.credit');
-        Route::post('clients/{client}/wallet/debit', [\Modules\ERP\Http\Controllers\WalletController::class, 'manualDebit'])->name('clients.wallet.debit');
-        Route::post('clients/{client}/wallet/lock', [\Modules\ERP\Http\Controllers\WalletController::class, 'lockFunds'])->name('clients.wallet.lock');
-        Route::post('clients/{client}/wallet/unlock', [\Modules\ERP\Http\Controllers\WalletController::class, 'unlockFunds'])->name('clients.wallet.unlock');
+        Route::post('clients/{client}/wallet/receive', [\Modules\ERP\Http\Controllers\WalletController::class, 'receivePayment'])->name('clients.wallet.receive');
+        Route::post('clients/{client}/wallet/send', [\Modules\ERP\Http\Controllers\WalletController::class, 'sendPayment'])->name('clients.wallet.send');
+        Route::post('clients/{client}/wallet/refund', [\Modules\ERP\Http\Controllers\WalletController::class, 'refund'])->name('clients.wallet.refund');
 
         // ── Transactions ──
         Route::get('transactions/{transaction}', [\Modules\ERP\Http\Controllers\TransactionController::class, 'show'])->name('transactions.show');

@@ -31,7 +31,7 @@ class ClientController extends Controller
 
         // Ensure the client belongs to the active tenant
         if ($client->tenant_id !== $tenantId) {
-            abort(403, 'Unauthorized access to client.');
+            abort(403, __('erp.unauthorized_client_access'));
         }
 
         // Load base relationships
@@ -66,6 +66,8 @@ class ClientController extends Controller
             'invoices' => $invoices,
             'activities' => $activities,
             'hasTickets' => $hasTickets,
+            'balance' => $client->balance(),
+            'lockedBalance' => $client->lockedBalance(),
         ]);
     }
 

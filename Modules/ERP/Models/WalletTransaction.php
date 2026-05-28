@@ -5,20 +5,23 @@ namespace Modules\ERP\Models;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
- * WalletTransaction — ERP ledger entry on a TenantClient's wallet.
+ * WalletTransaction — ERP ledger entry for a TenantClient.
  *
- * ⚠️  FINANCIAL ISOLATION: Do NOT confuse with App\Models\WalletTransaction
- *     which tracks REAL platform money (table: wallet_transactions).
+ * Table: erp_client_transactions
  *
- *     This model is ERP-internal ONLY (table: client_wallet_transactions).
- *     It records credit/debit movements on a tenant's client bookkeeping ledger.
+ * Transaction types:
+ *   - received: Payment received from client (positive amount)
+ *   - earned:   Earned credit/bonus for client (positive amount)
+ *   - refunded: Refund issued to client (negative amount)
+ *   - sent:     Money sent/deducted from client (negative amount)
+ *   - used:     Internal wallet utilization for invoice payment (excluded from income)
  */
 class WalletTransaction extends TenantModel
 {
     protected $table = 'erp_client_transactions';
 
     protected $fillable = [
-        'tenant_id', 'client_id', 'project_id', 'type', 'direction',
+        'tenant_id', 'client_id', 'project_id', 'type',
         'amount', 'currency_id', 'business_amount', 'business_currency_id',
         'exchange_rate', 'exchange_rate_date',
         'reference_type', 'reference_id', 'note', 'created_by'

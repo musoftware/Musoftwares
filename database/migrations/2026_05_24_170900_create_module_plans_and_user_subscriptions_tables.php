@@ -27,15 +27,16 @@ return new class extends Migration
         if (!Schema::hasTable('user_subscriptions')) {
             Schema::create('user_subscriptions', function (Blueprint $table) {
                 $table->id();
-                $table->foreignId('client_id')->constrained('users')->cascadeOnDelete();
-                $table->foreignId('plan_id')->constrained('module_plans')->cascadeOnDelete();
+                $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
+                $table->string('object');
                 $table->string('status')->default('active');  // active, expired, cancelled
                 $table->timestamp('started_at')->nullable();
                 $table->timestamp('expires_at')->nullable();
                 $table->boolean('auto_renew')->default(true);
                 $table->timestamps();
 
-                $table->index(['client_id', 'status']);
+                $table->index(['user_id', 'status']);
+                $table->index('object');
                 $table->index('expires_at');
             });
         }
