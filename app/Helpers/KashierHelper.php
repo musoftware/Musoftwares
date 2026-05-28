@@ -129,7 +129,7 @@ class KashierHelper
         int $userId,
         string $userName,
         string $userEmail,
-        int $planId,
+        ?int $planId = null,
         string $currency = 'USD',
         string $billingCycle = '1_year',
         int $days = 365,

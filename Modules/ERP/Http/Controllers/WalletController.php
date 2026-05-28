@@ -72,6 +72,23 @@ class WalletController extends Controller
         ]);
     }
 
+    // ── Adjust wallet ──────────────────────────────────────────────────
+
+    public function adjust(Request $request, int $client)
+    {
+        [$tenant, $clientModel] = $this->resolveTenantAndClient($client);
+
+        $wallet = ClientWallet::firstOrCreate(
+            ['tenant_id' => $tenant->id, 'client_id' => $clientModel->id],
+            ['balance' => 0, 'currency_id' => $clientModel->currency_id]
+        );
+
+        return Inertia::render('ERP/Wallet/Adjust', [
+            'wallet' => $wallet,
+            'client' => $clientModel,
+        ]);
+    }
+
     // ── Transaction history (JSON) ────────────────────────────────────
 
     public function transactions(Request $request, int $client)

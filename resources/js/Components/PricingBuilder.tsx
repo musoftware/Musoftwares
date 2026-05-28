@@ -50,6 +50,7 @@ interface PricingBuilderProps {
         billing: '1_month' | '6_months' | '1_year';
         total: number;
     }) => React.ReactNode;
+    proratedRefund?: number;
 }
 
 export default function PricingBuilder({ 
@@ -58,17 +59,16 @@ export default function PricingBuilder({
     activeSubscription,
     isNewSystem = true, // default for guests is new system
     onSystemTypeChange,
-    renderActions
+    renderActions,
+    proratedRefund = 0
 }: PricingBuilderProps) {
     const [billing, setBilling] = useState<'1_month' | '6_months' | '1_year'>('1_month');
     
     // Default selected items (e.g., ERP and CRM) to show a populated cart by default
     const activeItems = useMemo(() => {
         if (isNewSystem) return serviceItems.filter(i => i.id === 'erp' || i.id === 'crm').map(i => i.id);
-        return activeSubscription?.owned_features
-            ?.filter(f => f.status === 'active')
-            .map(f => f.id) || [];
-    }, [activeSubscription, isNewSystem, serviceItems]);
+        return [];
+    }, [isNewSystem, serviceItems]);
     useEffect(() => {
         setSelectedItems(activeItems);
     }, [isNewSystem, activeItems]);
@@ -275,7 +275,7 @@ export default function PricingBuilder({
                                     {renderItemCard(module)}
                                     
                                     {/* Add-ons Section */}
-                                    {moduleAddons.length > 0 && isModuleSelected && (
+                                    {moduleAddons.length > 0 && (isModuleSelected || (isNewSystem ? false : activeSubscription?.owned_features?.find(f => f.id === module.id)?.status === 'active')) && (
                                         <div className="mt-4 pl-4 md:pl-8 border-l-[3px] border-indigo-100 ml-4 md:ml-6 pb-2 animate-in slide-in-from-top-4 fade-in duration-300">
                                             <h4 className="text-sm font-bold text-slate-800 mb-3 flex items-center gap-2 tracking-tight">
                                                 <Sparkles className="w-4 h-4 text-indigo-500" /> 
@@ -321,7 +321,7 @@ export default function PricingBuilder({
                 <div className="bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-sm">
                     <div className="p-6 bg-slate-50/50 border-b border-slate-100 flex flex-col gap-3">
                         <div>
-                            <h3 className="text-lg font-semibold text-slate-900">Your Plan Summary</h3>
+                            <h3 className="text-lg font-semibold text-slate-900">Workspace Summary</h3>
                             <p className="text-sm text-slate-500">Select your preferred billing cycle</p>
                         </div>
                         
@@ -376,7 +376,7 @@ export default function PricingBuilder({
                                 <div className="w-12 h-12 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-3">
                                     <Layers className="w-6 h-6 text-slate-300" />
                                 </div>
-                                <p className="text-slate-500 text-sm">Select products to build your plan.</p>
+                                <p className="text-slate-500 text-sm">Select modules to build your workspace.</p>
                             </div>
                         ) : (
                             <div className="space-y-4">
@@ -415,11 +415,18 @@ export default function PricingBuilder({
                                     </div>
                                 )}
 
+                                {!isNewSystem && proratedRefund > 0 && (
+                                    <div className="flex justify-between text-sm text-amber-600 font-medium">
+                                        <span>Prorated Refund (Current Plan)</span>
+                                        <span>-{proratedRefund.toFixed(2)}</span>
+                                    </div>
+                                )}
+
                                 <div className="flex justify-between items-end">
-                                    <span className="text-base font-medium text-slate-900">Total</span>
+                                    <span className="text-base font-medium text-slate-900">Total To Pay</span>
                                     <div className="text-right">
                                         <span className="text-3xl font-bold tracking-tight text-indigo-600">
-                                            {total.toFixed(2)}
+                                            {Math.max(0, total - (!isNewSystem ? proratedRefund : 0)).toFixed(2)}
                                         </span>
                                         <span className="text-sm text-slate-400 ml-1">{currency}</span>
                                     </div>
@@ -440,7 +447,7 @@ export default function PricingBuilder({
                                             : 'bg-slate-100 text-slate-400 cursor-not-allowed'
                                     )}
                                 >
-                                    Start Building Your Plan
+                                    Start Building Your Workspace
                                 </Button>
                             </Link>
                         )}

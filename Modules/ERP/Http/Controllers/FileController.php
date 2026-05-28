@@ -28,6 +28,11 @@ class FileController extends Controller
         ]);
     }
 
+    public function create()
+    {
+        return inertia('ERP/Files/Create');
+    }
+
     public function store(Request $request)
     {
         $user = Auth::user();

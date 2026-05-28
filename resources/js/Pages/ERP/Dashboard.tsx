@@ -742,9 +742,9 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                                     </div>
                                     {!isReadOnlyMember && (
                                         <div className="flex items-center gap-3">
-                                            <Button size="sm" variant="outline" className="shadow-sm border-slate-200" onClick={() => setShowAddClientModal(true)}>
+                                            <Link href={route("erp.clients.create")}><Button size="sm" className="shadow-none">
                                                 <UserPlus className="mr-2 h-4 w-4" /> Add Client
-                                            </Button>
+                                            </Button></Link>
                                             <Link 
                                                 href={route('erp.invoices.create')}
                                                 className={cn(buttonVariants({ size: 'sm' }), "shadow-sm")}
@@ -843,7 +843,7 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                                             <div className="space-y-2">
                                                 {!isReadOnlyMember && (
                                                     <>
-                                                        <button onClick={() => setShowAddClientModal(true)} className="w-full flex items-center justify-between p-3 rounded-xl border border-slate-100 bg-white hover:border-slate-300 hover:shadow-sm transition-all text-left group">
+                                                        <Link href={route("erp.clients.create")} className="p-1.5 hover:bg-slate-100 rounded text-slate-400">
                                                             <div className="flex items-center gap-3">
                                                                 <div className="bg-slate-50 p-2 rounded-lg group-hover:bg-white transition-colors">
                                                                     <UserPlus className="h-4 w-4 text-slate-600" />
@@ -851,8 +851,8 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                                                                 <span className="font-medium text-slate-700 text-sm">Add Client</span>
                                                             </div>
                                                             <ChevronRight className="h-4 w-4 text-slate-400 group-hover:text-slate-600 transition-colors" />
-                                                        </button>
-                                                        <button onClick={() => setShowAddProjectModal(true)} className="w-full flex items-center justify-between p-3 rounded-xl border border-slate-100 bg-white hover:border-slate-300 hover:shadow-sm transition-all text-left group">
+                                                        </Link>
+                                                        <Link href={route("erp.projects.create")} className="p-1.5 hover:bg-slate-100 rounded text-slate-400">
                                                             <div className="flex items-center gap-3">
                                                                 <div className="bg-slate-50 p-2 rounded-lg group-hover:bg-white transition-colors">
                                                                     <Briefcase className="h-4 w-4 text-slate-600" />
@@ -860,7 +860,7 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                                                                 <span className="font-medium text-slate-700 text-sm">Create Project</span>
                                                             </div>
                                                             <ChevronRight className="h-4 w-4 text-slate-400 group-hover:text-slate-600 transition-colors" />
-                                                        </button>
+                                                        </Link>
                                                     </>
                                                 )}
                                                 <button onClick={() => handleSetSection('tasks')} className="w-full flex items-center justify-between p-3 rounded-xl border border-slate-100 bg-white hover:border-slate-300 hover:shadow-sm transition-all text-left group">
@@ -918,9 +918,9 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                                     title="Clients" 
                                     description="Manage your clients, contacts, and their billing profiles."
                                     actions={!isReadOnlyMember && (
-                                        <Button size="sm" onClick={() => setShowAddClientModal(true)} className="shadow-none">
+                                        <Link href={route("erp.clients.create")}><Button size="sm" className="shadow-none">
                                             <Plus className="mr-1.5 h-3.5 w-3.5" /> Add Client
-                                        </Button>
+                                        </Button></Link>
                                     )}
                                 />
 
@@ -969,17 +969,9 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                                                             </td>
                                                             {!isReadOnlyMember && (
                                                                 <td className="px-6 py-4 text-center">
-                                                                    <Button 
-                                                                        size="sm" 
-                                                                        variant="outline" 
-                                                                        className="h-8 shadow-none border-indigo-100 text-indigo-600 hover:bg-indigo-50 font-semibold"
-                                                                        onClick={() => {
-                                                                            setSelectedClient(client);
-                                                                            setShowWalletModal(true);
-                                                                        }}
-                                                                    >
+                                                                    <Link href={route("erp.clients.wallet.adjust", selectedClient?.id)}><Button size="sm" className="shadow-none">
                                                                         <CreditCard className="mr-1 h-3.5 w-3.5" /> Adjust Balance
-                                                                    </Button>
+                                                                    </Button></Link>
                                                                 </td>
                                                             )}
                                                             {!isReadOnlyMember && (
@@ -1027,9 +1019,9 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                                     title="Projects" 
                                     description="Manage active projects, track progress, and monitor deadlines."
                                     actions={!isReadOnlyMember && (
-                                        <Button size="sm" onClick={() => setShowAddProjectModal(true)} className="shadow-none">
+                                        <Link href={route("erp.projects.create")}><Button size="sm" className="shadow-none">
                                             <Plus className="mr-1.5 h-3.5 w-3.5" /> New Project
-                                        </Button>
+                                        </Button></Link>
                                     )}
                                 />
 
@@ -1277,9 +1269,9 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                                     title="Expenses" 
                                     description="Track and log operational expenses."
                                     actions={
-                                        <Button size="sm" onClick={() => setShowAddExpenseModal(true)} className="shadow-none">
+                                        <Link href={route("erp.expenses.create")}><Button size="sm" className="shadow-none">
                                             <Plus className="mr-1.5 h-3.5 w-3.5" /> Log Expense
-                                        </Button>
+                                        </Button></Link>
                                     }
                                 />
 
@@ -1331,9 +1323,9 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                                     title="Files" 
                                     description="Secure cloud repository for your documents and files."
                                     actions={!isReadOnlyMember && (
-                                        <Button size="sm" onClick={() => setShowAddDocModal(true)} className="shadow-none">
+                                        <Link href={route("erp.files.create")}><Button size="sm" className="shadow-none">
                                             <Plus className="mr-1.5 h-3.5 w-3.5" /> Upload File
-                                        </Button>
+                                        </Button></Link>
                                     )}
                                 />
 
@@ -1417,9 +1409,9 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                                     title="Contracts" 
                                     description="Draft and track client service agreements and contracts."
                                     actions={
-                                        <Button size="sm" onClick={() => setShowAddContractModal(true)} className="shadow-none">
+                                        <Link href={route("erp.contracts.create")}><Button size="sm" className="shadow-none">
                                             <Plus className="mr-1.5 h-3.5 w-3.5" /> Draft Contract
-                                        </Button>
+                                        </Button></Link>
                                     }
                                 />
 
@@ -1781,9 +1773,9 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                                     title="Support" 
                                     description="Track client helpdesk tickets and resolve inquiries."
                                     actions={
-                                        <Button size="sm" onClick={() => setShowAddTicketModal(true)} className="shadow-none">
+                                        <Link href={route("erp.tickets.create")}><Button size="sm" className="shadow-none">
                                             <Plus className="mr-1.5 h-3.5 w-3.5" /> Open Ticket
-                                        </Button>
+                                        </Button></Link>
                                     }
                                 />
 
@@ -1938,9 +1930,9 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                                             <h3 className="font-semibold text-slate-900 text-sm">Storage Integrations</h3>
                                             <p className="text-xs text-slate-500 mt-1">Connect your workspace directly to external cloud storage (S3 compatible).</p>
                                         </div>
-                                        <Button size="sm" variant="outline" className="shadow-sm" onClick={() => setShowAddProviderModal(true)}>
+                                        <Link href={route("erp.storage-providers.create")}><Button size="sm" variant="outline" className="shadow-sm">
                                             <Plus className="h-3.5 w-3.5 mr-1.5" /> Add Provider
-                                        </Button>
+                                        </Button></Link>
                                     </div>
                                     <div className="divide-y divide-slate-100">
                                         {storageProviders.map(provider => (
@@ -1972,546 +1964,7 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                             </div>
                         )}
 
-            {/* ────────────────────────────────────────────────────────
-                MODALS AND OVERLAYS SECTION
-                ──────────────────────────────────────────────────────── */}
-            
-            {/* ADD CLIENT MODAL */}
-            {showAddClientModal && (
-                <div className="fixed inset-0 bg-slate-950/20 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fade-in">
-                    <OperationalCard className="w-full max-w-md shadow-2xl animate-scale-up">
-                        <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
-                            <h3 className="font-semibold text-slate-800 text-[14px]">Establish Client Entity</h3>
-                            <button onClick={() => setShowAddClientModal(false)} className="p-1 hover:bg-slate-100 rounded text-slate-400">
-                                <X className="h-4 w-4" />
-                            </button>
-                        </div>
-                        <form onSubmit={handleAddClient} className="p-6 space-y-4">
-                            <div className="space-y-1">
-                                <label className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Client Name</label>
-                                <Input required placeholder="Jane Doe" value={clientForm.name} onChange={e => setClientForm(prev => ({ ...prev, name: e.target.value }))} className="shadow-none" />
-                            </div>
-                            <div className="space-y-1">
-                                <label className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Email Address</label>
-                                <Input required type="email" placeholder="jane@globex.org" value={clientForm.email} onChange={e => setClientForm(prev => ({ ...prev, email: e.target.value }))} className="shadow-none" />
-                            </div>
-                            <div className="space-y-1">
-                                <label className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Company Name</label>
-                                <Input placeholder="Globex Corp" value={clientForm.phone} onChange={e => setClientForm(prev => ({ ...prev, phone: e.target.value }))} className="shadow-none" />
-                            </div>
-                            <div className="space-y-1">
-                                <label className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Physical Address</label>
-                                <Input placeholder="120 San Francisco, CA" value={clientForm.address} onChange={e => setClientForm(prev => ({ ...prev, address: e.target.value }))} className="shadow-none" />
-                            </div>
-                            <div className="space-y-1">
-                                <label className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Wallet Currency</label>
-                                <select 
-                                    className="flex h-10 w-full rounded-md border border-slate-200 bg-background px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-slate-950 shadow-none"
-                                    value={clientForm.currency}
-                                    onChange={e => setClientForm(prev => ({ ...prev, currency: e.target.value }))}
-                                >
-                                    <option value="USD">USD ($)</option>
-                                    <option value="EUR">EUR (€)</option>
-                                    <option value="EGP">EGP (EGP)</option>
-                                </select>
-                            </div>
-                            <div className="pt-4 border-t flex justify-end gap-2">
-                                <Button type="button" variant="outline" size="sm" className="shadow-none" onClick={() => setShowAddClientModal(false)}>Cancel</Button>
-                                <Button type="submit" size="sm" className="shadow-none bg-indigo-600 hover:bg-indigo-700 text-white font-semibold">Commit Record</Button>
-                            </div>
-                        </form>
-                    </OperationalCard>
-                </div>
-            )}
-
-            {/* EDIT CLIENT MODAL */}
-            {showEditClientModal && (
-                <div className="fixed inset-0 bg-slate-950/20 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-                    <OperationalCard className="w-full max-w-md shadow-2xl">
-                        <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
-                            <h3 className="font-semibold text-slate-800 text-[14px]">Edit Client Record</h3>
-                            <button onClick={() => { setShowEditClientModal(false); setSelectedClient(null); }} className="p-1 hover:bg-slate-100 rounded text-slate-400">
-                                <X className="h-4 w-4" />
-                            </button>
-                        </div>
-                        <form onSubmit={handleEditClient} className="p-6 space-y-4">
-                            <div className="space-y-1">
-                                <label className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Client Name</label>
-                                <Input required value={clientForm.name} onChange={e => setClientForm(prev => ({ ...prev, name: e.target.value }))} className="shadow-none" />
-                            </div>
-                            <div className="space-y-1">
-                                <label className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Email Address</label>
-                                <Input required type="email" value={clientForm.email} onChange={e => setClientForm(prev => ({ ...prev, email: e.target.value }))} className="shadow-none" />
-                            </div>
-                            <div className="space-y-1">
-                                <label className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Company Name</label>
-                                <Input value={clientForm.phone} onChange={e => setClientForm(prev => ({ ...prev, phone: e.target.value }))} className="shadow-none" />
-                            </div>
-                            <div className="space-y-1">
-                                <label className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Physical Address</label>
-                                <Input value={clientForm.address} onChange={e => setClientForm(prev => ({ ...prev, address: e.target.value }))} className="shadow-none" />
-                            </div>
-                            <div className="space-y-1">
-                                <label className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Wallet Currency</label>
-                                <select 
-                                    className="flex h-10 w-full rounded-md border border-slate-200 bg-background px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-slate-950 shadow-none"
-                                    value={clientForm.currency}
-                                    onChange={e => setClientForm(prev => ({ ...prev, currency: e.target.value }))}
-                                >
-                                    <option value="USD">USD ($)</option>
-                                    <option value="EUR">EUR (€)</option>
-                                    <option value="EGP">EGP (EGP)</option>
-                                </select>
-                            </div>
-                            <div className="pt-4 border-t flex justify-end gap-2">
-                                <Button type="button" variant="outline" size="sm" className="shadow-none" onClick={() => { setShowEditClientModal(false); setSelectedClient(null); }}>Cancel</Button>
-                                <Button type="submit" size="sm" className="shadow-none bg-indigo-600 hover:bg-indigo-700 text-white font-semibold">Update Record</Button>
-                            </div>
-                        </form>
-                    </OperationalCard>
-                </div>
-            )}
-
-            {/* ADD PROJECT MODAL */}
-            {showAddProjectModal && (
-                <div className="fixed inset-0 bg-slate-950/20 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fade-in">
-                    <OperationalCard className="w-full max-w-md shadow-2xl animate-scale-up">
-                        <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
-                            <h3 className="font-semibold text-slate-800 text-[14px]">Create New Project</h3>
-                            <button onClick={() => setShowAddProjectModal(false)} className="p-1 hover:bg-slate-100 rounded text-slate-400">
-                                <X className="h-4 w-4" />
-                            </button>
-                        </div>
-                        <form onSubmit={handleAddProject} className="p-6 space-y-4">
-                            <div className="space-y-1">
-                                <label className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Project Name</label>
-                                <Input required placeholder="Website Redesign" value={newProjectForm.name} onChange={e => setNewProjectForm(prev => ({ ...prev, name: e.target.value }))} className="shadow-none" />
-                            </div>
-                            <div className="space-y-1">
-                                <label className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Client</label>
-                                <select 
-                                    className="flex h-10 w-full rounded-md border border-slate-200 bg-background px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-slate-950 shadow-none"
-                                    value={newProjectForm.client_id}
-                                    onChange={e => setNewProjectForm(prev => ({ ...prev, client_id: e.target.value }))}
-                                    required
-                                >
-                                    <option value="" disabled>Select a Client</option>
-                                    {activeClients.map(c => (
-                                        <option key={c.id} value={c.id}>{c.name}</option>
-                                    ))}
-                                </select>
-                            </div>
-                            <div className="space-y-1">
-                                <label className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Status</label>
-                                <select 
-                                    className="flex h-10 w-full rounded-md border border-slate-200 bg-background px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-slate-950 shadow-none"
-                                    value={newProjectForm.status}
-                                    onChange={e => setNewProjectForm(prev => ({ ...prev, status: e.target.value }))}
-                                >
-                                    <option value="Planning">Planning</option>
-                                    <option value="Active">Active</option>
-                                    <option value="On Hold">On Hold</option>
-                                    <option value="Completed">Completed</option>
-                                    <option value="Cancelled">Cancelled</option>
-                                </select>
-                            </div>
-                            <div className="grid grid-cols-2 gap-4">
-                                <div className="space-y-1">
-                                    <label className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Budget ($)</label>
-                                    <Input type="number" min="0" step="0.01" placeholder="5000.00" value={newProjectForm.budget} onChange={e => setNewProjectForm(prev => ({ ...prev, budget: e.target.value }))} className="shadow-none" />
-                                </div>
-                                <div className="space-y-1">
-                                    <label className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Deadline</label>
-                                    <Input type="date" value={newProjectForm.due_date} onChange={e => setNewProjectForm(prev => ({ ...prev, due_date: e.target.value }))} className="shadow-none" />
-                                </div>
-                            </div>
-                            <div className="pt-4 border-t flex justify-end gap-2">
-                                <Button type="button" variant="outline" size="sm" className="shadow-none" onClick={() => setShowAddProjectModal(false)}>Cancel</Button>
-                                <Button type="submit" size="sm" className="shadow-none bg-indigo-600 hover:bg-indigo-700 text-white font-semibold">Create Project</Button>
-                            </div>
-                        </form>
-                    </OperationalCard>
-                </div>
-            )}
-
-            {/* EDIT PROJECT MODAL */}
-            {showEditProjectModal && (
-                <div className="fixed inset-0 bg-slate-950/20 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-                    <OperationalCard className="w-full max-w-md shadow-2xl">
-                        <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
-                            <h3 className="font-semibold text-slate-800 text-[14px]">Edit Project</h3>
-                            <button onClick={() => setShowEditProjectModal(false)} className="p-1 hover:bg-slate-100 rounded text-slate-400">
-                                <X className="h-4 w-4" />
-                            </button>
-                        </div>
-                        <form onSubmit={handleEditProject} className="p-6 space-y-4">
-                            <div className="space-y-1">
-                                <label className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Project Name</label>
-                                <Input required placeholder="Website Redesign" value={editProjectForm.name} onChange={e => setEditProjectForm(prev => ({ ...prev, name: e.target.value }))} className="shadow-none" />
-                            </div>
-                            <div className="space-y-1">
-                                <label className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Client</label>
-                                <select 
-                                    className="flex h-10 w-full rounded-md border border-slate-200 bg-background px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-slate-950 shadow-none"
-                                    value={editProjectForm.client_id}
-                                    onChange={e => setEditProjectForm(prev => ({ ...prev, client_id: e.target.value }))}
-                                    required
-                                >
-                                    <option value="" disabled>Select a Client</option>
-                                    {activeClients.map(c => (
-                                        <option key={c.id} value={c.id}>{c.name}</option>
-                                    ))}
-                                </select>
-                            </div>
-                            <div className="space-y-1">
-                                <label className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Status</label>
-                                <select 
-                                    className="flex h-10 w-full rounded-md border border-slate-200 bg-background px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-slate-950 shadow-none"
-                                    value={editProjectForm.status}
-                                    onChange={e => setEditProjectForm(prev => ({ ...prev, status: e.target.value }))}
-                                >
-                                    <option value="Planning">Planning</option>
-                                    <option value="Active">Active</option>
-                                    <option value="On Hold">On Hold</option>
-                                    <option value="Completed">Completed</option>
-                                    <option value="Cancelled">Cancelled</option>
-                                </select>
-                            </div>
-                            <div className="grid grid-cols-2 gap-4">
-                                <div className="space-y-1">
-                                    <label className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Budget ($)</label>
-                                    <Input type="number" min="0" step="0.01" placeholder="5000.00" value={editProjectForm.budget} onChange={e => setEditProjectForm(prev => ({ ...prev, budget: e.target.value }))} className="shadow-none" />
-                                </div>
-                                <div className="space-y-1">
-                                    <label className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Deadline</label>
-                                    <Input type="date" value={editProjectForm.due_date} onChange={e => setEditProjectForm(prev => ({ ...prev, due_date: e.target.value }))} className="shadow-none" />
-                                </div>
-                            </div>
-                            <div className="pt-4 border-t flex justify-end gap-2">
-                                <Button type="button" variant="outline" size="sm" className="shadow-none" onClick={() => setShowEditProjectModal(false)}>Cancel</Button>
-                                <Button type="submit" size="sm" className="shadow-none bg-indigo-600 hover:bg-indigo-700 text-white font-semibold">Update Project</Button>
-                            </div>
-                        </form>
-                    </OperationalCard>
-                </div>
-            )}
-
-            {/* ADJUST CLIENT WALLET MODAL */}
-            {showWalletModal && selectedClient && (
-                <div className="fixed inset-0 bg-slate-950/20 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fade-in">
-                    <OperationalCard className="w-full max-w-md shadow-2xl animate-scale-up">
-                        <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
-                            <div>
-                                <h3 className="font-semibold text-slate-800 text-[14px]">Adjust Wallet Balance</h3>
-                                <p className="text-xs text-slate-400">Client: {selectedClient.name}</p>
-                            </div>
-                            <button onClick={() => setShowWalletModal(false)} className="p-1 hover:bg-slate-100 rounded text-slate-400">
-                                <X className="h-4 w-4" />
-                            </button>
-                        </div>
-                        <form onSubmit={handleWalletAdjustment} className="p-6 space-y-4">
-                            <div className="bg-slate-50 p-4 rounded-xl border border-slate-100 text-center font-mono">
-                                <span className="text-xs text-slate-400 block font-sans">Current balance</span>
-                                <span className="text-lg font-bold text-slate-800">
-                                    {selectedClient.wallet?.balance !== undefined ? selectedClient.wallet.balance : '$0.00'}
-                                </span>
-                            </div>
-
-                            <div className="space-y-1">
-                                <label className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Adjustment Type</label>
-                                <select 
-                                    className="flex h-10 w-full rounded-md border border-slate-200 bg-background px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-slate-950 shadow-none"
-                                    value={walletForm.type}
-                                    onChange={e => setWalletForm(prev => ({ ...prev, type: e.target.value }))}
-                                >
-                                    <option value="credit">Manual Credit Add (+)</option>
-                                    <option value="debit">Manual Debit Subtract (-)</option>
-                                    <option value="lock">Lock Funds</option>
-                                    <option value="unlock">Unlock Funds</option>
-                                </select>
-                            </div>
-
-                            <div className="space-y-1">
-                                <label className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Amount ($)</label>
-                                <Input required type="number" min="0.01" step="0.01" placeholder="50.00" value={walletForm.amount} onChange={e => setWalletForm(prev => ({ ...prev, amount: e.target.value }))} className="shadow-none font-mono" />
-                            </div>
-
-                            <div className="space-y-1">
-                                <label className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Internal Audit Note</label>
-                                <Textarea required placeholder="Compensation for project delays or wallet deposit verification reference" value={walletForm.note} onChange={e => setWalletForm(prev => ({ ...prev, note: e.target.value }))} className="shadow-none h-16" />
-                            </div>
-
-                            <div className="pt-4 border-t flex justify-end gap-2">
-                                <Button type="button" variant="outline" size="sm" className="shadow-none" onClick={() => setShowWalletModal(false)}>Cancel</Button>
-                                <Button type="submit" size="sm" className="shadow-none bg-indigo-600 hover:bg-indigo-700 text-white font-semibold">Apply Adjustments</Button>
-                            </div>
-                        </form>
-                    </OperationalCard>
-                </div>
-            )}
-
-
-
-            {/* LOG EXPENSE MODAL */}
-            {showAddExpenseModal && (
-                <div className="fixed inset-0 bg-slate-950/20 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-                    <OperationalCard className="w-full max-w-md shadow-2xl">
-                        <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
-                            <h3 className="font-semibold text-slate-800 text-[14px]">Log Corporate Expense</h3>
-                            <button onClick={() => setShowAddExpenseModal(false)} className="p-1 hover:bg-slate-100 rounded text-slate-400">
-                                <X className="h-4 w-4" />
-                            </button>
-                        </div>
-                        <form onSubmit={handleAddExpense} className="p-6 space-y-4">
-                            <div className="space-y-1">
-                                <label className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Expense Title</label>
-                                <Input required placeholder="Figma Enterprise seats" value={expenseForm.title} onChange={e => setExpenseForm(prev => ({ ...prev, title: e.target.value }))} className="shadow-none" />
-                            </div>
-                            <div className="space-y-1">
-                                <label className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Category</label>
-                                <select 
-                                    className="flex h-10 w-full rounded-md border border-slate-200 bg-background px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-slate-950 shadow-none"
-                                    value={expenseForm.category}
-                                    onChange={e => setExpenseForm(prev => ({ ...prev, category: e.target.value }))}
-                                >
-                                    <option value="Software">Software Scope</option>
-                                    <option value="Travel">Travel & Lodging</option>
-                                    <option value="Meals">Meals & Client Onboarding</option>
-                                    <option value="Hardware">Hardware & Equipment</option>
-                                    <option value="Other">Other Overheads</option>
-                                </select>
-                            </div>
-                            <div className="space-y-1">
-                                <label className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Amount ($)</label>
-                                <Input required type="number" placeholder="45.00" value={expenseForm.amount} onChange={e => setExpenseForm(prev => ({ ...prev, amount: e.target.value }))} className="shadow-none font-mono" />
-                            </div>
-                            <div className="space-y-1">
-                                <label className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Date Committed</label>
-                                <Input type="date" value={expenseForm.date} onChange={e => setExpenseForm(prev => ({ ...prev, date: e.target.value }))} className="shadow-none" />
-                            </div>
-                            <div className="pt-4 border-t flex justify-end gap-2">
-                                <Button type="button" variant="outline" size="sm" className="shadow-none" onClick={() => setShowAddExpenseModal(false)}>Cancel</Button>
-                                <Button type="submit" size="sm" className="shadow-none bg-indigo-600 hover:bg-indigo-700 text-white font-semibold">Save Expense</Button>
-                            </div>
-                        </form>
-                    </OperationalCard>
-                </div>
-            )}
-
-            {/* ADD DOCUMENT VAULT FILE MODAL */}
-            {showAddDocModal && (
-                <div className="fixed inset-0 bg-slate-950/20 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-                    <OperationalCard className="w-full max-w-md shadow-2xl">
-                        <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50">
-                            <div>
-                                <h3 className="font-semibold text-slate-800 text-[14px]">Direct Cloud Upload</h3>
-                                <p className="text-[10px] text-slate-500 font-mono mt-0.5">Secure transmission to external bucket</p>
-                            </div>
-                            <button onClick={() => setShowAddDocModal(false)} className="p-1 hover:bg-slate-200 rounded text-slate-400">
-                                <X className="h-4 w-4" />
-                            </button>
-                        </div>
-                        <form onSubmit={handleAddDoc} className="p-6 space-y-4">
-                            <div className="space-y-1">
-                                <label className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Select File</label>
-                                <Input required type="file" onChange={e => setDocFile(e.target.files ? e.target.files[0] : null)} className="shadow-none py-1.5" />
-                            </div>
-                            <div className="space-y-1">
-                                <label className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Classification</label>
-                                <select 
-                                    className="flex h-10 w-full rounded-md border border-slate-200 bg-background px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500 shadow-none"
-                                    value={docForm.type}
-                                    onChange={e => setDocForm(prev => ({ ...prev, type: e.target.value }))}
-                                >
-                                    <option value="Document">General Document</option>
-                                    <option value="Contract">Master Agreement</option>
-                                    <option value="Proposal">Client Proposal</option>
-                                    <option value="Receipt">Expense Receipt</option>
-                                    <option value="Tax">Corporate Tax Sheet</option>
-                                </select>
-                            </div>
-                            <div className="pt-4 border-t flex justify-end gap-2">
-                                <Button type="button" variant="outline" size="sm" className="shadow-none" onClick={() => setShowAddDocModal(false)}>Cancel</Button>
-                                <Button type="submit" size="sm" className="shadow-none bg-indigo-600 hover:bg-indigo-700 text-white font-semibold"><Cloud className="h-4 w-4 mr-1.5" /> Upload to Bucket</Button>
-                            </div>
-                        </form>
-                    </OperationalCard>
-                </div>
-            )}
-
-            {/* ADD STORAGE PROVIDER MODAL */}
-            {showAddProviderModal && (
-                <div className="fixed inset-0 bg-slate-950/20 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-                    <OperationalCard className="w-full max-w-md shadow-2xl">
-                        <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
-                            <div>
-                                <h3 className="font-semibold text-slate-800 text-[14px]">Connect Cloud Storage</h3>
-                                <p className="text-[10px] text-slate-500 font-mono mt-0.5">S3-Compatible Integration</p>
-                            </div>
-                            <button onClick={() => setShowAddProviderModal(false)} className="p-1 hover:bg-slate-100 rounded text-slate-400">
-                                <X className="h-4 w-4" />
-                            </button>
-                        </div>
-                        <form onSubmit={handleAddProvider} className="p-6 space-y-4">
-                            <div className="grid grid-cols-2 gap-4">
-                                <div className="space-y-1 col-span-2">
-                                    <label className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Integration Name</label>
-                                    <Input required placeholder="e.g. AWS S3 Frankfurt" value={providerForm.name} onChange={e => setProviderForm(prev => ({ ...prev, name: e.target.value }))} className="shadow-none" />
-                                </div>
-                                <div className="space-y-1">
-                                    <label className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Driver</label>
-                                    <select 
-                                        className="flex h-10 w-full rounded-md border border-slate-200 bg-background px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-slate-950 shadow-none"
-                                        value={providerForm.driver}
-                                        onChange={e => setProviderForm(prev => ({ ...prev, driver: e.target.value }))}
-                                    >
-                                        <option value="s3">AWS S3 (Native)</option>
-                                        <option value="s3-cloudflare">Cloudflare R2</option>
-                                        <option value="s3-digitalocean">DigitalOcean Spaces</option>
-                                        <option value="s3-wasabi">Wasabi</option>
-                                    </select>
-                                </div>
-                                <div className="space-y-1">
-                                    <label className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Region</label>
-                                    <Input placeholder="eu-central-1" value={providerForm.region} onChange={e => setProviderForm(prev => ({ ...prev, region: e.target.value }))} className="shadow-none font-mono" />
-                                </div>
-                                <div className="space-y-1 col-span-2">
-                                    <label className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Bucket Name</label>
-                                    <Input required placeholder="my-erp-files" value={providerForm.bucket} onChange={e => setProviderForm(prev => ({ ...prev, bucket: e.target.value }))} className="shadow-none font-mono" />
-                                </div>
-                                <div className="space-y-1 col-span-2">
-                                    <label className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Endpoint URL (Optional)</label>
-                                    <Input placeholder="https://<account_id>.r2.cloudflarestorage.com" value={providerForm.endpoint} onChange={e => setProviderForm(prev => ({ ...prev, endpoint: e.target.value }))} className="shadow-none font-mono text-xs" />
-                                </div>
-                                <div className="space-y-1 col-span-2">
-                                    <label className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 flex items-center gap-1.5"><Key className="h-3 w-3" /> Access Credentials</label>
-                                    <div className="flex gap-2">
-                                        <Input type="password" placeholder="Access Key" required className="shadow-none font-mono text-xs" />
-                                        <Input type="password" placeholder="Secret Key" required className="shadow-none font-mono text-xs" />
-                                    </div>
-                                    <p className="text-[9px] text-slate-400 mt-1">Keys are encrypted at rest using platform APP_KEY.</p>
-                                </div>
-                            </div>
-                            <div className="pt-4 border-t flex justify-between items-center mt-2">
-                                <Button type="button" variant="ghost" size="sm" className="text-slate-500">Test Connection</Button>
-                                <div className="flex gap-2">
-                                    <Button type="button" variant="outline" size="sm" className="shadow-none" onClick={() => setShowAddProviderModal(false)}>Cancel</Button>
-                                    <Button type="submit" size="sm" className="shadow-none bg-slate-900 text-white font-medium">Connect Bucket</Button>
-                                </div>
-                            </div>
-                        </form>
-                    </OperationalCard>
-                </div>
-            )}
-
-            {/* DRAFT CONTRACT AGREEMENT MODAL */}
-            {showAddContractModal && (
-                <div className="fixed inset-0 bg-slate-950/20 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-                    <OperationalCard className="w-full max-w-md shadow-2xl">
-                        <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
-                            <h3 className="font-semibold text-slate-800 text-[14px]">Draft Client Agreement</h3>
-                            <button onClick={() => setShowAddContractModal(false)} className="p-1 hover:bg-slate-100 rounded text-slate-400">
-                                <X className="h-4 w-4" />
-                            </button>
-                        </div>
-                        <form onSubmit={handleAddContract} className="p-6 space-y-4">
-                            <div className="space-y-1">
-                                <label className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Agreement Sheet Title</label>
-                                <Input required placeholder="Mutual Non-Disclosure Agreement" value={contractForm.title} onChange={e => setContractForm(prev => ({ ...prev, title: e.target.value }))} className="shadow-none" />
-                            </div>
-                            <div className="space-y-1">
-                                <label className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Client Tenant</label>
-                                <Input required placeholder="Globex Financials" value={contractForm.client} onChange={e => setContractForm(prev => ({ ...prev, client: e.target.value }))} className="shadow-none" />
-                            </div>
-                            <div className="space-y-1">
-                                <label className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Agreement Value ($)</label>
-                                <Input type="number" placeholder="4500" value={contractForm.value} onChange={e => setContractForm(prev => ({ ...prev, value: e.target.value }))} className="shadow-none font-mono" />
-                            </div>
-                            <div className="space-y-1">
-                                <label className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Status</label>
-                                <select 
-                                    className="flex h-10 w-full rounded-md border border-slate-200 bg-background px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-slate-950 shadow-none"
-                                    value={contractForm.status}
-                                    onChange={e => setContractForm(prev => ({ ...prev, status: e.target.value }))}
-                                >
-                                    <option value="Draft">Draft Memo</option>
-                                    <option value="Sent to Client">Sent to Client</option>
-                                    <option value="Signed">Fully Signed</option>
-                                </select>
-                            </div>
-                            <div className="pt-4 border-t flex justify-end gap-2">
-                                <Button type="button" variant="outline" size="sm" className="shadow-none" onClick={() => setShowAddContractModal(false)}>Cancel</Button>
-                                <Button type="submit" size="sm" className="shadow-none bg-indigo-600 hover:bg-indigo-700 text-white font-semibold">Initiate Agreement</Button>
-                            </div>
-                        </form>
-                    </OperationalCard>
-                </div>
-            )}
-
-            {/* OPEN TICKET MODAL */}
-            {showAddTicketModal && (
-                <div className="fixed inset-0 bg-slate-950/20 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-                    <OperationalCard className="w-full max-w-md shadow-2xl">
-                        <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
-                            <h3 className="font-semibold text-slate-800 text-[14px]">Open Support Ticket</h3>
-                            <button onClick={() => setShowAddTicketModal(false)} className="p-1 hover:bg-slate-100 rounded text-slate-400">
-                                <X className="h-4 w-4" />
-                            </button>
-                        </div>
-                        <form onSubmit={handleAddTicket} className="p-6 space-y-4">
-                            <div className="space-y-1">
-                                <label className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Ticket Subject</label>
-                                <Input required placeholder="Invoice transaction double charge error" value={newTicketForm.title} onChange={e => setNewTicketForm(prev => ({ ...prev, title: e.target.value }))} className="shadow-none" />
-                            </div>
-                            <div className="space-y-1">
-                                <label className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Client Tenant</label>
-                                <select 
-                                    className="flex h-10 w-full rounded-md border border-slate-200 bg-background px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-slate-950 shadow-none"
-                                    value={newTicketForm.client_id}
-                                    onChange={e => setNewTicketForm(prev => ({ 
-                                        ...prev, 
-                                        client_id: e.target.value, 
-                                        client_name: e.target.value === '' ? prev.client_name : '' 
-                                    }))}
-                                >
-                                    <option value="">-- New Client (Quick Create) --</option>
-                                    {activeClients.map(c => (
-                                        <option key={c.id} value={c.id}>{c.name}</option>
-                                    ))}
-                                </select>
-                            </div>
-                            {newTicketForm.client_id === '' && (
-                                <div className="space-y-1">
-                                    <label className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">New Client Name</label>
-                                    <Input required placeholder="Nexus Tech Inc" value={newTicketForm.client_name} onChange={e => setNewTicketForm(prev => ({ ...prev, client_name: e.target.value }))} className="shadow-none" />
-                                </div>
-                            )}
-                            <div className="space-y-1">
-                                <label className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Description</label>
-                                <Textarea required placeholder="Describe the issue in detail..." value={newTicketForm.description} onChange={e => setNewTicketForm(prev => ({ ...prev, description: e.target.value }))} className="shadow-none h-20" />
-                            </div>
-                            <div className="space-y-1">
-                                <label className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Priority</label>
-                                <select 
-                                    className="flex h-10 w-full rounded-md border border-slate-200 bg-background px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-slate-950 shadow-none"
-                                    value={newTicketForm.priority}
-                                    onChange={e => setNewTicketForm(prev => ({ ...prev, priority: e.target.value }))}
-                                >
-                                    <option value="Low">Low Queue</option>
-                                    <option value="Medium">Medium Queue</option>
-                                    <option value="High">High Queue</option>
-                                </select>
-                            </div>
-                            <div className="pt-4 border-t flex justify-end gap-2">
-                                <Button type="button" variant="outline" size="sm" className="shadow-none" onClick={() => setShowAddTicketModal(false)}>Cancel</Button>
-                                <Button type="submit" size="sm" className="shadow-none bg-indigo-600 hover:bg-indigo-700 text-white font-semibold">Open Ticket</Button>
-                            </div>
-                        </form>
-                    </OperationalCard>
-                </div>
-            )}
-
-        </div>
+            </div>
         </ERPLayout>
     );
 }

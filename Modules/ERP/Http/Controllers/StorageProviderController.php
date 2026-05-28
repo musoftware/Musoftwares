@@ -8,9 +8,15 @@ use Illuminate\Support\Facades\Auth;
 use Modules\ERP\Models\Tenant;
 use Modules\ERP\Models\TenantStorageProvider;
 use Modules\ERP\Services\ActivityLogger;
+use Inertia\Inertia;
 
 class StorageProviderController extends Controller
 {
+    public function create()
+    {
+        return Inertia::render('ERP/StorageProviders/Create');
+    }
+
     public function store(Request $request)
     {
         $user = Auth::user();
@@ -51,6 +57,6 @@ class StorageProviderController extends Controller
             null
         );
 
-        return back()->with('success', 'Storage provider configured successfully.');
+        return redirect()->route('erp.dashboard', ['section' => 'system'])->with('success', 'Storage provider configured successfully.');
     }
 }

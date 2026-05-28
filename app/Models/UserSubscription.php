@@ -11,7 +11,7 @@ class UserSubscription extends Model
 
     protected $fillable = [
         'client_id',
-        'plan_id',
+        'object',
         'status',
         'started_at',
         'expires_at',
@@ -32,11 +32,5 @@ class UserSubscription extends Model
         return $this->belongsTo(User::class, 'client_id');
     }
 
-    /**
-     * The plan this subscription is linked to.
-     */
-    public function plan(): BelongsTo
-    {
-        return $this->belongsTo(ModulePlan::class, 'plan_id');
-    }
+
 }
