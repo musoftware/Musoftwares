@@ -2,6 +2,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, router, Link } from '@inertiajs/react';
 import { Button } from '@/Components/ui/button';
+import PricingBuilder from '@/Components/PricingBuilder';
 import {
     Check, Wallet, CreditCard, ArrowRight, ShieldCheck,
     Sparkles, Building2, Wrench, MessageSquare, Zap,
