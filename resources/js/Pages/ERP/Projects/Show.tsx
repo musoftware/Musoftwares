@@ -388,47 +388,6 @@ export default function ProjectShow({
                                         </div>
                                     )
                                 )}
-391: 
-392:                                 {/* 2. Transactions Tab */}
-393:                                 {activeTab === 'transactions' && (
-394:                                     transactions.length === 0 ? (
-395:                                         <EmptyState icon={Wallet} title={__("No transactions recorded")} description={__("Record manual credit or debit adjustments to log transactions.")} className="border-0 rounded-none py-10" />
-396:                                     ) : (
-397:                                         <div className="overflow-x-auto">
-398:                                             <table className="w-full text-left text-sm border-collapse">
-399:                                                 <thead>
-400:                                                     <tr className="bg-slate-50 border-b border-slate-100 text-xs font-semibold text-slate-500 uppercase tracking-wider">
-401:                                                         <th className="px-6 py-3">{__("Reference")}</th>
-402:                                                         <th className="px-6 py-3">{__("Date")}</th>
-403:                                                         <th className="px-6 py-3">{__("Type")}</th>
-404:                                                         <th className="px-6 py-3">{__("Description")}</th>
-405:                                                         <th className="px-6 py-3 text-right">{__("Amount")}</th>
-406:                                                         <th className="px-6 py-3 text-right">{__("Value (Base)")}</th>
-407:                                                     </tr>
-408:                                                 </thead>
-409:                                                 <tbody className="divide-y divide-slate-100 text-[13px] text-slate-600">
-410:                                                     {transactions.map((txn) => (
-411:                                                         <tr key={txn.id} className="hover:bg-slate-50/50 transition-colors">
-412:                                                             <td className="px-6 py-3.5 font-medium text-slate-900">
-413:                                                                 {txn.reference_id}
-414:                                                             </td>
-415:                                                             <td className="px-6 py-3.5">
-416:                                                                 {txn.date}
-417:                                                             </td>
-418:                                                             <td className="px-6 py-3.5">
-419:                                                                 <Badge variant="outline" className={`text-[10px] uppercase font-bold tracking-wider ${
-420:                                                                     txn.direction === 'CREDIT' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-rose-50 text-rose-700 border-rose-200'
-421:                                                                 }`}>
-422:                                                                     {__(txn.type)}
-423:                                                                 </Badge>
-424:                                                             </td>
-425:                                                             <td className="px-6 py-3.5 max-w-xs truncate" title={txn.note}>
-426:                                                                 {txn.note}
-427:                                                             </td>
-428:                                                             <td className="px-6 py-3.5 text-right font-mono font-semibold">
-429:                                                                 <CurrencyDisplay amount={txn.amount} currency={stats.projectCurrency || 'USD'} />
-430:                                                             </td>
-431:                                                             <td className="px-6 py-3.5 text-right font-mono text-slate-500">
 
                                 {/* 2. Transactions Tab */}
                                 {activeTab === 'transactions' && (
@@ -675,6 +634,8 @@ export default function ProjectShow({
                             </CardContent>
                         </Card>
                     </div>
+                </div>
+            </div>
             {/* Create Task Board Dialog Modal */}
             <Dialog open={isCreateTaskOpen} onOpenChange={setIsCreateTaskOpen}>
                 <DialogContent className="sm:max-w-[480px]">
