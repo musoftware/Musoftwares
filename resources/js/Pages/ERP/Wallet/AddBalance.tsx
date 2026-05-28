@@ -109,7 +109,7 @@ export default function AddBalance({ wallet, client }: AddBalanceProps) {
             <div className="max-w-2xl mx-auto px-4 py-8 space-y-6">
                 {/* Header */}
                 <div className="space-y-2">
-                    <Link href={safeRoute('erp.wallet.show', activeClient.id, `/clients/${activeClient.id}/wallet`)} className="inline-flex items-center text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+                    <Link href={safeRoute('erp.clients.wallet.index', activeClient.id, `/erp/clients/${activeClient.id}/wallet`)} className="inline-flex items-center text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
                         <ArrowLeft className="mr-2 h-4 w-4" /> Back to Wallet
                     </Link>
                     <h1 className="text-2xl font-semibold tracking-tight">Deposit Funds</h1>

@@ -181,11 +181,13 @@ class ERPDashboardController extends Controller
                         'id' => $task->id,
                         'title' => $task->task_name,
                         'due' => $task->due_date ? $task->due_date->format('M j, Y') : 'No due date',
+                        'due_date' => $task->due_date ? $task->due_date->format('Y-m-d') : null,
                         'assignee' => $task->assignee ? $task->assignee->name : ($task->creator ? $task->creator->name : 'Unassigned'),
                         'priority' => ucfirst($task->priority ?? 'Normal'),
                         'category' => $category,
                         'client_id' => $task->client_id,
                         'client' => $task->client ? ['id' => $task->client->id, 'name' => $task->client->name] : null,
+                        'task_description' => $task->task_description,
                     ];
                 });
         }
@@ -334,8 +336,11 @@ class ERPDashboardController extends Controller
                 ->get();
 
             $transactionStats['txnCount'] = $rawTxns->count();
-            $transactionStats['totalCredits'] = round($rawTxns->where('direction', 'credit')->sum('business_amount'), 2);
-            $transactionStats['totalDebits'] = round($rawTxns->where('direction', 'debit')->sum('business_amount'), 2);
+            // From ERP owner's perspective:
+            // - Client DEBITs (client paying invoice/charges) represent business inflow (credits)
+            // - Client CREDITs (client depositing/refunds) represent business outflow (debits)
+            $transactionStats['totalCredits'] = round($rawTxns->where('direction', 'debit')->sum('business_amount'), 2);
+            $transactionStats['totalDebits'] = round($rawTxns->where('direction', 'credit')->sum('business_amount'), 2);
             $transactionStats['netFlow'] = round($transactionStats['totalCredits'] - $transactionStats['totalDebits'], 2);
 
             $transactions = $rawTxns->map(function ($txn) use ($businessCurrency) {
@@ -346,13 +351,18 @@ class ERPDashboardController extends Controller
                     $txnCurrency = $txn->currency?->currency ?? $businessCurrency;
                     $clientCurrency = $txn->wallet?->client?->currency?->currency ?? $txnCurrency;
                     
+                    // Invert direction from client wallet perspective to ERP owner perspective:
+                    // client debit => business CREDIT (inflow)
+                    // client credit => business DEBIT (outflow)
+                    $ownerDirection = $txn->direction === 'debit' ? 'credit' : 'debit';
+                    
                     return [
                         'id' => $txn->id,
                         'reference_id' => '#TXN-' . str_pad($txn->id, 4, '0', STR_PAD_LEFT),
                         'title' => $title,
                         'type' => $txn->type,
                         'note' => $txn->note ?? 'No details provided',
-                        'direction' => strtoupper($txn->direction),
+                        'direction' => strtoupper($ownerDirection),
                         'amount' => round($txn->amount, 2),
                         'business_amount' => round($txn->business_amount ?? $txn->amount, 2),
                         'currency' => $txnCurrency,

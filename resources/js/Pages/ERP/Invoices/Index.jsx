@@ -8,7 +8,7 @@ import { CurrencyDisplay } from '@/Components/ui/CurrencyDisplay';
 import { DateDisplay } from '@/Components/ui/DateDisplay';
 import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
-import { Plus, Search, FileText, Download, MoreHorizontal, Eye, Edit, Send } from 'lucide-react';
+import { Plus, Search, FileText, Download, MoreHorizontal, Eye, Edit, Send, Wallet, CheckCircle } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/Components/ui/dropdown-menu';
 import { Avatar, AvatarFallback } from '@/Components/ui/avatar';
 import { EmptyState } from '@/Components/ui/EmptyState';
@@ -108,22 +108,48 @@ export default function Index({ invoices, stats, filters }) {
                                 <MoreHorizontal className="h-4 w-4" />
                             </Button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-44">
-                            <DropdownMenuItem asChild>
-                                <Link href={route('erp.invoices.edit', row.id)}>
-                                    <Edit className="mr-2 h-4 w-4 text-slate-400" /> Edit
-                                </Link>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                                onClick={() => router.post(route('erp.invoices.send', row.id))}
-                            >
-                                <Send className="mr-2 h-4 w-4 text-slate-400" /> Send to client
-                            </DropdownMenuItem>
+                        <DropdownMenuContent align="end" className="w-48">
+                            {!['paid', 'cancelled', 'refunded'].includes(row.status) && (
+                                <DropdownMenuItem asChild>
+                                    <Link href={route('erp.invoices.edit', row.id)}>
+                                        <Edit className="mr-2 h-4 w-4 text-slate-400" /> Edit
+                                    </Link>
+                                </DropdownMenuItem>
+                            )}
+                            {row.status === 'draft' && (
+                                <DropdownMenuItem
+                                    onClick={() => router.post(route('erp.invoices.send', row.id))}
+                                >
+                                    <Send className="mr-2 h-4 w-4 text-slate-400" /> Issue Invoice
+                                </DropdownMenuItem>
+                            )}
+                            {(row.status === 'sent' || row.status === 'partial') && (
+                                <>
+                                    <DropdownMenuItem
+                                        onClick={() => router.post(route('erp.invoices.mark-paid', row.id))}
+                                    >
+                                        <CheckCircle className="mr-2 h-4 w-4 text-slate-400" /> Mark as Paid
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem
+                                        onClick={() => router.post(route('erp.invoices.pay-wallet', row.id))}
+                                    >
+                                        <Wallet className="mr-2 h-4 w-4 text-slate-400" /> Pay with Wallet
+                                    </DropdownMenuItem>
+                                </>
+                            )}
                             <DropdownMenuItem
                                 onClick={() => router.get(route('erp.invoices.download', row.id))}
                             >
                                 <Download className="mr-2 h-4 w-4 text-slate-400" /> Download PDF
                             </DropdownMenuItem>
+                            {(row.status === 'sent' || row.status === 'partial' || row.status === 'paid') && (
+                                <DropdownMenuItem
+                                    onClick={() => router.post(route('erp.invoices.cancel', row.id))}
+                                    className="text-rose-600 hover:text-rose-700 focus:text-rose-700"
+                                >
+                                    <CheckCircle className="mr-2 h-4 w-4 text-rose-500" /> Cancel Invoice
+                                </DropdownMenuItem>
+                            )}
                         </DropdownMenuContent>
                     </DropdownMenu>
                 </div>

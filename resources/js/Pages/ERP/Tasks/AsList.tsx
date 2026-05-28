@@ -210,7 +210,7 @@ export default function AsList({ arrangedClients: initialData }: AsListProps) {
                                                         </Link>
                                                     </DropdownMenuItem>
                                                     <DropdownMenuItem asChild>
-                                                        <Link href={route('erp.wallet.show', clientGroup.client.id)} className="flex items-center gap-2 cursor-pointer">
+                                                        <Link href={route('erp.clients.wallet.index', clientGroup.client.id)} className="flex items-center gap-2 cursor-pointer">
                                                             <HandCoins className="h-4 w-4 text-success" /> Receive Money
                                                         </Link>
                                                     </DropdownMenuItem>

@@ -17,6 +17,7 @@ import {
     Settings,
     Plus,
     Search,
+    ChevronLeft,
     ChevronRight,
     ArrowUpRight,
     Pin,
@@ -85,6 +86,47 @@ export function FinancialAmount({ amount, currency = 'USD', colorize = false }: 
             {colorize && numericAmount > 0 ? '+' : ''}
             <CurrencyDisplay amount={numericAmount} currency={currency} />
         </span>
+    );
+}
+
+function COANode({ node, currency, defaultExpanded = true }: { node: any; currency: string; defaultExpanded?: boolean }) {
+    const [isOpen, setIsOpen] = useState(defaultExpanded);
+    const hasChildren = node.children && node.children.length > 0;
+
+    useEffect(() => {
+        setIsOpen(defaultExpanded);
+    }, [defaultExpanded]);
+
+    return (
+        <div className="pl-4 border-l border-slate-100 mt-2 select-none">
+            <div className="flex items-center justify-between py-2 px-3 rounded-xl hover:bg-slate-50 transition-all group duration-150">
+                <div 
+                    className="flex items-center gap-2 cursor-pointer flex-1" 
+                    onClick={() => hasChildren && setIsOpen(!isOpen)}
+                >
+                    {hasChildren ? (
+                        <span className="text-slate-400 font-mono text-[11px] w-4 h-4 flex items-center justify-center rounded bg-slate-100 group-hover:bg-slate-200 transition-colors">
+                            {isOpen ? '−' : '+'}
+                        </span>
+                    ) : (
+                        <span className="w-4 h-4 flex items-center justify-center text-[13px] text-slate-350">•</span>
+                    )}
+                    <span className="font-mono text-xs text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded font-medium">{node.code}</span>
+                    <span className="font-semibold text-slate-800 text-[13px] group-hover:text-primary transition-colors">{node.name}</span>
+                    <span className="text-slate-450 text-xs font-normal">/ {node.name_ar}</span>
+                </div>
+                <div className="font-mono font-bold text-xs text-slate-900 pr-1">
+                    <CurrencyDisplay amount={node.balance} currency={currency} />
+                </div>
+            </div>
+            {hasChildren && isOpen && (
+                <div className="space-y-1 mt-1 transition-all pl-1">
+                    {node.children.map((child: any) => (
+                        <COANode key={child.code} node={child} currency={currency} defaultExpanded={defaultExpanded} />
+                    ))}
+                </div>
+            )}
+        </div>
     );
 }
 
@@ -298,10 +340,50 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
     const [quickTaskTitles, setQuickTaskTitles] = useState<Record<string, string>>({});
     const [selectedTaskClientId, setSelectedTaskClientId] = useState<string>('all');
 
+    // Calendar logic and modals states
+    const [calendarYear, setCalendarYear] = useState(() => new Date().getFullYear());
+    const [calendarMonth, setCalendarMonth] = useState(() => new Date().getMonth());
+    const [selectedCalendarTask, setSelectedCalendarTask] = useState<any>(null);
+    const [showCalendarTaskModal, setShowCalendarTaskModal] = useState(false);
+    const [showCalendarAddModal, setShowCalendarAddModal] = useState(false);
+    const [selectedCalendarDate, setSelectedCalendarDate] = useState<string>('');
+    const [calendarTaskForm, setCalendarTaskForm] = useState({
+        title: '',
+        client_id: '',
+        priority: 'normal',
+        status: 'open',
+        task_description: ''
+    });
+
     const filteredTasksForKanban = useMemo(() => {
         if (selectedTaskClientId === 'all') return tasks;
         return tasks.filter(t => t.client_id?.toString() === selectedTaskClientId || t.client?.id?.toString() === selectedTaskClientId);
     }, [tasks, selectedTaskClientId]);
+
+    const tasksByDate = useMemo(() => {
+        const grouped: Record<string, any[]> = {};
+        tasks.forEach(task => {
+            if (task.due_date) {
+                if (!grouped[task.due_date]) {
+                    grouped[task.due_date] = [];
+                }
+                grouped[task.due_date].push(task);
+            }
+        });
+        return grouped;
+    }, [tasks]);
+
+    const upcomingCalendarTasks = useMemo(() => {
+        const todayStr = new Date().toISOString().split('T')[0];
+        return tasks
+            .filter(t => t.due_date && t.due_date >= todayStr && t.category !== 'Done')
+            .sort((a, b) => (a.due_date || '').localeCompare(b.due_date || ''))
+            .slice(0, 5);
+    }, [tasks]);
+
+    const unscheduledCalendarTasks = useMemo(() => {
+        return tasks.filter(t => !t.due_date && t.category !== 'Done');
+    }, [tasks]);
 
     const [expenses, setExpenses] = useState<Array<any>>([]);
     const [expenseForm, setExpenseForm] = useState({ title: '', category: 'Software', amount: '', date: '', status: 'Pending' });
@@ -507,6 +589,39 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                 preserveState: true
             });
         }
+    };
+
+    // Calendar task submit handler
+    const handleCalendarAddTask = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!calendarTaskForm.title.trim()) return toast({ variant: 'destructive', description: 'Task title is required.' });
+
+        router.post(route('erp.tasks.store'), {
+            title: calendarTaskForm.title,
+            due_date: selectedCalendarDate,
+            client_id: calendarTaskForm.client_id || null,
+            priority: calendarTaskForm.priority,
+            status: calendarTaskForm.status,
+            task_description: calendarTaskForm.task_description,
+            redirect_back: true
+        }, {
+            preserveScroll: true,
+            onSuccess: () => {
+                setShowCalendarAddModal(false);
+                setCalendarTaskForm({
+                    title: '',
+                    client_id: '',
+                    priority: 'normal',
+                    status: 'open',
+                    task_description: ''
+                });
+                toast({ description: 'Task created successfully on calendar.' });
+                prependActivity('Task Created', `Created task "${calendarTaskForm.title}" due on ${selectedCalendarDate}`);
+            },
+            onError: (errors) => {
+                toast({ variant: 'destructive', description: Object.values(errors)[0] as string });
+            }
+        });
     };
 
     // Log Expense
@@ -1659,6 +1774,11 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                                 <ModulePageHeader 
                                     title="Transactions" 
                                     description="View all wallet activity, payments, and balance adjustments."
+                                    actions={
+                                        <Button onClick={() => setShowCOAModal(true)} variant="outline" size="sm" className="shadow-none">
+                                            <Layers className="mr-1.5 h-3.5 w-3.5 text-indigo-500" /> Chart of Accounts / شجرة الحسابات
+                                        </Button>
+                                    }
                                 />
 
                                 {/* Summary Metric Cards */}
@@ -1980,61 +2100,387 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                         )}
 
                         {/* 12. CALENDAR (WORKSPACE SCHEDULE) */}
-                        {currentSection === 'calendar' && (
-                            <div className="space-y-6">
-                                <ModulePageHeader 
-                                    title="Calendar" 
-                                    description="View task due dates, contract timelines, and upcoming events."
-                                />
+                        {currentSection === 'calendar' && (() => {
+                            const monthNames = [
+                                "January", "February", "March", "April", "May", "June",
+                                "July", "August", "September", "October", "November", "December"
+                            ];
 
-                                <OperationalCard>
-                                    <div className="p-6">
-                                        <div className="flex items-center justify-between mb-4">
-                                            <h3 className="font-semibold text-slate-800 text-[14px]">May 2026</h3>
-                                            <div className="flex items-center gap-1.5">
-                                                <Button size="icon" variant="outline" className="h-8 w-8 shadow-none">←</Button>
-                                                <Button size="icon" variant="outline" className="h-8 w-8 shadow-none">→</Button>
-                                            </div>
+                            const handlePrevMonth = () => {
+                                if (calendarMonth === 0) {
+                                    setCalendarMonth(11);
+                                    setCalendarYear(y => y - 1);
+                                } else {
+                                    setCalendarMonth(m => m - 1);
+                                }
+                            };
+
+                            const handleNextMonth = () => {
+                                if (calendarMonth === 11) {
+                                    setCalendarMonth(0);
+                                    setCalendarYear(y => y + 1);
+                                } else {
+                                    setCalendarMonth(m => m + 1);
+                                }
+                            };
+
+                            const handleGoToToday = () => {
+                                const today = new Date();
+                                setCalendarMonth(today.getMonth());
+                                setCalendarYear(today.getFullYear());
+                            };
+
+                            const daysInMonth = new Date(calendarYear, calendarMonth + 1, 0).getDate();
+                            const firstDayIndex = new Date(calendarYear, calendarMonth, 1).getDay();
+                            const startOffset = firstDayIndex === 0 ? 6 : firstDayIndex - 1;
+                            const prevMonthDaysTotal = new Date(calendarYear, calendarMonth, 0).getDate();
+
+                            const calendarCells = [];
+
+                            // Previous month padding
+                            const prevMonth = calendarMonth === 0 ? 11 : calendarMonth - 1;
+                            const prevYear = calendarMonth === 0 ? calendarYear - 1 : calendarYear;
+                            for (let i = startOffset - 1; i >= 0; i--) {
+                                const dayNum = prevMonthDaysTotal - i;
+                                const dateStr = `${prevYear}-${String(prevMonth + 1).padStart(2, '0')}-${String(dayNum).padStart(2, '0')}`;
+                                calendarCells.push({
+                                    day: dayNum,
+                                    month: 'prev',
+                                    dateString: dateStr,
+                                    isToday: false
+                                });
+                            }
+
+                            // Current month days
+                            for (let d = 1; d <= daysInMonth; d++) {
+                                const dateStr = `${calendarYear}-${String(calendarMonth + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+                                const isToday = new Date().toDateString() === new Date(calendarYear, calendarMonth, d).toDateString();
+                                calendarCells.push({
+                                    day: d,
+                                    month: 'current',
+                                    dateString: dateStr,
+                                    isToday
+                                });
+                            }
+
+                            // Next month padding
+                            const nextMonth = calendarMonth === 11 ? 0 : calendarMonth + 1;
+                            const nextYear = calendarMonth === 11 ? calendarYear + 1 : calendarYear;
+                            const nextMonthCount = 42 - calendarCells.length;
+                            for (let d = 1; d <= nextMonthCount; d++) {
+                                const dateStr = `${nextYear}-${String(nextMonth + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+                                calendarCells.push({
+                                    day: d,
+                                    month: 'next',
+                                    dateString: dateStr,
+                                    isToday: false
+                                });
+                            }
+
+                            return (
+                                <div className="space-y-6">
+                                    <ModulePageHeader 
+                                        title="Calendar" 
+                                        description="View task due dates, client deliverables, and scheduling timelines."
+                                    />
+
+                                    <div className="grid grid-cols-1 lg:grid-cols-10 gap-6">
+                                        {/* Main Month Calendar Card */}
+                                        <div className="lg:col-span-7">
+                                            <OperationalCard className="p-0 overflow-hidden">
+                                                <div className="p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+                                                    <h3 className="font-bold text-slate-800 text-[15px] flex items-center gap-2">
+                                                        <CalendarIcon className="h-4.5 w-4.5 text-indigo-650" />
+                                                        {monthNames[calendarMonth]} {calendarYear}
+                                                    </h3>
+                                                    <div className="flex items-center gap-1.5">
+                                                        <Button 
+                                                            size="xs" 
+                                                            variant="outline" 
+                                                            onClick={handleGoToToday}
+                                                            className="shadow-none text-xs font-semibold px-2.5 h-8 hover:bg-slate-100 hover:text-slate-900 transition-colors"
+                                                        >
+                                                            Today
+                                                        </Button>
+                                                        <div className="flex items-center border border-slate-200 rounded-lg bg-white p-0.5 overflow-hidden">
+                                                            <Button 
+                                                                size="icon" 
+                                                                variant="ghost" 
+                                                                onClick={handlePrevMonth}
+                                                                className="h-7 w-7 rounded-md hover:bg-slate-100 text-slate-600 transition-colors shadow-none"
+                                                            >
+                                                                <ChevronLeft className="h-4 w-4" />
+                                                            </Button>
+                                                            <div className="w-px bg-slate-200 h-4 self-center mx-0.5" />
+                                                            <Button 
+                                                                size="icon" 
+                                                                variant="ghost" 
+                                                                onClick={handleNextMonth}
+                                                                className="h-7 w-7 rounded-md hover:bg-slate-100 text-slate-600 transition-colors shadow-none"
+                                                            >
+                                                                <ChevronRight className="h-4 w-4" />
+                                                            </Button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div className="p-4 bg-white">
+                                                    {/* Days of week header */}
+                                                    <div className="grid grid-cols-7 gap-px mb-2 text-center">
+                                                        {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(d => (
+                                                            <div key={d} className="py-2 text-[11px] font-bold text-slate-450 uppercase tracking-wider">
+                                                                {d}
+                                                            </div>
+                                                        ))}
+                                                    </div>
+
+                                                    {/* Calendar grid cells */}
+                                                    <div className="grid grid-cols-7 gap-px bg-slate-100 rounded-xl overflow-hidden border border-slate-150">
+                                                        {calendarCells.map((cell, idx) => {
+                                                            const cellTasks = tasksByDate[cell.dateString] || [];
+                                                            const isDimmed = cell.month !== 'current';
+                                                            const isWeekend = idx % 7 === 5 || idx % 7 === 6; // Sat, Sun
+                                                            
+                                                            return (
+                                                                <div 
+                                                                    key={idx} 
+                                                                    onClick={() => {
+                                                                        setSelectedCalendarDate(cell.dateString);
+                                                                        setShowCalendarAddModal(true);
+                                                                    }}
+                                                                    className={cn(
+                                                                        "bg-white min-h-[90px] p-2 flex flex-col justify-between hover:bg-slate-50/70 transition group cursor-pointer relative",
+                                                                        isDimmed && "bg-slate-50/50 opacity-40 hover:opacity-80",
+                                                                        isWeekend && !isDimmed && "bg-slate-50/20"
+                                                                    )}
+                                                                >
+                                                                    <div className="flex items-center justify-between">
+                                                                        <span className={cn(
+                                                                            "text-xs font-mono font-medium text-slate-450",
+                                                                            cell.isToday && "bg-indigo-600 text-white w-5 h-5 flex items-center justify-center rounded-full font-bold shadow-md shadow-indigo-150 text-[10px]"
+                                                                        )}>
+                                                                            {cell.day}
+                                                                        </span>
+                                                                        <Plus className="h-3 w-3 text-slate-355 opacity-0 group-hover:opacity-100 transition-opacity" />
+                                                                    </div>
+
+                                                                    <div className="space-y-1 mt-1.5 flex-1 flex flex-col justify-end">
+                                                                        {cellTasks.slice(0, 3).map((task: any) => {
+                                                                            // status styles
+                                                                            const cat = task.category;
+                                                                            let badgeClass = "bg-blue-50 text-blue-750 border-blue-100 hover:bg-blue-100";
+                                                                            if (cat === 'Done') badgeClass = "bg-emerald-50 text-emerald-700 border-emerald-100 hover:bg-emerald-100";
+                                                                            else if (cat === 'In Progress') badgeClass = "bg-amber-50 text-amber-700 border-amber-100 hover:bg-amber-100";
+                                                                            else if (cat === 'In Review') badgeClass = "bg-purple-50 text-purple-700 border-purple-100 hover:bg-purple-100";
+
+                                                                            return (
+                                                                                <div 
+                                                                                    key={task.id} 
+                                                                                    onClick={(e) => {
+                                                                                        e.stopPropagation();
+                                                                                        setSelectedCalendarTask(task);
+                                                                                        setShowCalendarTaskModal(true);
+                                                                                    }}
+                                                                                    className={cn(
+                                                                                        "text-[10px] font-semibold tracking-tight border px-1.5 py-0.5 rounded leading-tight transition-transform hover:scale-102 flex items-center justify-between gap-1",
+                                                                                        badgeClass
+                                                                                    )}
+                                                                                >
+                                                                                    <span className="truncate max-w-[80px]">{task.title}</span>
+                                                                                    <span className="opacity-60 text-[9px] shrink-0 font-mono">
+                                                                                        {task.assignee ? task.assignee.substring(0, 2).toUpperCase() : 'UA'}
+                                                                                    </span>
+                                                                                </div>
+                                                                            );
+                                                                        })}
+                                                                        {cellTasks.length > 3 && (
+                                                                            <div className="text-[9px] font-bold text-slate-400 text-right pr-1">
+                                                                                +{cellTasks.length - 3} more
+                                                                            </div>
+                                                                        )}
+                                                                    </div>
+                                                                </div>
+                                                            );
+                                                        })}
+                                                    </div>
+                                                </div>
+                                            </OperationalCard>
                                         </div>
 
-                                        {/* Simple beautiful HSL calendar grid */}
-                                        <div className="grid grid-cols-7 gap-px bg-slate-200 rounded-lg overflow-hidden border border-slate-200">
-                                            {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(d => (
-                                                <div key={d} className="bg-slate-50 py-2 text-center text-xs font-semibold text-slate-500">
-                                                    {d}
+                                        {/* Sidebar widgets */}
+                                        <div className="lg:col-span-3 space-y-6">
+                                            {/* Upcoming Tasks widget */}
+                                            <OperationalCard>
+                                                <div className="p-4 border-b border-slate-100 flex items-center justify-between">
+                                                    <h4 className="font-bold text-slate-800 text-[13px] flex items-center gap-1.5">
+                                                        <Clock className="h-4 w-4 text-indigo-500" />
+                                                        Upcoming Schedule
+                                                    </h4>
+                                                    <Badge className="bg-indigo-50 text-indigo-700 font-bold border-none text-[9px] uppercase tracking-wider rounded">Next 7 days</Badge>
                                                 </div>
-                                            ))}
-                                            {/* Days (1 to 28) */}
-                                            {Array.from({ length: 28 }).map((_, idx) => {
-                                                const dayNum = idx + 1;
-                                                const isToday = dayNum === 18; // May 18 2026
-                                                const hasEvent = dayNum === 12 || dayNum === 15 || dayNum === 20 || dayNum === 25;
-                                                
-                                                return (
-                                                    <div key={idx} className="bg-white min-h-[70px] p-2 flex flex-col justify-between hover:bg-slate-50 transition group">
-                                                        <span className={`text-xs font-mono font-medium ${
-                                                            isToday 
-                                                            ? 'bg-indigo-600 text-white w-5 h-5 flex items-center justify-center rounded-full font-bold shadow-md shadow-indigo-100' 
-                                                            : 'text-slate-600'
-                                                        }`}>
-                                                            {dayNum}
-                                                        </span>
-                                                        
-                                                        {hasEvent && (
-                                                            <div className="text-[10px] truncate leading-tight font-semibold bg-indigo-50 border-l border-indigo-500 text-indigo-700 px-1.5 py-0.5 rounded mt-1">
-                                                                {dayNum === 12 ? 'TXN-899 Wired' :
-                                                                 dayNum === 15 ? 'MSA Signed' :
-                                                                 dayNum === 20 ? 'Q1 Reconcile' : 'MSA Revisions'}
+                                                <div className="p-3 divide-y divide-slate-100">
+                                                    {upcomingCalendarTasks.length === 0 ? (
+                                                        <div className="text-center py-6 text-xs text-slate-400">
+                                                            No tasks due this week
+                                                        </div>
+                                                    ) : (
+                                                        upcomingCalendarTasks.map(task => (
+                                                            <div 
+                                                                key={task.id} 
+                                                                onClick={() => {
+                                                                    setSelectedCalendarTask(task);
+                                                                    setShowCalendarTaskModal(true);
+                                                                }}
+                                                                className="py-2.5 px-1 hover:bg-slate-50 transition cursor-pointer rounded-lg text-left"
+                                                            >
+                                                                <span className="font-semibold text-xs text-slate-800 block truncate hover:text-indigo-650">{task.title}</span>
+                                                                <div className="flex items-center justify-between mt-1 text-[10px] text-slate-450 font-mono">
+                                                                    <span>Due: {task.due}</span>
+                                                                    <span className="font-semibold px-1 rounded bg-slate-100 text-slate-600 uppercase text-[8px]">{task.priority}</span>
+                                                                </div>
                                                             </div>
-                                                        )}
+                                                        ))
+                                                    )}
+                                                </div>
+                                            </OperationalCard>
+
+                                            {/* Unscheduled Tasks widget */}
+                                            <OperationalCard>
+                                                <div className="p-4 border-b border-slate-100">
+                                                    <h4 className="font-bold text-slate-800 text-[13px] flex items-center gap-1.5">
+                                                        <AlertCircle className="h-4 w-4 text-amber-500" />
+                                                        Needs Date Assignment
+                                                    </h4>
+                                                </div>
+                                                <div className="p-3 divide-y divide-slate-100 max-h-[220px] overflow-y-auto">
+                                                    {unscheduledCalendarTasks.length === 0 ? (
+                                                        <div className="text-center py-6 text-xs text-slate-400">
+                                                            All tasks scheduled
+                                                        </div>
+                                                    ) : (
+                                                        unscheduledCalendarTasks.map(task => (
+                                                            <div 
+                                                                key={task.id}
+                                                                onClick={() => {
+                                                                    setSelectedCalendarTask(task);
+                                                                    setShowCalendarTaskModal(true);
+                                                                }}
+                                                                className="py-2.5 px-1 hover:bg-slate-50 transition cursor-pointer rounded-lg flex items-center justify-between text-left"
+                                                            >
+                                                                <div className="max-w-[70%]">
+                                                                    <span className="font-semibold text-xs text-slate-800 block truncate">{task.title}</span>
+                                                                    <span className="text-[9px] font-semibold text-slate-450 uppercase">{task.priority} Priority</span>
+                                                                </div>
+                                                                <Button 
+                                                                    size="xs" 
+                                                                    variant="outline"
+                                                                    onClick={(e) => {
+                                                                        e.stopPropagation();
+                                                                        setSelectedCalendarDate(new Date().toISOString().split('T')[0]);
+                                                                        setSelectedCalendarTask(task);
+                                                                        // Open view modal to edit it, or prefill edit
+                                                                        setSelectedCalendarTask(task);
+                                                                        setShowCalendarTaskModal(true);
+                                                                    }}
+                                                                    className="h-6 text-[10px] font-semibold border-slate-200 shadow-none hover:bg-indigo-50 hover:text-indigo-700 hover:border-indigo-200"
+                                                                >
+                                                                    Schedule
+                                                                </Button>
+                                                            </div>
+                                                        ))
+                                                    )}
+                                                </div>
+                                            </OperationalCard>
+
+                                            {/* Quick calendar task add card */}
+                                            {!isReadOnlyMember && (
+                                                <OperationalCard>
+                                                    <div className="p-4 border-b border-slate-100">
+                                                        <h4 className="font-bold text-slate-800 text-[13px] flex items-center gap-1.5">
+                                                            <Plus className="h-4 w-4 text-indigo-500" />
+                                                            Quick Add Task
+                                                        </h4>
                                                     </div>
-                                                );
-                                            })}
+                                                    <form onSubmit={(e) => {
+                                                        e.preventDefault();
+                                                        if (!calendarTaskForm.title.trim()) return;
+                                                        const todayStr = new Date().toISOString().split('T')[0];
+                                                        router.post(route('erp.tasks.store'), {
+                                                            title: calendarTaskForm.title,
+                                                            client_id: calendarTaskForm.client_id || null,
+                                                            priority: calendarTaskForm.priority,
+                                                            status: calendarTaskForm.status,
+                                                            due_date: todayStr,
+                                                            redirect_back: true
+                                                        }, {
+                                                            preserveScroll: true,
+                                                            onSuccess: () => {
+                                                                setCalendarTaskForm(prev => ({ ...prev, title: '' }));
+                                                                toast({ description: 'Task scheduled for today.' });
+                                                            }
+                                                        });
+                                                    }} className="p-4 space-y-3.5 text-left">
+                                                        <div>
+                                                            <label className="text-[10px] uppercase font-bold tracking-wider text-slate-400 block mb-1">Task Title</label>
+                                                            <Input 
+                                                                placeholder="e.g. Design Wireframes"
+                                                                value={calendarTaskForm.title}
+                                                                onChange={e => setCalendarTaskForm(prev => ({ ...prev, title: e.target.value }))}
+                                                                className="h-8.5 text-xs shadow-none"
+                                                                required
+                                                            />
+                                                        </div>
+                                                        <div>
+                                                            <label className="text-[10px] uppercase font-bold tracking-wider text-slate-400 block mb-1">Assign Client</label>
+                                                            <select
+                                                                value={calendarTaskForm.client_id}
+                                                                onChange={e => setCalendarTaskForm(prev => ({ ...prev, client_id: e.target.value }))}
+                                                                className="w-full text-xs h-8.5 rounded-md border border-slate-200 bg-white px-2.5 shadow-none focus:outline-none focus:ring-1 focus:ring-ring"
+                                                            >
+                                                                <option value="">No Client (Internal)</option>
+                                                                {activeClients.map(c => (
+                                                                    <option key={c.id} value={c.id.toString()}>{c.name}</option>
+                                                                ))}
+                                                            </select>
+                                                        </div>
+                                                        <div className="grid grid-cols-2 gap-2">
+                                                            <div>
+                                                                <label className="text-[10px] uppercase font-bold tracking-wider text-slate-400 block mb-1">Priority</label>
+                                                                <select
+                                                                    value={calendarTaskForm.priority}
+                                                                    onChange={e => setCalendarTaskForm(prev => ({ ...prev, priority: e.target.value }))}
+                                                                    className="w-full text-xs h-8.5 rounded-md border border-slate-200 bg-white px-2.5 shadow-none focus:outline-none"
+                                                                >
+                                                                    <option value="low">Low</option>
+                                                                    <option value="normal">Normal</option>
+                                                                    <option value="high">High</option>
+                                                                    <option value="urgent">Urgent</option>
+                                                                </select>
+                                                            </div>
+                                                            <div>
+                                                                <label className="text-[10px] uppercase font-bold tracking-wider text-slate-400 block mb-1">Status</label>
+                                                                <select
+                                                                    value={calendarTaskForm.status}
+                                                                    onChange={e => setCalendarTaskForm(prev => ({ ...prev, status: e.target.value }))}
+                                                                    className="w-full text-xs h-8.5 rounded-md border border-slate-200 bg-white px-2.5 shadow-none focus:outline-none"
+                                                                >
+                                                                    <option value="open">Todo</option>
+                                                                    <option value="in_progress">In Progress</option>
+                                                                    <option value="review">In Review</option>
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                        <Button type="submit" size="sm" className="w-full shadow-none text-xs font-semibold h-8.5 mt-1 bg-indigo-600 text-white hover:bg-indigo-700 transition-colors">
+                                                            Add for Today
+                                                        </Button>
+                                                    </form>
+                                                </OperationalCard>
+                                            )}
                                         </div>
                                     </div>
-                                </OperationalCard>
-                            </div>
-                        )}
+                                </div>
+                            );
+                        })()}
 
                         {/* 13. SUPPORT TICKETS */}
                         {currentSection === 'support' && (
@@ -2281,6 +2727,248 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                                 </Card>
                             );
                         })()}
+
+                        {/* Chart of Accounts Modal */}
+                        <Dialog open={showCOAModal} onOpenChange={setShowCOAModal}>
+                            <DialogContent className="sm:max-w-2xl max-h-[85vh] flex flex-col p-0 overflow-hidden rounded-2xl border-none shadow-xl">
+                                <DialogHeader className="p-6 pb-4 border-b border-slate-100">
+                                    <DialogTitle className="text-lg font-bold text-slate-900 flex items-center gap-2">
+                                        <Layers className="h-5 w-5 text-indigo-600" />
+                                        <span>Chart of Accounts / شجرة الحسابات</span>
+                                    </DialogTitle>
+                                    <CardDescription className="text-xs text-slate-500 mt-1">
+                                        Double-entry trial balance mapping. Every asset, liability, equity, revenue, and expense is represented below.
+                                    </CardDescription>
+                                </DialogHeader>
+
+                                <div className="flex-1 overflow-y-auto p-6 space-y-4">
+                                    {chartOfAccounts ? (
+                                        <div className="space-y-4">
+                                            <div className="bg-slate-50/80 border border-slate-100 p-4 rounded-xl flex items-center justify-between">
+                                                <div>
+                                                    <span className="text-[10px] uppercase font-bold tracking-wider text-slate-400 block">Ledger Currency</span>
+                                                    <span className="font-semibold text-slate-800 text-xs block mt-0.5">{currency}</span>
+                                                </div>
+                                                <div className="text-right">
+                                                    <span className="text-[10px] uppercase font-bold tracking-wider text-slate-400 block">Total Assets Balance</span>
+                                                    <span className="font-mono font-bold text-indigo-600 text-sm block mt-0.5">
+                                                        <CurrencyDisplay amount={chartOfAccounts.balance} currency={currency} />
+                                                    </span>
+                                                </div>
+                                            </div>
+
+                                            <div className="border border-slate-100 rounded-xl p-3 bg-white space-y-1">
+                                                <COANode node={chartOfAccounts} currency={currency} defaultExpanded={true} />
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <EmptyState
+                                            icon={Layers}
+                                            title="No Chart of Accounts"
+                                            description="Configure a client or wallet to initialize the trial balance ledger."
+                                        />
+                                    )}
+                                </div>
+
+                                <div className="p-4 border-t border-slate-100 bg-slate-50/50 flex items-center justify-between">
+                                    <div className="text-slate-400 text-xs flex items-center gap-1">
+                                        <ShieldCheck className="h-4 w-4 text-emerald-500" />
+                                        Double-entry balance checked.
+                                    </div>
+                                    <Button onClick={() => setShowCOAModal(false)} size="sm" className="shadow-none">
+                                        Close / إغلاق
+                                    </Button>
+                                </div>
+                            </DialogContent>
+                        </Dialog>
+
+                        {/* Calendar Task Details Modal */}
+                        <Dialog open={showCalendarTaskModal} onOpenChange={setShowCalendarTaskModal}>
+                            <DialogContent className="sm:max-w-md p-6 rounded-2xl border-none shadow-xl bg-white">
+                                {selectedCalendarTask && (
+                                    <div className="space-y-4 text-left">
+                                        <DialogHeader className="pb-2 border-b border-slate-100 flex flex-row items-center justify-between">
+                                            <div>
+                                                <DialogTitle className="text-base font-bold text-slate-900 leading-tight">
+                                                    {selectedCalendarTask.title}
+                                                </DialogTitle>
+                                                <span className="text-[11px] text-slate-400 font-mono mt-1 block">Task ID: #TSK-{selectedCalendarTask.id}</span>
+                                            </div>
+                                            <Badge className={cn(
+                                                "text-[10px] uppercase font-bold tracking-wider rounded border self-start shrink-0",
+                                                selectedCalendarTask.category === 'Done' ? 'bg-emerald-50 text-emerald-700 border-emerald-250' :
+                                                selectedCalendarTask.category === 'In Progress' ? 'bg-amber-50 text-amber-700 border-amber-250' :
+                                                selectedCalendarTask.category === 'In Review' ? 'bg-purple-50 text-purple-700 border-purple-250' :
+                                                'bg-blue-50 text-blue-700 border-blue-250'
+                                            )}>
+                                                {selectedCalendarTask.category}
+                                            </Badge>
+                                        </DialogHeader>
+
+                                        <div className="space-y-3.5 text-xs text-slate-700">
+                                            {selectedCalendarTask.client && (
+                                                <div className="flex justify-between items-center py-1.5 border-b border-slate-50">
+                                                    <span className="font-semibold text-slate-400 uppercase tracking-wider text-[10px]">Client</span>
+                                                    <span className="font-bold text-slate-800 flex items-center gap-1">
+                                                        <Users className="h-3.5 w-3.5 text-indigo-500" />
+                                                        {selectedCalendarTask.client.name}
+                                                    </span>
+                                                </div>
+                                            )}
+                                            <div className="flex justify-between items-center py-1.5 border-b border-slate-50">
+                                                <span className="font-semibold text-slate-400 uppercase tracking-wider text-[10px]">Priority</span>
+                                                <Badge variant="outline" className={cn(
+                                                    "text-[10px] font-bold uppercase",
+                                                    selectedCalendarTask.priority.toLowerCase() === 'urgent' ? 'bg-rose-50 text-rose-700 border-rose-200' :
+                                                    selectedCalendarTask.priority.toLowerCase() === 'high' ? 'bg-amber-50 text-amber-700 border-amber-200' :
+                                                    'bg-slate-100 text-slate-600 border-slate-200'
+                                                )}>
+                                                    {selectedCalendarTask.priority}
+                                                </Badge>
+                                            </div>
+                                            <div className="flex justify-between items-center py-1.5 border-b border-slate-50">
+                                                <span className="font-semibold text-slate-400 uppercase tracking-wider text-[10px]">Due Date</span>
+                                                <span className="font-semibold text-slate-800 flex items-center gap-1 font-mono">
+                                                    <CalendarDays className="h-3.5 w-3.5 text-indigo-500" />
+                                                    {selectedCalendarTask.due || 'No due date'}
+                                                </span>
+                                            </div>
+                                            <div className="flex justify-between items-center py-1.5 border-b border-slate-50">
+                                                <span className="font-semibold text-slate-400 uppercase tracking-wider text-[10px]">Assignee</span>
+                                                <span className="font-semibold text-slate-800 flex items-center gap-1.5">
+                                                    <div className="w-5 h-5 rounded-full bg-slate-900 text-white flex items-center justify-center font-bold text-[9px]">
+                                                        {selectedCalendarTask.assignee ? selectedCalendarTask.assignee.substring(0, 2).toUpperCase() : 'UA'}
+                                                    </div>
+                                                    {selectedCalendarTask.assignee || 'Unassigned'}
+                                                </span>
+                                            </div>
+                                            {selectedCalendarTask.task_description && (
+                                                <div className="space-y-1.5 pt-2">
+                                                    <span className="font-semibold text-slate-400 uppercase tracking-wider text-[10px] block font-sans">Description</span>
+                                                    <p className="text-slate-600 bg-slate-50 p-3 rounded-xl border border-slate-100 leading-relaxed font-sans text-[12px]">
+                                                        {selectedCalendarTask.task_description}
+                                                    </p>
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        <div className="pt-4 border-t border-slate-100 flex items-center justify-between gap-3">
+                                            <Link 
+                                                href={route('erp.tasks.show', selectedCalendarTask.id)} 
+                                                className={cn(buttonVariants({ size: 'sm', variant: 'outline' }), "flex-1 shadow-none text-xs font-semibold h-9 gap-1.5 border-slate-200")}
+                                            >
+                                                <ArrowUpRight className="h-4 w-4" /> Go to Board
+                                            </Link>
+                                            <Button 
+                                                onClick={() => setShowCalendarTaskModal(false)} 
+                                                size="sm"
+                                                className="flex-1 shadow-none text-xs font-semibold h-9 bg-indigo-650 text-white hover:bg-indigo-700"
+                                            >
+                                                Close
+                                            </Button>
+                                        </div>
+                                    </div>
+                                )}
+                            </DialogContent>
+                        </Dialog>
+
+                        {/* Calendar Add Task Modal */}
+                        <Dialog open={showCalendarAddModal} onOpenChange={setShowCalendarAddModal}>
+                            <DialogContent className="sm:max-w-md p-6 rounded-2xl border-none shadow-xl bg-white text-left">
+                                <DialogHeader className="pb-2 border-b border-slate-100">
+                                    <DialogTitle className="text-base font-bold text-slate-900 flex items-center gap-2">
+                                        <Plus className="h-4.5 w-4.5 text-indigo-600" />
+                                        <span>Add Task on Calendar</span>
+                                    </DialogTitle>
+                                    <CardDescription className="text-xs text-slate-500 mt-1 font-mono">
+                                        Schedule deliverable due on: {selectedCalendarDate}
+                                    </CardDescription>
+                                </DialogHeader>
+
+                                <form onSubmit={handleCalendarAddTask} className="space-y-4 pt-2">
+                                    <div className="space-y-1">
+                                        <label className="text-[10px] uppercase font-bold tracking-wider text-slate-400">Task Title</label>
+                                        <Input 
+                                            placeholder="e.g. Design homepage wireframes"
+                                            value={calendarTaskForm.title}
+                                            onChange={e => setCalendarTaskForm(prev => ({ ...prev, title: e.target.value }))}
+                                            className="h-9.5 text-xs shadow-none border-slate-200 focus-visible:ring-indigo-500"
+                                            required
+                                        />
+                                    </div>
+                                    
+                                    <div className="space-y-1">
+                                        <label className="text-[10px] uppercase font-bold tracking-wider text-slate-400">Assign Client</label>
+                                        <select
+                                            value={calendarTaskForm.client_id}
+                                            onChange={e => setCalendarTaskForm(prev => ({ ...prev, client_id: e.target.value }))}
+                                            className="w-full text-xs h-9.5 rounded-md border border-slate-200 bg-white px-2.5 shadow-none focus:outline-none focus:ring-1 focus:ring-ring"
+                                        >
+                                            <option value="">No Client (Internal Task)</option>
+                                            {activeClients.map(c => (
+                                                <option key={c.id} value={c.id.toString()}>{c.name}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+
+                                    <div className="grid grid-cols-2 gap-3">
+                                        <div className="space-y-1">
+                                            <label className="text-[10px] uppercase font-bold tracking-wider text-slate-400">Priority</label>
+                                            <select
+                                                value={calendarTaskForm.priority}
+                                                onChange={e => setCalendarTaskForm(prev => ({ ...prev, priority: e.target.value }))}
+                                                className="w-full text-xs h-9.5 rounded-md border border-slate-200 bg-white px-2.5 shadow-none focus:outline-none"
+                                            >
+                                                <option value="low">Low</option>
+                                                <option value="normal">Normal</option>
+                                                <option value="high">High</option>
+                                                <option value="urgent">Urgent</option>
+                                            </select>
+                                        </div>
+                                        <div className="space-y-1">
+                                            <label className="text-[10px] uppercase font-bold tracking-wider text-slate-400">Status</label>
+                                            <select
+                                                value={calendarTaskForm.status}
+                                                onChange={e => setCalendarTaskForm(prev => ({ ...prev, status: e.target.value }))}
+                                                className="w-full text-xs h-9.5 rounded-md border border-slate-200 bg-white px-2.5 shadow-none focus:outline-none"
+                                            >
+                                                <option value="open">Todo</option>
+                                                <option value="in_progress">In Progress</option>
+                                                <option value="review">In Review</option>
+                                                <option value="completed">Done</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div className="space-y-1">
+                                        <label className="text-[10px] uppercase font-bold tracking-wider text-slate-400">Description</label>
+                                        <Textarea 
+                                            placeholder="Enter additional task details and guidelines..."
+                                            value={calendarTaskForm.task_description}
+                                            onChange={e => setCalendarTaskForm(prev => ({ ...prev, task_description: e.target.value }))}
+                                            className="min-h-[80px] text-xs shadow-none border-slate-200"
+                                        />
+                                    </div>
+
+                                    <div className="pt-4 border-t border-slate-100 flex items-center justify-end gap-2.5">
+                                        <Button 
+                                            type="button" 
+                                            variant="ghost" 
+                                            onClick={() => setShowCalendarAddModal(false)}
+                                            className="h-9 shadow-none text-xs font-semibold"
+                                        >
+                                            Cancel
+                                        </Button>
+                                        <Button 
+                                            type="submit"
+                                            className="h-9 shadow-none text-xs font-semibold bg-indigo-600 text-white hover:bg-indigo-700"
+                                        >
+                                            Schedule Task
+                                        </Button>
+                                    </div>
+                                </form>
+                            </DialogContent>
+                        </Dialog>
 
             </div>
         </ERPLayout>

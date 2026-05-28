@@ -452,18 +452,29 @@ class InvoiceController extends Controller
     }
 
     /**
-     * Mark an invoice as fully paid from client wallet.
-     * Recovered from old project: Invoice::bill_invoice()
+     * Mark an invoice as fully paid manually.
      */
     public function markPaid(Invoice $invoice)
+    {
+        $result = $invoice->markPaidManual();
+
+        if (!$result['ok']) {
+            return back()->withErrors(['payment' => $result['message']]);
+        }
+
+        return back()->with('success', $result['message']);
+    }
+
+    /**
+     * Mark an invoice as fully paid from client wallet.
+     */
+    public function payWallet(Invoice $invoice)
     {
         $result = $invoice->billInvoice();
 
         if (!$result['ok']) {
             return back()->withErrors(['payment' => $result['message']]);
         }
-
-        event(new InvoicePaid($invoice));
 
         return back()->with('success', $result['message']);
     }

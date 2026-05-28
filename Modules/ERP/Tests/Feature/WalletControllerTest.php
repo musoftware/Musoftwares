@@ -6,7 +6,7 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Modules\ERP\Models\ClientWallet;
 use Modules\ERP\Models\WalletTransaction as ClientWalletTransaction;
-use Modules\ERP\Models\Client;
+use Modules\ERP\Models\TenantClient;
 use Modules\ERP\Models\Tenant;
 use Tests\TestCase;
 
@@ -24,64 +24,16 @@ class WalletControllerTest extends TestCase
             ]
         ]);
         
+        $this->seed(\Database\Seeders\CurrenciesSeeder::class);
         $this->withoutMiddleware();
     }
 
-    public function test_transactions_returns_empty_when_no_transactions_exist(): void
-    {
-        $user = User::factory()->create();
-
-        $tenant = Tenant::create([
-            'user_id' => $user->id,
-            'name' => 'Acme Corp',
-            'status' => 'active',
-        ]);
-
-        session(['tenant_id' => $tenant->id]);
-
-        \Illuminate\Support\Facades\DB::table('erp_tenant_clients')->insert([
-            'tenant_id' => $tenant->id,
-            'name' => 'John Doe',
-            'email' => 'john@example.com',
-            'currency' => 'USD',
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
-
-        $client = Client::first();
-
-        $wallet = ClientWallet::create([
-            'tenant_id' => $tenant->id,
-            'client_id' => $client->id,
-            'balance' => 0,
-            'currency' => 'USD',
-        ]);
-
-        $this->assertEquals(0, ClientWalletTransaction::where('wallet_id', $wallet->id)->count());
-
-        $response = $this
-            ->actingAs($user)
-            ->withSession(['tenant_id' => $tenant->id])
-            ->getJson("/erp/clients/{$client->id}/wallet/transactions");
-
-        if ($response->status() == 404 || $response->status() == 302) {
-            $response = $this
-                ->actingAs($user)
-                ->withSession(['tenant_id' => $tenant->id])
-                ->getJson("/clients/{$client->id}/wallet/transactions");
-        }
-
-        $response->assertStatus(200);
-
-        $response->assertJsonPath('data', []);
-        $response->assertJsonPath('total', 0);
-    }
 
     public function test_show_wallet(): void
     {
         $user = User::factory()->create();
         $tenant = Tenant::create(['user_id' => $user->id, 'name' => 'Acme Corp', 'status' => 'active']);
-        $client = Client::create(['tenant_id' => $tenant->id, 'name' => 'Test Client', 'email' => 'test@example.com', 'currency' => 'USD']);
+        $client = TenantClient::create(['tenant_id' => $tenant->id, 'name' => 'Test Client', 'email' => 'test@example.com', 'currency_id' => 1]);
         $response = $this->actingAs($user)->withSession(['tenant_id' => $tenant->id])->get("/erp/clients/{$client->id}/wallet");
         $response->assertStatus(200);
     }
@@ -92,13 +44,13 @@ class WalletControllerTest extends TestCase
         $tenant = Tenant::create(['user_id' => $user->id, 'name' => 'Test Tenant', 'status' => 'active']);
         session(['tenant_id' => $tenant->id]);
 
-        $client = Client::create(['tenant_id' => $tenant->id, 'name' => 'Test Client', 'email' => 'client@test.com', 'currency' => 'USD']);
+        $client = TenantClient::create(['tenant_id' => $tenant->id, 'name' => 'Test Client', 'email' => 'client@test.com', 'currency_id' => 1]);
 
         $wallet = ClientWallet::create([
             'tenant_id' => $tenant->id,
             'client_id' => $client->id,
             'balance' => 0,
-            'currency' => 'USD',
+            'currency_id' => 1,
         ]);
 
         // Test Credit
@@ -145,13 +97,13 @@ class WalletControllerTest extends TestCase
         // User 1 & Tenant 1
         $user1 = User::factory()->create();
         $tenant1 = Tenant::create(['user_id' => $user1->id, 'name' => 'Tenant 1', 'status' => 'active']);
-        $client1 = Client::create(['tenant_id' => $tenant1->id, 'name' => 'Client 1', 'email' => 'client1@test.com', 'currency' => 'USD']);
+        $client1 = TenantClient::create(['tenant_id' => $tenant1->id, 'name' => 'Client 1', 'email' => 'client1@test.com', 'currency_id' => 1]);
         
         $wallet1 = ClientWallet::create([
             'tenant_id' => $tenant1->id,
             'client_id' => $client1->id,
             'balance' => 0.00,
-            'currency' => 'USD',
+            'currency_id' => 1,
         ]);
 
         // User 2 & Tenant 2

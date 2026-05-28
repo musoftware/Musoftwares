@@ -302,7 +302,7 @@ export default function Dashboard({
                                     <span className="text-sm font-medium">Unpaid Invoices</span>
                                     <span className="bg-white/20 px-2 py-0.5 rounded text-xs font-bold">{stats.unpaidInvoices}</span>
                                 </Link>
-                                <Link href={safeRoute('erp.wallet.show', user?.id || 1, `/erp/clients/${user?.id || 1}/wallet`)} className="flex items-center justify-between p-2.5 rounded-lg border border-slate-100 hover:border-slate-300 transition-colors group">
+                                <Link href={safeRoute('erp.clients.wallet.index', user?.id || 1, `/erp/clients/${user?.id || 1}/wallet`)} className="flex items-center justify-between p-2.5 rounded-lg border border-slate-100 hover:border-slate-300 transition-colors group">
                                     <span className="text-sm font-medium text-slate-700">Transactions</span>
                                     <ArrowRight className="w-4 h-4 text-slate-400" />
                                 </Link>
@@ -375,7 +375,7 @@ export default function Dashboard({
                             
                             <div className="pt-4 mt-auto border-t border-white/10">
                                 <Link 
-                                    href={safeRoute('erp.wallet.show', user?.id || 1, `/erp/clients/${user?.id || 1}/wallet`)} 
+                                    href={safeRoute('erp.clients.wallet.index', user?.id || 1, `/erp/clients/${user?.id || 1}/wallet`)} 
                                     className="flex items-center justify-center w-full py-2.5 rounded-lg border border-white/20 hover:bg-white/10 transition-colors text-sm font-medium text-white"
                                 >
                                     View Full History

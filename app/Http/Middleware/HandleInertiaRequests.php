@@ -124,7 +124,26 @@ class HandleInertiaRequests extends Middleware
                 return null;
             },
             'settings' => [
-                'base_currency' => 'USD'
+                'base_currency' => function () use ($user) {
+                    if ($user && class_exists(\Modules\ERP\Models\Tenant::class)) {
+                        $tenant = null;
+                        if (auth('erp_team')->check()) {
+                            $tenant = auth('erp_team')->user()?->tenant;
+                        } else {
+                            $tenant = \Modules\ERP\Models\Tenant::where('user_id', $user->id)->first();
+                        }
+                        if ($tenant && $tenant->base_currency_id) {
+                            $baseCurrency = \App\Models\Currency::find($tenant->base_currency_id);
+                            if ($baseCurrency) {
+                                return $baseCurrency->currency;
+                            }
+                        }
+                    }
+                    if (class_exists(\App\Models\AdminSettings::class)) {
+                        return \App\Models\AdminSettings::business_currency_name();
+                    }
+                    return 'USD';
+                }
             ],
             'currencies' => \App\Models\Currency::all()->map(fn($c) => [
                 'id' => $c->id,

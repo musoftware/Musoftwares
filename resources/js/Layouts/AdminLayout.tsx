@@ -18,6 +18,7 @@ import {
 import { User } from '@/types';
 import { Link } from '@inertiajs/react';
 import ApplicationLogo from '@/Components/ApplicationLogo';
+import { useInertiaNotifications } from '@/hooks/useInertiaNotifications';
 import {
     Bell,
     Briefcase,
@@ -38,6 +39,7 @@ interface AdminLayoutProps extends PropsWithChildren {
 }
 
 export default function AdminLayout({ user, children }: AdminLayoutProps) {
+    useInertiaNotifications();
     const [isCollapsed, setIsCollapsed] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 

@@ -1,8 +1,7 @@
 import React, { PropsWithChildren, ReactNode } from 'react';
 import { Head, Link } from '@inertiajs/react';
 import { ChevronRight, ArrowLeft, Lock } from 'lucide-react';
-import { Toaster } from '@/Components/ui/toaster';
-import { FlashHandler } from '@/Components/FlashHandler';
+import { useInertiaNotifications } from '@/hooks/useInertiaNotifications';
 
 interface ERPLayoutProps extends PropsWithChildren {
     title: string;
@@ -39,6 +38,7 @@ export default function ERPLayout({
     lockedAddons = [],
     children,
 }: ERPLayoutProps) {
+    useInertiaNotifications();
     const activeMenuItem = menuItems.find(item => item.isActive);
     const activeMenuLabel = activeMenuItem?.label || 'Workspace';
 
@@ -197,9 +197,6 @@ export default function ERPLayout({
                 </div>
             </div>
             
-            {/* Essential UI Components */}
-            <FlashHandler />
-            <Toaster />
         </div>
     );
 }

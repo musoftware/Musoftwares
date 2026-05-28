@@ -1,9 +1,8 @@
 import React, { PropsWithChildren } from 'react';
 import { Head, Link, usePage } from '@inertiajs/react';
 import { ChevronRight, ArrowLeft, LayoutDashboard, Users, Mail, PlayCircle, Settings } from 'lucide-react';
-import { Toaster } from '@/Components/ui/toaster';
+import { useInertiaNotifications } from '@/hooks/useInertiaNotifications';
 import { CrmCommandPalette } from '@/Components/CRM/CrmCommandPalette';
-import { FlashHandler } from '@/Components/FlashHandler';
 
 interface CrmLayoutProps extends PropsWithChildren {
     title: string;
@@ -12,8 +11,10 @@ interface CrmLayoutProps extends PropsWithChildren {
 
 export default function CrmLayout({ title, activeMenu, children }: CrmLayoutProps) {
     const { crm_features } = usePage().props as any;
+    useInertiaNotifications();
     const workspaceName = "My CRM Workspace";
     const tenantId = 'DRAFT';
+    const [cmdOpen, setCmdOpen] = React.useState(false);
 
     const hasFeature = (featureName: string) => {
         // If the features array includes the feature name or if the key is true
@@ -64,8 +65,6 @@ export default function CrmLayout({ title, activeMenu, children }: CrmLayoutProp
         href: '#', // TODO: CRM Settings route
         isActive: activeMenu === 'settings',
     });
-
-    const [cmdOpen, setCmdOpen] = React.useState(false);
 
     const activeMenuItem = menuItems.find(item => item.isActive);
     const activeMenuLabel = activeMenuItem?.label || 'Workspace';
@@ -172,8 +171,6 @@ export default function CrmLayout({ title, activeMenu, children }: CrmLayoutProp
             </div>
             
             <CrmCommandPalette open={cmdOpen} setOpen={setCmdOpen} onOpenLead={() => {}} />
-            <FlashHandler />
-            <Toaster />
         </div>
     );
 }

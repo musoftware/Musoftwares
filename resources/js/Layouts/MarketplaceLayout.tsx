@@ -1,11 +1,13 @@
 import ApplicationLogo from '@/Components/ApplicationLogo';
 import { Link, usePage } from '@inertiajs/react';
 import { PropsWithChildren, ReactNode } from 'react';
+import { useInertiaNotifications } from '@/hooks/useInertiaNotifications';
 
 export default function MarketplaceLayout({
     header,
     children,
 }: PropsWithChildren<{ header?: ReactNode }>) {
+    useInertiaNotifications();
     const { auth } = usePage().props as any;
     const user = auth?.user;
 
