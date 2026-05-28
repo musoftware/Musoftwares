@@ -35,8 +35,8 @@ class LeadTest extends TestCase
         ]);
 
         \DB::table('user_subscriptions')->insert([
-            'client_id' => $user->id,
-            'plan_id' => $planId,
+            'user_id' => $user->id,
+            'object' => 'crm',
             'status' => 'active',
             'started_at' => now(),
             'expires_at' => now()->addMonth(),

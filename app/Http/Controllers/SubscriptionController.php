@@ -69,7 +69,7 @@ class SubscriptionController extends Controller
         $wallet = ['id' => null, 'balance' => (float)$user->user_balance, 'currency' => $user->currency_name()];
 
         $ownedFeatures = [];
-        $userSubs = \App\Models\UserSubscription::where('client_id', $user->id)
+        $userSubs = \App\Models\UserSubscription::where('user_id', $user->id)
             ->where('status', 'active')
             ->get();
 
@@ -181,7 +181,7 @@ class SubscriptionController extends Controller
                 // Check if user already owns the parent
                 $alreadyOwned = false;
                 if ($user && !$inCart) {
-                    $alreadyOwned = \App\Models\UserSubscription::where('client_id', $user->id)
+                    $alreadyOwned = \App\Models\UserSubscription::where('user_id', $user->id)
                         ->where('object', $parent)
                         ->where('status', 'active')
                         ->where('expires_at', '>', now())
@@ -276,13 +276,13 @@ class SubscriptionController extends Controller
                         $expiry = \Carbon\Carbon::now()->addDays($days);
                         
                         // Check if they already own it, extend expiry
-                        $existing = \App\Models\UserSubscription::where('client_id', $user->id)->where('object', $item)->first();
+                        $existing = \App\Models\UserSubscription::where('user_id', $user->id)->where('object', $item)->first();
                         if ($existing && $existing->status === 'active' && \Carbon\Carbon::parse($existing->expires_at)->isFuture()) {
                             $expiry = \Carbon\Carbon::parse($existing->expires_at)->addDays($days);
                         }
 
                         \App\Models\UserSubscription::updateOrCreate(
-                            ['client_id' => $user->id, 'object' => $item],
+                            ['user_id' => $user->id, 'object' => $item],
                             [
                                 'status' => 'active',
                                 'started_at' => now(),
@@ -440,13 +440,13 @@ class SubscriptionController extends Controller
                                             $expiry = \Carbon\Carbon::now()->addDays($days);
                                             
                                             // Check if they already own it, extend expiry
-                                            $existing = \App\Models\UserSubscription::where('client_id', $user->id)->where('object', $item)->first();
+                                            $existing = \App\Models\UserSubscription::where('user_id', $user->id)->where('object', $item)->first();
                                             if ($existing && $existing->status === 'active' && \Carbon\Carbon::parse($existing->expires_at)->isFuture()) {
                                                 $expiry = \Carbon\Carbon::parse($existing->expires_at)->addDays($days);
                                             }
 
                                             \App\Models\UserSubscription::updateOrCreate(
-                                                ['client_id' => $user->id, 'object' => $item],
+                                                ['user_id' => $user->id, 'object' => $item],
                                                 [
                                                     'status' => 'active',
                                                     'started_at' => now(),
@@ -505,7 +505,7 @@ class SubscriptionController extends Controller
         
         $subscriptions = [];
         
-        $userSubs = \App\Models\UserSubscription::where('client_id', $user->id)
+        $userSubs = \App\Models\UserSubscription::where('user_id', $user->id)
             ->where('status', 'active')
             ->get();
             

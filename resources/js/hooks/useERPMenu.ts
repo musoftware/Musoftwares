@@ -83,6 +83,9 @@ export function useERPMenu(
     // Addon menu items — shown at the bottom of the sidebar
     // These map to saas.php addon slugs under 'erp' parent
     const addonItems = [
+        { id: 'erp-projects', label: 'Projects Management', icon: Briefcase, description: 'Organize invoices, tickets, and tasks under dedicated client projects with strict budget tracking.', features: ['Project ledgers', 'Budget tracking', 'Due dates'] },
+        { id: 'erp-tasks', label: 'Task Management', icon: CheckSquare, description: 'Manage task boards, todo lists, and collaborate with your team effectively.', features: ['Kanban boards', 'Checklists', 'Time tracking'] },
+        { id: 'erp-calendar', label: 'Calendar System', icon: Calendar, description: 'Visualize upcoming deadlines, tasks, and meetings in an interactive calendar.', features: ['Monthly view', 'Event tracking', 'Deadline mapping'] },
         { id: 'erp-team-members', label: 'Team Members', icon: Users, description: 'Invite managers and staff to your workspace. Assign roles, control access, and track activity.', features: ['Role-based access', 'Invite by email', 'Suspend anytime'] },
         { id: 'erp-tickets', label: 'Support Tickets', icon: LifeBuoy, description: 'Track client issues, manage priorities, and resolve tickets — all from your workspace.', features: ['Priority levels', 'Client-linked tickets', 'Resolution tracking'] },
         { id: 'erp-referrals', label: 'Referral Program', icon: Users, description: 'Track client referrals, links, trees, and referral earnings.', features: ['Referral links', 'Tree structure', 'Earnings tracking'] },
@@ -112,6 +115,15 @@ export function useERPMenu(
             return false;
         }
         if (item.id === 'branches' && !activeAddons.includes('erp-multi-branch')) {
+            return false;
+        }
+        if (item.id === 'projects' && !activeAddons.includes('erp-projects')) {
+            return false;
+        }
+        if (item.id === 'tasks' && !activeAddons.includes('erp-tasks')) {
+            return false;
+        }
+        if (item.id === 'calendar' && !activeAddons.includes('erp-calendar')) {
             return false;
         }
         return true;

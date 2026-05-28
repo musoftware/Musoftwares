@@ -41,7 +41,7 @@ class InventoryTest extends TestCase
 
         // Mock addon subscription
         UserSubscription::create([
-            'client_id' => $this->user->id,
+            'user_id' => $this->user->id,
             'object' => 'erp',
             'status' => 'active',
             'started_at' => now(),
@@ -49,7 +49,7 @@ class InventoryTest extends TestCase
             'auto_renew' => true,
         ]);
         UserSubscription::create([
-            'client_id' => $this->user->id,
+            'user_id' => $this->user->id,
             'object' => 'erp-inventory',
             'status' => 'active',
             'started_at' => now(),

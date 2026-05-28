@@ -4,7 +4,7 @@ namespace Modules\ERP\Tests\Feature;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
-use Modules\ERP\Models\WalletTransaction as ClientWalletTransaction;
+use Modules\ERP\Models\WalletTransaction;
 use Modules\ERP\Models\TenantClient;
 use Modules\ERP\Models\Tenant;
 use Tests\TestCase;
@@ -28,7 +28,7 @@ class WalletControllerTest extends TestCase
     }
 
 
-    public function test_show_wallet(): void
+    public function test_show_ledger(): void
     {
         $user = User::factory()->create();
         $tenant = Tenant::create(['user_id' => $user->id, 'name' => 'Acme Corp', 'status' => 'active']);
@@ -37,7 +37,7 @@ class WalletControllerTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function test_wallet_actions(): void
+    public function test_receive_and_send_payments(): void
     {
         $user = User::factory()->create();
         $tenant = Tenant::create(['user_id' => $user->id, 'name' => 'Test Tenant', 'status' => 'active']);
@@ -45,13 +45,18 @@ class WalletControllerTest extends TestCase
 
         $client = TenantClient::create(['tenant_id' => $tenant->id, 'name' => 'Test Client', 'email' => 'client@test.com', 'currency_id' => 1]);
 
-        // Test Credit
-        $response = $this->actingAs($user)->withSession(['tenant_id' => $tenant->id])->post("/erp/clients/{$client->id}/wallet/credit", [
+        // Test Receive Payment
+        $response = $this->actingAs($user)->withSession(['tenant_id' => $tenant->id])->post("/erp/clients/{$client->id}/wallet/receive", [
             'amount' => 500.00,
-            'note' => 'Initial deposit',
+            'note' => 'Initial payment',
         ]);
         $response->assertSessionHas('success');
         $this->assertEquals(500.00, (float)$client->balance());
+
+        // Verify transaction type
+        $receivedTx = WalletTransaction::where('client_id', $client->id)->where('type', 'received')->first();
+        $this->assertNotNull($receivedTx);
+        $this->assertEquals(500.00, (float)$receivedTx->amount);
 
         // Test Locked Balance by creating a sent invoice
         $invoice = \Modules\ERP\Models\Invoice::create([
@@ -69,16 +74,48 @@ class WalletControllerTest extends TestCase
 
         $this->assertEquals(100.00, (float)$client->lockedBalance());
 
-        // Test Debit
-        $response = $this->actingAs($user)->withSession(['tenant_id' => $tenant->id])->post("/erp/clients/{$client->id}/wallet/debit", [
+        // Test Send Payment
+        $response = $this->actingAs($user)->withSession(['tenant_id' => $tenant->id])->post("/erp/clients/{$client->id}/wallet/send", [
             'amount' => 200.00,
             'note' => 'Service charge',
         ]);
         $response->assertSessionHas('success');
         $this->assertEquals(300.00, (float)$client->balance());
+
+        // Verify sent transaction has negative amount
+        $sentTx = WalletTransaction::where('client_id', $client->id)->where('type', 'sent')->first();
+        $this->assertNotNull($sentTx);
+        $this->assertEquals(-200.00, (float)$sentTx->amount);
     }
 
-    public function test_user_cannot_modify_other_tenant_client_wallet(): void
+    public function test_refund_payment(): void
+    {
+        $user = User::factory()->create();
+        $tenant = Tenant::create(['user_id' => $user->id, 'name' => 'Test Tenant', 'status' => 'active']);
+        $client = TenantClient::create(['tenant_id' => $tenant->id, 'name' => 'Test Client', 'email' => 'client@test.com', 'currency_id' => 1]);
+
+        // First receive some money
+        $this->actingAs($user)->withSession(['tenant_id' => $tenant->id])->post("/erp/clients/{$client->id}/wallet/receive", [
+            'amount' => 500.00,
+            'note' => 'Initial payment',
+        ]);
+        $this->assertEquals(500.00, (float)$client->balance());
+
+        // Then refund
+        $response = $this->actingAs($user)->withSession(['tenant_id' => $tenant->id])->post("/erp/clients/{$client->id}/wallet/refund", [
+            'amount' => 150.00,
+            'note' => 'Partial refund for overpayment',
+        ]);
+        $response->assertSessionHas('success');
+        $this->assertEquals(350.00, (float)$client->balance());
+
+        // Verify refund transaction has negative amount
+        $refundTx = WalletTransaction::where('client_id', $client->id)->where('type', 'refunded')->first();
+        $this->assertNotNull($refundTx);
+        $this->assertEquals(-150.00, (float)$refundTx->amount);
+    }
+
+    public function test_user_cannot_modify_other_tenant_client(): void
     {
         // User 1 & Tenant 1
         $user1 = User::factory()->create();
@@ -92,7 +129,7 @@ class WalletControllerTest extends TestCase
         // Setup session for User 2
         session(['tenant_id' => $tenant2->id]);
 
-        $response = $this->actingAs($user2)->withSession(['tenant_id' => $tenant2->id])->postJson("/erp/clients/{$client1->id}/wallet/credit", [
+        $response = $this->actingAs($user2)->withSession(['tenant_id' => $tenant2->id])->postJson("/erp/clients/{$client1->id}/wallet/receive", [
             'amount' => 500.00,
             'note' => 'Hacker deposit',
         ]);
@@ -104,7 +141,7 @@ class WalletControllerTest extends TestCase
         $this->assertEquals(0.00, (float)$client1->balance());
     }
 
-    public function test_manual_wallet_adjustments_with_project(): void
+    public function test_receive_and_send_with_project(): void
     {
         $user = User::factory()->create();
         $tenant = Tenant::create(['user_id' => $user->id, 'name' => 'Acme Corp', 'status' => 'active']);
@@ -120,23 +157,23 @@ class WalletControllerTest extends TestCase
             'currency_id' => 1,
         ]);
 
-        // Credit with project_id
-        $response = $this->actingAs($user)->withSession(['tenant_id' => $tenant->id])->post("/erp/clients/{$client->id}/wallet/credit", [
+        // Receive with project_id
+        $response = $this->actingAs($user)->withSession(['tenant_id' => $tenant->id])->post("/erp/clients/{$client->id}/wallet/receive", [
             'amount' => 500.00,
-            'note' => 'Project milestone deposit',
+            'note' => 'Project milestone payment',
             'project_id' => $project->id,
         ]);
 
         $response->assertRedirect(route('erp.projects.show', $project->id));
         $this->assertEquals(500.00, (float)$client->balance());
 
-        $transaction = ClientWalletTransaction::where('project_id', $project->id)->first();
+        $transaction = WalletTransaction::where('project_id', $project->id)->where('type', 'received')->first();
         $this->assertNotNull($transaction);
         $this->assertEquals(500.00, (float)$transaction->amount);
-        $this->assertEquals('credit', $transaction->direction);
+        $this->assertEquals('received', $transaction->type);
 
-        // Debit with project_id
-        $response = $this->actingAs($user)->withSession(['tenant_id' => $tenant->id])->post("/erp/clients/{$client->id}/wallet/debit", [
+        // Send with project_id
+        $response = $this->actingAs($user)->withSession(['tenant_id' => $tenant->id])->post("/erp/clients/{$client->id}/wallet/send", [
             'amount' => 200.00,
             'note' => 'Project design costs',
             'project_id' => $project->id,
@@ -145,8 +182,25 @@ class WalletControllerTest extends TestCase
         $response->assertRedirect(route('erp.projects.show', $project->id));
         $this->assertEquals(300.00, (float)$client->balance());
 
-        $debitTransaction = ClientWalletTransaction::where('project_id', $project->id)->where('direction', 'debit')->first();
-        $this->assertNotNull($debitTransaction);
-        $this->assertEquals(200.00, (float)$debitTransaction->amount);
+        $sentTransaction = WalletTransaction::where('project_id', $project->id)->where('type', 'sent')->first();
+        $this->assertNotNull($sentTransaction);
+        $this->assertEquals(-200.00, (float)$sentTransaction->amount);
+        $this->assertEquals('sent', $sentTransaction->type);
+    }
+
+    public function test_send_insufficient_balance(): void
+    {
+        $user = User::factory()->create();
+        $tenant = Tenant::create(['user_id' => $user->id, 'name' => 'Test Tenant', 'status' => 'active']);
+        $client = TenantClient::create(['tenant_id' => $tenant->id, 'name' => 'Test Client', 'email' => 'client@test.com', 'currency_id' => 1]);
+
+        // Try to send without any balance
+        $response = $this->actingAs($user)->withSession(['tenant_id' => $tenant->id])->post("/erp/clients/{$client->id}/wallet/send", [
+            'amount' => 500.00,
+            'note' => 'Should fail',
+        ]);
+
+        $response->assertSessionHasErrors('amount');
+        $this->assertEquals(0.00, (float)$client->balance());
     }
 }

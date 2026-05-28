@@ -164,7 +164,8 @@ export default function OnboardingWizard({ user, countries }: Props) {
     const currentCitiesList = cities.length > 0 ? cities : defaultCities;
 
     // For the custom dropdown
-    const filteredCities = currentCitiesList.filter(c => c.toLowerCase().includes(citySearch.toLowerCase()));
+    const uniqueCities = Array.from(new Set(currentCitiesList));
+    const filteredCities = uniqueCities.filter(c => c.toLowerCase().includes(citySearch.toLowerCase()));
     // Take first 20 to avoid massive DOM
     const visibleCities = filteredCities.slice(0, 20);
 

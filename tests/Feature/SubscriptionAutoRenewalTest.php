@@ -56,7 +56,7 @@ class SubscriptionAutoRenewalTest extends TestCase
         $expiryTime = Carbon::now()->subMinutes(10);
 
         $subscription = UserSubscription::create([
-            'client_id' => $this->user->id,
+            'user_id' => $this->user->id,
             'plan_id' => $this->freePlan->id,
             'status' => 'active',
             'started_at' => Carbon::now()->subMonth(),
@@ -87,7 +87,7 @@ class SubscriptionAutoRenewalTest extends TestCase
         $expiryTime = Carbon::now()->subMinutes(5);
 
         $subscription = UserSubscription::create([
-            'client_id' => $this->user->id,
+            'user_id' => $this->user->id,
             'plan_id' => $this->paidPlan->id,
             'status' => 'active',
             'started_at' => Carbon::now()->subMonth(),
@@ -136,7 +136,7 @@ class SubscriptionAutoRenewalTest extends TestCase
         $expiryTime = Carbon::now()->subMinutes(5);
 
         $subscription = UserSubscription::create([
-            'client_id' => $this->user->id,
+            'user_id' => $this->user->id,
             'plan_id' => $this->paidPlan->id,
             'status' => 'active',
             'started_at' => Carbon::now()->subMonth(),
@@ -166,7 +166,7 @@ class SubscriptionAutoRenewalTest extends TestCase
         $expiryTime = Carbon::now()->subMinutes(5);
 
         $subscription = UserSubscription::create([
-            'client_id' => $this->user->id,
+            'user_id' => $this->user->id,
             'plan_id' => $this->freePlan->id,
             'status' => 'active',
             'started_at' => Carbon::now()->subMonth(),
@@ -190,7 +190,7 @@ class SubscriptionAutoRenewalTest extends TestCase
         $expiryTime = Carbon::now()->addDays(5); // future expiry
 
         $subscription = UserSubscription::create([
-            'client_id' => $this->user->id,
+            'user_id' => $this->user->id,
             'plan_id' => $this->freePlan->id,
             'status' => 'active',
             'started_at' => Carbon::now(),

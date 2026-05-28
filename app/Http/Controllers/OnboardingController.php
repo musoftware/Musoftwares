@@ -184,6 +184,7 @@ class OnboardingController extends Controller
         try {
             $cities = \Illuminate\Support\Facades\DB::table('cities')
                 ->where('country_id', $country->id)
+                ->distinct()
                 ->pluck('name')
                 ->toArray();
                 
@@ -194,6 +195,7 @@ class OnboardingController extends Controller
                 ]);
                 $cities = \Illuminate\Support\Facades\DB::table('cities')
                     ->where('country_id', $country->id)
+                    ->distinct()
                     ->pluck('name')
                     ->toArray();
             }
@@ -209,6 +211,7 @@ class OnboardingController extends Controller
                 ]);
                 $cities = \Illuminate\Support\Facades\DB::table('cities')
                     ->where('country_id', $country->id)
+                    ->distinct()
                     ->pluck('name')
                     ->toArray();
             } else {

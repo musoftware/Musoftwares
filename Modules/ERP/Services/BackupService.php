@@ -20,8 +20,7 @@ class BackupService
             'client_notes' => \Modules\ERP\Models\ClientNote::whereHas('client', function($q) use ($tenant) {
                 $q->where('tenant_id', $tenant->id);
             })->get()->toArray(),
-            'wallets' => \Modules\ERP\Models\ClientWallet::where('tenant_id', $tenant->id)->get()->toArray(),
-            'wallet_transactions' => \Modules\ERP\Models\WalletTransaction::where('tenant_id', $tenant->id)->get()->toArray(),
+            'transactions' => \Modules\ERP\Models\WalletTransaction::where('tenant_id', $tenant->id)->get()->toArray(),
         ];
 
         $json = json_encode($data, JSON_PRETTY_PRINT);
@@ -67,7 +66,7 @@ class BackupService
             // Delete primary records
             \Modules\ERP\Models\Invoice::where('tenant_id', $tenant->id)->delete();
             \Modules\ERP\Models\ERPTask::where('tenant_id', $tenant->id)->delete();
-            \Modules\ERP\Models\ClientWallet::where('tenant_id', $tenant->id)->delete();
+            // ClientWallet model removed — balance is computed from transactions
             \Modules\ERP\Models\RecurringEntry::where('tenant_id', $tenant->id)->delete();
             \Modules\ERP\Models\Project::where('tenant_id', $tenant->id)->delete();
             \Modules\ERP\Models\PaymentMethod::where('tenant_id', $tenant->id)->delete();
@@ -84,9 +83,7 @@ class BackupService
             if (isset($data['projects']) && count($data['projects']) > 0) {
                 DB::table('projects')->insert($data['projects']);
             }
-            if (isset($data['wallets']) && count($data['wallets']) > 0) {
-                DB::table('client_wallets')->insert($data['wallets']);
-            }
+            // wallets table removed — balance computed from transactions
             if (isset($data['tenant_notes']) && count($data['tenant_notes']) > 0) {
                 DB::table('tenant_notes')->insert($data['tenant_notes']);
             }
@@ -137,14 +134,8 @@ class BackupService
             if (isset($data['client_notes']) && count($data['client_notes']) > 0) {
                 DB::table('client_notes')->insert($data['client_notes']);
             }
-            if (isset($data['wallet_transactions']) && count($data['wallet_transactions']) > 0) {
-                // Some casts might be array, like metadata
-                foreach ($data['wallet_transactions'] as &$wt) {
-                    if (isset($wt['metadata']) && is_array($wt['metadata'])) {
-                        $wt['metadata'] = json_encode($wt['metadata']);
-                    }
-                }
-                DB::table('wallet_transactions')->insert($data['wallet_transactions']);
+            if (isset($data['transactions']) && count($data['transactions']) > 0) {
+                DB::table('erp_client_transactions')->insert($data['transactions']);
             }
         });
     }

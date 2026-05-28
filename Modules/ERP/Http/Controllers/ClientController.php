@@ -96,7 +96,7 @@ class ClientController extends Controller
             $client->id
         );
 
-        return back()->with('success', 'Client status updated.');
+        return back()->with('success', __('erp.client_status_updated'));
     }
 
     public function create()
@@ -104,7 +104,7 @@ class ClientController extends Controller
         $user = Auth::user();
         $tenant = Tenant::where('user_id', $user->id)->first();
         $hasMultiCurrency = $user->hasModuleSubscription('erp-multi-currency');
-        $baseCurrency = $tenant?->baseCurrency?->currency ?? 'USD';
+        $baseCurrency = $tenant?->baseCurrency?->currency;
 
         return Inertia::render('ERP/Clients/Create', [
             'currencies' => $hasMultiCurrency ? \App\Models\Currency::all() : [],
@@ -133,7 +133,7 @@ class ClientController extends Controller
         // If no currency provided (no multi-currency addon), use tenant's base currency
         $currencyCode = $validated['currency'] ?? null;
         if (!$currencyCode) {
-            $currencyCode = $tenant->baseCurrency?->currency ?? 'USD';
+            $currencyCode = $tenant->baseCurrency?->currency;
         }
         $currencyId = \App\Models\Currency::where('currency', $currencyCode)->value('id');
 
@@ -153,7 +153,7 @@ class ClientController extends Controller
             $client->id
         );
 
-        return redirect()->route('erp.dashboard', ['section' => 'clients'])->with('success', 'Client created successfully.');
+        return redirect()->route('erp.dashboard', ['section' => 'clients'])->with('success', __('erp.client_created_success'));
     }
 
     public function edit(TenantClient $client)
@@ -161,7 +161,7 @@ class ClientController extends Controller
         $tenantId = $this->resolveTenantId();
 
         if ($client->tenant_id !== $tenantId) {
-            abort(403, 'Unauthorized access to client.');
+            abort(403, __('erp.unauthorized_client_access'));
         }
 
         return Inertia::render('ERP/Clients/Edit', [
@@ -175,7 +175,7 @@ class ClientController extends Controller
         $tenantId = $this->resolveTenantId();
 
         if ($client->tenant_id !== $tenantId) {
-            abort(403, 'Unauthorized access to client.');
+            abort(403, __('erp.unauthorized_client_access'));
         }
 
         $validated = $request->validate([
@@ -198,7 +198,7 @@ class ClientController extends Controller
             $client->id
         );
 
-        return redirect()->route('erp.dashboard', ['section' => 'clients'])->with('success', 'Client updated successfully.');
+        return redirect()->route('erp.dashboard', ['section' => 'clients'])->with('success', __('erp.client_updated_success'));
     }
 
     /**
@@ -229,7 +229,7 @@ class ClientController extends Controller
                 'id' => $c->id,
                 'name' => $c->name,
                 'email' => $c->email,
-                'currency_code' => $c->currency?->currency ?? 'USD',
+                'currency_code' => $c->currency?->currency,
             ]);
 
         return response()->json($clients);
@@ -240,12 +240,12 @@ class ClientController extends Controller
         $tenantId = $this->resolveTenantId();
 
         if ($client->tenant_id !== $tenantId) {
-            abort(403, 'Unauthorized access to client.');
+            abort(403, __('erp.unauthorized_client_access'));
         }
 
         $hasOpenInvoices = $client->invoices()->whereNotIn('status', ['cancelled', 'paid'])->exists();
         if ($hasOpenInvoices) {
-            return back()->withErrors(['client' => 'Cannot delete a client with open invoices. Cancel or pay them first.']);
+            return back()->withErrors(['client' => __('erp.cannot_delete_client_open_invoices')]);
         }
 
         $clientName = $client->name;
@@ -259,6 +259,6 @@ class ClientController extends Controller
             ['tenant_id' => $tenantId]
         );
 
-        return back()->with('success', 'Client deleted successfully.');
+        return back()->with('success', __('erp.client_deleted_success'));
     }
 }

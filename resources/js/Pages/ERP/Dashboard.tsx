@@ -984,6 +984,50 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                 onCancel={() => setDeleteInvoiceConfirm({ open: false, invoice: null })}
             />
                         
+                        {/* 0. LOCKED ADDON OVERLAY */}
+                        {lockedAddons.some(a => a.id === currentSection) && (
+                            (() => {
+                                const lockedAddonItem = lockedAddons.find(a => a.id === currentSection)!;
+                                return (
+                                    <div className="max-w-4xl mx-auto space-y-6 pt-4">
+                                        <Card className="border-primary/20 bg-muted/10 shadow-none overflow-hidden relative mt-6">
+                                            <div className="absolute top-0 right-0 translate-x-12 -translate-y-12 opacity-5 pointer-events-none">
+                                                <Lock className="h-64 w-64 text-primary" />
+                                            </div>
+                                            <CardContent className="p-8 md:p-10 relative z-10 space-y-6">
+                                                <div className="flex items-center gap-2">
+                                                    <Lock className="h-5 w-5 text-primary" />
+                                                    <span className="font-semibold text-primary">Premium Feature</span>
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-foreground leading-tight">
+                                                        Unlock {lockedAddonItem.label}
+                                                    </h1>
+                                                    <p className="text-muted-foreground leading-relaxed max-w-2xl">
+                                                        {lockedAddonItem.description}
+                                                    </p>
+                                                    {lockedAddonItem.features && lockedAddonItem.features.length > 0 && (
+                                                        <ul className="list-disc pl-5 text-sm text-muted-foreground mt-4 space-y-1">
+                                                            {lockedAddonItem.features.map(f => <li key={f}>{f}</li>)}
+                                                        </ul>
+                                                    )}
+                                                </div>
+                                                <div className="pt-2">
+                                                    <Button 
+                                                        onClick={() => router.visit(route('subscriptions.plans', { module: 'erp' }))}
+                                                        className="shadow-none flex items-center gap-2 group h-11 px-8 transition-all"
+                                                    >
+                                                        Upgrade Workspace
+                                                        <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                                                    </Button>
+                                                </div>
+                                            </CardContent>
+                                        </Card>
+                                    </div>
+                                );
+                            })()
+                        )}
+
                         {/* 1. OVERVIEW (DASHBOARD) */}
                         {currentSection === 'overview' && (
                             <div className="space-y-10">
@@ -1036,6 +1080,7 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                                     {/* Main Content Column */}
                                     <div className="lg:col-span-2 space-y-8">
                                         
+                                        {auth?.erp_addons?.includes('erp-projects') && (
                                         <OperationalCard title="Active Projects" action={<button onClick={() => handleSetSection('projects')} className="text-sm text-primary hover:underline transition-colors">View all</button>}>
                                             <div className="space-y-3">
                                                 {projects.filter(p => p.status === 'Active' || p.status === 'Planning').slice(0, 3).map((proj) => (
@@ -1056,6 +1101,7 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                                                 ))}
                                             </div>
                                         </OperationalCard>
+                                        )}
 
                                         <OperationalCard title="Recent Invoices" noPadding action={<button onClick={() => handleSetSection('invoices')} className="text-sm text-primary hover:underline transition-colors">View all</button>}>
                                             <div className="divide-y divide-border/40">
@@ -1105,6 +1151,7 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                                                             </div>
                                                             <ChevronRight className="h-4 w-4 text-slate-400 group-hover:text-slate-600 transition-colors" />
                                                         </Link>
+                                                        {auth?.erp_addons?.includes('erp-projects') && (
                                                         <Link href={route("erp.projects.create")} className="w-full flex items-center justify-between p-3 rounded-xl border border-slate-100 bg-white hover:border-slate-300 hover:shadow-sm transition-all group">
                                                             <div className="flex items-center gap-3">
                                                                 <div className="bg-slate-50 p-2 rounded-lg group-hover:bg-white transition-colors">
@@ -1114,8 +1161,10 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                                                             </div>
                                                             <ChevronRight className="h-4 w-4 text-slate-400 group-hover:text-slate-600 transition-colors" />
                                                         </Link>
+                                                        )}
                                                     </>
                                                 )}
+                                                {auth?.erp_addons?.includes('erp-tasks') && (
                                                 <button onClick={() => handleSetSection('tasks')} className="w-full flex items-center justify-between p-3 rounded-xl border border-slate-100 bg-white hover:border-slate-300 hover:shadow-sm transition-all text-left group">
                                                     <div className="flex items-center gap-3">
                                                         <div className="bg-slate-50 p-2 rounded-lg group-hover:bg-white transition-colors">
@@ -1125,9 +1174,11 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                                                     </div>
                                                     <ChevronRight className="h-4 w-4 text-slate-400 group-hover:text-slate-600 transition-colors" />
                                                 </button>
+                                                )}
                                             </div>
                                         </div>
 
+                                        {auth?.erp_addons?.includes('erp-tasks') && (
                                         {/* Pending Tasks */}
                                         <div>
                                             <div className="flex items-center justify-between mb-4">
@@ -1150,6 +1201,7 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                                                 ))}
                                             </div>
                                         </div>
+                                        )}
 
                                         {/* Recent Activity */}
                                         <div>

@@ -21,7 +21,7 @@ class WalletTransaction extends TenantModel
     protected $table = 'erp_client_transactions';
 
     protected $fillable = [
-        'tenant_id', 'client_id', 'project_id', 'type',
+        'tenant_id', 'client_id', 'project_id', 'type', 'direction',
         'amount', 'currency_id', 'business_amount', 'business_currency_id',
         'exchange_rate', 'exchange_rate_date',
         'reference_type', 'reference_id', 'note', 'created_by'

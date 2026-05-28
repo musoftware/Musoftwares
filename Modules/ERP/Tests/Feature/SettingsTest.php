@@ -82,7 +82,7 @@ class SettingsTest extends TestCase
 
         // Create the active subscription for erp-multi-currency
         \App\Models\UserSubscription::create([
-            'client_id' => $user->id,
+            'user_id' => $user->id,
             'object' => 'erp-multi-currency',
             'status' => 'active',
             'started_at' => now(),

@@ -91,6 +91,12 @@ class InvoiceController extends Controller
         $tenant           = $this->resolveTenant();
         $baseCurrency     = Currency::find($tenant->base_currency_id);
 
+        $user = Auth::user();
+        if (Auth::guard('erp_team')->check()) {
+            $user = Auth::guard('erp_team')->user()->tenant->user ?? $user;
+        }
+        $hasProjectsAddon = $user ? $user->hasModuleSubscription('erp-projects') : false;
+
         $clients = TenantClient::with('currency')
             ->where('tenant_id', $tenant->id)
             ->get();
@@ -98,7 +104,7 @@ class InvoiceController extends Controller
         $preSelectedProjectId = $request->query('project_id') ? (int) $request->query('project_id') : null;
         $preSelectedClientId = $request->query('client_id') ? (int) $request->query('client_id') : null;
 
-        if ($preSelectedProjectId && !$preSelectedClientId) {
+        if ($hasProjectsAddon && $preSelectedProjectId && !$preSelectedClientId) {
             $project = \Modules\ERP\Models\Project::where('tenant_id', $tenant->id)->find($preSelectedProjectId);
             if ($project) {
                 $preSelectedClientId = (int) $project->client_id;
@@ -124,11 +130,12 @@ class InvoiceController extends Controller
         return Inertia::render('ERP/Invoices/Create', [
             'clients'           => $clients,
             'pre_selected_client' => $preSelectedClient,
-            'projects'          => \Modules\ERP\Models\Project::where('tenant_id', $tenant->id)->get(),
+            'projects'          => $hasProjectsAddon ? \Modules\ERP\Models\Project::where('tenant_id', $tenant->id)->get() : [],
+            'has_projects_addon'=> $hasProjectsAddon,
             'currencies'        => Currency::all(),
             'business_currency' => $baseCurrency ? $baseCurrency->currency : 'USD',
             'pre_selected_client_id' => $preSelectedClientId,
-            'pre_selected_project_id' => $preSelectedProjectId,
+            'pre_selected_project_id' => $hasProjectsAddon ? $preSelectedProjectId : null,
         ]);
     }
 
@@ -153,6 +160,14 @@ class InvoiceController extends Controller
         ]);
 
         $tenant = $this->resolveTenant();
+
+        $user = Auth::user();
+        if (Auth::guard('erp_team')->check()) {
+            $user = Auth::guard('erp_team')->user()->tenant->user ?? $user;
+        }
+        if (!$user || !$user->hasModuleSubscription('erp-projects')) {
+            $validated['project_id'] = null;
+        }
 
         // Validate uniqueness of invoice_number under the current tenant
         $exists = Invoice::where('tenant_id', $tenant->id)
@@ -293,6 +308,12 @@ class InvoiceController extends Controller
             abort(403, 'Unauthorized access to invoice.');
         }
 
+        $user = Auth::user();
+        if (Auth::guard('erp_team')->check()) {
+            $user = Auth::guard('erp_team')->user()->tenant->user ?? $user;
+        }
+        $hasProjectsAddon = $user ? $user->hasModuleSubscription('erp-projects') : false;
+
         $invoice->load(['items', 'costs', 'client.currency']);
         $baseCurrency = Currency::find($tenant->base_currency_id);
 
@@ -312,7 +333,8 @@ class InvoiceController extends Controller
             'invoice'           => $invoice,
             'clients'           => $clients,
             'pre_selected_client' => $currentClient,
-            'projects'          => \Modules\ERP\Models\Project::where('tenant_id', $tenant->id)->get(),
+            'projects'          => $hasProjectsAddon ? \Modules\ERP\Models\Project::where('tenant_id', $tenant->id)->get() : [],
+            'has_projects_addon'=> $hasProjectsAddon,
             'currencies'        => Currency::all(),
             'business_currency' => $baseCurrency ? $baseCurrency->currency : 'USD',
         ]);
@@ -346,6 +368,14 @@ class InvoiceController extends Controller
         $tenant = $this->resolveTenant();
         if ($invoice->tenant_id !== $tenant->id) {
             abort(403, 'Unauthorized access to invoice.');
+        }
+
+        $user = Auth::user();
+        if (Auth::guard('erp_team')->check()) {
+            $user = Auth::guard('erp_team')->user()->tenant->user ?? $user;
+        }
+        if (!$user || !$user->hasModuleSubscription('erp-projects')) {
+            $validated['project_id'] = null;
         }
 
         $client = TenantClient::with('currency')->where('tenant_id', $tenant->id)->findOrFail($validated['client_id']);

@@ -29,7 +29,7 @@ class SubscriptionModuleTest extends TestCase
         $user = User::factory()->create();
 
         UserSubscription::create([
-            'client_id' => $user->id,
+            'user_id' => $user->id,
             'object' => 'erp',
             'status' => 'active',
             'started_at' => now(),
@@ -51,7 +51,7 @@ class SubscriptionModuleTest extends TestCase
         $user = User::factory()->create();
 
         UserSubscription::create([
-            'client_id' => $user->id,
+            'user_id' => $user->id,
             'object' => 'erp',
             'status' => 'active',
             'started_at' => now()->subDays(60),
@@ -71,7 +71,7 @@ class SubscriptionModuleTest extends TestCase
         $user = User::factory()->create();
 
         UserSubscription::create([
-            'client_id' => $user->id,
+            'user_id' => $user->id,
             'object' => 'erp',
             'status' => 'active',
             'started_at' => now(),
@@ -87,7 +87,7 @@ class SubscriptionModuleTest extends TestCase
         $user = User::factory()->create();
 
         UserSubscription::create([
-            'client_id' => $user->id,
+            'user_id' => $user->id,
             'object' => 'erp',
             'status' => 'active',
             'started_at' => now(),
@@ -103,7 +103,7 @@ class SubscriptionModuleTest extends TestCase
         $user = User::factory()->create();
 
         UserSubscription::create([
-            'client_id' => $user->id,
+            'user_id' => $user->id,
             'object' => 'erp-backup',
             'status' => 'active',
             'started_at' => now()->subDays(60),
@@ -119,7 +119,7 @@ class SubscriptionModuleTest extends TestCase
         $user = User::factory()->create();
 
         UserSubscription::create([
-            'client_id' => $user->id,
+            'user_id' => $user->id,
             'object' => 'erp-backup',
             'status' => 'active',
             'started_at' => now(),
@@ -140,7 +140,7 @@ class SubscriptionModuleTest extends TestCase
         $service = app(SubscriptionService::class);
 
         UserSubscription::create([
-            'client_id' => $user->id,
+            'user_id' => $user->id,
             'object' => 'erp',
             'status' => 'active',
             'started_at' => now(),
@@ -165,7 +165,7 @@ class SubscriptionModuleTest extends TestCase
         $service = app(SubscriptionService::class);
 
         UserSubscription::create([
-            'client_id' => $user->id,
+            'user_id' => $user->id,
             'object' => 'crm',
             'status' => 'active',
             'started_at' => now(),
@@ -187,7 +187,7 @@ class SubscriptionModuleTest extends TestCase
         $user = User::factory()->create();
 
         UserSubscription::create([
-            'client_id' => $user->id,
+            'user_id' => $user->id,
             'object' => 'erp',
             'status' => 'active',
             'started_at' => now(),
@@ -196,7 +196,7 @@ class SubscriptionModuleTest extends TestCase
         ]);
 
         UserSubscription::create([
-            'client_id' => $user->id,
+            'user_id' => $user->id,
             'object' => 'erp-backup',
             'status' => 'active',
             'started_at' => now(),
@@ -217,7 +217,7 @@ class SubscriptionModuleTest extends TestCase
         $user = User::factory()->create();
 
         UserSubscription::create([
-            'client_id' => $user->id,
+            'user_id' => $user->id,
             'object' => 'erp-backup',
             'status' => 'active',
             'started_at' => now(),
@@ -247,7 +247,7 @@ class SubscriptionModuleTest extends TestCase
         $user = User::factory()->create();
 
         UserSubscription::create([
-            'client_id' => $user->id,
+            'user_id' => $user->id,
             'object' => 'erp-backup',
             'status' => 'active',
             'started_at' => now()->subDays(60),
@@ -318,7 +318,7 @@ class SubscriptionModuleTest extends TestCase
 
         // User already owns ERP
         UserSubscription::create([
-            'client_id' => $user->id,
+            'user_id' => $user->id,
             'object' => 'erp',
             'status' => 'active',
             'started_at' => now(),
@@ -335,7 +335,7 @@ class SubscriptionModuleTest extends TestCase
         $response->assertSessionHas('success');
 
         $this->assertDatabaseHas('user_subscriptions', [
-            'client_id' => $user->id,
+            'user_id' => $user->id,
             'object' => 'erp-backup',
             'status' => 'active',
         ]);
@@ -375,13 +375,13 @@ class SubscriptionModuleTest extends TestCase
         $response->assertSessionHas('success');
 
         $this->assertDatabaseHas('user_subscriptions', [
-            'client_id' => $user->id,
+            'user_id' => $user->id,
             'object' => 'erp',
             'status' => 'active',
         ]);
 
         $this->assertDatabaseHas('user_subscriptions', [
-            'client_id' => $user->id,
+            'user_id' => $user->id,
             'object' => 'erp-backup',
             'status' => 'active',
         ]);
@@ -406,7 +406,7 @@ class SubscriptionModuleTest extends TestCase
 
         $response->assertSessionHasErrors(['error']);
         $this->assertDatabaseMissing('user_subscriptions', [
-            'client_id' => $user->id,
+            'user_id' => $user->id,
             'object' => 'erp',
         ]);
     }
@@ -440,7 +440,7 @@ class SubscriptionModuleTest extends TestCase
         $user = User::factory()->create(['currency_id' => 1]);
 
         UserSubscription::create([
-            'client_id' => $user->id,
+            'user_id' => $user->id,
             'object' => 'erp',
             'status' => 'active',
             'started_at' => now(),
@@ -462,7 +462,7 @@ class SubscriptionModuleTest extends TestCase
         $user = User::factory()->create(['currency_id' => 1]);
 
         UserSubscription::create([
-            'client_id' => $user->id,
+            'user_id' => $user->id,
             'object' => 'erp',
             'status' => 'active',
             'started_at' => now(),
@@ -492,7 +492,7 @@ class SubscriptionModuleTest extends TestCase
         $user = User::factory()->create(['currency_id' => 1]);
 
         UserSubscription::create([
-            'client_id' => $user->id,
+            'user_id' => $user->id,
             'object' => 'erp',
             'status' => 'active',
             'started_at' => now(),
@@ -501,7 +501,7 @@ class SubscriptionModuleTest extends TestCase
         ]);
 
         UserSubscription::create([
-            'client_id' => $user->id,
+            'user_id' => $user->id,
             'object' => 'erp-backup',
             'status' => 'active',
             'started_at' => now(),
@@ -529,7 +529,7 @@ class SubscriptionModuleTest extends TestCase
         $user = User::factory()->create(['currency_id' => 1]);
 
         UserSubscription::create([
-            'client_id' => $user->id,
+            'user_id' => $user->id,
             'object' => 'erp-backup',
             'status' => 'active',
             'started_at' => now(),
@@ -550,7 +550,7 @@ class SubscriptionModuleTest extends TestCase
         $user = User::factory()->create(['currency_id' => 1]);
 
         UserSubscription::create([
-            'client_id' => $user->id,
+            'user_id' => $user->id,
             'object' => 'erp-backup',
             'status' => 'active',
             'started_at' => now()->subDays(60),
@@ -576,7 +576,7 @@ class SubscriptionModuleTest extends TestCase
         $user = User::factory()->create(['currency_id' => 1]);
 
         UserSubscription::create([
-            'client_id' => $user->id,
+            'user_id' => $user->id,
             'object' => 'erp',
             'status' => 'active',
             'started_at' => now(),
@@ -619,7 +619,7 @@ class SubscriptionModuleTest extends TestCase
         $columns = \Illuminate\Support\Facades\Schema::getColumnListing('user_subscriptions');
         $this->assertNotContains('plan_id', $columns);
         $this->assertContains('object', $columns);
-        $this->assertContains('client_id', $columns);
+        $this->assertContains('user_id', $columns);
         $this->assertContains('status', $columns);
         $this->assertContains('started_at', $columns);
         $this->assertContains('expires_at', $columns);
@@ -639,7 +639,7 @@ class SubscriptionModuleTest extends TestCase
         $originalExpiry = now()->addDays(30);
 
         UserSubscription::create([
-            'client_id' => $user->id,
+            'user_id' => $user->id,
             'object' => 'erp',
             'status' => 'active',
             'started_at' => now(),
@@ -656,7 +656,7 @@ class SubscriptionModuleTest extends TestCase
 
         $response->assertSessionHas('success');
 
-        $sub = UserSubscription::where('client_id', $user->id)->where('object', 'erp')->first();
+        $sub = UserSubscription::where('user_id', $user->id)->where('object', 'erp')->first();
 
         // Expiry should be extended beyond original
         $this->assertTrue(
