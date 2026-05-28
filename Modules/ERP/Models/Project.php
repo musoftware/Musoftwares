@@ -13,18 +13,25 @@ class Project extends TenantModel
 
     protected $fillable = [
         'tenant_id', 'client_id', 'name', 'description', 'status',
-        'budget', 'currency', 'due_date', 'completed_at', 'created_by'
+        'budget', 'currency', 'currency_id', 'due_date', 'completed_at', 'created_by'
     ];
 
     protected $casts = [
+        'tenant_id' => 'integer',
         'due_date' => 'date',
         'completed_at' => 'datetime',
         'budget' => 'decimal:2',
+        'currency_id' => 'integer',
     ];
 
     public function client(): BelongsTo
     {
         return $this->belongsTo(TenantClient::class, 'client_id');
+    }
+
+    public function currency(): BelongsTo
+    {
+        return $this->belongsTo(\App\Models\Currency::class, 'currency_id');
     }
 
     public function creator(): BelongsTo

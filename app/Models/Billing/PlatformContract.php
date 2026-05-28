@@ -14,6 +14,7 @@ class PlatformContract extends Model
     protected $table = 'contracts';
 
     protected $fillable = [
+        'uuid',
         'user_id',
         'project_id',
         'project_proposal_id',
@@ -61,6 +62,17 @@ class PlatformContract extends Model
         'includes_support' => 'boolean',
     ];
 
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($contract) {
+            if (empty($contract->uuid)) {
+                $contract->uuid = (string) \Illuminate\Support\Str::uuid();
+            }
+        });
+    }
+
     public function getCurrencyAttribute()
     {
         // Assuming currency_id 2 is EGP and 1 is USD
@@ -96,5 +108,10 @@ class PlatformContract extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function projectProposal()
+    {
+        return $this->belongsTo(ProjectProposal::class, 'project_proposal_id');
     }
 }

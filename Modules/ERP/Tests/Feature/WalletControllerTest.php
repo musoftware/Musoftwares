@@ -103,4 +103,50 @@ class WalletControllerTest extends TestCase
         // Verify balance did not change
         $this->assertEquals(0.00, (float)$client1->balance());
     }
+
+    public function test_manual_wallet_adjustments_with_project(): void
+    {
+        $user = User::factory()->create();
+        $tenant = Tenant::create(['user_id' => $user->id, 'name' => 'Acme Corp', 'status' => 'active']);
+        $client = TenantClient::create(['tenant_id' => $tenant->id, 'name' => 'Test Client', 'email' => 'test@example.com', 'currency_id' => 1]);
+        
+        $project = \Modules\ERP\Models\Project::create([
+            'tenant_id' => $tenant->id,
+            'client_id' => $client->id,
+            'name' => 'Acme Website',
+            'status' => 'Active',
+            'budget' => 1000.00,
+            'leader' => 'John Doe',
+            'currency_id' => 1,
+        ]);
+
+        // Credit with project_id
+        $response = $this->actingAs($user)->withSession(['tenant_id' => $tenant->id])->post("/erp/clients/{$client->id}/wallet/credit", [
+            'amount' => 500.00,
+            'note' => 'Project milestone deposit',
+            'project_id' => $project->id,
+        ]);
+
+        $response->assertRedirect(route('erp.projects.show', $project->id));
+        $this->assertEquals(500.00, (float)$client->balance());
+
+        $transaction = ClientWalletTransaction::where('project_id', $project->id)->first();
+        $this->assertNotNull($transaction);
+        $this->assertEquals(500.00, (float)$transaction->amount);
+        $this->assertEquals('credit', $transaction->direction);
+
+        // Debit with project_id
+        $response = $this->actingAs($user)->withSession(['tenant_id' => $tenant->id])->post("/erp/clients/{$client->id}/wallet/debit", [
+            'amount' => 200.00,
+            'note' => 'Project design costs',
+            'project_id' => $project->id,
+        ]);
+
+        $response->assertRedirect(route('erp.projects.show', $project->id));
+        $this->assertEquals(300.00, (float)$client->balance());
+
+        $debitTransaction = ClientWalletTransaction::where('project_id', $project->id)->where('direction', 'debit')->first();
+        $this->assertNotNull($debitTransaction);
+        $this->assertEquals(200.00, (float)$debitTransaction->amount);
+    }
 }

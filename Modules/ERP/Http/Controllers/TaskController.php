@@ -60,9 +60,10 @@ class TaskController extends Controller
             ->through(fn($task) => $this->shapeTask($task));
 
         return Inertia::render('ERP/Tasks/Index', [
-            'tasks'   => $tasks,
-            'clients' => TenantClient::where('tenant_id', $tenant->id)->select('id', 'name')->get(),
-            'filters' => $request->only(['client_id', 'status', 'show_archived']),
+            'tasks'    => $tasks,
+            'clients'  => TenantClient::where('tenant_id', $tenant->id)->select('id', 'name')->get(),
+            'projects' => Project::where('tenant_id', $tenant->id)->select('id', 'name', 'client_id')->get(),
+            'filters'  => $request->only(['client_id', 'status', 'show_archived']),
         ]);
     }
 

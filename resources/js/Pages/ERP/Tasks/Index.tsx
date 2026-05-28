@@ -50,6 +50,12 @@ interface Client {
     name: string;
 }
 
+interface Project {
+    id: number;
+    name: string;
+    client_id: number;
+}
+
 interface IndexProps {
     tasks: {
         data: Task[];
@@ -58,6 +64,7 @@ interface IndexProps {
         last_page: number;
     };
     clients: Client[];
+    projects: Project[];
     filters: {
         client_id?: string;
         status?: string;
@@ -65,7 +72,7 @@ interface IndexProps {
     };
 }
 
-export default function Index({ tasks, clients, filters }: IndexProps) {
+export default function Index({ tasks, clients, projects = [], filters }: IndexProps) {
     const [isCreateOpen, setIsCreateOpen] = useState(false);
     
     // Filters form
@@ -80,6 +87,7 @@ export default function Index({ tasks, clients, filters }: IndexProps) {
         task_name: '',
         task_description: '',
         client_id: '',
+        project_id: '',
         priority: 'normal',
         status: 'open',
         due_date: '',
@@ -456,7 +464,13 @@ export default function Index({ tasks, clients, filters }: IndexProps) {
                                 <select
                                     id="client_id"
                                     value={data.client_id}
-                                    onChange={(e) => setData('client_id', e.target.value)}
+                                    onChange={(e) => {
+                                        setData(prev => ({
+                                            ...prev,
+                                            client_id: e.target.value,
+                                            project_id: ''
+                                        }));
+                                    }}
                                     className="w-full rounded-md border border-input bg-transparent px-3 py-1.5 text-xs shadow-none focus:outline-none focus:ring-1 focus:ring-ring"
                                     required
                                 >
@@ -468,6 +482,28 @@ export default function Index({ tasks, clients, filters }: IndexProps) {
                                 {errors.client_id && <p className="text-rose-500 text-[11px] font-medium">{errors.client_id}</p>}
                             </div>
 
+                            {/* Project ID */}
+                            <div className="space-y-1.5">
+                                <Label htmlFor="project_id" className="text-xs font-semibold text-foreground">Select Project</Label>
+                                <select
+                                    id="project_id"
+                                    value={data.project_id}
+                                    onChange={(e) => setData('project_id', e.target.value)}
+                                    className="w-full rounded-md border border-input bg-transparent px-3 py-1.5 text-xs shadow-none focus:outline-none focus:ring-1 focus:ring-ring"
+                                    disabled={!data.client_id}
+                                >
+                                    <option value="">None (Independent Board)</option>
+                                    {projects
+                                        .filter(p => String(p.client_id) === String(data.client_id))
+                                        .map((p) => (
+                                            <option key={p.id} value={p.id}>{p.name}</option>
+                                        ))}
+                                </select>
+                                {errors.project_id && <p className="text-rose-500 text-[11px] font-medium">{errors.project_id}</p>}
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-4">
                             {/* Priority */}
                             <div className="space-y-1.5">
                                 <Label htmlFor="priority" className="text-xs font-semibold text-foreground">Priority Level</Label>
@@ -484,9 +520,7 @@ export default function Index({ tasks, clients, filters }: IndexProps) {
                                 </select>
                                 {errors.priority && <p className="text-rose-500 text-[11px] font-medium">{errors.priority}</p>}
                             </div>
-                        </div>
 
-                        <div className="grid grid-cols-2 gap-4">
                             {/* Status */}
                             <div className="space-y-1.5">
                                 <Label htmlFor="status" className="text-xs font-semibold text-foreground">Initial Status</Label>
@@ -503,19 +537,19 @@ export default function Index({ tasks, clients, filters }: IndexProps) {
                                 </select>
                                 {errors.status && <p className="text-rose-500 text-[11px] font-medium">{errors.status}</p>}
                             </div>
+                        </div>
 
-                            {/* Due Date */}
-                            <div className="space-y-1.5">
-                                <Label htmlFor="due_date" className="text-xs font-semibold text-foreground">Target Due Date</Label>
-                                <Input 
-                                    id="due_date"
-                                    type="date"
-                                    value={data.due_date}
-                                    onChange={(e) => setData('due_date', e.target.value)}
-                                    className="shadow-none h-9 text-xs"
-                                />
-                                {errors.due_date && <p className="text-rose-500 text-[11px] font-medium">{errors.due_date}</p>}
-                            </div>
+                        {/* Due Date */}
+                        <div className="space-y-1.5">
+                            <Label htmlFor="due_date" className="text-xs font-semibold text-foreground">Target Due Date</Label>
+                            <Input 
+                                id="due_date"
+                                type="date"
+                                value={data.due_date}
+                                onChange={(e) => setData('due_date', e.target.value)}
+                                className="shadow-none h-9 text-xs"
+                            />
+                            {errors.due_date && <p className="text-rose-500 text-[11px] font-medium">{errors.due_date}</p>}
                         </div>
 
                         <DialogFooter className="pt-4 border-t border-border mt-4">

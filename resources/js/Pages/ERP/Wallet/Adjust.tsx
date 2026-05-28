@@ -12,6 +12,11 @@ import { CurrencyDisplay } from '@/Components/ui/CurrencyDisplay';
 export default function AdjustWallet({ client, wallet }: { client: any, wallet: any }) {
     const searchParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
     const initialType = searchParams ? (searchParams.get('type') === 'debit' ? 'debit' : 'credit') : 'credit';
+    const projectId = searchParams ? searchParams.get('project_id') : null;
+
+    const backRoute = projectId 
+        ? route('erp.projects.show', projectId) 
+        : route('erp.dashboard', { section: 'clients' });
 
     const [form, setForm] = useState({
         type: initialType,
@@ -30,7 +35,8 @@ export default function AdjustWallet({ client, wallet }: { client: any, wallet: 
         
         router.post(endpoint, {
             amount: form.amount,
-            note: form.note
+            note: form.note,
+            ...(projectId ? { project_id: projectId } : {})
         }, {
             onSuccess: () => setIsSubmitting(false),
             onError: (errs) => {
@@ -46,7 +52,7 @@ export default function AdjustWallet({ client, wallet }: { client: any, wallet: 
 
             <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-6">
                 <div className="flex items-center gap-4">
-                    <Link href={route('erp.dashboard', { section: 'clients' })} className="text-slate-400 hover:text-slate-900 transition-colors">
+                    <Link href={backRoute} className="text-slate-400 hover:text-slate-900 transition-colors">
                         <ArrowLeft className="w-5 h-5" />
                     </Link>
                     <div>
@@ -124,7 +130,7 @@ export default function AdjustWallet({ client, wallet }: { client: any, wallet: 
                                 </div>
                                 
                                 <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-200">
-                                    <Link href={route('erp.dashboard', { section: 'clients' })}>
+                                    <Link href={backRoute}>
                                         <Button type="button" variant="ghost" className="text-slate-500 hover:text-slate-900 hover:bg-slate-100">
                                             Cancel
                                         </Button>

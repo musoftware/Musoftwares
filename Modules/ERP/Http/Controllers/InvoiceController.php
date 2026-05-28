@@ -95,12 +95,22 @@ class InvoiceController extends Controller
             ->where('tenant_id', $tenant->id)
             ->get();
 
+        $preSelectedProjectId = $request->query('project_id') ? (int) $request->query('project_id') : null;
+        $preSelectedClientId = $request->query('client_id') ? (int) $request->query('client_id') : null;
+
+        if ($preSelectedProjectId && !$preSelectedClientId) {
+            $project = \Modules\ERP\Models\Project::where('tenant_id', $tenant->id)->find($preSelectedProjectId);
+            if ($project) {
+                $preSelectedClientId = (int) $project->client_id;
+            }
+        }
+
         // Only send the pre-selected client (if any)
         $preSelectedClient = null;
-        if ($request->query('client_id')) {
+        if ($preSelectedClientId) {
             $preSelectedClient = TenantClient::with('currency')
                 ->where('tenant_id', $tenant->id)
-                ->find($request->query('client_id'));
+                ->find($preSelectedClientId);
             if ($preSelectedClient) {
                 $preSelectedClient = [
                     'id' => $preSelectedClient->id,
@@ -117,7 +127,8 @@ class InvoiceController extends Controller
             'projects'          => \Modules\ERP\Models\Project::where('tenant_id', $tenant->id)->get(),
             'currencies'        => Currency::all(),
             'business_currency' => $baseCurrency ? $baseCurrency->currency : 'USD',
-            'pre_selected_client_id' => $request->query('client_id'),
+            'pre_selected_client_id' => $preSelectedClientId,
+            'pre_selected_project_id' => $preSelectedProjectId,
         ]);
     }
 

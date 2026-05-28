@@ -25,9 +25,6 @@ class ProjectController extends Controller
         ]);
     }
 
-    /**
-     * Store a newly created project in storage.
-     */
     public function store(Request $request)
     {
         $user = Auth::user();
@@ -45,12 +42,15 @@ class ProjectController extends Controller
             'due_date' => 'nullable|date',
         ]);
 
+        $client = TenantClient::where('tenant_id', $tenant->id)->findOrFail($validated['client_id']);
+
         $project = Project::create([
             'tenant_id' => $tenant->id,
             'client_id' => $validated['client_id'],
             'name' => $validated['name'],
             'status' => $validated['status'],
             'budget' => $validated['budget'] ?? 0,
+            'currency_id' => $client->currency_id,
             'due_date' => $validated['due_date'] ?? null,
             'created_by' => $user->id,
         ]);
@@ -104,11 +104,14 @@ class ProjectController extends Controller
             'due_date' => 'nullable|date',
         ]);
 
+        $client = TenantClient::where('tenant_id', $tenant->id)->findOrFail($validated['client_id']);
+
         $project->update([
             'name' => $validated['name'],
             'client_id' => $validated['client_id'],
             'status' => $validated['status'],
             'budget' => $validated['budget'] ?? 0,
+            'currency_id' => $client->currency_id,
             'due_date' => $validated['due_date'] ?? null,
         ]);
 
@@ -164,7 +167,7 @@ class ProjectController extends Controller
         $businessCurrency = $currency ? $currency->currency : 'USD';
 
         // Load project relationships
-        $project->load(['client', 'creator']);
+        $project->load(['client', 'creator', 'currency']);
 
         // Get invoices linked to this project
         $invoices = Invoice::where('project_id', $project->id)
@@ -196,6 +199,12 @@ class ProjectController extends Controller
 
         // Net income/revenue
         $netRevenueBusiness = $totalPaidBusiness - $totalExpensesBusiness;
+
+        // Get transactions linked to this project
+        $transactions = \Modules\ERP\Models\WalletTransaction::where('project_id', $project->id)
+            ->with(['creator', 'currency'])
+            ->latest()
+            ->get();
 
         // Fetch tasks
         $tasks = ERPTask::where('project_id', $project->id)
@@ -254,9 +263,14 @@ class ProjectController extends Controller
                     'email' => $project->client->email,
                 ] : null,
                 'leader' => $project->creator?->name ?? '-',
+                'currency' => $project->currency ? [
+                    'id' => $project->currency->id,
+                    'currency' => $project->currency->currency,
+                ] : null,
             ],
             'stats' => [
                 'businessCurrency' => $businessCurrency,
+                'projectCurrency' => $project->currency?->currency ?? 'USD',
                 'paidInvoicesCount' => $paidCount,
                 'unpaidInvoicesCount' => $unpaidCount,
                 'totalInvoicesCount' => $totalCount,
@@ -275,6 +289,20 @@ class ProjectController extends Controller
                     'business_amount' => round((float) $inv->business_amount, 2),
                     'currency' => $inv->amount_currency,
                     'created_at' => $inv->created_at?->format('Y-m-d'),
+                ];
+            }),
+            'transactions' => $transactions->map(function ($txn) use ($businessCurrency) {
+                return [
+                    'id' => $txn->id,
+                    'reference_id' => '#TXN-' . str_pad($txn->id, 4, '0', STR_PAD_LEFT),
+                    'type' => $txn->type,
+                    'note' => $txn->note ?? 'No details provided',
+                    'direction' => strtoupper($txn->direction),
+                    'amount' => round($txn->amount, 2),
+                    'business_amount' => round($txn->business_amount ?? $txn->amount, 2),
+                    'currency' => $txn->currency?->currency ?? $businessCurrency,
+                    'date' => $txn->created_at?->format('Y-m-d H:i'),
+                    'authorizer' => $txn->creator?->name ?? 'System Core',
                 ];
             }),
             'expenses' => $expenses->map(function ($exp) {

@@ -62,6 +62,7 @@ Buttons must feel obvious, calm, and direct.
 ## 6. Form Design Rules
 - Avoid giant forms, massive settings pages, textarea-heavy interfaces, and config overload.
 - Prefer step-by-step wizards, cards, previews, guided builders, and smart defaults.
+- **Full Width Layout:** Every Create and Edit form container (the card or section wrapping the form fields) must occupy the **full width** of the main content area (e.g., using `w-full` or equivalent). Do not restrict forms to narrow max-widths (like `max-w-md` or `max-w-2xl`) or center them with massive empty margins on either side.
 
 ## 7. Defaults Philosophy
 The system should **intelligently choose defaults**.
