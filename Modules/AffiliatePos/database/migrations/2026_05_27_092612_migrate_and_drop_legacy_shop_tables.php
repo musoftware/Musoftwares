@@ -23,7 +23,7 @@ return new class extends Migration
                 'id' => $product->id,
                 'user_id' => $product->user_id ?? 1, // Default fallback
                 'category_id' => $product->category_id ?? null,
-                'name' => $product->name,
+                'name' => $product->name ?? $product->title ?? 'Unnamed Product',
                 'code' => $product->sku ?? null,
                 'price' => $product->price ?? 0,
                 'old_price' => $product->compare_price ?? null,

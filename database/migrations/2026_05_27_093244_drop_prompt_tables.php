@@ -11,10 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
+        \Illuminate\Support\Facades\DB::statement('SET FOREIGN_KEY_CHECKS=0;');
         Schema::dropIfExists('prompt_correct_history_inlines');
         Schema::dropIfExists('prompt_correct_histories');
         Schema::dropIfExists('prompt_generation_sessions');
         Schema::dropIfExists('prompt_generations');
+        \Illuminate\Support\Facades\DB::statement('SET FOREIGN_KEY_CHECKS=1;');
     }
 
     /**

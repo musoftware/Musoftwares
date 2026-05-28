@@ -35,7 +35,7 @@ return new class extends Migration
                     'target_amount' => 0,
                     'balance_grams' => 0,
                     'balance_amount' => 0,
-                    'currency' => 'EGP', // Assuming default currency based on legacy data
+                    'currency_id' => 1, // Assuming default currency based on legacy data
                     'created_at' => now(),
                     'updated_at' => now(),
                 ]);

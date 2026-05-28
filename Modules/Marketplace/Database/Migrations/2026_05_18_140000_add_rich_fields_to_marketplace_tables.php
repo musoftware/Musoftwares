@@ -9,7 +9,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('marketplace_services', function (Blueprint $table) {
-            $table->json('tags')->nullable()->after('is_featured');
+            $table->json('tags')->nullable();
             $table->json('faq')->nullable()->after('tags');
             $table->json('requirements')->nullable()->after('faq');
             $table->json('gallery')->nullable()->after('requirements');
