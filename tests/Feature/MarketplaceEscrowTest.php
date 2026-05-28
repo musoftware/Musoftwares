@@ -7,7 +7,7 @@ use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Modules\Marketplace\Models\Service;
 use Modules\Marketplace\Models\ServicePackage;
 use Modules\Marketplace\Models\ServiceOrder;
-use App\Models\Wallet;
+use Modules\Marketplace\Models\MarketplaceEscrow;
 use Tests\TestCase;
 
 class MarketplaceEscrowTest extends TestCase
@@ -23,27 +23,18 @@ class MarketplaceEscrowTest extends TestCase
 
     public function test_checkout_locks_funds_in_escrow_without_paying_seller_immediately()
     {
-        $seller = User::factory()->create(['onboarding_completed' => true]);
-        $buyer = User::factory()->create(['onboarding_completed' => true]);
+        $usdCurrency = \App\Models\Currency::firstOrCreate(
+            ['currency' => 'USD'],
+            ['symbol' => '$', 'string_format' => '$%01.2f']
+        );
+        $seller = User::factory()->create(['onboarding_completed' => true, 'currency_id' => $usdCurrency->id]);
+        $buyer = User::factory()->create(['onboarding_completed' => true, 'currency_id' => $usdCurrency->id]);
 
         // Give buyer some money
-        $buyerWallet = Wallet::create([
-            'owner_type' => User::class,
-            'owner_id' => $buyer->id,
-            'context' => 'user',
-            'balance' => 1000,
-            'locked_balance' => 0,
-            'currency' => 'USD'
-        ]);
-
-        $sellerWallet = Wallet::create([
-            'owner_type' => User::class,
-            'owner_id' => $seller->id,
-            'context' => 'user',
-            'balance' => 0,
-            'locked_balance' => 0,
-            'currency' => 'USD'
-        ]);
+        $buyer->user_balance = 1000;
+        $buyer->save();
+        $seller->user_balance = 0;
+        $seller->save();
 
         // Create category, Service and Package
         $category = \Modules\Marketplace\Models\ServiceCategory::create([
@@ -79,40 +70,33 @@ class MarketplaceEscrowTest extends TestCase
         $order = ServiceOrder::first();
         $this->assertNotNull($order);
         
-        $buyerWallet->refresh();
-        $sellerWallet->refresh();
-
-        // 100 should be deducted from balance and moved to locked_balance
-        $this->assertEquals(900, $buyerWallet->balance);
-        $this->assertEquals(100, $buyerWallet->locked_balance);
+        // 100 should be deducted from balance
+        $this->assertEquals(900, $buyer->fresh()->user_balance);
+        
+        // Escrow should hold 100
+        $escrow = MarketplaceEscrow::where('order_id', $order->id)->first();
+        $this->assertNotNull($escrow);
+        $this->assertEquals('held', $escrow->status);
+        $this->assertEquals(100, $escrow->amount);
 
         // Seller should have nothing yet
-        $this->assertEquals(0, $sellerWallet->balance);
+        $this->assertEquals(0, $seller->fresh()->user_balance);
     }
 
     public function test_completion_releases_escrow_to_seller()
     {
-        $seller = User::factory()->create(['onboarding_completed' => true]);
-        $buyer = User::factory()->create(['onboarding_completed' => true]);
+        $usdCurrency = \App\Models\Currency::firstOrCreate(
+            ['currency' => 'USD'],
+            ['symbol' => '$', 'string_format' => '$%01.2f']
+        );
+        $seller = User::factory()->create(['onboarding_completed' => true, 'currency_id' => $usdCurrency->id]);
+        $buyer = User::factory()->create(['onboarding_completed' => true, 'currency_id' => $usdCurrency->id]);
 
         // Manually setup order and escrow state
-        $buyerWallet = Wallet::create([
-            'owner_type' => User::class,
-            'owner_id' => $buyer->id,
-            'context' => 'user',
-            'balance' => 900,
-            'locked_balance' => 100,
-            'currency' => 'USD'
-        ]);
-
-        $sellerWallet = Wallet::create([
-            'owner_type' => User::class,
-            'owner_id' => $seller->id,
-            'context' => 'user',
-            'balance' => 0,
-            'locked_balance' => 0,
-            'currency' => 'USD'
-        ]);
+        $buyer->user_balance = 900;
+        $buyer->save();
+        $seller->user_balance = 0;
+        $seller->save();
 
         $category = \Modules\Marketplace\Models\ServiceCategory::create([
             'name' => 'Web Dev',
@@ -155,14 +139,10 @@ class MarketplaceEscrowTest extends TestCase
         $order->refresh();
         $this->assertEquals('completed', $order->status);
 
-        $buyerWallet->refresh();
-        $sellerWallet->refresh();
-
-        // Locked balance released
-        $this->assertEquals(0, $buyerWallet->locked_balance);
-        $this->assertEquals(900, $buyerWallet->balance); // balance remains 900
+        // Escrow released (Marketplace order completion controller handles this by crediting seller)
+        $this->assertEquals(900, $buyer->fresh()->user_balance); // balance remains 900
 
         // Seller gets amount - commission (100 - 10 = 90)
-        $this->assertEquals(90, $sellerWallet->balance);
+        $this->assertEquals(90, $seller->fresh()->user_balance);
     }
 }

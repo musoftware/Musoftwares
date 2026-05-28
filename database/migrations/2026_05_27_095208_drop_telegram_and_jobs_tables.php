@@ -13,8 +13,10 @@ return new class extends Migration
     {
         Schema::dropIfExists('telegram_saved_messages');
         Schema::dropIfExists('telegram_user_sessions');
-        Schema::dropIfExists('telegram_message_folders');
+        Schema::disableForeignKeyConstraints();
+        Schema::dropIfExists('telegram_groups');
         Schema::dropIfExists('jobs_and_tasks');
+        Schema::enableForeignKeyConstraints();
     }
 
     /**

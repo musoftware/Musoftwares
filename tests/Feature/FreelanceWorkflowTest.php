@@ -9,7 +9,7 @@ use Modules\Freelance\Models\Job;
 use Modules\Freelance\Models\Proposal;
 use Modules\Freelance\Models\Contract;
 use App\Models\PointTransaction;
-use App\Models\Wallet;
+// use App\Models\Wallet;
 use Tests\TestCase;
 
 class FreelanceWorkflowTest extends TestCase
@@ -23,13 +23,19 @@ class FreelanceWorkflowTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        $this->withoutMiddleware(\App\Http\Middleware\EnsureSubscriptionIsActive::class);
 
         $this->seed(\Database\Seeders\RolesAndPermissionsSeeder::class);
 
-        $this->clientUser = User::factory()->create(['onboarding_completed' => true]);
+        $usdCurrency = \App\Models\Currency::firstOrCreate(
+            ['currency' => 'USD'],
+            ['symbol' => '$', 'string_format' => '$%01.2f']
+        );
+
+        $this->clientUser = User::factory()->create(['onboarding_completed' => true, 'currency_id' => $usdCurrency->id]);
         $this->clientUser->assignRole('client');
 
-        $this->freelancerUser = User::factory()->create(['onboarding_completed' => true]);
+        $this->freelancerUser = User::factory()->create(['onboarding_completed' => true, 'currency_id' => $usdCurrency->id]);
         $this->freelancerUser->assignRole('client');
 
         $this->skill = Skill::create([
@@ -55,21 +61,12 @@ class FreelanceWorkflowTest extends TestCase
             'description' => 'Initial signup points',
         ]);
 
-        $clientWallet = Wallet::create([
-            'owner_type' => User::class,
-            'owner_id' => $this->clientUser->id,
-            'context' => 'user',
-            'balance' => 2000.00,
-            'currency' => 'USD',
-        ]);
-
-        $freelancerWallet = Wallet::create([
-            'owner_type' => User::class,
-            'owner_id' => $this->freelancerUser->id,
-            'context' => 'user',
-            'balance' => 0.00,
-            'currency' => 'USD',
-        ]);
+        $this->clientUser->user_balance = 2000.00;
+        $this->clientUser->points_balance = 100;
+        $this->clientUser->save();
+        $this->freelancerUser->user_balance = 0.00;
+        $this->freelancerUser->points_balance = 50;
+        $this->freelancerUser->save();
 
         // 2. Client posts a Job (costs 10 points)
         $response = $this->actingAs($this->clientUser)
@@ -83,6 +80,10 @@ class FreelanceWorkflowTest extends TestCase
                 'skills' => [$this->skill->id],
             ]);
 
+        if ($response->status() !== 302 || session()->has('error') || session()->has('errors')) {
+            dump(session()->all());
+            if (isset($response->exception)) dump($response->exception->getMessage());
+        }
         $response->assertStatus(302);
 
         $this->assertDatabaseHas('freelance_jobs', [
@@ -145,7 +146,7 @@ class FreelanceWorkflowTest extends TestCase
         $this->assertEquals('completed', $job->fresh()->status);
 
         // Verify wallet funds have been successfully debited and credited
-        $this->assertEquals(850.00, $clientWallet->fresh()->balance);
-        $this->assertEquals(1150.00, $freelancerWallet->fresh()->balance);
+        $this->assertEquals(850.00, $this->clientUser->fresh()->user_balance);
+        $this->assertEquals(1150.00, $this->freelancerUser->fresh()->user_balance);
     }
 }

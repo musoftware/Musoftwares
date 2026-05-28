@@ -98,6 +98,10 @@ class ServiceOrderController extends Controller
                 'buyer_wallet_transaction_id' => $transactionId,
                 'amount' => $package->price,
                 'amount_currency' => $package->currency_id,
+                'business_amount' => $commissionAmount,
+                'business_amount_currency' => $package->currency_id,
+                'exchange_rate' => 1,
+                'exchange_rate_date' => now()->toDateString(),
                 'status' => 'held'
             ]);
 

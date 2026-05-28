@@ -42,18 +42,20 @@ class PointPurchaseTest extends TestCase
         $this->user->currency_id = $usdCurrency->id;
         $this->user->save();
 
-        \App\Models\CurrenciesExchange::create([
+        \App\Models\CurrenciesExchange::updateOrCreate([
             'currency1' => $egpCurrency->id,
             'currency2' => $usdCurrency->id,
+            'date_string' => now()->toDateString(),
+        ], [
             'rate' => 0.02,
-            'date_string' => '2020-01-01',
         ]);
 
-        \App\Models\CurrenciesExchange::create([
+        \App\Models\CurrenciesExchange::updateOrCreate([
             'currency1' => $usdCurrency->id,
             'currency2' => $egpCurrency->id,
+            'date_string' => now()->toDateString(),
+        ], [
             'rate' => 50.00,
-            'date_string' => '2020-01-01',
         ]);
 
         // Points package: Starter Pack (100 points, 100 EGP price)
@@ -73,6 +75,9 @@ class PointPurchaseTest extends TestCase
             'package_id' => $this->package->id,
         ]);
 
+        if (!session()->has('success')) {
+            $response->dumpSession();
+        }
         $response->assertStatus(302);
         $response->assertSessionHas('success');
 
