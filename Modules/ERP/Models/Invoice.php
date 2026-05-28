@@ -49,21 +49,9 @@ class Invoice extends TenantModel
         return $this->belongsTo(\App\Models\Currency::class, 'currency_id');
     }
 
-    public function platformClient(): BelongsTo
-    {
-        return $this->belongsTo(\App\Models\User::class, 'client_id');
-    }
-
-    public function tenantClient(): BelongsTo
+    public function client(): BelongsTo
     {
         return $this->belongsTo(TenantClient::class, 'client_id');
-    }
-
-    public function getClientAttribute()
-    {
-        return (empty($this->tenant_id) || $this->tenant_id === Tenant::platformId())
-            ? $this->platformClient 
-            : $this->tenantClient;
     }
 
     public function project(): BelongsTo
@@ -385,8 +373,11 @@ class Invoice extends TenantModel
                     $wallet->update(['balance' => $balanceAfter]);
                 }
 
-                // Cancel related referral earnings
-                $this->referralEarnings()->update(['status' => 'cancelled']);
+                // Cancel related referral earnings if addon is active
+                $owner = $this->tenant?->user;
+                if ($owner && $owner->hasModuleSubscription('erp-referrals')) {
+                    $this->referralEarnings()->update(['status' => 'cancelled']);
+                }
             }
 
             $this->update([
@@ -411,6 +402,11 @@ class Invoice extends TenantModel
      */
     protected function processReferralCommissions(): void
     {
+        $owner = $this->tenant?->user;
+        if (!$owner || !$owner->hasModuleSubscription('erp-referrals')) {
+            return;
+        }
+
         $client = $this->client;
         if (!$client || !$client->referred_by) {
             return;

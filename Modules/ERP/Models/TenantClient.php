@@ -11,8 +11,19 @@ class TenantClient extends TenantModel
 
     protected $fillable = [
         'tenant_id', 'user_id', 'name', 'email', 'phone', 'address', 'currency_id',
-        'country_id', 'status'
+        'country_id', 'status', 'referral_code', 'referred_by'
     ];
+
+    protected static function booted()
+    {
+        parent::booted();
+
+        static::creating(function ($client) {
+            if (empty($client->referral_code)) {
+                $client->referral_code = 'REF-' . strtoupper(\Illuminate\Support\Str::random(8));
+            }
+        });
+    }
 
     public function currency()
     {
@@ -80,6 +91,16 @@ class TenantClient extends TenantModel
     public function tickets(): HasMany
     {
         return $this->hasMany(SupportTicket::class, 'client_id');
+    }
+
+    public function referrer(): BelongsTo
+    {
+        return $this->belongsTo(TenantClient::class, 'referred_by');
+    }
+
+    public function referrals(): HasMany
+    {
+        return $this->hasMany(TenantClient::class, 'referred_by');
     }
 }
 

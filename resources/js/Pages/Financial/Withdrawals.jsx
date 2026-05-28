@@ -9,6 +9,7 @@ import { Button } from '@/Components/ui/button';
 import { Label } from '@/Components/ui/label';
 import { Input } from '@/Components/ui/input';
 import Modal from '@/Components/Modal';
+import { formatMoney } from '@/lib/utils';
 
 export default function Withdrawals({ auth, withdrawals, payoutMethods, wallet }) {
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -41,8 +42,8 @@ export default function Withdrawals({ auth, withdrawals, payoutMethods, wallet }
                         <div className="space-y-2 text-center md:text-left">
                             <span className="text-sm font-semibold text-primary uppercase tracking-wider">Available Earned Funds</span>
                             <div className="text-4xl sm:text-5xl font-bold tracking-tight">
-                                {maxAvailable.toFixed(2)} <span className="text-xl sm:text-2xl font-normal text-muted-foreground">{wallet?.currency || 'USD'}</span>
-                            </div>
+                                {formatMoney(maxAvailable, wallet?.currency || 'USD')}
+                             </div>
                             <p className="text-sm text-muted-foreground">You can only withdraw funds that have been earned on the platform.</p>
                         </div>
 
@@ -108,7 +109,7 @@ export default function Withdrawals({ auth, withdrawals, payoutMethods, wallet }
                                                 {w.payout_method ? w.payout_method.type.replace('_', ' ') : 'Standard Method'}
                                             </TableCell>
                                             <TableCell className="font-semibold">
-                                                {Number(w.amount).toFixed(2)} {w.currency || 'USD'}
+                                                {formatMoney(w.amount, w.currency || 'USD')}
                                             </TableCell>
                                             <TableCell>
                                                 <Badge variant={
@@ -140,7 +141,7 @@ export default function Withdrawals({ auth, withdrawals, payoutMethods, wallet }
                         
                         <form onSubmit={handleSubmit} className="space-y-6">
                             <div className="space-y-2">
-                                <Label htmlFor="amount">Amount to Withdraw (Max: {maxAvailable.toFixed(2)} {wallet?.currency || 'USD'})</Label>
+                                <Label htmlFor="amount">Amount to Withdraw (Max: {formatMoney(maxAvailable, wallet?.currency || 'USD')})</Label>
                                 <div className="relative">
                                     <Input
                                         id="amount"

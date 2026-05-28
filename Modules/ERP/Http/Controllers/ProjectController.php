@@ -167,7 +167,7 @@ class ProjectController extends Controller
         $businessCurrency = $currency ? $currency->currency : 'USD';
 
         // Load project relationships
-        $project->load(['tenantClient', 'platformClient', 'creator']);
+        $project->load(['client', 'creator']);
 
         // Get invoices linked to this project
         $invoices = Invoice::where('project_id', $project->id)

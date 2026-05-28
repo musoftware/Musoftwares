@@ -40,12 +40,12 @@ class InvoiceController extends Controller
     public function index(Request $request)
     {
         $tenant = $this->resolveTenant();
-        $query = Invoice::with(['tenantClient', 'platformClient', 'currency'])->where('tenant_id', $tenant->id);
+        $query = Invoice::with(['client', 'currency'])->where('tenant_id', $tenant->id);
 
         if ($request->filled('search')) {
             $query->where(function($q) use ($request) {
                 $q->where('invoice_number', 'like', '%' . $request->search . '%')
-                  ->orWhereHas('tenantClient', function($q) use ($request) {
+                  ->orWhereHas('client', function($q) use ($request) {
                       $q->where('name', 'like', '%' . $request->search . '%');
                   });
             });
@@ -236,7 +236,7 @@ class InvoiceController extends Controller
 
     public function show(Invoice $invoice)
     {
-        $invoice->load(['tenantClient.wallet', 'tenantClient.currency', 'platformClient.platformWallet', 'items.timerSessions', 'costs', 'creator', 'project']);
+        $invoice->load(['client.wallet', 'client.currency', 'items.timerSessions', 'costs', 'creator', 'project']);
 
         // This is a simplified timeline, in real app it might be a separate table
         $timeline = [
@@ -245,12 +245,20 @@ class InvoiceController extends Controller
         if ($invoice->issued_at) $timeline[] = ['event' => 'Sent', 'time' => $invoice->issued_at, 'user' => 'System'];
         if ($invoice->paid_at) $timeline[] = ['event' => 'Paid', 'time' => $invoice->paid_at, 'user' => 'Client'];
 
+        $user = Auth::user();
+        if (auth('erp_team')->check()) {
+            $user = auth('erp_team')->user()?->tenant?->user;
+        }
+        $hasReferrals = $user && $user->hasModuleSubscription('erp-referrals');
+
         return Inertia::render('ERP/Invoices/Show', [
             'invoice' => $invoice,
             'timeline' => $timeline,
-            'referral_earnings' => \Modules\ERP\Models\ReferralEarning::with('referrer')
-                ->where('invoice_id', $invoice->id)
-                ->get(),
+            'referral_earnings' => $hasReferrals
+                ? \Modules\ERP\Models\ReferralEarning::with('referrer')
+                    ->where('invoice_id', $invoice->id)
+                    ->get()
+                : [],
         ]);
     }
 
@@ -269,7 +277,7 @@ class InvoiceController extends Controller
             abort(403, 'Unauthorized access to invoice.');
         }
 
-        $invoice->load(['items', 'costs', 'tenantClient.currency']);
+        $invoice->load(['items', 'costs', 'client.currency']);
         $baseCurrency = Currency::find($tenant->base_currency_id);
 
         $clients = TenantClient::with('currency')
@@ -277,11 +285,11 @@ class InvoiceController extends Controller
             ->get();
 
         // Only send the invoice's current client
-        $currentClient = $invoice->tenantClient ? [
-            'id' => $invoice->tenantClient->id,
-            'name' => $invoice->tenantClient->name,
-            'email' => $invoice->tenantClient->email,
-            'currency_code' => $invoice->tenantClient->currency?->currency ?? 'USD',
+        $currentClient = $invoice->client ? [
+            'id' => $invoice->client->id,
+            'name' => $invoice->client->name,
+            'email' => $invoice->client->email,
+            'currency_code' => $invoice->client->currency?->currency ?? 'USD',
         ] : null;
 
         return Inertia::render('ERP/Invoices/Edit', [
@@ -327,7 +335,7 @@ class InvoiceController extends Controller
         $client = TenantClient::with('currency')->where('tenant_id', $tenant->id)->findOrFail($validated['client_id']);
         $validated['amount_currency'] = $client->currency ? $client->currency->currency : 'USD';
 
-        return DB::transaction(function () use ($validated, $invoice, $tenant) {
+        return DB::transaction(function () use ($validated, $invoice, $tenant, $client) {
             $currency = \App\Models\Currency::find($tenant->base_currency_id);
             $businessCurrency = $currency ? $currency->currency : 'USD';
             $rate = $this->exchangeRateService->getRate($validated['amount_currency'], $businessCurrency, $validated['issued_at']);

@@ -108,7 +108,7 @@ class ERPDashboardController extends Controller
         // ── Real Invoice List ─────────────────────────────────────
         $invoices = collect();
         if ($tenantId) {
-            $invoices = Invoice::with(['tenantClient', 'platformClient'])
+            $invoices = Invoice::with(['client'])
                 ->where('tenant_id', $tenantId)
                 ->whereIn('status', ['draft', 'sent', 'partial'])
                 ->latest()
@@ -166,7 +166,7 @@ class ERPDashboardController extends Controller
         // ── Real Tasks ─────────────────────────────────────────────
         $tasks = collect();
         if ($tenantId) {
-            $tasks = \Modules\ERP\Models\ERPTask::with(['creator', 'assignee'])
+            $tasks = \Modules\ERP\Models\ERPTask::with(['creator', 'assignee', 'client'])
                 ->where('tenant_id', $tenantId)
                 ->where('archived', false)
                 ->latest()
@@ -184,6 +184,8 @@ class ERPDashboardController extends Controller
                         'assignee' => $task->assignee ? $task->assignee->name : ($task->creator ? $task->creator->name : 'Unassigned'),
                         'priority' => ucfirst($task->priority ?? 'Normal'),
                         'category' => $category,
+                        'client_id' => $task->client_id,
+                        'client' => $task->client ? ['id' => $task->client->id, 'name' => $task->client->name] : null,
                     ];
                 });
         }
@@ -212,7 +214,7 @@ class ERPDashboardController extends Controller
         // ── Real Projects List ─────────────────────────────────────
         $projects = collect();
         if ($tenantId) {
-            $projects = Project::with(['tenantClient', 'platformClient'])
+            $projects = Project::with(['client'])
                 ->where('tenant_id', $tenantId)
                 ->latest()
                 ->limit(10)
@@ -323,7 +325,7 @@ class ERPDashboardController extends Controller
         $transactions = collect();
         $transactionStats = ['totalCredits' => 0, 'totalDebits' => 0, 'netFlow' => 0, 'txnCount' => 0];
         if ($tenantId) {
-            $rawTxns = WalletTransaction::with(['creator', 'wallet.tenantClient', 'currency'])
+            $rawTxns = WalletTransaction::with(['creator', 'wallet.client', 'currency'])
                 ->where('tenant_id', $tenantId)
                 ->latest()
                 ->take(50)
@@ -340,7 +342,7 @@ class ERPDashboardController extends Controller
                     else if ($txn->reference_type === 'withdrawal') $title = 'Withdrawal Settlement';
 
                     $txnCurrency = $txn->currency?->currency ?? $businessCurrency;
-                    $clientCurrency = $txn->wallet?->tenantClient?->currency?->currency ?? $txnCurrency;
+                    $clientCurrency = $txn->wallet?->client?->currency?->currency ?? $txnCurrency;
                     
                     return [
                         'id' => $txn->id,
@@ -358,8 +360,8 @@ class ERPDashboardController extends Controller
                         'balance_after' => round($txn->balance_after ?? 0, 2),
                         'reference_type' => $txn->reference_type,
                         'reference_id_raw' => $txn->reference_id,
-                        'client_name' => $txn->wallet?->tenantClient?->name ?? 'Unknown',
-                        'client_id' => $txn->wallet?->tenantClient?->id,
+                        'client_name' => $txn->wallet?->client?->name ?? 'Unknown',
+                        'client_id' => $txn->wallet?->client?->id,
                         'authorizer' => $txn->creator?->name ?? 'System Core',
                         'date' => $txn->created_at?->format('Y-m-d H:i'),
                     ];

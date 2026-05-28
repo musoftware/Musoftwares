@@ -2,6 +2,7 @@ import ERPLayout from '@/Layouts/ERPLayout';
 import { useERPMenu } from '@/hooks/useERPMenu';
 import { Head, router, useForm } from '@inertiajs/react';
 import { useState } from 'react';
+import { formatMoney } from '@/lib/utils';
 
 export default function IndexClient({
     auth,
@@ -64,8 +65,7 @@ export default function IndexClient({
                                 Total Balance
                             </h3>
                             <p className="mt-2 text-3xl font-semibold text-gray-900">
-                                {Number(wallet?.balance || 0).toFixed(2)}{' '}
-                                {wallet?.currency || 'USD'}
+                                {formatMoney(wallet?.balance || 0, wallet?.currency || 'USD')}
                             </p>
                         </div>
                         <div className="overflow-hidden bg-white p-6 shadow-sm sm:rounded-lg">
@@ -73,8 +73,7 @@ export default function IndexClient({
                                 Locked (Pending)
                             </h3>
                             <p className="mt-2 text-3xl font-semibold text-yellow-600">
-                                {Number(lockedAmount).toFixed(2)}{' '}
-                                {wallet?.currency || 'USD'}
+                                {formatMoney(lockedAmount, wallet?.currency || 'USD')}
                             </p>
                         </div>
                         <div className="overflow-hidden bg-white p-6 shadow-sm sm:rounded-lg">
@@ -82,8 +81,7 @@ export default function IndexClient({
                                 Available for Withdrawal
                             </h3>
                             <p className="mt-2 text-3xl font-semibold text-green-600">
-                                {Number(availableBalance).toFixed(2)}{' '}
-                                {wallet?.currency || 'USD'}
+                                {formatMoney(availableBalance, wallet?.currency || 'USD')}
                             </p>
                         </div>
                     </div>

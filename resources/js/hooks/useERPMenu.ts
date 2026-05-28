@@ -65,6 +65,7 @@ export function useERPMenu(
         { id: 'tasks', label: 'Tasks', icon: CheckSquare },
         { id: 'invoices', label: 'Invoices', icon: FileText },
         { id: 'transactions', label: 'Transactions', icon: History },
+        { id: 'referrals', label: 'Referrals', icon: Users },
         { id: 'documents', label: 'Files', icon: Folder },
         { id: 'notes', label: 'Notes', icon: Pin },
         { id: 'calendar', label: 'Calendar', icon: Calendar },
@@ -78,6 +79,7 @@ export function useERPMenu(
     const addonItems = [
         { id: 'erp-team-members', label: 'Team Members', icon: Users, description: 'Invite managers and staff to your workspace. Assign roles, control access, and track activity.', features: ['Role-based access', 'Invite by email', 'Suspend anytime'] },
         { id: 'erp-tickets', label: 'Support Tickets', icon: LifeBuoy, description: 'Track client issues, manage priorities, and resolve tickets — all from your workspace.', features: ['Priority levels', 'Client-linked tickets', 'Resolution tracking'] },
+        { id: 'erp-referrals', label: 'Referral Program', icon: Users, description: 'Track client referrals, links, trees, and referral earnings.', features: ['Referral links', 'Tree structure', 'Earnings tracking'] },
         { id: 'erp-document-storage', label: 'Cloud Storage', icon: Package, description: 'Upload and manage files with your own S3-compatible storage provider.', features: ['S3/MinIO support', 'File categorization', 'Secure downloads'] },
         { id: 'erp-analytics', label: 'Reports', icon: BarChart, description: 'Unlock detailed revenue analytics, expense breakdowns, and client insights.', features: ['Revenue reports', 'Expense breakdown', 'Client insights'] },
         { id: 'erp-multi-currency', label: 'Multi Currency', icon: Coins, description: 'Issue invoices and track payments in multiple currencies with auto conversion.', features: ['Auto conversion', 'Multi-currency invoices', 'Exchange rate sync'] },
@@ -92,6 +94,9 @@ export function useERPMenu(
         if (isTeamMember && (item.id === 'team' || item.id === 'settings' || item.id === 'backup')) {
             return false;
         }
+        if (item.id === 'referrals' && !activeAddons.includes('erp-referrals')) {
+            return false;
+        }
         return true;
     });
 
@@ -103,7 +108,9 @@ export function useERPMenu(
                 ? route('erp.team-members.index')
                 : m.id === 'backup'
                   ? route('erp.backup.index')
-                  : route('erp.dashboard', { section: m.id }),
+                  : m.id === 'referrals'
+                    ? route('erp.referrals.index')
+                    : route('erp.dashboard', { section: m.id }),
     }));
 
     // Build locked addon items — only show addons the user DOESN'T have

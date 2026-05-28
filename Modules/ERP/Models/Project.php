@@ -22,21 +22,9 @@ class Project extends TenantModel
         'budget' => 'decimal:2',
     ];
 
-    public function platformClient(): BelongsTo
-    {
-        return $this->belongsTo(\App\Models\User::class, 'client_id');
-    }
-
-    public function tenantClient(): BelongsTo
+    public function client(): BelongsTo
     {
         return $this->belongsTo(TenantClient::class, 'client_id');
-    }
-
-    public function getClientAttribute()
-    {
-        return (empty($this->tenant_id) || $this->tenant_id === Tenant::platformId())
-            ? $this->platformClient 
-            : $this->tenantClient;
     }
 
     public function creator(): BelongsTo
