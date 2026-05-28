@@ -30,7 +30,7 @@ return new class extends Migration
             $table->string('phone')->nullable();
             $table->string('address')->nullable();
             $table->foreignId('currency_id')->nullable()->constrained('currencies')->nullOnDelete();
-            $table->foreignId('country_id')->nullable()->constrained('countries')->nullOnDelete();
+            $table->unsignedBigInteger('country_id')->nullable();
             $table->enum('status', ['active', 'inactive', 'banned'])->default('active');
             $table->timestamps();
         });

@@ -30,7 +30,7 @@ return new class extends Migration
             $table->string('name');
             $table->integer('points');
             $table->decimal('price', 20, 8);
-            $table->string('currency_code', 3);
+            $table->foreignId('currency_id')->default(2)->constrained('currencies')->onDelete('restrict');
             $table->timestamps();
         });
 
@@ -41,7 +41,7 @@ return new class extends Migration
             $table->string('title');
             $table->text('description');
             $table->decimal('budget', 20, 8);
-            $table->string('currency_code', 3);
+            $table->foreignId('currency_id')->default(2)->constrained('currencies')->onDelete('restrict');
             $table->string('type'); // fixed, hourly
             $table->string('duration')->nullable();
             $table->string('status'); // open, in_progress, completed, cancelled
@@ -65,7 +65,7 @@ return new class extends Migration
             $table->foreignId('freelancer_id')->constrained('users')->cascadeOnDelete();
             $table->text('cover_letter');
             $table->decimal('bid_amount', 20, 8);
-            $table->string('currency_code', 3);
+            $table->foreignId('currency_id')->default(2)->constrained('currencies')->onDelete('restrict');
             $table->string('status'); // pending, accepted, rejected
             $table->timestamps();
         });
@@ -78,7 +78,7 @@ return new class extends Migration
             $table->foreignId('client_id')->constrained('users')->cascadeOnDelete();
             $table->foreignId('freelancer_id')->constrained('users')->cascadeOnDelete();
             $table->decimal('amount', 20, 8);
-            $table->string('currency_code', 3);
+            $table->foreignId('currency_id')->default(2)->constrained('currencies')->onDelete('restrict');
             $table->string('status'); // active, completed, disputed
             $table->timestamp('started_at');
             $table->timestamp('completed_at')->nullable();
