@@ -52,7 +52,7 @@ class CompleteDeliveredMarketplaceOrders extends Command
                 $seller = \App\Models\User::find($order->seller_id);
                 if ($seller) {
                     $sellerCredit = $order->amount - $order->commission_amount;
-                    $transactionId = $seller->add_balance($sellerCredit, "Earnings from service order #{$order->id} (Escrow Auto-Released)", 'received', $order->currency_code);
+                    $transactionId = $seller->add_balance($sellerCredit, "Earnings from service order #{$order->id} (Escrow Auto-Released)", 'received', $order->currency_id);
 
                     // Update Escrow Record
                     $escrow = \Modules\Marketplace\Models\MarketplaceEscrow::where('order_id', $order->id)->first();

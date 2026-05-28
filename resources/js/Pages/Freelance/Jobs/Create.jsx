@@ -20,7 +20,7 @@ export default function CreateJob({ auth, egpToPreferredRate = 0.10 }) {
         description: '',
         budget_min: '',
         budget_max: '',
-        currency_code: 'USD',
+        currency_id: 1,
         type: 'fixed',
         duration: '',
         skills: []
@@ -165,13 +165,13 @@ export default function CreateJob({ auth, egpToPreferredRate = 0.10 }) {
                             <div className="w-full sm:w-1/3">
                                 <label className="block text-sm font-bold text-gray-700 mb-1">Currency</label>
                                 <select
-                                    value={data.currency_code}
-                                    onChange={e => setData('currency_code', e.target.value)}
+                                    value={data.currency_id}
+                                    onChange={e => setData('currency_id', parseInt(e.target.value))}
                                     className="w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
                                 >
-                                    <option value="USD">USD ($)</option>
-                                    <option value="EUR">EUR (€)</option>
-                                    <option value="GBP">GBP (£)</option>
+                                    <option value="1">USD ($)</option>
+                                    <option value="3">EUR (€)</option>
+                                    <option value="4">GBP (£)</option>
                                 </select>
                             </div>
                             <div className="w-full sm:w-1/3">

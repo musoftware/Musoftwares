@@ -42,7 +42,7 @@ export default function Index({ orders }) {
                                 <td className="p-4 text-gray-600">{order.buyer?.name || 'Unknown'}</td>
                                 <td className="p-4 text-gray-600">{order.seller?.name || 'Unknown'}</td>
                                 <td className="p-4 text-right font-jetbrains font-medium text-gray-900">
-                                    {formatCurrency(order.amount, order.currency_code)}
+                                    {order.formatted_amount}
                                 </td>
                                 <td className="p-4 text-center">
                                     {getStatusBadge(order.status)}

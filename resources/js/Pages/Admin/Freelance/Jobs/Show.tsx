@@ -44,7 +44,7 @@ export default function Show({ job }) {
                         <div className="grid grid-cols-2 gap-4 text-sm bg-gray-50 p-4 rounded-md">
                             <div>
                                 <span className="text-gray-500 block mb-1">Budget</span>
-                                <span className="font-semibold text-gray-900">{job.budget} {job.currency_code}</span>
+                                <span className="font-semibold text-gray-900">{job.formatted_budget}</span>
                             </div>
                             <div>
                                 <span className="text-gray-500 block mb-1">Duration</span>
@@ -85,7 +85,7 @@ export default function Show({ job }) {
                                             <div className="text-xs text-gray-500">{proposal.freelancer?.email}</div>
                                         </div>
                                         <div className="text-right">
-                                            <div className="font-semibold text-green-600">{proposal.bid_amount} {proposal.currency_code}</div>
+                                            <div className="font-semibold text-green-600">{proposal.formatted_bid_amount}</div>
                                             <Badge variant="outline" className="capitalize text-xs">{proposal.status}</Badge>
                                         </div>
                                     </div>

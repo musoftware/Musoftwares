@@ -54,7 +54,7 @@ export default function Show({ contract }) {
                         <div className="grid grid-cols-2 gap-4 text-sm bg-gray-50 p-4 rounded-md mb-6">
                             <div>
                                 <span className="text-gray-500 block mb-1">Contract Amount</span>
-                                <span className="font-semibold text-blue-600 text-lg">{contract.amount} {contract.currency_code}</span>
+                                <span className="font-semibold text-blue-600 text-lg">{contract.formatted_amount}</span>
                             </div>
                             <div>
                                 <span className="text-gray-500 block mb-1">Started At</span>

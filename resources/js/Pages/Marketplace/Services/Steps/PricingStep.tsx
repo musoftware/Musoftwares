@@ -5,7 +5,14 @@ import { cn } from '@/lib/utils';
 import { Trash2, Plus, Info } from 'lucide-react';
 import { emptyPackage } from '../Create';
 
-const CURRENCIES = ['USD', 'EUR', 'GBP', 'EGP', 'SAR', 'AED'];
+const CURRENCIES = [
+    { id: 1, code: 'USD' },
+    { id: 2, code: 'EGP' },
+    { id: 3, code: 'EUR' },
+    { id: 4, code: 'GBP' },
+    { id: 5, code: 'AED' },
+    { id: 6, code: 'SAR' },
+];
 const PKG_LABELS = ['Basic', 'Standard', 'Premium'];
 
 export default function PricingStep({ data, setData, errors }: any) {
@@ -113,11 +120,11 @@ export default function PricingStep({ data, setData, errors }: any) {
                                 <Label className="text-xs font-bold text-slate-600 uppercase tracking-wider mb-3 block">Price</Label>
                                 <div className="relative flex items-center shadow-sm rounded-xl overflow-hidden border focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-500/20 transition-all">
                                     <select
-                                        value={pkg.currency_code}
-                                        onChange={e => setPackageField(idx, 'currency_code', e.target.value)}
+                                        value={pkg.currency_id}
+                                        onChange={e => setPackageField(idx, 'currency_id', Number(e.target.value))}
                                         className="h-12 pl-4 pr-2 bg-slate-50 text-sm font-bold text-slate-600 border-none outline-none appearance-none cursor-pointer"
                                     >
-                                        {CURRENCIES.map(c => <option key={c}>{c}</option>)}
+                                        {CURRENCIES.map(c => <option key={c.id} value={c.id}>{c.code}</option>)}
                                     </select>
                                     <div className="w-[1px] h-6 bg-slate-200 mx-1"></div>
                                     <input

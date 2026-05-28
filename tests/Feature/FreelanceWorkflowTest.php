@@ -3,7 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Modules\Freelance\Models\Skill;
 use Modules\Freelance\Models\Job;
 use Modules\Freelance\Models\Proposal;
@@ -14,7 +14,7 @@ use Tests\TestCase;
 
 class FreelanceWorkflowTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     protected User $clientUser;
     protected User $freelancerUser;
@@ -77,7 +77,7 @@ class FreelanceWorkflowTest extends TestCase
                 'title' => 'Build a Laravel SaaS platform',
                 'description' => 'Need a stunning modular application with Stripe integration.',
                 'budget' => 1200.00,
-                'currency_code' => 'USD',
+                'currency_id' => 1,
                 'type' => 'fixed',
                 'duration' => '1 month',
                 'skills' => [$this->skill->id],

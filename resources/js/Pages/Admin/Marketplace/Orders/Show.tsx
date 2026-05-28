@@ -38,7 +38,7 @@ export default function Show({ order }) {
                             </div>
                             <div className="text-right">
                                 <span className="block text-2xl font-bold font-jetbrains text-slate-900">
-                                    {formatCurrency(order.amount, order.currency_code)}
+                                    {order.formatted_amount}
                                 </span>
                                 <Badge className="mt-1" variant={order.status === 'disputed' ? 'destructive' : 'secondary'}>
                                     {order.status.toUpperCase()}

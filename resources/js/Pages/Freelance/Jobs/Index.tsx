@@ -62,7 +62,7 @@ export default function Index({ jobs }: any) {
                                                     {job.title}
                                                 </td>
                                                 <td className="px-6 py-4 text-sm whitespace-nowrap text-gray-500">
-                                                    <FinancialAmount amount={job.budget} currency={job.currency_code || 'USD'} />
+                                                    <FinancialAmount amount={job.budget} currency={job.currency_id} />
                                                 </td>
                                                 <td className="px-6 py-4 text-sm whitespace-nowrap text-gray-500">
                                                     {formatDate(job.created_at)}

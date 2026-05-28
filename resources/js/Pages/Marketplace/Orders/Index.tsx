@@ -202,11 +202,7 @@ export default function Index({ orders, tab }: any) {
                                                     </td>
                                                     <td className="px-6 py-4 whitespace-nowrap">
                                                         <div className="text-sm font-bold text-gray-900">
-                                                            ${order.amount}
-                                                        </div>
-                                                        <div className="text-xs text-gray-500">
-                                                            {order.currency_code ||
-                                                                'USD'}
+                                                            {order.formatted_amount}
                                                         </div>
                                                     </td>
                                                     <td className="px-6 py-4 whitespace-nowrap">

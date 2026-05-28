@@ -3,7 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Modules\Marketplace\Models\Service;
 use Modules\Marketplace\Models\ServicePackage;
 use Modules\Marketplace\Models\ServiceOrder;
@@ -12,7 +12,7 @@ use Tests\TestCase;
 
 class MarketplaceEscrowTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     protected function setUp(): void
     {
@@ -58,7 +58,7 @@ class MarketplaceEscrowTest extends TestCase
             'slug' => 'test-service',
             'description' => 'Test',
             'status' => 'published',
-            'currency_code' => 'USD'
+            'currency_id' => 1
         ]);
 
         $package = ServicePackage::create([
@@ -66,7 +66,7 @@ class MarketplaceEscrowTest extends TestCase
             'name' => 'Basic',
             'description' => 'Basic package',
             'price' => 100,
-            'currency_code' => 'USD',
+            'currency_id' => 1,
             'delivery_days' => 3
         ]);
 
@@ -126,7 +126,7 @@ class MarketplaceEscrowTest extends TestCase
             'slug' => 'test-service',
             'description' => 'Test',
             'status' => 'published',
-            'currency_code' => 'USD'
+            'currency_id' => 1
         ]);
 
         $package = ServicePackage::create([
@@ -134,7 +134,7 @@ class MarketplaceEscrowTest extends TestCase
             'name' => 'Basic',
             'description' => 'Basic package',
             'price' => 100,
-            'currency_code' => 'USD',
+            'currency_id' => 1,
             'delivery_days' => 3
         ]);
 
@@ -143,7 +143,7 @@ class MarketplaceEscrowTest extends TestCase
             'seller_id' => $seller->id,
             'package_id' => $package->id,
             'amount' => 100,
-            'currency_code' => 'USD',
+            'currency_id' => 1,
             'commission_amount' => 10, // 10%
             'status' => 'delivered'
         ]);

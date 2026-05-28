@@ -19,7 +19,7 @@ class ProposalController extends Controller
         $user = $request->user();
 
         $proposals = Proposal::where('freelancer_id', $user->id)
-            ->with('job:id,title,budget,currency_code,type,status')
+            ->with('job:id,title,budget,currency_id,type,status')
             ->latest()
             ->paginate(20);
 
@@ -59,7 +59,7 @@ class ProposalController extends Controller
                 'freelancer_id' => $user->id,
                 'cover_letter' => $validated['cover_letter'],
                 'bid_amount' => $validated['bid_amount'],
-                'currency_code' => $job->currency_code,
+                'currency_id' => $job->currency_id,
                 'status' => 'pending',
             ]);
 
@@ -115,7 +115,7 @@ class ProposalController extends Controller
                 'client_id' => $job->client_id,
                 'freelancer_id' => $proposal->freelancer_id,
                 'amount' => $proposal->bid_amount,
-                'currency_code' => $proposal->currency_code,
+                'currency_id' => $proposal->currency_id,
                 'status' => 'active',
                 'started_at' => now(),
             ]);

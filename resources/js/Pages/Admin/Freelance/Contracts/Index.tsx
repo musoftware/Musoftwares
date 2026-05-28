@@ -81,7 +81,7 @@ export default function Index({ contracts, filters }) {
                                     <div>{contract.freelancer?.name || 'Unknown'}</div>
                                     <div className="text-xs text-gray-500">{contract.freelancer?.email}</div>
                                 </td>
-                                <td className="p-4 font-medium text-blue-600">{contract.amount} {contract.currency_code}</td>
+                                <td className="p-4 font-medium text-blue-600">{contract.formatted_amount}</td>
                                 <td className="p-4 capitalize">
                                     <span className={`inline-flex rounded-full px-2 text-xs font-semibold leading-5 
                                         ${contract.status === 'active' ? 'bg-green-100 text-green-800' : 

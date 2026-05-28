@@ -17,6 +17,7 @@ class AdminUserUILinksTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        $this->withoutVite();
 
         // Ensure admin role exists
         if (Role::where('name', 'admin')->doesntExist()) {
@@ -26,12 +27,14 @@ class AdminUserUILinksTest extends TestCase
         // Create an admin user
         $this->admin = User::factory()->create([
             'email' => 'admin_tester@test.com',
+            'onboarding_completed' => true,
         ]);
         $this->admin->assignRole('admin');
 
         // Create a regular user
         $this->clientUser = User::factory()->create([
             'email' => 'client_tester@test.com',
+            'onboarding_completed' => true,
         ]);
     }
 

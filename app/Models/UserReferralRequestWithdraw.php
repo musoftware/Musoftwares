@@ -12,6 +12,13 @@ class UserReferralRequestWithdraw extends Model
 {
     use HasFactory;
 
+    protected $appends = ['formatted_amount'];
+
+    public function getFormattedAmountAttribute()
+    {
+        return \App\Helpers\FinanceHelper::instance()->format_money($this->amount, $this->currency_id);
+    }
+
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id');

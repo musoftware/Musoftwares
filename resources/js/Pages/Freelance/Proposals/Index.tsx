@@ -178,7 +178,7 @@ export default function ProposalsIndex({ proposals, stats }: any) {
                                         <div className="text-right">
                                             <FinancialAmount
                                                 amount={proposal.bid_amount}
-                                                currency={proposal.currency_code || globalCurrency}
+                                                currency={proposal.currency_id}
                                                 className="text-base font-black text-slate-900"
                                             />
                                             <p className="text-[10px] text-slate-400">Your Bid</p>

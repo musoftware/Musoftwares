@@ -24,7 +24,7 @@ const STEPS = [
 ];
 
 export const emptyPackage = () => ({
-    name: '', description: '', price: '', currency_code: 'USD', delivery_days: 3, revisions: 2, features: []
+    name: '', description: '', price: '', currency_id: 1, delivery_days: 3, revisions: 2, features: []
 });
 
 export default function CreateService({ categories, seller }: Props) {
@@ -57,7 +57,8 @@ export default function CreateService({ categories, seller }: Props) {
 
     const lowestPrice = data.packages.reduce((min, p) => p.price && Number(p.price) < min ? Number(p.price) : min, Infinity);
     const displayPrice = lowestPrice === Infinity ? 0 : lowestPrice;
-    const currency = data.packages[0]?.currency_code || 'USD';
+    const currencyMap: Record<number, string> = { 1: 'USD', 2: 'EGP', 3: 'EUR', 4: 'GBP', 5: 'AED', 6: 'SAR' };
+    const currency = currencyMap[data.packages[0]?.currency_id] || 'USD';
     const selectedCategory = categories.find(c => String(c.id) === String(data.category_id));
 
     return (

@@ -39,7 +39,7 @@ class MarketplaceOrderService
                 $seller = \App\Models\User::find($order->seller_id);
                 if ($seller) {
                     $sellerCredit = $order->amount - $order->commission_amount;
-                    $transactionId = $seller->add_balance($sellerCredit, "Earnings from service order #{$order->id} (Dispute Resolved)", 'received', $order->currency_code);
+                    $transactionId = $seller->add_balance($sellerCredit, "Earnings from service order #{$order->id} (Dispute Resolved)", 'received', $order->currency_id);
                     
                     $escrow->update([
                         'status' => 'released',

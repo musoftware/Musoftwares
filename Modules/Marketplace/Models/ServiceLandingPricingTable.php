@@ -14,7 +14,7 @@ class ServiceLandingPricingTable extends Model
         'plan_name',
         'description',
         'price',
-        'currency_code',
+        'currency_id',
         'period',
         'features',
         'is_popular',
@@ -32,5 +32,10 @@ class ServiceLandingPricingTable extends Model
     public function landingPage()
     {
         return $this->belongsTo(ServiceLandingPage::class, 'landing_page_id');
+    }
+
+    public function currency()
+    {
+        return $this->belongsTo(\App\Models\Currency::class, 'currency_id');
     }
 }
