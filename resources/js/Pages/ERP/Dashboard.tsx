@@ -165,6 +165,7 @@ interface ERPDashboardProps {
         netFlow: number;
         txnCount: number;
     };
+    chartOfAccounts?: any;
     hasMultiCurrency?: boolean;
     filters?: {
         search?: string;
@@ -172,7 +173,7 @@ interface ERPDashboardProps {
     currencies?: Array<{ id: number; currency: string; symbol: string }>;
 }
 
-export default function ERPDashboard({ tenant: serverTenant, stats: serverStats, clients: serverClients, invoices: serverInvoices, chartData: serverChartData, projects: serverProjects, supportTickets: serverTickets, activityLogs: serverActivityLogs, upcomingBookings: serverBookings, storageProviders: serverStorageProviders, documents: serverDocuments, tasks: serverTasks, notes: serverNotes, transactions: serverTransactions, transactionStats: serverTransactionStats, hasMultiCurrency = false, currencies = [], filters = {} }: ERPDashboardProps) {
+export default function ERPDashboard({ tenant: serverTenant, stats: serverStats, clients: serverClients, invoices: serverInvoices, chartData: serverChartData, projects: serverProjects, supportTickets: serverTickets, activityLogs: serverActivityLogs, upcomingBookings: serverBookings, storageProviders: serverStorageProviders, documents: serverDocuments, tasks: serverTasks, notes: serverNotes, transactions: serverTransactions, transactionStats: serverTransactionStats, chartOfAccounts = null, hasMultiCurrency = false, currencies = [], filters = {} }: ERPDashboardProps) {
     const { toast } = useToast();
     const { auth } = usePage().props as any;
     const isTeamMember = !!auth?.team_member;
@@ -259,6 +260,7 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
     const [showAddClientModal, setShowAddClientModal] = useState(false);
     const [showEditClientModal, setShowEditClientModal] = useState(false);
     const [showWalletModal, setShowWalletModal] = useState(false);
+    const [showCOAModal, setShowCOAModal] = useState(false);
 
     // Form inputs for Client operations
     const [clientForm, setClientForm] = useState({

@@ -44,7 +44,7 @@ export default function AdjustWallet({ client, wallet }: { client: any, wallet: 
     return (
         <ERPLayout title={`Adjust Wallet: ${client?.name}`} workspaceName={workspaceName} tenantId={tenantId} menuItems={menuItems} lockedAddons={lockedAddons}>
 
-            <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8 space-y-6">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-6">
                 <div className="flex items-center gap-4">
                     <Link href={route('erp.dashboard', { section: 'clients' })} className="text-slate-400 hover:text-slate-900 transition-colors">
                         <ArrowLeft className="w-5 h-5" />
@@ -55,22 +55,24 @@ export default function AdjustWallet({ client, wallet }: { client: any, wallet: 
                     </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <Card className="bg-white border border-slate-200 shadow-sm md:col-span-1">
-                        <CardHeader>
-                            <CardTitle className="text-slate-900 text-sm">Current Balance</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="text-2xl font-bold text-slate-900 mb-1">
-                                <CurrencyDisplay amount={wallet?.balance !== undefined ? parseFloat(wallet.balance) : 0} currency={client?.currency?.currency || 'USD'} />
-                            </div>
-                            <div className="text-xs text-slate-500 uppercase tracking-wider font-mono">
-                                {client?.currency?.currency || 'USD'}
+                <div className="space-y-6">
+                    <Card className="bg-white border border-slate-200 shadow-sm">
+                        <CardContent className="p-6">
+                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                                <div className="space-y-1">
+                                    <p className="text-sm font-medium text-slate-500">Current Balance</p>
+                                    <div className="text-3xl font-bold tracking-tight text-slate-900">
+                                        <CurrencyDisplay amount={wallet?.balance !== undefined ? parseFloat(wallet.balance) : 0} currency={client?.currency?.currency || 'USD'} />
+                                    </div>
+                                </div>
+                                <div className="text-sm text-slate-500 max-w-[200px]">
+                                    Available balance in client's ERP wallet.
+                                </div>
                             </div>
                         </CardContent>
                     </Card>
 
-                    <Card className="bg-white border border-slate-200 shadow-sm md:col-span-2">
+                    <Card className="bg-white border border-slate-200 shadow-sm">
                         <CardHeader>
                             <CardTitle className="text-slate-900 flex items-center gap-2">
                                 <Wallet className="w-5 h-5" /> Adjustment Details
