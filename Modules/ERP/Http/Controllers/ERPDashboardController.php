@@ -383,6 +383,7 @@ class ERPDashboardController extends Controller
             'transactions' => $transactions,
             'transactionStats' => $transactionStats,
             'hasMultiCurrency' => $user->hasModuleSubscription('erp-multi-currency'),
+            'currencies' => \App\Models\Currency::all(),
             'filters' => $request->only(['search']),
         ]);
     }

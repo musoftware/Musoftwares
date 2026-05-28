@@ -7,6 +7,7 @@ import { FolderModal } from '@/Components/Tools/FolderModal';
 import { WindowModal } from '@/Components/Tools/WindowModal';
 import { CheckCircle2, Shield, Maximize, Minimize, FolderPlus } from 'lucide-react';
 import ApplicationLogo from '@/Components/ApplicationLogo';
+import { formatMoney } from '@/lib/utils';
 
 import { SettingsModal } from '@/Components/Tools/SettingsModal';
 import { ContextMenu, ContextMenuState } from '@/Components/Tools/ContextMenu';
@@ -1078,7 +1079,7 @@ export default function Explore({ tools, categories, subscribedSlugs, hasBrowser
                                         <span className="text-white text-lg font-bold">
                                             {selectedTool.pricing_plans[0].price_monthly <= 0 
                                                 ? 'Free' 
-                                                : `$${selectedTool.pricing_plans[0].price_monthly}/mo`}
+                                                : `${formatMoney(selectedTool.pricing_plans[0].price_monthly, 'USD')}/mo`}
                                         </span>
                                     </div>
                                     <div className="p-4">
@@ -1101,7 +1102,7 @@ export default function Explore({ tools, categories, subscribedSlugs, hasBrowser
                                 <div className="bg-white rounded-xl border border-slate-200 p-4 flex items-center justify-between">
                                     <span className="font-semibold text-slate-900">Starting at</span>
                                     <span className="text-lg font-bold text-slate-900">
-                                        {selectedTool.starting_price <= 0 ? 'Free' : `$${selectedTool.starting_price}/mo`}
+                                        {selectedTool.starting_price <= 0 ? 'Free' : `${formatMoney(selectedTool.starting_price, 'USD')}/mo`}
                                     </span>
                                 </div>
                             )}

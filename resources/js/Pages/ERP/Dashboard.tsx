@@ -169,9 +169,10 @@ interface ERPDashboardProps {
     filters?: {
         search?: string;
     };
+    currencies?: Array<{ id: number; currency: string; symbol: string }>;
 }
 
-export default function ERPDashboard({ tenant: serverTenant, stats: serverStats, clients: serverClients, invoices: serverInvoices, chartData: serverChartData, projects: serverProjects, supportTickets: serverTickets, activityLogs: serverActivityLogs, upcomingBookings: serverBookings, storageProviders: serverStorageProviders, documents: serverDocuments, tasks: serverTasks, notes: serverNotes, transactions: serverTransactions, transactionStats: serverTransactionStats, hasMultiCurrency = false, filters = {} }: ERPDashboardProps) {
+export default function ERPDashboard({ tenant: serverTenant, stats: serverStats, clients: serverClients, invoices: serverInvoices, chartData: serverChartData, projects: serverProjects, supportTickets: serverTickets, activityLogs: serverActivityLogs, upcomingBookings: serverBookings, storageProviders: serverStorageProviders, documents: serverDocuments, tasks: serverTasks, notes: serverNotes, transactions: serverTransactions, transactionStats: serverTransactionStats, hasMultiCurrency = false, currencies = [], filters = {} }: ERPDashboardProps) {
     const { toast } = useToast();
     const { auth } = usePage().props as any;
     const isTeamMember = !!auth?.team_member;
@@ -409,7 +410,7 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                 setShowWalletModal(false);
                 setWalletForm({ amount: '', type: 'credit', note: '' });
                 toast({ description: `Wallet ${walletForm.type} operation completed.` });
-                prependActivity('Wallet Adjusted', `Performed manual ${walletForm.type} of $${walletForm.amount} for ${selectedClient.name}.`);
+                prependActivity('Wallet Adjusted', `Performed manual ${walletForm.type} of ${formatMoney(walletForm.amount, selectedClient.currency?.currency || 'USD')} for ${selectedClient.name}.`);
             },
             onError: (errors) => {
                 toast({ variant: 'destructive', description: Object.values(errors)[0] as string });
@@ -834,12 +835,12 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                                     <MetricCard 
                                         label="Total Revenue"
-                                        value={new Intl.NumberFormat('en-US', { style: 'currency', currency }).format(stats.totalRevenue)}
+                                        value={formatMoney(stats.totalRevenue, currency)}
                                         icon={DollarSign}
                                     />
                                     <MetricCard 
                                         label="Outstanding"
-                                        value={new Intl.NumberFormat('en-US', { style: 'currency', currency }).format(stats.outstandingRevenue)}
+                                        value={formatMoney(stats.outstandingRevenue, currency)}
                                         icon={Clock}
                                     />
                                     <MetricCard 
@@ -1622,17 +1623,17 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                                     <MetricCard
                                         label="Total Credits"
-                                        value={new Intl.NumberFormat('en-US', { style: 'currency', currency }).format(txnStats.totalCredits)}
+                                        value={formatMoney(txnStats.totalCredits, currency)}
                                         icon={ArrowDown}
                                     />
                                     <MetricCard
                                         label="Total Debits"
-                                        value={new Intl.NumberFormat('en-US', { style: 'currency', currency }).format(txnStats.totalDebits)}
+                                        value={formatMoney(txnStats.totalDebits, currency)}
                                         icon={ArrowUp}
                                     />
                                     <MetricCard
                                         label="Net Flow"
-                                        value={new Intl.NumberFormat('en-US', { style: 'currency', currency }).format(txnStats.netFlow)}
+                                        value={formatMoney(txnStats.netFlow, currency)}
                                         icon={ArrowUpDown}
                                     />
                                     <MetricCard
@@ -2124,9 +2125,11 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                                                     value={settingsForm.defaultCurrency}
                                                     onChange={(e) => setSettingsForm(prev => ({ ...prev, defaultCurrency: e.target.value }))}
                                                 >
-                                                    <option value="USD">USD ($)</option>
-                                                    <option value="EUR">EUR (€)</option>
-                                                    <option value="EGP">EGP (EGP)</option>
+                                                    {currencies.map((c) => (
+                                                        <option key={c.id} value={c.currency}>
+                                                            {c.currency} ({c.symbol})
+                                                        </option>
+                                                    ))}
                                                 </select>
                                             </div>
                                             <div className="space-y-2">

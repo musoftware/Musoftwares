@@ -4,6 +4,7 @@ import { Head } from '@inertiajs/react';
 import { MetricCard } from '@/Components/ui/MetricCard';
 import { Store, TrendingUp, AlertTriangle, Activity } from 'lucide-react';
 import { BranchSwitcher } from '@/Components/ERP/BranchSwitcher';
+import { formatMoney } from '@/lib/utils';
 
 interface Props {
     activeBranchId: number | null;
@@ -36,7 +37,7 @@ export default function BranchDashboard({ activeBranchId, branches, metrics }: P
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
                 <MetricCard 
                     label="Local Revenue"
-                    value={`$${metrics.revenue.toLocaleString()}`}
+                    value={formatMoney(metrics.revenue, 'USD')}
                     icon={TrendingUp}
                 />
                 <MetricCard 

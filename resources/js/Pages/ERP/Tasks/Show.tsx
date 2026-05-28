@@ -75,9 +75,10 @@ interface ShowProps {
     task: Task;
     todos: TodoItem[];
     completion: number;
+    currencies?: Array<{ id: number; currency: string; symbol: string }>;
 }
 
-export default function Show({ task: initialTask, todos: initialTodos, completion: initialCompletion }: ShowProps) {
+export default function Show({ task: initialTask, todos: initialTodos, completion: initialCompletion, currencies = [] }: ShowProps) {
     const [task, setTask] = useState<Task>(initialTask);
     const [todos, setTodos] = useState<TodoItem[]>(initialTodos);
     const [completion, setCompletion] = useState<number>(initialCompletion);
@@ -768,10 +769,11 @@ export default function Show({ task: initialTask, todos: initialTodos, completio
                                     onChange={(e) => setTodoData({ ...todoData, cost_currency: e.target.value })}
                                     className="w-full rounded-md border border-input bg-transparent px-3 py-1.5 text-xs shadow-none focus:outline-none focus:ring-1 focus:ring-ring"
                                 >
-                                    <option value="USD">USD ($)</option>
-                                    <option value="EUR">EUR (€)</option>
-                                    <option value="EGP">EGP (EGP)</option>
-                                    <option value="SAR">SAR (SR)</option>
+                                    {currencies.map((c) => (
+                                        <option key={c.id} value={c.currency}>
+                                            {c.currency} ({c.symbol})
+                                        </option>
+                                    ))}
                                 </select>
                             </div>
                         </div>

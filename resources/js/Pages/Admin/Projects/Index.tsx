@@ -13,6 +13,7 @@ import {
 import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
 import ProjectActionsSheet from './ProjectActionsSheet';
+import { formatMoney } from '@/lib/utils';
 
 export default function Index({ projects, clients, currentTab }) {
     const [isCreateOpen, setIsCreateOpen] = useState(false);
@@ -175,7 +176,7 @@ export default function Index({ projects, clients, currentTab }) {
                                 <td className="p-4">
                                     {project.client?.name || 'Unknown'}
                                 </td>
-                                <td className="p-4">{project.project_balance ? `$${parseFloat(project.project_balance).toFixed(2)}` : '-'}</td>
+                                <td className="p-4">{project.project_balance ? formatMoney(project.project_balance, 'USD') : '-'}</td>
                                 <td className="p-4">
                                     <span className={`inline-flex rounded-full px-2 text-xs font-semibold leading-5 ${project.archived === 0 ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
                                         {project.archived === 0 ? project.status : 'Archived'}

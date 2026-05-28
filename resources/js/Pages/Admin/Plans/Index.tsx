@@ -13,6 +13,7 @@ import {
 import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
 import { Plus, Trash2 } from 'lucide-react';
+import { formatMoney } from '@/lib/utils';
 
 export default function Index({ plans }) {
     const [isCreateOpen, setIsCreateOpen] = useState(false);
@@ -236,7 +237,7 @@ export default function Index({ plans }) {
                             <tr key={plan.id} className="border-b hover:bg-gray-50">
                                 <td className="p-4 font-medium text-gray-900 uppercase">{plan.module}</td>
                                 <td className="p-4 font-medium text-gray-900">{plan.name}</td>
-                                <td className="p-4">${parseFloat(plan.price).toFixed(2)}</td>
+                                <td className="p-4">{formatMoney(plan.price, 'USD')}</td>
                                 <td className="p-4 capitalize">{plan.billing}</td>
                                 <td className="p-4">
                                     <span className={`inline-flex rounded-full px-2 text-xs font-semibold leading-5 ${plan.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>

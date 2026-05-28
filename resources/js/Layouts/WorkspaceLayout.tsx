@@ -5,9 +5,9 @@ import { ChevronRight } from 'lucide-react';
 
 interface WorkspaceLayoutProps extends PropsWithChildren {
     title: string;
-    workspaceName: string;
+    workspaceName?: string;
     tenantId?: string;
-    menuItems: Array<{
+    menuItems?: Array<{
         id: string;
         label: string;
         icon: any;
@@ -20,13 +20,15 @@ interface WorkspaceLayoutProps extends PropsWithChildren {
 
 export default function WorkspaceLayout({
     title,
-    workspaceName,
+    workspaceName = 'Workspace',
     tenantId = 'DRAFT',
-    menuItems,
+    menuItems = [],
     children,
 }: WorkspaceLayoutProps) {
     const activeMenuItem = menuItems.find(item => item.isActive);
     const activeMenuLabel = activeMenuItem?.label || 'Workspace';
+
+    const safeWorkspaceName = workspaceName || 'Workspace';
 
     return (
         <AuthenticatedLayout header="Workspace">
@@ -36,7 +38,7 @@ export default function WorkspaceLayout({
                 {/* Contextual Breadcrumb Navigator */}
                 <div className="mb-8 flex items-center gap-1.5 text-sm text-slate-500">
                     <span className="cursor-pointer transition-colors hover:text-slate-900">
-                        {workspaceName}
+                        {safeWorkspaceName}
                     </span>
                     <ChevronRight className="h-4 w-4 shrink-0 text-slate-400" />
                     <span className="font-medium text-slate-900">{activeMenuLabel}</span>
@@ -48,11 +50,11 @@ export default function WorkspaceLayout({
                         <div className="space-y-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
                             <div className="flex items-center gap-2 border-b border-slate-100 pb-3 px-3">
                                 <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-600 text-sm font-bold text-white shadow-md shadow-indigo-100">
-                                    {workspaceName.charAt(0).toUpperCase()}
+                                    {safeWorkspaceName.charAt(0).toUpperCase()}
                                 </div>
                                 <div className="min-w-0">
                                     <span className="block truncate text-sm font-semibold text-slate-900">
-                                        {workspaceName}
+                                        {safeWorkspaceName}
                                     </span>
                                     <span className="block font-mono text-[11px] text-slate-400">
                                         Active Tenant ID: #{tenantId}

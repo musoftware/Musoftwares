@@ -421,7 +421,7 @@ export default function Show({ invoice, timeline, referral_earnings }) {
                                 <div className="flex justify-between items-center">
                                     <p className="text-sm font-medium text-slate-500">Available Balance</p>
                                     <p className="text-lg font-bold tracking-tight text-slate-900">
-                                        <CurrencyDisplay amount={invoice.client?.wallet?.balance || 0} currency={invoice.client?.wallet?.currency} />
+                                        <CurrencyDisplay amount={invoice.client?.wallet?.balance || 0} currency={invoice.client?.currency?.currency || invoice.amount_currency} />
                                     </p>
                                 </div>
                                 <div className="flex gap-2">

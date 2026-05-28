@@ -143,6 +143,17 @@ class InvoiceController extends Controller
 
         $tenant = $this->resolveTenant();
 
+        // Validate uniqueness of invoice_number under the current tenant
+        $exists = Invoice::where('tenant_id', $tenant->id)
+            ->where('invoice_number', $validated['invoice_number'])
+            ->exists();
+
+        if ($exists) {
+            throw \Illuminate\Validation\ValidationException::withMessages([
+                'invoice_number' => 'The invoice number has already been taken for this tenant.'
+            ]);
+        }
+
         // Ensure client belongs to this tenant
         $client = TenantClient::with('currency')->where('tenant_id', $tenant->id)
             ->findOrFail($validated['client_id']);
@@ -225,7 +236,7 @@ class InvoiceController extends Controller
 
     public function show(Invoice $invoice)
     {
-        $invoice->load(['client.wallet', 'items.timerSessions', 'costs', 'creator', 'project']);
+        $invoice->load(['tenantClient.wallet', 'tenantClient.currency', 'platformClient.platformWallet', 'items.timerSessions', 'costs', 'creator', 'project']);
 
         // This is a simplified timeline, in real app it might be a separate table
         $timeline = [

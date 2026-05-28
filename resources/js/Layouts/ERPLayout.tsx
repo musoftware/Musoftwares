@@ -5,9 +5,9 @@ import { Toaster } from '@/Components/ui/toaster';
 
 interface ERPLayoutProps extends PropsWithChildren {
     title: string;
-    workspaceName: string;
+    workspaceName?: string;
     tenantId?: string;
-    menuItems: Array<{
+    menuItems?: Array<{
         id: string;
         label: string;
         icon: any;
@@ -32,14 +32,16 @@ interface ERPLayoutProps extends PropsWithChildren {
 
 export default function ERPLayout({
     title,
-    workspaceName,
+    workspaceName = 'Workspace',
     tenantId = 'DRAFT',
-    menuItems,
+    menuItems = [],
     lockedAddons = [],
     children,
 }: ERPLayoutProps) {
     const activeMenuItem = menuItems.find(item => item.isActive);
     const activeMenuLabel = activeMenuItem?.label || 'Workspace';
+
+    const safeWorkspaceName = workspaceName || 'Workspace';
 
     return (
         <div className="min-h-screen bg-slate-50 font-sans text-slate-900 flex flex-col">
@@ -50,9 +52,9 @@ export default function ERPLayout({
                 <div className="flex items-center justify-between px-4 sm:px-6 lg:px-8 h-full w-full mx-auto">
                     <div className="flex items-center gap-3">
                         <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-600 text-sm font-bold text-white shadow-md shadow-indigo-100">
-                            {workspaceName.charAt(0).toUpperCase()}
+                            {safeWorkspaceName.charAt(0).toUpperCase()}
                         </div>
-                        <span className="font-semibold text-slate-900 tracking-tight">{workspaceName} System</span>
+                        <span className="font-semibold text-slate-900 tracking-tight">{safeWorkspaceName} System</span>
                     </div>
                     <div className="flex items-center gap-4">
                         {/* 
@@ -76,7 +78,7 @@ export default function ERPLayout({
                     {/* Contextual Breadcrumb Navigator */}
                     <div className="mb-8 flex items-center gap-1.5 text-sm text-slate-500">
                         <span className="cursor-pointer transition-colors hover:text-slate-900">
-                            {workspaceName}
+                            {safeWorkspaceName}
                         </span>
                         <ChevronRight className="h-4 w-4 shrink-0 text-slate-400" />
                         <span className="font-medium text-slate-900">{activeMenuLabel}</span>
@@ -88,11 +90,11 @@ export default function ERPLayout({
                             <div className="space-y-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
                                 <div className="flex items-center gap-2 border-b border-slate-100 pb-3 px-3">
                                     <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-600 text-sm font-bold text-white shadow-md shadow-indigo-100">
-                                        {workspaceName.charAt(0).toUpperCase()}
+                                        {safeWorkspaceName.charAt(0).toUpperCase()}
                                     </div>
                                     <div className="min-w-0">
                                         <span className="block truncate text-sm font-semibold text-slate-900">
-                                            {workspaceName}
+                                            {safeWorkspaceName}
                                         </span>
                                         <span className="block font-mono text-[11px] text-slate-400">
                                             Active Tenant ID: #{tenantId}

@@ -5,6 +5,7 @@ import { Button } from '@/Components/ui/button';
 import { Textarea } from '@/Components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/Components/ui/card';
 import { Calculator, Save, CheckCircle2, Play, Loader2 } from 'lucide-react';
+import { formatMoney } from '@/lib/utils';
 
 export default function Index({ proposals }) {
     const [projectDetails, setProjectDetails] = useState('');
@@ -129,7 +130,7 @@ export default function Index({ proposals }) {
                                                     <div className="text-xs text-gray-400">{new Date(proposal.created_at).toLocaleDateString()}</div>
                                                 </div>
                                                 <div className="text-sm font-bold text-slate-900">
-                                                    {parseFloat(proposal.total_cost_egp).toLocaleString()} EGP
+                                                    {formatMoney(proposal.total_cost_egp, 'EGP')}
                                                 </div>
                                             </div>
                                             {proposal.status === 'converted_to_contract' ? (
@@ -177,7 +178,7 @@ export default function Index({ proposals }) {
                                             </div>
                                             <div className="p-4 rounded-lg border border-slate-200 bg-slate-50/50">
                                                 <div className="text-sm text-slate-500 font-medium">Estimated Cost</div>
-                                                <div className="text-2xl font-bold text-slate-900">{aiResult.total_cost_egp.toLocaleString()} EGP</div>
+                                                <div className="text-2xl font-bold text-slate-900">{formatMoney(aiResult.total_cost_egp, 'EGP')}</div>
                                             </div>
                                         </div>
                                         
