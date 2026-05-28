@@ -44,44 +44,44 @@ export default function CreateFile() {
 
             <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8 space-y-6">
                 <div className="flex items-center gap-4">
-                    <Link href={route('erp.dashboard', { section: 'documents' })} className="text-zinc-400 hover:text-white transition-colors">
+                    <Link href={route('erp.dashboard', { section: 'documents' })} className="text-slate-400 hover:text-slate-900 transition-colors">
                         <ArrowLeft className="w-5 h-5" />
                     </Link>
                     <div>
-                        <h1 className="text-2xl font-bold text-white">Upload Document</h1>
-                        <p className="text-zinc-400 text-sm mt-0.5">Upload a new file to your tenant storage.</p>
+                        <h1 className="text-2xl font-bold text-slate-900">Upload Document</h1>
+                        <p className="text-slate-500 text-sm mt-0.5">Upload a new file to your tenant storage.</p>
                     </div>
                 </div>
 
-                <Card className="bg-zinc-900 border-zinc-800">
+                <Card className="bg-white border border-slate-200 shadow-sm">
                     <CardHeader>
-                        <CardTitle className="text-white flex items-center gap-2">
+                        <CardTitle className="text-slate-900 flex items-center gap-2">
                             <UploadCloud className="w-5 h-5" /> File Upload
                         </CardTitle>
-                        <CardDescription className="text-zinc-400">
+                        <CardDescription className="text-slate-500">
                             Select a file from your computer and assign a category.
                         </CardDescription>
                     </CardHeader>
                     <CardContent>
                         <form onSubmit={handleSubmit} className="space-y-6">
                             <div className="space-y-2">
-                                <label className="text-sm font-medium text-zinc-300">File <span className="text-red-400">*</span></label>
+                                <label className="text-sm font-medium text-slate-700">File <span className="text-red-500">*</span></label>
                                 <Input 
                                     required 
                                     type="file"
                                     onChange={e => setForm({...form, file: e.target.files ? e.target.files[0] : null})} 
-                                    className="bg-zinc-950 border-zinc-800 text-zinc-300 file:bg-zinc-800 file:text-zinc-300 file:border-0 file:rounded-md file:mr-4 file:px-4 file:py-2 hover:file:bg-zinc-700 transition-colors"
+                                    className="bg-white border-slate-200 text-slate-700 file:bg-slate-100 file:text-slate-700 file:border-0 file:rounded-md file:mr-4 file:px-4 file:py-2 hover:file:bg-slate-200 transition-colors"
                                 />
-                                {errors.file && <p className="text-xs text-red-400">{errors.file}</p>}
+                                {errors.file && <p className="text-xs text-red-500">{errors.file}</p>}
                             </div>
                             
                             <div className="space-y-2">
-                                <label className="text-sm font-medium text-zinc-300">Document Category</label>
+                                <label className="text-sm font-medium text-slate-700">Document Category</label>
                                 <Select value={form.type} onValueChange={(val) => setForm({...form, type: val})}>
-                                    <SelectTrigger className="bg-zinc-950 border-zinc-800 text-white">
+                                    <SelectTrigger className="bg-white border-slate-200 text-slate-900">
                                         <SelectValue placeholder="Select Category" />
                                     </SelectTrigger>
-                                    <SelectContent className="bg-zinc-900 border-zinc-800 text-white">
+                                    <SelectContent className="bg-white border-slate-200 text-slate-900">
                                         <SelectItem value="Document">Document</SelectItem>
                                         <SelectItem value="Design Asset">Design Asset</SelectItem>
                                         <SelectItem value="Invoice PDF">Invoice PDF</SelectItem>
@@ -89,16 +89,16 @@ export default function CreateFile() {
                                         <SelectItem value="Contract">Contract</SelectItem>
                                     </SelectContent>
                                 </Select>
-                                {errors.type && <p className="text-xs text-red-400">{errors.type}</p>}
+                                {errors.type && <p className="text-xs text-red-500">{errors.type}</p>}
                             </div>
                             
-                            <div className="flex items-center justify-end gap-3 pt-4 border-t border-zinc-800">
+                            <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-200">
                                 <Link href={route('erp.dashboard', { section: 'documents' })}>
-                                    <Button type="button" variant="ghost" className="text-zinc-400 hover:text-white hover:bg-zinc-800">
+                                    <Button type="button" variant="ghost" className="text-slate-500 hover:text-slate-900 hover:bg-slate-100">
                                         Cancel
                                     </Button>
                                 </Link>
-                                <Button type="submit" disabled={isSubmitting} className="bg-violet-600 hover:bg-violet-500 text-white">
+                                <Button type="submit" disabled={isSubmitting}>
                                     {isSubmitting ? 'Uploading...' : 'Upload File'}
                                 </Button>
                             </div>

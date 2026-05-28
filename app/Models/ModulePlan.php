@@ -25,10 +25,11 @@ class ModulePlan extends Model
     ];
 
     /**
-     * Subscriptions linked to this plan.
+     * Subscriptions linked to this module.
+     * Matches on module_plans.module == user_subscriptions.object
      */
     public function subscriptions(): HasMany
     {
-        return $this->hasMany(UserSubscription::class, 'plan_id');
+        return $this->hasMany(UserSubscription::class, 'object', 'module');
     }
 }

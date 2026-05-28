@@ -509,14 +509,19 @@ class SubscriptionController extends Controller
             ->where('status', 'active')
             ->get();
             
+        $serviceItems = app(\App\Services\PricingService::class)->getServiceItems();
+        
         if ($userSubs->count() > 0) {
             foreach ($userSubs as $sub) {
+                $item = collect($serviceItems)->firstWhere('id', $sub->object);
+                $monthlyPrice = $item['monthly_price'] ?? 0;
+
                 $subscriptions[] = [
                     'id'            => $sub->id,
-                    'plan_name'     => ucfirst(str_replace('-', ' ', $sub->object)),
+                    'plan_name'     => $item['name'] ?? ucfirst(str_replace('-', ' ', $sub->object)),
                     'plan_slug'     => $sub->object,
                     'billing_cycle' => 'Module',
-                    'amount'        => 0, // Individual module amounts can be shown if needed
+                    'amount'        => $monthlyPrice,
                     'currency'      => $user->currency_name(),
                     'status'        => 'active',
                     'started_at'    => \Carbon\Carbon::parse($sub->started_at)->format('M d, Y'),

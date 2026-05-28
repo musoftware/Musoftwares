@@ -11,12 +11,23 @@ return new class extends Migration
      */
     public function up(): void
     {
-        \Illuminate\Support\Facades\DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+        $driver = \Illuminate\Support\Facades\DB::getDriverName();
+        if ($driver === 'mysql') {
+            \Illuminate\Support\Facades\DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+        } elseif ($driver === 'sqlite') {
+            \Illuminate\Support\Facades\DB::statement('PRAGMA foreign_keys = OFF');
+        }
+
         Schema::dropIfExists('prompt_correct_history_inlines');
         Schema::dropIfExists('prompt_correct_histories');
         Schema::dropIfExists('prompt_generation_sessions');
         Schema::dropIfExists('prompt_generations');
-        \Illuminate\Support\Facades\DB::statement('SET FOREIGN_KEY_CHECKS=1;');
+
+        if ($driver === 'mysql') {
+            \Illuminate\Support\Facades\DB::statement('SET FOREIGN_KEY_CHECKS=1;');
+        } elseif ($driver === 'sqlite') {
+            \Illuminate\Support\Facades\DB::statement('PRAGMA foreign_keys = ON');
+        }
     }
 
     /**

@@ -100,11 +100,20 @@ class DashboardController extends Controller
             ->where('status', 'active')
             ->count();
 
-        $erpMonthly = DB::table('user_subscriptions')
-            ->join('module_plans', 'user_subscriptions.plan_id', '=', 'module_plans.id')
-            ->where('user_subscriptions.client_id', $user->id)
-            ->where('user_subscriptions.status', 'active')
-            ->sum('module_plans.price');
+        $activeObjects = DB::table('user_subscriptions')
+            ->where('client_id', $user->id)
+            ->where('status', 'active')
+            ->pluck('object')
+            ->toArray();
+
+        $erpMonthly = 0;
+        $serviceItems = app(\App\Services\PricingService::class)->getServiceItems();
+        foreach ($activeObjects as $object) {
+            $item = collect($serviceItems)->firstWhere('id', $object);
+            if ($item) {
+                $erpMonthly += $item['monthly_price'] ?? 0;
+            }
+        }
 
         $toolsMonthly = 0;
         try {

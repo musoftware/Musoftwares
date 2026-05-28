@@ -31,12 +31,17 @@ class SubscriptionService
             return true;
         }
 
-        // Points-based modules are never free
-        if (in_array($module, ['freelance', 'facebook-publisher'])) {
-            return $user->hasSubscription();
+        // Check specific module subscription in user_subscriptions
+        if ($user->hasModuleSubscription($module)) {
+            return true;
         }
 
-        return $user->hasSubscription();
+        // Legacy fallback: old plan_id system gave access to everything
+        if ($user->plan_id && $user->subscription_date) {
+            return \Carbon\Carbon::parse($user->subscription_date)->isFuture();
+        }
+
+        return false;
     }
 
     /**

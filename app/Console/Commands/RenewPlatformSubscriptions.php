@@ -154,7 +154,6 @@ class RenewPlatformSubscriptions extends Command
             'subscription_date' => $newExpiresAt->format('Y-m-d'),
             'subscription_plan' => $plan->plan_name,
             'subscription_force' => 1,
-            'plan_id' => $plan->id
         ]);
     }
 }

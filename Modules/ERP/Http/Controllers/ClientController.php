@@ -91,8 +91,11 @@ class ClientController extends Controller
 
     public function create()
     {
+        $tenant = Tenant::where('user_id', Auth::id())->first();
+
         return Inertia::render('ERP/Clients/Create', [
             'currencies' => \App\Models\Currency::all(),
+            'tenant' => $tenant,
         ]);
     }
 
