@@ -468,22 +468,27 @@ class UsersController extends Controller
         $user = User::findOrFail($id);
         
         $request->validate([
-            'plan_id' => 'required|exists:module_plans,id',
+            'object' => 'required|string',
             'duration_days' => 'required|integer|min:1',
         ]);
 
-        $plan = \App\Models\ModulePlan::findOrFail($request->plan_id);
+        $serviceItems = app(\App\Http\Controllers\SubscriptionController::class)->getServiceItems();
+        $plan = collect($serviceItems)->firstWhere('id', $request->object);
+
+        if (!$plan) {
+            return back()->withErrors(['object' => 'Invalid subscription module']);
+        }
 
         \App\Models\UserSubscription::create([
             'client_id' => $user->id,
-            'plan_id' => $plan->id,
+            'object' => $plan['id'],
             'status' => 'active',
             'started_at' => now(),
             'expires_at' => now()->addDays($request->duration_days),
             'auto_renew' => false,
         ]);
 
-        return back()->with('success', "Membership ({$plan->name}) activated successfully for {$request->duration_days} days.");
+        return back()->with('success', "Membership ({$plan['name']}) activated successfully for {$request->duration_days} days.");
     }
 
     /**

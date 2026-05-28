@@ -68,9 +68,10 @@ class HandleInertiaRequests extends Middleware
                         ];
                     }
                 },
-                'crm_features' => function () {
+                'crm_features' => function () use ($user) {
+                    if (!$user) return [];
                     if (class_exists(\Modules\CRM\app\Core\FeatureManager::class)) {
-                        return app(\Modules\CRM\app\Core\FeatureManager::class)->getAll();
+                        return app(\Modules\CRM\app\Core\FeatureManager::class)->getAllForUser($user);
                     }
                     return [];
                 },

@@ -396,10 +396,29 @@ class User extends Authenticatable
 
     public function hasSubscription(): bool
     {
+        // Check new module-based subscriptions first
+        if ($this->subscriptions()->where('status', 'active')->where('expires_at', '>', now())->exists()) {
+            return true;
+        }
+
+        // Legacy fallback
         if ($this->plan_id && $this->subscription_date) {
             return \Carbon\Carbon::parse($this->subscription_date)->isFuture();
         }
-        return $this->subscriptions()->where('status', 'active')->exists();
+
+        return false;
+    }
+
+    /**
+     * Check if user has an active subscription to a specific module (e.g. 'erp', 'crm', 'erp-backup').
+     */
+    public function hasModuleSubscription(string $module): bool
+    {
+        return $this->subscriptions()
+            ->where('object', $module)
+            ->where('status', 'active')
+            ->where('expires_at', '>', now())
+            ->exists();
     }
 
     public function plan()

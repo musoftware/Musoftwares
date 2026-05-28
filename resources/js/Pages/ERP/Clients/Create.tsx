@@ -1,13 +1,32 @@
 import React, { useState } from 'react';
 import { Head, Link, router } from '@inertiajs/react';
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import ERPLayout from '@/Layouts/ERPLayout';
 import { Button } from '@/Components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/Components/ui/card';
 import { Input } from '@/Components/ui/input';
-import { ArrowLeft, UserPlus } from 'lucide-react';
+import {
+    LayoutDashboard,
+    Users,
+    Briefcase,
+    CheckSquare,
+    FileText,
+    History,
+    Pin,
+    Folder,
+    UserCheck,
+    Settings,
+    CalendarIcon,
+    HardDrive,
+    UserPlus,
+} from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/Components/ui/select';
 
-export default function CreateClient({ currencies }: { currencies: any[] }) {
+interface Props {
+    currencies: Array<{ id: number; currency: string; name: string }>;
+    tenant?: { id: number; name: string; user_id: number };
+}
+
+export default function CreateClient({ currencies, tenant }: Props) {
     const [form, setForm] = useState({
         name: '',
         email: '',
@@ -31,27 +50,51 @@ export default function CreateClient({ currencies }: { currencies: any[] }) {
         });
     };
 
-    return (
-        <AuthenticatedLayout>
-            <Head title="Add Client" />
+    const menuItems = [
+        { id: 'overview', label: 'Overview', icon: LayoutDashboard },
+        { id: 'clients', label: 'Clients', icon: Users },
+        { id: 'projects', label: 'Projects', icon: Briefcase },
+        { id: 'tasks', label: 'Tasks', icon: CheckSquare },
+        { id: 'invoices', label: 'Invoices', icon: FileText },
+        { id: 'transactions', label: 'Transactions', icon: History },
+        { id: 'documents', label: 'Files', icon: Folder },
+        { id: 'notes', label: 'Notes', icon: Pin },
+        { id: 'team', label: 'Team', icon: UserCheck },
+        { id: 'backup', label: 'Backup', icon: HardDrive },
+        { id: 'settings', label: 'Settings', icon: Settings },
+    ].map(m => ({
+        ...m,
+        isActive: m.id === 'clients',
+        href: m.id === 'team'
+            ? route('erp.team-members.index')
+            : m.id === 'backup'
+                ? route('erp.backup.index')
+                : route('erp.dashboard', { section: m.id }),
+    }));
 
-            <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8 space-y-6">
-                <div className="flex items-center gap-4">
-                    <Link href={route('erp.dashboard', { section: 'clients' })} className="text-zinc-400 hover:text-white transition-colors">
-                        <ArrowLeft className="w-5 h-5" />
-                    </Link>
-                    <div>
-                        <h1 className="text-2xl font-bold text-white">Add New Client</h1>
-                        <p className="text-zinc-400 text-sm mt-0.5">Register a new client in your workspace.</p>
-                    </div>
+    const workspaceName = tenant?.name || 'My Workspace';
+
+    return (
+        <ERPLayout
+            title="Add Client"
+            workspaceName={workspaceName}
+            tenantId={tenant?.id?.toString() || 'DRAFT'}
+            menuItems={menuItems}
+        >
+            <div className="space-y-6">
+                {/* Page Header */}
+                <div>
+                    <h2 className="text-2xl font-semibold text-slate-900 tracking-tight">Add New Client</h2>
+                    <p className="text-sm text-slate-500 mt-1">Register a new client in your workspace.</p>
                 </div>
 
-                <Card className="bg-zinc-900 border-zinc-800">
+                {/* Form Card */}
+                <Card className="bg-white border border-slate-200 shadow-sm">
                     <CardHeader>
-                        <CardTitle className="text-white flex items-center gap-2">
+                        <CardTitle className="text-slate-900 flex items-center gap-2">
                             <UserPlus className="w-5 h-5" /> Client Details
                         </CardTitle>
-                        <CardDescription className="text-zinc-400">
+                        <CardDescription className="text-slate-500">
                             Provide the necessary information to setup the client profile and wallet.
                         </CardDescription>
                     </CardHeader>
@@ -59,59 +102,59 @@ export default function CreateClient({ currencies }: { currencies: any[] }) {
                         <form onSubmit={handleSubmit} className="space-y-6">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div className="space-y-2">
-                                    <label className="text-sm font-medium text-zinc-300">Client/Company Name <span className="text-red-400">*</span></label>
-                                    <Input 
-                                        required 
-                                        value={form.name} 
-                                        onChange={e => setForm({...form, name: e.target.value})} 
-                                        placeholder="Acme Corp" 
-                                        className="bg-zinc-950 border-zinc-800 text-white"
+                                    <label className="text-sm font-medium text-slate-700">Client/Company Name <span className="text-red-500">*</span></label>
+                                    <Input
+                                        required
+                                        value={form.name}
+                                        onChange={e => setForm({...form, name: e.target.value})}
+                                        placeholder="Acme Corp"
+                                        className="bg-white border-slate-200 text-slate-900"
                                     />
-                                    {errors.name && <p className="text-xs text-red-400">{errors.name}</p>}
+                                    {errors.name && <p className="text-xs text-red-500">{errors.name}</p>}
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-sm font-medium text-zinc-300">Email Address</label>
-                                    <Input 
-                                        type="email" 
-                                        value={form.email} 
-                                        onChange={e => setForm({...form, email: e.target.value})} 
-                                        placeholder="contact@acme.com" 
-                                        className="bg-zinc-950 border-zinc-800 text-white"
+                                    <label className="text-sm font-medium text-slate-700">Email Address</label>
+                                    <Input
+                                        type="email"
+                                        value={form.email}
+                                        onChange={e => setForm({...form, email: e.target.value})}
+                                        placeholder="contact@acme.com"
+                                        className="bg-white border-slate-200 text-slate-900"
                                     />
-                                    {errors.email && <p className="text-xs text-red-400">{errors.email}</p>}
+                                    {errors.email && <p className="text-xs text-red-500">{errors.email}</p>}
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-sm font-medium text-zinc-300">Phone Number</label>
-                                    <Input 
-                                        value={form.phone} 
-                                        onChange={e => setForm({...form, phone: e.target.value})} 
-                                        placeholder="+1 234 567 890" 
-                                        className="bg-zinc-950 border-zinc-800 text-white"
+                                    <label className="text-sm font-medium text-slate-700">Phone Number</label>
+                                    <Input
+                                        value={form.phone}
+                                        onChange={e => setForm({...form, phone: e.target.value})}
+                                        placeholder="+1 234 567 890"
+                                        className="bg-white border-slate-200 text-slate-900"
                                     />
-                                    {errors.phone && <p className="text-xs text-red-400">{errors.phone}</p>}
+                                    {errors.phone && <p className="text-xs text-red-500">{errors.phone}</p>}
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-sm font-medium text-zinc-300">Status</label>
+                                    <label className="text-sm font-medium text-slate-700">Status</label>
                                     <Select value={form.status} onValueChange={(val) => setForm({...form, status: val})}>
-                                        <SelectTrigger className="bg-zinc-950 border-zinc-800 text-white">
+                                        <SelectTrigger className="bg-white border-slate-200 text-slate-900">
                                             <SelectValue placeholder="Select status" />
                                         </SelectTrigger>
-                                        <SelectContent className="bg-zinc-900 border-zinc-800 text-white">
+                                        <SelectContent className="bg-white border-slate-200 text-slate-900">
                                             <SelectItem value="lead">Lead</SelectItem>
                                             <SelectItem value="active">Active</SelectItem>
                                             <SelectItem value="paying">Paying</SelectItem>
                                             <SelectItem value="retained">Retained</SelectItem>
                                         </SelectContent>
                                     </Select>
-                                    {errors.status && <p className="text-xs text-red-400">{errors.status}</p>}
+                                    {errors.status && <p className="text-xs text-red-500">{errors.status}</p>}
                                 </div>
                                 <div className="space-y-2 md:col-span-2">
-                                    <label className="text-sm font-medium text-zinc-300">Billing Currency <span className="text-red-400">*</span></label>
+                                    <label className="text-sm font-medium text-slate-700">Billing Currency <span className="text-red-500">*</span></label>
                                     <Select value={form.currency} onValueChange={(val) => setForm({...form, currency: val})}>
-                                        <SelectTrigger className="bg-zinc-950 border-zinc-800 text-white">
+                                        <SelectTrigger className="bg-white border-slate-200 text-slate-900">
                                             <SelectValue placeholder="Select currency" />
                                         </SelectTrigger>
-                                        <SelectContent className="bg-zinc-900 border-zinc-800 text-white">
+                                        <SelectContent className="bg-white border-slate-200 text-slate-900">
                                             {currencies.map(c => (
                                                 <SelectItem key={c.currency} value={c.currency}>
                                                     {c.currency} - {c.name}
@@ -119,27 +162,27 @@ export default function CreateClient({ currencies }: { currencies: any[] }) {
                                             ))}
                                         </SelectContent>
                                     </Select>
-                                    {errors.currency && <p className="text-xs text-red-400">{errors.currency}</p>}
+                                    {errors.currency && <p className="text-xs text-red-500">{errors.currency}</p>}
                                 </div>
                                 <div className="space-y-2 md:col-span-2">
-                                    <label className="text-sm font-medium text-zinc-300">Address</label>
-                                    <Input 
-                                        value={form.address} 
-                                        onChange={e => setForm({...form, address: e.target.value})} 
-                                        placeholder="123 Business St, City, Country" 
-                                        className="bg-zinc-950 border-zinc-800 text-white"
+                                    <label className="text-sm font-medium text-slate-700">Address</label>
+                                    <Input
+                                        value={form.address}
+                                        onChange={e => setForm({...form, address: e.target.value})}
+                                        placeholder="123 Business St, City, Country"
+                                        className="bg-white border-slate-200 text-slate-900"
                                     />
-                                    {errors.address && <p className="text-xs text-red-400">{errors.address}</p>}
+                                    {errors.address && <p className="text-xs text-red-500">{errors.address}</p>}
                                 </div>
                             </div>
-                            
-                            <div className="flex items-center justify-end gap-3 pt-4 border-t border-zinc-800">
+
+                            <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-200">
                                 <Link href={route('erp.dashboard', { section: 'clients' })}>
-                                    <Button type="button" variant="ghost" className="text-zinc-400 hover:text-white hover:bg-zinc-800">
+                                    <Button type="button" variant="ghost" className="text-slate-500 hover:text-slate-900 hover:bg-slate-100">
                                         Cancel
                                     </Button>
                                 </Link>
-                                <Button type="submit" disabled={isSubmitting} className="bg-violet-600 hover:bg-violet-500 text-white">
+                                <Button type="submit" disabled={isSubmitting}>
                                     {isSubmitting ? 'Saving...' : 'Save Client'}
                                 </Button>
                             </div>
@@ -147,6 +190,6 @@ export default function CreateClient({ currencies }: { currencies: any[] }) {
                     </CardContent>
                 </Card>
             </div>
-        </AuthenticatedLayout>
+        </ERPLayout>
     );
 }

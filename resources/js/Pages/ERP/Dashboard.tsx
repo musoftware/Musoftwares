@@ -232,7 +232,7 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
 
     // Using real server tasks if available, fallback to empty
     const [tasks, setTasks] = useState<Array<any>>(serverTasks || []);
-    const [quickTaskTitle, setQuickTaskTitle] = useState('');
+    const [quickTaskTitles, setQuickTaskTitles] = useState<Record<string, string>>({});
 
     const [expenses, setExpenses] = useState<Array<any>>([]);
     const [expenseForm, setExpenseForm] = useState({ title: '', category: 'Software', amount: '', date: '', status: 'Pending' });
@@ -375,7 +375,7 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
 
     // Tasks Quick Add
     const handleQuickAddTask = (category: string) => {
-        if (!quickTaskTitle.trim()) return;
+        if (!(quickTaskTitles[category] || '').trim()) return;
         
         let status = 'open';
         if (category === 'In Progress') status = 'in_progress';
@@ -383,12 +383,12 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
         if (category === 'Done') status = 'completed';
         
         router.post(route('erp.tasks.store'), {
-            title: quickTaskTitle,
+            title: quickTaskTitles[category],
             status: status,
         }, {
             preserveScroll: true,
             onSuccess: () => {
-                setQuickTaskTitle('');
+                setQuickTaskTitles(prev => ({ ...prev, [category]: '' }));
                 toast({ description: 'Task created successfully.' });
             }
         });
@@ -1153,8 +1153,8 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                                                         <Input 
                                                             placeholder="Add task..." 
                                                             className="h-8 text-xs shadow-none"
-                                                            value={quickTaskTitle}
-                                                            onChange={(e) => setQuickTaskTitle(e.target.value)}
+                                                            value={quickTaskTitles[lane] || ''}
+                                                            onChange={(e) => setQuickTaskTitles(prev => ({ ...prev, [lane]: e.target.value }))}
                                                             onKeyDown={(e) => {
                                                                 if (e.key === 'Enter') handleQuickAddTask(lane);
                                                             }}

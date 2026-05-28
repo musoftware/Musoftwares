@@ -35,21 +35,21 @@ export default function CreateContract({ clients = [] }: { clients?: any[] }) {
 
             <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8 space-y-6">
                 <div className="flex items-center gap-4">
-                    <Link href={route('erp.dashboard', { section: 'documents' })} className="text-zinc-400 hover:text-white transition-colors">
+                    <Link href={route('erp.dashboard', { section: 'documents' })} className="text-slate-400 hover:text-slate-900 transition-colors">
                         <ArrowLeft className="w-5 h-5" />
                     </Link>
                     <div>
-                        <h1 className="text-2xl font-bold text-white">Draft New Contract</h1>
-                        <p className="text-zinc-400 text-sm mt-0.5">Create a new agreement or contract sheet.</p>
+                        <h1 className="text-2xl font-bold text-slate-900">Draft New Contract</h1>
+                        <p className="text-slate-500 text-sm mt-0.5">Create a new agreement or contract sheet.</p>
                     </div>
                 </div>
 
-                <Card className="bg-zinc-900 border-zinc-800">
+                <Card className="bg-white border border-slate-200 shadow-sm">
                     <CardHeader>
-                        <CardTitle className="text-white flex items-center gap-2">
+                        <CardTitle className="text-slate-900 flex items-center gap-2">
                             <FileSignature className="w-5 h-5" /> Contract Details
                         </CardTitle>
-                        <CardDescription className="text-zinc-400">
+                        <CardDescription className="text-slate-500">
                             Enter the details of the contract agreement.
                         </CardDescription>
                     </CardHeader>
@@ -57,23 +57,23 @@ export default function CreateContract({ clients = [] }: { clients?: any[] }) {
                         <form onSubmit={handleSubmit} className="space-y-6">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div className="space-y-2 md:col-span-2">
-                                    <label className="text-sm font-medium text-zinc-300">Agreement Sheet Title <span className="text-red-400">*</span></label>
+                                    <label className="text-sm font-medium text-slate-700">Agreement Sheet Title <span className="text-red-500">*</span></label>
                                     <Input 
                                         required 
                                         value={form.title} 
                                         onChange={e => setForm({...form, title: e.target.value})} 
                                         placeholder="Mutual Non-Disclosure Agreement" 
-                                        className="bg-zinc-950 border-zinc-800 text-white"
+                                        className="bg-white border-slate-200 text-slate-900"
                                     />
-                                    {errors.title && <p className="text-xs text-red-400">{errors.title}</p>}
+                                    {errors.title && <p className="text-xs text-red-500">{errors.title}</p>}
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-sm font-medium text-zinc-300">Client <span className="text-red-400">*</span></label>
+                                    <label className="text-sm font-medium text-slate-700">Client <span className="text-red-500">*</span></label>
                                     <Select value={form.client} onValueChange={(val) => setForm({...form, client: val})}>
-                                        <SelectTrigger className="bg-zinc-950 border-zinc-800 text-white">
+                                        <SelectTrigger className="bg-white border-slate-200 text-slate-900">
                                             <SelectValue placeholder="Select Client" />
                                         </SelectTrigger>
-                                        <SelectContent className="bg-zinc-900 border-zinc-800 text-white">
+                                        <SelectContent className="bg-white border-slate-200 text-slate-900">
                                             {clients.map(c => (
                                                 <SelectItem key={c.id} value={c.id.toString()}>
                                                     {c.name}
@@ -81,10 +81,10 @@ export default function CreateContract({ clients = [] }: { clients?: any[] }) {
                                             ))}
                                         </SelectContent>
                                     </Select>
-                                    {errors.client && <p className="text-xs text-red-400">{errors.client}</p>}
+                                    {errors.client && <p className="text-xs text-red-500">{errors.client}</p>}
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-sm font-medium text-zinc-300">Total Contract Value ($)</label>
+                                    <label className="text-sm font-medium text-slate-700">Total Contract Value ($)</label>
                                     <Input 
                                         type="number"
                                         min="0"
@@ -92,19 +92,19 @@ export default function CreateContract({ clients = [] }: { clients?: any[] }) {
                                         value={form.value} 
                                         onChange={e => setForm({...form, value: e.target.value})} 
                                         placeholder="15000.00" 
-                                        className="bg-zinc-950 border-zinc-800 text-white"
+                                        className="bg-white border-slate-200 text-slate-900"
                                     />
-                                    {errors.value && <p className="text-xs text-red-400">{errors.value}</p>}
+                                    {errors.value && <p className="text-xs text-red-500">{errors.value}</p>}
                                 </div>
                             </div>
                             
-                            <div className="flex items-center justify-end gap-3 pt-4 border-t border-zinc-800">
+                            <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-200">
                                 <Link href={route('erp.dashboard', { section: 'documents' })}>
-                                    <Button type="button" variant="ghost" className="text-zinc-400 hover:text-white hover:bg-zinc-800">
+                                    <Button type="button" variant="ghost" className="text-slate-500 hover:text-slate-900 hover:bg-slate-100">
                                         Cancel
                                     </Button>
                                 </Link>
-                                <Button type="submit" disabled={isSubmitting} className="bg-violet-600 hover:bg-violet-500 text-white">
+                                <Button type="submit" disabled={isSubmitting}>
                                     {isSubmitting ? 'Drafting...' : 'Draft Contract'}
                                 </Button>
                             </div>
