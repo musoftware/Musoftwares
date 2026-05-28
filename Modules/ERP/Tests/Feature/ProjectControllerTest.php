@@ -195,4 +195,38 @@ class ProjectControllerTest extends TestCase
         
         $this->assertNull(Project::find($project->id));
     }
+
+    public function test_edit_non_existent_project_renders_not_found_view(): void
+    {
+        $user = User::factory()->create();
+        $tenant = Tenant::create(['user_id' => $user->id, 'name' => 'Acme Corp', 'status' => 'active']);
+
+        $response = $this->actingAs($user)
+            ->withSession(['tenant_id' => $tenant->id])
+            ->get('/erp/projects/99999/edit');
+
+        $response->assertStatus(404);
+        $response->assertInertia(fn ($page) => $page
+            ->component('ERP/Errors/NotFound')
+            ->where('message', __('erp.project_not_found'))
+            ->where('section', 'projects')
+        );
+    }
+
+    public function test_show_non_existent_project_renders_not_found_view(): void
+    {
+        $user = User::factory()->create();
+        $tenant = Tenant::create(['user_id' => $user->id, 'name' => 'Acme Corp', 'status' => 'active']);
+
+        $response = $this->actingAs($user)
+            ->withSession(['tenant_id' => $tenant->id])
+            ->get('/erp/projects/99999');
+
+        $response->assertStatus(404);
+        $response->assertInertia(fn ($page) => $page
+            ->component('ERP/Errors/NotFound')
+            ->where('message', __('erp.project_not_found'))
+            ->where('section', 'projects')
+        );
+    }
 }
