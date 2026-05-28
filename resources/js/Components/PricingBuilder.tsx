@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/Components/ui/button';
 import { Link } from '@inertiajs/react';
@@ -60,7 +60,7 @@ export default function PricingBuilder({
     onSystemTypeChange,
     renderActions
 }: PricingBuilderProps) {
-    const [billing, setBilling] = useState<'1_month' | '6_months' | '1_year'>('1_year');
+    const [billing, setBilling] = useState<'1_month' | '6_months' | '1_year'>('1_month');
     
     // Default selected items (e.g., ERP and CRM) to show a populated cart by default
     const activeItems = useMemo(() => {
