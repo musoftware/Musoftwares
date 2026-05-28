@@ -72,5 +72,14 @@ class TenantClient extends TenantModel
     {
         return $this->hasMany(ERPTask::class, 'client_id');
     }
+
+    /**
+     * Support tickets filed for this client.
+     * Gated behind the erp-tickets addon.
+     */
+    public function tickets(): HasMany
+    {
+        return $this->hasMany(SupportTicket::class, 'client_id');
+    }
 }
 

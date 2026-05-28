@@ -1,4 +1,5 @@
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import ERPLayout from '@/Layouts/ERPLayout';
+import { useERPMenu } from '@/hooks/useERPMenu';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { PageHeader } from '@/Components/ui/PageHeader';
 import { CurrencyDisplay } from '@/Components/ui/CurrencyDisplay';
@@ -68,10 +69,10 @@ export default function Index({ income, expense, stats }) {
     };
 
     const businessCurrency = stats.business_currency || 'USD';
+    const { menuItems, workspaceName, tenantId } = useERPMenu('invoices');
 
     return (
-        <AuthenticatedLayout>
-            <Head title="Recurring Entries" />
+        <ERPLayout title="Recurring Entries" workspaceName={workspaceName} tenantId={tenantId} menuItems={menuItems}>
 
             <div className="py-12">
                 <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
@@ -262,6 +263,6 @@ export default function Index({ income, expense, stats }) {
                     </div>
                 </div>
             </div>
-        </AuthenticatedLayout>
+        </ERPLayout>
     );
 }

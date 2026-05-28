@@ -23,13 +23,16 @@ import {
     Loader2,
     Lock,
     Unlock,
-    UserPlus
+    UserPlus,
+    ArrowRight
 } from 'lucide-react';
 import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
+import { Card, CardContent } from '@/Components/ui/card';
 import { OperationalCard } from '@/Components/ui/OperationalCard';
 import { ConfirmModal } from '@/Components/ui/ConfirmModal';
+import { useERPMenu } from '@/hooks/useERPMenu';
 
 interface TeamMember {
     id: number;
@@ -43,6 +46,7 @@ interface TeamMember {
 
 interface MembersProps {
     members: TeamMember[];
+    hasFeature: boolean;
     auth: {
         user: {
             name: string;
@@ -52,7 +56,7 @@ interface MembersProps {
     };
 }
 
-export default function Members({ members, auth }: MembersProps) {
+export default function Members({ members, hasFeature, auth }: MembersProps) {
     const [showInviteModal, setShowInviteModal] = useState(false);
     const [showEditModal, setShowEditModal] = useState(false);
     const [selectedMember, setSelectedMember] = useState<TeamMember | null>(null);
@@ -119,37 +123,55 @@ export default function Members({ members, auth }: MembersProps) {
         });
     };
 
-    // Construct Menu Items matching Dashboard.tsx exactly
-    const menuItems = [
-        { id: 'overview', label: 'Overview', icon: LayoutDashboard },
-        { id: 'clients', label: 'Clients', icon: Users },
-        { id: 'projects', label: 'Projects', icon: Briefcase },
-        { id: 'tasks', label: 'Tasks', icon: CheckSquare },
-        { id: 'invoices', label: 'Invoices', icon: FileText },
-        { id: 'transactions', label: 'Transactions', icon: History },
-        { id: 'documents', label: 'Files', icon: Folder },
-        { id: 'notes', label: 'Notes', icon: Pin },
-        { id: 'calendar', label: 'Calendar', icon: CalendarIcon },
-        { id: 'team', label: 'Team', icon: UserCheck },
-        { id: 'settings', label: 'Settings', icon: Settings },
-    ];
-
-    const mappedMenuItems = menuItems.map(item => ({
-        ...item,
-        isActive: item.id === 'team',
-        href: item.id === 'team' ? route('erp.team-members.index') : route('erp.dashboard', { section: item.id })
-    }));
-
-    const workspaceName = auth.user ? `${auth.user.name}'s Workspace` : 'ERP Workspace';
+    // Use shared ERP menu hook
+    const { menuItems: mappedMenuItems, lockedAddons, workspaceName, tenantId } = useERPMenu('team');
 
     return (
         <ERPLayout 
             title="Team Members"
             workspaceName={workspaceName}
-            tenantId="ACTIVE"
+            tenantId={tenantId}
             menuItems={mappedMenuItems}
+            lockedAddons={lockedAddons}
         >
             <div className="space-y-6">
+                {!hasFeature ? (
+                    /* ── Premium Upgrade Card (same pattern as Backup) ── */
+                    <Card className="border-indigo-200/50 bg-gradient-to-br from-slate-50 to-indigo-50/30 shadow-none overflow-hidden relative mt-2">
+                        <div className="absolute top-0 right-0 translate-x-16 -translate-y-16 opacity-[0.04] pointer-events-none">
+                            <Users className="h-72 w-72 text-indigo-600" />
+                        </div>
+                        <CardContent className="p-8 md:p-10 relative z-10 space-y-6">
+                            <div className="flex items-center gap-2">
+                                <Lock className="h-5 w-5 text-indigo-600" />
+                                <span className="font-semibold text-indigo-600 text-sm tracking-wide">Premium Feature</span>
+                            </div>
+                            <div className="space-y-3">
+                                <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-slate-900 leading-tight">
+                                    Collaborate with Your Team in Real-Time
+                                </h1>
+                                <p className="text-slate-500 leading-relaxed max-w-2xl">
+                                    Unlock Team Members to invite managers and staff to your workspace. Assign roles, 
+                                    control access to finances and tasks, and track activity — all from one place.
+                                </p>
+                            </div>
+                            <div className="flex flex-wrap gap-4 text-sm text-slate-600">
+                                <div className="flex items-center gap-2"><Shield className="h-4 w-4 text-indigo-500" /> Role-based access</div>
+                                <div className="flex items-center gap-2"><UserPlus className="h-4 w-4 text-indigo-500" /> Invite by email</div>
+                                <div className="flex items-center gap-2"><Lock className="h-4 w-4 text-indigo-500" /> Suspend anytime</div>
+                            </div>
+                            <div className="pt-2">
+                                <Link href={route('subscriptions.plans')}>
+                                    <Button className="shadow-none flex items-center gap-2 group h-11 px-8 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold">
+                                        Unlock Team Members for 500 EGP/Yr
+                                        <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                                    </Button>
+                                </Link>
+                            </div>
+                        </CardContent>
+                    </Card>
+                ) : (
+                    <>
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div>
                         <h2 className="text-2xl font-semibold text-slate-900 tracking-tight">Team Members</h2>
@@ -254,7 +276,6 @@ export default function Members({ members, auth }: MembersProps) {
                         </table>
                     </div>
                 </OperationalCard>
-            </div>
 
             {/* INVITE TEAM MEMBER MODAL */}
             {showInviteModal && (
@@ -420,6 +441,9 @@ export default function Members({ members, auth }: MembersProps) {
                 onConfirm={confirmDelete}
                 onCancel={() => setDeleteConfirm({ open: false, member: null })}
             />
+            </>
+                )}
+            </div>
         </ERPLayout>
     );
 }

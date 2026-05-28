@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Head, Link, router } from '@inertiajs/react';
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import ERPLayout from '@/Layouts/ERPLayout';
+import { useERPMenu } from '@/hooks/useERPMenu';
 import { Button } from '@/Components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/Components/ui/card';
 import { Input } from '@/Components/ui/input';
@@ -30,9 +31,10 @@ export default function EditClient({ client, currencies }: { client: any, curren
         });
     };
 
+    const { menuItems, workspaceName, tenantId } = useERPMenu('clients');
+
     return (
-        <AuthenticatedLayout>
-            <Head title={`Edit Client — ${client.name}`} />
+        <ERPLayout title={`Edit — ${client.name}`} workspaceName={workspaceName} tenantId={tenantId} menuItems={menuItems}>
 
             <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8 space-y-6">
                 <div className="flex items-center gap-4">
@@ -131,6 +133,6 @@ export default function EditClient({ client, currencies }: { client: any, curren
                     </CardContent>
                 </Card>
             </div>
-        </AuthenticatedLayout>
+        </ERPLayout>
     );
 }

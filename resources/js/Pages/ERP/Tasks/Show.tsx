@@ -1,4 +1,5 @@
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import ERPLayout from '@/Layouts/ERPLayout';
+import { useERPMenu } from '@/hooks/useERPMenu';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -304,10 +305,10 @@ export default function Show({ task: initialTask, todos: initialTodos, completio
                 return <span className="px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide bg-slate-50 border border-slate-200 text-slate-500">Low</span>;
         }
     };
+    const { menuItems, workspaceName, tenantId } = useERPMenu('tasks');
 
     return (
-        <AuthenticatedLayout header="Task Board details">
-            <Head title={`ERP Task: ${task.task_name}`} />
+        <ERPLayout title={`ERP Task: ${task.task_name}`} workspaceName={workspaceName} tenantId={tenantId} menuItems={menuItems}>
 
             <div className="max-w-[1000px] mx-auto px-4 py-8 space-y-8 font-sans text-sm">
                 
@@ -835,6 +836,6 @@ export default function Show({ task: initialTask, todos: initialTodos, completio
                     </form>
                 </DialogContent>
             </Dialog>
-        </AuthenticatedLayout>
+        </ERPLayout>
     );
 }

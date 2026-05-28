@@ -1,4 +1,5 @@
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import ERPLayout from '@/Layouts/ERPLayout';
+import { useERPMenu } from '@/hooks/useERPMenu';
 import { Head, Link } from '@inertiajs/react';
 import { PageHeader } from '@/Components/ui/PageHeader';
 import { CurrencyDisplay } from '@/Components/ui/CurrencyDisplay';
@@ -8,8 +9,10 @@ import { format } from 'date-fns';
 import { ArrowLeft, CheckCircle2, XCircle } from 'lucide-react';
 
 export default function Logs({ entry, logs }) {
+    const { menuItems, workspaceName, tenantId } = useERPMenu('invoices');
+
     return (
-        <AuthenticatedLayout>
+        <ERPLayout title={`${entry.title} — Execution History`} workspaceName={workspaceName} tenantId={tenantId} menuItems={menuItems}>
             <Head title={`${entry.title} — Execution History`} />
 
             <div className="py-12">
@@ -88,6 +91,6 @@ export default function Logs({ entry, logs }) {
                     </div>
                 </div>
             </div>
-        </AuthenticatedLayout>
+        </ERPLayout>
     );
 }

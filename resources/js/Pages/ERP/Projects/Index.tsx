@@ -1,6 +1,7 @@
 import React from 'react';
 import { Head, Link, router } from '@inertiajs/react';
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import ERPLayout from '@/Layouts/ERPLayout';
+import { useERPMenu } from '@/hooks/useERPMenu';
 import { Badge } from '@/Components/ui/badge';
 import { Button } from '@/Components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/Components/ui/card';
@@ -37,9 +38,10 @@ export default function ProjectsIndex({ projects }: Props) {
         completed: projects.filter(p => p.status === 'completed').length,
     };
 
+    const { menuItems, workspaceName, tenantId } = useERPMenu('projects');
+
     return (
-        <AuthenticatedLayout>
-            <Head title="Projects" />
+        <ERPLayout title="Projects" workspaceName={workspaceName} tenantId={tenantId} menuItems={menuItems}>
 
             <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-6">
                 {/* Header */}
@@ -125,6 +127,6 @@ export default function ProjectsIndex({ projects }: Props) {
                     </div>
                 )}
             </div>
-        </AuthenticatedLayout>
+        </ERPLayout>
     );
 }

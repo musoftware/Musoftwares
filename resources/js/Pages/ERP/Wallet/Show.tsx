@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import ERPLayout from '@/Layouts/ERPLayout';
+import { useERPMenu } from '@/hooks/useERPMenu';
 import { Head, useForm, Link } from '@inertiajs/react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -120,10 +121,10 @@ export default function Show({ auth, wallet, transactions, client, errors }: Wal
         : [{ date: 'Today', balance: activeWallet.balance }];
 
     const clientInvoices: { id: string; amount: number; status: string; date: string }[] = [];
+    const { menuItems, workspaceName, tenantId } = useERPMenu('clients');
 
     return (
-        <AuthenticatedLayout header={undefined}>
-            <Head title={`Wallet Ledger - ${activeClient.name}`} />
+        <ERPLayout title={`Wallet Ledger - ${activeClient.name}`} workspaceName={workspaceName} tenantId={tenantId} menuItems={menuItems}>
 
             <div className="max-w-[1200px] mx-auto px-4 py-8 space-y-8">
                 {/* Header */}
@@ -440,6 +441,6 @@ export default function Show({ auth, wallet, transactions, client, errors }: Wal
                     </div>
                 </div>
             </div>
-        </AuthenticatedLayout>
+        </ERPLayout>
     );
 }

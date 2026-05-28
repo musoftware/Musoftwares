@@ -24,16 +24,17 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 interface Props {
     currencies: Array<{ id: number; currency: string; name: string }>;
     tenant?: { id: number; name: string; user_id: number };
+    hasMultiCurrency?: boolean;
+    baseCurrency?: string;
 }
 
-export default function CreateClient({ currencies, tenant }: Props) {
+export default function CreateClient({ currencies, tenant, hasMultiCurrency = false, baseCurrency = 'USD' }: Props) {
     const [form, setForm] = useState({
         name: '',
         email: '',
         phone: '',
         address: '',
-        currency: 'USD',
-        status: 'lead'
+        currency: hasMultiCurrency ? 'USD' : baseCurrency,
     });
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -133,21 +134,7 @@ export default function CreateClient({ currencies, tenant }: Props) {
                                     />
                                     {errors.phone && <p className="text-xs text-red-500">{errors.phone}</p>}
                                 </div>
-                                <div className="space-y-2">
-                                    <label className="text-sm font-medium text-slate-700">Status</label>
-                                    <Select value={form.status} onValueChange={(val) => setForm({...form, status: val})}>
-                                        <SelectTrigger className="bg-white border-slate-200 text-slate-900">
-                                            <SelectValue placeholder="Select status" />
-                                        </SelectTrigger>
-                                        <SelectContent className="bg-white border-slate-200 text-slate-900">
-                                            <SelectItem value="lead">Lead</SelectItem>
-                                            <SelectItem value="active">Active</SelectItem>
-                                            <SelectItem value="paying">Paying</SelectItem>
-                                            <SelectItem value="retained">Retained</SelectItem>
-                                        </SelectContent>
-                                    </Select>
-                                    {errors.status && <p className="text-xs text-red-500">{errors.status}</p>}
-                                </div>
+                                {hasMultiCurrency && (
                                 <div className="space-y-2 md:col-span-2">
                                     <label className="text-sm font-medium text-slate-700">Billing Currency <span className="text-red-500">*</span></label>
                                     <Select value={form.currency} onValueChange={(val) => setForm({...form, currency: val})}>
@@ -164,6 +151,7 @@ export default function CreateClient({ currencies, tenant }: Props) {
                                     </Select>
                                     {errors.currency && <p className="text-xs text-red-500">{errors.currency}</p>}
                                 </div>
+                                )}
                                 <div className="space-y-2 md:col-span-2">
                                     <label className="text-sm font-medium text-slate-700">Address</label>
                                     <Input

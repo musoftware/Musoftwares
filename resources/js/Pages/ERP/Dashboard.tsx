@@ -66,6 +66,7 @@ import { ActivityTimeline } from '@/Components/ui/ActivityTimeline';
 import { ConfirmModal } from '@/Components/ui/ConfirmModal';
 import { OperationalCard } from '@/Components/ui/OperationalCard';
 import { StatusBadge } from '@/Components/ui/StatusBadge';
+import { useERPMenu } from '@/hooks/useERPMenu';
 
 // FinancialAmount now uses CurrencyDisplay from the component library
 export function FinancialAmount({ amount, currency = 'USD', colorize = false }: { amount: number; currency?: string; colorize?: boolean }) {
@@ -149,9 +150,10 @@ interface ERPDashboardProps {
         authorizer: string;
         date: string;
     }>;
+    hasMultiCurrency?: boolean;
 }
 
-export default function ERPDashboard({ tenant: serverTenant, stats: serverStats, clients: serverClients, invoices: serverInvoices, chartData: serverChartData, projects: serverProjects, supportTickets: serverTickets, activityLogs: serverActivityLogs, upcomingBookings: serverBookings, storageProviders: serverStorageProviders, documents: serverDocuments, tasks: serverTasks, notes: serverNotes, transactions: serverTransactions }: ERPDashboardProps) {
+export default function ERPDashboard({ tenant: serverTenant, stats: serverStats, clients: serverClients, invoices: serverInvoices, chartData: serverChartData, projects: serverProjects, supportTickets: serverTickets, activityLogs: serverActivityLogs, upcomingBookings: serverBookings, storageProviders: serverStorageProviders, documents: serverDocuments, tasks: serverTasks, notes: serverNotes, transactions: serverTransactions, hasMultiCurrency = false }: ERPDashboardProps) {
     const { toast } = useToast();
     const { auth } = usePage().props as any;
     const isTeamMember = !!auth?.team_member;
@@ -929,23 +931,23 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                                         <table className="w-full text-left text-sm border-collapse">
                                             <thead>
                                                 <tr className="bg-slate-50 border-b border-slate-100 text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                                                    <th className="px-6 py-3.5">Client / Company</th>
-                                                    <th className="px-6 py-3.5">Contact Detail</th>
-                                                    <th className="px-6 py-3.5">Address</th>
-                                                    <th className="px-6 py-3.5 text-right">Invoiced</th>
+                                                    <th className="px-6 py-3.5">Client</th>
+                                                    <th className="px-6 py-3.5">Contact</th>
+                                                    <th className="px-6 py-3.5 text-right">Balance</th>
+                                                    <th className="px-6 py-3.5 text-right">Unpaid</th>
                                                     <th className="px-6 py-3.5 text-right">Paid</th>
-                                                    {!isReadOnlyMember && <th className="px-6 py-3.5 text-center">Wallet Action</th>}
-                                                    {!isReadOnlyMember && <th className="px-6 py-3.5 text-right">Control</th>}
+                                                    <th className="px-6 py-3.5">Created</th>
+                                                    {!isReadOnlyMember && <th className="px-6 py-3.5 text-right">Actions</th>}
                                                 </tr>
                                             </thead>
                                             <tbody className="divide-y divide-slate-100">
                                                 {activeClients.length === 0 ? (
                                                     <tr>
-                                                        <td colSpan={isReadOnlyMember ? 5 : 7} className="p-0">
+                                                        <td colSpan={isReadOnlyMember ? 6 : 7} className="p-0">
                                                             <EmptyState 
                                                                 icon={Users} 
                                                                 title="No Clients" 
-                                                                description="Establish client entities to start generating invoices and tracking project schedules."
+                                                                description="Add your first client to start managing invoices and projects."
                                                             />
                                                         </td>
                                                     </tr>
@@ -953,30 +955,37 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                                                     activeClients.map((client) => (
                                                         <tr key={client.id} className="hover:bg-slate-50 transition text-[13px] text-slate-700">
                                                             <td className="px-6 py-4">
-                                                                <span className="font-semibold text-slate-900 block">{client.name}</span>
-                                                                <span className="text-slate-400 text-xs mt-0.5 block">{client.company}</span>
+                                                                <Link href={route('erp.clients.show', client.id)} className="hover:underline">
+                                                                    <span className="font-semibold text-slate-900 block">{client.name}</span>
+                                                                </Link>
+                                                                <span className="text-slate-400 text-xs mt-0.5 block">ID: {client.id}</span>
                                                             </td>
                                                             <td className="px-6 py-4 font-mono text-xs">
                                                                 <span className="block text-slate-600">{client.email}</span>
                                                                 <span className="block text-slate-400 mt-0.5">{client.phone}</span>
                                                             </td>
-                                                            <td className="px-6 py-4 text-slate-500 text-xs truncate max-w-[150px]">{client.address}</td>
-                                                            <td className="px-6 py-4 text-right font-semibold text-slate-950 font-mono">
-                                                                <CurrencyDisplay amount={client.totalInvoiced} currency={currency} />
+                                                            <td className="px-6 py-4 text-right font-semibold text-slate-900 font-mono">
+                                                                <CurrencyDisplay amount={client.balance ?? 0} currency={currency} />
+                                                            </td>
+                                                            <td className="px-6 py-4 text-right font-mono">
+                                                                {(client.unpaid ?? 0) > 0 ? (
+                                                                    <span className="font-bold text-rose-600">
+                                                                        <CurrencyDisplay amount={client.unpaid} currency={currency} />
+                                                                    </span>
+                                                                ) : (
+                                                                    <span className="text-slate-400">—</span>
+                                                                )}
                                                             </td>
                                                             <td className="px-6 py-4 text-right font-bold text-emerald-600 font-mono">
-                                                                <CurrencyDisplay amount={client.totalPaid} currency={currency} />
+                                                                <CurrencyDisplay amount={client.totalPaid ?? 0} currency={currency} />
                                                             </td>
-                                                            {!isReadOnlyMember && (
-                                                                <td className="px-6 py-4 text-center">
-                                                                    <Link href={route("erp.clients.wallet.adjust", selectedClient?.id)}><Button size="sm" className="shadow-none">
-                                                                        <CreditCard className="mr-1 h-3.5 w-3.5" /> Adjust Balance
-                                                                    </Button></Link>
-                                                                </td>
-                                                            )}
+                                                            <td className="px-6 py-4 text-slate-500 text-xs">{client.created_at ?? '—'}</td>
                                                             {!isReadOnlyMember && (
                                                                 <td className="px-6 py-4 text-right">
                                                                     <div className="flex items-center justify-end gap-1.5">
+                                                                        <Link href={route('erp.clients.show', client.id)} className="p-1 hover:bg-slate-100 rounded text-slate-500">
+                                                                            <Eye className="h-3.5 w-3.5" />
+                                                                        </Link>
                                                                         <button 
                                                                             onClick={() => {
                                                                                 setSelectedClient(client);

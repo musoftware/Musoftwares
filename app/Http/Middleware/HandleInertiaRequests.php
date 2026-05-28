@@ -81,6 +81,17 @@ class HandleInertiaRequests extends Middleware
                     }
                     return [];
                 },
+                'erp_addons' => function () use ($user) {
+                    if (!$user) return [];
+                    try {
+                        $erpAddons = collect(config('saas.addons', []))
+                            ->filter(fn($a) => ($a['parent'] ?? '') === 'erp')
+                            ->keys();
+                        return $erpAddons->filter(fn($slug) => $user->hasModuleSubscription($slug))->values()->toArray();
+                    } catch (\Throwable $e) {
+                        return [];
+                    }
+                },
             ],
             'notifications' => function () use ($user) {
                 if ($user) {

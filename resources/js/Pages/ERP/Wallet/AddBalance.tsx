@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import ERPLayout from '@/Layouts/ERPLayout';
+import { useERPMenu } from '@/hooks/useERPMenu';
 import { Head, useForm, Link } from '@inertiajs/react';
 import {
     ArrowLeft, CreditCard, Zap, Building2, Banknote, ShieldCheck
@@ -98,10 +99,10 @@ export default function AddBalance({ wallet, client }: AddBalanceProps) {
         { id: 'bank', name: 'Wire / ACH', desc: '1-2 business days for clearing', icon: Building2 },
         { id: 'crypto', name: 'USDC Stablecoin', desc: 'Ethereum & Solana chains', icon: Banknote },
     ];
+    const { menuItems, workspaceName, tenantId } = useERPMenu('clients');
 
     return (
-        <AuthenticatedLayout header={undefined}>
-            <Head title="Deposit Funds" />
+        <ERPLayout title="Deposit Funds" workspaceName={workspaceName} tenantId={tenantId} menuItems={menuItems}>
 
             <div className="max-w-2xl mx-auto px-4 py-8 space-y-6">
                 {/* Header */}
@@ -181,6 +182,7 @@ export default function AddBalance({ wallet, client }: AddBalanceProps) {
                             {paymentMethods.map((method) => {
                                 const IconComponent = method.icon;
                                 const isSelected = selectedMethod === method.id;
+
                                 return (
                                     <div
                                         key={method.id}
@@ -219,7 +221,7 @@ export default function AddBalance({ wallet, client }: AddBalanceProps) {
                     </div>
                 </form>
             </div>
-        </AuthenticatedLayout>
+        </ERPLayout>
     );
 }
 

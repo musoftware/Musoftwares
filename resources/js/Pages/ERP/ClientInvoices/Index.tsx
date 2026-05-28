@@ -1,5 +1,6 @@
 import React from 'react';
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import ERPLayout from '@/Layouts/ERPLayout';
+import { useERPMenu } from '@/hooks/useERPMenu';
 import { Head, Link } from '@inertiajs/react';
 import { DataTable } from '@/Components/ui/DataTable';
 import { StatusBadge } from '@/Components/ui/StatusBadge';
@@ -75,8 +76,7 @@ export default function Index({
 }: IndexProps) {
     if (no_client) {
         return (
-            <AuthenticatedLayout>
-                <Head title="Billing Portal" />
+            <ERPLayout title="Billing Portal" workspaceName="Workspace" tenantId="ACTIVE" menuItems={[]}>
                 <div className="max-w-[800px] mx-auto px-4 sm:px-6 py-20 font-sans">
                     <Card className="border border-red-100 shadow-xl rounded-2xl overflow-hidden bg-white">
                         <CardContent className="p-8 flex flex-col items-center text-center space-y-6">
@@ -95,7 +95,7 @@ export default function Index({
                         </CardContent>
                     </Card>
                 </div>
-            </AuthenticatedLayout>
+            </ERPLayout>
         );
     }
 
@@ -211,9 +211,10 @@ export default function Index({
 
     const tableData = invoices?.data || [];
 
+    const { menuItems, workspaceName, tenantId } = useERPMenu('invoices');
+
     return (
-        <AuthenticatedLayout>
-            <Head title="Billing & Invoices" />
+        <ERPLayout title="Billing & Invoices" workspaceName={workspaceName} tenantId={tenantId} menuItems={menuItems}>
             <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 py-10 font-sans space-y-8">
                 
                 {/* Header */}
@@ -287,6 +288,6 @@ export default function Index({
                     />
                 </div>
             </div>
-        </AuthenticatedLayout>
+        </ERPLayout>
     );
 }

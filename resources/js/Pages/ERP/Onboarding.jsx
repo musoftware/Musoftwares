@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import ERPLayout from '@/Layouts/ERPLayout';
+import { useERPMenu } from '@/hooks/useERPMenu';
 import { Head, useForm } from '@inertiajs/react';
 import confetti from 'canvas-confetti';
 import { Card, CardContent } from '@/Components/ui/card';
@@ -32,10 +33,10 @@ export default function Onboarding({ currencies = [] }) {
 
         post(route('erp.onboarding.complete'));
     };
+    const { menuItems, workspaceName, tenantId } = useERPMenu('overview');
 
     return (
-        <AuthenticatedLayout header="ERP Setup Wizard">
-            <Head title="Configure ERP" />
+        <ERPLayout title="Configure ERP" workspaceName={workspaceName} tenantId={tenantId} menuItems={menuItems}>
 
             <div className="py-12 px-4 max-w-2xl mx-auto">
                 <Card className="shadow-none border bg-card text-card-foreground">
@@ -305,6 +306,6 @@ export default function Onboarding({ currencies = [] }) {
                     </CardContent>
                 </Card>
             </div>
-        </AuthenticatedLayout>
+        </ERPLayout>
     );
 }

@@ -81,8 +81,11 @@ Route::middleware(['web', 'auth', 'tenant.active'])
         Route::get('backup/download', [\Modules\ERP\Http\Controllers\BackupController::class, 'download'])->name('backup.download');
         Route::post('backup/restore', [\Modules\ERP\Http\Controllers\BackupController::class, 'restore'])->name('backup.restore');
 
-        // ── Missing Routes for Frontend ──
-        Route::get('team-members', [\Modules\ERP\Http\Controllers\ERPDashboardController::class, 'index'])->name('team-members.index');
+        // ── Team Members ──
+        Route::get('team-members', [\Modules\ERP\Http\Controllers\Team\TeamMemberController::class, 'index'])->name('team-members.index');
+        Route::post('team-members', [\Modules\ERP\Http\Controllers\Team\TeamMemberController::class, 'store'])->name('team-members.store');
+        Route::put('team-members/{id}', [\Modules\ERP\Http\Controllers\Team\TeamMemberController::class, 'update'])->name('team-members.update');
+        Route::delete('team-members/{id}', [\Modules\ERP\Http\Controllers\Team\TeamMemberController::class, 'destroy'])->name('team-members.destroy');
         Route::get('tickets/create', [\Modules\ERP\Http\Controllers\TicketController::class, 'create'])->name('tickets.create');
         Route::post('tickets', [\Modules\ERP\Http\Controllers\TicketController::class, 'store'])->name('tickets.store');
         Route::post('tickets/{ticket}/resolve', [\Modules\ERP\Http\Controllers\TicketController::class, 'resolve'])->name('tickets.resolve');

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import ERPLayout from '@/Layouts/ERPLayout';
+import { useERPMenu } from '@/hooks/useERPMenu';
 import { Head, Link, router } from '@inertiajs/react';
 import { CurrencyDisplay } from '@/Components/ui/CurrencyDisplay';
 import { DateDisplay } from '@/Components/ui/DateDisplay';
@@ -93,9 +94,10 @@ export default function Pay({
         }
     };
 
+    const { menuItems, workspaceName, tenantId } = useERPMenu('invoices');
+
     return (
-        <AuthenticatedLayout>
-            <Head title={`Invoice #${invoice.invoice_number}`} />
+        <ERPLayout title={`Invoice #${invoice.invoice_number}`} workspaceName={workspaceName} tenantId={tenantId} menuItems={menuItems}>
             
             <div className="max-w-[1000px] mx-auto px-4 sm:px-6 py-10 font-sans space-y-6">
                 {/* Navigation Back */}
@@ -273,6 +275,6 @@ export default function Pay({
                     </div>
                 </div>
             </div>
-        </AuthenticatedLayout>
+        </ERPLayout>
     );
 }
