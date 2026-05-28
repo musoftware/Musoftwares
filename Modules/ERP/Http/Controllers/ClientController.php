@@ -35,7 +35,7 @@ class ClientController extends Controller
         }
 
         // Load base relationships
-        $client->load(['projects', 'wallet', 'currency']);
+        $client->load(['projects', 'currency']);
 
         // Conditionally load tickets if addon is active
         $hasTickets = $user->hasModuleSubscription('erp-tickets');
@@ -143,12 +143,6 @@ class ClientController extends Controller
             'address'   => $validated['address'] ?? null,
             'currency_id' => $currencyId,
         ]);
-
-        // Auto-create client wallet
-        \Modules\ERP\Models\ClientWallet::firstOrCreate(
-            ['tenant_id' => $tenant->id, 'client_id' => $client->id],
-            ['balance' => 0, 'currency_id' => $client->currency_id]
-        );
 
         ActivityLogger::log(
             'client_created',

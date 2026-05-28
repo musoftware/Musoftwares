@@ -71,7 +71,7 @@ class ERPDashboardController extends Controller
         if ($tenantId) {
             $limit = $request->query('section') === 'clients' ? 100 : 10;
             $query = TenantClient::where('tenant_id', $tenantId)
-                ->with(['wallet', 'currency'])
+                ->with(['currency'])
                 ->withCount('invoices');
 
             if ($request->filled('search') && $request->query('section') === 'clients') {
@@ -101,7 +101,7 @@ class ERPDashboardController extends Controller
                         'phone' => $client->phone ?? '-',
                         'address' => $client->address ?? '-',
                         'currency' => $client->currency?->currency ?? 'USD',
-                        'balance' => round($client->wallet?->balance ?? 0, 2),
+                        'balance' => round($client->balance ?? 0, 2),
                         'unpaid' => round($unpaid, 2),
                         'totalPaid' => round($totalPaid, 2),
                         'invoices_count' => $client->invoices_count,
@@ -351,7 +351,7 @@ class ERPDashboardController extends Controller
 
 
         if ($tenantId) {
-            $rawTxns = WalletTransaction::with(['creator', 'wallet.client', 'currency'])
+            $rawTxns = WalletTransaction::with(['creator', 'client', 'currency'])
                 ->where('tenant_id', $tenantId)
                 ->latest()
                 ->take(50)
@@ -371,9 +371,9 @@ class ERPDashboardController extends Controller
                     else if ($txn->reference_type === 'withdrawal') $title = 'Withdrawal Settlement';
 
                     $txnCurrency = $txn->currency?->currency ?? $businessCurrency;
-                    $clientCurrency = $txn->wallet?->client?->currency?->currency ?? $txnCurrency;
+                    $clientCurrency = $txn->client?->currency?->currency ?? $txnCurrency;
                     
-                    // Invert direction from client wallet perspective to ERP owner perspective:
+                    // Invert direction from client perspective to ERP owner perspective:
                     // client debit => business CREDIT (inflow)
                     // client credit => business DEBIT (outflow)
                     $ownerDirection = $txn->direction === 'debit' ? 'credit' : 'debit';
@@ -390,12 +390,12 @@ class ERPDashboardController extends Controller
                         'currency' => $txnCurrency,
                         'client_currency' => $clientCurrency,
                         'business_currency' => $businessCurrency,
-                        'balance_before' => round($txn->balance_before ?? 0, 2),
-                        'balance_after' => round($txn->balance_after ?? 0, 2),
+                        'balance_before' => 0,
+                        'balance_after' => 0,
                         'reference_type' => $txn->reference_type,
                         'reference_id_raw' => $txn->reference_id,
-                        'client_name' => $txn->wallet?->client?->name ?? 'Unknown',
-                        'client_id' => $txn->wallet?->client?->id,
+                        'client_name' => $txn->client?->name ?? 'Unknown',
+                        'client_id' => $txn->client?->id,
                         'authorizer' => $txn->creator?->name ?? 'System Core',
                         'date' => $txn->created_at?->format('Y-m-d H:i'),
                     ];
@@ -488,11 +488,6 @@ class ERPDashboardController extends Controller
                         'currency_id' => \App\Models\Currency::where('currency', $clientCurrency)->value('id'),
                     ]);
 
-                    // Auto-create client wallet
-                    \Modules\ERP\Models\ClientWallet::firstOrCreate(
-                        ['tenant_id' => $tenant->id, 'client_id' => $client->id],
-                        ['balance' => 0, 'currency_id' => \App\Models\Currency::where('currency', $clientCurrency)->value('id')]
-                    );
 
                     // 4. Create first invoice if provided
                     if ($request->invoiceDesc && $request->invoiceAmount) {

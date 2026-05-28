@@ -6,7 +6,6 @@ use App\Models\User;
 use App\Models\Currency;
 use Modules\ERP\Models\Tenant;
 use Modules\ERP\Models\TenantClient;
-use Modules\ERP\Models\ClientWallet;
 use Modules\ERP\Models\Invoice;
 use Modules\ERP\Models\WalletTransaction;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -57,11 +56,19 @@ class ERPInvoiceManualPaymentTransactionTest extends TestCase
             'currency_id' => $this->currency->id,
         ]);
 
-        $wallet = ClientWallet::create([
+        // Seed initial balance of 150.00
+        WalletTransaction::create([
             'tenant_id' => $this->tenant->id,
             'client_id' => $client->id,
-            'balance' => 150.00,
+            'type' => 'manual_credit',
+            'direction' => 'credit',
+            'amount' => 150.00,
             'currency_id' => $this->currency->id,
+            'business_amount' => 150.00,
+            'business_currency_id' => $this->tenant->base_currency_id,
+            'exchange_rate' => 1.0,
+            'exchange_rate_date' => now()->toDateString(),
+            'note' => 'Initial deposit',
         ]);
 
         $invoice = Invoice::create([
@@ -86,33 +93,33 @@ class ERPInvoiceManualPaymentTransactionTest extends TestCase
         $this->assertEquals(500.00, (float) $invoice->fresh()->paid_amount);
 
         // Net wallet balance should remain unchanged
-        $wallet->refresh();
-        $this->assertEquals(150.00, (float) $wallet->balance);
+        $this->assertEquals(150.00, (float) $client->balance());
 
         // Check transactions
-        $transactions = WalletTransaction::where('wallet_id', $wallet->id)
+        $transactions = WalletTransaction::where('client_id', $client->id)
             ->orderBy('id', 'asc')
             ->get();
 
-        $this->assertCount(2, $transactions);
+        $this->assertCount(3, $transactions);
+
+        // Initial deposit
+        $this->assertEquals('manual_credit', $transactions[0]->type);
+        $this->assertEquals('credit', $transactions[0]->direction);
+        $this->assertEquals(150.00, (float) $transactions[0]->amount);
 
         // Credit transaction
-        $creditTx = $transactions[0];
+        $creditTx = $transactions[1];
         $this->assertEquals('manual_credit', $creditTx->type);
         $this->assertEquals('credit', $creditTx->direction);
         $this->assertEquals(500.00, (float) $creditTx->amount);
-        $this->assertEquals(150.00, (float) $creditTx->balance_before);
-        $this->assertEquals(650.00, (float) $creditTx->balance_after);
         $this->assertEquals(Invoice::class, $creditTx->reference_type);
         $this->assertEquals($invoice->id, $creditTx->reference_id);
 
         // Debit transaction
-        $debitTx = $transactions[1];
+        $debitTx = $transactions[2];
         $this->assertEquals('invoice_paid', $debitTx->type);
         $this->assertEquals('debit', $debitTx->direction);
         $this->assertEquals(500.00, (float) $debitTx->amount);
-        $this->assertEquals(650.00, (float) $debitTx->balance_before);
-        $this->assertEquals(150.00, (float) $debitTx->balance_after);
         $this->assertEquals(Invoice::class, $debitTx->reference_type);
         $this->assertEquals($invoice->id, $debitTx->reference_id);
     }
@@ -126,11 +133,19 @@ class ERPInvoiceManualPaymentTransactionTest extends TestCase
             'currency_id' => $this->currency->id,
         ]);
 
-        $wallet = ClientWallet::create([
+        // Seed initial balance of 500.00
+        WalletTransaction::create([
             'tenant_id' => $this->tenant->id,
             'client_id' => $client->id,
-            'balance' => 500.00,
+            'type' => 'manual_credit',
+            'direction' => 'credit',
+            'amount' => 500.00,
             'currency_id' => $this->currency->id,
+            'business_amount' => 500.00,
+            'business_currency_id' => $this->tenant->base_currency_id,
+            'exchange_rate' => 1.0,
+            'exchange_rate_date' => now()->toDateString(),
+            'note' => 'Initial deposit',
         ]);
 
         $invoice = Invoice::create([
@@ -150,8 +165,7 @@ class ERPInvoiceManualPaymentTransactionTest extends TestCase
         // Apply a partial payment of 200.00 first (this debits wallet by 200.00)
         $invoice->partiallyBillInvoice(200.00);
 
-        $wallet->refresh();
-        $this->assertEquals(300.00, (float) $wallet->balance);
+        $this->assertEquals(300.00, (float) $client->balance());
         $this->assertEquals('partial', $invoice->fresh()->status);
         $this->assertEquals(200.00, (float) $invoice->fresh()->paid_amount);
 
@@ -163,34 +177,34 @@ class ERPInvoiceManualPaymentTransactionTest extends TestCase
         $this->assertEquals(500.00, (float) $invoice->fresh()->paid_amount);
 
         // Wallet balance remains 300.00
-        $wallet->refresh();
-        $this->assertEquals(300.00, (float) $wallet->balance);
+        $this->assertEquals(300.00, (float) $client->balance());
 
         // Check transactions
-        $transactions = WalletTransaction::where('wallet_id', $wallet->id)
+        $transactions = WalletTransaction::where('client_id', $client->id)
             ->orderBy('id', 'asc')
             ->get();
 
-        // 1 from partial payment, 2 from manual payment = 3 total
-        $this->assertCount(3, $transactions);
+        // 1 initial credit, 1 from partial payment, 2 from manual payment = 4 total
+        $this->assertCount(4, $transactions);
+
+        // Initial deposit
+        $this->assertEquals('manual_credit', $transactions[0]->type);
+        $this->assertEquals('credit', $transactions[0]->direction);
+        $this->assertEquals(500.00, (float) $transactions[0]->amount);
 
         // First transaction (debit from partial bill)
-        $this->assertEquals('invoice_paid', $transactions[0]->type);
-        $this->assertEquals('debit', $transactions[0]->direction);
-        $this->assertEquals(200.00, (float) $transactions[0]->amount);
+        $this->assertEquals('invoice_paid', $transactions[1]->type);
+        $this->assertEquals('debit', $transactions[1]->direction);
+        $this->assertEquals(200.00, (float) $transactions[1]->amount);
 
         // Second transaction (credit from manual mark paid for the remaining amount)
-        $this->assertEquals('manual_credit', $transactions[1]->type);
-        $this->assertEquals('credit', $transactions[1]->direction);
-        $this->assertEquals(300.00, (float) $transactions[1]->amount);
-        $this->assertEquals(300.00, (float) $transactions[1]->balance_before);
-        $this->assertEquals(600.00, (float) $transactions[1]->balance_after);
+        $this->assertEquals('manual_credit', $transactions[2]->type);
+        $this->assertEquals('credit', $transactions[2]->direction);
+        $this->assertEquals(300.00, (float) $transactions[2]->amount);
 
         // Third transaction (debit from manual mark paid for the remaining amount)
-        $this->assertEquals('invoice_paid', $transactions[2]->type);
-        $this->assertEquals('debit', $transactions[2]->direction);
-        $this->assertEquals(300.00, (float) $transactions[2]->amount);
-        $this->assertEquals(600.00, (float) $transactions[2]->balance_before);
-        $this->assertEquals(300.00, (float) $transactions[2]->balance_after);
+        $this->assertEquals('invoice_paid', $transactions[3]->type);
+        $this->assertEquals('debit', $transactions[3]->direction);
+        $this->assertEquals(300.00, (float) $transactions[3]->amount);
     }
 }

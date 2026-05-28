@@ -29,18 +29,21 @@ The ERP is the nervous system of the company. It is NOT a collection of database
 - Invoices are immutable once finalized (Sent). Modifications require credit notes or explicit revision tracking.
 - Do not perform simple `delete()` calls on finalized financial documents. They must be voided or archived.
 
-### Wallet & Credits System
-- The Wallet acts as a ledger.
-- All additions and deductions to a user's wallet must be recorded as explicit Ledger Transactions (Credits / Debits) with reference IDs tying them back to the action that caused the transaction (e.g., "Purchased Plugin X").
+### Wallet & Credits System (Client Ledger)
+- **No Client Wallet Database Layer**: Do not use any client wallet table or model. Track client ledger balances entirely using direct transaction records.
+- **Direct Transactions**: Link all transactions and cost transactions (expenses) directly to the Client (`client_id`) and/or Project (`project_id`).
+- **Dynamic Balance**: Calculate the client's current balance on-the-fly as `Credits - Debits`.
+- **Computational Locked Balance**: Locked balance is purely computational. Do not use manual lock/unlock transaction structures or persist locked funds in the database. Calculate it dynamically as the sum of `unpaidAmount()` for all outstanding/pending invoices (status is `sent` or `partial`) for that client.
 
 ## 3. Implementation Constraints
 > [!WARNING]
-> **No Direct Database Manipulation for Financials.** Never increment/decrement balances directly via Eloquent updates without writing a corresponding ledger entry. Use the dedicated Wallet/Ledger Services.
+> **No Direct Database Manipulation for Financials.** Never increment/decrement client balances via raw database columns. All financial adjustments must be recorded as explicit ledger transaction entries.
 
 > [!IMPORTANT]
 > **Idempotency.** Actions like "Process Payment" or "Charge Subscription" must be idempotent. If a queue worker fails halfway through, retrying the job must not result in a double charge.
 
 ## Summary Checklist
 - [ ] Are financial transactions handled via ledger entries rather than raw balance updates?
+- [ ] Is the client's locked balance calculated dynamically as the sum of unpaid amounts on their pending invoices?
 - [ ] Does the UI reflect the entity's current lifecycle state (e.g., showing a "Void" button instead of "Delete" for a sent invoice)?
 - [ ] Are state transitions enforced by the backend service layer?

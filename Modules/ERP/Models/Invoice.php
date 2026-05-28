@@ -177,38 +177,22 @@ class Invoice extends TenantModel
     public function markPaidManual(): array
     {
         if ($this->status === 'paid') {
-            return ['ok' => false, 'message' => 'Invoice is already paid.'];
+            return ['ok' => false, 'message' => __('errors.invoice_already_paid')];
         }
 
         if (!in_array($this->status, ['sent', 'partial'])) {
-            return ['ok' => false, 'message' => 'Invoice must be issued before it can be marked as paid.'];
+            return ['ok' => false, 'message' => __('errors.invoice_must_be_issued')];
         }
 
         $client = $this->client;
         if (!$client) {
-            return ['ok' => false, 'message' => 'Invoice has no associated client.'];
-        }
-
-        $wallet = $client->wallet;
-        if (!$wallet) {
-            $wallet = ClientWallet::create([
-                'tenant_id' => $this->tenant_id,
-                'client_id' => $client->id,
-                'balance' => 0,
-                'currency_id' => $client->currency_id ?? $this->currency_id,
-            ]);
+            return ['ok' => false, 'message' => __('errors.invoice_no_client')];
         }
 
         $amountDue = $this->unpaidAmount();
 
-        return DB::transaction(function () use ($wallet, $amountDue, $client) {
+        return DB::transaction(function () use ($amountDue, $client) {
             if ($amountDue > 0) {
-                // Lock the wallet row for update
-                $wallet = ClientWallet::where('id', $wallet->id)->lockForUpdate()->first();
-
-                $balanceBefore = (float) $wallet->balance;
-                $balanceAfterCredit = $balanceBefore + $amountDue;
-
                 // Proportion for business amount
                 $ratio = $amountDue / max(0.01, (float) $this->amount);
                 $businessAmountDue = round((float) $this->business_amount * $ratio, 2);
@@ -216,7 +200,8 @@ class Invoice extends TenantModel
                 // 1. Create Credit Transaction (external payment deposit)
                 WalletTransaction::create([
                     'tenant_id' => $this->tenant_id,
-                    'wallet_id' => $wallet->id,
+                    'client_id' => $client->id,
+                    'project_id' => $this->project_id,
                     'type' => 'manual_credit',
                     'direction' => 'credit',
                     'amount' => $amountDue,
@@ -225,8 +210,6 @@ class Invoice extends TenantModel
                     'business_currency_id' => $this->tenant->base_currency_id,
                     'exchange_rate' => (float) $this->exchange_rate,
                     'exchange_rate_date' => $this->exchange_rate_date ?? now()->toDateString(),
-                    'balance_before' => $balanceBefore,
-                    'balance_after' => $balanceAfterCredit,
                     'reference_type' => Invoice::class,
                     'reference_id' => $this->id,
                     'note' => 'Manual payment deposit for Invoice #' . $this->invoice_number,
@@ -236,7 +219,8 @@ class Invoice extends TenantModel
                 // 2. Create Debit Transaction (invoice payment)
                 WalletTransaction::create([
                     'tenant_id' => $this->tenant_id,
-                    'wallet_id' => $wallet->id,
+                    'client_id' => $client->id,
+                    'project_id' => $this->project_id,
                     'type' => 'invoice_paid',
                     'direction' => 'debit',
                     'amount' => $amountDue,
@@ -245,16 +229,11 @@ class Invoice extends TenantModel
                     'business_currency_id' => $this->tenant->base_currency_id,
                     'exchange_rate' => (float) $this->exchange_rate,
                     'exchange_rate_date' => $this->exchange_rate_date ?? now()->toDateString(),
-                    'balance_before' => $balanceAfterCredit,
-                    'balance_after' => $balanceBefore, // Net balance is unchanged
                     'reference_type' => Invoice::class,
                     'reference_id' => $this->id,
                     'note' => 'Payment for Invoice #' . $this->invoice_number,
                     'created_by' => Auth::id(),
                 ]);
-
-                // Update wallet balance (will remain the same, but triggers model updates)
-                $wallet->update(['balance' => $balanceBefore]);
             }
 
             // Mark invoice as paid
@@ -279,7 +258,7 @@ class Invoice extends TenantModel
                 $client->id
             );
 
-            return ['ok' => true, 'message' => 'Invoice marked as paid manually.'];
+            return ['ok' => true, 'message' => __('erp.invoice_paid_manual_success')];
         });
     }
 
@@ -294,47 +273,33 @@ class Invoice extends TenantModel
     public function billInvoice(): array
     {
         if ($this->status === 'paid') {
-            return ['ok' => false, 'message' => 'Invoice is already paid.'];
+            return ['ok' => false, 'message' => __('errors.invoice_already_paid')];
         }
 
         if (!in_array($this->status, ['sent', 'partial'])) {
-            return ['ok' => false, 'message' => 'Invoice must be sent before it can be billed.'];
+            return ['ok' => false, 'message' => __('errors.invoice_must_be_sent')];
         }
 
         $client = $this->client;
         if (!$client) {
-            return ['ok' => false, 'message' => 'Invoice has no associated client.'];
-        }
-
-        $wallet = $client->wallet;
-        if (!$wallet) {
-            $wallet = ClientWallet::create([
-                'tenant_id' => $this->tenant_id,
-                'client_id' => $client->id,
-                'balance' => 0,
-            ]);
+            return ['ok' => false, 'message' => __('errors.invoice_no_client')];
         }
 
         $amountDue = $this->unpaidAmount();
         if ($amountDue <= 0) {
-            return ['ok' => false, 'message' => 'No outstanding balance on this invoice.'];
+            return ['ok' => false, 'message' => __('errors.invoice_no_outstanding')];
         }
 
-        if ((float) $wallet->balance < $amountDue) {
-            return ['ok' => false, 'message' => 'Insufficient client wallet balance. Required: ' . $amountDue . ', Available: ' . $wallet->balance];
+        if ((float) $client->balance() < $amountDue) {
+            return ['ok' => false, 'message' => __('errors.insufficient_client_balance_details', ['required' => $amountDue, 'available' => $client->balance()])];
         }
 
-        return DB::transaction(function () use ($wallet, $amountDue, $client) {
-            // Lock the wallet row for update
-            $wallet = ClientWallet::where('id', $wallet->id)->lockForUpdate()->first();
-
-            $balanceBefore = (float) $wallet->balance;
-            $balanceAfter = $balanceBefore - $amountDue;
-
-            // Debit the client wallet
+        return DB::transaction(function () use ($amountDue, $client) {
+            // Debit the client transactions
             WalletTransaction::create([
                 'tenant_id' => $this->tenant_id,
-                'wallet_id' => $wallet->id,
+                'client_id' => $client->id,
+                'project_id' => $this->project_id,
                 'type' => 'invoice_paid',
                 'direction' => 'debit',
                 'amount' => $amountDue,
@@ -343,15 +308,11 @@ class Invoice extends TenantModel
                 'business_currency_id' => $this->tenant->base_currency_id,
                 'exchange_rate' => (float) $this->exchange_rate,
                 'exchange_rate_date' => $this->exchange_rate_date ?? now()->toDateString(),
-                'balance_before' => $balanceBefore,
-                'balance_after' => $balanceAfter,
                 'reference_type' => Invoice::class,
                 'reference_id' => $this->id,
                 'note' => 'Payment for Invoice #' . $this->invoice_number,
                 'created_by' => Auth::id(),
             ]);
-
-            $wallet->update(['balance' => $balanceAfter]);
 
             // Mark invoice as paid
             $this->update([
@@ -375,7 +336,7 @@ class Invoice extends TenantModel
                 $client->id
             );
 
-            return ['ok' => true, 'message' => 'Invoice paid successfully.'];
+            return ['ok' => true, 'message' => __('erp.invoice_paid_success')];
         });
     }
 
@@ -389,18 +350,17 @@ class Invoice extends TenantModel
     public function partiallyBillInvoice(float $amount): array
     {
         if (!in_array($this->status, ['sent', 'partial'])) {
-            return ['ok' => false, 'message' => 'Invoice must be sent before partial payment.'];
+            return ['ok' => false, 'message' => __('errors.invoice_must_be_sent_partial')];
         }
 
         $maxPayable = $this->unpaidAmount();
         if ($amount <= 0 || $amount > $maxPayable) {
-            return ['ok' => false, 'message' => "Payment amount must be between 0.01 and {$maxPayable}."];
+            return ['ok' => false, 'message' => __('errors.payment_amount_invalid', ['max' => $maxPayable])];
         }
 
         $client = $this->client;
-        $wallet = $client?->wallet;
-        if (!$wallet || (float) $wallet->balance < $amount) {
-            return ['ok' => false, 'message' => 'Insufficient client wallet balance.'];
+        if (!$client || (float) $client->balance() < $amount) {
+            return ['ok' => false, 'message' => __('errors.insufficient_client_balance')];
         }
 
         // If the partial amount equals the remaining, treat as full payment
@@ -408,19 +368,15 @@ class Invoice extends TenantModel
             return $this->billInvoice();
         }
 
-        return DB::transaction(function () use ($wallet, $amount) {
-            $wallet = ClientWallet::where('id', $wallet->id)->lockForUpdate()->first();
-
-            $balanceBefore = (float) $wallet->balance;
-            $balanceAfter = $balanceBefore - $amount;
-
+        return DB::transaction(function () use ($client, $amount) {
             // Proportion for business amount
             $ratio = $amount / max(0.01, (float) $this->amount);
             $businessAmount = round((float) $this->business_amount * $ratio, 2);
 
             WalletTransaction::create([
                 'tenant_id' => $this->tenant_id,
-                'wallet_id' => $wallet->id,
+                'client_id' => $client->id,
+                'project_id' => $this->project_id,
                 'type' => 'invoice_paid',
                 'direction' => 'debit',
                 'amount' => $amount,
@@ -429,15 +385,11 @@ class Invoice extends TenantModel
                 'business_currency_id' => $this->tenant->base_currency_id,
                 'exchange_rate' => (float) $this->exchange_rate,
                 'exchange_rate_date' => $this->exchange_rate_date ?? now()->toDateString(),
-                'balance_before' => $balanceBefore,
-                'balance_after' => $balanceAfter,
                 'reference_type' => Invoice::class,
                 'reference_id' => $this->id,
                 'note' => 'Partial payment for Invoice #' . $this->invoice_number,
                 'created_by' => Auth::id(),
             ]);
-
-            $wallet->update(['balance' => $balanceAfter]);
 
             $newPaid = round((float) $this->paid_amount + $amount, 2);
             $this->update([
@@ -449,7 +401,7 @@ class Invoice extends TenantModel
                 'invoice_partially_paid',
                 "Invoice #{$this->invoice_number} received a partial payment of {$amount}.",
                 $this,
-                $wallet->client_id
+                $client->id
             );
 
             return ['ok' => true, 'message' => 'Partial payment of ' . $amount . ' recorded.'];
@@ -471,22 +423,18 @@ class Invoice extends TenantModel
         return DB::transaction(function () {
             $paidAmount = (float) $this->paid_amount;
 
-            // Refund any paid amount back to the client wallet
+            // Refund any paid amount back to the client
             if ($paidAmount > 0) {
                 $client = $this->client;
-                $wallet = $client?->wallet;
 
-                if ($wallet) {
-                    $wallet = ClientWallet::where('id', $wallet->id)->lockForUpdate()->first();
-                    $balanceBefore = (float) $wallet->balance;
-                    $balanceAfter = $balanceBefore + $paidAmount;
-
+                if ($client) {
                     $ratio = $paidAmount / max(0.01, (float) $this->amount);
                     $businessAmount = round((float) $this->business_amount * $ratio, 2);
 
                     WalletTransaction::create([
                         'tenant_id' => $this->tenant_id,
-                        'wallet_id' => $wallet->id,
+                        'client_id' => $client->id,
+                        'project_id' => $this->project_id,
                         'type' => 'invoice_refund',
                         'direction' => 'credit',
                         'amount' => $paidAmount,
@@ -495,15 +443,11 @@ class Invoice extends TenantModel
                         'business_currency_id' => $this->tenant->base_currency_id,
                         'exchange_rate' => (float) $this->exchange_rate,
                         'exchange_rate_date' => $this->exchange_rate_date ?? now()->toDateString(),
-                        'balance_before' => $balanceBefore,
-                        'balance_after' => $balanceAfter,
                         'reference_type' => Invoice::class,
                         'reference_id' => $this->id,
                         'note' => 'Refund for cancelled Invoice #' . $this->invoice_number,
                         'created_by' => Auth::id(),
                     ]);
-
-                    $wallet->update(['balance' => $balanceAfter]);
                 }
 
                 // Cancel related referral earnings if addon is active
@@ -576,34 +520,24 @@ class Invoice extends TenantModel
             'status' => 'pending',
         ]);
 
-        // Credit the referrer's wallet
-        $referrerWallet = $referrer->wallet;
-        if ($referrerWallet) {
-            $referrerWallet = ClientWallet::where('id', $referrerWallet->id)->lockForUpdate()->first();
-            $balanceBefore = (float) $referrerWallet->balance;
-            $balanceAfter = $balanceBefore + $commissionAmount;
-
-            WalletTransaction::create([
-                'tenant_id' => $this->tenant_id,
-                'wallet_id' => $referrerWallet->id,
-                'type' => 'commission_earned',
-                'direction' => 'credit',
-                'amount' => $commissionAmount,
-                'currency_id' => $this->currency_id,
-                'business_amount' => $businessCommission,
-                'business_currency_id' => $this->tenant->base_currency_id,
-                'exchange_rate' => (float) $this->exchange_rate,
-                'exchange_rate_date' => $this->exchange_rate_date ?? now()->toDateString(),
-                'balance_before' => $balanceBefore,
-                'balance_after' => $balanceAfter,
-                'reference_type' => Invoice::class,
-                'reference_id' => $this->id,
-                'note' => 'Referral commission (L1 ' . $commissionRate . '%) for Invoice #' . $this->invoice_number,
-                'created_by' => Auth::id(),
-            ]);
-
-            $referrerWallet->update(['balance' => $balanceAfter]);
-        }
+        // Credit the referrer
+        WalletTransaction::create([
+            'tenant_id' => $this->tenant_id,
+            'client_id' => $referrer->id,
+            'project_id' => $this->project_id,
+            'type' => 'commission_earned',
+            'direction' => 'credit',
+            'amount' => $commissionAmount,
+            'currency_id' => $this->currency_id,
+            'business_amount' => $businessCommission,
+            'business_currency_id' => $this->tenant->base_currency_id,
+            'exchange_rate' => (float) $this->exchange_rate,
+            'exchange_rate_date' => $this->exchange_rate_date ?? now()->toDateString(),
+            'reference_type' => Invoice::class,
+            'reference_id' => $this->id,
+            'note' => 'Referral commission (L1 ' . $commissionRate . '%) for Invoice #' . $this->invoice_number,
+            'created_by' => Auth::id(),
+        ]);
     }
 
     // ── Scopes ───────────────────────────────────────────────────

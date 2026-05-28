@@ -4,7 +4,6 @@ namespace Modules\ERP\Tests\Feature;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
-use Modules\ERP\Models\ClientWallet;
 use Modules\ERP\Models\WalletTransaction as ClientWalletTransaction;
 use Modules\ERP\Models\TenantClient;
 use Modules\ERP\Models\Tenant;
@@ -46,41 +45,29 @@ class WalletControllerTest extends TestCase
 
         $client = TenantClient::create(['tenant_id' => $tenant->id, 'name' => 'Test Client', 'email' => 'client@test.com', 'currency_id' => 1]);
 
-        $wallet = ClientWallet::create([
-            'tenant_id' => $tenant->id,
-            'client_id' => $client->id,
-            'balance' => 0,
-            'currency_id' => 1,
-        ]);
-
         // Test Credit
         $response = $this->actingAs($user)->withSession(['tenant_id' => $tenant->id])->post("/erp/clients/{$client->id}/wallet/credit", [
             'amount' => 500.00,
             'note' => 'Initial deposit',
         ]);
         $response->assertSessionHas('success');
-        $wallet->refresh();
-        $this->assertEquals(500.00, (float)$wallet->balance);
+        $this->assertEquals(500.00, (float)$client->balance());
 
-        // Test Lock Funds
-        $response = $this->actingAs($user)->withSession(['tenant_id' => $tenant->id])->post("/erp/clients/{$client->id}/wallet/lock", [
+        // Test Locked Balance by creating a sent invoice
+        $invoice = \Modules\ERP\Models\Invoice::create([
+            'tenant_id' => $tenant->id,
+            'client_id' => $client->id,
+            'invoice_number' => 'INV-2026-001',
+            'status' => 'sent',
             'amount' => 100.00,
-            'note' => 'Lock escrow',
+            'paid_amount' => 0.00,
+            'currency_id' => 1,
+            'exchange_rate' => 1.0,
+            'exchange_rate_date' => now()->toDateString(),
+            'due_date' => now()->addDays(30)->toDateString(),
         ]);
-        $response->assertSessionHas('success');
-        $wallet->refresh();
-        $this->assertEquals(400.00, (float)$wallet->balance);
-        $this->assertEquals(100.00, (float)$wallet->locked_balance);
 
-        // Test Unlock Funds
-        $response = $this->actingAs($user)->withSession(['tenant_id' => $tenant->id])->post("/erp/clients/{$client->id}/wallet/unlock", [
-            'amount' => 50.00,
-            'note' => 'Release escrow',
-        ]);
-        $response->assertSessionHas('success');
-        $wallet->refresh();
-        $this->assertEquals(450.00, (float)$wallet->balance);
-        $this->assertEquals(50.00, (float)$wallet->locked_balance);
+        $this->assertEquals(100.00, (float)$client->lockedBalance());
 
         // Test Debit
         $response = $this->actingAs($user)->withSession(['tenant_id' => $tenant->id])->post("/erp/clients/{$client->id}/wallet/debit", [
@@ -88,8 +75,7 @@ class WalletControllerTest extends TestCase
             'note' => 'Service charge',
         ]);
         $response->assertSessionHas('success');
-        $wallet->refresh();
-        $this->assertEquals(250.00, (float)$wallet->balance);
+        $this->assertEquals(300.00, (float)$client->balance());
     }
 
     public function test_user_cannot_modify_other_tenant_client_wallet(): void
@@ -98,13 +84,6 @@ class WalletControllerTest extends TestCase
         $user1 = User::factory()->create();
         $tenant1 = Tenant::create(['user_id' => $user1->id, 'name' => 'Tenant 1', 'status' => 'active']);
         $client1 = TenantClient::create(['tenant_id' => $tenant1->id, 'name' => 'Client 1', 'email' => 'client1@test.com', 'currency_id' => 1]);
-        
-        $wallet1 = ClientWallet::create([
-            'tenant_id' => $tenant1->id,
-            'client_id' => $client1->id,
-            'balance' => 0.00,
-            'currency_id' => 1,
-        ]);
 
         // User 2 & Tenant 2
         $user2 = User::factory()->create();
@@ -122,7 +101,6 @@ class WalletControllerTest extends TestCase
         $response->assertStatus(404);
         
         // Verify balance did not change
-        $wallet1->refresh();
-        $this->assertEquals(0.00, (float)$wallet1->balance);
+        $this->assertEquals(0.00, (float)$client1->balance());
     }
 }
