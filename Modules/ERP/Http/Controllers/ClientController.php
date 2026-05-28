@@ -88,4 +88,126 @@ class ClientController extends Controller
 
         return back()->with('success', 'Client status updated.');
     }
+
+    public function create()
+    {
+        return Inertia::render('ERP/Clients/Create', [
+            'currencies' => \App\Models\Currency::all(),
+        ]);
+    }
+
+    public function store(Request $request)
+    {
+        $user = Auth::user();
+        $tenant = Tenant::firstOrCreate(
+            ['user_id' => $user->id],
+            ['name' => $user->name . "'s Workspace", 'status' => 'active']
+        );
+
+        $validated = $request->validate([
+            'name'     => 'required|string|max:255',
+            'email'    => 'nullable|email|max:255',
+            'phone'    => 'nullable|string|max:20',
+            'address'  => 'nullable|string|max:255',
+            'currency' => 'required|string|size:3',
+            'status'   => 'nullable|in:lead,active,paying,retained,archived',
+        ]);
+
+        $client = TenantClient::create([
+            'tenant_id' => $tenant->id,
+            'name'      => $validated['name'],
+            'email'     => $validated['email'] ?? null,
+            'phone'     => $validated['phone'] ?? null,
+            'address'   => $validated['address'] ?? null,
+            'currency_id' => \App\Models\Currency::where('currency', $validated['currency'])->value('id'),
+            'status'    => $validated['status'] ?? 'lead',
+        ]);
+
+        // Auto-create client wallet
+        \Modules\ERP\Models\ClientWallet::firstOrCreate(
+            ['tenant_id' => $tenant->id, 'client_id' => $client->id],
+            ['balance' => 0, 'currency_id' => $client->currency_id]
+        );
+
+        ActivityLogger::log(
+            'client_created',
+            "Client '{$client->name}' was added.",
+            $client,
+            $client->id
+        );
+
+        return redirect()->route('erp.dashboard', ['section' => 'clients'])->with('success', 'Client created successfully.');
+    }
+
+    public function edit(TenantClient $client)
+    {
+        $tenantId = $this->resolveTenantId();
+
+        if ($client->tenant_id !== $tenantId) {
+            abort(403, 'Unauthorized access to client.');
+        }
+
+        return Inertia::render('ERP/Clients/Edit', [
+            'client' => $client->load('currency'),
+            'currencies' => \App\Models\Currency::all(),
+        ]);
+    }
+
+    public function update(Request $request, TenantClient $client)
+    {
+        $tenantId = $this->resolveTenantId();
+
+        if ($client->tenant_id !== $tenantId) {
+            abort(403, 'Unauthorized access to client.');
+        }
+
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'nullable|email|max:255',
+            'phone' => 'nullable|string|max:20',
+            'address' => 'nullable|string|max:255',
+            'currency' => 'required|string|size:3',
+        ]);
+
+        $validated['currency_id'] = \App\Models\Currency::where('currency', $validated['currency'])->value('id');
+        unset($validated['currency']);
+
+        $client->update($validated);
+
+        ActivityLogger::log(
+            'client_updated',
+            "Client '{$client->name}' profile was updated.",
+            $client,
+            $client->id
+        );
+
+        return redirect()->route('erp.dashboard', ['section' => 'clients'])->with('success', 'Client updated successfully.');
+    }
+
+    public function destroy(TenantClient $client)
+    {
+        $tenantId = $this->resolveTenantId();
+
+        if ($client->tenant_id !== $tenantId) {
+            abort(403, 'Unauthorized access to client.');
+        }
+
+        $hasOpenInvoices = $client->invoices()->whereNotIn('status', ['cancelled', 'paid'])->exists();
+        if ($hasOpenInvoices) {
+            return back()->withErrors(['client' => 'Cannot delete a client with open invoices. Cancel or pay them first.']);
+        }
+
+        $clientName = $client->name;
+        $client->delete();
+
+        ActivityLogger::log(
+            'client_deleted',
+            "Client '{$clientName}' was deleted.",
+            null,
+            null,
+            ['tenant_id' => $tenantId]
+        );
+
+        return back()->with('success', 'Client deleted successfully.');
+    }
 }

@@ -56,6 +56,7 @@ interface PlansProps {
     activeSubscription: ActiveSub | null;
     walletBalance: number;
     currency: string;
+    proratedRefund?: number;
 }
 
 const ICON_MAP: Record<string, React.ElementType> = {
@@ -73,23 +74,44 @@ const ICON_MAP: Record<string, React.ElementType> = {
     RefreshCw, PieChart
 };
 
-export default function Plans({ serviceItems, activeSubscription, walletBalance, currency }: PlansProps) {
+export default function Plans({ serviceItems, activeSubscription, walletBalance, currency, proratedRefund = 0 }: PlansProps) {
     const [billing, setBilling] = useState<'1_month' | '6_months' | '1_year'>('1_month');
     const [isNewSystem, setIsNewSystem] = useState<boolean>(false);
     
     const activeItems = useMemo(() => {
         if (isNewSystem) return [];
-        return activeSubscription?.owned_features
-            ?.filter(f => f.status === 'active')
-            .map(f => f.id) || [];
+        return [];
     }, [activeSubscription, isNewSystem]);
     
+    const [selectedItems, setSelectedItems] = useState<string[]>(() => {
+        const initial = [...activeItems];
+        if (typeof window !== 'undefined') {
+            const params = new URLSearchParams(window.location.search);
+            const mod = params.get('module');
+            // Do not select if they already own it
+            if (mod && !initial.includes(mod)) {
+                const ownsMod = activeSubscription?.owned_features?.find(f => f.id === mod && f.status === 'active');
+                if (!ownsMod) {
+                    initial.push(mod);
+                }
+            }
+        }
+        return initial;
+    });
+
     // Update selected items automatically when switching modes
     useEffect(() => {
-        setSelectedItems(activeItems);
-    }, [isNewSystem]);
-
-    const [selectedItems, setSelectedItems] = useState<string[]>(activeItems);
+        const next = [...activeItems];
+        const params = new URLSearchParams(window.location.search);
+        const mod = params.get('module');
+        if (mod && !next.includes(mod)) {
+            const ownsMod = activeSubscription?.owned_features?.find(f => f.id === mod && f.status === 'active');
+            if (!ownsMod || isNewSystem) {
+                next.push(mod);
+            }
+        }
+        setSelectedItems(next);
+    }, [isNewSystem, activeItems, activeSubscription]);
 
     const modules = serviceItems.filter(item => item.type === 'module');
     const tools = serviceItems.filter(item => item.type === 'tool');
@@ -203,6 +225,8 @@ export default function Plans({ serviceItems, activeSubscription, walletBalance,
     // Original total without discount
     const originalTotal = subtotal * months;
     const discount = originalTotal - total;
+    
+    const totalToPay = Math.max(0, total - (!isNewSystem ? proratedRefund : 0));
 
     const handleSubscribeWallet = () => {
         if (selectedItems.length === 0) return;
@@ -219,7 +243,7 @@ export default function Plans({ serviceItems, activeSubscription, walletBalance,
         router.post(route('subscriptions.kashier.checkout'), { items: selectedItems, billing_cycle: billing, is_new_system: isNewSystem });
     };
 
-    const canAfford = walletBalance >= total;
+    const canAfford = walletBalance >= totalToPay;
 
     const renderItemCard = (item: ServiceItem, isAddon: boolean = false) => {
         const isSelected = selectedItems.includes(item.id);
@@ -305,7 +329,7 @@ export default function Plans({ serviceItems, activeSubscription, walletBalance,
 
     return (
         <AuthenticatedLayout header={undefined}>
-            <Head title="Build Your Plan" />
+            <Head title="Build Your Workspace" />
 
             {/* ── Hero ── */}
             <div className="max-w-7xl mx-auto px-4 pt-10 pb-6">
@@ -318,7 +342,7 @@ export default function Plans({ serviceItems, activeSubscription, walletBalance,
                             <Crown className="h-3.5 w-3.5" /> Fully Genius System
                         </div>
                         <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-slate-900">
-                            Build Your Perfect Plan
+                            Build Your Workspace
                         </h1>
                         <p className="mt-2 text-lg text-slate-500 font-light">
                             Select exactly what you need. No more, no less.
@@ -328,14 +352,14 @@ export default function Plans({ serviceItems, activeSubscription, walletBalance,
             </div>
 
             {/* ── Active Subscription Banner ── */}
-            {activeSubscription && (
+            {activeSubscription && activeSubscription.owned_features && activeSubscription.owned_features.length > 0 && (
                 <div className="max-w-7xl mx-auto px-4 mb-6">
                     <div className="flex items-center justify-between bg-emerald-50 border border-emerald-100 rounded-2xl px-6 py-3.5">
                         <div className="flex items-center gap-2.5 text-sm text-emerald-800">
                             <ShieldCheck className="h-4 w-4 text-emerald-500" />
                             <span>
-                                You have an active subscription: <strong>{activeSubscription.plan_name}</strong>
-                                {activeSubscription.expires_at && ` · renews ${activeSubscription.expires_at}`}
+                                Your workspace has active modules
+                                {activeSubscription.expires_at && ` · next renewal on ${activeSubscription.expires_at}`}
                             </span>
                         </div>
                     </div>
@@ -349,8 +373,10 @@ export default function Plans({ serviceItems, activeSubscription, walletBalance,
                     activeSubscription={activeSubscription}
                     isNewSystem={isNewSystem}
                     onSystemTypeChange={setIsNewSystem}
+                    proratedRefund={proratedRefund}
                     renderActions={({ selectedItems, billing, total }) => {
-                        const canAfford = walletBalance >= total;
+                        const finalTotal = Math.max(0, total - (!isNewSystem ? proratedRefund : 0));
+                        const canAfford = walletBalance >= finalTotal;
                         
                         const handleSubscribeWallet = () => {
                             if (selectedItems.length === 0) return;
@@ -380,7 +406,7 @@ export default function Plans({ serviceItems, activeSubscription, walletBalance,
                                     )}
                                 >
                                     <Wallet className="h-4 w-4" />
-                                    {canAfford || selectedItems.length === 0 ? 'Subscribe with Wallet' : `Need ${currency} ${total.toFixed(2)}`}
+                                    {canAfford || selectedItems.length === 0 ? 'Subscribe with Wallet' : `Need ${currency} ${finalTotal.toFixed(2)}`}
                                 </Button>
 
                                 <Button

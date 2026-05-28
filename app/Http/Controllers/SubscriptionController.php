@@ -69,34 +69,35 @@ class SubscriptionController extends Controller
         $wallet = ['id' => null, 'balance' => (float)$user->user_balance, 'currency' => $user->currency_name()];
 
         $ownedFeatures = [];
-        if ($user->tenant_id) {
-            $features = \App\Models\TenantFeature::where('tenant_id', $user->tenant_id)->get();
-            foreach ($features as $f) {
-                $ownedFeatures[] = [
-                    'id' => $f->feature_key,
-                    'status' => \Carbon\Carbon::parse($f->expires_at)->isFuture() ? 'active' : 'expired',
-                    'expires_at' => \Carbon\Carbon::parse($f->expires_at)->format('M d, Y')
-                ];
-            }
+        $userSubs = \App\Models\UserSubscription::where('client_id', $user->id)
+            ->where('status', 'active')
+            ->get();
+
+        foreach ($userSubs as $sub) {
+            $ownedFeatures[] = [
+                'id' => $sub->object,
+                'status' => \Carbon\Carbon::parse($sub->expires_at)->isFuture() ? 'active' : 'expired',
+                'expires_at' => \Carbon\Carbon::parse($sub->expires_at)->format('M d, Y')
+            ];
         }
 
-        $hasSub = $user->hasSubscription();
+        $hasSub = count($ownedFeatures) > 0;
         $activeSub = null;
 
-        if ($hasSub && $user->plan) {
+        if ($hasSub) {
+            // Find the closest expiring subscription to use as the primary display date
+            $closestExpiry = $userSubs->min('expires_at');
+            
             $activeSub = [
-                'id'            => $user->plan->id,
-                'plan_id'       => $user->plan->id,
-                'plan_slug'     => \Str::slug($user->plan->plan_name),
-                'plan_name'     => $user->plan->plan_name,
+                'id'            => $user->id,
                 'status'        => 'active',
-                'billing_cycle' => $user->plan->plan_duration_short(),
-                'amount'        => $user->plan->current_plan_price(),
-                'expires_at'    => Carbon::parse($user->subscription_date)->format('M d, Y'),
-                'auto_renew'    => (bool) $user->subscription_force,
+                'expires_at'    => $closestExpiry ? Carbon::parse($closestExpiry)->format('M d, Y') : '-',
+                'auto_renew'    => false, // Handled per-module now
                 'owned_features' => $ownedFeatures,
             ];
         }
+
+        $proratedRefund = 0;
 
         return Inertia::render('Subscriptions/Plans', [
             'plans' => [],
@@ -104,6 +105,7 @@ class SubscriptionController extends Controller
             'activeSubscription' => $activeSub,
             'walletBalance' => (float) $user->available_balance(),
             'currency' => $currencyCode,
+            'proratedRefund' => (float) $proratedRefund,
         ]);
     }
 
@@ -164,7 +166,7 @@ class SubscriptionController extends Controller
         return $totalUsd * $rate;
     }
 
-    private function validateAddonParents($items)
+    private function validateAddonParents($items, $user = null)
     {
         if (!$items || !is_array($items)) return;
 
@@ -172,7 +174,21 @@ class SubscriptionController extends Controller
         foreach ($items as $item) {
             if (isset($addonsConfig[$item])) {
                 $parent = $addonsConfig[$item]['parent'];
-                if (!in_array($parent, $items)) {
+                
+                // Check if parent is in the cart
+                $inCart = in_array($parent, $items);
+                
+                // Check if user already owns the parent
+                $alreadyOwned = false;
+                if ($user && !$inCart) {
+                    $alreadyOwned = \App\Models\UserSubscription::where('client_id', $user->id)
+                        ->where('object', $parent)
+                        ->where('status', 'active')
+                        ->where('expires_at', '>', now())
+                        ->exists();
+                }
+
+                if (!$inCart && !$alreadyOwned) {
                     throw \Illuminate\Validation\ValidationException::withMessages([
                         'error' => "You cannot subscribe to {$addonsConfig[$item]['name']} without its parent module."
                     ]);
@@ -181,34 +197,6 @@ class SubscriptionController extends Controller
         }
     }
 
-    private function getOrCreateCustomPlan($selectedItems, $billingCycle, $currencyId)
-    {
-        sort($selectedItems);
-        $signature = md5(implode(',', $selectedItems) . '-' . $billingCycle . '-' . $currencyId);
-        $planName = 'Custom Plan - ' . strtoupper(substr($signature, 0, 6));
-
-        $price = $this->calculateCustomPriceBackend($selectedItems, $billingCycle, $currencyId);
-
-        $days = 30;
-        if ($billingCycle === '6_months') $days = 180;
-        if ($billingCycle === '1_year') $days = 365;
-
-        $plan = Plan::firstOrCreate(
-            ['plan_name' => $planName],
-            [
-                'plan_price' => $price,
-                'plan_duration' => $days,
-                'plan_status' => true,
-                'plan_currency' => $currencyId
-            ]
-        );
-        
-        $plan->plan_price = $price;
-        $plan->plan_duration = $days;
-        $plan->save();
-
-        return $plan;
-    }
 
     /**
      * Subscribe to a fixed plan using wallet balance.
@@ -222,9 +210,8 @@ class SubscriptionController extends Controller
             'is_new_system' => 'nullable|boolean',
         ]);
 
-        $this->validateAddonParents($request->items);
-
         $user = Auth::user();
+        $this->validateAddonParents($request->items, $user);
         
         $usdCurrency = \App\Models\Currency::where('currency', 'USD')->first();
         $usdCurrencyId = $usdCurrency ? $usdCurrency->id : 1;
@@ -234,61 +221,40 @@ class SubscriptionController extends Controller
         
         $userCurrencyId = $user->currency_id ?: $egpCurrencyId;
         
-        if ($request->has('items') && count($request->items) > 0) {
-            $plan = $this->getOrCreateCustomPlan($request->items, $request->input('billing_cycle', '1_year'), $userCurrencyId);
-        } else {
-            if (!$request->plan_id) return back()->withErrors(['error' => 'No plan or items selected.']);
-            $plan = Plan::findOrFail($request->plan_id);
-        }
-        
-        $rate = 1.0;
-        if ($usdCurrency && $userCurrencyId && $usdCurrency->id != $userCurrencyId) {
-            $rate = \App\Models\CurrenciesExchange::RateToday(1, $usdCurrency->id, $userCurrencyId);
-        }
-
         $billingCycle = $request->input('billing_cycle', '1_year');
         $multiplier = 1;
-        $days = $plan->plan_duration;
+        $days = 30;
         
-        if ($plan->plan_name !== 'Trial' && !str_starts_with($plan->plan_name, 'Custom Plan')) {
-            if ($billingCycle === '3_months') {
-                $multiplier = 0.25;
-                $days = 90;
-            } elseif ($billingCycle === '6_months') {
-                $multiplier = 0.5;
-                $days = 180;
-            } elseif ($billingCycle === '3_years') {
-                $multiplier = 3;
-                $days = 365 * 3;
-            }
+        if ($billingCycle === '3_months') {
+            $multiplier = 0.25;
+            $days = 90;
+        } elseif ($billingCycle === '6_months') {
+            $multiplier = 0.5;
+            $days = 180;
+        } elseif ($billingCycle === '1_year') {
+            $multiplier = 10; // 2 months free
+            $days = 365;
+        }
+
+        if ($request->has('items') && count($request->items) > 0) {
+            $base_plan_amount = $this->calculateCustomPriceBackend($request->items, $request->input('billing_cycle', '1_year'), $userCurrencyId);
+        } else {
+            return back()->withErrors(['error' => 'No modules selected.']);
         }
 
         $current_plan = null;
-        $base_plan_amount = $plan->current_plan_price() * $multiplier;
         $plan_amount = $base_plan_amount;
-        $current_plan_remaining_price = 0;
-        $isNewSystem = $request->input('is_new_system', false);
+        $current_plan_remaining_price = 0; // We no longer offer prorated refunds on module additions. Each module lives independently.
+        $isNewSystem = $request->input('is_new_system', true);
         
-        if (!$isNewSystem && $user->plan_id != null) {
-            $current_plan = Plan::find($user->plan_id);
-            if ($current_plan) {
-                // calc the remaining days
-                $current_plan_remaining_days = (strtotime($user->subscription_date) - strtotime(date('Y-m-d'))) / (60 * 60 * 24);
-                $current_plan_remaining_days = round($current_plan_remaining_days);
-                if ($current_plan_remaining_days > 0) {
-                    $base_remaining = ($current_plan->current_plan_price() / $current_plan->plan_duration) * $current_plan_remaining_days;
-                    $current_plan_remaining_price = $base_remaining;
-                }
-            }
-        }
 
         if (($user->user_balance + $current_plan_remaining_price) < $plan_amount) {
             return back()->withErrors(['error' => 'Insufficient balance.']);
         }
 
         try {
-            DB::transaction(function () use ($user, $plan, $plan_amount, $current_plan_remaining_price, $current_plan, $days, $billingCycle, $usdCurrencyId, $isNewSystem) {
-                if ($isNewSystem) {
+            DB::transaction(function () use ($user, $plan_amount, $days, $billingCycle, $usdCurrencyId, $isNewSystem, $request) {
+                if ($isNewSystem && !$user->tenant_id) {
                     $tenantName = explode(' ', $user->name)[0] . ' Workspace ' . substr(uniqid(), -4);
                     $tenant = \Modules\ERP\Models\Tenant::create([
                         'user_id' => $user->id,
@@ -300,46 +266,46 @@ class SubscriptionController extends Controller
                     $user->save();
                 }
 
-                if ($current_plan != null && $current_plan_remaining_price > 0) {
-                    $user->add_balance($current_plan_remaining_price, 'Refund for remaining days of ' . $current_plan->plan_name . ' plan', 'refund', null);
-                }
-
                 if ($plan_amount > 0) {
-                    $user->add_balance(-1 * $plan_amount, 'Subscribe to ' . $plan->plan_name . ' plan', 'used');
+                    $user->add_balance(-1 * $plan_amount, 'Subscribe to modules', 'used');
                 }
 
-                $user->subscription_plan = $plan->plan_name;
-                $user->subscription_date = date('Y-m-d', strtotime('+' . $days . ' day'));
-                $user->plan_id = $plan->id;
-                $user->subscription_force = $plan->plan_name === 'Trial' ? 0 : 1;
-                $user->save();
-
-                // Save capabilities
-                if (isset($request->items) && is_array($request->items) && $user->tenant_id) {
-                    \App\Models\TenantFeature::where('tenant_id', $user->tenant_id)
-                        ->whereNotIn('feature_key', $request->items)
-                        ->delete();
-
+                // Create subscriptions for each purchased item
+                if (isset($request->items) && is_array($request->items)) {
                     foreach ($request->items as $item) {
-                        \App\Models\TenantFeature::updateOrCreate(
-                            ['tenant_id' => $user->tenant_id, 'feature_key' => $item],
+                        $expiry = \Carbon\Carbon::now()->addDays($days);
+                        
+                        // Check if they already own it, extend expiry
+                        $existing = \App\Models\UserSubscription::where('client_id', $user->id)->where('object', $item)->first();
+                        if ($existing && $existing->status === 'active' && \Carbon\Carbon::parse($existing->expires_at)->isFuture()) {
+                            $expiry = \Carbon\Carbon::parse($existing->expires_at)->addDays($days);
+                        }
+
+                        \App\Models\UserSubscription::updateOrCreate(
+                            ['client_id' => $user->id, 'object' => $item],
                             [
-                                'module' => str_starts_with($item, 'crm') ? 'crm' : (str_starts_with($item, 'erp') ? 'erp' : (str_starts_with($item, 'tool') ? 'tools' : 'booking')),
-                                'plan_id' => $plan->id,
-                                'expires_at' => \Carbon\Carbon::parse($user->subscription_date)
+                                'status' => 'active',
+                                'started_at' => now(),
+                                'expires_at' => $expiry,
+                                'auto_renew' => true
                             ]
                         );
+
+                        // Also update tenant_features for system permissions if tenant exists
+                        if ($user->tenant_id) {
+                            \App\Models\TenantFeature::updateOrCreate(
+                                ['tenant_id' => $user->tenant_id, 'feature_key' => $item],
+                                [
+                                    'module' => str_starts_with($item, 'crm') ? 'crm' : (str_starts_with($item, 'erp') ? 'erp' : (str_starts_with($item, 'tool') ? 'tools' : 'booking')),
+                                    'expires_at' => $expiry
+                                ]
+                            );
+                        }
                     }
                 }
-
-                // Cancel old platform subscriptions
-                // (Removed PlatformSubscription usage)
-                
-                // Create new platform subscription
-                // (Removed PlatformSubscription usage)
             });
 
-            return redirect()->route('subscriptions.manage')->with('success', "Subscribed to {$plan->plan_name} successfully!");
+            return redirect()->route('subscriptions.manage')->with('success', "Subscribed to modules successfully!");
 
         } catch (\Exception $e) {
             Log::error('Platform subscription failed: ' . $e->getMessage());
@@ -366,10 +332,9 @@ class SubscriptionController extends Controller
             'is_new_system' => 'nullable|boolean',
         ]);
 
-        $this->validateAddonParents($request->items);
-        $isNewSystem = $request->input('is_new_system', false);
-
         $user = Auth::user();
+        $this->validateAddonParents($request->items, $user);
+        $isNewSystem = $request->input('is_new_system', false);
         
         $usdCurrency = \App\Models\Currency::where('currency', 'USD')->first();
         $usdCurrencyId = $usdCurrency ? $usdCurrency->id : 1;
@@ -381,36 +346,27 @@ class SubscriptionController extends Controller
         $userCurrency = \App\Models\Currency::find($userCurrencyId);
         $currencyCode = $userCurrency ? $userCurrency->currency : 'USD';
 
-        if ($request->has('items') && count($request->items) > 0) {
-            $plan = $this->getOrCreateCustomPlan($request->items, $request->input('billing_cycle', '1_year'), $userCurrencyId);
-        } else {
-            if (!$request->plan_id) return back()->withErrors(['error' => 'No plan or items selected.']);
-            $plan = Plan::findOrFail($request->plan_id);
-        }
-        
-        $rate = 1.0;
-        if ($usdCurrency && $userCurrencyId && $usdCurrency->id != $userCurrencyId) {
-            $rate = \App\Models\CurrenciesExchange::RateToday(1, $usdCurrency->id, $userCurrencyId);
-        }
-
         $billingCycle = $request->input('billing_cycle', '1_year');
         $multiplier = 1;
-        $days = $plan->plan_duration; 
+        $days = 30; 
         
-        if ($plan->plan_name !== 'Trial' && !str_starts_with($plan->plan_name, 'Custom Plan')) {
-            if ($billingCycle === '3_months') {
-                $multiplier = 0.25;
-                $days = 90;
-            } elseif ($billingCycle === '6_months') {
-                $multiplier = 0.5;
-                $days = 180;
-            } elseif ($billingCycle === '3_years') {
-                $multiplier = 3;
-                $days = 365 * 3;
-            }
+        if ($billingCycle === '3_months') {
+            $multiplier = 0.25;
+            $days = 90;
+        } elseif ($billingCycle === '6_months') {
+            $multiplier = 0.5;
+            $days = 180;
+        } elseif ($billingCycle === '1_year') {
+            $multiplier = 10;
+            $days = 365;
         }
 
-        $base_plan_amount = $plan->current_plan_price() * $multiplier;
+        if ($request->has('items') && count($request->items) > 0) {
+            $base_plan_amount = $this->calculateCustomPriceBackend($request->items, $request->input('billing_cycle', '1_year'), $userCurrencyId);
+        } else {
+            return back()->withErrors(['error' => 'No modules selected.']);
+        }
+
         $plan_amount = $base_plan_amount;
 
         $paymentUrl = \App\Helpers\KashierHelper::buildSubscriptionPaymentUrl(
@@ -418,7 +374,7 @@ class SubscriptionController extends Controller
             $user->id,
             $user->name,
             $user->email,
-            $plan->id,
+            null,
             $currencyCode,
             $billingCycle,
             $days,
@@ -444,25 +400,23 @@ class SubscriptionController extends Controller
                 $userId = $metadata['user_id'] ?? null;
                 $trxId = $data['transactionId'] ?? null;
                 $amountPaid = floatval($data['amount'] ?? 0);
-                $planId = $metadata['plan_id'] ?? null;
                 $days = $metadata['days'] ?? 365;
-                $isNewSystem = $metadata['is_new_system'] ?? false;
+                $isNewSystem = $metadata['is_new_system'] ?? true;
 
-                if ($userId && $trxId && $amountPaid > 0 && $planId) {
+                if ($userId && $trxId && $amountPaid > 0) {
                     $user = \App\Models\User::find($userId);
-                    $plan = Plan::find($planId);
                     
-                    if ($user && $plan) {
+                    if ($user) {
                         // Idempotency check
-                        $reason = "Subscription via Kashier online payment (Trx: $trxId)";
+                        $reason = "Subscription modules via Kashier online payment (Trx: $trxId)";
                         $alreadyProcessed = Transaction::where('user_id', $user->id)
                             ->where('reason', $reason)
                             ->exists();
 
                         if (!$alreadyProcessed) {
                             try {
-                                DB::transaction(function () use ($user, $plan, $amountPaid, $reason, $days, $isNewSystem, $metadata) {
-                                    if ($isNewSystem) {
+                                DB::transaction(function () use ($user, $amountPaid, $reason, $days, $isNewSystem, $metadata) {
+                                    if ($isNewSystem && !$user->tenant_id) {
                                         $tenantName = explode(' ', $user->name)[0] . ' Workspace ' . substr(uniqid(), -4);
                                         $tenant = \Modules\ERP\Models\Tenant::create([
                                             'user_id' => $user->id,
@@ -477,34 +431,44 @@ class SubscriptionController extends Controller
                                     $user->add_balance($amountPaid, $reason, 'received');
                                     
                                     // Deduct balance for plan
-                                    \App\Helpers\TimerHelper::instance()->addUsed($user, $amountPaid, 'Subscribe to ' . $plan->plan_name . ' plan');
-
-                                    $user->subscription_plan = $plan->plan_name;
-                                    $user->subscription_date = date('Y-m-d', strtotime('+' . $days . ' day'));
-                                    $user->plan_id = $plan->id;
-                                    $user->subscription_force = 1;
-                                    $user->save();
+                                    \App\Helpers\TimerHelper::instance()->addUsed($user, $amountPaid, 'Subscribe to modules');
 
                                     // Save capabilities
                                     $items = $metadata['items'] ?? [];
-                                    if (is_array($items) && !empty($items) && $user->tenant_id) {
-                                        \App\Models\TenantFeature::where('tenant_id', $user->tenant_id)
-                                            ->whereNotIn('feature_key', $items)
-                                            ->delete();
-
+                                    if (is_array($items) && !empty($items)) {
                                         foreach ($items as $item) {
-                                            \App\Models\TenantFeature::updateOrCreate(
-                                                ['tenant_id' => $user->tenant_id, 'feature_key' => $item],
+                                            $expiry = \Carbon\Carbon::now()->addDays($days);
+                                            
+                                            // Check if they already own it, extend expiry
+                                            $existing = \App\Models\UserSubscription::where('client_id', $user->id)->where('object', $item)->first();
+                                            if ($existing && $existing->status === 'active' && \Carbon\Carbon::parse($existing->expires_at)->isFuture()) {
+                                                $expiry = \Carbon\Carbon::parse($existing->expires_at)->addDays($days);
+                                            }
+
+                                            \App\Models\UserSubscription::updateOrCreate(
+                                                ['client_id' => $user->id, 'object' => $item],
                                                 [
-                                                    'module' => str_starts_with($item, 'crm') ? 'crm' : (str_starts_with($item, 'erp') ? 'erp' : (str_starts_with($item, 'tool') ? 'tools' : 'booking')),
-                                                    'plan_id' => $plan->id,
-                                                    'expires_at' => \Carbon\Carbon::parse($user->subscription_date)
+                                                    'status' => 'active',
+                                                    'started_at' => now(),
+                                                    'expires_at' => $expiry,
+                                                    'auto_renew' => true
                                                 ]
                                             );
+
+                                            // Also update tenant_features
+                                            if ($user->tenant_id) {
+                                                \App\Models\TenantFeature::updateOrCreate(
+                                                    ['tenant_id' => $user->tenant_id, 'feature_key' => $item],
+                                                    [
+                                                        'module' => str_starts_with($item, 'crm') ? 'crm' : (str_starts_with($item, 'erp') ? 'erp' : (str_starts_with($item, 'tool') ? 'tools' : 'booking')),
+                                                        'expires_at' => $expiry
+                                                    ]
+                                                );
+                                            }
                                         }
                                     }
                                 });
-                                \Illuminate\Support\Facades\Log::info("Kashier subscription processed successfully for User $userId, Plan: $plan->plan_name");
+                                \Illuminate\Support\Facades\Log::info("Kashier subscription processed successfully for User $userId");
                                 return response()->json(['status' => 'success', 'message' => 'Subscription processed successfully']);
                             } catch (\Exception $e) {
                                 \Illuminate\Support\Facades\Log::error('Kashier subscription failed: ' . $e->getMessage());
@@ -541,21 +505,27 @@ class SubscriptionController extends Controller
         
         $subscriptions = [];
         
-        if ($user->hasSubscription() && $user->plan) {
-            $subscriptions[] = [
-                'id'            => $user->plan->id,
-                'plan_name'     => $user->plan->plan_name,
-                'plan_slug'     => \Str::slug($user->plan->plan_name),
-                'billing_cycle' => $user->plan->plan_duration_short(),
-                'amount'        => $user->plan->current_plan_price(),
-                'currency'      => $user->currency_name(),
-                'status'        => 'active',
-                'started_at'    => '-', // Legacy doesn't store this exactly, just expiry
-                'expires_at'    => Carbon::parse($user->subscription_date)->format('M d, Y'),
-                'auto_renew'    => (bool) $user->subscription_force,
-                'custom_items'  => [],
-                'is_custom'     => false,
-            ];
+        $userSubs = \App\Models\UserSubscription::where('client_id', $user->id)
+            ->where('status', 'active')
+            ->get();
+            
+        if ($userSubs->count() > 0) {
+            foreach ($userSubs as $sub) {
+                $subscriptions[] = [
+                    'id'            => $sub->id,
+                    'plan_name'     => ucfirst(str_replace('-', ' ', $sub->object)),
+                    'plan_slug'     => $sub->object,
+                    'billing_cycle' => 'Module',
+                    'amount'        => 0, // Individual module amounts can be shown if needed
+                    'currency'      => $user->currency_name(),
+                    'status'        => 'active',
+                    'started_at'    => \Carbon\Carbon::parse($sub->started_at)->format('M d, Y'),
+                    'expires_at'    => \Carbon\Carbon::parse($sub->expires_at)->format('M d, Y'),
+                    'auto_renew'    => (bool) $sub->auto_renew,
+                    'custom_items'  => [$sub->object],
+                    'is_custom'     => false,
+                ];
+            }
         }
 
         $invoices = []; // SubscriptionInvoice might not exist in legacy DB

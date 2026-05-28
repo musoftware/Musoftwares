@@ -7,10 +7,23 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Modules\ERP\Models\Project;
 use Modules\ERP\Models\Tenant;
+use Modules\ERP\Models\TenantClient;
 use Modules\ERP\Services\ActivityLogger;
+use Inertia\Inertia;
 
 class ProjectController extends Controller
 {
+    public function create()
+    {
+        $user = Auth::user();
+        $tenant = Tenant::where('user_id', $user->id)->firstOrFail();
+        $clients = TenantClient::where('tenant_id', $tenant->id)->get(['id', 'name']);
+
+        return Inertia::render('ERP/Projects/Create', [
+            'clients' => $clients,
+        ]);
+    }
+
     /**
      * Store a newly created project in storage.
      */
@@ -48,7 +61,24 @@ class ProjectController extends Controller
             $project->client_id
         );
 
-        return back()->with('success', 'Project created successfully.');
+        return redirect()->route('erp.dashboard', ['section' => 'projects'])->with('success', 'Project created successfully.');
+    }
+
+    public function edit(Project $project)
+    {
+        $user = Auth::user();
+        $tenant = Tenant::where('user_id', $user->id)->firstOrFail();
+
+        if ($project->tenant_id !== $tenant->id) {
+            abort(403, 'Unauthorized access to project.');
+        }
+
+        $clients = TenantClient::where('tenant_id', $tenant->id)->get(['id', 'name']);
+
+        return Inertia::render('ERP/Projects/Edit', [
+            'project' => $project,
+            'clients' => $clients,
+        ]);
     }
 
     /**
@@ -87,7 +117,7 @@ class ProjectController extends Controller
             $project->client_id
         );
 
-        return back()->with('success', 'Project updated successfully.');
+        return redirect()->route('erp.dashboard', ['section' => 'projects'])->with('success', 'Project updated successfully.');
     }
 
     /**
