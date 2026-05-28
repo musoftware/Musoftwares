@@ -8,7 +8,7 @@
     "Intelligence": true,
     "Tools": true,
     "fbmb": true,
-    "TextPaymentGateway": true,
+    "SmsPaymentGateway": true,
     "GoldSavers": true,
     "WrittenCoursesEngine": true,
     "ISaas": true,

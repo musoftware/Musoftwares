@@ -68,7 +68,7 @@ class SmsPaymentGatewayController extends Controller
         // or use the token ID to reference it (but that won't work for API calls)
         // For now, we'll set it to null and show a message to create one
 
-        return \Inertia\Inertia::render('SmsPaymentGateway', [
+        return \Inertia\Inertia::render('TextPaymentGateway', [
             'devices' => $devices,
             'webhook' => $webhook,
             'token' => $token,
