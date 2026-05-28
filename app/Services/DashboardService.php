@@ -268,4 +268,177 @@ class DashboardService
             'tickets' => $tickets,
         ];
     }
+
+    public function getClientDashboardData(User $user): array
+    {
+        return [
+            'stats'               => $this->getClientStats($user),
+            'pendingInvoices'     => $this->getPendingInvoices($user),
+            'recentTransactions'  => $this->getRecentTransactions($user),
+            'chartData'           => $this->getWalletChartData($user),
+            'activeToolLicenses'  => $this->getActiveToolLicenses($user),
+        ];
+    }
+
+    private function getClientStats(User $user): array
+    {
+        $walletBalance = (float) ($user->user_balance ?? 0);
+        $earnedBalance = (float) ($user->pending_commission ?? 0);
+        $pointsBalance = $user->points_balance ?? 0;
+
+        $unpaidInvoices = clone $user->invoices()->whereIn('status', ['unpaid', 'partially_paid']);
+        $unpaidCount = $unpaidInvoices->count();
+        $unpaidAmount = round($user->unpaid_invoices_amount(), 2);
+
+        $openTicketsCount = Ticket::where('user_id', $user->id)
+            ->where('ticket_status', '!=', 'resolved')
+            ->count();
+
+        $pendingWithdrawals = UserReferralRequestWithdraw::where('user_id', $user->id)
+            ->where('status', 'pending')
+            ->count();
+
+        $activeSubscriptions = DB::table('user_subscriptions')
+            ->where('user_id', $user->id)
+            ->where('status', 'active')
+            ->count();
+
+        $totalMonthlySubscription = $this->calculateTotalMonthlySubscription($user);
+
+        return [
+            'walletBalance'       => $walletBalance,
+            'earnedBalance'       => $earnedBalance,
+            'pointsBalance'       => $pointsBalance,
+            'unpaidInvoices'      => $unpaidCount,
+            'unpaidAmount'        => $unpaidAmount,
+            'activeSubscriptions' => max($activeSubscriptions, 0),
+            'totalMonthlySubscription' => $totalMonthlySubscription,
+            'openTickets'         => $openTicketsCount,
+            'pendingWithdrawals'  => $pendingWithdrawals,
+            'currency'            => $user->currency_name(),
+        ];
+    }
+
+    private function calculateTotalMonthlySubscription(User $user): float
+    {
+        $activeObjects = DB::table('user_subscriptions')
+            ->where('user_id', $user->id)
+            ->where('status', 'active')
+            ->pluck('object')
+            ->toArray();
+
+        $erpMonthly = 0;
+        $serviceItems = app(\App\Services\PricingService::class)->getServiceItems();
+        foreach ($activeObjects as $object) {
+            $item = collect($serviceItems)->firstWhere('id', $object);
+            if ($item) {
+                $erpMonthly += $item['monthly_price'] ?? 0;
+            }
+        }
+
+        $toolsMonthly = 0;
+        try {
+            $toolsMonthly = DB::table('tool_subscriptions')
+                ->where('user_id', $user->id)
+                ->where('status', 'active')
+                ->sum('amount_paid');
+        } catch (\Throwable $e) {}
+
+        return (float) $erpMonthly + (float) $toolsMonthly;
+    }
+
+    private function getPendingInvoices(User $user)
+    {
+        return $user->invoices()
+            ->whereIn('status', ['unpaid', 'partially_paid'])
+            ->orderBy('id', 'asc')
+            ->limit(5)
+            ->get()
+            ->map(function ($invoice) {
+                $currencyObj = \App\Models\Currency::find($invoice->currency);
+                return [
+                    'id' => $invoice->id,
+                    'dbId' => $invoice->id,
+                    'date' => $invoice->created_at?->format('M d, Y') ?? '-',
+                    'amount' => round($invoice->unpaid_total(), 2),
+                    'status' => 'due',
+                    'description' => 'Invoice #' . $invoice->id,
+                    'currency' => $currencyObj ? $currencyObj->currency : 'USD',
+                ];
+            });
+    }
+
+    private function getRecentTransactions(User $user)
+    {
+        return Transaction::where('user_id', $user->id)
+            ->latest()
+            ->limit(8)
+            ->get()
+            ->map(function ($txn) {
+                $isCredit = in_array($txn->type, ['received', 'earned']);
+                return [
+                    'id' => $txn->id,
+                    'date' => $txn->created_at?->format('M d, Y') ?? '-',
+                    'type' => $isCredit ? 'deposit' : 'withdrawal',
+                    'amount' => $isCredit ? (float) $txn->amount : -1 * (float) $txn->amount,
+                    'method' => ucwords(str_replace('_', ' ', $txn->reason ?? 'Wallet')),
+                ];
+            });
+    }
+
+    private function getWalletChartData(User $user): array
+    {
+        $sixMonthsAgo = Carbon::now()->subMonths(5)->startOfMonth();
+        $chartTransactions = Transaction::where('user_id', $user->id)
+            ->where('created_at', '>=', $sixMonthsAgo)
+            ->select(
+                DB::raw("DATE_FORMAT(created_at, '%b') as month"),
+                DB::raw("DATE_FORMAT(created_at, '%Y-%m') as sort_month"),
+                'type',
+                DB::raw('SUM(amount) as total')
+            )
+            ->groupBy('month', 'sort_month', 'type')
+            ->orderBy('sort_month')
+            ->get();
+
+        $chartDataRaw = [];
+        for ($i = 5; $i >= 0; $i--) {
+            $m = Carbon::now()->subMonths($i)->format('b');
+            $chartDataRaw[$m] = ['month' => $m, 'deposit' => 0, 'withdrawal' => 0];
+        }
+
+        foreach ($chartTransactions as $txn) {
+            if (isset($chartDataRaw[$txn->month])) {
+                if ($txn->type === 'credit') {
+                    $chartDataRaw[$txn->month]['deposit'] = (float) $txn->total;
+                } else {
+                    $chartDataRaw[$txn->month]['withdrawal'] = (float) $txn->total;
+                }
+            }
+        }
+        
+        return array_values($chartDataRaw);
+    }
+
+    private function getActiveToolLicenses(User $user): array
+    {
+        try {
+            return \Modules\Tools\Models\ToolLicense::where('user_id', $user->id)
+                ->where('status', 'active')
+                ->limit(4)
+                ->get()
+                ->map(fn ($lic) => [
+                    'license_key'    => $lic->license_key,
+                    'expires_at'     => $lic->expires_at?->format('M d, Y'),
+                    'tool'           => [
+                        'slug'     => $lic->tool?->slug ?? '',
+                        'title'    => $lic->tool?->title ?? 'Unknown Tool',
+                        'icon_url' => $lic->tool?->icon_url,
+                    ],
+                ])
+                ->toArray();
+        } catch (\Throwable $e) {
+            return [];
+        }
+    }
 }

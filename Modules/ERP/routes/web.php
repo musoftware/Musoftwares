@@ -35,14 +35,14 @@ Route::middleware(['web', 'auth', 'tenant.active'])
         Route::get('transactions/{transaction}', [\Modules\ERP\Http\Controllers\TransactionController::class, 'show'])->name('transactions.show');
 
         // ── Tasks & Todos ──
-        Route::resource('tasks', \Modules\ERP\Http\Controllers\TaskController::class);
-        Route::post('tasks/{task}/items', [\Modules\ERP\Http\Controllers\TaskController::class, 'storeItem'])->name('tasks.items.store');
-        Route::put('tasks/{task}/items/{item}', [\Modules\ERP\Http\Controllers\TaskController::class, 'updateItem'])->name('tasks.items.update');
-        Route::post('tasks/{task}/items/{item}/complete', [\Modules\ERP\Http\Controllers\TaskController::class, 'completeItem'])->name('tasks.items.complete');
-        Route::post('tasks/{task}/items/sort', [\Modules\ERP\Http\Controllers\TaskController::class, 'sortItems'])->name('tasks.items.sort');
-        Route::post('tasks/{task}/items/{item}/pause', [\Modules\ERP\Http\Controllers\TaskController::class, 'pauseItem'])->name('tasks.items.pause');
-        Route::post('tasks/{task}/items/{item}/resume', [\Modules\ERP\Http\Controllers\TaskController::class, 'resumeItem'])->name('tasks.items.resume');
-        Route::delete('tasks/{task}/items/{item}', [\Modules\ERP\Http\Controllers\TaskController::class, 'destroyItem'])->name('tasks.items.destroy');
+        Route::resource('tasks', \Modules\ERP\app\Features\Tasks\Controllers\TaskController::class);
+        Route::post('tasks/{task}/items', [\Modules\ERP\app\Features\Tasks\Controllers\TaskController::class, 'storeItem'])->name('tasks.items.store');
+        Route::put('tasks/{task}/items/{item}', [\Modules\ERP\app\Features\Tasks\Controllers\TaskController::class, 'updateItem'])->name('tasks.items.update');
+        Route::post('tasks/{task}/items/{item}/complete', [\Modules\ERP\app\Features\Tasks\Controllers\TaskController::class, 'completeItem'])->name('tasks.items.complete');
+        Route::post('tasks/{task}/items/sort', [\Modules\ERP\app\Features\Tasks\Controllers\TaskController::class, 'sortItems'])->name('tasks.items.sort');
+        Route::post('tasks/{task}/items/{item}/pause', [\Modules\ERP\app\Features\Tasks\Controllers\TaskController::class, 'pauseItem'])->name('tasks.items.pause');
+        Route::post('tasks/{task}/items/{item}/resume', [\Modules\ERP\app\Features\Tasks\Controllers\TaskController::class, 'resumeItem'])->name('tasks.items.resume');
+        Route::delete('tasks/{task}/items/{item}', [\Modules\ERP\app\Features\Tasks\Controllers\TaskController::class, 'destroyItem'])->name('tasks.items.destroy');
 
         // ── Recurring Entries ──
         Route::resource('recurring', \Modules\ERP\Http\Controllers\RecurringController::class);
@@ -69,12 +69,15 @@ Route::middleware(['web', 'auth', 'tenant.active'])
         Route::get('/invoices/{invoice}/pdf', [InvoiceController::class, 'downloadPdf'])->name('invoices.pdf');
 
         // ── Projects ──
-        Route::get('projects/create', [\Modules\ERP\Http\Controllers\ProjectController::class, 'create'])->name('projects.create');
-        Route::get('projects/{project}/edit', [\Modules\ERP\Http\Controllers\ProjectController::class, 'edit'])->name('projects.edit');
-        Route::get('projects/{project}', [\Modules\ERP\Http\Controllers\ProjectController::class, 'show'])->name('projects.show');
-        Route::post('projects', [\Modules\ERP\Http\Controllers\ProjectController::class, 'store'])->name('projects.store');
-        Route::put('projects/{project}', [\Modules\ERP\Http\Controllers\ProjectController::class, 'update'])->name('projects.update');
-        Route::delete('projects/{project}', [\Modules\ERP\Http\Controllers\ProjectController::class, 'destroy'])->name('projects.destroy');
+        Route::get('projects/create', [\Modules\ERP\app\Features\Projects\Controllers\ProjectController::class, 'create'])->name('projects.create');
+        Route::get('projects/{project}/edit', [\Modules\ERP\app\Features\Projects\Controllers\ProjectController::class, 'edit'])->name('projects.edit');
+        Route::get('projects/{project}', [\Modules\ERP\app\Features\Projects\Controllers\ProjectController::class, 'show'])->name('projects.show');
+        Route::post('projects', [\Modules\ERP\app\Features\Projects\Controllers\ProjectController::class, 'store'])->name('projects.store');
+        Route::put('projects/{project}', [\Modules\ERP\app\Features\Projects\Controllers\ProjectController::class, 'update'])->name('projects.update');
+        Route::delete('projects/{project}', [\Modules\ERP\app\Features\Projects\Controllers\ProjectController::class, 'destroy'])->name('projects.destroy');
+
+        // ── Calendar ──
+        Route::get('calendar', [\Modules\ERP\app\Features\Calendar\Controllers\CalendarController::class, 'index'])->name('calendar.index');
 
         // ── Storage Providers ──
         Route::get('storage-providers/create', [\Modules\ERP\Http\Controllers\StorageProviderController::class, 'create'])->name('storage-providers.create');

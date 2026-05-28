@@ -61,7 +61,7 @@ class LimitManager
         $workspace = Workspace::find($workspaceId);
         if (!$workspace || !$workspace->user_id) return $this->limits = [];
 
-        $subscription = UserSubscription::where('client_id', $workspace->user_id)
+        $subscription = UserSubscription::where('user_id', $workspace->user_id)
             ->whereHas('plan', fn($q) => $q->where('module', 'crm'))
             ->where('status', 'active')
             ->with('plan')

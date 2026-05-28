@@ -386,12 +386,12 @@ class User extends Authenticatable
 
     public function subscriptions(): HasMany
     {
-        return $this->hasMany(\App\Models\UserSubscription::class, 'client_id');
+        return $this->hasMany(\App\Models\UserSubscription::class, 'user_id');
     }
 
     public function activeSubscription()
     {
-        return $this->hasOne(\App\Models\UserSubscription::class, 'client_id')->where('status', 'active')->latest();
+        return $this->hasOne(\App\Models\UserSubscription::class, 'user_id')->where('status', 'active')->latest();
     }
 
     public function hasSubscription(): bool

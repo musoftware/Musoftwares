@@ -9,6 +9,7 @@ import { StatusBadge } from '@/Components/ui/StatusBadge';
 import { CurrencyDisplay } from '@/Components/ui/CurrencyDisplay';
 import { DateDisplay } from '@/Components/ui/DateDisplay';
 import { EmptyState } from '@/Components/ui/EmptyState';
+import { __ } from '@/lib/i18n';
 import {
     ArrowLeft, User, FileText, CheckCircle, Clock, DollarSign,
     MessageSquare, FolderOpen, Activity, ChevronRight,
@@ -23,6 +24,7 @@ interface Client {
     company?: string;
     status: string;
     created_at: string;
+    currency?: { id: number; currency: string; symbol: string };
 }
 
 interface Invoice {
@@ -44,11 +46,13 @@ interface Props {
     invoices: Invoice[];
     activities: ActivityItem[];
     hasTickets?: boolean;
+    balance: number;
+    lockedBalance: number;
 }
 
 
 
-export default function ClientShow({ client, projects, tickets, invoices, activities, hasTickets = false }: Props) {
+export default function ClientShow({ client, projects, tickets, invoices, activities, hasTickets = false, balance, lockedBalance }: Props) {
     const totalRevenue = invoices
         .filter(i => i.status === 'paid')
         .reduce((s, i) => s + i.total, 0);
@@ -57,13 +61,12 @@ export default function ClientShow({ client, projects, tickets, invoices, activi
         .filter(i => ['unpaid', 'due', 'sent', 'overdue'].includes(i.status))
         .reduce((s, i) => s + i.total, 0);
 
-    const walletBalance = parseFloat((client as any).wallet?.balance ?? 0);
-    const lockedBalance = parseFloat((client as any).wallet?.locked_balance ?? 0);
+    const currencyCode = client.currency?.currency;
 
     const { menuItems, lockedAddons, workspaceName, tenantId } = useERPMenu('clients');
 
     return (
-        <ERPLayout title={`Client — ${client.name}`} workspaceName={workspaceName} tenantId={tenantId} menuItems={menuItems} lockedAddons={lockedAddons}>
+        <ERPLayout title={`${__('Client')} — ${client.name}`} workspaceName={workspaceName} tenantId={tenantId} menuItems={menuItems} lockedAddons={lockedAddons}>
 
             <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-6">
                 {/* Back + Header */}
@@ -85,32 +88,32 @@ export default function ClientShow({ client, projects, tickets, invoices, activi
                     <div className="flex flex-wrap items-center gap-2">
                         <Link href={route('erp.invoices.create', { client_id: client.id })}>
                             <Button size="sm" className="gap-1.5 shadow-none bg-slate-900 hover:bg-slate-800 text-white">
-                                <FileText className="w-3.5 h-3.5" /> New Invoice
+                                <FileText className="w-3.5 h-3.5" /> {__('New Invoice')}
                             </Button>
                         </Link>
-                        <Link href={route('erp.clients.wallet.adjust', client.id) + '?type=credit'}>
+                        <Link href={route('erp.clients.wallet.adjust', client.id) + '?type=receive'}>
                             <Button size="sm" variant="outline" className="gap-1.5 shadow-none border-slate-200 text-slate-700 hover:bg-slate-50">
-                                <ArrowDownLeft className="w-3.5 h-3.5 text-emerald-600" /> Receive Money
+                                <ArrowDownLeft className="w-3.5 h-3.5 text-emerald-600" /> {__('Receive Money')}
                             </Button>
                         </Link>
-                        <Link href={route('erp.clients.wallet.adjust', client.id) + '?type=debit'}>
+                        <Link href={route('erp.clients.wallet.adjust', client.id) + '?type=send'}>
                             <Button size="sm" variant="outline" className="gap-1.5 shadow-none border-slate-200 text-slate-700 hover:bg-slate-50">
-                                <ArrowUpRight className="w-3.5 h-3.5 text-amber-600" /> Send Money
+                                <ArrowUpRight className="w-3.5 h-3.5 text-amber-600" /> {__('Send Money')}
                             </Button>
                         </Link>
-                        <Link href={route('erp.clients.wallet.adjust', client.id) + '?type=debit'}>
+                        <Link href={route('erp.clients.wallet.adjust', client.id) + '?type=refund'}>
                             <Button size="sm" variant="outline" className="gap-1.5 shadow-none border-slate-200 text-slate-700 hover:bg-slate-50">
-                                <RotateCcw className="w-3.5 h-3.5 text-blue-600" /> Refund
+                                <RotateCcw className="w-3.5 h-3.5 text-blue-600" /> {__('Refund')}
                             </Button>
                         </Link>
                         <Link href={route('erp.clients.wallet.index', client.id)}>
                             <Button size="sm" variant="outline" className="gap-1.5 shadow-none border-slate-200 text-slate-700 hover:bg-slate-50">
-                                <Wallet className="w-3.5 h-3.5 text-slate-500" /> Ledger
+                                <Wallet className="w-3.5 h-3.5 text-slate-500" /> {__('Ledger')}
                             </Button>
                         </Link>
                         <Link href={route('erp.clients.edit', client.id)}>
                             <Button size="sm" variant="outline" className="gap-1.5 shadow-none border-slate-200 text-slate-700 hover:bg-slate-50">
-                                <Edit2 className="w-3.5 h-3.5 text-slate-500" /> Edit Profile
+                                <Edit2 className="w-3.5 h-3.5 text-slate-500" /> {__('Edit Profile')}
                             </Button>
                         </Link>
                     </div>
@@ -119,12 +122,12 @@ export default function ClientShow({ client, projects, tickets, invoices, activi
                 {/* Stats */}
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
                     {[
-                        { label: 'Available Balance', value: <CurrencyDisplay amount={walletBalance} currency={(client as any).currency?.currency || 'USD'} />, icon: Wallet, color: 'text-indigo-600' },
-                        { label: 'Locked Balance', value: <CurrencyDisplay amount={lockedBalance} currency={(client as any).currency?.currency || 'USD'} />, icon: Lock, color: 'text-amber-500' },
-                        { label: 'Total Revenue', value: <CurrencyDisplay amount={totalRevenue} currency={(client as any).currency?.currency || 'USD'} />, icon: DollarSign, color: 'text-emerald-600' },
-                        { label: 'Unpaid Invoices', value: unpaidRevenue > 0 ? <span className="text-rose-600"><CurrencyDisplay amount={unpaidRevenue} currency={(client as any).currency?.currency || 'USD'} /></span> : '—', icon: FileText, color: 'text-rose-600' },
-                        { label: 'Projects', value: projects.length, icon: FolderOpen, color: 'text-primary' },
-                        ...(hasTickets ? [{ label: 'Tickets', value: tickets.length, icon: MessageSquare, color: 'text-amber-600' }] : []),
+                        { label: __('Available Balance'), value: <CurrencyDisplay amount={balance} currency={currencyCode} />, icon: Wallet, color: 'text-indigo-600' },
+                        { label: __('Locked Balance'), value: <CurrencyDisplay amount={lockedBalance} currency={currencyCode} />, icon: Lock, color: 'text-amber-500' },
+                        { label: __('Total Revenue'), value: <CurrencyDisplay amount={totalRevenue} currency={currencyCode} />, icon: DollarSign, color: 'text-emerald-600' },
+                        { label: __('Unpaid Invoices'), value: unpaidRevenue > 0 ? <span className="text-rose-600"><CurrencyDisplay amount={unpaidRevenue} currency={currencyCode} /></span> : '—', icon: FileText, color: 'text-rose-600' },
+                        { label: __('Projects'), value: projects.length, icon: FolderOpen, color: 'text-primary' },
+                        ...(hasTickets ? [{ label: __('Tickets'), value: tickets.length, icon: MessageSquare, color: 'text-amber-600' }] : []),
                     ].map(({ label, value, icon: Icon, color }) => (
                         <Card key={label} className="bg-white border border-slate-200 shadow-sm">
                             <CardContent className="p-4 flex items-center gap-3">
@@ -145,12 +148,12 @@ export default function ClientShow({ client, projects, tickets, invoices, activi
                     <div className="lg:col-span-2 space-y-6">
                         <Card className="bg-white border border-slate-200 shadow-sm">
                             <CardHeader className="pb-3 flex flex-row items-center justify-between">
-                                <CardTitle className="text-slate-900 text-sm font-semibold">Invoices</CardTitle>
-                                <Link href={route('erp.invoices.index')} className="text-xs text-primary hover:underline">View all</Link>
+                                <CardTitle className="text-slate-900 text-sm font-semibold">{__('Invoices')}</CardTitle>
+                                <Link href={route('erp.invoices.index')} className="text-xs text-primary hover:underline">{__('View all')}</Link>
                             </CardHeader>
                             <CardContent className="p-0">
                                 {invoices.length === 0 ? (
-                                    <EmptyState icon={FileText} title="No invoices yet" description="Create the first invoice for this client." className="rounded-none border-0 py-6" />
+                                    <EmptyState icon={FileText} title={__('No invoices yet')} description={__('Create the first invoice for this client.')} className="rounded-none border-0 py-6" />
                                 ) : (
                                     <div className="divide-y divide-slate-100">
                                         {invoices.slice(0, 6).map(inv => (
@@ -164,7 +167,7 @@ export default function ClientShow({ client, projects, tickets, invoices, activi
                                                     </div>
                                                 </div>
                                                 <div className="flex items-center gap-3">
-                                                    <span className="text-slate-900 font-medium text-sm"><CurrencyDisplay amount={inv.total} currency={(client as any).currency?.currency || 'USD'} /></span>
+                                                    <span className="text-slate-900 font-medium text-sm"><CurrencyDisplay amount={inv.total} currency={currencyCode} /></span>
                                                     <StatusBadge status={inv.status} size="sm" />
                                                 </div>
                                             </Link>
@@ -177,11 +180,11 @@ export default function ClientShow({ client, projects, tickets, invoices, activi
                         {/* Projects */}
                         <Card className="bg-white border border-slate-200 shadow-sm">
                             <CardHeader className="pb-3">
-                                <CardTitle className="text-slate-900 text-sm font-semibold">Projects</CardTitle>
+                                <CardTitle className="text-slate-900 text-sm font-semibold">{__('Projects')}</CardTitle>
                             </CardHeader>
                             <CardContent className="p-0">
                                 {projects.length === 0 ? (
-                                    <EmptyState icon={FolderOpen} title="No projects yet" description="No projects have been linked to this client." className="rounded-none border-0 py-6" />
+                                    <EmptyState icon={FolderOpen} title={__('No projects yet')} description={__('No projects have been linked to this client.')} className="rounded-none border-0 py-6" />
                                 ) : (
                                     <div className="divide-y divide-slate-100">
                                         {projects.map(proj => (
@@ -207,12 +210,12 @@ export default function ClientShow({ client, projects, tickets, invoices, activi
                         <Card className="bg-white border border-slate-200 shadow-sm">
                             <CardHeader className="pb-3">
                                 <CardTitle className="text-slate-900 text-sm font-semibold flex items-center gap-2">
-                                    <Activity className="w-4 h-4 text-slate-400" /> Activity
+                                    <Activity className="w-4 h-4 text-slate-400" /> {__('Activity')}
                                 </CardTitle>
                             </CardHeader>
                             <CardContent className="p-0">
                                 {activities.length === 0 ? (
-                                    <EmptyState icon={Activity} title="No activity yet" className="rounded-none border-0 py-6" />
+                                    <EmptyState icon={Activity} title={__('No activity yet')} className="rounded-none border-0 py-6" />
                                 ) : (
                                     <div className="px-4 pb-4 space-y-4">
                                         {activities.slice(0, 6).map((act, i) => (
@@ -237,12 +240,12 @@ export default function ClientShow({ client, projects, tickets, invoices, activi
                             <Card className="bg-white border border-slate-200 shadow-sm">
                                 <CardHeader className="pb-3">
                                     <CardTitle className="text-slate-900 text-sm font-semibold flex items-center gap-2">
-                                        <MessageSquare className="w-4 h-4 text-slate-400" /> Support Tickets
+                                        <MessageSquare className="w-4 h-4 text-slate-400" /> {__('Support Tickets')}
                                     </CardTitle>
                                 </CardHeader>
                                 <CardContent className="p-0">
                                     {tickets.length === 0 ? (
-                                        <EmptyState icon={MessageSquare} title="No tickets" description="No support tickets from this client yet." className="rounded-none border-0 py-6" />
+                                        <EmptyState icon={MessageSquare} title={__('No tickets')} description={__('No support tickets from this client yet.')} className="rounded-none border-0 py-6" />
                                     ) : (
                                         <div className="divide-y divide-slate-100">
                                             {tickets.slice(0, 4).map(ticket => (

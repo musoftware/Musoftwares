@@ -75,7 +75,7 @@ class ERPReferralSystemTest extends TestCase
 
         // 2. Active subscription
         UserSubscription::create([
-            'client_id' => $this->user->id,
+            'user_id' => $this->user->id,
             'object' => 'erp-referrals',
             'status' => 'active',
             'started_at' => now(),
@@ -203,7 +203,7 @@ class ERPReferralSystemTest extends TestCase
 
         // 5. Active subscription to erp-referrals
         UserSubscription::create([
-            'client_id' => $this->user->id,
+            'user_id' => $this->user->id,
             'object' => 'erp-referrals',
             'status' => 'active',
             'started_at' => now(),

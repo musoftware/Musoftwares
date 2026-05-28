@@ -60,7 +60,7 @@ class FeatureManager
      */
     protected function getFeaturesForUser(\App\Models\User $user): array
     {
-        return UserSubscription::where('client_id', $user->id)
+        return UserSubscription::where('user_id', $user->id)
             ->where('status', 'active')
             ->where('expires_at', '>', now())
             ->pluck('object')

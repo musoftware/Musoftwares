@@ -170,7 +170,7 @@ class ERPDashboardController extends Controller
 
         // ── Real Tasks ─────────────────────────────────────────────
         $tasks = collect();
-        if ($tenantId) {
+        if ($tenantId && $ownerUser && $ownerUser->hasModuleSubscription('erp-tasks')) {
             $tasks = \Modules\ERP\Models\ERPTask::with(['creator', 'assignee', 'client'])
                 ->where('tenant_id', $tenantId)
                 ->where('archived', false)
@@ -220,7 +220,7 @@ class ERPDashboardController extends Controller
 
         // ── Real Projects List ─────────────────────────────────────
         $projects = collect();
-        if ($tenantId) {
+        if ($tenantId && $ownerUser && $ownerUser->hasModuleSubscription('erp-projects')) {
             $projects = Project::with(['client'])
                 ->where('tenant_id', $tenantId)
                 ->latest()
@@ -358,45 +358,38 @@ class ERPDashboardController extends Controller
                 ->get();
 
             $transactionStats['txnCount'] = $rawTxns->count();
-            // From ERP owner's perspective:
-            // - Client DEBITs (client paying invoice/charges) represent business inflow (credits)
-            // - Client CREDITs (client depositing/refunds) represent business outflow (debits)
-            $transactionStats['totalCredits'] = round($rawTxns->where('direction', 'debit')->sum('business_amount'), 2);
-            $transactionStats['totalDebits'] = round($rawTxns->where('direction', 'credit')->sum('business_amount'), 2);
+            // Per erp-financial-rules: income from received + earned, deductions from refunded + sent
+            $transactionStats['totalCredits'] = round($rawTxns->whereIn('type', ['received', 'earned'])->sum('business_amount'), 2);
+            $transactionStats['totalDebits'] = round(abs($rawTxns->whereIn('type', ['refunded', 'sent'])->sum('business_amount')), 2);
             $transactionStats['netFlow'] = round($transactionStats['totalCredits'] - $transactionStats['totalDebits'], 2);
 
             $transactions = $rawTxns->map(function ($txn) use ($businessCurrency) {
-                    $title = 'Manual ' . ucfirst($txn->type);
-                    if ($txn->reference_type === 'invoice') $title = 'Invoice Settlement';
-                    else if ($txn->reference_type === 'withdrawal') $title = 'Withdrawal Settlement';
+                    $title = ucfirst($txn->type);
+                    if ($txn->reference_type === 'invoice') $title = __('erp.invoice_settlement');
+                    else if ($txn->reference_type === 'withdrawal') $title = __('erp.withdrawal_settlement');
+                    else if ($txn->reference_type === 'manual_receive') $title = __('erp.manual_receive');
+                    else if ($txn->reference_type === 'manual_send') $title = __('erp.manual_send');
+                    else if ($txn->reference_type === 'manual_refund') $title = __('erp.manual_refund');
 
                     $txnCurrency = $txn->currency?->currency ?? $businessCurrency;
                     $clientCurrency = $txn->client?->currency?->currency ?? $txnCurrency;
-                    
-                    // Invert direction from client perspective to ERP owner perspective:
-                    // client debit => business CREDIT (inflow)
-                    // client credit => business DEBIT (outflow)
-                    $ownerDirection = $txn->direction === 'debit' ? 'credit' : 'debit';
                     
                     return [
                         'id' => $txn->id,
                         'reference_id' => '#TXN-' . str_pad($txn->id, 4, '0', STR_PAD_LEFT),
                         'title' => $title,
                         'type' => $txn->type,
-                        'note' => $txn->note ?? 'No details provided',
-                        'direction' => strtoupper($ownerDirection),
+                        'note' => $txn->note ?? __('erp.no_details'),
                         'amount' => round($txn->amount, 2),
                         'business_amount' => round($txn->business_amount ?? $txn->amount, 2),
                         'currency' => $txnCurrency,
                         'client_currency' => $clientCurrency,
                         'business_currency' => $businessCurrency,
-                        'balance_before' => 0,
-                        'balance_after' => 0,
                         'reference_type' => $txn->reference_type,
                         'reference_id_raw' => $txn->reference_id,
-                        'client_name' => $txn->client?->name ?? 'Unknown',
+                        'client_name' => $txn->client?->name ?? __('erp.unknown'),
                         'client_id' => $txn->client?->id,
-                        'authorizer' => $txn->creator?->name ?? 'System Core',
+                        'authorizer' => $txn->creator?->name ?? 'System',
                         'date' => $txn->created_at?->format('Y-m-d H:i'),
                     ];
                 });
@@ -541,11 +534,11 @@ class ERPDashboardController extends Controller
                 }
             });
 
-            return redirect()->route('erp.dashboard')->with('success', 'Workspace configured successfully! Welcome to your Business OS.');
+            return redirect()->route('erp.dashboard')->with('success', __('erp.workspace_configured_success'));
 
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::error('ERP Onboarding wizard failed: ' . $e->getMessage());
-            return back()->withErrors(['error' => 'Onboarding setup failed: ' . $e->getMessage()]);
+            return back()->withErrors(['error' => __('erp.onboarding_failed')]);
         }
     }
 
