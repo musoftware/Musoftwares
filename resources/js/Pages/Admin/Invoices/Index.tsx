@@ -18,6 +18,38 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { StatusBadge } from '@/Components/ui/StatusBadge';
 import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
+import { PremiumCombobox } from '@/Components/ui/PremiumCombobox';
+
+const filterByOptions = [
+    { value: 'all', label: 'All' },
+    { value: 'id', label: 'ID' },
+    { value: 'client_name', label: 'Customer Name' },
+    { value: 'date', label: 'Date' },
+    { value: 'total', label: 'Total' },
+    { value: 'status', label: 'Invoice Status' },
+    { value: 'unlinked', label: 'Unlinked Projects' }
+];
+
+const perPageOptions = [
+    { value: '12', label: '12' },
+    { value: '20', label: '20' },
+    { value: '50', label: '50' },
+    { value: '100', label: '100' }
+];
+
+const bulkActionOptions = [
+    { value: '', label: 'Bulk Actions' },
+    { value: 'bill_invoice', label: 'Bill Invoice' },
+    { value: 'fix_calc', label: 'Fix Calc' },
+    { value: 'merge', label: 'Merge' },
+    { value: 'split', label: 'Split Invoice' },
+    { value: 'change_project', label: 'Change Project' },
+    { value: 'archive', label: 'Archive' },
+    { value: 'unarchive', label: 'Unarchive' },
+    { value: 'convert_to_transaction', label: 'Convert to Transaction' },
+    { value: 'send_whatsapp_reminder', label: 'Send WhatsApp Reminder' },
+    { value: 'delete', label: 'Delete' }
+];
 
 export default function Index({ invoices, currentTab, filters = {}, stats, projects = [] }) {
     const [selectedClient, setSelectedClient] = React.useState(null);
@@ -217,33 +249,22 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
 
                         <div className="w-full md:w-48">
                             <Label className="mb-2 block text-xs uppercase text-muted-foreground">Filter By</Label>
-                            <select 
-                                className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
-                                value={filterBy} 
-                                onChange={(e) => { setFilterBy(e.target.value); setTimeout(handleFilter, 50); }}
-                            >
-                                <option value="all">All</option>
-                                <option value="id">ID</option>
-                                <option value="client_name">Customer Name</option>
-                                <option value="date">Date</option>
-                                <option value="total">Total</option>
-                                <option value="status">Invoice Status</option>
-                                <option value="unlinked">Unlinked Projects</option>
-                            </select>
+                            <PremiumCombobox
+                                value={filterBy}
+                                onChange={(val) => { setFilterBy(String(val)); setTimeout(handleFilter, 50); }}
+                                options={filterByOptions}
+                                placeholder="Select filter..."
+                            />
                         </div>
 
                         <div className="w-full md:w-32">
                             <Label className="mb-2 block text-xs uppercase text-muted-foreground">Show</Label>
-                            <select 
-                                className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
-                                value={perPage} 
-                                onChange={(e) => { setPerPage(e.target.value); setTimeout(handleFilter, 50); }}
-                            >
-                                <option value="12">12</option>
-                                <option value="20">20</option>
-                                <option value="50">50</option>
-                                <option value="100">100</option>
-                            </select>
+                            <PremiumCombobox
+                                value={perPage}
+                                onChange={(val) => { setPerPage(String(val)); setTimeout(handleFilter, 50); }}
+                                options={perPageOptions}
+                                placeholder="Per page"
+                            />
                         </div>
 
                         <div className="w-full md:ml-auto md:w-64">
@@ -415,39 +436,24 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
                 <CardContent className="p-4">
                     <div className="flex flex-col gap-4 md:flex-row md:items-center">
                         <div className="flex flex-wrap items-center gap-2">
-                            <select 
-                                className="flex h-9 w-40 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
-                                value={bulkAction}
-                                onChange={(e) => setBulkAction(e.target.value)}
-                            >
-                                <option value="">Bulk Actions</option>
-                                <optgroup label="Simple">
-                                    <option value="bill_invoice">Bill Invoice</option>
-                                    <option value="fix_calc">Fix Calc</option>
-                                    <option value="merge">Merge</option>
-                                    <option value="split">Split Invoice</option>
-                                    <option value="change_project">Change Project</option>
-                                    <option value="archive">Archive</option>
-                                    <option value="unarchive">Unarchive</option>
-                                    <option value="convert_to_transaction">Convert to Transaction</option>
-                                    <option value="send_whatsapp_reminder">Send WhatsApp Reminder</option>
-                                </optgroup>
-                                <optgroup label="Advanced">
-                                    <option value="delete">Delete</option>
-                                </optgroup>
-                            </select>
+                            <div className="w-48">
+                                <PremiumCombobox
+                                    value={bulkAction}
+                                    onChange={(val) => setBulkAction(String(val || ''))}
+                                    options={bulkActionOptions}
+                                    placeholder="Bulk Actions"
+                                />
+                            </div>
 
                             {bulkAction === 'change_project' && (
-                                <select 
-                                    className="flex h-9 w-40 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
-                                    value={bulkActionProject}
-                                    onChange={(e) => setBulkActionProject(e.target.value)}
-                                >
-                                    <option value="">Select Project</option>
-                                    {projects.map(project => (
-                                        <option key={project.id} value={project.id}>{project.project_name}</option>
-                                    ))}
-                                </select>
+                                <div className="w-48">
+                                    <PremiumCombobox
+                                        value={bulkActionProject}
+                                        onChange={(val) => setBulkActionProject(String(val || ''))}
+                                        options={projects.map(p => ({ value: String(p.id), label: p.project_name }))}
+                                        placeholder="Select Project"
+                                    />
+                                </div>
                             )}
 
                             <Button onClick={applyBulkAction} size="sm" className="h-9">

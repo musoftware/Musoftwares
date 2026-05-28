@@ -1014,7 +1014,7 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                                                 </div>
                                                 <div className="pt-2">
                                                     <Button 
-                                                        onClick={() => router.visit(route('subscriptions.plans', { module: 'erp' }))}
+                                                        onClick={() => router.visit(route('subscriptions.plans', { module: currentSection }))}
                                                         className="shadow-none flex items-center gap-2 group h-11 px-8 transition-all"
                                                     >
                                                         Upgrade Workspace
@@ -2968,9 +2968,9 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                                             </div>
                                         )}
                                         <div className="pt-2">
-                                            <Link href={route('subscriptions.plans')}>
+                                            <Link href={route('subscriptions.plans', { module: currentSection })}>
                                                 <Button className="shadow-none flex items-center gap-2 group h-11 px-8 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold">
-                                                    Unlock {activeAddon.label} for 500 EGP/Yr
+                                                    Unlock {activeAddon.label}
                                                     <ArrowUpRight className="h-4 w-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
                                                 </Button>
                                             </Link>
