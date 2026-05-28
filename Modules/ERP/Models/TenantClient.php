@@ -50,9 +50,34 @@ class TenantClient extends TenantModel
         return $this->hasMany(Invoice::class, 'client_id');
     }
 
-    public function wallet()
+    public function transactions(): HasMany
     {
-        return $this->hasOne(ClientWallet::class, 'client_id');
+        return $this->hasMany(WalletTransaction::class, 'client_id');
+    }
+
+    public function balance(): float
+    {
+        $credits = $this->transactions()->where('direction', 'credit')->sum('amount');
+        $debits = $this->transactions()->where('direction', 'debit')->sum('amount');
+        return round((float) $credits - (float) $debits, 2);
+    }
+
+    public function getBalanceAttribute(): float
+    {
+        return $this->balance();
+    }
+
+    public function lockedBalance(): float
+    {
+        $unpaidInvoices = $this->invoices()->whereIn('status', ['sent', 'partial'])->get();
+        return round((float) $unpaidInvoices->sum(function ($invoice) {
+            return $invoice->unpaidAmount();
+        }), 2);
+    }
+
+    public function getLockedBalanceAttribute(): float
+    {
+        return $this->lockedBalance();
     }
 
     public function projects(): HasMany

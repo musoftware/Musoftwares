@@ -7,8 +7,9 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/Com
 import { Input } from '@/Components/ui/input';
 import { ArrowLeft, Briefcase } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/Components/ui/select';
+import { ClientAutocomplete } from '@/Components/ClientAutocomplete';
 
-export default function CreateProject({ clients }: { clients: any[] }) {
+export default function CreateProject({ clients = [] }: { clients?: any[] }) {
     const [form, setForm] = useState({
         name: '',
         client_id: '',
@@ -72,18 +73,11 @@ export default function CreateProject({ clients }: { clients: any[] }) {
                                 </div>
                                 <div className="space-y-2">
                                     <label className="text-sm font-medium text-slate-700">Client <span className="text-red-500">*</span></label>
-                                    <Select value={form.client_id} onValueChange={(val) => setForm({...form, client_id: val})}>
-                                        <SelectTrigger className="bg-white border-slate-200 text-slate-900">
-                                            <SelectValue placeholder="Select a Client" />
-                                        </SelectTrigger>
-                                        <SelectContent className="bg-white border-slate-200 text-slate-900">
-                                            {clients.map(c => (
-                                                <SelectItem key={c.id} value={c.id.toString()}>
-                                                    {c.name}
-                                                </SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
+                                    <ClientAutocomplete
+                                        value={form.client_id}
+                                        onChange={(val) => setForm({...form, client_id: val})}
+                                        error={errors.client_id}
+                                    />
                                     {errors.client_id && <p className="text-xs text-red-500">{errors.client_id}</p>}
                                 </div>
                                 <div className="space-y-2">

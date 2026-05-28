@@ -18,9 +18,9 @@ class WalletTransaction extends TenantModel
     protected $table = 'erp_client_wallet_transactions';
 
     protected $fillable = [
-        'tenant_id', 'wallet_id', 'type', 'direction',
+        'tenant_id', 'client_id', 'project_id', 'type', 'direction',
         'amount', 'currency_id', 'business_amount', 'business_currency_id',
-        'exchange_rate', 'exchange_rate_date', 'balance_before', 'balance_after',
+        'exchange_rate', 'exchange_rate_date',
         'reference_type', 'reference_id', 'note', 'created_by'
     ];
 
@@ -31,8 +31,6 @@ class WalletTransaction extends TenantModel
         'business_amount' => 'decimal:2',
         'exchange_rate' => 'decimal:6',
         'exchange_rate_date' => 'date',
-        'balance_before' => 'decimal:2',
-        'balance_after' => 'decimal:2',
         'created_at' => 'datetime',
     ];
 
@@ -41,9 +39,14 @@ class WalletTransaction extends TenantModel
         return $this->belongsTo(Tenant::class);
     }
 
-    public function wallet(): BelongsTo
+    public function client(): BelongsTo
     {
-        return $this->belongsTo(ClientWallet::class, 'wallet_id');
+        return $this->belongsTo(TenantClient::class, 'client_id');
+    }
+
+    public function project(): BelongsTo
+    {
+        return $this->belongsTo(Project::class, 'project_id');
     }
 
     public function creator(): BelongsTo

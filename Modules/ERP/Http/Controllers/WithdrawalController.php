@@ -83,11 +83,6 @@ class WithdrawalController extends Controller
 
         try {
             DB::transaction(function () use ($request, $tenant, $client) {
-                $wallet = ClientWallet::where('tenant_id', $tenant->id)
-                    ->where('client_id', $client->id)
-                    ->lockForUpdate()
-                    ->firstOrFail();
-
                 $amount = (float) $request->amount;
 
                 // Check available balance (subtract already-pending withdrawals)
@@ -96,7 +91,7 @@ class WithdrawalController extends Controller
                     ->whereIn('status', ['pending', 'approved'])
                     ->sum('amount');
 
-                $available = (float) $wallet->balance - (float) $pendingLocked;
+                $available = (float) $client->balance() - (float) $pendingLocked;
 
                 if ($available < $amount) {
                     throw new \Exception("Insufficient available balance. Available: {$available}, Requested: {$amount}");
@@ -107,9 +102,9 @@ class WithdrawalController extends Controller
                     'client_id'         => $client->id,
                     'payment_method_id' => $request->payment_method_id,
                     'amount'            => $amount,
-                    'currency_id'       => $wallet->currency_id,
+                    'currency_id'       => $client->currency_id,
                     'status'            => 'pending',
-                    'balance_at_request'=> $wallet->balance,
+                    'balance_at_request'=> $client->balance(),
                 ]);
             });
 
@@ -138,8 +133,6 @@ class WithdrawalController extends Controller
         return back()->with('success', 'Withdrawal approved.');
     }
 
-    // ── Mark Paid — deducts from ERP ClientWallet ────────────────────
-
     public function markPaid(Request $request, Withdrawal $withdrawal)
     {
         $this->authorizeTenantWithdrawal($withdrawal);
@@ -155,41 +148,38 @@ class WithdrawalController extends Controller
 
         try {
             DB::transaction(function () use ($request, $withdrawal) {
-                // Lock and deduct from ERP ClientWallet (NOT platform wallet)
-                $wallet = ClientWallet::where('tenant_id', $withdrawal->tenant_id)
-                    ->where('client_id', $withdrawal->client_id)
-                    ->lockForUpdate()
-                    ->firstOrFail();
+                $client = TenantClient::findOrFail($withdrawal->client_id);
+                $amount = (float) $withdrawal->amount;
 
-                $amount    = (float) $withdrawal->amount;
-                $balBefore = (float) $wallet->balance;
-                $balAfter  = $balBefore - $amount;
-
-                if ($balBefore < $amount) {
-                    throw new \Exception('Client wallet balance is insufficient to complete this withdrawal.');
+                if ($client->balance() < $amount) {
+                    throw new \Exception('Client balance is insufficient to complete this withdrawal.');
                 }
+
+                $businessCurrencyId = $client->tenant->base_currency_id;
+                $businessAmount = \App\Models\CurrenciesExchange::RateByDate(
+                    now(),
+                    $amount,
+                    $client->currency_id,
+                    $businessCurrencyId
+                );
 
                 // Create an immutable ledger entry in ERP wallet transactions
                 ClientWalletTransaction::create([
                     'tenant_id'         => $withdrawal->tenant_id,
-                    'wallet_id'         => $wallet->id,
+                    'client_id'         => $client->id,
                     'type'              => 'manual_debit',
                     'direction'         => 'debit',
                     'amount'            => $amount,
-                    'currency_id'       => $wallet->currency_id,
-                    'business_amount'   => $amount,
-                    'business_currency_id'=> $wallet->currency_id,
-                    'exchange_rate'     => 1.0,
+                    'currency_id'       => $client->currency_id,
+                    'business_amount'   => $businessAmount,
+                    'business_currency_id'=> $businessCurrencyId,
+                    'exchange_rate'     => \App\Models\CurrenciesExchange::Rate(now()->toDateString(), $client->currency_id, $businessCurrencyId),
                     'exchange_rate_date'=> now()->toDateString(),
-                    'balance_before'    => $balBefore,
-                    'balance_after'     => $balAfter,
                     'reference_type'    => Withdrawal::class,
                     'reference_id'      => $withdrawal->id,
                     'note'              => 'Withdrawal paid — ref: ' . $request->reference,
                     'created_by'        => Auth::id(),
                 ]);
-
-                $wallet->update(['balance' => $balAfter]);
 
                 // Handle proof upload
                 $proofPath = null;

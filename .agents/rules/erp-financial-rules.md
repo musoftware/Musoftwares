@@ -40,6 +40,24 @@ In the ERP system, the **Client** (the client of the User, not the User/Tenant t
   $invoice->currency_id = $client->currency_id;
   ```
 
+#### Multi-Currency Transaction Conversions (Exchange Rates)
+When the ERP base business currency is different from the Client's currency (e.g., ERP base currency is `EGP` and the Client's currency is `USD`):
+- The transaction amount must be recorded in the Client's currency (`amount` in `USD`).
+- The `business_amount` must be converted to the ERP system's base currency using the exchange rate corresponding to the **date of the transaction**.
+- **Exchange Rates Table**: The system uses the `currencies_exchanges` table (represented by the `App\Models\CurrenciesExchange` model) to store daily historical rates.
+- **Lookup Method**: Always fetch the exchange rate using `\App\Models\CurrenciesExchange::RateByDate($date, $amount, $fromCurrencyId, $toCurrencyId)`. This ensures that we lock in the rate at the time/date of the transaction rather than using a dynamic real-time live rate that would retroactively alter past accounting metrics.
+
+```php
+// Example: Converting transaction to business currency on save/boot event
+$date = $transaction->created_at ?? now();
+$transaction->business_amount = \App\Models\CurrenciesExchange::RateByDate(
+    $date,
+    $transaction->amount,
+    $transaction->currency_id,
+    \App\Models\AdminSettings::business_currency()
+);
+```
+
 ---
 
 ### 3. Transactions as the Single Source of Truth for Income
@@ -51,16 +69,22 @@ In the ERP system, the **Client** (the client of the User, not the User/Tenant t
   - `Used`
 - **Income Formula**:
   - If Refund and Send transactions are stored as negative values:
-    $$\text{Income} = \sum \text{Transactions(Credit)} + \sum (\text{Transactions(Refund)} + \text{Transactions(Send)})$$
+    $$\text{Income} = \sum \text{Transactions(Credit).business\_amount} + \sum (\text{Transactions(Refund).business\_amount} + \text{Transactions(Send).business\_amount})$$
+  - **Multi-Currency Normalization**: You **MUST** sum the `business_amount` (normalized base currency amount) rather than the local/client `amount`. Summing different raw currencies (e.g. adding EGP directly to USD) is strictly forbidden.
   - **Caution**: Since Refund and Send amounts are stored as negative values, adding them to the Credit sum correctly decreases the income. Do not subtract them directly (i.e. `Credit - (Refund + Send)`) because subtracting a negative value results in addition (`minus minus is plus`).
 - **Exclusion of `Used`**: Do NOT sum or include transactions of type `Used` in the monthly/profit calculations. The `Used` type tracks internal wallet utilization (e.g. paying invoices using wallet balance) and including it would cause double-counting.
 
 #### Income Calculation Example:
 ```php
-$credits = Transaction::where('type', 'Credit')->whereMonth('created_at', $month)->sum('amount');
+// ✅ CORRECT: Summing business_amount (normalized base currency)
+$credits = Transaction::where('type', 'Credit')
+    ->whereMonth('created_at', $month)
+    ->sum('business_amount');
 
-// Note: Refund and Send transactions have negative amounts (e.g., -150.00)
-$deductions = Transaction::whereIn('type', ['Refund', 'Send'])->whereMonth('created_at', $month)->sum('amount');
+// Note: Refund and Send transactions have negative amounts (e.g., -150.00 in business currency)
+$deductions = Transaction::whereIn('type', ['Refund', 'Send'])
+    ->whereMonth('created_at', $month)
+    ->sum('business_amount');
 
 // ✅ CORRECT: Adding the negative deductions correctly subtracts them
 $monthlyIncome = $credits + $deductions;
@@ -70,18 +94,39 @@ $monthlyIncome = $credits + $deductions;
 
 ### 4. Expense & Cost Summation
 - **No Sub-types**: Expenses do not have sub-type classifications (like Credit, Refund, etc.) in the same transaction sense.
-- **Cost Calculation**: Simply sum all entries in the expenses table (or transactions marked as expenses) to compute the total cost/expenditures:
+- **Cost Calculation**: Simply sum all entries using `business_amount` to compute the total cost/expenditures:
   ```php
-  $totalExpenses = Expense::whereMonth('created_at', $month)->sum('amount');
+  // ✅ CORRECT: Summing business_amount for currency consistency
+  $totalExpenses = Expense::whereMonth('created_at', $month)->sum('business_amount');
   ```
 - **Net Profit**:
   $$\text{Net Profit} = \text{Monthly Income} - \text{Total Expenses}$$
 
+### 5. Client & Project Direct Ledger Linking
+- **No Client Wallet Layer**: Do not use an intermediate client wallet model or table (such as `ClientWallet` or `erp_client_wallets`) to track funds or intermediate states.
+- **Direct Foreign Keys**:
+  - Every transaction (`Transaction`) and cost transaction (`CostTransaction` / expense) must be linked directly to the **Client** (using `client_id` referencing `erp_tenant_clients`) and/or **Project** (using `project_id` referencing `projects`).
+  - Models must define direct relationships to the client:
+    ```php
+    public function client(): BelongsTo
+    {
+        return $this->belongsTo(\Modules\ERP\Models\Client::class, 'client_id');
+    }
+    ```
+- **Dynamic Balance & Computational Locked Balance**:
+  - Compute client or project financial health directly by summing their associated transactions rather than pulling a static `balance` from a wallet model.
+  - **Locked Balance is purely computational**: Do not use manual lock/unlock transaction structures or persist locked funds in the database. Instead, calculate the locked balance dynamically as the sum of `unpaidAmount()` for all outstanding/pending invoices (status is `sent` or `partial`) for that client.
+  - **Locked Balance Formula**:
+    $$\text{Locked Balance} = \sum \text{Client's Invoices(Unpaid).unpaidAmount()}$$
+
 ---
 
-### 5. Summary Checklist
+### 6. Summary Checklist
 - [ ] Does the Project/Invoice/Transaction use the `client->currency_id`?
 - [ ] Is the User currency modification guarded by a `multi-currency` addon check?
 - [ ] Are dashboard income metrics sourced directly from transaction sums?
 - [ ] Are transactions of type `Used` excluded from profit/income calculations?
 - [ ] Are expenses summed entirely without sub-type classification checks?
+- [ ] Are all transactions and cost transactions linked directly to the client/project (without an intermediate wallet model)?
+- [ ] Is the client's locked balance calculated dynamically as the sum of unpaid amounts on their pending invoices?
+

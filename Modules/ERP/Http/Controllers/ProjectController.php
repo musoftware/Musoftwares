@@ -20,12 +20,8 @@ class ProjectController extends Controller
 {
     public function create()
     {
-        $user = Auth::user();
-        $tenant = Tenant::where('user_id', $user->id)->firstOrFail();
-        $clients = TenantClient::where('tenant_id', $tenant->id)->get(['id', 'name']);
-
         return Inertia::render('ERP/Projects/Create', [
-            'clients' => $clients,
+            'clients' => [], // Searched dynamically on the frontend via API
         ]);
     }
 
@@ -38,7 +34,7 @@ class ProjectController extends Controller
         $tenant = Tenant::where('user_id', $user->id)->first();
         
         if (!$tenant) {
-            return back()->withErrors(['error' => 'No active workspace found.']);
+            return back()->withErrors(['error' => __('errors.no_active_workspace')]);
         }
 
         $validated = $request->validate([
@@ -66,7 +62,7 @@ class ProjectController extends Controller
             $project->client_id
         );
 
-        return redirect()->route('erp.dashboard', ['section' => 'projects'])->with('success', 'Project created successfully.');
+        return redirect()->route('erp.dashboard', ['section' => 'projects'])->with('success', __('erp.project_created_success'));
     }
 
     public function edit(Project $project)
@@ -75,10 +71,11 @@ class ProjectController extends Controller
         $tenant = Tenant::where('user_id', $user->id)->firstOrFail();
 
         if ($project->tenant_id !== $tenant->id) {
-            abort(403, 'Unauthorized access to project.');
+            abort(403, __('errors.unauthorized_project'));
         }
 
-        $clients = TenantClient::where('tenant_id', $tenant->id)->get(['id', 'name']);
+        // Only load the client associated with the project to pre-fill the combobox
+        $clients = TenantClient::where('id', $project->client_id)->get(['id', 'name']);
 
         return Inertia::render('ERP/Projects/Edit', [
             'project' => $project,
@@ -96,7 +93,7 @@ class ProjectController extends Controller
 
         // Ensure user owns this project via tenant
         if (!$tenant || $project->tenant_id !== $tenant->id) {
-            abort(403, 'Unauthorized access to project.');
+            abort(403, __('errors.unauthorized_project'));
         }
 
         $validated = $request->validate([
@@ -122,7 +119,7 @@ class ProjectController extends Controller
             $project->client_id
         );
 
-        return redirect()->route('erp.dashboard', ['section' => 'projects'])->with('success', 'Project updated successfully.');
+        return redirect()->route('erp.dashboard', ['section' => 'projects'])->with('success', __('erp.project_updated_success'));
     }
 
     /**
@@ -134,7 +131,7 @@ class ProjectController extends Controller
         $tenant = Tenant::where('user_id', $user->id)->first();
 
         if (!$tenant || $project->tenant_id !== $tenant->id) {
-            abort(403, 'Unauthorized access to project.');
+            abort(403, __('errors.unauthorized_project'));
         }
 
         $name = $project->name;
@@ -147,7 +144,7 @@ class ProjectController extends Controller
             null
         );
 
-        return back()->with('success', 'Project deleted successfully.');
+        return back()->with('success', __('erp.project_deleted_success'));
     }
 
     /**
@@ -159,7 +156,7 @@ class ProjectController extends Controller
         $tenant = Tenant::where('user_id', $user->id)->firstOrFail();
 
         if ($project->tenant_id !== $tenant->id) {
-            abort(403, 'Unauthorized access to project.');
+            abort(403, __('errors.unauthorized_project'));
         }
 
         // Get tenant base currency
