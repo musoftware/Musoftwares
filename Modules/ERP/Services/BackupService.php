@@ -21,6 +21,18 @@ class BackupService
                 $q->where('tenant_id', $tenant->id);
             })->get()->toArray(),
             'transactions' => \Modules\ERP\Models\WalletTransaction::where('tenant_id', $tenant->id)->get()->toArray(),
+            
+            // Addons Support
+            'products' => \Modules\ERP\Models\Product::where('tenant_id', $tenant->id)->get()->toArray(),
+            'product_stock_logs' => \Modules\ERP\Models\ProductStockLog::where('tenant_id', $tenant->id)->get()->toArray(),
+            'expenses' => \Modules\ERP\Models\Expense::where('tenant_id', $tenant->id)->get()->toArray(),
+            'expense_transactions' => \Modules\ERP\Models\ExpenseTransaction::where('tenant_id', $tenant->id)->get()->toArray(),
+            'support_tickets' => \Modules\ERP\Models\SupportTicket::where('tenant_id', $tenant->id)->get()->toArray(),
+            'contracts' => \Modules\ERP\Models\Contract::where('tenant_id', $tenant->id)->get()->toArray(),
+            'referral_earnings' => \Modules\ERP\Models\ReferralEarning::where('tenant_id', $tenant->id)->get()->toArray(),
+            'withdrawal_requests' => \Modules\ERP\Models\WithdrawalRequest::where('tenant_id', $tenant->id)->get()->toArray(),
+            'withdrawals' => \Modules\ERP\Models\Withdrawal::where('tenant_id', $tenant->id)->get()->toArray(),
+            'timer_sessions' => \Modules\ERP\Models\TimerSession::where('tenant_id', $tenant->id)->get()->toArray(),
         ];
 
         $json = json_encode($data, JSON_PRETTY_PRINT);
@@ -47,6 +59,21 @@ class BackupService
             throw new \Exception('Invalid backup file format.');
         }
 
+        // Convert ISO 8601 dates to MySQL compatible datetime strings
+        // and enforce dynamic security keys (tenant_id, user_id, created_by)
+        // to prevent ID tampering from the backup file.
+        array_walk_recursive($data, function (&$value, $key) use ($tenant) {
+            if (is_string($value) && preg_match('/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?Z$/', $value)) {
+                $value = \Carbon\Carbon::parse($value)->format('Y-m-d H:i:s');
+            }
+            if ($key === 'tenant_id') {
+                $value = $tenant->id;
+            }
+            if (in_array($key, ['user_id', 'created_by']) && $value !== null) {
+                $value = $tenant->user_id;
+            }
+        });
+
         DB::transaction(function () use ($tenant, $data) {
             // Delete dependent records first
             \Modules\ERP\Models\InvoiceItem::whereHas('invoice', function($q) use ($tenant) {
@@ -62,6 +89,12 @@ class BackupService
             \Modules\ERP\Models\ClientNote::whereHas('client', function($q) use ($tenant) {
                 $q->where('tenant_id', $tenant->id);
             })->delete();
+            
+            // Delete addon dependent records
+            \Modules\ERP\Models\ExpenseTransaction::where('tenant_id', $tenant->id)->delete();
+            \Modules\ERP\Models\ProductStockLog::where('tenant_id', $tenant->id)->delete();
+            \Modules\ERP\Models\ReferralEarning::where('tenant_id', $tenant->id)->delete();
+            \Modules\ERP\Models\TimerSession::where('tenant_id', $tenant->id)->delete();
 
             // Delete primary records
             \Modules\ERP\Models\Invoice::where('tenant_id', $tenant->id)->delete();
@@ -71,71 +104,256 @@ class BackupService
             \Modules\ERP\Models\Project::where('tenant_id', $tenant->id)->delete();
             \Modules\ERP\Models\PaymentMethod::where('tenant_id', $tenant->id)->delete();
             \Modules\ERP\Models\TenantNote::where('tenant_id', $tenant->id)->delete();
+            
+            // Delete addon primary records
+            \Modules\ERP\Models\Expense::where('tenant_id', $tenant->id)->delete();
+            \Modules\ERP\Models\Product::where('tenant_id', $tenant->id)->delete();
+            \Modules\ERP\Models\SupportTicket::where('tenant_id', $tenant->id)->delete();
+            \Modules\ERP\Models\Contract::where('tenant_id', $tenant->id)->delete();
+            \Modules\ERP\Models\WithdrawalRequest::where('tenant_id', $tenant->id)->delete();
+            \Modules\ERP\Models\Withdrawal::where('tenant_id', $tenant->id)->delete();
+
+            // Finally delete clients
             \Modules\ERP\Models\TenantClient::where('tenant_id', $tenant->id)->delete();
 
-            // Insert records using DB::table to preserve IDs
-            if (isset($data['clients']) && count($data['clients']) > 0) {
-                DB::table('tenant_clients')->insert($data['clients']);
+            // ID Maps to remap foreign keys since we cannot preserve IDs in a shared DB
+            $maps = [
+                'client_id' => [],
+                'payment_method_id' => [],
+                'project_id' => [],
+                'invoice_id' => [],
+                'invoice_cost_id' => [],
+                'invoice_item_id' => [],
+                'task_id' => [],
+                'product_id' => [],
+                'expense_id' => [],
+                'contract_id' => [],
+                'support_ticket_id' => [],
+            ];
+
+            $remapForeignKeys = function(&$item) use (&$maps) {
+                foreach (array_keys($maps) as $fk) {
+                    if (isset($item[$fk]) && isset($maps[$fk][$item[$fk]])) {
+                        $item[$fk] = $maps[$fk][$item[$fk]];
+                    }
+                }
+            };
+
+            if (isset($data['clients'])) {
+                foreach ($data['clients'] as $item) {
+                    $oldId = $item['id'];
+                    unset($item['id']);
+                    $remapForeignKeys($item);
+                    $maps['client_id'][$oldId] = DB::table('erp_tenant_clients')->insertGetId($item);
+                }
             }
-            if (isset($data['payment_methods']) && count($data['payment_methods']) > 0) {
-                DB::table('payment_methods')->insert($data['payment_methods']);
+            if (isset($data['payment_methods'])) {
+                foreach ($data['payment_methods'] as $item) {
+                    $oldId = $item['id'];
+                    unset($item['id']);
+                    $remapForeignKeys($item);
+                    $maps['payment_method_id'][$oldId] = DB::table('erp_payment_methods')->insertGetId($item);
+                }
             }
-            if (isset($data['projects']) && count($data['projects']) > 0) {
-                DB::table('projects')->insert($data['projects']);
+            if (isset($data['projects'])) {
+                foreach ($data['projects'] as $item) {
+                    $oldId = $item['id'];
+                    unset($item['id']);
+                    $remapForeignKeys($item);
+                    $maps['project_id'][$oldId] = DB::table('erp_projects')->insertGetId($item);
+                }
             }
-            // wallets table removed — balance computed from transactions
-            if (isset($data['tenant_notes']) && count($data['tenant_notes']) > 0) {
-                DB::table('tenant_notes')->insert($data['tenant_notes']);
+            
+            // Addons Primary
+            if (isset($data['products'])) {
+                foreach ($data['products'] as $item) {
+                    $oldId = $item['id'];
+                    unset($item['id']);
+                    $remapForeignKeys($item);
+                    $maps['product_id'][$oldId] = DB::table('erp_products')->insertGetId($item);
+                }
+            }
+            if (isset($data['expenses'])) {
+                foreach ($data['expenses'] as $item) {
+                    $oldId = $item['id'];
+                    unset($item['id']);
+                    $remapForeignKeys($item);
+                    $maps['expense_id'][$oldId] = DB::table('erp_expenses')->insertGetId($item);
+                }
+            }
+            if (isset($data['contracts'])) {
+                foreach ($data['contracts'] as $item) {
+                    $oldId = $item['id'];
+                    unset($item['id']);
+                    $remapForeignKeys($item);
+                    $maps['contract_id'][$oldId] = DB::table('erp_contracts')->insertGetId($item);
+                }
+            }
+            if (isset($data['support_tickets'])) {
+                foreach ($data['support_tickets'] as $item) {
+                    $oldId = $item['id'];
+                    unset($item['id']);
+                    $remapForeignKeys($item);
+                    $maps['support_ticket_id'][$oldId] = DB::table('erp_support_tickets')->insertGetId($item);
+                }
+            }
+
+            if (isset($data['tenant_notes'])) {
+                foreach ($data['tenant_notes'] as $item) {
+                    unset($item['id']);
+                    $remapForeignKeys($item);
+                    DB::table('erp_tenant_notes')->insert($item);
+                }
             }
 
             if (isset($data['invoices'])) {
                 foreach ($data['invoices'] as $invoiceData) {
+                    $oldId = $invoiceData['id'];
+                    unset($invoiceData['id']);
+                    
                     $items = $invoiceData['items'] ?? [];
                     $costs = $invoiceData['costs'] ?? [];
-                    unset($invoiceData['items']);
-                    unset($invoiceData['costs']);
-                    DB::table('invoices')->insert($invoiceData);
+                    unset($invoiceData['items'], $invoiceData['costs']);
+
+                    $remapForeignKeys($invoiceData);
+
+                    $newInvoiceId = DB::table('erp_invoices')->insertGetId($invoiceData);
+                    $maps['invoice_id'][$oldId] = $newInvoiceId;
                     
                     if (count($items) > 0) {
-                        DB::table('invoice_items')->insert($items);
+                        foreach ($items as &$i) {
+                            $oldItemId = $i['id'] ?? null;
+                            unset($i['id']);
+                            $i['invoice_id'] = $newInvoiceId;
+                            $remapForeignKeys($i);
+                            $newItemId = DB::table('erp_invoice_items')->insertGetId($i);
+                            if ($oldItemId) {
+                                $maps['invoice_item_id'][$oldItemId] = $newItemId;
+                            }
+                        }
                     }
                     if (count($costs) > 0) {
-                        DB::table('invoice_costs')->insert($costs);
+                        foreach ($costs as &$c) {
+                            $oldCostId = $c['id'] ?? null;
+                            unset($c['id']);
+                            $c['invoice_id'] = $newInvoiceId;
+                            $remapForeignKeys($c);
+                            $newCostId = DB::table('erp_invoice_costs')->insertGetId($c);
+                            if ($oldCostId) {
+                                $maps['invoice_cost_id'][$oldCostId] = $newCostId;
+                            }
+                        }
                     }
                 }
             }
 
             if (isset($data['tasks'])) {
                 foreach ($data['tasks'] as $taskData) {
+                    $oldId = $taskData['id'];
+                    unset($taskData['id']);
+                    
                     $items = $taskData['items'] ?? [];
                     unset($taskData['items']);
-                    DB::table('erp_tasks')->insert($taskData);
+
+                    $remapForeignKeys($taskData);
+
+                    $newTaskId = DB::table('erp_tasks')->insertGetId($taskData);
+                    $maps['task_id'][$oldId] = $newTaskId;
                     
                     if (count($items) > 0) {
-                        // Cast JSON array to string before insert for 'tags' if it's an array
                         foreach ($items as &$item) {
+                            unset($item['id']);
+                            $item['task_id'] = $newTaskId;
+                            $remapForeignKeys($item);
                             if (isset($item['tags']) && is_array($item['tags'])) {
                                 $item['tags'] = json_encode($item['tags']);
                             }
+                            DB::table('erp_todo_items')->insert($item);
                         }
-                        DB::table('erp_todo_items')->insert($items);
                     }
                 }
             }
             
-            if (isset($data['recurring_entries']) && count($data['recurring_entries']) > 0) {
-                // Remove some potential appended attributes
-                foreach ($data['recurring_entries'] as &$entry) {
-                    unset($entry['last_execution']);
+            if (isset($data['recurring_entries'])) {
+                foreach ($data['recurring_entries'] as $item) {
+                    unset($item['id'], $item['last_execution']);
+                    $remapForeignKeys($item);
+                    DB::table('erp_recurring_entries')->insert($item);
                 }
-                DB::table('recurring_entries')->insert($data['recurring_entries']);
             }
 
-            if (isset($data['client_notes']) && count($data['client_notes']) > 0) {
-                DB::table('client_notes')->insert($data['client_notes']);
+            if (isset($data['client_notes'])) {
+                foreach ($data['client_notes'] as $item) {
+                    unset($item['id']);
+                    $remapForeignKeys($item);
+                    DB::table('erp_client_notes')->insert($item);
+                }
             }
-            if (isset($data['transactions']) && count($data['transactions']) > 0) {
-                DB::table('erp_client_transactions')->insert($data['transactions']);
+            if (isset($data['transactions'])) {
+                foreach ($data['transactions'] as $item) {
+                    unset($item['id']);
+                    $remapForeignKeys($item);
+                    
+                    if (isset($item['reference_type']) && isset($item['reference_id'])) {
+                        if (str_contains($item['reference_type'], 'Invoice') && isset($maps['invoice_id'][$item['reference_id']])) {
+                            $item['reference_id'] = $maps['invoice_id'][$item['reference_id']];
+                        } elseif (str_contains($item['reference_type'], 'Project') && isset($maps['project_id'][$item['reference_id']])) {
+                            $item['reference_id'] = $maps['project_id'][$item['reference_id']];
+                        }
+                    }
+                    DB::table('erp_client_transactions')->insert($item);
+                }
+            }
+            
+            // Addon Dependents
+            if (isset($data['product_stock_logs'])) {
+                foreach ($data['product_stock_logs'] as $item) {
+                    unset($item['id']);
+                    $remapForeignKeys($item);
+                    DB::table('erp_product_stock_logs')->insert($item);
+                }
+            }
+            if (isset($data['expense_transactions'])) {
+                foreach ($data['expense_transactions'] as $item) {
+                    unset($item['id']);
+                    $remapForeignKeys($item);
+                    DB::table('erp_expense_transactions')->insert($item);
+                }
+            }
+            if (isset($data['referral_earnings'])) {
+                foreach ($data['referral_earnings'] as $item) {
+                    unset($item['id']);
+                    $remapForeignKeys($item);
+                    if (isset($item['referrer_id']) && isset($maps['client_id'][$item['referrer_id']])) {
+                        $item['referrer_id'] = $maps['client_id'][$item['referrer_id']];
+                    }
+                    if (isset($item['referee_id']) && isset($maps['client_id'][$item['referee_id']])) {
+                        $item['referee_id'] = $maps['client_id'][$item['referee_id']];
+                    }
+                    DB::table('erp_client_referral_earnings')->insert($item);
+                }
+            }
+            if (isset($data['withdrawals'])) {
+                foreach ($data['withdrawals'] as $item) {
+                    unset($item['id']);
+                    $remapForeignKeys($item);
+                    DB::table('erp_withdrawals')->insert($item);
+                }
+            }
+            if (isset($data['withdrawal_requests'])) {
+                foreach ($data['withdrawal_requests'] as $item) {
+                    unset($item['id']);
+                    $remapForeignKeys($item);
+                    DB::table('erp_withdrawal_requests')->insert($item);
+                }
+            }
+            if (isset($data['timer_sessions'])) {
+                foreach ($data['timer_sessions'] as $item) {
+                    unset($item['id']);
+                    $remapForeignKeys($item);
+                    DB::table('erp_timer_sessions')->insert($item);
+                }
+            }
             }
         });
     }

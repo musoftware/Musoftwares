@@ -49,7 +49,7 @@ import {
     AlertCircle,
     User,
     Cloud, Database, Link as LinkIcon, HardDrive, Key, CheckCircle, SearchCode, Lock, Layers,
-    MoreHorizontal, Wallet, RotateCcw, ArrowDownLeft, ArrowUpDown, ArrowDown, ArrowUp
+    MoreHorizontal, Wallet, RotateCcw, ArrowDownLeft, ArrowUpDown, ArrowDown, ArrowUp, ArrowRight
 } from 'lucide-react';
 import {
     Dialog, DialogContent, DialogHeader, DialogTitle,
@@ -200,12 +200,13 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
     const isTeamMember = !!auth?.team_member;
     const isReadOnlyMember = auth?.team_member && auth.team_member.role === 'member';
 
-    // Get locked addons for the sidebar upsell
-    const { lockedAddons } = useERPMenu('overview');
 
     const sectionMatch = typeof window !== 'undefined' ? window.location.search.match(/section=([^&]+)/) : null;
     const initialSection = sectionMatch ? sectionMatch[1] : 'overview';
     const [currentSection, setCurrentSection] = useState(initialSection);
+
+    // Get shared menu state
+    const { menuItems: sharedMenuItems, lockedAddons: sharedLockedAddons, workspaceName, tenantId, activeAddons } = useERPMenu(currentSection);
 
     const handleSetSection = (section: string) => {
         setCurrentSection(section);
@@ -723,8 +724,8 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
         if (!deleteProjectConfirm.project) return;
         router.delete(route('erp.projects.destroy', deleteProjectConfirm.project.id), {
             onSuccess: () => {
-                toast({ description: __('erp.project_deleted_success') });
-                prependActivity(__('erp.activity.project_deleted'), `Deleted project ${deleteProjectConfirm.project.name}.`);
+                toast({ description: __('Project deleted successfully') });
+                prependActivity(__('Project Deleted'), `Deleted project ${deleteProjectConfirm.project.name}.`);
                 setDeleteProjectConfirm({ open: false, project: null });
             }
         });
@@ -734,8 +735,8 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
         if (!deleteInvoiceConfirm.invoice) return;
         router.delete(route('erp.invoices.destroy', deleteInvoiceConfirm.invoice.id), {
             onSuccess: () => {
-                toast({ description: __('erp.invoice_deleted_success') });
-                prependActivity(__('erp.activity.invoice_deleted'), `Deleted invoice ${deleteInvoiceConfirm.invoice.invoiceNumber}.`);
+                toast({ description: __('Invoice deleted successfully') });
+                prependActivity(__('Invoice Deleted'), `Deleted invoice ${deleteInvoiceConfirm.invoice.invoiceNumber}.`);
                 setDeleteInvoiceConfirm({ open: false, invoice: null });
             }
         });
@@ -888,26 +889,32 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
     // ────────────────────────────────────────────────────────
     // WORKSPACE SIDEBAR SECTIONS REGISTRY
     // ────────────────────────────────────────────────────────
-    const menuItems = [
-        { id: 'overview', label: 'Overview', icon: LayoutDashboard },
-        { id: 'clients', label: 'Clients', icon: Users },
-        { id: 'projects', label: 'Projects', icon: Briefcase },
-        { id: 'tasks', label: 'Tasks', icon: CheckSquare, badge: tasks.filter(t => t.category !== 'Done').length },
-        { id: 'invoices', label: 'Invoices', icon: FileText, badge: activeInvoices.filter(inv => inv.status !== 'paid').length },
-        { id: 'transactions', label: 'Transactions', icon: History },
-        { id: 'expenses', label: 'Expenses', icon: Receipt },
-        { id: 'documents', label: 'Files', icon: Folder },
-        { id: 'notes', label: 'Notes', icon: Pin },
-        { id: 'calendar', label: 'Calendar', icon: CalendarIcon },
-        { id: 'team', label: 'Team', icon: UserCheck },
-        { id: 'backup', label: 'Backup', icon: HardDrive },
-        { id: 'settings', label: 'Settings', icon: Settings },
-    ].filter(item => {
-        if (isTeamMember && (item.id === 'team' || item.id === 'settings' || item.id === 'backup')) {
-            return false;
-        }
-        return true;
+    
+    // Use shared menu items but attach dynamic badges and custom onClick behaviors for the Dashboard monolith
+    const menuItems = sharedMenuItems.map(m => {
+        let badge = m.badge;
+        if (m.id === 'tasks') badge = tasks.filter(t => t.category !== 'Done').length;
+        if (m.id === 'invoices') badge = activeInvoices.filter(inv => inv.status !== 'paid').length;
+        
+        return {
+            ...m,
+            badge,
+            isActive: currentSection === m.id,
+            onClick: (m.id === 'team' || m.id === 'backup' || m.id === 'pos' || m.id === 'referrals' || m.id === 'branches' || m.id === 'inventory') ? undefined : (e: any) => {
+                e.preventDefault();
+                handleSetSection(m.id);
+            }
+        };
     });
+
+    const lockedAddons = sharedLockedAddons.map(a => ({
+        ...a,
+        isActive: currentSection === a.id,
+        onClick: (e: any) => {
+            e.preventDefault();
+            handleSetSection(a.id);
+        }
+    }));
 
     const activeMenuLabel = useMemo(() => {
         return menuItems.find(item => item.id === currentSection)?.label 
@@ -918,25 +925,10 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
     return (
         <ERPLayout 
             title={activeMenuLabel}
-            workspaceName={settingsForm.workspaceName}
-            tenantId={serverStats ? '9012' : 'DRAFT'}
-            menuItems={menuItems.map(m => ({
-                ...m,
-                isActive: currentSection === m.id,
-                href: m.id === 'team' ? route('erp.team-members.index') : (m.id === 'backup' ? route('erp.backup.index') : route('erp.dashboard', { section: m.id })),
-                onClick: (m.id === 'team' || m.id === 'backup') ? undefined : (e: any) => {
-                    e.preventDefault();
-                    handleSetSection(m.id);
-                }
-            }))}
-            lockedAddons={lockedAddons.map(a => ({
-                ...a,
-                isActive: currentSection === a.id,
-                onClick: (e: any) => {
-                    e.preventDefault();
-                    handleSetSection(a.id);
-                }
-            }))}
+            workspaceName={workspaceName}
+            tenantId={tenantId}
+            menuItems={menuItems}
+            lockedAddons={lockedAddons}
         >
             <div className="flex-1 w-full min-w-0">
 
@@ -976,57 +968,15 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
             {/* ConfirmModal for invoice deletion */}
             <ConfirmModal
                 isOpen={deleteInvoiceConfirm.open}
-                title={__('erp.delete_invoice')}
-                description={__('erp.delete_invoice_confirm')}
-                confirmLabel={__('erp.delete_invoice')}
+                title={__('Delete Invoice')}
+                description={__('Are you sure you want to delete this invoice? This action cannot be undone.')}
+                confirmLabel={__('Delete Invoice')}
                 variant="danger"
                 onConfirm={confirmDeleteInvoice}
                 onCancel={() => setDeleteInvoiceConfirm({ open: false, invoice: null })}
             />
                         
-                        {/* 0. LOCKED ADDON OVERLAY */}
-                        {lockedAddons.some(a => a.id === currentSection) && (
-                            (() => {
-                                const lockedAddonItem = lockedAddons.find(a => a.id === currentSection)!;
-                                return (
-                                    <div className="max-w-4xl mx-auto space-y-6 pt-4">
-                                        <Card className="border-primary/20 bg-muted/10 shadow-none overflow-hidden relative mt-6">
-                                            <div className="absolute top-0 right-0 translate-x-12 -translate-y-12 opacity-5 pointer-events-none">
-                                                <Lock className="h-64 w-64 text-primary" />
-                                            </div>
-                                            <CardContent className="p-8 md:p-10 relative z-10 space-y-6">
-                                                <div className="flex items-center gap-2">
-                                                    <Lock className="h-5 w-5 text-primary" />
-                                                    <span className="font-semibold text-primary">Premium Feature</span>
-                                                </div>
-                                                <div className="space-y-2">
-                                                    <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-foreground leading-tight">
-                                                        Unlock {lockedAddonItem.label}
-                                                    </h1>
-                                                    <p className="text-muted-foreground leading-relaxed max-w-2xl">
-                                                        {lockedAddonItem.description}
-                                                    </p>
-                                                    {lockedAddonItem.features && lockedAddonItem.features.length > 0 && (
-                                                        <ul className="list-disc pl-5 text-sm text-muted-foreground mt-4 space-y-1">
-                                                            {lockedAddonItem.features.map(f => <li key={f}>{f}</li>)}
-                                                        </ul>
-                                                    )}
-                                                </div>
-                                                <div className="pt-2">
-                                                    <Button 
-                                                        onClick={() => router.visit(route('subscriptions.plans', { module: currentSection }))}
-                                                        className="shadow-none flex items-center gap-2 group h-11 px-8 transition-all"
-                                                    >
-                                                        Upgrade Workspace
-                                                        <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
-                                                    </Button>
-                                                </div>
-                                            </CardContent>
-                                        </Card>
-                                    </div>
-                                );
-                            })()
-                        )}
+
 
                         {/* 1. OVERVIEW (DASHBOARD) */}
                         {currentSection === 'overview' && (
@@ -1178,8 +1128,8 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                                             </div>
                                         </div>
 
-                                        {auth?.erp_addons?.includes('erp-tasks') && (
                                         {/* Pending Tasks */}
+                                        {auth?.erp_addons?.includes('erp-tasks') && (
                                         <div>
                                             <div className="flex items-center justify-between mb-4">
                                                 <h3 className="text-sm font-semibold text-slate-900">Pending Tasks</h3>
@@ -1508,7 +1458,7 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                         )}
 
                         {/* 3. PROJECTS & MILESTONES */}
-                        {currentSection === 'projects' && (
+                        {currentSection === 'projects' && activeAddons.includes('erp-projects') && (
                             <div className="space-y-6">
                                 <ModulePageHeader 
                                     title="Projects" 
@@ -1593,7 +1543,7 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                         )}
 
                         {/* 4. TASK MANAGEMENT (KANBAN) */}
-                        {currentSection === 'tasks' && (
+                        {currentSection === 'tasks' && activeAddons.includes('erp-tasks') && (
                             <div className="space-y-6">
                                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                                     <div className="flex-grow">
@@ -1702,22 +1652,22 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                         {currentSection === 'invoices' && (
                             <div className="space-y-6">
                                 <ModulePageHeader 
-                                    title={__('erp.invoices')} 
-                                    description={__('erp.invoices_description')}
+                                    title={__('Invoices')} 
+                                    description={__('Track, manage, and send invoices to your clients')}
                                     actions={
                                         <div className="flex items-center gap-2">
                                             <Link 
                                                 href={route('erp.invoices.index')}
                                                 className={cn(buttonVariants({ variant: 'outline', size: 'sm' }), "shadow-none")}
                                             >
-                                                <History className="mr-1.5 h-3.5 w-3.5" /> {__('erp.invoices_archive')}
+                                                <History className="mr-1.5 h-3.5 w-3.5" /> {__('All Invoices')}
                                             </Link>
                                             {!isReadOnlyMember && (
                                                 <Link 
                                                     href={route('erp.invoices.create')}
                                                     className={cn(buttonVariants({ size: 'sm' }), "shadow-none")}
                                                 >
-                                                    <Plus className="mr-1.5 h-3.5 w-3.5" /> {__('erp.new_invoice')}
+                                                    <Plus className="mr-1.5 h-3.5 w-3.5" /> {__('New Invoice')}
                                                 </Link>
                                             )}
                                         </div>
@@ -1729,13 +1679,13 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                                         <table className="w-full text-left text-sm border-collapse">
                                             <thead>
                                                 <tr className="bg-slate-50 border-b border-slate-100 text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                                                    <th className="px-6 py-3.5">{__('erp.invoice_code')}</th>
-                                                    <th className="px-6 py-3.5">{__('erp.client_tenant')}</th>
-                                                    <th className="px-6 py-3.5">{__('erp.date_issued')}</th>
-                                                    <th className="px-6 py-3.5">{__('erp.date_due')}</th>
-                                                    <th className="px-6 py-3.5 text-right">{__('erp.invoice_sum')}</th>
-                                                    <th className="px-6 py-3.5 text-center">{__('erp.status')}</th>
-                                                    <th className="px-6 py-3.5 text-right">{__('erp.actions')}</th>
+                                                    <th className="px-6 py-3.5">{__('Invoice #')}</th>
+                                                    <th className="px-6 py-3.5">{__('Client')}</th>
+                                                    <th className="px-6 py-3.5">{__('Issued')}</th>
+                                                    <th className="px-6 py-3.5">{__('Due Date')}</th>
+                                                    <th className="px-6 py-3.5 text-right">{__('Amount')}</th>
+                                                    <th className="px-6 py-3.5 text-center">{__('Status')}</th>
+                                                    <th className="px-6 py-3.5 text-right">{__('Actions')}</th>
                                                 </tr>
                                             </thead>
                                             <tbody className="divide-y divide-slate-100">
@@ -1744,8 +1694,8 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                                                         <td colSpan={7} className="p-0">
                                                             <EmptyState 
                                                                 icon={FileText} 
-                                                                title={__('erp.no_invoices')} 
-                                                                description={__('erp.establish_first_invoice')}
+                                                                title={__('No invoices yet')} 
+                                                                description={__('Create your first invoice to start tracking payments')}
                                                             />
                                                         </td>
                                                     </tr>
@@ -1805,7 +1755,7 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
 
 
                         {/* 7. DOCUMENT VAULT */}
-                        {currentSection === 'documents' && (
+                        {currentSection === 'documents' && activeAddons.includes('erp-document-storage') && (
                             <div className="space-y-6">
                                 <ModulePageHeader 
                                     title="Files" 
@@ -2352,7 +2302,7 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                         )}
 
                         {/* 12. CALENDAR (WORKSPACE SCHEDULE) */}
-                        {currentSection === 'calendar' && (() => {
+                        {currentSection === 'calendar' && activeAddons.includes('erp-calendar') && (() => {
                             const monthNames = [
                                 "January", "February", "March", "April", "May", "June",
                                 "July", "August", "September", "October", "November", "December"

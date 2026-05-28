@@ -60,6 +60,7 @@ class BackupController extends Controller
             $backupService->restoreBackup($tenant, $request->file('backup_file'));
             return back()->with('success', __('erp.backup_restored_success'));
         } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Backup Restore Failed: ' . $e->getMessage() . ' Trace: ' . $e->getTraceAsString());
             return back()->with('error', __('errors.backup_restore_failed', ['message' => $e->getMessage()]));
         }
     }

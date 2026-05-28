@@ -1,22 +1,11 @@
 import React, { useState } from 'react';
 import { Head, Link, router } from '@inertiajs/react';
 import ERPLayout from '@/Layouts/ERPLayout';
+import { useERPMenu } from '@/hooks/useERPMenu';
 import { Button } from '@/Components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/Components/ui/card';
 import { Input } from '@/Components/ui/input';
 import {
-    LayoutDashboard,
-    Users,
-    Briefcase,
-    CheckSquare,
-    FileText,
-    History,
-    Pin,
-    Folder,
-    UserCheck,
-    Settings,
-    CalendarIcon,
-    HardDrive,
     UserPlus,
 } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/Components/ui/select';
@@ -51,36 +40,15 @@ export default function CreateClient({ currencies, tenant, hasMultiCurrency = fa
         });
     };
 
-    const menuItems = [
-        { id: 'overview', label: 'Overview', icon: LayoutDashboard },
-        { id: 'clients', label: 'Clients', icon: Users },
-        { id: 'projects', label: 'Projects', icon: Briefcase },
-        { id: 'tasks', label: 'Tasks', icon: CheckSquare },
-        { id: 'invoices', label: 'Invoices', icon: FileText },
-        { id: 'transactions', label: 'Transactions', icon: History },
-        { id: 'documents', label: 'Files', icon: Folder },
-        { id: 'notes', label: 'Notes', icon: Pin },
-        { id: 'team', label: 'Team', icon: UserCheck },
-        { id: 'backup', label: 'Backup', icon: HardDrive },
-        { id: 'settings', label: 'Settings', icon: Settings },
-    ].map(m => ({
-        ...m,
-        isActive: m.id === 'clients',
-        href: m.id === 'team'
-            ? route('erp.team-members.index')
-            : m.id === 'backup'
-                ? route('erp.backup.index')
-                : route('erp.dashboard', { section: m.id }),
-    }));
-
-    const workspaceName = tenant?.name || 'My Workspace';
+    const { menuItems, lockedAddons, workspaceName, tenantId } = useERPMenu('clients', { tenantId: tenant?.id?.toString() });
 
     return (
         <ERPLayout
             title="Add Client"
             workspaceName={workspaceName}
-            tenantId={tenant?.id?.toString() || 'DRAFT'}
+            tenantId={tenantId}
             menuItems={menuItems}
+            lockedAddons={lockedAddons}
         >
             <div className="space-y-6">
                 {/* Page Header */}

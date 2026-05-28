@@ -41,6 +41,7 @@ interface ERPMenuResult {
     lockedAddons: MenuItem[];
     workspaceName: string;
     tenantId: string;
+    activeAddons: string[];
 }
 
 /**
@@ -168,5 +169,5 @@ export function useERPMenu(
 
     const tenantId = options?.tenantId || tenant?.id?.toString() || 'ACTIVE';
 
-    return { menuItems, lockedAddons, workspaceName, tenantId };
+    return { menuItems, lockedAddons, workspaceName, tenantId, activeAddons };
 }

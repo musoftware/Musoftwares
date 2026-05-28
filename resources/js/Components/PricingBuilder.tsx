@@ -64,14 +64,30 @@ export default function PricingBuilder({
 }: PricingBuilderProps) {
     const [billing, setBilling] = useState<'1_month' | '6_months' | '1_year'>('1_month');
     
-    // Default selected items (e.g., ERP and CRM) to show a populated cart by default
+    // Determine default selected items (e.g., ERP and CRM) plus any module passed via URL
     const activeItems = useMemo(() => {
-        if (isNewSystem) return serviceItems.filter(i => i.id === 'erp' || i.id === 'crm').map(i => i.id);
-        return [];
-    }, [isNewSystem, serviceItems]);
+        const items = [];
+        if (isNewSystem) {
+            items.push(...serviceItems.filter(i => i.id === 'erp' || i.id === 'crm').map(i => i.id));
+        }
+        
+        if (typeof window !== 'undefined') {
+            const params = new URLSearchParams(window.location.search);
+            const mod = params.get('module');
+            if (mod && !items.includes(mod)) {
+                // If they are upgrading, check if they already own it
+                const ownsMod = !isNewSystem && activeSubscription?.owned_features?.find(f => f.id === mod && f.status === 'active');
+                if (!ownsMod) {
+                    items.push(mod);
+                }
+            }
+        }
+        return items;
+    }, [isNewSystem, serviceItems, activeSubscription]);
+
     useEffect(() => {
         setSelectedItems(activeItems);
-    }, [isNewSystem, activeItems]);
+    }, [isNewSystem]); // Only reset when switching modes, not when activeItems changes (to allow URL param to be set once)
 
     const [selectedItems, setSelectedItems] = useState<string[]>(activeItems);
 

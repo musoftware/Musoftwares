@@ -29,7 +29,6 @@ import { FloatingQuickAdd } from '@/Components/CRM/FloatingQuickAdd';
 import axios from 'axios';
 import FreelanceModeToggle from '@/Components/Freelance/FreelanceModeToggle';
 import MarketplaceModeToggle from '@/Components/Marketplace/MarketplaceModeToggle';
-import { FlashHandler } from '@/Components/FlashHandler';
 
 export default function Authenticated(props: PropsWithChildren<{ header?: ReactNode }>) {
     return (
@@ -764,7 +763,6 @@ function AuthenticatedContent({
 
             <CommandPalette />
             <FloatingQuickAdd />
-            <FlashHandler />
             <Toaster />
         </div>
     );
