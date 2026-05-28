@@ -5,10 +5,10 @@ import RecurringForm from './RecurringForm';
 import { PageHeader } from '@/Components/ui/PageHeader';
 
 export default function Edit({ entry, business_currency }) {
-    const { menuItems, workspaceName, tenantId } = useERPMenu('invoices');
+    const { menuItems, lockedAddons, workspaceName, tenantId } = useERPMenu('invoices');
 
     return (
-        <ERPLayout title={`Edit: ${entry.title}`} workspaceName={workspaceName} tenantId={tenantId} menuItems={menuItems}>
+        <ERPLayout title={`Edit: ${entry.title}`} workspaceName={workspaceName} tenantId={tenantId} menuItems={menuItems} lockedAddons={lockedAddons}>
 
             <div className="py-12">
                 <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">

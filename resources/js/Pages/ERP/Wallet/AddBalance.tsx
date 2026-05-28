@@ -99,10 +99,10 @@ export default function AddBalance({ wallet, client }: AddBalanceProps) {
         { id: 'bank', name: 'Wire / ACH', desc: '1-2 business days for clearing', icon: Building2 },
         { id: 'crypto', name: 'USDC Stablecoin', desc: 'Ethereum & Solana chains', icon: Banknote },
     ];
-    const { menuItems, workspaceName, tenantId } = useERPMenu('clients');
+    const { menuItems, lockedAddons, workspaceName, tenantId } = useERPMenu('clients');
 
     return (
-        <ERPLayout title="Deposit Funds" workspaceName={workspaceName} tenantId={tenantId} menuItems={menuItems}>
+        <ERPLayout title="Deposit Funds" workspaceName={workspaceName} tenantId={tenantId} menuItems={menuItems} lockedAddons={lockedAddons}>
 
             <div className="max-w-2xl mx-auto px-4 py-8 space-y-6">
                 {/* Header */}

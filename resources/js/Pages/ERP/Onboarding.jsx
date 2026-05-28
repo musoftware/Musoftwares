@@ -33,10 +33,10 @@ export default function Onboarding({ currencies = [] }) {
 
         post(route('erp.onboarding.complete'));
     };
-    const { menuItems, workspaceName, tenantId } = useERPMenu('overview');
+    const { menuItems, lockedAddons, workspaceName, tenantId } = useERPMenu('overview');
 
     return (
-        <ERPLayout title="Configure ERP" workspaceName={workspaceName} tenantId={tenantId} menuItems={menuItems}>
+        <ERPLayout title="Configure ERP" workspaceName={workspaceName} tenantId={tenantId} menuItems={menuItems} lockedAddons={lockedAddons}>
 
             <div className="py-12 px-4 max-w-2xl mx-auto">
                 <Card className="shadow-none border bg-card text-card-foreground">

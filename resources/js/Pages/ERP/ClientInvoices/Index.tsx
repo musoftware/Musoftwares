@@ -211,10 +211,10 @@ export default function Index({
 
     const tableData = invoices?.data || [];
 
-    const { menuItems, workspaceName, tenantId } = useERPMenu('invoices');
+    const { menuItems, lockedAddons, workspaceName, tenantId } = useERPMenu('invoices');
 
     return (
-        <ERPLayout title="Billing & Invoices" workspaceName={workspaceName} tenantId={tenantId} menuItems={menuItems}>
+        <ERPLayout title="Billing & Invoices" workspaceName={workspaceName} tenantId={tenantId} menuItems={menuItems} lockedAddons={lockedAddons}>
             <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 py-10 font-sans space-y-8">
                 
                 {/* Header */}

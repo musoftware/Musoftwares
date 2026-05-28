@@ -64,7 +64,7 @@ export default function BackupIndex({ hasBackupFeature }: { hasBackupFeature: bo
     };
 
     return (
-        <ERPLayout title="Backup" workspaceName="Workspace" tenantId="9012" menuItems={menuItems}>
+        <ERPLayout title="Backup" workspaceName="Workspace" tenantId="9012" menuItems={menuItems} lockedAddons={lockedAddons}>
             <Head title="ERP Backup Service" />
             
             <div className="max-w-4xl mx-auto space-y-6">

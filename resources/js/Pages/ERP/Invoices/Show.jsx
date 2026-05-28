@@ -202,10 +202,10 @@ export default function Show({ invoice, timeline, referral_earnings }) {
     }
 
     // ADMIN VIEW
-    const { menuItems, workspaceName, tenantId } = useERPMenu('invoices');
+    const { menuItems, lockedAddons, workspaceName, tenantId } = useERPMenu('invoices');
 
     return (
-        <ERPLayout title={`Invoice ${invoice.invoice_number}`} workspaceName={workspaceName} tenantId={tenantId} menuItems={menuItems}>
+        <ERPLayout title={`Invoice ${invoice.invoice_number}`} workspaceName={workspaceName} tenantId={tenantId} menuItems={menuItems} lockedAddons={lockedAddons}>
             <div className="max-w-[1000px] mx-auto px-4 sm:px-6 lg:px-8 py-10 font-sans space-y-12">
                 
                 {/* ──────────────────────────────────────────────────────── */}

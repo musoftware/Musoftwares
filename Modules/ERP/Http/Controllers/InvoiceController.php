@@ -80,11 +80,12 @@ class InvoiceController extends Controller
     public function create()
     {
         $tenant           = $this->resolveTenant();
+        $baseCurrency     = Currency::find($tenant->base_currency_id);
         return Inertia::render('ERP/Invoices/Create', [
             'clients'           => TenantClient::with('currency')->where('tenant_id', $tenant->id)->get(),
             'projects'          => \Modules\ERP\Models\Project::where('tenant_id', $tenant->id)->get(),
             'currencies'        => Currency::all(),
-            'currency_id'       => $tenant->base_currency_id,
+            'business_currency' => $baseCurrency ? $baseCurrency->currency : 'USD',
         ]);
     }
 
@@ -226,12 +227,13 @@ class InvoiceController extends Controller
         }
 
         $invoice->load(['items', 'costs']);
+        $baseCurrency = Currency::find($tenant->base_currency_id);
         return Inertia::render('ERP/Invoices/Edit', [
             'invoice'           => $invoice,
             'clients'           => TenantClient::with('currency')->where('tenant_id', $tenant->id)->get(),
             'projects'          => \Modules\ERP\Models\Project::where('tenant_id', $tenant->id)->get(),
             'currencies'        => Currency::all(),
-            'currency_id'       => $tenant->base_currency_id,
+            'business_currency' => $baseCurrency ? $baseCurrency->currency : 'USD',
         ]);
     }
 

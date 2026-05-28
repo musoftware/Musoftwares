@@ -121,10 +121,10 @@ export default function Show({ auth, wallet, transactions, client, errors }: Wal
         : [{ date: 'Today', balance: activeWallet.balance }];
 
     const clientInvoices: { id: string; amount: number; status: string; date: string }[] = [];
-    const { menuItems, workspaceName, tenantId } = useERPMenu('clients');
+    const { menuItems, lockedAddons, workspaceName, tenantId } = useERPMenu('clients');
 
     return (
-        <ERPLayout title={`Wallet Ledger - ${activeClient.name}`} workspaceName={workspaceName} tenantId={tenantId} menuItems={menuItems}>
+        <ERPLayout title={`Wallet Ledger - ${activeClient.name}`} workspaceName={workspaceName} tenantId={tenantId} menuItems={menuItems} lockedAddons={lockedAddons}>
 
             <div className="max-w-[1200px] mx-auto px-4 py-8 space-y-8">
                 {/* Header */}

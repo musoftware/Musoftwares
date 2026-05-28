@@ -168,10 +168,10 @@ export default function Index({ tasks, clients, filters }: IndexProps) {
                 return <span className={`${classes} bg-slate-50 text-slate-700 border-slate-200`}>Open</span>;
         }
     };
-    const { menuItems, workspaceName, tenantId } = useERPMenu('tasks');
+    const { menuItems, lockedAddons, workspaceName, tenantId } = useERPMenu('tasks');
 
     return (
-        <ERPLayout title="ERP Client Task Boards" workspaceName={workspaceName} tenantId={tenantId} menuItems={menuItems}>
+        <ERPLayout title="ERP Client Task Boards" workspaceName={workspaceName} tenantId={tenantId} menuItems={menuItems} lockedAddons={lockedAddons}>
 
             <div className="max-w-[1200px] mx-auto px-4 py-8 space-y-6 font-sans text-sm">
                 

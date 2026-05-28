@@ -38,10 +38,10 @@ export default function ProjectsIndex({ projects }: Props) {
         completed: projects.filter(p => p.status === 'completed').length,
     };
 
-    const { menuItems, workspaceName, tenantId } = useERPMenu('projects');
+    const { menuItems, lockedAddons, workspaceName, tenantId } = useERPMenu('projects');
 
     return (
-        <ERPLayout title="Projects" workspaceName={workspaceName} tenantId={tenantId} menuItems={menuItems}>
+        <ERPLayout title="Projects" workspaceName={workspaceName} tenantId={tenantId} menuItems={menuItems} lockedAddons={lockedAddons}>
 
             <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-6">
                 {/* Header */}

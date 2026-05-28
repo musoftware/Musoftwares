@@ -50,10 +50,10 @@ export default function IndexClient({
             router.post(route('erp.withdrawals.cancel', id));
         }
     };
-    const { menuItems, workspaceName, tenantId } = useERPMenu('transactions');
+    const { menuItems, lockedAddons, workspaceName, tenantId } = useERPMenu('transactions');
 
     return (
-        <ERPLayout title="Withdrawals" workspaceName={workspaceName} tenantId={tenantId} menuItems={menuItems}>
+        <ERPLayout title="Withdrawals" workspaceName={workspaceName} tenantId={tenantId} menuItems={menuItems} lockedAddons={lockedAddons}>
 
             <div className="py-12">
                 <div className="mx-auto max-w-7xl space-y-6 sm:px-6 lg:px-8">

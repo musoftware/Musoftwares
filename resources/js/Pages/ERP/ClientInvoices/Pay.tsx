@@ -94,10 +94,10 @@ export default function Pay({
         }
     };
 
-    const { menuItems, workspaceName, tenantId } = useERPMenu('invoices');
+    const { menuItems, lockedAddons, workspaceName, tenantId } = useERPMenu('invoices');
 
     return (
-        <ERPLayout title={`Invoice #${invoice.invoice_number}`} workspaceName={workspaceName} tenantId={tenantId} menuItems={menuItems}>
+        <ERPLayout title={`Invoice #${invoice.invoice_number}`} workspaceName={workspaceName} tenantId={tenantId} menuItems={menuItems} lockedAddons={lockedAddons}>
             
             <div className="max-w-[1000px] mx-auto px-4 sm:px-6 py-10 font-sans space-y-6">
                 {/* Navigation Back */}

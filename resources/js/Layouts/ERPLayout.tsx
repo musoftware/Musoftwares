@@ -24,6 +24,9 @@ interface ERPLayoutProps extends PropsWithChildren {
         href: string;
         locked?: boolean;
         isActive: boolean;
+        onClick?: (e?: any) => void;
+        description?: string;
+        features?: string[];
     }>;
 }
 
@@ -153,17 +156,27 @@ export default function ERPLayout({
                                         <nav className="space-y-0.5">
                                             {lockedAddons.map((addon) => {
                                                 const AddonIcon = addon.icon;
-                                                return (
-                                                    <Link
-                                                        key={addon.id}
-                                                        href={addon.href}
-                                                        className="group flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm transition-all text-slate-400 hover:bg-slate-50 hover:text-slate-500 opacity-60 hover:opacity-80"
-                                                    >
+                                                const addonClasses = `group flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm transition-all ${
+                                                    addon.isActive
+                                                        ? 'bg-slate-100/70 text-slate-500 opacity-75'
+                                                        : 'text-slate-400 hover:bg-slate-50 hover:text-slate-500 opacity-60 hover:opacity-80'
+                                                }`;
+                                                const addonContent = (
+                                                    <>
                                                         <div className="flex items-center gap-3">
                                                             <AddonIcon className="h-4 w-4 shrink-0 text-slate-300 group-hover:text-slate-400" />
                                                             <span>{addon.label}</span>
                                                         </div>
                                                         <Lock className="h-3 w-3 text-slate-300 group-hover:text-indigo-400 transition-colors" />
+                                                    </>
+                                                );
+                                                return addon.onClick ? (
+                                                    <button key={addon.id} onClick={addon.onClick} className={addonClasses}>
+                                                        {addonContent}
+                                                    </button>
+                                                ) : (
+                                                    <Link key={addon.id} href={addon.href} className={addonClasses}>
+                                                        {addonContent}
                                                     </Link>
                                                 );
                                             })}

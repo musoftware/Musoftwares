@@ -39,10 +39,10 @@ export default function CreateFile() {
         });
     };
 
-    const { menuItems, workspaceName, tenantId } = useERPMenu('documents');
+    const { menuItems, lockedAddons, workspaceName, tenantId } = useERPMenu('documents');
 
     return (
-        <ERPLayout title="Upload Document" workspaceName={workspaceName} tenantId={tenantId} menuItems={menuItems}>
+        <ERPLayout title="Upload Document" workspaceName={workspaceName} tenantId={tenantId} menuItems={menuItems} lockedAddons={lockedAddons}>
 
             <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8 space-y-6">
                 <div className="flex items-center gap-4">
