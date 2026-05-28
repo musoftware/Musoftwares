@@ -54,9 +54,13 @@ class SubscriptionController extends Controller
         $basePricesEGP = config('saas.modules', []);
 
         // Convert EGP to user's currency: (EGP / EGP_Rate) * User_Rate
-        $convertPrice = function($egpPrice) use ($egpRate, $rate) {
+        $convertPrice = function($egpPrice) use ($egpRate, $rate, $currencyCode) {
+            if ($currencyCode === 'EGP') {
+                return round($egpPrice);
+            }
             $usdPrice = $egpPrice / $egpRate;
-            return round($usdPrice * $rate, 2);
+            $converted = $usdPrice * $rate;
+            return psychological_price($converted);
         };
 
         $pricingService = new \App\Services\PricingService();
