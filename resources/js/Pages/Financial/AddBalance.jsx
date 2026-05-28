@@ -8,6 +8,7 @@ import { Input } from '@/Components/ui/input';
 import { Button } from '@/Components/ui/button';
 import { Label } from '@/Components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/Components/ui/card';
+import { formatMoney } from '@/lib/utils';
 
 export default function AddBalance({ wallet }) {
     const [selectedPreset, setSelectedPreset] = useState(50);
@@ -78,8 +79,7 @@ export default function AddBalance({ wallet }) {
                         <div>
                             <p className="text-sm font-medium text-slate-400 mb-1">Current Wallet Balance</p>
                             <div className="text-3xl font-bold tracking-tight">
-                                {walletBalance.toLocaleString(undefined, { minimumFractionDigits: 2 })}
-                                <span className="text-xl font-normal text-slate-400 ml-2">{walletCurrency}</span>
+                                {formatMoney(walletBalance, walletCurrency)}
                             </div>
                         </div>
                         <div className="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center">
@@ -124,7 +124,7 @@ export default function AddBalance({ wallet }) {
                                                 : 'border-slate-200 text-slate-700 hover:bg-slate-50'
                                         }`}
                                     >
-                                        {amount}
+                                        {formatMoney(amount, walletCurrency)}
                                     </Button>
                                 ))}
                             </div>
@@ -159,8 +159,8 @@ export default function AddBalance({ wallet }) {
                             {data.amount >= 5 && (
                                 <div className="bg-slate-50 border border-slate-200 rounded-lg p-3 flex items-center justify-between">
                                     <span className="text-sm text-slate-600">You will deposit:</span>
-                                    <span className="font-bold text-slate-900">
-                                        {Number(data.amount).toLocaleString(undefined, { minimumFractionDigits: 2 })} {walletCurrency}
+                                    <span className="font-bold text-slate-900 font-mono">
+                                        {formatMoney(data.amount, walletCurrency)}
                                     </span>
                                 </div>
                             )}
@@ -197,7 +197,7 @@ export default function AddBalance({ wallet }) {
                         >
                             {processing
                                 ? 'Redirecting to payment...'
-                                : `Pay ${Number(data.amount || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })} ${walletCurrency} via Kashier`
+                                : `Pay ${formatMoney(data.amount || 0, walletCurrency)} via Kashier`
                             }
                         </Button>
                         <div className="flex items-center gap-2 text-xs text-muted-foreground">
@@ -207,7 +207,7 @@ export default function AddBalance({ wallet }) {
                     </div>
 
                     <p className="text-xs text-slate-400 text-center">
-                        Minimum deposit: 5 {walletCurrency}. You will be redirected to Kashier's secure payment page to complete the transaction.
+                        Minimum deposit: {formatMoney(5, walletCurrency)}. You will be redirected to Kashier's secure payment page to complete the transaction.
                     </p>
                 </form>
             </div>

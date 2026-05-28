@@ -6,7 +6,7 @@ import {
     Sparkles, Plus, CreditCard, Inbox, Settings, Activity, ArrowRight, LayoutDashboard, History, Calendar, Layers
 } from 'lucide-react';
 import { Button } from '@/Components/ui/button';
-import { cn } from '@/lib/utils';
+import { cn, formatMoney } from '@/lib/utils';
 import { ModulePageHeader } from '@/Components/ui/ModulePageHeader';
 import { MetricCard } from '@/Components/ui/MetricCard';
 import { OperationalCard } from '@/Components/ui/OperationalCard';
@@ -99,7 +99,7 @@ export default function Dashboard({
         subject_type: 'transaction',
         subject_id: Number(String(txn.id).replace('TXN-', '')),
         event: txn.type,
-        description: `${txn.type.charAt(0).toUpperCase() + txn.type.slice(1)} of ${stats.currency} ${txn.amount.toLocaleString(undefined, {minimumFractionDigits: 2})} via ${txn.method}`,
+        description: `${txn.type.charAt(0).toUpperCase() + txn.type.slice(1)} of ${formatMoney(txn.amount, stats.currency)} via ${txn.method}`,
         properties: null,
         workspace: 'system',
         created_at: txn.date,
@@ -133,12 +133,12 @@ export default function Dashboard({
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <MetricCard 
                         label="Account Balance"
-                        value={stats.walletBalance}
+                        value={formatMoney(stats.walletBalance, stats.currency)}
                         icon={Wallet}
                     />
                     <MetricCard 
                         label="Monthly Subscription"
-                        value={stats.totalMonthlySubscription}
+                        value={formatMoney(stats.totalMonthlySubscription, stats.currency)}
                         icon={Sparkles}
                     />
                 </div>
@@ -274,7 +274,7 @@ export default function Dashboard({
                                         disabled={processing}
                                         className="flex flex-col items-center justify-center p-2 rounded-lg bg-slate-50 border border-slate-200 hover:border-emerald-500 hover:bg-emerald-50 hover:text-emerald-700 transition-colors"
                                     >
-                                        <span className="font-bold text-sm">${amount}</span>
+                                        <span className="font-bold text-sm">{formatMoney(amount, stats.currency)}</span>
                                     </button>
                                 ))}
                             </div>

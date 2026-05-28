@@ -6,6 +6,7 @@ import { Badge } from '@/Components/ui/badge';
 import { Button } from '@/Components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/Components/ui/card';
 import { FolderOpen, Plus, Calendar, DollarSign, Clock, CheckCircle, ArrowRight } from 'lucide-react';
+import { formatMoney } from '@/lib/utils';
 
 interface Project {
     id: number;
@@ -107,9 +108,8 @@ export default function ProjectsIndex({ projects }: Props) {
                                         <div className="flex items-center justify-between pt-1">
                                             <div className="flex items-center gap-3 text-xs text-slate-500">
                                                 {project.budget && (
-                                                    <span className="flex items-center gap-1">
-                                                        <DollarSign className="w-3 h-3" />
-                                                        {project.currency ?? 'USD'} {Number(project.budget).toLocaleString()}
+                                                    <span className="flex items-center gap-1 font-mono">
+                                                        {formatMoney(project.budget, project.currency ?? 'USD')}
                                                     </span>
                                                 )}
                                                 {project.due_date && (

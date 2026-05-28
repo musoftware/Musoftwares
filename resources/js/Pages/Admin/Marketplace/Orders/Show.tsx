@@ -3,7 +3,7 @@ import { Head, Link, useForm } from '@inertiajs/react';
 import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
 import { Badge } from '@/Components/ui/badge';
 import { Button } from '@/Components/ui/button';
-import { AlertTriangle, CheckCircle, ShieldAlert } from 'lucide-react';
+import { AlertTriangle, CheckCircle, ShieldAlert, MessageCircle } from 'lucide-react';
 import { formatMoney as formatCurrency } from '@/lib/utils';
 
 export default function Show({ order }) {

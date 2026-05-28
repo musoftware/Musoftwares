@@ -168,7 +168,7 @@ export default function AddBalance({ wallet, client }: AddBalanceProps) {
                                     placeholder="0.00"
                                     value={customAmount}
                                     onChange={(e) => handleCustomChange(e.target.value)}
-                                    className={`pl-8 shadow-none border-slate-200 ${customAmount && !selectedPreset ? "border-indigo-500 ring-1 ring-indigo-500 focus:border-indigo-500 focus:ring-indigo-500" : ""}`}
+                                    className={`pl-12 shadow-none border-slate-200 ${customAmount && !selectedPreset ? "border-indigo-500 ring-1 ring-indigo-500 focus:border-indigo-500 focus:ring-indigo-500" : ""}`}
                                 />
                             </div>
                         </div>

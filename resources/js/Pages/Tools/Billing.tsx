@@ -5,6 +5,7 @@ import { Button } from '@/Components/ui/button';
 import { Badge } from '@/Components/ui/badge';
 import { EmptyState } from '@/Components/ui/EmptyState';
 import { Download, ShoppingBag, Receipt, XCircle, Calculator } from 'lucide-react';
+import { formatMoney } from '@/lib/utils';
 
 interface Subscription {
     id: number; plan_name: string; billing_cycle: string; amount_paid: number;
@@ -69,7 +70,7 @@ export default function Billing({ subscriptions }: Props) {
                         </div>
                         <div className="text-right">
                             <p className="text-2xl font-bold text-slate-900 dark:text-white">
-                                ${totalMonthly.toFixed(2)}
+                                {formatMoney(totalMonthly, 'USD')}
                                 <span className="text-sm font-normal text-slate-500 ml-1">/mo</span>
                             </p>
                         </div>
@@ -103,7 +104,7 @@ export default function Billing({ subscriptions }: Props) {
                                                 </div>
                                                 <div className="text-right flex-shrink-0">
                                                     <Badge className={`${statusColors[sub.status] ?? ''} hover:${statusColors[sub.status]}`}>{sub.status}</Badge>
-                                                    <p className="text-lg font-bold text-slate-900 dark:text-white mt-1">${sub.amount_paid.toFixed(2)}<span className="text-xs text-slate-400 font-normal ml-1">{sub.currency}</span></p>
+                                                    <p className="text-lg font-bold text-slate-900 dark:text-white mt-1">{formatMoney(sub.amount_paid, sub.currency || 'USD')}</p>
                                                 </div>
                                             </div>
 

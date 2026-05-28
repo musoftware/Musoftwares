@@ -44,6 +44,7 @@ class PaymentMethodController extends Controller
 
         return Inertia::render('ERP/PaymentMethods/Index', [
             'paymentMethods' => $paymentMethods,
+            'currencies' => \App\Models\Currency::all(),
         ]);
     }
 

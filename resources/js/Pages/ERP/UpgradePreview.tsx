@@ -3,6 +3,7 @@ import { useERPMenu } from '@/hooks/useERPMenu';
 import { Head, router } from '@inertiajs/react';
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { formatMoney } from '@/lib/utils';
 import {
     Sparkles,
     CheckCircle2,
@@ -103,10 +104,10 @@ export default function UpgradePreview() {
                                     <span className="bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded font-medium">Draft</span>
                                 </div>
                                 <div className="space-y-1.5 text-muted-foreground">
-                                    <div className="flex justify-between"><span>Core Refactoring</span><span>$1,200.00</span></div>
-                                    <div className="flex justify-between"><span>Database Migration</span><span>$650.00</span></div>
+                                    <div className="flex justify-between"><span>Core Refactoring</span><span>{formatMoney(1200, 'USD')}</span></div>
+                                    <div className="flex justify-between"><span>Database Migration</span><span>{formatMoney(650, 'USD')}</span></div>
                                 </div>
-                                <div className="text-right font-bold pt-2 border-t border-border text-foreground">Total: $1,850.00</div>
+                                <div className="text-right font-bold pt-2 border-t border-border text-foreground">Total: {formatMoney(1850, 'USD')}</div>
                             </div>
                         </CardContent>
                     </Card>
@@ -132,8 +133,8 @@ export default function UpgradePreview() {
                                     <span className="text-emerald-600 font-bold flex items-center"><TrendingUp className="h-3 w-3 mr-1" /> +14.5%</span>
                                 </div>
                                 <div className="flex justify-between text-muted-foreground">
-                                    <span>Net Sales: $12,450.00</span>
-                                    <span>Expenses: $3,210.00</span>
+                                    <span>Net Sales: {formatMoney(12450, 'USD')}</span>
+                                    <span>Expenses: {formatMoney(3210, 'USD')}</span>
                                 </div>
                                 <div className="h-2 w-full bg-border rounded-full overflow-hidden flex">
                                     <div className="h-full bg-emerald-500 w-2/3" />

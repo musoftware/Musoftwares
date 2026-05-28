@@ -37,7 +37,7 @@ import {
 } from '@/Components/ui/dropdown-menu';
 import { useToast } from '@/Components/ui/use-toast';
 
-export default function Index({ auth, paymentMethods }) {
+export default function Index({ auth, paymentMethods, currencies = [] }) {
     const { toast } = useToast();
     const [isAddOpen, setIsAddOpen] = useState(false);
 
@@ -167,11 +167,11 @@ export default function Index({ auth, paymentMethods }) {
                                                 value={data.bank_currency}
                                                 onChange={e => setData('bank_currency', e.target.value)}
                                             >
-                                                <option value="EGP">EGP</option>
-                                                <option value="USD">USD</option>
-                                                <option value="EUR">EUR</option>
-                                                <option value="SAR">SAR</option>
-                                                <option value="AED">AED</option>
+                                                {currencies.map((c) => (
+                                                    <option key={c.id} value={c.currency}>
+                                                        {c.currency}
+                                                    </option>
+                                                ))}
                                             </select>
                                         </div>
                                     </div>

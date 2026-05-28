@@ -3,6 +3,7 @@ import { Head, useForm, router } from '@inertiajs/react';
 import ToolsPublicLayout from '@/Layouts/ToolsPublicLayout';
 import { Button } from '@/Components/ui/button';
 import { CheckCircle2, CreditCard, Wallet, AlertCircle, ArrowLeft, Shield } from 'lucide-react';
+import { formatMoney } from '@/lib/utils';
 
 interface Props {
     tool: { slug: string; title: string; icon_url: string | null };
@@ -99,7 +100,7 @@ export default function Subscribe({ tool, plan, walletBalance, hasExisting }: Pr
                         <div className="px-5 py-4">
                             <div className="flex items-end gap-1 mb-4">
                                 <span className="text-3xl font-bold text-white">
-                                    {price <= 0 ? 'Free' : `$${price.toFixed(2)}`}
+                                    {price <= 0 ? 'Free' : formatMoney(price, 'USD')}
                                 </span>
                                 {price > 0 && (
                                     <span className="text-slate-400 text-sm mb-1">/{billingCycle === 'monthly' ? 'month' : 'year'}</span>
@@ -125,7 +126,7 @@ export default function Subscribe({ tool, plan, walletBalance, hasExisting }: Pr
                                     method: 'wallet' as const,
                                     icon: Wallet,
                                     label: 'Wallet',
-                                    sub: `Balance: $${walletBalance.toFixed(2)}`,
+                                    sub: `Balance: ${formatMoney(walletBalance, 'USD')}`,
                                 },
                                 {
                                     method: 'kashier' as const,
@@ -172,7 +173,7 @@ export default function Subscribe({ tool, plan, walletBalance, hasExisting }: Pr
                         className="w-full bg-slate-900 hover:bg-slate-800 text-white h-11"
                         disabled={processing || (data.payment_method === 'wallet' && !canPayByWallet)}
                     >
-                        {processing ? 'Processing...' : price <= 0 ? 'Get Free Access' : `Subscribe — $${price.toFixed(2)}`}
+                        {processing ? 'Processing...' : price <= 0 ? 'Get Free Access' : `Subscribe — ${formatMoney(price, 'USD')}`}
                     </Button>
 
                     <p className="text-xs text-slate-400 text-center flex items-center justify-center gap-1">

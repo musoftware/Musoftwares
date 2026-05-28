@@ -152,6 +152,7 @@ class TaskController extends Controller
             'task'  => $this->shapeTask($task),
             'todos' => $task->items->map(fn($item) => $this->shapeTodo($item)),
             'completion' => $task->completionPercentage(),
+            'currencies' => \App\Models\Currency::all(),
         ]);
     }
 
