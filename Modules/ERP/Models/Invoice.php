@@ -13,6 +13,9 @@ class Invoice extends TenantModel
     protected $table = 'erp_invoices';
 
     use Searchable;
+
+    protected $appends = ['amount_currency'];
+
     protected $fillable = [
         'tenant_id', 'invoice_number', 'client_id', 'project_id', 'status',
         'amount', 'currency_id', 'business_amount',
@@ -94,6 +97,11 @@ class Invoice extends TenantModel
     }
 
     // ── Computed Attributes ──────────────────────────────────────
+
+    public function getAmountCurrencyAttribute(): string
+    {
+        return $this->currency?->currency ?? 'USD';
+    }
 
     /**
      * Remaining unpaid amount.

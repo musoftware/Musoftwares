@@ -21,7 +21,7 @@ export function formatMoney(amount: number | string, currency = 'USD') {
     const numericAmount = typeof amount === 'string' ? parseFloat(amount) : amount;
     if (isNaN(numericAmount)) return `${currency} 0.00`;
     
-    const curCode = (typeof currency === 'string' ? currency : 'USD').toUpperCase();
+    const curCode = (typeof currency === 'string' ? currency : 'USD').trim().toUpperCase();
     
     const isNegative = numericAmount < 0;
     const absoluteAmount = Math.abs(numericAmount);
@@ -30,6 +30,33 @@ export function formatMoney(amount: number | string, currency = 'USD') {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2,
     }).format(absoluteAmount);
+
+    // Dynamic look up from window.currencies shared from database
+    const dynamicCurrencies = (window as any).currencies;
+    if (Array.isArray(dynamicCurrencies)) {
+        const found = dynamicCurrencies.find(c => c.currency && c.currency.toUpperCase() === curCode);
+        if (found) {
+            const symbol = found.symbol || curCode;
+            const fmt = found.string_format;
+            if (fmt) {
+                const specifiers = ['%01.2f', '%s', '%.2f'];
+                for (const spec of specifiers) {
+                    if (fmt.includes(spec)) {
+                        const formatted = fmt.replace(spec, numberPart);
+                        return isNegative ? `-${formatted}` : formatted;
+                    }
+                }
+                if (fmt.includes('{amount}') || fmt.includes('{symbol}') || fmt.includes('{code}')) {
+                    const formatted = fmt
+                        .replace('{symbol}', symbol)
+                        .replace('{amount}', numberPart)
+                        .replace('{code}', curCode);
+                    return isNegative ? `-${formatted}` : formatted;
+                }
+            }
+            return isNegative ? `-${symbol}${numberPart}` : `${symbol}${numberPart}`;
+        }
+    }
 
     if (CURRENCY_FORMATS[curCode]) {
         const formatted = CURRENCY_FORMATS[curCode].replace('%v', numberPart);

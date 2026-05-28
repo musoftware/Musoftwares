@@ -116,6 +116,12 @@ class HandleInertiaRequests extends Middleware
             'settings' => [
                 'base_currency' => 'USD'
             ],
+            'currencies' => \App\Models\Currency::all()->map(fn($c) => [
+                'id' => $c->id,
+                'currency' => $c->currency,
+                'symbol' => $c->symbol,
+                'string_format' => $c->string_format,
+            ])->toArray(),
             'flash' => [
                 'message' => fn () => $request->session()->get('message')
             ],

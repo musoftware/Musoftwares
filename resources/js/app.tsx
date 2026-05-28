@@ -57,6 +57,10 @@ createInertiaApp({
         ),
     setup({ el, App, props }) {
         const root = createRoot(el);
+        
+        if (props.initialPage.props.currencies) {
+            (window as any).currencies = props.initialPage.props.currencies;
+        }
 
         root.render(
             <MarketplaceModeProvider>

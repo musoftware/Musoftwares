@@ -8,6 +8,11 @@ use Illuminate\Support\Facades\Auth;
 use Modules\ERP\Models\Project;
 use Modules\ERP\Models\Tenant;
 use Modules\ERP\Models\TenantClient;
+use Modules\ERP\Models\Invoice;
+use Modules\ERP\Models\InvoiceCost;
+use Modules\ERP\Models\ERPTask;
+use Modules\ERP\Models\SupportTicket;
+use Modules\ERP\Models\Activity;
 use Modules\ERP\Services\ActivityLogger;
 use Inertia\Inertia;
 
@@ -143,5 +148,163 @@ class ProjectController extends Controller
         );
 
         return back()->with('success', 'Project deleted successfully.');
+    }
+
+    /**
+     * Display the specified project with detailed statistics, invoices, expenses, tasks, and tickets.
+     */
+    public function show(Project $project)
+    {
+        $user = Auth::user();
+        $tenant = Tenant::where('user_id', $user->id)->firstOrFail();
+
+        if ($project->tenant_id !== $tenant->id) {
+            abort(403, 'Unauthorized access to project.');
+        }
+
+        // Get tenant base currency
+        $currency = \App\Models\Currency::find($tenant->base_currency_id);
+        $businessCurrency = $currency ? $currency->currency : 'USD';
+
+        // Load project relationships
+        $project->load(['tenantClient', 'platformClient', 'creator']);
+
+        // Get invoices linked to this project
+        $invoices = Invoice::where('project_id', $project->id)
+            ->with(['currency'])
+            ->latest()
+            ->get();
+
+        // Stats calculation
+        $paidInvoices = $invoices->where('status', 'paid');
+        $unpaidInvoices = $invoices->whereIn('status', ['sent', 'partial']);
+        
+        $paidCount = $paidInvoices->count();
+        $unpaidCount = $unpaidInvoices->count();
+        $totalCount = $invoices->count();
+
+        // Calculate invoiced totals in base currency (business_amount)
+        $totalInvoicedBusiness = (float) $invoices->sum('business_amount');
+        $totalPaidBusiness = (float) $paidInvoices->sum('business_amount');
+        $totalUnpaidBusiness = (float) $unpaidInvoices->sum('business_amount');
+
+        // Project expenses (Invoice costs of linked invoices)
+        $invoiceIds = $invoices->pluck('id');
+        $expenses = InvoiceCost::whereIn('invoice_id', $invoiceIds)
+            ->with(['payer', 'currency'])
+            ->latest()
+            ->get();
+
+        $totalExpensesBusiness = (float) $expenses->sum('business_amount');
+
+        // Net income/revenue
+        $netRevenueBusiness = $totalPaidBusiness - $totalExpensesBusiness;
+
+        // Fetch tasks
+        $tasks = ERPTask::where('project_id', $project->id)
+            ->with(['creator', 'assignee'])
+            ->latest()
+            ->get()
+            ->map(function ($task) {
+                $category = 'Todo';
+                if ($task->status === 'in_progress') $category = 'In Progress';
+                if ($task->status === 'review') $category = 'In Review';
+                if ($task->status === 'completed') $category = 'Done';
+                return [
+                    'id' => $task->id,
+                    'title' => $task->task_name,
+                    'due' => $task->due_date ? $task->due_date->format('M j, Y') : 'No due date',
+                    'assignee' => $task->assignee ? $task->assignee->name : ($task->creator ? $task->creator->name : 'Unassigned'),
+                    'priority' => ucfirst($task->priority ?? 'Normal'),
+                    'category' => $category,
+                ];
+            });
+
+        // Fetch support tickets
+        $tickets = SupportTicket::where('project_id', $project->id)
+            ->with(['assignee', 'creator'])
+            ->latest()
+            ->get();
+
+        // Activity log
+        $activities = Activity::with('causer')
+            ->where('subject_type', Project::class)
+            ->where('subject_id', $project->id)
+            ->latest()
+            ->limit(10)
+            ->get()
+            ->map(function ($activity) {
+                return [
+                    'title' => $activity->action,
+                    'time' => $activity->created_at?->diffForHumans(),
+                    'description' => $activity->description,
+                    'user' => $activity->causer?->name ?? 'System',
+                ];
+            });
+
+        return Inertia::render('ERP/Projects/Show', [
+            'project' => [
+                'id' => $project->id,
+                'name' => $project->name,
+                'description' => $project->description,
+                'status' => $project->status,
+                'budget' => round((float) $project->budget, 2),
+                'deadline' => $project->due_date?->format('Y-m-d'),
+                'created_at' => $project->created_at?->format('Y-m-d'),
+                'client' => $project->client ? [
+                    'id' => $project->client->id,
+                    'name' => $project->client->name,
+                    'email' => $project->client->email,
+                ] : null,
+                'leader' => $project->creator?->name ?? '-',
+            ],
+            'stats' => [
+                'businessCurrency' => $businessCurrency,
+                'paidInvoicesCount' => $paidCount,
+                'unpaidInvoicesCount' => $unpaidCount,
+                'totalInvoicesCount' => $totalCount,
+                'totalInvoiced' => round($totalInvoicedBusiness, 2),
+                'totalPaid' => round($totalPaidBusiness, 2),
+                'totalUnpaid' => round($totalUnpaidBusiness, 2),
+                'totalExpenses' => round($totalExpensesBusiness, 2),
+                'netRevenue' => round($netRevenueBusiness, 2),
+            ],
+            'invoices' => $invoices->map(function ($inv) {
+                return [
+                    'id' => $inv->id,
+                    'invoice_number' => $inv->invoice_number,
+                    'status' => $inv->status,
+                    'amount' => round((float) $inv->amount, 2),
+                    'business_amount' => round((float) $inv->business_amount, 2),
+                    'currency' => $inv->amount_currency,
+                    'created_at' => $inv->created_at?->format('Y-m-d'),
+                ];
+            }),
+            'expenses' => $expenses->map(function ($exp) {
+                return [
+                    'id' => $exp->id,
+                    'title' => $exp->title,
+                    'description' => $exp->description,
+                    'amount' => round((float) $exp->amount, 2),
+                    'business_amount' => round((float) $exp->business_amount, 2),
+                    'currency' => $exp->currency?->currency ?? 'USD',
+                    'date' => $exp->created_at?->format('Y-m-d'),
+                    'payer' => $exp->payer?->name ?? 'System',
+                ];
+            }),
+            'tasks' => $tasks,
+            'tickets' => $tickets->map(function ($ticket) {
+                return [
+                    'id' => $ticket->id,
+                    'subject' => $ticket->subject,
+                    'status' => $ticket->status,
+                    'priority' => $ticket->priority,
+                    'assignee' => $ticket->assignee?->name ?? 'Unassigned',
+                    'created_at' => $ticket->created_at?->format('Y-m-d'),
+                ];
+            }),
+            'activities' => $activities,
+            'hasTickets' => $user->hasModuleSubscription('erp-tickets'),
+        ]);
     }
 }

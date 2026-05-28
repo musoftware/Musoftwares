@@ -64,6 +64,7 @@ Route::middleware(['web', 'auth', 'tenant.active'])
         // ── Projects ──
         Route::get('projects/create', [\Modules\ERP\Http\Controllers\ProjectController::class, 'create'])->name('projects.create');
         Route::get('projects/{project}/edit', [\Modules\ERP\Http\Controllers\ProjectController::class, 'edit'])->name('projects.edit');
+        Route::get('projects/{project}', [\Modules\ERP\Http\Controllers\ProjectController::class, 'show'])->name('projects.show');
         Route::post('projects', [\Modules\ERP\Http\Controllers\ProjectController::class, 'store'])->name('projects.store');
         Route::put('projects/{project}', [\Modules\ERP\Http\Controllers\ProjectController::class, 'update'])->name('projects.update');
         Route::delete('projects/{project}', [\Modules\ERP\Http\Controllers\ProjectController::class, 'destroy'])->name('projects.destroy');

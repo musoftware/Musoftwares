@@ -30,6 +30,11 @@ class InvoiceWorkflowTest extends TestCase
         $this->seed(\Database\Seeders\RolesAndPermissionsSeeder::class);
         $this->seed(\Database\Seeders\CurrenciesSeeder::class);
 
+        $this->currency = Currency::firstOrCreate(
+            ['currency' => 'USD'],
+            ['symbol' => '$', 'string_format' => '$%01.2f']
+        );
+
         $this->user = User::factory()->create([
             'onboarding_completed' => true,
             'preferred_currency' => 'USD',
@@ -40,6 +45,7 @@ class InvoiceWorkflowTest extends TestCase
             'user_id' => $this->user->id,
             'name' => 'Test Agency',
             'status' => 'active',
+            'base_currency_id' => $this->currency->id,
         ]);
 
         session(['tenant_id' => $this->tenant->id]);
@@ -49,14 +55,9 @@ class InvoiceWorkflowTest extends TestCase
             'name' => 'Acme Corp',
             'email' => 'billing@acme.com',
             'phone' => '+15551234567',
-            'currency' => 'USD',
+            'currency_id' => $this->currency->id,
             'address' => '123 Main St, Anytown',
         ]);
-
-        $this->currency = Currency::firstOrCreate(
-            ['currency' => 'USD'],
-            ['symbol' => '$', 'string_format' => '$%01.2f']
-        );
 
         $this->project = \Modules\ERP\Models\Project::create([
             'tenant_id' => $this->tenant->id,
@@ -87,7 +88,6 @@ class InvoiceWorkflowTest extends TestCase
             'invoice_number' => 'INV-2026-001',
             'issued_at' => now()->toDateString(),
             'due_date' => now()->addDays(30)->toDateString(),
-            'amount_currency' => 'USD',
             'discount_amount' => 50,
             'tax_rate' => 10,
             'notes' => 'Thank you for your business!',
@@ -138,7 +138,7 @@ class InvoiceWorkflowTest extends TestCase
             'project_id' => $this->project->id,
             'invoice_number' => 'INV-2026-001',
             'amount' => 1705.00,
-            'amount_currency' => 'USD',
+            'currency_id' => $this->currency->id,
             'discount_amount' => 50.00,
             'tax_rate' => 10.00,
             'tax_amount' => 155.00,
@@ -165,7 +165,7 @@ class InvoiceWorkflowTest extends TestCase
             'tenant_id' => $this->tenant->id,
             'client_id' => $this->client->id,
             'balance' => 1000.00,
-            'currency' => 'USD',
+            'currency_id' => $this->currency->id,
         ]);
 
         $invoice = Invoice::create([
@@ -174,9 +174,8 @@ class InvoiceWorkflowTest extends TestCase
             'client_id' => $this->client->id,
             'status' => 'draft',
             'amount' => 500.00,
-            'amount_currency' => 'USD',
+            'currency_id' => $this->currency->id,
             'business_amount' => 500.00,
-            'business_currency' => 'USD',
             'exchange_rate' => 1.0,
             'exchange_rate_date' => now()->toDateString(),
             'due_date' => now()->addDays(14)->toDateString(),
@@ -195,7 +194,7 @@ class InvoiceWorkflowTest extends TestCase
         $response = $this->actingAs($this->user)
             ->withoutMiddleware(\App\Http\Middleware\SubscriptionMiddleware::class)
             ->withSession(['tenant_id' => $this->tenant->id])
-            ->post(route('erp.invoices.markPaid', $invoice->id));
+            ->post(route('erp.invoices.mark-paid', $invoice->id));
 
         echo "markPaid Response Status: " . $response->status() . "\n";
         if ($response->status() === 500) {
