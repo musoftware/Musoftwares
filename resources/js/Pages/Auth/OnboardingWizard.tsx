@@ -11,6 +11,7 @@ import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/Components/ui/card';
 import ApplicationLogo from '@/Components/ApplicationLogo';
+import { PremiumCombobox } from '@/Components/ui/PremiumCombobox';
 
 interface UserData {
     id: number;
@@ -42,9 +43,6 @@ export default function OnboardingWizard({ user, countries }: Props) {
         whatsapp_number: user.whatsapp_number || '',
     });
 
-    const [countrySearch, setCountrySearch] = useState('');
-    const [isCountryOpen, setIsCountryOpen] = useState(false);
-
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [saving, setSaving] = useState(false);
     const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
@@ -52,29 +50,19 @@ export default function OnboardingWizard({ user, countries }: Props) {
 
     // Dynamic cities
     const [cities, setCities] = useState<string[]>([]);
-    const [isLoadingCities, setIsLoadingCities] = useState(false);
-    const [citySearch, setCitySearch] = useState('');
-    const [isCityOpen, setIsCityOpen] = useState(false);
 
     useEffect(() => {
         if (!formData.country) return;
 
         let isMounted = true;
-        setIsLoadingCities(true);
 
         axios.get(route('onboarding.cities', { countryName: formData.country }))
             .then(res => {
                 if (isMounted) {
                     setCities(res.data || []);
-                    setIsLoadingCities(false);
                 }
             })
-            .catch(err => {
-                console.error('Failed to fetch cities:', err);
-                if (isMounted) {
-                    setIsLoadingCities(false);
-                }
-            });
+            .catch(err => console.error('Failed to fetch cities:', err));
 
         return () => { isMounted = false; };
     }, [formData.country]);
@@ -157,17 +145,10 @@ export default function OnboardingWizard({ user, countries }: Props) {
         });
     };
 
-    const filteredCountries = (countries || []).filter(c => typeof c === 'string' && c.toLowerCase().includes((countrySearch || '').toLowerCase()));
-
     // Default top 8 cities if empty
     const defaultCities = ['New York', 'San Francisco', 'Los Angeles', 'Chicago', 'Austin', 'Miami', 'Seattle', 'Denver'];
     const currentCitiesList = cities.length > 0 ? cities : defaultCities;
-
-    // For the custom dropdown
     const uniqueCities = Array.from(new Set(currentCitiesList));
-    const filteredCities = uniqueCities.filter(c => c.toLowerCase().includes(citySearch.toLowerCase()));
-    // Take first 20 to avoid massive DOM
-    const visibleCities = filteredCities.slice(0, 20);
 
     return (
         <div className="min-h-screen bg-muted/20 text-foreground flex flex-col font-sans">
@@ -252,103 +233,28 @@ export default function OnboardingWizard({ user, countries }: Props) {
                                     {/* Country Combobox Selector */}
                                     <div className="space-y-2">
                                         <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Country</label>
-                                        <div className="relative">
-                                            <div
-                                                onClick={() => setIsCountryOpen(!isCountryOpen)}
-                                                className="w-full min-h-11 px-3.5 py-2.5 rounded-xl border bg-background hover:bg-muted/50 transition cursor-pointer flex items-center justify-between text-sm shadow-sm font-medium"
-                                            >
-                                                <span>{formData.country || 'Select a country...'}</span>
-                                                <ChevronRight className={`w-4 h-4 text-muted-foreground transition-transform ${isCountryOpen ? 'rotate-90' : ''}`} />
-                                            </div>
-
-                                            {isCountryOpen && (
-                                                <div className="absolute top-full left-0 right-0 mt-2 bg-background border rounded-xl shadow-xl z-50 p-2 max-h-60 overflow-y-auto">
-                                                    <div className="relative mb-2">
-                                                        <Search className="absolute left-3 top-2.5 w-4 h-4 text-muted-foreground" />
-                                                        <input
-                                                            type="text"
-                                                            placeholder="Search country..."
-                                                            value={countrySearch}
-                                                            onChange={(e) => setCountrySearch(e.target.value)}
-                                                            onClick={(e) => e.stopPropagation()}
-                                                            className="w-full bg-muted rounded-lg pl-9 pr-3 py-1.5 text-xs border-none outline-none focus:ring-2 focus:ring-primary/20"
-                                                        />
-                                                    </div>
-                                                    {filteredCountries.map(c => (
-                                                        <div
-                                                            key={c}
-                                                            onClick={() => {
-                                                                setFormData(prev => ({ ...prev, country: c, city: '' }));
-                                                                setIsCountryOpen(false);
-                                                                setCountrySearch('');
-                                                            }}
-                                                            className={`px-3 py-2 rounded-lg text-xs font-medium cursor-pointer transition ${c === formData.country ? 'bg-primary text-primary-foreground font-semibold' : 'hover:bg-muted'}`}
-                                                        >
-                                                            {c}
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            )}
-                                        </div>
+                                        <PremiumCombobox
+                                            value={formData.country}
+                                            onChange={(val) => setFormData(prev => ({ ...prev, country: String(val), city: '' }))}
+                                            options={countries}
+                                            placeholder="Select a country..."
+                                            searchPlaceholder="Search country..."
+                                        />
                                         {errors.country && <span className="text-xs text-destructive mt-1 block">{errors.country}</span>}
                                     </div>
 
                                     {/* City Combobox Selector */}
                                     <div className="space-y-2">
                                         <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">City / Operational Node</label>
-                                        <div className="relative">
-                                            <div
-                                                onClick={() => setIsCityOpen(!isCityOpen)}
-                                                className="w-full min-h-11 px-3.5 py-2.5 rounded-xl border bg-background hover:bg-muted/50 transition cursor-pointer flex items-center justify-between text-sm shadow-sm font-medium"
-                                            >
-                                                <div className="flex items-center space-x-2 truncate">
-                                                    <MapPin className="w-4 h-4 shrink-0 opacity-70" />
-                                                    <span className="truncate">{formData.city || 'Select a city...'}</span>
-                                                </div>
-                                                {isLoadingCities ? (
-                                                    <Loader2 className="w-4 h-4 text-muted-foreground animate-spin shrink-0" />
-                                                ) : (
-                                                    <ChevronRight className={`w-4 h-4 text-muted-foreground transition-transform shrink-0 ${isCityOpen ? 'rotate-90' : ''}`} />
-                                                )}
-                                            </div>
-
-                                            {isCityOpen && (
-                                                <div className="absolute top-full left-0 right-0 mt-2 bg-background border rounded-xl shadow-xl z-50 p-2 max-h-60 overflow-y-auto">
-                                                    <div className="relative mb-2">
-                                                        <Search className="absolute left-3 top-2.5 w-4 h-4 text-muted-foreground" />
-                                                        <input
-                                                            type="text"
-                                                            placeholder="Search or enter custom city..."
-                                                            value={citySearch}
-                                                            onChange={(e) => {
-                                                                setCitySearch(e.target.value);
-                                                                setFormData(prev => ({ ...prev, city: e.target.value }));
-                                                            }}
-                                                            onClick={(e) => e.stopPropagation()}
-                                                            className="w-full bg-muted rounded-lg pl-9 pr-3 py-1.5 text-xs border-none outline-none focus:ring-2 focus:ring-primary/20"
-                                                        />
-                                                    </div>
-                                                    {visibleCities.length > 0 ? visibleCities.map(city => (
-                                                        <div
-                                                            key={city}
-                                                            onClick={() => {
-                                                                setFormData(prev => ({ ...prev, city }));
-                                                                setIsCityOpen(false);
-                                                                setCitySearch('');
-                                                            }}
-                                                            className={`px-3 py-2 rounded-lg text-xs font-medium cursor-pointer transition flex items-center space-x-2 ${city === formData.city ? 'bg-primary text-primary-foreground font-semibold' : 'hover:bg-muted'}`}
-                                                        >
-                                                            <MapPin className="w-3.5 h-3.5 shrink-0 opacity-70" />
-                                                            <span className="truncate">{city}</span>
-                                                        </div>
-                                                    )) : (
-                                                        <div className="px-3 py-4 text-xs text-center text-muted-foreground">
-                                                            No cities found. Type above to use custom.
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            )}
-                                        </div>
+                                        <PremiumCombobox
+                                            value={formData.city}
+                                            onChange={(val) => setFormData(prev => ({ ...prev, city: String(val) }))}
+                                            options={uniqueCities}
+                                            placeholder="Select a city..."
+                                            searchPlaceholder="Search or enter custom city..."
+                                            icon={<MapPin className="w-4 h-4" />}
+                                            allowCustomValue={true}
+                                        />
                                         {errors.city && <span className="text-xs text-destructive mt-1 block">{errors.city}</span>}
                                     </div>
                                 </CardContent>
