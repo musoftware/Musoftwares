@@ -11,7 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
+        Schema::disableForeignKeyConstraints();
+        Schema::dropIfExists('project_proposal_milestones');
         Schema::dropIfExists('project_proposals');
+        Schema::enableForeignKeyConstraints();
         
         Schema::table('users', function (Blueprint $table) {
             if (Schema::hasColumn('users', 'default_ai_model')) {
