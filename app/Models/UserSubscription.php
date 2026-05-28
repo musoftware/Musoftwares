@@ -10,7 +10,7 @@ class UserSubscription extends Model
     protected $table = 'user_subscriptions';
 
     protected $fillable = [
-        'client_id',
+        'user_id',
         'object',
         'status',
         'started_at',
@@ -25,11 +25,11 @@ class UserSubscription extends Model
     ];
 
     /**
-     * The user (client) who owns this subscription.
+     * The user who owns this subscription.
      */
-    public function client(): BelongsTo
+    public function user(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'client_id');
+        return $this->belongsTo(User::class, 'user_id');
     }
 
 
