@@ -166,9 +166,12 @@ interface ERPDashboardProps {
         txnCount: number;
     };
     hasMultiCurrency?: boolean;
+    filters?: {
+        search?: string;
+    };
 }
 
-export default function ERPDashboard({ tenant: serverTenant, stats: serverStats, clients: serverClients, invoices: serverInvoices, chartData: serverChartData, projects: serverProjects, supportTickets: serverTickets, activityLogs: serverActivityLogs, upcomingBookings: serverBookings, storageProviders: serverStorageProviders, documents: serverDocuments, tasks: serverTasks, notes: serverNotes, transactions: serverTransactions, transactionStats: serverTransactionStats, hasMultiCurrency = false }: ERPDashboardProps) {
+export default function ERPDashboard({ tenant: serverTenant, stats: serverStats, clients: serverClients, invoices: serverInvoices, chartData: serverChartData, projects: serverProjects, supportTickets: serverTickets, activityLogs: serverActivityLogs, upcomingBookings: serverBookings, storageProviders: serverStorageProviders, documents: serverDocuments, tasks: serverTasks, notes: serverNotes, transactions: serverTransactions, transactionStats: serverTransactionStats, hasMultiCurrency = false, filters = {} }: ERPDashboardProps) {
     const { toast } = useToast();
     const { auth } = usePage().props as any;
     const isTeamMember = !!auth?.team_member;
@@ -188,6 +191,14 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
         }
     };
 
+    const handleClientSearch = (value: string) => {
+        router.get(
+            route('erp.dashboard'),
+            { section: 'clients', search: value },
+            { preserveState: true, preserveScroll: true }
+        );
+    };
+
     useEffect(() => {
         const handlePopState = () => {
             const match = window?.location?.search?.match(/section=([^&]+)/);
@@ -196,6 +207,34 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
         window.addEventListener('popstate', handlePopState);
         return () => window.removeEventListener('popstate', handlePopState);
     }, []);
+
+    useEffect(() => {
+        setActiveClients(serverClients || []);
+    }, [serverClients]);
+
+    useEffect(() => {
+        setActiveInvoices(serverInvoices || []);
+    }, [serverInvoices]);
+
+    useEffect(() => {
+        setProjects(serverProjects || []);
+    }, [serverProjects]);
+
+    useEffect(() => {
+        setTasks(serverTasks || []);
+    }, [serverTasks]);
+
+    useEffect(() => {
+        setDocuments(serverDocuments || []);
+    }, [serverDocuments]);
+
+    useEffect(() => {
+        setNotes(serverNotes || []);
+    }, [serverNotes]);
+
+    useEffect(() => {
+        setTransactions(serverTransactions || []);
+    }, [serverTransactions]);
 
     const [deleteConfirm, setDeleteConfirm] = useState<{ open: boolean; client: any }>({ open: false, client: null });
     const [actionModalClient, setActionModalClient] = useState<any>(null);
@@ -823,7 +862,7 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                                         <OperationalCard title="Active Projects" action={<button onClick={() => handleSetSection('projects')} className="text-sm text-primary hover:underline transition-colors">View all</button>}>
                                             <div className="space-y-3">
                                                 {projects.filter(p => p.status === 'Active' || p.status === 'Planning').slice(0, 3).map((proj) => (
-                                                    <div key={proj.id} className="group border border-border p-4 rounded-xl hover:bg-surface-raised transition-all cursor-pointer" onClick={() => handleSetSection('projects')}>
+                                                    <Link href={route('erp.projects.show', proj.id)} key={proj.id} className="block group border border-border p-4 rounded-xl hover:bg-surface-raised transition-all cursor-pointer">
                                                         <div className="flex items-start justify-between">
                                                             <div>
                                                                 <h4 className="font-medium text-text-primary text-sm group-hover:text-primary transition-colors">{proj.name}</h4>
@@ -836,7 +875,7 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                                                         <div className="w-full bg-border/40 h-1.5 rounded-full overflow-hidden mt-4">
                                                             <div className="bg-primary h-full rounded-full transition-all" style={{ width: `${proj.progress}%` }} />
                                                         </div>
-                                                    </div>
+                                                    </Link>
                                                 ))}
                                             </div>
                                         </OperationalCard>
@@ -880,7 +919,7 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                                             <div className="space-y-2">
                                                 {!isReadOnlyMember && (
                                                     <>
-                                                        <Link href={route("erp.clients.create")} className="p-1.5 hover:bg-slate-100 rounded text-slate-400">
+                                                        <Link href={route("erp.clients.create")} className="w-full flex items-center justify-between p-3 rounded-xl border border-slate-100 bg-white hover:border-slate-300 hover:shadow-sm transition-all group">
                                                             <div className="flex items-center gap-3">
                                                                 <div className="bg-slate-50 p-2 rounded-lg group-hover:bg-white transition-colors">
                                                                     <UserPlus className="h-4 w-4 text-slate-600" />
@@ -889,7 +928,7 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                                                             </div>
                                                             <ChevronRight className="h-4 w-4 text-slate-400 group-hover:text-slate-600 transition-colors" />
                                                         </Link>
-                                                        <Link href={route("erp.projects.create")} className="p-1.5 hover:bg-slate-100 rounded text-slate-400">
+                                                        <Link href={route("erp.projects.create")} className="w-full flex items-center justify-between p-3 rounded-xl border border-slate-100 bg-white hover:border-slate-300 hover:shadow-sm transition-all group">
                                                             <div className="flex items-center gap-3">
                                                                 <div className="bg-slate-50 p-2 rounded-lg group-hover:bg-white transition-colors">
                                                                     <Briefcase className="h-4 w-4 text-slate-600" />
@@ -959,6 +998,22 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                                             <Plus className="mr-1.5 h-3.5 w-3.5" /> Add Client
                                         </Button></Link>
                                     )}
+                                    filters={
+                                        <div className="relative w-full max-w-md">
+                                            <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
+                                            <Input
+                                                placeholder="Search by name, email or phone..."
+                                                className="pl-9 h-10 shadow-none border-transparent bg-slate-50 focus:bg-white transition-colors text-sm"
+                                                defaultValue={filters?.search || ''}
+                                                onKeyDown={(e) => {
+                                                    if (e.key === 'Enter') {
+                                                        handleClientSearch((e.target as HTMLInputElement).value);
+                                                    }
+                                                }}
+                                                onBlur={(e) => handleClientSearch(e.target.value)}
+                                            />
+                                        </div>
+                                    }
                                 />
 
                                 <OperationalCard>
@@ -1000,19 +1055,19 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                                                                 <span className="block text-slate-400 mt-0.5">{client.phone}</span>
                                                             </td>
                                                             <td className="px-6 py-4 text-right font-semibold text-slate-900 font-mono">
-                                                                <CurrencyDisplay amount={client.balance ?? 0} currency={currency} />
+                                                                <CurrencyDisplay amount={client.balance ?? 0} currency={client.currency || currency} />
                                                             </td>
                                                             <td className="px-6 py-4 text-right font-mono">
                                                                 {(client.unpaid ?? 0) > 0 ? (
                                                                     <span className="font-bold text-rose-600">
-                                                                        <CurrencyDisplay amount={client.unpaid} currency={currency} />
+                                                                        <CurrencyDisplay amount={client.unpaid} currency={client.currency || currency} />
                                                                     </span>
                                                                 ) : (
                                                                     <span className="text-slate-400">—</span>
                                                                 )}
                                                             </td>
                                                             <td className="px-6 py-4 text-right font-bold text-emerald-600 font-mono">
-                                                                <CurrencyDisplay amount={client.totalPaid ?? 0} currency={currency} />
+                                                                <CurrencyDisplay amount={client.totalPaid ?? 0} currency={client.currency || currency} />
                                                             </td>
                                                             <td className="px-6 py-4 text-slate-500 text-xs">{client.created_at ?? '—'}</td>
                                                             {!isReadOnlyMember && (
@@ -1128,7 +1183,9 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                                             <div className="p-5 space-y-4">
                                                 <div className="flex items-start justify-between">
                                                     <div>
-                                                        <h3 className="font-semibold text-slate-800 text-[14px]">{proj.name}</h3>
+                                                         <Link href={route('erp.projects.show', proj.id)}>
+                                                             <h3 className="font-semibold text-slate-800 text-[14px] hover:text-primary hover:underline transition-colors">{proj.name}</h3>
+                                                         </Link>
                                                         <span className="text-xs text-slate-400 mt-1 block">{proj.client}</span>
                                                     </div>
                                                     <Badge className={`text-[10px] rounded uppercase font-bold tracking-wider ${

@@ -31,6 +31,11 @@ class ClientWallet extends TenantModel
         return $this->belongsTo(TenantClient::class, 'client_id');
     }
 
+    public function currency(): BelongsTo
+    {
+        return $this->belongsTo(\App\Models\Currency::class, 'currency_id');
+    }
+
     public function getClientAttribute()
     {
         return (empty($this->tenant_id) || $this->tenant_id === Tenant::platformId())

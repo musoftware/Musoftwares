@@ -21,7 +21,7 @@ function FieldError({ message }) {
     );
 }
 
-export default function CreateEdit({ invoice, clients, projects = [], currencies, business_currency, pre_selected_client_id }) {
+export default function CreateEdit({ invoice, clients = [], projects = [], currencies, business_currency, pre_selected_client_id }) {
     const isEdit = !!invoice;
     const [showCosts, setShowCosts] = useState(false);
     const [clientError, setClientError] = useState('');
@@ -49,8 +49,8 @@ export default function CreateEdit({ invoice, clients, projects = [], currencies
     useEffect(() => {
         if (data.client_id) {
             const client = clients.find(c => String(c.id) === String(data.client_id));
-            if (client && client.currency && !isEdit) {
-                setData('amount_currency', client.currency?.currency || client.currency);
+            if (client) {
+                setData('amount_currency', client.currency?.currency || client.currency_code || 'USD');
             }
 
             if (data.project_id) {
@@ -62,7 +62,7 @@ export default function CreateEdit({ invoice, clients, projects = [], currencies
         } else {
             setData('project_id', '');
         }
-    }, [data.client_id]);
+    }, [data.client_id, clients]);
 
     const filteredProjects = data.client_id
         ? projects.filter(p => String(p.client_id) === String(data.client_id))
@@ -279,17 +279,15 @@ export default function CreateEdit({ invoice, clients, projects = [], currencies
                                     <Label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
                                         Currency
                                     </Label>
-                                    <select
-                                        className="flex h-11 w-full rounded-lg border-slate-200 bg-slate-50/50 px-3 py-2 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:bg-white transition-colors"
+                                    <Input
+                                        className="h-11 rounded-lg border-slate-200 bg-slate-100/50 text-slate-700 font-medium"
                                         value={data.amount_currency}
-                                        onChange={(e) => setData('amount_currency', e.target.value)}
-                                    >
-                                        {currencies.map((c) => (
-                                            <option key={c.code} value={c.code}>
-                                                {c.code} — {c.name}
-                                            </option>
-                                        ))}
-                                    </select>
+                                        disabled
+                                        readOnly
+                                    />
+                                    <p className="text-[10px] text-slate-400">
+                                        Inherited from client profile
+                                    </p>
                                 </div>
                             </div>
 

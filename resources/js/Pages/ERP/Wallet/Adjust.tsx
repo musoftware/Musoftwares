@@ -7,10 +7,14 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/Com
 import { Input } from '@/Components/ui/input';
 import { ArrowLeft, Wallet } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/Components/ui/select';
+import { CurrencyDisplay } from '@/Components/ui/CurrencyDisplay';
 
 export default function AdjustWallet({ client, wallet }: { client: any, wallet: any }) {
+    const searchParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
+    const initialType = searchParams ? (searchParams.get('type') === 'debit' ? 'debit' : 'credit') : 'credit';
+
     const [form, setForm] = useState({
-        type: 'credit',
+        type: initialType,
         amount: '',
         note: ''
     });
@@ -57,11 +61,11 @@ export default function AdjustWallet({ client, wallet }: { client: any, wallet: 
                             <CardTitle className="text-slate-900 text-sm">Current Balance</CardTitle>
                         </CardHeader>
                         <CardContent>
-                            <div className="text-3xl font-bold text-slate-900 mb-1">
-                                {wallet?.balance !== undefined ? wallet.balance : '0.00'}
+                            <div className="text-2xl font-bold text-slate-900 mb-1">
+                                <CurrencyDisplay amount={wallet?.balance !== undefined ? parseFloat(wallet.balance) : 0} currency={client?.currency?.currency || 'USD'} />
                             </div>
                             <div className="text-xs text-slate-500 uppercase tracking-wider font-mono">
-                                {client?.currency_id || 'USD'}
+                                {client?.currency?.currency || 'USD'}
                             </div>
                         </CardContent>
                     </Card>

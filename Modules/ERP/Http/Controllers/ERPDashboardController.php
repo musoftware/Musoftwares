@@ -26,7 +26,7 @@ class ERPDashboardController extends Controller
      * ERP workspace dashboard with real operational data.
      * Redirects to onboarding if the tenant workspace isn't initialized yet.
      */
-    public function index()
+    public function index(\Illuminate\Http\Request $request)
     {
         $user = Auth::user();
         // Resolve tenant for the user, redirect to onboarding if not existing
@@ -64,19 +64,30 @@ class ERPDashboardController extends Controller
         // ── Real Client List ──────────────────────────────────────
         $clients = collect();
         if ($tenantId) {
-            $clients = TenantClient::where('tenant_id', $tenantId)
+            $limit = $request->query('section') === 'clients' ? 100 : 10;
+            $query = TenantClient::where('tenant_id', $tenantId)
                 ->with(['wallet', 'currency'])
-                ->withCount('invoices')
-                ->latest()
-                ->limit(10)
+                ->withCount('invoices');
+
+            if ($request->filled('search') && $request->query('section') === 'clients') {
+                $search = $request->query('search');
+                $query->where(function ($q) use ($search) {
+                    $q->where('name', 'like', '%' . $search . '%')
+                      ->orWhere('email', 'like', '%' . $search . '%')
+                      ->orWhere('phone', 'like', '%' . $search . '%');
+                });
+            }
+
+            $clients = $query->latest()
+                ->limit($limit)
                 ->get()
                 ->map(function ($client) {
                     $unpaid = Invoice::where('client_id', $client->id)
                         ->whereIn('status', ['sent', 'partial'])
-                        ->sum('business_amount');
+                        ->sum('amount');
                     $totalPaid = Invoice::where('client_id', $client->id)
                         ->where('status', 'paid')
-                        ->sum('business_amount');
+                        ->sum('amount');
                     return [
                         'id' => $client->id,
                         'name' => $client->name,
@@ -372,6 +383,7 @@ class ERPDashboardController extends Controller
             'transactions' => $transactions,
             'transactionStats' => $transactionStats,
             'hasMultiCurrency' => $user->hasModuleSubscription('erp-multi-currency'),
+            'filters' => $request->only(['search']),
         ]);
     }
 

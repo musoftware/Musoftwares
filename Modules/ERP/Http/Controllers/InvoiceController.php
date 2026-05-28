@@ -40,7 +40,7 @@ class InvoiceController extends Controller
     public function index(Request $request)
     {
         $tenant = $this->resolveTenant();
-        $query = Invoice::with(['tenantClient', 'platformClient'])->where('tenant_id', $tenant->id);
+        $query = Invoice::with(['tenantClient', 'platformClient', 'currency'])->where('tenant_id', $tenant->id);
 
         if ($request->filled('search')) {
             $query->where(function($q) use ($request) {
@@ -56,10 +56,18 @@ class InvoiceController extends Controller
         }
 
         if ($request->filled('currency')) {
-            $query->where('amount_currency', $request->currency);
+            $val = $request->currency;
+            if (is_numeric($val)) {
+                $query->where('currency_id', $val);
+            } else {
+                $query->whereHas('currency', function($q) use ($val) {
+                    $q->where('currency', $val);
+                });
+            }
         }
 
         $invoices = $query->latest()->paginate(15)->withQueryString();
+        $baseCurrency = Currency::find($tenant->base_currency_id);
 
         // Stats scoped to this tenant only
         $stats = [
@@ -68,6 +76,7 @@ class InvoiceController extends Controller
             'pending'           => Invoice::where('tenant_id', $tenant->id)->where('status', 'sent')->sum('business_amount'),
             'overdue'           => Invoice::where('tenant_id', $tenant->id)->where('status', 'sent')->where('due_date', '<', now())->sum('business_amount'),
             'currency_id'       => $tenant->base_currency_id,
+            'business_currency' => $baseCurrency ? $baseCurrency->currency : 'USD',
         ];
 
         return Inertia::render('ERP/Invoices/Index', [
@@ -82,7 +91,11 @@ class InvoiceController extends Controller
         $tenant           = $this->resolveTenant();
         $baseCurrency     = Currency::find($tenant->base_currency_id);
 
-        // Only send the pre-selected client (if any) — frontend fetches others lazily
+        $clients = TenantClient::with('currency')
+            ->where('tenant_id', $tenant->id)
+            ->get();
+
+        // Only send the pre-selected client (if any)
         $preSelectedClient = null;
         if ($request->query('client_id')) {
             $preSelectedClient = TenantClient::with('currency')
@@ -99,6 +112,7 @@ class InvoiceController extends Controller
         }
 
         return Inertia::render('ERP/Invoices/Create', [
+            'clients'           => $clients,
             'pre_selected_client' => $preSelectedClient,
             'projects'          => \Modules\ERP\Models\Project::where('tenant_id', $tenant->id)->get(),
             'currencies'        => Currency::all(),
@@ -247,7 +261,11 @@ class InvoiceController extends Controller
         $invoice->load(['items', 'costs', 'tenantClient.currency']);
         $baseCurrency = Currency::find($tenant->base_currency_id);
 
-        // Only send the invoice's current client — frontend fetches others lazily
+        $clients = TenantClient::with('currency')
+            ->where('tenant_id', $tenant->id)
+            ->get();
+
+        // Only send the invoice's current client
         $currentClient = $invoice->tenantClient ? [
             'id' => $invoice->tenantClient->id,
             'name' => $invoice->tenantClient->name,
@@ -257,6 +275,7 @@ class InvoiceController extends Controller
 
         return Inertia::render('ERP/Invoices/Edit', [
             'invoice'           => $invoice,
+            'clients'           => $clients,
             'pre_selected_client' => $currentClient,
             'projects'          => \Modules\ERP\Models\Project::where('tenant_id', $tenant->id)->get(),
             'currencies'        => Currency::all(),

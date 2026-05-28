@@ -44,7 +44,7 @@ class WalletController extends Controller
         $user   = Auth::user();
         $tenant = Tenant::where('user_id', $user->id)->firstOrFail();
 
-        $client = TenantClient::where('tenant_id', $tenant->id)
+        $client = TenantClient::with('currency')->where('tenant_id', $tenant->id)
             ->findOrFail($clientId);
 
         return [$tenant, $client];
@@ -60,6 +60,7 @@ class WalletController extends Controller
             ['tenant_id' => $tenant->id, 'client_id' => $clientModel->id],
             ['balance' => 0, 'currency_id' => $clientModel->currency_id]
         );
+        $wallet->load('currency');
 
         $transactions = ClientWalletTransaction::where('wallet_id', $wallet->id)
             ->latest()
@@ -82,6 +83,7 @@ class WalletController extends Controller
             ['tenant_id' => $tenant->id, 'client_id' => $clientModel->id],
             ['balance' => 0, 'currency_id' => $clientModel->currency_id]
         );
+        $wallet->load('currency');
 
         return Inertia::render('ERP/Wallet/Adjust', [
             'wallet' => $wallet,

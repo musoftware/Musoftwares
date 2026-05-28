@@ -29,7 +29,7 @@ class FinanceService
      */
     public function formatMoney(float $amount, string $currencyCode = 'USD'): string
     {
-        return number_format($amount, 2, '.', ',') . ' ' . strtoupper($currencyCode);
+        return \App\Helpers\FinanceHelper::instance()->format_money($amount, $currencyCode);
     }
 
     /**

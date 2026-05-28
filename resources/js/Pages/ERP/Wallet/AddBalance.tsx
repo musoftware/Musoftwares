@@ -10,6 +10,8 @@ import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/Components/ui/card';
 import { useToast } from '@/Components/ui/use-toast';
+import { CurrencyDisplay } from '@/Components/ui/CurrencyDisplay';
+import { formatMoney } from '@/lib/utils';
 
 interface AddBalanceProps {
     wallet: { id: number; balance: number; currency: string };
@@ -78,7 +80,7 @@ export default function AddBalance({ wallet, client }: AddBalanceProps) {
             onSuccess: () => {
                 toast({
                     title: "Deposit Successful!",
-                    description: `Successfully added $${form.data.amount.toFixed(2)} to your wallet balance.`,
+                    description: `Successfully added ${formatMoney(form.data.amount, activeWallet.currency)} to your wallet balance.`,
                 });
             },
             onError: (err: any) => {
@@ -120,7 +122,7 @@ export default function AddBalance({ wallet, client }: AddBalanceProps) {
                         <div className="space-y-1">
                             <p className="text-sm font-medium text-slate-500">Wallet Balance</p>
                             <div className="text-3xl font-bold tracking-tight text-slate-900">
-                                ${activeWallet.balance.toLocaleString(undefined, {minimumFractionDigits: 2})} <span className="text-lg font-normal text-slate-400">{activeWallet.currency}</span>
+                                <CurrencyDisplay amount={activeWallet.balance} currency={activeWallet.currency} />
                             </div>
                         </div>
                         <div className="text-sm text-slate-500 max-w-[200px]">
@@ -147,7 +149,7 @@ export default function AddBalance({ wallet, client }: AddBalanceProps) {
                                     onClick={() => handlePresetSelect(amt)}
                                     className={`h-12 text-base font-medium transition-colors shadow-sm ${selectedPreset === amt ? 'bg-slate-900 text-white hover:bg-slate-800' : 'border-slate-200 text-slate-700 hover:bg-slate-50'}`}
                                 >
-                                    ${amt}
+                                    {formatMoney(amt, activeWallet.currency)}
                                 </Button>
                             ))}
                         </div>
@@ -156,7 +158,7 @@ export default function AddBalance({ wallet, client }: AddBalanceProps) {
                             <Label htmlFor="custom-amount" className="text-slate-700 font-medium">Custom Amount</Label>
                             <div className="relative">
                                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <span className="text-slate-500 font-medium">$</span>
+                                    <span className="text-slate-500 font-medium text-xs">{activeWallet.currency}</span>
                                 </div>
                                 <Input
                                     id="custom-amount"
@@ -212,7 +214,7 @@ export default function AddBalance({ wallet, client }: AddBalanceProps) {
                             disabled={form.processing || form.data.amount < 5}
                             className="w-full sm:w-auto h-12 px-8 text-base shadow-none"
                         >
-                            {form.processing ? 'Processing...' : `Deposit $${(form.data.amount || 0).toFixed(2)}`}
+                            {form.processing ? 'Processing...' : `Deposit ${formatMoney(form.data.amount || 0, activeWallet.currency)}`}
                         </Button>
                         <div className="flex items-center gap-2 text-sm text-muted-foreground">
                             <ShieldCheck className="h-4 w-4" />

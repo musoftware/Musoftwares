@@ -38,10 +38,24 @@ class FinanceHelper
         if ($currencyModel) {
             $symbol = $currencyModel->symbol ?? $currencyModel->currency;
             if ($currencyModel->string_format) {
+                $fmt = $currencyModel->string_format;
+                if (str_contains($fmt, '%')) {
+                    $specifiers = ['%01.2f', '%s', '%.2f'];
+                    foreach ($specifiers as $spec) {
+                        if (str_contains($fmt, $spec)) {
+                            return str_replace($spec, $formattedAmount, $fmt);
+                        }
+                    }
+                    try {
+                        return sprintf($fmt, $amount);
+                    } catch (\Throwable $e) {
+                        // ignore and fallback
+                    }
+                }
                 return str_replace(
                     ['{symbol}', '{amount}', '{code}'],
                     [$symbol, $formattedAmount, $currencyModel->currency],
-                    $currencyModel->string_format
+                    $fmt
                 );
             }
             return $symbol . $formattedAmount;

@@ -11,7 +11,8 @@ import { DateDisplay } from '@/Components/ui/DateDisplay';
 import { EmptyState } from '@/Components/ui/EmptyState';
 import {
     ArrowLeft, User, FileText, CheckCircle, Clock, DollarSign,
-    MessageSquare, FolderOpen, Activity, ChevronRight
+    MessageSquare, FolderOpen, Activity, ChevronRight,
+    ArrowDownLeft, ArrowUpRight, RotateCcw, Wallet, Edit2, Lock
 } from 'lucide-react';
 
 interface Client {
@@ -42,14 +43,22 @@ interface Props {
     tickets: Ticket[];
     invoices: Invoice[];
     activities: ActivityItem[];
+    hasTickets?: boolean;
 }
 
 
 
-export default function ClientShow({ client, projects, tickets, invoices, activities }: Props) {
+export default function ClientShow({ client, projects, tickets, invoices, activities, hasTickets = false }: Props) {
     const totalRevenue = invoices
         .filter(i => i.status === 'paid')
         .reduce((s, i) => s + i.total, 0);
+
+    const unpaidRevenue = invoices
+        .filter(i => ['unpaid', 'due', 'sent', 'overdue'].includes(i.status))
+        .reduce((s, i) => s + i.total, 0);
+
+    const walletBalance = parseFloat((client as any).wallet?.balance ?? 0);
+    const lockedBalance = parseFloat((client as any).wallet?.locked_balance ?? 0);
 
     const { menuItems, lockedAddons, workspaceName, tenantId } = useERPMenu('clients');
 
@@ -58,40 +67,73 @@ export default function ClientShow({ client, projects, tickets, invoices, activi
 
             <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-6">
                 {/* Back + Header */}
-                <div className="flex items-center gap-4">
-                    <Link href={route('erp.dashboard')} className="text-slate-400 hover:text-slate-900 transition-colors">
-                        <ArrowLeft className="w-5 h-5" />
-                    </Link>
-                    <div className="flex-1">
-                        <div className="flex items-center gap-3">
-                            <h1 className="text-2xl font-bold text-slate-900">{client.name}</h1>
-                            <StatusBadge status={client.status} />
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 pb-5">
+                    <div className="flex items-center gap-4">
+                        <Link href={route('erp.dashboard')} className="text-slate-400 hover:text-slate-900 transition-colors">
+                            <ArrowLeft className="w-5 h-5" />
+                        </Link>
+                        <div className="flex-1">
+                            <div className="flex items-center gap-3">
+                                <h1 className="text-2xl font-bold text-slate-900">{client.name}</h1>
+                                <StatusBadge status={client.status} />
+                            </div>
+                            <p className="text-slate-500 text-sm mt-0.5">{client.email}{client.company ? ` · ${client.company}` : ''}</p>
                         </div>
-                        <p className="text-slate-500 text-sm mt-0.5">{client.email}{client.company ? ` · ${client.company}` : ''}</p>
                     </div>
-                    <Link href={route('erp.invoices.create', { client_id: client.id })}>
-                        <Button size="sm" className="gap-2">
-                            <FileText className="w-4 h-4" /> New Invoice
-                        </Button>
-                    </Link>
+                    
+                    {/* Action buttons */}
+                    <div className="flex flex-wrap items-center gap-2">
+                        <Link href={route('erp.invoices.create', { client_id: client.id })}>
+                            <Button size="sm" className="gap-1.5 shadow-none bg-slate-900 hover:bg-slate-800 text-white">
+                                <FileText className="w-3.5 h-3.5" /> New Invoice
+                            </Button>
+                        </Link>
+                        <Link href={route('erp.clients.wallet.adjust', client.id) + '?type=credit'}>
+                            <Button size="sm" variant="outline" className="gap-1.5 shadow-none border-slate-200 text-slate-700 hover:bg-slate-50">
+                                <ArrowDownLeft className="w-3.5 h-3.5 text-emerald-600" /> Receive Money
+                            </Button>
+                        </Link>
+                        <Link href={route('erp.clients.wallet.adjust', client.id) + '?type=debit'}>
+                            <Button size="sm" variant="outline" className="gap-1.5 shadow-none border-slate-200 text-slate-700 hover:bg-slate-50">
+                                <ArrowUpRight className="w-3.5 h-3.5 text-amber-600" /> Send Money
+                            </Button>
+                        </Link>
+                        <Link href={route('erp.clients.wallet.adjust', client.id) + '?type=debit'}>
+                            <Button size="sm" variant="outline" className="gap-1.5 shadow-none border-slate-200 text-slate-700 hover:bg-slate-50">
+                                <RotateCcw className="w-3.5 h-3.5 text-blue-600" /> Refund
+                            </Button>
+                        </Link>
+                        <Link href={route('erp.clients.wallet.index', client.id)}>
+                            <Button size="sm" variant="outline" className="gap-1.5 shadow-none border-slate-200 text-slate-700 hover:bg-slate-50">
+                                <Wallet className="w-3.5 h-3.5 text-slate-500" /> Ledger
+                            </Button>
+                        </Link>
+                        <Link href={route('erp.clients.edit', client.id)}>
+                            <Button size="sm" variant="outline" className="gap-1.5 shadow-none border-slate-200 text-slate-700 hover:bg-slate-50">
+                                <Edit2 className="w-3.5 h-3.5 text-slate-500" /> Edit Profile
+                            </Button>
+                        </Link>
+                    </div>
                 </div>
 
                 {/* Stats */}
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
                     {[
+                        { label: 'Available Balance', value: <CurrencyDisplay amount={walletBalance} currency={(client as any).currency?.currency || 'USD'} />, icon: Wallet, color: 'text-indigo-600' },
+                        { label: 'Locked Balance', value: <CurrencyDisplay amount={lockedBalance} currency={(client as any).currency?.currency || 'USD'} />, icon: Lock, color: 'text-amber-500' },
                         { label: 'Total Revenue', value: <CurrencyDisplay amount={totalRevenue} currency={(client as any).currency?.currency || 'USD'} />, icon: DollarSign, color: 'text-emerald-600' },
-                        { label: 'Invoices', value: invoices.length, icon: FileText, color: 'text-blue-600' },
+                        { label: 'Unpaid Invoices', value: unpaidRevenue > 0 ? <span className="text-rose-600"><CurrencyDisplay amount={unpaidRevenue} currency={(client as any).currency?.currency || 'USD'} /></span> : '—', icon: FileText, color: 'text-rose-600' },
                         { label: 'Projects', value: projects.length, icon: FolderOpen, color: 'text-primary' },
-                        { label: 'Tickets', value: tickets.length, icon: MessageSquare, color: 'text-amber-600' },
+                        ...(hasTickets ? [{ label: 'Tickets', value: tickets.length, icon: MessageSquare, color: 'text-amber-600' }] : []),
                     ].map(({ label, value, icon: Icon, color }) => (
                         <Card key={label} className="bg-white border border-slate-200 shadow-sm">
                             <CardContent className="p-4 flex items-center gap-3">
-                                <div className="w-9 h-9 rounded-lg bg-slate-100 flex items-center justify-center shrink-0">
+                                <div className="w-9 h-9 rounded-lg bg-slate-50 flex items-center justify-center shrink-0">
                                     <Icon className={`w-4 h-4 ${color}`} />
                                 </div>
-                                <div>
-                                    <p className="text-xl font-bold text-slate-900">{value}</p>
-                                    <p className="text-xs text-slate-500">{label}</p>
+                                <div className="min-w-0">
+                                    <p className="text-base font-bold text-slate-900 truncate" title={typeof value === 'string' || typeof value === 'number' ? String(value) : undefined}>{value}</p>
+                                    <p className="text-[10px] uppercase font-semibold tracking-wider text-slate-400 truncate" title={label}>{label}</p>
                                 </div>
                             </CardContent>
                         </Card>
@@ -146,7 +188,9 @@ export default function ClientShow({ client, projects, tickets, invoices, activi
                                             <div key={proj.id} className="flex items-center justify-between px-4 py-3">
                                                 <div className="flex items-center gap-3">
                                                     <FolderOpen className="w-4 h-4 text-primary" />
-                                                    <span className="text-sm text-slate-900">{proj.title}</span>
+                                                    <Link href={route('erp.projects.show', proj.id)} className="text-sm text-slate-900 hover:text-primary hover:underline transition-colors font-medium">
+                                                        {proj.title}
+                                                    </Link>
                                                 </div>
                                                 <StatusBadge status={proj.status} size="sm" />
                                             </div>
@@ -189,27 +233,29 @@ export default function ClientShow({ client, projects, tickets, invoices, activi
                         </Card>
 
                         {/* Support Tickets */}
-                        <Card className="bg-white border border-slate-200 shadow-sm">
-                            <CardHeader className="pb-3">
-                                <CardTitle className="text-slate-900 text-sm font-semibold flex items-center gap-2">
-                                    <MessageSquare className="w-4 h-4 text-slate-400" /> Support Tickets
-                                </CardTitle>
-                            </CardHeader>
-                            <CardContent className="p-0">
-                                {tickets.length === 0 ? (
-                                    <EmptyState icon={MessageSquare} title="No tickets" description="No support tickets from this client yet." className="rounded-none border-0 py-6" />
-                                ) : (
-                                    <div className="divide-y divide-slate-100">
-                                        {tickets.slice(0, 4).map(ticket => (
-                                            <div key={ticket.id} className="px-4 py-2.5 flex items-start justify-between gap-2">
-                                                <p className="text-sm text-slate-700 leading-tight">{ticket.subject}</p>
-                                                <StatusBadge status={ticket.status} size="sm" />
-                                            </div>
-                                        ))}
-                                    </div>
-                                )}
-                            </CardContent>
-                        </Card>
+                        {hasTickets && (
+                            <Card className="bg-white border border-slate-200 shadow-sm">
+                                <CardHeader className="pb-3">
+                                    <CardTitle className="text-slate-900 text-sm font-semibold flex items-center gap-2">
+                                        <MessageSquare className="w-4 h-4 text-slate-400" /> Support Tickets
+                                    </CardTitle>
+                                </CardHeader>
+                                <CardContent className="p-0">
+                                    {tickets.length === 0 ? (
+                                        <EmptyState icon={MessageSquare} title="No tickets" description="No support tickets from this client yet." className="rounded-none border-0 py-6" />
+                                    ) : (
+                                        <div className="divide-y divide-slate-100">
+                                            {tickets.slice(0, 4).map(ticket => (
+                                                <div key={ticket.id} className="px-4 py-2.5 flex items-start justify-between gap-2">
+                                                    <p className="text-sm text-slate-700 leading-tight">{ticket.subject}</p>
+                                                    <StatusBadge status={ticket.status} size="sm" />
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+                                </CardContent>
+                            </Card>
+                        )}
                     </div>
                 </div>
             </div>
