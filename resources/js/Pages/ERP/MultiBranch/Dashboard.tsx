@@ -5,6 +5,7 @@ import { MetricCard } from '@/Components/ui/MetricCard';
 import { Store, TrendingUp, AlertTriangle, Activity } from 'lucide-react';
 import { BranchSwitcher } from '@/Components/ERP/BranchSwitcher';
 import { formatMoney } from '@/lib/utils';
+import { useERPMenu } from '@/hooks/useERPMenu';
 
 interface Props {
     activeBranchId: number | null;
@@ -18,8 +19,16 @@ interface Props {
 }
 
 export default function BranchDashboard({ activeBranchId, branches, metrics }: Props) {
+    const { menuItems, lockedAddons, workspaceName, tenantId } = useERPMenu('branches');
+
     return (
-        <ERPLayout title="Branch Dashboard">
+        <ERPLayout 
+            title="Branch Dashboard"
+            menuItems={menuItems}
+            lockedAddons={lockedAddons}
+            workspaceName={workspaceName}
+            tenantId={tenantId}
+        >
             <Head title="Branch Dashboard - ERP" />
 
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">

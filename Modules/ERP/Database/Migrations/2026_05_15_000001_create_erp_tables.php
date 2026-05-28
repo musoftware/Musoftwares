@@ -119,32 +119,14 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        // 9. client_wallets table
-        Schema::create('erp_client_wallets', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('tenant_id')->constrained('erp_tenants')->cascadeOnDelete();
-            $table->foreignId('client_id')->constrained('erp_tenant_clients')->cascadeOnDelete();
-            $table->decimal('balance', 15, 2)->default(0);
-            $table->decimal('locked_balance', 15, 2)->default(0);
-            $table->foreignId('currency_id')->nullable()->constrained('currencies')->nullOnDelete();
-            $table->timestamps();
-
-            $table->unique(['tenant_id', 'client_id']);
-        });
-
-        // 10. client_wallet_transactions table
-        Schema::create('erp_client_wallet_transactions', function (Blueprint $table) {
+        // 10. client_transactions table
+        Schema::create('erp_client_transactions', function (Blueprint $table) {
             $table->id();
             $table->foreignId('tenant_id')->nullable()->constrained('erp_tenants')->cascadeOnDelete();
-            $table->foreignId('wallet_id')->constrained('erp_client_wallets')->cascadeOnDelete();
+            $table->foreignId('client_id')->constrained('erp_tenant_clients')->cascadeOnDelete();
+            $table->foreignId('project_id')->nullable();
 
-            $table->enum('type', [
-                'invoice_issued', 'invoice_paid', 'invoice_refund',
-                'commission_earned', 'commission_paid',
-                'manual_credit', 'manual_debit',
-                'withdrawal_requested', 'withdrawal_paid', 'withdrawal_cancelled',
-                'cost_deducted'
-            ]);
+            $table->enum('type', ['received', 'refunded', 'sent', 'used', 'earned']);
             $table->enum('direction', ['debit', 'credit']);
 
             $table->decimal('amount', 15, 2);
@@ -154,8 +136,7 @@ return new class extends Migration
             $table->decimal('exchange_rate', 15, 6);
             $table->date('exchange_rate_date');
 
-            $table->decimal('balance_before', 15, 2);
-            $table->decimal('balance_after', 15, 2);
+
 
             $table->string('reference_type')->nullable();
             $table->unsignedBigInteger('reference_id')->nullable();
@@ -176,8 +157,7 @@ return new class extends Migration
             $table->foreignId('invoice_id')->nullable()->constrained('erp_invoices')->nullOnDelete();
             $table->foreignId('client_id')->nullable()->constrained('erp_tenant_clients')->nullOnDelete();
 
-            $table->enum('type', ['cost_recorded', 'cost_paid_manual', 'cost_paid_from_balance']);
-            $table->enum('direction', ['debit', 'credit']);
+
 
             $table->decimal('amount', 15, 2);
             $table->foreignId('currency_id')->nullable()->constrained('currencies')->nullOnDelete();
@@ -314,8 +294,7 @@ return new class extends Migration
         Schema::dropIfExists('erp_recurring_execution_logs');
         Schema::dropIfExists('erp_recurring_entries');
         Schema::dropIfExists('erp_expense_transactions');
-        Schema::dropIfExists('erp_client_wallet_transactions');
-        Schema::dropIfExists('erp_client_wallets');
+        Schema::dropIfExists('erp_client_transactions');
         Schema::dropIfExists('erp_invoice_costs');
         Schema::dropIfExists('erp_timer_sessions');
         Schema::dropIfExists('erp_invoice_items');

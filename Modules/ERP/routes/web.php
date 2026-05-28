@@ -32,6 +32,9 @@ Route::middleware(['web', 'auth', 'tenant.active'])
         Route::post('clients/{client}/wallet/lock', [\Modules\ERP\Http\Controllers\WalletController::class, 'lockFunds'])->name('clients.wallet.lock');
         Route::post('clients/{client}/wallet/unlock', [\Modules\ERP\Http\Controllers\WalletController::class, 'unlockFunds'])->name('clients.wallet.unlock');
 
+        // ── Transactions ──
+        Route::get('transactions/{transaction}', [\Modules\ERP\Http\Controllers\TransactionController::class, 'show'])->name('transactions.show');
+
         // ── Tasks & Todos ──
         Route::resource('tasks', \Modules\ERP\Http\Controllers\TaskController::class);
         Route::post('tasks/{task}/items', [\Modules\ERP\Http\Controllers\TaskController::class, 'storeItem'])->name('tasks.items.store');
@@ -109,6 +112,25 @@ Route::middleware(['web', 'auth', 'tenant.active'])
         Route::get('referrals', [\Modules\ERP\Http\Controllers\ReferralController::class, 'index'])->name('referrals.index');
         Route::get('referrals/earnings', [\Modules\ERP\Http\Controllers\ReferralController::class, 'earnings'])->name('referrals.earnings');
         Route::get('referrals/tree/{client}', [\Modules\ERP\Http\Controllers\ReferralController::class, 'tree'])->name('referrals.tree');
+
+        // ── Inventory ──
+        Route::get('inventory', [\Modules\ERP\Http\Controllers\InventoryController::class, 'index'])->name('inventory.index');
+        Route::resource('inventory/products', \Modules\ERP\Http\Controllers\ProductController::class)->names('inventory.products');
+        Route::get('inventory/products/{product}/adjust', [\Modules\ERP\Http\Controllers\ProductController::class, 'adjust'])->name('inventory.products.adjust');
+        Route::post('inventory/products/{product}/adjust', [\Modules\ERP\Http\Controllers\ProductController::class, 'storeAdjustment'])->name('inventory.products.store_adjustment');
+
+        // ── POS ──
+        Route::get('pos', [\Modules\ERP\Http\Controllers\PosController::class, 'index'])->name('pos.index');
+        
+        // ── Branches ──
+        Route::prefix('branches')->name('branches.')->group(function () {
+            Route::post('switch', [\Modules\ERP\app\Features\MultiBranch\Controllers\BranchController::class, 'switchBranch'])->name('switch');
+            Route::get('dashboard', [\Modules\ERP\app\Features\MultiBranch\Controllers\BranchController::class, 'dashboard'])->name('dashboard');
+            Route::get('/', [\Modules\ERP\app\Features\MultiBranch\Controllers\BranchController::class, 'index'])->name('index');
+            Route::post('/', [\Modules\ERP\app\Features\MultiBranch\Controllers\BranchController::class, 'store'])->name('store');
+            Route::get('transfers', [\Modules\ERP\app\Features\MultiBranch\Controllers\BranchTransferController::class, 'index'])->name('transfers');
+            Route::post('{branch}/transfers', [\Modules\ERP\app\Features\MultiBranch\Controllers\BranchTransferController::class, 'store'])->name('transfers.store');
+        });
     });
 
 Route::middleware(['web', 'auth', 'admin'])

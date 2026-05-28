@@ -1979,7 +1979,9 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                                                     filteredTransactions.map((txn) => (
                                                         <tr key={txn.id} className="hover:bg-slate-50/80 transition text-[13px] text-slate-700">
                                                             <td className="px-5 py-4">
-                                                                <span className="font-mono font-bold text-indigo-600">{txn.reference_id}</span>
+                                                                <Link href={route('erp.transactions.show', txn.id)} className="font-mono font-bold text-indigo-600 hover:underline">
+                                                                    {txn.reference_id}
+                                                                </Link>
                                                             </td>
                                                             <td className="px-5 py-4">
                                                                 <span className="font-semibold text-slate-900">{txn.client_name}</span>

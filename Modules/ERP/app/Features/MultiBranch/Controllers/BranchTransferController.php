@@ -6,6 +6,9 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Modules\ERP\app\Features\MultiBranch\Services\BranchTransferService;
 use Modules\ERP\Models\BranchTransfer;
+use Inertia\Inertia;
+use Illuminate\Support\Facades\Auth;
+use Modules\ERP\Models\Tenant;
 
 class BranchTransferController extends Controller
 {
@@ -16,21 +19,61 @@ class BranchTransferController extends Controller
         $this->transferService = $transferService;
     }
 
+    protected function getTenantAndCheckAccess() {
+        $user = Auth::user();
+        if (Auth::guard('erp_team')->check()) {
+            $tenant = Auth::guard('erp_team')->user()->tenant;
+            $ownerUser = $tenant?->user;
+        } else {
+            $tenant = Tenant::where('user_id', $user?->id)->first();
+            $ownerUser = $user;
+        }
+
+        if (!$ownerUser || !$ownerUser->hasModuleSubscription('erp-multi-branch')) {
+            abort(403, __('erp.unauthorized_multi_branch'));
+        }
+
+        return $tenant->id;
+    }
+
+    public function index(Request $request)
+    {
+        $tenantId = $this->getTenantAndCheckAccess();
+        $transfers = BranchTransfer::where('tenant_id', $tenantId)->latest()->get();
+
+        $branches = \Modules\ERP\Models\Branch::where('tenant_id', $tenantId)->get();
+
+        if ($request->wantsJson()) {
+            return response()->json(['data' => $transfers, 'branches' => $branches]);
+        }
+
+        return Inertia::render('ERP/MultiBranch/TransferCenter', [
+            'transfers' => $transfers,
+            'branches' => $branches
+        ]);
+    }
+
     public function store(Request $request, $branchId)
     {
+        $tenantId = $this->getTenantAndCheckAccess();
+
         $validated = $request->validate([
             'to_branch_id' => 'required|exists:erp_branches,id',
             'type' => 'required|string',
         ]);
 
         $transfer = $this->transferService->createTransfer(
-            $request->user()->tenant_id,
+            $tenantId,
             $branchId,
             $validated['to_branch_id'],
             $validated['type'],
-            $request->user()->id
+            Auth::id()
         );
 
-        return response()->json(['data' => $transfer], 201);
+        if ($request->wantsJson()) {
+            return response()->json(['data' => $transfer], 201);
+        }
+        
+        return redirect()->back()->with('success', __('erp.transfer_created'));
     }
 }

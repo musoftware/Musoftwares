@@ -7,7 +7,7 @@ use App\Models\UserSubscription;
 use App\Models\Currency;
 use Modules\ERP\Models\Tenant;
 use Modules\ERP\Models\TenantClient;
-use Modules\ERP\Models\ClientWallet;
+use Modules\ERP\Models\WalletTransaction;
 use Modules\ERP\Models\Invoice;
 use Modules\ERP\Models\ReferralEarning;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -138,12 +138,7 @@ class ERPReferralSystemTest extends TestCase
             'currency_id' => $this->currency->id,
         ]);
 
-        ClientWallet::create([
-            'tenant_id' => $this->tenant->id,
-            'client_id' => $referrer->id,
-            'balance' => 0.00,
-            'currency_id' => $this->currency->id,
-        ]);
+
 
         // 2. Create Referee client referred by Referrer
         $referee = TenantClient::create([
@@ -154,11 +149,18 @@ class ERPReferralSystemTest extends TestCase
             'referred_by' => $referrer->id,
         ]);
 
-        ClientWallet::create([
+        WalletTransaction::create([
             'tenant_id' => $this->tenant->id,
             'client_id' => $referee->id,
-            'balance' => 1000.00,
+            'type' => 'manual_credit',
+            'direction' => 'credit',
+            'amount' => 1000.00,
             'currency_id' => $this->currency->id,
+            'business_amount' => 1000.00,
+            'business_currency_id' => $this->tenant->base_currency_id,
+            'exchange_rate' => 1.0,
+            'exchange_rate_date' => now()->toDateString(),
+            'created_by' => $this->user->id,
         ]);
 
         // 3. Create Invoice for Referee
@@ -181,11 +183,23 @@ class ERPReferralSystemTest extends TestCase
         $this->assertDatabaseMissing('erp_client_referral_earnings', [
             'invoice_id' => $invoice->id,
         ]);
-        $this->assertEquals(0.00, (float) $referrer->wallet->fresh()->balance);
+        $this->assertEquals(0.00, (float) $referrer->balance());
 
         // Reset Invoice and referee wallet balance for next check
         $invoice->update(['status' => 'sent', 'paid_amount' => 0, 'paid_at' => null]);
-        $referee->wallet->update(['balance' => 1000.00]);
+        WalletTransaction::create([
+            'tenant_id' => $this->tenant->id,
+            'client_id' => $referee->id,
+            'type' => 'manual_credit',
+            'direction' => 'credit',
+            'amount' => 500.00,
+            'currency_id' => $this->currency->id,
+            'business_amount' => 500.00,
+            'business_currency_id' => $this->tenant->base_currency_id,
+            'exchange_rate' => 1.0,
+            'exchange_rate_date' => now()->toDateString(),
+            'created_by' => $this->user->id,
+        ]);
 
         // 5. Active subscription to erp-referrals
         UserSubscription::create([
@@ -210,7 +224,7 @@ class ERPReferralSystemTest extends TestCase
             'status' => 'pending',
         ]);
 
-        $this->assertEquals(25.00, (float) $referrer->wallet->fresh()->balance);
+        $this->assertEquals(25.00, (float) $referrer->balance());
 
         // 6. Cancelling invoice should set commission status to cancelled
         $invoice->cancelInvoice();
