@@ -90,6 +90,7 @@ export function useERPMenu(
         { id: 'erp-payroll', label: 'Payroll', icon: Banknote, description: 'Automate salary calculations, deductions, and payment tracking for your team.', features: ['Salary management', 'Deduction rules', 'Payment history'] },
         { id: 'erp-inventory', label: 'Inventory', icon: Package, description: 'Track stock levels, manage products, and automate reorder alerts.', features: ['Stock tracking', 'Product catalog', 'Reorder alerts'] },
         { id: 'erp-tax-engine', label: 'Tax Engine', icon: Receipt, description: 'Automated tax calculation, VAT management, and tax-ready invoice generation.', features: ['Auto tax calc', 'VAT support', 'Tax reports'] },
+        { id: 'erp-smtp', label: 'Custom SMTP', icon: Settings, description: 'Send emails (invoices, receipts, etc) to clients from your own domain and custom email address.', features: ['Custom Sender Identity', 'White-labeled Emails', 'Increased Deliverability'] },
     ];
 
     // Team members don't see team, settings, or backup

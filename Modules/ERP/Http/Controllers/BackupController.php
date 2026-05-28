@@ -25,8 +25,12 @@ class BackupController extends Controller
     public function download(BackupService $backupService)
     {
         $user = auth()->user();
-        if (!$user->hasModuleSubscription('erp-backup')) {
-            abort(403, 'Upgrade to enable ERP Backup.');
+        if (auth('erp_team')->check()) {
+            $user = auth('erp_team')->user()?->tenant?->user;
+        }
+        
+        if (!$user || !$user->hasModuleSubscription('erp-backup')) {
+            abort(403, __('errors.erp_backup_addon_required'));
         }
 
         $tenant = \Modules\ERP\Models\Tenant::where('user_id', $user->id)->firstOrFail();
@@ -38,8 +42,12 @@ class BackupController extends Controller
     public function restore(Request $request, BackupService $backupService)
     {
         $user = auth()->user();
-        if (!$user->hasModuleSubscription('erp-backup')) {
-            abort(403, 'Upgrade to enable ERP Backup.');
+        if (auth('erp_team')->check()) {
+            $user = auth('erp_team')->user()?->tenant?->user;
+        }
+
+        if (!$user || !$user->hasModuleSubscription('erp-backup')) {
+            abort(403, __('errors.erp_backup_addon_required'));
         }
 
         $request->validate([
@@ -50,9 +58,9 @@ class BackupController extends Controller
 
         try {
             $backupService->restoreBackup($tenant, $request->file('backup_file'));
-            return back()->with('success', 'Backup restored successfully.');
+            return back()->with('success', __('erp.backup_restored_success'));
         } catch (\Exception $e) {
-            return back()->with('error', 'Failed to restore backup: ' . $e->getMessage());
+            return back()->with('error', __('errors.backup_restore_failed', ['message' => $e->getMessage()]));
         }
     }
 }

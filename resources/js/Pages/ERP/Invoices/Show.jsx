@@ -17,7 +17,7 @@ import { PromptModal } from '@/Components/ui/ConfirmModal';
 
 const Separator = () => <div className="h-px bg-gray-200 w-full my-4" />;
 
-export default function Show({ invoice, timeline, referral_earnings }) {
+export default function Show({ invoice, timeline, referral_earnings, has_smtp_addon, has_smtp_settings }) {
     const { auth } = usePage().props;
     const isClientView = !auth.user.roles?.includes('admin') && auth.user.id !== invoice.created_by;
 
@@ -223,7 +223,7 @@ export default function Show({ invoice, timeline, referral_earnings }) {
                                     <Link href={route('erp.invoices.edit', invoice.id)}><Edit className="mr-2 h-4 w-4" /> Edit Draft</Link>
                                 </Button>
                                 <Button variant="outline" size="sm" onClick={() => router.post(route('erp.invoices.send', invoice.id))} className="shadow-sm border-slate-200 text-slate-700 hover:bg-slate-50 transition-colors">
-                                    <Send className="mr-2 h-4 w-4" /> Issue Invoice
+                                    <CheckCircle className="mr-2 h-4 w-4" /> Issue Invoice
                                 </Button>
                             </>
                         )}
@@ -232,6 +232,17 @@ export default function Show({ invoice, timeline, referral_earnings }) {
                                 <Button variant="outline" size="sm" asChild className="shadow-sm border-slate-200 hover:bg-slate-50 transition-colors text-slate-700">
                                     <Link href={route('erp.invoices.edit', invoice.id)}><Edit className="mr-2 h-4 w-4" /> Edit Draft</Link>
                                 </Button>
+                                {has_smtp_addon ? (
+                                    has_smtp_settings ? (
+                                        <Button variant="outline" size="sm" onClick={() => router.post(route('erp.invoices.send-email', invoice.id))} className="shadow-sm border-indigo-200 text-indigo-700 hover:bg-indigo-50 transition-colors">
+                                            <Send className="mr-2 h-4 w-4" /> Send Email
+                                        </Button>
+                                    ) : (
+                                        <Button variant="outline" size="sm" asChild className="shadow-sm border-orange-200 text-orange-700 hover:bg-orange-50 transition-colors">
+                                            <Link href={route('erp.settings.smtp.edit')}><Send className="mr-2 h-4 w-4" /> Configure SMTP to Send</Link>
+                                        </Button>
+                                    )
+                                ) : null}
                                 <Button variant="outline" size="sm" onClick={() => router.post(route('erp.invoices.mark-paid', invoice.id))} className="shadow-sm border-emerald-200 text-emerald-700 hover:bg-emerald-50 transition-colors">
                                     <CheckCircle className="mr-2 h-4 w-4" /> Mark as Paid
                                 </Button>
