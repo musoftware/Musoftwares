@@ -45,7 +45,7 @@ class InvoiceController extends Controller
         if ($request->filled('search')) {
             $query->where(function($q) use ($request) {
                 $q->where('invoice_number', 'like', '%' . $request->search . '%')
-                  ->orWhereHas('client', function($q) use ($request) {
+                  ->orWhereHas('tenantClient', function($q) use ($request) {
                       $q->where('name', 'like', '%' . $request->search . '%');
                   });
             });
@@ -77,15 +77,33 @@ class InvoiceController extends Controller
         ]);
     }
 
-    public function create()
+    public function create(Request $request)
     {
         $tenant           = $this->resolveTenant();
         $baseCurrency     = Currency::find($tenant->base_currency_id);
+
+        // Only send the pre-selected client (if any) — frontend fetches others lazily
+        $preSelectedClient = null;
+        if ($request->query('client_id')) {
+            $preSelectedClient = TenantClient::with('currency')
+                ->where('tenant_id', $tenant->id)
+                ->find($request->query('client_id'));
+            if ($preSelectedClient) {
+                $preSelectedClient = [
+                    'id' => $preSelectedClient->id,
+                    'name' => $preSelectedClient->name,
+                    'email' => $preSelectedClient->email,
+                    'currency_code' => $preSelectedClient->currency?->currency ?? 'USD',
+                ];
+            }
+        }
+
         return Inertia::render('ERP/Invoices/Create', [
-            'clients'           => TenantClient::with('currency')->where('tenant_id', $tenant->id)->get(),
+            'pre_selected_client' => $preSelectedClient,
             'projects'          => \Modules\ERP\Models\Project::where('tenant_id', $tenant->id)->get(),
             'currencies'        => Currency::all(),
             'business_currency' => $baseCurrency ? $baseCurrency->currency : 'USD',
+            'pre_selected_client_id' => $request->query('client_id'),
         ]);
     }
 
@@ -226,11 +244,20 @@ class InvoiceController extends Controller
             abort(403, 'Unauthorized access to invoice.');
         }
 
-        $invoice->load(['items', 'costs']);
+        $invoice->load(['items', 'costs', 'tenantClient.currency']);
         $baseCurrency = Currency::find($tenant->base_currency_id);
+
+        // Only send the invoice's current client — frontend fetches others lazily
+        $currentClient = $invoice->tenantClient ? [
+            'id' => $invoice->tenantClient->id,
+            'name' => $invoice->tenantClient->name,
+            'email' => $invoice->tenantClient->email,
+            'currency_code' => $invoice->tenantClient->currency?->currency ?? 'USD',
+        ] : null;
+
         return Inertia::render('ERP/Invoices/Edit', [
             'invoice'           => $invoice,
-            'clients'           => TenantClient::with('currency')->where('tenant_id', $tenant->id)->get(),
+            'pre_selected_client' => $currentClient,
             'projects'          => \Modules\ERP\Models\Project::where('tenant_id', $tenant->id)->get(),
             'currencies'        => Currency::all(),
             'business_currency' => $baseCurrency ? $baseCurrency->currency : 'USD',

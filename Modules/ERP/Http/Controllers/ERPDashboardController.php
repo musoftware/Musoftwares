@@ -310,24 +310,45 @@ class ERPDashboardController extends Controller
 
         // ── Transactions (Wallet Ledger) ──────────────────────────
         $transactions = collect();
+        $transactionStats = ['totalCredits' => 0, 'totalDebits' => 0, 'netFlow' => 0, 'txnCount' => 0];
         if ($tenantId) {
-            $transactions = WalletTransaction::with(['creator', 'wallet.client'])
+            $rawTxns = WalletTransaction::with(['creator', 'wallet.tenantClient', 'currency'])
                 ->where('tenant_id', $tenantId)
                 ->latest()
-                ->take(15)
-                ->get()
-                ->map(function ($txn) {
+                ->take(50)
+                ->get();
+
+            $transactionStats['txnCount'] = $rawTxns->count();
+            $transactionStats['totalCredits'] = round($rawTxns->where('direction', 'credit')->sum('business_amount'), 2);
+            $transactionStats['totalDebits'] = round($rawTxns->where('direction', 'debit')->sum('business_amount'), 2);
+            $transactionStats['netFlow'] = round($transactionStats['totalCredits'] - $transactionStats['totalDebits'], 2);
+
+            $transactions = $rawTxns->map(function ($txn) use ($businessCurrency) {
                     $title = 'Manual ' . ucfirst($txn->type);
                     if ($txn->reference_type === 'invoice') $title = 'Invoice Settlement';
                     else if ($txn->reference_type === 'withdrawal') $title = 'Withdrawal Settlement';
+
+                    $txnCurrency = $txn->currency?->currency ?? $businessCurrency;
+                    $clientCurrency = $txn->wallet?->tenantClient?->currency?->currency ?? $txnCurrency;
                     
                     return [
                         'id' => $txn->id,
                         'reference_id' => '#TXN-' . str_pad($txn->id, 4, '0', STR_PAD_LEFT),
                         'title' => $title,
+                        'type' => $txn->type,
                         'note' => $txn->note ?? 'No details provided',
                         'direction' => strtoupper($txn->direction),
-                        'amount' => round($txn->business_amount ?? $txn->amount, 2),
+                        'amount' => round($txn->amount, 2),
+                        'business_amount' => round($txn->business_amount ?? $txn->amount, 2),
+                        'currency' => $txnCurrency,
+                        'client_currency' => $clientCurrency,
+                        'business_currency' => $businessCurrency,
+                        'balance_before' => round($txn->balance_before ?? 0, 2),
+                        'balance_after' => round($txn->balance_after ?? 0, 2),
+                        'reference_type' => $txn->reference_type,
+                        'reference_id_raw' => $txn->reference_id,
+                        'client_name' => $txn->wallet?->tenantClient?->name ?? 'Unknown',
+                        'client_id' => $txn->wallet?->tenantClient?->id,
                         'authorizer' => $txn->creator?->name ?? 'System Core',
                         'date' => $txn->created_at?->format('Y-m-d H:i'),
                     ];
@@ -349,6 +370,7 @@ class ERPDashboardController extends Controller
             'tasks' => $tasks,
             'notes' => $notes,
             'transactions' => $transactions,
+            'transactionStats' => $transactionStats,
             'hasMultiCurrency' => $user->hasModuleSubscription('erp-multi-currency'),
         ]);
     }

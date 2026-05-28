@@ -47,8 +47,12 @@ import {
     UserPlus,
     Sliders,
     AlertCircle,
-    Cloud, Database, Link as LinkIcon, HardDrive, Key, CheckCircle, SearchCode, Lock
+    Cloud, Database, Link as LinkIcon, HardDrive, Key, CheckCircle, SearchCode, Lock,
+    MoreHorizontal, Wallet, RotateCcw, ArrowDownLeft, ArrowUpDown, ArrowDown, ArrowUp
 } from 'lucide-react';
+import {
+    Dialog, DialogContent, DialogHeader, DialogTitle,
+} from '@/Components/ui/dialog';
 import { Button, buttonVariants } from '@/Components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/Components/ui/card';
 import { Badge } from '@/Components/ui/badge';
@@ -147,13 +151,24 @@ interface ERPDashboardProps {
         note: string;
         direction: string;
         amount: number;
+        currency: string;
+        balance_before: number;
+        balance_after: number;
+        reference_type: string;
+        client_name: string;
         authorizer: string;
         date: string;
     }>;
+    transactionStats?: {
+        totalCredits: number;
+        totalDebits: number;
+        netFlow: number;
+        txnCount: number;
+    };
     hasMultiCurrency?: boolean;
 }
 
-export default function ERPDashboard({ tenant: serverTenant, stats: serverStats, clients: serverClients, invoices: serverInvoices, chartData: serverChartData, projects: serverProjects, supportTickets: serverTickets, activityLogs: serverActivityLogs, upcomingBookings: serverBookings, storageProviders: serverStorageProviders, documents: serverDocuments, tasks: serverTasks, notes: serverNotes, transactions: serverTransactions, hasMultiCurrency = false }: ERPDashboardProps) {
+export default function ERPDashboard({ tenant: serverTenant, stats: serverStats, clients: serverClients, invoices: serverInvoices, chartData: serverChartData, projects: serverProjects, supportTickets: serverTickets, activityLogs: serverActivityLogs, upcomingBookings: serverBookings, storageProviders: serverStorageProviders, documents: serverDocuments, tasks: serverTasks, notes: serverNotes, transactions: serverTransactions, transactionStats: serverTransactionStats, hasMultiCurrency = false }: ERPDashboardProps) {
     const { toast } = useToast();
     const { auth } = usePage().props as any;
     const isTeamMember = !!auth?.team_member;
@@ -183,6 +198,7 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
     }, []);
 
     const [deleteConfirm, setDeleteConfirm] = useState<{ open: boolean; client: any }>({ open: false, client: null });
+    const [actionModalClient, setActionModalClient] = useState<any>(null);
 
     // ────────────────────────────────────────────────────────
     // BACKEND HYDRATION & CORE STATES
@@ -266,6 +282,12 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
     const [showAddTicketModal, setShowAddTicketModal] = useState(false);
 
     const [transactions, setTransactions] = useState<Array<any>>(serverTransactions || []);
+    const txnStats = serverTransactionStats || { totalCredits: 0, totalDebits: 0, netFlow: 0, txnCount: 0 };
+    const [txnDirectionFilter, setTxnDirectionFilter] = useState<'all' | 'CREDIT' | 'DEBIT'>('all');
+    const filteredTransactions = useMemo(() => {
+        if (txnDirectionFilter === 'all') return transactions;
+        return transactions.filter(t => t.direction === txnDirectionFilter);
+    }, [transactions, txnDirectionFilter]);
 
     const [teamMembers] = useState<Array<any>>([
         { id: 1, name: 'Owner', email: 'owner@workspace', role: 'Owner', status: 'Active', activities: 0 }
@@ -995,33 +1017,12 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                                                             <td className="px-6 py-4 text-slate-500 text-xs">{client.created_at ?? '—'}</td>
                                                             {!isReadOnlyMember && (
                                                                 <td className="px-6 py-4 text-right">
-                                                                    <div className="flex items-center justify-end gap-1.5">
-                                                                        <Link href={route('erp.clients.show', client.id)} className="p-1 hover:bg-slate-100 rounded text-slate-500">
-                                                                            <Eye className="h-3.5 w-3.5" />
-                                                                        </Link>
-                                                                        <button 
-                                                                            onClick={() => {
-                                                                                setSelectedClient(client);
-                                                                                setClientForm({
-                                                                                    name: client.name,
-                                                                                    email: client.email || '',
-                                                                                    phone: client.phone || '',
-                                                                                    address: client.address || '',
-                                                                                    currency: client.currency || 'USD'
-                                                                                });
-                                                                                setShowEditClientModal(true);
-                                                                            }} 
-                                                                            className="p-1 hover:bg-slate-100 rounded text-slate-500"
-                                                                        >
-                                                                            <Edit2 className="h-3.5 w-3.5" />
-                                                                        </button>
-                                                                        <button 
-                                                                            onClick={() => handleDeleteClient(client)} 
-                                                                            className="p-1 hover:bg-rose-50 rounded text-rose-500"
-                                                                        >
-                                                                            <Trash2 className="h-3.5 w-3.5" />
-                                                                        </button>
-                                                                    </div>
+                                                                    <button
+                                                                        onClick={() => setActionModalClient(client)}
+                                                                        className="p-1.5 hover:bg-slate-100 rounded-md text-slate-500 transition"
+                                                                    >
+                                                                        <MoreHorizontal className="h-4 w-4" />
+                                                                    </button>
                                                                 </td>
                                                             )}
                                                         </tr>
@@ -1031,6 +1032,80 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                                         </table>
                                     </div>
                                 </OperationalCard>
+
+                                {/* Client Action Modal */}
+                                <Dialog open={!!actionModalClient} onOpenChange={(open) => !open && setActionModalClient(null)}>
+                                    <DialogContent className="sm:max-w-lg">
+                                        <DialogHeader>
+                                            <DialogTitle className="flex items-center gap-3">
+                                                <div className="flex items-center justify-center w-9 h-9 rounded-full bg-slate-100 text-slate-700 text-sm font-bold">
+                                                    {actionModalClient?.name?.substring(0, 2)?.toUpperCase()}
+                                                </div>
+                                                <div>
+                                                    <span className="block">{actionModalClient?.name}</span>
+                                                    <span className="text-xs font-normal text-slate-400">{actionModalClient?.email}</span>
+                                                </div>
+                                            </DialogTitle>
+                                        </DialogHeader>
+
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-2">
+                                            {/* Finance Column */}
+                                            <div>
+                                                <h4 className="text-[10px] uppercase tracking-widest font-bold text-slate-400 mb-3 px-1">Finance</h4>
+                                                <div className="space-y-0.5">
+                                                    {[
+                                                        { icon: FileText, label: 'New Invoice', color: 'text-slate-600', href: route('erp.invoices.create') + '?client_id=' + actionModalClient?.id },
+                                                        { icon: ArrowDownLeft, label: 'Receive Money', color: 'text-emerald-600', href: route('erp.clients.wallet.adjust', actionModalClient?.id || 0) + '?type=credit' },
+                                                        { icon: ArrowUpRight, label: 'Send Money', color: 'text-amber-600', href: route('erp.clients.wallet.adjust', actionModalClient?.id || 0) + '?type=debit' },
+                                                        { icon: RotateCcw, label: 'Refund', color: 'text-blue-600', href: route('erp.clients.wallet.adjust', actionModalClient?.id || 0) + '?type=refund' },
+                                                        { icon: Receipt, label: 'All Invoices', color: 'text-slate-600', href: route('erp.invoices.index') + '?search=' + encodeURIComponent(actionModalClient?.name || '') },
+                                                        { icon: Wallet, label: 'Transactions', color: 'text-slate-600', href: route('erp.clients.wallet.index', actionModalClient?.id || 0) },
+                                                    ].map((item) => (
+                                                        <Link
+                                                            key={item.label}
+                                                            href={item.href}
+                                                            className="flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-[13px] text-slate-700 hover:bg-slate-50 transition-colors group"
+                                                        >
+                                                            <item.icon className={`h-4 w-4 ${item.color} shrink-0`} />
+                                                            <span className="group-hover:translate-x-0.5 transition-transform">{item.label}</span>
+                                                        </Link>
+                                                    ))}
+                                                </div>
+                                            </div>
+
+                                            {/* Manage Column */}
+                                            <div>
+                                                <h4 className="text-[10px] uppercase tracking-widest font-bold text-slate-400 mb-3 px-1">Account</h4>
+                                                <div className="space-y-0.5">
+                                                    {[
+                                                        { icon: Eye, label: 'View Profile', color: 'text-slate-600', href: route('erp.clients.show', actionModalClient?.id || 0) },
+                                                        { icon: Edit2, label: 'Edit Client', color: 'text-slate-600', href: route('erp.clients.edit', actionModalClient?.id || 0) },
+                                                    ].map((item) => (
+                                                        <Link
+                                                            key={item.label}
+                                                            href={item.href}
+                                                            className="flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-[13px] text-slate-700 hover:bg-slate-50 transition-colors group"
+                                                        >
+                                                            <item.icon className={`h-4 w-4 ${item.color} shrink-0`} />
+                                                            <span className="group-hover:translate-x-0.5 transition-transform">{item.label}</span>
+                                                        </Link>
+                                                    ))}
+                                                    <div className="border-t border-slate-100 my-2" />
+                                                    <button
+                                                        onClick={() => {
+                                                            setActionModalClient(null);
+                                                            handleDeleteClient(actionModalClient);
+                                                        }}
+                                                        className="flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-[13px] text-rose-600 hover:bg-rose-50 transition-colors group w-full text-left"
+                                                    >
+                                                        <Trash2 className="h-4 w-4 shrink-0" />
+                                                        <span className="group-hover:translate-x-0.5 transition-transform">Delete Client</span>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </DialogContent>
+                                </Dialog>
                             </div>
                         )}
 
@@ -1486,60 +1561,133 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                                     description="View all wallet activity, payments, and balance adjustments."
                                 />
 
-                                <OperationalCard noPadding>
-                                    <DataTable
-                                        data={transactions}
-                                        columns={[
-                                            {
-                                                key: 'reference_id',
-                                                label: 'Reference ID',
-                                                className: 'font-mono font-bold text-indigo-600',
-                                            },
-                                            {
-                                                key: 'title',
-                                                label: 'Transaction Type',
-                                                render: (txn) => (
-                                                    <>
-                                                        <span className="font-semibold text-slate-900 block">{txn.title}</span>
-                                                        <span className="text-slate-400 text-xs block">{txn.note}</span>
-                                                    </>
-                                                )
-                                            },
-                                            {
-                                                key: 'direction',
-                                                label: 'Direction',
-                                                render: (txn) => (
-                                                    txn.direction === 'CREDIT' ? (
-                                                        <Badge className="bg-emerald-50 text-emerald-700 rounded font-bold text-[10px]">CREDIT</Badge>
-                                                    ) : (
-                                                        <Badge className="bg-rose-50 text-rose-700 rounded font-bold text-[10px]">DEBIT</Badge>
-                                                    )
-                                                )
-                                            },
-                                            {
-                                                key: 'amount',
-                                                label: 'Sum',
-                                                className: 'text-right',
-                                                render: (txn) => (
-                                                    <FinancialAmount amount={txn.direction === 'DEBIT' ? -txn.amount : txn.amount} colorize={true} />
-                                                )
-                                            },
-                                            {
-                                                key: 'authorizer',
-                                                label: 'Authorized',
-                                                className: 'text-right font-medium text-slate-600',
-                                            },
-                                            {
-                                                key: 'date',
-                                                label: 'Timestamp',
-                                                className: 'text-right text-slate-400 font-mono text-xs',
-                                            }
-                                        ]}
-                                        emptyTitle="No transactions found"
-                                        emptyDescription="No transactions found in this workspace's ledger."
-                                        emptyIcon={History}
-                                        className="border-0 shadow-none rounded-none"
+                                {/* Summary Metric Cards */}
+                                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                                    <MetricCard
+                                        label="Total Credits"
+                                        value={new Intl.NumberFormat('en-US', { style: 'currency', currency }).format(txnStats.totalCredits)}
+                                        icon={ArrowDown}
                                     />
+                                    <MetricCard
+                                        label="Total Debits"
+                                        value={new Intl.NumberFormat('en-US', { style: 'currency', currency }).format(txnStats.totalDebits)}
+                                        icon={ArrowUp}
+                                    />
+                                    <MetricCard
+                                        label="Net Flow"
+                                        value={new Intl.NumberFormat('en-US', { style: 'currency', currency }).format(txnStats.netFlow)}
+                                        icon={ArrowUpDown}
+                                    />
+                                    <MetricCard
+                                        label="Total Entries"
+                                        value={txnStats.txnCount}
+                                        icon={History}
+                                    />
+                                </div>
+
+                                {/* Filters */}
+                                <div className="flex items-center gap-2">
+                                    <span className="text-xs font-medium text-slate-500 mr-1">Filter:</span>
+                                    {(['all', 'CREDIT', 'DEBIT'] as const).map(dir => (
+                                        <button
+                                            key={dir}
+                                            onClick={() => setTxnDirectionFilter(dir)}
+                                            className={cn(
+                                                "px-3 py-1.5 rounded-lg text-xs font-semibold transition-all",
+                                                txnDirectionFilter === dir
+                                                    ? dir === 'CREDIT' ? 'bg-emerald-100 text-emerald-800' : dir === 'DEBIT' ? 'bg-rose-100 text-rose-800' : 'bg-slate-900 text-white'
+                                                    : 'bg-slate-100 text-slate-500 hover:bg-slate-200'
+                                            )}
+                                        >
+                                            {dir === 'all' ? 'All' : dir === 'CREDIT' ? '↓ Credits' : '↑ Debits'}
+                                        </button>
+                                    ))}
+                                    {txnDirectionFilter !== 'all' && (
+                                        <span className="text-xs text-slate-400 ml-2">
+                                            Showing {filteredTransactions.length} of {transactions.length}
+                                        </span>
+                                    )}
+                                </div>
+
+                                <OperationalCard noPadding>
+                                    <div className="overflow-x-auto">
+                                        <table className="w-full text-left text-sm border-collapse">
+                                            <thead>
+                                                <tr className="bg-slate-50 border-b border-slate-100 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                                                    <th className="px-5 py-3.5">Reference</th>
+                                                    <th className="px-5 py-3.5">Client</th>
+                                                    <th className="px-5 py-3.5">Type</th>
+                                                    <th className="px-5 py-3.5 text-center">Direction</th>
+                                                    <th className="px-5 py-3.5 text-right">Amount</th>
+                                                    <th className="px-5 py-3.5 text-right">Balance</th>
+                                                    <th className="px-5 py-3.5">Authorized By</th>
+                                                    <th className="px-5 py-3.5 text-right">Timestamp</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody className="divide-y divide-slate-100">
+                                                {filteredTransactions.length === 0 ? (
+                                                    <tr>
+                                                        <td colSpan={8} className="p-0">
+                                                            <EmptyState
+                                                                icon={History}
+                                                                title="No transactions found"
+                                                                description={txnDirectionFilter !== 'all' ? `No ${txnDirectionFilter.toLowerCase()} transactions found. Try adjusting the filter.` : "No transactions found in this workspace's ledger."}
+                                                            />
+                                                        </td>
+                                                    </tr>
+                                                ) : (
+                                                    filteredTransactions.map((txn) => (
+                                                        <tr key={txn.id} className="hover:bg-slate-50/80 transition text-[13px] text-slate-700">
+                                                            <td className="px-5 py-4">
+                                                                <span className="font-mono font-bold text-indigo-600">{txn.reference_id}</span>
+                                                            </td>
+                                                            <td className="px-5 py-4">
+                                                                <span className="font-semibold text-slate-900">{txn.client_name}</span>
+                                                            </td>
+                                                            <td className="px-5 py-4">
+                                                                <div>
+                                                                    <span className="font-semibold text-slate-900 block">{txn.title}</span>
+                                                                    <span className="text-slate-400 text-xs block mt-0.5">{txn.note}</span>
+                                                                </div>
+                                                            </td>
+                                                            <td className="px-5 py-4 text-center">
+                                                                {txn.direction === 'CREDIT' ? (
+                                                                    <Badge className="bg-emerald-50 text-emerald-700 border-none rounded font-bold text-[10px]">
+                                                                        <ArrowDown className="h-3 w-3 mr-0.5" /> CREDIT
+                                                                    </Badge>
+                                                                ) : (
+                                                                    <Badge className="bg-rose-50 text-rose-700 border-none rounded font-bold text-[10px]">
+                                                                        <ArrowUp className="h-3 w-3 mr-0.5" /> DEBIT
+                                                                    </Badge>
+                                                                )}
+                                                            </td>
+                                                            <td className="px-5 py-4 text-right">
+                                                                <FinancialAmount amount={txn.direction === 'DEBIT' ? -txn.amount : txn.amount} currency={txn.currency || currency} colorize={true} />
+                                                            </td>
+                                                            <td className="px-5 py-4 text-right">
+                                                                <div className="flex items-center justify-end gap-1 text-xs font-mono">
+                                                                    <span className="text-slate-400"><CurrencyDisplay amount={txn.balance_before} currency={txn.currency || currency} /></span>
+                                                                    <ChevronRight className="h-3 w-3 text-slate-300" />
+                                                                    <span className="text-slate-700 font-semibold"><CurrencyDisplay amount={txn.balance_after} currency={txn.currency || currency} /></span>
+                                                                </div>
+                                                            </td>
+                                                            <td className="px-5 py-4">
+                                                                <div className="flex items-center gap-2">
+                                                                    <div className="flex items-center justify-center w-6 h-6 rounded-full bg-slate-100 text-slate-500 text-[9px] font-bold">
+                                                                        {txn.authorizer?.substring(0, 2)?.toUpperCase()}
+                                                                    </div>
+                                                                    <span className="text-slate-600 font-medium text-xs">{txn.authorizer}</span>
+                                                                </div>
+                                                            </td>
+                                                            <td className="px-5 py-4 text-right text-slate-400 font-mono text-xs">
+                                                                {txn.date}
+                                                            </td>
+                                                        </tr>
+                                                    ))
+                                                )}
+                                            </tbody>
+                                        </table>
+                                    </div>
                                 </OperationalCard>
                             </div>
                         )}

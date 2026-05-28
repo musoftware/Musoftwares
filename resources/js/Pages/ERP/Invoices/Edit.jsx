@@ -1,5 +1,11 @@
 /**
- * Edit.jsx — thin re-export of the Create page's CreateEdit component.
- * The Create page already handles both create and edit modes via the `invoice` prop.
+ * Edit.jsx — Standalone page component for editing invoices.
+ * Wraps the same CreateEdit component used by Create.jsx.
  */
-export { default } from './Create';
+import React from 'react';
+import CreateEdit from './Create';
+
+export default function Edit(props) {
+    return <CreateEdit {...props} />;
+}
+

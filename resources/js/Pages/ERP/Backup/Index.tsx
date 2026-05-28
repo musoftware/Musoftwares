@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { Head, router, usePage } from '@inertiajs/react';
 import ERPLayout from '@/Layouts/ERPLayout';
+import { useERPMenu } from '@/hooks/useERPMenu';
 import { 
-    HardDrive, Download, UploadCloud, AlertTriangle, Lock, ArrowRight, Loader2,
-    LayoutDashboard, Users, Briefcase, CheckSquare, FileText, History, Folder, Pin, Calendar, UserCheck, Settings
+    HardDrive, Download, UploadCloud, AlertTriangle, Lock, ArrowRight, Loader2
 } from 'lucide-react';
 import { Button } from '@/Components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/Components/ui/card';
@@ -18,20 +18,7 @@ export default function BackupIndex({ hasBackupFeature }: { hasBackupFeature: bo
     const [restoreFile, setRestoreFile] = useState<File | null>(null);
     const [confirmRestore, setConfirmRestore] = useState(false);
 
-    const menuItems = [
-        { id: 'overview', label: 'Overview', icon: LayoutDashboard, isActive: false, href: route('erp.dashboard') },
-        { id: 'clients', label: 'Clients', icon: Users, isActive: false, href: route('erp.dashboard', { section: 'clients' }) },
-        { id: 'projects', label: 'Projects', icon: Briefcase, isActive: false, href: route('erp.dashboard', { section: 'projects' }) },
-        { id: 'tasks', label: 'Tasks', icon: CheckSquare, isActive: false, href: route('erp.dashboard', { section: 'tasks' }) },
-        { id: 'invoices', label: 'Invoices', icon: FileText, isActive: false, href: route('erp.dashboard', { section: 'invoices' }) },
-        { id: 'transactions', label: 'Transactions', icon: History, isActive: false, href: route('erp.dashboard', { section: 'transactions' }) },
-        { id: 'documents', label: 'Files', icon: Folder, isActive: false, href: route('erp.dashboard', { section: 'documents' }) },
-        { id: 'notes', label: 'Notes', icon: Pin, isActive: false, href: route('erp.dashboard', { section: 'notes' }) },
-        { id: 'calendar', label: 'Calendar', icon: Calendar, isActive: false, href: route('erp.dashboard', { section: 'calendar' }) },
-        { id: 'team', label: 'Team', icon: UserCheck, isActive: false, href: route('erp.team-members.index') },
-        { id: 'backup', label: 'Backup', icon: HardDrive, isActive: true, href: route('erp.backup.index') },
-        { id: 'settings', label: 'Settings', icon: Settings, isActive: false, href: route('erp.dashboard', { section: 'settings' }) },
-    ];
+    const { menuItems, lockedAddons } = useERPMenu('backup');
 
     const handleUpgradeSimulate = () => {
         router.visit(route('subscriptions.plans', { module: 'erp' }));
@@ -64,7 +51,7 @@ export default function BackupIndex({ hasBackupFeature }: { hasBackupFeature: bo
     };
 
     return (
-        <ERPLayout title="Backup" workspaceName="Workspace" tenantId="9012" menuItems={menuItems} lockedAddons={lockedAddons}>
+        <ERPLayout title="Backup" menuItems={menuItems} lockedAddons={lockedAddons}>
             <Head title="ERP Backup Service" />
             
             <div className="max-w-4xl mx-auto space-y-6">

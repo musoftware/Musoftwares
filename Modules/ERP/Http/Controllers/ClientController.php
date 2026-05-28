@@ -205,6 +205,40 @@ class ClientController extends Controller
         return redirect()->route('erp.dashboard', ['section' => 'clients'])->with('success', 'Client updated successfully.');
     }
 
+    /**
+     * JSON search endpoint for async client combobox.
+     * GET /erp/clients/search?q=term&limit=20
+     */
+    public function search(Request $request)
+    {
+        $tenantId = $this->resolveTenantId();
+        $query = TenantClient::with('currency')
+            ->where('tenant_id', $tenantId)
+            ->select('id', 'name', 'email', 'currency_id');
+
+        if ($request->filled('q')) {
+            $term = $request->q;
+            $query->where(function ($q) use ($term) {
+                $q->where('name', 'like', "%{$term}%")
+                  ->orWhere('email', 'like', "%{$term}%");
+            });
+        }
+
+        $limit = min((int) $request->input('limit', 20), 50);
+
+        $clients = $query->orderBy('name')
+            ->limit($limit)
+            ->get()
+            ->map(fn ($c) => [
+                'id' => $c->id,
+                'name' => $c->name,
+                'email' => $c->email,
+                'currency_code' => $c->currency?->currency ?? 'USD',
+            ]);
+
+        return response()->json($clients);
+    }
+
     public function destroy(TenantClient $client)
     {
         $tenantId = $this->resolveTenantId();
