@@ -214,6 +214,15 @@ export default function Show({ task: initialTask, todos: initialTodos, completio
         }
     };
 
+    // Delete entire board
+    const handleDeleteBoard = () => {
+        if (confirm("Are you sure you want to delete this task board? All todo items will be permanently removed.")) {
+            import('@inertiajs/react').then(({ router }) => {
+                router.delete(route('erp.tasks.destroy', task.id));
+            });
+        }
+    };
+
     // Open create todo modal
     const openAddTodo = () => {
         setTodoData({
@@ -345,6 +354,16 @@ export default function Show({ task: initialTask, todos: initialTodos, completio
                         >
                             <Edit3 className="h-3.5 w-3.5" />
                             Edit Board
+                        </Button>
+                        <Button 
+                            onClick={handleDeleteBoard}
+                            variant="outline" 
+                            size="sm"
+                            className="shadow-none h-8 text-xs gap-1.5 text-rose-500 hover:text-rose-600 hover:bg-rose-50 border-border"
+                            title="Delete Board"
+                        >
+                            <Trash2 className="h-3.5 w-3.5" />
+                            Delete Board
                         </Button>
                     </div>
 
@@ -666,24 +685,36 @@ export default function Show({ task: initialTask, todos: initialTodos, completio
                             </div>
                         </div>
 
-                        <DialogFooter className="pt-4 border-t border-border mt-4">
+                        <DialogFooter className="pt-4 border-t border-border mt-4 flex sm:justify-between items-center w-full">
                             <Button 
                                 type="button" 
-                                variant="outline" 
-                                onClick={() => setIsEditBoardOpen(false)}
-                                className="shadow-none text-xs"
+                                variant="ghost" 
+                                onClick={handleDeleteBoard}
+                                className="shadow-none text-xs text-rose-500 hover:text-rose-600 hover:bg-rose-50 px-2"
                                 disabled={boardForm.processing}
                             >
-                                Cancel
+                                <Trash2 className="h-3.5 w-3.5 mr-1.5" />
+                                Delete Board
                             </Button>
-                            <Button 
-                                type="submit" 
-                                className="shadow-none text-xs gap-2"
-                                disabled={boardForm.processing}
-                            >
-                                {boardForm.processing && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
-                                Save Changes
-                            </Button>
+                            <div className="flex items-center gap-2">
+                                <Button 
+                                    type="button" 
+                                    variant="outline" 
+                                    onClick={() => setIsEditBoardOpen(false)}
+                                    className="shadow-none text-xs"
+                                    disabled={boardForm.processing}
+                                >
+                                    Cancel
+                                </Button>
+                                <Button 
+                                    type="submit" 
+                                    className="shadow-none text-xs gap-2"
+                                    disabled={boardForm.processing}
+                                >
+                                    {boardForm.processing && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
+                                    Save Changes
+                                </Button>
+                            </div>
                         </DialogFooter>
                     </form>
                 </DialogContent>

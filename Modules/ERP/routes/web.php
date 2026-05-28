@@ -12,6 +12,8 @@ Route::middleware(['web', 'auth', 'tenant.active'])
         Route::get('onboarding', [\Modules\ERP\Http\Controllers\ERPDashboardController::class, 'onboarding'])->name('onboarding');
         Route::post('onboarding', [\Modules\ERP\Http\Controllers\ERPDashboardController::class, 'completeOnboarding'])->name('onboarding.complete');
         Route::put('settings', [\Modules\ERP\Http\Controllers\ERPDashboardController::class, 'updateSettings'])->name('settings.update');
+        Route::get('settings/smtp', [\Modules\ERP\Http\Controllers\SmtpSettingController::class, 'edit'])->name('settings.smtp.edit');
+        Route::put('settings/smtp', [\Modules\ERP\Http\Controllers\SmtpSettingController::class, 'update'])->name('settings.smtp.update');
 
         // ── Clients ──
         Route::get('clients/search', [\Modules\ERP\Http\Controllers\ClientController::class, 'search'])->name('clients.search');
@@ -56,6 +58,7 @@ Route::middleware(['web', 'auth', 'tenant.active'])
         // ── Invoices ──
         Route::resource('invoices', InvoiceController::class);
         Route::post('invoices/{invoice}/send', [InvoiceController::class, 'send'])->name('invoices.send');
+        Route::post('invoices/{invoice}/send-email', [InvoiceController::class, 'sendEmail'])->name('invoices.send-email');
         Route::post('invoices/{invoice}/mark-paid', [InvoiceController::class, 'markPaid'])->name('invoices.mark-paid');
         Route::post('invoices/{invoice}/pay-wallet', [InvoiceController::class, 'payWallet'])->name('invoices.pay-wallet');
         Route::post('invoices/{invoice}/cancel', [InvoiceController::class, 'cancel'])->name('invoices.cancel');

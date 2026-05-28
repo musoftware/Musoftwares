@@ -73,10 +73,17 @@ class PlatformContract extends Model
         });
     }
 
+    public function currencyRelation()
+    {
+        return $this->belongsTo(\App\Models\Currency::class, 'currency_id');
+    }
+
     public function getCurrencyAttribute()
     {
-        // Assuming currency_id 2 is EGP and 1 is USD
-        return $this->currency_id == 2 ? 'EGP' : 'USD';
+        if (!$this->currencyRelation) {
+            throw new \Exception("Contract {$this->id} is missing an associated currency relation.");
+        }
+        return $this->currencyRelation->code;
     }
 
     public function getTotalPriceAttribute()

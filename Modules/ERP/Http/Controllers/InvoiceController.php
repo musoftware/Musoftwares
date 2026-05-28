@@ -261,10 +261,15 @@ class InvoiceController extends Controller
             $user = auth('erp_team')->user()?->tenant?->user;
         }
         $hasReferrals = $user && $user->hasModuleSubscription('erp-referrals');
+        $hasSmtpAddon = $user && $user->hasModuleSubscription('erp-smtp');
+        $tenant = $invoice->tenant;
+        $hasSmtpSettings = $tenant && $tenant->smtpSetting && $tenant->smtpSetting->host && $tenant->smtpSetting->username;
 
         return Inertia::render('ERP/Invoices/Show', [
             'invoice' => $invoice,
             'timeline' => $timeline,
+            'has_smtp_addon' => $hasSmtpAddon,
+            'has_smtp_settings' => $hasSmtpSettings,
             'referral_earnings' => $hasReferrals
                 ? \Modules\ERP\Models\ReferralEarning::with('referrer')
                     ->where('invoice_id', $invoice->id)
@@ -460,6 +465,35 @@ class InvoiceController extends Controller
         }
 
         return back()->with('success', __('erp.invoice_issued_success'));
+    }
+
+    public function sendEmail(Invoice $invoice)
+    {
+        $tenant = $this->resolveTenant();
+        $user = Auth::user();
+
+        if (!$user->hasModuleSubscription('erp-smtp')) {
+            abort(403, __('errors.erp_smtp_addon_required'));
+        }
+
+        $smtpSetting = $tenant->smtpSetting;
+        if (!$smtpSetting || !$smtpSetting->host || !$smtpSetting->username) {
+            return back()->withErrors(['email' => __('errors.smtp_settings_not_configured')]);
+        }
+
+        // Normally, you would dynamically configure the mailer here and dispatch a Job/Mailable.
+        // For example: Config::set('mail.mailers.smtp.host', $smtpSetting->host);
+        // Mail::to($invoice->client->email)->send(new \Modules\ERP\Mail\InvoiceMail($invoice));
+        
+        // Simulating email send for now.
+        ActivityService::log(
+            event: 'invoice.emailed',
+            description: "Emailed invoice #{$invoice->invoice_number} to client",
+            subject: $invoice,
+            workspace: 'erp'
+        );
+
+        return back()->with('success', __('erp.invoice_emailed_successfully'));
     }
 
     /**

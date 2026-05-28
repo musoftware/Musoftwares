@@ -31,8 +31,19 @@ class ContractController extends Controller
             'status' => 'nullable|in:Draft,Active,Completed,Cancelled',
         ]);
 
-        // TODO: Create contract record once model/migration is ready
+        $contract = new \Modules\ERP\Models\Contract($validated);
+        $contract->tenant_id = $tenant->id;
+        
+        // Force the currency to match the client's currency if available
+        if ($contract->client_id) {
+            $client = \Modules\ERP\Models\Client::find($contract->client_id);
+            if ($client && $client->currency_id) {
+                $contract->currency_id = $client->currency_id;
+            }
+        }
+        
+        $contract->save();
 
-        return back()->with('success', 'Contract created.');
+        return back()->with('success', __('erp.contract_created_success'));
     }
 }

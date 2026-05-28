@@ -308,6 +308,8 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
     // ────────────────────────────────────────────────────────
     const [projects, setProjects] = useState<Array<any>>(serverProjects || []);
     const [branches, setBranches] = useState<Array<any>>(serverBranches || []);
+    const [showAddBranchModal, setShowAddBranchModal] = useState(false);
+    const [branchForm, setBranchForm] = useState({ name: '', type: 'retail', timezone: 'UTC' });
     const [newProjectForm, setNewProjectForm] = useState({
         name: '', client_id: '', budget: '', due_date: '', status: 'Planning'
     });
@@ -319,6 +321,7 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
     const [showEditProjectModal, setShowEditProjectModal] = useState(false);
     const [deleteProjectConfirm, setDeleteProjectConfirm] = useState<{ open: boolean; project: any }>({ open: false, project: null });
     const [deleteExpenseConfirm, setDeleteExpenseConfirm] = useState<{ open: boolean; expense: any }>({ open: false, expense: null });
+    const [deleteInvoiceConfirm, setDeleteInvoiceConfirm] = useState<{ open: boolean; invoice: any }>({ open: false, invoice: null });
 
     // Using real server tasks if available, fallback to empty
     const [tasks, setTasks] = useState<Array<any>>(serverTasks || []);
@@ -683,6 +686,22 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
         });
     };
 
+    // Add Branch
+    const handleAddBranch = (e: React.FormEvent) => {
+        e.preventDefault();
+        router.post(route('erp.branches.store'), branchForm, {
+            onSuccess: () => {
+                setShowAddBranchModal(false);
+                setBranchForm({ name: '', type: 'retail', timezone: 'UTC' });
+                toast({ description: 'Branch created successfully.' });
+                prependActivity('Branch Created', `Created new branch ${branchForm.name}.`);
+            },
+            onError: (errors) => {
+                toast({ variant: 'destructive', description: Object.values(errors)[0] as string });
+            }
+        });
+    };
+
     // Edit Project
     const handleEditProject = (e: React.FormEvent) => {
         e.preventDefault();
@@ -707,6 +726,17 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                 toast({ description: __('erp.project_deleted_success') });
                 prependActivity(__('erp.activity.project_deleted'), `Deleted project ${deleteProjectConfirm.project.name}.`);
                 setDeleteProjectConfirm({ open: false, project: null });
+            }
+        });
+    };
+
+    const confirmDeleteInvoice = () => {
+        if (!deleteInvoiceConfirm.invoice) return;
+        router.delete(route('erp.invoices.destroy', deleteInvoiceConfirm.invoice.id), {
+            onSuccess: () => {
+                toast({ description: __('erp.invoice_deleted_success') });
+                prependActivity(__('erp.activity.invoice_deleted'), `Deleted invoice ${deleteInvoiceConfirm.invoice.invoiceNumber}.`);
+                setDeleteInvoiceConfirm({ open: false, invoice: null });
             }
         });
     };
@@ -941,6 +971,17 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                 variant="danger"
                 onConfirm={confirmDeleteExpense}
                 onCancel={() => setDeleteExpenseConfirm({ open: false, expense: null })}
+            />
+
+            {/* ConfirmModal for invoice deletion */}
+            <ConfirmModal
+                isOpen={deleteInvoiceConfirm.open}
+                title={__('erp.delete_invoice')}
+                description={__('erp.delete_invoice_confirm')}
+                confirmLabel={__('erp.delete_invoice')}
+                variant="danger"
+                onConfirm={confirmDeleteInvoice}
+                onCancel={() => setDeleteInvoiceConfirm({ open: false, invoice: null })}
             />
                         
                         {/* 1. OVERVIEW (DASHBOARD) */}
@@ -1307,7 +1348,7 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                                     title="Branches" 
                                     description="Manage your business branches, locations, and timezone settings."
                                     actions={!isReadOnlyMember && (
-                                        <Button size="sm" className="shadow-none">
+                                        <Button size="sm" className="shadow-none" onClick={() => setShowAddBranchModal(true)}>
                                             <Plus className="mr-1.5 h-3.5 w-3.5" /> New Branch
                                         </Button>
                                     )}
@@ -1359,10 +1400,58 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                                         description="You haven't added any secondary branches to your workspace yet."
                                         action={!isReadOnlyMember ? {
                                             label: "Create Branch",
-                                            onClick: () => {}
+                                            onClick: () => setShowAddBranchModal(true)
                                         } : undefined}
                                     />
                                 )}
+                                
+                                {/* Add Branch Modal */}
+                                <Dialog open={showAddBranchModal} onOpenChange={setShowAddBranchModal}>
+                                    <DialogContent className="sm:max-w-[425px]">
+                                        <DialogHeader>
+                                            <DialogTitle>Create New Branch</DialogTitle>
+                                        </DialogHeader>
+                                        <form onSubmit={handleAddBranch} className="space-y-4 pt-4">
+                                            <div className="space-y-2">
+                                                <label className="text-sm font-medium text-slate-700">Branch Name</label>
+                                                <Input
+                                                    required
+                                                    value={branchForm.name}
+                                                    onChange={(e) => setBranchForm({ ...branchForm, name: e.target.value })}
+                                                    placeholder="e.g. Downtown Office"
+                                                />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <label className="text-sm font-medium text-slate-700">Branch Type</label>
+                                                <select
+                                                    required
+                                                    value={branchForm.type}
+                                                    onChange={(e) => setBranchForm({ ...branchForm, type: e.target.value })}
+                                                    className="w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm transition-colors focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                                                >
+                                                    <option value="retail">Retail Store</option>
+                                                    <option value="office">Office</option>
+                                                    <option value="warehouse">Warehouse</option>
+                                                    <option value="virtual">Virtual / Online</option>
+                                                </select>
+                                            </div>
+                                            <div className="space-y-2">
+                                                <label className="text-sm font-medium text-slate-700">Timezone</label>
+                                                <Input
+                                                    value={branchForm.timezone}
+                                                    onChange={(e) => setBranchForm({ ...branchForm, timezone: e.target.value })}
+                                                    placeholder="e.g. UTC"
+                                                />
+                                            </div>
+                                            <div className="flex justify-end gap-3 pt-4 border-t border-slate-100">
+                                                <Button type="button" variant="outline" onClick={() => setShowAddBranchModal(false)}>
+                                                    Cancel
+                                                </Button>
+                                                <Button type="submit">Create Branch</Button>
+                                            </div>
+                                        </form>
+                                    </DialogContent>
+                                </Dialog>
                             </div>
                         )}
 
@@ -1561,22 +1650,22 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                         {currentSection === 'invoices' && (
                             <div className="space-y-6">
                                 <ModulePageHeader 
-                                    title="Invoices" 
-                                    description="Create, issue, and track client invoices."
+                                    title={__('erp.invoices')} 
+                                    description={__('erp.invoices_description')}
                                     actions={
                                         <div className="flex items-center gap-2">
                                             <Link 
                                                 href={route('erp.invoices.index')}
                                                 className={cn(buttonVariants({ variant: 'outline', size: 'sm' }), "shadow-none")}
                                             >
-                                                <History className="mr-1.5 h-3.5 w-3.5" /> Invoices Archive / الفواتير القديمة
+                                                <History className="mr-1.5 h-3.5 w-3.5" /> {__('erp.invoices_archive')}
                                             </Link>
                                             {!isReadOnlyMember && (
                                                 <Link 
                                                     href={route('erp.invoices.create')}
                                                     className={cn(buttonVariants({ size: 'sm' }), "shadow-none")}
                                                 >
-                                                    <Plus className="mr-1.5 h-3.5 w-3.5" /> New Invoice
+                                                    <Plus className="mr-1.5 h-3.5 w-3.5" /> {__('erp.new_invoice')}
                                                 </Link>
                                             )}
                                         </div>
@@ -1588,13 +1677,13 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                                         <table className="w-full text-left text-sm border-collapse">
                                             <thead>
                                                 <tr className="bg-slate-50 border-b border-slate-100 text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                                                    <th className="px-6 py-3.5">Invoice Code</th>
-                                                    <th className="px-6 py-3.5">Client Tenant</th>
-                                                    <th className="px-6 py-3.5">Date Issued</th>
-                                                    <th className="px-6 py-3.5">Date Due</th>
-                                                    <th className="px-6 py-3.5 text-right">Invoice Sum</th>
-                                                    <th className="px-6 py-3.5 text-center">Status</th>
-                                                    <th className="px-6 py-3.5 text-right">Actions</th>
+                                                    <th className="px-6 py-3.5">{__('erp.invoice_code')}</th>
+                                                    <th className="px-6 py-3.5">{__('erp.client_tenant')}</th>
+                                                    <th className="px-6 py-3.5">{__('erp.date_issued')}</th>
+                                                    <th className="px-6 py-3.5">{__('erp.date_due')}</th>
+                                                    <th className="px-6 py-3.5 text-right">{__('erp.invoice_sum')}</th>
+                                                    <th className="px-6 py-3.5 text-center">{__('erp.status')}</th>
+                                                    <th className="px-6 py-3.5 text-right">{__('erp.actions')}</th>
                                                 </tr>
                                             </thead>
                                             <tbody className="divide-y divide-slate-100">
@@ -1603,8 +1692,8 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                                                         <td colSpan={7} className="p-0">
                                                             <EmptyState 
                                                                 icon={FileText} 
-                                                                title="No Invoices" 
-                                                                description="Establish your first invoice record to start tracking claims."
+                                                                title={__('erp.no_invoices')} 
+                                                                description={__('erp.establish_first_invoice')}
                                                             />
                                                         </td>
                                                     </tr>
@@ -1623,12 +1712,7 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                                                                 <CurrencyDisplay amount={inv.amount} currency={inv.currency} />
                                                             </td>
                                                             <td className="px-6 py-4 text-center">
-                                                                <Badge className={`text-[10px] uppercase font-bold tracking-wider rounded ${
-                                                                    inv.status === 'paid' ? 'bg-emerald-50 text-emerald-700 border-none' :
-                                                                    inv.status === 'sent' ? 'bg-amber-50 text-amber-700 border-none' : 'bg-slate-100 text-slate-600'
-                                                                }`}>
-                                                                    {inv.status}
-                                                                </Badge>
+                                                                <StatusBadge status={inv.status} size="sm" />
                                                             </td>
                                                             <td className="px-6 py-4 text-right">
                                                                  <div className="flex items-center justify-end gap-1">
@@ -1639,12 +1723,20 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                                                                          <Eye className="h-4 w-4" />
                                                                      </Link>
                                                                      {!isReadOnlyMember && (
-                                                                         <Link 
-                                                                             href={route('erp.invoices.edit', inv.id)} 
-                                                                             className={cn(buttonVariants({ variant: 'ghost', size: 'icon' }), "h-8 w-8 text-slate-400 hover:text-slate-900")}
-                                                                         >
-                                                                             <Edit2 className="h-4 w-4" />
-                                                                         </Link>
+                                                                         <>
+                                                                             <Link 
+                                                                                 href={route('erp.invoices.edit', inv.id)} 
+                                                                                 className={cn(buttonVariants({ variant: 'ghost', size: 'icon' }), "h-8 w-8 text-slate-400 hover:text-slate-900")}
+                                                                             >
+                                                                                 <Edit2 className="h-4 w-4" />
+                                                                             </Link>
+                                                                             <button 
+                                                                                 onClick={() => setDeleteInvoiceConfirm({ open: true, invoice: inv })}
+                                                                                 className="h-8 w-8 flex items-center justify-center rounded-md text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors"
+                                                                             >
+                                                                                 <Trash2 className="h-4 w-4" />
+                                                                             </button>
+                                                                         </>
                                                                      )}
                                                                  </div>
                                                              </td>

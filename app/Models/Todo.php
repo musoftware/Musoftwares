@@ -34,9 +34,6 @@ class Todo extends Model
         'paused',
         'start_at',
         'end_at',
-        'cost',
-        'currency_id',
-        'is_paid',
     ];
 
     public static function parseItems($items)
@@ -111,6 +108,11 @@ class Todo extends Model
     public function children()
     {
         return $this->hasMany(self::class, 'parent_id');
+    }
+
+    public function checklist_items()
+    {
+        return $this->hasMany(TodoChecklistItem::class);
     }
 
     /**

@@ -437,6 +437,7 @@ class ERPDashboardController extends Controller
             'branches' => $branches,
 
             'hasMultiCurrency' => $ownerUser ? $ownerUser->hasModuleSubscription('erp-multi-currency') : false,
+            'hasMultiBranch' => $ownerUser ? $ownerUser->hasModuleSubscription('erp-multi-branch') : false,
             'currencies' => \App\Models\Currency::all(),
             'filters' => $request->only(['search']),
         ]);
