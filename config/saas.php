@@ -100,6 +100,7 @@ return [
         'erp-smart-insights' => ['price' => 500, 'name' => 'Smart Insights', 'desc' => 'Best selling & high expenses', 'icon' => 'Lightbulb', 'parent' => 'erp'],
         'erp-tickets' => ['price' => 500, 'name' => 'Support Tickets', 'desc' => 'Client ticket & issue tracking', 'icon' => 'LifeBuoy', 'parent' => 'erp'],
         'erp-team-members' => ['price' => 500, 'name' => 'Team Members', 'desc' => 'Invite & manage workspace team', 'icon' => 'Users', 'parent' => 'erp'],
+        'erp-referrals' => ['price' => 500, 'name' => 'Referral Program', 'desc' => 'Track client referral trees and automatically calculate & distribute commission earnings.', 'icon' => 'UserPlus', 'parent' => 'erp'],
         // ── GOLD SAVER ──
         'gold-live-prices'      => ['price' => 500, 'name' => 'Live Gold Prices',    'desc' => 'Realtime prices & charts',          'icon' => 'TrendingUp',   'parent' => 'gold-saver'],
         'gold-analytics'        => ['price' => 500, 'name' => 'Portfolio Analytics', 'desc' => 'Profit/loss & growth charts',        'icon' => 'PieChart',     'parent' => 'gold-saver'],

@@ -70,7 +70,7 @@ export default function AddBalance({ wallet, client }: AddBalanceProps) {
         if (form.data.amount < 5) {
             toast({
                 title: "Minimum Deposit",
-                description: "The minimum deposit amount is $5.00",
+                description: `The minimum deposit amount is ${formatMoney(5, activeWallet.currency)}`,
                 variant: "destructive"
             });
             return;

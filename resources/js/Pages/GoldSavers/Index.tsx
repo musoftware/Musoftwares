@@ -11,6 +11,7 @@ import { Plus, Trash2, TrendingUp, Coins, AlertCircle, Scale, ShieldCheck, Info,
 import { AppPage } from '@/Components/ui/AppPage';
 import { PageHeader } from '@/Components/ui/PageHeader';
 import { Alert, AlertTitle, AlertDescription } from '@/Components/ui/alert';
+import { formatMoney } from '@/lib/utils';
 
 interface GoldSaverRecord {
     id: number;
@@ -141,7 +142,7 @@ export default function Index({ records, latestPrice }: { records: GoldSaverReco
                             Your zakatable gold is equivalent to <strong>{zakatable24kGrams.toFixed(2)}g of 24k gold</strong>. 
                             {isZakatDue ? (
                                 <span> This exceeds the Nisab threshold (85g). Therefore, Zakat (2.5%) is obligatory if a full Hijri year has passed since acquiring it. 
-                                <br/><span className="inline-block mt-2 font-medium px-2 py-1 bg-amber-100 text-amber-800 rounded">Estimated Zakat Amount: {zakatEstimate.toLocaleString(undefined, {maximumFractionDigits: 2})} EGP</span>
+                                <br/><span className="inline-block mt-2 font-medium px-2 py-1 bg-amber-100 text-amber-800 rounded">Estimated Zakat Amount: {formatMoney(zakatEstimate, 'EGP')}</span>
                                 </span>
                             ) : (
                                 <span> You are short of the Nisab threshold (85g) by <strong>{(nisabThreshold - zakatable24kGrams).toFixed(2)}g</strong>. Zakat is not currently obligatory on this gold.</span>
@@ -171,7 +172,7 @@ export default function Index({ records, latestPrice }: { records: GoldSaverReco
                                 <Card key={item.label} className="border-0 shadow-sm ring-1 ring-slate-200/50 bg-white">
                                     <CardContent className="p-4 text-center">
                                         <p className="text-sm font-medium text-slate-500 mb-1">{item.label}</p>
-                                        <p className="text-xl font-bold text-slate-900">{Number(item.value).toLocaleString()}</p>
+                                        <p className="text-xl font-bold text-slate-900">{formatMoney(item.value, 'EGP')}</p>
                                     </CardContent>
                                 </Card>
                             ))}
@@ -190,7 +191,7 @@ export default function Index({ records, latestPrice }: { records: GoldSaverReco
                                 </div>
                             </div>
                             <div className="mt-4">
-                                <h3 className="text-3xl font-bold text-slate-900">{totalInvestment.toLocaleString()} <span className="text-sm font-normal text-slate-500">EGP</span></h3>
+                                <h3 className="text-3xl font-bold text-slate-900">{formatMoney(totalInvestment, 'EGP')}</h3>
                             </div>
                             <p className="text-xs text-slate-400 mt-2">Total amount spent including tax & making charges.</p>
                         </CardContent>
@@ -205,7 +206,7 @@ export default function Index({ records, latestPrice }: { records: GoldSaverReco
                                 </div>
                             </div>
                             <div className="mt-4">
-                                <h3 className="text-3xl font-bold text-slate-900">{totalCurrentValue.toLocaleString()} <span className="text-sm font-normal text-slate-500">EGP</span></h3>
+                                <h3 className="text-3xl font-bold text-slate-900">{formatMoney(totalCurrentValue, 'EGP')}</h3>
                             </div>
                             <p className="text-xs text-slate-400 mt-2">Estimated market value of your portfolio today.</p>
                         </CardContent>
@@ -221,7 +222,7 @@ export default function Index({ records, latestPrice }: { records: GoldSaverReco
                             </div>
                             <div className="mt-4 flex items-baseline gap-2">
                                 <h3 className={`text-3xl font-bold ${totalProfit >= 0 ? 'text-emerald-600' : 'text-red-600'}`}>
-                                    {totalProfit >= 0 ? '+' : ''}{totalProfit.toLocaleString()} <span className="text-sm font-normal opacity-80">EGP</span>
+                                    {totalProfit >= 0 ? '+' : ''}{formatMoney(totalProfit, 'EGP')}
                                 </h3>
                                 <span className={`text-sm font-bold ${totalProfit >= 0 ? 'text-emerald-600' : 'text-red-600'}`}>
                                     ({totalProfit >= 0 ? '+' : ''}{totalProfitPercentage.toFixed(2)}%)
@@ -394,17 +395,15 @@ export default function Index({ records, latestPrice }: { records: GoldSaverReco
                                                             </div>
                                                         </TableCell>
                                                         <TableCell className="text-right">
-                                                            <div className="text-xs text-slate-500 font-medium">Base: <span className="text-slate-900">{Number(record.gram_price).toLocaleString(undefined, { maximumFractionDigits: 2 })}</span></div>
-                                                            <div className="text-xs text-slate-500">Making: +{Number(record.additional_price).toLocaleString(undefined, { maximumFractionDigits: 2 })}</div>
-                                                            <div className="text-xs text-slate-500">Tax/Stamp: +{Number(record.tax).toLocaleString(undefined, { maximumFractionDigits: 2 })}</div>
+                                                            <div className="text-xs text-slate-500 font-medium">Base: <span className="text-slate-900">{formatMoney(record.gram_price, 'EGP')}</span></div>
+                                                            <div className="text-xs text-slate-500">Making: +{formatMoney(record.additional_price, 'EGP')}</div>
+                                                            <div className="text-xs text-slate-500">Tax/Stamp: +{formatMoney(record.tax, 'EGP')}</div>
                                                         </TableCell>
-                                                        <TableCell className="text-right">
-                                                            <span className="font-bold text-slate-900">{record.buyer_price.toLocaleString()}</span>
-                                                            <span className="text-xs text-slate-500 ml-1">EGP</span>
+                                                        <TableCell className="text-right whitespace-nowrap">
+                                                            <span className="font-bold text-slate-900">{formatMoney(record.buyer_price, 'EGP')}</span>
                                                         </TableCell>
-                                                        <TableCell className="text-right">
-                                                            <span className="font-bold text-indigo-600">{record.current_value.toLocaleString()}</span>
-                                                            <span className="text-xs text-slate-500 ml-1">EGP</span>
+                                                        <TableCell className="text-right whitespace-nowrap">
+                                                            <span className="font-bold text-indigo-600">{formatMoney(record.current_value, 'EGP')}</span>
                                                         </TableCell>
                                                         <TableCell className="text-center">
                                                             <div className="flex flex-col items-center">
@@ -412,7 +411,7 @@ export default function Index({ records, latestPrice }: { records: GoldSaverReco
                                                                     record.profit >= 0 ? 'bg-emerald-50 text-emerald-700 ring-1 ring-inset ring-emerald-600/20' : 
                                                                     'bg-red-50 text-red-700 ring-1 ring-inset ring-red-600/20'
                                                                 }`}>
-                                                                    {record.profit >= 0 ? '+' : ''}{record.profit.toLocaleString()}
+                                                                    {record.profit >= 0 ? '+' : ''}{formatMoney(record.profit, 'EGP')}
                                                                 </span>
                                                                 <span className={`text-[10px] font-medium mt-1 ${record.profit >= 0 ? 'text-emerald-600' : 'text-red-600'}`}>
                                                                     {record.profit >= 0 ? '+' : ''}{Number(record.profit_percentage).toLocaleString(undefined, { maximumFractionDigits: 2 })}%

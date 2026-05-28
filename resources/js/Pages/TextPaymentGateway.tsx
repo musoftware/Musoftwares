@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/Com
 import { Button } from '@/Components/ui/button';
 import { Smartphone, Webhook, Key, Activity, CreditCard, ArrowRight, ShieldCheck } from 'lucide-react';
 import { Badge } from '@/Components/ui/badge';
+import { formatMoney } from '@/lib/utils';
 
 interface DashboardProps {
     devices: any[];
@@ -172,7 +173,7 @@ export default function TextPaymentGateway({ devices, webhook, token, stats, rec
                                                         <Badge variant="outline" className="font-mono text-xs text-slate-600 bg-slate-50">{txn.sender_name || txn.sender}</Badge>
                                                     </td>
                                                     <td className="px-6 py-4 whitespace-nowrap font-bold text-slate-900">
-                                                        {txn.amount ? `${txn.amount} ${txn.currency || 'EGP'}` : '---'}
+                                                        {txn.amount ? formatMoney(txn.amount, txn.currency || 'EGP') : '---'}
                                                     </td>
                                                     <td className="px-6 py-4 whitespace-nowrap">
                                                         {txn.is_valid ? (

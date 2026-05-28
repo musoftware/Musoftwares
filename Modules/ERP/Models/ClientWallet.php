@@ -21,12 +21,7 @@ class ClientWallet extends TenantModel
         return $this->belongsTo(Tenant::class);
     }
 
-    public function platformClient(): BelongsTo
-    {
-        return $this->belongsTo(\App\Models\User::class, 'client_id');
-    }
-
-    public function tenantClient(): BelongsTo
+    public function client(): BelongsTo
     {
         return $this->belongsTo(TenantClient::class, 'client_id');
     }
@@ -34,13 +29,6 @@ class ClientWallet extends TenantModel
     public function currency(): BelongsTo
     {
         return $this->belongsTo(\App\Models\Currency::class, 'currency_id');
-    }
-
-    public function getClientAttribute()
-    {
-        return (empty($this->tenant_id) || $this->tenant_id === Tenant::platformId())
-            ? $this->platformClient 
-            : $this->tenantClient;
     }
 
     public function transactions(): HasMany

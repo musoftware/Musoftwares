@@ -294,6 +294,12 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
     // Using real server tasks if available, fallback to empty
     const [tasks, setTasks] = useState<Array<any>>(serverTasks || []);
     const [quickTaskTitles, setQuickTaskTitles] = useState<Record<string, string>>({});
+    const [selectedTaskClientId, setSelectedTaskClientId] = useState<string>('all');
+
+    const filteredTasksForKanban = useMemo(() => {
+        if (selectedTaskClientId === 'all') return tasks;
+        return tasks.filter(t => t.client_id?.toString() === selectedTaskClientId || t.client?.id?.toString() === selectedTaskClientId);
+    }, [tasks, selectedTaskClientId]);
 
     const [expenses, setExpenses] = useState<Array<any>>([]);
     const [expenseForm, setExpenseForm] = useState({ title: '', category: 'Software', amount: '', date: '', status: 'Pending' });
@@ -449,10 +455,15 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
         if (category === 'In Review') status = 'review';
         if (category === 'Done') status = 'completed';
         
-        router.post(route('erp.tasks.store'), {
+        const payload: any = {
             title: quickTaskTitles[category],
             status: status,
-        }, {
+        };
+        if (selectedTaskClientId !== 'all') {
+            payload.client_id = selectedTaskClientId;
+        }
+        
+        router.post(route('erp.tasks.store'), payload, {
             preserveScroll: true,
             onSuccess: () => {
                 setQuickTaskTitles(prev => ({ ...prev, [category]: '' }));
@@ -1251,14 +1262,31 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                         {/* 4. TASK MANAGEMENT (KANBAN) */}
                         {currentSection === 'tasks' && (
                             <div className="space-y-6">
-                                <ModulePageHeader 
-                                    title="Tasks" 
-                                    description="Manage and organize your team's tasks and priorities."
-                                />
+                                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                                    <div className="flex-grow">
+                                        <ModulePageHeader 
+                                            title="Tasks" 
+                                            description="Manage and organize your team's tasks and priorities."
+                                        />
+                                    </div>
+                                    <div className="w-full sm:w-[240px] flex flex-col gap-1.5 mt-2">
+                                        <label className="text-[10px] uppercase font-bold tracking-wider text-slate-400">Filter tasks by client</label>
+                                        <select
+                                            value={selectedTaskClientId}
+                                            onChange={(e) => setSelectedTaskClientId(e.target.value)}
+                                            className="w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-xs shadow-none focus:outline-none focus:ring-1 focus:ring-ring"
+                                        >
+                                            <option value="all">All Clients</option>
+                                            {activeClients.map((c) => (
+                                                <option key={c.id} value={c.id.toString()}>{c.name}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                </div>
 
                                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-start">
                                     {['Todo', 'In Progress', 'In Review', 'Done'].map((lane) => {
-                                        const laneTasks = tasks.filter(t => t.category === lane);
+                                        const laneTasks = filteredTasksForKanban.filter(t => t.category === lane);
                                         return (
                                             <div key={lane} className="bg-slate-50/80 border border-slate-200/60 p-3.5 rounded-xl space-y-4">
                                                 <div className="flex items-center justify-between pb-1">
@@ -1272,7 +1300,19 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                                                 <div className="space-y-2">
                                                     {laneTasks.map((t) => (
                                                         <div key={t.id} className="bg-white border border-slate-200/80 p-3 rounded-lg shadow-sm hover:border-slate-300 transition space-y-3">
-                                                            <p className="text-[13px] font-medium text-slate-800 leading-tight">{t.title}</p>
+                                                            <div className="space-y-1">
+                                                                <p className="text-[13px] font-semibold text-slate-800 leading-tight">
+                                                                    <Link href={route('erp.tasks.show', t.id)} className="hover:underline hover:text-primary">
+                                                                        {t.title}
+                                                                    </Link>
+                                                                </p>
+                                                                {t.client && (
+                                                                    <div className="flex items-center gap-1.5 text-slate-400 text-[11px] font-medium mt-1">
+                                                                        <User className="h-3.5 w-3.5 text-indigo-500 shrink-0" />
+                                                                        <span className="truncate">{t.client.name}</span>
+                                                                    </div>
+                                                                )}
+                                                            </div>
                                                             <div className="flex items-center justify-between text-[11px] text-slate-400 font-medium">
                                                                 <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold uppercase ${
                                                                     t.priority === 'Urgent' ? 'bg-rose-50 text-rose-700 border border-rose-100' :
@@ -1285,9 +1325,9 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                                                             <div className="flex items-center justify-between pt-2.5 border-t border-slate-100">
                                                                 <div className="flex items-center gap-1.5">
                                                                     <div className="w-5 h-5 rounded-full bg-slate-900 text-white flex items-center justify-center font-bold text-[9px]">
-                                                                        {t.assignee.substring(0, 2)}
+                                                                        {t.assignee ? t.assignee.substring(0, 2) : 'U'}
                                                                     </div>
-                                                                    <span className="text-[11px] text-slate-500 font-semibold">{t.assignee}</span>
+                                                                    <span className="text-[11px] text-slate-500 font-semibold">{t.assignee || 'Unassigned'}</span>
                                                                 </div>
                                                                 <div className="flex items-center gap-1 shrink-0">
                                                                     <button onClick={() => moveTask(t.id, 'backward')} className="p-0.5 hover:bg-slate-100 rounded text-slate-400">

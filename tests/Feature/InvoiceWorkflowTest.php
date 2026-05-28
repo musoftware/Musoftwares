@@ -209,4 +209,58 @@ class InvoiceWorkflowTest extends TestCase
         $this->assertEquals('paid', $invoice->fresh()->status);
         $this->assertNotNull($invoice->fresh()->paid_at);
     }
+
+    public function test_can_update_invoice(): void
+    {
+        $invoice = Invoice::create([
+            'tenant_id' => $this->tenant->id,
+            'invoice_number' => 'INV-2026-003',
+            'client_id' => $this->client->id,
+            'status' => 'draft',
+            'amount' => 500.00,
+            'currency_id' => $this->currency->id,
+            'business_amount' => 500.00,
+            'exchange_rate' => 1.0,
+            'exchange_rate_date' => now()->toDateString(),
+            'due_date' => now()->addDays(14)->toDateString(),
+            'created_by' => $this->user->id,
+        ]);
+
+        $updateData = [
+            'client_id' => $this->client->id,
+            'project_id' => $this->project->id,
+            'issued_at' => now()->toDateString(),
+            'due_date' => now()->addDays(30)->toDateString(),
+            'discount_amount' => 10,
+            'tax_rate' => 5,
+            'notes' => 'Updated invoice notes',
+            'items' => [
+                [
+                    'type' => 'simple',
+                    'title' => 'Updated Web Design',
+                    'unit_price' => 1200.00,
+                    'quantity' => 1,
+                ]
+            ],
+            'costs' => []
+        ];
+
+        $response = $this->actingAs($this->user)
+            ->withoutMiddleware(\App\Http\Middleware\SubscriptionMiddleware::class)
+            ->withSession(['tenant_id' => $this->tenant->id])
+            ->put(route('erp.invoices.update', $invoice->id), $updateData);
+
+        if ($response->status() !== 302) {
+            echo "Update response status: " . $response->status() . "\n";
+            echo "Errors: " . json_encode(session('errors')?->all()) . "\n";
+        }
+
+        $response->assertRedirect(route('erp.invoices.show', $invoice->id));
+        $this->assertDatabaseHas('erp_invoices', [
+            'id' => $invoice->id,
+            'amount' => 1249.50, // (1200 - 10) * 1.05 = 1190 * 1.05 = 1249.5
+            'notes' => 'Updated invoice notes',
+        ]);
+    }
 }
+

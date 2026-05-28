@@ -100,6 +100,11 @@ Route::middleware(['web', 'auth', 'tenant.active'])
 
         Route::get('contracts/create', [\Modules\ERP\Http\Controllers\ContractController::class, 'create'])->name('contracts.create');
         Route::post('contracts', [\Modules\ERP\Http\Controllers\ContractController::class, 'store'])->name('contracts.store');
+
+        // ── Referrals ──
+        Route::get('referrals', [\Modules\ERP\Http\Controllers\ReferralController::class, 'index'])->name('referrals.index');
+        Route::get('referrals/earnings', [\Modules\ERP\Http\Controllers\ReferralController::class, 'earnings'])->name('referrals.earnings');
+        Route::get('referrals/tree/{client}', [\Modules\ERP\Http\Controllers\ReferralController::class, 'tree'])->name('referrals.tree');
     });
 
 Route::middleware(['web', 'auth', 'admin'])

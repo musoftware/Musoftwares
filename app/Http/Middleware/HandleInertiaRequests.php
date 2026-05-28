@@ -113,6 +113,16 @@ class HandleInertiaRequests extends Middleware
                 }
                 return null;
             },
+            'tenant' => function () use ($user) {
+                if (!$user) return null;
+                if (auth('erp_team')->check()) {
+                    return auth('erp_team')->user()?->tenant;
+                }
+                if (class_exists(\Modules\ERP\Models\Tenant::class)) {
+                    return \Modules\ERP\Models\Tenant::where('user_id', $user->id)->first();
+                }
+                return null;
+            },
             'settings' => [
                 'base_currency' => 'USD'
             ],
