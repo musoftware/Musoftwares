@@ -1,5 +1,5 @@
 import React from 'react';
-import { Dropdown } from '@/Components/Dropdown';
+import Dropdown from '@/Components/Dropdown';
 import { Store, Building2, Warehouse } from 'lucide-react';
 import { usePage, router } from '@inertiajs/react';
 
@@ -54,24 +54,24 @@ export function BranchSwitcher({ branches, activeBranchId }: BranchSwitcherProps
             </Dropdown.Trigger>
 
             <Dropdown.Content align="left" width="48">
-                <Dropdown.Button onClick={() => handleSwitch(null)}>
-                    <div className="flex items-center text-slate-700">
+                <button className="block w-full px-4 py-2 text-left text-sm leading-5 text-slate-700 hover:bg-slate-100 focus:outline-none" onClick={() => handleSwitch(null)}>
+                    <div className="flex items-center">
                         <Building2 className="w-4 h-4 mr-2" />
                         All Branches (Global)
                     </div>
-                </Dropdown.Button>
+                </button>
                 
                 <div className="border-t border-slate-100 my-1"></div>
 
                 {branches.map((branch) => (
-                    <Dropdown.Button key={branch.id} onClick={() => handleSwitch(branch.id)}>
-                        <div className="flex items-center text-slate-700">
+                    <button key={branch.id} className="block w-full px-4 py-2 text-left text-sm leading-5 text-slate-700 hover:bg-slate-100 focus:outline-none" onClick={() => handleSwitch(branch.id)}>
+                        <div className="flex items-center">
                             {getIcon(branch.type)}
                             <span className={activeBranchId === branch.id ? 'font-bold' : ''}>
                                 {branch.name}
                             </span>
                         </div>
-                    </Dropdown.Button>
+                    </button>
                 ))}
             </Dropdown.Content>
         </Dropdown>
