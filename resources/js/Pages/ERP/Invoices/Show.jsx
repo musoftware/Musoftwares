@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import ERPLayout from '@/Layouts/ERPLayout';
+import { useERPMenu } from '@/hooks/useERPMenu';
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import { PageHeader } from '@/Components/ui/PageHeader';
 import { Button } from '@/Components/ui/button';
@@ -24,7 +25,7 @@ export default function Show({ invoice, timeline, referral_earnings }) {
     const [walletModal, setWalletModal] = useState({ open: false, type: '' });
     const activeTimerItem = invoice.items.find((i) => i.type === 'timer' && i.timer_sessions?.some((s) => !s.stopped_at));
 
-    const workspaceName = auth.user?.workspace_name || auth.user?.name || 'Your Business';
+    const clientViewWorkspaceName = auth.user?.workspace_name || auth.user?.name || 'Your Business';
 
     useEffect(() => {
         let interval;
@@ -37,7 +38,8 @@ export default function Show({ invoice, timeline, referral_earnings }) {
                 setTimerValue(Math.floor((now - startTime) / 1000));
             }, 1000);
         }
-        return () => clearInterval(interval);
+
+    return () => clearInterval(interval);
     }, [activeTimerItem]);
 
     const formatDuration = (seconds) => {
@@ -59,7 +61,8 @@ export default function Show({ invoice, timeline, referral_earnings }) {
     };
 
     if (isClientView) {
-        return (
+
+    return (
             <div className="min-h-screen bg-background p-4 md:p-8">
                 <Head title={`Invoice ${invoice.invoice_number}`} />
                 <div className="max-w-4xl mx-auto bg-card text-card-foreground shadow-sm rounded-xl overflow-hidden border">
@@ -77,9 +80,9 @@ export default function Show({ invoice, timeline, referral_earnings }) {
                         <div className="flex flex-col md:flex-row justify-between mb-12 gap-8">
                             <div>
                                 <div className="h-12 w-12 bg-slate-900 rounded-lg flex items-center justify-center text-white font-bold text-lg mb-4">
-                                    {workspaceName.charAt(0).toUpperCase()}
+                                    {clientViewWorkspaceName.charAt(0).toUpperCase()}
                                 </div>
-                                <h2 className="text-xl font-bold">{workspaceName}</h2>
+                                <h2 className="text-xl font-bold">{clientViewWorkspaceName}</h2>
                                 <p className="text-muted-foreground">{auth.user?.email}</p>
                             </div>
                             <div className="text-md-right">
@@ -199,9 +202,10 @@ export default function Show({ invoice, timeline, referral_earnings }) {
     }
 
     // ADMIN VIEW
+    const { menuItems, workspaceName, tenantId } = useERPMenu('invoices');
+
     return (
-        <AuthenticatedLayout header={`Invoice ${invoice.invoice_number}`}>
-            <Head title={`Invoice ${invoice.invoice_number}`} />
+        <ERPLayout title={`Invoice ${invoice.invoice_number}`} workspaceName={workspaceName} tenantId={tenantId} menuItems={menuItems}>
             <div className="max-w-[1000px] mx-auto px-4 sm:px-6 lg:px-8 py-10 font-sans space-y-12">
                 
                 {/* ──────────────────────────────────────────────────────── */}
@@ -501,23 +505,6 @@ export default function Show({ invoice, timeline, referral_earnings }) {
                 onConfirm={handleWalletConfirm}
                 onCancel={() => setWalletModal({ open: false, type: '' })}
             />
-        </AuthenticatedLayout>
-    );
-}
-
-// PromptModal rendered at root so it appears above everything
-function WalletPromptModal({ walletModal, setWalletModal, onConfirm }) {
-    return (
-        <PromptModal
-            isOpen={walletModal.open}
-            title={walletModal.type === 'credit' ? 'Credit Client Wallet' : 'Debit Client Wallet'}
-            description={`Enter the amount to ${walletModal.type} from the client's wallet.`}
-            label="Amount"
-            placeholder="0.00"
-            inputType="number"
-            confirmLabel={walletModal.type === 'credit' ? 'Credit' : 'Debit'}
-            onConfirm={onConfirm}
-            onCancel={() => setWalletModal({ open: false, type: '' })}
-        />
+        </ERPLayout>
     );
 }

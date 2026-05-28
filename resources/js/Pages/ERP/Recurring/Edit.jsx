@@ -1,12 +1,14 @@
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import ERPLayout from '@/Layouts/ERPLayout';
+import { useERPMenu } from '@/hooks/useERPMenu';
 import { Head } from '@inertiajs/react';
 import RecurringForm from './RecurringForm';
 import { PageHeader } from '@/Components/ui/PageHeader';
 
 export default function Edit({ entry, business_currency }) {
+    const { menuItems, workspaceName, tenantId } = useERPMenu('invoices');
+
     return (
-        <AuthenticatedLayout>
-            <Head title={`Edit: ${entry.title}`} />
+        <ERPLayout title={`Edit: ${entry.title}`} workspaceName={workspaceName} tenantId={tenantId} menuItems={menuItems}>
 
             <div className="py-12">
                 <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
@@ -18,6 +20,6 @@ export default function Edit({ entry, business_currency }) {
                     <RecurringForm entry={entry} business_currency={business_currency} />
                 </div>
             </div>
-        </AuthenticatedLayout>
+        </ERPLayout>
     );
 }

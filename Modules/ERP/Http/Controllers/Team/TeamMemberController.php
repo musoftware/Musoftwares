@@ -32,25 +32,30 @@ class TeamMemberController extends Controller
         $this->checkOwner();
 
         $user = Auth::user();
+        $hasFeature = $user->hasModuleSubscription('erp-team-members');
         $tenant = Tenant::where('user_id', $user->id)->firstOrFail();
 
-        $members = TeamMember::where('tenant_id', $tenant->id)
-            ->latest()
-            ->get()
-            ->map(function ($member) {
-                return [
-                    'id' => $member->id,
-                    'name' => $member->name,
-                    'email' => $member->email,
-                    'role' => $member->role,
-                    'status' => $member->status,
-                    'invited_at' => $member->invited_at?->format('Y-m-d H:i') ?? '-',
-                    'last_login_at' => $member->last_login_at?->format('Y-m-d H:i') ?? '-',
-                ];
-            });
+        $members = collect();
+        if ($hasFeature) {
+            $members = TeamMember::where('tenant_id', $tenant->id)
+                ->latest()
+                ->get()
+                ->map(function ($member) {
+                    return [
+                        'id' => $member->id,
+                        'name' => $member->name,
+                        'email' => $member->email,
+                        'role' => $member->role,
+                        'status' => $member->status,
+                        'invited_at' => $member->invited_at?->format('Y-m-d H:i') ?? '-',
+                        'last_login_at' => $member->last_login_at?->format('Y-m-d H:i') ?? '-',
+                    ];
+                });
+        }
 
         return Inertia::render('ERP/Team/Members', [
             'members' => $members,
+            'hasFeature' => $hasFeature,
         ]);
     }
 

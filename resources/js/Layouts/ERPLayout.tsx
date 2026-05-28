@@ -1,6 +1,6 @@
 import React, { PropsWithChildren, ReactNode } from 'react';
 import { Head, Link } from '@inertiajs/react';
-import { ChevronRight, ArrowLeft } from 'lucide-react';
+import { ChevronRight, ArrowLeft, Lock } from 'lucide-react';
 import { Toaster } from '@/Components/ui/toaster';
 
 interface ERPLayoutProps extends PropsWithChildren {
@@ -15,6 +15,15 @@ interface ERPLayoutProps extends PropsWithChildren {
         href?: string;
         onClick?: (e?: any) => void;
         isActive: boolean;
+        locked?: boolean;
+    }>;
+    lockedAddons?: Array<{
+        id: string;
+        label: string;
+        icon: any;
+        href: string;
+        locked?: boolean;
+        isActive: boolean;
     }>;
 }
 
@@ -23,6 +32,7 @@ export default function ERPLayout({
     workspaceName,
     tenantId = 'DRAFT',
     menuItems,
+    lockedAddons = [],
     children,
 }: ERPLayoutProps) {
     const activeMenuItem = menuItems.find(item => item.isActive);
@@ -133,6 +143,33 @@ export default function ERPLayout({
                                         );
                                     })}
                                 </nav>
+
+                                {/* Locked Addon Upsells */}
+                                {lockedAddons.length > 0 && (
+                                    <div className="mt-2 pt-3 border-t border-slate-100">
+                                        <div className="px-3 pb-2">
+                                            <span className="text-[10px] font-semibold uppercase tracking-widest text-slate-300">Available Add-ons</span>
+                                        </div>
+                                        <nav className="space-y-0.5">
+                                            {lockedAddons.map((addon) => {
+                                                const AddonIcon = addon.icon;
+                                                return (
+                                                    <Link
+                                                        key={addon.id}
+                                                        href={addon.href}
+                                                        className="group flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm transition-all text-slate-400 hover:bg-slate-50 hover:text-slate-500 opacity-60 hover:opacity-80"
+                                                    >
+                                                        <div className="flex items-center gap-3">
+                                                            <AddonIcon className="h-4 w-4 shrink-0 text-slate-300 group-hover:text-slate-400" />
+                                                            <span>{addon.label}</span>
+                                                        </div>
+                                                        <Lock className="h-3 w-3 text-slate-300 group-hover:text-indigo-400 transition-colors" />
+                                                    </Link>
+                                                );
+                                            })}
+                                        </nav>
+                                    </div>
+                                )}
                             </div>
                         </aside>
 

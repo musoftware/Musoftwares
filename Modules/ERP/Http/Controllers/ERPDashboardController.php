@@ -65,12 +65,18 @@ class ERPDashboardController extends Controller
         $clients = collect();
         if ($tenantId) {
             $clients = TenantClient::where('tenant_id', $tenantId)
+                ->with(['wallet', 'currency'])
                 ->withCount('invoices')
+                ->latest()
                 ->limit(10)
                 ->get()
                 ->map(function ($client) {
-                    $totalInvoiced = Invoice::where('client_id', $client->id)->sum('business_amount');
-                    $totalPaid = Invoice::where('client_id', $client->id)->where('status', 'paid')->sum('business_amount');
+                    $unpaid = Invoice::where('client_id', $client->id)
+                        ->whereIn('status', ['sent', 'partial'])
+                        ->sum('business_amount');
+                    $totalPaid = Invoice::where('client_id', $client->id)
+                        ->where('status', 'paid')
+                        ->sum('business_amount');
                     return [
                         'id' => $client->id,
                         'name' => $client->name,
@@ -79,8 +85,11 @@ class ERPDashboardController extends Controller
                         'phone' => $client->phone ?? '-',
                         'address' => $client->address ?? '-',
                         'currency' => $client->currency?->currency ?? 'USD',
-                        'totalInvoiced' => round($totalInvoiced, 2),
+                        'balance' => round($client->wallet?->balance ?? 0, 2),
+                        'unpaid' => round($unpaid, 2),
                         'totalPaid' => round($totalPaid, 2),
+                        'invoices_count' => $client->invoices_count,
+                        'created_at' => $client->created_at?->format('M d, Y'),
                     ];
                 });
         }
@@ -340,6 +349,7 @@ class ERPDashboardController extends Controller
             'tasks' => $tasks,
             'notes' => $notes,
             'transactions' => $transactions,
+            'hasMultiCurrency' => $user->hasModuleSubscription('erp-multi-currency'),
         ]);
     }
 

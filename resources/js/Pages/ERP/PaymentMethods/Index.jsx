@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import ERPLayout from '@/Layouts/ERPLayout';
+import { useERPMenu } from '@/hooks/useERPMenu';
 import { Head, useForm, router } from '@inertiajs/react';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/Components/ui/card';
 import { Button } from '@/Components/ui/button';
@@ -82,13 +83,10 @@ export default function Index({ auth, paymentMethods }) {
         if (!iban) return '';
         return iban.substring(0, 4) + ' .... ' + iban.substring(iban.length - 4);
     };
+    const { menuItems, workspaceName, tenantId } = useERPMenu('settings');
 
     return (
-        <AuthenticatedLayout
-            user={auth.user}
-            header={<h2 className="font-semibold text-xl leading-tight">Payment Methods</h2>}
-        >
-            <Head title="Payment Methods" />
+        <ERPLayout title="Payment Methods" workspaceName={workspaceName} tenantId={tenantId} menuItems={menuItems}>
 
             <div className="py-12">
                 <div className="max-w-[1000px] mx-auto px-4 sm:px-6 lg:px-8 space-y-10 font-sans">
@@ -292,6 +290,6 @@ export default function Index({ auth, paymentMethods }) {
                     </div>
                 </div>
             </div>
-        </AuthenticatedLayout>
+        </ERPLayout>
     );
 }

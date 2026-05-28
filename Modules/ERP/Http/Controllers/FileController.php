@@ -28,6 +28,47 @@ class FileController extends Controller
         ]);
     }
 
+    public function index()
+    {
+        $user = Auth::user();
+        if (auth('erp_team')->check()) {
+            $user = auth('erp_team')->user()?->tenant?->user;
+        }
+
+        $hasFeature = $user ? $user->hasModuleSubscription('erp-document-storage') : false;
+        $tenant = Tenant::where('user_id', $user->id)->first();
+
+        $files = collect();
+        $storageProviders = collect();
+
+        if ($hasFeature && $tenant) {
+            $files = TenantFile::where('tenant_id', $tenant->id)
+                ->with('uploader')
+                ->latest()
+                ->get()
+                ->map(function ($file) {
+                    return [
+                        'id' => $file->id,
+                        'name' => $file->name,
+                        'mime_type' => $file->mime_type,
+                        'size' => $file->size,
+                        'folder' => $file->folder,
+                        'uploaded_by' => $file->uploader?->name ?? 'System',
+                        'created_at' => $file->created_at?->format('M d, Y H:i'),
+                    ];
+                });
+
+            $storageProviders = TenantStorageProvider::where('tenant_id', $tenant->id)->get();
+        }
+
+        return inertia('ERP/Files/Index', [
+            'files' => $files,
+            'storageProviders' => $storageProviders,
+            'hasFeature' => $hasFeature,
+            'hasProvider' => $storageProviders->isNotEmpty(),
+        ]);
+    }
+
     public function create()
     {
         return inertia('ERP/Files/Create');

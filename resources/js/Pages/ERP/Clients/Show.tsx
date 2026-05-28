@@ -1,6 +1,7 @@
 import React from 'react';
 import { Head, Link, router } from '@inertiajs/react';
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import ERPLayout from '@/Layouts/ERPLayout';
+import { useERPMenu } from '@/hooks/useERPMenu';
 import { Badge } from '@/Components/ui/badge';
 import { Button } from '@/Components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/Components/ui/card';
@@ -50,9 +51,10 @@ export default function ClientShow({ client, projects, tickets, invoices, activi
         .filter(i => i.status === 'paid')
         .reduce((s, i) => s + i.total, 0);
 
+    const { menuItems, workspaceName, tenantId } = useERPMenu('clients');
+
     return (
-        <AuthenticatedLayout>
-            <Head title={`Client — ${client.name}`} />
+        <ERPLayout title={`Client — ${client.name}`} workspaceName={workspaceName} tenantId={tenantId} menuItems={menuItems}>
 
             <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-6">
                 {/* Back + Header */}
@@ -211,6 +213,6 @@ export default function ClientShow({ client, projects, tickets, invoices, activi
                     </div>
                 </div>
             </div>
-        </AuthenticatedLayout>
+        </ERPLayout>
     );
 }

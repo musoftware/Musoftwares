@@ -1,4 +1,5 @@
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import ERPLayout from '@/Layouts/ERPLayout';
+import { useERPMenu } from '@/hooks/useERPMenu';
 import { Head, router } from '@inertiajs/react';
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -39,10 +40,10 @@ export default function UpgradePreview() {
             router.visit(route('dashboard'));
         }, 1500);
     };
+    const { menuItems, workspaceName, tenantId } = useERPMenu('overview');
 
     return (
-        <AuthenticatedLayout header="ERP Expansion Preview">
-            <Head title="ERP Workspace Premium Upgrade" />
+        <ERPLayout title="ERP Workspace Premium Upgrade" workspaceName={workspaceName} tenantId={tenantId} menuItems={menuItems}>
 
             <div className="max-w-[1000px] mx-auto px-4 py-8 space-y-8 font-sans text-sm">
                 
@@ -240,6 +241,6 @@ export default function UpgradePreview() {
                     </motion.div>
                 )}
             </AnimatePresence>
-        </AuthenticatedLayout>
+        </ERPLayout>
     );
 }

@@ -1,4 +1,5 @@
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import ERPLayout from '@/Layouts/ERPLayout';
+import { useERPMenu } from '@/hooks/useERPMenu';
 import { Head, router, useForm } from '@inertiajs/react';
 import { useState } from 'react';
 
@@ -38,17 +39,10 @@ export default function IndexAdmin({ auth, withdrawals }) {
             },
         });
     };
+    const { menuItems, workspaceName, tenantId } = useERPMenu('transactions');
 
     return (
-        <AuthenticatedLayout
-            user={auth.user}
-            header={
-                <h2 className="text-xl leading-tight font-semibold text-gray-800">
-                    Manage Withdrawals
-                </h2>
-            }
-        >
-            <Head title="Withdrawals" />
+        <ERPLayout title="Withdrawals" workspaceName={workspaceName} tenantId={tenantId} menuItems={menuItems}>
 
             <div className="py-12">
                 <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
@@ -325,6 +319,6 @@ export default function IndexAdmin({ auth, withdrawals }) {
                     </div>
                 </div>
             )}
-        </AuthenticatedLayout>
+        </ERPLayout>
     );
 }

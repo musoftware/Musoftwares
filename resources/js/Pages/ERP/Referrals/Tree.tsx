@@ -1,4 +1,5 @@
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import ERPLayout from '@/Layouts/ERPLayout';
+import { useERPMenu } from '@/hooks/useERPMenu';
 import { Head, Link } from '@inertiajs/react';
 
 function TreeNode({ client }: { client: any }) {
@@ -21,15 +22,10 @@ function TreeNode({ client }: { client: any }) {
 }
 
 export default function Tree({ client }: { client: any }) {
+    const { menuItems, workspaceName, tenantId } = useERPMenu('overview');
+
     return (
-        <AuthenticatedLayout
-            header={
-                <h2 className="text-xl leading-tight font-semibold text-gray-800">
-                    Referral Tree: {client.name}
-                </h2>
-            }
-        >
-            <Head title={`Referral Tree - ${client.name}`} />
+        <ERPLayout title={`Referral Tree — ${client.name}`} workspaceName={workspaceName} tenantId={tenantId} menuItems={menuItems}>
 
             <div className="py-12">
                 <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
@@ -60,6 +56,6 @@ export default function Tree({ client }: { client: any }) {
                     </div>
                 </div>
             </div>
-        </AuthenticatedLayout>
+        </ERPLayout>
     );
 }

@@ -1,4 +1,5 @@
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import ERPLayout from '@/Layouts/ERPLayout';
+import { useERPMenu } from '@/hooks/useERPMenu';
 import { Head, Link } from '@inertiajs/react';
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -133,10 +134,10 @@ export default function AsList({ arrangedClients: initialData }: AsListProps) {
             setErrorMessage(err.response?.data?.message || "Failed to update item status.");
         }
     };
+    const { menuItems, workspaceName, tenantId } = useERPMenu('tasks');
 
     return (
-        <AuthenticatedLayout header="Current Tasks">
-            <Head title="Current Tasks As List" />
+        <ERPLayout title="Current Tasks As List" workspaceName={workspaceName} tenantId={tenantId} menuItems={menuItems}>
 
             <div className="max-w-[1200px] mx-auto px-4 py-8 space-y-8 font-sans text-sm">
                 
@@ -357,6 +358,6 @@ export default function AsList({ arrangedClients: initialData }: AsListProps) {
                     </CardContent>
                 </Card>
             </div>
-        </AuthenticatedLayout>
+        </ERPLayout>
     );
 }

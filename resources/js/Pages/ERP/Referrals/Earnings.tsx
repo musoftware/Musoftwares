@@ -1,16 +1,12 @@
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import ERPLayout from '@/Layouts/ERPLayout';
+import { useERPMenu } from '@/hooks/useERPMenu';
 import { Head, Link } from '@inertiajs/react';
 
 export default function Earnings({ earnings }: { earnings: any }) {
+    const { menuItems, workspaceName, tenantId } = useERPMenu('overview');
+
     return (
-        <AuthenticatedLayout
-            header={
-                <h2 className="text-xl leading-tight font-semibold text-gray-800">
-                    Referral Earnings
-                </h2>
-            }
-        >
-            <Head title="Referral Earnings" />
+        <ERPLayout title="Referral Earnings" workspaceName={workspaceName} tenantId={tenantId} menuItems={menuItems}>
 
             <div className="py-12">
                 <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
@@ -88,6 +84,6 @@ export default function Earnings({ earnings }: { earnings: any }) {
                     </div>
                 </div>
             </div>
-        </AuthenticatedLayout>
+        </ERPLayout>
     );
 }

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Head, Link, router } from '@inertiajs/react';
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import ERPLayout from '@/Layouts/ERPLayout';
+import { useERPMenu } from '@/hooks/useERPMenu';
 import { Button } from '@/Components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/Components/ui/card';
 import { Input } from '@/Components/ui/input';
@@ -28,10 +29,10 @@ export default function CreateTicket() {
             }
         });
     };
+    const { menuItems, workspaceName, tenantId } = useERPMenu('overview');
 
     return (
-        <AuthenticatedLayout>
-            <Head title="Create Ticket" />
+        <ERPLayout title="Create Ticket" workspaceName={workspaceName} tenantId={tenantId} menuItems={menuItems}>
 
             <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8 space-y-6">
                 <div className="flex items-center gap-4">
@@ -108,6 +109,6 @@ export default function CreateTicket() {
                     </CardContent>
                 </Card>
             </div>
-        </AuthenticatedLayout>
+        </ERPLayout>
     );
 }

@@ -27,14 +27,21 @@ class ClientController extends Controller
     public function show(TenantClient $client)
     {
         $tenantId = $this->resolveTenantId();
+        $user = Auth::user();
 
         // Ensure the client belongs to the active tenant
         if ($client->tenant_id !== $tenantId) {
             abort(403, 'Unauthorized access to client.');
         }
 
-        // Load relationships
-        $client->load(['projects', 'tickets']);
+        // Load base relationships
+        $client->load(['projects', 'wallet', 'currency']);
+
+        // Conditionally load tickets if addon is active
+        $hasTickets = $user->hasModuleSubscription('erp-tickets');
+        if ($hasTickets) {
+            $client->load('tickets');
+        }
 
         // Fetch related operational data
         $invoices = Invoice::where('client_id', $client->id)->latest()->get();
@@ -55,9 +62,10 @@ class ClientController extends Controller
         return Inertia::render('ERP/Clients/Show', [
             'client' => $client,
             'projects' => $client->projects,
-            'tickets' => $client->tickets,
+            'tickets' => $hasTickets ? $client->tickets : [],
             'invoices' => $invoices,
             'activities' => $activities,
+            'hasTickets' => $hasTickets,
         ]);
     }
 
@@ -91,11 +99,16 @@ class ClientController extends Controller
 
     public function create()
     {
-        $tenant = Tenant::where('user_id', Auth::id())->first();
+        $user = Auth::user();
+        $tenant = Tenant::where('user_id', $user->id)->first();
+        $hasMultiCurrency = $user->hasModuleSubscription('erp-multi-currency');
+        $baseCurrency = $tenant?->baseCurrency?->currency ?? 'USD';
 
         return Inertia::render('ERP/Clients/Create', [
-            'currencies' => \App\Models\Currency::all(),
+            'currencies' => $hasMultiCurrency ? \App\Models\Currency::all() : [],
             'tenant' => $tenant,
+            'hasMultiCurrency' => $hasMultiCurrency,
+            'baseCurrency' => $baseCurrency,
         ]);
     }
 
@@ -112,9 +125,15 @@ class ClientController extends Controller
             'email'    => 'nullable|email|max:255',
             'phone'    => 'nullable|string|max:20',
             'address'  => 'nullable|string|max:255',
-            'currency' => 'required|string|size:3',
-            'status'   => 'nullable|in:lead,active,paying,retained,archived',
+            'currency' => 'nullable|string|size:3',
         ]);
+
+        // If no currency provided (no multi-currency addon), use tenant's base currency
+        $currencyCode = $validated['currency'] ?? null;
+        if (!$currencyCode) {
+            $currencyCode = $tenant->baseCurrency?->currency ?? 'USD';
+        }
+        $currencyId = \App\Models\Currency::where('currency', $currencyCode)->value('id');
 
         $client = TenantClient::create([
             'tenant_id' => $tenant->id,
@@ -122,8 +141,7 @@ class ClientController extends Controller
             'email'     => $validated['email'] ?? null,
             'phone'     => $validated['phone'] ?? null,
             'address'   => $validated['address'] ?? null,
-            'currency_id' => \App\Models\Currency::where('currency', $validated['currency'])->value('id'),
-            'status'    => $validated['status'] ?? 'lead',
+            'currency_id' => $currencyId,
         ]);
 
         // Auto-create client wallet

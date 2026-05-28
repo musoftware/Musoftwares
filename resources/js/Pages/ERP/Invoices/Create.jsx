@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import ERPLayout from '@/Layouts/ERPLayout';
+import { useERPMenu } from '@/hooks/useERPMenu';
 import { Head, useForm, Link } from '@inertiajs/react';
 import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
@@ -11,6 +12,7 @@ import { cn } from '@/lib/utils';
 
 function FieldError({ message }) {
     if (!message) return null;
+
     return (
         <div className="flex items-center gap-1.5 mt-1.5">
             <AlertCircle className="h-3.5 w-3.5 text-red-500 shrink-0" />
@@ -162,10 +164,10 @@ export default function CreateEdit({ invoice, clients, projects = [], currencies
             post(route('erp.invoices.store'), options);
         }
     };
+    const { menuItems, workspaceName, tenantId } = useERPMenu('invoices');
 
     return (
-        <AuthenticatedLayout header={isEdit ? 'Edit Invoice' : 'New Invoice'}>
-            <Head title={isEdit ? 'Edit Invoice' : 'New Invoice'} />
+        <ERPLayout title={isEdit ? 'Edit Invoice' : 'New Invoice'} workspaceName={workspaceName} tenantId={tenantId} menuItems={menuItems}>
 
             <form onSubmit={handleSubmit} className="max-w-[900px] mx-auto px-4 sm:px-6 lg:px-8 py-10 font-sans">
 
@@ -541,6 +543,6 @@ export default function CreateEdit({ invoice, clients, projects = [], currencies
 
                 </div>
             </form>
-        </AuthenticatedLayout>
+        </ERPLayout>
     );
 }

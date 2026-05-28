@@ -1,4 +1,5 @@
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import ERPLayout from '@/Layouts/ERPLayout';
+import { useERPMenu } from '@/hooks/useERPMenu';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { useState } from 'react';
 import { motion } from 'framer-motion';
@@ -167,10 +168,10 @@ export default function Index({ tasks, clients, filters }: IndexProps) {
                 return <span className={`${classes} bg-slate-50 text-slate-700 border-slate-200`}>Open</span>;
         }
     };
+    const { menuItems, workspaceName, tenantId } = useERPMenu('tasks');
 
     return (
-        <AuthenticatedLayout header="Client Task Boards">
-            <Head title="ERP Client Task Boards" />
+        <ERPLayout title="ERP Client Task Boards" workspaceName={workspaceName} tenantId={tenantId} menuItems={menuItems}>
 
             <div className="max-w-[1200px] mx-auto px-4 py-8 space-y-6 font-sans text-sm">
                 
@@ -539,6 +540,6 @@ export default function Index({ tasks, clients, filters }: IndexProps) {
                     </form>
                 </DialogContent>
             </Dialog>
-        </AuthenticatedLayout>
+        </ERPLayout>
     );
 }

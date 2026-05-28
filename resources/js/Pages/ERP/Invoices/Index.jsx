@@ -1,5 +1,6 @@
 import React from 'react';
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import ERPLayout from '@/Layouts/ERPLayout';
+import { useERPMenu } from '@/hooks/useERPMenu';
 import { Head, Link, router } from '@inertiajs/react';
 import { DataTable } from '@/Components/ui/DataTable';
 import { StatusBadge } from '@/Components/ui/StatusBadge';
@@ -56,6 +57,7 @@ export default function Index({ invoices, stats, filters }) {
                     row.due_date &&
                     new Date(row.due_date) < new Date() &&
                     row.status !== 'paid';
+
                 return (
                     <DateDisplay
                         date={row.due_date}
@@ -138,10 +140,10 @@ export default function Index({ invoices, stats, filters }) {
     };
 
     const tableData = Array.isArray(invoices?.data) ? invoices.data : Array.isArray(invoices) ? invoices : [];
+    const { menuItems, workspaceName, tenantId } = useERPMenu('invoices');
 
     return (
-        <AuthenticatedLayout>
-            <Head title="Invoices" />
+        <ERPLayout title="Invoices" workspaceName={workspaceName} tenantId={tenantId} menuItems={menuItems}>
             <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 py-10 font-sans space-y-8">
 
                 {/* ── Header ───────────────────────────────────────────────── */}
@@ -248,6 +250,6 @@ export default function Index({ invoices, stats, filters }) {
                     emptyDescription="Create your first invoice to start tracking payments."
                 />
             </div>
-        </AuthenticatedLayout>
+        </ERPLayout>
     );
 }
