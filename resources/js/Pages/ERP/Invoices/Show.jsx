@@ -55,7 +55,7 @@ export default function Show({ invoice, timeline, referral_earnings }) {
 
     const handleWalletConfirm = (amount) => {
         if (amount && !isNaN(amount)) {
-            router.post(route(`erp.wallet.${walletModal.type}`, invoice.client_id), { amount });
+            router.post(route(`erp.clients.wallet.${walletModal.type}`, invoice.client_id), { amount });
         }
         setWalletModal({ open: false, type: '' });
     };
@@ -217,15 +217,29 @@ export default function Show({ invoice, timeline, referral_earnings }) {
                         <StatusBadge status={invoice.status} />
                     </div>
                     <div className="flex flex-wrap items-center gap-2">
-                        <Button variant="outline" size="sm" asChild className="shadow-sm border-slate-200 hover:bg-slate-50 transition-colors text-slate-700">
-                            <Link href={route('erp.invoices.edit', invoice.id)}><Edit className="mr-2 h-4 w-4" /> Edit Draft</Link>
-                        </Button>
-                        <Button variant="outline" size="sm" onClick={() => router.post(route('erp.invoices.send', invoice.id))} className="shadow-sm border-indigo-200 text-indigo-700 hover:bg-indigo-50 transition-colors">
-                            <Send className="mr-2 h-4 w-4" /> Send Email
-                        </Button>
-                        <Button variant="outline" size="sm" onClick={() => router.post(route('erp.invoices.mark-paid', invoice.id))} className="shadow-sm border-emerald-200 text-emerald-700 hover:bg-emerald-50 transition-colors">
-                            <CheckCircle className="mr-2 h-4 w-4" /> Mark as Paid
-                        </Button>
+                        {invoice.status === 'draft' && (
+                            <>
+                                <Button variant="outline" size="sm" asChild className="shadow-sm border-slate-200 hover:bg-slate-50 transition-colors text-slate-700">
+                                    <Link href={route('erp.invoices.edit', invoice.id)}><Edit className="mr-2 h-4 w-4" /> Edit Draft</Link>
+                                </Button>
+                                <Button variant="outline" size="sm" onClick={() => router.post(route('erp.invoices.send', invoice.id))} className="shadow-sm border-slate-200 text-slate-700 hover:bg-slate-50 transition-colors">
+                                    <Send className="mr-2 h-4 w-4" /> Issue Invoice
+                                </Button>
+                            </>
+                        )}
+                        {(invoice.status === 'sent' || invoice.status === 'partial') && (
+                            <>
+                                <Button variant="outline" size="sm" asChild className="shadow-sm border-slate-200 hover:bg-slate-50 transition-colors text-slate-700">
+                                    <Link href={route('erp.invoices.edit', invoice.id)}><Edit className="mr-2 h-4 w-4" /> Edit Draft</Link>
+                                </Button>
+                                <Button variant="outline" size="sm" onClick={() => router.post(route('erp.invoices.mark-paid', invoice.id))} className="shadow-sm border-emerald-200 text-emerald-700 hover:bg-emerald-50 transition-colors">
+                                    <CheckCircle className="mr-2 h-4 w-4" /> Mark as Paid
+                                </Button>
+                                <Button variant="outline" size="sm" onClick={() => router.post(route('erp.invoices.pay-wallet', invoice.id))} className="shadow-sm border-indigo-200 text-indigo-700 hover:bg-indigo-50 transition-colors">
+                                    <Wallet className="mr-2 h-4 w-4" /> Pay with Wallet
+                                </Button>
+                            </>
+                        )}
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                                 <Button variant="outline" size="sm" className="shadow-sm border-slate-200"><MoreHorizontal className="h-4 w-4 text-slate-500" /></Button>
@@ -237,6 +251,11 @@ export default function Show({ invoice, timeline, referral_earnings }) {
                                 <DropdownMenuItem asChild className="cursor-pointer">
                                     <Link href={route('erp.invoices.download', invoice.id)}><Download className="mr-2 h-4 w-4 text-slate-400" /> Download PDF</Link>
                                 </DropdownMenuItem>
+                                {(invoice.status === 'sent' || invoice.status === 'partial' || invoice.status === 'paid') && (
+                                    <DropdownMenuItem onClick={() => router.post(route('erp.invoices.cancel', invoice.id))} className="cursor-pointer text-rose-600 hover:text-rose-700 focus:text-rose-700">
+                                        <CheckCircle className="mr-2 h-4 w-4 text-rose-500" /> Cancel Invoice
+                                    </DropdownMenuItem>
+                                )}
                             </DropdownMenuContent>
                         </DropdownMenu>
                     </div>

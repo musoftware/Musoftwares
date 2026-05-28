@@ -1,6 +1,7 @@
 import React, { PropsWithChildren } from 'react';
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import ApplicationLogo from '@/Components/ApplicationLogo';
+import { useInertiaNotifications } from '@/hooks/useInertiaNotifications';
 import { Button } from '@/Components/ui/button';
 import { RuntimeStatusBanner } from '@/Components/Tools/RuntimeStatusBanner';
 import { Download, CreditCard, LayoutGrid, LogIn, UserPlus, ArrowUpRight, LifeBuoy } from 'lucide-react';
@@ -18,6 +19,7 @@ export default function ToolsPublicLayout({
     activeNav = 'explore',
     toolSlug,
 }: ToolsPublicLayoutProps) {
+    useInertiaNotifications();
     const { auth } = usePage().props as any;
     const isAuthed = !!auth?.user;
 

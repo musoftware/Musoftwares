@@ -1,5 +1,6 @@
 import React, { PropsWithChildren, ReactNode, useEffect, useState } from 'react';
 import { Link, usePage } from '@inertiajs/react';
+import { useInertiaNotifications } from '@/hooks/useInertiaNotifications';
 import ApplicationLogo from '@/Components/ApplicationLogo';
 import { Toaster } from '@/Components/ui/toaster';
 import { useToast } from '@/Components/ui/use-toast';
@@ -41,6 +42,7 @@ function AuthenticatedContent({
     children,
 }: PropsWithChildren<{ header?: ReactNode }>) {
     const { auth, notifications, flash, wallet } = usePage().props as any;
+    useInertiaNotifications();
     const user = auth.user;
     const { toast } = useToast();
 

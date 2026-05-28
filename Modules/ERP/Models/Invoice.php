@@ -14,7 +14,9 @@ class Invoice extends TenantModel
 
     use Searchable;
 
-    protected $appends = ['amount_currency'];
+    protected $with = ['currency', 'businessCurrency'];
+
+    protected $appends = ['amount_currency', 'business_currency'];
 
     protected $fillable = [
         'tenant_id', 'invoice_number', 'client_id', 'project_id', 'status',
@@ -47,6 +49,18 @@ class Invoice extends TenantModel
     public function currency(): BelongsTo
     {
         return $this->belongsTo(\App\Models\Currency::class, 'currency_id');
+    }
+
+    public function businessCurrency()
+    {
+        return $this->hasOneThrough(
+            \App\Models\Currency::class,
+            Tenant::class,
+            'id', // Foreign key on Tenant table (erp_tenants.id)
+            'id', // Foreign key on Currency table (currencies.id)
+            'tenant_id', // Local key on Invoice table (erp_invoices.tenant_id)
+            'base_currency_id' // Local key on Tenant table (erp_tenants.base_currency_id)
+        );
     }
 
     public function client(): BelongsTo
@@ -89,6 +103,11 @@ class Invoice extends TenantModel
     public function getAmountCurrencyAttribute(): string
     {
         return $this->currency?->currency ?? 'USD';
+    }
+
+    public function getBusinessCurrencyAttribute(): string
+    {
+        return $this->businessCurrency?->currency ?? 'USD';
     }
 
     /**
@@ -149,6 +168,120 @@ class Invoice extends TenantModel
     // ── Payment Lifecycle ────────────────────────────────────────
     // Recovered from old project: Invoice::bill_invoice(),
     //     Invoice::partially_bill_invoice(), Invoice::cancel_invoice()
+
+    /**
+     * Mark the invoice as paid manually (without wallet balance subtraction).
+     *
+     * @return array{ok: bool, message?: string}
+     */
+    public function markPaidManual(): array
+    {
+        if ($this->status === 'paid') {
+            return ['ok' => false, 'message' => 'Invoice is already paid.'];
+        }
+
+        if (!in_array($this->status, ['sent', 'partial'])) {
+            return ['ok' => false, 'message' => 'Invoice must be issued before it can be marked as paid.'];
+        }
+
+        $client = $this->client;
+        if (!$client) {
+            return ['ok' => false, 'message' => 'Invoice has no associated client.'];
+        }
+
+        $wallet = $client->wallet;
+        if (!$wallet) {
+            $wallet = ClientWallet::create([
+                'tenant_id' => $this->tenant_id,
+                'client_id' => $client->id,
+                'balance' => 0,
+                'currency_id' => $client->currency_id ?? $this->currency_id,
+            ]);
+        }
+
+        $amountDue = $this->unpaidAmount();
+
+        return DB::transaction(function () use ($wallet, $amountDue, $client) {
+            if ($amountDue > 0) {
+                // Lock the wallet row for update
+                $wallet = ClientWallet::where('id', $wallet->id)->lockForUpdate()->first();
+
+                $balanceBefore = (float) $wallet->balance;
+                $balanceAfterCredit = $balanceBefore + $amountDue;
+
+                // Proportion for business amount
+                $ratio = $amountDue / max(0.01, (float) $this->amount);
+                $businessAmountDue = round((float) $this->business_amount * $ratio, 2);
+
+                // 1. Create Credit Transaction (external payment deposit)
+                WalletTransaction::create([
+                    'tenant_id' => $this->tenant_id,
+                    'wallet_id' => $wallet->id,
+                    'type' => 'manual_credit',
+                    'direction' => 'credit',
+                    'amount' => $amountDue,
+                    'currency_id' => $this->currency_id,
+                    'business_amount' => $businessAmountDue,
+                    'business_currency_id' => $this->tenant->base_currency_id,
+                    'exchange_rate' => (float) $this->exchange_rate,
+                    'exchange_rate_date' => $this->exchange_rate_date ?? now()->toDateString(),
+                    'balance_before' => $balanceBefore,
+                    'balance_after' => $balanceAfterCredit,
+                    'reference_type' => Invoice::class,
+                    'reference_id' => $this->id,
+                    'note' => 'Manual payment deposit for Invoice #' . $this->invoice_number,
+                    'created_by' => Auth::id(),
+                ]);
+
+                // 2. Create Debit Transaction (invoice payment)
+                WalletTransaction::create([
+                    'tenant_id' => $this->tenant_id,
+                    'wallet_id' => $wallet->id,
+                    'type' => 'invoice_paid',
+                    'direction' => 'debit',
+                    'amount' => $amountDue,
+                    'currency_id' => $this->currency_id,
+                    'business_amount' => $businessAmountDue,
+                    'business_currency_id' => $this->tenant->base_currency_id,
+                    'exchange_rate' => (float) $this->exchange_rate,
+                    'exchange_rate_date' => $this->exchange_rate_date ?? now()->toDateString(),
+                    'balance_before' => $balanceAfterCredit,
+                    'balance_after' => $balanceBefore, // Net balance is unchanged
+                    'reference_type' => Invoice::class,
+                    'reference_id' => $this->id,
+                    'note' => 'Payment for Invoice #' . $this->invoice_number,
+                    'created_by' => Auth::id(),
+                ]);
+
+                // Update wallet balance (will remain the same, but triggers model updates)
+                $wallet->update(['balance' => $balanceBefore]);
+            }
+
+            // Mark invoice as paid
+            $this->update([
+                'status' => 'paid',
+                'paid_amount' => $this->amount,
+                'paid_at' => now(),
+            ]);
+
+            // Process referral commissions
+            $this->processReferralCommissions();
+
+            // Fire event
+            if (class_exists(\App\Events\InvoicePaid::class)) {
+                event(new \App\Events\InvoicePaid($this));
+            }
+
+            \Modules\ERP\Services\ActivityLogger::log(
+                'invoice_paid_manual',
+                "Invoice #{$this->invoice_number} was marked as paid manually.",
+                $this,
+                $client->id
+            );
+
+            return ['ok' => true, 'message' => 'Invoice marked as paid manually.'];
+        });
+    }
 
     /**
      * Bill the invoice in full from the client's wallet.

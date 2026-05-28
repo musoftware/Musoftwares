@@ -57,6 +57,8 @@ Route::middleware(['web', 'auth', 'tenant.active'])
         Route::resource('invoices', InvoiceController::class);
         Route::post('invoices/{invoice}/send', [InvoiceController::class, 'send'])->name('invoices.send');
         Route::post('invoices/{invoice}/mark-paid', [InvoiceController::class, 'markPaid'])->name('invoices.mark-paid');
+        Route::post('invoices/{invoice}/pay-wallet', [InvoiceController::class, 'payWallet'])->name('invoices.pay-wallet');
+        Route::post('invoices/{invoice}/cancel', [InvoiceController::class, 'cancel'])->name('invoices.cancel');
         Route::post('invoices/{invoice}/duplicate', [InvoiceController::class, 'duplicate'])->name('invoices.duplicate');
         Route::get('invoices/{invoice}/download', [InvoiceController::class, 'downloadPdf'])->name('invoices.download');
         Route::get('/invoices/{invoice}/pdf', [InvoiceController::class, 'downloadPdf'])->name('invoices.pdf');
@@ -95,8 +97,7 @@ Route::middleware(['web', 'auth', 'tenant.active'])
         Route::delete('tickets/{ticket}', [\Modules\ERP\Http\Controllers\TicketController::class, 'destroy'])->name('tickets.destroy');
         Route::post('notes/{note}/toggle-pin', [\Modules\ERP\Http\Controllers\TenantNoteController::class, 'togglePin'])->name('notes.togglePin');
         Route::resource('notes', \Modules\ERP\Http\Controllers\TenantNoteController::class)->except(['create', 'edit']);
-        Route::get('expenses/create', [\Modules\ERP\Http\Controllers\ExpenseController::class, 'create'])->name('expenses.create');
-        Route::post('expenses', [\Modules\ERP\Http\Controllers\ExpenseController::class, 'store'])->name('expenses.store');
+        Route::resource('expenses', \Modules\ERP\Http\Controllers\ExpenseController::class)->except(['show']);
 
         Route::get('contracts/create', [\Modules\ERP\Http\Controllers\ContractController::class, 'create'])->name('contracts.create');
         Route::post('contracts', [\Modules\ERP\Http\Controllers\ContractController::class, 'store'])->name('contracts.store');

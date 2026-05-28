@@ -35,7 +35,7 @@ export default function Show({ auth, wallet, transactions, client, errors }: Wal
     const activeWallet = wallet || { id: 0, balance: 0, currency: 'USD', locked_balance: 0 };
     const activeTransactions = transactions?.data || [];
 
-    const safeRoute = (name: string, params?: any) => {
+    const safeRoute = (name: string, params?: any, fallbackUrl?: string) => {
         try {
             // @ts-ignore
             if (typeof route !== 'undefined' && route().has(name)) {
@@ -43,7 +43,7 @@ export default function Show({ auth, wallet, transactions, client, errors }: Wal
                 return route(name, params);
             }
         } catch (e) {}
-        return '#';
+        return fallbackUrl || '#';
     };
 
     const [actionType, setActionType] = useState<'credit' | 'debit' | 'lock' | 'unlock' | null>(null);
@@ -72,16 +72,16 @@ export default function Show({ auth, wallet, transactions, client, errors }: Wal
 
         if (type === 'credit') {
             form = creditForm;
-            routeName = 'erp.wallet.credit';
+            routeName = 'erp.clients.wallet.credit';
         } else if (type === 'debit') {
             form = debitForm;
-            routeName = 'erp.wallet.debit';
+            routeName = 'erp.clients.wallet.debit';
         } else if (type === 'lock') {
             form = lockForm;
-            routeName = 'erp.wallet.lock';
+            routeName = 'erp.clients.wallet.lock';
         } else {
             form = unlockForm;
-            routeName = 'erp.wallet.unlock';
+            routeName = 'erp.clients.wallet.unlock';
         }
 
         const amt = parseFloat(form.data.amount);
@@ -131,7 +131,7 @@ export default function Show({ auth, wallet, transactions, client, errors }: Wal
             <div className="max-w-[1200px] mx-auto px-4 py-8 space-y-8">
                 {/* Header */}
                 <div className="space-y-2">
-                    <Link href={safeRoute('erp.clients.index')} className="inline-flex items-center text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+                    <Link href={safeRoute('erp.dashboard', { section: 'clients' }, '/erp/dashboard?section=clients')} className="inline-flex items-center text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
                         <ArrowLeft className="mr-2 h-4 w-4" /> Client List
                     </Link>
                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
