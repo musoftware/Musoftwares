@@ -47,6 +47,7 @@ import {
     UserPlus,
     Sliders,
     AlertCircle,
+    User,
     Cloud, Database, Link as LinkIcon, HardDrive, Key, CheckCircle, SearchCode, Lock, Layers,
     MoreHorizontal, Wallet, RotateCcw, ArrowDownLeft, ArrowUpDown, ArrowDown, ArrowUp
 } from 'lucide-react';
@@ -70,6 +71,7 @@ import { ActivityTimeline } from '@/Components/ui/ActivityTimeline';
 import { ConfirmModal } from '@/Components/ui/ConfirmModal';
 import { OperationalCard } from '@/Components/ui/OperationalCard';
 import { StatusBadge } from '@/Components/ui/StatusBadge';
+import { AsyncCombobox } from '@/Components/ui/AsyncCombobox';
 import { useERPMenu } from '@/hooks/useERPMenu';
 
 const __ = (key: string) => key;
@@ -1304,15 +1306,18 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     {projects.map((proj) => (
                                         <OperationalCard key={proj.id}>
-                                            <div className="p-5 space-y-4">
-                                                <div className="flex items-start justify-between">
-                                                    <div>
+                                            <div className="p-4 sm:p-5 space-y-4">
+                                                <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 sm:gap-4">
+                                                    <div className="flex-1 min-w-0">
                                                          <Link href={route('erp.projects.show', proj.id)}>
-                                                             <h3 className="font-semibold text-slate-800 text-[14px] hover:text-primary hover:underline transition-colors">{proj.name}</h3>
+                                                             <h3 className="font-semibold text-slate-800 text-[15px] sm:text-[14px] hover:text-primary hover:underline transition-colors truncate">{proj.name}</h3>
                                                          </Link>
-                                                        <span className="text-xs text-slate-400 mt-1 block">{proj.client}</span>
+                                                        <div className="flex items-center gap-1.5 mt-1 sm:mt-1.5 text-xs text-slate-500">
+                                                            <Users className="h-3.5 w-3.5 shrink-0" />
+                                                            <span className="truncate">{proj.client}</span>
+                                                        </div>
                                                     </div>
-                                                    <Badge className={`text-[10px] rounded uppercase font-bold tracking-wider ${
+                                                    <Badge className={`w-fit text-[10px] rounded uppercase font-bold tracking-wider shrink-0 ${
                                                         proj.status === 'Completed' ? 'bg-emerald-50 text-emerald-700' :
                                                         proj.status === 'Active' ? 'bg-blue-50 text-blue-700' : 'bg-slate-100 text-slate-600'
                                                     }`}>
@@ -1320,40 +1325,49 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                                                     </Badge>
                                                 </div>
 
-                                                <div className="space-y-1">
+                                                <div className="grid grid-cols-2 gap-3 bg-slate-50/50 p-3 rounded-lg border border-slate-100">
+                                                    <div>
+                                                        <span className="block text-[10px] uppercase font-bold text-slate-400 tracking-wider">Budget</span>
+                                                        <span className="block text-[13px] font-semibold text-slate-700 mt-0.5">
+                                                            <CurrencyDisplay amount={proj.budget} currency={proj.currency || currency} />
+                                                        </span>
+                                                    </div>
+                                                    <div>
+                                                        <span className="block text-[10px] uppercase font-bold text-slate-400 tracking-wider">Deadline</span>
+                                                        <span className="block text-[13px] font-semibold text-slate-700 mt-0.5 flex items-center gap-1.5">
+                                                            <CalendarIcon className="h-3.5 w-3.5 text-slate-400 shrink-0" />
+                                                            {formatDate(proj.deadline)}
+                                                        </span>
+                                                    </div>
+                                                </div>
+
+                                                <div className="space-y-1.5">
                                                     <div className="flex justify-between text-xs font-semibold text-slate-500">
                                                         <span>Progress</span>
                                                         <span>{proj.progress}%</span>
                                                     </div>
                                                     <div className="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
-                                                        <div className="bg-indigo-600 h-full rounded-full transition-all" style={{ width: `${proj.progress}%` }} />
+                                                        <div className="bg-primary h-full rounded-full transition-all" style={{ width: `${proj.progress}%` }} />
                                                     </div>
                                                 </div>
 
-                                                <div className="flex items-center justify-between text-xs pt-3 border-t border-slate-100 text-slate-400 font-mono">
-                                                    <div className="flex items-center gap-4">
-                                                        <span>Budget: <span className="font-semibold text-slate-700">{formatMoney(proj.budget, currency)}</span></span>
-                                                        <span>Deadline: <span className="font-semibold text-slate-700">{formatDate(proj.deadline)}</span></span>
+                                                {!isReadOnlyMember && (
+                                                    <div className="pt-3 sm:pt-4 border-t border-slate-100 flex items-center gap-2">
+                                                        <Link 
+                                                            href={route('erp.projects.edit', proj.id)}
+                                                            className="flex-1 flex items-center justify-center gap-2 py-2 px-3 bg-white border border-slate-200 rounded-lg text-xs font-semibold text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors shadow-sm"
+                                                        >
+                                                            <Edit2 className="h-3.5 w-3.5" /> Edit
+                                                        </Link>
+                                                        <button 
+                                                            onClick={() => setDeleteProjectConfirm({ open: true, project: proj })}
+                                                            className="flex items-center justify-center py-2 px-3 bg-white border border-slate-200 rounded-lg text-xs font-semibold text-rose-600 hover:bg-rose-50 hover:border-rose-200 transition-colors shadow-sm shrink-0"
+                                                            title="Delete Project"
+                                                        >
+                                                            <Trash2 className="h-3.5 w-3.5" />
+                                                        </button>
                                                     </div>
-                                                    {!isReadOnlyMember && (
-                                                        <div className="flex items-center gap-1">
-                                                            <Link 
-                                                                href={route('erp.projects.edit', proj.id)}
-                                                                className="p-1.5 hover:bg-slate-100 rounded text-slate-500 transition-colors inline-block"
-                                                                title="Edit Project"
-                                                            >
-                                                                <Edit2 className="h-3.5 w-3.5" />
-                                                            </Link>
-                                                            <button 
-                                                                onClick={() => setDeleteProjectConfirm({ open: true, project: proj })}
-                                                                className="p-1.5 hover:bg-rose-50 rounded text-rose-500 transition-colors"
-                                                                title="Delete Project"
-                                                            >
-                                                                <Trash2 className="h-3.5 w-3.5" />
-                                                            </button>
-                                                        </div>
-                                                    )}
-                                                </div>
+                                                )}
                                             </div>
                                         </OperationalCard>
                                     ))}
@@ -1373,16 +1387,15 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                                     </div>
                                     <div className="w-full sm:w-[240px] flex flex-col gap-1.5 mt-2">
                                         <label className="text-[10px] uppercase font-bold tracking-wider text-slate-400">Filter tasks by client</label>
-                                        <select
-                                            value={selectedTaskClientId}
-                                            onChange={(e) => setSelectedTaskClientId(e.target.value)}
-                                            className="w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-xs shadow-none focus:outline-none focus:ring-1 focus:ring-ring"
-                                        >
-                                            <option value="all">All Clients</option>
-                                            {activeClients.map((c) => (
-                                                <option key={c.id} value={c.id.toString()}>{c.name}</option>
-                                            ))}
-                                        </select>
+                                        <AsyncCombobox
+                                            endpoint={route('erp.clients.search')}
+                                            value={selectedTaskClientId === 'all' ? null : selectedTaskClientId}
+                                            initialLabel={selectedTaskClientId === 'all' ? "All Clients" : (activeClients.find(c => c.id.toString() === selectedTaskClientId)?.name || "")}
+                                            onChange={(val) => setSelectedTaskClientId(val ? val.toString() : 'all')}
+                                            placeholder="Select client to filter"
+                                            className="w-full h-9 bg-white"
+                                            prependOptions={[{ id: 'all', name: 'All Clients' }]}
+                                        />
                                     </div>
                                 </div>
 

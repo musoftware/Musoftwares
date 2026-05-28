@@ -551,6 +551,18 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/points', [\App\Http\Controllers\PointPurchaseController::class, 'index'])->name('points.index');
     Route::post('/points/purchase', [\App\Http\Controllers\PointPurchaseController::class, 'store'])->name('point-purchases.store');
     Route::post('/points/purchase-wallet', [\App\Http\Controllers\PointPurchaseController::class, 'storeWallet'])->name('point-purchases.store-wallet');
+    
+    // Contracts (Generated from Proposals or Wizard)
+    Route::get('/contracts', [\App\Http\Controllers\iSaaS\ContractController::class, 'index'])->name('contracts.index');
+    Route::get('/contracts/create', [\App\Http\Controllers\iSaaS\ContractController::class, 'create'])->name('contracts.create');
+    Route::post('/contracts', [\App\Http\Controllers\iSaaS\ContractController::class, 'store'])->name('contracts.store');
+    Route::get('/contracts/{contract}/edit', [\App\Http\Controllers\iSaaS\ContractController::class, 'edit'])->name('contracts.edit');
+    Route::put('/contracts/{contract}', [\App\Http\Controllers\iSaaS\ContractController::class, 'update'])->name('contracts.update');
+    Route::delete('/contracts/{contract}', [\App\Http\Controllers\iSaaS\ContractController::class, 'destroy'])->name('contracts.destroy');
+    Route::post('/contracts/{contract}/status', [\App\Http\Controllers\iSaaS\ContractController::class, 'updateStatus'])->name('contracts.update-status');
+    Route::post('/contracts/ai-generate', [\App\Http\Controllers\iSaaS\ContractController::class, 'aiGenerate'])->name('contracts.ai-generate');
+    Route::post('/contracts/ai-review', [\App\Http\Controllers\iSaaS\ContractController::class, 'aiReview'])->name('contracts.ai-review');
+
     Route::post('/freelance/points/purchase', [\App\Http\Controllers\PointPurchaseController::class, 'store'])->name('freelance.point-purchases.store');
     Route::post('/freelance/points/purchase-wallet', [\App\Http\Controllers\PointPurchaseController::class, 'storeWallet'])->name('freelance.point-purchases.store-wallet');
 
@@ -615,7 +627,14 @@ Route::middleware(['auth', 'verified'])->prefix('financial')->name('financial.')
 
     // iSAAS Connected Apps Routes
     Route::prefix('isaas')->name('isaas.')->group(function () {
-        
+        // Project Proposals (AI Estimator)
+        Route::get('/proposals', [\App\Http\Controllers\Isaas\ProjectProposalController::class, 'index'])->name('proposals.index');
+        Route::get('/proposals/create', [\App\Http\Controllers\Isaas\ProjectProposalController::class, 'create'])->name('proposals.create');
+        Route::post('/proposals/estimate', [\App\Http\Controllers\Isaas\ProjectProposalController::class, 'estimate'])->name('proposals.estimate');
+        Route::get('/proposals/{id}', [\App\Http\Controllers\Isaas\ProjectProposalController::class, 'show'])->name('proposals.show');
+        Route::put('/proposals/{id}', [\App\Http\Controllers\Isaas\ProjectProposalController::class, 'update'])->name('proposals.update');
+        Route::post('/proposals/{id}/convert', [\App\Http\Controllers\Isaas\ProjectProposalController::class, 'convert'])->name('proposals.convert');
+        Route::delete('/proposals/{id}', [\App\Http\Controllers\Isaas\ProjectProposalController::class, 'destroy'])->name('proposals.destroy');
     });
 
     // Route::get('/conversations', [\App\Http\Controllers\ConversationController::class, 'index']);
@@ -637,6 +656,12 @@ Route::middleware(['auth', 'verified'])->prefix('api')->group(function () {
 Route::post('/financial/add-balance/webhook', [\App\Http\Controllers\FinancialController::class, 'webhook'])->name('financial.add-balance.webhook');
 Route::post('/freelance/point-purchases/webhook', [\App\Http\Controllers\PointPurchaseController::class, 'webhook'])->name('freelance.point-purchases.webhook');
 Route::post('/subscriptions/kashier/webhook', [\App\Http\Controllers\SubscriptionController::class, 'webhook'])->name('subscriptions.kashier.webhook');
+
+// ── Public Client Portal (No Auth Required) ──
+Route::prefix('c')->name('client-portal.')->group(function () {
+    Route::get('/contracts/{uuid}', [\App\Http\Controllers\iSaaS\ClientPortalController::class, 'showContract'])->name('contracts.show');
+    Route::post('/contracts/{uuid}/sign', [\App\Http\Controllers\iSaaS\ClientPortalController::class, 'signContract'])->name('contracts.sign');
+});
 
 // General Messages Route
 Route::middleware(['auth', 'verified'])->group(function () {
