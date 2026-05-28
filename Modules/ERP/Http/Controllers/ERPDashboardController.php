@@ -324,6 +324,8 @@ class ERPDashboardController extends Controller
         // ── Transactions (Wallet Ledger) ──────────────────────────
         $transactions = collect();
         $transactionStats = ['totalCredits' => 0, 'totalDebits' => 0, 'netFlow' => 0, 'txnCount' => 0];
+        $chartOfAccounts = null;
+
         if ($tenantId) {
             $rawTxns = WalletTransaction::with(['creator', 'wallet.client', 'currency'])
                 ->where('tenant_id', $tenantId)
@@ -366,6 +368,143 @@ class ERPDashboardController extends Controller
                         'date' => $txn->created_at?->format('Y-m-d H:i'),
                     ];
                 });
+
+            // Calculate Chart of Accounts Tree balances
+            $totalClientWallets = \Modules\ERP\Models\ClientWallet::where('tenant_id', $tenantId)->sum('balance');
+            $totalLockedWallets = \Modules\ERP\Models\ClientWallet::where('tenant_id', $tenantId)->sum('locked_balance');
+            $totalCosts = DB::table('erp_invoice_costs')->where('tenant_id', $tenantId)->sum('business_amount');
+            
+            $calculatedCash = $totalClientWallets + $totalLockedWallets + $totalPaidRevenue - $totalCosts - $outstandingRevenue;
+            $equityBalance = 0;
+            if ($calculatedCash < 0) {
+                $equityBalance = $calculatedCash;
+                $cashAndBanks = 0;
+            } else {
+                $cashAndBanks = $calculatedCash;
+            }
+
+            $chartOfAccounts = [
+                'name' => 'Chart of Accounts',
+                'name_ar' => 'شجرة الحسابات',
+                'code' => '0',
+                'balance' => round($cashAndBanks + $outstandingRevenue, 2),
+                'children' => [
+                    [
+                        'name' => 'Assets',
+                        'name_ar' => 'الأصول',
+                        'code' => '1',
+                        'balance' => round($cashAndBanks + $outstandingRevenue, 2),
+                        'children' => [
+                            [
+                                'name' => 'Current Assets',
+                                'name_ar' => 'الأصول المتداولة',
+                                'code' => '11',
+                                'balance' => round($cashAndBanks + $outstandingRevenue, 2),
+                                'children' => [
+                                    [
+                                        'name' => 'Cash & Banks',
+                                        'name_ar' => 'النقدية بالخزينة والبنوك',
+                                        'code' => '1101',
+                                        'balance' => round($cashAndBanks, 2),
+                                    ],
+                                    [
+                                        'name' => 'Accounts Receivable',
+                                        'name_ar' => 'الذمم المدينة (الفواتير المستحقة)',
+                                        'code' => '1102',
+                                        'balance' => round($outstandingRevenue, 2),
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ],
+                    [
+                        'name' => 'Liabilities',
+                        'name_ar' => 'الخصوم',
+                        'code' => '2',
+                        'balance' => round($totalClientWallets + $totalLockedWallets, 2),
+                        'children' => [
+                            [
+                                'name' => 'Current Liabilities',
+                                'name_ar' => 'الخصوم المتداولة',
+                                'code' => '21',
+                                'balance' => round($totalClientWallets + $totalLockedWallets, 2),
+                                'children' => [
+                                    [
+                                        'name' => 'Client Wallets (Deposits)',
+                                        'name_ar' => 'محافظ العملاء (الأرصدة المودعة)',
+                                        'code' => '2101',
+                                        'balance' => round($totalClientWallets, 2),
+                                    ],
+                                    [
+                                        'name' => 'Locked Client Funds',
+                                        'name_ar' => 'أموال العملاء المحتجزة',
+                                        'code' => '2102',
+                                        'balance' => round($totalLockedWallets, 2),
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ],
+                    [
+                        'name' => 'Equity',
+                        'name_ar' => 'حقوق الملكية',
+                        'code' => '3',
+                        'balance' => round($equityBalance, 2),
+                        'children' => [
+                            [
+                                'name' => 'Retained Earnings',
+                                'name_ar' => 'الأرباح المرحلة / رأس المال المؤقت',
+                                'code' => '31',
+                                'balance' => round($equityBalance, 2),
+                            ]
+                        ]
+                    ],
+                    [
+                        'name' => 'Revenue',
+                        'name_ar' => 'الإيرادات',
+                        'code' => '4',
+                        'balance' => round($totalPaidRevenue, 2),
+                        'children' => [
+                            [
+                                'name' => 'Operating Revenue',
+                                'name_ar' => 'الإيرادات التشغيلية',
+                                'code' => '41',
+                                'balance' => round($totalPaidRevenue, 2),
+                                'children' => [
+                                    [
+                                        'name' => 'Invoice Sales',
+                                        'name_ar' => 'مبيعات الفواتير المحصلة',
+                                        'code' => '4101',
+                                        'balance' => round($totalPaidRevenue, 2),
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ],
+                    [
+                        'name' => 'Expenses',
+                        'name_ar' => 'المصروفات',
+                        'code' => '5',
+                        'balance' => round($totalCosts, 2),
+                        'children' => [
+                            [
+                                'name' => 'Operating Expenses',
+                                'name_ar' => 'المصروفات التشغيلية',
+                                'code' => '51',
+                                'balance' => round($totalCosts, 2),
+                                'children' => [
+                                    [
+                                        'name' => 'Project & Invoice Costs',
+                                        'name_ar' => 'تكاليف المشاريع والفواتير',
+                                        'code' => '5101',
+                                        'balance' => round($totalCosts, 2),
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
+            ];
         }
 
         return Inertia::render('ERP/Dashboard', [
@@ -384,6 +523,7 @@ class ERPDashboardController extends Controller
             'notes' => $notes,
             'transactions' => $transactions,
             'transactionStats' => $transactionStats,
+            'chartOfAccounts' => $chartOfAccounts,
             'hasMultiCurrency' => $user->hasModuleSubscription('erp-multi-currency'),
             'currencies' => \App\Models\Currency::all(),
             'filters' => $request->only(['search']),

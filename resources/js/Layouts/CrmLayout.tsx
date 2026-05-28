@@ -3,6 +3,7 @@ import { Head, Link, usePage } from '@inertiajs/react';
 import { ChevronRight, ArrowLeft, LayoutDashboard, Users, Mail, PlayCircle, Settings } from 'lucide-react';
 import { Toaster } from '@/Components/ui/toaster';
 import { CrmCommandPalette } from '@/Components/CRM/CrmCommandPalette';
+import { FlashHandler } from '@/Components/FlashHandler';
 
 interface CrmLayoutProps extends PropsWithChildren {
     title: string;
@@ -171,6 +172,7 @@ export default function CrmLayout({ title, activeMenu, children }: CrmLayoutProp
             </div>
             
             <CrmCommandPalette open={cmdOpen} setOpen={setCmdOpen} onOpenLead={() => {}} />
+            <FlashHandler />
             <Toaster />
         </div>
     );

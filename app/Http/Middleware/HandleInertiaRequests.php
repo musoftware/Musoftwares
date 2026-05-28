@@ -133,7 +133,11 @@ class HandleInertiaRequests extends Middleware
                 'string_format' => $c->string_format,
             ])->toArray(),
             'flash' => [
-                'message' => fn () => $request->session()->get('message')
+                'message' => fn () => $request->session()->get('message'),
+                'success' => fn () => $request->session()->get('success'),
+                'error' => fn () => $request->session()->get('error'),
+                'danger' => fn () => $request->session()->get('danger'),
+                'warning' => fn () => $request->session()->get('warning'),
             ],
         ];
     }

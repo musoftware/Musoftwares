@@ -28,6 +28,7 @@ import { FloatingQuickAdd } from '@/Components/CRM/FloatingQuickAdd';
 import axios from 'axios';
 import FreelanceModeToggle from '@/Components/Freelance/FreelanceModeToggle';
 import MarketplaceModeToggle from '@/Components/Marketplace/MarketplaceModeToggle';
+import { FlashHandler } from '@/Components/FlashHandler';
 
 export default function Authenticated(props: PropsWithChildren<{ header?: ReactNode }>) {
     return (
@@ -84,11 +85,7 @@ function AuthenticatedContent({
     const [isTourOpen, setIsTourOpen] = useState(false);
     const [tourStep, setTourStep] = useState(1);
 
-    useEffect(() => {
-        if (flash?.message) {
-            toast({ description: flash.message });
-        }
-    }, [flash]);
+
 
     // Check if product tour should auto-open for new users
     useEffect(() => {
@@ -765,6 +762,7 @@ function AuthenticatedContent({
 
             <CommandPalette />
             <FloatingQuickAdd />
+            <FlashHandler />
             <Toaster />
         </div>
     );
