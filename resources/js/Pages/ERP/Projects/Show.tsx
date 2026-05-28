@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, useForm } from '@inertiajs/react';
 import ERPLayout from '@/Layouts/ERPLayout';
 import { useERPMenu } from '@/hooks/useERPMenu';
 import { Badge } from '@/Components/ui/badge';
@@ -10,10 +10,19 @@ import { CurrencyDisplay } from '@/Components/ui/CurrencyDisplay';
 import { DateDisplay } from '@/Components/ui/DateDisplay';
 import { EmptyState } from '@/Components/ui/EmptyState';
 import {
+    Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter
+} from '@/Components/ui/dialog';
+import { Input } from '@/Components/ui/input';
+import { Label } from '@/Components/ui/label';
+import { Textarea } from '@/Components/ui/textarea';
+import {
     ArrowLeft, Briefcase, FileText, CheckCircle2, Clock, DollarSign,
     MessageSquare, Activity, ChevronRight, Edit2, ShieldAlert,
-    TrendingUp, TrendingDown, Layers, CheckSquare, Plus, ArrowUpRight, BarChart2
+    TrendingUp, TrendingDown, Layers, CheckSquare, Plus, ArrowUpRight, BarChart2,
+    Wallet, ArrowDownLeft, RotateCcw
 } from 'lucide-react';
+
+const __ = (key: string) => key;
 
 interface Project {
     id: number;
@@ -25,10 +34,12 @@ interface Project {
     created_at: string;
     client?: { id: number; name: string; email: string };
     leader: string;
+    currency?: { id: number; currency: string };
 }
 
 interface Stats {
     businessCurrency: string;
+    projectCurrency: string;
     paidInvoicesCount: number;
     unpaidInvoicesCount: number;
     totalInvoicesCount: number;
@@ -47,6 +58,19 @@ interface Invoice {
     business_amount: number;
     currency: string;
     created_at: string;
+}
+
+interface Transaction {
+    id: number;
+    reference_id: string;
+    type: string;
+    note: string;
+    direction: string;
+    amount: number;
+    business_amount: number;
+    currency: string;
+    date: string;
+    authorizer: string;
 }
 
 interface Expense {
@@ -89,6 +113,7 @@ interface Props {
     project: Project;
     stats: Stats;
     invoices: Invoice[];
+    transactions: Transaction[];
     expenses: Expense[];
     tasks: Task[];
     tickets: Ticket[];
@@ -100,6 +125,7 @@ export default function ProjectShow({
     project,
     stats,
     invoices,
+    transactions,
     expenses,
     tasks,
     tickets,
@@ -107,7 +133,28 @@ export default function ProjectShow({
     hasTickets = false
 }: Props) {
     const { menuItems, lockedAddons, workspaceName, tenantId } = useERPMenu('projects');
-    const [activeTab, setActiveTab] = useState<'invoices' | 'expenses' | 'tasks' | 'tickets' | 'activities'>('invoices');
+    const [activeTab, setActiveTab] = useState<'invoices' | 'transactions' | 'expenses' | 'tasks' | 'tickets' | 'activities'>('invoices');
+    const [isCreateTaskOpen, setIsCreateTaskOpen] = useState(false);
+
+    const taskForm = useForm({
+        task_name: '',
+        task_description: '',
+        client_id: project.client?.id || '',
+        project_id: project.id,
+        priority: 'normal',
+        status: 'open',
+        due_date: '',
+    });
+
+    const handleCreateTaskSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        taskForm.post(route('erp.tasks.store'), {
+            onSuccess: () => {
+                setIsCreateTaskOpen(false);
+                taskForm.reset();
+            }
+        });
+    };
 
     const businessCurrency = stats.businessCurrency || 'USD';
 
@@ -146,11 +193,38 @@ export default function ProjectShow({
                         </div>
                     </div>
 
-                    {/* Edit Project Button */}
-                    <div className="flex items-center gap-2">
+                    {/* Action Buttons */}
+                    <div className="flex flex-wrap items-center gap-2">
+                        <Link href={route('erp.invoices.create', { client_id: project.client?.id, project_id: project.id })}>
+                            <Button size="sm" className="gap-1.5 shadow-none bg-slate-900 hover:bg-slate-800 text-white">
+                                <FileText className="w-3.5 h-3.5" /> {__("New Invoice")}
+                            </Button>
+                        </Link>
+                        {project.client && (
+                            <>
+                                <Link href={route('erp.clients.wallet.adjust', project.client.id) + '?type=credit&project_id=' + project.id}>
+                                    <Button size="sm" variant="outline" className="gap-1.5 shadow-none border-slate-200 text-slate-700 hover:bg-slate-50">
+                                        <ArrowDownLeft className="w-3.5 h-3.5 text-emerald-600" /> {__("Receive Money")}
+                                    </Button>
+                                </Link>
+                                <Link href={route('erp.clients.wallet.adjust', project.client.id) + '?type=debit&project_id=' + project.id}>
+                                    <Button size="sm" variant="outline" className="gap-1.5 shadow-none border-slate-200 text-slate-700 hover:bg-slate-50">
+                                        <ArrowUpRight className="w-3.5 h-3.5 text-amber-600" /> {__("Send Money")}
+                                    </Button>
+                                </Link>
+                                <Link href={route('erp.clients.wallet.adjust', project.client.id) + '?type=debit&project_id=' + project.id}>
+                                    <Button size="sm" variant="outline" className="gap-1.5 shadow-none border-slate-200 text-slate-700 hover:bg-slate-50">
+                                        <RotateCcw className="w-3.5 h-3.5 text-blue-600" /> {__("Refund")}
+                                    </Button>
+                                </Link>
+                            </>
+                        )}
+                        <Button size="sm" variant="outline" onClick={() => setIsCreateTaskOpen(true)} className="gap-1.5 shadow-none border-slate-200 text-slate-700 hover:bg-slate-50">
+                            <Plus className="w-3.5 h-3.5 text-indigo-600" /> {__("New Task Board")}
+                        </Button>
                         <Link href={route('erp.projects.edit', project.id)}>
                             <Button size="sm" variant="outline" className="gap-1.5 shadow-none border-slate-200 text-slate-700 hover:bg-slate-50">
-                                <Edit2 className="w-3.5 h-3.5 text-slate-500" /> Edit Project
+                                <Edit2 className="w-3.5 h-3.5 text-slate-500" /> {__("Edit Project")}
                             </Button>
                         </Link>
                     </div>
@@ -161,7 +235,7 @@ export default function ProjectShow({
                     {[
                         { 
                             label: 'Project Budget', 
-                            value: <CurrencyDisplay amount={project.budget} currency={businessCurrency} />, 
+                            value: <CurrencyDisplay amount={project.budget} currency={stats.projectCurrency || 'USD'} />, 
                             sub: 'Allocated budget',
                             icon: Briefcase, 
                             color: 'text-indigo-600' 
@@ -240,6 +314,7 @@ export default function ProjectShow({
                             <div className="flex border-b border-slate-100 bg-slate-50/50 overflow-x-auto">
                                 {[
                                     { id: 'invoices', label: 'Invoices', count: invoices.length, icon: FileText },
+                                    { id: 'transactions', label: 'Transactions', count: transactions.length, icon: Wallet },
                                     { id: 'expenses', label: 'Expenses', count: expenses.length, icon: TrendingDown },
                                     { id: 'tasks', label: 'Tasks', count: tasks.length, icon: CheckSquare },
                                     ...(hasTickets ? [{ id: 'tickets', label: 'Tickets', count: tickets.length, icon: MessageSquare }] : []),
@@ -313,8 +388,99 @@ export default function ProjectShow({
                                         </div>
                                     )
                                 )}
+391: 
+392:                                 {/* 2. Transactions Tab */}
+393:                                 {activeTab === 'transactions' && (
+394:                                     transactions.length === 0 ? (
+395:                                         <EmptyState icon={Wallet} title={__("No transactions recorded")} description={__("Record manual credit or debit adjustments to log transactions.")} className="border-0 rounded-none py-10" />
+396:                                     ) : (
+397:                                         <div className="overflow-x-auto">
+398:                                             <table className="w-full text-left text-sm border-collapse">
+399:                                                 <thead>
+400:                                                     <tr className="bg-slate-50 border-b border-slate-100 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+401:                                                         <th className="px-6 py-3">{__("Reference")}</th>
+402:                                                         <th className="px-6 py-3">{__("Date")}</th>
+403:                                                         <th className="px-6 py-3">{__("Type")}</th>
+404:                                                         <th className="px-6 py-3">{__("Description")}</th>
+405:                                                         <th className="px-6 py-3 text-right">{__("Amount")}</th>
+406:                                                         <th className="px-6 py-3 text-right">{__("Value (Base)")}</th>
+407:                                                     </tr>
+408:                                                 </thead>
+409:                                                 <tbody className="divide-y divide-slate-100 text-[13px] text-slate-600">
+410:                                                     {transactions.map((txn) => (
+411:                                                         <tr key={txn.id} className="hover:bg-slate-50/50 transition-colors">
+412:                                                             <td className="px-6 py-3.5 font-medium text-slate-900">
+413:                                                                 {txn.reference_id}
+414:                                                             </td>
+415:                                                             <td className="px-6 py-3.5">
+416:                                                                 {txn.date}
+417:                                                             </td>
+418:                                                             <td className="px-6 py-3.5">
+419:                                                                 <Badge variant="outline" className={`text-[10px] uppercase font-bold tracking-wider ${
+420:                                                                     txn.direction === 'CREDIT' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-rose-50 text-rose-700 border-rose-200'
+421:                                                                 }`}>
+422:                                                                     {__(txn.type)}
+423:                                                                 </Badge>
+424:                                                             </td>
+425:                                                             <td className="px-6 py-3.5 max-w-xs truncate" title={txn.note}>
+426:                                                                 {txn.note}
+427:                                                             </td>
+428:                                                             <td className="px-6 py-3.5 text-right font-mono font-semibold">
+429:                                                                 <CurrencyDisplay amount={txn.amount} currency={stats.projectCurrency || 'USD'} />
+430:                                                             </td>
+431:                                                             <td className="px-6 py-3.5 text-right font-mono text-slate-500">
 
-                                {/* 2. Expenses Tab */}
+                                {/* 2. Transactions Tab */}
+                                {activeTab === 'transactions' && (
+                                    transactions.length === 0 ? (
+                                        <EmptyState icon={Wallet} title={__("No transactions recorded")} description={__("Record manual credit or debit adjustments to log transactions.")} className="border-0 rounded-none py-10" />
+                                    ) : (
+                                        <div className="overflow-x-auto">
+                                            <table className="w-full text-left text-sm border-collapse">
+                                                <thead>
+                                                    <tr className="bg-slate-50 border-b border-slate-100 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                                                        <th className="px-6 py-3">{__("Reference")}</th>
+                                                        <th className="px-6 py-3">{__("Date")}</th>
+                                                        <th className="px-6 py-3">{__("Type")}</th>
+                                                        <th className="px-6 py-3">{__("Description")}</th>
+                                                        <th className="px-6 py-3 text-right">{__("Amount")}</th>
+                                                        <th className="px-6 py-3 text-right">{__("Value (Base)")}</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody className="divide-y divide-slate-100 text-[13px] text-slate-600">
+                                                    {transactions.map((txn) => (
+                                                        <tr key={txn.id} className="hover:bg-slate-50/50 transition-colors">
+                                                            <td className="px-6 py-3.5 font-medium text-slate-900">
+                                                                {txn.reference_id}
+                                                            </td>
+                                                            <td className="px-6 py-3.5">
+                                                                {txn.date}
+                                                            </td>
+                                                            <td className="px-6 py-3.5">
+                                                                <Badge variant="outline" className={`text-[10px] uppercase font-bold tracking-wider ${
+                                                                    txn.direction === 'CREDIT' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-rose-50 text-rose-700 border-rose-200'
+                                                                }`}>
+                                                                    {__(txn.type)}
+                                                                </Badge>
+                                                            </td>
+                                                            <td className="px-6 py-3.5 max-w-xs truncate" title={txn.note}>
+                                                                {txn.note}
+                                                            </td>
+                                                            <td className="px-6 py-3.5 text-right font-mono font-semibold">
+                                                                <CurrencyDisplay amount={txn.amount} currency={stats.projectCurrency || 'USD'} />
+                                                            </td>
+                                                            <td className="px-6 py-3.5 text-right font-mono text-slate-500">
+                                                                <CurrencyDisplay amount={txn.business_amount} currency={businessCurrency} />
+                                                            </td>
+                                                        </tr>
+                                                    ))}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    )
+                                )}
+
+                                {/* 3. Expenses Tab */}
                                 {activeTab === 'expenses' && (
                                     expenses.length === 0 ? (
                                         <EmptyState icon={TrendingDown} title="No expenses recorded" description="Add costs inside invoices to log project expenses." className="border-0 rounded-none py-10" />
@@ -509,8 +675,117 @@ export default function ProjectShow({
                             </CardContent>
                         </Card>
                     </div>
-                </div>
-            </div>
+            {/* Create Task Board Dialog Modal */}
+            <Dialog open={isCreateTaskOpen} onOpenChange={setIsCreateTaskOpen}>
+                <DialogContent className="sm:max-w-[480px]">
+                    <DialogHeader>
+                        <DialogTitle className="flex items-center gap-2">
+                            <Plus className="h-5 w-5 text-primary" />
+                            {__("Create Task Board")}
+                        </DialogTitle>
+                        <DialogDescription className="text-xs">
+                            {__("Set up a shared, dedicated board where you can add, organize, and check off todo list items for this project.")}
+                        </DialogDescription>
+                    </DialogHeader>
+
+                    <form onSubmit={handleCreateTaskSubmit} className="space-y-4 py-2 text-xs">
+                        {/* Name */}
+                        <div className="space-y-1.5">
+                            <Label htmlFor="task_name" className="text-xs font-semibold text-foreground">{__("Task Board Title")}</Label>
+                            <Input 
+                                id="task_name"
+                                value={taskForm.data.task_name}
+                                onChange={(e) => taskForm.setData('task_name', e.target.value)}
+                                placeholder={__("e.g. Phase 1 — UI Design & Prototypes")}
+                                className="shadow-none h-9 text-xs"
+                                required
+                            />
+                            {taskForm.errors.task_name && <p className="text-rose-500 text-[11px] font-medium">{taskForm.errors.task_name}</p>}
+                        </div>
+
+                        {/* Description */}
+                        <div className="space-y-1.5">
+                            <Label htmlFor="task_description" className="text-xs font-semibold text-foreground">{__("Brief Description")}</Label>
+                            <Textarea 
+                                id="task_description"
+                                value={taskForm.data.task_description}
+                                onChange={(e) => taskForm.setData('task_description', e.target.value)}
+                                placeholder={__("Detail what this board represents for your client...")}
+                                className="shadow-none text-xs min-h-[80px] resize-none"
+                            />
+                            {taskForm.errors.task_description && <p className="text-rose-500 text-[11px] font-medium">{taskForm.errors.task_description}</p>}
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-4">
+                            {/* Priority */}
+                            <div className="space-y-1.5">
+                                <Label htmlFor="priority" className="text-xs font-semibold text-foreground">{__("Priority Level")}</Label>
+                                <select
+                                    id="priority"
+                                    value={taskForm.data.priority}
+                                    onChange={(e) => taskForm.setData('priority', e.target.value)}
+                                    className="w-full rounded-md border border-input bg-transparent px-3 py-1.5 text-xs shadow-none focus:outline-none focus:ring-1 focus:ring-ring"
+                                >
+                                    <option value="low">{__("Low")}</option>
+                                    <option value="normal">{__("Normal")}</option>
+                                    <option value="high">{__("High")}</option>
+                                    <option value="urgent">{__("Urgent")}</option>
+                                </select>
+                                {taskForm.errors.priority && <p className="text-rose-500 text-[11px] font-medium">{taskForm.errors.priority}</p>}
+                            </div>
+
+                            {/* Status */}
+                            <div className="space-y-1.5">
+                                <Label htmlFor="status" className="text-xs font-semibold text-foreground">{__("Initial Status")}</Label>
+                                <select
+                                    id="status"
+                                    value={taskForm.data.status}
+                                    onChange={(e) => taskForm.setData('status', e.target.value)}
+                                    className="w-full rounded-md border border-input bg-transparent px-3 py-1.5 text-xs shadow-none focus:outline-none focus:ring-1 focus:ring-ring"
+                                >
+                                    <option value="open">{__("Open")}</option>
+                                    <option value="in_progress">{__("In Progress")}</option>
+                                    <option value="review">{__("Review")}</option>
+                                    <option value="completed">{__("Completed")}</option>
+                                </select>
+                                {taskForm.errors.status && <p className="text-rose-500 text-[11px] font-medium">{taskForm.errors.status}</p>}
+                            </div>
+                        </div>
+
+                        {/* Due Date */}
+                        <div className="space-y-1.5">
+                            <Label htmlFor="due_date" className="text-xs font-semibold text-foreground">{__("Target Due Date")}</Label>
+                            <Input 
+                                id="due_date"
+                                type="date"
+                                value={taskForm.data.due_date}
+                                onChange={(e) => taskForm.setData('due_date', e.target.value)}
+                                className="shadow-none h-9 text-xs"
+                            />
+                            {taskForm.errors.due_date && <p className="text-rose-500 text-[11px] font-medium">{taskForm.errors.due_date}</p>}
+                        </div>
+
+                        <DialogFooter className="pt-4 border-t border-border mt-4">
+                            <Button 
+                                type="button" 
+                                variant="outline" 
+                                onClick={() => setIsCreateTaskOpen(false)}
+                                className="shadow-none text-xs"
+                                disabled={taskForm.processing}
+                            >
+                                {__("Cancel")}
+                            </Button>
+                            <Button 
+                                type="submit" 
+                                className="shadow-none text-xs gap-2"
+                                disabled={taskForm.processing}
+                            >
+                                {__("Create Board")}
+                            </Button>
+                        </DialogFooter>
+                    </form>
+                </DialogContent>
+            </Dialog>
         </ERPLayout>
     );
 }

@@ -27,6 +27,7 @@ Always define explicit routes for creating and editing resources:
 - **Navigation:** The form page must include a clear "Back" or "Cancel" button to return to the previous index or detail view.
 - **Header:** Use the standard page header component (e.g., `<x-client.section-header>`) with a clear title like "Create [Entity]" or "Edit [Entity]".
 - **Layout:** Wrap the form in an appropriate card layout (e.g., `<x-client.form-card>`) as per the standard design system.
+- **Full Width Constraint:** Every Create and Edit form container (the card wrapping the form fields) MUST span the **full width** of the main content area (e.g., using `w-full` or `max-w-7xl` or equivalent full width styling). Never use a narrow layout (e.g., centering the form card with large left/right empty margins, or setting fixed narrow max-widths like `max-w-md` or `max-w-2xl` for the card).
 
 ### 3. What is NOT Allowed
 - `shadcn/ui` Dialogs or Modals for creating/editing main resources.

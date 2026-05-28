@@ -21,7 +21,7 @@ function FieldError({ message }) {
     );
 }
 
-export default function CreateEdit({ invoice, clients = [], projects = [], currencies, business_currency, pre_selected_client_id }) {
+export default function CreateEdit({ invoice, clients = [], projects = [], currencies, business_currency, pre_selected_client_id, pre_selected_project_id }) {
     const isEdit = !!invoice;
     const [showCosts, setShowCosts] = useState(false);
     const [clientError, setClientError] = useState('');
@@ -30,7 +30,7 @@ export default function CreateEdit({ invoice, clients = [], projects = [], curre
 
     const { data, setData, post, put, processing, errors } = useForm({
         client_id: invoice?.client_id || pre_selected_client_id || '',
-        project_id: invoice?.project_id || '',
+        project_id: invoice?.project_id || pre_selected_project_id || '',
         invoice_number: invoice?.invoice_number || `INV-${Date.now()}`,
         issued_at: invoice?.issued_at?.split('T')[0] || new Date().toISOString().split('T')[0],
         due_date: invoice?.due_date?.split('T')[0] || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
@@ -62,7 +62,7 @@ export default function CreateEdit({ invoice, clients = [], projects = [], curre
         } else {
             setData('project_id', '');
         }
-    }, [data.client_id, clients]);
+    }, [data.client_id, clients, projects]);
 
     const filteredProjects = data.client_id
         ? projects.filter(p => String(p.client_id) === String(data.client_id))

@@ -47,7 +47,7 @@ import {
     UserPlus,
     Sliders,
     AlertCircle,
-    Cloud, Database, Link as LinkIcon, HardDrive, Key, CheckCircle, SearchCode, Lock,
+    Cloud, Database, Link as LinkIcon, HardDrive, Key, CheckCircle, SearchCode, Lock, Layers,
     MoreHorizontal, Wallet, RotateCcw, ArrowDownLeft, ArrowUpDown, ArrowDown, ArrowUp
 } from 'lucide-react';
 import {
@@ -71,6 +71,8 @@ import { ConfirmModal } from '@/Components/ui/ConfirmModal';
 import { OperationalCard } from '@/Components/ui/OperationalCard';
 import { StatusBadge } from '@/Components/ui/StatusBadge';
 import { useERPMenu } from '@/hooks/useERPMenu';
+
+const __ = (key: string) => key;
 
 // FinancialAmount now uses CurrencyDisplay from the component library
 export function FinancialAmount({ amount, currency = 'USD', colorize = false }: { amount: number; currency?: string; colorize?: boolean }) {
@@ -686,13 +688,12 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
         });
     };
 
-    // Confirm Delete Project
     const confirmDeleteProject = () => {
         if (!deleteProjectConfirm.project) return;
         router.delete(route('erp.projects.destroy', deleteProjectConfirm.project.id), {
             onSuccess: () => {
-                toast({ description: `Project deleted successfully.` });
-                prependActivity('Project Deleted', `Deleted project ${deleteProjectConfirm.project.name}.`);
+                toast({ description: __('erp.project_deleted_success') });
+                prependActivity(__('erp.activity.project_deleted'), `Deleted project ${deleteProjectConfirm.project.name}.`);
                 setDeleteProjectConfirm({ open: false, project: null });
             }
         });
@@ -1336,23 +1337,13 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                                                     </div>
                                                     {!isReadOnlyMember && (
                                                         <div className="flex items-center gap-1">
-                                                            <button 
-                                                                onClick={() => {
-                                                                    setEditProjectForm({
-                                                                        id: proj.id,
-                                                                        name: proj.name,
-                                                                        client_id: proj.client_id || '',
-                                                                        budget: proj.budget || '',
-                                                                        due_date: proj.deadline || '',
-                                                                        status: proj.status || 'Planning'
-                                                                    });
-                                                                    setShowEditProjectModal(true);
-                                                                }}
-                                                                className="p-1.5 hover:bg-slate-100 rounded text-slate-500 transition-colors"
+                                                            <Link 
+                                                                href={route('erp.projects.edit', proj.id)}
+                                                                className="p-1.5 hover:bg-slate-100 rounded text-slate-500 transition-colors inline-block"
                                                                 title="Edit Project"
                                                             >
                                                                 <Edit2 className="h-3.5 w-3.5" />
-                                                            </button>
+                                                            </Link>
                                                             <button 
                                                                 onClick={() => setDeleteProjectConfirm({ open: true, project: proj })}
                                                                 className="p-1.5 hover:bg-rose-50 rounded text-rose-500 transition-colors"

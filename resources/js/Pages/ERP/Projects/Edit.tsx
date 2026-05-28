@@ -37,7 +37,7 @@ export default function EditProject({ project, clients = [] }: { project: any, c
     return (
         <ERPLayout title={`Edit — ${project.name}`} workspaceName={workspaceName} tenantId={tenantId} menuItems={menuItems} lockedAddons={lockedAddons}>
 
-            <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8 space-y-6">
+            <div className="w-full px-4 sm:px-6 lg:px-8 py-8 space-y-6">
                 <div className="flex items-center gap-4">
                     <Link href={route('erp.dashboard', { section: 'projects' })} className="text-slate-400 hover:text-slate-900 transition-colors">
                         <ArrowLeft className="w-5 h-5" />

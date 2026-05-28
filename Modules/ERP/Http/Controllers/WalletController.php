@@ -119,14 +119,23 @@ class WalletController extends Controller
     public function manualCredit(Request $request, int $client)
     {
         $request->validate([
-            'amount' => 'required|numeric|min:0.01',
-            'note'   => 'required|string|max:500',
+            'amount'     => 'required|numeric|min:0.01',
+            'note'       => 'required|string|max:500',
+            'project_id' => 'nullable|exists:erp_projects,id',
         ]);
 
         [$tenant, $clientModel] = $this->resolveTenantAndClient($client);
 
         try {
-            DB::transaction(function () use ($request, $tenant, $clientModel) {
+            $projectId = $request->input('project_id');
+            if ($projectId) {
+                $project = \Modules\ERP\Models\Project::where('tenant_id', $tenant->id)->findOrFail($projectId);
+                if ($project->client_id !== $clientModel->id) {
+                    throw new \Exception(__('errors.project_client_mismatch'));
+                }
+            }
+
+            DB::transaction(function () use ($request, $tenant, $clientModel, $projectId) {
                 $amount = (float) $request->input('amount');
 
                 $businessCurrencyId = $tenant->base_currency_id;
@@ -140,6 +149,7 @@ class WalletController extends Controller
                 ClientWalletTransaction::create([
                     'tenant_id'        => $tenant->id,
                     'client_id'        => $clientModel->id,
+                    'project_id'       => $projectId,
                     'type'             => 'manual_credit',
                     'direction'        => 'credit',
                     'amount'           => $amount,
@@ -155,6 +165,11 @@ class WalletController extends Controller
                 ]);
             });
 
+            if ($projectId) {
+                return redirect()->route('erp.projects.show', $projectId)
+                    ->with('success', __('erp.client_credit_added_success'));
+            }
+
             return back()->with('success', __('erp.client_credit_added_success'));
         } catch (\Exception $e) {
             return back()->withErrors(['amount' => $e->getMessage()]);
@@ -166,14 +181,23 @@ class WalletController extends Controller
     public function manualDebit(Request $request, int $client)
     {
         $request->validate([
-            'amount' => 'required|numeric|min:0.01',
-            'note'   => 'required|string|max:500',
+            'amount'     => 'required|numeric|min:0.01',
+            'note'       => 'required|string|max:500',
+            'project_id' => 'nullable|exists:erp_projects,id',
         ]);
 
         [$tenant, $clientModel] = $this->resolveTenantAndClient($client);
 
         try {
-            DB::transaction(function () use ($request, $tenant, $clientModel) {
+            $projectId = $request->input('project_id');
+            if ($projectId) {
+                $project = \Modules\ERP\Models\Project::where('tenant_id', $tenant->id)->findOrFail($projectId);
+                if ($project->client_id !== $clientModel->id) {
+                    throw new \Exception(__('errors.project_client_mismatch'));
+                }
+            }
+
+            DB::transaction(function () use ($request, $tenant, $clientModel, $projectId) {
                 $amount = (float) $request->input('amount');
 
                 if ($clientModel->balance() < $amount) {
@@ -191,6 +215,7 @@ class WalletController extends Controller
                 ClientWalletTransaction::create([
                     'tenant_id'        => $tenant->id,
                     'client_id'        => $clientModel->id,
+                    'project_id'       => $projectId,
                     'type'             => 'manual_debit',
                     'direction'        => 'debit',
                     'amount'           => $amount,
@@ -205,6 +230,11 @@ class WalletController extends Controller
                     'created_by'       => Auth::id(),
                 ]);
             });
+
+            if ($projectId) {
+                return redirect()->route('erp.projects.show', $projectId)
+                    ->with('success', __('erp.client_debit_recorded_success'));
+            }
 
             return back()->with('success', __('erp.client_debit_recorded_success'));
         } catch (\Exception $e) {

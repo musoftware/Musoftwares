@@ -31,6 +31,15 @@ return new class extends Migration
                 $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
                 $table->timestamps();
             });
+        } else {
+            if (!Schema::hasColumn('erp_projects', 'currency_id')) {
+                Schema::table('erp_projects', function (Blueprint $table) {
+                    if (Schema::hasColumn('erp_projects', 'currency')) {
+                        $table->dropColumn('currency');
+                    }
+                    $table->foreignId('currency_id')->nullable()->constrained('currencies')->onDelete('set null');
+                });
+            }
         }
 
         // Helper function to check if foreign key exists in MySQL
