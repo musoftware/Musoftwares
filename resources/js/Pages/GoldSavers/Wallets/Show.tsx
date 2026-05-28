@@ -95,23 +95,23 @@ export default function WalletsShow({ wallet }: WalletsShowProps) {
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <Card>
+                        <Card className="hover:-translate-y-1 hover:shadow-lg transition-all duration-300 cursor-default">
                             <CardHeader className="pb-2">
                                 <CardTitle className="text-sm font-medium text-muted-foreground">Total Grams</CardTitle>
                             </CardHeader>
                             <CardContent>
-                                <div className="text-3xl font-bold">{wallet.balance_grams} g</div>
+                                <div className="text-3xl font-bold text-indigo-700">{wallet.balance_grams} g</div>
                             </CardContent>
                         </Card>
-                        <Card>
+                        <Card className="hover:-translate-y-1 hover:shadow-lg transition-all duration-300 cursor-default">
                             <CardHeader className="pb-2">
                                 <CardTitle className="text-sm font-medium text-muted-foreground">Total Investment Value</CardTitle>
                             </CardHeader>
                             <CardContent>
-                                <div className="text-3xl font-bold">{formatNumber(wallet.balance_amount)} {wallet.currency}</div>
+                                <div className="text-3xl font-bold">{formatNumber(wallet.balance_amount)} <span className="text-lg text-muted-foreground">{wallet.currency}</span></div>
                             </CardContent>
                         </Card>
-                        <Card>
+                        <Card className="hover:-translate-y-1 hover:shadow-lg transition-all duration-300 cursor-default">
                             <CardHeader className="pb-2">
                                 <CardTitle className="text-sm font-medium text-muted-foreground">Goal Progress</CardTitle>
                             </CardHeader>

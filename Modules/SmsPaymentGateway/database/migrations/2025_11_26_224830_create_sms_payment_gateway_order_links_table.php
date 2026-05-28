@@ -24,7 +24,7 @@ return new class extends Migration
             $table->index('phone_number');
             $table->index('status');
             $table->index('created_at');
-            $table->index(['user_id', 'phone_number', 'status']);
+            $table->index(['user_id', 'phone_number', 'status'], 'spg_order_links_u_p_s_idx');
         });
     }
 
