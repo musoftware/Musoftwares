@@ -35,7 +35,6 @@ import {
     Eye,
     TrendingUp,
     TrendingDown,
-    Layers,
     Share2,
     Inbox,
     FileSpreadsheet,
@@ -86,47 +85,6 @@ export function FinancialAmount({ amount, currency = 'USD', colorize = false }: 
             {colorize && numericAmount > 0 ? '+' : ''}
             <CurrencyDisplay amount={numericAmount} currency={currency} />
         </span>
-    );
-}
-
-function COANode({ node, currency, defaultExpanded = true }: { node: any; currency: string; defaultExpanded?: boolean }) {
-    const [isOpen, setIsOpen] = useState(defaultExpanded);
-    const hasChildren = node.children && node.children.length > 0;
-
-    useEffect(() => {
-        setIsOpen(defaultExpanded);
-    }, [defaultExpanded]);
-
-    return (
-        <div className="pl-4 border-l border-slate-100 mt-2 select-none">
-            <div className="flex items-center justify-between py-2 px-3 rounded-xl hover:bg-slate-50 transition-all group duration-150">
-                <div 
-                    className="flex items-center gap-2 cursor-pointer flex-1" 
-                    onClick={() => hasChildren && setIsOpen(!isOpen)}
-                >
-                    {hasChildren ? (
-                        <span className="text-slate-400 font-mono text-[11px] w-4 h-4 flex items-center justify-center rounded bg-slate-100 group-hover:bg-slate-200 transition-colors">
-                            {isOpen ? '−' : '+'}
-                        </span>
-                    ) : (
-                        <span className="w-4 h-4 flex items-center justify-center text-[13px] text-slate-350">•</span>
-                    )}
-                    <span className="font-mono text-xs text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded font-medium">{node.code}</span>
-                    <span className="font-semibold text-slate-800 text-[13px] group-hover:text-primary transition-colors">{node.name}</span>
-                    <span className="text-slate-450 text-xs font-normal">/ {node.name_ar}</span>
-                </div>
-                <div className="font-mono font-bold text-xs text-slate-900 pr-1">
-                    <CurrencyDisplay amount={node.balance} currency={currency} />
-                </div>
-            </div>
-            {hasChildren && isOpen && (
-                <div className="space-y-1 mt-1 transition-all pl-1">
-                    {node.children.map((child: any) => (
-                        <COANode key={child.code} node={child} currency={currency} defaultExpanded={defaultExpanded} />
-                    ))}
-                </div>
-            )}
-        </div>
     );
 }
 
@@ -207,15 +165,23 @@ interface ERPDashboardProps {
         netFlow: number;
         txnCount: number;
     };
-    chartOfAccounts?: any;
+
     hasMultiCurrency?: boolean;
     filters?: {
         search?: string;
     };
     currencies?: Array<{ id: number; currency: string; symbol: string }>;
+    expenses?: Array<{
+        id: number;
+        title: string;
+        amount: number;
+        category: string;
+        date: string;
+        description: string;
+    }>;
 }
 
-export default function ERPDashboard({ tenant: serverTenant, stats: serverStats, clients: serverClients, invoices: serverInvoices, chartData: serverChartData, projects: serverProjects, supportTickets: serverTickets, activityLogs: serverActivityLogs, upcomingBookings: serverBookings, storageProviders: serverStorageProviders, documents: serverDocuments, tasks: serverTasks, notes: serverNotes, transactions: serverTransactions, transactionStats: serverTransactionStats, chartOfAccounts = null, hasMultiCurrency = false, currencies = [], filters = {} }: ERPDashboardProps) {
+export default function ERPDashboard({ tenant: serverTenant, stats: serverStats, clients: serverClients, invoices: serverInvoices, chartData: serverChartData, projects: serverProjects, expenses: serverExpenses = [], supportTickets: serverTickets, activityLogs: serverActivityLogs, upcomingBookings: serverBookings, storageProviders: serverStorageProviders, documents: serverDocuments, tasks: serverTasks, notes: serverNotes, transactions: serverTransactions, transactionStats: serverTransactionStats, hasMultiCurrency = false, currencies = [], filters = {} }: ERPDashboardProps) {
     const { toast } = useToast();
     const { auth } = usePage().props as any;
     const isTeamMember = !!auth?.team_member;
@@ -280,6 +246,10 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
         setTransactions(serverTransactions || []);
     }, [serverTransactions]);
 
+    useEffect(() => {
+        setExpenses(serverExpenses || []);
+    }, [serverExpenses]);
+
     const [deleteConfirm, setDeleteConfirm] = useState<{ open: boolean; client: any }>({ open: false, client: null });
     const [actionModalClient, setActionModalClient] = useState<any>(null);
 
@@ -302,7 +272,7 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
     const [showAddClientModal, setShowAddClientModal] = useState(false);
     const [showEditClientModal, setShowEditClientModal] = useState(false);
     const [showWalletModal, setShowWalletModal] = useState(false);
-    const [showCOAModal, setShowCOAModal] = useState(false);
+
 
     // Form inputs for Client operations
     const [clientForm, setClientForm] = useState({
@@ -334,6 +304,7 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
     });
     const [showEditProjectModal, setShowEditProjectModal] = useState(false);
     const [deleteProjectConfirm, setDeleteProjectConfirm] = useState<{ open: boolean; project: any }>({ open: false, project: null });
+    const [deleteExpenseConfirm, setDeleteExpenseConfirm] = useState<{ open: boolean; expense: any }>({ open: false, expense: null });
 
     // Using real server tasks if available, fallback to empty
     const [tasks, setTasks] = useState<Array<any>>(serverTasks || []);
@@ -385,7 +356,7 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
         return tasks.filter(t => !t.due_date && t.category !== 'Done');
     }, [tasks]);
 
-    const [expenses, setExpenses] = useState<Array<any>>([]);
+    const [expenses, setExpenses] = useState<Array<any>>(serverExpenses || []);
     const [expenseForm, setExpenseForm] = useState({ title: '', category: 'Software', amount: '', date: '', status: 'Pending' });
     const [showAddExpenseModal, setShowAddExpenseModal] = useState(false);
 
@@ -727,6 +698,17 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
         });
     };
 
+    const confirmDeleteExpense = () => {
+        if (!deleteExpenseConfirm.expense) return;
+        router.delete(route('erp.expenses.destroy', deleteExpenseConfirm.expense.id), {
+            onSuccess: () => {
+                toast({ description: 'Expense deleted successfully.' });
+                prependActivity('Expense Deleted', `Deleted expense "${deleteExpenseConfirm.expense.title}".`);
+                setDeleteExpenseConfirm({ open: false, expense: null });
+            }
+        });
+    };
+
     // Draft Contract
     const handleAddContract = (e: React.FormEvent) => {
         e.preventDefault();
@@ -870,6 +852,7 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
         { id: 'tasks', label: 'Tasks', icon: CheckSquare, badge: tasks.filter(t => t.category !== 'Done').length },
         { id: 'invoices', label: 'Invoices', icon: FileText, badge: activeInvoices.filter(inv => inv.status !== 'paid').length },
         { id: 'transactions', label: 'Transactions', icon: History },
+        { id: 'expenses', label: 'Expenses', icon: Receipt },
         { id: 'documents', label: 'Files', icon: Folder },
         { id: 'notes', label: 'Notes', icon: Pin },
         { id: 'calendar', label: 'Calendar', icon: CalendarIcon },
@@ -934,6 +917,17 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                 variant="danger"
                 onConfirm={confirmDeleteProject}
                 onCancel={() => setDeleteProjectConfirm({ open: false, project: null })}
+            />
+
+            {/* ConfirmModal for expense deletion */}
+            <ConfirmModal
+                isOpen={deleteExpenseConfirm.open}
+                title="Delete Expense"
+                description={`Are you sure you want to delete "${deleteExpenseConfirm.expense?.title}"? This cannot be undone.`}
+                confirmLabel="Delete Expense"
+                variant="danger"
+                onConfirm={confirmDeleteExpense}
+                onCancel={() => setDeleteExpenseConfirm({ open: false, expense: null })}
             />
                         
                         {/* 1. OVERVIEW (DASHBOARD) */}
@@ -1337,7 +1331,7 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
 
                                                 <div className="flex items-center justify-between text-xs pt-3 border-t border-slate-100 text-slate-400 font-mono">
                                                     <div className="flex items-center gap-4">
-                                                        <span>Budget: <span className="font-semibold text-slate-700">{formatMoney(proj.budget, 'USD')}</span></span>
+                                                        <span>Budget: <span className="font-semibold text-slate-700">{formatMoney(proj.budget, currency)}</span></span>
                                                         <span>Deadline: <span className="font-semibold text-slate-700">{formatDate(proj.deadline)}</span></span>
                                                     </div>
                                                     {!isReadOnlyMember && (
@@ -1489,14 +1483,24 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                                 <ModulePageHeader 
                                     title="Invoices" 
                                     description="Create, send, and track client invoices."
-                                    actions={!isReadOnlyMember && (
-                                        <Link 
-                                            href={route('erp.invoices.create')}
-                                            className={cn(buttonVariants({ size: 'sm' }), "shadow-none")}
-                                        >
-                                            <Plus className="mr-1.5 h-3.5 w-3.5" /> New Invoice
-                                        </Link>
-                                    )}
+                                    actions={
+                                        <div className="flex items-center gap-2">
+                                            <Link 
+                                                href={route('erp.invoices.index')}
+                                                className={cn(buttonVariants({ variant: 'outline', size: 'sm' }), "shadow-none")}
+                                            >
+                                                <History className="mr-1.5 h-3.5 w-3.5" /> Invoices Archive / الفواتير القديمة
+                                            </Link>
+                                            {!isReadOnlyMember && (
+                                                <Link 
+                                                    href={route('erp.invoices.create')}
+                                                    className={cn(buttonVariants({ size: 'sm' }), "shadow-none")}
+                                                >
+                                                    <Plus className="mr-1.5 h-3.5 w-3.5" /> New Invoice
+                                                </Link>
+                                            )}
+                                        </div>
+                                    }
                                 />
 
                                 <OperationalCard>
@@ -1574,59 +1578,7 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                             </div>
                         )}
 
-                        {/* 6. EXPENSE MANAGEMENT */}
-                        {currentSection === 'expenses' && (
-                            <div className="space-y-6">
-                                <ModulePageHeader 
-                                    title="Expenses" 
-                                    description="Track and log operational expenses."
-                                    actions={
-                                        <Link href={route("erp.expenses.create")}><Button size="sm" className="shadow-none">
-                                            <Plus className="mr-1.5 h-3.5 w-3.5" /> Log Expense
-                                        </Button></Link>
-                                    }
-                                />
 
-                                <OperationalCard>
-                                    <div className="overflow-x-auto">
-                                        <table className="w-full text-left text-sm border-collapse">
-                                            <thead>
-                                                <tr className="bg-slate-50 border-b border-slate-100 text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                                                    <th className="px-6 py-3.5">Expense Title</th>
-                                                    <th className="px-6 py-3.5">Category</th>
-                                                    <th className="px-6 py-3.5">Date logged</th>
-                                                    <th className="px-6 py-3.5 text-right">Amount</th>
-                                                    <th className="px-6 py-3.5 text-center">Status</th>
-                                                    <th className="px-6 py-3.5 text-right">Document</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody className="divide-y divide-slate-100">
-                                                {expenses.map((exp) => (
-                                                    <tr key={exp.id} className="hover:bg-slate-50 transition text-[13px] text-slate-700">
-                                                        <td className="px-6 py-4 font-semibold text-slate-900">{exp.title}</td>
-                                                        <td className="px-6 py-4 text-slate-500 font-medium">{exp.category}</td>
-                                                        <td className="px-6 py-4 text-slate-400 font-mono text-xs">{formatDate(exp.date)}</td>
-                                                        <td className="px-6 py-4 text-right font-bold text-slate-950 font-mono">
-                                                            {formatMoney(exp.amount, 'USD')}
-                                                        </td>
-                                                        <td className="px-6 py-4 text-center">
-                                                            <Badge className={`text-[10px] uppercase font-bold tracking-wider rounded ${
-                                                                exp.status === 'Paid' || exp.status === 'Reimbursed' ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700'
-                                                            }`}>
-                                                                {exp.status}
-                                                            </Badge>
-                                                        </td>
-                                                        <td className="px-6 py-4 text-right text-indigo-600 font-medium hover:underline cursor-pointer font-mono text-xs">
-                                                            {exp.receipt}
-                                                        </td>
-                                                    </tr>
-                                                ))}
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </OperationalCard>
-                            </div>
-                        )}
 
                         {/* 7. DOCUMENT VAULT */}
                         {currentSection === 'documents' && (
@@ -1748,7 +1700,7 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                                                         </td>
                                                         <td className="px-6 py-4 font-medium text-slate-800">{cont.client}</td>
                                                         <td className="px-6 py-4 text-right font-bold text-slate-950 font-mono">
-                                                            {cont.value > 0 ? formatMoney(cont.value, 'USD') : 'N/A'}
+                                                            {cont.value > 0 ? formatMoney(cont.value, currency) : 'N/A'}
                                                         </td>
                                                         <td className="px-6 py-4 text-center">
                                                             <Badge className={`text-[10px] uppercase font-bold tracking-wider rounded ${
@@ -1774,11 +1726,7 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                                 <ModulePageHeader 
                                     title="Transactions" 
                                     description="View all wallet activity, payments, and balance adjustments."
-                                    actions={
-                                        <Button onClick={() => setShowCOAModal(true)} variant="outline" size="sm" className="shadow-none">
-                                            <Layers className="mr-1.5 h-3.5 w-3.5 text-indigo-500" /> Chart of Accounts / شجرة الحسابات
-                                        </Button>
-                                    }
+
                                 />
 
                                 {/* Summary Metric Cards */}
@@ -1902,6 +1850,84 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                                                             <td className="px-5 py-4 text-right text-slate-400 font-mono text-xs">
                                                                 {txn.date}
                                                             </td>
+                                                        </tr>
+                                                    ))
+                                                )}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </OperationalCard>
+                            </div>
+                        )}
+
+                        {/* EXPENSES MANAGEMENT */}
+                        {currentSection === 'expenses' && (
+                            <div className="space-y-6">
+                                <ModulePageHeader 
+                                    title="Expenses" 
+                                    description="Log and manage your business expenses and operating costs."
+                                    actions={!isReadOnlyMember && (
+                                        <Link href={route("erp.expenses.create")}><Button size="sm" className="shadow-none">
+                                            <Plus className="mr-1.5 h-3.5 w-3.5" /> Log Expense
+                                        </Button></Link>
+                                    )}
+                                />
+
+                                <OperationalCard>
+                                    <div className="overflow-x-auto">
+                                        <table className="w-full text-left text-sm border-collapse">
+                                            <thead>
+                                                <tr className="bg-slate-50 border-b border-slate-100 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                                                    <th className="px-6 py-3.5">Expense</th>
+                                                    <th className="px-6 py-3.5">Category</th>
+                                                    <th className="px-6 py-3.5 text-right">Amount</th>
+                                                    <th className="px-6 py-3.5">Date</th>
+                                                    {!isReadOnlyMember && <th className="px-6 py-3.5 text-right">Actions</th>}
+                                                </tr>
+                                            </thead>
+                                            <tbody className="divide-y divide-slate-100">
+                                                {expenses.length === 0 ? (
+                                                    <tr>
+                                                        <td colSpan={isReadOnlyMember ? 4 : 5} className="p-0">
+                                                            <EmptyState 
+                                                                icon={Receipt} 
+                                                                title="No Expenses" 
+                                                                description="Log your first business expense to track workspace costs."
+                                                            />
+                                                        </td>
+                                                    </tr>
+                                                ) : (
+                                                    expenses.map((exp) => (
+                                                        <tr key={exp.id} className="hover:bg-slate-50 transition text-[13px] text-slate-700">
+                                                            <td className="px-6 py-4" data-label="Expense">
+                                                                <span className="font-semibold text-slate-900 block">{exp.title}</span>
+                                                                {exp.description && exp.description !== '-' && (
+                                                                    <span className="text-slate-400 text-xs mt-0.5 block">{exp.description}</span>
+                                                                )}
+                                                            </td>
+                                                            <td className="px-6 py-4" data-label="Category">
+                                                                <Badge variant="outline" className="text-[10px] font-medium text-slate-500 bg-white shadow-none rounded-md">
+                                                                    {exp.category}
+                                                                </Badge>
+                                                            </td>
+                                                            <td className="px-6 py-4 text-right font-semibold text-slate-900 font-mono" data-label="Amount">
+                                                                <CurrencyDisplay amount={exp.amount} currency={currency} />
+                                                            </td>
+                                                            <td className="px-6 py-4 text-slate-500 text-xs font-mono" data-label="Date">
+                                                                {formatDate(exp.date)}
+                                                            </td>
+                                                            {!isReadOnlyMember && (
+                                                                <td className="px-6 py-4 text-right" data-label="Actions">
+                                                                    <div className="flex items-center justify-end gap-2">
+                                                                        <Link href={route('erp.expenses.edit', exp.id)} className={cn(buttonVariants({ variant: 'ghost', size: 'icon' }), "h-8 w-8 text-slate-400 hover:text-indigo-600")}>
+                                                                            <Edit2 className="h-4 w-4" />
+                                                                        </Link>
+                                                                        <Button variant="ghost" size="icon" onClick={() => handleDeleteExpense(exp)} className="h-8 w-8 text-slate-400 hover:text-rose-600">
+                                                                            <Trash2 className="h-4 w-4" />
+                                                                        </Button>
+                                                                    </div>
+                                                                </td>
+                                                            )}
                                                         </tr>
                                                     ))
                                                 )}
@@ -2728,59 +2754,6 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                             );
                         })()}
 
-                        {/* Chart of Accounts Modal */}
-                        <Dialog open={showCOAModal} onOpenChange={setShowCOAModal}>
-                            <DialogContent className="sm:max-w-2xl max-h-[85vh] flex flex-col p-0 overflow-hidden rounded-2xl border-none shadow-xl">
-                                <DialogHeader className="p-6 pb-4 border-b border-slate-100">
-                                    <DialogTitle className="text-lg font-bold text-slate-900 flex items-center gap-2">
-                                        <Layers className="h-5 w-5 text-indigo-600" />
-                                        <span>Chart of Accounts / شجرة الحسابات</span>
-                                    </DialogTitle>
-                                    <CardDescription className="text-xs text-slate-500 mt-1">
-                                        Double-entry trial balance mapping. Every asset, liability, equity, revenue, and expense is represented below.
-                                    </CardDescription>
-                                </DialogHeader>
-
-                                <div className="flex-1 overflow-y-auto p-6 space-y-4">
-                                    {chartOfAccounts ? (
-                                        <div className="space-y-4">
-                                            <div className="bg-slate-50/80 border border-slate-100 p-4 rounded-xl flex items-center justify-between">
-                                                <div>
-                                                    <span className="text-[10px] uppercase font-bold tracking-wider text-slate-400 block">Ledger Currency</span>
-                                                    <span className="font-semibold text-slate-800 text-xs block mt-0.5">{currency}</span>
-                                                </div>
-                                                <div className="text-right">
-                                                    <span className="text-[10px] uppercase font-bold tracking-wider text-slate-400 block">Total Assets Balance</span>
-                                                    <span className="font-mono font-bold text-indigo-600 text-sm block mt-0.5">
-                                                        <CurrencyDisplay amount={chartOfAccounts.balance} currency={currency} />
-                                                    </span>
-                                                </div>
-                                            </div>
-
-                                            <div className="border border-slate-100 rounded-xl p-3 bg-white space-y-1">
-                                                <COANode node={chartOfAccounts} currency={currency} defaultExpanded={true} />
-                                            </div>
-                                        </div>
-                                    ) : (
-                                        <EmptyState
-                                            icon={Layers}
-                                            title="No Chart of Accounts"
-                                            description="Configure a client or wallet to initialize the trial balance ledger."
-                                        />
-                                    )}
-                                </div>
-
-                                <div className="p-4 border-t border-slate-100 bg-slate-50/50 flex items-center justify-between">
-                                    <div className="text-slate-400 text-xs flex items-center gap-1">
-                                        <ShieldCheck className="h-4 w-4 text-emerald-500" />
-                                        Double-entry balance checked.
-                                    </div>
-                                    <Button onClick={() => setShowCOAModal(false)} size="sm" className="shadow-none">
-                                        Close / إغلاق
-                                    </Button>
-                                </div>
-                            </DialogContent>
-                        </Dialog>
 
                         {/* Calendar Task Details Modal */}
                         <Dialog open={showCalendarTaskModal} onOpenChange={setShowCalendarTaskModal}>

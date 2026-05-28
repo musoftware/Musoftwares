@@ -17,11 +17,18 @@ const CURRENCY_FORMATS: Record<string, string> = {
     'IQD': '%v IQD'
 };
 
-export function formatMoney(amount: number | string, currency = 'USD') {
+export function formatMoney(amount: number | string, currency: any = 'USD') {
     const numericAmount = typeof amount === 'string' ? parseFloat(amount) : amount;
-    if (isNaN(numericAmount)) return `${currency} 0.00`;
     
-    const curCode = (typeof currency === 'string' ? currency : 'USD').trim().toUpperCase();
+    let curCode = 'USD';
+    if (typeof currency === 'string') {
+        curCode = currency;
+    } else if (currency && typeof currency === 'object' && typeof currency.currency === 'string') {
+        curCode = currency.currency;
+    }
+    curCode = curCode.trim().toUpperCase();
+
+    if (isNaN(numericAmount)) return `${curCode} 0.00`;
     
     const isNegative = numericAmount < 0;
     const absoluteAmount = Math.abs(numericAmount);
@@ -33,29 +40,33 @@ export function formatMoney(amount: number | string, currency = 'USD') {
 
     // Dynamic look up from window.currencies shared from database
     const dynamicCurrencies = (window as any).currencies;
-    if (Array.isArray(dynamicCurrencies)) {
-        const found = dynamicCurrencies.find(c => c.currency && c.currency.toUpperCase() === curCode);
-        if (found) {
-            const symbol = found.symbol || curCode;
-            const fmt = found.string_format;
-            if (fmt) {
-                const specifiers = ['%01.2f', '%s', '%.2f'];
-                for (const spec of specifiers) {
-                    if (fmt.includes(spec)) {
-                        const formatted = fmt.replace(spec, numberPart);
-                        return isNegative ? `-${formatted}` : formatted;
-                    }
-                }
-                if (fmt.includes('{amount}') || fmt.includes('{symbol}') || fmt.includes('{code}')) {
-                    const formatted = fmt
-                        .replace('{symbol}', symbol)
-                        .replace('{amount}', numberPart)
-                        .replace('{code}', curCode);
+    let found = null;
+    if (currency && typeof currency === 'object' && typeof currency.currency === 'string') {
+        found = currency;
+    } else if (Array.isArray(dynamicCurrencies)) {
+        found = dynamicCurrencies.find(c => c.currency && c.currency.toUpperCase() === curCode);
+    }
+
+    if (found) {
+        const symbol = found.symbol || curCode;
+        const fmt = found.string_format;
+        if (fmt) {
+            const specifiers = ['%01.2f', '%s', '%.2f'];
+            for (const spec of specifiers) {
+                if (fmt.includes(spec)) {
+                    const formatted = fmt.replace(spec, numberPart);
                     return isNegative ? `-${formatted}` : formatted;
                 }
             }
-            return isNegative ? `-${symbol}${numberPart}` : `${symbol}${numberPart}`;
+            if (fmt.includes('{amount}') || fmt.includes('{symbol}') || fmt.includes('{code}')) {
+                const formatted = fmt
+                    .replace('{symbol}', symbol)
+                    .replace('{amount}', numberPart)
+                    .replace('{code}', curCode);
+                return isNegative ? `-${formatted}` : formatted;
+            }
         }
+        return isNegative ? `-${symbol}${numberPart}` : `${symbol}${numberPart}`;
     }
 
     if (CURRENCY_FORMATS[curCode]) {
@@ -73,21 +84,30 @@ export function formatMoney(amount: number | string, currency = 'USD') {
     }
 }
 
-export function formatCompactCurrency(amount: number | string, currency = 'USD') {
+export function formatCompactCurrency(amount: number | string, currency: any = 'USD') {
     const numericAmount =
         typeof amount === 'string' ? parseFloat(amount) : amount;
-    if (isNaN(numericAmount)) return `${currency} 0`;
+    
+    let curCode = 'USD';
+    if (typeof currency === 'string') {
+        curCode = currency;
+    } else if (currency && typeof currency === 'object' && typeof currency.currency === 'string') {
+        curCode = currency.currency;
+    }
+    curCode = curCode.trim().toUpperCase();
+
+    if (isNaN(numericAmount)) return `${curCode} 0`;
     
     if (Math.abs(numericAmount) >= 1_000_000) {
         try {
             return new Intl.NumberFormat('en-US', {
                 style: 'currency',
-                currency: typeof currency === 'string' && currency.trim() !== '' ? currency : 'USD',
+                currency: curCode,
                 notation: 'compact',
                 maximumFractionDigits: 1,
             }).format(numericAmount);
         } catch (e) {
-            return `${currency} ${(numericAmount / 1_000_000).toFixed(1)}M`;
+            return `${curCode} ${(numericAmount / 1_000_000).toFixed(1)}M`;
         }
     }
     return formatMoney(numericAmount, currency);
