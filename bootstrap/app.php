@@ -43,11 +43,44 @@ return Application::configure(basePath: dirname(__DIR__))
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->respond(function (\Symfony\Component\HttpFoundation\Response $response, \Throwable $exception, \Illuminate\Http\Request $request) {
-            if (! app()->environment(['local', 'testing']) && in_array($response->getStatusCode(), [500, 503, 404, 403])) {
-                return \Inertia\Inertia::render('Error', ['status' => $response->getStatusCode()])
-                    ->toResponse($request)
-                    ->setStatusCode($response->getStatusCode());
-            } elseif ($response->getStatusCode() === 419) {
+            $statusCode = $response->getStatusCode();
+
+            // API or JSON requests: return generic error responses without exposing framework classes or path traces
+            if ($request->expectsJson() || $request->is('api/*')) {
+                if ($exception instanceof \Illuminate\Validation\ValidationException) {
+                    return $response;
+                }
+
+                $message = $response->headers->get('Content-Type') === 'application/json'
+                    ? json_decode($response->getContent(), true)['message'] ?? $exception->getMessage()
+                    : $exception->getMessage();
+
+                if ($exception instanceof \Illuminate\Database\QueryException) {
+                    $message = __('errors.database_error') === 'errors.database_error'
+                        ? 'A database error occurred.'
+                        : __('errors.database_error');
+                }
+
+                return response()->json([
+                    'status' => 'error',
+                    'message' => $message ?: 'An error occurred.',
+                ], in_array($statusCode, [200, 0]) ? 500 : $statusCode);
+            }
+
+            // If we already rendered a custom ERP error component, preserve it
+            $content = $response->getContent();
+            if (is_string($content) && (str_contains($content, 'ERP/Errors/NotFound') || str_contains($content, 'ERP\\/Errors\\/NotFound'))) {
+                return $response;
+            }
+
+            // Web requests - render custom Inertia error page for 404/403/503
+            if (in_array($statusCode, [404, 403, 503]) || ($statusCode === 500 && ! app()->environment(['local', 'testing']))) {
+                if (class_exists(\Inertia\Inertia::class)) {
+                    return \Inertia\Inertia::render('Error', ['status' => $statusCode])
+                        ->toResponse($request)
+                        ->setStatusCode($statusCode);
+                }
+            } elseif ($statusCode === 419) {
                 return back()->with([
                     'message' => 'The page expired, please try again.',
                 ]);

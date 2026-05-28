@@ -241,7 +241,7 @@ class InvoiceController extends Controller
             );
 
             return redirect()->route('erp.invoices.show', $invoice->id)
-                ->with('success', 'Invoice created successfully.');
+                ->with('success', __('erp.invoice_created_success'));
         });
     }
 
@@ -278,7 +278,7 @@ class InvoiceController extends Controller
         // Guard M2: prevent editing finalised invoices
         if (in_array($invoice->status, ['paid', 'cancelled', 'refunded'])) {
             return redirect()->route('erp.invoices.show', $invoice->id)
-                ->with('error', 'A ' . $invoice->status . ' invoice cannot be edited.');
+                ->with('error', __('errors.finalised_invoice_cannot_be_edited', ['status' => $invoice->status]));
         }
 
         $tenant = $this->resolveTenant();
@@ -335,7 +335,7 @@ class InvoiceController extends Controller
 
         // Guard M2: prevent editing finalised invoices
         if (in_array($invoice->status, ['paid', 'cancelled', 'refunded'])) {
-            return back()->withErrors(['status' => 'A ' . $invoice->status . ' invoice cannot be edited.']);
+            return back()->withErrors(['status' => __('errors.finalised_invoice_cannot_be_edited', ['status' => $invoice->status])]);
         }
 
         $tenant = $this->resolveTenant();
@@ -418,14 +418,14 @@ class InvoiceController extends Controller
             }
 
             return redirect()->route('erp.invoices.show', $invoice->id)
-                ->with('success', 'Invoice updated successfully.');
+                ->with('success', __('erp.invoice_updated_success'));
         });
     }
 
     public function send(Invoice $invoice)
     {
         if ($invoice->status !== 'draft') {
-            return back()->withErrors(['status' => 'Only draft invoices can be sent.']);
+            return back()->withErrors(['status' => __('errors.only_draft_invoices_can_be_issued')]);
         }
 
         $invoice->update([
@@ -459,7 +459,7 @@ class InvoiceController extends Controller
             }
         }
 
-        return back()->with('success', 'Invoice sent to client.');
+        return back()->with('success', __('erp.invoice_issued_success'));
     }
 
     /**
@@ -549,7 +549,7 @@ class InvoiceController extends Controller
         }
 
         return redirect()->route('erp.invoices.edit', $newInvoice->id)
-            ->with('success', 'Invoice duplicated as draft.');
+            ->with('success', __('erp.invoice_duplicated_success'));
     }
 
     public function downloadPdf(Invoice $invoice)
@@ -566,11 +566,11 @@ class InvoiceController extends Controller
         }
 
         if ($invoice->status === 'paid') {
-            return back()->withErrors(['status' => 'A paid invoice cannot be deleted.']);
+            return back()->withErrors(['status' => __('errors.paid_invoice_cannot_be_deleted')]);
         }
 
         $invoice->delete();
         return redirect()->route('erp.invoices.index')
-            ->with('success', 'Invoice deleted.');
+            ->with('success', __('erp.invoice_deleted_success'));
     }
 }

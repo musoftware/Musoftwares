@@ -171,6 +171,7 @@ interface ERPDashboardProps {
     };
 
     hasMultiCurrency?: boolean;
+    hasMultiBranch?: boolean;
     filters?: {
         search?: string;
     };
@@ -183,9 +184,17 @@ interface ERPDashboardProps {
         date: string;
         description: string;
     }>;
+    branches?: Array<{
+        id: number;
+        name: string;
+        type: string;
+        timezone: string;
+        status: string;
+        created_at: string;
+    }>;
 }
 
-export default function ERPDashboard({ tenant: serverTenant, stats: serverStats, clients: serverClients, invoices: serverInvoices, chartData: serverChartData, projects: serverProjects, expenses: serverExpenses = [], supportTickets: serverTickets, activityLogs: serverActivityLogs, upcomingBookings: serverBookings, storageProviders: serverStorageProviders, documents: serverDocuments, tasks: serverTasks, notes: serverNotes, transactions: serverTransactions, transactionStats: serverTransactionStats, hasMultiCurrency = false, currencies = [], filters = {} }: ERPDashboardProps) {
+export default function ERPDashboard({ tenant: serverTenant, stats: serverStats, clients: serverClients, invoices: serverInvoices, chartData: serverChartData, projects: serverProjects, expenses: serverExpenses = [], supportTickets: serverTickets, activityLogs: serverActivityLogs, upcomingBookings: serverBookings, storageProviders: serverStorageProviders, documents: serverDocuments, tasks: serverTasks, notes: serverNotes, transactions: serverTransactions, transactionStats: serverTransactionStats, branches: serverBranches, hasMultiCurrency = false, hasMultiBranch = false, currencies = [], filters = {} }: ERPDashboardProps) {
     const { toast } = useToast();
     const { auth } = usePage().props as any;
     const isTeamMember = !!auth?.team_member;
@@ -298,6 +307,7 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
     // WORKSPACE DB HYDRATION
     // ────────────────────────────────────────────────────────
     const [projects, setProjects] = useState<Array<any>>(serverProjects || []);
+    const [branches, setBranches] = useState<Array<any>>(serverBranches || []);
     const [newProjectForm, setNewProjectForm] = useState({
         name: '', client_id: '', budget: '', due_date: '', status: 'Planning'
     });
@@ -1290,6 +1300,72 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                             </div>
                         )}
 
+                        {/* BRANCHES (MULTI-BRANCH) */}
+                        {currentSection === 'branches' && hasMultiBranch && (
+                            <div className="space-y-6">
+                                <ModulePageHeader 
+                                    title="Branches" 
+                                    description="Manage your business branches, locations, and timezone settings."
+                                    actions={!isReadOnlyMember && (
+                                        <Button size="sm" className="shadow-none">
+                                            <Plus className="mr-1.5 h-3.5 w-3.5" /> New Branch
+                                        </Button>
+                                    )}
+                                />
+                                
+                                {branches && branches.length > 0 ? (
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        {branches.map((branch) => (
+                                            <OperationalCard key={branch.id}>
+                                                <div className="p-4 sm:p-5 space-y-4">
+                                                    <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 sm:gap-4">
+                                                        <div className="flex-1 min-w-0">
+                                                            <h3 className="font-semibold text-slate-800 text-[15px] sm:text-[14px] truncate">{branch.name}</h3>
+                                                            <div className="flex items-center gap-1.5 mt-1 sm:mt-1.5 text-xs text-slate-500">
+                                                                <Building2 className="h-3.5 w-3.5 shrink-0" />
+                                                                <span className="truncate capitalize">{branch.type}</span>
+                                                            </div>
+                                                        </div>
+                                                        <Badge className={`w-fit text-[10px] rounded uppercase font-bold tracking-wider shrink-0 ${
+                                                            branch.status === 'active' ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-600'
+                                                        }`}>
+                                                            {branch.status}
+                                                        </Badge>
+                                                    </div>
+
+                                                    <div className="grid grid-cols-2 gap-3 bg-slate-50/50 p-3 rounded-lg border border-slate-100">
+                                                        <div>
+                                                            <span className="block text-[10px] uppercase font-bold text-slate-400 tracking-wider">Timezone</span>
+                                                            <span className="block text-[13px] font-semibold text-slate-700 mt-0.5">
+                                                                {branch.timezone}
+                                                            </span>
+                                                        </div>
+                                                        <div>
+                                                            <span className="block text-[10px] uppercase font-bold text-slate-400 tracking-wider">Created</span>
+                                                            <span className="block text-[13px] font-semibold text-slate-700 mt-0.5 flex items-center gap-1.5">
+                                                                <CalendarIcon className="h-3.5 w-3.5 text-slate-400 shrink-0" />
+                                                                {branch.created_at}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </OperationalCard>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <EmptyState 
+                                        icon={Building2}
+                                        title="No Branches Found"
+                                        description="You haven't added any secondary branches to your workspace yet."
+                                        action={!isReadOnlyMember ? {
+                                            label: "Create Branch",
+                                            onClick: () => {}
+                                        } : undefined}
+                                    />
+                                )}
+                            </div>
+                        )}
+
                         {/* 3. PROJECTS & MILESTONES */}
                         {currentSection === 'projects' && (
                             <div className="space-y-6">
@@ -1486,7 +1562,7 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                             <div className="space-y-6">
                                 <ModulePageHeader 
                                     title="Invoices" 
-                                    description="Create, send, and track client invoices."
+                                    description="Create, issue, and track client invoices."
                                     actions={
                                         <div className="flex items-center gap-2">
                                             <Link 
