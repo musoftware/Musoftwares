@@ -83,10 +83,10 @@ export default function Index({ auth, paymentMethods }) {
         if (!iban) return '';
         return iban.substring(0, 4) + ' .... ' + iban.substring(iban.length - 4);
     };
-    const { menuItems, workspaceName, tenantId } = useERPMenu('settings');
+    const { menuItems, lockedAddons, workspaceName, tenantId } = useERPMenu('settings');
 
     return (
-        <ERPLayout title="Payment Methods" workspaceName={workspaceName} tenantId={tenantId} menuItems={menuItems}>
+        <ERPLayout title="Payment Methods" workspaceName={workspaceName} tenantId={tenantId} menuItems={menuItems} lockedAddons={lockedAddons}>
 
             <div className="py-12">
                 <div className="max-w-[1000px] mx-auto px-4 sm:px-6 lg:px-8 space-y-10 font-sans">

@@ -9,10 +9,10 @@ import { format } from 'date-fns';
 import { ArrowLeft, CheckCircle2, XCircle } from 'lucide-react';
 
 export default function Logs({ entry, logs }) {
-    const { menuItems, workspaceName, tenantId } = useERPMenu('invoices');
+    const { menuItems, lockedAddons, workspaceName, tenantId } = useERPMenu('invoices');
 
     return (
-        <ERPLayout title={`${entry.title} — Execution History`} workspaceName={workspaceName} tenantId={tenantId} menuItems={menuItems}>
+        <ERPLayout title={`${entry.title} — Execution History`} workspaceName={workspaceName} tenantId={tenantId} menuItems={menuItems} lockedAddons={lockedAddons}>
             <Head title={`${entry.title} — Execution History`} />
 
             <div className="py-12">

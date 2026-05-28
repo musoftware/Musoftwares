@@ -22,10 +22,10 @@ function TreeNode({ client }: { client: any }) {
 }
 
 export default function Tree({ client }: { client: any }) {
-    const { menuItems, workspaceName, tenantId } = useERPMenu('overview');
+    const { menuItems, lockedAddons, workspaceName, tenantId } = useERPMenu('overview');
 
     return (
-        <ERPLayout title={`Referral Tree — ${client.name}`} workspaceName={workspaceName} tenantId={tenantId} menuItems={menuItems}>
+        <ERPLayout title={`Referral Tree — ${client.name}`} workspaceName={workspaceName} tenantId={tenantId} menuItems={menuItems} lockedAddons={lockedAddons}>
 
             <div className="py-12">
                 <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">

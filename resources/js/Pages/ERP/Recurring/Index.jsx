@@ -69,10 +69,10 @@ export default function Index({ income, expense, stats }) {
     };
 
     const businessCurrency = stats.business_currency || 'USD';
-    const { menuItems, workspaceName, tenantId } = useERPMenu('invoices');
+    const { menuItems, lockedAddons, workspaceName, tenantId } = useERPMenu('invoices');
 
     return (
-        <ERPLayout title="Recurring Entries" workspaceName={workspaceName} tenantId={tenantId} menuItems={menuItems}>
+        <ERPLayout title="Recurring Entries" workspaceName={workspaceName} tenantId={tenantId} menuItems={menuItems} lockedAddons={lockedAddons}>
 
             <div className="py-12">
                 <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">

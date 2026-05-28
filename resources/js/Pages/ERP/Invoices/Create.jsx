@@ -164,10 +164,10 @@ export default function CreateEdit({ invoice, clients, projects = [], currencies
             post(route('erp.invoices.store'), options);
         }
     };
-    const { menuItems, workspaceName, tenantId } = useERPMenu('invoices');
+    const { menuItems, lockedAddons, workspaceName, tenantId } = useERPMenu('invoices');
 
     return (
-        <ERPLayout title={isEdit ? 'Edit Invoice' : 'New Invoice'} workspaceName={workspaceName} tenantId={tenantId} menuItems={menuItems}>
+        <ERPLayout title={isEdit ? 'Edit Invoice' : 'New Invoice'} workspaceName={workspaceName} tenantId={tenantId} menuItems={menuItems} lockedAddons={lockedAddons}>
 
             <form onSubmit={handleSubmit} className="max-w-[900px] mx-auto px-4 sm:px-6 lg:px-8 py-10 font-sans">
 

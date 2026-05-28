@@ -31,10 +31,10 @@ export default function CreateProject({ clients }: { clients: any[] }) {
         });
     };
 
-    const { menuItems, workspaceName, tenantId } = useERPMenu('projects');
+    const { menuItems, lockedAddons, workspaceName, tenantId } = useERPMenu('projects');
 
     return (
-        <ERPLayout title="Create Project" workspaceName={workspaceName} tenantId={tenantId} menuItems={menuItems}>
+        <ERPLayout title="Create Project" workspaceName={workspaceName} tenantId={tenantId} menuItems={menuItems} lockedAddons={lockedAddons}>
 
             <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8 space-y-6">
                 <div className="flex items-center gap-4">

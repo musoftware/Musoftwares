@@ -40,10 +40,10 @@ export default function UpgradePreview() {
             router.visit(route('dashboard'));
         }, 1500);
     };
-    const { menuItems, workspaceName, tenantId } = useERPMenu('overview');
+    const { menuItems, lockedAddons, workspaceName, tenantId } = useERPMenu('overview');
 
     return (
-        <ERPLayout title="ERP Workspace Premium Upgrade" workspaceName={workspaceName} tenantId={tenantId} menuItems={menuItems}>
+        <ERPLayout title="ERP Workspace Premium Upgrade" workspaceName={workspaceName} tenantId={tenantId} menuItems={menuItems} lockedAddons={lockedAddons}>
 
             <div className="max-w-[1000px] mx-auto px-4 py-8 space-y-8 font-sans text-sm">
                 

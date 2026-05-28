@@ -305,10 +305,10 @@ export default function Show({ task: initialTask, todos: initialTodos, completio
                 return <span className="px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide bg-slate-50 border border-slate-200 text-slate-500">Low</span>;
         }
     };
-    const { menuItems, workspaceName, tenantId } = useERPMenu('tasks');
+    const { menuItems, lockedAddons, workspaceName, tenantId } = useERPMenu('tasks');
 
     return (
-        <ERPLayout title={`ERP Task: ${task.task_name}`} workspaceName={workspaceName} tenantId={tenantId} menuItems={menuItems}>
+        <ERPLayout title={`ERP Task: ${task.task_name}`} workspaceName={workspaceName} tenantId={tenantId} menuItems={menuItems} lockedAddons={lockedAddons}>
 
             <div className="max-w-[1000px] mx-auto px-4 py-8 space-y-8 font-sans text-sm">
                 

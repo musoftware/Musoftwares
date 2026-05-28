@@ -35,10 +35,10 @@ export default function AdjustWallet({ client, wallet }: { client: any, wallet: 
             }
         });
     };
-    const { menuItems, workspaceName, tenantId } = useERPMenu('clients');
+    const { menuItems, lockedAddons, workspaceName, tenantId } = useERPMenu('clients');
 
     return (
-        <ERPLayout title={`Adjust Wallet: ${client?.name}`} workspaceName={workspaceName} tenantId={tenantId} menuItems={menuItems}>
+        <ERPLayout title={`Adjust Wallet: ${client?.name}`} workspaceName={workspaceName} tenantId={tenantId} menuItems={menuItems} lockedAddons={lockedAddons}>
 
             <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8 space-y-6">
                 <div className="flex items-center gap-4">

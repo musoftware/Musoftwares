@@ -159,6 +159,9 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
     const isTeamMember = !!auth?.team_member;
     const isReadOnlyMember = auth?.team_member && auth.team_member.role === 'member';
 
+    // Get locked addons for the sidebar upsell
+    const { lockedAddons } = useERPMenu('overview');
+
     const sectionMatch = typeof window !== 'undefined' ? window.location.search.match(/section=([^&]+)/) : null;
     const initialSection = sectionMatch ? sectionMatch[1] : 'overview';
     const [currentSection, setCurrentSection] = useState(initialSection);
@@ -672,10 +675,10 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
     // ────────────────────────────────────────────────────────
     const menuItems = [
         { id: 'overview', label: 'Overview', icon: LayoutDashboard },
-        { id: 'clients', label: 'Clients', icon: Users, badge: activeClients.length },
-        { id: 'projects', label: 'Projects', icon: Briefcase, badge: projects.filter(p => p.status === 'Active').length },
+        { id: 'clients', label: 'Clients', icon: Users },
+        { id: 'projects', label: 'Projects', icon: Briefcase },
         { id: 'tasks', label: 'Tasks', icon: CheckSquare, badge: tasks.filter(t => t.category !== 'Done').length },
-        { id: 'invoices', label: 'Invoices', icon: FileText, badge: activeInvoices.length },
+        { id: 'invoices', label: 'Invoices', icon: FileText, badge: activeInvoices.filter(inv => inv.status !== 'paid').length },
         { id: 'transactions', label: 'Transactions', icon: History },
         { id: 'documents', label: 'Files', icon: Folder },
         { id: 'notes', label: 'Notes', icon: Pin },
@@ -691,8 +694,10 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
     });
 
     const activeMenuLabel = useMemo(() => {
-        return menuItems.find(item => item.id === currentSection)?.label || 'Workspace';
-    }, [currentSection, menuItems]);
+        return menuItems.find(item => item.id === currentSection)?.label 
+            || lockedAddons.find(a => a.id === currentSection)?.label 
+            || 'Workspace';
+    }, [currentSection, menuItems, lockedAddons]);
 
     return (
         <ERPLayout 
@@ -706,6 +711,14 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                 onClick: (m.id === 'team' || m.id === 'backup') ? undefined : (e: any) => {
                     e.preventDefault();
                     handleSetSection(m.id);
+                }
+            }))}
+            lockedAddons={lockedAddons.map(a => ({
+                ...a,
+                isActive: currentSection === a.id,
+                onClick: (e: any) => {
+                    e.preventDefault();
+                    handleSetSection(a.id);
                 }
             }))}
         >
@@ -1972,6 +1985,52 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                                 </OperationalCard>
                             </div>
                         )}
+
+                        {/* LOCKED ADDON UPGRADE CARD */}
+                        {(() => {
+                            const activeAddon = lockedAddons.find(a => a.id === currentSection);
+                            if (!activeAddon) return null;
+                            const AddonIcon = activeAddon.icon;
+                            return (
+                                <Card className="border-indigo-200/50 bg-gradient-to-br from-slate-50 to-indigo-50/30 shadow-none overflow-hidden relative mt-2">
+                                    <div className="absolute top-0 right-0 translate-x-16 -translate-y-16 opacity-[0.04] pointer-events-none">
+                                        <AddonIcon className="h-72 w-72 text-indigo-600" />
+                                    </div>
+                                    <CardContent className="p-8 md:p-10 relative z-10 space-y-6">
+                                        <div className="flex items-center gap-2">
+                                            <Lock className="h-5 w-5 text-indigo-600" />
+                                            <span className="font-semibold text-indigo-600 text-sm tracking-wide">Premium Feature</span>
+                                        </div>
+                                        <div className="space-y-3">
+                                            <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-slate-900 leading-tight">
+                                                {activeAddon.label}
+                                            </h1>
+                                            <p className="text-slate-500 leading-relaxed max-w-2xl">
+                                                {activeAddon.description || `Unlock ${activeAddon.label} to enhance your workspace with powerful capabilities.`}
+                                            </p>
+                                        </div>
+                                        {activeAddon.features && activeAddon.features.length > 0 && (
+                                            <div className="flex flex-wrap gap-4 text-sm text-slate-600">
+                                                {activeAddon.features.map((f: string, i: number) => (
+                                                    <div key={i} className="flex items-center gap-2">
+                                                        <CheckCircle2 className="h-4 w-4 text-indigo-500" />
+                                                        {f}
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        )}
+                                        <div className="pt-2">
+                                            <Link href={route('subscriptions.plans')}>
+                                                <Button className="shadow-none flex items-center gap-2 group h-11 px-8 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold">
+                                                    Unlock {activeAddon.label} for 500 EGP/Yr
+                                                    <ArrowUpRight className="h-4 w-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                                                </Button>
+                                            </Link>
+                                        </div>
+                                    </CardContent>
+                                </Card>
+                            );
+                        })()}
 
             </div>
         </ERPLayout>

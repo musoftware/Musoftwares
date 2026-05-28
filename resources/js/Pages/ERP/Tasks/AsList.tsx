@@ -134,10 +134,10 @@ export default function AsList({ arrangedClients: initialData }: AsListProps) {
             setErrorMessage(err.response?.data?.message || "Failed to update item status.");
         }
     };
-    const { menuItems, workspaceName, tenantId } = useERPMenu('tasks');
+    const { menuItems, lockedAddons, workspaceName, tenantId } = useERPMenu('tasks');
 
     return (
-        <ERPLayout title="Current Tasks As List" workspaceName={workspaceName} tenantId={tenantId} menuItems={menuItems}>
+        <ERPLayout title="Current Tasks As List" workspaceName={workspaceName} tenantId={tenantId} menuItems={menuItems} lockedAddons={lockedAddons}>
 
             <div className="max-w-[1200px] mx-auto px-4 py-8 space-y-8 font-sans text-sm">
                 

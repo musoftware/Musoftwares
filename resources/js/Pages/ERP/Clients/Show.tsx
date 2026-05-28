@@ -51,10 +51,10 @@ export default function ClientShow({ client, projects, tickets, invoices, activi
         .filter(i => i.status === 'paid')
         .reduce((s, i) => s + i.total, 0);
 
-    const { menuItems, workspaceName, tenantId } = useERPMenu('clients');
+    const { menuItems, lockedAddons, workspaceName, tenantId } = useERPMenu('clients');
 
     return (
-        <ERPLayout title={`Client — ${client.name}`} workspaceName={workspaceName} tenantId={tenantId} menuItems={menuItems}>
+        <ERPLayout title={`Client — ${client.name}`} workspaceName={workspaceName} tenantId={tenantId} menuItems={menuItems} lockedAddons={lockedAddons}>
 
             <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-6">
                 {/* Back + Header */}

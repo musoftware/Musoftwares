@@ -3,10 +3,10 @@ import { useERPMenu } from '@/hooks/useERPMenu';
 import { Head, Link } from '@inertiajs/react';
 
 export default function Earnings({ earnings }: { earnings: any }) {
-    const { menuItems, workspaceName, tenantId } = useERPMenu('overview');
+    const { menuItems, lockedAddons, workspaceName, tenantId } = useERPMenu('overview');
 
     return (
-        <ERPLayout title="Referral Earnings" workspaceName={workspaceName} tenantId={tenantId} menuItems={menuItems}>
+        <ERPLayout title="Referral Earnings" workspaceName={workspaceName} tenantId={tenantId} menuItems={menuItems} lockedAddons={lockedAddons}>
 
             <div className="py-12">
                 <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
