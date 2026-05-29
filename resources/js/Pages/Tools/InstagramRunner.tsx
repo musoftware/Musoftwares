@@ -6,8 +6,10 @@ import {
     Zap, ArrowLeft, Calendar, Hash, ExternalLink,
     UserPlus, UserMinus, Heart, MessageSquare,
     ImageIcon, Shield, BadgeCheck, Lock, Globe2,
+    Loader2, Plus, Trash2, Check
 } from 'lucide-react';
 import { Button } from '@/Components/ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/Components/ui/select';
 import { Input } from '@/Components/ui/input';
 import { Badge } from '@/Components/ui/badge';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/Components/ui/tabs';
@@ -179,6 +181,12 @@ export default function InstagramRunner({ tool }: any) {
     const [errorMsg, setError]      = useState('');
     const campaignIdRef = useRef<string>('');
 
+    // Accounts
+    const [accounts, setAccounts] = useState<any[]>([]);
+    const [selectedAccountId, setSelectedAccountId] = useState('');
+    const [loadingAccounts, setLoadingAccounts] = useState(false);
+    const [addingAccount, setAddingAccount] = useState(false);
+
     // Campaigns tab
     const [campaigns, setCampaigns]         = useState<any[]>([]);
     const [selectedCampaign, setSelectedCampaign] = useState<any>(null);
@@ -318,47 +326,98 @@ export default function InstagramRunner({ tool }: any) {
     }, [status, connected]);
 
     // ── RPC helper ──
-    const callRPC = useCallback((action: string, data: any = {}): Promise<any> => {
-        return new Promise((resolve, reject) => {
-            const ws = wsRef.current;
-            if (!ws || ws.readyState !== WebSocket.OPEN) return reject(new Error('Not connected'));
-            if (!(ws as any)._pending) (ws as any)._pending = new Map();
-            const requestId = Math.random().toString(36).slice(2);
-            (ws as any)._pending.set(requestId, { resolve, reject });
-            ws.send(JSON.stringify({ type: 'plugin_rpc', requestId, payload: { plugin: 'instagram', action, data } }));
-            setTimeout(() => {
-                if ((ws as any)._pending?.has(requestId)) {
-                    (ws as any)._pending.get(requestId).reject(new Error('Timeout'));
-                    (ws as any)._pending.delete(requestId);
+    const callRPC = useCallback((action: string, data: any = {}) => {
+        return new Promise<any>((resolve, reject) => {
+            if (!wsRef.current || wsRef.current.readyState !== WebSocket.OPEN) {
+                return reject(new Error('WebSocket is not connected'));
+            }
+            const id = Math.random().toString(36).substring(7);
+            const ws = wsRef.current as any;
+            if (!ws._pending) ws._pending = new Map();
+            ws._pending.set(id, { resolve, reject });
+            ws.send(JSON.stringify({
+                type: 'plugin_rpc',
+                requestId: id,
+                payload: {
+                    plugin: 'instagram',
+                    action,
+                    data
                 }
-            }, 30000);
+            }));
         });
     }, []);
 
+    const fetchAccounts = useCallback(async () => {
+        setLoadingAccounts(true);
+        try {
+            const data = await callRPC('instagram.sessions.list');
+            if (data?.sessions) {
+                setAccounts(data.sessions);
+                if (data.sessions.length > 0 && !selectedAccountId) {
+                    setSelectedAccountId(data.sessions[0].id);
+                }
+            }
+        } catch (e) {}
+        setLoadingAccounts(false);
+    }, [callRPC, selectedAccountId]);
+
+    useEffect(() => {
+        if (connected) fetchAccounts();
+    }, [connected, fetchAccounts]);
+
+    const handleAddAccount = async () => {
+        setAddingAccount(true);
+        try {
+            const data = await callRPC('instagram.session.add');
+            await fetchAccounts();
+            if (data?.session?.id) {
+                setSelectedAccountId(data.session.id);
+            }
+        } catch (e: any) {
+            alert('Failed to add account: ' + e.message);
+        }
+        setAddingAccount(false);
+    };
+
+    const handleDeleteAccount = async (id: string, e: React.MouseEvent) => {
+        e.stopPropagation();
+        if (!confirm('Are you sure you want to remove this account?')) return;
+        try {
+            await callRPC('instagram.session.delete', { id });
+            if (selectedAccountId === id) setSelectedAccountId('');
+            await fetchAccounts();
+        } catch (e: any) {
+            alert('Error deleting account: ' + e.message);
+        }
+    };
+
     // ── Start extraction ──
     const handleStart = async () => {
-        if (!target.trim()) return;
-        const cId = `ig_${extractionType}_${Date.now()}`;
-        campaignIdRef.current = cId;
+        if (!selectedAccountId) {
+            alert('Please select or add an Instagram account first.');
+            return;
+        }
 
         setStatus('running');
         setUsers([]);
-        setProgress(5);
-        setProgressMsg('Starting extraction...');
+        setProgress(0);
+        setProgressMsg('Starting...');
         setError('');
+
+        const cid = `ig_cmp_${Date.now()}`;
+        campaignIdRef.current = cid;
 
         try {
             await callRPC('instagram.extract.start', {
                 type: extractionType,
-                target: target.trim(),
+                target,
                 limit,
-                campaignId: cId,
+                campaignId: cid,
+                sessionId: selectedAccountId
             });
-            const typeLabel = EXTRACTION_TYPES.find(t => t.id === extractionType)?.label || extractionType;
-            setProgressMsg(`Extracting ${typeLabel} for "${target}"...`);
-        } catch (err: any) {
-            setError(err.message);
+        } catch (e: any) {
             setStatus('error');
+            setError(e.message);
         }
     };
 
@@ -533,7 +592,61 @@ export default function InstagramRunner({ tool }: any) {
                                 </div>
                             </div>
 
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                            {/* Form Grid */}
+                            <div className="grid grid-cols-1 md:grid-cols-[1fr_200px] gap-6 mb-8">
+                                {/* Account Selection */}
+                                <div className="md:col-span-2">
+                                    <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1.5">Selected Account</label>
+                                    <div className="flex gap-2">
+                                        <Select value={selectedAccountId} onValueChange={setSelectedAccountId}>
+                                            <SelectTrigger className="flex-1 h-11 bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800">
+                                                <SelectValue placeholder={loadingAccounts ? "Loading accounts..." : "Select an Instagram account"} />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                {accounts.map(acc => (
+                                                    <SelectItem key={acc.id} value={acc.id}>
+                                                        <div className="flex items-center justify-between w-full pr-4">
+                                                            <div className="flex items-center gap-2">
+                                                                {acc.profile_pic ? (
+                                                                    <img src={acc.profile_pic} alt="" className="w-5 h-5 rounded-full" />
+                                                                ) : (
+                                                                    <div className="w-5 h-5 rounded-full bg-indigo-100 text-indigo-500 flex items-center justify-center text-[10px] font-bold">
+                                                                        {acc.username?.[0]?.toUpperCase()}
+                                                                    </div>
+                                                                )}
+                                                                <span className="font-medium text-slate-800 dark:text-slate-200">@{acc.username}</span>
+                                                                {acc.full_name && <span className="text-xs text-slate-400 hidden sm:inline">- {acc.full_name}</span>}
+                                                            </div>
+                                                            <div
+                                                                role="button"
+                                                                onClick={(e) => handleDeleteAccount(acc.id, e)}
+                                                                className="opacity-50 hover:opacity-100 hover:text-red-500 transition-opacity ml-4"
+                                                            >
+                                                                <Trash2 className="w-3.5 h-3.5" />
+                                                            </div>
+                                                        </div>
+                                                    </SelectItem>
+                                                ))}
+                                                {accounts.length === 0 && (
+                                                    <div className="p-3 text-sm text-center text-slate-500">No accounts added yet.</div>
+                                                )}
+                                            </SelectContent>
+                                        </Select>
+                                        <Button
+                                            variant="outline"
+                                            onClick={handleAddAccount}
+                                            disabled={addingAccount}
+                                            className="h-11 px-4 border-slate-200 dark:border-slate-800"
+                                        >
+                                            {addingAccount ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4 mr-2" />}
+                                            {addingAccount ? '' : 'Add Account'}
+                                        </Button>
+                                    </div>
+                                    <p className="text-[10px] text-slate-400 mt-2">
+                                        Note: If you have multiple Chrome profiles open, the system will automatically pull the logged-in Instagram account from all of them at once.
+                                    </p>
+                                </div>
+
                                 {/* Target */}
                                 <div className="md:col-span-2">
                                     <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1.5">Target</label>
