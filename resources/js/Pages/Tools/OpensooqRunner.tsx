@@ -176,6 +176,20 @@ export default function OpensooqRunner({ tool }: any) {
         return () => { clearTimeout(retry); ws?.close(); };
     }, []);
 
+    // ── Load existing leads on mount ──
+    useEffect(() => {
+        if (!connected) return;
+        callRPC('opensooq.leads.list', { limit: 1000 }).then(res => {
+            if (res && res.leads) {
+                setLeads(res.leads);
+                if (res.leads.length > 0) {
+                    setStatus('done');
+                    setProgressMsg(`Loaded ${res.leads.length} existing leads from database.`);
+                }
+            }
+        }).catch(err => console.error('Failed to load leads', err));
+    }, [connected]);
+
     // ── RPC call helper ──
     const callRPC = (action: string, data: any = {}): Promise<any> => {
         return new Promise((resolve, reject) => {
@@ -342,7 +356,12 @@ export default function OpensooqRunner({ tool }: any) {
                         {leads.length > 0 && status !== 'running' && (
                             <Button
                                 variant="outline"
-                                onClick={() => { setLeads([]); setStatus('idle'); setProgress(0); }}
+                                onClick={async () => { 
+                                    await callRPC('opensooq.leads.clear');
+                                    setLeads([]); 
+                                    setStatus('idle'); 
+                                    setProgress(0); 
+                                }}
                                 className="h-11 px-4 border-slate-200 text-slate-500 hover:bg-slate-50 hover:text-slate-600 text-sm font-medium"
                             >
                                 Clear
