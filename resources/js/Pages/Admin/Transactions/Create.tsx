@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Head, useForm, router } from '@inertiajs/react';
-import AdminLayout from '@/Layouts/AdminLayout';
+import { Head, useForm, router, usePage } from '@inertiajs/react';
+import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/Components/ui/card';
 import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
@@ -17,11 +17,9 @@ interface Props {
     currencies: any[];
     businessCurrency: any;
     exchanges: any;
-    hourRate: number;
-    recommendedHourRate: number;
 }
 
-export default function Create({ user, selectedProject, type, currencies, businessCurrency, exchanges, hourRate, recommendedHourRate }: Props) {
+export default function Create({ user, selectedProject, type, currencies, businessCurrency, exchanges }: Props) {
     const defaultTab = () => {
         if (type === 'receive') return 'timer-received';
         if (type === 'send-money' || type === 'send') return 'send';
@@ -81,8 +79,10 @@ export default function Create({ user, selectedProject, type, currencies, busine
         });
     };
 
+    const { auth } = usePage().props as any;
+
     return (
-        <AdminLayout>
+        <AdminSidebarLayout title="New Transaction" header="New Transaction" user={auth?.user}>
             <Head title={`Adjust Wallet: ${user.name}`} />
 
             <div className="max-w-4xl mx-auto py-6">
@@ -205,42 +205,7 @@ export default function Create({ user, selectedProject, type, currencies, busine
                         </CardContent>
                     </Card>
                 </Tabs>
-
-                {/* Rates & quick links */}
-                <div className="mt-6 flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-3 justify-center">
-                    <div className="bg-background border rounded-full px-4 py-2 flex items-center gap-2 shadow-sm flex-1 sm:flex-none">
-                        <Coins className="h-4 w-4 text-amber-500 shrink-0" />
-                        <span className="text-[10px] font-bold text-muted-foreground uppercase shrink-0">Client rate:</span>
-                        <span className="text-sm font-bold truncate">
-                            <CurrencyDisplay amount={hourRate} currency={currencies.find(c => String(c.id) === String(user.currency || businessCurrency.id))} className="inline-block" />/hr
-                        </span>
-                    </div>
-                    <div className="bg-background border rounded-full px-4 py-2 flex items-center gap-2 shadow-sm flex-1 sm:flex-none">
-                        <TrendingUp className="h-4 w-4 text-green-500 shrink-0" />
-                        <span className="text-[10px] font-bold text-muted-foreground uppercase shrink-0">Day 8 rate:</span>
-                        <span className="text-sm font-bold truncate">
-                            <CurrencyDisplay amount={recommendedHourRate} currency={currencies.find(c => String(c.id) === String(user.currency || businessCurrency.id))} className="inline-block" />/hr
-                        </span>
-                    </div>
-
-                    <div className="hidden sm:block h-8 w-px bg-border mx-2"></div>
-
-                    <div className="flex flex-wrap gap-2 w-full sm:w-auto justify-center">
-                        <Button variant="secondary" className="rounded-full flex-1 sm:flex-none" asChild>
-                            <a href={route('admin.users.notes', user.id)} target="_blank" rel="noopener noreferrer">
-                                <StickyNote className="h-4 w-4 mr-2" />
-                                User Notes
-                            </a>
-                        </Button>
-                        <Button variant="default" className="rounded-full flex-1 sm:flex-none" asChild>
-                            <a href={route('admin.project-price-calculator')} target="_blank" rel="noopener noreferrer">
-                                <Calculator className="h-4 w-4 mr-2" />
-                                Rate Calculator
-                            </a>
-                        </Button>
-                    </div>
-                </div>
             </div>
-        </AdminLayout>
+        </AdminSidebarLayout>
     );
 }
