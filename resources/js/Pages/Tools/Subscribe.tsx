@@ -10,9 +10,11 @@ interface Props {
     plan: { id: number; name: string; price_monthly: number; price_yearly: number; features: string[] };
     walletBalance: number;
     hasExisting: boolean;
+    maxSubscriptionMonths: number | null;
 }
 
-export default function Subscribe({ tool, plan, walletBalance, hasExisting }: Props) {
+export default function Subscribe({ tool, plan, walletBalance, hasExisting, maxSubscriptionMonths }: Props) {
+    const isMonthlyOnly = maxSubscriptionMonths !== null && maxSubscriptionMonths <= 1;
     const [billingCycle, setBillingCycle] = useState<'monthly' | 'yearly'>('monthly');
     const { data, setData, post, processing, errors } = useForm({
         billing_cycle: 'monthly' as 'monthly' | 'yearly',
@@ -78,23 +80,29 @@ export default function Subscribe({ tool, plan, walletBalance, hasExisting }: Pr
                                 <p className="font-semibold text-white">{plan.name} Plan</p>
                                 
                             </div>
-                            {/* Billing toggle */}
-                            <div className="flex items-center bg-slate-800 rounded-lg p-0.5 gap-0.5">
-                                {(['monthly', 'yearly'] as const).map(cycle => (
-                                    <button
-                                        type="button"
-                                        key={cycle}
-                                        onClick={() => handleCycleChange(cycle)}
-                                        className={`px-3 py-1.5 rounded-md text-xs font-medium capitalize transition-all ${
-                                            billingCycle === cycle
-                                                ? 'bg-white text-slate-900 shadow-sm'
-                                                : 'text-slate-400 hover:text-slate-200'
-                                        }`}
-                                    >
-                                        {cycle}
-                                    </button>
-                                ))}
-                            </div>
+                            {/* Billing toggle — hidden when monthly-only restriction is active */}
+                            {!isMonthlyOnly ? (
+                                <div className="flex items-center bg-slate-800 rounded-lg p-0.5 gap-0.5">
+                                    {(['monthly', 'yearly'] as const).map(cycle => (
+                                        <button
+                                            type="button"
+                                            key={cycle}
+                                            onClick={() => handleCycleChange(cycle)}
+                                            className={`px-3 py-1.5 rounded-md text-xs font-medium capitalize transition-all ${
+                                                billingCycle === cycle
+                                                    ? 'bg-white text-slate-900 shadow-sm'
+                                                    : 'text-slate-400 hover:text-slate-200'
+                                            }`}
+                                        >
+                                            {cycle}
+                                        </button>
+                                    ))}
+                                </div>
+                            ) : (
+                                <span className="inline-flex items-center px-2.5 py-1 bg-amber-500/20 text-amber-300 rounded-md text-xs font-medium">
+                                    Monthly Only
+                                </span>
+                            )}
                         </div>
 
                         <div className="px-5 py-4">

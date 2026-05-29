@@ -78,6 +78,9 @@ class SubscriptionController extends Controller
 
         $walletBalance = auth()->user()->walletBalance ?? 0;
 
+        // Max subscription months restriction (admin-configurable per tool)
+        $maxSubscriptionMonths = $tool['max_subscription_months'] ?? null;
+
         return Inertia::render('Tools/Subscribe', [
             'tool'          => [
                 'slug'    => $tool['slug'],
@@ -91,8 +94,9 @@ class SubscriptionController extends Controller
                 'price_yearly'  => $plan['price_yearly'],
                 'features'      => $plan['features'] ?? [],
             ],
-            'walletBalance' => $walletBalance,
-            'hasExisting'   => (bool) $existing,
+            'walletBalance'         => $walletBalance,
+            'hasExisting'           => (bool) $existing,
+            'maxSubscriptionMonths' => $maxSubscriptionMonths,
         ]);
     }
 
@@ -109,6 +113,12 @@ class SubscriptionController extends Controller
         $plan = collect($tool['plans'] ?? [])->firstWhere('guid', $planGuid);
         if (!$plan) {
             abort(404);
+        }
+
+        // Enforce max subscription months restriction
+        $maxSubscriptionMonths = $tool['max_subscription_months'] ?? null;
+        if ($maxSubscriptionMonths && $maxSubscriptionMonths <= 1 && $request->input('billing_cycle') === 'yearly') {
+            return back()->with('error', __('tools.monthly_only_restriction'));
         }
 
         $price = $request->input('billing_cycle') === 'yearly'
@@ -129,7 +139,7 @@ class SubscriptionController extends Controller
             ->first();
 
         if ($existing) {
-            return back()->with('error', 'You already have an active subscription to this tool.');
+            return back()->with('error', __('tools.already_subscribed'));
         }
 
         $expiresAt = now()->addMonth($request->billing_cycle === 'yearly' ? 12 : 1);
