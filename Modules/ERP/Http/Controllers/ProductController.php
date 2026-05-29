@@ -67,6 +67,43 @@ class ProductController extends Controller
         return redirect()->route('erp.inventory.index')->with('success', __('erp.product_created_successfully'));
     }
 
+    public function search(Request $request)
+    {
+        $search = $request->input('q');
+        $tenantId = $this->getTenantId();
+        
+        $products = Product::with('currency')
+            ->where('tenant_id', $tenantId)
+            ->where('is_active', true)
+            ->when($search, function ($query, $search) {
+                $query->where(function ($sub) use ($search) {
+                    $sub->where('name', 'like', "%{$search}%")
+                        ->orWhere('sku', 'like', "%{$search}%");
+                });
+            })
+            ->limit(20)
+            ->get(['id', 'name', 'sku', 'price', 'currency_id', 'stock_quantity']);
+            
+        return response()->json($products);
+    }
+
+    public function show(Product $product)
+    {
+        $this->authorize('view', $product);
+        
+        $product->load('currency');
+        
+        $stockLogs = ProductStockLog::with('user:id,name')
+            ->where('product_id', $product->id)
+            ->latest()
+            ->paginate(20);
+
+        return Inertia::render('ERP/Inventory/Products/Show', [
+            'product' => $product,
+            'stockLogs' => $stockLogs,
+        ]);
+    }
+
     public function edit(Product $product)
     {
         $this->authorize('update', $product);
@@ -74,15 +111,10 @@ class ProductController extends Controller
         $tenantId = $this->getTenantId();
 
         $currencies = \App\Models\Currency::where('status', 'active')->get();
-        $stockLogs = ProductStockLog::with('user:id,name')
-            ->where('product_id', $product->id)
-            ->latest()
-            ->get();
 
         return Inertia::render('ERP/Inventory/Products/Edit', [
             'product' => $product,
             'currencies' => $currencies,
-            'stockLogs' => $stockLogs,
         ]);
     }
 

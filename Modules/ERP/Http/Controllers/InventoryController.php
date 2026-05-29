@@ -19,17 +19,10 @@ class InventoryController extends Controller
         return $user;
     }
 
-    private function checkAddon()
-    {
-        $user = $this->resolveTenantUser();
-        if (!$user || !$user->hasModuleSubscription('erp-inventory')) {
-            abort(403, __('errors.upgrade_to_inventory'));
-        }
-    }
+
 
     public function index()
     {
-        $this->checkAddon();
         $user = $this->resolveTenantUser();
         $tenant = Tenant::where('user_id', $user->id)->firstOrFail();
         
@@ -37,8 +30,11 @@ class InventoryController extends Controller
             ->where('tenant_id', $tenant->id)
             ->paginate(15);
 
+        $hasInventoryFeature = $user && $user->hasModuleSubscription('erp-inventory');
+
         return Inertia::render('ERP/Inventory/Index', [
             'products' => $products,
+            'hasInventoryFeature' => $hasInventoryFeature,
         ]);
     }
 }

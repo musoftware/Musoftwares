@@ -117,12 +117,14 @@ Route::middleware(['web', 'auth', 'tenant.active'])
 
         // ── Inventory ──
         Route::get('inventory', [\Modules\ERP\Http\Controllers\InventoryController::class, 'index'])->name('inventory.index');
+        Route::get('inventory/products/search', [\Modules\ERP\Http\Controllers\ProductController::class, 'search'])->name('inventory.products.search');
         Route::resource('inventory/products', \Modules\ERP\Http\Controllers\ProductController::class)->names('inventory.products');
         Route::get('inventory/products/{product}/adjust', [\Modules\ERP\Http\Controllers\ProductController::class, 'adjust'])->name('inventory.products.adjust');
         Route::post('inventory/products/{product}/adjust', [\Modules\ERP\Http\Controllers\ProductController::class, 'storeAdjustment'])->name('inventory.products.store_adjustment');
 
         // ── POS ──
         Route::get('pos', [\Modules\ERP\Http\Controllers\PosController::class, 'index'])->name('pos.index');
+        Route::post('pos/checkout', [\Modules\ERP\Http\Controllers\PosController::class, 'checkout'])->name('pos.checkout');
         
         // ── Branches ──
         Route::prefix('branches')->name('branches.')->group(function () {

@@ -124,4 +124,65 @@ class InventoryTest extends TestCase
             'reason' => 'Sale',
         ]);
     }
+
+    public function test_can_search_products()
+    {
+        $product = Product::create([
+            'tenant_id' => $this->tenant->id,
+            'name' => 'Searchable Product',
+            'sku' => 'SEARCH-123',
+            'price' => 10,
+            'currency_id' => $this->currency->id,
+            'stock_quantity' => 10,
+        ]);
+
+        $response = $this->actingAs($this->user)->get(route('erp.inventory.products.search', ['q' => 'SEARCH']));
+        
+        $response->assertStatus(200);
+        $response->assertJsonFragment([
+            'sku' => 'SEARCH-123'
+        ]);
+    }
+
+    public function test_invoice_creation_deducts_stock()
+    {
+        $client = \Modules\ERP\Models\TenantClient::create([
+            'tenant_id' => $this->tenant->id,
+            'name' => 'Test Client',
+            'email' => 'client@test.com',
+            'currency_id' => $this->currency->id,
+        ]);
+
+        $product = Product::create([
+            'tenant_id' => $this->tenant->id,
+            'name' => 'Invoice Product',
+            'price' => 10,
+            'currency_id' => $this->currency->id,
+            'stock_quantity' => 10,
+        ]);
+
+        $service = app(\Modules\ERP\Services\InvoiceService::class);
+        $service->createInvoice([
+            'client_id' => $client->id,
+            'invoice_number' => 'INV-0001',
+            'issued_at' => now()->toDateString(),
+            'due_date' => now()->addDays(7)->toDateString(),
+            'notes' => 'Test Invoice',
+            'items' => [
+                [
+                    'type' => 'product',
+                    'title' => 'Invoice Product',
+                    'unit_price' => 10,
+                    'quantity' => 3,
+                    'product_id' => $product->id,
+                ]
+            ],
+            'costs' => []
+        ], $this->tenant);
+
+        $this->assertDatabaseHas('erp_products', [
+            'id' => $product->id,
+            'stock_quantity' => 7,
+        ]);
+    }
 }

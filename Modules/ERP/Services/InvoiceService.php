@@ -76,16 +76,19 @@ class InvoiceService
                 if (!empty($itemData['product_id'])) {
                     $product = Product::find($itemData['product_id']);
                     if ($product) {
-                        $product->stock -= $itemData['quantity'];
+                        $oldQuantity = (float) $product->stock_quantity;
+                        $product->stock_quantity -= $itemData['quantity'];
                         $product->save();
 
                         ProductStockLog::create([
+                            'tenant_id' => $tenant->id,
                             'product_id' => $product->id,
-                            'user_id' => Auth::id(),
                             'change_amount' => -$itemData['quantity'],
-                            'new_quantity' => $product->stock,
+                            'new_quantity' => $product->stock_quantity,
                             'reason' => "Added to Invoice #{$invoice->invoice_number}",
                         ]);
+
+                        $product->checkLowStock($oldQuantity);
                     }
                 }
             }
@@ -158,13 +161,13 @@ class InvoiceService
                 if ($delItem->product_id) {
                     $product = Product::find($delItem->product_id);
                     if ($product) {
-                        $product->stock += $delItem->quantity;
+                        $product->stock_quantity += $delItem->quantity;
                         $product->save();
                         ProductStockLog::create([
+                            'tenant_id' => $tenant->id,
                             'product_id' => $product->id,
-                            'user_id' => Auth::id(),
                             'change_amount' => $delItem->quantity,
-                            'new_quantity' => $product->stock,
+                            'new_quantity' => $product->stock_quantity,
                             'reason' => "Removed from Invoice #{$invoice->invoice_number}",
                         ]);
                     }
@@ -199,28 +202,32 @@ class InvoiceService
                         if ($diff != 0) {
                             $product = Product::find($oldItem->product_id);
                             if ($product) {
-                                $product->stock -= $diff;
+                                $oldQuantity = (float) $product->stock_quantity;
+                                $product->stock_quantity -= $diff;
                                 $product->save();
                                 ProductStockLog::create([
+                                    'tenant_id' => $tenant->id,
                                     'product_id' => $product->id,
-                                    'user_id' => Auth::id(),
                                     'change_amount' => -$diff,
-                                    'new_quantity' => $product->stock,
+                                    'new_quantity' => $product->stock_quantity,
                                     'reason' => "Quantity updated on Invoice #{$invoice->invoice_number}",
                                 ]);
+                                if ($diff > 0) {
+                                    $product->checkLowStock($oldQuantity);
+                                }
                             }
                         }
                     } else {
                         if ($oldItem->product_id) {
                             $oldProduct = Product::find($oldItem->product_id);
                             if ($oldProduct) {
-                                $oldProduct->stock += $oldItem->quantity;
+                                $oldProduct->stock_quantity += $oldItem->quantity;
                                 $oldProduct->save();
                                 ProductStockLog::create([
-                                    'product_id' => $oldProduct->id,
-                                    'user_id' => Auth::id(),
+                                    'tenant_id' => $tenant->id,
+                                    'product_id' => $oldItem->product_id,
                                     'change_amount' => $oldItem->quantity,
-                                    'new_quantity' => $oldProduct->stock,
+                                    'new_quantity' => $oldProduct->stock_quantity,
                                     'reason' => "Removed from Invoice #{$invoice->invoice_number}",
                                 ]);
                             }
@@ -228,15 +235,17 @@ class InvoiceService
                         if (!empty($itemData['product_id'])) {
                             $newProduct = Product::find($itemData['product_id']);
                             if ($newProduct) {
-                                $newProduct->stock -= $itemData['quantity'];
+                                $oldQuantity = (float) $newProduct->stock_quantity;
+                                $newProduct->stock_quantity -= $itemData['quantity'];
                                 $newProduct->save();
                                 ProductStockLog::create([
-                                    'product_id' => $newProduct->id,
-                                    'user_id' => Auth::id(),
+                                    'tenant_id' => $tenant->id,
+                                    'product_id' => $itemData['product_id'],
                                     'change_amount' => -$itemData['quantity'],
-                                    'new_quantity' => $newProduct->stock,
+                                    'new_quantity' => $newProduct->stock_quantity,
                                     'reason' => "Added to Invoice #{$invoice->invoice_number}",
                                 ]);
+                                $newProduct->checkLowStock($oldQuantity);
                             }
                         }
                     }
@@ -244,15 +253,17 @@ class InvoiceService
                     if (!empty($itemData['product_id'])) {
                         $newProduct = Product::find($itemData['product_id']);
                         if ($newProduct) {
-                            $newProduct->stock -= $itemData['quantity'];
+                            $oldQuantity = (float) $newProduct->stock_quantity;
+                            $newProduct->stock_quantity -= $itemData['quantity'];
                             $newProduct->save();
                             ProductStockLog::create([
-                                'product_id' => $newProduct->id,
-                                'user_id' => Auth::id(),
+                                'tenant_id' => $tenant->id,
+                                'product_id' => $itemData['product_id'],
                                 'change_amount' => -$itemData['quantity'],
-                                'new_quantity' => $newProduct->stock,
+                                'new_quantity' => $newProduct->stock_quantity,
                                 'reason' => "Added to Invoice #{$invoice->invoice_number}",
                             ]);
+                            $newProduct->checkLowStock($oldQuantity);
                         }
                     }
                 }
