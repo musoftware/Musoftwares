@@ -139,7 +139,7 @@ class TimerHelper
                 $type
                 , null, $project);
 
-            $client->add_cost_balance($fee,
+            \App\Models\CostTransaction::add_cost_balance($client, $fee,
                 ($reason . ' Fee')
                 , null, $project);
 

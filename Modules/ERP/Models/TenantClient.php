@@ -134,5 +134,22 @@ class TenantClient extends TenantModel
     {
         return $this->hasMany(TenantClient::class, 'referred_by');
     }
+
+    public function debtTransactions(): HasMany
+    {
+        return $this->hasMany(DebtTransaction::class, 'client_id');
+    }
+
+    public function debtBalance(): float
+    {
+        $given = $this->debtTransactions()->where('type', 'given')->sum('amount');
+        $received = $this->debtTransactions()->where('type', 'received')->sum('amount');
+        return (float) ($given - $received);
+    }
+
+    public function getDebtBalanceAttribute(): float
+    {
+        return $this->debtBalance();
+    }
 }
 

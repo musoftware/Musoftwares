@@ -31,6 +31,7 @@ class UpdateInvoiceRequest extends FormRequest
             'items.*.unit_price' => 'required|numeric|min:0',
             'items.*.quantity' => 'required|numeric|min:0',
             'items.*.product_id' => 'nullable|exists:erp_products,id',
+            'items.*.uom' => 'nullable|string',
             'costs' => 'nullable|array',
             'discount_amount' => 'nullable|numeric|min:0',
             'tax_rate' => 'nullable|numeric|min:0',

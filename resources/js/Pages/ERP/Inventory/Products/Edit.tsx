@@ -4,7 +4,7 @@ import { Head, Link, useForm } from '@inertiajs/react';
 import { ArrowLeft } from 'lucide-react';
 import InputError from '@/components/InputError';
 
-export default function Edit({ product, currencies, hasMultiCurrency, stockLogs }: { product: any, currencies: any[], hasMultiCurrency: boolean, stockLogs?: any[] }) {
+export default function Edit({ product, currencies, categories, hasMultiCurrency, stockLogs }: { product: any, currencies: any[], categories: any[], hasMultiCurrency: boolean, stockLogs?: any[] }) {
     const { menuItems, lockedAddons, workspaceName, tenantId } = useERPMenu('inventory');
 
     const t = (key: string, fallback: string) => {
@@ -22,6 +22,11 @@ export default function Edit({ product, currencies, hasMultiCurrency, stockLogs 
         description: product.description || '',
         price: product.price || '',
         currency_id: product.currency_id || '',
+        category_id: product.category_id || '',
+        barcode: product.barcode || '',
+        uom: product.uom || 'piece',
+        tax_rate: product.tax_rate || '0',
+        image: null as File | null,
         reorder_level: product.reorder_level || '',
         is_active: product.is_active,
     });
@@ -101,9 +106,92 @@ export default function Edit({ product, currencies, hasMultiCurrency, stockLogs 
                                                 </option>
                                             ))}
                                         </select>
-                                        <InputError message={errors.currency_id} className="mt-2" />
+                                    <InputError message={errors.currency_id} className="mt-2" />
+                                </div>
+                            )}
+
+                            <div>
+                                <label htmlFor="category_id" className="block text-sm font-medium text-gray-700">
+                                    {t('erp.category', 'Category')}
+                                </label>
+                                <select
+                                    id="category_id"
+                                    value={data.category_id}
+                                    onChange={(e) => setData('category_id', e.target.value)}
+                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                                >
+                                    <option value="">{t('erp.select_category', 'Select Category (Optional)')}</option>
+                                    {categories.map((category) => (
+                                        <option key={category.id} value={category.id}>
+                                            {category.name}
+                                        </option>
+                                    ))}
+                                </select>
+                                <InputError message={errors.category_id} className="mt-2" />
+                            </div>
+
+                            <div>
+                                <label htmlFor="barcode" className="block text-sm font-medium text-gray-700">
+                                    {t('erp.barcode', 'Barcode / EAN')}
+                                </label>
+                                <input
+                                    type="text"
+                                    id="barcode"
+                                    value={data.barcode}
+                                    onChange={(e) => setData('barcode', e.target.value)}
+                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                                />
+                                <InputError message={errors.barcode} className="mt-2" />
+                            </div>
+
+                            <div>
+                                <label htmlFor="uom" className="block text-sm font-medium text-gray-700">
+                                    {t('erp.uom', 'Unit of Measure (Qty Type)')}
+                                </label>
+                                <input
+                                    type="text"
+                                    id="uom"
+                                    value={data.uom}
+                                    onChange={(e) => setData('uom', e.target.value)}
+                                    placeholder="piece, kg, box..."
+                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                                />
+                                <InputError message={errors.uom} className="mt-2" />
+                            </div>
+
+                            <div>
+                                <label htmlFor="tax_rate" className="block text-sm font-medium text-gray-700">
+                                    {t('erp.tax_rate', 'Tax Rate (%)')}
+                                </label>
+                                <input
+                                    type="number"
+                                    id="tax_rate"
+                                    step="0.01"
+                                    value={data.tax_rate}
+                                    onChange={(e) => setData('tax_rate', e.target.value)}
+                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                                />
+                                <InputError message={errors.tax_rate} className="mt-2" />
+                            </div>
+
+                            <div>
+                                <label htmlFor="image" className="block text-sm font-medium text-gray-700">
+                                    {t('erp.product_image', 'Product Image')}
+                                </label>
+                                {product.image_path && (
+                                    <div className="mb-2">
+                                        <img src={`/storage/${product.image_path}`} alt={product.name} className="h-16 w-16 object-cover rounded-md border" />
                                     </div>
                                 )}
+                                <input
+                                    type="file"
+                                    id="image"
+                                    onChange={(e) => setData('image', e.target.files ? e.target.files[0] : null)}
+                                    className="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
+                                    accept="image/*"
+                                />
+                                <InputError message={errors.image} className="mt-2" />
+                            </div>
 
                                 <div>
                                     <label htmlFor="price" className="block text-sm font-medium text-gray-700">

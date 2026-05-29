@@ -121,10 +121,22 @@ Route::middleware(['web', 'auth:web,erp_team', 'tenant.active'])
         Route::resource('inventory/products', \Modules\ERP\Http\Controllers\ProductController::class)->names('inventory.products');
         Route::get('inventory/products/{product}/adjust', [\Modules\ERP\Http\Controllers\ProductController::class, 'adjust'])->name('inventory.products.adjust');
         Route::post('inventory/products/{product}/adjust', [\Modules\ERP\Http\Controllers\ProductController::class, 'storeAdjustment'])->name('inventory.products.store_adjustment');
+        
+        // Product Categories
+        Route::get('inventory/categories', [\Modules\ERP\Http\Controllers\ProductCategoryController::class, 'index'])->name('inventory.categories.index');
+        Route::post('inventory/categories', [\Modules\ERP\Http\Controllers\ProductCategoryController::class, 'store'])->name('inventory.categories.store');
+        Route::delete('inventory/categories/{category}', [\Modules\ERP\Http\Controllers\ProductCategoryController::class, 'destroy'])->name('inventory.categories.destroy');
 
         // ── POS ──
         Route::get('pos', [\Modules\ERP\Http\Controllers\PosController::class, 'index'])->name('pos.index');
         Route::post('pos/checkout', [\Modules\ERP\Http\Controllers\PosController::class, 'checkout'])->name('pos.checkout');
+        
+        // ── Debts / Quick Ledger ──
+        Route::get('debts', [\Modules\ERP\Http\Controllers\DebtController::class, 'index'])->name('debts.index');
+        Route::get('debts/transactions/create', [\Modules\ERP\Http\Controllers\DebtTransactionController::class, 'create'])->name('debts.transactions.create');
+        Route::post('debts/transactions', [\Modules\ERP\Http\Controllers\DebtTransactionController::class, 'store'])->name('debts.transactions.store');
+        Route::delete('debts/transactions/{transaction}', [\Modules\ERP\Http\Controllers\DebtTransactionController::class, 'destroy'])->name('debts.transactions.destroy');
+        Route::get('debts/client/{client}', [\Modules\ERP\Http\Controllers\DebtController::class, 'show'])->name('debts.show');
         
         // ── Branches ──
         Route::prefix('branches')->name('branches.')->group(function () {

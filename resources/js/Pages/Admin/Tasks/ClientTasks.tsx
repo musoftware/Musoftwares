@@ -24,6 +24,7 @@ import { Input } from '@/Components/ui/input';
 import { Card, CardContent } from '@/Components/ui/card';
 import { Badge } from '@/Components/ui/badge';
 import { toast } from 'sonner';
+import { formatMoney as formatCurrency } from '@/lib/utils';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from '@/Components/ui/dialog';
 import { Label } from '@/Components/ui/label';
 import { Textarea } from '@/Components/ui/textarea';
@@ -381,7 +382,7 @@ export default function ClientTasks({ clients, selectedClient, todos, filters }:
                                                             {todo.cost > 0 && (
                                                                 <span className="flex items-center gap-0.5 text-emerald-600 font-semibold">
                                                                     <DollarSign className="h-3.5 w-3.5" />
-                                                                    {todo.cost_in_client_currency.toLocaleString(undefined, {minimumFractionDigits: 2})} {todo.client_currency}
+                                                                    {formatCurrency(todo.cost_in_client_currency, todo.client_currency)}
                                                                 </span>
                                                             )}
                                                             {(todo.start_at || todo.end_at) && (
@@ -491,7 +492,7 @@ export default function ClientTasks({ clients, selectedClient, todos, filters }:
                                         <div className="flex items-baseline gap-1.5">
                                             <Wallet className="h-4 w-4 text-emerald-600 self-center" />
                                             <p className="text-lg font-bold text-emerald-600">
-                                                {selectedClient.balance.toLocaleString(undefined, {minimumFractionDigits: 2})} {selectedClient.currency}
+                                                {formatCurrency(selectedClient.balance, selectedClient.currency)}
                                             </p>
                                         </div>
                                     </div>

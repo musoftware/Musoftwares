@@ -70,6 +70,7 @@ class InvoiceService
                     'total' => $itemData['unit_price'] * $itemData['quantity'],
                     'sort_order' => $index,
                     'product_id' => $itemData['product_id'] ?? null,
+                    'uom' => $itemData['uom'] ?? null,
                 ]);
 
                 // Deduct stock if product is linked
@@ -193,6 +194,7 @@ class InvoiceService
                         'total' => $itemData['unit_price'] * $itemData['quantity'],
                         'sort_order' => $index,
                         'product_id' => $itemData['product_id'] ?? null,
+                        'uom' => $itemData['uom'] ?? null,
                     ]
                 );
 

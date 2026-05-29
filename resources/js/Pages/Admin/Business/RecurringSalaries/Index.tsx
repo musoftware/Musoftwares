@@ -3,6 +3,7 @@ import { Head, Link, router, usePage } from '@inertiajs/react';
 import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
 import { Button } from '@/Components/ui/button';
 import { Trash2, Edit, Plus, User, Clock, Calendar, ArrowLeft, Eye } from 'lucide-react';
+import { formatMoney as formatCurrency } from '@/lib/utils';
 import {
     Dialog,
     DialogContent,
@@ -319,7 +320,7 @@ export default function Index({ salaries, currencies, users }) {
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-center">
                                     <span className="text-sm font-bold text-red-600 bg-red-50 border border-red-200 px-2 py-1 rounded">
-                                        {parseFloat(salary.amount).toLocaleString()} {currenciesList.find(c => c.id === salary.currency)?.currency || 'EGP'}
+                                        {formatCurrency(salary.amount, currenciesList.find(c => c.id === salary.currency_id) || 'EGP')}
                                     </span>
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-center">

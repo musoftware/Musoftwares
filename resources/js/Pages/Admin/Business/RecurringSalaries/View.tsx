@@ -3,6 +3,7 @@ import { Head, Link, router } from '@inertiajs/react';
 import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
 import { Button } from '@/Components/ui/button';
 import { ArrowLeft, Calendar, Clock, User, List, History, AlertCircle, Edit, Trash2 } from 'lucide-react';
+import { formatMoney as formatCurrency } from '@/lib/utils';
 
 export default function View({ salary, transactions, upcomingSchedule, total_stat }) {
     const [activeTab, setActiveTab] = useState<'history' | 'schedule'>('history');
@@ -54,7 +55,7 @@ export default function View({ salary, transactions, upcomingSchedule, total_sta
                         <div>
                             <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider block">Salary Rate</span>
                             <span className="text-sm font-bold text-slate-900 block mt-1">
-                                {parseFloat(salary.amount).toLocaleString()} {salary.currency} ({salary.currency_symbol})
+                                {formatCurrency(salary.amount, salary.currency)}
                             </span>
                         </div>
                         <div className="mt-2">
@@ -163,7 +164,7 @@ export default function View({ salary, transactions, upcomingSchedule, total_sta
                                                         {tx.reason}
                                                     </td>
                                                     <td className="px-4 py-3 whitespace-nowrap text-sm font-bold text-red-600 text-right">
-                                                        -{parseFloat(tx.amount).toLocaleString()} {tx.currency}
+                                                        -{formatCurrency(tx.amount, tx.currency)}
                                                     </td>
                                                 </tr>
                                             ))}

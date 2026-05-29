@@ -77,7 +77,6 @@ return [
         'erp-analytics' => ['price' => 500, 'name' => 'Advanced Reports', 'desc' => 'Profit, cash flow, analytics', 'icon' => 'BarChart', 'parent' => 'erp'],
         'erp-extra-employees' => ['price' => 500, 'name' => 'Extra Employees', 'desc' => 'Add more staff to your ERP', 'icon' => 'Users', 'parent' => 'erp'],
         'erp-permissions' => ['price' => 500, 'name' => 'Role & Permissions', 'desc' => 'Advanced access control', 'icon' => 'Shield', 'parent' => 'erp'],
-        'erp-accounting' => ['price' => 500, 'name' => 'Accounting Module', 'desc' => 'Invoices, expenses, journal', 'icon' => 'Calculator', 'parent' => 'erp'],
         'erp-payroll' => ['price' => 500, 'name' => 'Payroll System', 'desc' => 'Salaries, attendance, deductions', 'icon' => 'Banknote', 'parent' => 'erp'],
         'erp-whatsapp' => ['price' => 500, 'name' => 'WhatsApp Notifications', 'desc' => 'Order & invoice updates', 'icon' => 'MessageSquare', 'parent' => 'erp'],
         'erp-purchase-orders' => ['price' => 500, 'name' => 'Purchase Orders', 'desc' => 'Manage supplier orders', 'icon' => 'ShoppingCart', 'parent' => 'erp'],

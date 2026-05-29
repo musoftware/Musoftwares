@@ -85,7 +85,7 @@ class RecurringBusinessController extends Controller
         $rCost = new RecurringCost();
         $rCost->title = $request->input('title');
         $rCost->amount = $request->input('amount');
-        $rCost->currency = $request->input('currency');
+        $rCost->currency_id = $request->input('currency');
         $rCost->start_date = $request->input('start_date');
         $rCost->current_date = $request->input('start_date');
         $rCost->recurring = $request->input('recurring');
@@ -128,7 +128,7 @@ class RecurringBusinessController extends Controller
                 'id' => $cost->id,
                 'title' => $cost->title,
                 'amount' => $cost->amount,
-                'currency' => $cost->currency,
+                'currency' => $cost->currency_id,
                 'start_date' => $cost->start_date,
                 'recurring' => $cost->recurring,
                 'recurring_times' => $cost->recurring_times,
@@ -158,7 +158,7 @@ class RecurringBusinessController extends Controller
         $rCost = RecurringCost::findOrFail($id);
         $rCost->title = $request->input('title');
         $rCost->amount = $request->input('amount');
-        $rCost->currency = $request->input('currency');
+        $rCost->currency_id = $request->input('currency');
         $rCost->start_date = $request->input('start_date');
         $rCost->current_date = $request->input('start_date');
         $rCost->recurring = $request->input('recurring');
@@ -219,7 +219,7 @@ class RecurringBusinessController extends Controller
             }
         }
 
-        $currencyModel = Currency::find($rCost->currency);
+        $currencyModel = Currency::find($rCost->currency_id);
 
         return Inertia::render('Admin/Business/RecurringCosts/View', [
             'cost' => [
@@ -239,7 +239,7 @@ class RecurringBusinessController extends Controller
             'upcomingSchedule' => $upcomingSchedule,
             'total_stat' => [
                 'entries_count' => $rCost->transactions()->count(),
-                'total_cost' => \App\Helpers\FinanceHelper::instance()->format_money($rCost->transactions()->sum('amount'), $rCost->currency),
+                'total_cost' => \App\Helpers\FinanceHelper::instance()->format_money($rCost->transactions()->sum('amount'), $rCost->currency_id),
             ]
         ]);
     }
@@ -305,7 +305,7 @@ class RecurringBusinessController extends Controller
         $rIncome = new RecurringIncome();
         $rIncome->title = $request->input('title');
         $rIncome->amount = $request->input('amount');
-        $rIncome->currency = $request->input('currency');
+        $rIncome->currency_id = $request->input('currency');
         $rIncome->start_date = $request->input('start_date');
         $rIncome->current_date = $request->input('start_date');
         $rIncome->recurring = $request->input('recurring');
@@ -348,7 +348,7 @@ class RecurringBusinessController extends Controller
                 'id' => $income->id,
                 'title' => $income->title,
                 'amount' => $income->amount,
-                'currency' => $income->currency,
+                'currency' => $income->currency_id,
                 'start_date' => $income->start_date,
                 'recurring' => $income->recurring,
                 'recurring_times' => $income->recurring_times,
@@ -378,7 +378,7 @@ class RecurringBusinessController extends Controller
         $rIncome = RecurringIncome::findOrFail($id);
         $rIncome->title = $request->input('title');
         $rIncome->amount = $request->input('amount');
-        $rIncome->currency = $request->input('currency');
+        $rIncome->currency_id = $request->input('currency');
         $rIncome->start_date = $request->input('start_date');
         $rIncome->current_date = $request->input('start_date');
         $rIncome->recurring = $request->input('recurring');
@@ -439,7 +439,7 @@ class RecurringBusinessController extends Controller
             }
         }
 
-        $currencyModel = Currency::find($rIncome->currency);
+        $currencyModel = Currency::find($rIncome->currency_id);
 
         return Inertia::render('Admin/Business/RecurringIncome/View', [
             'income' => [
@@ -459,7 +459,7 @@ class RecurringBusinessController extends Controller
             'upcomingSchedule' => $upcomingSchedule,
             'total_stat' => [
                 'entries_count' => $rIncome->transactions()->count(),
-                'total_cost' => \App\Helpers\FinanceHelper::instance()->format_money($rIncome->transactions()->sum('amount'), $rIncome->currency),
+                'total_cost' => \App\Helpers\FinanceHelper::instance()->format_money($rIncome->transactions()->sum('amount'), $rIncome->currency_id),
             ]
         ]);
     }
@@ -513,7 +513,7 @@ class RecurringBusinessController extends Controller
         $salary->start_date = $request->input('start_date');
         $salary->current_date = $request->input('start_date');
         $salary->amount = (float) $request->input('amount');
-        $salary->currency = (int) $request->input('currency');
+        $salary->currency_id = (int) $request->input('currency');
         $salary->reason = $request->input('reason') ? trim($request->input('reason')) : null;
         $salary->recurring = $request->input('recurring');
         $salary->recurring_times = (int) $request->input('recurring_times');
@@ -549,7 +549,7 @@ class RecurringBusinessController extends Controller
                 'user_id' => $salary->user_id,
                 'title' => $salary->title,
                 'amount' => $salary->amount,
-                'currency' => $salary->currency,
+                'currency' => $salary->currency_id,
                 'reason' => $salary->reason ?? '',
                 'start_date' => $salary->start_date,
                 'recurring' => $salary->recurring,
@@ -581,7 +581,7 @@ class RecurringBusinessController extends Controller
         $salary->start_date = $request->input('start_date');
         $salary->current_date = $request->input('start_date');
         $salary->amount = (float) $request->input('amount');
-        $salary->currency = (int) $request->input('currency');
+        $salary->currency_id = (int) $request->input('currency');
         $salary->reason = $request->input('reason') ? trim($request->input('reason')) : null;
         $salary->recurring = $request->input('recurring');
         $salary->recurring_times = (int) $request->input('recurring_times');
@@ -637,7 +637,7 @@ class RecurringBusinessController extends Controller
             }
         }
 
-        $currencyModel = Currency::find($salary->currency);
+        $currencyModel = Currency::find($salary->currency_id);
 
         return Inertia::render('Admin/Business/RecurringSalaries/View', [
             'salary' => [
@@ -658,7 +658,7 @@ class RecurringBusinessController extends Controller
             'upcomingSchedule' => $upcomingSchedule,
             'total_stat' => [
                 'entries_count' => $salary->transactions()->count(),
-                'total_cost' => \App\Helpers\FinanceHelper::instance()->format_money($salary->transactions()->sum('amount'), $salary->currency),
+                'total_cost' => \App\Helpers\FinanceHelper::instance()->format_money($salary->transactions()->sum('amount'), $salary->currency_id),
             ]
         ]);
     }

@@ -26,6 +26,7 @@ import {
     XCircle,
     Clock,
 } from 'lucide-react';
+import { formatMoney as formatCurrency } from '@/lib/utils';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -265,19 +266,19 @@ export default function Show({ client, payments, stats }: Props) {
                 <StatCard
                     icon={DollarSign}
                     label="Total Volume"
-                    value={`EGP ${stats.total_volume.toLocaleString('en', { minimumFractionDigits: 2 })}`}
+                    value={formatCurrency(stats.total_volume, 'EGP')}
                     sub={`${stats.successful_count} successful payments`}
                 />
                 <StatCard
                     icon={TrendingUp}
                     label={`Our Commission (${stats.commission_rate}%)`}
-                    value={`EGP ${stats.total_commission.toLocaleString('en', { minimumFractionDigits: 2 })}`}
+                    value={formatCurrency(stats.total_commission, 'EGP')}
                     accent="text-green-700"
                 />
                 <StatCard
                     icon={CreditCard}
                     label="Client Net (60%)"
-                    value={`EGP ${stats.total_net.toLocaleString('en', { minimumFractionDigits: 2 })}`}
+                    value={formatCurrency(stats.total_net, 'EGP')}
                 />
                 <StatCard
                     icon={Activity}
@@ -352,15 +353,14 @@ export default function Show({ client, payments, stats }: Props) {
                                     <div className="text-xs text-gray-400">{p.customer_email ?? ''}</div>
                                 </td>
                                 <td className="p-4 font-semibold text-gray-900">
-                                    {p.amount.toLocaleString('en', { minimumFractionDigits: 2 })}
-                                    <span className="ml-1 text-xs font-normal text-gray-400">{p.currency}</span>
+                                    {formatCurrency(p.amount, p.currency)}
                                 </td>
                                 <td className="p-4 font-medium text-green-700">
-                                    {p.commission_amount.toLocaleString('en', { minimumFractionDigits: 2 })}
+                                    {formatCurrency(p.commission_amount, p.currency)}
                                     <span className="ml-1 text-xs text-gray-400">({p.commission_rate}%)</span>
                                 </td>
                                 <td className="p-4 text-gray-700">
-                                    {p.net_amount.toLocaleString('en', { minimumFractionDigits: 2 })}
+                                    {formatCurrency(p.net_amount, p.currency)}
                                 </td>
                                 <td className="p-4">
                                     <StatusBadge status={p.status} />

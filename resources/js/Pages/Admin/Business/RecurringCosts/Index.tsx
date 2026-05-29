@@ -3,6 +3,7 @@ import { Head, Link, router, usePage } from '@inertiajs/react';
 import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
 import { Button } from '@/Components/ui/button';
 import { Trash2, Edit, Plus, DollarSign, TrendingDown, Clock, Search, X, Calendar, ArrowLeft, Eye } from 'lucide-react';
+import { formatMoney as formatCurrency } from '@/lib/utils';
 
 export default function Index({ costs, currencies, categories, stats }) {
     const { errors } = usePage().props;
@@ -122,7 +123,7 @@ export default function Index({ costs, currencies, categories, stats }) {
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-center">
                                     <span className="text-sm font-bold text-red-600 bg-red-50 border border-red-200 px-2 py-1 rounded">
-                                        {parseFloat(cost.amount).toLocaleString()} {currenciesList.find(c => c.id === cost.currency)?.currency || 'EGP'}
+                                        {formatCurrency(cost.amount, currenciesList.find(c => c.id === cost.currency_id) || 'EGP')}
                                     </span>
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-center">
