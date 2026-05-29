@@ -21,7 +21,7 @@ function FieldError({ message }) {
     );
 }
 
-export default function CreateEdit({ invoice, clients = [], projects = [], currencies, business_currency, pre_selected_client_id, pre_selected_project_id }) {
+export default function CreateEdit({ invoice, clients = [], projects = [], products = [], has_inventory_addon, currencies, business_currency, pre_selected_client_id, pre_selected_project_id }) {
     const isEdit = !!invoice;
     const [showCosts, setShowCosts] = useState(false);
     const [clientError, setClientError] = useState('');
@@ -342,6 +342,37 @@ export default function CreateEdit({ invoice, clients = [], projects = [], curre
                                 {data.items.map((item, index) => (
                                     <div key={index} className="flex items-start gap-4 p-4 group hover:bg-slate-50/50 transition-colors">
                                         <div className="flex-1 space-y-1">
+                                            {has_inventory_addon && (
+                                                <select
+                                                    className="mb-1 h-8 w-full text-sm text-slate-600 shadow-none border-slate-200 bg-slate-50 px-2 rounded hover:border-slate-300 focus:border-indigo-500 transition-all"
+                                                    value={item.product_id || ''}
+                                                    onChange={e => {
+                                                        const productId = e.target.value;
+                                                        const product = products.find(p => String(p.id) === String(productId));
+                                                        const newItems = [...data.items];
+                                                        if (product) {
+                                                            newItems[index] = { 
+                                                                ...newItems[index], 
+                                                                product_id: productId,
+                                                                title: product.name,
+                                                                unit_price: parseFloat(product.price),
+                                                                description: product.sku ? `SKU: ${product.sku}` : ''
+                                                            };
+                                                        } else {
+                                                            newItems[index] = { ...newItems[index], product_id: '' };
+                                                        }
+                                                        setData('items', newItems);
+                                                        if (itemErrors[index]) {
+                                                            setItemErrors(prev => ({ ...prev, [index]: undefined }));
+                                                        }
+                                                    }}
+                                                >
+                                                    <option value="">+ Load from Inventory...</option>
+                                                    {products.map(p => (
+                                                        <option key={p.id} value={p.id}>{p.name} ({p.price})</option>
+                                                    ))}
+                                                </select>
+                                            )}
                                             <Input
                                                 className={cn(
                                                     "h-9 font-medium text-slate-900 shadow-none border-transparent bg-transparent px-2",
@@ -358,7 +389,7 @@ export default function CreateEdit({ invoice, clients = [], projects = [], curre
                                             <Input
                                                 className="h-8 text-sm text-slate-500 shadow-none border-transparent bg-transparent hover:border-slate-200 focus:border-indigo-500 focus:bg-white transition-all px-2 placeholder:text-slate-300"
                                                 placeholder="Optional description..."
-                                                value={item.description}
+                                                value={item.description || ''}
                                                 onChange={e => updateItem(index, 'description', e.target.value)}
                                             />
                                         </div>

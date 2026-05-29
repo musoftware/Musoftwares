@@ -84,10 +84,15 @@ class ProductController extends Controller
         if ($product->tenant_id !== $tenantId) abort(404);
 
         $currencies = \App\Models\Currency::where('status', 'active')->get();
+        $stockLogs = ProductStockLog::with('user:id,name')
+            ->where('product_id', $product->id)
+            ->latest()
+            ->get();
 
         return Inertia::render('ERP/Inventory/Products/Edit', [
             'product' => $product,
             'currencies' => $currencies,
+            'stockLogs' => $stockLogs,
         ]);
     }
 

@@ -11,7 +11,7 @@ class InvoiceItem extends TenantModel
 
     protected $fillable = [
         'invoice_id', 'tenant_id', 'type', 'title', 'description',
-        'unit_price', 'quantity', 'total', 'sort_order'
+        'unit_price', 'quantity', 'total', 'sort_order', 'product_id'
     ];
 
     protected $casts = [
@@ -34,5 +34,10 @@ class InvoiceItem extends TenantModel
     public function timerSessions(): HasMany
     {
         return $this->hasMany(TimerSession::class);
+    }
+
+    public function product(): BelongsTo
+    {
+        return $this->belongsTo(Product::class);
     }
 }
