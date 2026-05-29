@@ -157,6 +157,18 @@ export default function OpensooqRunner({ tool }: any) {
                         setProgressMsg(`Done — ${msg.data.total} leads extracted.`);
                     }
 
+                    // Handle progress events including stop
+                    if (msg.event === 'opensooq.extract.progress' && msg.data?.campaignId === campaignIdRef.current) {
+                        if (msg.data.status === 'stopping') {
+                            setProgressMsg('Stopping extraction...');
+                        }
+                        if (msg.data.status === 'stopped') {
+                            setStatus('done');
+                            setProgress(100);
+                            setProgressMsg(`Stopped — ${msg.data.extracted || leads.length} leads captured.`);
+                        }
+                    }
+
                     // RPC responses
                     if (msg.type === 'plugin_rpc_res' || msg.type === 'plugin_rpc_error') {
                         const id = msg.requestId;
@@ -233,9 +245,20 @@ export default function OpensooqRunner({ tool }: any) {
         }
     };
 
-    const handleStop = () => {
+    const handleStop = async () => {
+        const cId = campaignIdRef.current;
+        if (cId) {
+            try {
+                await callRPC('opensooq.extract.stop', { campaignId: cId });
+            } catch (err: any) {
+                console.error('Stop RPC failed:', err);
+                // Even if RPC fails, stop all as fallback
+                try { await callRPC('opensooq.extract.stop.all', {}); } catch {}
+            }
+        }
         setStatus('done');
         setProgressMsg(`Stopped — ${leads.length} leads captured.`);
+        setProgress(100);
     };
 
     if (!connected) return (
