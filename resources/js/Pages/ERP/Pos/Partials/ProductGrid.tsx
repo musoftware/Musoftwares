@@ -11,9 +11,9 @@ interface Product {
     id: number;
     name: string;
     price: number;
-    stock: number;
+    stock_quantity: number;
     image_url: string | null;
-    barcode: string | null;
+    sku: string | null;
 }
 
 interface ProductGridProps {
@@ -56,7 +56,7 @@ export default function ProductGrid({ products, onAddToCart, currency }: Product
                     {products.data.map((product) => (
                         <Card 
                             key={product.id} 
-                            className={`cursor-pointer hover:border-primary transition-colors ${product.stock <= 0 ? 'opacity-50 pointer-events-none' : ''}`}
+                            className={`cursor-pointer hover:border-primary transition-colors ${product.stock_quantity <= 0 ? 'opacity-50 pointer-events-none' : ''}`}
                             onClick={() => onAddToCart(product)}
                         >
                             <CardContent className="p-4 flex flex-col items-center text-center">
@@ -69,7 +69,7 @@ export default function ProductGrid({ products, onAddToCart, currency }: Product
                                 )}
                                 <h4 className="font-medium text-sm line-clamp-2 mb-1">{product.name}</h4>
                                 <p className="text-primary font-bold">{formatCurrency(product.price, currency)}</p>
-                                <p className="text-xs text-gray-500 mt-2">{__('Stock:')} {product.stock}</p>
+                                <p className="text-xs text-gray-500 mt-2">{__('Stock:')} {product.stock_quantity}</p>
                             </CardContent>
                         </Card>
                     ))}

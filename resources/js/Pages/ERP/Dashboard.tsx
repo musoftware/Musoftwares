@@ -989,7 +989,7 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                                         <p className="text-sm text-slate-500 mt-1">Here's what's happening in your workspace today.</p>
                                     </div>
                                     {!isReadOnlyMember && (
-                                        <div className="flex items-center gap-3">
+                                        <div className="hidden sm:flex items-center gap-3">
                                             <Link href={route("erp.clients.create")}><Button size="sm" className="shadow-none">
                                                 <UserPlus className="mr-2 h-4 w-4" /> Add Client
                                             </Button></Link>
@@ -1003,7 +1003,47 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                                     )}
                                 </div>
 
-                                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                                {/* Mobile Quick Actions Grid */}
+                                {!isReadOnlyMember && (
+                                    <div className="sm:hidden space-y-3">
+                                        <h3 className="text-xs uppercase tracking-widest font-bold text-slate-400 px-1">Quick Actions</h3>
+                                        <div className="grid grid-cols-2 gap-3">
+                                            <Link href={route('erp.invoices.create')} className="flex flex-col items-center justify-center p-4 bg-white border border-slate-100 rounded-2xl shadow-sm active:scale-95 transition-all">
+                                                <div className="h-10 w-10 bg-primary/10 rounded-full flex items-center justify-center mb-2">
+                                                    <FileText className="h-5 w-5 text-primary" />
+                                                </div>
+                                                <span className="text-xs font-medium text-slate-700">New Invoice</span>
+                                            </Link>
+                                            
+                                            <Link href={route("erp.clients.create")} className="flex flex-col items-center justify-center p-4 bg-white border border-slate-100 rounded-2xl shadow-sm active:scale-95 transition-all">
+                                                <div className="h-10 w-10 bg-emerald-50 rounded-full flex items-center justify-center mb-2">
+                                                    <UserPlus className="h-5 w-5 text-emerald-600" />
+                                                </div>
+                                                <span className="text-xs font-medium text-slate-700">Add Client</span>
+                                            </Link>
+
+                                            {auth?.erp_addons?.includes('erp-projects') && (
+                                            <Link href={route("erp.projects.create")} className="flex flex-col items-center justify-center p-4 bg-white border border-slate-100 rounded-2xl shadow-sm active:scale-95 transition-all">
+                                                <div className="h-10 w-10 bg-blue-50 rounded-full flex items-center justify-center mb-2">
+                                                    <Briefcase className="h-5 w-5 text-blue-600" />
+                                                </div>
+                                                <span className="text-xs font-medium text-slate-700">New Project</span>
+                                            </Link>
+                                            )}
+
+                                            {auth?.erp_addons?.includes('erp-tasks') && (
+                                            <button onClick={() => handleSetSection('tasks')} className="flex flex-col items-center justify-center p-4 bg-white border border-slate-100 rounded-2xl shadow-sm active:scale-95 transition-all">
+                                                <div className="h-10 w-10 bg-amber-50 rounded-full flex items-center justify-center mb-2">
+                                                    <CheckSquare className="h-5 w-5 text-amber-600" />
+                                                </div>
+                                                <span className="text-xs font-medium text-slate-700">Assign Task</span>
+                                            </button>
+                                            )}
+                                        </div>
+                                    </div>
+                                )}
+
+                                <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
                                     <MetricCard 
                                         label="Total Revenue"
                                         value={formatMoney(stats.totalRevenue, currency)}
@@ -1026,16 +1066,16 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                                     />
                                 </div>
 
-                                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
                                     
                                     {/* Main Content Column */}
-                                    <div className="lg:col-span-2 space-y-8">
+                                    <div className="lg:col-span-2 space-y-6 sm:space-y-8">
                                         
                                         {auth?.erp_addons?.includes('erp-projects') && (
-                                        <OperationalCard title="Active Projects" action={<button onClick={() => handleSetSection('projects')} className="text-sm text-primary hover:underline transition-colors">View all</button>}>
+                                        <OperationalCard title="Active Projects" action={<button onClick={() => handleSetSection('projects')} className="text-sm text-primary hover:underline transition-colors py-2 px-3 -mr-3 sm:py-0 sm:px-0 sm:mr-0">View all</button>}>
                                             <div className="space-y-3">
                                                 {projects.filter(p => p.status === 'Active' || p.status === 'Planning').slice(0, 3).map((proj) => (
-                                                    <Link href={route('erp.projects.show', proj.id)} key={proj.id} className="block group border border-border p-4 rounded-xl hover:bg-surface-raised transition-all cursor-pointer">
+                                                    <Link href={route('erp.projects.show', proj.id)} key={proj.id} className="block group border border-border p-4 rounded-xl hover:bg-surface-raised active:scale-[0.99] transition-all cursor-pointer">
                                                         <div className="flex items-start justify-between">
                                                             <div>
                                                                 <h4 className="font-medium text-text-primary text-sm group-hover:text-primary transition-colors">{proj.name}</h4>
@@ -1054,7 +1094,7 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                                         </OperationalCard>
                                         )}
 
-                                        <OperationalCard title="Recent Invoices" noPadding action={<button onClick={() => handleSetSection('invoices')} className="text-sm text-primary hover:underline transition-colors">View all</button>}>
+                                        <OperationalCard title="Recent Invoices" noPadding action={<button onClick={() => handleSetSection('invoices')} className="text-sm text-primary hover:underline transition-colors py-2 px-3 -mr-3 sm:py-0 sm:px-0 sm:mr-0">View all</button>}>
                                             <div className="divide-y divide-border/40">
                                                 {activeInvoices.length === 0 ? (
                                                     <EmptyState 
@@ -1063,17 +1103,17 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                                                     />
                                                 ) : (
                                                     activeInvoices.slice(0, 4).map((inv) => (
-                                                        <div key={inv.id} className="p-4 hover:bg-surface-raised transition-colors flex items-center justify-between">
-                                                            <div className="flex items-center gap-4">
-                                                                <div className="h-10 w-10 rounded-full bg-surface-raised flex items-center justify-center text-text-secondary">
+                                                        <div key={inv.id} className="p-4 hover:bg-surface-raised active:bg-surface-raised transition-colors flex items-center justify-between">
+                                                            <div className="flex items-center gap-3 sm:gap-4 min-w-0">
+                                                                <div className="h-10 w-10 shrink-0 rounded-full bg-surface-raised flex items-center justify-center text-text-secondary">
                                                                     <FileText className="h-4 w-4" />
                                                                 </div>
-                                                                <div>
-                                                                    <span className="font-medium text-text-primary text-sm block">{inv.clientName}</span>
-                                                                    <span className="text-text-muted block text-xs mt-0.5">{inv.invoiceNumber} • Due {formatDate(inv.dueDate)}</span>
+                                                                <div className="min-w-0">
+                                                                    <span className="font-medium text-text-primary text-sm block truncate">{inv.clientName}</span>
+                                                                    <span className="text-text-muted block text-xs mt-0.5 truncate">{inv.invoiceNumber} • Due {formatDate(inv.dueDate)}</span>
                                                                 </div>
                                                             </div>
-                                                            <div className="text-right flex flex-col items-end gap-1">
+                                                            <div className="text-right flex flex-col items-end gap-1 shrink-0 ml-2">
                                                                 <FinancialAmount amount={inv.amount} currency={inv.currency} />
                                                                 <StatusBadge status={inv.status} size="sm" />
                                                             </div>
@@ -1085,15 +1125,15 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                                     </div>
 
                                     {/* Sidebar Column */}
-                                    <div className="space-y-8">
+                                    <div className="space-y-6 sm:space-y-8">
                                         
-                                        {/* Quick Actions */}
-                                        <div>
+                                        {/* Desktop Quick Actions */}
+                                        <div className="hidden sm:block">
                                             <h3 className="text-sm font-semibold text-slate-900 mb-4">Quick Actions</h3>
                                             <div className="space-y-2">
                                                 {!isReadOnlyMember && (
                                                     <>
-                                                        <Link href={route("erp.clients.create")} className="w-full flex items-center justify-between p-3 rounded-xl border border-slate-100 bg-white hover:border-slate-300 hover:shadow-sm transition-all group">
+                                                        <Link href={route("erp.clients.create")} className="w-full flex items-center justify-between p-3 rounded-xl border border-slate-100 bg-white hover:border-slate-300 hover:shadow-sm active:scale-[0.99] transition-all group">
                                                             <div className="flex items-center gap-3">
                                                                 <div className="bg-slate-50 p-2 rounded-lg group-hover:bg-white transition-colors">
                                                                     <UserPlus className="h-4 w-4 text-slate-600" />
@@ -1103,7 +1143,7 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                                                             <ChevronRight className="h-4 w-4 text-slate-400 group-hover:text-slate-600 transition-colors" />
                                                         </Link>
                                                         {auth?.erp_addons?.includes('erp-projects') && (
-                                                        <Link href={route("erp.projects.create")} className="w-full flex items-center justify-between p-3 rounded-xl border border-slate-100 bg-white hover:border-slate-300 hover:shadow-sm transition-all group">
+                                                        <Link href={route("erp.projects.create")} className="w-full flex items-center justify-between p-3 rounded-xl border border-slate-100 bg-white hover:border-slate-300 hover:shadow-sm active:scale-[0.99] transition-all group">
                                                             <div className="flex items-center gap-3">
                                                                 <div className="bg-slate-50 p-2 rounded-lg group-hover:bg-white transition-colors">
                                                                     <Briefcase className="h-4 w-4 text-slate-600" />
@@ -1116,7 +1156,7 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                                                     </>
                                                 )}
                                                 {auth?.erp_addons?.includes('erp-tasks') && (
-                                                <button onClick={() => handleSetSection('tasks')} className="w-full flex items-center justify-between p-3 rounded-xl border border-slate-100 bg-white hover:border-slate-300 hover:shadow-sm transition-all text-left group">
+                                                <button onClick={() => handleSetSection('tasks')} className="w-full flex items-center justify-between p-3 rounded-xl border border-slate-100 bg-white hover:border-slate-300 hover:shadow-sm active:scale-[0.99] transition-all text-left group">
                                                     <div className="flex items-center gap-3">
                                                         <div className="bg-slate-50 p-2 rounded-lg group-hover:bg-white transition-colors">
                                                             <CheckSquare className="h-4 w-4 text-slate-600" />
@@ -1134,7 +1174,7 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                                         <div>
                                             <div className="flex items-center justify-between mb-4">
                                                 <h3 className="text-sm font-semibold text-slate-900">Pending Tasks</h3>
-                                                <button onClick={() => handleSetSection('tasks')} className="text-sm text-slate-500 hover:text-slate-900 transition-colors">View all</button>
+                                                <button onClick={() => handleSetSection('tasks')} className="text-sm text-slate-500 hover:text-slate-900 transition-colors py-2 px-3 -mr-3 sm:py-0 sm:px-0 sm:mr-0">View all</button>
                                             </div>
                                             <div className="bg-white border border-slate-100 rounded-xl shadow-sm p-4 space-y-4">
                                                 {tasks.filter(t => t.category !== 'Done').slice(0, 4).map((t) => (

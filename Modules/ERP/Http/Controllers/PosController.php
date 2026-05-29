@@ -35,15 +35,16 @@ class PosController extends Controller
     public function index(Request $request)
     {
         $this->checkAddon();
-        $user = $this->resolveTenantUser();
+        $tenant = $this->resolveTenant();
 
         $search = $request->input('search');
 
-        $productsQuery = \Modules\ERP\Models\Product::where('tenant_id', $user->tenant_id);
-        
+        $productsQuery = \Modules\ERP\Models\Product::where('tenant_id', $tenant->id);
         if ($search) {
-            $productsQuery->where('name', 'like', "%{$search}%")
-                          ->orWhere('barcode', 'like', "%{$search}%");
+            $productsQuery->where(function($query) use ($search) {
+                $query->where('name', 'like', "%{$search}%")
+                      ->orWhere('sku', 'like', "%{$search}%");
+            });
         }
 
         $products = $productsQuery->paginate(20)->withQueryString();
@@ -65,6 +66,8 @@ class PosController extends Controller
             'items.*.quantity' => 'required|integer|min:1',
             'items.*.unit_price' => 'required|numeric|min:0',
             'payment_method' => 'required|string',
+            'discount_amount' => 'nullable|numeric|min:0',
+            'is_paid' => 'required|boolean',
         ]);
 
         $invoice = $posService->processCheckout($tenant, $validated);

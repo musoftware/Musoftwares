@@ -13,9 +13,9 @@ interface Product {
     id: number;
     name: string;
     price: number;
-    stock: number;
+    stock_quantity: number;
     image_url: string | null;
-    barcode: string | null;
+    sku: string | null;
 }
 
 interface CartItem extends Product {
@@ -65,7 +65,7 @@ export default function Index({ products, auth }: any) {
 
     const handleBarcodeScanned = (barcode: string) => {
         // Search in currently loaded products, or trigger an API call if not found
-        const product = products.data.find((p: Product) => p.barcode === barcode);
+        const product = products.data.find((p: Product) => p.sku === barcode);
         if (product) {
             handleAddToCart(product);
             toast.success(__('Product added via barcode'));
@@ -79,7 +79,7 @@ export default function Index({ products, auth }: any) {
         setCart(prevCart => {
             const existingItem = prevCart.find(item => item.product_id === product.id);
             if (existingItem) {
-                if (existingItem.quantity >= product.stock) {
+                if (existingItem.quantity >= product.stock_quantity) {
                     toast.error(__('Insufficient stock available.'));
                     return prevCart;
                 }
@@ -89,7 +89,7 @@ export default function Index({ products, auth }: any) {
                         : item
                 );
             }
-            if (product.stock <= 0) {
+            if (product.stock_quantity <= 0) {
                 toast.error(__('Product is out of stock.'));
                 return prevCart;
             }
@@ -116,16 +116,19 @@ export default function Index({ products, auth }: any) {
         setCart(prevCart => prevCart.filter(item => item.product_id !== productId));
     };
 
-    const handleCheckout = (paymentMethod: string) => {
+    const handleCheckout = (checkoutData: { paymentMethod: string; clientId: string; discountAmount: number; isPaid: boolean }) => {
         setIsProcessing(true);
 
         const payload = {
+            client_id: checkoutData.clientId || null,
+            discount_amount: checkoutData.discountAmount,
+            is_paid: checkoutData.isPaid,
             items: cart.map(item => ({
                 product_id: item.product_id,
                 quantity: item.quantity,
                 unit_price: item.unit_price
             })),
-            payment_method: paymentMethod
+            payment_method: checkoutData.paymentMethod
         };
 
         window.axios.post(route('erp.pos.checkout'), payload)

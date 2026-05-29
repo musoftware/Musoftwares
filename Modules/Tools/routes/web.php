@@ -12,7 +12,7 @@ use Modules\Tools\Http\Controllers\WhatsAppController;
 // After login, this page POSTs the Sanctum token back to the runtime.
 Route::middleware('auth')->group(function () {
     Route::get('/runtime/connect', [RuntimeAuthController::class, 'connect'])->name('runtime.connect');
-    Route::post('/runtime/connect', [RuntimeAuthController::class, 'authorize'])->name('runtime.authorize');
+    Route::post('/runtime/connect', [RuntimeAuthController::class, 'approve'])->name('runtime.authorize');
 });
 
 
