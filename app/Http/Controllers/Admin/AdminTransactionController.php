@@ -9,6 +9,7 @@ use App\Models\Project;
 use App\Models\Transaction;
 use App\Models\AdminSettings;
 use App\Models\Currency;
+use App\Models\CurrenciesExchange;
 use App\Services\TransactionService;
 use App\Http\Resources\TransactionResource;
 use Inertia\Inertia;
@@ -34,12 +35,19 @@ class AdminTransactionController extends Controller
             $project = $user->projects()->find($request->query('project'));
         }
 
+        $exchanges = CurrenciesExchange::Today();
+        $hour_rate = $user->hour_rate_client();
+        $recommended_hour_rate = AdminSettings::GetRecommendedHourlyRate($user->currency);
+
         return Inertia::render('Admin/Transactions/Create', [
             'user' => $user,
             'selectedProject' => $project,
             'type' => $type,
-            'currencies' => Currency::as_array(),
+            'currencies' => array_values(Currency::as_array()),
             'businessCurrency' => Currency::find(AdminSettings::business_currency()),
+            'exchanges' => $exchanges,
+            'hourRate' => $hour_rate,
+            'recommendedHourRate' => $recommended_hour_rate,
         ]);
     }
 

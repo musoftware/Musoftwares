@@ -78,4 +78,21 @@ class TeamMember extends Authenticatable
     {
         return $this->status === 'active';
     }
+
+    /**
+     * Check if the tenant owner has an active subscription to a specific module.
+     * This allows Auth::user()->hasModuleSubscription() to work transparently for TeamMembers.
+     */
+    public function hasModuleSubscription(string $module): bool
+    {
+        return $this->tenant && $this->tenant->user ? $this->tenant->user->hasModuleSubscription($module) : false;
+    }
+
+    /**
+     * Check if the tenant owner has any active subscription.
+     */
+    public function hasSubscription(): bool
+    {
+        return $this->tenant && $this->tenant->user ? $this->tenant->user->hasSubscription() : false;
+    }
 }
