@@ -4,10 +4,13 @@ namespace Modules\ERP\Models;
 
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Models\Currency;
 
 class Product extends TenantModel
 {
+    use SoftDeletes;
+
     protected $table = 'erp_products';
 
     protected $fillable = [
@@ -42,5 +45,15 @@ class Product extends TenantModel
     public function stockLogs(): HasMany
     {
         return $this->hasMany(ProductStockLog::class);
+    }
+
+    public function checkLowStock(float $oldQuantity): void
+    {
+        if ($this->reorder_level !== null && $this->stock_quantity <= $this->reorder_level && $oldQuantity > $this->reorder_level) {
+            $tenantUser = \App\Models\User::find($this->tenant->user_id ?? null);
+            if ($tenantUser) {
+                $tenantUser->notify(new \Modules\ERP\Notifications\LowStockNotification($this));
+            }
+        }
     }
 }

@@ -3,9 +3,23 @@ import { useERPMenu } from '@/hooks/useERPMenu';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { Package, Plus, Edit, Trash2, AlertCircle, ListPlus } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import UpgradeOverlay from '@/Components/ui/UpgradeOverlay';
 
-export default function Index({ products }: { products: any }) {
+export default function Index({ products, hasInventoryFeature }: { products: any, hasInventoryFeature: boolean }) {
     const { menuItems, lockedAddons, workspaceName, tenantId } = useERPMenu('inventory');
+
+    if (!hasInventoryFeature) {
+        return (
+            <ERPLayout title="Inventory" workspaceName={workspaceName} tenantId={tenantId} menuItems={menuItems} lockedAddons={lockedAddons}>
+                <Head title="Inventory" />
+                <UpgradeOverlay 
+                    title="Unlock ERP Inventory"
+                    description="Upgrade your subscription to track stock, manage products, and streamline your supply chain directly from your dashboard."
+                    module="erp-inventory"
+                />
+            </ERPLayout>
+        );
+    }
 
     const t = (key: string, fallback: string) => {
         // @ts-ignore

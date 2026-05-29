@@ -58,7 +58,8 @@ class InventoryService
     public function adjustStock(Product $product, float $changeAmount, string $reason, int $tenantId): Product
     {
         return DB::transaction(function () use ($product, $changeAmount, $reason, $tenantId) {
-            $newQuantity = $product->stock_quantity + $changeAmount;
+            $oldQuantity = (float) $product->stock_quantity;
+            $newQuantity = $oldQuantity + $changeAmount;
 
             $product->update(['stock_quantity' => $newQuantity]);
 
@@ -70,6 +71,8 @@ class InventoryService
                 'new_quantity' => $newQuantity,
                 'reason' => $reason,
             ]);
+
+            $product->checkLowStock($oldQuantity);
 
             return $product;
         });

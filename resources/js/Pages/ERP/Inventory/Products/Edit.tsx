@@ -161,49 +161,6 @@ export default function Edit({ product, currencies, stockLogs }: { product: any,
                         </form>
                     </div>
 
-                    {stockLogs && stockLogs.length > 0 && (
-                        <div className="mt-8 overflow-hidden bg-white shadow-sm sm:rounded-lg">
-                            <div className="p-6">
-                                <h4 className="text-lg font-medium text-gray-900 mb-4">{t('erp.stock_history', 'Stock History')}</h4>
-                                <div className="overflow-x-auto">
-                                    <table className="min-w-full divide-y divide-gray-200">
-                                        <thead className="bg-gray-50">
-                                            <tr>
-                                                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">{t('erp.date', 'Date')}</th>
-                                                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">{t('erp.user', 'User')}</th>
-                                                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">{t('erp.change', 'Change')}</th>
-                                                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">{t('erp.current_stock', 'Current Stock')}</th>
-                                                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">{t('erp.reason', 'Reason')}</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody className="divide-y divide-gray-200 bg-white">
-                                            {stockLogs.map((log: any) => (
-                                                <tr key={log.id}>
-                                                    <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
-                                                        {new Date(log.created_at).toLocaleString()}
-                                                    </td>
-                                                    <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-900">
-                                                        {log.user?.name || '-'}
-                                                    </td>
-                                                    <td className="whitespace-nowrap px-6 py-4 text-sm">
-                                                        <span className={log.change_amount > 0 ? 'text-green-600' : 'text-red-600'}>
-                                                            {log.change_amount > 0 ? '+' : ''}{log.change_amount}
-                                                        </span>
-                                                    </td>
-                                                    <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-900">
-                                                        {log.new_quantity}
-                                                    </td>
-                                                    <td className="px-6 py-4 text-sm text-gray-500">
-                                                        {log.reason}
-                                                    </td>
-                                                </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                    )}
                 </div>
             </div>
         </ERPLayout>
