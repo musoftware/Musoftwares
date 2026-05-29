@@ -38,19 +38,14 @@ class MarketplaceController extends Controller
 
         $tools = $tools->sortByDesc('is_featured')->values();
 
-        $page = $request->input('page', 1);
-        $perPage = 12;
-        
-        $paginatedTools = new LengthAwarePaginator(
-            $tools->forPage($page, $perPage)->values()->map(fn($t) => $this->serializeTool($t)),
-            $tools->count(),
-            $perPage,
-            $page,
-            ['path' => $request->url(), 'query' => $request->query()]
-        );
+        // Desktop UI renders all tools as icons — no pagination needed
+        $allTools = [
+            'data' => $tools->map(fn($t) => $this->serializeTool($t))->values()->toArray(),
+        ];
 
         $subscribedSlugs = [];
         $hasBrowserSubscription = false;
+        $user = null;
         if (auth()->check()) {
             $user = auth()->user();
             $subscriptionService = app(\App\Services\SubscriptionService::class);
@@ -86,14 +81,15 @@ class MarketplaceController extends Controller
         }
 
         return Inertia::render('Tools/Explore', [
-            'tools'                  => $paginatedTools,
+            'tools'                  => $allTools,
             'workspaceSettings'      => $workspaceSettings,
-            'categories'             => ['intelligence' => 'Intelligence', 'monitoring' => 'Monitoring', 'automation' => 'Automation', 'Media' => 'Media', 'Productivity' => 'Productivity'], // Hardcoded or from config
+            'categories'             => ['intelligence' => 'Intelligence', 'monitoring' => 'Monitoring', 'automation' => 'Automation', 'Marketing' => 'Marketing', 'Media' => 'Media', 'Productivity' => 'Productivity', 'SEO' => 'SEO'],
             'subscribedSlugs'        => $subscribedSlugs,
             'hasBrowserSubscription' => $hasBrowserSubscription,
             'filters'                => $request->only(['search', 'category']),
         ]);
     }
+
 
     /**
      * Save workspace settings (desktop layout, wallpaper, prayer times).

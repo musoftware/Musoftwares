@@ -1023,4 +1023,702 @@ Not copying content — copying the psychology.
         ],
         'version' => '1.0.0',
     ],
+    'a1b2c3d4-1111-4aaa-bbbb-111111111111' => [
+        'guid' => 'a1b2c3d4-1111-4aaa-bbbb-111111111111',
+        'title' => 'Google Maps Extractor',
+        'slug' => 'google-maps',
+        'short_description' => 'Extract business leads, phone numbers, and emails from Google Maps search results.',
+        'description' => 'Google Maps Extractor is a powerful local scraper that mines business data directly from Google Maps.
+
+- Search any keyword, location, or category
+- Extract business names, phone numbers, emails, websites, and ratings
+- Export leads to CSV for CRM import
+- 100% local execution with SQLite storage',
+        'category' => 'intelligence',
+        'supported_os' => [
+            'windows',
+            'mac',
+        ],
+        'is_featured' => true,
+        'is_active' => true,
+        'is_free' => true,
+        'runner_component' => 'google-maps',
+        'features' => [
+            'Business Data Extraction',
+            'Phone & Email Scraping',
+            'Multi-location Search',
+            'CSV Export',
+            'Local SQLite Storage',
+        ],
+        'requirements' => [
+            'Musoftware Runtime Agent running locally',
+            'Internet connection',
+        ],
+        'plans' => [
+            'a1b2c3d4-1111-4aaa-bbbb-111111111112' => [
+                'guid' => 'a1b2c3d4-1111-4aaa-bbbb-111111111112',
+                'name' => 'Free',
+                'price_monthly' => 0,
+                'price_yearly' => 0,
+                'is_popular' => true,
+                'features' => [
+                    'Unlimited Extractions',
+                    'Local DB Storage',
+                ],
+            ],
+        ],
+        'version' => '1.0.0',
+    ],
+    'a1b2c3d4-2222-4aaa-bbbb-222222222222' => [
+        'guid' => 'a1b2c3d4-2222-4aaa-bbbb-222222222222',
+        'title' => 'Snap Downloader',
+        'slug' => 'snap-downloader',
+        'short_description' => 'Download Snapchat stories, spotlights, and public content locally.',
+        'description' => 'Snap Downloader captures Snapchat media directly to your local machine.
+
+- Download public stories and spotlights
+- Save user profiles and metadata
+- Batch download support
+- 100% local execution with SQLite storage',
+        'category' => 'Media',
+        'supported_os' => [
+            'windows',
+            'mac',
+        ],
+        'is_featured' => true,
+        'is_active' => true,
+        'is_free' => true,
+        'runner_component' => 'SnapDownloaderRunner',
+        'features' => [
+            'Story & Spotlight Downloads',
+            'Profile Metadata Capture',
+            'Batch Processing',
+            'Local SQLite Storage',
+        ],
+        'requirements' => [
+            'Musoftware Runtime Agent running locally',
+            'Internet connection',
+        ],
+        'plans' => [
+            'a1b2c3d4-2222-4aaa-bbbb-222222222223' => [
+                'guid' => 'a1b2c3d4-2222-4aaa-bbbb-222222222223',
+                'name' => 'Free',
+                'price_monthly' => 0,
+                'price_yearly' => 0,
+                'is_popular' => true,
+                'features' => [
+                    'Unlimited Downloads',
+                    'Local DB Storage',
+                ],
+            ],
+        ],
+        'version' => '1.0.0',
+    ],
+    'a1b2c3d4-3333-4aaa-bbbb-333333333333' => [
+        'guid' => 'a1b2c3d4-3333-4aaa-bbbb-333333333333',
+        'title' => 'Haraj Extractor',
+        'slug' => 'haraj',
+        'short_description' => 'Extract seller leads and listings from Haraj.com.sa, the largest Saudi classifieds marketplace.',
+        'description' => 'Haraj Extractor scrapes verified seller data from Haraj.com.sa.
+
+- Search any category or keyword
+- Extract seller names, phone numbers, and listing details
+- Filter by city and region
+- Export leads to CSV
+- 100% local execution with SQLite storage',
+        'category' => 'intelligence',
+        'supported_os' => [
+            'windows',
+            'mac',
+        ],
+        'is_featured' => true,
+        'is_active' => true,
+        'is_free' => true,
+        'runner_component' => 'HarajRunner',
+        'features' => [
+            'Listing Data Extraction',
+            'Seller Contact Scraping',
+            'City & Region Filtering',
+            'CSV Export',
+            'Local SQLite Storage',
+        ],
+        'requirements' => [
+            'Musoftware Runtime Agent running locally',
+            'Internet connection',
+        ],
+        'plans' => [
+            'a1b2c3d4-3333-4aaa-bbbb-333333333334' => [
+                'guid' => 'a1b2c3d4-3333-4aaa-bbbb-333333333334',
+                'name' => 'Free',
+                'price_monthly' => 0,
+                'price_yearly' => 0,
+                'is_popular' => true,
+                'features' => [
+                    'Unlimited Extractions',
+                    'Local DB Storage',
+                ],
+            ],
+        ],
+        'version' => '1.0.0',
+    ],
+    'a1b2c3d4-4444-4aaa-bbbb-444444444444' => [
+        'guid' => 'a1b2c3d4-4444-4aaa-bbbb-444444444444',
+        'title' => 'WhatsApp AI Agent',
+        'slug' => 'wa-ai-agent',
+        'short_description' => 'Deploy an AI-powered auto-reply agent on your WhatsApp number for 24/7 customer support.',
+        'description' => 'WhatsApp AI Agent runs a GPT-powered conversational agent directly on your WhatsApp number.
+
+- Automatic intelligent replies using AI
+- Custom knowledge base and persona configuration
+- Conversation history and analytics
+- 100% local execution with SQLite storage',
+        'category' => 'automation',
+        'supported_os' => [
+            'windows',
+            'mac',
+        ],
+        'is_featured' => true,
+        'is_active' => true,
+        'is_free' => true,
+        'runner_component' => 'WaAiAgentRunner',
+        'features' => [
+            'AI Auto-Reply Engine',
+            'Custom Knowledge Base',
+            'Conversation Analytics',
+            'Local SQLite Storage',
+        ],
+        'requirements' => [
+            'Musoftware Runtime Agent running locally',
+            'Active WhatsApp account',
+            'Internet connection',
+        ],
+        'plans' => [
+            'a1b2c3d4-4444-4aaa-bbbb-444444444445' => [
+                'guid' => 'a1b2c3d4-4444-4aaa-bbbb-444444444445',
+                'name' => 'Free',
+                'price_monthly' => 0,
+                'price_yearly' => 0,
+                'is_popular' => true,
+                'features' => [
+                    'Unlimited Conversations',
+                    'Local DB Storage',
+                ],
+            ],
+        ],
+        'version' => '1.0.0',
+    ],
+    'a1b2c3d4-5555-4aaa-bbbb-555555555555' => [
+        'guid' => 'a1b2c3d4-5555-4aaa-bbbb-555555555555',
+        'title' => 'WhatsApp Funnel Engine',
+        'slug' => 'wa-funnel-engine',
+        'short_description' => 'Build automated WhatsApp sales funnels with drip sequences and conditional flows.',
+        'description' => 'WhatsApp Funnel Engine lets you design and run multi-step WhatsApp drip campaigns.
+
+- Visual funnel builder with conditional logic
+- Automated drip message sequences
+- Lead qualification and tagging
+- Performance analytics dashboard
+- 100% local execution with SQLite storage',
+        'category' => 'automation',
+        'supported_os' => [
+            'windows',
+            'mac',
+        ],
+        'is_featured' => true,
+        'is_active' => true,
+        'is_free' => true,
+        'runner_component' => 'WaFunnelEngineRunner',
+        'features' => [
+            'Drip Campaign Builder',
+            'Conditional Flow Logic',
+            'Lead Qualification',
+            'Performance Analytics',
+            'Local SQLite Storage',
+        ],
+        'requirements' => [
+            'Musoftware Runtime Agent running locally',
+            'Active WhatsApp account',
+            'Internet connection',
+        ],
+        'plans' => [
+            'a1b2c3d4-5555-4aaa-bbbb-555555555556' => [
+                'guid' => 'a1b2c3d4-5555-4aaa-bbbb-555555555556',
+                'name' => 'Free',
+                'price_monthly' => 0,
+                'price_yearly' => 0,
+                'is_popular' => true,
+                'features' => [
+                    'Unlimited Funnels',
+                    'Local DB Storage',
+                ],
+            ],
+        ],
+        'version' => '1.0.0',
+    ],
+    'a1b2c3d4-6666-4aaa-bbbb-666666666666' => [
+        'guid' => 'a1b2c3d4-6666-4aaa-bbbb-666666666666',
+        'title' => 'WhatsApp Warmup',
+        'slug' => 'wa-warmup',
+        'short_description' => 'Warm up new WhatsApp numbers with realistic automated conversations to avoid bans.',
+        'description' => 'WhatsApp Warmup simulates natural human conversations on new numbers to build trust with WhatsApp.
+
+- Automated realistic conversations between numbers
+- Configurable warmup duration and intensity
+- Number health monitoring
+- Anti-ban pacing and random delays
+- 100% local execution with SQLite storage',
+        'category' => 'automation',
+        'supported_os' => [
+            'windows',
+            'mac',
+        ],
+        'is_featured' => true,
+        'is_active' => true,
+        'is_free' => true,
+        'runner_component' => 'WaWarmupRunner',
+        'features' => [
+            'Realistic Conversation Simulation',
+            'Configurable Warmup Plans',
+            'Number Health Monitoring',
+            'Anti-Ban Pacing',
+            'Local SQLite Storage',
+        ],
+        'requirements' => [
+            'Musoftware Runtime Agent running locally',
+            'Active WhatsApp accounts',
+            'Internet connection',
+        ],
+        'plans' => [
+            'a1b2c3d4-6666-4aaa-bbbb-666666666667' => [
+                'guid' => 'a1b2c3d4-6666-4aaa-bbbb-666666666667',
+                'name' => 'Free',
+                'price_monthly' => 0,
+                'price_yearly' => 0,
+                'is_popular' => true,
+                'features' => [
+                    'Unlimited Warmup Sessions',
+                    'Local DB Storage',
+                ],
+            ],
+        ],
+        'version' => '1.0.0',
+    ],
+    'a1b2c3d4-7777-4aaa-bbbb-777777777777' => [
+        'guid' => 'a1b2c3d4-7777-4aaa-bbbb-777777777777',
+        'title' => 'Facebook Inbox Sender',
+        'slug' => 'fb-inbox-sender',
+        'short_description' => 'Send bulk messages to Facebook pages, profiles, and group members via Messenger.',
+        'description' => 'Facebook Inbox Sender automates Messenger outreach campaigns.
+
+- Bulk message Facebook pages and profiles
+- Target group members with personalized messages
+- Configurable delays and anti-ban pacing
+- Message template variables
+- 100% local execution with SQLite storage',
+        'category' => 'Marketing',
+        'supported_os' => [
+            'windows',
+            'mac',
+        ],
+        'is_featured' => true,
+        'is_active' => true,
+        'is_free' => true,
+        'runner_component' => 'fb-inbox-sender',
+        'features' => [
+            'Bulk Messenger Campaigns',
+            'Group Member Targeting',
+            'Message Templates',
+            'Anti-Ban Pacing',
+            'Local SQLite Storage',
+        ],
+        'requirements' => [
+            'Musoftware Runtime Agent running locally',
+            'Facebook account',
+            'Internet connection',
+        ],
+        'plans' => [
+            'a1b2c3d4-7777-4aaa-bbbb-777777777778' => [
+                'guid' => 'a1b2c3d4-7777-4aaa-bbbb-777777777778',
+                'name' => 'Free',
+                'price_monthly' => 0,
+                'price_yearly' => 0,
+                'is_popular' => true,
+                'features' => [
+                    'Unlimited Messages',
+                    'Local DB Storage',
+                ],
+            ],
+        ],
+        'version' => '1.0.0',
+    ],
+    'a1b2c3d4-8888-4aaa-bbbb-888888888888' => [
+        'guid' => 'a1b2c3d4-8888-4aaa-bbbb-888888888888',
+        'title' => 'Instagram V4',
+        'slug' => 'instagram',
+        'short_description' => 'Full Instagram automation suite — followers extraction, DM campaigns, and engagement tools.',
+        'description' => 'Instagram V4 is a comprehensive Instagram automation platform.
+
+- Extract followers and following lists
+- Automated DM campaigns with templates
+- Engagement automation (like, follow, comment)
+- Profile scraping and lead extraction
+- 100% local execution with SQLite storage',
+        'category' => 'Marketing',
+        'supported_os' => [
+            'windows',
+            'mac',
+        ],
+        'is_featured' => true,
+        'is_active' => true,
+        'is_free' => true,
+        'runner_component' => 'instagram',
+        'features' => [
+            'Follower Extraction',
+            'DM Campaign Engine',
+            'Engagement Automation',
+            'Profile Scraping',
+            'Local SQLite Storage',
+        ],
+        'requirements' => [
+            'Musoftware Runtime Agent running locally',
+            'Instagram account',
+            'Internet connection',
+        ],
+        'plans' => [
+            'a1b2c3d4-8888-4aaa-bbbb-888888888889' => [
+                'guid' => 'a1b2c3d4-8888-4aaa-bbbb-888888888889',
+                'name' => 'Free',
+                'price_monthly' => 0,
+                'price_yearly' => 0,
+                'is_popular' => true,
+                'features' => [
+                    'Unlimited Operations',
+                    'Local DB Storage',
+                ],
+            ],
+        ],
+        'version' => '1.0.0',
+    ],
+    'a1b2c3d4-9999-4aaa-bbbb-999999999999' => [
+        'guid' => 'a1b2c3d4-9999-4aaa-bbbb-999999999999',
+        'title' => 'PropertyFinder Scraper',
+        'slug' => 'propertyfinder',
+        'short_description' => 'Extract real estate listings, agent contacts, and property data from PropertyFinder.',
+        'description' => 'PropertyFinder Scraper mines real estate data from PropertyFinder.ae and related markets.
+
+- Extract property listings with prices and details
+- Scrape agent names, phone numbers, and emails
+- Filter by location, price range, and property type
+- Export to CSV
+- 100% local execution with SQLite storage',
+        'category' => 'intelligence',
+        'supported_os' => [
+            'windows',
+            'mac',
+        ],
+        'is_featured' => true,
+        'is_active' => true,
+        'is_free' => true,
+        'runner_component' => 'PropertyFinderRunner',
+        'features' => [
+            'Property Listing Extraction',
+            'Agent Contact Scraping',
+            'Advanced Filtering',
+            'CSV Export',
+            'Local SQLite Storage',
+        ],
+        'requirements' => [
+            'Musoftware Runtime Agent running locally',
+            'Internet connection',
+        ],
+        'plans' => [
+            'a1b2c3d4-9999-4aaa-bbbb-999999999990' => [
+                'guid' => 'a1b2c3d4-9999-4aaa-bbbb-999999999990',
+                'name' => 'Free',
+                'price_monthly' => 0,
+                'price_yearly' => 0,
+                'is_popular' => true,
+                'features' => [
+                    'Unlimited Extractions',
+                    'Local DB Storage',
+                ],
+            ],
+        ],
+        'version' => '1.0.0',
+    ],
+    'a1b2c3d4-aaaa-4aaa-bbbb-aaaaaaaaaaaa' => [
+        'guid' => 'a1b2c3d4-aaaa-4aaa-bbbb-aaaaaaaaaaaa',
+        'title' => 'Telegram Bomber V3',
+        'slug' => 'telegram-tool',
+        'short_description' => 'Bulk Telegram messaging tool with group member extraction and automated campaigns.',
+        'description' => 'Telegram Bomber V3 is a full Telegram automation suite.
+
+- Extract members from Telegram groups and channels
+- Bulk messaging with configurable delays
+- Account session management
+- Message templates with variables
+- 100% local execution with SQLite storage',
+        'category' => 'Marketing',
+        'supported_os' => [
+            'windows',
+            'mac',
+        ],
+        'is_featured' => true,
+        'is_active' => true,
+        'is_free' => true,
+        'runner_component' => 'TelegramToolRunner',
+        'features' => [
+            'Group Member Extraction',
+            'Bulk Messaging Engine',
+            'Session Management',
+            'Message Templates',
+            'Local SQLite Storage',
+        ],
+        'requirements' => [
+            'Musoftware Runtime Agent running locally',
+            'Telegram account',
+            'Internet connection',
+        ],
+        'plans' => [
+            'a1b2c3d4-aaaa-4aaa-bbbb-aaaaaaaaaaab' => [
+                'guid' => 'a1b2c3d4-aaaa-4aaa-bbbb-aaaaaaaaaaab',
+                'name' => 'Free',
+                'price_monthly' => 0,
+                'price_yearly' => 0,
+                'is_popular' => true,
+                'features' => [
+                    'Unlimited Messages',
+                    'Local DB Storage',
+                ],
+            ],
+        ],
+        'version' => '1.0.0',
+    ],
+    'a1b2c3d4-bbbb-4aaa-bbbb-bbbbbbbbbbbb' => [
+        'guid' => 'a1b2c3d4-bbbb-4aaa-bbbb-bbbbbbbbbbbb',
+        'title' => 'Article Maker',
+        'slug' => 'article-maker',
+        'short_description' => 'AI-powered article generation with SEO optimization, bulk creation, and WordPress publishing.',
+        'description' => 'Article Maker is a full-stack AI content engine.
+
+- Generate SEO-optimized articles using AI
+- Bulk article creation with CSV import
+- Direct WordPress publishing integration
+- Keyword research and content planning
+- 100% local execution with SQLite storage',
+        'category' => 'SEO',
+        'supported_os' => [
+            'windows',
+            'mac',
+        ],
+        'is_featured' => true,
+        'is_active' => true,
+        'is_free' => true,
+        'runner_component' => 'article-maker',
+        'features' => [
+            'AI Article Generation',
+            'SEO Optimization',
+            'Bulk Content Creation',
+            'WordPress Publishing',
+            'Local SQLite Storage',
+        ],
+        'requirements' => [
+            'Musoftware Runtime Agent running locally',
+            'Internet connection',
+        ],
+        'plans' => [
+            'a1b2c3d4-bbbb-4aaa-bbbb-bbbbbbbbbbbc' => [
+                'guid' => 'a1b2c3d4-bbbb-4aaa-bbbb-bbbbbbbbbbbc',
+                'name' => 'Free',
+                'price_monthly' => 0,
+                'price_yearly' => 0,
+                'is_popular' => true,
+                'features' => [
+                    'Unlimited Articles',
+                    'Local DB Storage',
+                ],
+            ],
+        ],
+        'version' => '1.0.0',
+    ],
+    'a1b2c3d4-cccc-4aaa-bbbb-cccccccccccc' => [
+        'guid' => 'a1b2c3d4-cccc-4aaa-bbbb-cccccccccccc',
+        'title' => 'Competitor Tracker',
+        'slug' => 'competitor-tracker',
+        'short_description' => 'Track competitor metrics and changes directly from your local machine.',
+        'description' => 'Competitor Tracker monitors your competitors in real time using the Musoftware Runtime.
+
+- Track pricing, content, and social changes
+- Automated alerts and notifications
+- Historical data comparison
+- 100% local execution',
+        'category' => 'monitoring',
+        'supported_os' => [
+            'windows',
+            'mac',
+        ],
+        'is_featured' => false,
+        'is_active' => true,
+        'is_free' => true,
+        'runner_component' => 'competitor-tracker',
+        'features' => [
+            'Competitor Monitoring',
+            'Change Detection',
+            'Automated Alerts',
+            'Historical Comparison',
+        ],
+        'requirements' => [
+            'Musoftware Runtime Agent running locally',
+            'Internet connection',
+        ],
+        'plans' => [
+            'a1b2c3d4-cccc-4aaa-bbbb-cccccccccccd' => [
+                'guid' => 'a1b2c3d4-cccc-4aaa-bbbb-cccccccccccd',
+                'name' => 'Free',
+                'price_monthly' => 0,
+                'price_yearly' => 0,
+                'is_popular' => true,
+                'features' => [
+                    'Unlimited Tracking',
+                    'Local DB Storage',
+                ],
+            ],
+        ],
+        'version' => '1.0.0',
+    ],
+    'a1b2c3d4-dddd-4aaa-bbbb-dddddddddddd' => [
+        'guid' => 'a1b2c3d4-dddd-4aaa-bbbb-dddddddddddd',
+        'title' => 'Ad Library Monitor',
+        'slug' => 'ad-library-monitor',
+        'short_description' => 'Monitor ads across multiple platforms via the local Musoftware extension.',
+        'description' => 'Ad Library Monitor tracks competitor advertising across major platforms.
+
+- Monitor Facebook, TikTok, and Google ad libraries
+- Track creative changes and A/B tests
+- Capture ad copy, media, and targeting
+- 100% local execution via browser extension',
+        'category' => 'monitoring',
+        'supported_os' => [
+            'windows',
+            'mac',
+        ],
+        'is_featured' => false,
+        'is_active' => true,
+        'is_free' => true,
+        'runner_component' => 'ad-library-monitor',
+        'features' => [
+            'Multi-Platform Ad Monitoring',
+            'Creative Change Tracking',
+            'Ad Copy Extraction',
+            'Browser Extension Integration',
+        ],
+        'requirements' => [
+            'Musoftware Runtime Agent running locally',
+            'Musoftware Browser Extension installed',
+        ],
+        'plans' => [
+            'a1b2c3d4-dddd-4aaa-bbbb-ddddddddddde' => [
+                'guid' => 'a1b2c3d4-dddd-4aaa-bbbb-ddddddddddde',
+                'name' => 'Free',
+                'price_monthly' => 0,
+                'price_yearly' => 0,
+                'is_popular' => true,
+                'features' => [
+                    'Unlimited Monitoring',
+                    'Local DB Storage',
+                ],
+            ],
+        ],
+        'version' => '1.0.0',
+    ],
+    'a1b2c3d4-eeee-4aaa-bbbb-eeeeeeeeeeee' => [
+        'guid' => 'a1b2c3d4-eeee-4aaa-bbbb-eeeeeeeeeeee',
+        'title' => 'UGC Creators Search',
+        'slug' => 'ugc-creators-search',
+        'short_description' => 'Find and connect with UGC creators natively from your browser via the local runtime.',
+        'description' => 'UGC Creators Search helps you discover user-generated content creators.
+
+- Search creators by niche and engagement
+- Extract contact information
+- Creator performance analytics
+- 100% local execution via browser extension',
+        'category' => 'intelligence',
+        'supported_os' => [
+            'windows',
+            'mac',
+        ],
+        'is_featured' => false,
+        'is_active' => true,
+        'is_free' => true,
+        'runner_component' => 'ugc-creators-search',
+        'features' => [
+            'Creator Discovery',
+            'Contact Extraction',
+            'Performance Analytics',
+            'Browser Extension Integration',
+        ],
+        'requirements' => [
+            'Musoftware Runtime Agent running locally',
+            'Musoftware Browser Extension installed',
+        ],
+        'plans' => [
+            'a1b2c3d4-eeee-4aaa-bbbb-eeeeeeeeeeef' => [
+                'guid' => 'a1b2c3d4-eeee-4aaa-bbbb-eeeeeeeeeeef',
+                'name' => 'Free',
+                'price_monthly' => 0,
+                'price_yearly' => 0,
+                'is_popular' => true,
+                'features' => [
+                    'Unlimited Searches',
+                    'Local DB Storage',
+                ],
+            ],
+        ],
+        'version' => '1.0.0',
+    ],
+    'a1b2c3d4-ffff-4aaa-bbbb-ffffffffffff' => [
+        'guid' => 'a1b2c3d4-ffff-4aaa-bbbb-ffffffffffff',
+        'title' => 'Swipe Vault',
+        'slug' => 'swipe-vault',
+        'short_description' => 'Save and organize creative inspiration automatically via the local runtime.',
+        'description' => 'Swipe Vault automatically saves and organizes creative assets for inspiration.
+
+- Auto-capture ads and creative content
+- Tag and categorize saved assets
+- Search and filter your vault
+- 100% local execution with SQLite storage',
+        'category' => 'Productivity',
+        'supported_os' => [
+            'windows',
+            'mac',
+        ],
+        'is_featured' => false,
+        'is_active' => true,
+        'is_free' => true,
+        'runner_component' => 'swipe-vault',
+        'features' => [
+            'Auto-Capture Creative Assets',
+            'Tagging & Categorization',
+            'Search & Filter',
+            'Local SQLite Storage',
+        ],
+        'requirements' => [
+            'Musoftware Runtime Agent running locally',
+            'Musoftware Browser Extension installed',
+        ],
+        'plans' => [
+            'a1b2c3d4-ffff-4aaa-bbbb-ffffffffffff' => [
+                'guid' => 'a1b2c3d4-ffff-4aaa-bbbb-ffffffffffff',
+                'name' => 'Free',
+                'price_monthly' => 0,
+                'price_yearly' => 0,
+                'is_popular' => true,
+                'features' => [
+                    'Unlimited Saves',
+                    'Local DB Storage',
+                ],
+            ],
+        ],
+        'version' => '1.0.0',
+    ],
 ];
