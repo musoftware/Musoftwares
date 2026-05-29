@@ -7,7 +7,8 @@ import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/Components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/Components/ui/select';
-import { ArrowDownLeft, ArrowUpRight, Undo2, Receipt, Coins, Plus, Trash2 } from 'lucide-react';
+import { ArrowDownLeft, ArrowUpRight, Undo2, Receipt, Coins, Plus, Trash2, Calculator, StickyNote, TrendingUp } from 'lucide-react';
+import { CurrencyDisplay } from '@/Components/ui/CurrencyDisplay';
 
 interface Props {
     user: any;
@@ -15,9 +16,12 @@ interface Props {
     type: string;
     currencies: any[];
     businessCurrency: any;
+    exchanges: any;
+    hourRate: number;
+    recommendedHourRate: number;
 }
 
-export default function Create({ user, selectedProject, type, currencies, businessCurrency }: Props) {
+export default function Create({ user, selectedProject, type, currencies, businessCurrency, exchanges, hourRate, recommendedHourRate }: Props) {
     const defaultTab = () => {
         if (type === 'receive') return 'timer-received';
         if (type === 'send-money' || type === 'send') return 'send';
@@ -158,7 +162,11 @@ export default function Create({ user, selectedProject, type, currencies, busine
                                                 onValueChange={(val) => updateRow(index, 'currency', val)}
                                             >
                                                 <SelectTrigger>
-                                                    <SelectValue placeholder="Currency" />
+                                                    <SelectValue placeholder="Currency">
+                                                        {currencies.find(c => String(c.id) === String(row.currency)) 
+                                                            ? `${currencies.find(c => String(c.id) === String(row.currency))?.currency} (${currencies.find(c => String(c.id) === String(row.currency))?.symbol})`
+                                                            : 'Currency'}
+                                                    </SelectValue>
                                                 </SelectTrigger>
                                                 <SelectContent>
                                                     {currencies.map((c) => (
@@ -197,6 +205,41 @@ export default function Create({ user, selectedProject, type, currencies, busine
                         </CardContent>
                     </Card>
                 </Tabs>
+
+                {/* Rates & quick links */}
+                <div className="mt-6 flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-3 justify-center">
+                    <div className="bg-background border rounded-full px-4 py-2 flex items-center gap-2 shadow-sm flex-1 sm:flex-none">
+                        <Coins className="h-4 w-4 text-amber-500 shrink-0" />
+                        <span className="text-[10px] font-bold text-muted-foreground uppercase shrink-0">Client rate:</span>
+                        <span className="text-sm font-bold truncate">
+                            <CurrencyDisplay amount={hourRate} currency={currencies.find(c => String(c.id) === String(user.currency || businessCurrency.id))} className="inline-block" />/hr
+                        </span>
+                    </div>
+                    <div className="bg-background border rounded-full px-4 py-2 flex items-center gap-2 shadow-sm flex-1 sm:flex-none">
+                        <TrendingUp className="h-4 w-4 text-green-500 shrink-0" />
+                        <span className="text-[10px] font-bold text-muted-foreground uppercase shrink-0">Day 8 rate:</span>
+                        <span className="text-sm font-bold truncate">
+                            <CurrencyDisplay amount={recommendedHourRate} currency={currencies.find(c => String(c.id) === String(user.currency || businessCurrency.id))} className="inline-block" />/hr
+                        </span>
+                    </div>
+
+                    <div className="hidden sm:block h-8 w-px bg-border mx-2"></div>
+
+                    <div className="flex flex-wrap gap-2 w-full sm:w-auto justify-center">
+                        <Button variant="secondary" className="rounded-full flex-1 sm:flex-none" asChild>
+                            <a href={route('admin.users.notes', user.id)} target="_blank" rel="noopener noreferrer">
+                                <StickyNote className="h-4 w-4 mr-2" />
+                                User Notes
+                            </a>
+                        </Button>
+                        <Button variant="default" className="rounded-full flex-1 sm:flex-none" asChild>
+                            <a href={route('admin.project-price-calculator')} target="_blank" rel="noopener noreferrer">
+                                <Calculator className="h-4 w-4 mr-2" />
+                                Rate Calculator
+                            </a>
+                        </Button>
+                    </div>
+                </div>
             </div>
         </AdminLayout>
     );
