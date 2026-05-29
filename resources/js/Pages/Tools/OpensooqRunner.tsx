@@ -43,22 +43,31 @@ function LeadCard({ lead, idx }: { lead: any; idx: number }) {
             <div className="w-8 h-8 rounded-full bg-gradient-to-br from-orange-400 to-rose-500 flex items-center justify-center text-white text-xs font-black shrink-0">
                 {idx + 1}
             </div>
-            <div className="flex-1 grid grid-cols-2 md:grid-cols-4 gap-3 min-w-0">
+            <div className="flex-1 grid grid-cols-2 md:grid-cols-5 gap-3 min-w-0 items-center">
                 <div className="min-w-0">
                     <p className="text-[9px] font-black uppercase tracking-wider text-slate-400 mb-0.5">Name</p>
                     <p className="text-xs font-semibold text-slate-800 truncate">{lead.name || '—'}</p>
-                </div>
-                <div className="min-w-0">
-                    <p className="text-[9px] font-black uppercase tracking-wider text-slate-400 mb-0.5">Email</p>
-                    <p className="text-xs font-mono text-slate-600 truncate">{lead.email || '—'}</p>
                 </div>
                 <div className="min-w-0">
                     <p className="text-[9px] font-black uppercase tracking-wider text-slate-400 mb-0.5">Phone</p>
                     <p className="text-xs font-mono text-slate-600 truncate">{lead.phone || '—'}</p>
                 </div>
                 <div className="min-w-0">
-                    <p className="text-[9px] font-black uppercase tracking-wider text-slate-400 mb-0.5">Source</p>
-                    <p className="text-xs text-slate-500 truncate">{lead.source || 'opensooq'}</p>
+                    <p className="text-[9px] font-black uppercase tracking-wider text-slate-400 mb-0.5">Email</p>
+                    <p className="text-xs font-mono text-slate-600 truncate">{lead.email || '—'}</p>
+                </div>
+                <div className="min-w-0">
+                    <p className="text-[9px] font-black uppercase tracking-wider text-slate-400 mb-0.5">Details</p>
+                    <p className="text-xs text-slate-600 truncate" title={lead.listing_title || ''}>{lead.listing_title || '—'}</p>
+                    <p className="text-[10px] text-slate-400 truncate" title={lead.region || ''}>{lead.region || '—'}</p>
+                </div>
+                <div className="min-w-0">
+                    <p className="text-[9px] font-black uppercase tracking-wider text-slate-400 mb-0.5">Link</p>
+                    {lead.url ? (
+                        <a href={lead.url} target="_blank" rel="noreferrer" className="text-xs text-blue-500 hover:underline truncate block">View Listing</a>
+                    ) : (
+                        <p className="text-xs text-slate-500">—</p>
+                    )}
                 </div>
             </div>
             <Button
@@ -390,8 +399,8 @@ export default function OpensooqRunner({ tool }: any) {
                         </div>
 
                         {/* Table header */}
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 px-5 py-2 bg-slate-50 border-b border-slate-100">
-                            {['Name', 'Email', 'Phone', 'Source'].map(h => (
+                        <div className="grid grid-cols-2 md:grid-cols-5 gap-3 px-5 py-2 bg-slate-50 border-b border-slate-100">
+                            {['Name', 'Phone', 'Email', 'Details', 'Link'].map(h => (
                                 <p key={h} className="text-[9px] font-black uppercase tracking-wider text-slate-400">{h}</p>
                             ))}
                         </div>

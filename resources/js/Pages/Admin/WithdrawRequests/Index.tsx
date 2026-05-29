@@ -1,5 +1,5 @@
 import React from 'react';
-import { Head, Link, router } from '@inertiajs/react';
+import { Head, Link, router, usePage } from '@inertiajs/react';
 import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
 import { DataTable } from '@/Components/ui/DataTable';
 import {
@@ -10,6 +10,7 @@ import {
     DropdownMenuTrigger,
 } from '@/Components/ui/dropdown-menu';
 import { MoreHorizontal, Eye } from 'lucide-react';
+import { formatMoney as formatCurrency } from '@/lib/utils';
 
 interface WithdrawRequest {
     id: number;
@@ -35,6 +36,8 @@ const statusStyles: Record<string, string> = {
 };
 
 export default function Index({ requests, filters }: Props) {
+    const { base_currency } = usePage<any>().props;
+
     const handleFilter = (value: string) => {
         router.get(
             '/admin/withdraw-requests',
@@ -86,7 +89,7 @@ export default function Index({ requests, filters }: Props) {
             sortable: true,
             render: (row: WithdrawRequest) => (
                 <span className="font-semibold text-slate-800">
-                    {Number(row.amount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    {formatCurrency(row.amount, base_currency)}
                 </span>
             ),
         },
