@@ -25,6 +25,7 @@ interface Tool {
     requirements: string[];
     is_active: boolean;
     is_featured: boolean;
+    max_subscription_months: number | null;
 }
 
 interface Props {
@@ -54,6 +55,7 @@ export default function AdminToolEdit({ tool, categories }: Props) {
         is_featured: tool.is_featured,
         features: tool.features ?? [],
         requirements: tool.requirements ?? [],
+        max_subscription_months: tool.max_subscription_months ?? null as number | null,
     });
 
     const [newFeature, setNewFeature] = useState('');
@@ -227,6 +229,24 @@ export default function AdminToolEdit({ tool, categories }: Props) {
                                     />
                                     <span className="text-sm font-medium">Featured</span>
                                 </label>
+                            </div>
+
+                            <div className="space-y-1.5 sm:col-span-2">
+                                <Label className="text-xs font-semibold">Max Subscription Duration</Label>
+                                <p className="text-xs text-text-muted mb-1.5">
+                                    Restrict how long users can subscribe. Set to 1 month to prevent yearly subscriptions.
+                                </p>
+                                <select
+                                    value={data.max_subscription_months ?? ''}
+                                    onChange={e => {
+                                        const val = e.target.value;
+                                        setData('max_subscription_months', val === '' ? null : parseInt(val));
+                                    }}
+                                    className="w-full h-9 rounded-md border border-input bg-background px-3 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                                >
+                                    <option value="">No Limit (Monthly & Yearly)</option>
+                                    <option value="1">1 Month Only (Block Yearly)</option>
+                                </select>
                             </div>
                         </div>
                     </OperationalCard>

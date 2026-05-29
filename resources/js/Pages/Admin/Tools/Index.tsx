@@ -9,7 +9,7 @@ import { Button } from '@/Components/ui/button';
 import {
     Package, Plus, Edit2, Trash2, ToggleLeft, ToggleRight,
     Download, Users, Star, Tag, BarChart3, Settings,
-    Layers, ChevronLeft, ChevronRight,
+    Layers, ChevronLeft, ChevronRight, Clock,
 } from 'lucide-react';
 
 interface Tool {
@@ -21,6 +21,7 @@ interface Tool {
     current_version: string;
     is_active: boolean;
     is_featured: boolean;
+    max_subscription_months: number | null;
     subscriptions: number;
     downloads: number;
     deleted_at: string | null;
@@ -126,7 +127,15 @@ export default function AdminToolsIndex({ tools, categories }: Props) {
                                                             )}
                                                         </div>
                                                         <div>
-                                                            <p className="font-semibold text-text-primary text-sm leading-tight">{tool.title}</p>
+                                                            <div className="flex items-center gap-1.5">
+                                                                <p className="font-semibold text-text-primary text-sm leading-tight">{tool.title}</p>
+                                                                {tool.max_subscription_months === 1 && (
+                                                                    <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 bg-amber-50 border border-amber-200 text-amber-700 rounded text-[10px] font-semibold" title="Monthly subscriptions only">
+                                                                        <Clock className="h-2.5 w-2.5" />
+                                                                        Monthly Only
+                                                                    </span>
+                                                                )}
+                                                            </div>
                                                             <p className="text-xs text-text-muted mt-0.5">{tool.slug}</p>
                                                         </div>
                                                         {tool.is_featured && (
