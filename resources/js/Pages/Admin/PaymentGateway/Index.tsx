@@ -23,6 +23,7 @@ import {
     XCircle,
     Percent,
 } from 'lucide-react';
+import { formatMoney as formatCurrency } from '@/lib/utils';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -132,8 +133,8 @@ export default function Index({ clients, totals }: Props) {
             <div className="mb-6 grid grid-cols-2 gap-4 lg:grid-cols-5">
                 <StatCard icon={Users}      label="Total Clients"   value={String(totals.total_clients)}  sub={`${totals.active_clients} active`} />
                 <StatCard icon={CheckCircle} label="Payments Done"  value={String(totals.total_payments)} />
-                <StatCard icon={DollarSign} label="Total Volume"    value={`EGP ${totals.total_volume.toLocaleString('en', { minimumFractionDigits: 2 })}`} />
-                <StatCard icon={TrendingUp} label="Our Commission"  value={`EGP ${totals.total_commission.toLocaleString('en', { minimumFractionDigits: 2 })}`} />
+                <StatCard icon={DollarSign} label="Total Volume"    value={formatCurrency(totals.total_volume, 'EGP')} />
+                <StatCard icon={TrendingUp} label="Our Commission"  value={formatCurrency(totals.total_commission, 'EGP')} />
                 <StatCard icon={Percent}    label="Default Rate"    value="40%" sub="Per payment" />
             </div>
 
@@ -192,12 +193,10 @@ export default function Index({ clients, totals }: Props) {
                                     </span>
                                 </td>
                                 <td className="p-4 font-medium text-gray-900">
-                                    {client.stats.total_volume.toLocaleString('en', { minimumFractionDigits: 2 })}
-                                    <span className="ml-1 text-xs text-gray-400">EGP</span>
+                                    {formatCurrency(client.stats.total_volume, 'EGP')}
                                 </td>
                                 <td className="p-4 font-semibold text-green-700">
-                                    {client.stats.total_commission.toLocaleString('en', { minimumFractionDigits: 2 })}
-                                    <span className="ml-1 text-xs font-normal text-gray-400">EGP</span>
+                                    {formatCurrency(client.stats.total_commission, 'EGP')}
                                 </td>
                                 <td className="p-4">
                                     {client.status === 'active' ? (

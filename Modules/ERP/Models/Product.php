@@ -21,6 +21,11 @@ class Product extends TenantModel
         'price',
         'cost_price',
         'currency_id',
+        'category_id',
+        'barcode',
+        'uom',
+        'image_path',
+        'tax_rate',
         'stock_quantity',
         'reorder_level',
         'is_active',
@@ -31,6 +36,7 @@ class Product extends TenantModel
         'cost_price' => 'decimal:2',
         'stock_quantity' => 'decimal:2',
         'reorder_level' => 'decimal:2',
+        'tax_rate' => 'decimal:2',
         'is_active' => 'boolean',
     ];
 
@@ -42,6 +48,11 @@ class Product extends TenantModel
     public function currency(): BelongsTo
     {
         return $this->belongsTo(Currency::class);
+    }
+
+    public function category(): BelongsTo
+    {
+        return $this->belongsTo(ProductCategory::class);
     }
 
     public function stockLogs(): HasMany

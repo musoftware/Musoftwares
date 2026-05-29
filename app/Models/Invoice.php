@@ -44,6 +44,16 @@ class Invoice extends Model
         });
     }
 
+    public function getCurrencyAttribute()
+    {
+        return $this->attributes['currency_id'] ?? null;
+    }
+
+    public function setCurrencyAttribute($value)
+    {
+        $this->attributes['currency_id'] = $value;
+    }
+
     public function transactions()
     {
         return $this->belongsToMany(Transaction::class);
@@ -113,7 +123,7 @@ class Invoice extends Model
         $unpaid = 0;
 
         foreach ($invoices as $invoice) {
-            $unpaid += CurrenciesExchange::RateToday($invoice->unpaid, $invoice->currency, \App\Models\CurrenciesExchange::BusinessCurrency());
+            $unpaid += CurrenciesExchange::RateToday($invoice->unpaid, $invoice->currency_id, \App\Models\CurrenciesExchange::BusinessCurrency());
         }
         return $unpaid;
     }
@@ -193,14 +203,14 @@ class Invoice extends Model
 
         if (!empty($this->project_id)) {
             $project = Project::find($this->project_id);
-            $project->add_balance($this->total(), 'Invoice #' . $this->id, 'received', $this->id, $this->currency);
-            $project->add_balance(-1 * $this->total(), 'Invoice #' . $this->id, 'used', $this->id, $this->currency);
+            $project->add_balance($this->total(), 'Invoice #' . $this->id, 'received', $this->id, $this->currency_id);
+            $project->add_balance(-1 * $this->total(), 'Invoice #' . $this->id, 'used', $this->id, $this->currency_id);
         } else {
             $client = User::find($this->user_id);
-            $client->add_balance($this->total(), 'Invoice #' . $this->id, 'received', $this->id, $this->currency);
-            $client->add_balance(-1 * $this->total(), 'Invoice #' . $this->id, 'used', $this->id, $this->currency);
+            $client->add_balance($this->total(), 'Invoice #' . $this->id, 'received', $this->id, $this->currency_id);
+            $client->add_balance(-1 * $this->total(), 'Invoice #' . $this->id, 'used', $this->id, $this->currency_id);
         }
-        $this->user->calc_ref($this->total_min_cost(), $this->id, $this->currency);
+        $this->user->calc_ref($this->total_min_cost(), $this->id, $this->currency_id);
         $this->paid = $this->total();
         $this->status = 'paid';
         $this->job_status = 'done';
@@ -221,7 +231,7 @@ class Invoice extends Model
     {
         $invoice = new Invoice();
         $invoice->user_id = Auth::id();
-        $invoice->currency = $client->currency;
+        $invoice->currency_id = $client->currency_id ?? $client->currency;
         if ($project !== null) {
             $invoice->project_id = $project->id;
         }
@@ -237,7 +247,7 @@ class Invoice extends Model
         $new_inc = new Invoice();
         $new_inc->user_id = $this->user_id;
         $new_inc->project_id = $this->project_id;
-        $new_inc->currency = $this->currency;
+        $new_inc->currency_id = $this->currency_id;
         return $new_inc;
     }
 
@@ -269,7 +279,7 @@ class Invoice extends Model
 
     public function unpaid_str()
     {
-        return FinanceHelper::instance()->format_money(round($this->unpaid_total(), 2), $this->currency);
+        return FinanceHelper::instance()->format_money(round($this->unpaid_total(), 2), $this->currency_id);
     }
 
     public function tax()
@@ -294,7 +304,7 @@ class Invoice extends Model
 
     public function tax_str()
     {
-        return FinanceHelper::instance()->format_money($this->tax(), $this->currency);
+        return FinanceHelper::instance()->format_money($this->tax(), $this->currency_id);
     }
 
     public function sub_total()
@@ -360,7 +370,7 @@ class Invoice extends Model
      */
     public function commission_amount_str()
     {
-        return FinanceHelper::instance()->format_money($this->commission_amount(), $this->currency);
+        return FinanceHelper::instance()->format_money($this->commission_amount(), $this->currency_id);
     }
 
     /**
@@ -368,7 +378,7 @@ class Invoice extends Model
      */
     public function base_total_str()
     {
-        return FinanceHelper::instance()->format_money($this->base_total(), $this->currency);
+        return FinanceHelper::instance()->format_money($this->base_total(), $this->currency_id);
     }
 
     /**
@@ -384,7 +394,7 @@ class Invoice extends Model
      */
     public function total_with_commission_str()
     {
-        return FinanceHelper::instance()->format_money($this->total_with_commission(), $this->currency);
+        return FinanceHelper::instance()->format_money($this->total_with_commission(), $this->currency_id);
     }
 
     public function unpaid_total()
@@ -409,7 +419,7 @@ class Invoice extends Model
 
     public function total_str()
     {
-        return FinanceHelper::instance()->format_money($this->total(), $this->currency);
+        return FinanceHelper::instance()->format_money($this->total(), $this->currency_id);
     }
 
     public function total_timer()
@@ -508,10 +518,10 @@ class Invoice extends Model
     {
         DB::transaction(function () {
             if ($this->status == 'paid') {
-                $this->client->calc_ref(-1 * $this->total(), $this->id, $this->currency);
+                $this->client->calc_ref(-1 * $this->total(), $this->id, $this->currency_id);
             }
             if ($this->status == 'partially_paid') {
-                $this->client->calc_ref(-1 * round($this->paid, 2), $this->id, $this->currency);
+                $this->client->calc_ref(-1 * round($this->paid, 2), $this->id, $this->currency_id);
             }
 
             $this->delete_transactions();
@@ -557,18 +567,18 @@ class Invoice extends Model
 
     public function business_total()
     {
-        return CurrenciesExchange::RateToday($this->total(), $this->currency, AdminSettings::GetValue('business_currency', 2));
+        return CurrenciesExchange::RateToday($this->total(), $this->currency_id, AdminSettings::GetValue('business_currency', 2));
     }
 
     public function discount_str()
     {
-        return FinanceHelper::instance()->format_money(($this->discount + $this->second_discount), $this->currency);
+        return FinanceHelper::instance()->format_money(($this->discount + $this->second_discount), $this->currency_id);
     }
 
 
     public function sub_total_str()
     {
-        return FinanceHelper::instance()->format_money($this->sub_total(), $this->currency);
+        return FinanceHelper::instance()->format_money($this->sub_total(), $this->currency_id);
     }
 
     public function revenue()
@@ -578,17 +588,17 @@ class Invoice extends Model
 
     public function revenue_str()
     {
-        return FinanceHelper::instance()->format_money($this->revenue(), $this->currency);
+        return FinanceHelper::instance()->format_money($this->revenue(), $this->currency_id);
     }
 
     public function paid_str()
     {
-        return FinanceHelper::instance()->format_money(round($this->paid, 2), $this->currency);
+        return FinanceHelper::instance()->format_money(round($this->paid, 2), $this->currency_id);
     }
 
     public function business_paid_str()
     {
-        $total = CurrenciesExchange::RateToday(round($this->paid, 2), $this->currency, AdminSettings::GetValue('business_currency', 2));
+        $total = CurrenciesExchange::RateToday(round($this->paid, 2), $this->currency_id, AdminSettings::GetValue('business_currency', 2));
         return FinanceHelper::instance()->format_money($total, AdminSettings::GetValue('business_currency', 2));
     }
 
@@ -605,15 +615,15 @@ class Invoice extends Model
             if (!empty($this->project_id)) {
                 $client = User::find($this->user_id);
                 $project = \App\Models\Project::find($this->project_id);
-                $transaction_id = $project->add_balance(-1 * $this->unpaid_total(), 'Invoice #' . $this->id, 'used', $this->currency);
+                $transaction_id = $project->add_balance(-1 * $this->unpaid_total(), 'Invoice #' . $this->id, 'used', $this->currency_id);
                 $this->transactions()->attach($transaction_id);
-                $this->user->calc_ref($this->unpaid_total(), $this->id, $this->currency);
+                $this->user->calc_ref($this->unpaid_total(), $this->id, $this->currency_id);
             } else {
                 $client = User::find($this->user_id);
-                $transaction_id = $client->add_balance(-1 * $this->unpaid_total(), 'Invoice #' . $this->id, 'used', $this->currency);
+                $transaction_id = $client->add_balance(-1 * $this->unpaid_total(), 'Invoice #' . $this->id, 'used', $this->currency_id);
 
                 $this->transactions()->attach($transaction_id);
-                $this->user->calc_ref($this->unpaid_total(), $this->id, $this->currency);
+                $this->user->calc_ref($this->unpaid_total(), $this->id, $this->currency_id);
             }
             $this->paid = $this->total();
             $this->unpaid = 0;
@@ -626,7 +636,7 @@ class Invoice extends Model
             $this->refresh();
             $this->calculate_cost();
 
-            $coins = max(1, CurrenciesExchange::RateToday($this->paid, $this->currency, 1) * 10);
+            $coins = max(1, CurrenciesExchange::RateToday($this->paid, $this->currency_id, 1) * 10);
 
             ActionHelper::add_action_coins($this->user, 'Invoice Paid', $coins);
 
@@ -692,10 +702,11 @@ class Invoice extends Model
             $reason = trim((string) $line->description) !== ''
                 ? $line->description
                 : ('Invoice #' . $this->id . ' — direct cost');
-            $c_id = $this->user->add_cost_balance(
-                CurrenciesExchange::RateToday((float) $line->amount, $this->currency, $this->client->currency),
+            $c_id = \App\Models\CostTransaction::add_cost_balance(
+                $this->user,
+                CurrenciesExchange::RateToday((float) $line->amount, $this->currency_id, $this->client->currency_id ?? $this->client->currency),
                 $reason,
-                $this->client->currency,
+                $this->client->currency_id ?? $this->client->currency,
                 $this->project_id
             );
             if (! $c_id) {
@@ -730,10 +741,11 @@ class Invoice extends Model
                     $reason = trim((string) $line->description) !== ''
                         ? $line->description
                         : ('Invoice #' . $this->id . ' — direct cost');
-                    $c_id = $this->user->add_cost_balance(
-                        CurrenciesExchange::RateToday((float) $line->amount, $this->currency, $this->client->currency),
+                    $c_id = \App\Models\CostTransaction::add_cost_balance(
+                        $this->user,
+                        CurrenciesExchange::RateToday((float) $line->amount, $this->currency_id, $this->client->currency_id ?? $this->client->currency),
                         $reason,
-                        $this->client->currency,
+                        $this->client->currency_id ?? $this->client->currency,
                         $this->project_id
                     );
                     $line->update(['cost_transaction_id' => $c_id]);
@@ -749,7 +761,7 @@ class Invoice extends Model
                             (float) $line->amount,
                             $reason,
                             'earned',
-                            (int) $this->currency
+                            (int) $this->currency_id
                         );
                         $line->update(['earned_transaction_id' => $tid]);
                     }
@@ -775,7 +787,7 @@ class Invoice extends Model
                     (float) $this->cost,
                     'Invoice #' . $this->id . ' cost',
                     'earned',
-                    (int) $this->currency
+                    (int) $this->currency_id
                 );
             }
             $this->update(['cost_calculated' => '1']);
@@ -784,10 +796,11 @@ class Invoice extends Model
         }
 
         if ($this->cost > 0) {
-            $c_id = $this->user->add_cost_balance(
-                CurrenciesExchange::RateToday($this->cost, $this->currency, $this->client->currency),
+            $c_id = \App\Models\CostTransaction::add_cost_balance(
+                $this->user,
+                CurrenciesExchange::RateToday($this->cost, $this->currency_id, $this->client->currency_id ?? $this->client->currency),
                 'Costs for Invoice #' . $this->id,
-                $this->client->currency,
+                $this->client->currency_id ?? $this->client->currency,
                 $this->project_id
             );
 

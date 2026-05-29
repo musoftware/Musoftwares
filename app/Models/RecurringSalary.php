@@ -35,7 +35,7 @@ class RecurringSalary extends Model
 
     public function current_amount_str(): string
     {
-        return \App\Helpers\FinanceHelper::instance()->format_money($this->current_amount(), $this->currency);
+        return \App\Helpers\FinanceHelper::instance()->format_money($this->current_amount(), $this->currency_id);
     }
 
     /**
@@ -65,7 +65,7 @@ class RecurringSalary extends Model
             (float) $this->amount,
             $reason,
             'earned',
-            (int) $this->currency,
+            (int) $this->currency_id,
             null
         );
         if ($tid) {

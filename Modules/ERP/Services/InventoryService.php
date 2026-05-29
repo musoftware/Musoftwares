@@ -17,6 +17,11 @@ class InventoryService
             ]);
         }
 
+        if (isset($validated['image'])) {
+            $validated['image_path'] = $validated['image']->store('products', 'public');
+            unset($validated['image']);
+        }
+
         return DB::transaction(function () use ($validated, $tenantId) {
             $product = Product::create(array_merge($validated, ['tenant_id' => $tenantId]));
 
@@ -44,6 +49,11 @@ class InventoryService
         }
 
         unset($validated['stock_quantity']); // Enforce stock updates via adjustment
+
+        if (isset($validated['image'])) {
+            $validated['image_path'] = $validated['image']->store('products', 'public');
+            unset($validated['image']);
+        }
 
         $product->update($validated);
 

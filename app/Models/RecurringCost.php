@@ -18,7 +18,7 @@ class RecurringCost extends Model
 
     public function current_amount_str()
     {
-        return \App\Helpers\FinanceHelper::instance()->format_money($this->current_amount(), $this->currency);
+        return \App\Helpers\FinanceHelper::instance()->format_money($this->current_amount(), $this->currency_id);
     }
 
     public function transactions()
@@ -47,7 +47,7 @@ class RecurringCost extends Model
         $now = Carbon::now();
         if ($this->isToday($now)) {
             if (!$this->createdBefore($now)) {
-                $c_id = CostTransaction::add_cost_balance(null, $this->amount, $this->reason, $this->currency, null);
+                $c_id = CostTransaction::add_cost_balance(null, $this->amount, $this->reason, $this->currency_id, null);
                 $this->transactions()->attach($c_id, [
                     'unique_id' => $this->unique_id($now)
                 ]);
@@ -166,7 +166,7 @@ class RecurringCost extends Model
                 $times_type = 1;
             }
 
-            $business_amount = CurrenciesExchange::RateToday($rCost->amount, $rCost->currency, $b_currency);
+            $business_amount = CurrenciesExchange::RateToday($rCost->amount, $rCost->currency_id, $b_currency);
             $c_amount = $business_amount / $rCost->recurring_times * count($detail) * $times_type;;
             $total_amount += $c_amount;
         }

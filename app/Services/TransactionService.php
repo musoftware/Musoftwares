@@ -58,16 +58,21 @@ class TransactionService
 
         DB::transaction(function () use ($request, $user, $project, $data, $type, &$added) {
             foreach ($data as $item) {
+                $itemProject = $project;
+                if (!$itemProject && isset($item['project']) && $item['project']) {
+                    $itemProject = $user->projects()->find($item['project']);
+                }
+
                 if ($type === 'timer-received' || $type === 'timer-due') {
-                    $added += TimerHelper::instance()->addTimerReceived($request, $user, $project, $item);
+                    $added += TimerHelper::instance()->addTimerReceived($request, $user, $itemProject, $item);
                 } elseif ($type === 'out-timer-received') {
-                    $added += TimerHelper::instance()->addNoTimerReceived($request, $user, $project, $item);
+                    $added += TimerHelper::instance()->addNoTimerReceived($request, $user, $itemProject, $item);
                 } elseif ($type === 'refund') {
-                    $added += TimerHelper::instance()->addRefund($request, $user, $project, $item);
+                    $added += TimerHelper::instance()->addRefund($request, $user, $itemProject, $item);
                 } elseif ($type === 'earned') {
-                    $added += TimerHelper::instance()->addEarned($request, $user, $project, $item);
+                    $added += TimerHelper::instance()->addEarned($request, $user, $itemProject, $item);
                 } elseif ($type === 'send') {
-                    $added += TimerHelper::instance()->addSend($request, $user, $project, $item);
+                    $added += TimerHelper::instance()->addSend($request, $user, $itemProject, $item);
                 }
             }
 

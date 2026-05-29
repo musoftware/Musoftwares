@@ -49,14 +49,18 @@ class ProductController extends Controller
     public function create()
     {
         Gate::authorize('create', Product::class);
+        $tenantId = $this->getTenantId();
 
         $currencies = \App\Models\Currency::all();
         $user = $this->resolveTenantUser();
         $tenant = Tenant::where('user_id', $user->id)->first();
         $hasMultiCurrency = $user && $user->hasModuleSubscription('multi-currency');
 
+        $categories = \Modules\ERP\Models\ProductCategory::where('tenant_id', $tenantId)->get();
+
         return Inertia::render('ERP/Inventory/Products/Create', [
             'currencies' => $currencies,
+            'categories' => $categories,
             'hasMultiCurrency' => $hasMultiCurrency,
             'baseCurrencyId' => $tenant ? $tenant->base_currency_id : ($currencies->first()->id ?? 1),
         ]);
@@ -88,7 +92,7 @@ class ProductController extends Controller
                 });
             })
             ->limit(20)
-            ->get(['id', 'name', 'sku', 'price', 'currency_id', 'stock_quantity']);
+            ->get(['id', 'name', 'sku', 'barcode', 'uom', 'tax_rate', 'price', 'currency_id', 'stock_quantity']);
             
         return response()->json($products);
     }
@@ -121,9 +125,12 @@ class ProductController extends Controller
         $tenant = Tenant::where('user_id', $user->id)->first();
         $hasMultiCurrency = $user && $user->hasModuleSubscription('multi-currency');
 
+        $categories = \Modules\ERP\Models\ProductCategory::where('tenant_id', $tenantId)->get();
+
         return Inertia::render('ERP/Inventory/Products/Edit', [
             'product' => $product,
             'currencies' => $currencies,
+            'categories' => $categories,
             'hasMultiCurrency' => $hasMultiCurrency,
         ]);
     }

@@ -4,6 +4,7 @@ import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
 import { Button } from '@/Components/ui/button';
 import { Trash2, Edit, Plus, DollarSign, TrendingDown, TrendingUp, Users, CheckCircle2, AlertCircle, Clock, Search, X, ChevronUp, ChevronDown, Eye, ExternalLink, FileText, Layers, Calendar, RefreshCw, ChevronLeft, ChevronRight, CalendarDays } from 'lucide-react';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isToday, addMonths, subMonths, startOfWeek, endOfWeek } from 'date-fns';
+import { formatMoney as formatCurrency } from '@/lib/utils';
 import {
     AreaChart,
     Area,
@@ -61,7 +62,7 @@ export default function Index({ entries, categories, users, currentTab, stats, a
                         <div key={idx} className="flex justify-between items-center gap-4 py-0.5">
                             <span className="text-slate-400 capitalize">{entry.name}:</span>
                             <span className="font-mono font-semibold">
-                                {stats.business_currency_symbol}{entry.value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                {formatCurrency(entry.value, stats.business_currency_code)}
                             </span>
                         </div>
                     ))}
@@ -330,7 +331,7 @@ export default function Index({ entries, categories, users, currentTab, stats, a
                     </div>
                     <div>
                         <p className="text-sm text-gray-500 font-medium uppercase tracking-wider">Monthly Net Income</p>
-                        <h3 className="text-2xl font-bold text-slate-900">{stats.business_currency_symbol} {parseFloat(stats.total_monthly_income).toLocaleString()}</h3>
+                        <h3 className="text-2xl font-bold text-slate-900">{formatCurrency(stats.total_monthly_income, stats.business_currency_code)}</h3>
                     </div>
                 </div>
                 <div className="bg-white p-6 rounded-xl border shadow-sm flex items-center">
@@ -339,7 +340,7 @@ export default function Index({ entries, categories, users, currentTab, stats, a
                     </div>
                     <div>
                         <p className="text-sm text-gray-500 font-medium uppercase tracking-wider">Monthly Expenses</p>
-                        <h3 className="text-2xl font-bold text-slate-900">{stats.business_currency_symbol} {parseFloat(stats.total_monthly_expenses).toLocaleString()}</h3>
+                        <h3 className="text-2xl font-bold text-slate-900">{formatCurrency(stats.total_monthly_expenses, stats.business_currency_code)}</h3>
                     </div>
                 </div>
                 <div className="bg-white p-6 rounded-xl border shadow-sm flex items-center">
@@ -348,7 +349,7 @@ export default function Index({ entries, categories, users, currentTab, stats, a
                     </div>
                     <div>
                         <p className="text-sm text-gray-500 font-medium uppercase tracking-wider">Monthly Payroll</p>
-                        <h3 className="text-2xl font-bold text-slate-900">{stats.business_currency_symbol} {parseFloat(stats.total_monthly_salaries).toLocaleString()}</h3>
+                        <h3 className="text-2xl font-bold text-slate-900">{formatCurrency(stats.total_monthly_salaries, stats.business_currency_code)}</h3>
                     </div>
                 </div>
             </div>
@@ -435,7 +436,7 @@ export default function Index({ entries, categories, users, currentTab, stats, a
                                     <div className="absolute inset-0 flex flex-col items-center justify-center">
                                         <span className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">Total</span>
                                         <span className="text-sm font-extrabold text-slate-900 font-mono">
-                                            {stats.business_currency_symbol}{Math.round(categoryAllocationData.reduce((sum, item) => sum + item.value, 0)).toLocaleString()}
+                                            {formatCurrency(categoryAllocationData.reduce((sum, item) => sum + item.value, 0), stats.business_currency_code)}
                                         </span>
                                     </div>
                                     <ResponsiveContainer width="100%" height="100%">
@@ -470,7 +471,7 @@ export default function Index({ entries, categories, users, currentTab, stats, a
                                                     <span className="truncate font-medium text-slate-800">{entry.name}</span>
                                                 </div>
                                                 <span className="font-mono text-slate-500 shrink-0 font-normal">
-                                                    {percentage}% ({stats.business_currency_symbol}{Math.round(entry.value).toLocaleString()})
+                                                    {percentage}% ({formatCurrency(entry.value, stats.business_currency_code)})
                                                 </span>
                                             </div>
                                         );
@@ -528,7 +529,7 @@ export default function Index({ entries, categories, users, currentTab, stats, a
                                                     <span className={`w-1.5 h-1.5 rounded-full ${dotColor}`} />
                                                     <span className="font-medium text-slate-800">{item.status}:</span>
                                                     <span className={`font-mono ${textColor} font-semibold`}>
-                                                        {stats.business_currency_symbol}{Math.round(item.amount).toLocaleString()}
+                                                        {formatCurrency(item.amount, stats.business_currency_code)}
                                                     </span>
                                                 </div>
                                             );
@@ -787,10 +788,10 @@ export default function Index({ entries, categories, users, currentTab, stats, a
                                         )}
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap cursor-pointer" onClick={() => openDetails(entry)}>
-                                        <div className="text-sm font-bold text-gray-900">{parseFloat(entry.amount).toLocaleString()} {entry.currency}</div>
+                                        <div className="text-sm font-bold text-gray-900">{formatCurrency(entry.amount, entry.currency)}</div>
                                         {entry.business_amount && entry.currency !== stats.business_currency_code && (
                                             <div className="text-xs text-gray-500 mt-0.5">
-                                                ≈ {parseFloat(entry.business_amount).toLocaleString()} {stats.business_currency_code}
+                                                ≈ {formatCurrency(entry.business_amount, stats.business_currency_code)}
                                             </div>
                                         )}
                                     </td>
@@ -958,10 +959,10 @@ export default function Index({ entries, categories, users, currentTab, stats, a
                                                             key={`${event.type}-${event.id}`}
                                                             onClick={() => openEdit(event)}
                                                             className={`w-full text-left text-[10px] p-1 rounded border flex flex-col hover:opacity-80 transition-opacity truncate ${bgClass}`}
-                                                            title={`${event.title}: ${event.currency_symbol}${parseFloat(event.amount).toLocaleString()}`}
+                                                            title={`${event.title}: ${formatCurrency(event.amount, event.currency || stats.business_currency_code)}`}
                                                         >
                                                             <span className="font-semibold truncate">{event.title}</span>
-                                                            <span className="font-bold">{event.currency_symbol} {parseFloat(event.amount).toLocaleString()}</span>
+                                                            <span className="font-bold">{formatCurrency(event.amount, event.currency || stats.business_currency_code)}</span>
                                                         </button>
                                                     );
                                                 })}
@@ -1124,14 +1125,13 @@ export default function Index({ entries, categories, users, currentTab, stats, a
                                     Amount
                                 </div>
                                 <div className="text-3xl font-black text-slate-900 flex justify-center items-baseline gap-1">
-                                    <span>{parseFloat(selectedDetailEntry.amount).toLocaleString()}</span>
-                                    <span className="text-lg font-bold text-slate-500">{selectedDetailEntry.currency}</span>
+                                    {formatCurrency(selectedDetailEntry.amount, selectedDetailEntry.currency)}
                                 </div>
                                 {selectedDetailEntry.business_amount && selectedDetailEntry.currency !== stats.business_currency_code && (
                                     <div className="text-sm text-gray-500 mt-2 flex items-center justify-center gap-1 font-medium border-t pt-2 border-slate-200/60">
                                         <span>Equivalent:</span>
                                         <span className="font-bold text-slate-800">
-                                            {parseFloat(selectedDetailEntry.business_amount).toLocaleString()} {stats.business_currency_code}
+                                            {formatCurrency(selectedDetailEntry.business_amount, stats.business_currency_code)}
                                         </span>
                                     </div>
                                 )}

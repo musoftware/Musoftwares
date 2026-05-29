@@ -3,6 +3,7 @@ import { Head, Link, router } from '@inertiajs/react';
 import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
 import { Button } from '@/Components/ui/button';
 import { ArrowLeft, Calendar, Clock, DollarSign, List, History, AlertCircle, Edit, Trash2 } from 'lucide-react';
+import { formatMoney as formatCurrency } from '@/lib/utils';
 
 export default function View({ cost, transactions, upcomingSchedule, total_stat }) {
     const [activeTab, setActiveTab] = useState<'history' | 'schedule'>('history');
@@ -54,7 +55,7 @@ export default function View({ cost, transactions, upcomingSchedule, total_stat 
                         </div>
                         <div>
                             <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider block">Amount</span>
-                            <span className="text-sm font-bold text-slate-900">{parseFloat(cost.amount).toLocaleString()} {cost.currency} ({cost.currency_symbol})</span>
+                            <span className="text-sm font-bold text-slate-900">{formatCurrency(cost.amount, cost.currency)}</span>
                         </div>
                         <div className="mt-2">
                             <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider block">Recurrence Pattern</span>
@@ -158,7 +159,7 @@ export default function View({ cost, transactions, upcomingSchedule, total_stat 
                                                         {tx.reason}
                                                     </td>
                                                     <td className="px-4 py-3 whitespace-nowrap text-sm font-bold text-red-600 text-right">
-                                                        -{parseFloat(tx.amount).toLocaleString()} {tx.currency}
+                                                        -{formatCurrency(tx.amount, tx.currency)}
                                                     </td>
                                                 </tr>
                                             ))}

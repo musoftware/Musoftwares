@@ -144,7 +144,9 @@ export default function Show({ invoice, timeline, referral_earnings, has_smtp_ad
                                             {item.description && <div className="text-sm text-muted-foreground mt-1">{item.description}</div>}
                                             {item.type === 'timer' && <Badge variant="outline" className="mt-2 text-primary border-primary/20 bg-primary/5">Timer Item</Badge>}
                                         </TableCell>
-                                        <TableCell className="text-center">{item.quantity}</TableCell>
+                                        <TableCell className="text-center">
+                                            {item.quantity} {item.uom && <span className="text-xs text-muted-foreground uppercase">{item.uom}</span>}
+                                        </TableCell>
                                         <TableCell className="text-right">
                                             <CurrencyDisplay amount={item.unit_price} currency={invoice.amount_currency} />
                                         </TableCell>
@@ -348,7 +350,9 @@ export default function Show({ invoice, timeline, referral_earnings, has_smtp_ad
                                                     <div className="font-medium text-slate-900">{item.title}</div>
                                                     {item.description && <div className="text-sm text-slate-500 mt-0.5">{item.description}</div>}
                                                 </TableCell>
-                                                <TableCell className="text-center font-medium text-slate-700 py-4">{item.quantity}</TableCell>
+                                                <TableCell className="text-center font-medium text-slate-700 py-4">
+                                                    {item.quantity} {item.uom && <span className="text-xs text-slate-400 uppercase">{item.uom}</span>}
+                                                </TableCell>
                                                 <TableCell className="text-right font-medium text-slate-700 py-4">
                                                     <CurrencyDisplay amount={item.unit_price} currency={invoice.amount_currency} />
                                                 </TableCell>

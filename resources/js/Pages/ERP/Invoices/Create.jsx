@@ -356,10 +356,11 @@ export default function CreateEdit({ invoice, clients = [], projects = [], produ
                                                                 product_id: productId,
                                                                 title: product.name,
                                                                 unit_price: parseFloat(product.price),
-                                                                description: product.sku ? `SKU: ${product.sku}` : ''
+                                                                description: product.sku ? `SKU: ${product.sku}` : '',
+                                                                uom: product.uom
                                                             };
                                                         } else {
-                                                            newItems[index] = { ...newItems[index], product_id: '' };
+                                                            newItems[index] = { ...newItems[index], product_id: '', uom: null };
                                                         }
                                                         setData('items', newItems);
                                                         if (itemErrors[index]) {
@@ -393,9 +394,9 @@ export default function CreateEdit({ invoice, clients = [], projects = [], produ
                                                 onChange={e => updateItem(index, 'description', e.target.value)}
                                             />
                                         </div>
-                                        <div className="w-24 pt-0.5">
+                                        <div className="w-24 pt-0.5 relative">
                                             <Input
-                                                className="h-8 text-right shadow-none border-transparent bg-transparent hover:border-slate-200 focus:border-indigo-500 focus:bg-white transition-all px-2"
+                                                className="h-8 text-right shadow-none border-transparent bg-transparent hover:border-slate-200 focus:border-indigo-500 focus:bg-white transition-all px-2 pr-8"
                                                 type="number"
                                                 min="0.01"
                                                 step="0.01"
@@ -403,6 +404,11 @@ export default function CreateEdit({ invoice, clients = [], projects = [], produ
                                                 value={item.quantity || ''}
                                                 onChange={e => updateItem(index, 'quantity', parseFloat(e.target.value) || 0)}
                                             />
+                                            {item.uom && (
+                                                <span className="absolute right-2 top-2 text-[10px] text-slate-400 font-medium select-none pointer-events-none uppercase">
+                                                    {item.uom}
+                                                </span>
+                                            )}
                                         </div>
                                         <div className="w-32 pt-0.5">
                                             <Input

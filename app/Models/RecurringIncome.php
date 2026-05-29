@@ -18,7 +18,7 @@ class RecurringIncome extends Model
 
     public function current_amount_str()
     {
-        return \App\Helpers\FinanceHelper::instance()->format_money($this->current_amount(), $this->currency);
+        return \App\Helpers\FinanceHelper::instance()->format_money($this->current_amount(), $this->currency_id);
     }
 
     public function transactions()
@@ -47,7 +47,7 @@ class RecurringIncome extends Model
         $now = Carbon::now();
         if ($this->isToday($now)) {
             if (!$this->createdBefore($now)) {
-                $c_id = Transaction::add_income_balance($this->amount, $this->reason, $this->currency);
+                $c_id = Transaction::add_income_balance($this->amount, $this->reason, $this->currency_id);
                 $this->transactions()->attach($c_id, [
                     'unique_id' => $this->unique_id($now)
                 ]);
@@ -166,7 +166,7 @@ class RecurringIncome extends Model
                 $times_type = 1;
             }
 
-            $business_amount = CurrenciesExchange::RateToday($rIncome->amount, $rIncome->currency, $b_currency);
+            $business_amount = CurrenciesExchange::RateToday($rIncome->amount, $rIncome->currency_id, $b_currency);
             $c_amount = $business_amount / $rIncome->recurring_times * count($detail) * $times_type;;
             $total_amount += $c_amount;
         }
