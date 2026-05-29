@@ -6,7 +6,10 @@
   "permissions": [
     "storage",
     "activeTab",
-    "scripting"
+    "scripting",
+    "tabs",
+    "webRequest",
+    "alarms"
   ],
   "host_permissions": [
     "*://*/*",
@@ -25,7 +28,16 @@
         "https://*.facebook.com/*",
         "https://facebook.com/*",
         "https://*.instagram.com/*",
-        "https://*.whatsapp.com/*"
+        "https://*.whatsapp.com/*",
+        "https://*.olx.com.eg/*",
+        "https://*.olx.com.lb/*",
+        "https://*.olx.com.om/*",
+        "https://*.dubizzle.com/*",
+        "https://*.dubizzle.com.eg/*",
+        "https://*.dubizzle.com.lb/*",
+        "https://*.dubizzle.com.bh/*",
+        "https://*.dubizzle.com.om/*",
+        "https://*.dubizzle.com.qa/*"
       ],
       "js": ["src/content.js"]
     }
@@ -37,7 +49,16 @@
         "https://*.facebook.com/*",
         "https://facebook.com/*",
         "https://*.instagram.com/*",
-        "https://*.whatsapp.com/*"
+        "https://*.whatsapp.com/*",
+        "https://*.olx.com.eg/*",
+        "https://*.olx.com.lb/*",
+        "https://*.olx.com.om/*",
+        "https://*.dubizzle.com/*",
+        "https://*.dubizzle.com.eg/*",
+        "https://*.dubizzle.com.lb/*",
+        "https://*.dubizzle.com.bh/*",
+        "https://*.dubizzle.com.om/*",
+        "https://*.dubizzle.com.qa/*"
       ]
     }
   ]
