@@ -4,7 +4,7 @@ import { Head, Link, useForm } from '@inertiajs/react';
 import { ArrowLeft } from 'lucide-react';
 import InputError from '@/components/InputError';
 
-export default function Edit({ product, currencies, stockLogs }: { product: any, currencies: any[], stockLogs?: any[] }) {
+export default function Edit({ product, currencies, hasMultiCurrency, stockLogs }: { product: any, currencies: any[], hasMultiCurrency: boolean, stockLogs?: any[] }) {
     const { menuItems, lockedAddons, workspaceName, tenantId } = useERPMenu('inventory');
 
     const t = (key: string, fallback: string) => {
@@ -36,7 +36,7 @@ export default function Edit({ product, currencies, stockLogs }: { product: any,
             <Head title={t('erp.edit_product', 'Edit Product')} />
 
             <div className="py-12">
-                <div className="mx-auto max-w-3xl sm:px-6 lg:px-8">
+                <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
                     <div className="mb-6 flex items-center">
                         <Link
                             href={route('erp.inventory.index')}
@@ -82,26 +82,28 @@ export default function Edit({ product, currencies, stockLogs }: { product: any,
                                     <InputError message={errors.sku} className="mt-2" />
                                 </div>
 
-                                <div>
-                                    <label htmlFor="currency_id" className="block text-sm font-medium text-gray-700">
-                                        {t('erp.currency', 'Currency')}
-                                    </label>
-                                    <select
-                                        id="currency_id"
-                                        value={data.currency_id}
-                                        onChange={(e) => setData('currency_id', e.target.value)}
-                                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                                        required
-                                    >
-                                        <option value="">{t('erp.select_currency', 'Select Currency')}</option>
-                                        {currencies.map((currency) => (
-                                            <option key={currency.id} value={currency.id}>
-                                                {currency.code} - {currency.name}
-                                            </option>
-                                        ))}
-                                    </select>
-                                    <InputError message={errors.currency_id} className="mt-2" />
-                                </div>
+                                {hasMultiCurrency && (
+                                    <div>
+                                        <label htmlFor="currency_id" className="block text-sm font-medium text-gray-700">
+                                            {t('erp.currency', 'Currency')}
+                                        </label>
+                                        <select
+                                            id="currency_id"
+                                            value={data.currency_id}
+                                            onChange={(e) => setData('currency_id', e.target.value)}
+                                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                                            required
+                                        >
+                                            <option value="">{t('erp.select_currency', 'Select Currency')}</option>
+                                            {currencies.map((currency) => (
+                                                <option key={currency.id} value={currency.id}>
+                                                    {currency.currency} - {currency.symbol}
+                                                </option>
+                                            ))}
+                                        </select>
+                                        <InputError message={errors.currency_id} className="mt-2" />
+                                    </div>
+                                )}
 
                                 <div>
                                     <label htmlFor="price" className="block text-sm font-medium text-gray-700">

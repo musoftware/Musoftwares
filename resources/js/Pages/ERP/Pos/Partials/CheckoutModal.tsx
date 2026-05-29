@@ -1,7 +1,7 @@
 import React from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { formatCurrency } from '@/utils/currency';
+import { formatMoney as formatCurrency } from '@/lib/utils';
 import { Banknote, CreditCard, Wallet } from 'lucide-react';
 
 interface CheckoutModalProps {

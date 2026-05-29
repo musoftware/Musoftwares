@@ -11,6 +11,7 @@ use Modules\ERP\Http\Requests\StoreProductRequest;
 use Modules\ERP\Http\Requests\UpdateProductRequest;
 use Modules\ERP\Http\Requests\AdjustStockRequest;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 use Modules\ERP\Services\InventoryService;
 
@@ -47,18 +48,23 @@ class ProductController extends Controller
 
     public function create()
     {
-        $this->authorize('create', Product::class);
+        Gate::authorize('create', Product::class);
 
-        $currencies = \App\Models\Currency::where('status', 'active')->get();
+        $currencies = \App\Models\Currency::all();
+        $user = $this->resolveTenantUser();
+        $tenant = Tenant::where('user_id', $user->id)->first();
+        $hasMultiCurrency = $user && $user->hasModuleSubscription('multi-currency');
 
         return Inertia::render('ERP/Inventory/Products/Create', [
             'currencies' => $currencies,
+            'hasMultiCurrency' => $hasMultiCurrency,
+            'baseCurrencyId' => $tenant ? $tenant->base_currency_id : ($currencies->first()->id ?? 1),
         ]);
     }
 
     public function store(StoreProductRequest $request)
     {
-        $this->authorize('create', Product::class);
+        Gate::authorize('create', Product::class);
 
         $tenantId = $this->getTenantId();
 
@@ -89,7 +95,7 @@ class ProductController extends Controller
 
     public function show(Product $product)
     {
-        $this->authorize('view', $product);
+        Gate::authorize('view', $product);
         
         $product->load('currency');
         
@@ -106,21 +112,25 @@ class ProductController extends Controller
 
     public function edit(Product $product)
     {
-        $this->authorize('update', $product);
+        Gate::authorize('update', $product);
 
         $tenantId = $this->getTenantId();
 
-        $currencies = \App\Models\Currency::where('status', 'active')->get();
+        $currencies = \App\Models\Currency::all();
+        $user = $this->resolveTenantUser();
+        $tenant = Tenant::where('user_id', $user->id)->first();
+        $hasMultiCurrency = $user && $user->hasModuleSubscription('multi-currency');
 
         return Inertia::render('ERP/Inventory/Products/Edit', [
             'product' => $product,
             'currencies' => $currencies,
+            'hasMultiCurrency' => $hasMultiCurrency,
         ]);
     }
 
     public function update(UpdateProductRequest $request, Product $product)
     {
-        $this->authorize('update', $product);
+        Gate::authorize('update', $product);
 
         $tenantId = $this->getTenantId();
 
@@ -131,7 +141,7 @@ class ProductController extends Controller
 
     public function destroy(Product $product)
     {
-        $this->authorize('delete', $product);
+        Gate::authorize('delete', $product);
 
         $this->inventoryService->deleteProduct($product);
 
@@ -140,7 +150,7 @@ class ProductController extends Controller
 
     public function adjust(Product $product)
     {
-        $this->authorize('update', $product);
+        Gate::authorize('update', $product);
 
         return Inertia::render('ERP/Inventory/Products/AdjustStock', [
             'product' => $product,
@@ -149,7 +159,7 @@ class ProductController extends Controller
 
     public function storeAdjustment(AdjustStockRequest $request, Product $product)
     {
-        $this->authorize('update', $product);
+        Gate::authorize('update', $product);
 
         $tenantId = $this->getTenantId();
 
