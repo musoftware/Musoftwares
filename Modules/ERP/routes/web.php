@@ -135,6 +135,15 @@ Route::middleware(['web', 'auth', 'tenant.active'])
             Route::get('transfers', [\Modules\ERP\app\Features\MultiBranch\Controllers\BranchTransferController::class, 'index'])->name('transfers');
             Route::post('{branch}/transfers', [\Modules\ERP\app\Features\MultiBranch\Controllers\BranchTransferController::class, 'store'])->name('transfers.store');
         });
+
+        // ── Payroll ──
+        Route::prefix('payroll')->name('payroll.')->group(function () {
+            Route::get('/', [\Modules\ERP\Http\Controllers\PayrollController::class, 'index'])->name('index');
+            Route::post('contract', [\Modules\ERP\Http\Controllers\PayrollController::class, 'updateContract'])->name('contract.update');
+            Route::post('generate', [\Modules\ERP\Http\Controllers\PayrollController::class, 'generate'])->name('generate');
+            Route::post('payslips/{id}/items', [\Modules\ERP\Http\Controllers\PayrollController::class, 'updatePayslipItems'])->name('payslips.items.update');
+            Route::post('payslips/{id}/mark-paid', [\Modules\ERP\Http\Controllers\PayrollController::class, 'markAsPaid'])->name('payslips.mark_paid');
+        });
     });
 
 Route::middleware(['web', 'auth', 'admin'])

@@ -167,6 +167,11 @@ export default function Members({ members, hasFeature, auth }: MembersProps) {
                     </Button>
                 </div>
 
+                <div className="bg-indigo-50 border border-indigo-100 rounded-lg p-3 text-sm text-indigo-700 flex items-center gap-2">
+                    <Key className="w-4 h-4" />
+                    <span>Your team members can log in at: <a href="/erp/team/login" target="_blank" className="font-bold hover:underline">{window.location.origin}/erp/team/login</a></span>
+                </div>
+
                 {/* Team Members List */}
                 <OperationalCard>
                     <div className="overflow-x-auto">
