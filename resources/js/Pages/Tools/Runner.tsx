@@ -46,6 +46,17 @@ const components: Record<string, React.ElementType> = {
     'OlxB2CFinderRunner':       lazy(() => import('./OlxB2CFinderRunner')),
     'TikTokBoosterRunner':      lazy(() => import('./TikTokBoosterRunner')),
     'TelegramDownloaderRunner': lazy(() => import('./TelegramDownloaderRunner')),
+    'telegram-downloader':      lazy(() => import('./TelegramDownloaderRunner')),
+    'fb-inbox-sender':          lazy(() => import('./FbInboxSenderRunner')),
+    'FbInboxSenderRunner':      lazy(() => import('./FbInboxSenderRunner')),
+    'instagram':                lazy(() => import('./InstagramRunner')),
+    'InstagramRunner':          lazy(() => import('./InstagramRunner')),
+    'PropertyFinderRunner':     lazy(() => import('./PropertyFinderRunner')),
+    'propertyfinder':           lazy(() => import('./PropertyFinderRunner')),
+    'TelegramToolRunner':       lazy(() => import('./TelegramToolRunner')),
+    'telegram-tool':            lazy(() => import('./TelegramToolRunner')),
+    'article-maker':            lazy(() => import('./ArticleMakerRunner')),
+    'ArticleMakerRunner':       lazy(() => import('./ArticleMakerRunner')),
 };
 
 function SetupWizard({ currentHost, onLinked }: { currentHost: string; onLinked: (ip: string) => void }) {
