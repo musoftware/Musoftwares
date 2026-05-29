@@ -15,9 +15,25 @@ use Modules\ERP\Models\SupportTicket;
 use Modules\ERP\Models\Activity;
 use Modules\ERP\Services\ActivityLogger;
 use Inertia\Inertia;
+use Modules\ERP\Http\Requests\StoreProjectRequest;
+use Modules\ERP\Http\Requests\UpdateProjectRequest;
+use Modules\ERP\Services\ProjectService;
+use Modules\ERP\Transformers\ProjectDashboardResource;
+use Modules\ERP\Transformers\InvoiceResource;
+use Modules\ERP\Transformers\TransactionResource;
+use Modules\ERP\Transformers\ExpenseResource;
+use Modules\ERP\Transformers\ProjectTaskResource;
+use Modules\ERP\Transformers\TicketResource;
+use Modules\ERP\Transformers\ActivityResource;
 
 class ProjectController extends Controller
 {
+    protected $projectService;
+
+    public function __construct(ProjectService $projectService)
+    {
+        $this->projectService = $projectService;
+    }
     public function create()
     {
         return Inertia::render('ERP/Projects/Create', [
@@ -25,7 +41,7 @@ class ProjectController extends Controller
         ]);
     }
 
-    public function store(Request $request)
+    public function store(StoreProjectRequest $request)
     {
         $user = Auth::user();
         $tenant = Tenant::where('user_id', $user->id)->first();
@@ -34,45 +50,14 @@ class ProjectController extends Controller
             return back()->withErrors(['error' => __('errors.no_active_workspace')]);
         }
 
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'client_id' => 'required|exists:erp_tenant_clients,id',
-            'status' => 'required|string|in:Planning,Active,On Hold,Completed,Cancelled',
-            'budget' => 'nullable|numeric|min:0',
-            'due_date' => 'nullable|date',
-        ]);
-
-        $client = TenantClient::where('tenant_id', $tenant->id)->findOrFail($validated['client_id']);
-
-        $project = Project::create([
-            'tenant_id' => $tenant->id,
-            'client_id' => $validated['client_id'],
-            'name' => $validated['name'],
-            'status' => $validated['status'],
-            'budget' => $validated['budget'] ?? 0,
-            'currency_id' => $client->currency_id,
-            'due_date' => $validated['due_date'] ?? null,
-            'created_by' => $user->id,
-        ]);
-
-        ActivityLogger::log(
-            'project_created',
-            "Project '{$project->name}' was created.",
-            $project,
-            $project->client_id
-        );
+        $this->projectService->createProject($request->validated(), $tenant, $user->id);
 
         return redirect()->route('erp.dashboard', ['section' => 'projects'])->with('success', __('erp.project_created_success'));
     }
 
     public function edit(Project $project)
     {
-        $user = Auth::user();
-        $tenant = Tenant::where('user_id', $user->id)->firstOrFail();
-
-        if ($project->tenant_id !== $tenant->id) {
-            abort(403, __('errors.unauthorized_project'));
-        }
+        $this->authorize('update', $project);
 
         // Only load the client associated with the project to pre-fill the combobox
         $clients = TenantClient::where('id', $project->client_id)->get(['id', 'name']);
@@ -86,41 +71,14 @@ class ProjectController extends Controller
     /**
      * Update the specified project in storage.
      */
-    public function update(Request $request, Project $project)
+    public function update(UpdateProjectRequest $request, Project $project)
     {
+        $this->authorize('update', $project);
+
         $user = Auth::user();
         $tenant = Tenant::where('user_id', $user->id)->first();
 
-        // Ensure user owns this project via tenant
-        if (!$tenant || $project->tenant_id !== $tenant->id) {
-            abort(403, __('errors.unauthorized_project'));
-        }
-
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'client_id' => 'required|exists:erp_tenant_clients,id',
-            'status' => 'required|string|in:Planning,Active,On Hold,Completed,Cancelled',
-            'budget' => 'nullable|numeric|min:0',
-            'due_date' => 'nullable|date',
-        ]);
-
-        $client = TenantClient::where('tenant_id', $tenant->id)->findOrFail($validated['client_id']);
-
-        $project->update([
-            'name' => $validated['name'],
-            'client_id' => $validated['client_id'],
-            'status' => $validated['status'],
-            'budget' => $validated['budget'] ?? 0,
-            'currency_id' => $client->currency_id,
-            'due_date' => $validated['due_date'] ?? null,
-        ]);
-
-        ActivityLogger::log(
-            'project_updated',
-            "Project '{$project->name}' was updated.",
-            $project,
-            $project->client_id
-        );
+        $this->projectService->updateProject($project, $request->validated(), $tenant);
 
         return redirect()->route('erp.dashboard', ['section' => 'projects'])->with('success', __('erp.project_updated_success'));
     }
@@ -130,205 +88,38 @@ class ProjectController extends Controller
      */
     public function destroy(Project $project)
     {
-        $user = Auth::user();
-        $tenant = Tenant::where('user_id', $user->id)->first();
+        $this->authorize('delete', $project);
 
-        if (!$tenant || $project->tenant_id !== $tenant->id) {
-            abort(403, __('errors.unauthorized_project'));
-        }
-
-        $name = $project->name;
-        $project->delete();
-
-        ActivityLogger::log(
-            'project_deleted',
-            "Project '{$name}' was deleted.",
-            null,
-            null
-        );
+        $this->projectService->deleteProject($project);
 
         return back()->with('success', __('erp.project_deleted_success'));
     }
 
-    /**
-     * Display the specified project with detailed statistics, invoices, expenses, tasks, and tickets.
-     */
     public function show(Project $project)
     {
+        $this->authorize('view', $project);
+
         $user = Auth::user();
         $tenant = Tenant::where('user_id', $user->id)->firstOrFail();
 
-        if ($project->tenant_id !== $tenant->id) {
-            abort(403, __('errors.unauthorized_project'));
-        }
-
-        // Get tenant base currency
         $currency = \App\Models\Currency::find($tenant->base_currency_id);
         $businessCurrency = $currency ? $currency->currency : 'USD';
 
-        // Load project relationships
-        $project->load(['client', 'creator', 'currency']);
+        $data = $this->projectService->getProjectDashboardStats($project);
 
-        // Get invoices linked to this project
-        $invoices = Invoice::where('project_id', $project->id)
-            ->with(['currency'])
-            ->latest()
-            ->get();
-
-        // Stats calculation
-        $paidInvoices = $invoices->where('status', 'paid');
-        $unpaidInvoices = $invoices->whereIn('status', ['sent', 'partial']);
-        
-        $paidCount = $paidInvoices->count();
-        $unpaidCount = $unpaidInvoices->count();
-        $totalCount = $invoices->count();
-
-        // Calculate invoiced totals in base currency (business_amount)
-        $totalInvoicedBusiness = (float) $invoices->sum('business_amount');
-        $totalPaidBusiness = (float) $paidInvoices->sum('business_amount');
-        $totalUnpaidBusiness = (float) $unpaidInvoices->sum('business_amount');
-
-        // Project expenses (Invoice costs of linked invoices)
-        $invoiceIds = $invoices->pluck('id');
-        $expenses = InvoiceCost::whereIn('invoice_id', $invoiceIds)
-            ->with(['payer', 'currency'])
-            ->latest()
-            ->get();
-
-        $totalExpensesBusiness = (float) $expenses->sum('business_amount');
-
-        // Net income/revenue
-        $netRevenueBusiness = $totalPaidBusiness - $totalExpensesBusiness;
-
-        // Get transactions linked to this project
-        $transactions = \Modules\ERP\Models\WalletTransaction::where('project_id', $project->id)
-            ->with(['creator', 'currency'])
-            ->latest()
-            ->get();
-
-        // Fetch tasks
-        $tasks = ERPTask::where('project_id', $project->id)
-            ->with(['creator', 'assignee'])
-            ->latest()
-            ->get()
-            ->map(function ($task) {
-                $category = 'Todo';
-                if ($task->status === 'in_progress') $category = 'In Progress';
-                if ($task->status === 'review') $category = 'In Review';
-                if ($task->status === 'completed') $category = 'Done';
-                return [
-                    'id' => $task->id,
-                    'title' => $task->task_name,
-                    'due' => $task->due_date ? $task->due_date->format('M j, Y') : 'No due date',
-                    'assignee' => $task->assignee ? $task->assignee->name : ($task->creator ? $task->creator->name : 'Unassigned'),
-                    'priority' => ucfirst($task->priority ?? 'Normal'),
-                    'category' => $category,
-                ];
-            });
-
-        // Fetch support tickets
-        $tickets = SupportTicket::where('project_id', $project->id)
-            ->with(['assignee', 'creator'])
-            ->latest()
-            ->get();
-
-        // Activity log
-        $activities = Activity::with('causer')
-            ->where('subject_type', Project::class)
-            ->where('subject_id', $project->id)
-            ->latest()
-            ->limit(10)
-            ->get()
-            ->map(function ($activity) {
-                return [
-                    'title' => $activity->action,
-                    'time' => $activity->created_at?->diffForHumans(),
-                    'description' => $activity->description,
-                    'user' => $activity->causer?->name ?? 'System',
-                ];
-            });
+        $stats = $data['stats'];
+        $stats['businessCurrency'] = $businessCurrency;
+        $stats['projectCurrency'] = $project->currency?->currency ?? 'USD';
 
         return Inertia::render('ERP/Projects/Show', [
-            'project' => [
-                'id' => $project->id,
-                'name' => $project->name,
-                'description' => $project->description,
-                'status' => $project->status,
-                'budget' => round((float) $project->budget, 2),
-                'deadline' => $project->due_date?->format('Y-m-d'),
-                'created_at' => $project->created_at?->format('Y-m-d'),
-                'client' => $project->client ? [
-                    'id' => $project->client->id,
-                    'name' => $project->client->name,
-                    'email' => $project->client->email,
-                ] : null,
-                'leader' => $project->creator?->name ?? '-',
-                'currency' => $project->currency ? [
-                    'id' => $project->currency->id,
-                    'currency' => $project->currency->currency,
-                ] : null,
-            ],
-            'stats' => [
-                'businessCurrency' => $businessCurrency,
-                'projectCurrency' => $project->currency?->currency ?? 'USD',
-                'paidInvoicesCount' => $paidCount,
-                'unpaidInvoicesCount' => $unpaidCount,
-                'totalInvoicesCount' => $totalCount,
-                'totalInvoiced' => round($totalInvoicedBusiness, 2),
-                'totalPaid' => round($totalPaidBusiness, 2),
-                'totalUnpaid' => round($totalUnpaidBusiness, 2),
-                'totalExpenses' => round($totalExpensesBusiness, 2),
-                'netRevenue' => round($netRevenueBusiness, 2),
-            ],
-            'invoices' => $invoices->map(function ($inv) {
-                return [
-                    'id' => $inv->id,
-                    'invoice_number' => $inv->invoice_number,
-                    'status' => $inv->status,
-                    'amount' => round((float) $inv->amount, 2),
-                    'business_amount' => round((float) $inv->business_amount, 2),
-                    'currency' => $inv->amount_currency,
-                    'created_at' => $inv->created_at?->format('Y-m-d'),
-                ];
-            }),
-            'transactions' => $transactions->map(function ($txn) use ($businessCurrency) {
-                return [
-                    'id' => $txn->id,
-                    'reference_id' => '#TXN-' . str_pad($txn->id, 4, '0', STR_PAD_LEFT),
-                    'type' => $txn->type,
-                    'note' => $txn->note ?? 'No details provided',
-                    'direction' => strtoupper($txn->direction),
-                    'amount' => round($txn->amount, 2),
-                    'business_amount' => round($txn->business_amount ?? $txn->amount, 2),
-                    'currency' => $txn->currency?->currency ?? $businessCurrency,
-                    'date' => $txn->created_at?->format('Y-m-d H:i'),
-                    'authorizer' => $txn->creator?->name ?? 'System Core',
-                ];
-            }),
-            'expenses' => $expenses->map(function ($exp) {
-                return [
-                    'id' => $exp->id,
-                    'title' => $exp->title,
-                    'description' => $exp->description,
-                    'amount' => round((float) $exp->amount, 2),
-                    'business_amount' => round((float) $exp->business_amount, 2),
-                    'currency' => $exp->currency?->currency ?? 'USD',
-                    'date' => $exp->created_at?->format('Y-m-d'),
-                    'payer' => $exp->payer?->name ?? 'System',
-                ];
-            }),
-            'tasks' => $tasks,
-            'tickets' => $tickets->map(function ($ticket) {
-                return [
-                    'id' => $ticket->id,
-                    'subject' => $ticket->subject,
-                    'status' => $ticket->status,
-                    'priority' => $ticket->priority,
-                    'assignee' => $ticket->assignee?->name ?? 'Unassigned',
-                    'created_at' => $ticket->created_at?->format('Y-m-d'),
-                ];
-            }),
-            'activities' => $activities,
+            'project' => ProjectDashboardResource::make($data['project'])->resolve(),
+            'stats' => $stats,
+            'invoices' => InvoiceResource::collection($data['invoices'])->resolve(),
+            'transactions' => TransactionResource::collection($data['transactions'])->resolve(),
+            'expenses' => ExpenseResource::collection($data['expenses'])->resolve(),
+            'tasks' => ProjectTaskResource::collection($data['tasks'])->resolve(),
+            'tickets' => TicketResource::collection($data['tickets'])->resolve(),
+            'activities' => ActivityResource::collection($data['activities'])->resolve(),
             'hasTickets' => $user->hasModuleSubscription('erp-tickets'),
         ]);
     }

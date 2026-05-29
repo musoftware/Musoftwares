@@ -18,14 +18,19 @@ use Illuminate\Support\Facades\Auth;
 use Modules\ERP\Models\Tenant;
 use App\Services\ActivityService;
 use App\Events\InvoicePaid;
+use Modules\ERP\Http\Requests\StoreInvoiceRequest;
+use Modules\ERP\Http\Requests\UpdateInvoiceRequest;
+use Modules\ERP\Services\InvoiceService;
 
 class InvoiceController extends Controller
 {
     protected $exchangeRateService;
+    protected $invoiceService;
 
-    public function __construct(ExchangeRateService $exchangeRateService)
+    public function __construct(ExchangeRateService $exchangeRateService, InvoiceService $invoiceService)
     {
         $this->exchangeRateService = $exchangeRateService;
+        $this->invoiceService = $invoiceService;
     }
 
     // ── Tenant resolution ─────────────────────────────────────────
@@ -142,148 +147,20 @@ class InvoiceController extends Controller
         ]);
     }
 
-    public function store(Request $request)
+    public function store(StoreInvoiceRequest $request)
     {
-        $validated = $request->validate([
-            'client_id' => 'required|exists:erp_tenant_clients,id',
-            'project_id' => 'nullable|exists:erp_projects,id',
-            'invoice_number' => 'required|string',
-            'issued_at' => 'required|date',
-            'due_date' => 'required|date|after_or_equal:issued_at',
-            'amount_currency' => 'nullable|string|size:3',
-            'items' => 'required|array|min:1',
-            'items.*.type' => 'required|in:simple,quantity,timer',
-            'items.*.title' => 'required|string',
-            'items.*.unit_price' => 'required|numeric|min:0',
-            'items.*.quantity' => 'required|numeric|min:0',
-            'items.*.product_id' => 'nullable|exists:erp_products,id',
-            'costs' => 'nullable|array',
-            'discount_amount' => 'nullable|numeric|min:0',
-            'tax_rate' => 'nullable|numeric|min:0',
-            'notes' => 'nullable|string',
-        ]);
-
         $tenant = $this->resolveTenant();
 
-        $user = Auth::user();
-        if (Auth::guard('erp_team')->check()) {
-            $user = Auth::guard('erp_team')->user()->tenant->user ?? $user;
-        }
-        if (!$user || !$user->hasModuleSubscription('erp-projects')) {
-            $validated['project_id'] = null;
-        }
+        $invoice = $this->invoiceService->createInvoice($request->validated(), $tenant);
 
-        // Validate uniqueness of invoice_number under the current tenant
-        $exists = Invoice::where('tenant_id', $tenant->id)
-            ->where('invoice_number', $validated['invoice_number'])
-            ->exists();
-
-        if ($exists) {
-            throw \Illuminate\Validation\ValidationException::withMessages([
-                'invoice_number' => 'The invoice number has already been taken for this tenant.'
-            ]);
-        }
-
-        // Ensure client belongs to this tenant
-        $client = TenantClient::with('currency')->where('tenant_id', $tenant->id)
-            ->findOrFail($validated['client_id']);
-
-        $validated['amount_currency'] = $client->currency ? $client->currency->currency : 'USD';
-
-        return DB::transaction(function () use ($validated, $tenant, $client) {
-            $currency = \App\Models\Currency::find($tenant->base_currency_id);
-            $businessCurrency = $currency ? $currency->currency : 'USD';
-            $rate = $this->exchangeRateService->getRate($validated['amount_currency'], $businessCurrency, $validated['issued_at']);
-
-            $subtotal = collect($validated['items'])->sum(fn($i) => $i['unit_price'] * $i['quantity']);
-            $discount = $validated['discount_amount'] ?? 0;
-            $taxable  = $subtotal - $discount;
-            $tax      = $taxable * (($validated['tax_rate'] ?? 0) / 100);
-            $total    = $taxable + $tax;
-
-            $invoice = Invoice::create([
-                'tenant_id'         => $tenant->id,   // FIX H1: was missing
-                'client_id'         => $client->id,
-                'project_id'        => $validated['project_id'] ?? null,
-                'invoice_number'    => $validated['invoice_number'],
-                'status'            => 'draft',
-                'paid_amount'       => 0,
-                'amount'            => $total,
-                'currency_id'       => $client->currency_id,
-                'business_amount'   => $total * $rate,
-                'exchange_rate'     => $rate,
-                'exchange_rate_date'=> $validated['issued_at'],
-                'discount_amount'   => $discount,
-                'tax_rate'          => $validated['tax_rate'] ?? 0,
-                'tax_amount'        => $tax,
-                'issued_at'         => $validated['issued_at'],
-                'due_date'          => $validated['due_date'],
-                'notes'             => $validated['notes'],
-                'created_by'        => Auth::id(),
-            ]);
-
-            foreach ($validated['items'] as $index => $itemData) {
-                $invoice->items()->create([
-                    'tenant_id' => $invoice->tenant_id,
-                    'type' => $itemData['type'],
-                    'title' => $itemData['title'],
-                    'description' => $itemData['description'] ?? null,
-                    'unit_price' => $itemData['unit_price'],
-                    'quantity' => $itemData['quantity'],
-                    'total' => $itemData['unit_price'] * $itemData['quantity'],
-                    'sort_order' => $index,
-                    'product_id' => $itemData['product_id'] ?? null,
-                ]);
-
-                // Deduct stock if product is linked
-                if (!empty($itemData['product_id'])) {
-                    $product = \Modules\ERP\Models\Product::find($itemData['product_id']);
-                    if ($product) {
-                        $product->stock -= $itemData['quantity'];
-                        $product->save();
-
-                        \Modules\ERP\Models\ProductStockLog::create([
-                            'product_id' => $product->id,
-                            'user_id' => Auth::id(),
-                            'change_amount' => -$itemData['quantity'],
-                            'new_quantity' => $product->stock,
-                            'reason' => "Added to Invoice #{$invoice->invoice_number}",
-                        ]);
-                    }
-                }
-            }
-
-            if (!empty($validated['costs'])) {
-                foreach ($validated['costs'] as $costData) {
-                    $costRate = $this->exchangeRateService->getRate($validated['amount_currency'], $businessCurrency, $validated['issued_at']);
-                    $invoice->costs()->create([
-                        'tenant_id' => $invoice->tenant_id,
-                        'title' => $costData['title'],
-                        'amount' => $costData['amount'],
-                        'currency_id' => $client->currency_id,
-                        'business_amount' => $costData['amount'] * $costRate,
-                        'business_currency_id' => $tenant->base_currency_id,
-                        'exchange_rate' => $costRate,
-                        'exchange_rate_date' => $validated['issued_at'],
-                        'payment_status' => 'unpaid',
-                    ]);
-                }
-            }
-
-            ActivityService::log(
-                event: 'invoice.created',
-                description: "Created invoice #{$invoice->invoice_number}",
-                subject: $invoice,
-                workspace: 'erp'
-            );
-
-            return redirect()->route('erp.invoices.show', $invoice->id)
-                ->with('success', __('erp.invoice_created_success'));
-        });
+        return redirect()->route('erp.invoices.show', $invoice->id)
+            ->with('success', __('erp.invoice_created_success'));
     }
 
     public function show(Invoice $invoice)
     {
+        $this->authorize('view', $invoice);
+
         $invoice->load(['client.currency', 'items.timerSessions', 'costs', 'creator', 'project']);
 
         // This is a simplified timeline, in real app it might be a separate table
@@ -317,18 +194,9 @@ class InvoiceController extends Controller
 
     public function edit(Invoice $invoice)
     {
-        // Guard M2: prevent editing finalised invoices
-        if (in_array($invoice->status, ['paid', 'cancelled', 'refunded'])) {
-            return redirect()->route('erp.invoices.show', $invoice->id)
-                ->with('error', __('errors.finalised_invoice_cannot_be_edited', ['status' => $invoice->status]));
-        }
+        $this->authorize('update', $invoice);
 
         $tenant = $this->resolveTenant();
-
-        // Ensure this invoice belongs to the current tenant
-        if ($invoice->tenant_id !== $tenant->id) {
-            abort(403, 'Unauthorized access to invoice.');
-        }
 
         $user = Auth::user();
         if (Auth::guard('erp_team')->check()) {
@@ -365,211 +233,21 @@ class InvoiceController extends Controller
         ]);
     }
 
-    public function update(Request $request, Invoice $invoice)
+    public function update(UpdateInvoiceRequest $request, Invoice $invoice)
     {
-        $validated = $request->validate([
-            'client_id' => 'required|exists:erp_tenant_clients,id',
-            'project_id' => 'nullable|exists:erp_projects,id',
-            'issued_at' => 'required|date',
-            'due_date' => 'required|date|after_or_equal:issued_at',
-            'amount_currency' => 'nullable|string|size:3',
-            'items' => 'required|array|min:1',
-            'items.*.id' => 'nullable',
-            'items.*.type' => 'required|in:simple,quantity,timer',
-            'items.*.title' => 'required|string',
-            'items.*.unit_price' => 'required|numeric|min:0',
-            'items.*.quantity' => 'required|numeric|min:0',
-            'items.*.product_id' => 'nullable|exists:erp_products,id',
-            'costs' => 'nullable|array',
-            'discount_amount' => 'nullable|numeric|min:0',
-            'tax_rate' => 'nullable|numeric|min:0',
-            'notes' => 'nullable|string',
-        ]);
+        $this->authorize('update', $invoice);
+
+        $tenant = $this->resolveTenant();
 
         // Guard M2: prevent editing finalised invoices
         if (in_array($invoice->status, ['paid', 'cancelled', 'refunded'])) {
             return back()->withErrors(['status' => __('errors.finalised_invoice_cannot_be_edited', ['status' => $invoice->status])]);
         }
 
-        $tenant = $this->resolveTenant();
-        if ($invoice->tenant_id !== $tenant->id) {
-            abort(403, 'Unauthorized access to invoice.');
-        }
+        $this->invoiceService->updateInvoice($invoice, $request->validated(), $tenant);
 
-        $user = Auth::user();
-        if (Auth::guard('erp_team')->check()) {
-            $user = Auth::guard('erp_team')->user()->tenant->user ?? $user;
-        }
-        if (!$user || !$user->hasModuleSubscription('erp-projects')) {
-            $validated['project_id'] = null;
-        }
-
-        $client = TenantClient::with('currency')->where('tenant_id', $tenant->id)->findOrFail($validated['client_id']);
-        $validated['amount_currency'] = $client->currency ? $client->currency->currency : 'USD';
-
-        return DB::transaction(function () use ($validated, $invoice, $tenant, $client) {
-            $currency = \App\Models\Currency::find($tenant->base_currency_id);
-            $businessCurrency = $currency ? $currency->currency : 'USD';
-            $rate = $this->exchangeRateService->getRate($validated['amount_currency'], $businessCurrency, $validated['issued_at']);
-
-            $subtotal = collect($validated['items'])->sum(fn($i) => $i['unit_price'] * $i['quantity']);
-            $discount = $validated['discount_amount'] ?? 0;
-            $taxable = $subtotal - $discount;
-            $tax = $taxable * (($validated['tax_rate'] ?? 0) / 100);
-            $total = $taxable + $tax;
-
-            $invoice->update([
-                'client_id' => $validated['client_id'],
-                'project_id' => $validated['project_id'] ?? null,
-                'amount' => $total,
-                'currency_id' => $client->currency_id,
-                'business_amount' => $total * $rate,
-                'exchange_rate' => $rate,
-                'exchange_rate_date' => $validated['issued_at'],
-                'discount_amount' => $discount,
-                'tax_rate' => $validated['tax_rate'] ?? 0,
-                'tax_amount' => $tax,
-                'issued_at' => $validated['issued_at'],
-                'due_date' => $validated['due_date'],
-                'notes' => $validated['notes'],
-            ]);
-
-            // Non-destructive sync for items to preserve timer sessions
-            $itemIds = collect($validated['items'])->pluck('id')->filter()->toArray();
-            
-            // Restore stock for deleted items
-            $deletedItems = $invoice->items()->whereNotIn('id', $itemIds)->get();
-            foreach ($deletedItems as $delItem) {
-                if ($delItem->product_id) {
-                    $product = \Modules\ERP\Models\Product::find($delItem->product_id);
-                    if ($product) {
-                        $product->stock += $delItem->quantity;
-                        $product->save();
-                        \Modules\ERP\Models\ProductStockLog::create([
-                            'product_id' => $product->id,
-                            'user_id' => Auth::id(),
-                            'change_amount' => $delItem->quantity,
-                            'new_quantity' => $product->stock,
-                            'reason' => "Removed from Invoice #{$invoice->invoice_number}",
-                        ]);
-                    }
-                }
-            }
-            $invoice->items()->whereNotIn('id', $itemIds)->delete();
-
-            foreach ($validated['items'] as $index => $itemData) {
-                $oldItem = null;
-                if (!empty($itemData['id'])) {
-                    $oldItem = $invoice->items()->find($itemData['id']);
-                }
-
-                $item = $invoice->items()->updateOrCreate(
-                    ['id' => $itemData['id'] ?? null],
-                    [
-                        'tenant_id' => $invoice->tenant_id,
-                        'type' => $itemData['type'],
-                        'title' => $itemData['title'],
-                        'description' => $itemData['description'] ?? null,
-                        'unit_price' => $itemData['unit_price'],
-                        'quantity' => $itemData['quantity'],
-                        'total' => $itemData['unit_price'] * $itemData['quantity'],
-                        'sort_order' => $index,
-                        'product_id' => $itemData['product_id'] ?? null,
-                    ]
-                );
-
-                if ($oldItem) {
-                    if ($oldItem->product_id && $oldItem->product_id == ($itemData['product_id'] ?? null)) {
-                        $diff = $itemData['quantity'] - $oldItem->quantity;
-                        if ($diff != 0) {
-                            $product = \Modules\ERP\Models\Product::find($oldItem->product_id);
-                            if ($product) {
-                                $product->stock -= $diff;
-                                $product->save();
-                                \Modules\ERP\Models\ProductStockLog::create([
-                                    'product_id' => $product->id,
-                                    'user_id' => Auth::id(),
-                                    'change_amount' => -$diff,
-                                    'new_quantity' => $product->stock,
-                                    'reason' => "Quantity updated on Invoice #{$invoice->invoice_number}",
-                                ]);
-                            }
-                        }
-                    } else {
-                        if ($oldItem->product_id) {
-                            $oldProduct = \Modules\ERP\Models\Product::find($oldItem->product_id);
-                            if ($oldProduct) {
-                                $oldProduct->stock += $oldItem->quantity;
-                                $oldProduct->save();
-                                \Modules\ERP\Models\ProductStockLog::create([
-                                    'product_id' => $oldProduct->id,
-                                    'user_id' => Auth::id(),
-                                    'change_amount' => $oldItem->quantity,
-                                    'new_quantity' => $oldProduct->stock,
-                                    'reason' => "Removed from Invoice #{$invoice->invoice_number}",
-                                ]);
-                            }
-                        }
-                        if (!empty($itemData['product_id'])) {
-                            $newProduct = \Modules\ERP\Models\Product::find($itemData['product_id']);
-                            if ($newProduct) {
-                                $newProduct->stock -= $itemData['quantity'];
-                                $newProduct->save();
-                                \Modules\ERP\Models\ProductStockLog::create([
-                                    'product_id' => $newProduct->id,
-                                    'user_id' => Auth::id(),
-                                    'change_amount' => -$itemData['quantity'],
-                                    'new_quantity' => $newProduct->stock,
-                                    'reason' => "Added to Invoice #{$invoice->invoice_number}",
-                                ]);
-                            }
-                        }
-                    }
-                } else {
-                    if (!empty($itemData['product_id'])) {
-                        $newProduct = \Modules\ERP\Models\Product::find($itemData['product_id']);
-                        if ($newProduct) {
-                            $newProduct->stock -= $itemData['quantity'];
-                            $newProduct->save();
-                            \Modules\ERP\Models\ProductStockLog::create([
-                                'product_id' => $newProduct->id,
-                                'user_id' => Auth::id(),
-                                'change_amount' => -$itemData['quantity'],
-                                'new_quantity' => $newProduct->stock,
-                                'reason' => "Added to Invoice #{$invoice->invoice_number}",
-                            ]);
-                        }
-                    }
-                }
-            }
-
-            // Sync costs
-            $costIds = collect($validated['costs'] ?? [])->pluck('id')->filter()->toArray();
-            $invoice->costs()->whereNotIn('id', $costIds)->delete();
-
-            if (!empty($validated['costs'])) {
-                foreach ($validated['costs'] as $costData) {
-                    $costRate = $this->exchangeRateService->getRate($validated['amount_currency'], $businessCurrency, $validated['issued_at']);
-                    $invoice->costs()->updateOrCreate(
-                        ['id' => $costData['id'] ?? null],
-                        [
-                            'tenant_id' => $invoice->tenant_id,
-                            'title' => $costData['title'],
-                            'amount' => $costData['amount'],
-                            'currency_id' => $client->currency_id,
-                            'business_amount' => $costData['amount'] * $costRate,
-                            'business_currency_id' => $tenant->base_currency_id,
-                            'exchange_rate' => $costRate,
-                            'exchange_rate_date' => $validated['issued_at'],
-                            'payment_status' => $costData['payment_status'] ?? 'unpaid',
-                        ]
-                    );
-                }
-            }
-
-            return redirect()->route('erp.invoices.show', $invoice->id)
-                ->with('success', __('erp.invoice_updated_success'));
-        });
+        return redirect()->route('erp.invoices.show', $invoice->id)
+            ->with('success', __('erp.invoice_updated_success'));
     }
 
     public function send(Invoice $invoice)

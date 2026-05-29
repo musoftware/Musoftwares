@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import ERPLayout from '@/Layouts/ERPLayout';
 import { Head, useForm, Link } from '@inertiajs/react';
+import { UpgradeOverlay } from '@/Components/ui/UpgradeOverlay';
 import { 
     LayoutDashboard, 
     Users, 
@@ -136,40 +137,18 @@ export default function Members({ members, hasFeature, auth }: MembersProps) {
         >
             <div className="space-y-6">
                 {!hasFeature ? (
-                    /* ── Premium Upgrade Card (same pattern as Backup) ── */
-                    <Card className="border-indigo-200/50 bg-gradient-to-br from-slate-50 to-indigo-50/30 shadow-none overflow-hidden relative mt-2">
-                        <div className="absolute top-0 right-0 translate-x-16 -translate-y-16 opacity-[0.04] pointer-events-none">
-                            <Users className="h-72 w-72 text-indigo-600" />
-                        </div>
-                        <CardContent className="p-8 md:p-10 relative z-10 space-y-6">
-                            <div className="flex items-center gap-2">
-                                <Lock className="h-5 w-5 text-indigo-600" />
-                                <span className="font-semibold text-indigo-600 text-sm tracking-wide">Premium Feature</span>
-                            </div>
-                            <div className="space-y-3">
-                                <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-slate-900 leading-tight">
-                                    Collaborate with Your Team in Real-Time
-                                </h1>
-                                <p className="text-slate-500 leading-relaxed max-w-2xl">
-                                    Unlock Team Members to invite managers and staff to your workspace. Assign roles, 
-                                    control access to finances and tasks, and track activity — all from one place.
-                                </p>
-                            </div>
-                            <div className="flex flex-wrap gap-4 text-sm text-slate-600">
-                                <div className="flex items-center gap-2"><Shield className="h-4 w-4 text-indigo-500" /> Role-based access</div>
-                                <div className="flex items-center gap-2"><UserPlus className="h-4 w-4 text-indigo-500" /> Invite by email</div>
-                                <div className="flex items-center gap-2"><Lock className="h-4 w-4 text-indigo-500" /> Suspend anytime</div>
-                            </div>
-                            <div className="pt-2">
-                                <Link href={route('subscriptions.plans')}>
-                                    <Button className="shadow-none flex items-center gap-2 group h-11 px-8 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold">
-                                        Unlock Team Members for 500 EGP/Yr
-                                        <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
-                                    </Button>
-                                </Link>
-                            </div>
-                        </CardContent>
-                    </Card>
+                    <UpgradeOverlay 
+                        title="Collaborate with Your Team in Real-Time"
+                        description="Unlock Team Members to invite managers and staff to your workspace. Assign roles, control access to finances and tasks, and track activity — all from one place."
+                        icon={Users}
+                        module="erp-team-members"
+                        priceText="Unlock Team Members for 500 EGP/Yr"
+                        features={[
+                            { icon: Shield, text: "Role-based access" },
+                            { icon: UserPlus, text: "Invite by email" },
+                            { icon: Lock, text: "Suspend anytime" }
+                        ]}
+                    />
                 ) : (
                     <>
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
