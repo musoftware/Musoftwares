@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { Head, Link, router } from '@inertiajs/react';
+import { Head, Link, router, usePage } from '@inertiajs/react';
 import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
 import { Button } from '@/Components/ui/button';
 import { useToast } from '@/Components/ui/use-toast';
 import { ArrowLeft, User, Wallet, Calendar, FileText, CheckCircle, XCircle, Clock } from 'lucide-react';
+import { formatMoney as formatCurrency } from '@/lib/utils';
 
 interface WithdrawRequest {
     id: number;
@@ -28,6 +29,7 @@ const statusStyles: Record<string, { cls: string; label: string }> = {
 };
 
 export default function Show({ withdrawRequest }: Props) {
+    const { base_currency } = usePage<any>().props;
     const { toast } = useToast();
     const [loading, setLoading] = useState(false);
 
@@ -83,10 +85,7 @@ export default function Show({ withdrawRequest }: Props) {
                                     <Wallet className="h-3.5 w-3.5" /> Amount
                                 </dt>
                                 <dd className="text-2xl font-bold text-slate-900">
-                                    {Number(withdrawRequest.amount).toLocaleString(undefined, {
-                                        minimumFractionDigits: 2,
-                                        maximumFractionDigits: 2,
-                                    })}
+                                    {formatCurrency(withdrawRequest.amount, base_currency)}
                                 </dd>
                             </div>
 
