@@ -4,8 +4,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Search } from 'lucide-react';
 import { router } from '@inertiajs/react';
-import { useDebounce } from 'react-use';
-import { formatCurrency } from '@/utils/currency';
+
+import { formatMoney as formatCurrency } from '@/lib/utils';
 
 interface Product {
     id: number;
@@ -30,13 +30,12 @@ const __ = (key: string) => key;
 export default function ProductGrid({ products, onAddToCart, currency }: ProductGridProps) {
     const [search, setSearch] = React.useState('');
 
-    useDebounce(
-        () => {
+    React.useEffect(() => {
+        const timer = setTimeout(() => {
             router.get(route('erp.pos.index'), { search }, { preserveState: true, preserveScroll: true, replace: true });
-        },
-        300,
-        [search]
-    );
+        }, 300);
+        return () => clearTimeout(timer);
+    }, [search]);
 
     return (
         <div className="flex flex-col h-full">

@@ -3,7 +3,7 @@ import { useERPMenu } from '@/hooks/useERPMenu';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { Package, Plus, Edit, Trash2, AlertCircle, ListPlus } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
-import UpgradeOverlay from '@/Components/ui/UpgradeOverlay';
+import { UpgradeOverlay } from '@/Components/ui/UpgradeOverlay';
 
 export default function Index({ products, hasInventoryFeature }: { products: any, hasInventoryFeature: boolean }) {
     const { menuItems, lockedAddons, workspaceName, tenantId } = useERPMenu('inventory');
@@ -16,6 +16,8 @@ export default function Index({ products, hasInventoryFeature }: { products: any
                     title="Unlock ERP Inventory"
                     description="Upgrade your subscription to track stock, manage products, and streamline your supply chain directly from your dashboard."
                     module="erp-inventory"
+                    icon={Package}
+                    priceText="Upgrade Now"
                 />
             </ERPLayout>
         );
@@ -87,7 +89,7 @@ export default function Index({ products, hasInventoryFeature }: { products: any
                                                 </td>
                                                 <td className="whitespace-nowrap px-6 py-4">
                                                     <div className="text-sm text-gray-900">
-                                                        {product.price} {product.currency?.code}
+                                                        {product.price} {product.currency?.symbol}
                                                     </div>
                                                 </td>
                                                 <td className="whitespace-nowrap px-6 py-4">

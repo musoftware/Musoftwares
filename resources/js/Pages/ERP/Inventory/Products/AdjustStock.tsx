@@ -31,7 +31,7 @@ export default function AdjustStock({ product }: { product: any }) {
             <Head title={t('erp.adjust_stock', 'Adjust Stock')} />
 
             <div className="py-12">
-                <div className="mx-auto max-w-3xl sm:px-6 lg:px-8">
+                <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
                     <div className="mb-6 flex items-center">
                         <Link
                             href={route('erp.inventory.index')}

@@ -31,12 +31,9 @@ class InventoryTest extends TestCase
         ]);
         
         $this->currency = Currency::create([
-            'name' => 'US Dollar',
             'currency' => 'US Dollar',
-            'code' => 'USD',
             'symbol' => '$',
             'string_format' => '$%v',
-            'status' => 'active',
         ]);
 
         // Mock addon subscription
