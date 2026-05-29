@@ -37,7 +37,9 @@
         "https://*.dubizzle.com.lb/*",
         "https://*.dubizzle.com.bh/*",
         "https://*.dubizzle.com.om/*",
-        "https://*.dubizzle.com.qa/*"
+        "https://*.dubizzle.com.qa/*",
+        "https://*.opensooq.com/*",
+        "https://opensooq.com/*"
       ],
       "js": ["src/content.js"]
     }
@@ -58,7 +60,9 @@
         "https://*.dubizzle.com.lb/*",
         "https://*.dubizzle.com.bh/*",
         "https://*.dubizzle.com.om/*",
-        "https://*.dubizzle.com.qa/*"
+        "https://*.dubizzle.com.qa/*",
+        "https://*.opensooq.com/*",
+        "https://opensooq.com/*"
       ]
     }
   ]

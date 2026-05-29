@@ -30,6 +30,8 @@ return new class extends Migration
      */
     public function up(): void
     {
+        Schema::disableForeignKeyConstraints();
+
         // ── 1. Drop dependent tables first ──────────────────────────────
 
         Schema::dropIfExists('whatsapp_chats');
@@ -81,6 +83,8 @@ return new class extends Migration
                 $table->dropColumn(array_values($existing));
             }
         });
+
+        Schema::enableForeignKeyConstraints();
     }
 
     /**
