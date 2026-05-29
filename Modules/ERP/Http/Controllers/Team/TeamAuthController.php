@@ -14,7 +14,7 @@ class TeamAuthController extends Controller
     /**
      * Show the team member login page.
      */
-    public function showLogin(): InertiaResponse
+    public function showLogin()
     {
         if (Auth::guard('erp_team')->check()) {
             return redirect()->route('erp.dashboard');

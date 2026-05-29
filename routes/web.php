@@ -281,6 +281,10 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
 
 
 
+    // ── Platform Users Transactions ───────────────────────────────
+    Route::get('/transactions/create', [\App\Http\Controllers\Admin\AdminTransactionController::class, 'create'])->name('transactions.create');
+    Route::post('/transactions', [\App\Http\Controllers\Admin\AdminTransactionController::class, 'store'])->name('transactions.store');
+
     // ── Admin Financial Operations ────────────────────────────────
     Route::get('/finance', [\App\Http\Controllers\Admin\FinancialOperationsController::class, 'index'])->name('finance.index');
     Route::post('/finance', [\App\Http\Controllers\Admin\FinancialOperationsController::class, 'store'])->name('finance.store');

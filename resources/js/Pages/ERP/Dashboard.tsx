@@ -1044,16 +1044,20 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                                 )}
 
                                 <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-                                    <MetricCard 
-                                        label="Total Revenue"
-                                        value={formatMoney(stats.totalRevenue, currency)}
-                                        icon={DollarSign}
-                                    />
-                                    <MetricCard 
-                                        label="Outstanding"
-                                        value={formatMoney(stats.outstandingRevenue, currency)}
-                                        icon={Clock}
-                                    />
+                                    {!isReadOnlyMember && (
+                                        <>
+                                            <MetricCard 
+                                                label={__('Total Revenue')}
+                                                value={formatMoney(stats.totalRevenue, currency)}
+                                                icon={DollarSign}
+                                            />
+                                            <MetricCard 
+                                                label={__('Outstanding')}
+                                                value={formatMoney(stats.outstandingRevenue, currency)}
+                                                icon={Clock}
+                                            />
+                                        </>
+                                    )}
                                     <MetricCard 
                                         label="Active Clients"
                                         value={activeClients.length}
@@ -1094,6 +1098,7 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                                         </OperationalCard>
                                         )}
 
+                                        {!isReadOnlyMember && (
                                         <OperationalCard title="Recent Invoices" noPadding action={<button onClick={() => handleSetSection('invoices')} className="text-sm text-primary hover:underline transition-colors py-2 px-3 -mr-3 sm:py-0 sm:px-0 sm:mr-0">View all</button>}>
                                             <div className="divide-y divide-border/40">
                                                 {activeInvoices.length === 0 ? (
@@ -1122,6 +1127,7 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                                                 )}
                                             </div>
                                         </OperationalCard>
+                                        )}
                                     </div>
 
                                     {/* Sidebar Column */}
