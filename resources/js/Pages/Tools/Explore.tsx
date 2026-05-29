@@ -44,7 +44,26 @@ const SLUG_EMOJI_MAP: Record<string, string> = {
     'content-researcher': '🔍',
     'data-filter': '📊',
     'facebook-publisher': '📢',
-    'domain-intelligence': '🌐'
+    'domain-intelligence': '🌐',
+    'domain-prospector': '🏷️',
+    'tiktok-booster': '🚀',
+    'telegram-downloader': '⬇️',
+    'olx-b2c-finder': '🏪',
+    'google-maps': '📍',
+    'snap-downloader': '👻',
+    'haraj': '🏬',
+    'wa-ai-agent': '🤖',
+    'wa-funnel-engine': '🔄',
+    'wa-warmup': '🔥',
+    'fb-inbox-sender': '📨',
+    'instagram': '📷',
+    'propertyfinder': '🏠',
+    'telegram-tool': '✈️',
+    'article-maker': '✍️',
+    'competitor-tracker': '🎯',
+    'ad-library-monitor': '📡',
+    'ugc-creators-search': '🧑‍🎨',
+    'swipe-vault': '🗂️',
 };
 
 interface PricingPlan {
