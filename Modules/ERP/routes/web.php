@@ -3,7 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use Modules\ERP\Http\Controllers\InvoiceController;
 
-Route::middleware(['web', 'auth', 'tenant.active'])
+Route::middleware(['web', 'auth:web,erp_team', 'tenant.active'])
     ->prefix('erp')
     ->name('erp.')
     ->group(function () {

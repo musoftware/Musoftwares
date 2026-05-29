@@ -19,6 +19,30 @@ class AdminTransactionController extends Controller
         protected TransactionService $transactionService
     ) {}
 
+    public function create(Request $request)
+    {
+        $userId = $request->query('user');
+        $type = $request->query('type', 'receive'); // Default type for the UI
+
+        if (!$userId) {
+            return redirect()->route('admin.users.index')->with('danger', 'Please select a user to add a transaction.');
+        }
+
+        $user = User::with('projects')->findOrFail($userId);
+        $project = null;
+        if ($request->has('project')) {
+            $project = $user->projects()->find($request->query('project'));
+        }
+
+        return Inertia::render('Admin/Transactions/Create', [
+            'user' => $user,
+            'selectedProject' => $project,
+            'type' => $type,
+            'currencies' => Currency::as_array(),
+            'businessCurrency' => Currency::find(AdminSettings::business_currency()),
+        ]);
+    }
+
     public function index(Request $request)
     {
         $filters = $request->only(['user', 'project', 'currency', 'month', 'year', 'type']);

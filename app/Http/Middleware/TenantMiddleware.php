@@ -15,7 +15,7 @@ class TenantMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (!auth()->check()) {
+        if (!auth()->guard('web')->check() && !auth()->guard('erp_team')->check()) {
             abort(403, 'Unauthorized access.');
         }
 
