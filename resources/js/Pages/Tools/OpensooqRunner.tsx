@@ -224,6 +224,14 @@ export default function OpensooqRunner({ tool }: any) {
                     // Progress events
                     if (msg.event === 'opensooq.extract.progress' && msg.data?.campaignId === campaignIdRef.current) {
                         const d = msg.data;
+                        // Cookie/auth status
+                        if (d.status === 'authenticated') {
+                            setProgressMsg(d.message || 'Authenticated ✓');
+                        }
+                        if (d.status === 'no_auth' || d.status === 'no_cookies') {
+                            setProgressMsg(d.message || 'No cookies — phone reveal may not work');
+                            setError(d.message || '');
+                        }
                         if (d.status === 'extracting' && d.extracted != null) {
                             const pct = Math.min(5 + (d.extracted / limit) * 90, 95);
                             setProgress(pct);
@@ -231,6 +239,9 @@ export default function OpensooqRunner({ tool }: any) {
                         }
                         if (d.status === 'searching') {
                             setProgressMsg(`Searching page ${d.page || '?'}...`);
+                        }
+                        if (d.status === 'launching') {
+                            setProgressMsg('Launching browser...');
                         }
                         if (d.status === 'completed') {
                             setStatus('done');
@@ -265,6 +276,49 @@ export default function OpensooqRunner({ tool }: any) {
         connect();
         return () => { clearTimeout(retry); ws?.close(); };
     }, []);
+
+    // ── Real-time polling fallback: fetch leads from DB every 4s while running ──
+    useEffect(() => {
+        if (status !== 'running' || !connected) return;
+        const cid = campaignIdRef.current;
+        if (!cid) return;
+
+        const poll = setInterval(async () => {
+            try {
+                const ws = wsRef.current;
+                if (!ws || ws.readyState !== WebSocket.OPEN) return;
+
+                // Quick RPC to get leads from DB
+                const res = await new Promise<any>((resolve, reject) => {
+                    if (!(ws as any)._pending) (ws as any)._pending = new Map();
+                    const requestId = Math.random().toString(36).slice(2);
+                    (ws as any)._pending.set(requestId, { resolve, reject });
+                    ws.send(JSON.stringify({
+                        type: 'plugin_rpc', requestId,
+                        payload: { plugin: 'opensooq', action: 'opensooq.leads.list', data: { campaignId: cid, limit: 500 } }
+                    }));
+                    setTimeout(() => {
+                        if ((ws as any)._pending?.has(requestId)) {
+                            (ws as any)._pending.delete(requestId);
+                            reject(new Error('poll timeout'));
+                        }
+                    }, 5000);
+                });
+
+                if (res?.leads && res.leads.length > 0) {
+                    setLeads(prev => {
+                        // Only update if DB has more leads than local state
+                        if (res.leads.length > prev.length) {
+                            return res.leads;
+                        }
+                        return prev;
+                    });
+                }
+            } catch {}
+        }, 4000);
+
+        return () => clearInterval(poll);
+    }, [status, connected]);
 
     // ── RPC helper ──
     const callRPC = useCallback((action: string, data: any = {}): Promise<any> => {
