@@ -37,4 +37,21 @@ return [
     'date' => 'Date',
     'user' => 'User',
     'change' => 'Change',
+
+    // Payroll System
+    'upgrade_to_enable_payroll_system' => 'Please upgrade to enable the Payroll system.',
+    'payroll_contract_updated' => 'Payroll contract updated successfully.',
+    'payroll_generated' => 'Payroll generated successfully.',
+    'payslip_updated' => 'Payslip items updated successfully.',
+    'payslip_already_paid' => 'This payslip is already marked as paid.',
+    'payslip_marked_paid' => 'Payslip marked as paid successfully.',
+    'payroll_expense_title' => 'Salary: :name - :month/:year',
+    'days_worked' => 'Days Worked',
+    'days_absent' => 'Days Absent',
+    'please_select_payment_method' => 'Please select a payment method.',
+    'mark_payslip_as_paid' => 'Mark Payslip as Paid',
+    'total_net_pay' => 'Total Net Pay',
+    'payment_method' => 'Payment Method',
+    'select_payment_method' => 'Select Payment Method',
+    'confirm_payment' => 'Confirm Payment',
 ];

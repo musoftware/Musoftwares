@@ -37,4 +37,21 @@ return [
     'date' => 'التاريخ',
     'user' => 'المستخدم',
     'change' => 'التغيير',
+
+    // Payroll System
+    'upgrade_to_enable_payroll_system' => 'يرجى الترقية لتفعيل نظام الرواتب.',
+    'payroll_contract_updated' => 'تم تحديث عقد الراتب بنجاح.',
+    'payroll_generated' => 'تم إصدار مسير الرواتب بنجاح.',
+    'payslip_updated' => 'تم تحديث عناصر مسير الراتب بنجاح.',
+    'payslip_already_paid' => 'مسير الراتب هذا مدفوع مسبقاً.',
+    'payslip_marked_paid' => 'تم تعيين مسير الراتب كمدفوع بنجاح.',
+    'payroll_expense_title' => 'راتب: :name - :month/:year',
+    'days_worked' => 'أيام العمل',
+    'days_absent' => 'أيام الغياب',
+    'please_select_payment_method' => 'يرجى تحديد طريقة الدفع.',
+    'mark_payslip_as_paid' => 'دفع مسير الراتب',
+    'total_net_pay' => 'إجمالي الراتب الصافي',
+    'payment_method' => 'طريقة الدفع',
+    'select_payment_method' => 'اختر طريقة الدفع',
+    'confirm_payment' => 'تأكيد الدفع',
 ];
