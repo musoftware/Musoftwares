@@ -19,6 +19,7 @@ class Product extends TenantModel
         'sku',
         'description',
         'price',
+        'cost_price',
         'currency_id',
         'stock_quantity',
         'reorder_level',
@@ -27,6 +28,7 @@ class Product extends TenantModel
 
     protected $casts = [
         'price' => 'decimal:2',
+        'cost_price' => 'decimal:2',
         'stock_quantity' => 'decimal:2',
         'reorder_level' => 'decimal:2',
         'is_active' => 'boolean',

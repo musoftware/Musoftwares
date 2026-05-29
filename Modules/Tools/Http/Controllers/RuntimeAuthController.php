@@ -53,7 +53,7 @@ class RuntimeAuthController extends Controller
      * POST /runtime/connect
      * Create token and push it back to the local runtime.
      */
-    public function authorize(Request $request)
+    public function approve(Request $request)
     {
         $request->validate([
             'code' => 'required|string|min:10',
