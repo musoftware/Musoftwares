@@ -1,4 +1,5 @@
 import ERPLayout from '@/Layouts/ERPLayout';
+import { UpgradeOverlay } from '@/Components/ui/UpgradeOverlay';
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import React, { useState, useMemo, useEffect } from 'react';
 import {
@@ -2889,43 +2890,14 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                             if (!activeAddon) return null;
                             const AddonIcon = activeAddon.icon;
                             return (
-                                <Card className="border-indigo-200/50 bg-gradient-to-br from-slate-50 to-indigo-50/30 shadow-none overflow-hidden relative mt-2">
-                                    <div className="absolute top-0 right-0 translate-x-16 -translate-y-16 opacity-[0.04] pointer-events-none">
-                                        <AddonIcon className="h-72 w-72 text-indigo-600" />
-                                    </div>
-                                    <CardContent className="p-8 md:p-10 relative z-10 space-y-6">
-                                        <div className="flex items-center gap-2">
-                                            <Lock className="h-5 w-5 text-indigo-600" />
-                                            <span className="font-semibold text-indigo-600 text-sm tracking-wide">Premium Feature</span>
-                                        </div>
-                                        <div className="space-y-3">
-                                            <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-slate-900 leading-tight">
-                                                {activeAddon.label}
-                                            </h1>
-                                            <p className="text-slate-500 leading-relaxed max-w-2xl">
-                                                {activeAddon.description || `Unlock ${activeAddon.label} to enhance your workspace with powerful capabilities.`}
-                                            </p>
-                                        </div>
-                                        {activeAddon.features && activeAddon.features.length > 0 && (
-                                            <div className="flex flex-wrap gap-4 text-sm text-slate-600">
-                                                {activeAddon.features.map((f: string, i: number) => (
-                                                    <div key={i} className="flex items-center gap-2">
-                                                        <CheckCircle2 className="h-4 w-4 text-indigo-500" />
-                                                        {f}
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        )}
-                                        <div className="pt-2">
-                                            <Link href={route('subscriptions.plans', { module: currentSection })}>
-                                                <Button className="shadow-none flex items-center gap-2 group h-11 px-8 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold">
-                                                    Unlock {activeAddon.label}
-                                                    <ArrowUpRight className="h-4 w-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
-                                                </Button>
-                                            </Link>
-                                        </div>
-                                    </CardContent>
-                                </Card>
+                                <UpgradeOverlay 
+                                    title={activeAddon.label}
+                                    description={activeAddon.description || `Unlock ${activeAddon.label} to enhance your workspace with powerful capabilities.`}
+                                    icon={AddonIcon}
+                                    module={currentSection}
+                                    priceText={`Unlock ${activeAddon.label}`}
+                                    features={activeAddon.features ? activeAddon.features.map((f: string) => ({ icon: CheckCircle2, text: f })) : undefined}
+                                />
                             );
                         })()}
 

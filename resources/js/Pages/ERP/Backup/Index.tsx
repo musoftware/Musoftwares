@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Head, router, usePage } from '@inertiajs/react';
 import ERPLayout from '@/Layouts/ERPLayout';
+import { UpgradeOverlay } from '@/Components/ui/UpgradeOverlay';
 import { useERPMenu } from '@/hooks/useERPMenu';
 import { 
     HardDrive, Download, UploadCloud, AlertTriangle, Lock, ArrowRight, Loader2
@@ -66,34 +67,13 @@ export default function BackupIndex({ hasBackupFeature }: { hasBackupFeature: bo
                 </div>
 
                 {!hasBackupFeature ? (
-                    <Card className="border-primary/20 bg-muted/10 shadow-none overflow-hidden relative mt-6">
-                        <div className="absolute top-0 right-0 translate-x-12 -translate-y-12 opacity-5 pointer-events-none">
-                            <HardDrive className="h-64 w-64 text-primary" />
-                        </div>
-                        <CardContent className="p-8 md:p-10 relative z-10 space-y-6">
-                            <div className="flex items-center gap-2">
-                                <Lock className="h-5 w-5 text-primary" />
-                                <span className="font-semibold text-primary">Premium Feature</span>
-                            </div>
-                            <div className="space-y-2">
-                                <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-foreground leading-tight">
-                                    Secure Your Operational Data with One-Click Backups
-                                </h1>
-                                <p className="text-muted-foreground leading-relaxed max-w-2xl">
-                                    Upgrade your workspace to unlock the ERP Backup Service. Download full snapshots of your clients, invoices, tasks, and ledgers in JSON format, and instantly restore them if needed. 
-                                </p>
-                            </div>
-                            <div className="pt-2">
-                                <Button 
-                                    onClick={handleUpgradeSimulate}
-                                    className="shadow-none flex items-center gap-2 group h-11 px-8 transition-all"
-                                >
-                                    Unlock Backup Addon for 500 EGP/Yr
-                                    <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
-                                </Button>
-                            </div>
-                        </CardContent>
-                    </Card>
+                    <UpgradeOverlay 
+                        title="Secure Your Operational Data with One-Click Backups"
+                        description="Upgrade your workspace to unlock the ERP Backup Service. Download full snapshots of your clients, invoices, tasks, and ledgers in JSON format, and instantly restore them if needed."
+                        icon={HardDrive}
+                        module="erp-backup"
+                        priceText="Unlock Backup Addon for 500 EGP/Yr"
+                    />
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
                         {/* Download Backup */}

@@ -12,10 +12,16 @@ use Modules\ERP\Http\Requests\UpdateProductRequest;
 use Modules\ERP\Http\Requests\AdjustStockRequest;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
-use Illuminate\Support\Facades\DB;
+use Modules\ERP\Services\InventoryService;
 
 class ProductController extends Controller
 {
+    protected $inventoryService;
+
+    public function __construct(InventoryService $inventoryService)
+    {
+        $this->inventoryService = $inventoryService;
+    }
     private function resolveTenantUser()
     {
         $user = Auth::user();
@@ -41,7 +47,8 @@ class ProductController extends Controller
 
     public function create()
     {
-        $this->checkAddon();
+        $this->authorize('create', Product::class);
+
         $currencies = \App\Models\Currency::where('status', 'active')->get();
 
         return Inertia::render('ERP/Inventory/Products/Create', [
@@ -51,37 +58,20 @@ class ProductController extends Controller
 
     public function store(StoreProductRequest $request)
     {
-        $this->checkAddon();
+        $this->authorize('create', Product::class);
+
         $tenantId = $this->getTenantId();
 
-        // Unique SKU check per tenant
-        if ($request->sku && Product::where('tenant_id', $tenantId)->where('sku', $request->sku)->exists()) {
-            return back()->withErrors(['sku' => __('erp.sku_already_exists')]);
-        }
-
-        DB::transaction(function () use ($request, $tenantId) {
-            $product = Product::create(array_merge($request->validated(), ['tenant_id' => $tenantId]));
-
-            if ($product->stock_quantity > 0) {
-                ProductStockLog::create([
-                    'product_id' => $product->id,
-                    'tenant_id' => $tenantId,
-                    'user_id' => Auth::id(),
-                    'change_amount' => $product->stock_quantity,
-                    'new_quantity' => $product->stock_quantity,
-                    'reason' => __('erp.initial_stock'),
-                ]);
-            }
-        });
+        $this->inventoryService->createProduct($request->validated(), $tenantId);
 
         return redirect()->route('erp.inventory.index')->with('success', __('erp.product_created_successfully'));
     }
 
     public function edit(Product $product)
     {
-        $this->checkAddon();
+        $this->authorize('update', $product);
+
         $tenantId = $this->getTenantId();
-        if ($product->tenant_id !== $tenantId) abort(404);
 
         $currencies = \App\Models\Currency::where('status', 'active')->get();
         $stockLogs = ProductStockLog::with('user:id,name')
@@ -98,40 +88,27 @@ class ProductController extends Controller
 
     public function update(UpdateProductRequest $request, Product $product)
     {
-        $this->checkAddon();
+        $this->authorize('update', $product);
+
         $tenantId = $this->getTenantId();
-        if ($product->tenant_id !== $tenantId) abort(404);
 
-        // Unique SKU check per tenant
-        if ($request->sku && Product::where('tenant_id', $tenantId)->where('sku', $request->sku)->where('id', '!=', $product->id)->exists()) {
-            return back()->withErrors(['sku' => __('erp.sku_already_exists')]);
-        }
-
-        // We do not update stock_quantity through the edit form. It must be done via adjustment.
-        $data = $request->validated();
-        unset($data['stock_quantity']);
-
-        $product->update($data);
+        $this->inventoryService->updateProduct($product, $request->validated(), $tenantId);
 
         return redirect()->route('erp.inventory.index')->with('success', __('erp.product_updated_successfully'));
     }
 
     public function destroy(Product $product)
     {
-        $this->checkAddon();
-        $tenantId = $this->getTenantId();
-        if ($product->tenant_id !== $tenantId) abort(404);
+        $this->authorize('delete', $product);
 
-        $product->delete();
+        $this->inventoryService->deleteProduct($product);
 
         return redirect()->route('erp.inventory.index')->with('success', __('erp.product_deleted_successfully'));
     }
 
     public function adjust(Product $product)
     {
-        $this->checkAddon();
-        $tenantId = $this->getTenantId();
-        if ($product->tenant_id !== $tenantId) abort(404);
+        $this->authorize('update', $product);
 
         return Inertia::render('ERP/Inventory/Products/AdjustStock', [
             'product' => $product,
@@ -140,25 +117,11 @@ class ProductController extends Controller
 
     public function storeAdjustment(AdjustStockRequest $request, Product $product)
     {
-        $this->checkAddon();
+        $this->authorize('update', $product);
+
         $tenantId = $this->getTenantId();
-        if ($product->tenant_id !== $tenantId) abort(404);
 
-        DB::transaction(function () use ($request, $product, $tenantId) {
-            $changeAmount = $request->change_amount;
-            $newQuantity = $product->stock_quantity + $changeAmount;
-
-            $product->update(['stock_quantity' => $newQuantity]);
-
-            ProductStockLog::create([
-                'product_id' => $product->id,
-                'tenant_id' => $tenantId,
-                'user_id' => Auth::id(),
-                'change_amount' => $changeAmount,
-                'new_quantity' => $newQuantity,
-                'reason' => $request->reason,
-            ]);
-        });
+        $this->inventoryService->adjustStock($product, (float) $request->change_amount, $request->reason, $tenantId);
 
         return redirect()->route('erp.inventory.index')->with('success', __('erp.stock_adjusted_successfully'));
     }
