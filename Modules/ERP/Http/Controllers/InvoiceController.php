@@ -96,6 +96,7 @@ class InvoiceController extends Controller
             $user = Auth::guard('erp_team')->user()->tenant->user ?? $user;
         }
         $hasProjectsAddon = $user ? $user->hasModuleSubscription('erp-projects') : false;
+        $hasInventoryAddon = $user ? $user->hasModuleSubscription('erp-inventory') : false;
 
         $clients = TenantClient::with('currency')
             ->where('tenant_id', $tenant->id)
@@ -132,6 +133,8 @@ class InvoiceController extends Controller
             'pre_selected_client' => $preSelectedClient,
             'projects'          => $hasProjectsAddon ? \Modules\ERP\Models\Project::where('tenant_id', $tenant->id)->get() : [],
             'has_projects_addon'=> $hasProjectsAddon,
+            'products'          => $hasInventoryAddon ? \Modules\ERP\Models\Product::where('tenant_id', $tenant->id)->where('is_active', true)->get() : [],
+            'has_inventory_addon'=> $hasInventoryAddon,
             'currencies'        => Currency::all(),
             'business_currency' => $baseCurrency ? $baseCurrency->currency : 'USD',
             'pre_selected_client_id' => $preSelectedClientId,
@@ -153,6 +156,7 @@ class InvoiceController extends Controller
             'items.*.title' => 'required|string',
             'items.*.unit_price' => 'required|numeric|min:0',
             'items.*.quantity' => 'required|numeric|min:0',
+            'items.*.product_id' => 'nullable|exists:erp_products,id',
             'costs' => 'nullable|array',
             'discount_amount' => 'nullable|numeric|min:0',
             'tax_rate' => 'nullable|numeric|min:0',
@@ -228,7 +232,25 @@ class InvoiceController extends Controller
                     'quantity' => $itemData['quantity'],
                     'total' => $itemData['unit_price'] * $itemData['quantity'],
                     'sort_order' => $index,
+                    'product_id' => $itemData['product_id'] ?? null,
                 ]);
+
+                // Deduct stock if product is linked
+                if (!empty($itemData['product_id'])) {
+                    $product = \Modules\ERP\Models\Product::find($itemData['product_id']);
+                    if ($product) {
+                        $product->stock -= $itemData['quantity'];
+                        $product->save();
+
+                        \Modules\ERP\Models\ProductStockLog::create([
+                            'product_id' => $product->id,
+                            'user_id' => Auth::id(),
+                            'change_amount' => -$itemData['quantity'],
+                            'new_quantity' => $product->stock,
+                            'reason' => "Added to Invoice #{$invoice->invoice_number}",
+                        ]);
+                    }
+                }
             }
 
             if (!empty($validated['costs'])) {
@@ -313,6 +335,7 @@ class InvoiceController extends Controller
             $user = Auth::guard('erp_team')->user()->tenant->user ?? $user;
         }
         $hasProjectsAddon = $user ? $user->hasModuleSubscription('erp-projects') : false;
+        $hasInventoryAddon = $user ? $user->hasModuleSubscription('erp-inventory') : false;
 
         $invoice->load(['items', 'costs', 'client.currency']);
         $baseCurrency = Currency::find($tenant->base_currency_id);
@@ -335,6 +358,8 @@ class InvoiceController extends Controller
             'pre_selected_client' => $currentClient,
             'projects'          => $hasProjectsAddon ? \Modules\ERP\Models\Project::where('tenant_id', $tenant->id)->get() : [],
             'has_projects_addon'=> $hasProjectsAddon,
+            'products'          => $hasInventoryAddon ? \Modules\ERP\Models\Product::where('tenant_id', $tenant->id)->where('is_active', true)->get() : [],
+            'has_inventory_addon'=> $hasInventoryAddon,
             'currencies'        => Currency::all(),
             'business_currency' => $baseCurrency ? $baseCurrency->currency : 'USD',
         ]);
@@ -354,6 +379,7 @@ class InvoiceController extends Controller
             'items.*.title' => 'required|string',
             'items.*.unit_price' => 'required|numeric|min:0',
             'items.*.quantity' => 'required|numeric|min:0',
+            'items.*.product_id' => 'nullable|exists:erp_products,id',
             'costs' => 'nullable|array',
             'discount_amount' => 'nullable|numeric|min:0',
             'tax_rate' => 'nullable|numeric|min:0',
@@ -410,10 +436,34 @@ class InvoiceController extends Controller
 
             // Non-destructive sync for items to preserve timer sessions
             $itemIds = collect($validated['items'])->pluck('id')->filter()->toArray();
+            
+            // Restore stock for deleted items
+            $deletedItems = $invoice->items()->whereNotIn('id', $itemIds)->get();
+            foreach ($deletedItems as $delItem) {
+                if ($delItem->product_id) {
+                    $product = \Modules\ERP\Models\Product::find($delItem->product_id);
+                    if ($product) {
+                        $product->stock += $delItem->quantity;
+                        $product->save();
+                        \Modules\ERP\Models\ProductStockLog::create([
+                            'product_id' => $product->id,
+                            'user_id' => Auth::id(),
+                            'change_amount' => $delItem->quantity,
+                            'new_quantity' => $product->stock,
+                            'reason' => "Removed from Invoice #{$invoice->invoice_number}",
+                        ]);
+                    }
+                }
+            }
             $invoice->items()->whereNotIn('id', $itemIds)->delete();
 
             foreach ($validated['items'] as $index => $itemData) {
-                $invoice->items()->updateOrCreate(
+                $oldItem = null;
+                if (!empty($itemData['id'])) {
+                    $oldItem = $invoice->items()->find($itemData['id']);
+                }
+
+                $item = $invoice->items()->updateOrCreate(
                     ['id' => $itemData['id'] ?? null],
                     [
                         'tenant_id' => $invoice->tenant_id,
@@ -424,8 +474,73 @@ class InvoiceController extends Controller
                         'quantity' => $itemData['quantity'],
                         'total' => $itemData['unit_price'] * $itemData['quantity'],
                         'sort_order' => $index,
+                        'product_id' => $itemData['product_id'] ?? null,
                     ]
                 );
+
+                if ($oldItem) {
+                    if ($oldItem->product_id && $oldItem->product_id == ($itemData['product_id'] ?? null)) {
+                        $diff = $itemData['quantity'] - $oldItem->quantity;
+                        if ($diff != 0) {
+                            $product = \Modules\ERP\Models\Product::find($oldItem->product_id);
+                            if ($product) {
+                                $product->stock -= $diff;
+                                $product->save();
+                                \Modules\ERP\Models\ProductStockLog::create([
+                                    'product_id' => $product->id,
+                                    'user_id' => Auth::id(),
+                                    'change_amount' => -$diff,
+                                    'new_quantity' => $product->stock,
+                                    'reason' => "Quantity updated on Invoice #{$invoice->invoice_number}",
+                                ]);
+                            }
+                        }
+                    } else {
+                        if ($oldItem->product_id) {
+                            $oldProduct = \Modules\ERP\Models\Product::find($oldItem->product_id);
+                            if ($oldProduct) {
+                                $oldProduct->stock += $oldItem->quantity;
+                                $oldProduct->save();
+                                \Modules\ERP\Models\ProductStockLog::create([
+                                    'product_id' => $oldProduct->id,
+                                    'user_id' => Auth::id(),
+                                    'change_amount' => $oldItem->quantity,
+                                    'new_quantity' => $oldProduct->stock,
+                                    'reason' => "Removed from Invoice #{$invoice->invoice_number}",
+                                ]);
+                            }
+                        }
+                        if (!empty($itemData['product_id'])) {
+                            $newProduct = \Modules\ERP\Models\Product::find($itemData['product_id']);
+                            if ($newProduct) {
+                                $newProduct->stock -= $itemData['quantity'];
+                                $newProduct->save();
+                                \Modules\ERP\Models\ProductStockLog::create([
+                                    'product_id' => $newProduct->id,
+                                    'user_id' => Auth::id(),
+                                    'change_amount' => -$itemData['quantity'],
+                                    'new_quantity' => $newProduct->stock,
+                                    'reason' => "Added to Invoice #{$invoice->invoice_number}",
+                                ]);
+                            }
+                        }
+                    }
+                } else {
+                    if (!empty($itemData['product_id'])) {
+                        $newProduct = \Modules\ERP\Models\Product::find($itemData['product_id']);
+                        if ($newProduct) {
+                            $newProduct->stock -= $itemData['quantity'];
+                            $newProduct->save();
+                            \Modules\ERP\Models\ProductStockLog::create([
+                                'product_id' => $newProduct->id,
+                                'user_id' => Auth::id(),
+                                'change_amount' => -$itemData['quantity'],
+                                'new_quantity' => $newProduct->stock,
+                                'reason' => "Added to Invoice #{$invoice->invoice_number}",
+                            ]);
+                        }
+                    }
+                }
             }
 
             // Sync costs

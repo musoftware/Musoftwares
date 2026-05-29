@@ -22,17 +22,17 @@ class BackupService
             })->get()->toArray(),
             'transactions' => \Modules\ERP\Models\WalletTransaction::where('tenant_id', $tenant->id)->get()->toArray(),
             
-            // Addons Support
-            'products' => \Modules\ERP\Models\Product::where('tenant_id', $tenant->id)->get()->toArray(),
-            'product_stock_logs' => \Modules\ERP\Models\ProductStockLog::where('tenant_id', $tenant->id)->get()->toArray(),
-            'expenses' => \Modules\ERP\Models\Expense::where('tenant_id', $tenant->id)->get()->toArray(),
-            'expense_transactions' => \Modules\ERP\Models\ExpenseTransaction::where('tenant_id', $tenant->id)->get()->toArray(),
-            'support_tickets' => \Modules\ERP\Models\SupportTicket::where('tenant_id', $tenant->id)->get()->toArray(),
-            'contracts' => \Modules\ERP\Models\Contract::where('tenant_id', $tenant->id)->get()->toArray(),
-            'referral_earnings' => \Modules\ERP\Models\ReferralEarning::where('tenant_id', $tenant->id)->get()->toArray(),
-            'withdrawal_requests' => \Modules\ERP\Models\WithdrawalRequest::where('tenant_id', $tenant->id)->get()->toArray(),
-            'withdrawals' => \Modules\ERP\Models\Withdrawal::where('tenant_id', $tenant->id)->get()->toArray(),
-            'timer_sessions' => \Modules\ERP\Models\TimerSession::where('tenant_id', $tenant->id)->get()->toArray(),
+            // Addons Support (Check table existence)
+            'products' => \Illuminate\Support\Facades\Schema::hasTable('erp_products') ? \Modules\ERP\Models\Product::where('tenant_id', $tenant->id)->get()->toArray() : [],
+            'product_stock_logs' => \Illuminate\Support\Facades\Schema::hasTable('erp_product_stock_logs') ? \Modules\ERP\Models\ProductStockLog::where('tenant_id', $tenant->id)->get()->toArray() : [],
+            'expenses' => \Illuminate\Support\Facades\Schema::hasTable('erp_expenses') ? \Modules\ERP\Models\Expense::where('tenant_id', $tenant->id)->get()->toArray() : [],
+            'expense_transactions' => \Illuminate\Support\Facades\Schema::hasTable('erp_expense_transactions') ? \Modules\ERP\Models\ExpenseTransaction::where('tenant_id', $tenant->id)->get()->toArray() : [],
+            'support_tickets' => \Illuminate\Support\Facades\Schema::hasTable('erp_support_tickets') ? \Modules\ERP\Models\SupportTicket::where('tenant_id', $tenant->id)->get()->toArray() : [],
+            'contracts' => \Illuminate\Support\Facades\Schema::hasTable('erp_contracts') ? \Modules\ERP\Models\Contract::where('tenant_id', $tenant->id)->get()->toArray() : [],
+            'referral_earnings' => \Illuminate\Support\Facades\Schema::hasTable('erp_referral_earnings') ? \Modules\ERP\Models\ReferralEarning::where('tenant_id', $tenant->id)->get()->toArray() : [],
+            'withdrawal_requests' => \Illuminate\Support\Facades\Schema::hasTable('erp_withdrawal_requests') ? \Modules\ERP\Models\WithdrawalRequest::where('tenant_id', $tenant->id)->get()->toArray() : [],
+            'withdrawals' => \Illuminate\Support\Facades\Schema::hasTable('erp_withdrawals') ? \Modules\ERP\Models\Withdrawal::where('tenant_id', $tenant->id)->get()->toArray() : [],
+            'timer_sessions' => \Illuminate\Support\Facades\Schema::hasTable('erp_timer_sessions') ? \Modules\ERP\Models\TimerSession::where('tenant_id', $tenant->id)->get()->toArray() : [],
         ];
 
         $json = json_encode($data, JSON_PRETTY_PRINT);
@@ -91,10 +91,10 @@ class BackupService
             })->delete();
             
             // Delete addon dependent records
-            \Modules\ERP\Models\ExpenseTransaction::where('tenant_id', $tenant->id)->delete();
-            \Modules\ERP\Models\ProductStockLog::where('tenant_id', $tenant->id)->delete();
-            \Modules\ERP\Models\ReferralEarning::where('tenant_id', $tenant->id)->delete();
-            \Modules\ERP\Models\TimerSession::where('tenant_id', $tenant->id)->delete();
+            if (\Illuminate\Support\Facades\Schema::hasTable('erp_expense_transactions')) \Modules\ERP\Models\ExpenseTransaction::where('tenant_id', $tenant->id)->delete();
+            if (\Illuminate\Support\Facades\Schema::hasTable('erp_product_stock_logs')) \Modules\ERP\Models\ProductStockLog::where('tenant_id', $tenant->id)->delete();
+            if (\Illuminate\Support\Facades\Schema::hasTable('erp_referral_earnings')) \Modules\ERP\Models\ReferralEarning::where('tenant_id', $tenant->id)->delete();
+            if (\Illuminate\Support\Facades\Schema::hasTable('erp_timer_sessions')) \Modules\ERP\Models\TimerSession::where('tenant_id', $tenant->id)->delete();
 
             // Delete primary records
             \Modules\ERP\Models\Invoice::where('tenant_id', $tenant->id)->delete();
@@ -106,12 +106,12 @@ class BackupService
             \Modules\ERP\Models\TenantNote::where('tenant_id', $tenant->id)->delete();
             
             // Delete addon primary records
-            \Modules\ERP\Models\Expense::where('tenant_id', $tenant->id)->delete();
-            \Modules\ERP\Models\Product::where('tenant_id', $tenant->id)->delete();
-            \Modules\ERP\Models\SupportTicket::where('tenant_id', $tenant->id)->delete();
-            \Modules\ERP\Models\Contract::where('tenant_id', $tenant->id)->delete();
-            \Modules\ERP\Models\WithdrawalRequest::where('tenant_id', $tenant->id)->delete();
-            \Modules\ERP\Models\Withdrawal::where('tenant_id', $tenant->id)->delete();
+            if (\Illuminate\Support\Facades\Schema::hasTable('erp_expenses')) \Modules\ERP\Models\Expense::where('tenant_id', $tenant->id)->delete();
+            if (\Illuminate\Support\Facades\Schema::hasTable('erp_products')) \Modules\ERP\Models\Product::where('tenant_id', $tenant->id)->delete();
+            if (\Illuminate\Support\Facades\Schema::hasTable('erp_support_tickets')) \Modules\ERP\Models\SupportTicket::where('tenant_id', $tenant->id)->delete();
+            if (\Illuminate\Support\Facades\Schema::hasTable('erp_contracts')) \Modules\ERP\Models\Contract::where('tenant_id', $tenant->id)->delete();
+            if (\Illuminate\Support\Facades\Schema::hasTable('erp_withdrawal_requests')) \Modules\ERP\Models\WithdrawalRequest::where('tenant_id', $tenant->id)->delete();
+            if (\Illuminate\Support\Facades\Schema::hasTable('erp_withdrawals')) \Modules\ERP\Models\Withdrawal::where('tenant_id', $tenant->id)->delete();
 
             // Finally delete clients
             \Modules\ERP\Models\TenantClient::where('tenant_id', $tenant->id)->delete();
@@ -306,21 +306,21 @@ class BackupService
             }
             
             // Addon Dependents
-            if (isset($data['product_stock_logs'])) {
+            if (isset($data['product_stock_logs']) && \Illuminate\Support\Facades\Schema::hasTable('erp_product_stock_logs')) {
                 foreach ($data['product_stock_logs'] as $item) {
                     unset($item['id']);
                     $remapForeignKeys($item);
                     DB::table('erp_product_stock_logs')->insert($item);
                 }
             }
-            if (isset($data['expense_transactions'])) {
+            if (isset($data['expense_transactions']) && \Illuminate\Support\Facades\Schema::hasTable('erp_expense_transactions')) {
                 foreach ($data['expense_transactions'] as $item) {
                     unset($item['id']);
                     $remapForeignKeys($item);
                     DB::table('erp_expense_transactions')->insert($item);
                 }
             }
-            if (isset($data['referral_earnings'])) {
+            if (isset($data['referral_earnings']) && \Illuminate\Support\Facades\Schema::hasTable('erp_client_referral_earnings')) {
                 foreach ($data['referral_earnings'] as $item) {
                     unset($item['id']);
                     $remapForeignKeys($item);
@@ -333,27 +333,26 @@ class BackupService
                     DB::table('erp_client_referral_earnings')->insert($item);
                 }
             }
-            if (isset($data['withdrawals'])) {
+            if (isset($data['withdrawals']) && \Illuminate\Support\Facades\Schema::hasTable('erp_withdrawals')) {
                 foreach ($data['withdrawals'] as $item) {
                     unset($item['id']);
                     $remapForeignKeys($item);
                     DB::table('erp_withdrawals')->insert($item);
                 }
             }
-            if (isset($data['withdrawal_requests'])) {
+            if (isset($data['withdrawal_requests']) && \Illuminate\Support\Facades\Schema::hasTable('erp_withdrawal_requests')) {
                 foreach ($data['withdrawal_requests'] as $item) {
                     unset($item['id']);
                     $remapForeignKeys($item);
                     DB::table('erp_withdrawal_requests')->insert($item);
                 }
             }
-            if (isset($data['timer_sessions'])) {
+            if (isset($data['timer_sessions']) && \Illuminate\Support\Facades\Schema::hasTable('erp_timer_sessions')) {
                 foreach ($data['timer_sessions'] as $item) {
                     unset($item['id']);
                     $remapForeignKeys($item);
                     DB::table('erp_timer_sessions')->insert($item);
                 }
-            }
             }
         });
     }

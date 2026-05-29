@@ -2634,16 +2634,15 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                                                         </div>
                                                         <div>
                                                             <label className="text-[10px] uppercase font-bold tracking-wider text-slate-400 block mb-1">Assign Client</label>
-                                                            <select
+                                                            <AsyncCombobox
+                                                                endpoint={route('erp.clients.search')}
                                                                 value={calendarTaskForm.client_id}
-                                                                onChange={e => setCalendarTaskForm(prev => ({ ...prev, client_id: e.target.value }))}
-                                                                className="w-full text-xs h-8.5 rounded-md border border-slate-200 bg-white px-2.5 shadow-none focus:outline-none focus:ring-1 focus:ring-ring"
-                                                            >
-                                                                <option value="">No Client (Internal)</option>
-                                                                {activeClients.map(c => (
-                                                                    <option key={c.id} value={c.id.toString()}>{c.name}</option>
-                                                                ))}
-                                                            </select>
+                                                                onChange={(val) => setCalendarTaskForm(prev => ({ ...prev, client_id: val ? val.toString() : '' }))}
+                                                                placeholder="Select a client..."
+                                                                className="h-8.5 bg-white border-slate-200"
+                                                                prependOptions={[{ id: '', name: 'No Client (Internal)' }]}
+                                                                initialLabel={calendarTaskForm.client_id ? activeClients.find(c => c.id.toString() === calendarTaskForm.client_id)?.name : ''}
+                                                            />
                                                         </div>
                                                         <div className="grid grid-cols-2 gap-2">
                                                             <div>
@@ -3048,16 +3047,15 @@ export default function ERPDashboard({ tenant: serverTenant, stats: serverStats,
                                     
                                     <div className="space-y-1">
                                         <label className="text-[10px] uppercase font-bold tracking-wider text-slate-400">Assign Client</label>
-                                        <select
+                                        <AsyncCombobox
+                                            endpoint={route('erp.clients.search')}
                                             value={calendarTaskForm.client_id}
-                                            onChange={e => setCalendarTaskForm(prev => ({ ...prev, client_id: e.target.value }))}
-                                            className="w-full text-xs h-9.5 rounded-md border border-slate-200 bg-white px-2.5 shadow-none focus:outline-none focus:ring-1 focus:ring-ring"
-                                        >
-                                            <option value="">No Client (Internal Task)</option>
-                                            {activeClients.map(c => (
-                                                <option key={c.id} value={c.id.toString()}>{c.name}</option>
-                                            ))}
-                                        </select>
+                                            onChange={(val) => setCalendarTaskForm(prev => ({ ...prev, client_id: val ? val.toString() : '' }))}
+                                            placeholder="Select a client..."
+                                            className="h-9.5 bg-white border-slate-200"
+                                            prependOptions={[{ id: '', name: 'No Client (Internal Task)' }]}
+                                            initialLabel={calendarTaskForm.client_id ? activeClients.find(c => c.id.toString() === calendarTaskForm.client_id)?.name : ''}
+                                        />
                                     </div>
 
                                     <div className="grid grid-cols-2 gap-3">
