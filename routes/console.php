@@ -27,3 +27,7 @@ Schedule::command(ProcessEarningsClearing::class)->everyMinute();
 // Auto-complete delivered marketplace orders hourly
 Schedule::command(\App\Console\Commands\CompleteDeliveredMarketplaceOrders::class)->hourly();
 
+
+// Gold Savers Jobs
+Schedule::job(new \Modules\GoldSavers\app\Features\LivePrices\Jobs\FetchLiveGoldPriceJob)->hourly();
+

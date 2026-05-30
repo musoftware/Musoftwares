@@ -2,8 +2,10 @@ import React from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link } from '@inertiajs/react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/Components/ui/card';
-import { Wallet, TrendingUp, Activity, Target, ChevronRight, ExternalLink } from 'lucide-react';
+import { Wallet, TrendingUp, Activity, Target, ChevronRight, ExternalLink, Lightbulb, Lock } from 'lucide-react';
 import { formatNumber } from '@/lib/utils';
+import { __ } from '@/lib/i18n';
+import GoldSaversTabs from './Components/GoldSaversTabs';
 
 interface Portfolio {
     total_grams: number;
@@ -25,25 +27,40 @@ interface Wallet {
 }
 
 interface GoldPrice {
-    karat_24: number;
-    karat_21: number;
-    karat_18: number;
-    currency: string;
-    date: string;
+    price_gram_24k: number;
+    price_gram_21k: number;
+    price_gram_18k: number;
+    currency_id?: number; // Adjust according to new schema
+    fetched_at?: string;
+}
+
+interface SmartInsight {
+    icon: 'TrendingUp' | 'Target' | 'Lightbulb';
+    text: string;
 }
 
 interface DashboardProps {
     wallets: Wallet[];
     latestPrice: GoldPrice | null;
     portfolio: Portfolio;
+    hasLivePrices: boolean;
+    hasSmartInsights: boolean;
+    smartInsights: SmartInsight[];
 }
 
-export default function Dashboard({ wallets, latestPrice, portfolio }: DashboardProps) {
+export default function Dashboard({ wallets, latestPrice, portfolio, hasLivePrices, hasSmartInsights, smartInsights }: DashboardProps) {
     return (
         <AuthenticatedLayout
-            header={<h2 className="font-semibold text-xl text-gray-800 leading-tight">Gold Saver Portfolio</h2>}
+            header={
+                <div className="flex flex-col">
+                    <h2 className="font-semibold text-xl text-gray-800 leading-tight mb-4">
+                        {__('Gold Saver Portfolio')}
+                    </h2>
+                    <GoldSaversTabs />
+                </div>
+            }
         >
-            <Head title="Gold Saver Portfolio" />
+            <Head title={__('Gold Saver Portfolio')} />
 
             <div className="py-12">
                 <div className="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
@@ -52,17 +69,17 @@ export default function Dashboard({ wallets, latestPrice, portfolio }: Dashboard
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                         <Card className="hover:-translate-y-1 hover:shadow-lg transition-all duration-300 cursor-default group">
                             <CardHeader className="flex flex-row items-center justify-between pb-2">
-                                <CardTitle className="text-sm font-medium text-muted-foreground group-hover:text-primary transition-colors">Total Grams</CardTitle>
+                                <CardTitle className="text-sm font-medium text-muted-foreground group-hover:text-primary transition-colors">{__('Total Grams')}</CardTitle>
                                 <Activity className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
                             </CardHeader>
                             <CardContent>
-                                <div className="text-2xl font-bold">{portfolio.total_grams.toFixed(2)} g</div>
+                                <div className="text-2xl font-bold">{portfolio.total_grams.toFixed(2)} {__('G')}</div>
                             </CardContent>
                         </Card>
                         
                         <Card className="hover:-translate-y-1 hover:shadow-lg transition-all duration-300 cursor-default group">
                             <CardHeader className="flex flex-row items-center justify-between pb-2">
-                                <CardTitle className="text-sm font-medium text-muted-foreground group-hover:text-primary transition-colors">Total Invested</CardTitle>
+                                <CardTitle className="text-sm font-medium text-muted-foreground group-hover:text-primary transition-colors">{__('Total Invested')}</CardTitle>
                                 <Wallet className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
                             </CardHeader>
                             <CardContent>
@@ -72,7 +89,7 @@ export default function Dashboard({ wallets, latestPrice, portfolio }: Dashboard
                         
                         <Card className="hover:-translate-y-1 hover:shadow-lg transition-all duration-300 cursor-default group">
                             <CardHeader className="flex flex-row items-center justify-between pb-2">
-                                <CardTitle className="text-sm font-medium text-muted-foreground group-hover:text-primary transition-colors">Current Value</CardTitle>
+                                <CardTitle className="text-sm font-medium text-muted-foreground group-hover:text-primary transition-colors">{__('Current Value')}</CardTitle>
                                 <TrendingUp className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
                             </CardHeader>
                             <CardContent>
@@ -82,7 +99,7 @@ export default function Dashboard({ wallets, latestPrice, portfolio }: Dashboard
                         
                         <Card className="hover:-translate-y-1 hover:shadow-lg transition-all duration-300 cursor-default group">
                             <CardHeader className="flex flex-row items-center justify-between pb-2">
-                                <CardTitle className="text-sm font-medium text-muted-foreground group-hover:text-primary transition-colors">Profit/Loss</CardTitle>
+                                <CardTitle className="text-sm font-medium text-muted-foreground group-hover:text-primary transition-colors">{__('Profit Loss')}</CardTitle>
                                 <Target className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
                             </CardHeader>
                             <CardContent>
@@ -97,7 +114,7 @@ export default function Dashboard({ wallets, latestPrice, portfolio }: Dashboard
                     {/* Quick Access */}
                     <div className="flex gap-4">
                         <Link href={route('isaas.gold-savers.wallets.index')} className="group flex items-center gap-2 bg-indigo-600 text-white px-5 py-2.5 rounded-md hover:bg-indigo-700 hover:shadow-md transition-all duration-300">
-                            Manage Wallets
+                            {__('Manage Wallets')}
                             <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                         </Link>
                     </div>
@@ -105,11 +122,11 @@ export default function Dashboard({ wallets, latestPrice, portfolio }: Dashboard
                     {/* Active Wallets List */}
                     <Card>
                         <CardHeader>
-                            <CardTitle>Active Wallets</CardTitle>
+                            <CardTitle>{__('Active Wallets')}</CardTitle>
                         </CardHeader>
                         <CardContent>
                             {wallets.length === 0 ? (
-                                <p className="text-muted-foreground">No active wallets. Create one to start tracking your goals.</p>
+                                <p className="text-muted-foreground">{__('No Active Wallets Create One')}</p>
                             ) : (
                                 <div className="space-y-4">
                                     {wallets.map(wallet => (
@@ -124,12 +141,12 @@ export default function Dashboard({ wallets, latestPrice, portfolio }: Dashboard
                                                 </div>
                                                 <div>
                                                     <h4 className="font-semibold group-hover:text-indigo-700 transition-colors">{wallet.name}</h4>
-                                                    <p className="text-sm text-muted-foreground">{wallet.goal_type}</p>
+                                                    <p className="text-sm text-muted-foreground">{__(wallet.goal_type)}</p>
                                                 </div>
                                             </div>
                                             <div className="text-right flex items-center gap-4">
                                                 <div>
-                                                    <div className="font-bold">{wallet.balance_grams} g</div>
+                                                    <div className="font-bold">{wallet.balance_grams} {__('G')}</div>
                                                     <div className="text-sm text-muted-foreground">{formatNumber(wallet.balance_amount)} {wallet.currency}</div>
                                                 </div>
                                                 <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-indigo-600 group-hover:translate-x-1 transition-all" />
@@ -141,31 +158,91 @@ export default function Dashboard({ wallets, latestPrice, portfolio }: Dashboard
                         </CardContent>
                     </Card>
 
-                    {/* Live Prices Widget */}
-                    <Card>
+                    {/* Smart Insights Widget */}
+                    <Card className="relative overflow-hidden bg-gradient-to-br from-indigo-50 to-white border-indigo-100">
                         <CardHeader>
-                            <CardTitle>Market Prices (Latest)</CardTitle>
+                            <CardTitle className="flex items-center gap-2 text-indigo-900">
+                                <Lightbulb className="w-5 h-5 text-indigo-600" />
+                                {__('Smart Insights')}
+                                {!hasSmartInsights && <span className="px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 text-xs font-semibold uppercase">{__('Premium')}</span>}
+                            </CardTitle>
                         </CardHeader>
                         <CardContent>
-                            {latestPrice ? (
-                                <div className="grid grid-cols-3 gap-4 text-center relative overflow-hidden">
-                                    <div className="absolute top-0 right-0 w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
-                                    <div className="p-4 rounded-xl bg-slate-50 border hover:border-indigo-200 hover:shadow-sm transition-all cursor-default">
-                                        <div className="text-muted-foreground text-sm font-medium mb-1">24k</div>
-                                        <div className="font-bold text-lg">{latestPrice.karat_24}</div>
+                            {!hasSmartInsights ? (
+                                <div className="absolute inset-0 bg-white/60 backdrop-blur-[2px] flex items-center justify-center z-10 flex-col gap-2 rounded-xl">
+                                    <div className="bg-white p-3 rounded-full shadow-sm border text-indigo-600">
+                                        <Lock className="w-6 h-6" />
                                     </div>
-                                    <div className="p-4 rounded-xl bg-slate-50 border hover:border-indigo-200 hover:shadow-sm transition-all cursor-default">
-                                        <div className="text-muted-foreground text-sm font-medium mb-1">21k</div>
-                                        <div className="font-bold text-lg text-indigo-700">{latestPrice.karat_21}</div>
-                                    </div>
-                                    <div className="p-4 rounded-xl bg-slate-50 border hover:border-indigo-200 hover:shadow-sm transition-all cursor-default">
-                                        <div className="text-muted-foreground text-sm font-medium mb-1">18k</div>
-                                        <div className="font-bold text-lg">{latestPrice.karat_18}</div>
-                                    </div>
+                                    <p className="font-medium text-slate-800">{__('Upgrade To See Insights')}</p>
+                                    <Link href={route('isaas.subscriptions.index')} className="text-sm text-indigo-600 hover:underline">
+                                        {__('Upgrade Now')}
+                                    </Link>
                                 </div>
-                            ) : (
-                                <p className="text-muted-foreground text-center">No market prices available yet.</p>
-                            )}
+                            ) : null}
+
+                            <div className={!hasSmartInsights ? "opacity-30 select-none pointer-events-none" : ""}>
+                                <div className="space-y-4">
+                                    {smartInsights && smartInsights.length > 0 ? (
+                                        smartInsights.map((insight, index) => (
+                                            <div key={index} className="flex items-start gap-3 bg-white p-4 rounded-xl border border-indigo-50 shadow-sm">
+                                                <div className="bg-indigo-100 p-2 rounded-lg shrink-0">
+                                                    {insight.icon === 'TrendingUp' && <TrendingUp className="w-5 h-5 text-indigo-600" />}
+                                                    {insight.icon === 'Target' && <Target className="w-5 h-5 text-indigo-600" />}
+                                                    {insight.icon === 'Lightbulb' && <Lightbulb className="w-5 h-5 text-indigo-600" />}
+                                                </div>
+                                                <p className="text-slate-700 font-medium leading-relaxed">{insight.text}</p>
+                                            </div>
+                                        ))
+                                    ) : (
+                                        <p className="text-muted-foreground">{__('No Insights Available')}</p>
+                                    )}
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    {/* Live Prices Widget */}
+                    <Card className="relative overflow-hidden">
+                        <CardHeader>
+                            <CardTitle className="flex items-center gap-2">
+                                {__('Market Prices Latest')}
+                                {!hasLivePrices && <span className="px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 text-xs font-semibold uppercase">{__('Premium')}</span>}
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            {!hasLivePrices ? (
+                                <div className="absolute inset-0 bg-white/60 backdrop-blur-[2px] flex items-center justify-center z-10 rounded-xl flex-col gap-2">
+                                    <div className="bg-white p-3 rounded-full shadow-sm border text-indigo-600">
+                                        <ExternalLink className="w-6 h-6" />
+                                    </div>
+                                    <p className="font-medium text-slate-800">{__('Upgrade To See Live Prices')}</p>
+                                    <Link href={route('isaas.subscriptions.index')} className="text-sm text-indigo-600 hover:underline">
+                                        {__('Upgrade Now')}
+                                    </Link>
+                                </div>
+                            ) : null}
+                            
+                            <div className={!hasLivePrices ? "opacity-30 select-none pointer-events-none" : ""}>
+                                {latestPrice || !hasLivePrices ? (
+                                    <div className="grid grid-cols-3 gap-4 text-center relative overflow-hidden">
+                                        {hasLivePrices && <div className="absolute top-0 right-0 w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>}
+                                        <div className="p-4 rounded-xl bg-slate-50 border hover:border-indigo-200 hover:shadow-sm transition-all cursor-default">
+                                            <div className="text-muted-foreground text-sm font-medium mb-1">24k</div>
+                                            <div className="font-bold text-lg">{latestPrice?.price_gram_24k ?? '4,050'}</div>
+                                        </div>
+                                        <div className="p-4 rounded-xl bg-slate-50 border hover:border-indigo-200 hover:shadow-sm transition-all cursor-default">
+                                            <div className="text-muted-foreground text-sm font-medium mb-1">21k</div>
+                                            <div className="font-bold text-lg text-indigo-700">{latestPrice?.price_gram_21k ?? '3,550'}</div>
+                                        </div>
+                                        <div className="p-4 rounded-xl bg-slate-50 border hover:border-indigo-200 hover:shadow-sm transition-all cursor-default">
+                                            <div className="text-muted-foreground text-sm font-medium mb-1">18k</div>
+                                            <div className="font-bold text-lg">{latestPrice?.price_gram_18k ?? '3,040'}</div>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <p className="text-muted-foreground text-center">{__('No Market Prices Available Yet')}</p>
+                                )}
+                            </div>
                         </CardContent>
                     </Card>
 

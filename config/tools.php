@@ -1731,7 +1731,7 @@ Not copying content — copying the psychology.
         'supported_os' => ['windows'],
         'is_featured' => false,
         'is_active' => true,
-        'is_free' => false,
+        'is_free' => true,
         'runner_component' => 'LaragonManagerRunner',
         'features' => ['Project Scanning', 'VSCode Integration', 'Service Management'],
         'requirements' => ['Musoftware Runtime Agent running locally', 'Laragon Installed'],
@@ -1739,7 +1739,7 @@ Not copying content — copying the psychology.
             '33fc05d4-e756-4a97-be62-dab6e02a9e08' => [
                 'guid' => '33fc05d4-e756-4a97-be62-dab6e02a9e08',
                 'name' => 'Free',
-                'price_monthly' => 100,
+                'price_monthly' => 0,
                 'price_yearly' => 0,
                 'is_popular' => true,
                 'features' => ['Unlimited Scans', 'Local DB Storage'],
@@ -1757,7 +1757,7 @@ Not copying content — copying the psychology.
         'supported_os' => ['windows', 'mac'],
         'is_featured' => false,
         'is_active' => true,
-        'is_free' => false,
+        'is_free' => true,
         'runner_component' => 'ObfuscatorRunner',
         'features' => ['Directory Scanning', 'Configurable Obfuscation', 'Local Execution'],
         'requirements' => ['Musoftware Runtime Agent running locally'],
@@ -1765,7 +1765,7 @@ Not copying content — copying the psychology.
             '13e16a75-3ea3-4449-8fba-3ba7fcfbbbde' => [
                 'guid' => '13e16a75-3ea3-4449-8fba-3ba7fcfbbbde',
                 'name' => 'Free',
-                'price_monthly' => 100,
+                'price_monthly' => 0,
                 'price_yearly' => 0,
                 'is_popular' => true,
                 'features' => ['Unlimited Obfuscation'],
@@ -1783,7 +1783,7 @@ Not copying content — copying the psychology.
         'supported_os' => ['windows', 'mac'],
         'is_featured' => false,
         'is_active' => true,
-        'is_free' => false,
+        'is_free' => true,
         'runner_component' => 'DuplicateFinderRunner',
         'features' => ['Hash matching', 'Safe deletion', 'Recursive scanning'],
         'requirements' => ['Musoftware Runtime Agent running locally'],
@@ -1791,10 +1791,54 @@ Not copying content — copying the psychology.
             '39ff7878-86e3-4c7a-821b-58357e0eca03' => [
                 'guid' => '39ff7878-86e3-4c7a-821b-58357e0eca03',
                 'name' => 'Free',
-                'price_monthly' => 100,
+                'price_monthly' => 0,
                 'price_yearly' => 0,
                 'is_popular' => true,
                 'features' => ['Unlimited Scans'],
+            ],
+        ],
+        'version' => '1.0.0',
+    ],
+    '50c3d9a1-7788-444f-8a43-9828557a2c6d' => [
+        'guid' => '50c3d9a1-7788-444f-8a43-9828557a2c6d',
+        'title' => 'Excel Merger',
+        'slug' => 'excel-merger',
+        'short_description' => 'Fast, local, privacy-first Excel and CSV file merger.',
+        'description' => 'A local utility to merge multiple Excel (.xlsx) or CSV files into a single master sheet without uploading your sensitive data to the cloud.
+
+- 100% private local execution in your browser
+- Drag and drop batch processing
+- Optional deduplication
+- Legacy phone number extraction (Musoftware standard)',
+        'category' => 'Productivity',
+        'supported_os' => [
+            'windows',
+            'mac',
+        ],
+        'is_featured' => true,
+        'is_active' => true,
+        'is_free' => true,
+        'runner_component' => 'ExcelMergerRunner',
+        'features' => [
+            'Unlimited Merges',
+            'Multiple formats (XLSX, CSV)',
+            'Row deduplication',
+            'Local Browser Execution'
+        ],
+        'requirements' => [
+            'Browser with File API support'
+        ],
+        'plans' => [
+            '50c3d9a1-7788-444f-8a43-9828557a2c6e' => [
+                'guid' => '50c3d9a1-7788-444f-8a43-9828557a2c6e',
+                'name' => 'Free',
+                'price_monthly' => 0,
+                'price_yearly' => 0,
+                'is_popular' => true,
+                'features' => [
+                    'Unlimited use',
+                    'Local browser execution'
+                ],
             ],
         ],
         'version' => '1.0.0',

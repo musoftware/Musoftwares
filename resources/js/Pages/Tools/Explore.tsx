@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Head, router, Link } from '@inertiajs/react';
+import { Head, router, Link, usePage } from '@inertiajs/react';
 import { Button } from '@/Components/ui/button';
 import { DesktopIcon } from '@/Components/Tools/DesktopIcon';
 import { DesktopFolder } from '@/Components/Tools/DesktopFolder';
@@ -99,6 +99,7 @@ interface Props {
     hasBrowserSubscription: boolean;
     filters: { search?: string; category?: string };
     workspaceSettings: any;
+    businessCurrency: string;
 }
 
 type ItemType = 'tool' | 'folder';
@@ -113,7 +114,7 @@ interface DesktopItem {
     y?: number;
 }
 
-export default function Explore({ tools, categories, subscribedSlugs, hasBrowserSubscription, filters, workspaceSettings }: Props) {
+export default function Explore({ tools, categories, subscribedSlugs, hasBrowserSubscription, filters, workspaceSettings, businessCurrency }: Props) {
     const [currentTime, setCurrentTime] = useState(new Date());
     const [selectedTool, setSelectedTool] = useState<Tool | null>(null);
     const [isSubscribeModalOpen, setSubscribeModalOpen] = useState(false);
@@ -1060,12 +1061,14 @@ export default function Explore({ tools, categories, subscribedSlugs, hasBrowser
                     setSelectedTool(null);
                 }}
                 title={selectedTool ? `Subscribe to ${selectedTool.title}` : 'Subscribe'}
-                icon={
-                    selectedTool?.icon_url ? 
-                    <img src={selectedTool.icon_url} alt="" className="w-full h-full object-contain" /> : 
-                    <span className="text-[10px]">{selectedTool ? SLUG_EMOJI_MAP[selectedTool.slug] || '📦' : '📦'}</span>
-                }
+                iconUrl={selectedTool?.icon_url}
+                isMaximized={false}
+                onMinimize={() => {}}
+                onMaximize={() => {}}
+                zIndex={9999}
+                onFocus={() => {}}
                 width="w-[500px]"
+                height="h-[600px]"
             >
                 {selectedTool && (
                     <div className="flex flex-col h-full bg-slate-50">
@@ -1098,7 +1101,7 @@ export default function Explore({ tools, categories, subscribedSlugs, hasBrowser
                                         <span className="text-white text-lg font-bold">
                                             {selectedTool.pricing_plans[0].price_monthly <= 0 
                                                 ? 'Free' 
-                                                : `${formatMoney(selectedTool.pricing_plans[0].price_monthly, 'USD')}/mo`}
+                                                : `${formatMoney(selectedTool.pricing_plans[0].price_monthly, businessCurrency)}/mo`}
                                         </span>
                                     </div>
                                     <div className="p-4">
@@ -1121,7 +1124,7 @@ export default function Explore({ tools, categories, subscribedSlugs, hasBrowser
                                 <div className="bg-white rounded-xl border border-slate-200 p-4 flex items-center justify-between">
                                     <span className="font-semibold text-slate-900">Starting at</span>
                                     <span className="text-lg font-bold text-slate-900">
-                                        {selectedTool.starting_price <= 0 ? 'Free' : `${formatMoney(selectedTool.starting_price, 'USD')}/mo`}
+                                        {selectedTool.starting_price <= 0 ? 'Free' : `${formatMoney(selectedTool.starting_price, businessCurrency)}/mo`}
                                     </span>
                                 </div>
                             )}

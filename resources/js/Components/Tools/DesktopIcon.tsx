@@ -1,4 +1,5 @@
 import React from 'react';
+import { Lock } from 'lucide-react';
 
 
 interface DesktopIconProps {
@@ -80,17 +81,22 @@ export function DesktopIcon({
             style={style}
             className={`flex flex-col items-center gap-1 w-24 p-2 rounded-lg hover:bg-white/20 active:bg-white/30 cursor-pointer transition-all group select-none ${style?.position === 'absolute' ? 'absolute' : 'relative'} ${isDragOver ? 'bg-white/30 scale-105 outline outline-2 outline-blue-400' : ''} ${isSelected ? 'bg-white/20 ring-1 ring-white/50' : ''} ${className}`}
         >
-            {isOwned && (
-                <div className="absolute top-0 right-1 bg-emerald-500 rounded-full w-3 h-3 border-2 border-slate-900 shadow-sm z-10"></div>
-            )}
-            
-            <div className="w-12 h-12 rounded-xl bg-white/10 backdrop-blur-md shadow-lg border border-white/20 flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform">
+            <div className={`w-12 h-12 rounded-xl bg-white/10 backdrop-blur-md shadow-lg border border-white/20 flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform ${!isOwned ? 'grayscale opacity-75' : ''}`}>
                 {iconUrl ? (
                     <img src={iconUrl} alt={title} className="w-8 h-8 object-contain drop-shadow-md" draggable={false} />
                 ) : (
                     <span className="text-2xl drop-shadow-md select-none">{emojiFallback}</span>
                 )}
             </div>
+
+            {!isOwned && (
+                <div className="absolute -top-1 right-0 bg-slate-800/90 rounded-full p-[3px] border border-slate-600 shadow-sm backdrop-blur-sm">
+                    <Lock className="w-3 h-3 text-slate-300" strokeWidth={2.5} />
+                </div>
+            )}
+            {isOwned && (
+                <div className="absolute top-0 right-1 bg-emerald-500 rounded-full w-3 h-3 border-2 border-slate-900 shadow-sm"></div>
+            )}
             
             {isEditing ? (
                 <input

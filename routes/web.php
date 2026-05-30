@@ -282,6 +282,7 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
 
 
     // ── Platform Users Transactions ───────────────────────────────
+    Route::get('/transactions', [\App\Http\Controllers\Admin\AdminTransactionController::class, 'index'])->name('transactions.index');
     Route::get('/transactions/create', [\App\Http\Controllers\Admin\AdminTransactionController::class, 'create'])->name('transactions.create');
     Route::post('/transactions', [\App\Http\Controllers\Admin\AdminTransactionController::class, 'store'])->name('transactions.store');
 
@@ -573,6 +574,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/subscriptions/plans', [\App\Http\Controllers\SubscriptionController::class, 'plans'])->name('subscriptions.plans');
     Route::post('/subscriptions/subscribe', [\App\Http\Controllers\SubscriptionController::class, 'subscribe'])->name('subscriptions.subscribe');
     Route::post('/subscriptions/subscribe-custom', [\App\Http\Controllers\SubscriptionController::class, 'subscribeCustom'])->name('subscriptions.subscribe-custom');
+    Route::post('/subscriptions/trial', [\App\Http\Controllers\SubscriptionController::class, 'startTrial'])->name('subscriptions.trial');
     Route::post('/subscriptions/calculate-custom', [\App\Http\Controllers\SubscriptionController::class, 'calculateCustomPrice'])->name('subscriptions.calculate-custom');
     Route::get('/subscriptions/manage', [\App\Http\Controllers\SubscriptionController::class, 'manage'])->name('subscriptions.manage');
     Route::post('/subscriptions/cancel', [\App\Http\Controllers\SubscriptionController::class, 'cancel'])->name('subscriptions.cancel');

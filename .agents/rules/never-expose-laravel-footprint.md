@@ -13,9 +13,10 @@ Exposing framework-specific footprints (such as default Laravel/Symfony exceptio
 
 ### 1. Zero Database/SQL Leakage in Exceptions
 - **Never** catch an exception and return the raw message (e.g. `$e->getMessage()`) or stack trace to the user, as this can leak database schema details (table names, columns, queries).
-- In controllers and API routes, use custom error responses with localized generic messages instead.
-- For database query errors, catch them and return a generic system error.
-- **Example**:
+- In pure API routes (`api/*`), use custom error responses with localized generic JSON messages instead.
+- **CRITICAL INERTIA RULE**: If the controller is handling a standard web form submission via Inertia (e.g., React `useForm().post()`), you **MUST NOT** return a raw JSON response (`response()->json()`). Inertia requires a valid HTTP redirect (e.g., `redirect()->back()->with('error', '...')`) to trigger a page refresh and display flash messages. Only use `response()->json()` for pure API endpoints or specific async dropdown searches.
+- For database query errors in APIs, catch them and return a generic system error JSON. For Inertia web routes, catch them and redirect back with a generic flash message.
+- **API Endpoint Example**:
   ```php
   // ❌ INCORRECT (Leaks database exception details)
   try {

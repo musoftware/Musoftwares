@@ -1,11 +1,13 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, router } from '@inertiajs/react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/Components/ui/card';
 import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
 import { formatNumber } from '@/lib/utils';
-import { ArrowLeft, Wallet, TrendingUp, TrendingDown } from 'lucide-react';
+import { __ } from '@/lib/i18n';
+import { ArrowLeft, Wallet, TrendingUp, TrendingDown, Settings, MoreHorizontal, Trash, Edit } from 'lucide-react';
+import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle } from '@/Components/ui/dialog';
 
 interface GoldTransaction {
     id: number;
@@ -31,12 +33,16 @@ interface GoldWallet {
     transactions: GoldTransaction[];
 }
 
-interface WalletsShowProps {
+interface ShowProps {
     wallet: GoldWallet;
+    hasGoalTracking: boolean;
 }
 
-export default function WalletsShow({ wallet }: WalletsShowProps) {
+export default function ShowWallet({ wallet, hasGoalTracking }: ShowProps) {
     const [isCreatingTx, setIsCreatingTx] = useState(false);
+    const [isEditingWallet, setIsEditingWallet] = useState(false);
+    const [editingTx, setEditingTx] = useState<GoldTransaction | null>(null);
+    
     const [newTx, setNewTx] = useState({
         type: 'buy',
         grams: '',
@@ -45,6 +51,13 @@ export default function WalletsShow({ wallet }: WalletsShowProps) {
         fees: '',
         transaction_date: new Date().toISOString().split('T')[0],
         notes: '',
+    });
+
+    const [editWalletData, setEditWalletData] = useState({
+        name: wallet.name,
+        goal_type: wallet.goal_type,
+        target_grams: wallet.target_grams || '',
+        target_amount: wallet.target_amount || '',
     });
 
     const handleCreateTransaction = (e: React.FormEvent) => {
@@ -65,6 +78,33 @@ export default function WalletsShow({ wallet }: WalletsShowProps) {
         });
     };
 
+    const handleUpdateTransaction = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!editingTx) return;
+        router.put(route('isaas.gold-savers.wallets.transactions.update', { wallet: wallet.id, transaction: editingTx.id }), editingTx, {
+            onSuccess: () => setEditingTx(null)
+        });
+    };
+
+    const handleDeleteTransaction = (txId: number) => {
+        if (confirm(__('Confirm Delete Transaction'))) {
+            router.delete(route('isaas.gold-savers.wallets.transactions.destroy', { wallet: wallet.id, transaction: txId }));
+        }
+    };
+
+    const handleUpdateWallet = (e: React.FormEvent) => {
+        e.preventDefault();
+        router.put(route('isaas.gold-savers.wallets.update', wallet.id), editWalletData, {
+            onSuccess: () => setIsEditingWallet(false)
+        });
+    };
+
+    const handleDeleteWallet = () => {
+        if (confirm(__('Confirm Delete Wallet'))) {
+            router.delete(route('isaas.gold-savers.wallets.destroy', wallet.id));
+        }
+    };
+
     return (
         <AuthenticatedLayout
             header={
@@ -72,11 +112,11 @@ export default function WalletsShow({ wallet }: WalletsShowProps) {
                     <Button variant="ghost" size="icon" onClick={() => router.get(route('isaas.gold-savers.wallets.index'))}>
                         <ArrowLeft className="w-5 h-5" />
                     </Button>
-                    <h2 className="font-semibold text-xl text-gray-800 leading-tight">Wallet Details</h2>
+                    <h2 className="font-semibold text-xl text-gray-800 leading-tight">{__('Wallet Details')}</h2>
                 </div>
             }
         >
-            <Head title={`Wallet: ${wallet.name}`} />
+            <Head title={`${__('Wallet')}: ${wallet.name}`} />
 
             <div className="py-12">
                 <div className="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
@@ -87,25 +127,96 @@ export default function WalletsShow({ wallet }: WalletsShowProps) {
                                 <Wallet className="text-indigo-600" />
                                 {wallet.name}
                             </h3>
-                            <p className="text-muted-foreground">{wallet.goal_type} Goal</p>
+                            <p className="text-muted-foreground">{__(wallet.goal_type)} {__('Goal')}</p>
                         </div>
-                        <Button onClick={() => setIsCreatingTx(!isCreatingTx)} className="bg-indigo-600 hover:bg-indigo-700 text-white">
-                            {isCreatingTx ? 'Cancel' : 'Add Transaction'}
-                        </Button>
+                        <div className="flex gap-2">
+                            <Button onClick={() => setIsEditingWallet(!isEditingWallet)} variant="outline" className="flex items-center gap-2">
+                                <Settings className="w-4 h-4" />
+                                {__('Edit Settings')}
+                            </Button>
+                            <Button onClick={() => setIsCreatingTx(!isCreatingTx)} className="bg-indigo-600 hover:bg-indigo-700 text-white">
+                                {isCreatingTx ? __('Cancel') : __('Add Transaction')}
+                            </Button>
+                        </div>
                     </div>
+
+                    {isEditingWallet && (
+                        <Card className="border-indigo-200 shadow-sm">
+                            <CardHeader>
+                                <CardTitle className="text-lg">{__('Edit Wallet Settings')}</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <form onSubmit={handleUpdateWallet} className="space-y-4">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div className="space-y-2">
+                                            <label className="text-sm font-medium">{__('Wallet Name')}</label>
+                                            <Input 
+                                                required
+                                                value={editWalletData.name} 
+                                                onChange={e => setEditWalletData({...editWalletData, name: e.target.value})} 
+                                            />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="text-sm font-medium">{__('Goal Type')}</label>
+                                            <select 
+                                                className="w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                                                value={editWalletData.goal_type}
+                                                onChange={e => setEditWalletData({...editWalletData, goal_type: e.target.value})}
+                                            >
+                                                <option value="Investment">{__('Investment')}</option>
+                                                <option value="Savings">{__('Savings')}</option>
+                                                <option value="Trading">{__('Trading')}</option>
+                                                <option value="Retirement">{__('Retirement')}</option>
+                                            </select>
+                                        </div>
+                                        {hasGoalTracking && (
+                                            <div className="grid grid-cols-2 gap-4">
+                                                <div className="space-y-2">
+                                                    <label className="text-sm font-medium">{__('Target Grams')}</label>
+                                                    <Input 
+                                                        type="number" step="0.01"
+                                                        value={editWalletData.target_grams} 
+                                                        onChange={e => setEditWalletData({...editWalletData, target_grams: e.target.value})} 
+                                                    />
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <label className="text-sm font-medium">{__('Target Amount')}</label>
+                                                    <Input 
+                                                        type="number" step="0.01"
+                                                        value={editWalletData.target_amount} 
+                                                        onChange={e => setEditWalletData({...editWalletData, target_amount: e.target.value})} 
+                                                    />
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                    <div className="flex justify-between items-center pt-2">
+                                        <Button type="button" variant="destructive" onClick={handleDeleteWallet}>
+                                            <Trash className="w-4 h-4 mr-2" />
+                                            {__('Delete Wallet')}
+                                        </Button>
+                                        <div className="flex gap-2">
+                                            <Button type="button" variant="outline" onClick={() => setIsEditingWallet(false)}>{__('Cancel')}</Button>
+                                            <Button type="submit" className="bg-indigo-600 hover:bg-indigo-700 text-white">{__('Save Changes')}</Button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </CardContent>
+                        </Card>
+                    )}
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <Card className="hover:-translate-y-1 hover:shadow-lg transition-all duration-300 cursor-default">
                             <CardHeader className="pb-2">
-                                <CardTitle className="text-sm font-medium text-muted-foreground">Total Grams</CardTitle>
+                                <CardTitle className="text-sm font-medium text-muted-foreground">{__('Total Grams')}</CardTitle>
                             </CardHeader>
                             <CardContent>
-                                <div className="text-3xl font-bold text-indigo-700">{wallet.balance_grams} g</div>
+                                <div className="text-3xl font-bold text-indigo-700">{wallet.balance_grams} {__('G')}</div>
                             </CardContent>
                         </Card>
                         <Card className="hover:-translate-y-1 hover:shadow-lg transition-all duration-300 cursor-default">
                             <CardHeader className="pb-2">
-                                <CardTitle className="text-sm font-medium text-muted-foreground">Total Investment Value</CardTitle>
+                                <CardTitle className="text-sm font-medium text-muted-foreground">{__('Total Investment Value')}</CardTitle>
                             </CardHeader>
                             <CardContent>
                                 <div className="text-3xl font-bold">{formatNumber(wallet.balance_amount)} <span className="text-lg text-muted-foreground">{wallet.currency}</span></div>
@@ -113,17 +224,17 @@ export default function WalletsShow({ wallet }: WalletsShowProps) {
                         </Card>
                         <Card className="hover:-translate-y-1 hover:shadow-lg transition-all duration-300 cursor-default">
                             <CardHeader className="pb-2">
-                                <CardTitle className="text-sm font-medium text-muted-foreground">Goal Progress</CardTitle>
+                                <CardTitle className="text-sm font-medium text-muted-foreground">{__('Goal Progress')}</CardTitle>
                             </CardHeader>
                             <CardContent>
                                 <div className="text-3xl font-bold">
                                     {wallet.target_grams > 0 
                                         ? `${((wallet.balance_grams / wallet.target_grams) * 100).toFixed(1)}%` 
-                                        : 'N/A'
+                                        : __('Na')
                                     }
                                 </div>
                                 <p className="text-xs text-muted-foreground mt-1">
-                                    Target: {wallet.target_grams > 0 ? `${wallet.target_grams} g` : 'No target set'}
+                                    {__('Target')}: {wallet.target_grams > 0 ? `${wallet.target_grams} ${__('G')}` : __('No Target Set')}
                                 </p>
                             </CardContent>
                         </Card>
@@ -132,24 +243,24 @@ export default function WalletsShow({ wallet }: WalletsShowProps) {
                     {isCreatingTx && (
                         <Card className="border-indigo-200 shadow-sm">
                             <CardHeader>
-                                <CardTitle className="text-lg">Add New Transaction</CardTitle>
+                                <CardTitle className="text-lg">{__('Add New Transaction')}</CardTitle>
                             </CardHeader>
                             <CardContent>
                                 <form onSubmit={handleCreateTransaction} className="space-y-4">
                                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                         <div className="space-y-2">
-                                            <label className="text-sm font-medium">Type</label>
+                                            <label className="text-sm font-medium">{__('Type')}</label>
                                             <select 
                                                 className="w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                                                 value={newTx.type}
                                                 onChange={e => setNewTx({...newTx, type: e.target.value as 'buy' | 'sell'})}
                                             >
-                                                <option value="buy">Buy</option>
-                                                <option value="sell">Sell</option>
+                                                <option value="buy">{__('Buy')}</option>
+                                                <option value="sell">{__('Sell')}</option>
                                             </select>
                                         </div>
                                         <div className="space-y-2">
-                                            <label className="text-sm font-medium">Grams</label>
+                                            <label className="text-sm font-medium">{__('Grams')}</label>
                                             <Input 
                                                 type="number" step="0.01" min="0.01" required
                                                 value={newTx.grams} 
@@ -157,7 +268,7 @@ export default function WalletsShow({ wallet }: WalletsShowProps) {
                                             />
                                         </div>
                                         <div className="space-y-2">
-                                            <label className="text-sm font-medium">Karat</label>
+                                            <label className="text-sm font-medium">{__('Karat')}</label>
                                             <select 
                                                 className="w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                                                 value={newTx.karat}
@@ -170,7 +281,7 @@ export default function WalletsShow({ wallet }: WalletsShowProps) {
                                             </select>
                                         </div>
                                         <div className="space-y-2">
-                                            <label className="text-sm font-medium">Price Per Gram ({wallet.currency})</label>
+                                            <label className="text-sm font-medium">{__('Price Per Gram')} ({wallet.currency})</label>
                                             <Input 
                                                 type="number" step="0.01" min="0.01" required
                                                 value={newTx.price_per_gram} 
@@ -178,16 +289,15 @@ export default function WalletsShow({ wallet }: WalletsShowProps) {
                                             />
                                         </div>
                                         <div className="space-y-2">
-                                            <label className="text-sm font-medium">Fees/Taxes ({wallet.currency})</label>
+                                            <label className="text-sm font-medium">{__('Fees')} ({wallet.currency})</label>
                                             <Input 
                                                 type="number" step="0.01" min="0"
                                                 value={newTx.fees} 
                                                 onChange={e => setNewTx({...newTx, fees: e.target.value})} 
-                                                placeholder="Optional"
                                             />
                                         </div>
                                         <div className="space-y-2">
-                                            <label className="text-sm font-medium">Date</label>
+                                            <label className="text-sm font-medium">{__('Date')}</label>
                                             <Input 
                                                 type="date" required
                                                 value={newTx.transaction_date} 
@@ -196,16 +306,15 @@ export default function WalletsShow({ wallet }: WalletsShowProps) {
                                         </div>
                                     </div>
                                     <div className="space-y-2">
-                                        <label className="text-sm font-medium">Notes</label>
+                                        <label className="text-sm font-medium">{__('Notes')}</label>
                                         <Input 
                                             value={newTx.notes} 
                                             onChange={e => setNewTx({...newTx, notes: e.target.value})} 
-                                            placeholder="Optional details (e.g. bought from Shop X)"
                                         />
                                     </div>
                                     <div className="flex justify-end gap-2 pt-2">
-                                        <Button type="button" variant="outline" onClick={() => setIsCreatingTx(false)}>Cancel</Button>
-                                        <Button type="submit" className="bg-indigo-600 hover:bg-indigo-700 text-white">Save Transaction</Button>
+                                        <Button type="button" variant="outline" onClick={() => setIsCreatingTx(false)}>{__('Cancel')}</Button>
+                                        <Button type="submit" className="bg-indigo-600 hover:bg-indigo-700 text-white">{__('Save Transaction')}</Button>
                                     </div>
                                 </form>
                             </CardContent>
@@ -214,7 +323,7 @@ export default function WalletsShow({ wallet }: WalletsShowProps) {
 
                     <Card>
                         <CardHeader>
-                            <CardTitle>Transaction History</CardTitle>
+                            <CardTitle>{__('Transaction History')}</CardTitle>
                         </CardHeader>
                         <CardContent>
                             {wallet.transactions.length > 0 ? (
@@ -222,14 +331,15 @@ export default function WalletsShow({ wallet }: WalletsShowProps) {
                                     <table className="w-full text-sm text-left">
                                         <thead className="text-xs text-gray-700 uppercase bg-gray-50 border-b">
                                             <tr>
-                                                <th className="px-4 py-3">Date</th>
-                                                <th className="px-4 py-3">Type</th>
-                                                <th className="px-4 py-3">Karat</th>
-                                                <th className="px-4 py-3">Grams</th>
-                                                <th className="px-4 py-3">Price/g</th>
-                                                <th className="px-4 py-3">Fees</th>
-                                                <th className="px-4 py-3">Total</th>
-                                                <th className="px-4 py-3">Notes</th>
+                                                <th className="px-4 py-3">{__('Date')}</th>
+                                                <th className="px-4 py-3">{__('Type')}</th>
+                                                <th className="px-4 py-3">{__('Karat')}</th>
+                                                <th className="px-4 py-3">{__('Grams')}</th>
+                                                <th className="px-4 py-3">{__('Price Per Gram')}</th>
+                                                <th className="px-4 py-3">{__('Fees')}</th>
+                                                <th className="px-4 py-3">{__('Total')}</th>
+                                                <th className="px-4 py-3">{__('Notes')}</th>
+                                                <th className="px-4 py-3 w-10"></th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -241,20 +351,47 @@ export default function WalletsShow({ wallet }: WalletsShowProps) {
                                                     <td className="px-4 py-3">
                                                         {tx.type === 'buy' ? (
                                                             <span className="flex items-center text-green-600 font-medium gap-1">
-                                                                <TrendingUp className="w-4 h-4" /> Buy
+                                                                <TrendingUp className="w-4 h-4" /> {__('Buy')}
                                                             </span>
                                                         ) : (
                                                             <span className="flex items-center text-red-600 font-medium gap-1">
-                                                                <TrendingDown className="w-4 h-4" /> Sell
+                                                                <TrendingDown className="w-4 h-4" /> {__('Sell')}
                                                             </span>
                                                         )}
                                                     </td>
                                                     <td className="px-4 py-3">{tx.karat}k</td>
-                                                    <td className="px-4 py-3">{tx.grams} g</td>
+                                                    <td className="px-4 py-3">{tx.grams} {__('G')}</td>
                                                     <td className="px-4 py-3">{formatNumber(tx.price_per_gram)}</td>
                                                     <td className="px-4 py-3">{formatNumber(tx.fees)}</td>
                                                     <td className="px-4 py-3 font-semibold">{formatNumber(tx.total_amount)} {wallet.currency}</td>
                                                     <td className="px-4 py-3 text-muted-foreground">{tx.notes}</td>
+                                                    <td className="px-4 py-3 text-right">
+                                                        <Dialog>
+                                                            <DialogTrigger asChild>
+                                                                <Button variant="ghost" className="h-8 w-8 p-0">
+                                                                    <span className="sr-only">Open menu</span>
+                                                                    <MoreHorizontal className="h-4 w-4" />
+                                                                </Button>
+                                                            </DialogTrigger>
+                                                            <DialogContent className="sm:max-w-xs">
+                                                                <DialogHeader>
+                                                                    <DialogTitle>{__('Actions')}</DialogTitle>
+                                                                </DialogHeader>
+                                                                <div className="flex flex-col gap-2 py-2">
+                                                                    <Button variant="outline" className="justify-start" onClick={() => {
+                                                                        setEditingTx(tx);
+                                                                    }}>
+                                                                        <Edit className="w-4 h-4 mr-2" />
+                                                                        {__('Edit')}
+                                                                    </Button>
+                                                                    <Button variant="destructive" className="justify-start" onClick={() => handleDeleteTransaction(tx.id)}>
+                                                                        <Trash className="w-4 h-4 mr-2" />
+                                                                        {__('Delete')}
+                                                                    </Button>
+                                                                </div>
+                                                            </DialogContent>
+                                                        </Dialog>
+                                                    </td>
                                                 </tr>
                                             ))}
                                         </tbody>
@@ -262,7 +399,7 @@ export default function WalletsShow({ wallet }: WalletsShowProps) {
                                 </div>
                             ) : (
                                 <div className="text-center py-8 text-muted-foreground">
-                                    No transactions recorded in this wallet yet.
+                                    {__('No Transactions Yet')}
                                 </div>
                             )}
                         </CardContent>
@@ -270,6 +407,67 @@ export default function WalletsShow({ wallet }: WalletsShowProps) {
 
                 </div>
             </div>
+
+            {/* Edit Transaction Modal */}
+            {editingTx && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+                    <Card className="w-full max-w-lg mx-4">
+                        <CardHeader>
+                            <CardTitle>{__('Edit Transaction')}</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <form onSubmit={handleUpdateTransaction} className="space-y-4">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-medium">{__('Type')}</label>
+                                        <select 
+                                            className="w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                                            value={editingTx.type}
+                                            onChange={e => setEditingTx({...editingTx, type: e.target.value as 'buy' | 'sell'})}
+                                        >
+                                            <option value="buy">{__('Buy')}</option>
+                                            <option value="sell">{__('Sell')}</option>
+                                        </select>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-medium">{__('Grams')}</label>
+                                        <Input 
+                                            type="number" step="0.01" min="0.01" required
+                                            value={editingTx.grams} 
+                                            onChange={e => setEditingTx({...editingTx, grams: parseFloat(e.target.value)})} 
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-medium">{__('Karat')}</label>
+                                        <select 
+                                            className="w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                                            value={editingTx.karat}
+                                            onChange={e => setEditingTx({...editingTx, karat: parseInt(e.target.value)})}
+                                        >
+                                            <option value="18">18k</option>
+                                            <option value="21">21k</option>
+                                            <option value="22">22k</option>
+                                            <option value="24">24k</option>
+                                        </select>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-medium">{__('Price Per Gram')} ({wallet.currency})</label>
+                                        <Input 
+                                            type="number" step="0.01" min="0.01" required
+                                            value={editingTx.price_per_gram} 
+                                            onChange={e => setEditingTx({...editingTx, price_per_gram: parseFloat(e.target.value)})} 
+                                        />
+                                    </div>
+                                </div>
+                                <div className="flex justify-end gap-2 pt-2">
+                                    <Button type="button" variant="outline" onClick={() => setEditingTx(null)}>{__('Cancel')}</Button>
+                                    <Button type="submit" className="bg-indigo-600 hover:bg-indigo-700 text-white">{__('Save Changes')}</Button>
+                                </div>
+                            </form>
+                        </CardContent>
+                    </Card>
+                </div>
+            )}
         </AuthenticatedLayout>
     );
 }

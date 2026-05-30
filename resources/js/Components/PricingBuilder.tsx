@@ -469,7 +469,7 @@ export default function PricingBuilder({
                         )}
                         {!renderActions && (
                             <p className="text-xs text-center text-slate-500 pt-2">
-                                No credit card required for 14-day trial.
+                                No credit card required for 14-day trial on ERP & modules (Not applicable for tools).
                             </p>
                         )}
                     </div>

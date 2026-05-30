@@ -107,15 +107,12 @@ class AdminTransactionController extends Controller
         $project = $request->filled('project') ? $user->projects()->find($request->project) : null;
 
         if ($request->filled('project') && !$project) {
-            return response()->json([
-                'status' => false, 
-                'message' => 'Project is not associated to this client',
-            ], 403);
+            return redirect()->back()->with('danger', __('erp.project_not_associated_client'));
         }
 
         $addedCount = $this->transactionService->processTransactionBatch($request, $user, $project, $request->data, $request->type);
 
-        return response()->json(['status' => true, 'added' => $addedCount]);
+        return redirect()->back()->with('success', __('erp.transactions_added_successfully', ['count' => $addedCount]));
     }
 
     public function reverse(Transaction $transaction)
