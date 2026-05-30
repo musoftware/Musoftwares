@@ -23,13 +23,13 @@ it('prevents accepting multiple proposals for the same job simultaneously', func
     $job = $scenario->getJob();
     $freelancers = $scenario->getFreelancers();
 
-    $proposal1 = Proposal::create(['job_id' => $job->id, 'freelancer_id' => $freelancers[0]->id, 'cover_letter' => 'A', 'bid_amount' => 1000, 'currency_id' => $job->currency_id, 'status' => 'pending']);
-    $proposal2 = Proposal::create(['job_id' => $job->id, 'freelancer_id' => $freelancers[1]->id, 'cover_letter' => 'B', 'bid_amount' => 1000, 'currency_id' => $job->currency_id, 'status' => 'pending']);
+    $proposal1 = Proposal::create(['job_id' => $job->id, 'freelancer_id' => $freelancers[0]->id, 'cover_letter' => 'A', 'proposed_budget_points' => 1000, 'points_spent' => 2, 'status' => 'pending']);
+    $proposal2 = Proposal::create(['job_id' => $job->id, 'freelancer_id' => $freelancers[1]->id, 'cover_letter' => 'B', 'proposed_budget_points' => 1000, 'points_spent' => 2, 'status' => 'pending']);
 
     $action = app(AcceptProposalAction::class);
     
     // Accept proposal 1
-    $contract1 = $action->execute($proposal1, $client, 2);
+    $contract1 = $action->execute($proposal1, $client);
 
     expect($contract1)->toBeInstanceOf(Contract::class);
 
@@ -51,7 +51,7 @@ it('prevents accepting multiple proposals for the same job simultaneously', func
     
     // EXPECTED: Accepting a non-pending proposal or a job that is not 'open' should fail.
     try {
-        $action->execute($proposal2, $client, 2);
+        $action->execute($proposal2, $client);
         // NOTE: If this fails, the AcceptProposalAction needs an update to check job/proposal status.
         $this->fail('Should not be able to accept a rejected proposal or for an already in-progress job.');
     } catch (\Exception $e) {

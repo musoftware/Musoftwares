@@ -18,8 +18,8 @@ it('handles full contract lifecycle from acceptance to completion via API', func
         'client_id' => $client->id,
         'title' => 'API Lifecycle Job',
         'description' => 'Desc',
-        'budget' => 1000,
-        'currency_id' => $currency->id,
+        'budget_points' => 1000,
+        'min_proposal_points' => 0,
         'type' => 'fixed',
         'duration' => '1_month',
         'status' => 'open'
@@ -29,8 +29,8 @@ it('handles full contract lifecycle from acceptance to completion via API', func
         'job_id' => $job->id,
         'freelancer_id' => $freelancer->id,
         'cover_letter' => 'My proposal',
-        'bid_amount' => 1000,
-        'currency_id' => $currency->id,
+        'proposed_budget_points' => 1000,
+        'points_spent' => 2,
         'status' => 'pending'
     ]);
 

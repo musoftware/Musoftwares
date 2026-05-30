@@ -14,9 +14,13 @@ class SubmitProposalAction
 {
     public function __construct(private DeductPointsAction $deductPointsAction) {}
 
-    public function execute(SubmitProposalData $data, Job $job, User $user, int $proposalCost = 2)
+    public function execute(SubmitProposalData $data, Job $job, User $user)
     {
-        if ($user->points_balance < $proposalCost) {
+        if ($data->pointsSpent < $job->min_proposal_points) {
+            throw new \Exception("Minimum proposal bid is {$job->min_proposal_points} points.");
+        }
+
+        if ($user->points_balance < $data->pointsSpent) {
             throw new \Exception('Insufficient points to submit a proposal.');
         }
 
@@ -24,18 +28,18 @@ class SubmitProposalAction
             throw new \Exception('You have already submitted a proposal for this job.');
         }
 
-        return DB::transaction(function () use ($data, $user, $job, $proposalCost) {
+        return DB::transaction(function () use ($data, $user, $job) {
             $proposal = $job->proposals()->create([
                 'freelancer_id' => $data->freelancerId,
                 'cover_letter' => $data->coverLetter,
-                'bid_amount' => $data->bidAmount,
-                'currency_id' => $data->currencyId,
+                'proposed_budget_points' => $data->proposedBudgetPoints,
+                'points_spent' => $data->pointsSpent,
                 'status' => 'pending',
             ]);
 
             $this->deductPointsAction->execute(
                 $user->id,
-                $proposalCost,
+                $data->pointsSpent,
                 "Submitted proposal for job: {$job->title}",
                 'proposal',
                 $proposal->id

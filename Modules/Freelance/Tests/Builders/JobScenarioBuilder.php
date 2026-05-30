@@ -11,8 +11,7 @@ class JobScenarioBuilder
     protected $client;
     protected $freelancers = [];
     protected $job;
-    protected $currencyId;
-    protected $jobCost = 10;
+    protected $jobCost = 25;
     protected $proposalCost = 2;
 
     public static function create(): self
@@ -39,14 +38,12 @@ class JobScenarioBuilder
 
     public function withJob(array $attributes = [])
     {
-        $this->currencyId = $attributes['currency_id'] ?? Currency::factory()->create()->id;
-
         $this->job = Job::create(array_merge([
             'client_id' => $this->client->id,
             'title' => 'Enterprise System Architecture',
             'description' => 'Build a robust freelance platform.',
-            'budget' => 5000.0,
-            'currency_id' => $this->currencyId,
+            'budget_points' => 5000,
+            'min_proposal_points' => 0,
             'type' => 'fixed',
             'duration' => '3_months',
             'status' => 'open',

@@ -24,11 +24,11 @@ it('submits a proposal successfully and deducts points', function () {
     $data = new SubmitProposalData(
         freelancerId: $freelancer->id,
         coverLetter: 'I am the best fit for this.',
-        bidAmount: 1000,
-        currencyId: $currency->id
+        proposedBudgetPoints: 1000,
+        pointsSpent: 2
     );
 
-    $proposal = $action->execute($data, $job, $freelancer, proposalCost: 2);
+    $proposal = $action->execute($data, $job, $freelancer);
 
     expect($proposal)->toBeInstanceOf(Proposal::class)
         ->and($proposal->cover_letter)->toBe('I am the best fit for this.')
@@ -53,15 +53,15 @@ it('prevents submitting multiple proposals for the same job', function () {
     $data = new SubmitProposalData(
         freelancerId: $freelancer->id,
         coverLetter: 'I am the best fit for this.',
-        bidAmount: 1000,
-        currencyId: $currency->id
+        proposedBudgetPoints: 1000,
+        pointsSpent: 2
     );
 
     // First submission
-    $action->execute($data, $job, $freelancer, 2);
+    $action->execute($data, $job, $freelancer);
 
     // Second submission should fail
-    $action->execute($data, $job, $freelancer, 2);
+    $action->execute($data, $job, $freelancer);
 })->throws(\Exception::class, 'You have already submitted a proposal for this job.');
 
 it('throws exception if freelancer has insufficient points', function () {
@@ -78,11 +78,11 @@ it('throws exception if freelancer has insufficient points', function () {
     $data = new SubmitProposalData(
         freelancerId: $freelancer->id,
         coverLetter: 'I am the best fit for this.',
-        bidAmount: 1000,
-        currencyId: $currency->id
+        proposedBudgetPoints: 1000,
+        pointsSpent: 2
     );
 
-    $action->execute($data, $job, $freelancer, 2);
+    $action->execute($data, $job, $freelancer);
 })->throws(\Exception::class, 'Insufficient points to submit a proposal.');
 
 it('rolls back proposal creation if point deduction fails', function () {
@@ -103,12 +103,12 @@ it('rolls back proposal creation if point deduction fails', function () {
     $data = new SubmitProposalData(
         freelancerId: $freelancer->id,
         coverLetter: 'Will fail.',
-        bidAmount: 1000,
-        currencyId: $currency->id
+        proposedBudgetPoints: 1000,
+        pointsSpent: 2
     );
 
     try {
-        $action->execute($data, $job, $freelancer, 2);
+        $action->execute($data, $job, $freelancer);
     } catch (\Exception $e) {
         expect($e->getMessage())->toBe('Point deduction failed');
     }

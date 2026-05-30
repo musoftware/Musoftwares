@@ -23,8 +23,8 @@ it('prevents an unauthorized user from modifying a contract state', function () 
         'job_id' => $job->id,
         'freelancer_id' => $freelancer->id,
         'cover_letter' => 'My proposal',
-        'bid_amount' => 1000,
-        'currency_id' => $job->currency_id,
+        'proposed_budget_points' => 1000,
+        'points_spent' => 2,
         'status' => 'accepted'
     ]);
 
@@ -33,8 +33,7 @@ it('prevents an unauthorized user from modifying a contract state', function () 
         'proposal_id' => $proposal->id,
         'client_id' => $client->id,
         'freelancer_id' => $freelancer->id,
-        'amount' => 1000,
-        'currency_id' => $job->currency_id,
+        'contract_points' => 1000,
         'status' => 'active',
         'started_at' => now(),
     ]);

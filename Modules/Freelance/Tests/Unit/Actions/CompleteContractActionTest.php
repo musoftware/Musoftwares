@@ -19,15 +19,14 @@ it('completes a contract and releases escrow to freelancer', function () {
     $job = $scenario->getJob();
     $freelancer = $scenario->getFreelancer(0);
 
-    $proposal = Proposal::create(['job_id' => $job->id, 'freelancer_id' => $freelancer->id, 'cover_letter' => 'A', 'bid_amount' => 1000, 'currency_id' => $job->currency_id, 'status' => 'accepted']);
+    $proposal = Proposal::create(['job_id' => $job->id, 'freelancer_id' => $freelancer->id, 'cover_letter' => 'A', 'proposed_budget_points' => 1000, 'points_spent' => 2, 'status' => 'accepted']);
     
     $contract = Contract::create([
         'job_id' => $job->id,
         'proposal_id' => $proposal->id,
         'client_id' => $client->id,
         'freelancer_id' => $freelancer->id,
-        'amount' => 1000,
-        'currency_id' => $job->currency_id,
+        'contract_points' => 1000,
         'status' => 'active',
         'started_at' => now(),
     ]);
@@ -52,15 +51,14 @@ it('throws exception if non-client tries to complete contract', function () {
     $freelancer = $scenario->getFreelancer(0);
     $unauthorizedUser = $scenario->getFreelancer(1);
 
-    $proposal = Proposal::create(['job_id' => $job->id, 'freelancer_id' => $freelancer->id, 'cover_letter' => 'A', 'bid_amount' => 1000, 'currency_id' => $job->currency_id, 'status' => 'accepted']);
+    $proposal = Proposal::create(['job_id' => $job->id, 'freelancer_id' => $freelancer->id, 'cover_letter' => 'A', 'proposed_budget_points' => 1000, 'points_spent' => 2, 'status' => 'accepted']);
     
     $contract = Contract::create([
         'job_id' => $job->id,
         'proposal_id' => $proposal->id,
         'client_id' => $scenario->getClient()->id,
         'freelancer_id' => $freelancer->id,
-        'amount' => 1000,
-        'currency_id' => $job->currency_id,
+        'contract_points' => 1000,
         'status' => 'active',
         'started_at' => now(),
     ]);
@@ -79,15 +77,14 @@ it('throws exception if contract is already completed', function () {
     $job = $scenario->getJob();
     $freelancer = $scenario->getFreelancer(0);
 
-    $proposal = Proposal::create(['job_id' => $job->id, 'freelancer_id' => $freelancer->id, 'cover_letter' => 'A', 'bid_amount' => 1000, 'currency_id' => $job->currency_id, 'status' => 'accepted']);
+    $proposal = Proposal::create(['job_id' => $job->id, 'freelancer_id' => $freelancer->id, 'cover_letter' => 'A', 'proposed_budget_points' => 1000, 'points_spent' => 2, 'status' => 'accepted']);
     
     $contract = Contract::create([
         'job_id' => $job->id,
         'proposal_id' => $proposal->id,
         'client_id' => $client->id,
         'freelancer_id' => $freelancer->id,
-        'amount' => 1000,
-        'currency_id' => $job->currency_id,
+        'contract_points' => 1000,
         'status' => 'completed', // Already completed
         'started_at' => now(),
     ]);

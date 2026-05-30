@@ -27,14 +27,14 @@ it('posts a job successfully and deducts points', function () {
         clientId: $client->id,
         title: 'Enterprise Architecture',
         description: 'Build an enterprise system',
-        budget: 5000,
-        currencyId: $currency->id,
+        budgetPoints: 5000,
+        minProposalPoints: 0,
         type: 'fixed',
         duration: '3_months',
         skills: [$skill->id]
     );
 
-    $job = $action->execute($data, $client, postCost: 10);
+    $job = $action->execute($data, $client);
 
     expect($job)->toBeInstanceOf(Job::class)
         ->and($job->title)->toBe('Enterprise Architecture')
@@ -43,7 +43,7 @@ it('posts a job successfully and deducts points', function () {
 
     // Refresh client to check points
     $client->refresh();
-    expect($client->points_balance)->toBe(40); // 50 - 10
+    expect($client->points_balance)->toBe(25); // 50 - 25
 
     // Assert Notification Job was dispatched
     Queue::assertPushed(NotifyFreelancersForJob::class, function ($queuedJob) use ($job) {
@@ -60,15 +60,15 @@ it('throws exception if client has insufficient points', function () {
         clientId: $client->id,
         title: 'Enterprise Architecture',
         description: 'Build an enterprise system',
-        budget: 5000,
-        currencyId: $currency->id,
+        budgetPoints: 5000,
+        minProposalPoints: 0,
         type: 'fixed',
         duration: '3_months',
         skills: []
     );
 
     // Should throw exception
-    $action->execute($data, $client, postCost: 10);
+    $action->execute($data, $client);
 })->throws(\Exception::class, 'Insufficient points to post a job.');
 
 it('reverts database transaction if point deduction fails', function () {
@@ -87,15 +87,15 @@ it('reverts database transaction if point deduction fails', function () {
         clientId: $client->id,
         title: 'Will Fail',
         description: 'Should not exist',
-        budget: 100,
-        currencyId: $currency->id,
+        budgetPoints: 100,
+        minProposalPoints: 0,
         type: 'fixed',
         duration: '1_week',
         skills: []
     );
 
     try {
-        $action->execute($data, $client, 10);
+        $action->execute($data, $client);
     } catch (\Exception $e) {
         expect($e->getMessage())->toBe('Database locking failed');
     }
