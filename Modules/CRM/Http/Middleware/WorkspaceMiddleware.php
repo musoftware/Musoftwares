@@ -38,7 +38,7 @@ class WorkspaceMiddleware
                 // We should probably auto-create one for them if they have a valid subscription.
                 // For now, abort or redirect to an onboarding page.
                 // In a production scenario, you would redirect to /crm/onboarding
-                return abort(403, 'You do not have access to any CRM workspace. Please contact support or upgrade your subscription.');
+                return abort(403, __('crm.no_workspace_access'));
             }
         }
 

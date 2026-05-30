@@ -31,7 +31,7 @@ class SequenceController extends Controller
     public function store(StoreSequenceRequest $request)
     {
         $this->sequenceService->createSequence($request->validated());
-        return redirect()->back()->with('success', 'Sequence created successfully.');
+        return redirect()->back()->with('success', __('crm.sequence_created'));
     }
 
     public function show(Sequence $sequence)
@@ -45,26 +45,26 @@ class SequenceController extends Controller
     public function destroy(Sequence $sequence)
     {
         $this->sequenceService->deleteSequence($sequence);
-        return redirect()->route('admin.sequences.index')->with('success', 'Sequence deleted.');
+        return redirect()->route('admin.sequences.index')->with('success', __('crm.sequence_deleted'));
     }
 
     // -- Steps Management --
     public function storeStep(StoreSequenceStepRequest $request, Sequence $sequence)
     {
         $this->sequenceService->addStep($sequence, $request->validated());
-        return redirect()->back()->with('success', 'Step added.');
+        return redirect()->back()->with('success', __('crm.step_added'));
     }
 
     public function updateStep(UpdateSequenceStepRequest $request, SequenceStep $step)
     {
         $this->sequenceService->updateStep($step, $request->validated());
-        return redirect()->back()->with('success', 'Step updated.');
+        return redirect()->back()->with('success', __('crm.step_updated'));
     }
 
     public function deleteStep(SequenceStep $step)
     {
         $this->sequenceService->deleteStep($step);
-        return redirect()->back()->with('success', 'Step deleted.');
+        return redirect()->back()->with('success', __('crm.step_deleted'));
     }
 
     // -- AI Generation --
@@ -86,6 +86,6 @@ class SequenceController extends Controller
     {
         $this->sequenceService->applyGeneratedSteps($sequence, $request->validated('steps'));
 
-        return redirect()->back()->with('success', 'AI steps applied successfully.');
+        return redirect()->back()->with('success', __('crm.ai_steps_applied'));
     }
 }

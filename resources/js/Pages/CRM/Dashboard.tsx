@@ -3,57 +3,58 @@ import { Head, Link, usePage } from '@inertiajs/react';
 import CrmLayout from '@/Layouts/CrmLayout';
 import { Users, Mail, PlayCircle, BarChart3, ArrowRight } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/Components/ui/card';
+import { __ } from '@/lib/i18n';
 
 export default function Dashboard({ stats }) {
     const { auth } = usePage().props;
 
     const cards = [
         {
-            title: 'Leads',
-            description: 'Manage and track your leads pipeline',
+            title: __('Leads'),
+            description: __('Manage and track your leads pipeline'),
             icon: Users,
             href: route('crm.leads.index'),
-            stats: `${stats.total_leads} Total (${stats.new_leads} New)`,
+            stats: `${stats.total_leads} ${__('Total')} (${stats.new_leads} ${__('New')})`,
             color: 'text-blue-600',
             bg: 'bg-blue-100',
         },
         {
-            title: 'Campaigns',
-            description: 'Email and WhatsApp marketing campaigns',
+            title: __('Campaigns'),
+            description: __('Email and WhatsApp marketing campaigns'),
             icon: Mail,
             href: route('crm.campaigns.index'),
-            stats: `${stats.active_campaigns} Active Campaigns`,
+            stats: `${stats.active_campaigns} ${__('Active Campaigns')}`,
             color: 'text-indigo-600',
             bg: 'bg-indigo-100',
         },
         {
-            title: 'Sequences',
-            description: 'Automated follow-up sequences',
+            title: __('Sequences'),
+            description: __('Automated follow-up sequences'),
             icon: PlayCircle,
             href: route('crm.sequences.index'),
-            stats: `${stats.total_sequences} Sequences`,
+            stats: `${stats.total_sequences} ${__('Sequences')}`,
             color: 'text-purple-600',
             bg: 'bg-purple-100',
         },
     ];
 
     return (
-        <CrmLayout title="Dashboard" activeMenu="dashboard">
-            <div className="mb-8">
+        <CrmLayout title={__('Welcome')} activeMenu="dashboard">
+            <div className="flex-1 space-y-4 p-8 pt-6">
                 <h2 className="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight flex items-center">
                     <BarChart3 className="mr-3 h-8 w-8 text-indigo-600" />
-                    CRM Dashboard
+                    {__('CRM Dashboard')}
                 </h2>
                 <p className="mt-2 text-sm text-gray-600">
-                    Overview of your marketing, leads, and automations.
+                    {__('Overview of your marketing, leads, and automations.')}
                 </p>
             </div>
 
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            <div className="px-8 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                 {cards.map((card) => (
-                    <Card key={card.title} className="hover:shadow-lg transition-shadow duration-200">
+                    <Card key={card.title} className="hover:shadow-lg transition-shadow duration-200 border-slate-200/60 shadow-sm">
                         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-xl font-bold">
+                            <CardTitle className="text-xl font-bold tracking-tight">
                                 {card.title}
                             </CardTitle>
                             <div className={`p-2 rounded-lg ${card.bg}`}>
@@ -61,18 +62,20 @@ export default function Dashboard({ stats }) {
                             </div>
                         </CardHeader>
                         <CardContent>
-                            <CardDescription className="mb-4">
+                            <CardDescription className="mb-4 text-slate-500">
                                 {card.description}
                             </CardDescription>
-                            <div className="text-sm font-medium text-gray-700 mb-6">
+                            <div className="text-sm font-medium text-slate-700 mb-6 bg-slate-50 p-2 rounded-md inline-block">
                                 {card.stats}
                             </div>
-                            <Link 
-                                href={card.href} 
-                                className="inline-flex items-center text-sm font-semibold text-indigo-600 hover:text-indigo-500"
-                            >
-                                Go to {card.title} <ArrowRight className="ml-1 h-4 w-4" />
-                            </Link>
+                            <div className="flex items-center mt-2">
+                                <Link 
+                                    href={card.href} 
+                                    className="inline-flex items-center text-sm font-semibold text-indigo-600 hover:text-indigo-500 transition-colors"
+                                >
+                                    {__('Go to')} {card.title} <ArrowRight className="ml-1 h-4 w-4" />
+                                </Link>
+                            </div>
                         </CardContent>
                     </Card>
                 ))}

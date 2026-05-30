@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import CrmLayout from '@/Layouts/CrmLayout';
 import { Button } from '@/Components/ui/button';
@@ -37,8 +37,8 @@ export default function Index({ sequences }) {
     };
 
     return (
-        <CrmLayout title="Sequences (Drip Campaigns)" activeMenu="sequences">
-            <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
+        <CrmLayout title="Automated Sequences" activeMenu="sequences">
+            <div className="flex-1 space-y-4 p-8 pt-6">
             <div className="mb-6 flex justify-end">
                 <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
                     <DialogTrigger asChild>

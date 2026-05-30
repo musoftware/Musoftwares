@@ -15,7 +15,7 @@ class ProcessLeadImportAction
     public function execute(LeadImportData $data): int
     {
         $importedCount = 0;
-        $tenantId = session('tenant_id') ?? auth()->user()->tenant_id;
+        $tenantId = $data->tenantId;
 
         $insertData = [];
 

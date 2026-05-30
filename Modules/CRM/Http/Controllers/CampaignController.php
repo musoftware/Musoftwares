@@ -29,7 +29,7 @@ class CampaignController extends Controller
     {
         $campaign = $this->campaignService->createCampaign($request->validated());
         
-        return redirect()->route('admin.campaigns.show', $campaign->id)->with('success', 'Campaign created successfully.');
+        return redirect()->route('admin.campaigns.show', $campaign->id)->with('success', __('crm.campaign_created'));
     }
 
     public function show(Campaign $campaign)
@@ -44,13 +44,13 @@ class CampaignController extends Controller
     {
         $this->campaignService->updateCampaign($campaign, $request->validated());
 
-        return redirect()->back()->with('success', 'Campaign content saved.');
+        return redirect()->back()->with('success', __('crm.campaign_content_saved'));
     }
 
     public function destroy(Campaign $campaign)
     {
         $this->campaignService->deleteCampaign($campaign);
-        return redirect()->route('admin.campaigns.index')->with('success', 'Campaign deleted.');
+        return redirect()->route('admin.campaigns.index')->with('success', __('crm.campaign_deleted'));
     }
 
     // -- AI Generation --
@@ -72,18 +72,18 @@ class CampaignController extends Controller
     public function schedule(Request $request, Campaign $campaign)
     {
         $this->campaignService->scheduleCampaign($campaign);
-        return redirect()->back()->with('success', 'Campaign scheduled.');
+        return redirect()->back()->with('success', __('crm.campaign_scheduled'));
     }
 
     public function pause(Campaign $campaign)
     {
         $this->campaignService->pauseCampaign($campaign);
-        return redirect()->back()->with('success', 'Campaign paused.');
+        return redirect()->back()->with('success', __('crm.campaign_paused'));
     }
 
     public function resume(Campaign $campaign)
     {
         $this->campaignService->resumeCampaign($campaign);
-        return redirect()->back()->with('success', 'Campaign resumed.');
+        return redirect()->back()->with('success', __('crm.campaign_resumed'));
     }
 }

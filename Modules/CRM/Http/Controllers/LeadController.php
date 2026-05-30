@@ -47,7 +47,7 @@ class LeadController extends Controller
     {
         $this->leadService->updateStatus($lead, $request->validated('status'));
 
-        return redirect()->back()->with('success', 'Lead status updated.');
+        return redirect()->back()->with('success', __('crm.lead_status_updated'));
     }
 
     public function assign(Request $request, Lead $lead)
@@ -60,13 +60,13 @@ class LeadController extends Controller
             'assigned_to' => $validated['assigned_to'],
         ]);
 
-        return redirect()->back()->with('success', 'Lead assignment updated.');
+        return redirect()->back()->with('success', __('crm.lead_assignment_updated'));
     }
 
     public function destroy(Lead $lead)
     {
         $this->leadService->deleteLead($lead);
 
-        return redirect()->back()->with('success', 'Lead deleted successfully.');
+        return redirect()->back()->with('success', __('crm.lead_deleted'));
     }
 }
