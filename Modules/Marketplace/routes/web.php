@@ -39,14 +39,40 @@ Route::middleware(['web', 'auth'])
     ->prefix('marketplace')
     ->name('marketplace.')
     ->group(function () {
+        // CRUD
         Route::get('/landing-pages', [\Modules\Marketplace\Http\Controllers\Seller\ServiceLandingPageController::class, 'index'])->name('landing-pages.index');
         Route::get('/landing-pages/create/{service}', [\Modules\Marketplace\Http\Controllers\Seller\ServiceLandingPageController::class, 'create'])->name('landing-pages.create');
         Route::post('/landing-pages/{service}', [\Modules\Marketplace\Http\Controllers\Seller\ServiceLandingPageController::class, 'store'])->name('landing-pages.store');
         Route::get('/landing-pages/{service}/edit/{landingPage?}', [\Modules\Marketplace\Http\Controllers\Seller\ServiceLandingPageController::class, 'edit'])->name('landing-pages.edit');
         Route::put('/landing-pages/{service}/{landingPage?}', [\Modules\Marketplace\Http\Controllers\Seller\ServiceLandingPageController::class, 'update'])->name('landing-pages.update');
-        Route::get('/landing-pages/{service}/submissions', [\Modules\Marketplace\Http\Controllers\Seller\ServiceLandingPageController::class, 'submissions'])->name('landing-pages.submissions');
-        Route::get('/landing-pages/{service}/analytics', [\Modules\Marketplace\Http\Controllers\Seller\ServiceLandingPageController::class, 'analytics'])->name('landing-pages.analytics');
+        Route::post('/landing-pages/{landingPage}/duplicate', [\Modules\Marketplace\Http\Controllers\Seller\ServiceLandingPageController::class, 'duplicate'])->name('landing-pages.duplicate');
+
+        // Submissions
+        Route::get('/landing-pages/{service}/submissions', [\Modules\Marketplace\Http\Controllers\Seller\ServiceLandingPageSubmissionController::class, 'submissions'])->name('landing-pages.submissions');
+        Route::delete('/landing-pages/submissions/{submission}', [\Modules\Marketplace\Http\Controllers\Seller\ServiceLandingPageSubmissionController::class, 'destroySubmission'])->name('landing-pages.submissions.destroy');
+        Route::get('/landing-pages/{service}/submissions/export', [\Modules\Marketplace\Http\Controllers\Seller\ServiceLandingPageSubmissionController::class, 'exportSubmissions'])->name('landing-pages.submissions.export');
+
+        // Analytics
+        Route::get('/landing-pages/{service}/analytics', [\Modules\Marketplace\Http\Controllers\Seller\ServiceLandingPageAnalyticsController::class, 'analytics'])->name('landing-pages.analytics');
+
+        // AI Generation
+        Route::post('/landing-pages/{service}/generate-questions', [\Modules\Marketplace\Http\Controllers\Seller\ServiceLandingPageAIController::class, 'generateQuestions'])->name('landing-pages.generate-questions');
+        Route::post('/landing-pages/{service}/generate-faqs', [\Modules\Marketplace\Http\Controllers\Seller\ServiceLandingPageAIController::class, 'generateFAQs'])->name('landing-pages.generate-faqs');
+        Route::post('/landing-pages/{service}/generate-pricing', [\Modules\Marketplace\Http\Controllers\Seller\ServiceLandingPageAIController::class, 'generatePricingTables'])->name('landing-pages.generate-pricing');
+        Route::post('/landing-pages/{service}/generate-content', [\Modules\Marketplace\Http\Controllers\Seller\ServiceLandingPageAIController::class, 'generateLandingPageContent'])->name('landing-pages.generate-content');
     });
+
+// -- Public Landing Page Routes ------------------------------------
+Route::middleware(['web'])
+    ->name('services.')
+    ->group(function () {
+        Route::get('/s/{slug}', [\Modules\Marketplace\Http\Controllers\Seller\ServiceLandingPagePublicController::class, 'show'])->name('landing-page.show');
+        Route::get('/s/preview/{template}', [\Modules\Marketplace\Http\Controllers\Seller\ServiceLandingPagePublicController::class, 'previewTemplate'])->name('landing-page.preview');
+        Route::post('/s/{slug}/submit', [\Modules\Marketplace\Http\Controllers\Seller\ServiceLandingPageSubmissionController::class, 'submitForm'])->name('landing-page.submit');
+        
+        // Analytics Tracking endpoints
+        Route::post('/s/track/cta', [\Modules\Marketplace\Http\Controllers\Seller\ServiceLandingPageAnalyticsController::class, 'trackCtaClick'])->name('landing-page.track.cta');
+        Route::post('/s/track/scroll', [\Modules\Marketplace\Http\Controllers\Seller\ServiceLandingPageAnalyticsController::class, 'trackScroll'])->name('landing-page.track.scroll');
 
 // -- Admin Routes --------------------------------------------------
 Route::middleware(['web', 'auth', 'admin'])

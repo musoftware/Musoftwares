@@ -16,9 +16,7 @@ class OrderMessageController extends Controller
             'body' => 'required|string|max:1000'
         ]);
 
-        if (auth()->id() !== $order->buyer_id && auth()->id() !== $order->seller_id) {
-            abort(403);
-        }
+        $this->authorize('message', $order);
 
         $conversation = Conversation::where('conversable_type', ServiceOrder::class)
             ->where('conversable_id', $order->id)

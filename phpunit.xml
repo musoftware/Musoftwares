@@ -15,6 +15,7 @@
             <directory>Modules/ERP/Tests/Feature</directory>
             <directory>Modules/Shared/Tests/Feature</directory>
             <directory>Modules/Tools/Tests/Feature</directory>
+            <directory>Modules/Freelance/Tests/Feature</directory>
         </testsuite>
     </testsuites>
     <source>

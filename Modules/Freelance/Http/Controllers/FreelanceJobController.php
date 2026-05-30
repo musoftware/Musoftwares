@@ -9,9 +9,14 @@ use Modules\Freelance\Jobs\NotifyFreelancersForJob;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\DB;
+use Modules\Freelance\Domains\Job\Actions\PostJobAction;
+use Modules\Freelance\Domains\Job\DTOs\PostJobData;
+use Illuminate\Support\Facades\Gate;
 
 class FreelanceJobController extends Controller
 {
+    public function __construct(private PostJobAction $postJobAction) {}
+
     public function index(Request $request)
     {
         $query = Job::with(['client', 'skills'])->where('status', 'open');
@@ -76,38 +81,22 @@ class FreelanceJobController extends Controller
         $postCost = 10; // Cost to post a job
         $user = $request->user();
 
-        if ($user->points_balance < $postCost) {
-            return back()->withErrors(['points' => 'Insufficient points to post a job.']);
+        $data = new PostJobData(
+            clientId: $user->id,
+            title: $validated['title'],
+            description: $validated['description'],
+            budget: $validated['budget'],
+            currencyId: $validated['currency_id'],
+            type: $validated['type'],
+            duration: $validated['duration'],
+            skills: $validated['skills'],
+        );
+
+        try {
+            $job = $this->postJobAction->execute($data, $user, $postCost);
+        } catch (\Exception $e) {
+            return back()->withErrors(['points' => $e->getMessage()]);
         }
-
-        $job = DB::transaction(function () use ($validated, $user, $postCost) {
-            $job = Job::create([
-                'client_id' => $user->id,
-                'title' => $validated['title'],
-                'description' => $validated['description'],
-                'budget' => $validated['budget'],
-                'currency_id' => $validated['currency_id'],
-                'type' => $validated['type'],
-                'duration' => $validated['duration'],
-                'status' => 'open',
-            ]);
-
-            $job->skills()->syncWithPivotValues($validated['skills'], ['is_required' => true]);
-
-            $user->points_balance -= $postCost;
-            $user->save();
-
-            PointTransaction::create([
-                'user_id' => $user->id,
-                'points' => $postCost,
-                'type' => 'spent',
-                'description' => "Posted job: {$job->title}",
-            ]);
-
-            return $job;
-        });
-
-        NotifyFreelancersForJob::dispatch($job);
 
         return redirect()->route('freelance.my-jobs')->with('success', 'Job posted successfully.');
     }
@@ -136,9 +125,7 @@ class FreelanceJobController extends Controller
 
     public function edit(Job $job)
     {
-        if ($job->client_id !== auth()->id()) {
-            abort(403);
-        }
+        Gate::authorize('update', $job);
 
         $job->load('skills');
         return Inertia::render('Freelance/Jobs/Edit', ['job' => $job]);
@@ -146,9 +133,7 @@ class FreelanceJobController extends Controller
 
     public function update(Request $request, Job $job)
     {
-        if ($job->client_id !== $request->user()->id) {
-            abort(403);
-        }
+        Gate::authorize('update', $job);
 
         $validated = $request->validate([
             'title' => 'required|string|max:255',
@@ -164,9 +149,7 @@ class FreelanceJobController extends Controller
 
     public function destroy(Request $request, Job $job)
     {
-        if ($job->client_id !== $request->user()->id) {
-            abort(403);
-        }
+        Gate::authorize('delete', $job);
 
         $job->delete();
         return redirect()->route('freelance.my-jobs')->with('success', 'Job deleted.');
