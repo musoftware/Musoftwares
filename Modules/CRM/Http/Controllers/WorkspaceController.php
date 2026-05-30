@@ -71,22 +71,20 @@ class WorkspaceController extends Controller
 
         $userId = $request->user()->id;
 
-        // Fetch leads assigned to this agent grouped by pipeline stage
-        $leads = DB::table('leads')
-            ->where('assigned_to_id', $userId)
-            ->get()
-            ->groupBy('pipeline_stage');
-
         $kpiAction = new CalculateKpisAction();
         $kpis = $kpiAction->execute($userId, now()->startOfDay()->toDateTimeString(), now()->endOfDay()->toDateTimeString());
 
+        // SCALABILITY HARDENING: We no longer pull all historical leads into memory.
+        // The React frontend will fetch them lazily and paginated via the api/leads/kanban endpoint.
+        
         return Inertia::render('CRM/Workspaces/TelesalesDashboard', [
             'kpis' => [
                 'calls_today' => $kpis->callsMade,
-                'pending_followups' => isset($leads['FOLLOW_UP']) ? count($leads['FOLLOW_UP']) : 0,
+                'pending_followups' => DB::table('leads')->where('assigned_to_id', $userId)->where('pipeline_stage', 'FOLLOW_UP')->count(),
                 'conversion_rate' => $kpis->conversionRate . '%'
             ],
-            'pipeline' => $leads
+            // Pipeline will be fetched client-side infinitely via IntersectionObserver
+            'pipeline' => []
         ]);
     }
 
