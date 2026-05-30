@@ -40,6 +40,7 @@ class User extends Authenticatable
         'kyc_reference_id',
         'kyc_notes',
         'workspace_settings',
+        'can_add_freelance_skills',
     ];
 
     protected $hidden = [
@@ -63,6 +64,7 @@ class User extends Authenticatable
             'kyc_verified' => 'boolean',
             'kyc_verified_at' => 'datetime',
             'workspace_settings' => 'array',
+            'can_add_freelance_skills' => 'boolean',
         ];
     }
 
