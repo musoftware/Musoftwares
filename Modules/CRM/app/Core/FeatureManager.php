@@ -4,6 +4,7 @@ namespace Modules\CRM\app\Core;
 
 use Modules\CRM\Models\Workspace;
 use App\Models\UserSubscription;
+use Modules\CRM\Infrastructure\Capabilities\EntitlementEngine;
 
 class FeatureManager
 {
@@ -17,9 +18,7 @@ class FeatureManager
      */
     public function has(string $feature): bool
     {
-        $features = $this->getActiveFeatures();
-        
-        return in_array($feature, $features) || (isset($features[$feature]) && $features[$feature] === true);
+        return app(EntitlementEngine::class)->has($feature);
     }
 
     /**
@@ -27,32 +26,7 @@ class FeatureManager
      */
     protected function getActiveFeatures(): array
     {
-        if ($this->activeFeatures !== null) {
-            return $this->activeFeatures;
-        }
-
-        // Try to resolve user from multiple guards
-        $user = auth()->user();
-        if (!$user && auth('erp_team')->check()) {
-            $user = auth('erp_team')->user()?->tenant?->user;
-        }
-
-        if ($user) {
-            return $this->activeFeatures = $this->getFeaturesForUser($user);
-        }
-
-        $workspaceId = session('crm_workspace_id');
-        if ($workspaceId) {
-            $workspace = Workspace::find($workspaceId);
-            if ($workspace && $workspace->user_id) {
-                $owner = \App\Models\User::find($workspace->user_id);
-                if ($owner) {
-                    return $this->activeFeatures = $this->getFeaturesForUser($owner);
-                }
-            }
-        }
-
-        return $this->activeFeatures = [];
+        return app(EntitlementEngine::class)->getActiveEntitlements();
     }
 
     /**
@@ -60,11 +34,7 @@ class FeatureManager
      */
     protected function getFeaturesForUser(\App\Models\User $user): array
     {
-        return UserSubscription::where('user_id', $user->id)
-            ->where('status', 'active')
-            ->where('expires_at', '>', now())
-            ->pluck('object')
-            ->toArray();
+        return app(EntitlementEngine::class)->getForUser($user);
     }
 
     /**
@@ -80,7 +50,7 @@ class FeatureManager
      */
     public function getAllForUser(\App\Models\User $user): array
     {
-        return $this->activeFeatures = $this->getFeaturesForUser($user);
+        return app(EntitlementEngine::class)->getForUser($user);
     }
 
     /**
@@ -88,6 +58,6 @@ class FeatureManager
      */
     public function flush()
     {
-        $this->activeFeatures = null;
+        app(EntitlementEngine::class)->flush();
     }
 }
