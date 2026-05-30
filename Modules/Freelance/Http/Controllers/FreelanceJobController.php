@@ -86,43 +86,61 @@ class FreelanceJobController extends Controller
         $newSkillsCount = 0;
 
         foreach ($validated['skills'] as $skill) {
-            if (is_numeric($skill)) {
-                $processedSkills[] = (int) $skill;
+            // Frontend sends skills as objects: {id, name, required}
+            // Normalize to either an int ID or a string name
+            if (is_array($skill)) {
+                $skillId   = $skill['id'] ?? null;
+                $skillName = isset($skill['name']) ? trim($skill['name']) : null;
+            } elseif (is_numeric($skill)) {
+                $skillId   = (int) $skill;
+                $skillName = null;
             } else {
-                $skillName = trim($skill);
+                $skillId   = null;
+                $skillName = trim((string) $skill);
+            }
+
+            // Case 1: We have a numeric ID — use it directly
+            if ($skillId && is_numeric($skillId)) {
+                $processedSkills[] = (int) $skillId;
+                continue;
+            }
+
+            // Case 2: We have a name — look it up or create it
+            if ($skillName) {
                 $existingSkill = \Modules\Freelance\Models\Skill::whereRaw('LOWER(name) = ?', [strtolower($skillName)])->first();
 
                 if ($existingSkill) {
                     if ($existingSkill->status === 'rejected') {
-                        return back()->withErrors(['skills' => "The skill '{$skillName}' has been rejected by the admin."]);
+                        return back()->withErrors(['skills' => __('freelance.skill_rejected', ['skill' => $skillName])]);
                     }
                     $processedSkills[] = $existingSkill->id;
                 } else {
                     if (!$user->can_add_freelance_skills) {
-                        return back()->withErrors(['skills' => 'You are not allowed to add new skills.']);
+                        return back()->withErrors(['skills' => __('freelance.skills_not_allowed')]);
                     }
 
                     if ($newSkillsCount == 0) {
                         $userAddedCount = \Modules\Freelance\Models\Skill::where('created_by', $user->id)->count();
                         if ($userAddedCount >= 3) {
-                            return back()->withErrors(['skills' => 'You can only add up to 3 new skills to the system.']);
+                            return back()->withErrors(['skills' => __('freelance.skills_limit_exceeded')]);
                         }
                     }
 
                     $newSkillsCount++;
                     if ($newSkillsCount > 3) {
-                        return back()->withErrors(['skills' => 'You can only add up to 3 new skills to the system.']);
+                        return back()->withErrors(['skills' => __('freelance.skills_limit_exceeded')]);
                     }
 
                     $newSkill = \Modules\Freelance\Models\Skill::create([
-                        'name' => $skillName,
-                        'status' => 'pending',
-                        'created_by' => $user->id
+                        'name'       => $skillName,
+                        'status'     => 'pending',
+                        'created_by' => $user->id,
                     ]);
                     $processedSkills[] = $newSkill->id;
                 }
             }
         }
+
 
         $data = new PostJobData(
             clientId: $user->id,
