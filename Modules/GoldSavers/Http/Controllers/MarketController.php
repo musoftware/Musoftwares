@@ -17,7 +17,7 @@ class MarketController extends Controller implements HasMiddleware
         return [
             function ($request, $next) {
                 if (!Auth::user()->hasModuleSubscription('gold-saver')) {
-                    abort(403, __('gold_saver.gold_saver_subscription_required'));
+                    return redirect()->route('subscriptions.plans')->with('error', __('gold_saver.gold_saver_subscription_required'));
                 }
                 return $next($request);
             }
