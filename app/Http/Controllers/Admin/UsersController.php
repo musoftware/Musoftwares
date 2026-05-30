@@ -142,11 +142,13 @@ class UsersController extends Controller
         });
 
         $modulePlans = \App\Models\ModulePlan::where('is_active', true)->get();
+        $subscriptions = $user->subscriptions()->orderBy('expires_at', 'desc')->get();
 
         return Inertia::render('Admin/Users/Show', [
             'client' => $userDetail,
             'stats'  => $stats,
             'modulePlans' => $modulePlans,
+            'subscriptions' => $subscriptions,
             'wallets' => [
                 [
                     'id' => 'main',
@@ -491,7 +493,7 @@ class UsersController extends Controller
         }
 
         \App\Models\UserSubscription::create([
-            'client_id' => $user->id,
+            'user_id' => $user->id,
             'object' => $plan['id'],
             'status' => 'active',
             'started_at' => now(),
@@ -500,6 +502,33 @@ class UsersController extends Controller
         ]);
 
         return back()->with('success', "Membership ({$plan['name']}) activated successfully for {$request->duration_days} days.");
+    }
+
+    public function updateMembership(Request $request, $id, $sub_id)
+    {
+        $user = User::findOrFail($id);
+        $subscription = \App\Models\UserSubscription::where('user_id', $user->id)->findOrFail($sub_id);
+
+        $request->validate([
+            'status' => 'required|in:active,expired,cancelled,pending',
+            'expires_at' => 'required|date',
+        ]);
+
+        $subscription->update([
+            'status' => $request->status,
+            'expires_at' => $request->expires_at,
+        ]);
+
+        return back()->with('success', "Membership updated successfully.");
+    }
+
+    public function deleteMembership($id, $sub_id)
+    {
+        $user = User::findOrFail($id);
+        $subscription = \App\Models\UserSubscription::where('user_id', $user->id)->findOrFail($sub_id);
+        $subscription->delete();
+
+        return back()->with('success', "Membership deleted successfully.");
     }
 
     /**

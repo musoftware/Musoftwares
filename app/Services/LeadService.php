@@ -3,17 +3,20 @@
 namespace App\Services;
 
 use Modules\CRM\Models\Lead;
+use Illuminate\Support\Facades\DB;
 
 class LeadService
 {
     public function updateStatus(Lead $lead, string $status): void
     {
-        $lead->status = $status;
-        $lead->save();
+        DB::transaction(function () use ($lead, $status) {
+            $lead->status = $status;
+            $lead->save();
+        });
     }
 
     public function deleteLead(Lead $lead): void
     {
-        $lead->delete();
+        DB::transaction(fn() => $lead->delete());
     }
 }

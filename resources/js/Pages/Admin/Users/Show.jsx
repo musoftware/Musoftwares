@@ -25,7 +25,7 @@ import { Label } from '@/Components/ui/label';
 import AdminNotesPanel from '@/Components/AdminNotesPanel';
 import { formatMoney as formatCurrency } from '@/lib/utils';
 
-export default function Show({ client, stats = {}, wallets, modulePlans = [] }) {
+export default function Show({ client, stats = {}, wallets, modulePlans = [], subscriptions = [] }) {
     const [isLoginAsLoading, setIsLoginAsLoading] = useState(false);
     const [isResetPassOpen, setIsResetPassOpen] = useState(false);
     const [newPassword, setNewPassword] = useState('');
@@ -102,7 +102,7 @@ export default function Show({ client, stats = {}, wallets, modulePlans = [] }) 
     };
 
     const [membershipForm, setMembershipForm] = useState({ 
-        plan_id: modulePlans.length > 0 ? modulePlans[0].id : '', 
+        object: modulePlans.length > 0 ? modulePlans[0].id : '', 
         duration_days: '1' 
     });
     const submitActivateMembership = (e) => {
@@ -110,13 +110,47 @@ export default function Show({ client, stats = {}, wallets, modulePlans = [] }) 
         router.post(`/admin/users/${client.id}/membership`, membershipForm, {
             onSuccess: () => {
                 setIsActivateMembershipOpen(false);
-                setMembershipForm({ plan_id: modulePlans.length > 0 ? modulePlans[0].id : '', duration_days: '1' });
+                setMembershipForm({ object: modulePlans.length > 0 ? modulePlans[0].id : '', duration_days: '1' });
                 alert("Membership activated successfully!");
             }
         });
     };
 
+    const [isEditMembershipOpen, setIsEditMembershipOpen] = useState(false);
+    const [editMembershipForm, setEditMembershipForm] = useState({
+        id: '',
+        status: 'active',
+        expires_at: ''
+    });
 
+    const openEditMembership = (sub) => {
+        setEditMembershipForm({
+            id: sub.id,
+            status: sub.status,
+            expires_at: sub.expires_at ? sub.expires_at.split('T')[0] : ''
+        });
+        setIsEditMembershipOpen(true);
+    };
+
+    const submitEditMembership = (e) => {
+        e.preventDefault();
+        router.put(`/admin/users/${client.id}/membership/${editMembershipForm.id}`, editMembershipForm, {
+            onSuccess: () => {
+                setIsEditMembershipOpen(false);
+                alert("Membership updated successfully!");
+            }
+        });
+    };
+
+    const deleteMembership = (subId) => {
+        if (confirm("Are you sure you want to delete this subscription?")) {
+            router.delete(`/admin/users/${client.id}/membership/${subId}`, {
+                onSuccess: () => {
+                    alert("Membership deleted successfully!");
+                }
+            });
+        }
+    };
 
     const referralCode = client.slug || client.id;
     const referralLink = `${window.location.origin}/r/${referralCode}`;
@@ -452,7 +486,50 @@ export default function Show({ client, stats = {}, wallets, modulePlans = [] }) 
                 </DialogContent>
             </Dialog>
 
-            
+
+            <Dialog open={isEditMembershipOpen} onOpenChange={setIsEditMembershipOpen}>
+                <DialogContent>
+                    <form onSubmit={submitEditMembership}>
+                        <DialogHeader>
+                            <DialogTitle>Edit Membership</DialogTitle>
+                            <DialogDescription>
+                                Modify the subscription status and expiration date.
+                            </DialogDescription>
+                        </DialogHeader>
+                        <div className="py-4 space-y-4">
+                            <div>
+                                <Label>Status</Label>
+                                <select 
+                                    className="border-gray-300 rounded-md w-full mt-1"
+                                    value={editMembershipForm.status}
+                                    onChange={e => setEditMembershipForm({...editMembershipForm, status: e.target.value})}
+                                    required
+                                >
+                                    <option value="active">Active</option>
+                                    <option value="expired">Expired</option>
+                                    <option value="cancelled">Cancelled</option>
+                                    <option value="pending">Pending</option>
+                                </select>
+                            </div>
+                            <div>
+                                <Label>Expires At</Label>
+                                <Input 
+                                    type="date" 
+                                    value={editMembershipForm.expires_at}
+                                    onChange={e => setEditMembershipForm({...editMembershipForm, expires_at: e.target.value})}
+                                    required 
+                                    className="mt-1"
+                                />
+                            </div>
+                        </div>
+                        <DialogFooter>
+                            <Button type="button" variant="outline" onClick={() => setIsEditMembershipOpen(false)}>Cancel</Button>
+                            <Button type="submit">Save Changes</Button>
+                        </DialogFooter>
+                    </form>
+                </DialogContent>
+            </Dialog>
+
             {/* NEW HERO SECTION */}
             <div className="bg-white p-8 rounded-[12px] shadow-sm border border-slate-200 mb-6 flex flex-col md:flex-row items-center md:items-start gap-6 text-center md:text-left">
                 <div className="w-24 h-24 rounded-full bg-slate-900 text-white flex items-center justify-center text-3xl font-bold font-sora shadow-md shrink-0">
@@ -703,6 +780,60 @@ export default function Show({ client, stats = {}, wallets, modulePlans = [] }) 
                         </div>
                     </div>
                     )}
+
+                    {/* User Subscriptions List */}
+                    <div className="bg-white p-6 rounded-[12px] shadow-sm border border-slate-200">
+                        <h2 className="text-lg font-bold font-sora text-slate-900 mb-4 border-b pb-2 flex items-center gap-2">
+                            <Briefcase size={18} className="text-slate-400" /> User Subscriptions
+                        </h2>
+                        {subscriptions && subscriptions.length > 0 ? (
+                            <div className="overflow-x-auto">
+                                <table className="w-full text-left text-sm">
+                                    <thead className="bg-slate-50 border-b border-slate-200">
+                                        <tr>
+                                            <th className="p-3 font-bold text-slate-600">Module</th>
+                                            <th className="p-3 font-bold text-slate-600">Status</th>
+                                            <th className="p-3 font-bold text-slate-600">Expires At</th>
+                                            <th className="p-3 text-right font-bold text-slate-600">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {subscriptions.map((sub) => (
+                                            <tr key={sub.id} className="border-b border-slate-100 hover:bg-slate-50">
+                                                <td className="p-3 font-medium text-slate-900">
+                                                    {modulePlans.find(p => p.id === sub.object)?.name || sub.object}
+                                                </td>
+                                                <td className="p-3">
+                                                    <span className={`px-2 py-1 text-xs font-bold uppercase rounded-full ${
+                                                        sub.status === 'active' ? 'bg-green-100 text-green-800' :
+                                                        sub.status === 'expired' ? 'bg-red-100 text-red-800' :
+                                                        'bg-amber-100 text-amber-800'
+                                                    }`}>
+                                                        {sub.status}
+                                                    </span>
+                                                </td>
+                                                <td className="p-3 text-slate-500">
+                                                    {sub.expires_at ? new Date(sub.expires_at).toLocaleDateString() : 'Lifetime'}
+                                                </td>
+                                                <td className="p-3 text-right space-x-2">
+                                                    <Button variant="ghost" size="sm" onClick={() => openEditMembership(sub)}>
+                                                        Edit
+                                                    </Button>
+                                                    <Button variant="ghost" size="sm" className="text-red-600 hover:text-red-800 hover:bg-red-50" onClick={() => deleteMembership(sub.id)}>
+                                                        Delete
+                                                    </Button>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        ) : (
+                            <p className="text-sm text-slate-500 italic p-4 bg-slate-50 rounded-md">
+                                No module subscriptions found.
+                            </p>
+                        )}
+                    </div>
 
                     {/* Wallets & Transactions */}
                     {wallets.map((wallet) => (
