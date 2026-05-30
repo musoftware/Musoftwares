@@ -101,6 +101,10 @@ class FreelanceJobController extends Controller
 
             // Case 1: We have a numeric ID — use it directly
             if ($skillId && is_numeric($skillId)) {
+                $existingSkill = \Modules\Freelance\Models\Skill::find((int) $skillId);
+                if ($existingSkill && $existingSkill->status === 'rejected') {
+                    return back()->withErrors(['skills' => __('freelance.skill_rejected', ['skill' => $existingSkill->name])]);
+                }
                 $processedSkills[] = (int) $skillId;
                 continue;
             }

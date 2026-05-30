@@ -205,3 +205,5 @@ public/downloads/runtime/mac/musoftware-runtime-mac-silicon.dmg
 u962989541_db (3).sql
 db_backup.sql
 u962989541_db (4).sql
+playwright-report/*
+test-results/*
