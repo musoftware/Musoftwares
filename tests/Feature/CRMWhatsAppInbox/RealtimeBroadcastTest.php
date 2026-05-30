@@ -2,8 +2,8 @@
 
 namespace Tests\Feature\CRMWhatsAppInbox;
 
-use App\Modules\CRMWhatsAppInbox\Events\WhatsAppMessageReceived;
-use App\Modules\CRMWhatsAppInbox\Services\WhatsAppRealtimeBroadcaster;
+use Modules\CRM\app\Features\CRMWhatsAppInbox\Events\WhatsAppMessageReceived;
+use Modules\CRM\app\Features\CRMWhatsAppInbox\Services\WhatsAppRealtimeBroadcaster;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use Modules\CRM\Models\WhatsAppAccount;

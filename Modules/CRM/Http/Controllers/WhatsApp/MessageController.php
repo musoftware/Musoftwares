@@ -3,10 +3,10 @@
 namespace Modules\CRM\Http\Controllers\WhatsApp;
 
 use App\Http\Controllers\Controller;
-use App\Modules\CRMWhatsAppInbox\Exceptions\UsageLimitExceededException;
-use App\Modules\CRMWhatsAppInbox\Services\MessageDeliveryService;
-use App\Modules\CRMWhatsAppInbox\Services\WhatsAppMediaService;
-use App\Modules\CRMWhatsAppInbox\Services\WhatsAppRealtimeBroadcaster;
+use Modules\CRM\app\Features\CRMWhatsAppInbox\Exceptions\UsageLimitExceededException;
+use Modules\CRM\app\Features\CRMWhatsAppInbox\Services\MessageDeliveryService;
+use Modules\CRM\app\Features\CRMWhatsAppInbox\Services\WhatsAppMediaService;
+use Modules\CRM\app\Features\CRMWhatsAppInbox\Services\WhatsAppRealtimeBroadcaster;
 use Modules\CRM\Http\Requests\WhatsApp\SendMessageRequest;
 use Modules\CRM\Http\Resources\WhatsApp\MessageResource;
 use Modules\CRM\Models\WhatsAppConversation;

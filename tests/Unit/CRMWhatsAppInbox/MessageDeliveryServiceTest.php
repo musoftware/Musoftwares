@@ -2,9 +2,9 @@
 
 namespace Tests\Unit\CRMWhatsAppInbox;
 
-use App\Modules\CRMWhatsAppInbox\Events\WhatsAppMessageSent;
-use App\Modules\CRMWhatsAppInbox\Exceptions\UsageLimitExceededException;
-use App\Modules\CRMWhatsAppInbox\Services\MessageDeliveryService;
+use Modules\CRM\app\Features\CRMWhatsAppInbox\Events\WhatsAppMessageSent;
+use Modules\CRM\app\Features\CRMWhatsAppInbox\Exceptions\UsageLimitExceededException;
+use Modules\CRM\app\Features\CRMWhatsAppInbox\Services\MessageDeliveryService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Queue;
@@ -46,7 +46,7 @@ class MessageDeliveryServiceTest extends TestCase
         $this->assertEquals('Hello there!', $message->body);
         $this->assertEquals('pending', $message->delivery_status);
 
-        Queue::assertPushed(\App\Modules\CRMWhatsAppInbox\Jobs\SendWhatsAppMessageJob::class);
+        Queue::assertPushed(\Modules\CRM\app\Features\CRMWhatsAppInbox\Jobs\SendWhatsAppMessageJob::class);
     }
 
     public function test_add_internal_note_is_not_sent_via_whatsapp(): void
@@ -66,7 +66,7 @@ class MessageDeliveryServiceTest extends TestCase
         $this->assertEquals('delivered', $note->delivery_status);
 
         // Internal notes should NOT be sent via WhatsApp
-        Queue::assertNotPushed(\App\Modules\CRMWhatsAppInbox\Jobs\SendWhatsAppMessageJob::class);
+        Queue::assertNotPushed(\Modules\CRM\app\Features\CRMWhatsAppInbox\Jobs\SendWhatsAppMessageJob::class);
     }
 
     public function test_mark_as_sent_updates_status_and_fires_event(): void
@@ -115,6 +115,6 @@ class MessageDeliveryServiceTest extends TestCase
         $this->assertEquals('failed', $message->delivery_status);
         $this->assertEquals('Connection timeout', $message->failed_reason);
 
-        Event::assertDispatched(\App\Modules\CRMWhatsAppInbox\Events\WhatsAppMessageFailed::class);
+        Event::assertDispatched(\Modules\CRM\app\Features\CRMWhatsAppInbox\Events\WhatsAppMessageFailed::class);
     }
 }

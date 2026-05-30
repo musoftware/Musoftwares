@@ -3,7 +3,7 @@
 namespace Tests\Unit\CRMWhatsAppCampaign;
 
 use Tests\TestCase;
-use App\Modules\CRMWhatsAppCampaigns\Services\CRMWhatsAppCampaignLimitsService;
+use Modules\CRM\app\Features\CRMWhatsAppCampaigns\Services\CRMWhatsAppCampaignLimitsService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 

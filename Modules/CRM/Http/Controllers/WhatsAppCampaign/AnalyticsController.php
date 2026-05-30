@@ -3,7 +3,7 @@
 namespace Modules\CRM\Http\Controllers\WhatsAppCampaign;
 
 use App\Http\Controllers\Controller;
-use App\Modules\CRMWhatsAppCampaigns\Services\CampaignAnalyticsAggregator;
+use Modules\CRM\app\Features\CRMWhatsAppCampaigns\Services\CampaignAnalyticsAggregator;
 use Modules\CRM\Http\Resources\WhatsAppCampaign\CampaignAnalyticsResource;
 use Modules\CRM\Models\WhatsAppCampaign;
 use Illuminate\Http\Request;

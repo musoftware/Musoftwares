@@ -27,7 +27,7 @@ class WebhookProcessingTest extends TestCase
         $response->assertOk();
         $response->assertJson(['status' => 'queued']);
 
-        Queue::assertPushed(\App\Modules\CRMWhatsAppInbox\Jobs\ProcessWhatsAppWebhookJob::class);
+        Queue::assertPushed(\Modules\CRM\app\Features\CRMWhatsAppInbox\Jobs\ProcessWhatsAppWebhookJob::class);
     }
 
     public function test_webhook_rejects_invalid_signature(): void
@@ -69,7 +69,7 @@ class WebhookProcessingTest extends TestCase
 
         $response->assertOk();
 
-        Queue::assertPushed(\App\Modules\CRMWhatsAppInbox\Jobs\ProcessWhatsAppWebhookJob::class, function ($job) {
+        Queue::assertPushed(\Modules\CRM\app\Features\CRMWhatsAppInbox\Jobs\ProcessWhatsAppWebhookJob::class, function ($job) {
             return $job->eventType === 'status_update';
         });
     }

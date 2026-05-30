@@ -2,7 +2,7 @@
 
 namespace Tests\Feature\CRMWhatsAppInbox;
 
-use App\Modules\CRMWhatsAppInbox\Services\CRMWhatsAppLimitsService;
+use Modules\CRM\app\Features\CRMWhatsAppInbox\Services\CRMWhatsAppLimitsService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Modules\CRM\Models\WhatsAppAccount;

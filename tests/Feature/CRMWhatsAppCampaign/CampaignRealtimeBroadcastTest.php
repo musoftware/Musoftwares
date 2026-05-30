@@ -3,10 +3,10 @@
 namespace Tests\Feature\CRMWhatsAppCampaign;
 
 use Tests\TestCase;
-use App\Modules\CRMWhatsAppCampaigns\Events\WhatsAppCampaignStarted;
-use App\Modules\CRMWhatsAppCampaigns\Events\WhatsAppCampaignCompleted;
-use App\Modules\CRMWhatsAppCampaigns\Events\WhatsAppCampaignMessageDelivered;
-use App\Modules\CRMWhatsAppCampaigns\Listeners\BroadcastCampaignProgress;
+use Modules\CRM\app\Features\CRMWhatsAppCampaigns\Events\WhatsAppCampaignStarted;
+use Modules\CRM\app\Features\CRMWhatsAppCampaigns\Events\WhatsAppCampaignCompleted;
+use Modules\CRM\app\Features\CRMWhatsAppCampaigns\Events\WhatsAppCampaignMessageDelivered;
+use Modules\CRM\app\Features\CRMWhatsAppCampaigns\Listeners\BroadcastCampaignProgress;
 use Modules\CRM\Models\WhatsAppCampaign;
 use Modules\CRM\Models\WhatsAppCampaignDelivery;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -66,7 +66,7 @@ class CampaignRealtimeBroadcastTest extends TestCase
     {
         $campaign = WhatsAppCampaign::factory()->create(['workspace_id' => 42]);
 
-        $created = new \App\Modules\CRMWhatsAppCampaigns\Events\WhatsAppCampaignCreated(42, $campaign);
+        $created = new \Modules\CRM\app\Features\CRMWhatsAppCampaigns\Events\WhatsAppCampaignCreated(42, $campaign);
         $this->assertEquals(42, $created->workspaceId);
         $this->assertEquals($campaign->id, $created->campaign->id);
     }

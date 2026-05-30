@@ -3,6 +3,6 @@
 return [
     App\Providers\AppServiceProvider::class,
     Nwidart\Modules\LaravelModulesServiceProvider::class,
-    App\Modules\CRMWhatsAppInbox\CRMWhatsAppInboxServiceProvider::class,
-    App\Modules\CRMWhatsAppCampaigns\CRMWhatsAppCampaignsServiceProvider::class,
+    Modules\CRM\app\Features\CRMWhatsAppInbox\CRMWhatsAppInboxServiceProvider::class,
+    Modules\CRM\app\Features\CRMWhatsAppCampaigns\CRMWhatsAppCampaignsServiceProvider::class,
 ];

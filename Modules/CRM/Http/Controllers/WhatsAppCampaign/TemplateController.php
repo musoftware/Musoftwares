@@ -3,7 +3,7 @@
 namespace Modules\CRM\Http\Controllers\WhatsAppCampaign;
 
 use App\Http\Controllers\Controller;
-use App\Modules\CRMWhatsAppCampaigns\Services\WhatsAppTemplateRenderer;
+use Modules\CRM\app\Features\CRMWhatsAppCampaigns\Services\WhatsAppTemplateRenderer;
 use Modules\CRM\Http\Requests\WhatsAppCampaign\StoreTemplateRequest;
 use Modules\CRM\Http\Requests\WhatsAppCampaign\PreviewTemplateRequest;
 use Modules\CRM\Http\Resources\WhatsAppCampaign\TemplateResource;

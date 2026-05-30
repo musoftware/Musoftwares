@@ -3,7 +3,7 @@
 namespace Tests\Unit\CRMWhatsAppCampaign;
 
 use Tests\TestCase;
-use App\Modules\CRMWhatsAppCampaigns\Services\WhatsAppTemplateRenderer;
+use Modules\CRM\app\Features\CRMWhatsAppCampaigns\Services\WhatsAppTemplateRenderer;
 
 class WhatsAppTemplateRendererTest extends TestCase
 {

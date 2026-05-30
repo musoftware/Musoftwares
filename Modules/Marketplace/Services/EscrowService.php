@@ -3,127 +3,115 @@
 namespace Modules\Marketplace\Services;
 
 use Modules\Marketplace\Models\MarketplaceEscrow;
-use Modules\Marketplace\Models\Order;
-use App\Services\WalletService;
+use Modules\Marketplace\Models\ServiceOrder;
+use Modules\Marketplace\Enums\EscrowStatus;
 use Illuminate\Support\Facades\DB;
 use Exception;
+use App\Models\CurrenciesExchange;
+use App\Models\AdminSettings;
 
 class EscrowService
 {
-    protected WalletService $walletService;
-
-    public function __construct(WalletService $walletService)
+    /**
+     * Locks funds from the buyer's wallet and creates an Escrow record.
+     */
+    public function holdFunds(ServiceOrder $order): MarketplaceEscrow
     {
-        $this->walletService = $walletService;
-    }
+        return DB::transaction(function () use ($order) {
+            $buyer = $order->buyer;
+            
+            if ($buyer->user_balance < $order->amount) {
+                throw new Exception("Insufficient balance to hold funds.");
+            }
 
-    public function createHold(Order $order, float $amount, string $currency): MarketplaceEscrow
-    {
-        return DB::transaction(function () use ($order, $amount, $currency) {
-            // Check if user has wallet, etc. Assuming buyer has wallet linked.
-            // Simplified logic: locking funds from buyer's wallet
-
-            $defaultCurrency = config('app.business_currency', 'USD');
-            $defaultCurrencyId = \App\Models\Currency::where('currency', $defaultCurrency)->value('id');
-            $currencyId = \App\Models\Currency::where('currency', $currency)->value('id') ?? $defaultCurrencyId;
-            $buyerWallet = $order->buyer->wallets()->firstOrCreate(['currency_id' => $currencyId]); // Assuming wallets exist
-
-            $this->walletService->lockFunds(
-                $buyerWallet,
-                $amount,
-                $currency,
-                'marketplace_escrow',
-                $order->id,
-                "Escrow hold for order #{$order->id}"
+            // Deduct from Buyer using 'used' type per rules
+            $transactionId = $buyer->add_balance(
+                -$order->amount,
+                "Escrow hold for service order #{$order->id}",
+                'used',
+                $order->currency_id
             );
 
-            $businessCurrencyStr = \App\Models\CurrenciesExchange::BusinessCurrency();
-            $businessCurrencyId = \App\Models\Currency::where('currency', $businessCurrencyStr)->value('id');
+            $businessCurrencyStr = CurrenciesExchange::BusinessCurrency();
+            $businessCurrencyModel = \App\Models\Currency::where('currency', $businessCurrencyStr)->first();
+            $businessCurrencyId = $businessCurrencyModel ? $businessCurrencyModel->id : $order->currency_id;
 
-            // Calculate the exact exchange rate
-            $exchangeRate = \App\Models\CurrenciesExchange::Rate(now()->toDateString(), $currency, $businessCurrencyStr);
-            $businessAmount = $amount * $exchangeRate;
+            $currencyStr = \App\Models\Currency::find($order->currency_id)->currency ?? '';
+
+            $exchangeRate = CurrenciesExchange::RateByDate(now()->toDateString(), 1, $currencyStr, $businessCurrencyStr);
+            // Ensure proper normalized business amount for the entire order
+            $businessAmount = $order->amount * $exchangeRate;
 
             $escrow = MarketplaceEscrow::create([
                 'order_id' => $order->id,
-                'amount' => $amount,
-                'currency_id' => $currencyId,
+                'buyer_wallet_transaction_id' => $transactionId,
+                'amount' => $order->amount,
+                'currency_id' => $order->currency_id,
                 'business_amount' => $businessAmount,
                 'business_currency_id' => $businessCurrencyId,
                 'exchange_rate' => $exchangeRate,
                 'exchange_rate_date' => now(),
-                'status' => 'held'
+                'status' => EscrowStatus::HELD
             ]);
 
             return $escrow;
         });
     }
 
-    public function release(MarketplaceEscrow $escrow, float $commissionAmount = 0): void
+    /**
+     * Releases funds to the seller, deducting the system commission.
+     */
+    public function releaseFunds(MarketplaceEscrow $escrow): void
     {
-        DB::transaction(function () use ($escrow, $commissionAmount) {
-            if ($escrow->status !== 'held') {
-                throw new Exception("Escrow is not held.");
+        DB::transaction(function () use ($escrow) {
+            if ($escrow->status !== EscrowStatus::HELD) {
+                throw new Exception("Escrow is not held. Current status: " . $escrow->status->value);
             }
 
             $order = $escrow->order;
-            $buyerWallet = $order->buyer->wallets()->first();
-            $sellerWallet = $order->seller->wallets()->firstOrCreate(['currency_id' => $escrow->currency_id]);
+            $seller = $order->seller;
+            
+            // Re-calculate or use stored commission
+            $sellerEarnings = $order->amount - $order->commission_amount;
 
-            // Transfer locked to spent from buyer
-            $buyerTx = $this->walletService->transferLockedToSpent(
-                $buyerWallet,
-                $escrow->amount,
-                $escrow->currency_id,
-                'marketplace_escrow_release',
-                $order->id,
-                "Release escrow for order #{$order->id}"
+            $transactionId = $seller->add_balance(
+                $sellerEarnings,
+                "Earnings from service order #{$order->id} (Escrow Released)",
+                'earned',
+                $order->currency_id
             );
-
-            $sellerAmount = $escrow->amount - $commissionAmount;
-
-            // Credit seller
-            $sellerTx = $this->walletService->creditAvailable(
-                $sellerWallet,
-                $sellerAmount,
-                $escrow->currency_id,
-                'marketplace_order_earning',
-                $order->id,
-                "Earnings for order #{$order->id}"
-            );
-
-            // Deduct commission to system? Not explicit here but typical.
 
             $escrow->update([
-                'status' => 'released',
-                'buyer_wallet_transaction_id' => $buyerTx->id,
-                'seller_wallet_transaction_id' => $sellerTx->id,
+                'status' => EscrowStatus::RELEASED,
+                'seller_wallet_transaction_id' => $transactionId,
                 'released_at' => now(),
             ]);
         });
     }
 
-    public function refund(MarketplaceEscrow $escrow): void
+    /**
+     * Refunds the escrowed funds back to the buyer.
+     */
+    public function refundFunds(MarketplaceEscrow $escrow): void
     {
         DB::transaction(function () use ($escrow) {
-            if (!in_array($escrow->status, ['held', 'disputed'])) {
-                throw new Exception("Cannot refund escrow in current state.");
+            if (!in_array($escrow->status, [EscrowStatus::HELD, EscrowStatus::DISPUTED])) {
+                throw new Exception("Cannot refund escrow in current state: " . $escrow->status->value);
             }
 
             $order = $escrow->order;
-            $buyerWallet = $order->buyer->wallets()->first();
+            $buyer = $order->buyer;
 
-            $this->walletService->unlockFunds(
-                $buyerWallet,
-                $escrow->amount,
-                $escrow->currency_id,
-                'marketplace_escrow_refund',
-                $order->id,
-                "Refund escrow for order #{$order->id}"
+            // Credit back buyer via 'refunded'
+            $transactionId = $buyer->add_balance(
+                $order->amount,
+                "Refund for service order #{$order->id} (Escrow Cancelled)",
+                'refunded',
+                $order->currency_id
             );
 
             $escrow->update([
-                'status' => 'refunded',
+                'status' => EscrowStatus::REFUNDED,
                 'refunded_at' => now(),
             ]);
         });
@@ -132,12 +120,12 @@ class EscrowService
     public function dispute(MarketplaceEscrow $escrow): void
     {
         DB::transaction(function () use ($escrow) {
-            if ($escrow->status !== 'held') {
+            if ($escrow->status !== EscrowStatus::HELD) {
                 throw new Exception("Only held escrows can be disputed.");
             }
 
             $escrow->update([
-                'status' => 'disputed'
+                'status' => EscrowStatus::DISPUTED
             ]);
         });
     }

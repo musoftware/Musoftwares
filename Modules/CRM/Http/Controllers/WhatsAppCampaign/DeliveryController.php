@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use Modules\CRM\Http\Resources\WhatsAppCampaign\DeliveryResource;
 use Modules\CRM\Models\WhatsAppCampaign;
 use Modules\CRM\Models\WhatsAppCampaignDelivery;
-use App\Modules\CRMWhatsAppCampaigns\Jobs\RetryCampaignDeliveryJob;
+use Modules\CRM\app\Features\CRMWhatsAppCampaigns\Jobs\RetryCampaignDeliveryJob;
 use Illuminate\Http\Request;
 
 class DeliveryController extends Controller

@@ -3,7 +3,7 @@
 namespace Modules\CRM\Http\Controllers\WhatsApp;
 
 use App\Http\Controllers\Controller;
-use App\Modules\CRMWhatsAppInbox\Jobs\ProcessWhatsAppWebhookJob;
+use Modules\CRM\app\Features\CRMWhatsAppInbox\Jobs\ProcessWhatsAppWebhookJob;
 use Modules\CRM\Models\WhatsAppAccount;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;

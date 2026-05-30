@@ -3,7 +3,7 @@
 namespace Tests\Unit\CRMWhatsAppCampaign;
 
 use Tests\TestCase;
-use App\Modules\CRMWhatsAppCampaigns\Services\CampaignAnalyticsAggregator;
+use Modules\CRM\app\Features\CRMWhatsAppCampaigns\Services\CampaignAnalyticsAggregator;
 use Modules\CRM\Models\WhatsAppCampaign;
 use Modules\CRM\Models\WhatsAppCampaignDelivery;
 use Illuminate\Foundation\Testing\RefreshDatabase;

@@ -2,9 +2,9 @@
 
 namespace Tests\Unit\CRMWhatsAppInbox;
 
-use App\Modules\CRMWhatsAppInbox\Contracts\WhatsAppProviderInterface;
-use App\Modules\CRMWhatsAppInbox\Events\WhatsAppAccountConnected;
-use App\Modules\CRMWhatsAppInbox\Services\WhatsAppSessionManager;
+use Modules\CRM\app\Features\CRMWhatsAppInbox\Contracts\WhatsAppProviderInterface;
+use Modules\CRM\app\Features\CRMWhatsAppInbox\Events\WhatsAppAccountConnected;
+use Modules\CRM\app\Features\CRMWhatsAppInbox\Services\WhatsAppSessionManager;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use Modules\CRM\Models\WhatsAppAccount;

@@ -3,8 +3,8 @@
 namespace Tests\Unit\BookingRules;
 
 use PHPUnit\Framework\TestCase;
-use App\Modules\BookingRules\Services\Evaluators\RuleConditionEvaluator;
-use App\Modules\BookingRules\Models\BookingAdvancedRule;
+use Modules\Booking\app\Features\BookingRules\Services\Evaluators\RuleConditionEvaluator;
+use Modules\Booking\app\Features\BookingRules\Models\BookingAdvancedRule;
 
 class RuleConditionEvaluatorTest extends TestCase
 {

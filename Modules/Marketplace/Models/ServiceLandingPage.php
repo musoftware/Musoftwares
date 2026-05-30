@@ -232,22 +232,26 @@ class ServiceLandingPage extends Model
             return $this->parentVariant->determineWinner();
         }
 
-        $variants = collect([$this])->merge($this->variants()->where('is_active', true)->get());
-        
-        $winner = $variants->sortByDesc(function ($variant) {
-            return $variant->getConversionRate();
-        })->first();
-
-        if ($winner) {
-            // Mark winner
-            $winner->update(['is_winner' => true]);
+        return \Illuminate\Support\Facades\DB::transaction(function () {
+            $parent = self::where('id', $this->id)->lockForUpdate()->first();
+            $variantsQuery = $parent->variants()->where('is_active', true)->lockForUpdate()->get();
+            $variants = collect([$parent])->merge($variantsQuery);
             
-            // Deactivate other variants
-            $variants->where('id', '!=', $winner->id)->each(function ($variant) {
-                $variant->update(['is_active' => false, 'is_winner' => false]);
-            });
-        }
+            $winner = $variants->sortByDesc(function ($variant) {
+                return $variant->getConversionRate();
+            })->first();
 
-        return $winner;
+            if ($winner) {
+                // Mark winner
+                $winner->update(['is_winner' => true]);
+                
+                // Deactivate other variants
+                $variants->where('id', '!=', $winner->id)->each(function ($variant) {
+                    $variant->update(['is_active' => false, 'is_winner' => false]);
+                });
+            }
+
+            return $winner;
+        });
     }
 }

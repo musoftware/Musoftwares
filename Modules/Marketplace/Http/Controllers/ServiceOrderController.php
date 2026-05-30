@@ -12,6 +12,8 @@ use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use App\Events\MarketplaceOrderPlaced;
 use App\Events\MarketplaceOrderCompleted;
+use Modules\Marketplace\Enums\ServiceOrderStatus;
+use Modules\Marketplace\Services\EscrowService;
 
 class ServiceOrderController extends Controller
 {
@@ -52,7 +54,7 @@ class ServiceOrderController extends Controller
         ]);
     }
 
-    public function store(Request $request, FinancialTransactionService $financialService)
+    public function store(Request $request, FinancialTransactionService $financialService, EscrowService $escrowService)
     {
         $validated = $request->validate([
             'package_id' => 'required|exists:marketplace_packages,id',
@@ -70,10 +72,9 @@ class ServiceOrderController extends Controller
             return redirect()->back()->withErrors(['error' => 'Insufficient balance.']);
         }
 
-        // Commission logic (e.g., 10%)
-        $commissionRate = 0.10;
+        // Commission logic
+        $commissionRate = config('marketplace.commission_rate', 0.10);
         $commissionAmount = $package->price * $commissionRate;
-        $sellerCredit = $package->price - $commissionAmount;
 
         DB::beginTransaction();
 
@@ -86,26 +87,11 @@ class ServiceOrderController extends Controller
                 'amount' => $package->price,
                 'currency_id' => $package->currency_id,
                 'commission_amount' => $commissionAmount,
-                'status' => 'pending'
+                'status' => ServiceOrderStatus::PENDING
             ]);
 
-            // Escrow Lock: Deduct from Buyer balance using type 'used'
-            $transactionId = $buyer->add_balance(-$package->price, "Escrow lock for service order #{$order->id}", 'used', $package->currency_id);
-
-            // Create Escrow record
-            \Modules\Marketplace\Models\MarketplaceEscrow::create([
-                'order_id' => $order->id,
-                'buyer_wallet_transaction_id' => $transactionId,
-                'amount' => $package->price,
-                'amount_currency' => $package->currency_id,
-                'business_amount' => $commissionAmount,
-                'business_amount_currency' => $package->currency_id,
-                'exchange_rate' => 1,
-                'exchange_rate_date' => now()->toDateString(),
-                'status' => 'held'
-            ]);
-
-            // Seller does NOT get credited yet. Funds are in Escrow.
+            // Delegate escrow creation and lock to the EscrowService
+            $escrowService->holdFunds($order);
 
             // Create Conversation
             $conversation = Conversation::create([
@@ -133,9 +119,7 @@ class ServiceOrderController extends Controller
 
     public function deliver(Request $request, ServiceOrder $order)
     {
-        if (auth()->id() !== $order->seller_id) {
-            abort(403);
-        }
+        $this->authorize('deliver', $order);
 
         $validated = $request->validate([
             'message' => 'nullable|string',
@@ -148,7 +132,7 @@ class ServiceOrderController extends Controller
         ];
 
         $order->update([
-            'status' => 'delivered',
+            'status' => ServiceOrderStatus::DELIVERED,
             'delivered_at' => now(),
             'auto_complete_at' => now()->addDays(3),
             'delivery_payload' => $payload
@@ -157,37 +141,24 @@ class ServiceOrderController extends Controller
         return redirect()->back()->with('success', 'Order marked as delivered.');
     }
 
-    public function complete(ServiceOrder $order)
+    public function complete(ServiceOrder $order, EscrowService $escrowService)
     {
-        if (auth()->id() !== $order->buyer_id) {
-            abort(403);
-        }
+        $this->authorize('complete', $order);
 
-        if ($order->status === 'completed') {
+        if ($order->status === ServiceOrderStatus::COMPLETED) {
             return redirect()->back()->with('error', 'Order already completed.');
         }
 
         DB::beginTransaction();
         try {
             $order->update([
-                'status' => 'completed',
+                'status' => ServiceOrderStatus::COMPLETED,
                 'completed_at' => now(),
             ]);
 
-            // Release Escrow: Credit Seller balance
-            $seller = \App\Models\User::findOrFail($order->seller_id);
-            $sellerCredit = $order->amount - $order->commission_amount;
-
-            $transactionId = $seller->add_balance($sellerCredit, "Earnings from service order #{$order->id} (Escrow Released)", 'received', $order->currency_id);
-
-            // Update Escrow Record
             $escrow = \Modules\Marketplace\Models\MarketplaceEscrow::where('order_id', $order->id)->first();
             if ($escrow) {
-                $escrow->update([
-                    'status' => 'released',
-                    'seller_wallet_transaction_id' => $transactionId,
-                    'released_at' => now(),
-                ]);
+                $escrowService->releaseFunds($escrow);
             }
 
             DB::commit();
@@ -201,16 +172,18 @@ class ServiceOrderController extends Controller
         return redirect()->back()->with('success', 'Order completed.');
     }
 
-    public function dispute(ServiceOrder $order)
+    public function dispute(ServiceOrder $order, EscrowService $escrowService)
     {
-        // Allow either buyer or seller to dispute
-        if (auth()->id() !== $order->buyer_id && auth()->id() !== $order->seller_id) {
-            abort(403);
-        }
+        $this->authorize('dispute', $order);
 
         $order->update([
-            'status' => 'disputed',
+            'status' => ServiceOrderStatus::DISPUTED,
         ]);
+        
+        $escrow = \Modules\Marketplace\Models\MarketplaceEscrow::where('order_id', $order->id)->first();
+        if ($escrow) {
+            $escrowService->dispute($escrow);
+        }
 
         return redirect()->back()->with('success', 'Order is now in dispute.');
     }

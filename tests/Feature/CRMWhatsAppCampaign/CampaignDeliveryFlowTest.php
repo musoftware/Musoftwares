@@ -4,10 +4,10 @@ namespace Tests\Feature\CRMWhatsAppCampaign;
 
 use Tests\TestCase;
 use App\Models\User;
-use App\Modules\CRMWhatsAppCampaigns\Services\CampaignDeliveryManager;
-use App\Modules\CRMWhatsAppCampaigns\Services\CampaignAudienceResolver;
-use App\Modules\CRMWhatsAppCampaigns\Services\WhatsAppTemplateRenderer;
-use App\Modules\CRMWhatsAppInbox\Contracts\WhatsAppProviderInterface;
+use Modules\CRM\app\Features\CRMWhatsAppCampaigns\Services\CampaignDeliveryManager;
+use Modules\CRM\app\Features\CRMWhatsAppCampaigns\Services\CampaignAudienceResolver;
+use Modules\CRM\app\Features\CRMWhatsAppCampaigns\Services\WhatsAppTemplateRenderer;
+use Modules\CRM\app\Features\CRMWhatsAppInbox\Contracts\WhatsAppProviderInterface;
 use Modules\CRM\Models\WhatsAppAccount;
 use Modules\CRM\Models\WhatsAppCampaign;
 use Modules\CRM\Models\WhatsAppCampaignAudience;

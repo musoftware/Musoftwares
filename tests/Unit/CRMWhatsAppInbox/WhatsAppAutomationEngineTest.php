@@ -2,7 +2,7 @@
 
 namespace Tests\Unit\CRMWhatsAppInbox;
 
-use App\Modules\CRMWhatsAppInbox\Services\WhatsAppAutomationEngine;
+use Modules\CRM\app\Features\CRMWhatsAppInbox\Services\WhatsAppAutomationEngine;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Queue;
 use Modules\CRM\Models\WhatsAppAccount;
