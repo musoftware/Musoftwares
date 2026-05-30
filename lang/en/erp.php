@@ -163,5 +163,23 @@ return [
     'payment_due_by' => 'Payment due by :date',
     'payment_due_upon_receipt' => 'Payment due upon receipt.',
     'page_x_of_y' => 'Page {PAGE_NUM} of {PAGE_COUNT}',
-    'manual_wallet_transaction' => 'Manual wallet transaction'
+    'manual_wallet_transaction' => 'Manual wallet transaction',
+    
+    // Team Roles & Capacity
+    'roles_admin' => 'CRM Admin',
+    'roles_sales_agent' => 'Sales Agent',
+    'roles_sales_manager' => 'Sales Manager',
+    'roles_support_agent' => 'Customer Support Agent',
+    'roles_support_manager' => 'Support Manager',
+    'roles_marketing' => 'Marketing Team',
+    'roles_call_center' => 'Call Center Agent',
+    'roles_account_manager' => 'Account Manager',
+    'roles_branch_manager' => 'Branch Manager',
+    'roles_legacy_manager' => 'Manager (Legacy)',
+    'roles_legacy_member' => 'Member (Legacy)',
+    'team_capacity_reached' => 'You have reached your team capacity limit of :limit members. Please upgrade your capacity to add more.',
+    'advanced_roles_addon_required' => 'The selected role requires the Advanced Roles addon. Please upgrade to assign this role.',
+    'team_member_added' => 'Team member :name has been added successfully.',
+    'team_member_updated' => 'Team member details updated successfully.',
+    'team_member_removed' => 'Team member :name has been removed.',
 ];

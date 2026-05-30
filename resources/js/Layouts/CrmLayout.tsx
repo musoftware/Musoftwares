@@ -30,11 +30,11 @@ export default function CrmLayout({ title, activeMenu, children }: CrmLayoutProp
         {
             title: __('Core Operations'),
             items: [
-                { id: 'dashboard', label: __('Dashboard'), icon: LayoutDashboard, href: '/crm/dashboard', isActive: activeMenu === 'dashboard' },
-                { id: 'workspaces', label: __('Workspaces'), icon: Activity, href: '/crm', isActive: activeMenu === 'workspaces' },
-                { id: 'leads', label: __('Leads & Pipeline'), icon: Users, href: '/crm/leads', isActive: activeMenu === 'leads' },
-                { id: 'tags', label: __('Tags & Attributes'), icon: Tag, href: '/crm/tags', isActive: activeMenu === 'tags' },
-                { id: 'search', label: __('Universal Search'), icon: Search, href: '/crm/search', isActive: activeMenu === 'search' },
+                { id: 'dashboard', label: __('Dashboard'), icon: LayoutDashboard, href: route('crm.dashboard'), isActive: activeMenu === 'dashboard' },
+                { id: 'workspaces', label: __('Workspaces'), icon: Activity, href: route('crm.workspaces.index'), isActive: activeMenu === 'workspaces' },
+                { id: 'leads', label: __('Leads & Pipeline'), icon: Users, href: route('crm.leads.index'), isActive: activeMenu === 'leads' },
+                { id: 'tags', label: __('Tags & Attributes'), icon: Tag, href: route('crm.tags.index'), isActive: activeMenu === 'tags' },
+                { id: 'search', label: __('Universal Search'), icon: Search, href: route('crm.search'), isActive: activeMenu === 'search' },
             ]
         }
     ];
@@ -42,10 +42,10 @@ export default function CrmLayout({ title, activeMenu, children }: CrmLayoutProp
     // Advanced Operations / Automations
     const advancedItems = [];
     if (hasFeature('crm.campaigns.whatsapp') || hasFeature('crm.campaigns.email') || hasFeature('crm-advanced-operations')) {
-        advancedItems.push({ id: 'campaigns', label: __('Broadcast Campaigns'), icon: Mail, href: '/crm/campaigns', isActive: activeMenu === 'campaigns' });
+        advancedItems.push({ id: 'campaigns', label: __('Broadcast Campaigns'), icon: Mail, href: route('crm.campaigns.index'), isActive: activeMenu === 'campaigns' });
     }
     if (hasFeature('crm.automations') || hasFeature('crm-advanced-operations')) {
-        advancedItems.push({ id: 'sequences', label: __('Automated Sequences'), icon: PlayCircle, href: '/crm/sequences', isActive: activeMenu === 'sequences' });
+        advancedItems.push({ id: 'sequences', label: __('Automated Sequences'), icon: PlayCircle, href: route('crm.sequences.index'), isActive: activeMenu === 'sequences' });
     }
     if (advancedItems.length > 0) {
         menuGroups.push({

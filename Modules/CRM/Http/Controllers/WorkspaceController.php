@@ -72,7 +72,9 @@ class WorkspaceController extends Controller
         }
 
         if (empty($availableCenters)) {
-            abort(403, __('errors.unauthorized_workspace'));
+            // Fallback: If they have no specialized workspaces but reached here,
+            // they at least have Core CRM access. Redirect to general dashboard.
+            return redirect()->route('crm.dashboard');
         }
 
         // If they only have access to exactly 1 center, save them a click and redirect directly
@@ -169,12 +171,16 @@ class WorkspaceController extends Controller
     {
         $this->ensureAccess($request, ['Manager'], 'crm-sales-management');
 
-        $branchId = $request->user()->branch_id;
-        $tenantId = session('tenant_id') ?? $request->user()->tenant_id;
+        $tenantId = session('tenant_id');
+        if (!$tenantId) {
+            $tenant = \Modules\ERP\Models\Tenant::where('user_id', $request->user()->id)->first();
+            $tenantId = $tenant ? $tenant->id : null;
+        }
 
-        $activeAgents = DB::table('users')
-            ->where('branch_id', $branchId)
-            ->count();
+        $activeAgents = $tenantId ? DB::table('erp_team_members')
+            ->where('tenant_id', $tenantId)
+            ->where('status', 'active')
+            ->count() : 0;
 
         $slaBreaches = DB::table('leads')
             ->where('tenant_id', $tenantId)

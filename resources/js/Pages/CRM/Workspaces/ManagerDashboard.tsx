@@ -3,6 +3,7 @@ import CrmLayout from '@/Layouts/CrmLayout';
 import KPICard from '../Components/Widgets/KPICard';
 import { Activity, AlertTriangle, Users, Trophy } from 'lucide-react';
 import { __ } from '@/lib/i18n';
+import { Card, CardHeader, CardTitle, CardContent } from '@/Components/ui/card';
 
 export default function ManagerDashboard({ branchKpis, slaAlerts }: { branchKpis: any, slaAlerts: any }) {
     return (
@@ -11,8 +12,8 @@ export default function ManagerDashboard({ branchKpis, slaAlerts }: { branchKpis
                 
                 {/* Dashboard Header */}
                 <div>
-                    <h1 className="text-2xl font-bold text-slate-900 tracking-tight">{__('Operations Oversight')}</h1>
-                    <p className="text-sm text-slate-500 mt-1">{__('Branch performance and agent tracking.')}</p>
+                    <h1 className="text-2xl font-bold tracking-tight text-foreground">{__('Operations Oversight')}</h1>
+                    <p className="text-sm text-muted-foreground mt-1">{__('Branch performance and agent tracking.')}</p>
                 </div>
 
                 {/* KPI Bar */}
@@ -39,19 +40,19 @@ export default function ManagerDashboard({ branchKpis, slaAlerts }: { branchKpis
 
                 {/* Main Content Area */}
                 <div className="flex-1 flex gap-6 min-h-0">
-                    <div className="flex-1 flex flex-col bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-                        <div className="p-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
-                            <h2 className="font-semibold text-slate-800 flex items-center gap-2">
+                    <Card className="flex-1 flex flex-col overflow-hidden shadow-sm">
+                        <CardHeader className="p-4 border-b bg-muted/50 space-y-0">
+                            <CardTitle className="font-semibold flex items-center gap-2">
                                 <Trophy size={18} className="text-amber-500" />
                                 {__('Agent Leaderboard')}
-                            </h2>
-                        </div>
-                        <div className="flex-1 p-4 overflow-y-auto">
-                            <div className="flex items-center justify-center h-40 text-sm text-slate-400 border border-dashed border-slate-200 rounded-lg">
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent className="flex-1 p-4 overflow-y-auto">
+                            <div className="flex items-center justify-center h-40 text-sm text-muted-foreground border border-dashed rounded-lg">
                                 {__('No agent data available for this branch.')}
                             </div>
-                        </div>
-                    </div>
+                        </CardContent>
+                    </Card>
                 </div>
 
             </div>

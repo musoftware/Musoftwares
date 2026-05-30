@@ -55,6 +55,11 @@ Route::middleware(['web'])->group(function () {
     Route::get('erp/team/login', [\Modules\ERP\Http\Controllers\Team\TeamAuthController::class, 'showLogin'])->name('erp.team.login');
     Route::post('erp/team/login', [\Modules\ERP\Http\Controllers\Team\TeamAuthController::class, 'login'])->name('erp.team.login.store');
     Route::post('erp/team/logout', [\Modules\ERP\Http\Controllers\Team\TeamAuthController::class, 'logout'])->name('erp.team.logout');
+    
+    // CRM Portal Alias for Telesales and CRM employees
+    Route::get('crm/portal/login', [\Modules\ERP\Http\Controllers\Team\TeamAuthController::class, 'showLogin'])->name('crm.team.login');
+    Route::post('crm/portal/login', [\Modules\ERP\Http\Controllers\Team\TeamAuthController::class, 'login'])->name('crm.team.login.store');
+    Route::post('crm/portal/logout', [\Modules\ERP\Http\Controllers\Team\TeamAuthController::class, 'logout'])->name('crm.team.logout');
 });
 
 /* // ERP Routes (Migrated to Modules/ERP/routes/web.php)
