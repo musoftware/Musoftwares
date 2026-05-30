@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Campaign;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\DB;
 
 class CampaignService
 {
@@ -12,7 +13,7 @@ class CampaignService
      */
     public function createCampaign(array $data): Campaign
     {
-        return Campaign::create($data);
+        return DB::transaction(fn() => Campaign::create($data));
     }
 
     /**
@@ -20,7 +21,7 @@ class CampaignService
      */
     public function updateCampaign(Campaign $campaign, array $data): void
     {
-        $campaign->update($data);
+        DB::transaction(fn() => $campaign->update($data));
     }
 
     /**
@@ -28,7 +29,7 @@ class CampaignService
      */
     public function deleteCampaign(Campaign $campaign): void
     {
-        $campaign->delete();
+        DB::transaction(fn() => $campaign->delete());
     }
 
     /**
@@ -36,8 +37,10 @@ class CampaignService
      */
     public function scheduleCampaign(Campaign $campaign): void
     {
-        // Business logic for scheduling
-        $campaign->update(['status' => 'scheduled']);
+        DB::transaction(function () use ($campaign) {
+            // Business logic for scheduling
+            $campaign->update(['status' => 'scheduled']);
+        });
     }
 
     /**
@@ -45,7 +48,7 @@ class CampaignService
      */
     public function pauseCampaign(Campaign $campaign): void
     {
-        $campaign->update(['status' => 'paused']);
+        DB::transaction(fn() => $campaign->update(['status' => 'paused']));
     }
 
     /**
@@ -53,7 +56,7 @@ class CampaignService
      */
     public function resumeCampaign(Campaign $campaign): void
     {
-        $campaign->update(['status' => 'active']);
+        DB::transaction(fn() => $campaign->update(['status' => 'active']));
     }
 
     public function generateAIContent(string $context, string $tone, string $type): array

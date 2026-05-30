@@ -443,6 +443,11 @@ class ERPDashboardController extends Controller
     public function onboarding()
     {
         $user = Auth::user();
+        
+        if (!$user->hasModuleSubscription('erp')) {
+            return redirect()->route('subscriptions.plans')->with('error', __('erp.subscription_required_for_erp'));
+        }
+
         if (Tenant::where('user_id', $user->id)->exists()) {
             return redirect()->route('erp.dashboard');
         }
@@ -470,6 +475,10 @@ class ERPDashboardController extends Controller
         ]);
 
         $user = Auth::user();
+
+        if (!$user->hasModuleSubscription('erp')) {
+            return redirect()->route('subscriptions.plans')->with('error', __('erp.subscription_required_for_erp'));
+        }
 
         if (Tenant::where('user_id', $user->id)->exists()) {
             return redirect()->route('erp.dashboard');

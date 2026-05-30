@@ -5,6 +5,7 @@ namespace Modules\CRM\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Modules\CRM\Models\Workspace;
+use Modules\CRM\Infrastructure\Context\TenantContext;
 
 class WorkspaceMiddleware
 {
@@ -41,8 +42,8 @@ class WorkspaceMiddleware
             }
         }
 
-        // Add the workspace ID to the request or context if needed globally
-        // For our BelongsToWorkspace trait, session('crm_workspace_id') is sufficient.
+        // Add the workspace ID to the TenantContext singleton
+        app(TenantContext::class)->setWorkspaceId($workspaceId);
 
         return $next($request);
     }

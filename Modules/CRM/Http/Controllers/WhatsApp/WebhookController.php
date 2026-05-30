@@ -3,7 +3,7 @@
 namespace Modules\CRM\Http\Controllers\WhatsApp;
 
 use App\Http\Controllers\Controller;
-use Modules\CRM\app\Features\CRMWhatsAppInbox\Jobs\ProcessWhatsAppWebhookJob;
+use Modules\CRM\Domains\Communication\Actions\ReceiveWhatsAppWebhookAction;
 use Modules\CRM\Models\WhatsAppAccount;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -36,12 +36,8 @@ class WebhookController extends Controller
         // 3. Determine event type from payload
         $eventType = $this->determineEventType($request->all());
 
-        // 4. Dispatch to queue
-        ProcessWhatsAppWebhookJob::dispatch(
-            $account,
-            $request->all(),
-            $eventType
-        )->onQueue('whatsapp-incoming');
+        // 4. Dispatch to queue via Action (guarantees idempotency)
+        app(ReceiveWhatsAppWebhookAction::class)->execute($account, $request->all(), $eventType);
 
         // 5. Respond immediately (webhook best practice)
         return response()->json(['status' => 'queued'], 200);
