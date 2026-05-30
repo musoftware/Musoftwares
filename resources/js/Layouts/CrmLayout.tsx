@@ -30,11 +30,11 @@ export default function CrmLayout({ title, activeMenu, children }: CrmLayoutProp
         {
             title: __('Core Operations'),
             items: [
-                { id: 'dashboard', label: __('Dashboard'), icon: LayoutDashboard, href: route('crm.dashboard'), isActive: activeMenu === 'dashboard' },
-                { id: 'workspaces', label: __('Workspaces'), icon: Activity, href: route('crm.workspaces.index'), isActive: activeMenu === 'workspaces' },
-                { id: 'leads', label: __('Leads & Pipeline'), icon: Users, href: route('crm.leads.index'), isActive: activeMenu === 'leads' },
-                { id: 'tags', label: __('Tags & Attributes'), icon: Tag, href: route('crm.tags.index'), isActive: activeMenu === 'tags' },
-                { id: 'search', label: __('Universal Search'), icon: Search, href: route('crm.search'), isActive: activeMenu === 'search' },
+                { id: 'dashboard', label: __('Dashboard'), icon: LayoutDashboard, href: '/crm/dashboard', isActive: activeMenu === 'dashboard' },
+                { id: 'workspaces', label: __('Workspaces'), icon: Activity, href: '/crm', isActive: activeMenu === 'workspaces' },
+                { id: 'leads', label: __('Leads & Pipeline'), icon: Users, href: '/crm/leads', isActive: activeMenu === 'leads' },
+                { id: 'tags', label: __('Tags & Attributes'), icon: Tag, href: '/crm/tags', isActive: activeMenu === 'tags' },
+                { id: 'search', label: __('Universal Search'), icon: Search, href: '/crm/search', isActive: activeMenu === 'search' },
             ]
         }
     ];
@@ -42,10 +42,10 @@ export default function CrmLayout({ title, activeMenu, children }: CrmLayoutProp
     // Advanced Operations / Automations
     const advancedItems = [];
     if (hasFeature('crm.campaigns.whatsapp') || hasFeature('crm.campaigns.email') || hasFeature('crm-advanced-operations')) {
-        advancedItems.push({ id: 'campaigns', label: __('Broadcast Campaigns'), icon: Mail, href: route('crm.campaigns.index'), isActive: activeMenu === 'campaigns' });
+        advancedItems.push({ id: 'campaigns', label: __('Broadcast Campaigns'), icon: Mail, href: '/crm/campaigns', isActive: activeMenu === 'campaigns' });
     }
     if (hasFeature('crm.automations') || hasFeature('crm-advanced-operations')) {
-        advancedItems.push({ id: 'sequences', label: __('Automated Sequences'), icon: PlayCircle, href: route('crm.sequences.index'), isActive: activeMenu === 'sequences' });
+        advancedItems.push({ id: 'sequences', label: __('Automated Sequences'), icon: PlayCircle, href: '/crm/sequences', isActive: activeMenu === 'sequences' });
     }
     if (advancedItems.length > 0) {
         menuGroups.push({
@@ -59,12 +59,12 @@ export default function CrmLayout({ title, activeMenu, children }: CrmLayoutProp
         menuGroups.push({
             title: __('WhatsApp Inbox'),
             items: [
-                { id: 'wa-inbox', label: __('Live Inbox'), icon: MessageCircle, href: route('crm.whatsapp.inbox'), isActive: activeMenu === 'wa-inbox' },
-                { id: 'wa-accounts', label: __('Connected Accounts'), icon: Smartphone, href: route('crm.whatsapp.accounts.index'), isActive: activeMenu === 'wa-accounts' },
-                { id: 'wa-labels', label: __('Labels'), icon: Bookmark, href: route('crm.whatsapp.labels.index'), isActive: activeMenu === 'wa-labels' },
-                { id: 'wa-quick-replies', label: __('Quick Replies'), icon: Zap, href: route('crm.whatsapp.quick-replies.index'), isActive: activeMenu === 'wa-quick-replies' },
-                { id: 'wa-sla-policies', label: __('SLA Policies'), icon: Clock, href: route('crm.whatsapp.sla-policies.index'), isActive: activeMenu === 'wa-sla-policies' },
-                { id: 'wa-inbox-analytics', label: __('Inbox Analytics'), icon: BarChart2, href: route('crm.whatsapp.analytics.overview'), isActive: activeMenu === 'wa-inbox-analytics' },
+                { id: 'wa-inbox', label: __('Live Inbox'), icon: MessageCircle, href: '/crm/whatsapp', isActive: activeMenu === 'wa-inbox' },
+                { id: 'wa-accounts', label: __('Connected Accounts'), icon: Smartphone, href: '/crm/whatsapp/accounts', isActive: activeMenu === 'wa-accounts' },
+                { id: 'wa-labels', label: __('Labels'), icon: Bookmark, href: '/crm/whatsapp/labels', isActive: activeMenu === 'wa-labels' },
+                { id: 'wa-quick-replies', label: __('Quick Replies'), icon: Zap, href: '/crm/whatsapp/quick-replies', isActive: activeMenu === 'wa-quick-replies' },
+                { id: 'wa-sla-policies', label: __('SLA Policies'), icon: Clock, href: '/crm/whatsapp/sla-policies', isActive: activeMenu === 'wa-sla-policies' },
+                { id: 'wa-inbox-analytics', label: __('Inbox Analytics'), icon: BarChart2, href: '/crm/whatsapp/analytics/overview', isActive: activeMenu === 'wa-inbox-analytics' },
             ]
         });
     }
@@ -74,11 +74,11 @@ export default function CrmLayout({ title, activeMenu, children }: CrmLayoutProp
         menuGroups.push({
             title: __('WhatsApp Campaigns'),
             items: [
-                { id: 'wac-campaigns', label: __('Campaigns'), icon: Send, href: route('crm.whatsapp-campaigns.index'), isActive: activeMenu === 'wac-campaigns' },
-                { id: 'wac-audiences', label: __('Audiences'), icon: UsersRound, href: route('crm.whatsapp-campaigns.audiences.index'), isActive: activeMenu === 'wac-audiences' },
-                { id: 'wac-templates', label: __('Templates'), icon: FileText, href: route('crm.whatsapp-campaigns.templates.index'), isActive: activeMenu === 'wac-templates' },
-                { id: 'wac-automations', label: __('Automations'), icon: Bot, href: route('crm.whatsapp-campaigns.automations.index'), isActive: activeMenu === 'wac-automations' },
-                { id: 'wac-analytics', label: __('Campaign Analytics'), icon: PieChart, href: route('crm.whatsapp-campaigns.analytics.overview'), isActive: activeMenu === 'wac-analytics' },
+                { id: 'wac-campaigns', label: __('Campaigns'), icon: Send, href: '/crm/whatsapp-campaigns', isActive: activeMenu === 'wac-campaigns' },
+                { id: 'wac-audiences', label: __('Audiences'), icon: UsersRound, href: '/crm/whatsapp-campaigns/audiences', isActive: activeMenu === 'wac-audiences' },
+                { id: 'wac-templates', label: __('Templates'), icon: FileText, href: '/crm/whatsapp-campaigns/templates', isActive: activeMenu === 'wac-templates' },
+                { id: 'wac-automations', label: __('Automations'), icon: Bot, href: '/crm/whatsapp-campaigns/automations', isActive: activeMenu === 'wac-automations' },
+                { id: 'wac-analytics', label: __('Campaign Analytics'), icon: PieChart, href: '/crm/whatsapp-campaigns/analytics/overview', isActive: activeMenu === 'wac-analytics' },
             ]
         });
     }
