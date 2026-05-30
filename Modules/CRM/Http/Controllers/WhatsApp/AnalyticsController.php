@@ -3,9 +3,9 @@
 namespace Modules\CRM\Http\Controllers\WhatsApp;
 
 use App\Http\Controllers\Controller;
-use App\Modules\CRMWhatsAppInbox\Services\WhatsAppAnalyticsService;
-use App\Modules\CRMWhatsAppInbox\Services\WhatsAppSlaEngine;
-use App\Modules\CRMWhatsAppInbox\Services\CRMWhatsAppLimitsService;
+use Modules\CRM\app\Features\CRMWhatsAppInbox\Services\WhatsAppAnalyticsService;
+use Modules\CRM\app\Features\CRMWhatsAppInbox\Services\WhatsAppSlaEngine;
+use Modules\CRM\app\Features\CRMWhatsAppInbox\Services\CRMWhatsAppLimitsService;
 use Illuminate\Http\Request;
 
 class AnalyticsController extends Controller

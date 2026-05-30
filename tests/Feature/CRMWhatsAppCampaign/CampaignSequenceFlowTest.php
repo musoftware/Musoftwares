@@ -3,9 +3,9 @@
 namespace Tests\Feature\CRMWhatsAppCampaign;
 
 use Tests\TestCase;
-use App\Modules\CRMWhatsAppCampaigns\Services\CampaignSequenceEngine;
-use App\Modules\CRMWhatsAppCampaigns\Services\WhatsAppTemplateRenderer;
-use App\Modules\CRMWhatsAppCampaigns\Jobs\ProcessSequenceStepJob;
+use Modules\CRM\app\Features\CRMWhatsAppCampaigns\Services\CampaignSequenceEngine;
+use Modules\CRM\app\Features\CRMWhatsAppCampaigns\Services\WhatsAppTemplateRenderer;
+use Modules\CRM\app\Features\CRMWhatsAppCampaigns\Jobs\ProcessSequenceStepJob;
 use Modules\CRM\Models\WhatsAppCampaign;
 use Modules\CRM\Models\WhatsAppCampaignDelivery;
 use Modules\CRM\Models\WhatsAppCampaignSequence;

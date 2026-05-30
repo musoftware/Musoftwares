@@ -2,8 +2,8 @@
 
 namespace Tests\Unit\CRMWhatsAppInbox;
 
-use App\Modules\CRMWhatsAppInbox\Events\WhatsAppConversationAssigned;
-use App\Modules\CRMWhatsAppInbox\Services\ConversationAssignmentEngine;
+use Modules\CRM\app\Features\CRMWhatsAppInbox\Events\WhatsAppConversationAssigned;
+use Modules\CRM\app\Features\CRMWhatsAppInbox\Services\ConversationAssignmentEngine;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use Modules\CRM\Models\WhatsAppAccount;

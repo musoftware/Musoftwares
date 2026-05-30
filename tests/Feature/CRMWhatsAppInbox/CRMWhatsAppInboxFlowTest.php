@@ -2,7 +2,7 @@
 
 namespace Tests\Feature\CRMWhatsAppInbox;
 
-use App\Modules\CRMWhatsAppInbox\Events\WhatsAppMessageReceived;
+use Modules\CRM\app\Features\CRMWhatsAppInbox\Events\WhatsAppMessageReceived;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Queue;
@@ -31,7 +31,7 @@ class CRMWhatsAppInboxFlowTest extends TestCase
             'body'       => 'I want to buy your product',
         ];
 
-        $service = app(\App\Modules\CRMWhatsAppInbox\Services\WhatsAppInboxService::class);
+        $service = app(\Modules\CRM\app\Features\CRMWhatsAppInbox\Services\WhatsAppInboxService::class);
         $message = $service->processIncomingMessage($account, $payload);
 
         // Verify the full chain
@@ -56,7 +56,7 @@ class CRMWhatsAppInboxFlowTest extends TestCase
 
         $account = WhatsAppAccount::factory()->connected()->create();
 
-        $service = app(\App\Modules\CRMWhatsAppInbox\Services\WhatsAppInboxService::class);
+        $service = app(\Modules\CRM\app\Features\CRMWhatsAppInbox\Services\WhatsAppInboxService::class);
 
         // First message
         $msg1 = $service->processIncomingMessage($account, [

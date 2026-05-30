@@ -2,9 +2,9 @@
 
 namespace Tests\Unit\CRMWhatsAppInbox;
 
-use App\Modules\CRMWhatsAppInbox\Contracts\WhatsAppProviderInterface;
-use App\Modules\CRMWhatsAppInbox\Events\WhatsAppMessageReceived;
-use App\Modules\CRMWhatsAppInbox\Services\WhatsAppInboxService;
+use Modules\CRM\app\Features\CRMWhatsAppInbox\Contracts\WhatsAppProviderInterface;
+use Modules\CRM\app\Features\CRMWhatsAppInbox\Events\WhatsAppMessageReceived;
+use Modules\CRM\app\Features\CRMWhatsAppInbox\Services\WhatsAppInboxService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use Modules\CRM\Models\WhatsAppAccount;

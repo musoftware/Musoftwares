@@ -49,6 +49,7 @@ class ServiceOrder extends Model
         'completed_at' => 'datetime',
         'auto_complete_at' => 'datetime',
         'delivery_payload' => 'array',
+        'status' => \Modules\Marketplace\Enums\ServiceOrderStatus::class,
     ];
 
     public function buyer(): BelongsTo

@@ -3,9 +3,9 @@
 namespace Tests\Unit\BookingPriority;
 
 use PHPUnit\Framework\TestCase;
-use App\Modules\BookingPriority\Services\PriorityAssignmentEngine;
-use App\Modules\BookingPriority\Models\BookingPriorityLevel;
-use App\Modules\BookingPriority\Models\BookingPriorityAssignment;
+use Modules\Booking\app\Features\BookingPriority\Services\PriorityAssignmentEngine;
+use Modules\Booking\app\Features\BookingPriority\Models\BookingPriorityLevel;
+use Modules\Booking\app\Features\BookingPriority\Models\BookingPriorityAssignment;
 
 class PriorityAssignmentEngineTest extends TestCase
 {

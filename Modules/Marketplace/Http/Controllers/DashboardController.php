@@ -8,6 +8,8 @@ use Inertia\Inertia;
 use Modules\Marketplace\Models\Service;
 use Modules\Marketplace\Models\ServiceOrder;
 use Modules\Marketplace\Models\ServiceCategory;
+use Modules\Marketplace\Enums\ServiceOrderStatus;
+use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
@@ -17,7 +19,7 @@ class DashboardController extends Controller
 
         // 1. Fetch Active Purchases (As Buyer)
         $activePurchases = ServiceOrder::where('buyer_id', $user->id)
-            ->whereIn('status', ['pending', 'processing'])
+            ->whereIn('status', [ServiceOrderStatus::PENDING, ServiceOrderStatus::PROCESSING])
             ->with(['package.service', 'seller'])
             ->latest()
             ->take(5)
@@ -35,7 +37,7 @@ class DashboardController extends Controller
 
         // 2. Fetch Active Sales (As Seller)
         $activeSales = ServiceOrder::where('seller_id', $user->id)
-            ->whereIn('status', ['pending', 'processing'])
+            ->whereIn('status', [ServiceOrderStatus::PENDING, ServiceOrderStatus::PROCESSING])
             ->with(['package.service', 'buyer'])
             ->latest()
             ->take(5)
@@ -53,6 +55,7 @@ class DashboardController extends Controller
 
         // 3. Fetch Listed Gigs (As Seller)
         $listedGigs = Service::where('seller_id', $user->id)
+            ->withMin('packages', 'price')
             ->latest()
             ->take(5)
             ->get()
@@ -60,19 +63,25 @@ class DashboardController extends Controller
                 return [
                     'id' => $service->id,
                     'title' => $service->title,
-                    'price' => $service->packages()->min('price') ?? 0,
+                    'price' => $service->packages_min_price ?? 0,
                     'reviews' => 0, // Placeholder until reviews module is built
                     'rating' => 0.0,
                 ];
             });
 
         // 4. Compute Real Stats
+        $ordersStats = ServiceOrder::where('seller_id', $user->id)
+            ->select(
+                DB::raw("SUM(CASE WHEN status = 'processing' THEN amount ELSE 0 END) as locked_escrow"),
+                DB::raw("SUM(CASE WHEN status = 'processing' THEN 1 ELSE 0 END) as active_orders"),
+                DB::raw("SUM(CASE WHEN status = 'completed' THEN amount ELSE 0 END) as total_sales")
+            )->first();
+
         $stats = [
-            // Escrow locked hold could be sum of active orders where user is buyer or seller
-            'lockedEscrow' => ServiceOrder::where('seller_id', $user->id)->where('status', 'processing')->sum('amount'),
-            'activeOrders' => ServiceOrder::where('seller_id', $user->id)->where('status', 'processing')->count(),
+            'lockedEscrow' => $ordersStats->locked_escrow ?? 0,
+            'activeOrders' => (int) ($ordersStats->active_orders ?? 0),
             'servicesListed' => Service::where('seller_id', $user->id)->count(),
-            'totalSales' => ServiceOrder::where('seller_id', $user->id)->where('status', 'completed')->sum('amount'),
+            'totalSales' => $ordersStats->total_sales ?? 0,
         ];
 
         // 5. Fetch Service Categories for Publish Modal

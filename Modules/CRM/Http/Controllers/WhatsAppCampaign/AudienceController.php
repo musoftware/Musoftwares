@@ -3,7 +3,7 @@
 namespace Modules\CRM\Http\Controllers\WhatsAppCampaign;
 
 use App\Http\Controllers\Controller;
-use App\Modules\CRMWhatsAppCampaigns\Services\CampaignAudienceResolver;
+use Modules\CRM\app\Features\CRMWhatsAppCampaigns\Services\CampaignAudienceResolver;
 use Modules\CRM\Http\Requests\WhatsAppCampaign\StoreAudienceRequest;
 use Modules\CRM\Http\Resources\WhatsAppCampaign\AudienceResource;
 use Modules\CRM\Models\WhatsAppCampaignAudience;

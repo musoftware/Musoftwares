@@ -3,7 +3,7 @@
 namespace Modules\CRM\Http\Controllers\WhatsApp;
 
 use App\Http\Controllers\Controller;
-use App\Modules\CRMWhatsAppInbox\Services\WhatsAppInboxService;
+use Modules\CRM\app\Features\CRMWhatsAppInbox\Services\WhatsAppInboxService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Modules\CRM\Http\Resources\WhatsApp\ConversationResource;

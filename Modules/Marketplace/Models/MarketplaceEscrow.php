@@ -30,6 +30,7 @@ class MarketplaceEscrow extends Model
         'exchange_rate_date' => 'date',
         'released_at' => 'datetime',
         'refunded_at' => 'datetime',
+        'status' => \Modules\Marketplace\Enums\EscrowStatus::class,
     ];
 
     public function order(): BelongsTo

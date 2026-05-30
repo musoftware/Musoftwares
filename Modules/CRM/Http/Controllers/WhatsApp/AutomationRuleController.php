@@ -3,7 +3,7 @@
 namespace Modules\CRM\Http\Controllers\WhatsApp;
 
 use App\Http\Controllers\Controller;
-use App\Modules\CRMWhatsAppInbox\Services\CRMWhatsAppLimitsService;
+use Modules\CRM\app\Features\CRMWhatsAppInbox\Services\CRMWhatsAppLimitsService;
 use Modules\CRM\Http\Requests\WhatsApp\StoreAutomationRuleRequest;
 use Modules\CRM\Models\WhatsAppAutomationRule;
 

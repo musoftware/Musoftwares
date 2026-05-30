@@ -3,9 +3,9 @@
 namespace Modules\CRM\Http\Controllers\WhatsApp;
 
 use App\Http\Controllers\Controller;
-use App\Modules\CRMWhatsAppInbox\Events\WhatsAppConversationResolved;
-use App\Modules\CRMWhatsAppInbox\Services\ConversationAssignmentEngine;
-use App\Modules\CRMWhatsAppInbox\Services\WhatsAppSlaEngine;
+use Modules\CRM\app\Features\CRMWhatsAppInbox\Events\WhatsAppConversationResolved;
+use Modules\CRM\app\Features\CRMWhatsAppInbox\Services\ConversationAssignmentEngine;
+use Modules\CRM\app\Features\CRMWhatsAppInbox\Services\WhatsAppSlaEngine;
 use Modules\CRM\Http\Requests\WhatsApp\AssignConversationRequest;
 use Modules\CRM\Http\Resources\WhatsApp\ConversationResource;
 use Modules\CRM\Http\Resources\WhatsApp\MessageResource;

@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\DB;
 use Modules\Marketplace\Models\Service;
 use Modules\Marketplace\Models\ServiceCategory;
 use Modules\Marketplace\Models\ServicePackage;
+use Modules\Marketplace\Http\Requests\StoreServiceRequest;
+use Modules\Marketplace\Http\Requests\UpdateServiceRequest;
 use Inertia\Inertia;
 
 class ServiceController extends Controller
@@ -69,32 +71,9 @@ class ServiceController extends Controller
         ]);
     }
 
-    public function store(Request $request)
+    public function store(StoreServiceRequest $request)
     {
-        $validated = $request->validate([
-            'title'                    => 'required|string|max:255',
-            'description'              => 'required|string|min:100',
-            'category_id'              => 'required|exists:marketplace_service_categories,id',
-            'tags'                     => 'nullable|array|max:5',
-            'tags.*'                   => 'string|max:40',
-            'video_url'                => 'nullable|url|max:255',
-            'packages'                 => 'required|array|min:1|max:3',
-            'packages.*.name'          => 'required|string|max:80',
-            'packages.*.description'   => 'required|string|max:500',
-            'packages.*.price'         => 'required|numeric|min:1',
-            'packages.*.currency_id'   => 'required|integer|exists:currencies,id',
-            'packages.*.delivery_days' => 'required|integer|min:1|max:365',
-            'packages.*.revisions'     => 'nullable|integer|min:-1',
-            'packages.*.features'      => 'nullable|array',
-            'packages.*.features.*'    => 'string|max:60',
-            'faq'                      => 'nullable|array|max:10',
-            'faq.*.question'           => 'required|string|max:200',
-            'faq.*.answer'             => 'required|string|max:1000',
-            'requirements'             => 'nullable|array|max:10',
-            'requirements.*'           => 'string|max:300',
-            'gallery'                  => 'nullable|array|max:5',
-            'gallery.*'                => 'image|mimes:jpeg,png,jpg,webp|max:5120',
-        ]);
+        $validated = $request->validated();
 
         $service = DB::transaction(function () use ($validated, $request) {
             // Handle gallery uploads
@@ -154,38 +133,11 @@ class ServiceController extends Controller
         ]);
     }
 
-    public function update(Request $request, Service $service)
+    public function update(UpdateServiceRequest $request, Service $service)
     {
-        if (auth()->id() !== $service->seller_id) {
-            abort(403);
-        }
+        $this->authorize('update', $service);
 
-        $validated = $request->validate([
-            'title'                    => 'required|string|max:255',
-            'description'              => 'required|string|min:100',
-            'category_id'              => 'required|exists:marketplace_service_categories,id',
-            'tags'                     => 'nullable|array|max:5',
-            'tags.*'                   => 'string|max:40',
-            'video_url'                => 'nullable|url|max:255',
-            'packages'                 => 'required|array|min:1|max:3',
-            'packages.*.name'          => 'required|string|max:80',
-            'packages.*.description'   => 'required|string|max:500',
-            'packages.*.price'         => 'required|numeric|min:1',
-            'packages.*.currency_id'   => 'required|integer|exists:currencies,id',
-            'packages.*.delivery_days' => 'required|integer|min:1|max:365',
-            'packages.*.revisions'     => 'nullable|integer|min:-1',
-            'packages.*.features'      => 'nullable|array',
-            'packages.*.features.*'    => 'string|max:60',
-            'faq'                      => 'nullable|array|max:10',
-            'faq.*.question'           => 'required|string|max:200',
-            'faq.*.answer'             => 'required|string|max:1000',
-            'requirements'             => 'nullable|array|max:10',
-            'requirements.*'           => 'string|max:300',
-            'gallery'                  => 'nullable|array|max:5',
-            'gallery.*'                => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
-            'kept_gallery'             => 'nullable|array',
-            'kept_gallery.*'           => 'string'
-        ]);
+        $validated = $request->validated();
 
         DB::transaction(function () use ($validated, $request, $service) {
             $galleryPaths = $validated['kept_gallery'] ?? [];
@@ -209,19 +161,36 @@ class ServiceController extends Controller
                 'status'       => 'draft', // Requires re-approval
             ]);
 
-            $service->packages()->delete();
+            $submittedPackageIds = collect($validated['packages'])->pluck('id')->filter()->toArray();
+
+            // Soft-delete removed packages
+            $service->packages()->whereNotIn('id', $submittedPackageIds)->delete();
 
             foreach ($validated['packages'] as $pkg) {
-                ServicePackage::create([
-                    'service_id'    => $service->id,
-                    'name'          => $pkg['name'],
-                    'description'   => $pkg['description'],
-                    'price'         => $pkg['price'],
-                    'currency_id'   => $pkg['currency_id'],
-                    'delivery_days' => $pkg['delivery_days'],
-                    'revisions'     => $pkg['revisions'] ?? 2,
-                    'features'      => $pkg['features'] ?? [],
-                ]);
+                if (!empty($pkg['id'])) {
+                    // Update existing
+                    $service->packages()->where('id', $pkg['id'])->update([
+                        'name'          => $pkg['name'],
+                        'description'   => $pkg['description'],
+                        'price'         => $pkg['price'],
+                        'currency_id'   => $pkg['currency_id'],
+                        'delivery_days' => $pkg['delivery_days'],
+                        'revisions'     => $pkg['revisions'] ?? 2,
+                        'features'      => $pkg['features'] ?? [],
+                    ]);
+                } else {
+                    // Create new
+                    ServicePackage::create([
+                        'service_id'    => $service->id,
+                        'name'          => $pkg['name'],
+                        'description'   => $pkg['description'],
+                        'price'         => $pkg['price'],
+                        'currency_id'   => $pkg['currency_id'],
+                        'delivery_days' => $pkg['delivery_days'],
+                        'revisions'     => $pkg['revisions'] ?? 2,
+                        'features'      => $pkg['features'] ?? [],
+                    ]);
+                }
             }
         });
 

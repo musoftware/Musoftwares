@@ -4,7 +4,7 @@ namespace Tests\Feature\BookingRules;
 
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use App\Modules\BookingRules\Models\BookingAdvancedRule;
+use Modules\Booking\app\Features\BookingRules\Models\BookingAdvancedRule;
 
 class TenantIsolationAdvancedRulesTest extends TestCase
 {

@@ -3,8 +3,8 @@
 namespace Modules\CRM\Http\Controllers\WhatsApp;
 
 use App\Http\Controllers\Controller;
-use App\Modules\CRMWhatsAppInbox\Services\WhatsAppSessionManager;
-use App\Modules\CRMWhatsAppInbox\Services\CRMWhatsAppLimitsService;
+use Modules\CRM\app\Features\CRMWhatsAppInbox\Services\WhatsAppSessionManager;
+use Modules\CRM\app\Features\CRMWhatsAppInbox\Services\CRMWhatsAppLimitsService;
 use Modules\CRM\Http\Requests\WhatsApp\StoreAccountRequest;
 use Modules\CRM\Http\Resources\WhatsApp\AccountResource;
 use Modules\CRM\Models\WhatsAppAccount;

@@ -3,9 +3,9 @@
 namespace Tests\Unit\BookingSmartSlots;
 
 use PHPUnit\Framework\TestCase;
-use App\Modules\BookingSmartSlots\Services\SmartSlotEngine;
-use App\Modules\BookingSmartSlots\Services\DynamicAvailabilityGenerator;
-use App\Modules\BookingSmartSlots\Services\ResourceLoadBalancer;
+use Modules\Booking\app\Features\BookingSmartSlots\Services\SmartSlotEngine;
+use Modules\Booking\app\Features\BookingSmartSlots\Services\DynamicAvailabilityGenerator;
+use Modules\Booking\app\Features\BookingSmartSlots\Services\ResourceLoadBalancer;
 
 class SmartSlotEngineTest extends TestCase
 {

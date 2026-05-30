@@ -253,6 +253,7 @@ export default function SnapDownloaderRunner() {
     });
     const [isCreatingAuto, setIsCreatingAuto] = useState(false);
     const [showAutoForm, setShowAutoForm] = useState(false);
+    const [editingAutoId, setEditingAutoId] = useState<string | null>(null);
 
     // Data state
     const [activeProcesses, setActiveProcesses] = useState<Process[]>([]);
@@ -324,23 +325,34 @@ export default function SnapDownloaderRunner() {
         if (!autoForm.name.trim() || !autoForm.targets.trim()) return;
         setIsCreatingAuto(true);
         try {
-            await callRPC('create_automation', {
+            const payload = {
                 name: autoForm.name,
                 targets: autoForm.targets.split('\n').map(t => t.trim()).filter(t => t),
                 frequency: autoForm.frequency,
                 filters: autoForm.filters,
-                ffmpegAddLogo: autoForm.ffmpegAddLogo,
-                watermarkPath: autoForm.watermarkPath,
-                watermarkPosition: autoForm.watermarkPosition,
-                minDuration: autoForm.minDuration,
-                maxDuration: autoForm.maxDuration,
-                globalDeduplication: autoForm.globalDeduplication,
-                exportMetadata: autoForm.exportMetadata,
-                muteAudio: autoForm.muteAudio,
-                smartSync: autoForm.smartSync,
-                pacing: autoForm.pacing,
-            });
+                executionRules: {
+                    smartSync: autoForm.smartSync,
+                    pacing: autoForm.pacing,
+                    minDuration: autoForm.minDuration,
+                    maxDuration: autoForm.maxDuration,
+                    globalDeduplication: autoForm.globalDeduplication,
+                    exportMetadata: autoForm.exportMetadata,
+                },
+                pipeline: {
+                    ffmpegOptimize: autoForm.ffmpegOptimize,
+                    ffmpegAddLogo: autoForm.ffmpegAddLogo,
+                    watermarkPath: autoForm.watermarkPath,
+                    watermarkPosition: autoForm.watermarkPosition,
+                    muteAudio: autoForm.muteAudio,
+                }
+            };
+            if (editingAutoId) {
+                await callRPC('update_automation', { ...payload, id: editingAutoId });
+            } else {
+                await callRPC('create_automation', payload);
+            }
             setShowAutoForm(false);
+            setEditingAutoId(null);
             setAutoForm({ ...autoForm, name: '', targets: '' });
             loadAll();
         } catch (err: any) {
@@ -348,6 +360,28 @@ export default function SnapDownloaderRunner() {
         } finally {
             setIsCreatingAuto(false);
         }
+    };
+
+    const handleEditAutomation = (auto: any) => {
+        setAutoForm({
+            name: auto.name || '',
+            targets: Array.isArray(auto.targets) ? auto.targets.join('\n') : '',
+            frequency: auto.frequency || 'daily',
+            filters: auto.filters || { stories: true, spotlights: true, highlights: false, episodes: false },
+            ffmpegOptimize: auto.pipeline?.ffmpegOptimize || false,
+            ffmpegAddLogo: auto.pipeline?.ffmpegAddLogo || false,
+            watermarkPath: auto.pipeline?.watermarkPath || '',
+            watermarkPosition: auto.pipeline?.watermarkPosition || 'bottom_right',
+            minDuration: auto.executionRules?.minDuration || 0,
+            maxDuration: auto.executionRules?.maxDuration || 0,
+            globalDeduplication: auto.executionRules?.globalDeduplication ?? true,
+            exportMetadata: auto.executionRules?.exportMetadata ?? true,
+            muteAudio: auto.pipeline?.muteAudio || false,
+            smartSync: auto.executionRules?.smartSync ?? true,
+            pacing: auto.executionRules?.pacing || '1_min',
+        });
+        setEditingAutoId(auto.id);
+        setShowAutoForm(true);
     };
 
     const handleToggleAutomation = async (id: string, active: boolean) => {
@@ -674,7 +708,17 @@ export default function SnapDownloaderRunner() {
                                     <p className="text-xs mt-1" style={{ color: 'rgba(255,255,255,0.35)' }}>Recurring campaigns that run automatically in the background</p>
                                 </div>
                                 {!showAutoForm && (
-                                    <Button onClick={() => setShowAutoForm(true)} className="gap-2 h-11 text-xs font-bold" style={{ background: 'rgba(245,158,11,0.15)', color: '#f59e0b' }}>
+                                    <Button onClick={() => {
+                                        setEditingAutoId(null);
+                                        setAutoForm({
+                                            name: '', targets: '', frequency: 'daily',
+                                            filters: { stories: true, spotlights: true, highlights: false, episodes: false },
+                                            ffmpegOptimize: false, ffmpegAddLogo: false, watermarkPath: '', watermarkPosition: 'bottom_right',
+                                            minDuration: 0, maxDuration: 0, globalDeduplication: true, exportMetadata: true,
+                                            muteAudio: false, smartSync: true, pacing: '1_min',
+                                        });
+                                        setShowAutoForm(true);
+                                    }} className="gap-2 h-11 text-xs font-bold" style={{ background: 'rgba(245,158,11,0.15)', color: '#f59e0b' }}>
                                         <Play className="w-3.5 h-3.5 fill-current" /> New Campaign
                                     </Button>
                                 )}
@@ -683,8 +727,8 @@ export default function SnapDownloaderRunner() {
                             {showAutoForm ? (
                                 <div className="rounded-2xl border p-4 sm:p-6 space-y-5" style={{ background: '#13161f', borderColor: 'rgba(255,255,255,0.06)' }}>
                                     <div className="flex items-center justify-between mb-4 border-b pb-4" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
-                                        <h2 className="text-lg font-bold text-white">Create Automation Campaign</h2>
-                                        <Button variant="ghost" size="sm" onClick={() => setShowAutoForm(false)} className="text-slate-400 hover:text-white">Cancel</Button>
+                                        <h2 className="text-lg font-bold text-white">{editingAutoId ? 'Edit Automation Campaign' : 'Create Automation Campaign'}</h2>
+                                        <Button variant="ghost" size="sm" onClick={() => { setShowAutoForm(false); setEditingAutoId(null); }} className="text-slate-400 hover:text-white">Cancel</Button>
                                     </div>
 
                                     {/* Name & Frequency */}
@@ -895,7 +939,15 @@ export default function SnapDownloaderRunner() {
                                                             <Button 
                                                                 variant="ghost" 
                                                                 size="icon" 
-                                                                className="h-8 w-8 text-rose-500/60 hover:text-rose-500 hover:bg-rose-500/10 ml-2"
+                                                                className="h-8 w-8 text-slate-400 hover:text-white hover:bg-white/10 ml-2"
+                                                                onClick={() => handleEditAutomation(auto)}
+                                                            >
+                                                                <Settings className="w-4 h-4" />
+                                                            </Button>
+                                                            <Button 
+                                                                variant="ghost" 
+                                                                size="icon" 
+                                                                className="h-8 w-8 text-rose-500/60 hover:text-rose-500 hover:bg-rose-500/10"
                                                                 onClick={() => handleDeleteAutomation(auto.id)}
                                                             >
                                                                 <Trash2 className="w-4 h-4" />

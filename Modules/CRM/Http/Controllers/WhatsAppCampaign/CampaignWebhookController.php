@@ -3,7 +3,7 @@
 namespace Modules\CRM\Http\Controllers\WhatsAppCampaign;
 
 use App\Http\Controllers\Controller;
-use App\Modules\CRMWhatsAppCampaigns\Jobs\ProcessCampaignWebhookJob;
+use Modules\CRM\app\Features\CRMWhatsAppCampaigns\Jobs\ProcessCampaignWebhookJob;
 use Modules\CRM\Models\WhatsAppAccount;
 use Illuminate\Http\Request;
 

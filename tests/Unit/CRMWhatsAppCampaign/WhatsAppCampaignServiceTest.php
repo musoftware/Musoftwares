@@ -3,12 +3,12 @@
 namespace Tests\Unit\CRMWhatsAppCampaign;
 
 use Tests\TestCase;
-use App\Modules\CRMWhatsAppCampaigns\Services\WhatsAppCampaignService;
-use App\Modules\CRMWhatsAppCampaigns\Services\CRMWhatsAppCampaignLimitsService;
-use App\Modules\CRMWhatsAppCampaigns\Services\CampaignAudienceResolver;
-use App\Modules\CRMWhatsAppCampaigns\Events\WhatsAppCampaignCreated;
-use App\Modules\CRMWhatsAppCampaigns\Events\WhatsAppCampaignStarted;
-use App\Modules\CRMWhatsAppCampaigns\Events\WhatsAppCampaignCompleted;
+use Modules\CRM\app\Features\CRMWhatsAppCampaigns\Services\WhatsAppCampaignService;
+use Modules\CRM\app\Features\CRMWhatsAppCampaigns\Services\CRMWhatsAppCampaignLimitsService;
+use Modules\CRM\app\Features\CRMWhatsAppCampaigns\Services\CampaignAudienceResolver;
+use Modules\CRM\app\Features\CRMWhatsAppCampaigns\Events\WhatsAppCampaignCreated;
+use Modules\CRM\app\Features\CRMWhatsAppCampaigns\Events\WhatsAppCampaignStarted;
+use Modules\CRM\app\Features\CRMWhatsAppCampaigns\Events\WhatsAppCampaignCompleted;
 use Modules\CRM\Models\WhatsAppCampaign;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;

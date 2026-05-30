@@ -3,7 +3,7 @@
 namespace Modules\CRM\Http\Controllers\WhatsAppCampaign;
 
 use App\Http\Controllers\Controller;
-use App\Modules\CRMWhatsAppCampaigns\Services\WhatsAppCampaignService;
+use Modules\CRM\app\Features\CRMWhatsAppCampaigns\Services\WhatsAppCampaignService;
 use Modules\CRM\Http\Requests\WhatsAppCampaign\StoreCampaignRequest;
 use Modules\CRM\Http\Requests\WhatsAppCampaign\UpdateCampaignRequest;
 use Modules\CRM\Http\Requests\WhatsAppCampaign\CampaignFilterRequest;

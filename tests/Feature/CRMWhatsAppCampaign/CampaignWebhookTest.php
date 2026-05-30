@@ -58,6 +58,6 @@ class CampaignWebhookTest extends TestCase
             'status'     => 'read',
         ]);
 
-        Queue::assertPushed(\App\Modules\CRMWhatsAppCampaigns\Jobs\ProcessCampaignWebhookJob::class);
+        Queue::assertPushed(\Modules\CRM\app\Features\CRMWhatsAppCampaigns\Jobs\ProcessCampaignWebhookJob::class);
     }
 }
