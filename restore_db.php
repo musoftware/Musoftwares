@@ -65,16 +65,36 @@ if ($returnVar !== 0) {
 echo "SQL Import finished successfully.\n";
 }
 
-echo "\n2.5 Migrating whatsapp_number to mobile_1 (if exists)...\n";
-try {
-    DB::statement("UPDATE users SET mobile_1 = whatsapp_number WHERE (mobile_1 IS NULL OR mobile_1 = '') AND whatsapp_number IS NOT NULL AND whatsapp_number != '';");
-    DB::statement("ALTER TABLE users DROP COLUMN whatsapp_number;");
-    echo "Migrated and dropped whatsapp_number column.\n";
-} catch (\Exception $e) {
-    echo "No whatsapp_number column to migrate (or already dropped).\n";
-}
 echo "\n3. Running migrations to update the schema...\n";
 Artisan::call('migrate', ['--force' => true]);
 echo trim(Artisan::output()) . "\n\n";
+
+echo "\n3.5 Migrating old phone numbers to mobile_1 and mobile_2...\n";
+try {
+    // Migrate phone_number to mobile_1
+    DB::statement("UPDATE users SET mobile_1 = phone_number WHERE (mobile_1 IS NULL OR mobile_1 = '') AND phone_number IS NOT NULL AND phone_number != '';");
+    DB::statement("ALTER TABLE users DROP COLUMN phone_number;");
+    echo "Migrated and dropped phone_number column.\n";
+} catch (\Exception $e) {
+    echo "No phone_number column to migrate (or already dropped): " . $e->getMessage() . "\n";
+}
+
+try {
+    // Migrate phone_number2 to mobile_2
+    DB::statement("UPDATE users SET mobile_2 = phone_number2 WHERE (mobile_2 IS NULL OR mobile_2 = '') AND phone_number2 IS NOT NULL AND phone_number2 != '';");
+    DB::statement("ALTER TABLE users DROP COLUMN phone_number2;");
+    echo "Migrated and dropped phone_number2 column.\n";
+} catch (\Exception $e) {
+    echo "No phone_number2 column to migrate (or already dropped): " . $e->getMessage() . "\n";
+}
+
+try {
+    // Fallback: if mobile_1 is still empty, try to get it from whatsapp_number
+    DB::statement("UPDATE users SET mobile_1 = whatsapp_number WHERE (mobile_1 IS NULL OR mobile_1 = '') AND whatsapp_number IS NOT NULL AND whatsapp_number != '';");
+    // We do NOT drop whatsapp_number because the new schema might still use it
+    echo "Migrated whatsapp_number to mobile_1 where mobile_1 was empty.\n";
+} catch (\Exception $e) {
+    echo "No whatsapp_number column to migrate.\n";
+}
 
 echo "✅ All Done! Database is clean, imported, and migrated.\n";

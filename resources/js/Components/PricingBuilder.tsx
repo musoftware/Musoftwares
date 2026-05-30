@@ -149,13 +149,17 @@ export default function PricingBuilder({
 
     const subtotal = useMemo(() => {
         let baseSubtotal = 0;
-        let toolsCount = 0;
+        let paidToolsCount = 0;
+        let toolsBaseTotal = 0;
 
         selectedItems.forEach((id) => {
             const item = serviceItems.find((i) => i.id === id);
             if (item) {
                 if (item.type === 'tool') {
-                    toolsCount++;
+                    if (item.monthly_price > 0) {
+                        paidToolsCount++;
+                        toolsBaseTotal += item.monthly_price;
+                    }
                 } else {
                     baseSubtotal += item.monthly_price;
                 }
@@ -163,36 +167,32 @@ export default function PricingBuilder({
         });
 
         let toolsSubtotal = 0;
-        if (toolsCount > 0) {
-            const firstToolId = selectedItems.find(id => serviceItems.find(i => i.id === id)?.type === 'tool');
-            const toolBaseMonthly = serviceItems.find(i => i.id === firstToolId)?.monthly_price || 0;
-            const discountPercent = Math.min(50, (toolsCount - 1) * 10);
-            toolsSubtotal = (toolBaseMonthly * toolsCount) * (1 - (discountPercent / 100));
+        if (paidToolsCount > 0) {
+            const discountPercent = Math.min(50, (paidToolsCount - 1) * 10);
+            toolsSubtotal = toolsBaseTotal * (1 - (discountPercent / 100));
         }
 
         return baseSubtotal + toolsSubtotal;
     }, [selectedItems, serviceItems]);
 
     const toolsDiscount = useMemo(() => {
-        let toolsCount = 0;
-        let firstToolId: string | null = null;
+        let paidToolsCount = 0;
+        let toolsBaseTotal = 0;
         
         selectedItems.forEach((id) => {
             const item = serviceItems.find((i) => i.id === id);
-            if (item && item.type === 'tool') {
-                toolsCount++;
-                if (!firstToolId) firstToolId = id;
+            if (item && item.type === 'tool' && item.monthly_price > 0) {
+                paidToolsCount++;
+                toolsBaseTotal += item.monthly_price;
             }
         });
 
-        if (toolsCount <= 1) return 0;
+        if (paidToolsCount <= 1) return 0;
         
-        const toolBaseMonthly = serviceItems.find(i => i.id === firstToolId)?.monthly_price || 0;
-        const discountPercent = Math.min(50, (toolsCount - 1) * 10);
-        const originalToolsPrice = toolBaseMonthly * toolsCount;
-        const discountedToolsPrice = originalToolsPrice * (1 - (discountPercent / 100));
+        const discountPercent = Math.min(50, (paidToolsCount - 1) * 10);
+        const discountedToolsPrice = toolsBaseTotal * (1 - (discountPercent / 100));
         
-        return (originalToolsPrice - discountedToolsPrice) * months;
+        return (toolsBaseTotal - discountedToolsPrice) * months;
     }, [selectedItems, serviceItems, months]);
 
     const total = subtotal * multiplier;

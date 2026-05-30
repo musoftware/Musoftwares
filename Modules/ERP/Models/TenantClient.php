@@ -14,6 +14,10 @@ class TenantClient extends TenantModel
         'country_id', 'status', 'referral_code', 'referred_by'
     ];
 
+    protected $appends = [
+        'balance', 'locked_balance'
+    ];
+
     protected static function booted()
     {
         parent::booted();
@@ -57,16 +61,11 @@ class TenantClient extends TenantModel
 
     public function balance(): float
     {
-        $credits = $this->transactions()
-            ->whereIn('type', ['received', 'earned'])
-            ->sum('amount');
-
-        $deductions = $this->transactions()
-            ->whereIn('type', ['refunded', 'sent'])
-            ->sum('amount');
-
-        // refunded & sent are stored as negative values, so adding them correctly subtracts
-        return round((float) $credits + (float) $deductions, 2);
+        // All transactions reflect correctly on the wallet balance.
+        // 'received' and 'earned' are positive.
+        // 'refunded', 'sent', and 'used' are negative.
+        // Reversals (e.g. cancelled invoices) can result in a positive 'used'.
+        return round((float) $this->transactions()->sum('amount'), 2);
     }
 
     public function getBalanceAttribute(): float

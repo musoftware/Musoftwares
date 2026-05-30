@@ -329,6 +329,47 @@ class InvoiceController extends Controller
     }
 
     /**
+     * Mark an internal cost as paid.
+     */
+    public function markCostPaid(Invoice $invoice, \Modules\ERP\Models\InvoiceCost $cost)
+    {
+        if ($cost->invoice_id !== $invoice->id) {
+            abort(404);
+        }
+
+        if ($cost->payment_status === 'paid') {
+            return back()->with('info', __('erp.cost_already_paid'));
+        }
+
+        DB::transaction(function () use ($invoice, $cost) {
+            $cost->update([
+                'payment_status' => 'paid',
+                'paid_at' => now(),
+                'paid_by' => Auth::id(),
+            ]);
+
+            \Modules\ERP\Models\ExpenseTransaction::create([
+                'tenant_id' => $cost->tenant_id,
+                'invoice_cost_id' => $cost->id,
+                'invoice_id' => $invoice->id,
+                'client_id' => $invoice->client_id,
+                'amount' => $cost->amount,
+                'currency_id' => $cost->currency_id,
+                'business_amount' => $cost->business_amount,
+                'business_currency_id' => $cost->business_currency_id,
+                'exchange_rate' => $cost->exchange_rate,
+                'exchange_rate_date' => $cost->exchange_rate_date,
+                'balance_before' => 0,
+                'balance_after' => 0,
+                'note' => 'Paid internal cost for invoice: ' . $invoice->invoice_number,
+                'created_by' => Auth::id(),
+            ]);
+        });
+
+        return back()->with('success', __('erp.cost_marked_paid_success'));
+    }
+
+    /**
      * Mark an invoice as fully paid from client wallet.
      */
     public function payWallet(Invoice $invoice)
@@ -404,9 +445,20 @@ class InvoiceController extends Controller
             ->with('success', __('erp.invoice_duplicated_success'));
     }
 
-    public function downloadPdf(Invoice $invoice)
+    public function downloadPdf(Request $request, Invoice $invoice)
     {
-        $pdf = Pdf::loadView('erp::invoices.pdf', compact('invoice'));
+        $invoice->load(['client.currency', 'items', 'tenant.user']);
+        
+        $paperType = $request->query('paper', 'a4');
+        
+        if ($paperType === 'thermal') {
+            $pdf = Pdf::loadView('erp::invoices.pdf_thermal', compact('invoice'));
+            $pdf->setPaper([0, 0, 226.77, 800], 'portrait');
+        } else {
+            $pdf = Pdf::loadView('erp::invoices.pdf', compact('invoice'));
+            $pdf->setPaper('a4', 'portrait');
+        }
+
         return $pdf->download("invoice-{$invoice->invoice_number}.pdf");
     }
 

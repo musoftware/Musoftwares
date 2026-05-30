@@ -44,7 +44,6 @@ export default function CreateEdit({ invoice, clients = [], projects = [], produ
         notes: invoice?.notes || '',
     });
 
-    const [exchangeRate, setExchangeRate] = useState(invoice?.exchange_rate || 1);
 
     useEffect(() => {
         if (data.client_id) {
@@ -304,14 +303,6 @@ export default function CreateEdit({ invoice, clients = [], projects = [], produ
                                 </div>
                             </div>
 
-                            {data.amount_currency !== business_currency && (
-                                <div className="p-3 bg-slate-50 rounded-lg border border-slate-100 text-xs text-slate-500 flex items-center gap-2">
-                                    <Clock className="h-3.5 w-3.5 text-slate-400 shrink-0" />
-                                    <span>
-                                        Exchange Rate: 1 {data.amount_currency} = {exchangeRate} {business_currency}
-                                    </span>
-                                </div>
-                            )}
                         </div>
                     </section>
 

@@ -30,6 +30,7 @@ Route::middleware(['web', 'auth:web,erp_team', 'tenant.active'])
         Route::post('clients/{client}/wallet/receive', [\Modules\ERP\Http\Controllers\WalletController::class, 'receivePayment'])->name('clients.wallet.receive');
         Route::post('clients/{client}/wallet/send', [\Modules\ERP\Http\Controllers\WalletController::class, 'sendPayment'])->name('clients.wallet.send');
         Route::post('clients/{client}/wallet/refund', [\Modules\ERP\Http\Controllers\WalletController::class, 'refund'])->name('clients.wallet.refund');
+        Route::post('clients/{client}/wallet/bonus', [\Modules\ERP\Http\Controllers\WalletController::class, 'addBonus'])->name('clients.wallet.bonus');
 
         // ── Transactions ──
         Route::get('transactions/{transaction}', [\Modules\ERP\Http\Controllers\TransactionController::class, 'show'])->name('transactions.show');
@@ -62,6 +63,7 @@ Route::middleware(['web', 'auth:web,erp_team', 'tenant.active'])
         Route::post('invoices/{invoice}/send', [InvoiceController::class, 'send'])->name('invoices.send');
         Route::post('invoices/{invoice}/send-email', [InvoiceController::class, 'sendEmail'])->name('invoices.send-email');
         Route::post('invoices/{invoice}/mark-paid', [InvoiceController::class, 'markPaid'])->name('invoices.mark-paid');
+        Route::post('invoices/{invoice}/costs/{cost}/mark-paid', [InvoiceController::class, 'markCostPaid'])->name('invoices.costs.mark-paid');
         Route::post('invoices/{invoice}/pay-wallet', [InvoiceController::class, 'payWallet'])->name('invoices.pay-wallet');
         Route::post('invoices/{invoice}/cancel', [InvoiceController::class, 'cancel'])->name('invoices.cancel');
         Route::post('invoices/{invoice}/duplicate', [InvoiceController::class, 'duplicate'])->name('invoices.duplicate');

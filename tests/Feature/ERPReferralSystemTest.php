@@ -152,7 +152,7 @@ class ERPReferralSystemTest extends TestCase
         WalletTransaction::create([
             'tenant_id' => $this->tenant->id,
             'client_id' => $referee->id,
-            'type' => 'manual_credit',
+            'type' => 'received',
             'direction' => 'credit',
             'amount' => 1000.00,
             'currency_id' => $this->currency->id,
@@ -190,7 +190,7 @@ class ERPReferralSystemTest extends TestCase
         WalletTransaction::create([
             'tenant_id' => $this->tenant->id,
             'client_id' => $referee->id,
-            'type' => 'manual_credit',
+            'type' => 'received',
             'direction' => 'credit',
             'amount' => 500.00,
             'currency_id' => $this->currency->id,
