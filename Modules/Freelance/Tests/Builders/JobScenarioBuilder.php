@@ -1,10 +1,12 @@
 <?php
 
+
+
 namespace Modules\Freelance\Tests\Builders;
 
 use Modules\Freelance\Models\Job;
 use App\Models\User;
-use App\Models\Currency;
+
 
 class JobScenarioBuilder
 {

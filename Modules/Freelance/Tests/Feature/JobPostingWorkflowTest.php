@@ -1,13 +1,15 @@
 <?php
 
+uses(\Tests\TestCase::class, \Illuminate\Foundation\Testing\RefreshDatabase::class);
+
 use Modules\Freelance\Models\Job;
 use App\Models\User;
-use App\Models\Currency;
+
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Queue;
 use Modules\Freelance\Jobs\NotifyFreelancersForJob;
 
-uses(Tests\TestCase::class, RefreshDatabase::class)->in(__DIR__);
+
 
 beforeEach(function () {
     Queue::fake();
@@ -15,7 +17,7 @@ beforeEach(function () {
 
 it('allows a client to post a job and deducts points via API', function () {
     $client = User::factory()->create(['points_balance' => 50]);
-    $currency = Currency::factory()->create();
+    
 
     $payload = [
         'title' => 'Feature Test Job',
@@ -49,7 +51,7 @@ it('allows a client to post a job and deducts points via API', function () {
 
 it('blocks job posting via API if points are insufficient', function () {
     $client = User::factory()->create(['points_balance' => 5]);
-    $currency = Currency::factory()->create();
+    
 
     $payload = [
         'title' => 'Insufficient Points Job',

@@ -1,5 +1,7 @@
 <?php
 
+uses(\Tests\TestCase::class, \Illuminate\Foundation\Testing\RefreshDatabase::class);
+
 use Modules\Freelance\Domains\Proposal\Actions\SubmitProposalAction;
 use Modules\Freelance\Domains\Proposal\DTOs\SubmitProposalData;
 use App\Models\User;

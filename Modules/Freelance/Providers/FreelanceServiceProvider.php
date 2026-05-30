@@ -4,7 +4,7 @@ namespace Modules\Freelance\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Gate;
-use Modules\Freelance\Console\ExpireOldJobs;
+use Modules\Freelance\Console\RefundInactiveJobsCommand;
 use Modules\Freelance\Models\Job;
 use Modules\Freelance\Policies\JobPolicy;
 use Modules\Freelance\Models\Proposal;
@@ -31,8 +31,13 @@ class FreelanceServiceProvider extends ServiceProvider
 
         if ($this->app->runningInConsole()) {
             $this->commands([
-                ExpireOldJobs::class,
+                RefundInactiveJobsCommand::class,
             ]);
+
+            $this->app->booted(function () {
+                $schedule = $this->app->make(\Illuminate\Console\Scheduling\Schedule::class);
+                $schedule->command('freelance:refund-inactive-jobs')->daily();
+            });
         }
     }
 }

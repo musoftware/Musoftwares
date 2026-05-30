@@ -1,17 +1,19 @@
 <?php
 
+uses(\Tests\TestCase::class, \Illuminate\Foundation\Testing\RefreshDatabase::class);
+
 use Modules\Freelance\Models\Job;
 use Modules\Freelance\Models\Proposal;
 use App\Models\User;
-use App\Models\Currency;
+
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
-uses(Tests\TestCase::class, RefreshDatabase::class)->in(__DIR__);
+
 
 it('allows a freelancer to submit a proposal via API', function () {
     $client = User::factory()->create();
     $freelancer = User::factory()->create(['points_balance' => 50]);
-    $currency = Currency::factory()->create();
+    
 
     $job = Job::create([
         'client_id' => $client->id,
@@ -26,8 +28,8 @@ it('allows a freelancer to submit a proposal via API', function () {
 
     $payload = [
         'cover_letter' => 'My proposal',
-        proposedBudgetPoints: 800,
-        pointsSpent: 2
+        'proposed_budget_points' => 800,
+        'points_spent' => 2
     ];
 
     $response = $this->actingAs($freelancer)->postJson("/api/freelance/jobs/{$job->id}/proposals", $payload);

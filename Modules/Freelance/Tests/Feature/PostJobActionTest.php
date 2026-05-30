@@ -1,5 +1,7 @@
 <?php
 
+uses(\Tests\TestCase::class, \Illuminate\Foundation\Testing\RefreshDatabase::class);
+
 use Modules\Freelance\Domains\Job\Actions\PostJobAction;
 use Modules\Freelance\Domains\Job\DTOs\PostJobData;
 use App\Models\User;
@@ -31,7 +33,7 @@ it('posts a job successfully and deducts points', function () {
 
     expect($job)->toBeInstanceOf(Job::class);
     expect($job->title)->toBe('Test Job');
-    expect($job->status)->toBe('open');
+    expect($job->status->getValue())->toBe('open');
 
     // Check points deduction
     expect($user->fresh()->points_balance)->toBe(5); // 30 - 25

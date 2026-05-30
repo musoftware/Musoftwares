@@ -1,18 +1,20 @@
 <?php
 
+uses(\Tests\TestCase::class, \Illuminate\Foundation\Testing\RefreshDatabase::class);
+
 use Modules\Freelance\Models\Job;
 use Modules\Freelance\Models\Proposal;
 use Modules\Freelance\Models\Contract;
 use App\Models\User;
-use App\Models\Currency;
+
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
-uses(Tests\TestCase::class, RefreshDatabase::class)->in(__DIR__);
+
 
 it('handles full contract lifecycle from acceptance to completion via API', function () {
     $client = User::factory()->create();
     $freelancer = User::factory()->create(['points_balance' => 50]);
-    $currency = Currency::factory()->create();
+    
 
     $job = Job::create([
         'client_id' => $client->id,

@@ -1,11 +1,13 @@
 <?php
 
+uses(\Tests\TestCase::class, \Illuminate\Foundation\Testing\RefreshDatabase::class);
+
 use Modules\Freelance\Domains\Finance\Actions\AddPointsAction;
 use App\Models\User;
 use App\Models\PointTransaction;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
-uses(Tests\TestCase::class, RefreshDatabase::class)->in(__DIR__);
+
 
 it('adds points and creates a transaction log', function () {
     $user = User::factory()->create(['points_balance' => 10]);
