@@ -1,0 +1,117 @@
+<?php
+
+use Modules\Freelance\Domains\Proposal\Actions\SubmitProposalAction;
+use Modules\Freelance\Domains\Proposal\DTOs\SubmitProposalData;
+use Modules\Freelance\Tests\Builders\JobScenarioBuilder;
+use Modules\Freelance\Models\Proposal;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use App\Models\Currency;
+use Modules\Freelance\Domains\Finance\Actions\DeductPointsAction;
+
+uses(Tests\TestCase::class, RefreshDatabase::class)->in(__DIR__);
+
+it('submits a proposal successfully and deducts points', function () {
+    $scenario = JobScenarioBuilder::create()
+        ->withClient()
+        ->withFreelancers(1, points: 50)
+        ->withJob();
+
+    $freelancer = $scenario->getFreelancer(0);
+    $job = $scenario->getJob();
+    $currency = Currency::factory()->create();
+
+    $action = app(SubmitProposalAction::class);
+    $data = new SubmitProposalData(
+        freelancerId: $freelancer->id,
+        coverLetter: 'I am the best fit for this.',
+        bidAmount: 1000,
+        currencyId: $currency->id
+    );
+
+    $proposal = $action->execute($data, $job, $freelancer, proposalCost: 2);
+
+    expect($proposal)->toBeInstanceOf(Proposal::class)
+        ->and($proposal->cover_letter)->toBe('I am the best fit for this.')
+        ->and($proposal->status)->toBe('pending')
+        ->and($proposal->freelancer_id)->toBe($freelancer->id);
+
+    $freelancer->refresh();
+    expect($freelancer->points_balance)->toBe(48); // 50 - 2
+});
+
+it('prevents submitting multiple proposals for the same job', function () {
+    $scenario = JobScenarioBuilder::create()
+        ->withClient()
+        ->withFreelancers(1, points: 50)
+        ->withJob();
+
+    $freelancer = $scenario->getFreelancer(0);
+    $job = $scenario->getJob();
+    $currency = Currency::factory()->create();
+
+    $action = app(SubmitProposalAction::class);
+    $data = new SubmitProposalData(
+        freelancerId: $freelancer->id,
+        coverLetter: 'I am the best fit for this.',
+        bidAmount: 1000,
+        currencyId: $currency->id
+    );
+
+    // First submission
+    $action->execute($data, $job, $freelancer, 2);
+
+    // Second submission should fail
+    $action->execute($data, $job, $freelancer, 2);
+})->throws(\Exception::class, 'You have already submitted a proposal for this job.');
+
+it('throws exception if freelancer has insufficient points', function () {
+    $scenario = JobScenarioBuilder::create()
+        ->withClient()
+        ->withFreelancers(1, points: 1) // Cost is 2
+        ->withJob();
+
+    $freelancer = $scenario->getFreelancer(0);
+    $job = $scenario->getJob();
+    $currency = Currency::factory()->create();
+
+    $action = app(SubmitProposalAction::class);
+    $data = new SubmitProposalData(
+        freelancerId: $freelancer->id,
+        coverLetter: 'I am the best fit for this.',
+        bidAmount: 1000,
+        currencyId: $currency->id
+    );
+
+    $action->execute($data, $job, $freelancer, 2);
+})->throws(\Exception::class, 'Insufficient points to submit a proposal.');
+
+it('rolls back proposal creation if point deduction fails', function () {
+    $scenario = JobScenarioBuilder::create()
+        ->withClient()
+        ->withFreelancers(1, points: 50)
+        ->withJob();
+
+    $freelancer = $scenario->getFreelancer(0);
+    $job = $scenario->getJob();
+    $currency = Currency::factory()->create();
+
+    $deductActionMock = Mockery::mock(DeductPointsAction::class);
+    $deductActionMock->shouldReceive('execute')->andThrow(new \Exception('Point deduction failed'));
+    $this->app->instance(DeductPointsAction::class, $deductActionMock);
+
+    $action = app(SubmitProposalAction::class);
+    $data = new SubmitProposalData(
+        freelancerId: $freelancer->id,
+        coverLetter: 'Will fail.',
+        bidAmount: 1000,
+        currencyId: $currency->id
+    );
+
+    try {
+        $action->execute($data, $job, $freelancer, 2);
+    } catch (\Exception $e) {
+        expect($e->getMessage())->toBe('Point deduction failed');
+    }
+
+    expect(Proposal::count())->toBe(0);
+});

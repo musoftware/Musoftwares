@@ -29,15 +29,6 @@ class CompleteContractAction
 
             $freelancer = User::findOrFail($contract->freelancer_id);
 
-            // Escrow: Funds were already deducted from client when contract started.
-            // Now we release funds to the freelancer.
-            $freelancer->add_balance(
-                $contract->amount,
-                "Payment received for contract #{$contract->id}: {$contract->job->title}",
-                'received', // 'received' increments balance
-                $contract->currency_id
-            );
-
             ActivityService::log(
                 event: 'contract.completed',
                 description: "Contract completed for job: {$contract->job->title}",

@@ -1,5 +1,6 @@
 import { useForm } from '@inertiajs/react';
 import FreelanceLayout from '../Layout';
+import { __ } from '@/lib/i18n';
 
 export default function EditJob({ auth, job }) {
     const { data, setData, put, processing, errors } = useForm({
@@ -19,13 +20,13 @@ export default function EditJob({ auth, job }) {
         <FreelanceLayout>
             <div className="mx-auto max-w-2xl">
                 <h2 className="mb-6 text-2xl font-bold">
-                    Edit Job: {job.title}
+                    {__('Edit Job')}: {job.title}
                 </h2>
 
                 <form onSubmit={submit}>
                     <div className="mb-4">
                         <label className="mb-2 block text-sm font-bold text-gray-700">
-                            Title
+                            {__('Title')}
                         </label>
                         <input
                             type="text"
@@ -42,7 +43,7 @@ export default function EditJob({ auth, job }) {
 
                     <div className="mb-4">
                         <label className="mb-2 block text-sm font-bold text-gray-700">
-                            Description
+                            {__('Description')}
                         </label>
                         <textarea
                             value={data.description}
@@ -61,7 +62,7 @@ export default function EditJob({ auth, job }) {
                     <div className="mb-4 flex space-x-4">
                         <div className="w-1/2">
                             <label className="mb-2 block text-sm font-bold text-gray-700">
-                                Type
+                                {__('Type')}
                             </label>
                             <select
                                 value={data.type}
@@ -70,13 +71,13 @@ export default function EditJob({ auth, job }) {
                                 }
                                 className="w-full rounded border px-3 py-2 text-gray-700 shadow"
                             >
-                                <option value="fixed">Fixed Price</option>
-                                <option value="hourly">Hourly Rate</option>
+                                <option value="fixed">{__('Fixed Price')}</option>
+                                <option value="hourly">{__('Hourly Rate')}</option>
                             </select>
                         </div>
                         <div className="w-1/2">
                             <label className="mb-2 block text-sm font-bold text-gray-700">
-                                Budget
+                                {__('Budget')}
                             </label>
                             <input
                                 type="number"
@@ -96,7 +97,7 @@ export default function EditJob({ auth, job }) {
 
                     <div className="mb-6">
                         <label className="mb-2 block text-sm font-bold text-gray-700">
-                            Duration (e.g. "2 weeks", "3 months")
+                            {__('Duration')} ({__('e.g. "2 weeks", "3 months"')})
                         </label>
                         <input
                             type="text"
@@ -113,7 +114,7 @@ export default function EditJob({ auth, job }) {
                         disabled={processing}
                         className="focus:shadow-outline w-full rounded bg-blue-600 px-4 py-2 font-bold text-white hover:bg-blue-700 focus:outline-none"
                     >
-                        Update Job
+                        {__('Update Job')}
                     </button>
                 </form>
             </div>

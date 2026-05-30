@@ -9,6 +9,7 @@ import {
     Plus,
     Coins
 } from 'lucide-react';
+import { __ } from '@/lib/i18n';
 
 export default function FreelanceLayout({ children, clean = false }) {
     const freelanceModeContext = useFreelanceMode();
@@ -47,26 +48,26 @@ export default function FreelanceLayout({ children, clean = false }) {
     }, [isClient, currentPath]);
 
     const freelancerMenuItems = [
-        { id: 'dashboard',  label: 'Dashboard',    icon: Briefcase, href: '/freelance/dashboard',              isActive: currentPath === '/freelance/dashboard' || currentPath === '/freelance/dashboard/' },
-        { id: 'jobs',       label: 'Find Work',     icon: Search,    href: '/freelance/jobs/browse',  isActive: currentPath.startsWith('/freelance/jobs/browse') || currentPath.startsWith('/freelance/jobs/') && !currentPath.includes('/my-jobs') && !currentPath.includes('/create') },
-        { id: 'proposals',  label: 'My Proposals',  icon: Clock,     href: '/freelance/proposals',    isActive: currentPath.startsWith('/freelance/proposals') },
-        { id: 'contracts',  label: 'My Contracts',  icon: Clock,     href: '/freelance/contracts',    isActive: currentPath.startsWith('/freelance/contracts') },
-        { id: 'points',     label: 'Buy Points',  icon: Coins,     href: '/points',       isActive: currentPath.startsWith('/points') },
+        { id: 'dashboard',  label: __('Dashboard'),    icon: Briefcase, href: '/freelance/dashboard',              isActive: currentPath === '/freelance/dashboard' || currentPath === '/freelance/dashboard/' },
+        { id: 'jobs',       label: __('Find Work'),     icon: Search,    href: '/freelance/jobs/browse',  isActive: currentPath.startsWith('/freelance/jobs/browse') || currentPath.startsWith('/freelance/jobs/') && !currentPath.includes('/my-jobs') && !currentPath.includes('/create') },
+        { id: 'proposals',  label: __('My Proposals'),  icon: Clock,     href: '/freelance/proposals',    isActive: currentPath.startsWith('/freelance/proposals') },
+        { id: 'contracts',  label: __('My Contracts'),  icon: Clock,     href: '/freelance/contracts',    isActive: currentPath.startsWith('/freelance/contracts') },
+        { id: 'points',     label: __('Buy Points'),  icon: Coins,     href: '/points',       isActive: currentPath.startsWith('/points') },
     ];
 
     const clientMenuItems = [
-        { id: 'dashboard',  label: 'Dashboard',       icon: Briefcase, href: '/freelance/dashboard',              isActive: currentPath === '/freelance/dashboard' || currentPath === '/freelance/dashboard/' },
-        { id: 'post-job',   label: 'Post a Job',      icon: Plus,      href: '/freelance/jobs/create',  isActive: currentPath.startsWith('/freelance/jobs/create') },
-        { id: 'my-jobs',    label: 'My Posted Jobs',  icon: Briefcase, href: '/freelance/jobs/my-jobs', isActive: currentPath.startsWith('/freelance/jobs/my-jobs') },
-        { id: 'contracts',  label: 'My Contracts',    icon: Clock,     href: '/freelance/contracts',    isActive: currentPath.startsWith('/freelance/contracts') },
+        { id: 'dashboard',  label: __('Dashboard'),       icon: Briefcase, href: '/freelance/dashboard',              isActive: currentPath === '/freelance/dashboard' || currentPath === '/freelance/dashboard/' },
+        { id: 'post-job',   label: __('Post a Job'),      icon: Plus,      href: '/freelance/jobs/create',  isActive: currentPath.startsWith('/freelance/jobs/create') },
+        { id: 'my-jobs',    label: __('My Posted Jobs'),  icon: Briefcase, href: '/freelance/jobs/my-jobs', isActive: currentPath.startsWith('/freelance/jobs/my-jobs') },
+        { id: 'contracts',  label: __('My Contracts'),    icon: Clock,     href: '/freelance/contracts',    isActive: currentPath.startsWith('/freelance/contracts') },
     ];
 
     const menuItems = isClient ? clientMenuItems : freelancerMenuItems;
 
     return (
         <WorkspaceLayout 
-            title="Freelance Hub"
-            workspaceName="Freelance Hub"
+            title={__('Freelance Hub')}
+            workspaceName={__('Freelance Hub')}
             tenantId="FR-DRAFT"
             menuItems={menuItems}
         >

@@ -1,0 +1,77 @@
+<?php
+
+use Modules\Freelance\Domains\Contract\Actions\AcceptProposalAction;
+use Modules\Freelance\Tests\Builders\JobScenarioBuilder;
+use Modules\Freelance\Models\Proposal;
+use Modules\Freelance\Models\Contract;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use App\Models\Currency;
+use Illuminate\Support\Facades\Event;
+use App\Events\ProposalAccepted;
+
+uses(Tests\TestCase::class, RefreshDatabase::class)->in(__DIR__);
+
+beforeEach(function () {
+    Event::fake([ProposalAccepted::class]);
+});
+
+it('accepts a proposal, locks funds, refunds other freelancers, and creates a contract', function () {
+    $scenario = JobScenarioBuilder::create()
+        ->withClient(points: 100, balance: 5000)
+        ->withFreelancers(3, points: 50)
+        ->withJob(['status' => 'open']);
+
+    $client = $scenario->getClient();
+    $job = $scenario->getJob();
+    $currencyId = $job->currency_id;
+    $freelancers = $scenario->getFreelancers();
+
+    // Create 3 proposals
+    $proposal1 = Proposal::create(['job_id' => $job->id, 'freelancer_id' => $freelancers[0]->id, 'cover_letter' => 'A', 'bid_amount' => 1000, 'currency_id' => $currencyId, 'status' => 'pending']);
+    $proposal2 = Proposal::create(['job_id' => $job->id, 'freelancer_id' => $freelancers[1]->id, 'cover_letter' => 'B', 'bid_amount' => 1500, 'currency_id' => $currencyId, 'status' => 'pending']);
+    $proposal3 = Proposal::create(['job_id' => $job->id, 'freelancer_id' => $freelancers[2]->id, 'cover_letter' => 'C', 'bid_amount' => 2000, 'currency_id' => $currencyId, 'status' => 'pending']);
+
+    $action = app(AcceptProposalAction::class);
+    
+    // Accept proposal 1
+    $contract = $action->execute($proposal1, $client, proposalCostRefund: 2);
+
+    expect($contract)->toBeInstanceOf(Contract::class)
+        ->and($contract->amount)->toBe(1000.0)
+        ->and($contract->status)->toBe('active')
+        ->and($contract->freelancer_id)->toBe($freelancers[0]->id);
+
+    // Job should be in progress
+    expect($job->fresh()->status->getValue())->toBe('in_progress');
+
+    // Proposal 1 is accepted, others rejected
+    expect($proposal1->fresh()->status)->toBe('accepted')
+        ->and($proposal2->fresh()->status)->toBe('rejected')
+        ->and($proposal3->fresh()->status)->toBe('rejected');
+
+    // Other freelancers refunded points
+    expect($freelancers[1]->fresh()->points_balance)->toBe(52) // 50 + 2
+        ->and($freelancers[2]->fresh()->points_balance)->toBe(52);
+
+    // Winning freelancer points are unchanged
+    expect($freelancers[0]->fresh()->points_balance)->toBe(50);
+
+    Event::assertDispatched(ProposalAccepted::class);
+});
+
+it('throws exception if non-client tries to accept proposal', function () {
+    $scenario = JobScenarioBuilder::create()
+        ->withClient(points: 100, balance: 5000)
+        ->withFreelancers(2, points: 50)
+        ->withJob();
+
+    $job = $scenario->getJob();
+    $freelancer = $scenario->getFreelancer(0);
+    $otherUser = $scenario->getFreelancer(1); // acting as random user
+
+    $proposal = Proposal::create(['job_id' => $job->id, 'freelancer_id' => $freelancer->id, 'cover_letter' => 'A', 'bid_amount' => 1000, 'currency_id' => $job->currency_id, 'status' => 'pending']);
+
+    $action = app(AcceptProposalAction::class);
+    
+    $action->execute($proposal, $otherUser, 2);
+})->throws(\Exception::class, 'Unauthorized to accept proposals for this job.');

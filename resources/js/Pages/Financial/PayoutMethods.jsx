@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, useForm, router } from '@inertiajs/react';
-import { CreditCard, Plus, Trash2, Edit2, CheckCircle2, Building, DollarSign, Key } from 'lucide-react';
+import { CreditCard, Plus, Trash2, Edit2, CheckCircle2, Building, DollarSign, Smartphone, Zap } from 'lucide-react';
 import Modal from '@/Components/Modal';
 import TextInput from '@/Components/TextInput';
 import InputLabel from '@/Components/InputLabel';
 import { Button } from '@/Components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/Components/ui/card';
 import { Badge } from '@/Components/ui/badge';
+import { Smartphone, Send } from 'lucide-react';
 
 export default function PayoutMethods({ payoutMethods }) {
     const [isCreating, setIsCreating] = useState(false);
@@ -15,17 +16,19 @@ export default function PayoutMethods({ payoutMethods }) {
 
     const { data, setData, post, patch, processing, reset } = useForm({
         type: 'bank_transfer',
-        details: { bank_name: '', account_number: '', routing_number: '' },
+        details: { full_name: '', bank_name: '', account_number: '', routing_number: '' },
         is_default: false,
     });
 
     const handleTypeChange = (type) => {
         if (type === 'bank_transfer') {
-            setData({ type, details: { bank_name: '', account_number: '', routing_number: '' }, is_default: data.is_default });
+            setData({ type, details: { full_name: '', bank_name: '', account_number: '', routing_number: '' }, is_default: data.is_default });
         } else if (type === 'paypal') {
             setData({ type, details: { paypal_email: '' }, is_default: data.is_default });
-        } else {
-            setData({ type, details: { wallet_address: '', network: 'Ethereum' }, is_default: data.is_default });
+        } else if (type === 'vodafone_cash') {
+            setData({ type, details: { mobile_number: '' }, is_default: data.is_default });
+        } else if (type === 'instapay') {
+            setData({ type, details: { mobile_number: '', instapay_username: '' }, is_default: data.is_default });
         }
     };
 
@@ -92,7 +95,7 @@ export default function PayoutMethods({ payoutMethods }) {
                             </div>
                             <h3 className="text-lg font-semibold text-foreground">No payout methods configured</h3>
                             <p className="text-sm text-muted-foreground max-w-md mx-auto mt-2 mb-6 leading-relaxed">
-                                Add a bank account, PayPal, or Crypto wallet to enable fast, secure withdrawals from your earned balance.
+                                Add a bank account, PayPal, Vodafone Cash, or InstaPay to enable fast, secure withdrawals from your earned balance.
                             </p>
                             <Button onClick={() => { setEditingMethod(null); reset(); setIsCreating(true); }} className="shadow-none">
                                 <Plus className="w-4 h-4 mr-2" /> Setup Payout Method
@@ -117,7 +120,8 @@ export default function PayoutMethods({ payoutMethods }) {
                                             <div className="w-12 h-12 rounded-xl bg-muted flex items-center justify-center text-muted-foreground">
                                                 {pm.type === 'bank_transfer' && <Building className="w-6 h-6" />}
                                                 {pm.type === 'paypal' && <DollarSign className="w-6 h-6" />}
-                                                {pm.type === 'crypto_wallet' && <Key className="w-6 h-6" />}
+                                                {pm.type === 'vodafone_cash' && <Smartphone className="w-6 h-6" />}
+                                                {pm.type === 'instapay' && <Send className="w-6 h-6" />}
                                             </div>
                                             <div>
                                                 <h3 className="font-semibold text-foreground capitalize">{pm.type.replace('_', ' ')}</h3>
@@ -128,6 +132,7 @@ export default function PayoutMethods({ payoutMethods }) {
                                         <div className="space-y-1.5 p-3.5 bg-muted/30 rounded-xl text-sm text-muted-foreground break-all">
                                             {pm.type === 'bank_transfer' && (
                                                 <>
+                                                    <div className="flex justify-between"><span>Name:</span> <span className="font-medium text-foreground">{pm.details?.full_name}</span></div>
                                                     <div className="flex justify-between"><span>Bank:</span> <span className="font-medium text-foreground">{pm.details?.bank_name}</span></div>
                                                     <div className="flex justify-between"><span>Acc:</span> <span className="font-medium text-foreground">••••{pm.details?.account_number?.slice(-4)}</span></div>
                                                 </>
@@ -135,10 +140,15 @@ export default function PayoutMethods({ payoutMethods }) {
                                             {pm.type === 'paypal' && (
                                                 <div className="flex flex-col gap-1"><span>Email:</span> <span className="font-medium text-foreground">{pm.details?.paypal_email}</span></div>
                                             )}
-                                            {pm.type === 'crypto_wallet' && (
+                                            {pm.type === 'vodafone_cash' && (
                                                 <>
-                                                    <div className="flex justify-between"><span>Network:</span> <span className="font-medium text-foreground">{pm.details?.network}</span></div>
-                                                    <div className="flex flex-col gap-1"><span>Addr:</span> <span className="font-medium text-foreground">{pm.details?.wallet_address?.slice(0, 8)}...{pm.details?.wallet_address?.slice(-6)}</span></div>
+                                                    <div className="flex justify-between"><span>Mobile:</span> <span className="font-medium text-foreground">{pm.details?.mobile_number}</span></div>
+                                                </>
+                                            )}
+                                            {pm.type === 'instapay' && (
+                                                <>
+                                                    <div className="flex justify-between"><span>Username:</span> <span className="font-medium text-foreground">{pm.details?.instapay_username}</span></div>
+                                                    <div className="flex justify-between"><span>Mobile:</span> <span className="font-medium text-foreground">{pm.details?.mobile_number}</span></div>
                                                 </>
                                             )}
                                         </div>
@@ -170,7 +180,6 @@ export default function PayoutMethods({ payoutMethods }) {
                     </div>
                 )}
 
-                {/* Create / Edit Modal */}
                 <Modal show={isCreating} onClose={() => { setIsCreating(false); setEditingMethod(null); reset(); }}>
                     <div className="p-6">
                         <h2 className="text-xl font-bold text-foreground mb-4 flex items-center gap-2 tracking-tight">
@@ -180,11 +189,12 @@ export default function PayoutMethods({ payoutMethods }) {
                             {!editingMethod && (
                                 <div>
                                     <InputLabel value="Payout Method Type" />
-                                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-2">
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 mt-2">
                                         {[
-                                            { id: 'bank_transfer', label: 'Bank Transfer', icon: Building },
+                                            { id: 'bank_transfer', label: 'Bank', icon: Building },
+                                            { id: 'vodafone_cash', label: 'Vodafone Cash', icon: Smartphone },
+                                            { id: 'instapay', label: 'Instapay', icon: Send },
                                             { id: 'paypal', label: 'PayPal', icon: DollarSign },
-                                            { id: 'crypto_wallet', label: 'Crypto Wallet', icon: Key },
                                         ].map((opt) => {
                                             const Icon = opt.icon;
                                             return (
@@ -198,7 +208,7 @@ export default function PayoutMethods({ payoutMethods }) {
                                                             : 'border-border text-muted-foreground hover:border-primary/50 hover:bg-muted/20'
                                                     }`}
                                                 >
-                                                    <Icon className="w-6 h-6" />
+                                                    <Icon className="w-5 h-5" />
                                                     {opt.label}
                                                 </button>
                                             );
@@ -209,6 +219,16 @@ export default function PayoutMethods({ payoutMethods }) {
 
                             {data.type === 'bank_transfer' && (
                                 <div className="space-y-4">
+                                    <div>
+                                        <InputLabel htmlFor="full_name" value="Full Name" />
+                                        <TextInput
+                                            id="full_name"
+                                            value={data.details.full_name || ''}
+                                            onChange={(e) => handleDetailChange('full_name', e.target.value)}
+                                            className="mt-1 block w-full"
+                                            required
+                                        />
+                                    </div>
                                     <div>
                                         <InputLabel htmlFor="bank_name" value="Bank Name" />
                                         <TextInput
@@ -256,26 +276,42 @@ export default function PayoutMethods({ payoutMethods }) {
                                 </div>
                             )}
 
-                            {data.type === 'crypto_wallet' && (
+                            {data.type === 'vodafone_cash' && (
                                 <div className="space-y-4">
                                     <div>
-                                        <InputLabel htmlFor="network" value="Blockchain Network (e.g., Ethereum, TRON, Binance Smart Chain)" />
+                                        <InputLabel htmlFor="mobile_number" value="Vodafone Cash Mobile Number" />
                                         <TextInput
-                                            id="network"
-                                            value={data.details.network || ''}
-                                            onChange={(e) => handleDetailChange('network', e.target.value)}
+                                            id="mobile_number"
+                                            type="tel"
+                                            value={data.details.mobile_number || ''}
+                                            onChange={(e) => handleDetailChange('mobile_number', e.target.value)}
+                                            className="mt-1 block w-full"
+                                            required
+                                        />
+                                    </div>
+                                </div>
+                            )}
+
+                            {data.type === 'instapay' && (
+                                <div className="space-y-4">
+                                    <div>
+                                        <InputLabel htmlFor="instapay_username" value="Instapay Username (IPA)" />
+                                        <TextInput
+                                            id="instapay_username"
+                                            value={data.details.instapay_username || ''}
+                                            onChange={(e) => handleDetailChange('instapay_username', e.target.value)}
                                             className="mt-1 block w-full"
                                             required
                                         />
                                     </div>
                                     <div>
-                                        <InputLabel htmlFor="wallet_address" value="Wallet Address" />
+                                        <InputLabel htmlFor="mobile_number" value="Mobile Number (Optional but recommended)" />
                                         <TextInput
-                                            id="wallet_address"
-                                            value={data.details.wallet_address || ''}
-                                            onChange={(e) => handleDetailChange('wallet_address', e.target.value)}
-                                            className="mt-1 block w-full font-mono text-sm"
-                                            required
+                                            id="mobile_number"
+                                            type="tel"
+                                            value={data.details.mobile_number || ''}
+                                            onChange={(e) => handleDetailChange('mobile_number', e.target.value)}
+                                            className="mt-1 block w-full"
                                         />
                                     </div>
                                 </div>

@@ -4,6 +4,7 @@ import { formatDate } from '@/lib/utils';
 import { CurrencyDisplay as FinancialAmount } from '@/Components/ui/CurrencyDisplay';
 import { Head, router } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
+import { __ } from '@/lib/i18n';
 
 export default function Index({ jobs }: any) {
     const [loading, setLoading] = useState(false);
@@ -22,22 +23,22 @@ export default function Index({ jobs }: any) {
         <AuthenticatedLayout
             header={
                 <h2 className="text-xl leading-tight font-semibold text-gray-800">
-                    Jobs Portal
+                    {__('Jobs Portal')}
                 </h2>
             }
         >
-            <Head title="Freelance Jobs" />
+            <Head title={__('Freelance Jobs')} />
             <div className="py-12">
                 <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
                     <div className="relative overflow-hidden bg-white p-6 shadow-sm sm:rounded-lg">
                         {loading && (
                             <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/50 backdrop-blur-sm">
                                 <div className="font-medium text-indigo-600">
-                                    Loading...
+                                    {__('Loading...')}
                                 </div>
                             </div>
                         )}
-                        <h3 className="mb-4 text-lg font-bold">Jobs</h3>
+                        <h3 className="mb-4 text-lg font-bold">{__('Jobs')}</h3>
 
                         {jobs.data.length > 0 ? (
                             <div className="overflow-x-auto">
@@ -45,13 +46,13 @@ export default function Index({ jobs }: any) {
                                     <thead className="bg-gray-50">
                                         <tr>
                                             <th className="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase">
-                                                Title
+                                                {__('Title')}
                                             </th>
                                             <th className="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase">
-                                                Budget
+                                                {__('Budget')}
                                             </th>
                                             <th className="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase">
-                                                Created At
+                                                {__('Created At')}
                                             </th>
                                         </tr>
                                     </thead>
@@ -74,7 +75,7 @@ export default function Index({ jobs }: any) {
                             </div>
                         ) : (
                             <div className="py-12 text-center">
-                                <p className="text-gray-500">No jobs found.</p>
+                                <p className="text-gray-500">{__('No jobs found.')}</p>
                             </div>
                         )}
 

@@ -22,18 +22,7 @@ class AcceptProposalAction
             throw new \Exception('Unauthorized to accept proposals for this job.');
         }
 
-        if ($client->user_balance < $proposal->bid_amount) {
-            throw new \Exception('Insufficient funds in your platform wallet to start this contract.');
-        }
-
         return DB::transaction(function () use ($job, $proposal, $client, $proposalCostRefund) {
-            // Escrow: Deduct funds from client immediately
-            $client->add_balance(
-                -$proposal->bid_amount,
-                "Escrow locked for contract on job: {$job->title}",
-                'sent', // 'sent' deducts balance
-                $proposal->currency_id
-            );
 
             $proposal->update(['status' => 'accepted']);
             $job->update(['status' => 'in_progress']);

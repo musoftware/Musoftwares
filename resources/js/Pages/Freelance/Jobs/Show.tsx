@@ -12,6 +12,7 @@ import { formatMoney, formatDate } from '@/lib/utils';
 import { Clock, DollarSign, Briefcase, MapPin, CheckCircle2, AlertCircle, FileText, Send, User } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from "@/Components/ui/alert";
 import { CurrencyDisplay as FinancialAmount } from '@/Components/ui/CurrencyDisplay';
+import { __ } from '@/lib/i18n';
 
 function ShowJobContent({ auth, job, pointsCost }: any) {
     const { mode } = useFreelanceMode();
@@ -44,12 +45,12 @@ function ShowJobContent({ auth, job, pointsCost }: any) {
 
     return (
         <>
-            <Head title={`${job.title} | Jobs`} />
+            <Head title={`${job.title} | ${__('Jobs')}`} />
             
             <div className="w-full space-y-8 pb-12">
                 <div className="flex flex-col gap-2">
                     <Link href="/freelance/jobs/browse" className="text-sm font-medium text-slate-500 hover:text-indigo-600 transition-colors w-fit">
-                        &larr; Back to job search
+                        &larr; {__('Back to job search')}
                     </Link>
                 </div>
 
@@ -64,12 +65,12 @@ function ShowJobContent({ auth, job, pointsCost }: any) {
                                             {job.title}
                                         </CardTitle>
                                         <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-slate-500 pt-2">
-                                            <span className="flex items-center gap-1.5"><Clock className="h-4 w-4" /> Posted {formatDate(job.created_at)}</span>
-                                            <span className="flex items-center gap-1.5"><MapPin className="h-4 w-4" /> Worldwide</span>
+                                            <span className="flex items-center gap-1.5"><Clock className="h-4 w-4" /> {__('Posted')} {formatDate(job.created_at)}</span>
+                                            <span className="flex items-center gap-1.5"><MapPin className="h-4 w-4" /> {__('Worldwide')}</span>
                                         </div>
                                     </div>
                                     <Badge variant={job.status === 'open' ? 'default' : 'secondary'} className={`uppercase tracking-wider font-semibold ${job.status === 'open' ? 'bg-emerald-500 hover:bg-emerald-600' : ''}`}>
-                                        {job.status.replace('_', ' ')}
+                                        {__(job.status.replace('_', ' '))}
                                     </Badge>
                                 </div>
                             </CardHeader>
@@ -78,7 +79,7 @@ function ShowJobContent({ auth, job, pointsCost }: any) {
 
                                 <div className="space-y-4">
                                     <h3 className="text-sm font-bold uppercase tracking-wider text-slate-900 flex items-center gap-2 border-b border-slate-100 pb-2">
-                                        <Briefcase className="h-4 w-4 text-indigo-500" /> Skills and Expertise
+                                        <Briefcase className="h-4 w-4 text-indigo-500" /> {__('Skills and Expertise')}
                                     </h3>
                                     <div className="flex flex-wrap gap-2">
                                         {job.skills?.map((skill: any) => (
@@ -96,14 +97,14 @@ function ShowJobContent({ auth, job, pointsCost }: any) {
                             <div className="space-y-4">
                                 <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
                                     <User className="h-5 w-5 text-indigo-600" /> 
-                                    Proposals Received ({job.proposals?.length || 0})
+                                    {__('Proposals Received')} ({job.proposals?.length || 0})
                                 </h2>
 
                                 {!job.proposals || job.proposals.length === 0 ? (
                                     <Card className="border-dashed shadow-none bg-slate-50 border-slate-200">
                                         <CardContent className="py-12 flex flex-col items-center justify-center text-slate-500">
                                             <FileText className="h-10 w-10 text-slate-300 mb-3" />
-                                            <p className="font-medium">No proposals received yet.</p>
+                                            <p className="font-medium">{__('No proposals received yet.')}</p>
                                         </CardContent>
                                     </Card>
                                 ) : (
@@ -115,7 +116,7 @@ function ShowJobContent({ auth, job, pointsCost }: any) {
                                                         <div className="space-y-1">
                                                             <h3 className="font-bold text-lg text-slate-900">{proposal.freelancer?.name}</h3>
                                                             <div className="flex items-center gap-3 text-sm text-slate-500">
-                                                                <span className="flex items-center gap-1"><Clock className="h-3.5 w-3.5" /> {proposal.delivery_days} days delivery</span>
+                                                                <span className="flex items-center gap-1"><Clock className="h-3.5 w-3.5" /> {proposal.delivery_days} {__('days delivery')}</span>
                                                             </div>
                                                         </div>
                                                         <div className="text-right">
@@ -123,7 +124,7 @@ function ShowJobContent({ auth, job, pointsCost }: any) {
                                                                 <FinancialAmount amount={proposal.bid_amount} currency={globalCurrency} />
                                                             </div>
                                                             <Badge variant="outline" className="mt-1 bg-amber-50 text-amber-700 border-amber-200">
-                                                                {proposal.status}
+                                                                {__(proposal.status)}
                                                             </Badge>
                                                         </div>
                                                     </div>
@@ -135,10 +136,10 @@ function ShowJobContent({ auth, job, pointsCost }: any) {
                                                     {job.status === 'open' && proposal.status === 'pending' && (
                                                         <div className="flex flex-wrap gap-3 mt-6 pt-4 border-t border-slate-100">
                                                             <Button onClick={() => handleAccept(proposal.id)} className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold">
-                                                                <CheckCircle2 className="mr-2 h-4 w-4" /> Accept & Create Contract
+                                                                <CheckCircle2 className="mr-2 h-4 w-4" /> {__('Accept & Create Contract')}
                                                             </Button>
                                                             <Button onClick={() => handleReject(proposal.id)} variant="outline" className="text-slate-600 hover:text-red-600 hover:bg-red-50">
-                                                                Reject Proposal
+                                                                {__('Reject Proposal')}
                                                             </Button>
                                                         </div>
                                                     )}
@@ -155,7 +156,7 @@ function ShowJobContent({ auth, job, pointsCost }: any) {
                     <div className="lg:col-span-4 space-y-6">
                         <Card className="shadow-sm border-slate-200/60 sticky top-6">
                             <CardHeader className="border-b border-slate-100 bg-slate-50/50 pb-5">
-                                <CardTitle className="text-base font-semibold text-slate-900">Project Overview</CardTitle>
+                                <CardTitle className="text-base font-semibold text-slate-900">{__('Project Overview')}</CardTitle>
                             </CardHeader>
                             <CardContent className="p-0">
                                 <div className="divide-y divide-slate-100">
@@ -164,9 +165,9 @@ function ShowJobContent({ auth, job, pointsCost }: any) {
                                             <DollarSign className="h-5 w-5" />
                                         </div>
                                         <div>
-                                            <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Budget</p>
+                                            <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">{__('Budget')}</p>
                                             <div className="font-bold text-slate-900"><FinancialAmount amount={job.budget} currency={globalCurrency} /></div>
-                                            <p className="text-xs text-slate-500 mt-0.5 capitalize">{job.type} Price</p>
+                                            <p className="text-xs text-slate-500 mt-0.5 capitalize">{__(job.type)} {__('Price')}</p>
                                         </div>
                                     </div>
                                     
@@ -175,8 +176,8 @@ function ShowJobContent({ auth, job, pointsCost }: any) {
                                             <Clock className="h-5 w-5" />
                                         </div>
                                         <div>
-                                            <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Duration</p>
-                                            <p className="font-medium text-slate-900">{job.duration || 'Not specified'}</p>
+                                            <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">{__('Duration')}</p>
+                                            <p className="font-medium text-slate-900">{job.duration || __('Not specified')}</p>
                                         </div>
                                     </div>
                                     
@@ -188,7 +189,7 @@ function ShowJobContent({ auth, job, pointsCost }: any) {
                                             <div>
                                                 <p className="font-semibold text-slate-900">{job.client?.name}</p>
                                                 <div className="flex items-center gap-1 text-xs text-slate-500 mt-0.5">
-                                                    <CheckCircle2 className="h-3 w-3 text-emerald-500" /> Payment Verified
+                                                    <CheckCircle2 className="h-3 w-3 text-emerald-500" /> {__('Payment Verified')}
                                                 </div>
                                             </div>
                                         </div>
@@ -201,36 +202,36 @@ function ShowJobContent({ auth, job, pointsCost }: any) {
                                     {job.status !== 'open' ? (
                                         <Alert>
                                             <AlertCircle className="h-4 w-4" />
-                                            <AlertTitle>Closed</AlertTitle>
-                                            <AlertDescription>This job is no longer accepting proposals.</AlertDescription>
+                                            <AlertTitle>{__('Closed')}</AlertTitle>
+                                            <AlertDescription>{__('This job is no longer accepting proposals.')}</AlertDescription>
                                         </Alert>
                                     ) : hasSubmitted ? (
                                         <Alert className="bg-emerald-50 border-emerald-200 text-emerald-800">
                                             <CheckCircle2 className="h-4 w-4 text-emerald-600" />
-                                            <AlertTitle className="text-emerald-800 font-bold">Proposal Submitted</AlertTitle>
-                                            <AlertDescription className="text-emerald-700">You have already applied for this job.</AlertDescription>
+                                            <AlertTitle className="text-emerald-800 font-bold">{__('Proposal Submitted')}</AlertTitle>
+                                            <AlertDescription className="text-emerald-700">{__('You have already applied for this job.')}</AlertDescription>
                                         </Alert>
                                     ) : (
                                         <>
                                             <div className="bg-white rounded-lg border border-slate-200 p-4 text-center space-y-2">
-                                                <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Connects Required</p>
+                                                <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">{__('Connects Required')}</p>
                                                 <div className="flex items-center justify-center gap-2">
                                                     <span className="text-2xl font-bold text-indigo-600 font-mono">{pointsCost}</span>
                                                 </div>
-                                                <p className="text-xs text-slate-500">Your balance: <span className="font-bold text-slate-700">{userPoints}</span></p>
+                                                <p className="text-xs text-slate-500">{__('Your balance:')} <span className="font-bold text-slate-700">{userPoints}</span></p>
                                             </div>
                                             
                                             {(errors as any).points && (
                                                 <Alert variant="destructive">
                                                     <AlertCircle className="h-4 w-4" />
-                                                    <AlertTitle>Error</AlertTitle>
+                                                    <AlertTitle>{__('Error')}</AlertTitle>
                                                     <AlertDescription>{(errors as any).points}</AlertDescription>
                                                 </Alert>
                                             )}
 
                                             <form onSubmit={submitProposal} className="space-y-4">
                                                 <div className="space-y-1.5">
-                                                    <Label htmlFor="bid_amount">Your Bid ({globalCurrency})</Label>
+                                                    <Label htmlFor="bid_amount">{__('Your Bid')} ({globalCurrency})</Label>
                                                     <Input
                                                         id="bid_amount"
                                                         type="number"
@@ -240,7 +241,7 @@ function ShowJobContent({ auth, job, pointsCost }: any) {
                                                     />
                                                 </div>
                                                 <div className="space-y-1.5">
-                                                    <Label htmlFor="delivery_days">Delivery time (days)</Label>
+                                                    <Label htmlFor="delivery_days">{__('Delivery time (days)')}</Label>
                                                     <Input
                                                         id="delivery_days"
                                                         type="number"
@@ -250,13 +251,13 @@ function ShowJobContent({ auth, job, pointsCost }: any) {
                                                     />
                                                 </div>
                                                 <div className="space-y-1.5">
-                                                    <Label htmlFor="cover_letter">Cover Letter</Label>
+                                                    <Label htmlFor="cover_letter">{__('Cover Letter')}</Label>
                                                     <Textarea
                                                         id="cover_letter"
                                                         value={data.cover_letter}
                                                         onChange={e => setData('cover_letter', e.target.value)}
                                                         className="h-32 resize-none"
-                                                        placeholder="Explain why you are the best fit for this project..."
+                                                        placeholder={__('Explain why you are the best fit for this project...')}
                                                         required
                                                     />
                                                 </div>
@@ -265,7 +266,7 @@ function ShowJobContent({ auth, job, pointsCost }: any) {
                                                     disabled={processing || userPoints < pointsCost}
                                                     className="w-full bg-indigo-600 hover:bg-indigo-700 font-bold"
                                                 >
-                                                    <Send className="mr-2 h-4 w-4" /> Submit Proposal
+                                                    <Send className="mr-2 h-4 w-4" /> {__('Submit Proposal')}
                                                 </Button>
                                             </form>
                                         </>
@@ -285,7 +286,7 @@ export default function ShowJob({ auth, job, pointsCost = 5 }: any) {
         return (
             <FreelanceLayout clean={true}>
                 <div className="w-full py-12 text-center text-slate-500">
-                    Job not found.
+                    {__('Job not found.')}
                 </div>
             </FreelanceLayout>
         );

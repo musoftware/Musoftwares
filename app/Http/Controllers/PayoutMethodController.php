@@ -35,51 +35,30 @@ class PayoutMethodController extends Controller
 
         // Base validation rules
         $rules = [
-            'type' => 'required|string|in:bank_transfer,paypal,mobile_wallet,instapay,crypto_wallet',
+            'type' => 'required|string|in:bank_transfer,paypal,vodafone_cash,instapay',
             'is_default' => 'boolean',
         ];
 
         // Type-specific validation rules
-        // Recovered from old project: PayoutController::store_payment_method() conditional rules
         switch ($type) {
             case 'bank_transfer':
                 $rules['details.full_name'] = 'required|string|max:255';
                 $rules['details.bank_name'] = 'required|string|max:255';
                 $rules['details.account_number'] = 'required|string|max:50';
-                $rules['details.account_name'] = 'required|string|max:255';
-                $rules['details.iban'] = 'nullable|string|max:34';
-                $rules['details.swift_code'] = 'nullable|string|max:11';
-                $rules['details.bank_country'] = 'nullable|string|max:2';
-                $rules['details.currency'] = 'required|string|in:USD,EUR,GBP,EGP,TRY,CAD,AUD';
+                $rules['details.routing_number'] = 'nullable|string|max:50';
                 break;
 
-            case 'mobile_wallet':
-                // Recovered from old project: wallet type requires 11-digit mobile number
-                $rules['details.full_name'] = 'required|string|max:255';
+            case 'vodafone_cash':
                 $rules['details.mobile_number'] = 'required|string|regex:/^[0-9]{10,15}$/';
-                $rules['details.provider'] = 'nullable|string|max:50';
-                $rules['details.currency'] = 'required|string|in:EGP,USD';
                 break;
 
             case 'paypal':
-                // Recovered from old project: paypal type requires valid email
-                $rules['details.full_name'] = 'required|string|max:255';
                 $rules['details.paypal_email'] = 'required|email|max:255';
-                $rules['details.currency'] = 'required|string|in:USD,EUR,GBP';
                 break;
 
             case 'instapay':
-                // Recovered from old project: instapay type requires mobile + username
-                $rules['details.full_name'] = 'required|string|max:255';
                 $rules['details.mobile_number'] = 'required|string|regex:/^[0-9]{10,15}$/';
                 $rules['details.instapay_username'] = 'required|string|max:255';
-                $rules['details.currency'] = 'required|string|in:EGP';
-                break;
-
-            case 'crypto_wallet':
-                $rules['details.wallet_address'] = 'required|string|min:20|max:100';
-                $rules['details.network'] = 'required|string|in:BTC,ETH,USDT_TRC20,USDT_ERC20';
-                $rules['details.currency'] = 'required|string|in:BTC,ETH,USDT';
                 break;
         }
 
@@ -115,7 +94,7 @@ class PayoutMethodController extends Controller
 
         // Apply same type-specific validation as store()
         $rules = [
-            'type' => 'required|string|in:bank_transfer,paypal,mobile_wallet,instapay,crypto_wallet',
+            'type' => 'required|string|in:bank_transfer,paypal,vodafone_cash,instapay',
             'details' => 'required|array',
             'is_default' => 'boolean',
         ];
@@ -125,29 +104,17 @@ class PayoutMethodController extends Controller
                 $rules['details.full_name'] = 'required|string|max:255';
                 $rules['details.bank_name'] = 'required|string|max:255';
                 $rules['details.account_number'] = 'required|string|max:50';
-                $rules['details.account_name'] = 'required|string|max:255';
-                $rules['details.currency'] = 'required|string|in:USD,EUR,GBP,EGP,TRY,CAD,AUD';
+                $rules['details.routing_number'] = 'nullable|string|max:50';
                 break;
-            case 'mobile_wallet':
-                $rules['details.full_name'] = 'required|string|max:255';
+            case 'vodafone_cash':
                 $rules['details.mobile_number'] = 'required|string|regex:/^[0-9]{10,15}$/';
-                $rules['details.currency'] = 'required|string|in:EGP,USD';
                 break;
             case 'paypal':
-                $rules['details.full_name'] = 'required|string|max:255';
                 $rules['details.paypal_email'] = 'required|email|max:255';
-                $rules['details.currency'] = 'required|string|in:USD,EUR,GBP';
                 break;
             case 'instapay':
-                $rules['details.full_name'] = 'required|string|max:255';
                 $rules['details.mobile_number'] = 'required|string|regex:/^[0-9]{10,15}$/';
                 $rules['details.instapay_username'] = 'required|string|max:255';
-                $rules['details.currency'] = 'required|string|in:EGP';
-                break;
-            case 'crypto_wallet':
-                $rules['details.wallet_address'] = 'required|string|min:20|max:100';
-                $rules['details.network'] = 'required|string|in:BTC,ETH,USDT_TRC20,USDT_ERC20';
-                $rules['details.currency'] = 'required|string|in:BTC,ETH,USDT';
                 break;
         }
 
