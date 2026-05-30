@@ -664,4 +664,90 @@ class SubscriptionModuleTest extends TestCase
             'Subscription expiry should be extended when re-purchased'
         );
     }
+    // ─────────────────────────────────────────────────────────────
+    //  16. Free Tools Subscription Flow
+    // ─────────────────────────────────────────────────────────────
+
+    public function test_subscribe_succeeds_for_free_tools_with_zero_balance()
+    {
+        $user = User::factory()->create([
+            'user_balance' => 0,
+            'currency_id' => 1,
+        ]);
+
+        config(['tools' => [
+            'test-free-tool' => ['is_free' => true, 'title' => 'Test Free Tool'],
+        ]]);
+
+        $response = $this->actingAs($user)->post(route('subscriptions.subscribe'), [
+            'items' => ['tool-test-free-tool'],
+            'billing_cycle' => '1_month',
+            'is_new_system' => false,
+        ]);
+
+        $response->assertSessionHas('success');
+        $this->assertDatabaseHas('user_subscriptions', [
+            'user_id' => $user->id,
+            'object' => 'tool-test-free-tool',
+            'status' => 'active',
+        ]);
+    }
+
+    public function test_subscribe_fails_for_paid_tools_with_zero_balance()
+    {
+        $user = User::factory()->create([
+            'user_balance' => 0,
+            'currency_id' => 1,
+        ]);
+
+        config(['tools' => [
+            'test-paid-tool' => ['is_free' => false, 'title' => 'Test Paid Tool'],
+        ]]);
+
+        $response = $this->actingAs($user)->post(route('subscriptions.subscribe'), [
+            'items' => ['tool-test-paid-tool'],
+            'billing_cycle' => '1_month',
+            'is_new_system' => false,
+        ]);
+
+        $response->assertSessionHasErrors(['error']);
+        $this->assertDatabaseMissing('user_subscriptions', [
+            'user_id' => $user->id,
+            'object' => 'tool-test-paid-tool',
+        ]);
+    }
+
+    public function test_volume_discount_applied_to_paid_tools()
+    {
+        $user = User::factory()->create([
+            'user_balance' => 10000,
+            'currency_id' => 1,
+        ]);
+
+        config(['tools' => [
+            'paid-1' => ['is_free' => false, 'title' => 'Tool 1'],
+            'paid-2' => ['is_free' => false, 'title' => 'Tool 2'],
+            'free-1' => ['is_free' => true, 'title' => 'Free 1'],
+        ]]);
+
+        $response = $this->actingAs($user)->post(route('subscriptions.subscribe'), [
+            'items' => ['tool-paid-1', 'tool-paid-2', 'tool-free-1'],
+            'billing_cycle' => '1_month',
+            'is_new_system' => false,
+        ]);
+
+        $response->assertSessionHas('success');
+        
+        $this->assertDatabaseHas('user_subscriptions', [
+            'user_id' => $user->id,
+            'object' => 'tool-paid-1',
+        ]);
+        $this->assertDatabaseHas('user_subscriptions', [
+            'user_id' => $user->id,
+            'object' => 'tool-free-1',
+        ]);
+
+        $user->refresh();
+        $this->assertEquals(10000 - 180, $user->user_balance);
+    }
 }

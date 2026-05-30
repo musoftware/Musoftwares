@@ -49,21 +49,28 @@ class SubscriptionService
      */
     public function hasAccessToTool(User $user, string $toolSlug): bool
     {
-        // Admins and moderators have access to everything
-        if ($user->hasRole(['admin', 'Admin', 'moderator', 'Moderator'])) {
+        // 1. Check if tool is free
+        $tool = collect(config('tools'))->firstWhere('slug', $toolSlug);
+        if ($tool && ($tool['is_free'] ?? false)) {
             return true;
         }
 
-        // Points-based tools are never free
+        // 2. Points-based tools are never free
         if (in_array($toolSlug, ['freelance', 'facebook-publisher'])) {
             return false;
         }
 
-        if ($user->hasSubscription()) {
+        // 3. Check if user specifically bought this tool (new module system)
+        if ($user->hasModuleSubscription('tool-' . $toolSlug)) {
             return true;
         }
 
-        $tool = collect(config('tools'))->firstWhere('slug', $toolSlug);
+        // 4. Check if user has the global 'tools' module subscription (Platform Pass)
+        if ($user->hasModuleSubscription('tools')) {
+            return true;
+        }
+
+        // 5. Fallback: old ToolSubscription model
         if ($tool && class_exists(\Modules\Tools\Models\ToolSubscription::class)) {
             return \Modules\Tools\Models\ToolSubscription::where('user_id', $user->id)
                 ->where('tool_guid', $tool['guid'])

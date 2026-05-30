@@ -87,6 +87,7 @@ class MarketplaceController extends Controller
             'subscribedSlugs'        => $subscribedSlugs,
             'hasBrowserSubscription' => $hasBrowserSubscription,
             'filters'                => $request->only(['search', 'category']),
+            'businessCurrency'       => class_exists(\App\Models\AdminSettings::class) ? \App\Models\AdminSettings::business_currency_name() : 'USD',
         ]);
     }
 

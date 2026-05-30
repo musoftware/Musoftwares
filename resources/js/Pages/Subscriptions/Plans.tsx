@@ -57,6 +57,7 @@ interface PlansProps {
     walletBalance: number;
     currency: string;
     proratedRefund?: number;
+    isEligibleForTrial?: boolean;
 }
 
 const ICON_MAP: Record<string, React.ElementType> = {
@@ -74,7 +75,7 @@ const ICON_MAP: Record<string, React.ElementType> = {
     RefreshCw, PieChart
 };
 
-export default function Plans({ serviceItems, activeSubscription, walletBalance, currency, proratedRefund = 0 }: PlansProps) {
+export default function Plans({ serviceItems, activeSubscription, walletBalance, currency, proratedRefund = 0, isEligibleForTrial = false }: PlansProps) {
     const [billing, setBilling] = useState<'1_month' | '6_months' | '1_year'>('1_month');
     const [isNewSystem, setIsNewSystem] = useState<boolean>(false);
     
@@ -143,6 +144,33 @@ export default function Plans({ serviceItems, activeSubscription, walletBalance,
                             if (selectedItems.length === 0) return;
                             router.post(route('subscriptions.kashier.checkout'), { items: selectedItems, billing_cycle: billing, is_new_system: isNewSystem });
                         };
+
+                        const handleStartTrial = () => {
+                            if (selectedItems.length === 0) return;
+                            if (confirm(`Start your 14-day free trial for the selected ${selectedItems.length} items?`)) {
+                                router.post(route('subscriptions.trial'), { items: selectedItems, is_new_system: isNewSystem });
+                            }
+                        };
+
+                        const hasOnlyTools = selectedItems.length > 0 && selectedItems.every(id => id.startsWith('tool-'));
+
+                        if (isEligibleForTrial && !hasOnlyTools) {
+                            return (
+                                <Button
+                                    onClick={handleStartTrial}
+                                    disabled={selectedItems.length === 0}
+                                    className={cn(
+                                        'w-full h-12 rounded-xl text-sm font-medium gap-2 transition-all',
+                                        selectedItems.length > 0
+                                            ? 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm'
+                                            : 'bg-slate-100 text-slate-400 cursor-not-allowed'
+                                    )}
+                                >
+                                    <Sparkles className="h-4 w-4" />
+                                    Start 14-Day Free Trial
+                                </Button>
+                            );
+                        }
 
                         return (
                             <>

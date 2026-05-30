@@ -83,14 +83,16 @@ class PricingService
         foreach ($configTools as $guid => $tool) {
             if (!isset($tool['is_active']) || !$tool['is_active']) continue;
 
+            $isFree = $tool['is_free'] ?? false;
+
             $items[] = [
                 'id' => 'tool-' . $guid,
                 'slug' => $tool['slug'] ?? $guid,
                 'name' => $tool['title'] ?? 'Unknown Tool',
                 'type' => 'tool',
                 'description' => null,
-                'monthly_price' => $convertPrice($toolBasePrice / 10),
-                'yearly_price' => $convertPrice($toolBasePrice),
+                'monthly_price' => $isFree ? 0 : $convertPrice($toolBasePrice / 10),
+                'yearly_price' => $isFree ? 0 : $convertPrice($toolBasePrice),
                 'icon' => 'Wrench',
             ];
         }

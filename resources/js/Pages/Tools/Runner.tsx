@@ -60,6 +60,7 @@ const components: Record<string, React.ElementType> = {
     'LaragonManagerRunner':     lazy(() => import('./LaragonManagerRunner')),
     'ObfuscatorRunner':         lazy(() => import('./ObfuscatorRunner')),
     'DuplicateFinderRunner':    lazy(() => import('./DuplicateFinderRunner')),
+    'ExcelMergerRunner':        lazy(() => import('./ExcelMergerRunner')),
 };
 
 function SetupWizard({ currentHost, onLinked }: { currentHost: string; onLinked: (ip: string) => void }) {
