@@ -9,44 +9,71 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Modules\CRM\Infrastructure\Queue\RequiresAddonMiddleware;
 
 class MonitorLeadSlaJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
+    public int $tenantId;
+
+    public function __construct(int $tenantId)
+    {
+        $this->tenantId = $tenantId;
+    }
+
     /**
-     * Execute the job.
+     * Get the middleware the job should pass through.
      */
+    public function middleware(): array
+    {
+        return [new RequiresAddonMiddleware('crm-advanced-operations')];
+    }
+
     public function handle(): void
     {
-        Log::info('Starting MonitorLeadSlaJob...');
+        Log::info("Starting MonitorLeadSlaJob for tenant {$this->tenantId}...");
 
-        // Find leads where SLA has breached and they are not yet marked as stale
-        $breachedLeads = DB::table('leads')
+        // Process in chunks to prevent memory explosion
+        DB::table('leads')
+            ->where('tenant_id', $this->tenantId)
             ->whereNotNull('sla_breach_at')
             ->where('sla_breach_at', '<', now())
             ->where('is_stale', false)
-            ->get();
+            ->orderBy('id')
+            ->chunk(500, function ($breachedLeads) {
 
-        foreach ($breachedLeads as $lead) {
-            DB::transaction(function () use ($lead) {
-                // Mark lead as stale
-                DB::table('leads')->where('id', $lead->id)->update([
+                $leadIds = $breachedLeads->pluck('id')->toArray();
+                
+                // Group by branch for digest notification (mocked dispatch here)
+                $branchGroups = $breachedLeads->groupBy('branch_id');
+                foreach ($branchGroups as $branchId => $leads) {
+                    Log::info("SLA Digest: Branch {$branchId} has {$leads->count()} new SLA breaches.");
+                    // dispatch(new SendSlaDigestNotification($branchId, $leads->count()));
+                }
+
+                // Batch update to mark as stale
+                DB::table('leads')->whereIn('id', $leadId)->update([
                     'is_stale' => true,
-                    'pipeline_stage' => 'NEW', // Optional: throw back into generic pool
+                    'pipeline_stage' => 'NEW',
                 ]);
 
-                // Create an alert/notification for the manager
-                DB::table('crm_activities')->insert([
-                    'lead_id' => $lead->id,
-                    'type' => 'sla_breach',
-                    'description' => "Lead SLA breached. Agent {$lead->assigned_to_id} failed to contact in time.",
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ]);
+                // Batch insert activities
+                $activities = [];
+                foreach ($breachedLeads as $lead) {
+                    $activities[] = [
+                        'tenant_id' => $this->tenantId,
+                        'lead_id' => $lead->id,
+                        'type' => 'sla_breach',
+                        'description' => "Lead SLA breached. Agent {$lead->assigned_to_id} failed to contact in time.",
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ];
+                }
+                
+                DB::table('crm_activities')->insert($activities);
             });
-        }
 
-        Log::info("MonitorLeadSlaJob completed. Marked {$breachedLeads->count()} leads as SLA breached.");
+        Log::info("MonitorLeadSlaJob completed for tenant {$this->tenantId}.");
     }
 }

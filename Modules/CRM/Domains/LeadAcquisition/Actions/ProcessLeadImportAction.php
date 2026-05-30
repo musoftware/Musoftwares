@@ -17,23 +17,15 @@ class ProcessLeadImportAction
         $importedCount = 0;
         $tenantId = session('tenant_id') ?? auth()->user()->tenant_id;
 
+        $insertData = [];
+
         foreach ($data->data as $row) {
-            // Check for duplicate by phone
             $phone = $row['phone'] ?? null;
             if (!$phone) {
                 continue; // Skip leads without phone
             }
 
-            $exists = DB::table('leads')
-                ->where('tenant_id', $tenantId)
-                ->where('phone', $phone)
-                ->exists();
-
-            if ($exists) {
-                continue;
-            }
-
-            DB::table('leads')->insert([
+            $insertData[] = [
                 'tenant_id' => $tenantId,
                 'name' => $row['name'] ?? 'Unknown Lead',
                 'phone' => $phone,
@@ -44,12 +36,16 @@ class ProcessLeadImportAction
                 'branch_id' => $data->branchId,
                 'created_at' => now(),
                 'updated_at' => now(),
-            ]);
-
-            $importedCount++;
+            ];
         }
 
-        Log::info("Imported {$importedCount} new leads into the system.");
+        // Hardware-level idempotency protection.
+        // Uses the unique (tenant_id, phone) constraint to automatically drop race-condition duplicates.
+        if (!empty($insertData)) {
+            $importedCount = DB::table('leads')->insertOrIgnore($insertData);
+        }
+
+        Log::info("Attempted to import " . count($insertData) . " leads. Successfully inserted {$importedCount} new leads into the system.");
         return $importedCount;
     }
 }

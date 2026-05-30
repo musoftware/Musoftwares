@@ -5,41 +5,49 @@ namespace Modules\CRM\Domains\SalesOperations\Actions;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Redis;
 
 class AssignLeadRoundRobinAction
 {
     /**
-     * Assign a lead using a strict round-robin logic with atomic database locks
-     * to prevent queue race conditions.
+     * Assign a lead using Redis atomic counters to prevent MySQL lock contention
+     * under high webhook concurrency.
      */
     public function execute(int $leadId, int $branchId): void
     {
-        DB::transaction(function () use ($leadId, $branchId) {
-            // Get all eligible telesales agents for this branch
-            $agents = User::where('branch_id', $branchId)
-                ->whereHas('subscriptions', function ($q) {
-                    $q->where('module_id', 'crm-sales-staff');
-                })
-                ->orderBy('last_assigned_lead_at', 'asc') // Simple round-robin approach
-                ->lockForUpdate() // Prevent race conditions
-                ->get();
+        // 1. Get eligible agents for this branch. We cache this briefly in real production
+        // to avoid hitting MySQL on every webhook, but we pull it here for clarity.
+        $agents = User::where('branch_id', $branchId)
+            ->whereHas('subscriptions', function ($q) {
+                $q->where('module_id', 'crm-sales-staff');
+            })
+            ->orderBy('id', 'asc') // Deterministic order
+            ->pluck('id')
+            ->toArray();
 
-            if ($agents->isEmpty()) {
-                Log::warning("No eligible telesales agents found in branch {$branchId} for lead {$leadId}");
-                return;
-            }
+        if (empty($agents)) {
+            Log::warning("No eligible telesales agents found in branch {$branchId} for lead {$leadId}");
+            return;
+        }
 
-            $selectedAgent = $agents->first();
+        // 2. Atomically increment the pointer in Redis
+        $redisKey = "crm:round_robin:branch:{$branchId}";
+        $pointer = Redis::incr($redisKey);
 
-            DB::table('leads')->where('id', $leadId)->update([
-                'assigned_to_id' => $selectedAgent->id,
-                'reassigned_at' => now(),
-            ]);
+        // 3. Determine the selected agent using modulo
+        $agentCount = count($agents);
+        $selectedIndex = ($pointer - 1) % $agentCount;
+        $selectedAgentId = $agents[$selectedIndex];
 
-            // Update the agent's last assigned timestamp
-            $selectedAgent->update(['last_assigned_lead_at' => now()]);
+        // 4. Assign the lead (Simple UPDATE, no lock contention on users table)
+        DB::table('leads')->where('id', $leadId)->update([
+            'assigned_to_id' => $selectedAgentId,
+            'reassigned_at' => now(),
+        ]);
 
-            Log::info("Lead {$leadId} successfully assigned to agent {$selectedAgent->id} via Round-Robin.");
-        });
+        // Note: We no longer need to update `last_assigned_lead_at` on the user model,
+        // because the Redis pointer is the single source of truth for the queue!
+
+        Log::info("Lead {$leadId} successfully assigned to agent {$selectedAgentId} via Redis Round-Robin.");
     }
 }
