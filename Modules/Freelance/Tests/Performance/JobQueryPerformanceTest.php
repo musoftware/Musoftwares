@@ -1,12 +1,14 @@
 <?php
 
+uses(\Tests\TestCase::class, \Illuminate\Foundation\Testing\RefreshDatabase::class);
+
 use Modules\Freelance\Models\Job;
 use Modules\Freelance\Models\Proposal;
 use Modules\Freelance\Tests\Builders\JobScenarioBuilder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 
-uses(Tests\TestCase::class, RefreshDatabase::class)->in(__DIR__);
+
 
 it('loads jobs and their related counts without N+1 queries', function () {
     // Generate 5 jobs with 3 proposals each

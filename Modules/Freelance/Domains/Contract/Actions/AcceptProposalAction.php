@@ -23,6 +23,11 @@ class AcceptProposalAction
         }
 
         return DB::transaction(function () use ($job, $proposal, $client) {
+            $job = Job::where('id', $job->id)->lockForUpdate()->first();
+
+            if (! $job->status->equals(\Modules\Freelance\Domains\Job\States\Open::class)) {
+                throw new \Exception('Job is no longer open for accepting proposals.');
+            }
 
             $proposal->update(['status' => 'accepted']);
             $job->update(['status' => 'in_progress']);

@@ -1,12 +1,14 @@
 <?php
 
+uses(\Tests\TestCase::class, \Illuminate\Foundation\Testing\RefreshDatabase::class);
+
 use Modules\Freelance\Jobs\NotifyFreelancersForJob;
 use Modules\Freelance\Models\Job;
 use Modules\Freelance\Tests\Builders\JobScenarioBuilder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Queue;
 
-uses(Tests\TestCase::class, RefreshDatabase::class)->in(__DIR__);
+
 
 it('handles large batches of notifications gracefully', function () {
     // This is typically a test to ensure a job can be serialized and dispatched efficiently.
@@ -24,6 +26,6 @@ it('handles large batches of notifications gracefully', function () {
     NotifyFreelancersForJob::dispatch($job);
 
     Queue::assertPushed(NotifyFreelancersForJob::class, function ($queuedJob) use ($job) {
-        return $queuedJob->job->id === $job->id;
+        return $queuedJob->freelanceJob->id === $job->id;
     });
 });

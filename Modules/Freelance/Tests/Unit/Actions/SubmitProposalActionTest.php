@@ -1,14 +1,16 @@
 <?php
 
+uses(\Tests\TestCase::class, \Illuminate\Foundation\Testing\RefreshDatabase::class);
+
 use Modules\Freelance\Domains\Proposal\Actions\SubmitProposalAction;
 use Modules\Freelance\Domains\Proposal\DTOs\SubmitProposalData;
 use Modules\Freelance\Tests\Builders\JobScenarioBuilder;
 use Modules\Freelance\Models\Proposal;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use App\Models\Currency;
+
 use Modules\Freelance\Domains\Finance\Actions\DeductPointsAction;
 
-uses(Tests\TestCase::class, RefreshDatabase::class)->in(__DIR__);
+
 
 it('submits a proposal successfully and deducts points', function () {
     $scenario = JobScenarioBuilder::create()
@@ -18,10 +20,11 @@ it('submits a proposal successfully and deducts points', function () {
 
     $freelancer = $scenario->getFreelancer(0);
     $job = $scenario->getJob();
-    $currency = Currency::factory()->create();
+    
 
     $action = app(SubmitProposalAction::class);
     $data = new SubmitProposalData(
+        jobId: $job->id,
         freelancerId: $freelancer->id,
         coverLetter: 'I am the best fit for this.',
         proposedBudgetPoints: 1000,
@@ -47,10 +50,11 @@ it('prevents submitting multiple proposals for the same job', function () {
 
     $freelancer = $scenario->getFreelancer(0);
     $job = $scenario->getJob();
-    $currency = Currency::factory()->create();
+    
 
     $action = app(SubmitProposalAction::class);
     $data = new SubmitProposalData(
+        jobId: $job->id,
         freelancerId: $freelancer->id,
         coverLetter: 'I am the best fit for this.',
         proposedBudgetPoints: 1000,
@@ -72,10 +76,11 @@ it('throws exception if freelancer has insufficient points', function () {
 
     $freelancer = $scenario->getFreelancer(0);
     $job = $scenario->getJob();
-    $currency = Currency::factory()->create();
+    
 
     $action = app(SubmitProposalAction::class);
     $data = new SubmitProposalData(
+        jobId: $job->id,
         freelancerId: $freelancer->id,
         coverLetter: 'I am the best fit for this.',
         proposedBudgetPoints: 1000,
@@ -93,7 +98,7 @@ it('rolls back proposal creation if point deduction fails', function () {
 
     $freelancer = $scenario->getFreelancer(0);
     $job = $scenario->getJob();
-    $currency = Currency::factory()->create();
+    
 
     $deductActionMock = Mockery::mock(DeductPointsAction::class);
     $deductActionMock->shouldReceive('execute')->andThrow(new \Exception('Point deduction failed'));
@@ -101,6 +106,7 @@ it('rolls back proposal creation if point deduction fails', function () {
 
     $action = app(SubmitProposalAction::class);
     $data = new SubmitProposalData(
+        jobId: $job->id,
         freelancerId: $freelancer->id,
         coverLetter: 'Will fail.',
         proposedBudgetPoints: 1000,

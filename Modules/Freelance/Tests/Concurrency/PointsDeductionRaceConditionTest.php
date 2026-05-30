@@ -1,12 +1,14 @@
 <?php
 
+uses(\Tests\TestCase::class, \Illuminate\Foundation\Testing\RefreshDatabase::class);
+
 use Modules\Freelance\Domains\Finance\Actions\DeductPointsAction;
 use Modules\Freelance\Domains\Finance\Actions\AddPointsAction;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 
-uses(Tests\TestCase::class, RefreshDatabase::class)->in(__DIR__);
+
 
 it('uses pessimistic locking to prevent points deduction race conditions', function () {
     $user = User::factory()->create(['points_balance' => 50]);

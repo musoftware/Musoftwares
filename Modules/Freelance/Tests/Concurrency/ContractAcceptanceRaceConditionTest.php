@@ -1,5 +1,7 @@
 <?php
 
+uses(\Tests\TestCase::class, \Illuminate\Foundation\Testing\RefreshDatabase::class);
+
 use Modules\Freelance\Domains\Contract\Actions\AcceptProposalAction;
 use Modules\Freelance\Tests\Builders\JobScenarioBuilder;
 use Modules\Freelance\Models\Proposal;
@@ -7,7 +9,7 @@ use Modules\Freelance\Models\Contract;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 
-uses(Tests\TestCase::class, RefreshDatabase::class)->in(__DIR__);
+
 
 beforeEach(function () {
     Event::fake();

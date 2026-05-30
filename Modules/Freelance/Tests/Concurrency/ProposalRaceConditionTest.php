@@ -1,13 +1,15 @@
 <?php
 
+uses(\Tests\TestCase::class, \Illuminate\Foundation\Testing\RefreshDatabase::class);
+
 use Modules\Freelance\Domains\Proposal\Actions\SubmitProposalAction;
 use Modules\Freelance\Domains\Proposal\DTOs\SubmitProposalData;
 use Modules\Freelance\Tests\Builders\JobScenarioBuilder;
 use Modules\Freelance\Models\Proposal;
-use App\Models\Currency;
+
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
-uses(Tests\TestCase::class, RefreshDatabase::class)->in(__DIR__);
+
 
 it('prevents a freelancer from submitting duplicate proposals for the same job', function () {
     $scenario = JobScenarioBuilder::create()
@@ -17,10 +19,11 @@ it('prevents a freelancer from submitting duplicate proposals for the same job',
 
     $freelancer = $scenario->getFreelancer(0);
     $job = $scenario->getJob();
-    $currency = Currency::factory()->create();
+
 
     $action = app(SubmitProposalAction::class);
     $data = new SubmitProposalData(
+        jobId: $job->id,
         freelancerId: $freelancer->id,
         coverLetter: 'I am the best fit for this.',
         proposedBudgetPoints: 1000,

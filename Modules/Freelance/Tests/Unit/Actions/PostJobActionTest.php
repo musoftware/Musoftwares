@@ -1,17 +1,19 @@
 <?php
 
+uses(\Tests\TestCase::class, \Illuminate\Foundation\Testing\RefreshDatabase::class);
+
 use Modules\Freelance\Domains\Job\Actions\PostJobAction;
 use Modules\Freelance\Domains\Job\DTOs\PostJobData;
 use Modules\Freelance\Domains\Finance\Actions\DeductPointsAction;
 use Modules\Freelance\Jobs\NotifyFreelancersForJob;
 use App\Models\User;
-use App\Models\Currency;
+
 use Modules\Freelance\Models\Job;
 use Modules\Freelance\Models\Skill;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
-uses(Tests\TestCase::class, RefreshDatabase::class)->in(__DIR__);
+
 
 beforeEach(function () {
     Queue::fake();
@@ -19,8 +21,8 @@ beforeEach(function () {
 
 it('posts a job successfully and deducts points', function () {
     $client = User::factory()->create(['points_balance' => 50]);
-    $currency = Currency::factory()->create();
-    $skill = Skill::factory()->create();
+    
+    $skill = Skill::create(['name' => 'PHP', 'description' => 'PHP']);
 
     $action = app(PostJobAction::class);
     $data = new PostJobData(
@@ -47,13 +49,13 @@ it('posts a job successfully and deducts points', function () {
 
     // Assert Notification Job was dispatched
     Queue::assertPushed(NotifyFreelancersForJob::class, function ($queuedJob) use ($job) {
-        return $queuedJob->job->id === $job->id;
+        return $queuedJob->freelanceJob->id === $job->id;
     });
 });
 
 it('throws exception if client has insufficient points', function () {
     $client = User::factory()->create(['points_balance' => 5]); // Less than postCost (10)
-    $currency = Currency::factory()->create();
+    
 
     $action = app(PostJobAction::class);
     $data = new PostJobData(
@@ -75,7 +77,7 @@ it('reverts database transaction if point deduction fails', function () {
     // This requires mocking the DeductPointsAction to throw an error 
     // and ensuring no job was created.
     $client = User::factory()->create(['points_balance' => 50]);
-    $currency = Currency::factory()->create();
+    
 
     // Mocking to simulate an inner failure
     $deductActionMock = Mockery::mock(DeductPointsAction::class);
