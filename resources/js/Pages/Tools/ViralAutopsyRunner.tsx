@@ -180,7 +180,7 @@ export default function ViralAutopsyRunner({ tool }: any) {
                     <div className="w-7 h-7 bg-gradient-to-br from-rose-500 to-orange-500 rounded-lg flex items-center justify-center shadow-sm">
                         <Zap className="w-4 h-4 text-white" />
                     </div>
-                    <span className="font-bold text-sm text-slate-800 tracking-tight">Viral Autopsy</span>
+                    <span className="font-bold text-sm text-slate-800 tracking-tight">Viral Videos Finder</span>
                 </div>
                 <Badge variant="outline" className={`gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase ${status === 'running' ? 'bg-amber-50 border-amber-200 text-amber-700' : status === 'done' ? 'bg-emerald-50 border-emerald-200 text-emerald-700' : 'bg-slate-100 border-slate-200 text-slate-500'}`}>
                     <div className={`w-1.5 h-1.5 rounded-full ${status === 'running' ? 'bg-amber-500 animate-pulse' : status === 'done' ? 'bg-emerald-500' : 'bg-slate-400'}`} />

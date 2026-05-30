@@ -132,7 +132,7 @@ export default function Tutorial({ tool }: Props) {
                                     <div className="space-y-2">
                                         <h3 className="text-sm font-bold text-slate-900">Open the platform</h3>
                                         <p className="text-xs text-slate-500 leading-relaxed max-w-xl">
-                                            Go to the target automation site (e.g. Facebook for the Facebook Extractor) and log in. The extension will automatically coordinate background handshakes.
+                                            Go to the target automation site (e.g. Facebook for the Facebook Data Extractor) and log in. The extension will automatically coordinate background handshakes.
                                         </p>
                                     </div>
                                 </div>

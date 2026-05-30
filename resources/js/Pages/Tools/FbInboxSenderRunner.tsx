@@ -134,7 +134,7 @@ export default function FbInboxSenderRunner({ tool }: any) {
                                 <Inbox className="w-4 h-4 text-white" />
                             </div>
                             <div>
-                                <h1 className="text-sm font-bold tracking-tight">Facebook Inbox Sender</h1>
+                                <h1 className="text-sm font-bold tracking-tight">Messenger Bulk Sender</h1>
                                 <p className="text-[10px] text-white/40 font-medium">Page Inbox Automation</p>
                             </div>
                         </div>

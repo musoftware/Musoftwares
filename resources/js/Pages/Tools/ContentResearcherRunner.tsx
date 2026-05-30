@@ -221,7 +221,7 @@ export default function ContentResearcherRunner({ tool, subscription, runtimePor
                     <div className="w-12 h-12 bg-indigo-500 rounded-2xl flex items-center justify-center shadow-inner mb-6 shadow-indigo-200">
                         <Search className="w-6 h-6 text-white" />
                     </div>
-                    <h1 className="text-xl font-black tracking-tight text-slate-900 mb-2">Content Researcher</h1>
+                    <h1 className="text-xl font-black tracking-tight text-slate-900 mb-2">Content Search</h1>
                     <p className="text-sm font-medium text-slate-500 mb-8 leading-relaxed">
                         Deep SERP analysis and intelligent SEO data extraction.
                     </p>

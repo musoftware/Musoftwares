@@ -322,7 +322,7 @@ export default function SwipeVaultRunner({ tool, subscription, runtimePort, plug
                         <div className="w-7 h-7 bg-gradient-to-br from-amber-500 to-orange-600 rounded-lg flex items-center justify-center shadow-lg shadow-amber-500/20">
                             <Bookmark className="w-3.5 h-3.5 text-white" />
                         </div>
-                        <span className="font-bold text-sm tracking-tight text-white">Swipe Vault</span>
+                        <span className="font-bold text-sm tracking-tight text-white">Ads Library</span>
                     </div>
 
                     <div className="h-4 w-px bg-white/10" />

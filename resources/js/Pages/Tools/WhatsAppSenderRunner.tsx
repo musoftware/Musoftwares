@@ -20,7 +20,7 @@ type TabId = 'accounts' | 'campaign' | 'groups' | 'group-campaign' | 'history' |
 
 const translations = {
     en: {
-        title: "WhatsApp Sender",
+        title: "Bulk WhatsApp Sender",
         subtitle: "Campaign Engine & Automation",
         language: "العربية",
         connected: "Runtime Connected",

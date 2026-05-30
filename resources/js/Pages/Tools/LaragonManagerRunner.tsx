@@ -118,7 +118,7 @@ export default function LaragonManagerRunner({ tool }: any) {
                     <div className="w-7 h-7 bg-blue-500 rounded-lg flex items-center justify-center shadow-sm">
                         <Folder className="w-4 h-4 text-white" />
                     </div>
-                    <span className="font-bold text-sm text-slate-800 dark:text-slate-200 tracking-tight">Laragon Manager</span>
+                    <span className="font-bold text-sm text-slate-800 dark:text-slate-200 tracking-tight">Local Server Manager</span>
                 </div>
                 <div className="flex items-center gap-3">
                     <Input 

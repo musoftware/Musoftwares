@@ -3,7 +3,7 @@
 return [
     '832b99f8-26dc-405b-b741-36c3b982a32e' => [
         'guid' => '832b99f8-26dc-405b-b741-36c3b982a32e',
-        'title' => 'TikTok Intelligence',
+        'title' => 'TikTok Analytics',
         'slug' => 'tiktok-intelligence',
         'short_description' => 'Discover viral creators, monitor competitors, track UGC trends, and build actionable market intelligence pipelines.',
         'description' => 'The TikTok Intelligence Engine is a production-grade intelligence platform that runs entirely locally on your machine.
@@ -65,7 +65,7 @@ return [
     ],
     '8b8b5c09-0763-4d4b-9c76-26c2688e3d8f' => [
         'guid' => '8b8b5c09-0763-4d4b-9c76-26c2688e3d8f',
-        'title' => 'B2B Prospector',
+        'title' => 'B2B Leads Finder',
         'slug' => 'b2b-prospector',
         'short_description' => 'Enterprise-grade lead discovery, enrichment, and cold email outreach built directly into your local runtime.',
         'description' => 'The B2B Prospector is a complete B2B prospecting ecosystem designed to rival Apollo.io and Instantly.ai, but running 100% locally to ensure data privacy and maximum deliverability.
@@ -129,7 +129,7 @@ return [
     ],
     'cd07ba6f-422d-4e72-86d2-c60a2f5ce0fb' => [
         'guid' => 'cd07ba6f-422d-4e72-86d2-c60a2f5ce0fb',
-        'title' => 'Competitor Intelligence',
+        'title' => 'Competitor Analytics',
         'slug' => 'competitor-intel',
         'short_description' => 'Monitor competitor ads, pricing, and content changes in real time.',
         'description' => 'Stay ahead of your competition with automated monitoring.
@@ -188,7 +188,7 @@ return [
     ],
     '7a4af7e5-ea44-49af-8dbf-dac14c807120' => [
         'guid' => '7a4af7e5-ea44-49af-8dbf-dac14c807120',
-        'title' => 'WhatsApp Sender',
+        'title' => 'Bulk WhatsApp Sender',
         'slug' => 'whatsapp-sender-pro',
         'short_description' => 'Enterprise-grade WhatsApp Operations tool supporting multi-session automation, bulk campaigns, and AI auto-replies.',
         'description' => 'WhatsApp Sender Pro is a complete enterprise operations platform running as a local runtime plugin.
@@ -249,7 +249,7 @@ return [
     ],
     '9eac08aa-a59a-46b4-859b-588b33810920' => [
         'guid' => '9eac08aa-a59a-46b4-859b-588b33810920',
-        'title' => 'Viral Autopsy',
+        'title' => 'Viral Videos Finder',
         'slug' => 'viral-autopsy',
         'short_description' => 'Paste any TikTok URL — get a full breakdown of WHY it went viral with a 0-100 Viral Score.',
         'description' => 'Viral Autopsy analyzes any TikTok video across 5 dimensions to explain exactly why it performed the way it did.
@@ -312,7 +312,7 @@ Get a Viral Score (0-100) with detailed per-dimension breakdown.',
     ],
     'b96bfb82-7726-4d8a-9b38-a4b58a8687c2' => [
         'guid' => 'b96bfb82-7726-4d8a-9b38-a4b58a8687c2',
-        'title' => 'Hook Analyzer',
+        'title' => 'Video Hooks Analytics',
         'slug' => 'hook-analyzer',
         'short_description' => 'Analyze TikTok hooks — get a Hook Score, pattern detection, and specific suggestions to improve retention.',
         'description' => 'Hook Analyzer scores the first 3 seconds of any TikTok video using proven hook pattern matching.
@@ -373,7 +373,7 @@ Get a Viral Score (0-100) with detailed per-dimension breakdown.',
     ],
     '6212a6ac-477e-4b72-8610-b479a9bc92ac' => [
         'guid' => '6212a6ac-477e-4b72-8610-b479a9bc92ac',
-        'title' => 'Format Extractor',
+        'title' => 'Content Extractor',
         'slug' => 'format-extractor',
         'short_description' => 'Extract the viral format blueprint from any TikTok video — reusable hook templates, structure patterns, and sound strategy.',
         'description' => 'Format DNA Extractor reverse-engineers viral TikTok formats into reusable blueprints.
@@ -485,7 +485,7 @@ Not copying content — copying the psychology.
     ],
     '50dc5bff-8c85-423c-9d65-f66648c66e46' => [
         'guid' => '50dc5bff-8c85-423c-9d65-f66648c66e46',
-        'title' => 'Screenshot Feedback',
+        'title' => 'Website Feedback',
         'slug' => 'screenshot-feedback',
         'short_description' => 'A clean, operational workspace for UI review, feedback pins, and screenshot organization.',
         'description' => 'Screenshot Feedback Workspace is a visual review tool that lets you drop pin-based comments directly on design screenshots.
@@ -533,7 +533,7 @@ Not copying content — copying the psychology.
     ],
     '2d142935-58f5-4bc3-bfce-d0e1af658e32' => [
         'guid' => '2d142935-58f5-4bc3-bfce-d0e1af658e32',
-        'title' => 'OpenSooq Extractor',
+        'title' => 'OpenSooq Data Extractor',
         'slug' => 'opensooq',
         'short_description' => 'Extract real buyer and seller leads from OpenSooq listings — by keyword, category, and country.',
         'description' => 'OpenSooq Lead Extractor mines verified leads from OpenSooq.com, the largest classifieds marketplace in the Arab world.
@@ -582,7 +582,7 @@ Not copying content — copying the psychology.
     ],
     '123e4567-e89b-12d3-a456-426614174000' => [
         'guid' => '123e4567-e89b-12d3-a456-426614174000',
-        'title' => 'Email Sender',
+        'title' => 'Bulk Email Sender',
         'slug' => 'email-sender',
         'short_description' => 'Bulk Email Campaigns & Marketing',
         'description' => 'Send bulk emails locally with high deliverability using SMTP accounts and beautiful templates. Complete with bounce tracking and reporting.',
@@ -623,7 +623,7 @@ Not copying content — copying the psychology.
     ],
     'fbe12345-0000-0000-0000-000000000000' => [
         'guid' => 'fbe12345-0000-0000-0000-000000000000',
-        'title' => 'Facebook Extractor',
+        'title' => 'Facebook Data Extractor',
         'slug' => 'facebook-extractor',
         'short_description' => 'Extract members, comments, and likes directly from the Facebook UI without APIs.',
         'description' => 'A Runtime-First Browser Bridge extension that securely intercepts Facebook GraphQL responses without fragile DOM scraping. Extract group members, post comments, and post likes directly into local SQLite storage.',
@@ -663,7 +663,7 @@ Not copying content — copying the psychology.
     ],
     '9e1c4824-345f-4a0b-9d47-66a70a831d68' => [
         'guid' => '9e1c4824-345f-4a0b-9d47-66a70a831d68',
-        'title' => 'Content Researcher',
+        'title' => 'Content Search',
         'slug' => 'content-researcher',
         'short_description' => 'Scrape DuckDuckGo and analyze SEO data for any keyword.',
         'description' => 'Content Researcher takes your target keyword, scrapes search engine results, and extracts the full SEO blueprint of top-ranking pages.
@@ -709,7 +709,7 @@ Not copying content — copying the psychology.
     ],
     '5c6d32f1-6789-4a0b-11c2-334455667788' => [
         'guid' => '5c6d32f1-6789-4a0b-11c2-334455667788',
-        'title' => 'CSV Filter',
+        'title' => 'CSV Editor',
         'slug' => 'data-filter',
         'short_description' => 'Fast, local CSV processing for large datasets. Filter, combine, and remove duplicates without crashing.',
         'description' => 'Process huge CSV datasets entirely locally with stream-based processing.
@@ -751,7 +751,7 @@ Not copying content — copying the psychology.
     ],
     '2e9c48b2-1a2b-4c3d-8e5f-123456789abc' => [
         'guid' => '2e9c48b2-1a2b-4c3d-8e5f-123456789abc',
-        'title' => 'Facebook Publisher',
+        'title' => 'Facebook Auto Poster',
         'slug' => 'facebook-publisher',
         'short_description' => 'Automate publishing of Reels, Stories, and Video Posts to Facebook Pages.',
         'description' => 'Facebook Auto Publisher is a headless local engine designed to automate video publishing and media management to Facebook Pages without human intervention.
@@ -797,7 +797,7 @@ Not copying content — copying the psychology.
     ],
     '4c7a52e1-7e88-444f-8a43-9828557a2c6d' => [
         'guid' => '4c7a52e1-7e88-444f-8a43-9828557a2c6d',
-        'title' => 'Domain Intelligence',
+        'title' => 'Domain Analytics',
         'slug' => 'domain-intelligence',
         'short_description' => 'Scrape and analyze domain WHOIS, DNS, and technology stack information.',
         'description' => 'Domain Intelligence provides an in-depth analysis of any domain name.
@@ -843,7 +843,7 @@ Not copying content — copying the psychology.
     ],
     '1d856d35-9502-4b2a-8869-7603c4cf7e72' => [
         'guid' => '1d856d35-9502-4b2a-8869-7603c4cf7e72',
-        'title' => 'Domain Prospector',
+        'title' => 'Domain Finder',
         'slug' => 'domain-prospector',
         'short_description' => 'Find domain sellers and ownership contact information for acquisition.',
         'description' => 'Domain Prospector is built to help you find the current owner or seller of a target domain.
@@ -888,7 +888,7 @@ Not copying content — copying the psychology.
     ],
     '6f481ab0-00d5-4e31-8919-482f3dbf7b11' => [
         'guid' => '6f481ab0-00d5-4e31-8919-482f3dbf7b11',
-        'title' => 'TikTok Booster',
+        'title' => 'TikTok Views Booster',
         'slug' => 'tiktok-booster',
         'short_description' => 'Automated TikTok View, Share, and Favorite Booster using intelligent CAPTCHA bypass.',
         'description' => 'TikTok Booster automates the process of increasing your TikTok metrics using local headless browser automation.
@@ -980,7 +980,7 @@ Not copying content — copying the psychology.
     ],
     'b7f0e6e9-3d14-46f3-8b7c-87d4c80327f3' => [
         'guid' => 'b7f0e6e9-3d14-46f3-8b7c-87d4c80327f3',
-        'title' => 'OLX B2C Finder',
+        'title' => 'OLX Finder',
         'slug' => 'olx-b2c-finder',
         'short_description' => 'Extract high-fidelity B2C leads from OLX and Dubizzle directly from the network wire.',
         'description' => 'OLX B2C Finder is an enterprise-grade extraction tool designed for Dubizzle and OLX marketplaces.
@@ -1025,7 +1025,7 @@ Not copying content — copying the psychology.
     ],
     'a1b2c3d4-1111-4aaa-bbbb-111111111111' => [
         'guid' => 'a1b2c3d4-1111-4aaa-bbbb-111111111111',
-        'title' => 'Google Maps Extractor',
+        'title' => 'Google Maps Data Extractor',
         'slug' => 'google-maps',
         'short_description' => 'Extract business leads, phone numbers, and emails from Google Maps search results.',
         'description' => 'Google Maps Extractor is a powerful local scraper that mines business data directly from Google Maps.
@@ -1071,7 +1071,7 @@ Not copying content — copying the psychology.
     ],
     'a1b2c3d4-2222-4aaa-bbbb-222222222222' => [
         'guid' => 'a1b2c3d4-2222-4aaa-bbbb-222222222222',
-        'title' => 'Snap Downloader',
+        'title' => 'Snapchat Downloader',
         'slug' => 'snap-downloader',
         'short_description' => 'Download Snapchat stories, spotlights, and public content locally.',
         'description' => 'Snap Downloader captures Snapchat media directly to your local machine.
@@ -1116,7 +1116,7 @@ Not copying content — copying the psychology.
     ],
     'a1b2c3d4-3333-4aaa-bbbb-333333333333' => [
         'guid' => 'a1b2c3d4-3333-4aaa-bbbb-333333333333',
-        'title' => 'Haraj Extractor',
+        'title' => 'Haraj Data Extractor',
         'slug' => 'haraj',
         'short_description' => 'Extract seller leads and listings from Haraj.com.sa, the largest Saudi classifieds marketplace.',
         'description' => 'Haraj Extractor scrapes verified seller data from Haraj.com.sa.
@@ -1163,7 +1163,7 @@ Not copying content — copying the psychology.
     ],
     'a1b2c3d4-4444-4aaa-bbbb-444444444444' => [
         'guid' => 'a1b2c3d4-4444-4aaa-bbbb-444444444444',
-        'title' => 'WhatsApp AI Agent',
+        'title' => 'WhatsApp AI Bot',
         'slug' => 'wa-ai-agent',
         'short_description' => 'Deploy an AI-powered auto-reply agent on your WhatsApp number for 24/7 customer support.',
         'description' => 'WhatsApp AI Agent runs a GPT-powered conversational agent directly on your WhatsApp number.
@@ -1209,7 +1209,7 @@ Not copying content — copying the psychology.
     ],
     'a1b2c3d4-5555-4aaa-bbbb-555555555555' => [
         'guid' => 'a1b2c3d4-5555-4aaa-bbbb-555555555555',
-        'title' => 'WhatsApp Funnel Engine',
+        'title' => 'WhatsApp Campaigns',
         'slug' => 'wa-funnel-engine',
         'short_description' => 'Build automated WhatsApp sales funnels with drip sequences and conditional flows.',
         'description' => 'WhatsApp Funnel Engine lets you design and run multi-step WhatsApp drip campaigns.
@@ -1257,7 +1257,7 @@ Not copying content — copying the psychology.
     ],
     'a1b2c3d4-6666-4aaa-bbbb-666666666666' => [
         'guid' => 'a1b2c3d4-6666-4aaa-bbbb-666666666666',
-        'title' => 'WhatsApp Warmup',
+        'title' => 'WhatsApp Number Warmup',
         'slug' => 'wa-warmup',
         'short_description' => 'Warm up new WhatsApp numbers with realistic automated conversations to avoid bans.',
         'description' => 'WhatsApp Warmup simulates natural human conversations on new numbers to build trust with WhatsApp.
@@ -1305,7 +1305,7 @@ Not copying content — copying the psychology.
     ],
     'a1b2c3d4-7777-4aaa-bbbb-777777777777' => [
         'guid' => 'a1b2c3d4-7777-4aaa-bbbb-777777777777',
-        'title' => 'Facebook Inbox Sender',
+        'title' => 'Messenger Bulk Sender',
         'slug' => 'fb-inbox-sender',
         'short_description' => 'Send bulk messages to Facebook pages, profiles, and group members via Messenger.',
         'description' => 'Facebook Inbox Sender automates Messenger outreach campaigns.
@@ -1353,7 +1353,7 @@ Not copying content — copying the psychology.
     ],
     'a1b2c3d4-8888-4aaa-bbbb-888888888888' => [
         'guid' => 'a1b2c3d4-8888-4aaa-bbbb-888888888888',
-        'title' => 'Instagram V4',
+        'title' => 'Instagram Tools',
         'slug' => 'instagram',
         'short_description' => 'Full Instagram automation suite — followers extraction, DM campaigns, and engagement tools.',
         'description' => 'Instagram V4 is a comprehensive Instagram automation platform.
@@ -1401,7 +1401,7 @@ Not copying content — copying the psychology.
     ],
     'a1b2c3d4-9999-4aaa-bbbb-999999999999' => [
         'guid' => 'a1b2c3d4-9999-4aaa-bbbb-999999999999',
-        'title' => 'PropertyFinder Scraper',
+        'title' => 'Property Finder Data Extractor',
         'slug' => 'propertyfinder',
         'short_description' => 'Extract real estate listings, agent contacts, and property data from PropertyFinder.',
         'description' => 'PropertyFinder Scraper mines real estate data from PropertyFinder.ae and related markets.
@@ -1448,7 +1448,7 @@ Not copying content — copying the psychology.
     ],
     'a1b2c3d4-aaaa-4aaa-bbbb-aaaaaaaaaaaa' => [
         'guid' => 'a1b2c3d4-aaaa-4aaa-bbbb-aaaaaaaaaaaa',
-        'title' => 'Telegram Bomber V3',
+        'title' => 'Telegram Bulk Sender',
         'slug' => 'telegram-tool',
         'short_description' => 'Bulk Telegram messaging tool with group member extraction and automated campaigns.',
         'description' => 'Telegram Bomber V3 is a full Telegram automation suite.
@@ -1496,7 +1496,7 @@ Not copying content — copying the psychology.
     ],
     'a1b2c3d4-bbbb-4aaa-bbbb-bbbbbbbbbbbb' => [
         'guid' => 'a1b2c3d4-bbbb-4aaa-bbbb-bbbbbbbbbbbb',
-        'title' => 'Article Maker',
+        'title' => 'AI Article Writer',
         'slug' => 'article-maker',
         'short_description' => 'AI-powered article generation with SEO optimization, bulk creation, and WordPress publishing.',
         'description' => 'Article Maker is a full-stack AI content engine.
@@ -1543,7 +1543,7 @@ Not copying content — copying the psychology.
     ],
     'a1b2c3d4-cccc-4aaa-bbbb-cccccccccccc' => [
         'guid' => 'a1b2c3d4-cccc-4aaa-bbbb-cccccccccccc',
-        'title' => 'Competitor Tracker',
+        'title' => 'Competitor Analytics',
         'slug' => 'competitor-tracker',
         'short_description' => 'Track competitor metrics and changes directly from your local machine.',
         'description' => 'Competitor Tracker monitors your competitors in real time using the Musoftware Runtime.
@@ -1588,7 +1588,7 @@ Not copying content — copying the psychology.
     ],
     'a1b2c3d4-dddd-4aaa-bbbb-dddddddddddd' => [
         'guid' => 'a1b2c3d4-dddd-4aaa-bbbb-dddddddddddd',
-        'title' => 'Ad Library Monitor',
+        'title' => 'Ads Analytics',
         'slug' => 'ad-library-monitor',
         'short_description' => 'Monitor ads across multiple platforms via the local Musoftware extension.',
         'description' => 'Ad Library Monitor tracks competitor advertising across major platforms.
@@ -1633,7 +1633,7 @@ Not copying content — copying the psychology.
     ],
     'a1b2c3d4-eeee-4aaa-bbbb-eeeeeeeeeeee' => [
         'guid' => 'a1b2c3d4-eeee-4aaa-bbbb-eeeeeeeeeeee',
-        'title' => 'UGC Creators Search',
+        'title' => 'Creators Finder',
         'slug' => 'ugc-creators-search',
         'short_description' => 'Find and connect with UGC creators natively from your browser via the local runtime.',
         'description' => 'UGC Creators Search helps you discover user-generated content creators.
@@ -1678,7 +1678,7 @@ Not copying content — copying the psychology.
     ],
     'a1b2c3d4-ffff-4aaa-bbbb-ffffffffffff' => [
         'guid' => 'a1b2c3d4-ffff-4aaa-bbbb-ffffffffffff',
-        'title' => 'Swipe Vault',
+        'title' => 'Ads Library',
         'slug' => 'swipe-vault',
         'short_description' => 'Save and organize creative inspiration automatically via the local runtime.',
         'description' => 'Swipe Vault automatically saves and organizes creative assets for inspiration.
@@ -1723,7 +1723,7 @@ Not copying content — copying the psychology.
     ],
     '238e25da-e5cb-4cc3-ab2c-09d77f76d0ce' => [
         'guid' => '238e25da-e5cb-4cc3-ab2c-09d77f76d0ce',
-        'title' => 'Laragon Manager',
+        'title' => 'Local Server Manager',
         'slug' => 'laragon-manager',
         'short_description' => 'Local PHP/Laragon project management environment.',
         'description' => 'A local manager for Laragon. Browse projects, start services, edit .env files, and quick-open in VSCode.',
@@ -1749,7 +1749,7 @@ Not copying content — copying the psychology.
     ],
     'd526cf44-7b2f-486d-a704-23cad6a660cd' => [
         'guid' => 'd526cf44-7b2f-486d-a704-23cad6a660cd',
-        'title' => 'JS Obfuscator',
+        'title' => 'JS Code Protector',
         'slug' => 'js-obfuscator',
         'short_description' => 'Obfuscate JavaScript and Node.js source code locally.',
         'description' => 'Protect your proprietary JavaScript code by obfuscating it instantly using the local runtime without exposing source code to cloud APIs.',
@@ -1775,7 +1775,7 @@ Not copying content — copying the psychology.
     ],
     '4def30c4-796e-47df-8782-e31a12d135e4' => [
         'guid' => '4def30c4-796e-47df-8782-e31a12d135e4',
-        'title' => 'Duplicate Finder',
+        'title' => 'Duplicate File Finder',
         'slug' => 'duplicate-finder',
         'short_description' => 'Find and delete duplicate files quickly.',
         'description' => 'Scan any local directory to find exact duplicate files using size and hash matching to safely free up disk space.',

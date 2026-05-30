@@ -136,7 +136,7 @@ export default function DomainIntelligenceRunner({ tool }: any) {
                     <div className="w-7 h-7 bg-gradient-to-br from-indigo-600 to-violet-600 rounded-lg flex items-center justify-center shadow-sm">
                         <Globe className="w-4 h-4 text-white" />
                     </div>
-                    <span className="font-bold text-sm text-slate-800 tracking-tight">Domain Intelligence</span>
+                    <span className="font-bold text-sm text-slate-800 tracking-tight">Domain Analytics</span>
                 </div>
                 <div className="flex items-center gap-3">
                     <Button variant="outline" onClick={exportCsv} disabled={results.length === 0} className="h-8 text-xs font-bold gap-1.5">

@@ -116,7 +116,7 @@ export default function DomainProspectorRunner({ tool }: any) {
                     <div className="w-7 h-7 bg-gradient-to-br from-indigo-600 to-rose-600 rounded-lg flex items-center justify-center shadow-sm">
                         <Target className="w-4 h-4 text-white" />
                     </div>
-                    <span className="font-bold text-sm text-slate-800 tracking-tight">Domain Prospector</span>
+                    <span className="font-bold text-sm text-slate-800 tracking-tight">Domain Finder</span>
                 </div>
                 <div className="flex items-center gap-3">
                     <Button variant="outline" onClick={exportCsv} disabled={results.length === 0} className="h-8 text-xs font-bold gap-1.5">
