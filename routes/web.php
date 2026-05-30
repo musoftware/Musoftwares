@@ -359,6 +359,9 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
 
     // ── Freelance (Admin Control) ───────────────────────────────────
     Route::prefix('freelance')->name('freelance.')->group(function () {
+        Route::post('skills/{skill}/approve', [\App\Http\Controllers\Admin\FreelanceSkillController::class, 'approve'])->name('skills.approve');
+        Route::post('skills/{skill}/reject', [\App\Http\Controllers\Admin\FreelanceSkillController::class, 'reject'])->name('skills.reject');
+        Route::post('skills/block-user/{user}', [\App\Http\Controllers\Admin\FreelanceSkillController::class, 'blockUser'])->name('skills.block-user');
         Route::resource('skills', \App\Http\Controllers\Admin\FreelanceSkillController::class)->except(['show']);
         Route::resource('jobs', \App\Http\Controllers\Admin\FreelanceJobController::class)->only(['index', 'show', 'destroy']);
         Route::post('jobs/{job}/status', [\App\Http\Controllers\Admin\FreelanceJobController::class, 'updateStatus'])->name('jobs.status');

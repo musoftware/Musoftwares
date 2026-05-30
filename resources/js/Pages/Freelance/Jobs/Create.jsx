@@ -7,7 +7,7 @@ import { cn } from '@/lib/utils';
 import { Zap } from 'lucide-react';
 import { __ } from '@/lib/i18n';
 
-export default function CreateJob({ auth, egpToPreferredRate = 0.10 }) {
+export default function CreateJob({ auth, currencies = [], egpToPreferredRate = 1.00, preferredCurrency = 'USD' }) {
     const freelanceModeContext = useFreelanceMode();
 
     useEffect(() => {
@@ -19,9 +19,9 @@ export default function CreateJob({ auth, egpToPreferredRate = 0.10 }) {
     const { data, setData, post, processing, errors } = useForm({
         title: '',
         description: '',
-        budget_min: '',
-        budget_max: '',
-        currency_id: 1,
+        budget: '',
+        currency_id: auth?.user?.currency_id ?? (currencies[0]?.id ?? null),
+        min_proposal_points: 0,
         type: 'fixed',
         duration: '',
         skills: []
@@ -37,7 +37,7 @@ export default function CreateJob({ auth, egpToPreferredRate = 0.10 }) {
     ]);
     const [skillSearch, setSkillSearch] = useState('');
 
-    const pointsCost = 10;
+    const pointsCost = 25 + (parseInt(data.min_proposal_points) || 0);
     const currentPoints = auth.user.points_balance !== undefined ? auth.user.points_balance : 0;
 
     useEffect(() => {
@@ -60,7 +60,6 @@ export default function CreateJob({ auth, egpToPreferredRate = 0.10 }) {
         const neededPoints = pointsCost - currentPoints;
         const cost = neededPoints * egpToPreferredRate;
         
-        const preferredCurrency = auth?.user?.preferred_currency || 'USD';
         const costFormatted = new Intl.NumberFormat('en-US', {
             style: 'currency',
             currency: preferredCurrency
@@ -166,34 +165,38 @@ export default function CreateJob({ auth, egpToPreferredRate = 0.10 }) {
                             <div className="w-full sm:w-1/3">
                                 <label className="block text-sm font-bold text-gray-700 mb-1">{__('Currency')}</label>
                                 <select
-                                    value={data.currency_id}
+                                    value={data.currency_id ?? ''}
                                     onChange={e => setData('currency_id', parseInt(e.target.value))}
                                     className="w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
                                 >
-                                    <option value="1">USD ($)</option>
-                                    <option value="3">EUR (€)</option>
-                                    <option value="4">GBP (£)</option>
+                                    {currencies.map(currency => (
+                                        <option key={currency.id} value={currency.id}>
+                                            {currency.currency} ({currency.symbol})
+                                        </option>
+                                    ))}
                                 </select>
                             </div>
                             <div className="w-full sm:w-1/3">
-                                <label className="block text-sm font-bold text-gray-700 mb-1">{__('Min Budget')}</label>
+                                <label className="block text-sm font-bold text-gray-700 mb-1">{__('Project Budget')}</label>
                                 <input
                                     type="number"
-                                    value={data.budget_min}
-                                    onChange={e => setData('budget_min', e.target.value)}
+                                    value={data.budget}
+                                    onChange={e => setData('budget', e.target.value)}
                                     placeholder={__('e.g. 500')}
                                     className="w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
                                 />
+                                {errors.budget && <p className="text-red-500 text-xs mt-1">{errors.budget}</p>}
                             </div>
                             <div className="w-full sm:w-1/3">
-                                <label className="block text-sm font-bold text-gray-700 mb-1">{__('Max Budget')}</label>
+                                <label className="block text-sm font-bold text-gray-700 mb-1">{__('Min Proposal Bid (Points)')}</label>
                                 <input
                                     type="number"
-                                    value={data.budget_max}
-                                    onChange={e => setData('budget_max', e.target.value)}
-                                    placeholder={__('e.g. 1500')}
+                                    value={data.min_proposal_points}
+                                    onChange={e => setData('min_proposal_points', e.target.value)}
+                                    placeholder={__('e.g. 0')}
                                     className="w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
                                 />
+                                {errors.min_proposal_points && <p className="text-red-500 text-xs mt-1">{errors.min_proposal_points}</p>}
                             </div>
                         </div>
 

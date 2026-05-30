@@ -5,7 +5,10 @@
     "scripts": {
         "build": "vite build",
         "dev": "vite",
-        "lint": "eslint resources/js --ext .js,.jsx,.ts,.tsx --ignore-path .gitignore --fix"
+        "lint": "eslint resources/js --ext .js,.jsx,.ts,.tsx --ignore-path .gitignore --fix",
+        "test:e2e": "playwright test",
+        "test:e2e:freelance": "playwright test tests/e2e/freelance.spec.ts",
+        "test:e2e:ui": "playwright test --ui"
     },
     "devDependencies": {
         "@headlessui/react": "^2.0.0",

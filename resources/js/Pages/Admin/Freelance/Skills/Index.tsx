@@ -72,6 +72,20 @@ export default function Index({ skills, filters }: any) {
         }
     };
 
+    const handleApprove = (id: any) => {
+        router.post(route('admin.freelance.skills.approve', id), {}, { preserveScroll: true });
+    };
+
+    const handleReject = (id: any) => {
+        router.post(route('admin.freelance.skills.reject', id), {}, { preserveScroll: true });
+    };
+
+    const handleBlockUser = (userId: any, userName: string) => {
+        if (confirm(`Are you sure you want to block ${userName} from adding new skills?`)) {
+            router.post(route('admin.freelance.skills.block-user', userId), {}, { preserveScroll: true });
+        }
+    };
+
     const renderFormFields = () => (
         <div className="space-y-4 p-1">
             <div>
@@ -114,7 +128,9 @@ export default function Index({ skills, filters }: any) {
                 </form>
 
                 <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
-                    <DialogTrigger render={<Button>Create Skill</Button>} />
+                    <DialogTrigger asChild>
+                        <Button>Create Skill</Button>
+                    </DialogTrigger>
                     <DialogContent>
                         <DialogHeader>
                             <DialogTitle>Create New Skill</DialogTitle>
@@ -139,6 +155,8 @@ export default function Index({ skills, filters }: any) {
                             <th className="p-4 font-medium text-gray-600">ID</th>
                             <th className="p-4 font-medium text-gray-600">Name</th>
                             <th className="p-4 font-medium text-gray-600">Description</th>
+                            <th className="p-4 font-medium text-gray-600">Status</th>
+                            <th className="p-4 font-medium text-gray-600">Created By</th>
                             <th className="p-4 font-medium text-gray-600 text-right">Actions</th>
                         </tr>
                     </thead>
@@ -148,7 +166,36 @@ export default function Index({ skills, filters }: any) {
                                 <td className="p-4 font-medium text-gray-900">{skill.id}</td>
                                 <td className="p-4 font-medium text-gray-900">{skill.name}</td>
                                 <td className="p-4 text-gray-500">{skill.description || '-'}</td>
+                                <td className="p-4">
+                                    <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
+                                        skill.status === 'approved' ? 'bg-green-100 text-green-800' :
+                                        skill.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                                        'bg-red-100 text-red-800'
+                                    }`}>
+                                        {skill.status.charAt(0).toUpperCase() + skill.status.slice(1)}
+                                    </span>
+                                </td>
+                                <td className="p-4 text-gray-500">
+                                    {skill.creator ? (
+                                        <div className="flex items-center space-x-2">
+                                            <span>{skill.creator.name}</span>
+                                            <Button variant="ghost" size="sm" onClick={() => handleBlockUser(skill.creator.id, skill.creator.name)} className="h-6 px-2 text-xs text-red-600">
+                                                Block User
+                                            </Button>
+                                        </div>
+                                    ) : 'System'}
+                                </td>
                                 <td className="p-4 space-x-2 text-right">
+                                    {skill.status === 'pending' && (
+                                        <>
+                                            <Button variant="secondary" size="sm" onClick={() => handleApprove(skill.id)}>
+                                                Approve
+                                            </Button>
+                                            <Button variant="destructive" size="sm" onClick={() => handleReject(skill.id)}>
+                                                Decline
+                                            </Button>
+                                        </>
+                                    )}
                                     <Button variant="outline" size="sm" onClick={() => openEditModal(skill)}>
                                         Edit
                                     </Button>
@@ -160,7 +207,7 @@ export default function Index({ skills, filters }: any) {
                         ))}
                         {skills.data.length === 0 && (
                             <tr>
-                                <td colSpan={4} className="p-4 text-center text-gray-500">
+                                <td colSpan={6} className="p-4 text-center text-gray-500">
                                     No skills found.
                                 </td>
                             </tr>

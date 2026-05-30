@@ -9,9 +9,17 @@ use Inertia\Inertia;
 
 class SkillController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $skills = Skill::orderBy('name')->get();
+        $skills = Skill::where('status', 'approved')
+            ->orWhere(function ($query) use ($request) {
+                if ($request->user()) {
+                    $query->where('created_by', $request->user()->id)
+                          ->where('status', 'pending');
+                }
+            })
+            ->orderBy('name')
+            ->get();
         return response()->json($skills);
     }
 

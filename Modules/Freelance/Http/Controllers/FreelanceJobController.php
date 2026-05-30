@@ -72,14 +72,57 @@ class FreelanceJobController extends Controller
             'description' => 'required|string',
             'budget' => 'required|numeric|min:0',
             'currency_id' => 'required|integer|exists:currencies,id',
+            'min_proposal_points' => 'required|integer|min:0',
             'type' => 'required|in:fixed,hourly',
             'duration' => 'nullable|string|max:255',
             'skills' => 'required|array',
-            'skills.*' => 'exists:freelance_skills,id',
+            'skills.*' => 'required',
         ]);
 
-        $postCost = 10; // Cost to post a job
         $user = $request->user();
+
+        // Process dynamic skills
+        $processedSkills = [];
+        $newSkillsCount = 0;
+
+        foreach ($validated['skills'] as $skill) {
+            if (is_numeric($skill)) {
+                $processedSkills[] = (int) $skill;
+            } else {
+                $skillName = trim($skill);
+                $existingSkill = \Modules\Freelance\Models\Skill::whereRaw('LOWER(name) = ?', [strtolower($skillName)])->first();
+
+                if ($existingSkill) {
+                    if ($existingSkill->status === 'rejected') {
+                        return back()->withErrors(['skills' => "The skill '{$skillName}' has been rejected by the admin."]);
+                    }
+                    $processedSkills[] = $existingSkill->id;
+                } else {
+                    if (!$user->can_add_freelance_skills) {
+                        return back()->withErrors(['skills' => 'You are not allowed to add new skills.']);
+                    }
+
+                    if ($newSkillsCount == 0) {
+                        $userAddedCount = \Modules\Freelance\Models\Skill::where('created_by', $user->id)->count();
+                        if ($userAddedCount >= 3) {
+                            return back()->withErrors(['skills' => 'You can only add up to 3 new skills to the system.']);
+                        }
+                    }
+
+                    $newSkillsCount++;
+                    if ($newSkillsCount > 3) {
+                        return back()->withErrors(['skills' => 'You can only add up to 3 new skills to the system.']);
+                    }
+
+                    $newSkill = \Modules\Freelance\Models\Skill::create([
+                        'name' => $skillName,
+                        'status' => 'pending',
+                        'created_by' => $user->id
+                    ]);
+                    $processedSkills[] = $newSkill->id;
+                }
+            }
+        }
 
         $data = new PostJobData(
             clientId: $user->id,
@@ -87,30 +130,46 @@ class FreelanceJobController extends Controller
             description: $validated['description'],
             budget: $validated['budget'],
             currencyId: $validated['currency_id'],
+            minProposalPoints: $validated['min_proposal_points'],
             type: $validated['type'],
             duration: $validated['duration'],
-            skills: $validated['skills'],
+            skills: $processedSkills,
         );
 
         try {
-            $job = $this->postJobAction->execute($data, $user, $postCost);
+            $job = $this->postJobAction->execute($data, $user);
         } catch (\Exception $e) {
             return back()->withErrors(['points' => $e->getMessage()]);
         }
 
-        return redirect()->route('freelance.my-jobs')->with('success', 'Job posted successfully.');
+        return redirect()->route('freelance.my-jobs')->with('success', __('Job posted successfully.'));
     }
 
     public function create(Request $request)
     {
         $user = $request->user();
-        $preferredCurrency = $user->preferred_currency ?: 'USD';
-        
-        $financeService = app(\App\Services\FinanceService::class);
-        $egpToPreferredRate = $financeService->getExchangeRate('EGP', $preferredCurrency);
+
+        $currencies = \App\Models\Currency::orderBy('currency')->get(['id', 'currency', 'symbol', 'string_format']);
+
+        $egpCurrency = $currencies->firstWhere('currency', 'EGP');
+        $userCurrency = $currencies->firstWhere('id', $user->currency_id);
+        $preferredCurrencyCode = $userCurrency?->currency;
+
+        if (!$egpCurrency || !$userCurrency || !$preferredCurrencyCode) {
+            throw new \Exception(__('errors.currency_configuration_missing'));
+        }
+
+        $egpToPreferredRate = \App\Models\CurrenciesExchange::RateByDate(
+            now(),
+            1,
+            $egpCurrency->id,
+            $userCurrency->id
+        );
 
         return Inertia::render('Freelance/Jobs/Create', [
+            'currencies' => $currencies,
             'egpToPreferredRate' => $egpToPreferredRate,
+            'preferredCurrency' => $preferredCurrencyCode,
         ]);
     }
 
