@@ -8,9 +8,13 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\DB;
 use App\Services\ActivityService;
+use Modules\Freelance\Domains\Contract\Actions\CompleteContractAction;
+use Illuminate\Support\Facades\Gate;
 
 class ContractController extends Controller
 {
+    public function __construct(private CompleteContractAction $completeContractAction) {}
+
     public function index(Request $request)
     {
         $user = $request->user();
@@ -46,52 +50,20 @@ class ContractController extends Controller
         ]);
     }
 
-    public function show(Request $request, Contract $contract)
+    public function show(Contract $contract)
     {
-        $user = $request->user();
-        if ($contract->client_id !== $user->id && $contract->freelancer_id !== $user->id) {
-            abort(403);
-        }
+        Gate::authorize('view', $contract);
 
-        $contract->load(['job', 'proposal', 'client', 'freelancer']);
+        $contract->load(['job.client', 'freelancer']);
         return Inertia::render('Freelance/Contracts/Show', ['contract' => $contract]);
     }
 
     public function complete(Request $request, Contract $contract)
     {
-        if ($contract->client_id !== $request->user()->id) {
-            abort(403);
-        }
+        Gate::authorize('complete', $contract);
 
         try {
-            DB::transaction(function () use ($contract) {
-                $contract->update([
-                    'status' => 'completed',
-                    'completed_at' => now(),
-                ]);
-                $contract->job->update(['status' => 'completed']);
-
-                $client = \App\Models\User::findOrFail($contract->client_id);
-                $freelancer = \App\Models\User::findOrFail($contract->freelancer_id);
-
-                if ($client->user_balance < $contract->amount) {
-                    throw new \Exception('Insufficient client balance.');
-                }
-
-                // Debit client using 'sent' type
-                $client->add_balance(-$contract->amount, "Payout for contract #{$contract->id}: {$contract->job->title}", 'sent', $contract->currency_id);
-
-                // Credit freelancer using 'received' type
-                $freelancer->add_balance($contract->amount, "Payment for contract #{$contract->id}: {$contract->job->title}", 'received', $contract->currency_id);
-            });
-
-            ActivityService::log(
-                event: 'contract.completed',
-                description: "Contract completed for job: {$contract->job->title}",
-                subject: $contract,
-                workspace: 'freelance'
-            );
-
+            $this->completeContractAction->execute($contract, $request->user());
             return back()->with('success', 'Contract marked as completed and funds paid to freelancer.');
         } catch (\Exception $e) {
             return back()->withErrors(['error' => 'Payout failed: ' . $e->getMessage()]);

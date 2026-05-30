@@ -7,6 +7,15 @@ use Modules\Marketplace\Models\Service;
 
 class ServicePolicy
 {
+    public function before(User $user, $ability): ?bool
+    {
+        if ($user->hasRole('admin')) {
+            return true;
+        }
+
+        return null;
+    }
+
     public function update(User $user, Service $service): bool
     {
         return $user->id === $service->seller_id;

@@ -6,16 +6,22 @@ use Illuminate\Database\Eloquent\Model;
 use Laravel\Scout\Searchable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Models\User;
+use Spatie\ModelStates\HasStates;
+use Modules\Freelance\Domains\Job\States\JobState;
 
 class Job extends Model
 {
-    use Searchable, SoftDeletes;
+    use Searchable, SoftDeletes, HasStates;
 
     protected $table = 'freelance_jobs';
 
     protected $fillable = ['client_id', 'title', 'description', 'budget', 'currency_id', 'type', 'duration', 'status'];
 
     protected $appends = ['formatted_budget'];
+
+    protected $casts = [
+        'status' => JobState::class,
+    ];
 
     public function getFormattedBudgetAttribute()
     {

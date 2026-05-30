@@ -5,9 +5,9 @@ namespace Modules\Marketplace\Http\Controllers;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Inertia\Inertia;
 use Modules\Marketplace\Models\ServiceOrder;
 use Modules\Marketplace\Models\ServiceReview;
+use Modules\Marketplace\Enums\ServiceOrderStatus;
 
 class ServiceReviewController extends Controller
 {
@@ -19,11 +19,11 @@ class ServiceReviewController extends Controller
     public function store(Request $request, ServiceOrder $order): RedirectResponse
     {
         // Auth checks
-        if ($order->client_id !== auth()->id()) {
+        if ($order->buyer_id !== auth()->id()) {
             abort(403, 'Only the buyer can leave a review.');
         }
 
-        if ($order->status !== 'completed') {
+        if ($order->status !== ServiceOrderStatus::COMPLETED) {
             return back()->with('error', 'You can only review completed orders.');
         }
 
@@ -38,7 +38,7 @@ class ServiceReviewController extends Controller
         ]);
 
         ServiceReview::create([
-            'service_id'  => $order->service_id,
+            'service_id'  => $order->package->service_id ?? 0,
             'order_id'    => $order->id,
             'reviewer_id' => auth()->id(),
             'seller_id'   => $order->seller_id,
@@ -48,7 +48,7 @@ class ServiceReviewController extends Controller
         ]);
 
         // Update aggregate rating on the service
-        ServiceReview::syncServiceRating($order->service_id);
+        ServiceReview::syncServiceRating($order->package->service_id ?? 0);
 
         return back()->with('success', 'Thank you for your review!');
     }

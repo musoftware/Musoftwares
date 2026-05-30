@@ -11,9 +11,18 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\DB;
 use App\Events\ProposalAccepted;
+use Modules\Freelance\Domains\Contract\Actions\AcceptProposalAction;
+use Modules\Freelance\Domains\Proposal\Actions\SubmitProposalAction;
+use Modules\Freelance\Domains\Proposal\DTOs\SubmitProposalData;
+use Illuminate\Support\Facades\Gate;
 
 class ProposalController extends Controller
 {
+    public function __construct(
+        private AcceptProposalAction $acceptProposalAction,
+        private SubmitProposalAction $submitProposalAction
+    ) {}
+
     public function index(Request $request)
     {
         $user = $request->user();
@@ -46,80 +55,32 @@ class ProposalController extends Controller
         $proposalCost = 2; // Cost to submit proposal
         $user = $request->user();
 
-        if ($user->points_balance < $proposalCost) {
-            return back()->withErrors(['points' => 'Insufficient points to submit a proposal.']);
+        $data = new SubmitProposalData(
+            jobId: $job->id,
+            freelancerId: $user->id,
+            coverLetter: $validated['cover_letter'],
+            bidAmount: $validated['bid_amount'],
+            currencyId: $job->currency_id,
+        );
+
+        try {
+            $this->submitProposalAction->execute($data, $job, $user, $proposalCost);
+        } catch (\Exception $e) {
+            return back()->withErrors(['proposal' => $e->getMessage()]);
         }
-
-        if ($job->proposals()->where('freelancer_id', $user->id)->exists()) {
-            return back()->withErrors(['proposal' => 'You have already submitted a proposal for this job.']);
-        }
-
-        DB::transaction(function () use ($validated, $user, $job, $proposalCost) {
-            $job->proposals()->create([
-                'freelancer_id' => $user->id,
-                'cover_letter' => $validated['cover_letter'],
-                'bid_amount' => $validated['bid_amount'],
-                'currency_id' => $job->currency_id,
-                'status' => 'pending',
-            ]);
-
-            $user->points_balance -= $proposalCost;
-            $user->save();
-
-            PointTransaction::create([
-                'user_id' => $user->id,
-                'points' => $proposalCost,
-                'type' => 'spent',
-                'description' => "Submitted proposal for job: {$job->title}",
-            ]);
-        });
 
         return back()->with('success', 'Proposal submitted successfully.');
     }
 
     public function accept(Request $request, Proposal $proposal)
     {
-        $job = $proposal->job;
+        Gate::authorize('accept', $proposal);
 
-        if ($job->client_id !== $request->user()->id) {
-            abort(403);
+        try {
+            $this->acceptProposalAction->execute($proposal, $request->user());
+        } catch (\Exception $e) {
+            return back()->withErrors(['error' => $e->getMessage()]);
         }
-
-        DB::transaction(function () use ($job, $proposal) {
-            $proposal->update(['status' => 'accepted']);
-            $job->update(['status' => 'in_progress']);
-
-            // Refund and reject other pending proposals
-            $rejectedProposals = $job->proposals()->where('id', '!=', $proposal->id)->where('status', 'pending')->get();
-            $job->proposals()->where('id', '!=', $proposal->id)->where('status', 'pending')->update(['status' => 'rejected']);
-
-            $proposalCost = 2; // Fixed cost of proposal submission
-            foreach ($rejectedProposals as $rejected) {
-                $freelancer = $rejected->freelancer;
-                if ($freelancer) {
-                    $freelancer->points_balance += $proposalCost;
-                    $freelancer->save();
-
-                    PointTransaction::create([
-                        'user_id' => $freelancer->id,
-                        'points' => $proposalCost,
-                        'type' => 'credit',
-                        'description' => "Refunded staked points for job: {$job->title}",
-                    ]);
-                }
-            }
-
-            Contract::create([
-                'job_id' => $job->id,
-                'proposal_id' => $proposal->id,
-                'client_id' => $job->client_id,
-                'freelancer_id' => $proposal->freelancer_id,
-                'amount' => $proposal->bid_amount,
-                'currency_id' => $proposal->currency_id,
-                'status' => 'active',
-                'started_at' => now(),
-            ]);
-        });
 
         event(new ProposalAccepted($proposal));
 
@@ -128,9 +89,7 @@ class ProposalController extends Controller
 
     public function reject(Request $request, Proposal $proposal)
     {
-        if ($proposal->job->client_id !== $request->user()->id) {
-            abort(403);
-        }
+        Gate::authorize('reject', $proposal);
 
         DB::transaction(function () use ($proposal) {
             if ($proposal->status === 'pending') {
@@ -155,13 +114,7 @@ class ProposalController extends Controller
 
     public function withdraw(Request $request, Proposal $proposal)
     {
-        if ($proposal->freelancer_id !== $request->user()->id) {
-            abort(403);
-        }
-
-        if ($proposal->status !== 'pending') {
-            return back()->withErrors(['proposal' => 'Cannot withdraw a non-pending proposal.']);
-        }
+        Gate::authorize('withdraw', $proposal);
 
         DB::transaction(function () use ($proposal) {
             $freelancer = $proposal->freelancer;

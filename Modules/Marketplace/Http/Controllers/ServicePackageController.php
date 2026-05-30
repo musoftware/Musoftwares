@@ -11,9 +11,7 @@ class ServicePackageController extends Controller
 {
     public function store(Request $request, Service $service)
     {
-        if (auth()->id() !== $service->seller_id && !auth()->user()->hasRole('admin')) {
-            abort(403, 'Unauthorized.');
-        }
+        $this->authorize('update', $service);
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',
@@ -30,9 +28,7 @@ class ServicePackageController extends Controller
 
     public function update(Request $request, Service $service, ServicePackage $package)
     {
-        if (auth()->id() !== $service->seller_id && !auth()->user()->hasRole('admin')) {
-            abort(403, 'Unauthorized.');
-        }
+        $this->authorize('update', $service);
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',
@@ -49,9 +45,7 @@ class ServicePackageController extends Controller
 
     public function destroy(Service $service, ServicePackage $package)
     {
-        if (auth()->id() !== $service->seller_id && !auth()->user()->hasRole('admin')) {
-            abort(403, 'Unauthorized.');
-        }
+        $this->authorize('update', $service);
 
         $package->delete();
 
