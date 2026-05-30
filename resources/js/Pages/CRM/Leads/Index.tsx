@@ -128,11 +128,9 @@ export default function Index({ leads, currentTab }) {
                                     </td>
                                     <td className="px-6 py-4 text-right">
                                         <DropdownMenu>
-                                            <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
-                                                <Button variant="ghost" className="h-8 w-8 p-0 text-slate-400 hover:text-slate-900">
-                                                    <span className="sr-only">{__('Open menu')}</span>
-                                                    <MoreHorizontal className="h-4 w-4" />
-                                                </Button>
+                                            <DropdownMenuTrigger render={<Button variant="ghost" className="h-8 w-8 p-0 text-slate-400 hover:text-slate-900" />} onClick={(e) => e.stopPropagation()}>
+                                                <span className="sr-only">{__('Open menu')}</span>
+                                                <MoreHorizontal className="h-4 w-4" />
                                             </DropdownMenuTrigger>
                                             <DropdownMenuContent align="end" className="w-48">
                                                 <DropdownMenuLabel>{__('Actions')}</DropdownMenuLabel>

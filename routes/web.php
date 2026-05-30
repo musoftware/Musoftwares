@@ -235,7 +235,9 @@ Route::middleware(['auth', 'verified'])->prefix('settings')->name('settings.')->
     Route::post('/backup/import', [\App\Http\Controllers\TenantBackupController::class, 'import'])->name('backup.import');
 });
 
-// ── CRM Module Routes are loaded automatically from Modules/CRM/routes/web.php ──
+if (file_exists(base_path('Modules/CRM/routes/web.php'))) {
+    require base_path('Modules/CRM/routes/web.php');
+}
 
 // Admin Routes
 Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')->name('admin.')->group(function () {
@@ -525,33 +527,6 @@ Route::get('/crm/embed/capture/{token}', [\Modules\CRM\Http\Controllers\LeadCapt
 Route::post('/crm/embed/capture/{token}', [\Modules\CRM\Http\Controllers\LeadCaptureController::class, 'store'])
     ->name('crm.embed.capture.store')
     ->withoutMiddleware([\Illuminate\Http\Middleware\FrameGuard::class]);
-
-// CRM iSAAS Subscriber Routes
-Route::middleware(['auth', 'verified', 'onboarding'])->prefix('crm')->name('crm.')->group(function () {
-    Route::get('/dashboard', [\Modules\CRM\Http\Controllers\DashboardController::class, 'index'])->name('dashboard');
-    
-    // Campaigns
-    Route::get('/campaigns', [\Modules\CRM\Http\Controllers\CampaignController::class, 'index'])->name('campaigns.index');
-    Route::post('/campaigns', [\Modules\CRM\Http\Controllers\CampaignController::class, 'store'])->name('campaigns.store');
-    Route::get('/campaigns/{campaign}', [\Modules\CRM\Http\Controllers\CampaignController::class, 'show'])->name('campaigns.show');
-
-    // Leads
-    Route::get('/leads', [\Modules\CRM\Http\Controllers\LeadController::class, 'index'])->name('leads.index');
-    Route::get('/leads/{lead}', [\Modules\CRM\Http\Controllers\LeadController::class, 'show'])->name('leads.show');
-    Route::patch('/leads/{lead}/status', [\Modules\CRM\Http\Controllers\LeadController::class, 'updateStatus'])->name('leads.updateStatus');
-
-    // Sequences
-    Route::get('/sequences', [\Modules\CRM\Http\Controllers\SequenceController::class, 'index'])->name('sequences.index');
-    Route::post('/sequences', [\Modules\CRM\Http\Controllers\SequenceController::class, 'store'])->name('sequences.store');
-    Route::get('/sequences/{sequence}', [\Modules\CRM\Http\Controllers\SequenceController::class, 'show'])->name('sequences.show');
-    Route::delete('/sequences/{sequence}', [\Modules\CRM\Http\Controllers\SequenceController::class, 'destroy'])->name('sequences.destroy');
-    Route::post('/sequences/{sequence}/steps', [\Modules\CRM\Http\Controllers\SequenceController::class, 'storeStep'])->name('sequences.steps.store');
-    Route::put('/sequences/steps/{step}', [\Modules\CRM\Http\Controllers\SequenceController::class, 'updateStep'])->name('sequences.steps.update');
-    Route::delete('/sequences/steps/{step}', [\Modules\CRM\Http\Controllers\SequenceController::class, 'deleteStep'])->name('sequences.steps.destroy');
-    Route::post('/sequences/{sequence}/generate-ai', [\Modules\CRM\Http\Controllers\SequenceController::class, 'generateStepsWithAI'])->name('sequences.generate-ai');
-    Route::post('/sequences/{sequence}/apply-ai', [\Modules\CRM\Http\Controllers\SequenceController::class, 'applyGeneratedSteps'])->name('sequences.apply-ai');
-});
-
 
 
 // SaaS Subscription & Billing Routes
