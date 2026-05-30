@@ -61,9 +61,9 @@ class TeamAuthController extends Controller
             \Modules\ERP\Models\TeamMember::ROLE_SALES_AGENT => route('crm.workspaces.telesales'),
             \Modules\ERP\Models\TeamMember::ROLE_CALL_CENTER => route('crm.workspaces.telesales'),
             \Modules\ERP\Models\TeamMember::ROLE_SALES_MANAGER => route('crm.workspaces.manager'),
-            \Modules\ERP\Models\TeamMember::ROLE_MARKETING => route('crm.campaigns.index'),
-            \Modules\ERP\Models\TeamMember::ROLE_SUPPORT_AGENT => route('crm.whatsapp.inbox'), // Assuming whatsapp inbox is for support
-            \Modules\ERP\Models\TeamMember::ROLE_SUPPORT_MANAGER => route('crm.whatsapp.inbox'),
+            \Modules\ERP\Models\TeamMember::ROLE_MARKETING => route('crm.workspaces.marketing'),
+            \Modules\ERP\Models\TeamMember::ROLE_SUPPORT_AGENT => route('crm.workspaces.support'),
+            \Modules\ERP\Models\TeamMember::ROLE_SUPPORT_MANAGER => route('crm.workspaces.support'),
             default => route('erp.dashboard'),
         };
 

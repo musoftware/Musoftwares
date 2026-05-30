@@ -34,6 +34,8 @@ Route::middleware(['web', 'auth', 'verified', 'onboarding', 'subscription:crm', 
         Route::get('/workspaces/collector', [WorkspaceController::class, 'collectorWorkspace'])->name('workspaces.collector');
         Route::get('/workspaces/telesales', [WorkspaceController::class, 'telesalesWorkspace'])->name('workspaces.telesales');
         Route::get('/workspaces/manager', [WorkspaceController::class, 'managerWorkspace'])->name('workspaces.manager');
+        Route::get('/workspaces/marketing', [WorkspaceController::class, 'marketingWorkspace'])->name('workspaces.marketing');
+        Route::get('/workspaces/support', [WorkspaceController::class, 'supportWorkspace'])->name('workspaces.support');
 
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
         
