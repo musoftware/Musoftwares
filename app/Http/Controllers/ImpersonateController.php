@@ -29,8 +29,12 @@ class ImpersonateController extends Controller
     {
         if (session()->has('impersonator_id')) {
             $impersonatorId = session()->get('impersonator_id');
-            session()->forget('impersonator_id');
-            session()->forget('impersonate');
+            session()->forget([
+                'impersonator_id',
+                'impersonate',
+                'impersonating_user_id',
+                'impersonated_by'
+            ]);
 
             Auth::loginUsingId($impersonatorId);
         }

@@ -94,7 +94,7 @@ class WalletController extends Controller
     {
         $request->validate([
             'amount'     => 'required|numeric|min:0.01',
-            'note'       => 'required|string|max:500',
+            'note'       => 'nullable|string|max:500',
             'project_id' => 'nullable|exists:erp_projects,id',
         ]);
 
@@ -134,7 +134,7 @@ class WalletController extends Controller
                     'exchange_rate_date'=> now()->toDateString(),
                     'reference_type'   => 'manual_receive',
                     'reference_id'     => Auth::id(),
-                    'note'             => $request->input('note'),
+                    'note'             => $request->input('note') ?? __('erp.manual_wallet_transaction'),
                     'created_by'       => Auth::id(),
                 ]);
             });
@@ -157,7 +157,7 @@ class WalletController extends Controller
     {
         $request->validate([
             'amount'     => 'required|numeric|min:0.01',
-            'note'       => 'required|string|max:500',
+            'note'       => 'nullable|string|max:500',
             'project_id' => 'nullable|exists:erp_projects,id',
         ]);
 
@@ -202,7 +202,7 @@ class WalletController extends Controller
                     'exchange_rate_date'=> now()->toDateString(),
                     'reference_type'   => 'manual_send',
                     'reference_id'     => Auth::id(),
-                    'note'             => $request->input('note'),
+                    'note'             => $request->input('note') ?? __('erp.manual_wallet_transaction'),
                     'created_by'       => Auth::id(),
                 ]);
             });
@@ -225,7 +225,7 @@ class WalletController extends Controller
     {
         $request->validate([
             'amount'     => 'required|numeric|min:0.01',
-            'note'       => 'required|string|max:500',
+            'note'       => 'nullable|string|max:500',
             'project_id' => 'nullable|exists:erp_projects,id',
         ]);
 
@@ -266,7 +266,7 @@ class WalletController extends Controller
                     'exchange_rate_date'=> now()->toDateString(),
                     'reference_type'   => 'manual_refund',
                     'reference_id'     => Auth::id(),
-                    'note'             => $request->input('note'),
+                    'note'             => $request->input('note') ?? __('erp.manual_wallet_transaction'),
                     'created_by'       => Auth::id(),
                 ]);
             });
@@ -279,6 +279,69 @@ class WalletController extends Controller
             return back()->with('success', __('erp.refund_processed_success'));
         } catch (\Exception $e) {
             Log::error("Failed to refund for client {$clientModel->id}: " . $e->getMessage());
+            return back()->withErrors(['amount' => __('erp.transaction_failed')]);
+        }
+    }
+
+    // ── Earn (Add bonus to client → creates 'earned' transaction with positive amount) ──
+
+    public function addBonus(Request $request, int $client)
+    {
+        $request->validate([
+            'amount'     => 'required|numeric|min:0.01',
+            'note'       => 'nullable|string|max:500',
+            'project_id' => 'nullable|exists:erp_projects,id',
+        ]);
+
+        [$tenant, $clientModel] = $this->resolveTenantAndClient($client);
+
+        try {
+            $projectId = $request->input('project_id');
+            if ($projectId) {
+                $project = \Modules\ERP\Models\Project::where('tenant_id', $tenant->id)->findOrFail($projectId);
+                if ($project->client_id !== $clientModel->id) {
+                    throw new \Exception(__('erp.project_client_mismatch'));
+                }
+            }
+
+            DB::transaction(function () use ($request, $tenant, $clientModel, $projectId) {
+                $amount = (float) $request->input('amount');
+
+                $businessCurrencyId = $tenant->base_currency_id;
+                $businessAmount = \App\Models\CurrenciesExchange::RateByDate(
+                    now(),
+                    $amount,
+                    $clientModel->currency_id,
+                    $businessCurrencyId
+                );
+
+                WalletTransaction::create([
+                    'tenant_id'        => $tenant->id,
+                    'client_id'        => $clientModel->id,
+                    'project_id'       => $projectId,
+                    'type'             => 'earned',
+                    'direction'        => 'credit',
+                    'amount'           => $amount,
+                    'currency_id'      => $clientModel->currency_id,
+                    'business_amount'  => $businessAmount,
+                    'business_currency_id' => $businessCurrencyId,
+                    'exchange_rate'    => \App\Models\CurrenciesExchange::Rate(now()->toDateString(), $clientModel->currency_id, $businessCurrencyId),
+                    'exchange_rate_date'=> now()->toDateString(),
+                    'reference_type'   => 'manual_bonus',
+                    'reference_id'     => Auth::id(),
+                    'note'             => $request->input('note') ?? __('erp.manual_wallet_transaction'),
+                    'created_by'       => Auth::id(),
+                ]);
+            });
+
+            if ($projectId) {
+                return redirect()->route('erp.projects.show', $projectId)
+                    ->with('success', __('erp.bonus_added_success'));
+            }
+
+            return back()->with('success', __('erp.bonus_added_success'));
+        } catch (\Exception $e) {
+            Log::error("Failed to add bonus for client {$clientModel->id}: " . $e->getMessage());
             return back()->withErrors(['amount' => __('erp.transaction_failed')]);
         }
     }

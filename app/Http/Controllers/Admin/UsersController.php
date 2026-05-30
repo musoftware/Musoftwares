@@ -265,18 +265,29 @@ class UsersController extends Controller
      * Impersonate a user — generate a token and redirect to impersonation endpoint.
      * Recovered from old project: UsersController::login_as()
      */
-    public function loginAs($id)
+    public function loginAs(Request $request, $id)
     {
         $user  = User::findOrFail($id);
         $token = $user->createToken('admin-impersonation-' . Auth::id())->plainTextToken;
 
         // Store the impersonation token in session so the impersonated session can be detected
-        session(['impersonating_user_id' => $user->id, 'impersonated_by' => Auth::id()]);
-
-        return Inertia::render('Admin/Users/Impersonate', [
-            'user'  => ['id' => $user->id, 'name' => $user->name, 'email' => $user->email],
-            'token' => $token,
+        session([
+            'impersonator_id' => Auth::id(),
+            'impersonate' => $user->id,
+            'impersonating_user_id' => $user->id,
+            'impersonated_by' => Auth::id()
         ]);
+
+        Auth::loginUsingId($user->id);
+
+        if ($request->wantsJson() || $request->isMethod('post')) {
+            return response()->json([
+                'token' => $token,
+                'redirect_url' => route('dashboard'),
+            ]);
+        }
+
+        return redirect()->route('dashboard');
     }
 
     /**

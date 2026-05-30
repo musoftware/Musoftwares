@@ -34,6 +34,14 @@ const OPERATION_CONFIG = {
         iconColor: 'text-blue-600',
         buttonClass: 'bg-blue-600 hover:bg-blue-700 text-white',
     },
+    bonus: {
+        title: () => __('Earn (Bonus)'),
+        description: () => __('Add bonus or credit to client without affecting business income.'),
+        route: 'erp.clients.wallet.bonus',
+        icon: ArrowDownLeft,
+        iconColor: 'text-indigo-600',
+        buttonClass: 'bg-indigo-600 hover:bg-indigo-700 text-white',
+    },
 } as const;
 
 type OperationType = keyof typeof OPERATION_CONFIG;

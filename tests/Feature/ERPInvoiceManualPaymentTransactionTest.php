@@ -60,7 +60,7 @@ class ERPInvoiceManualPaymentTransactionTest extends TestCase
         WalletTransaction::create([
             'tenant_id' => $this->tenant->id,
             'client_id' => $client->id,
-            'type' => 'manual_credit',
+            'type' => 'received',
             'direction' => 'credit',
             'amount' => 150.00,
             'currency_id' => $this->currency->id,
@@ -103,13 +103,13 @@ class ERPInvoiceManualPaymentTransactionTest extends TestCase
         $this->assertCount(3, $transactions);
 
         // Initial deposit
-        $this->assertEquals('manual_credit', $transactions[0]->type);
+        $this->assertEquals('received', $transactions[0]->type);
         $this->assertEquals('credit', $transactions[0]->direction);
         $this->assertEquals(150.00, (float) $transactions[0]->amount);
 
         // Credit transaction
         $creditTx = $transactions[1];
-        $this->assertEquals('manual_credit', $creditTx->type);
+        $this->assertEquals('received', $creditTx->type);
         $this->assertEquals('credit', $creditTx->direction);
         $this->assertEquals(500.00, (float) $creditTx->amount);
         $this->assertEquals(Invoice::class, $creditTx->reference_type);
@@ -117,7 +117,7 @@ class ERPInvoiceManualPaymentTransactionTest extends TestCase
 
         // Debit transaction
         $debitTx = $transactions[2];
-        $this->assertEquals('invoice_paid', $debitTx->type);
+        $this->assertEquals('used', $debitTx->type);
         $this->assertEquals('debit', $debitTx->direction);
         $this->assertEquals(500.00, (float) $debitTx->amount);
         $this->assertEquals(Invoice::class, $debitTx->reference_type);
@@ -137,7 +137,7 @@ class ERPInvoiceManualPaymentTransactionTest extends TestCase
         WalletTransaction::create([
             'tenant_id' => $this->tenant->id,
             'client_id' => $client->id,
-            'type' => 'manual_credit',
+            'type' => 'received',
             'direction' => 'credit',
             'amount' => 500.00,
             'currency_id' => $this->currency->id,
@@ -188,22 +188,22 @@ class ERPInvoiceManualPaymentTransactionTest extends TestCase
         $this->assertCount(4, $transactions);
 
         // Initial deposit
-        $this->assertEquals('manual_credit', $transactions[0]->type);
+        $this->assertEquals('received', $transactions[0]->type);
         $this->assertEquals('credit', $transactions[0]->direction);
         $this->assertEquals(500.00, (float) $transactions[0]->amount);
 
         // First transaction (debit from partial bill)
-        $this->assertEquals('invoice_paid', $transactions[1]->type);
+        $this->assertEquals('used', $transactions[1]->type);
         $this->assertEquals('debit', $transactions[1]->direction);
         $this->assertEquals(200.00, (float) $transactions[1]->amount);
 
         // Second transaction (credit from manual mark paid for the remaining amount)
-        $this->assertEquals('manual_credit', $transactions[2]->type);
+        $this->assertEquals('received', $transactions[2]->type);
         $this->assertEquals('credit', $transactions[2]->direction);
         $this->assertEquals(300.00, (float) $transactions[2]->amount);
 
         // Third transaction (debit from manual mark paid for the remaining amount)
-        $this->assertEquals('invoice_paid', $transactions[3]->type);
+        $this->assertEquals('used', $transactions[3]->type);
         $this->assertEquals('debit', $transactions[3]->direction);
         $this->assertEquals(300.00, (float) $transactions[3]->amount);
     }

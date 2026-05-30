@@ -160,11 +160,10 @@ Route::middleware(['auth', 'verified', 'onboarding', 'subscription:erp', 'erp.te
     Route::delete('/notes/{note}', [\Modules\ERP\Http\Controllers\TenantNoteController::class, 'destroy'])->name('notes.destroy');
 }); */
 
-// ── Client-Facing ERP Routes ─────────────────────────────────────────
-// Platform users (subscribers) view their invoices and tasks created by admin/tenants.
-// Recovered from old project: Client/InvoicesController + Client/TaskController
-Route::middleware(['auth', 'verified', 'onboarding'])->prefix('my')->name('erp.client-')->group(function () {
-    // Client Invoice List + Payment
+// ── Client-Facing Billing Routes ─────────────────────────────────────
+// Platform users (subscribers) view their invoices issued by admin and pay them.
+// These are CORE platform billing routes — NOT related to the ERP module.
+Route::middleware(['auth', 'verified', 'onboarding'])->prefix('billing')->name('billing.')->group(function () {
     Route::get('/invoices', [\Modules\ERP\Http\Controllers\InvoicePaymentController::class, 'clientIndex'])->name('invoices.index');
     Route::get('/invoices/{uuid}/pay', [\Modules\ERP\Http\Controllers\InvoicePaymentController::class, 'show'])->name('invoices.pay');
     Route::post('/invoices/{uuid}/pay/wallet', [\Modules\ERP\Http\Controllers\InvoicePaymentController::class, 'processWalletPayment'])->name('invoices.pay.wallet');
@@ -379,8 +378,8 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
     Route::get('/users/earning-analyze', [\App\Http\Controllers\Admin\UsersController::class, 'earningAnalyze'])->name('users.earning-analyze');
     
     // Matches exact old links
-    Route::get('/users/loginas/{id}', [\App\Http\Controllers\Admin\UsersController::class, 'loginAs'])->name('users.loginas');
-    Route::post('/users/loginas/{id}', [\App\Http\Controllers\Admin\UsersController::class, 'loginAs']); // Allows POST for React compatibility
+    Route::get('/users/{id}/login-as', [\App\Http\Controllers\Admin\UsersController::class, 'loginAs'])->name('users.login-as');
+    Route::post('/users/{id}/login-as', [\App\Http\Controllers\Admin\UsersController::class, 'loginAs']); // Allows POST for React compatibility
     Route::get('/users/reset-password/{id}', [\App\Http\Controllers\Admin\UsersController::class, 'reset_password'])->name('users.reset-password');
     Route::post('/users/{id}/generate-password', [\App\Http\Controllers\Admin\UsersController::class, 'reset_password'])->name('users.generate-password');
     Route::get('/users/{id}/referrals', [\App\Http\Controllers\Admin\UsersController::class, 'referrals'])->name('users.referrals');
@@ -504,7 +503,7 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
 });
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('/admin/stop-impersonating', [\App\Http\Controllers\ImpersonateController::class, 'stopImpersonating'])->name('admin.stop-impersonate');
+    Route::get('/admin/stop-impersonate', [\App\Http\Controllers\ImpersonateController::class, 'stopImpersonating'])->name('admin.stop-impersonate');
 });
 
 // ── Reseller Portal (public, iframe-embeddable) ───────────────────────────────

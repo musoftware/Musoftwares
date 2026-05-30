@@ -35,14 +35,14 @@ class InvoicePaymentController extends Controller
             ->firstOrFail();
 
         if ($invoice->status === 'paid') {
-            return redirect()->route('erp.client-invoices.index')
-                ->with('info', 'This invoice is already paid.');
+            return redirect()->route('billing.invoices.index')
+                ->with('info', __('billing.invoice_already_paid'));
         }
 
         // Load the legacy user balance
         $balance = (float) $user->user_balance;
 
-        return Inertia::render('ERP/ClientInvoices/Pay', [
+        return Inertia::render('Billing/InvoicePay', [
             'invoice' => [
                 'id'            => $invoice->id,
                 'uuid'          => $invoice->uuid ?? $invoice->id,
@@ -118,7 +118,7 @@ class InvoicePaymentController extends Controller
                 'success'      => true,
                 'message'      => 'Payment recorded successfully.',
                 'fully_paid'   => $result,
-                'redirect_url' => route('erp.client-invoices.index'),
+                'redirect_url' => route('billing.invoices.index'),
             ]);
         } catch (\Throwable $e) {
             return response()->json([
@@ -158,7 +158,7 @@ class InvoicePaymentController extends Controller
         // Legacy user balance for platform
         $balance = (float) $user->user_balance;
 
-        return Inertia::render('ERP/ClientInvoices/Index', [
+        return Inertia::render('Billing/Invoices', [
             'invoices'        => $invoices,
             'unpaid_invoices' => $unpaidInvoices,
             'paid_invoices'   => $paidInvoices,

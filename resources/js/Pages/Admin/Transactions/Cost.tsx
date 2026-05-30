@@ -5,7 +5,7 @@ import { DataTable } from '@/Components/ui/DataTable';
 import { formatMoney as formatCurrency } from '@/lib/utils';
 import { Badge } from '@/Components/ui/badge';
 import { Button } from '@/Components/ui/button';
-import { __ } from '@/lib/utils'; // Make sure localization rule is applied
+import { __ } from '@/lib/i18n';
 
 export default function Cost({ transactions, filters }) {
     const handleSearch = (search) => {

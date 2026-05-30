@@ -43,7 +43,7 @@ class InvoiceService
                 'client_id'         => $client->id,
                 'project_id'        => $validated['project_id'] ?? null,
                 'invoice_number'    => $validated['invoice_number'],
-                'status'            => 'draft',
+                'status'            => 'sent',
                 'paid_amount'       => 0,
                 'amount'            => $total,
                 'currency_id'       => $client->currency_id,

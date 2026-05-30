@@ -106,6 +106,11 @@ export default function ClientShow({ client, projects, tickets, invoices, activi
                                 <RotateCcw className="w-3.5 h-3.5 text-blue-600" /> {__('Refund')}
                             </Button>
                         </Link>
+                        <Link href={route('erp.clients.wallet.adjust', client.id) + '?type=bonus'}>
+                            <Button size="sm" variant="outline" className="gap-1.5 shadow-none border-slate-200 text-slate-700 hover:bg-slate-50">
+                                <ArrowDownLeft className="w-3.5 h-3.5 text-indigo-600" /> {__('Earn (Bonus)')}
+                            </Button>
+                        </Link>
                         <Link href={route('erp.clients.wallet.index', client.id)}>
                             <Button size="sm" variant="outline" className="gap-1.5 shadow-none border-slate-200 text-slate-700 hover:bg-slate-50">
                                 <Wallet className="w-3.5 h-3.5 text-slate-500" /> {__('Ledger')}

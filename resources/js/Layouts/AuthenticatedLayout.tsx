@@ -178,7 +178,7 @@ function AuthenticatedContent({
                                                         <Link href={activeModules.erp ? safeRoute('erp.dashboard') : safeRoute('subscriptions.plans', { module: 'erp' })} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-50 text-slate-700 font-medium">
                                                             <Building2 className="w-5 h-5 text-slate-400" /> ERP
                                                         </Link>
-                                                        <Link href={safeRoute('erp.client-invoices.index')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-50 text-slate-700 font-medium">
+                                                        <Link href={safeRoute('billing.invoices.index')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-50 text-slate-700 font-medium">
                                                             <FileText className="w-5 h-5 text-slate-400" /> My Invoices
                                                         </Link>
                                                         <Link href={safeRoute('financial.add-balance')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-emerald-50 text-emerald-700 font-medium">
@@ -243,7 +243,7 @@ function AuthenticatedContent({
                                                 <Link href={safeRoute('financial.payout-methods.index')} className="flex items-center gap-3 px-2 py-1.5 rounded-md hover:bg-slate-50 text-sm font-medium text-slate-700">
                                                     <CreditCard className="w-4 h-4 text-slate-400" /> Payout Methods
                                                 </Link>
-                                                <Link href={safeRoute('erp.client-invoices.index')} className="flex items-center gap-3 px-2 py-1.5 rounded-md hover:bg-slate-50 text-sm font-medium text-slate-700">
+                                                <Link href={safeRoute('billing.invoices.index')} className="flex items-center gap-3 px-2 py-1.5 rounded-md hover:bg-slate-50 text-sm font-medium text-slate-700">
                                                     <FileText className="w-4 h-4 text-slate-400" /> My Invoices
                                                 </Link>
                                             </div>

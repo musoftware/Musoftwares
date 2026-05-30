@@ -157,7 +157,7 @@ export default function Dashboard({
                             </p>
                         </div>
                         <Link 
-                            href={safeRoute('erp.client-invoices.index', undefined, '/my/invoices')}
+                            href={safeRoute('billing.invoices.index', undefined, '/billing/invoices')}
                             className="inline-flex items-center justify-center h-10 px-6 rounded-lg bg-rose-600 hover:bg-rose-700 text-white font-medium text-sm transition-colors shadow-sm shrink-0 whitespace-nowrap"
                         >
                             Settle Now
@@ -174,7 +174,7 @@ export default function Dashboard({
                             </span>
                             <h2 className="text-xl font-bold text-slate-900 mb-0">Pending Invoices</h2>
                         </div>
-                        <Link href={safeRoute('erp.client-invoices.index', undefined, '/my/invoices')} className="text-slate-900 font-bold text-xs hover:underline flex items-center">
+                        <Link href={safeRoute('billing.invoices.index', undefined, '/billing/invoices')} className="text-slate-900 font-bold text-xs hover:underline flex items-center">
                             View All <ArrowRight className="w-3 h-3 ml-1" />
                         </Link>
                     </div>
@@ -207,14 +207,14 @@ export default function Dashboard({
                                             </div>
                                             <div className="flex gap-1.5">
                                                 <Link 
-                                                    href={safeRoute('erp.client-invoices.pay', invoice.id, `/my/invoices/${invoice.id}/pay`)}
+                                                    href={safeRoute('billing.invoices.pay', invoice.id, `/billing/invoices/${invoice.id}/pay`)}
                                                     className="inline-flex items-center justify-center h-7 px-2 rounded bg-slate-200 hover:bg-slate-300 text-slate-800 text-[10px] font-bold uppercase tracking-wider transition-colors"
                                                     title="Pay with Wallet"
                                                 >
                                                     Wallet
                                                 </Link>
                                                 <Link 
-                                                    href={safeRoute('erp.client-invoices.pay', invoice.id, `/my/invoices/${invoice.id}/pay`)}
+                                                    href={safeRoute('billing.invoices.pay', invoice.id, `/billing/invoices/${invoice.id}/pay`)}
                                                     className="inline-flex items-center justify-center h-7 px-2 rounded bg-slate-900 hover:bg-slate-800 text-white text-[10px] font-bold uppercase tracking-wider transition-colors"
                                                     title="Pay with Kashier"
                                                 >
@@ -247,7 +247,7 @@ export default function Dashboard({
                                     <span className="text-sm font-medium text-slate-700 group-hover:text-primary">View Tool Plans</span>
                                     <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-primary" />
                                 </Link>
-                                <Link href={safeRoute('erp.client-invoices.index', undefined, '/my/invoices')} className="flex items-center justify-between p-2.5 rounded-lg border border-slate-100 hover:border-primary hover:bg-slate-50 transition-colors group">
+                                <Link href={safeRoute('billing.invoices.index', undefined, '/billing/invoices')} className="flex items-center justify-between p-2.5 rounded-lg border border-slate-100 hover:border-primary hover:bg-slate-50 transition-colors group">
                                     <span className="text-sm font-medium text-slate-700 group-hover:text-primary">Subscription History</span>
                                     <History className="w-4 h-4 text-slate-400 group-hover:text-primary" />
                                 </Link>
@@ -298,13 +298,13 @@ export default function Dashboard({
                         <div className="mt-auto pt-4">
                             <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Billing Quick Access</p>
                             <div className="flex flex-col gap-2">
-                                <Link href={safeRoute('erp.client-invoices.index', undefined, '/my/invoices')} className="flex items-center justify-between p-2.5 rounded-lg bg-slate-900 text-white hover:bg-slate-800 transition-colors">
-                                    <span className="text-sm font-medium">Unpaid Invoices</span>
-                                    <span className="bg-white/20 px-2 py-0.5 rounded text-xs font-bold">{stats.unpaidInvoices}</span>
+                                <Link href={safeRoute('billing.invoices.index', undefined, '/billing/invoices')} className="flex items-center justify-between p-2.5 rounded-lg border border-slate-200 bg-slate-50 hover:border-slate-300 transition-colors group">
+                                    <span className="text-sm font-medium text-slate-700 group-hover:text-slate-900">Unpaid Invoices</span>
+                                    <span className="bg-slate-200 text-slate-700 px-2 py-0.5 rounded text-xs font-bold">{stats.unpaidInvoices}</span>
                                 </Link>
-                                <Link href={safeRoute('erp.clients.wallet.index', user?.id || 1, `/erp/clients/${user?.id || 1}/wallet`)} className="flex items-center justify-between p-2.5 rounded-lg border border-slate-100 hover:border-slate-300 transition-colors group">
-                                    <span className="text-sm font-medium text-slate-700">Transactions</span>
-                                    <ArrowRight className="w-4 h-4 text-slate-400" />
+                                <Link href={safeRoute('financial.transactions', undefined, '/financial/transactions')} className="flex items-center justify-between p-2.5 rounded-lg border border-slate-200 hover:bg-slate-50 transition-colors group">
+                                    <span className="text-sm font-medium text-slate-700 group-hover:text-slate-900">Transactions</span>
+                                    <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-slate-900" />
                                 </Link>
                             </div>
                         </div>
@@ -375,7 +375,7 @@ export default function Dashboard({
                             
                             <div className="pt-4 mt-auto border-t border-slate-100">
                                 <Link 
-                                    href={safeRoute('erp.clients.wallet.index', user?.id || 1, `/erp/clients/${user?.id || 1}/wallet`)} 
+                                    href={safeRoute('financial.transactions', undefined, '/financial/transactions')} 
                                     className="flex items-center justify-center w-full py-2.5 rounded-lg border border-slate-200 hover:bg-slate-50 transition-colors text-sm font-medium text-slate-700 hover:text-slate-900"
                                 >
                                     View Full History

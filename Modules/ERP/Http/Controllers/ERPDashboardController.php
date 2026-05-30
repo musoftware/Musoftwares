@@ -358,8 +358,8 @@ class ERPDashboardController extends Controller
                 ->get();
 
             $transactionStats['txnCount'] = $rawTxns->count();
-            // Per erp-financial-rules: income from received + earned, deductions from refunded + sent
-            $transactionStats['totalCredits'] = round($rawTxns->whereIn('type', ['received', 'earned'])->sum('business_amount'), 2);
+            // Per user request: earned is a client bonus and should not be calculated as business income.
+            $transactionStats['totalCredits'] = round($rawTxns->whereIn('type', ['received'])->sum('business_amount'), 2);
             $transactionStats['totalDebits'] = round(abs($rawTxns->whereIn('type', ['refunded', 'sent'])->sum('business_amount')), 2);
             $transactionStats['netFlow'] = round($transactionStats['totalCredits'] - $transactionStats['totalDebits'], 2);
 
