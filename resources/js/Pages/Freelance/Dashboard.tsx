@@ -72,9 +72,11 @@ export default function FreelanceDashboard({
         stats: {
             activeJobs: 0,
             activeContracts: 0,
-            totalSpend: 0,
+            totalContractedValue: 0,
+            pointsSpent: 0,
             receivedProposals: 0,
-            currency: auth?.user?.preferred_currency || 'USD'
+            currencySymbol: null,
+            currencyCode: null,
         },
         recentActivities: []
     };
@@ -196,11 +198,16 @@ export default function FreelanceDashboard({
 
                 {/* Metrics Grid */}
                 {isClient ? (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
                         <MetricCard 
-                            label={__('Total Spend')}
-                            value={clientData.stats.totalSpend}
+                            label={__('Contracted Value')}
+                            value={clientData.stats.totalContractedValue}
                             icon={DollarSign}
+                        />
+                        <MetricCard 
+                            label={__('Points Spent')}
+                            value={clientData.stats.pointsSpent}
+                            icon={Coins}
                         />
                         <MetricCard 
                             label={__('Active Contracts')}

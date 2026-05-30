@@ -9,7 +9,7 @@ use Modules\Freelance\Models\Contract;
 use Modules\Freelance\Models\Proposal;
 use App\Models\PointTransaction;
 use Modules\Freelance\Models\Job;
-use Carbon\Carbon;
+use Illuminate\Support\Facades\Schema;
 
 class DashboardController extends Controller
 {
@@ -17,254 +17,284 @@ class DashboardController extends Controller
     {
         $user = $request->user();
 
-        // 1. Fetch Real Active Proposals
+        // Detect which columns exist on contracts (migration-safe)
+        $hasAmountCol    = Schema::hasColumn('freelance_contracts', 'amount');
+        $hasCurrencyCol  = Schema::hasColumn('freelance_contracts', 'currency_id');
+        $earningsField   = $hasAmountCol ? 'amount' : 'contract_points';
+
+        // ── FREELANCER DATA ────────────────────────────────────────────
+
+        // 1. Active Proposals
         $activeProposals = Proposal::where('freelancer_id', $user->id)
             ->whereIn('status', ['pending'])
             ->with('job:id,title')
             ->latest()
             ->take(5)
             ->get()
-            ->map(function($proposal) {
+            ->map(function ($proposal) use ($hasCurrencyCol) {
                 return [
-                    'id' => $proposal->id,
-                    'title' => $proposal->job->title ?? 'Unknown Job',
-                    'status' => $proposal->status,
-                    'budget' => $proposal->bid_amount ?? 0,
+                    'id'          => $proposal->id,
+                    'title'       => $proposal->job->title ?? __('freelance.unknown_job'),
+                    'status'      => $proposal->status,
+                    'budget'      => $proposal->bid_amount ?? $proposal->proposed_budget_points ?? 0,
                     'submittedAt' => $proposal->created_at->format('Y-m-d'),
-                    'connectsUsed' => 2, // Default or fetch from transaction if linked
+                    'connectsUsed' => $proposal->points_spent ?? 0,
                 ];
             });
 
-        // 2. Fetch Real Active Contracts
-        $activeContracts = Contract::where('freelancer_id', $user->id)
+        // 2. Active Contracts (as freelancer)
+        $contractQuery = Contract::where('freelancer_id', $user->id)
             ->where('status', 'active')
             ->with(['client:id,name', 'job:id,title'])
             ->latest()
-            ->take(5)
-            ->get()
-            ->map(function($contract) {
-                return [
-                    'id' => $contract->id,
-                    'title' => $contract->job->title ?? 'Unknown Job',
-                    'clientName' => $contract->client->name ?? 'Unknown Client',
-                    'startDate' => $contract->created_at->format('Y-m-d'),
-                    'value' => $contract->amount ?? 0,
-                    'progress' => $this->calculateContractProgress($contract),
-                    'status' => $contract->status,
-                ];
-            });
+            ->take(5);
 
-        // 3. Compute Real Stats
+        $activeContracts = $contractQuery->get()->map(function ($contract) use ($hasAmountCol) {
+            return [
+                'id'         => $contract->id,
+                'title'      => $contract->job->title ?? __('freelance.unknown_job'),
+                'clientName' => $contract->client->name ?? __('freelance.unknown_client'),
+                'startDate'  => $contract->created_at->format('Y-m-d'),
+                'value'      => $hasAmountCol ? ($contract->amount ?? 0) : ($contract->contract_points ?? 0),
+                'progress'   => $this->calculateContractProgress($contract),
+                'status'     => $contract->status,
+            ];
+        });
+
+        // 3. Stats
+        $totalEarnings = $hasAmountCol
+            ? Contract::where('freelancer_id', $user->id)->where('status', 'completed')->sum('amount')
+            : Contract::where('freelancer_id', $user->id)->where('status', 'completed')->sum('contract_points');
+
+        // Get user's currency model (no hardcoded string fallback)
+        $userCurrencyModel = $hasCurrencyCol && $user->currency_id
+            ? \App\Models\Currency::find($user->currency_id)
+            : null;
+
         $stats = [
-            'pointsBalance' => $user->points_balance ?? 0,
+            'pointsBalance'   => $user->points_balance ?? 0,
             'activeProposals' => Proposal::where('freelancer_id', $user->id)->whereIn('status', ['pending'])->count(),
             'activeContracts' => Contract::where('freelancer_id', $user->id)->where('status', 'active')->count(),
-            'totalEarnings' => Contract::where('freelancer_id', $user->id)->where('status', 'completed')->sum('amount'),
-            'currency' => $user->preferred_currency ?? 'USD',
+            'totalEarnings'   => $totalEarnings,
+            'currencySymbol'  => $userCurrencyModel?->symbol,
+            'currencyCode'    => $userCurrencyModel?->currency,
         ];
 
-        // 4. Compute Real Recent Activities
+        // 4. Recent Activities
         $activities = [];
 
         $recentProposals = Proposal::where('freelancer_id', $user->id)->with('job')->latest()->take(3)->get();
         foreach ($recentProposals as $prop) {
             $activities[] = [
-                'id' => 'p_'.$prop->id,
-                'type' => 'proposal',
-                'description' => 'Submitted bid for "' . ($prop->job->title ?? 'Unknown') . '"',
-                'created_at' => $prop->created_at->toISOString(),
-                'timestamp' => $prop->created_at->timestamp,
-                'color' => 'blue'
+                'id'          => 'p_' . $prop->id,
+                'type'        => 'proposal',
+                'description' => __('freelance.submitted_bid_for', ['job' => $prop->job->title ?? __('freelance.unknown_job')]),
+                'created_at'  => $prop->created_at->toISOString(),
+                'timestamp'   => $prop->created_at->timestamp,
+                'color'       => 'blue',
             ];
         }
 
         $recentContracts = Contract::where('freelancer_id', $user->id)->with('job')->latest()->take(3)->get();
         foreach ($recentContracts as $contract) {
-            $statusText = $contract->status === 'active' ? 'Started contract for' : 'Contract update for';
             $activities[] = [
-                'id' => 'c_'.$contract->id,
-                'type' => 'contract',
-                'description' => $statusText . ' "' . ($contract->job->title ?? 'Unknown') . '"',
-                'created_at' => $contract->updated_at->toISOString(),
-                'timestamp' => $contract->updated_at->timestamp,
-                'color' => 'emerald'
+                'id'          => 'c_' . $contract->id,
+                'type'        => 'contract',
+                'description' => __('freelance.contract_update_for', ['job' => $contract->job->title ?? __('freelance.unknown_job')]),
+                'created_at'  => $contract->updated_at->toISOString(),
+                'timestamp'   => $contract->updated_at->timestamp,
+                'color'       => 'emerald',
             ];
         }
 
         $recentPoints = PointTransaction::where('user_id', $user->id)->latest()->take(3)->get();
         foreach ($recentPoints as $pt) {
             $activities[] = [
-                'id' => 'pt_'.$pt->id,
-                'type' => 'connects',
-                'description' => $pt->description ?? 'Connects transaction',
-                'created_at' => $pt->created_at->toISOString(),
-                'timestamp' => $pt->created_at->timestamp,
-                'color' => 'amber'
+                'id'          => 'pt_' . $pt->id,
+                'type'        => 'connects',
+                'description' => $pt->description ?? __('freelance.points_transaction'),
+                'created_at'  => $pt->created_at->toISOString(),
+                'timestamp'   => $pt->created_at->timestamp,
+                'color'       => 'amber',
             ];
         }
 
-        // Sort activities by timestamp descending
-        usort($activities, function($a, $b) {
-            return $b['timestamp'] <=> $a['timestamp'];
-        });
-
+        usort($activities, fn($a, $b) => $b['timestamp'] <=> $a['timestamp']);
         $recentActivities = array_slice($activities, 0, 5);
 
-        // 5. Fetch upcoming bookings for Dashboard widgets
-        $upcomingBookings = \Modules\Booking\Models\Booking::with('eventType')
-            ->whereHas('eventType', function($q) use ($user) {
-                $q->where('user_id', $user->id);
-            })
-            ->where('starts_at', '>=', now())
-            ->whereIn('status', ['confirmed', 'paid'])
-            ->orderBy('starts_at', 'asc')
-            ->take(5)
-            ->get();
+        // 5. Upcoming Bookings (optional — module may not be active)
+        $upcomingBookings = [];
+        if (class_exists(\Modules\Booking\Models\Booking::class)) {
+            try {
+                $upcomingBookings = \Modules\Booking\Models\Booking::with('eventType')
+                    ->whereHas('eventType', fn($q) => $q->where('user_id', $user->id))
+                    ->where('starts_at', '>=', now())
+                    ->whereIn('status', ['confirmed', 'paid'])
+                    ->orderBy('starts_at', 'asc')
+                    ->take(5)
+                    ->get();
+            } catch (\Throwable $e) {
+                $upcomingBookings = [];
+            }
+        }
 
-        // --- CLIENT DATA FETCHING ---
-        // 1. Fetch posted jobs by this client (open ones)
+        // ── CLIENT DATA ────────────────────────────────────────────────
+
+        // 1. Client's posted jobs
         $clientJobs = Job::where('client_id', $user->id)
             ->whereIn('status', ['open'])
             ->withCount('proposals')
+            ->with('currency')
             ->latest()
             ->take(5)
             ->get()
-            ->map(function($job) {
+            ->map(function ($job) use ($hasCurrencyCol) {
                 return [
-                    'id' => $job->id,
-                    'title' => $job->title,
-                    'status' => $job->status,
-                    'budget' => $job->budget ?? 0,
-                    'currency' => $job->currency_id ?? 1,
+                    'id'             => $job->id,
+                    'title'          => $job->title,
+                    'status'         => $job->status,
+                    'budget'         => $job->budget ?? 0,
+                    'formattedBudget' => $job->formatted_budget ?? null,
+                    'currencySymbol'  => $job->currency?->symbol,
                     'proposalsCount' => $job->proposals_count ?? 0,
-                    'createdAt' => $job->created_at->format('Y-m-d'),
+                    'createdAt'      => $job->created_at->format('Y-m-d'),
                 ];
             });
 
-        // 2. Fetch contracts where this user is the client
+        // 2. Client's active contracts
         $clientContracts = Contract::where('client_id', $user->id)
             ->where('status', 'active')
             ->with(['freelancer:id,name', 'job:id,title'])
             ->latest()
             ->take(5)
             ->get()
-            ->map(function($contract) {
+            ->map(function ($contract) use ($hasAmountCol) {
                 return [
-                    'id' => $contract->id,
-                    'title' => $contract->job->title ?? 'Unknown Job',
-                    'freelancerName' => $contract->freelancer->name ?? 'Unknown Freelancer',
-                    'startDate' => $contract->created_at->format('Y-m-d'),
-                    'value' => $contract->amount ?? 0,
-                    'progress' => $this->calculateContractProgress($contract),
-                    'status' => $contract->status,
+                    'id'             => $contract->id,
+                    'title'          => $contract->job->title ?? __('freelance.unknown_job'),
+                    'freelancerName' => $contract->freelancer->name ?? __('freelance.unknown_freelancer'),
+                    'startDate'      => $contract->created_at->format('Y-m-d'),
+                    'value'          => $hasAmountCol ? ($contract->amount ?? 0) : ($contract->contract_points ?? 0),
+                    'progress'       => $this->calculateContractProgress($contract),
+                    'status'         => $contract->status,
                 ];
             });
 
-        // 3. Fetch proposals received on jobs posted by this client
-        $clientProposals = Proposal::whereHas('job', function($q) use ($user) {
-                $q->where('client_id', $user->id);
-            })
+        // 3. Proposals received on client's jobs
+        $clientProposals = Proposal::whereHas('job', fn($q) => $q->where('client_id', $user->id))
             ->whereIn('status', ['pending'])
             ->with(['job:id,title', 'freelancer:id,name'])
             ->latest()
             ->take(5)
             ->get()
-            ->map(function($proposal) {
+            ->map(function ($proposal) {
                 return [
-                    'id' => $proposal->id,
-                    'title' => $proposal->job->title ?? 'Unknown Job',
-                    'freelancerName' => $proposal->freelancer->name ?? 'Unknown Freelancer',
-                    'status' => $proposal->status,
-                    'budget' => $proposal->bid_amount ?? 0,
-                    'submittedAt' => $proposal->created_at->format('Y-m-d'),
+                    'id'             => $proposal->id,
+                    'title'          => $proposal->job->title ?? __('freelance.unknown_job'),
+                    'freelancerName' => $proposal->freelancer->name ?? __('freelance.unknown_freelancer'),
+                    'status'         => $proposal->status,
+                    'budget'         => $proposal->bid_amount ?? $proposal->proposed_budget_points ?? 0,
+                    'pointsSpent'    => $proposal->points_spent ?? 0,
+                    'submittedAt'    => $proposal->created_at->format('Y-m-d'),
                 ];
             });
 
-        // 4. Compute Client-specific Stats
+        // 4. Client stats
+        $totalContractedValue = $hasAmountCol
+            ? Contract::where('client_id', $user->id)->where('status', 'completed')->sum('amount')
+            : Contract::where('client_id', $user->id)->where('status', 'completed')->sum('contract_points');
+
+        // Points spent by this client = points deducted for posting jobs
+        $pointsSpent = \App\Models\PointTransaction::where('user_id', $user->id)
+            ->where('type', 'spent')
+            ->sum('points');
+
+        // Also count job-posting deductions (type = deducted)
+        $pointsSpentFromDeductions = \App\Models\PointTransaction::where('user_id', $user->id)
+            ->whereIn('type', ['spent', 'deducted', 'used'])
+            ->sum('points');
+
         $clientStats = [
-            'activeJobs' => Job::where('client_id', $user->id)->where('status', 'open')->count(),
-            'activeContracts' => Contract::where('client_id', $user->id)->where('status', 'active')->count(),
-            'totalSpend' => Contract::where('client_id', $user->id)->where('status', 'completed')->sum('amount'),
-            'receivedProposals' => Proposal::whereHas('job', function($q) use ($user) {
-                    $q->where('client_id', $user->id);
-                })->where('status', 'pending')->count(),
-            'currency' => $user->preferred_currency ?? 'USD',
+            'activeJobs'             => Job::where('client_id', $user->id)->where('status', 'open')->count(),
+            'activeContracts'        => Contract::where('client_id', $user->id)->where('status', 'active')->count(),
+            'totalContractedValue'   => $totalContractedValue,
+            'pointsSpent'            => abs((int) $pointsSpentFromDeductions),
+            'receivedProposals'      => Proposal::whereHas('job', fn($q) => $q->where('client_id', $user->id))->where('status', 'pending')->count(),
+            'currencySymbol'         => $userCurrencyModel?->symbol,
+            'currencyCode'           => $userCurrencyModel?->currency,
         ];
 
-        // 5. Compute Client-specific recent activities
+
+        // 5. Client activities
         $clientActivitiesList = [];
 
         $recentClientJobs = Job::where('client_id', $user->id)->latest()->take(3)->get();
         foreach ($recentClientJobs as $job) {
             $clientActivitiesList[] = [
-                'id' => 'j_'.$job->id,
-                'type' => 'job',
-                'description' => 'Posted job "' . $job->title . '"',
-                'created_at' => $job->created_at->toISOString(),
-                'timestamp' => $job->created_at->timestamp,
-                'color' => 'indigo'
+                'id'          => 'j_' . $job->id,
+                'type'        => 'job',
+                'description' => __('freelance.posted_job', ['title' => $job->title]),
+                'created_at'  => $job->created_at->toISOString(),
+                'timestamp'   => $job->created_at->timestamp,
+                'color'       => 'indigo',
             ];
         }
 
-        $recentReceivedProposals = Proposal::whereHas('job', function($q) use ($user) {
-                $q->where('client_id', $user->id);
-            })->with(['job', 'freelancer'])->latest()->take(3)->get();
+        $recentReceivedProposals = Proposal::whereHas('job', fn($q) => $q->where('client_id', $user->id))
+            ->with(['job', 'freelancer'])
+            ->latest()
+            ->take(3)
+            ->get();
         foreach ($recentReceivedProposals as $prop) {
             $clientActivitiesList[] = [
-                'id' => 'pr_'.$prop->id,
-                'type' => 'proposal_received',
-                'description' => ($prop->freelancer->name ?? 'A freelancer') . ' bid on "' . ($prop->job->title ?? 'Unknown') . '"',
-                'created_at' => $prop->created_at->toISOString(),
-                'timestamp' => $prop->created_at->timestamp,
-                'color' => 'blue'
+                'id'          => 'pr_' . $prop->id,
+                'type'        => 'proposal_received',
+                'description' => __('freelance.freelancer_bid_on', [
+                    'freelancer' => $prop->freelancer->name ?? __('freelance.unknown_freelancer'),
+                    'job'        => $prop->job->title ?? __('freelance.unknown_job'),
+                ]),
+                'created_at'  => $prop->created_at->toISOString(),
+                'timestamp'   => $prop->created_at->timestamp,
+                'color'       => 'blue',
             ];
         }
 
         $recentClientContracts = Contract::where('client_id', $user->id)->with('job')->latest()->take(3)->get();
         foreach ($recentClientContracts as $contract) {
-            $statusText = $contract->status === 'active' ? 'Started contract for' : 'Contract update for';
             $clientActivitiesList[] = [
-                'id' => 'cc_'.$contract->id,
-                'type' => 'contract',
-                'description' => $statusText . ' "' . ($contract->job->title ?? 'Unknown') . '"',
-                'created_at' => $contract->updated_at->toISOString(),
-                'timestamp' => $contract->updated_at->timestamp,
-                'color' => 'emerald'
+                'id'          => 'cc_' . $contract->id,
+                'type'        => 'contract',
+                'description' => __('freelance.contract_update_for', ['job' => $contract->job->title ?? __('freelance.unknown_job')]),
+                'created_at'  => $contract->updated_at->toISOString(),
+                'timestamp'   => $contract->updated_at->timestamp,
+                'color'       => 'emerald',
             ];
         }
 
-        usort($clientActivitiesList, function($a, $b) {
-            return $b['timestamp'] <=> $a['timestamp'];
-        });
-
+        usort($clientActivitiesList, fn($a, $b) => $b['timestamp'] <=> $a['timestamp']);
         $clientActivities = array_slice($clientActivitiesList, 0, 5);
 
         return Inertia::render('Freelance/Dashboard', [
-            'activeProposals' => $activeProposals,
-            'activeContracts' => $activeContracts,
-            'stats' => $stats,
+            'activeProposals'  => $activeProposals,
+            'activeContracts'  => $activeContracts,
+            'stats'            => $stats,
             'recentActivities' => $recentActivities,
             'upcomingBookings' => $upcomingBookings,
-            
-            // Client data
-            'clientData' => [
-                'activeJobs' => $clientJobs,
-                'activeContracts' => $clientContracts,
-                'receivedProposals' => $clientProposals,
-                'stats' => $clientStats,
-                'recentActivities' => $clientActivities,
-            ]
+            'clientData'       => [
+                'activeJobs'         => $clientJobs,
+                'activeContracts'    => $clientContracts,
+                'receivedProposals'  => $clientProposals,
+                'stats'              => $clientStats,
+                'recentActivities'   => $clientActivities,
+            ],
         ]);
     }
 
-    private function calculateContractProgress($contract)
+    private function calculateContractProgress($contract): int
     {
-        if ($contract->status === 'completed') {
-            return 100;
-        }
-        if (in_array($contract->status, ['terminated', 'canceled'])) {
-            return 0;
-        }
-        return 25; // Default for in-progress contract
+        if ($contract->status === 'completed') return 100;
+        if (in_array($contract->status, ['terminated', 'canceled'])) return 0;
+        return 25;
     }
 }
+

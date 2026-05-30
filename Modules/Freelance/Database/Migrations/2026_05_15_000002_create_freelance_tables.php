@@ -40,14 +40,16 @@ return new class extends Migration
             $table->foreignId('client_id')->constrained('users')->cascadeOnDelete();
             $table->string('title');
             $table->text('description');
-            $table->decimal('budget', 20, 8);
+            $table->decimal('budget', 20, 8)->default(0);
             $table->foreignId('currency_id')->default(2)->constrained('currencies')->onDelete('restrict');
+            $table->integer('min_proposal_points')->default(0);
             $table->string('type'); // fixed, hourly
             $table->string('duration')->nullable();
             $table->string('status'); // open, in_progress, completed, cancelled
             $table->softDeletes();
             $table->timestamps();
         });
+
 
         // Job Skills
         Schema::create('freelance_job_skills', function (Blueprint $table) {
@@ -64,8 +66,10 @@ return new class extends Migration
             $table->foreignId('job_id')->constrained('freelance_jobs')->cascadeOnDelete();
             $table->foreignId('freelancer_id')->constrained('users')->cascadeOnDelete();
             $table->text('cover_letter');
-            $table->decimal('bid_amount', 20, 8);
+            $table->decimal('bid_amount', 20, 8)->default(0);
             $table->foreignId('currency_id')->default(2)->constrained('currencies')->onDelete('restrict');
+            $table->integer('proposed_budget_points')->default(0);
+            $table->integer('points_spent')->default(0);
             $table->string('status'); // pending, accepted, rejected
             $table->timestamps();
         });
@@ -77,8 +81,9 @@ return new class extends Migration
             $table->foreignId('proposal_id')->constrained('freelance_proposals')->cascadeOnDelete();
             $table->foreignId('client_id')->constrained('users')->cascadeOnDelete();
             $table->foreignId('freelancer_id')->constrained('users')->cascadeOnDelete();
-            $table->decimal('amount', 20, 8);
+            $table->decimal('amount', 20, 8)->default(0);
             $table->foreignId('currency_id')->default(2)->constrained('currencies')->onDelete('restrict');
+            $table->integer('contract_points')->default(0);
             $table->string('status'); // active, completed, disputed
             $table->timestamp('started_at');
             $table->timestamp('completed_at')->nullable();
