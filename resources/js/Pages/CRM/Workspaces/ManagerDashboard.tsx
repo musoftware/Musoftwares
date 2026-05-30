@@ -4,8 +4,10 @@ import KPICard from '../Components/Widgets/KPICard';
 import { Activity, AlertTriangle, Users, Trophy } from 'lucide-react';
 import { __ } from '@/lib/i18n';
 import { Card, CardHeader, CardTitle, CardContent } from '@/Components/ui/card';
+import LeaderboardTable from '../Components/Widgets/LeaderboardTable';
+import SlaAlertsList from '../Components/Widgets/SlaAlertsList';
 
-export default function ManagerDashboard({ branchKpis, slaAlerts }: { branchKpis: any, slaAlerts: any }) {
+export default function ManagerDashboard({ branchKpis, slaAlerts, leaderboard }: { branchKpis: any, slaAlerts: any, leaderboard: any }) {
     return (
         <CrmLayout title={__('Manager Workspace')} activeMenu="workspaces">
             <div className="flex flex-col h-full gap-6 p-8 pt-6">
@@ -40,17 +42,27 @@ export default function ManagerDashboard({ branchKpis, slaAlerts }: { branchKpis
 
                 {/* Main Content Area */}
                 <div className="flex-1 flex gap-6 min-h-0">
-                    <Card className="flex-1 flex flex-col overflow-hidden shadow-sm">
+                    <Card className="flex-[2] flex flex-col overflow-hidden shadow-sm">
                         <CardHeader className="p-4 border-b bg-muted/50 space-y-0">
                             <CardTitle className="font-semibold flex items-center gap-2">
                                 <Trophy size={18} className="text-amber-500" />
                                 {__('Agent Leaderboard')}
                             </CardTitle>
                         </CardHeader>
-                        <CardContent className="flex-1 p-4 overflow-y-auto">
-                            <div className="flex items-center justify-center h-40 text-sm text-muted-foreground border border-dashed rounded-lg">
-                                {__('No agent data available for this branch.')}
-                            </div>
+                        <CardContent className="flex-1 p-0 overflow-y-auto">
+                            <LeaderboardTable leaderboard={leaderboard} />
+                        </CardContent>
+                    </Card>
+
+                    <Card className="flex-1 flex flex-col overflow-hidden shadow-sm border-red-200">
+                        <CardHeader className="p-4 border-b bg-red-50/50 border-red-100 space-y-0">
+                            <CardTitle className="font-semibold flex items-center gap-2 text-red-700">
+                                <AlertTriangle size={18} className="text-red-500" />
+                                {__('SLA Breaches & Stale Leads')}
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent className="flex-1 p-4 overflow-y-auto bg-slate-50/30">
+                            <SlaAlertsList leads={slaAlerts?.leads || []} />
                         </CardContent>
                     </Card>
                 </div>

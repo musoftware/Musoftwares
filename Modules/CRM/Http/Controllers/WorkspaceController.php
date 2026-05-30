@@ -170,6 +170,8 @@ class WorkspaceController extends Controller
     public function managerWorkspace(Request $request): Response
     {
         $this->ensureAccess($request, ['Manager'], 'crm-sales-management');
+        
+        $userId = $request->user()->id;
 
         $tenantId = session('tenant_id');
         if (!$tenantId) {
@@ -182,10 +184,50 @@ class WorkspaceController extends Controller
             ->where('status', 'active')
             ->count() : 0;
 
-        $slaBreaches = DB::table('leads')
+        $staleLeads = $tenantId ? DB::table('leads')
             ->where('tenant_id', $tenantId)
             ->where('is_stale', true)
-            ->count();
+            ->select('id', 'name', 'phone', 'pipeline_stage', 'updated_at', 'assigned_to_id')
+            ->orderBy('updated_at', 'asc')
+            ->limit(10)
+            ->get() : collect();
+
+        $slaBreaches = $staleLeads->count();
+
+        // Calculate Leaderboard
+        $leaderboard = [];
+        if ($tenantId) {
+            $agents = DB::table('erp_team_members')
+                ->join('users', 'erp_team_members.user_id', '=', 'users.id')
+                ->where('erp_team_members.tenant_id', $tenantId)
+                ->where('erp_team_members.status', 'active')
+                ->select('users.id', 'users.name', 'erp_team_members.role')
+                ->get();
+
+            $kpiAction = new \Modules\CRM\Domains\WorkforceMonitoring\Actions\CalculateKpisAction();
+            $startDate = now()->startOfMonth()->toDateTimeString();
+            $endDate = now()->endOfDay()->toDateTimeString();
+
+            foreach ($agents as $agent) {
+                $kpis = $kpiAction->execute($agent->id, $startDate, $endDate);
+                $leaderboard[] = [
+                    'id' => $agent->id,
+                    'name' => $agent->name,
+                    'role' => $agent->role,
+                    'calls_made' => $kpis->callsMade,
+                    'conversion_rate' => $kpis->conversionRate,
+                    'leads_closed' => $kpis->leadsClosed
+                ];
+            }
+
+            // Sort by conversions, then calls
+            usort($leaderboard, function($a, $b) {
+                if ($a['conversion_rate'] === $b['conversion_rate']) {
+                    return $b['calls_made'] <=> $a['calls_made'];
+                }
+                return $b['conversion_rate'] <=> $a['conversion_rate'];
+            });
+        }
 
         return Inertia::render('CRM/Workspaces/ManagerDashboard', [
             'branchKpis' => [
@@ -193,7 +235,56 @@ class WorkspaceController extends Controller
                 'active_agents' => $activeAgents
             ],
             'slaAlerts' => [
-                'total' => $slaBreaches
+                'total' => $slaBreaches,
+                'leads' => $staleLeads
+            ],
+            'leaderboard' => array_slice($leaderboard, 0, 10)
+        ]);
+    }
+
+    public function marketingWorkspace(Request $request): Response
+    {
+        $tenantId = session('tenant_id');
+        if (!$tenantId) {
+            $tenant = \Modules\ERP\Models\Tenant::where('user_id', $request->user()->id)->first();
+            $tenantId = $tenant ? $tenant->id : null;
+        }
+
+        $activeCampaigns = DB::table('crm_campaigns')
+            ->where('tenant_id', $tenantId)
+            ->where('status', 'ACTIVE')
+            ->count();
+
+        $leadsGeneratedToday = DB::table('leads')
+            ->where('tenant_id', $tenantId)
+            ->whereDate('created_at', now()->toDateString())
+            ->count();
+
+        return Inertia::render('CRM/Workspaces/MarketingDashboard', [
+            'stats' => [
+                'active_campaigns' => $activeCampaigns,
+                'leads_today' => $leadsGeneratedToday,
+                'cost_per_lead' => '$2.50',
+                'roi' => '125%'
+            ]
+        ]);
+    }
+
+    public function supportWorkspace(Request $request): Response
+    {
+        $tenantId = session('tenant_id');
+        if (!$tenantId) {
+            $tenant = \Modules\ERP\Models\Tenant::where('user_id', $request->user()->id)->first();
+            $tenantId = $tenant ? $tenant->id : null;
+        }
+
+        // Mock stats for support
+        return Inertia::render('CRM/Workspaces/SupportDashboard', [
+            'stats' => [
+                'open_tickets' => 12,
+                'avg_response_time' => '15m',
+                'unread_messages' => 34,
+                'resolved_today' => 45
             ]
         ]);
     }
