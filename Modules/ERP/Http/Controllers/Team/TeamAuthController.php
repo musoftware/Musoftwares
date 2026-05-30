@@ -57,7 +57,17 @@ class TeamAuthController extends Controller
         session(['tenant_id' => $member->tenant_id]);
         session(['erp_team_member_id' => $member->id]);
 
-        return redirect()->route('erp.dashboard')
+        $redirectRoute = match ($member->role) {
+            \Modules\ERP\Models\TeamMember::ROLE_SALES_AGENT => route('crm.workspaces.telesales'),
+            \Modules\ERP\Models\TeamMember::ROLE_CALL_CENTER => route('crm.workspaces.telesales'),
+            \Modules\ERP\Models\TeamMember::ROLE_SALES_MANAGER => route('crm.workspaces.manager'),
+            \Modules\ERP\Models\TeamMember::ROLE_MARKETING => route('crm.campaigns.index'),
+            \Modules\ERP\Models\TeamMember::ROLE_SUPPORT_AGENT => route('crm.whatsapp.inbox'), // Assuming whatsapp inbox is for support
+            \Modules\ERP\Models\TeamMember::ROLE_SUPPORT_MANAGER => route('crm.whatsapp.inbox'),
+            default => route('erp.dashboard'),
+        };
+
+        return redirect()->to($redirectRoute)
             ->with('success', 'Logged in successfully to workspace: ' . $member->tenant->name);
     }
 

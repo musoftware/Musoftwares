@@ -25,7 +25,8 @@ import {
     Lock,
     Unlock,
     UserPlus,
-    ArrowRight
+    ArrowRight,
+    AlertCircle
 } from 'lucide-react';
 import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
@@ -39,7 +40,8 @@ interface TeamMember {
     id: number;
     name: string;
     email: string;
-    role: 'manager' | 'member';
+    role: string;
+    role_label: string;
     status: 'active' | 'suspended';
     invited_at: string;
     last_login_at: string;
@@ -48,6 +50,11 @@ interface TeamMember {
 interface MembersProps {
     members: TeamMember[];
     hasFeature: boolean;
+    capacityLimit: number;
+    activeMembersCount: number;
+    hasAdvancedRolesAddon: boolean;
+    basicRoles: Record<string, string>;
+    advancedRoles: Record<string, string>;
     auth: {
         user: {
             name: string;
@@ -57,7 +64,7 @@ interface MembersProps {
     };
 }
 
-export default function Members({ members, hasFeature, auth }: MembersProps) {
+export default function Members({ members, hasFeature, capacityLimit, activeMembersCount, hasAdvancedRolesAddon, basicRoles, advancedRoles, auth }: MembersProps) {
     const [showInviteModal, setShowInviteModal] = useState(false);
     const [showEditModal, setShowEditModal] = useState(false);
     const [selectedMember, setSelectedMember] = useState<TeamMember | null>(null);
@@ -70,11 +77,11 @@ export default function Members({ members, hasFeature, auth }: MembersProps) {
         name: '',
         email: '',
         password: '',
-        role: 'member' as 'manager' | 'member',
+        role: 'sales_agent',
     });
 
     const editForm = useForm({
-        role: 'member' as 'manager' | 'member',
+        role: '',
         status: 'active' as 'active' | 'suspended',
     });
 
@@ -155,21 +162,38 @@ export default function Members({ members, hasFeature, auth }: MembersProps) {
                     <div>
                         <h2 className="text-2xl font-semibold text-slate-900 tracking-tight">Team Members</h2>
                         <p className="text-sm text-slate-500 mt-1">
-                            Invite team members to collaborate on projects, clients, and invoice scheduling.
+                            Invite team members and assign specific CRM roles and access levels.
                         </p>
                     </div>
-                    <Button 
-                        size="sm" 
-                        onClick={() => setShowInviteModal(true)} 
-                        className="shadow-sm bg-indigo-600 hover:bg-indigo-700 text-white font-semibold flex items-center gap-1.5"
-                    >
-                        <UserPlus className="h-4 w-4" /> Invite Member
-                    </Button>
+                    <div className="flex items-center gap-3">
+                        <div className="text-[13px] font-semibold text-slate-600 bg-white border border-slate-200 px-3 py-1.5 rounded-full shadow-sm flex items-center gap-2">
+                            <Users className="w-4 h-4 text-slate-400" />
+                            <span>
+                                <span className={activeMembersCount >= capacityLimit ? "text-rose-600" : "text-indigo-600"}>
+                                    {activeMembersCount}
+                                </span>
+                                {' '} / {capacityLimit} Seats Used
+                            </span>
+                        </div>
+                        {activeMembersCount >= capacityLimit ? (
+                            <Button size="sm" variant="outline" className="shadow-sm border-amber-200 bg-amber-50 text-amber-700 hover:bg-amber-100 flex items-center gap-1.5 cursor-not-allowed">
+                                <Lock className="h-3 w-3" /> Upgrade Capacity
+                            </Button>
+                        ) : (
+                            <Button 
+                                size="sm" 
+                                onClick={() => setShowInviteModal(true)} 
+                                className="shadow-sm bg-indigo-600 hover:bg-indigo-700 text-white font-semibold flex items-center gap-1.5"
+                            >
+                                <UserPlus className="h-4 w-4" /> Invite Member
+                            </Button>
+                        )}
+                    </div>
                 </div>
 
                 <div className="bg-indigo-50 border border-indigo-100 rounded-lg p-3 text-sm text-indigo-700 flex items-center gap-2">
                     <Key className="w-4 h-4" />
-                    <span>Your team members can log in at: <a href="/erp/team/login" target="_blank" className="font-bold hover:underline">{window.location.origin}/erp/team/login</a></span>
+                    <span>Your team members can log in to their specific workspace at: <a href="/crm/portal/login" target="_blank" className="font-bold hover:underline">{window.location.origin}/crm/portal/login</a></span>
                 </div>
 
                 {/* Team Members List */}
@@ -210,23 +234,19 @@ export default function Members({ members, hasFeature, auth }: MembersProps) {
                                                 {member.email}
                                             </td>
                                             <td className="px-6 py-4">
-                                                <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold uppercase tracking-wider ${
-                                                    member.role === 'manager' 
-                                                        ? 'bg-purple-50 text-purple-700' 
-                                                        : 'bg-blue-50 text-blue-700'
-                                                }`}>
-                                                    <Shield className="h-3 w-3" />
-                                                    {member.role}
+                                                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold tracking-wider bg-slate-100 text-slate-700 border border-slate-200">
+                                                    <Briefcase className="h-3 w-3 text-slate-500" />
+                                                    {member.role_label}
                                                 </span>
                                             </td>
                                             <td className="px-6 py-4">
-                                                <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold uppercase tracking-wider ${
+                                                <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold tracking-wider ${
                                                     member.status === 'active' 
-                                                        ? 'bg-emerald-50 text-emerald-700' 
-                                                        : 'bg-rose-50 text-rose-700'
+                                                        ? 'bg-emerald-50 text-emerald-700 border border-emerald-100' 
+                                                        : 'bg-rose-50 text-rose-700 border border-rose-100'
                                                 }`}>
                                                     {member.status === 'active' ? <Unlock className="h-3 w-3" /> : <Lock className="h-3 w-3" />}
-                                                    {member.status}
+                                                    {member.status === 'active' ? 'Active' : 'Suspended'}
                                                 </span>
                                             </td>
                                             <td className="px-6 py-4 text-slate-500 font-mono text-xs">
@@ -239,17 +259,17 @@ export default function Members({ members, hasFeature, auth }: MembersProps) {
                                                 <div className="flex items-center justify-end gap-2">
                                                     <button 
                                                         onClick={() => handleEditClick(member)}
-                                                        className="p-1 hover:bg-slate-100 rounded text-slate-500 transition-colors"
+                                                        className="p-1.5 hover:bg-slate-100 rounded text-slate-500 transition-colors"
                                                         title="Edit Role or Status"
                                                     >
-                                                        <Edit2 className="h-3.5 w-3.5" />
+                                                        <Edit2 className="h-4 w-4" />
                                                     </button>
                                                     <button 
                                                         onClick={() => handleDeleteClick(member)}
-                                                        className="p-1 hover:bg-rose-50 rounded text-rose-500 transition-colors"
+                                                        className="p-1.5 hover:bg-rose-50 rounded text-rose-500 transition-colors"
                                                         title="Delete Member"
                                                     >
-                                                        <Trash2 className="h-3.5 w-3.5" />
+                                                        <Trash2 className="h-4 w-4" />
                                                     </button>
                                                 </div>
                                             </td>
@@ -311,16 +331,32 @@ export default function Members({ members, hasFeature, auth }: MembersProps) {
                             </div>
 
                             <div className="space-y-1">
-                                <label className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Access Role</label>
+                                <label className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Access Role (Job Title)</label>
                                 <select 
                                     className="flex h-10 w-full rounded-md border border-slate-200 bg-background px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-slate-950 shadow-none"
                                     value={inviteForm.data.role}
-                                    onChange={e => inviteForm.setData('role', e.target.value as 'manager' | 'member')}
+                                    onChange={e => inviteForm.setData('role', e.target.value)}
                                 >
-                                    <option value="member">Member (Read-only on finances, full tasks)</option>
-                                    <option value="manager">Manager (Read/Write on finances and tasks)</option>
+                                    <optgroup label="Basic Roles">
+                                        {Object.entries(basicRoles).map(([key, label]) => (
+                                            <option key={key} value={key}>{label}</option>
+                                        ))}
+                                    </optgroup>
+                                    <optgroup label={hasAdvancedRolesAddon ? "Advanced Roles" : "Advanced Roles (Requires Addon)"}>
+                                        {Object.entries(advancedRoles).map(([key, label]) => (
+                                            <option key={key} value={key} disabled={!hasAdvancedRolesAddon}>
+                                                {label} {!hasAdvancedRolesAddon && "🔒"}
+                                            </option>
+                                        ))}
+                                    </optgroup>
                                 </select>
                                 {inviteForm.errors.role && <p className="text-xs text-rose-500">{inviteForm.errors.role}</p>}
+                                
+                                {!hasAdvancedRolesAddon && (
+                                    <p className="text-[11px] text-amber-600 mt-1 flex items-center gap-1">
+                                        <Lock className="w-3 h-3" /> Get the <strong>Advanced Roles</strong> addon to unlock Manager titles.
+                                    </p>
+                                )}
                             </div>
 
                             <div className="pt-4 border-t flex justify-end gap-2">
@@ -365,16 +401,32 @@ export default function Members({ members, hasFeature, auth }: MembersProps) {
                             </div>
 
                             <div className="space-y-1">
-                                <label className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Access Role</label>
+                                <label className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Access Role (Job Title)</label>
                                 <select 
                                     className="flex h-10 w-full rounded-md border border-slate-200 bg-background px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-slate-950 shadow-none"
                                     value={editForm.data.role}
-                                    onChange={e => editForm.setData('role', e.target.value as 'manager' | 'member')}
+                                    onChange={e => editForm.setData('role', e.target.value)}
                                 >
-                                    <option value="member">Member (Read-only on finances, full tasks)</option>
-                                    <option value="manager">Manager (Read/Write on finances and tasks)</option>
+                                    <optgroup label="Basic Roles">
+                                        {Object.entries(basicRoles).map(([key, label]) => (
+                                            <option key={key} value={key}>{label}</option>
+                                        ))}
+                                    </optgroup>
+                                    <optgroup label={hasAdvancedRolesAddon ? "Advanced Roles" : "Advanced Roles (Requires Addon)"}>
+                                        {Object.entries(advancedRoles).map(([key, label]) => (
+                                            <option key={key} value={key} disabled={!hasAdvancedRolesAddon}>
+                                                {label} {!hasAdvancedRolesAddon && "🔒"}
+                                            </option>
+                                        ))}
+                                    </optgroup>
                                 </select>
                                 {editForm.errors.role && <p className="text-xs text-rose-500">{editForm.errors.role}</p>}
+
+                                {!hasAdvancedRolesAddon && (
+                                    <p className="text-[11px] text-amber-600 mt-1 flex items-center gap-1">
+                                        <Lock className="w-3 h-3" /> Get the <strong>Advanced Roles</strong> addon to unlock Manager titles.
+                                    </p>
+                                )}
                             </div>
 
                             <div className="space-y-1">
@@ -388,6 +440,13 @@ export default function Members({ members, hasFeature, auth }: MembersProps) {
                                     <option value="suspended">Suspended (Access blocked)</option>
                                 </select>
                                 {editForm.errors.status && <p className="text-xs text-rose-500">{editForm.errors.status}</p>}
+                                
+                                {editForm.data.status === 'active' && selectedMember.status !== 'active' && activeMembersCount >= capacityLimit && (
+                                    <div className="mt-2 p-2 bg-rose-50 border border-rose-100 rounded text-rose-600 text-[11px] flex items-start gap-1.5">
+                                        <AlertCircle className="w-3.5 h-3.5 shrink-0 mt-0.5" />
+                                        <span>You cannot activate this user because you have reached your {capacityLimit}-user capacity limit. Upgrade your capacity to activate.</span>
+                                    </div>
+                                )}
                             </div>
 
                             <div className="pt-4 border-t flex justify-end gap-2">
@@ -403,7 +462,7 @@ export default function Members({ members, hasFeature, auth }: MembersProps) {
                                 <Button 
                                     type="submit" 
                                     size="sm" 
-                                    disabled={editForm.processing}
+                                    disabled={editForm.processing || (editForm.data.status === 'active' && selectedMember.status !== 'active' && activeMembersCount >= capacityLimit)}
                                     className="shadow-none bg-indigo-600 hover:bg-indigo-700 text-white font-semibold flex items-center gap-1.5"
                                 >
                                     {editForm.processing && <Loader2 className="h-3 w-3 animate-spin" />}

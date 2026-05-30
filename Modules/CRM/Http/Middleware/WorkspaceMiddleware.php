@@ -34,11 +34,15 @@ class WorkspaceMiddleware
                 session(['crm_workspace_id' => $workspace->id]);
                 $workspaceId = $workspace->id;
             } else {
-                // If they don't have a workspace, they can't access the CRM!
-                // We should probably auto-create one for them if they have a valid subscription.
-                // For now, abort or redirect to an onboarding page.
-                // In a production scenario, you would redirect to /crm/onboarding
-                return abort(403, __('crm.no_workspace_access'));
+                // Since the user already passed the 'subscription:crm' middleware, 
+                // they are authorized. Auto-create their default workspace.
+                $workspace = Workspace::create([
+                    'user_id' => $user->id,
+                    'name' => $user->name . "'s Workspace",
+                ]);
+                
+                session(['crm_workspace_id' => $workspace->id]);
+                $workspaceId = $workspace->id;
             }
         }
 

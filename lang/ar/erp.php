@@ -163,5 +163,23 @@ return [
     'payment_due_by' => 'يستحق الدفع بحلول :date',
     'payment_due_upon_receipt' => 'يستحق الدفع عند الاستلام.',
     'page_x_of_y' => 'صفحة {PAGE_NUM} من {PAGE_COUNT}',
-    'manual_wallet_transaction' => 'معاملة محفظة يدوية'
+    'manual_wallet_transaction' => 'معاملة محفظة يدوية',
+
+    // Team Roles & Capacity
+    'roles_admin' => 'مدير النظام',
+    'roles_sales_agent' => 'وكيل مبيعات',
+    'roles_sales_manager' => 'مدير مبيعات',
+    'roles_support_agent' => 'وكيل دعم فني',
+    'roles_support_manager' => 'مدير دعم فني',
+    'roles_marketing' => 'فريق التسويق',
+    'roles_call_center' => 'مركز الاتصال',
+    'roles_account_manager' => 'مدير حسابات',
+    'roles_branch_manager' => 'مدير فرع',
+    'roles_legacy_manager' => 'مدير (قديم)',
+    'roles_legacy_member' => 'عضو (قديم)',
+    'team_capacity_reached' => 'لقد وصلت إلى الحد الأقصى لسعة الفريق وهو :limit أعضاء. يرجى ترقية سعة الفريق لإضافة المزيد.',
+    'advanced_roles_addon_required' => 'الدور المحدد يتطلب إضافة الأدوار المتقدمة. يرجى الترقية لتعيين هذا الدور.',
+    'team_member_added' => 'تم إضافة عضو الفريق :name بنجاح.',
+    'team_member_updated' => 'تم تحديث تفاصيل عضو الفريق بنجاح.',
+    'team_member_removed' => 'تم إزالة عضو الفريق :name بنجاح.',
 ];

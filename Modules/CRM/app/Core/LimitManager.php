@@ -61,17 +61,20 @@ class LimitManager
         $workspace = Workspace::find($workspaceId);
         if (!$workspace || !$workspace->user_id) return $this->limits = [];
 
-        $subscription = UserSubscription::where('user_id', $workspace->user_id)
-            ->whereHas('plan', fn($q) => $q->where('module', 'crm'))
-            ->where('status', 'active')
-            ->with('plan')
-            ->first();
+        $owner = \App\Models\User::find($workspace->user_id);
+        if (!$owner) return $this->limits = [];
 
-        // The limits could be stored in a 'limits' json column on the plan, 
-        // or inside the 'features' json column as key-value pairs (e.g., 'max_leads' => 500).
-        // Assuming they are in 'features' for simplicity, or a dedicated 'limits' column if it exists.
-        // Let's use 'features' array since ModulePlan model has it casted.
-        $this->limits = $subscription->plan->features ?? [];
+        $subscriptionService = app(\App\Services\SubscriptionService::class);
+        $hasCrm = $subscriptionService->hasActiveSubscription($owner, 'crm');
+
+        if ($hasCrm) {
+             $this->limits = [
+                 'max_leads' => -1,
+                 'max_users' => -1,
+             ];
+        } else {
+             $this->limits = [];
+        }
 
         return $this->limits;
     }

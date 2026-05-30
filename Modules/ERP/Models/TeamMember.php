@@ -13,6 +13,20 @@ class TeamMember extends Authenticatable
 
     protected $table = 'erp_team_members';
 
+    public const ROLE_ADMIN = 'admin';
+    public const ROLE_SALES_AGENT = 'sales_agent';
+    public const ROLE_SALES_MANAGER = 'sales_manager';
+    public const ROLE_SUPPORT_AGENT = 'support_agent';
+    public const ROLE_SUPPORT_MANAGER = 'support_manager';
+    public const ROLE_MARKETING = 'marketing';
+    public const ROLE_CALL_CENTER = 'call_center';
+    public const ROLE_ACCOUNT_MANAGER = 'account_manager';
+    public const ROLE_BRANCH_MANAGER = 'branch_manager';
+
+    // Legacy roles
+    public const ROLE_LEGACY_MANAGER = 'manager';
+    public const ROLE_LEGACY_MEMBER = 'member';
+
     protected $fillable = [
         'tenant_id',
         'name',
@@ -39,6 +53,35 @@ class TeamMember extends Authenticatable
         ];
     }
 
+    public static function getBasicRoles(): array
+    {
+        return [
+            self::ROLE_ADMIN => __('erp.roles_admin'),
+            self::ROLE_SALES_AGENT => __('erp.roles_sales_agent'),
+        ];
+    }
+
+    public static function getAdvancedRoles(): array
+    {
+        return [
+            self::ROLE_SALES_MANAGER => __('erp.roles_sales_manager'),
+            self::ROLE_SUPPORT_AGENT => __('erp.roles_support_agent'),
+            self::ROLE_SUPPORT_MANAGER => __('erp.roles_support_manager'),
+            self::ROLE_MARKETING => __('erp.roles_marketing'),
+            self::ROLE_CALL_CENTER => __('erp.roles_call_center'),
+            self::ROLE_ACCOUNT_MANAGER => __('erp.roles_account_manager'),
+            self::ROLE_BRANCH_MANAGER => __('erp.roles_branch_manager'),
+        ];
+    }
+
+    public static function getAllRoles(): array
+    {
+        return array_merge(self::getBasicRoles(), self::getAdvancedRoles(), [
+            self::ROLE_LEGACY_MANAGER => __('erp.roles_legacy_manager'),
+            self::ROLE_LEGACY_MEMBER => __('erp.roles_legacy_member'),
+        ]);
+    }
+
     /**
      * Get the tenant that owns the team member.
      */
@@ -60,7 +103,13 @@ class TeamMember extends Authenticatable
      */
     public function isManager(): bool
     {
-        return $this->role === 'manager';
+        return in_array($this->role, [
+            self::ROLE_LEGACY_MANAGER,
+            self::ROLE_ADMIN,
+            self::ROLE_SALES_MANAGER,
+            self::ROLE_SUPPORT_MANAGER,
+            self::ROLE_BRANCH_MANAGER,
+        ]);
     }
 
     /**
@@ -68,7 +117,14 @@ class TeamMember extends Authenticatable
      */
     public function isMember(): bool
     {
-        return $this->role === 'member';
+        return in_array($this->role, [
+            self::ROLE_LEGACY_MEMBER,
+            self::ROLE_SALES_AGENT,
+            self::ROLE_SUPPORT_AGENT,
+            self::ROLE_CALL_CENTER,
+            self::ROLE_ACCOUNT_MANAGER,
+            self::ROLE_MARKETING,
+        ]);
     }
 
     /**

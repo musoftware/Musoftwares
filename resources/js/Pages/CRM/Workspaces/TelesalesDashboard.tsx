@@ -5,6 +5,7 @@ import ActivityFeed from '../Components/Widgets/ActivityFeed';
 import PipelineBoard from '../Components/Kanban/PipelineBoard';
 import { PhoneCall, CalendarAlert, Target, Zap } from 'lucide-react';
 import { __ } from '@/lib/i18n';
+import { Card, CardHeader, CardTitle, CardContent } from '@/Components/ui/card';
 
 export default function TelesalesDashboard({ pipeline, kpis }: { pipeline: any, kpis: any }) {
     return (
@@ -50,17 +51,17 @@ export default function TelesalesDashboard({ pipeline, kpis }: { pipeline: any, 
                 {/* Main Content Area (Pipeline & Activity Feed) */}
                 <div className="flex-1 flex gap-6 min-h-0">
                     {/* Kanban Pipeline */}
-                    <div className="flex-1 flex flex-col bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-                        <div className="p-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
-                            <h2 className="font-semibold text-slate-800">{__('Active Pipeline')}</h2>
+                    <Card className="flex-1 flex flex-col overflow-hidden border-slate-200 shadow-sm">
+                        <CardHeader className="p-4 border-b border-slate-100 flex flex-row justify-between items-center bg-slate-50/50 space-y-0">
+                            <CardTitle className="font-semibold text-slate-800">{__('Active Pipeline')}</CardTitle>
                             <button className="text-sm text-indigo-600 hover:text-indigo-700 font-medium transition-colors">
                                 {__('View All Leads')}
                             </button>
-                        </div>
-                        <div className="flex-1 p-4 overflow-hidden">
+                        </CardHeader>
+                        <CardContent className="flex-1 p-4 overflow-hidden">
                             <PipelineBoard />
-                        </div>
-                    </div>
+                        </CardContent>
+                    </Card>
 
                     {/* Right Sidebar (Live Feed) */}
                     <div className="w-80 hidden xl:block flex-shrink-0">

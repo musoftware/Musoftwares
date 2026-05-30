@@ -1,5 +1,6 @@
 import React from 'react';
 import { LucideIcon } from 'lucide-react';
+import { Card, CardContent } from '@/Components/ui/card';
 
 interface KPICardProps {
     title: string;
@@ -15,25 +16,27 @@ interface KPICardProps {
 
 export default function KPICard({ title, value, trend, icon: Icon, colorClass }: KPICardProps) {
     return (
-        <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-sm hover:shadow-md transition-shadow">
-            <div className="flex items-start justify-between">
-                <div>
-                    <p className="text-sm font-medium text-slate-500 mb-1">{title}</p>
-                    <h3 className="text-2xl font-bold text-slate-900">{value}</h3>
+        <Card className="hover:shadow-md transition-shadow">
+            <CardContent className="p-5">
+                <div className="flex items-start justify-between">
+                    <div>
+                        <p className="text-sm font-medium text-muted-foreground mb-1">{title}</p>
+                        <h3 className="text-2xl font-bold tracking-tight text-foreground">{value}</h3>
+                    </div>
+                    <div className={`p-3 rounded-lg ${colorClass}`}>
+                        <Icon size={20} />
+                    </div>
                 </div>
-                <div className={`p-3 rounded-lg ${colorClass}`}>
-                    <Icon size={20} />
-                </div>
-            </div>
-            
-            {trend && (
-                <div className="mt-4 flex items-center gap-2">
-                    <span className={`text-sm font-semibold ${trend.isPositive ? 'text-green-600' : 'text-red-600'}`}>
-                        {trend.isPositive ? '+' : '-'}{Math.abs(trend.value)}%
-                    </span>
-                    <span className="text-sm text-slate-500">{trend.label}</span>
-                </div>
-            )}
-        </div>
+                
+                {trend && (
+                    <div className="mt-4 flex items-center gap-2">
+                        <span className={`text-sm font-semibold ${trend.isPositive ? 'text-green-600' : 'text-red-600'}`}>
+                            {trend.isPositive ? '+' : '-'}{Math.abs(trend.value)}%
+                        </span>
+                        <span className="text-sm text-muted-foreground">{trend.label}</span>
+                    </div>
+                )}
+            </CardContent>
+        </Card>
     );
 }
