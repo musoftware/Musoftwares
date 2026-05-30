@@ -6,7 +6,7 @@ import {
     Zap, ArrowLeft, Calendar, Hash, ExternalLink,
     UserPlus, UserMinus, Heart, MessageSquare,
     ImageIcon, Shield, BadgeCheck, Lock, Globe2,
-    Loader2, Plus, Trash2, Check
+    Loader2, Plus, Trash2, Check, Database
 } from 'lucide-react';
 import { Button } from '@/Components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/Components/ui/select';
@@ -44,7 +44,7 @@ function UserCard({ user, idx }: { user: any; idx: number }) {
             <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 via-pink-500 to-orange-400 flex items-center justify-center text-white text-[10px] font-black shrink-0 shadow-sm">
                 {idx + 1}
             </div>
-            <div className="flex-1 grid grid-cols-2 md:grid-cols-5 gap-3 min-w-0 items-center">
+            <div className="flex-1 grid grid-cols-2 md:grid-cols-7 gap-3 min-w-0 items-center">
                 <div className="min-w-0">
                     <p className="text-[9px] font-black uppercase tracking-wider text-slate-400 mb-0.5">Username</p>
                     <p className="text-xs font-semibold text-slate-800 dark:text-slate-200 truncate flex items-center gap-1">
@@ -55,6 +55,14 @@ function UserCard({ user, idx }: { user: any; idx: number }) {
                 <div className="min-w-0">
                     <p className="text-[9px] font-black uppercase tracking-wider text-slate-400 mb-0.5">Full Name</p>
                     <p className="text-xs text-slate-600 dark:text-slate-400 truncate">{user.full_name || '—'}</p>
+                </div>
+                <div className="min-w-0">
+                    <p className="text-[9px] font-black uppercase tracking-wider text-slate-400 mb-0.5">Email</p>
+                    <p className="text-xs text-slate-600 dark:text-slate-400 truncate" title={user.email}>{user.email || '—'}</p>
+                </div>
+                <div className="min-w-0">
+                    <p className="text-[9px] font-black uppercase tracking-wider text-slate-400 mb-0.5">Phone</p>
+                    <p className="text-xs text-slate-600 dark:text-slate-400 truncate">{user.phone || '—'}</p>
                 </div>
                 <div className="min-w-0">
                     <p className="text-[9px] font-black uppercase tracking-wider text-slate-400 mb-0.5">Privacy</p>
@@ -118,8 +126,8 @@ function UsersTable({ users, status, onExport }: { users: any[]; status?: string
             </div>
 
             {/* Table header */}
-            <div className="hidden md:grid grid-cols-5 gap-3 px-5 py-2 bg-slate-50 dark:bg-slate-900/50 border-b border-slate-100 dark:border-slate-800" style={{ paddingLeft: 'calc(2rem + 1.25rem + 1rem)' }}>
-                {['Username', 'Full Name', 'Privacy', 'Source', 'Profile'].map(h => (
+            <div className="hidden md:grid grid-cols-7 gap-3 px-5 py-2 bg-slate-50 dark:bg-slate-900/50 border-b border-slate-100 dark:border-slate-800" style={{ paddingLeft: 'calc(2rem + 1.25rem + 1rem)' }}>
+                {['Username', 'Full Name', 'Email', 'Phone', 'Privacy', 'Source', 'Profile'].map(h => (
                     <p key={h} className="text-[9px] font-black uppercase tracking-wider text-slate-400">{h}</p>
                 ))}
             </div>
@@ -150,9 +158,10 @@ function UsersTable({ users, status, onExport }: { users: any[]; status?: string
 
 // ── CSV export ────────────────────────────────────────────────────────────────
 function exportCSV(users: any[], prefix = 'instagram-users') {
-    const header = 'Username,Full Name,Is Private,Is Verified,Follower Count,Source Type,Profile URL';
+    const header = 'Username,Full Name,Email,Phone,Website,Is Private,Is Verified,Follower Count,Source Type,Profile URL';
     const rows = users.map(u => [
-        u.username ?? '', u.full_name ?? '', u.is_private ? 'Yes' : 'No',
+        u.username ?? '', u.full_name ?? '', u.email ?? '', u.phone ?? '', u.website ?? '',
+        u.is_private ? 'Yes' : 'No',
         u.is_verified ? 'Yes' : 'No', u.follower_count ?? '',
         u.source_type ?? '', u.profile_url ?? ''
     ].map(v => `"${String(v).replace(/"/g, '""')}"`).join(','));
@@ -172,6 +181,12 @@ export default function InstagramRunner({ tool }: any) {
     const [extractionType, setExtractionType] = useState('followers');
     const [target, setTarget]   = useState('');
     const [limit, setLimit]     = useState(100);
+    
+    // Advanced Options
+    const [deepExtraction, setDeepExtraction] = useState(false);
+    const [skipPrivate, setSkipPrivate] = useState(false);
+    const [mustHaveEmail, setMustHaveEmail] = useState(false);
+    const [minFollowers, setMinFollowers] = useState<number | ''>('');
 
     // Run state
     const [status, setStatus]       = useState<'idle' | 'running' | 'done' | 'error'>('idle');
@@ -413,7 +428,53 @@ export default function InstagramRunner({ tool }: any) {
                 target,
                 limit,
                 campaignId: cid,
-                sessionId: selectedAccountId
+                sessionId: selectedAccountId,
+                options: {
+                    deepExtraction,
+                    skipPrivate,
+                    mustHaveEmail,
+                    minFollowers: Number(minFollowers) || 0
+                }
+            });
+        } catch (e: any) {
+            setStatus('error');
+            setError(e.message);
+        }
+    };
+
+    // ── Resume extraction ──
+    const handleResume = async (campaign: any) => {
+        if (!selectedAccountId) {
+            alert('Please select or add an Instagram account first.');
+            return;
+        }
+
+        setActiveTab('extract');
+        setExtractionType(campaign.type);
+        setTarget(campaign.target);
+        
+        setStatus('running');
+        setUsers([]);
+        setProgress(0);
+        setProgressMsg('Resuming...');
+        setError('');
+
+        campaignIdRef.current = campaign.id;
+
+        try {
+            await callRPC('instagram.extract.start', {
+                type: campaign.type,
+                target: campaign.target,
+                limit,
+                campaignId: campaign.id,
+                sessionId: selectedAccountId,
+                options: {
+                    deepExtraction,
+                    skipPrivate,
+                    mustHaveEmail,
+                    minFollowers: Number(minFollowers) || 0,
+                    resumeCursor: campaign.end_cursor
+                }
             });
         } catch (e: any) {
             setStatus('error');
@@ -596,52 +657,77 @@ export default function InstagramRunner({ tool }: any) {
                             <div className="grid grid-cols-1 md:grid-cols-[1fr_200px] gap-6 mb-8">
                                 {/* Account Selection */}
                                 <div className="md:col-span-2">
-                                    <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1.5">Selected Account</label>
-                                    <div className="flex gap-2">
-                                        <Select value={selectedAccountId} onValueChange={setSelectedAccountId}>
-                                            <SelectTrigger className="flex-1 h-11 bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800">
-                                                <SelectValue placeholder={loadingAccounts ? "Loading accounts..." : "Select an Instagram account"} />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                {accounts.map(acc => (
-                                                    <SelectItem key={acc.id} value={acc.id}>
-                                                        <div className="flex items-center justify-between w-full pr-4">
-                                                            <div className="flex items-center gap-2">
-                                                                {acc.profile_pic ? (
-                                                                    <img src={acc.profile_pic} alt="" className="w-5 h-5 rounded-full" />
-                                                                ) : (
-                                                                    <div className="w-5 h-5 rounded-full bg-indigo-100 text-indigo-500 flex items-center justify-center text-[10px] font-bold">
-                                                                        {acc.username?.[0]?.toUpperCase()}
-                                                                    </div>
-                                                                )}
-                                                                <span className="font-medium text-slate-800 dark:text-slate-200">@{acc.username}</span>
-                                                                {acc.full_name && <span className="text-xs text-slate-400 hidden sm:inline">- {acc.full_name}</span>}
-                                                            </div>
-                                                            <div
-                                                                role="button"
-                                                                onClick={(e) => handleDeleteAccount(acc.id, e)}
-                                                                className="opacity-50 hover:opacity-100 hover:text-red-500 transition-opacity ml-4"
-                                                            >
-                                                                <Trash2 className="w-3.5 h-3.5" />
-                                                            </div>
-                                                        </div>
-                                                    </SelectItem>
-                                                ))}
-                                                {accounts.length === 0 && (
-                                                    <div className="p-3 text-sm text-center text-slate-500">No accounts added yet.</div>
-                                                )}
-                                            </SelectContent>
-                                        </Select>
-                                        <Button
-                                            variant="outline"
-                                            onClick={handleAddAccount}
-                                            disabled={addingAccount}
-                                            className="h-11 px-4 border-slate-200 dark:border-slate-800"
-                                        >
-                                            {addingAccount ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4 mr-2" />}
-                                            {addingAccount ? '' : 'Add Account'}
-                                        </Button>
+                                    <div className="flex items-center justify-between mb-2">
+                                        <label className="text-[10px] font-black uppercase tracking-wider text-slate-400">Selected Account</label>
+                                        {accounts.length > 0 && (
+                                            <Button
+                                                variant="ghost" size="sm"
+                                                onClick={handleAddAccount}
+                                                disabled={addingAccount}
+                                                className="h-6 text-[10px] px-2 font-bold text-purple-600 hover:text-purple-700 hover:bg-purple-50 dark:hover:bg-purple-500/10"
+                                            >
+                                                {addingAccount ? <Loader2 className="w-3 h-3 animate-spin mr-1" /> : <Plus className="w-3 h-3 mr-1" />} Add Account
+                                            </Button>
+                                        )}
                                     </div>
+
+                                    {accounts.length === 0 ? (
+                                        <div className="border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-xl p-6 text-center bg-slate-50/50 dark:bg-slate-900/50">
+                                            <div className="w-10 h-10 bg-white dark:bg-slate-950 rounded-full flex items-center justify-center mx-auto mb-3 shadow-sm">
+                                                <Users className="w-5 h-5 text-slate-400" />
+                                            </div>
+                                            <h4 className="text-sm font-bold text-slate-800 dark:text-slate-200 mb-1">No accounts added</h4>
+                                            <p className="text-xs text-slate-500 mb-4 max-w-xs mx-auto">Add an Instagram account to start extracting data.</p>
+                                            <Button onClick={handleAddAccount} disabled={addingAccount} className="h-9 px-4 bg-slate-900 hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-200 text-white dark:text-slate-900 text-xs font-bold">
+                                                {addingAccount ? <Loader2 className="w-3 h-3 animate-spin mr-1.5" /> : <Plus className="w-3 h-3 mr-1.5" />} Add Account
+                                            </Button>
+                                        </div>
+                                    ) : (
+                                        <div className="flex gap-3 overflow-x-auto pb-2 -mx-1 px-1 snap-x scrollbar-thin scrollbar-thumb-slate-200 dark:scrollbar-thumb-slate-800">
+                                            {accounts.map(acc => {
+                                                const isSelected = selectedAccountId === acc.id;
+                                                return (
+                                                    <div 
+                                                        key={acc.id}
+                                                        onClick={() => setSelectedAccountId(acc.id)}
+                                                        className={`group relative flex items-center gap-3 p-3 rounded-xl border-2 cursor-pointer transition-all shrink-0 w-[240px] snap-center ${
+                                                            isSelected 
+                                                                ? 'border-purple-500 bg-purple-50/50 dark:bg-purple-500/10 shadow-sm' 
+                                                                : 'border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 bg-white dark:bg-slate-950'
+                                                        }`}
+                                                    >
+                                                        {isSelected && (
+                                                            <div className="absolute -top-2 -right-2 w-5 h-5 bg-purple-500 rounded-full flex items-center justify-center text-white shadow-sm border-2 border-white dark:border-slate-900 z-10">
+                                                                <Check className="w-3 h-3" strokeWidth={3} />
+                                                            </div>
+                                                        )}
+                                                        
+                                                        {acc.profile_pic ? (
+                                                            <img src={acc.profile_pic} alt="" className="w-10 h-10 rounded-full object-cover border border-slate-100 dark:border-slate-800 shrink-0" />
+                                                        ) : (
+                                                            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-100 to-purple-100 text-indigo-600 flex items-center justify-center text-sm font-bold border border-indigo-200 shrink-0">
+                                                                {acc.username?.[0]?.toUpperCase()}
+                                                            </div>
+                                                        )}
+                                                        <div className="min-w-0 flex-1">
+                                                            <p className="text-sm font-bold text-slate-800 dark:text-slate-200 truncate">@{acc.username}</p>
+                                                            <p className="text-[10px] text-slate-500 truncate">{acc.full_name || 'Instagram Account'}</p>
+                                                        </div>
+                                                        
+                                                        <button
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                handleDeleteAccount(acc.id, e);
+                                                            }}
+                                                            className="opacity-0 group-hover:opacity-100 bg-white dark:bg-slate-900 hover:bg-red-50 dark:hover:bg-red-900/30 p-1.5 rounded-md text-slate-400 hover:text-red-500 transition-all absolute right-2 shadow-sm border border-slate-100 dark:border-slate-800"
+                                                        >
+                                                            <Trash2 className="w-3.5 h-3.5" />
+                                                        </button>
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
+                                    )}
                                     <p className="text-[10px] text-slate-400 mt-2">
                                         Note: If you have multiple Chrome profiles open, the system will automatically pull the logged-in Instagram account from all of them at once.
                                     </p>
@@ -675,6 +761,37 @@ export default function InstagramRunner({ tool }: any) {
                                             onChange={e => setLimit(parseInt(e.target.value, 10))}
                                             className="pl-9 h-11 text-sm bg-slate-50 dark:bg-slate-900"
                                         />
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Advanced Settings */}
+                            <div className="bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4">
+                                <h4 className="text-xs font-bold text-slate-800 dark:text-slate-200 mb-3 uppercase tracking-wide flex items-center gap-2">
+                                    <Database className="w-3.5 h-3.5 text-purple-500" /> Advanced Settings & Filtering
+                                </h4>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <label className="flex items-start gap-2 cursor-pointer">
+                                        <input type="checkbox" className="mt-1 rounded border-slate-300" checked={deepExtraction} onChange={e => setDeepExtraction(e.target.checked)} />
+                                        <div>
+                                            <p className="text-sm font-bold text-slate-700 dark:text-slate-300">Deep Extraction (Enrichment)</p>
+                                            <p className="text-[10px] text-slate-400 leading-tight mt-0.5">Visits each profile to extract Bio, Email, and Phone. Slower & uses more API requests.</p>
+                                        </div>
+                                    </label>
+                                    <label className="flex items-start gap-2 cursor-pointer">
+                                        <input type="checkbox" className="mt-1 rounded border-slate-300" checked={mustHaveEmail} onChange={e => setMustHaveEmail(e.target.checked)} />
+                                        <div>
+                                            <p className="text-sm font-bold text-slate-700 dark:text-slate-300">Must Have Email/Phone</p>
+                                            <p className="text-[10px] text-slate-400 leading-tight mt-0.5">Skip users who don't have an email or phone in their bio. (Requires Deep Extraction).</p>
+                                        </div>
+                                    </label>
+                                    <label className="flex items-center gap-2 cursor-pointer">
+                                        <input type="checkbox" className="rounded border-slate-300" checked={skipPrivate} onChange={e => setSkipPrivate(e.target.checked)} />
+                                        <span className="text-sm font-bold text-slate-700 dark:text-slate-300">Skip Private Accounts</span>
+                                    </label>
+                                    <div className="flex items-center gap-2">
+                                        <span className="text-sm font-bold text-slate-700 dark:text-slate-300">Min Followers:</span>
+                                        <Input type="number" min="0" value={minFollowers} onChange={e => setMinFollowers(e.target.value === '' ? '' : Number(e.target.value))} className="h-8 w-24 text-xs" placeholder="e.g. 1000" />
                                     </div>
                                 </div>
                             </div>
@@ -801,7 +918,17 @@ export default function InstagramRunner({ tool }: any) {
                                                 </span>
                                             </div>
                                         </div>
-                                        {statusBadge(selectedCampaign.status)}
+                                        <div className="flex items-center gap-3">
+                                            {selectedCampaign.status === 'stopped' && (
+                                                <Button
+                                                    onClick={() => handleResume(selectedCampaign)}
+                                                    className="h-8 gap-1.5 px-3 bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold"
+                                                >
+                                                    <Play className="w-3 h-3" /> Resume
+                                                </Button>
+                                            )}
+                                            {statusBadge(selectedCampaign.status)}
+                                        </div>
                                     </div>
 
                                     {campaignUsers.length > 0 && (
