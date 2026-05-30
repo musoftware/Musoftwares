@@ -6,13 +6,15 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\CleansLeadData;
 use Modules\CRM\app\Traits\BelongsToWorkspace;
+use Modules\CRM\Infrastructure\Authorization\HasEnterpriseVisibility;
 
 class Lead extends Model
 {
-    use HasFactory, \Illuminate\Database\Eloquent\SoftDeletes, CleansLeadData, BelongsToWorkspace;
+    use HasFactory, \Illuminate\Database\Eloquent\SoftDeletes, CleansLeadData, BelongsToWorkspace, HasEnterpriseVisibility;
 
     protected $fillable = [
         'workspace_id',
+        'branch_id',
         'campaign_id',
         'source',
         'name',
@@ -95,5 +97,13 @@ class Lead extends Model
     public function assignee()
     {
         return $this->belongsTo(\App\Models\User::class, 'assigned_to');
+    }
+
+    /**
+     * Get the branch this lead belongs to
+     */
+    public function branch()
+    {
+        return $this->belongsTo(Branch::class);
     }
 }
