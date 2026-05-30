@@ -344,28 +344,28 @@ export default function Dashboard({
 
                     {/* Recent Transactions (4-col equivalent) */}
                     <div className="lg:col-span-1">
-                        <div className="bg-slate-900 rounded-xl border border-slate-800 shadow-sm p-6 h-full text-white flex flex-col">
-                            <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-white/10 text-white/70 mb-2 w-fit">
+                        <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6 h-full flex flex-col">
+                            <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-slate-100 text-slate-600 mb-2 border border-slate-200 w-fit">
                                 Recent Ledger
                             </span>
-                            <h2 className="text-xl font-bold text-white mb-6">Latest Transactions</h2>
+                            <h2 className="text-xl font-bold text-slate-900 mb-6">Latest Transactions</h2>
                             
                             <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar">
                                 {activityFeedItems.length === 0 ? (
                                     <div className="text-center py-6">
-                                        <Inbox className="w-8 h-8 text-white/20 mx-auto mb-2" />
-                                        <p className="text-sm text-white/50">No transactions yet.</p>
+                                        <Inbox className="w-8 h-8 text-slate-300 mx-auto mb-2" />
+                                        <p className="text-sm text-slate-500">No transactions yet.</p>
                                     </div>
                                 ) : (
                                     <div className="space-y-4">
                                         {activityFeedItems.slice(0, 5).map((txn) => (
-                                            <div key={txn.id} className="flex items-start gap-3 pb-4 border-b border-white/10 last:border-0">
-                                                <div className={cn("w-8 h-8 rounded-full flex items-center justify-center shrink-0", txn.color === 'emerald' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-amber-500/20 text-amber-400')}>
+                                            <div key={txn.id} className="flex items-start gap-3 pb-4 border-b border-slate-100 last:border-0">
+                                                <div className={cn("w-8 h-8 rounded-full flex items-center justify-center shrink-0", txn.color === 'emerald' ? 'bg-emerald-100 text-emerald-600' : 'bg-amber-100 text-amber-600')}>
                                                     {txn.icon === 'wallet' ? <Wallet className="w-4 h-4" /> : <History className="w-4 h-4" />}
                                                 </div>
                                                 <div>
-                                                    <p className="text-sm font-medium text-white/90 leading-tight">{txn.description}</p>
-                                                    <p className="text-xs text-white/40 mt-1">{txn.created_at}</p>
+                                                    <p className="text-sm font-medium text-slate-900 leading-tight">{txn.description}</p>
+                                                    <p className="text-xs text-slate-500 mt-1">{txn.created_at}</p>
                                                 </div>
                                             </div>
                                         ))}
@@ -373,10 +373,10 @@ export default function Dashboard({
                                 )}
                             </div>
                             
-                            <div className="pt-4 mt-auto border-t border-white/10">
+                            <div className="pt-4 mt-auto border-t border-slate-100">
                                 <Link 
                                     href={safeRoute('erp.clients.wallet.index', user?.id || 1, `/erp/clients/${user?.id || 1}/wallet`)} 
-                                    className="flex items-center justify-center w-full py-2.5 rounded-lg border border-white/20 hover:bg-white/10 transition-colors text-sm font-medium text-white"
+                                    className="flex items-center justify-center w-full py-2.5 rounded-lg border border-slate-200 hover:bg-slate-50 transition-colors text-sm font-medium text-slate-700 hover:text-slate-900"
                                 >
                                     View Full History
                                 </Link>

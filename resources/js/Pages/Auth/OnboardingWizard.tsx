@@ -22,7 +22,6 @@ interface UserData {
     mobile_1: string;
     mobile_2: string;
     telegram_username: string;
-    whatsapp_number: string;
     preferred_currency: string;
     preferred_currency_locked_at: string | null;
 }
@@ -40,7 +39,6 @@ export default function OnboardingWizard({ user, countries }: Props) {
         mobile_1: user.mobile_1 || '',
         mobile_2: user.mobile_2 || '',
         telegram_username: user.telegram_username || '',
-        whatsapp_number: user.whatsapp_number || '',
     });
 
     const [errors, setErrors] = useState<Record<string, string>>({});
@@ -326,20 +324,6 @@ export default function OnboardingWizard({ user, countries }: Props) {
                                                     className="h-10 text-sm font-medium pl-8"
                                                 />
                                             </div>
-                                        </div>
-
-                                        {/* WhatsApp */}
-                                        <div className="space-y-2">
-                                            <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center space-x-1.5">
-                                                <MessageSquare className="w-3.5 h-3.5 text-emerald-500" />
-                                                <span>WhatsApp Number</span>
-                                            </label>
-                                            <Input
-                                                placeholder="+1 (555) 123-4567"
-                                                value={formData.whatsapp_number}
-                                                onChange={(e) => setFormData(prev => ({ ...prev, whatsapp_number: e.target.value }))}
-                                                className="h-10 text-sm font-medium"
-                                            />
                                         </div>
                                     </div>
                                 </CardContent>

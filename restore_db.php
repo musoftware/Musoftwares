@@ -14,7 +14,7 @@ Artisan::call('db:wipe', ['--force' => true]);
 echo trim(Artisan::output()) . "\n\n";
 
 echo "2. Importing SQL File...\n";
-$sqlPath = __DIR__.'/u962989541_db (3).sql';
+$sqlPath = __DIR__.'/u962989541_db (4).sql';
 
 if (!file_exists($sqlPath)) {
     die("ERROR: SQL File not found: {$sqlPath}\n");
@@ -62,9 +62,17 @@ if ($returnVar !== 0) {
         die("PDO Import failed: " . $e->getMessage() . "\n");
     }
 } else {
-    echo "SQL Import finished successfully.\n";
+echo "SQL Import finished successfully.\n";
 }
 
+echo "\n2.5 Migrating whatsapp_number to mobile_1 (if exists)...\n";
+try {
+    DB::statement("UPDATE users SET mobile_1 = whatsapp_number WHERE (mobile_1 IS NULL OR mobile_1 = '') AND whatsapp_number IS NOT NULL AND whatsapp_number != '';");
+    DB::statement("ALTER TABLE users DROP COLUMN whatsapp_number;");
+    echo "Migrated and dropped whatsapp_number column.\n";
+} catch (\Exception $e) {
+    echo "No whatsapp_number column to migrate (or already dropped).\n";
+}
 echo "\n3. Running migrations to update the schema...\n";
 Artisan::call('migrate', ['--force' => true]);
 echo trim(Artisan::output()) . "\n\n";

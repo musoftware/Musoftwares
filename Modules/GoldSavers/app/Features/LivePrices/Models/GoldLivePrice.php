@@ -62,6 +62,11 @@ class GoldLivePrice extends Model
         return $this->belongsTo(GoldMarketSource::class, 'source_id');
     }
 
+    public function currency()
+    {
+        return $this->belongsTo(\App\Models\Currency::class, 'currency_id');
+    }
+
     // ─── Scopes ─────────────────────────────────────────────────────────────────
 
     public function scopeForTenant($query, int $tenantId)

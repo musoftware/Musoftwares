@@ -72,7 +72,6 @@ class OnboardingController extends Controller
                 'mobile_1' => $user->mobile_1 ?: '',
                 'mobile_2' => $user->mobile_2 ?: '',
                 'telegram_username' => $user->telegram_username ?: '',
-                'whatsapp_number' => $user->whatsapp_number ?: '',
             ],
             'countries' => $countries,
         ]);
@@ -96,7 +95,6 @@ class OnboardingController extends Controller
             $rules['mobile_1'] = ['required', 'string', 'max:50'];
             $rules['mobile_2'] = ['nullable', 'string', 'max:50'];
             $rules['telegram_username'] = ['nullable', 'string', 'max:100'];
-            $rules['whatsapp_number'] = ['nullable', 'string', 'max:50'];
         }
 
 

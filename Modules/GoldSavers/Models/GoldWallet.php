@@ -27,6 +27,11 @@ class GoldWallet extends Model
         return $this->hasMany(GoldTransaction::class, 'wallet_id');
     }
 
+    public function currency()
+    {
+        return $this->belongsTo(\App\Models\Currency::class, 'currency_id');
+    }
+
     public function recalculateBalance()
     {
         $this->balance_grams = 0;
