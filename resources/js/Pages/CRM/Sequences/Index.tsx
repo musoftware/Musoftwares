@@ -1,6 +1,6 @@
 import React from 'react';
 import { Head, Link, router, usePage } from '@inertiajs/react';
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import CrmLayout from '@/Layouts/CrmLayout';
 import { Button } from '@/Components/ui/button';
 import { Trash2, Edit, Plus, Users, GitMerge } from 'lucide-react';
 import {
@@ -37,10 +37,7 @@ export default function Index({ sequences }) {
     };
 
     return (
-        <AuthenticatedLayout 
-            user={auth.user} 
-            header={<h2 className="font-semibold text-xl text-slate-800 leading-tight">Sequences (Drip Campaigns)</h2>}
-        >
+        <CrmLayout title="Sequences (Drip Campaigns)" activeMenu="sequences">
             <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
             <div className="mb-6 flex justify-end">
                 <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
@@ -137,6 +134,6 @@ export default function Index({ sequences }) {
                 )}
             </div>
             </div>
-        </AuthenticatedLayout>
+        </CrmLayout>
     );
 }

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Head, Link, router, usePage } from '@inertiajs/react';
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import CrmLayout from '@/Layouts/CrmLayout';
 import { Button } from '@/Components/ui/button';
 import { Save, Sparkles, Send, PlayCircle, PauseCircle, Clock, CheckCircle2, Loader2, AlertCircle } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/Components/ui/card';
@@ -71,10 +71,7 @@ export default function Show({ campaign }) {
     const isEditable = campaign.status === 'draft';
 
     return (
-        <AuthenticatedLayout 
-            user={auth.user} 
-            header={<h2 className="font-semibold text-xl text-slate-800 leading-tight">Campaign Builder: {campaign.name}</h2>}
-        >
+        <CrmLayout title={`Campaign Builder: ${campaign.name}`} activeMenu="campaigns">
             <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
             <div className="mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
@@ -248,6 +245,6 @@ export default function Show({ campaign }) {
                 </div>
             )}
             </div>
-        </AuthenticatedLayout>
+        </CrmLayout>
     );
 }

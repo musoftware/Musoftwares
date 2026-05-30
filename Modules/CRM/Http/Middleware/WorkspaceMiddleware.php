@@ -43,7 +43,14 @@ class WorkspaceMiddleware
         }
 
         // Add the workspace ID to the TenantContext singleton
-        app(TenantContext::class)->setWorkspaceId($workspaceId);
+        $tenantContext = app(TenantContext::class);
+        $tenantContext->setWorkspaceId($workspaceId);
+
+        // Check and set branch_id if applicable
+        $branchId = session('crm_branch_id');
+        if ($branchId) {
+            $tenantContext->setBranchId($branchId);
+        }
 
         return $next($request);
     }
