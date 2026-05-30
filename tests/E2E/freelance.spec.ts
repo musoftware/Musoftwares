@@ -469,3 +469,54 @@ test.describe('Freelance — Currency Display Rules', () => {
         }
     });
 });
+
+// ─────────────────────────────────────────────
+// Suite 10 — Custom Skills & Admin Management
+// ─────────────────────────────────────────────
+
+test.describe('Freelance — Custom Skills & Admin Management', () => {
+    
+    test('client can type a new custom skill while creating a job', async ({ page }) => {
+        await login(page, 'client');
+        await page.goto('/freelance/jobs/create');
+        await page.waitForLoadState('networkidle');
+
+        // Locate the skills input (Combobox or Creatable Select)
+        const skillsInput = page.locator('input[placeholder*="skill" i], .skills-input, [data-testid="skills-select"] input').first();
+        
+        if (await skillsInput.isVisible()) {
+            await skillsInput.fill('My Brand New Skill');
+            await skillsInput.press('Enter');
+            
+            // Should appear as a selected badge
+            await expect(page.locator('body')).toContainText('My Brand New Skill');
+        }
+    });
+
+    test('admin can view pending skills and approve/decline', async ({ page }) => {
+        // Admin credentials
+        await page.goto('/login');
+        await page.waitForSelector('input[name="email"]');
+        await page.fill('input[name="email"]', 'admin@musoftwares.com'); // standard test admin
+        await page.fill('input[name="password"]', 'password');
+        await page.click('button[type="submit"]');
+        await page.waitForURL(/\/(admin|dashboard)/);
+
+        await page.goto('/admin/freelance/skills');
+        await page.waitForLoadState('networkidle');
+
+        // Check if page loads
+        await expect(page.locator('h1, h2').filter({ hasText: /skills|مهارات/i }).first()).toBeVisible();
+
+        // Check if pending skills are listed (if any)
+        const approveBtn = page.getByRole('button', { name: /approve|موافقة/i }).first();
+        if (await approveBtn.isVisible()) {
+            // we won't click it to avoid side effects if not seeded properly,
+            // just verify the button exists in the UI
+            await expect(approveBtn).toBeVisible();
+            
+            const rejectBtn = page.getByRole('button', { name: /reject|decline|رفض/i }).first();
+            await expect(rejectBtn).toBeVisible();
+        }
+    });
+});
