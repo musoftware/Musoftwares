@@ -222,7 +222,7 @@ return [
             '9a95a2ab-42c7-4a8e-bc47-79b8e3e5470d' => [
                 'guid' => '9a95a2ab-42c7-4a8e-bc47-79b8e3e5470d',
                 'name' => 'Starter',
-                'price_monthly' => 100,
+                'price_monthly' => 250,
                 'price_yearly' => 0,
                 'is_popular' => false,
                 'features' => array (
@@ -234,7 +234,7 @@ return [
             'd71b5ed6-e3df-43d5-b14c-333fd4f32d17' => [
                 'guid' => 'd71b5ed6-e3df-43d5-b14c-333fd4f32d17',
                 'name' => 'Enterprise',
-                'price_monthly' => 100,
+                'price_monthly' => 250,
                 'price_yearly' => 0,
                 'is_popular' => true,
                 'features' => array (
@@ -1102,8 +1102,8 @@ Not copying content — copying the psychology.
         'plans' => [
             'a1b2c3d4-2222-4aaa-bbbb-222222222223' => [
                 'guid' => 'a1b2c3d4-2222-4aaa-bbbb-222222222223',
-                'name' => 'Free',
-                'price_monthly' => 100,
+                'name' => 'Pro',
+                'price_monthly' => 350,
                 'price_yearly' => 0,
                 'is_popular' => true,
                 'features' => [
@@ -1196,7 +1196,7 @@ Not copying content — copying the psychology.
             'a1b2c3d4-4444-4aaa-bbbb-444444444445' => [
                 'guid' => 'a1b2c3d4-4444-4aaa-bbbb-444444444445',
                 'name' => 'Free',
-                'price_monthly' => 100,
+                'price_monthly' => 250,
                 'price_yearly' => 0,
                 'is_popular' => true,
                 'features' => [
@@ -1244,7 +1244,7 @@ Not copying content — copying the psychology.
             'a1b2c3d4-5555-4aaa-bbbb-555555555556' => [
                 'guid' => 'a1b2c3d4-5555-4aaa-bbbb-555555555556',
                 'name' => 'Free',
-                'price_monthly' => 100,
+                'price_monthly' => 250,
                 'price_yearly' => 0,
                 'is_popular' => true,
                 'features' => [
@@ -1292,7 +1292,7 @@ Not copying content — copying the psychology.
             'a1b2c3d4-6666-4aaa-bbbb-666666666667' => [
                 'guid' => 'a1b2c3d4-6666-4aaa-bbbb-666666666667',
                 'name' => 'Free',
-                'price_monthly' => 100,
+                'price_monthly' => 250,
                 'price_yearly' => 0,
                 'is_popular' => true,
                 'features' => [

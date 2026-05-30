@@ -65,6 +65,14 @@ class SubscriptionService
             return true;
         }
 
+        if ($tool && $user->hasModuleSubscription('tool-' . $tool['guid'])) {
+            return true;
+        }
+
+        if ($tool && $user->hasModuleSubscription('TOOL-' . strtoupper($tool['guid']))) {
+            return true;
+        }
+
         // 4. Check if user has the global 'tools' module subscription (Platform Pass)
         if ($user->hasModuleSubscription('tools')) {
             return true;
