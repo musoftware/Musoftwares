@@ -7,16 +7,18 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
 use Modules\CRM\app\Traits\BelongsToWorkspace;
+use Modules\CRM\Infrastructure\Authorization\HasEnterpriseVisibility;
 
 class WhatsAppConversation extends Model
 {
-    use HasFactory, SoftDeletes, BelongsToWorkspace;
+    use HasFactory, SoftDeletes, BelongsToWorkspace, HasEnterpriseVisibility;
 
     protected $table = 'crm_whatsapp_conversations';
 
     protected $fillable = [
         'uuid',
         'workspace_id',
+        'branch_id',
         'account_id',
         'contact_phone',
         'contact_name',
@@ -175,5 +177,13 @@ class WhatsAppConversation extends Model
     public function markAsRead(): void
     {
         $this->update(['unread_count' => 0]);
+    }
+
+    /**
+     * Get the branch this conversation belongs to
+     */
+    public function branch()
+    {
+        return $this->belongsTo(Branch::class);
     }
 }
