@@ -75,7 +75,7 @@ class WhatsAppCampaignService
     public function update(WhatsAppCampaign $campaign, array $data): WhatsAppCampaign
     {
         if (!in_array($campaign->status, ['draft', 'paused'])) {
-            throw new \RuntimeException('Campaign can only be edited in draft or paused state.');
+            throw new \RuntimeException(__('crm.campaign_edit_state_error'));
         }
 
         $campaign->update($data);
@@ -116,7 +116,7 @@ class WhatsAppCampaignService
     public function schedule(WhatsAppCampaign $campaign, \Carbon\Carbon $scheduledAt): WhatsAppCampaign
     {
         if (!$campaign->isDraft()) {
-            throw new \RuntimeException('Only draft campaigns can be scheduled.');
+            throw new \RuntimeException(__('crm.campaign_schedule_draft_error'));
         }
 
         $this->validateBeforeStart($campaign);
@@ -137,7 +137,7 @@ class WhatsAppCampaignService
     public function pause(WhatsAppCampaign $campaign): WhatsAppCampaign
     {
         if (!$campaign->canPause()) {
-            throw new \RuntimeException('Campaign is not running.');
+            throw new \RuntimeException(__('crm.campaign_not_running'));
         }
 
         $campaign->update([
@@ -156,7 +156,7 @@ class WhatsAppCampaignService
     public function resume(WhatsAppCampaign $campaign): WhatsAppCampaign
     {
         if (!$campaign->canResume()) {
-            throw new \RuntimeException('Campaign is not paused.');
+            throw new \RuntimeException(__('crm.campaign_not_paused'));
         }
 
         $campaign->update([
@@ -178,7 +178,7 @@ class WhatsAppCampaignService
     public function cancel(WhatsAppCampaign $campaign): WhatsAppCampaign
     {
         if (!$campaign->canCancel()) {
-            throw new \RuntimeException('Campaign cannot be cancelled in current state.');
+            throw new \RuntimeException(__('crm.campaign_cancel_state_error'));
         }
 
         $campaign->update([
@@ -260,7 +260,7 @@ class WhatsAppCampaignService
         }
 
         if (!empty($errors)) {
-            throw new \RuntimeException('Campaign validation failed: ' . implode(' ', $errors));
+            throw new \RuntimeException(__('crm.campaign_validation_failed', ['errors' => implode(' ', $errors)]));
         }
     }
 

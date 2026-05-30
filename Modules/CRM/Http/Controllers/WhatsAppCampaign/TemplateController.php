@@ -29,19 +29,19 @@ class TemplateController extends Controller
             'created_by'   => auth()->id(),
         ]));
 
-        return redirect()->back()->with('success', 'Template created.');
+        return redirect()->back()->with('success', __('crm.template_created'));
     }
 
     public function update(StoreTemplateRequest $request, WhatsAppCampaignTemplate $template)
     {
         $template->update($request->validated());
-        return redirect()->back()->with('success', 'Template updated.');
+        return redirect()->back()->with('success', __('crm.template_updated'));
     }
 
     public function destroy(WhatsAppCampaignTemplate $template)
     {
         $template->delete();
-        return redirect()->back()->with('success', 'Template deleted.');
+        return redirect()->back()->with('success', __('crm.template_deleted'));
     }
 
     public function preview(PreviewTemplateRequest $request)

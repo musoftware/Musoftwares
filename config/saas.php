@@ -45,10 +45,10 @@ return [
         'booking-smart-slots' => ['price' => 500, 'name' => 'Smart Suggestions', 'desc' => 'Earliest available & best match', 'icon' => 'Zap', 'parent' => 'booking'],
 
         // ── CRM (Enterprise Operations Bundles) ──
-        'crm-sales-staff' => ['price' => 2000, 'name' => 'Sales Staff Operations', 'desc' => 'Lead collection, pipelines, and basic telesales', 'icon' => 'Users', 'parent' => 'crm'],
-        'crm-sales-management' => ['price' => 3000, 'name' => 'Sales Management & Tracking', 'desc' => 'KPIs, SLA monitoring, and branch analytics', 'icon' => 'Activity', 'parent' => 'crm'],
-        'crm-call-center' => ['price' => 4000, 'name' => 'Enterprise Call Center', 'desc' => 'Dial queues, QA, and advanced telephony', 'icon' => 'Headset', 'parent' => 'crm'],
-        'crm-advanced-operations' => ['price' => 5000, 'name' => 'Advanced Operations & Workflows', 'desc' => 'Automations, webhooks, and SLA routing engines', 'icon' => 'Settings', 'parent' => 'crm'],
+        'crm-sales-staff' => ['price' => 200, 'name' => 'Sales Staff Operations', 'desc' => 'Lead collection, pipelines, and basic telesales', 'icon' => 'Users', 'parent' => 'crm'],
+        'crm-sales-management' => ['price' => 300, 'name' => 'Sales Management & Tracking', 'desc' => 'KPIs, SLA monitoring, and branch analytics', 'icon' => 'Activity', 'parent' => 'crm'],
+        'crm-call-center' => ['price' => 400, 'name' => 'Enterprise Call Center', 'desc' => 'Dial queues, QA, and advanced telephony', 'icon' => 'Headset', 'parent' => 'crm'],
+        'crm-advanced-operations' => ['price' => 500, 'name' => 'Advanced Operations & Workflows', 'desc' => 'Automations, webhooks, and SLA routing engines', 'icon' => 'Settings', 'parent' => 'crm'],
 
         // ── ERP ──
         'erp-projects' => ['price' => 500, 'name' => 'Projects Management', 'desc' => 'Track client projects and budgets', 'icon' => 'Briefcase', 'parent' => 'erp'],

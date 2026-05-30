@@ -1,70 +1,74 @@
 import React from 'react';
-import AppLayout from '@/Layouts/AppLayout';
-import { Card, CardHeader, CardTitle, CardContent } from '@/Components/ui/card';
-import { Phone, Clock, CheckCircle } from 'lucide-react';
-import { __ } from '@/utils/translations';
+import CrmLayout from '@/Layouts/CrmLayout';
+import KPICard from '../Components/Widgets/KPICard';
+import ActivityFeed from '../Components/Widgets/ActivityFeed';
+import PipelineBoard from '../Components/Kanban/PipelineBoard';
+import { PhoneCall, CalendarAlert, Target, Zap } from 'lucide-react';
+import { __ } from '@/lib/i18n';
 
 export default function TelesalesDashboard({ pipeline, kpis }: { pipeline: any, kpis: any }) {
     return (
-        <AppLayout title={__('Telesales Workspace')}>
-            <div className="flex-1 space-y-4 p-8 pt-6">
-                <div className="flex items-center justify-between space-y-2">
-                    <h2 className="text-3xl font-bold tracking-tight">{__('Telesales Pipeline')}</h2>
+        <CrmLayout title={__('Telesales Workspace')} activeMenu="workspaces">
+            <div className="flex flex-col h-full gap-6 p-8 pt-6">
+                
+                {/* Dashboard Header */}
+                <div>
+                    <h1 className="text-2xl font-bold text-slate-900 tracking-tight">{__('Telesales Workspace')}</h1>
+                    <p className="text-sm text-slate-500 mt-1">
+                        {__('Good morning. You have')} <span className="font-semibold text-slate-700">{kpis?.pending_followups ?? 0}</span> {__('follow-ups due today.')}
+                    </p>
                 </div>
 
-                <div className="grid gap-4 md:grid-cols-3">
-                    <Card>
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">{__('Calls Made Today')}</CardTitle>
-                            <Phone className="h-4 w-4 text-muted-foreground" />
-                        </CardHeader>
-                        <CardContent>
-                            <div className="text-2xl font-bold">{kpis?.calls_today ?? 0}</div>
-                        </CardContent>
-                    </Card>
-                    <Card>
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">{__('Pending Follow-ups')}</CardTitle>
-                            <Clock className="h-4 w-4 text-muted-foreground" />
-                        </CardHeader>
-                        <CardContent>
-                            <div className="text-2xl font-bold">{kpis?.pending_followups ?? 0}</div>
-                        </CardContent>
-                    </Card>
-                    <Card>
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">{__('Conversion Rate')}</CardTitle>
-                            <CheckCircle className="h-4 w-4 text-muted-foreground" />
-                        </CardHeader>
-                        <CardContent>
-                            <div className="text-2xl font-bold">{kpis?.conversion_rate ?? '0%'}</div>
-                        </CardContent>
-                    </Card>
+                {/* KPI Bar */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <KPICard 
+                        title={__('Calls Made Today')} 
+                        value={kpis?.calls_today ?? 0} 
+                        icon={PhoneCall} 
+                        colorClass="bg-blue-100 text-blue-600" 
+                    />
+                    <KPICard 
+                        title={__('Pending Follow-ups')} 
+                        value={kpis?.pending_followups ?? 0} 
+                        icon={CalendarAlert} 
+                        colorClass="bg-red-100 text-red-600" 
+                    />
+                    <KPICard 
+                        title={__('Conversion Rate')} 
+                        value={kpis?.conversion_rate ?? '0%'} 
+                        icon={Target} 
+                        colorClass="bg-green-100 text-green-600" 
+                    />
+                    <KPICard 
+                        title={__('Hot Leads')} 
+                        value={kpis?.hot_leads ?? 0} 
+                        icon={Zap} 
+                        colorClass="bg-amber-100 text-amber-600" 
+                    />
                 </div>
 
-                <div className="grid gap-4 grid-cols-4 mt-6">
-                    {['NEW', 'FOLLOW_UP', 'INTERESTED', 'NEGOTIATION'].map(stage => (
-                        <div key={stage} className="bg-gray-50/50 p-4 rounded-lg border h-[600px] overflow-y-auto">
-                            <h3 className="font-semibold mb-4 pb-2 border-b">{__(stage)}</h3>
-                            <div className="space-y-3">
-                                {pipeline[stage] ? pipeline[stage].map((lead: any) => (
-                                    <div key={lead.id} className="bg-white p-3 rounded shadow-sm border text-sm">
-                                        <p className="font-bold">{lead.name}</p>
-                                        <p className="text-muted-foreground">{lead.phone}</p>
-                                        {lead.last_contacted_at && (
-                                            <p className="text-xs text-gray-400 mt-2">
-                                                {__('Last Contact:')} {new Date(lead.last_contacted_at).toLocaleDateString()}
-                                            </p>
-                                        )}
-                                    </div>
-                                )) : (
-                                    <p className="text-xs text-muted-foreground italic">{__('No leads in this stage.')}</p>
-                                )}
-                            </div>
+                {/* Main Content Area (Pipeline & Activity Feed) */}
+                <div className="flex-1 flex gap-6 min-h-0">
+                    {/* Kanban Pipeline */}
+                    <div className="flex-1 flex flex-col bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+                        <div className="p-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+                            <h2 className="font-semibold text-slate-800">{__('Active Pipeline')}</h2>
+                            <button className="text-sm text-indigo-600 hover:text-indigo-700 font-medium transition-colors">
+                                {__('View All Leads')}
+                            </button>
                         </div>
-                    ))}
+                        <div className="flex-1 p-4 overflow-hidden">
+                            <PipelineBoard />
+                        </div>
+                    </div>
+
+                    {/* Right Sidebar (Live Feed) */}
+                    <div className="w-80 hidden xl:block flex-shrink-0">
+                        <ActivityFeed />
+                    </div>
                 </div>
+
             </div>
-        </AppLayout>
+        </CrmLayout>
     );
 }

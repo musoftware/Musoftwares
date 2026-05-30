@@ -2,7 +2,8 @@
 
 namespace Modules\CRM\Infrastructure\Queue;
 
-use App\Models\UserSubscription;
+use Modules\ERP\Models\Tenant;
+use App\Services\SubscriptionService;
 use Illuminate\Support\Facades\Log;
 
 class RequiresAddonMiddleware
@@ -20,10 +21,15 @@ class RequiresAddonMiddleware
         // We bypass this strict check if the job doesn't declare a tenantId to avoid crashing global jobs,
         // but for CRM tenant jobs, they must declare it.
         if (property_exists($job, 'tenantId')) {
-            $hasActiveAddon = UserSubscription::where('tenant_id', $job->tenantId)
-                ->where('module_id', $this->addonId)
-                ->where('status', 'active')
-                ->exists();
+            $tenant = Tenant::find($job->tenantId);
+
+            if (!$tenant || !$tenant->user) {
+                Log::warning("Queue Addon Guard: Dropped job " . get_class($job) . " because tenant {$job->tenantId} is invalid or has no owner.");
+                return;
+            }
+
+            $subscriptionService = app(SubscriptionService::class);
+            $hasActiveAddon = $subscriptionService->hasActiveSubscription($tenant->user, $this->addonId);
 
             if (!$hasActiveAddon) {
                 Log::warning("Queue Addon Guard: Dropped job " . get_class($job) . " because tenant {$job->tenantId} lacks active {$this->addonId} addon.");

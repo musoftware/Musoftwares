@@ -42,13 +42,13 @@ class LeadTagController extends Controller
 
         $lead->tags()->syncWithoutDetaching([$validated['tag_id']]);
 
-        return redirect()->back()->with('success', 'Tag added to lead.');
+        return redirect()->back()->with('success', __('crm.tag_added'));
     }
 
     public function detach(Request $request, Lead $lead, LeadTag $tag)
     {
         $lead->tags()->detach($tag->id);
 
-        return redirect()->back()->with('success', 'Tag removed from lead.');
+        return redirect()->back()->with('success', __('crm.tag_removed'));
     }
 }

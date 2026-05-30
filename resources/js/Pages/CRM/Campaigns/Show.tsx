@@ -71,8 +71,8 @@ export default function Show({ campaign }) {
     const isEditable = campaign.status === 'draft';
 
     return (
-        <CrmLayout title={`Campaign Builder: ${campaign.name}`} activeMenu="campaigns">
-            <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
+        <CrmLayout title={`Campaign: ${campaign.name}`} activeMenu="campaigns">
+            <div className="flex-1 space-y-4 p-8 pt-6">
             <div className="mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
                     <h2 className="text-2xl font-bold text-gray-900 flex items-center">

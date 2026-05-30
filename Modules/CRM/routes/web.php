@@ -8,6 +8,7 @@ use Modules\CRM\Http\Controllers\CampaignController;
 use Modules\CRM\Http\Controllers\LeadNoteController;
 use Modules\CRM\Http\Controllers\LeadTagController;
 use Modules\CRM\Http\Controllers\WorkspaceController;
+use Modules\CRM\Http\Controllers\Api\KanbanController;
 
 use Modules\CRM\Http\Controllers\SearchController;
 
@@ -45,6 +46,10 @@ Route::middleware(['web', 'auth', 'verified', 'onboarding', 'subscription:crm', 
         Route::post('/leads/{lead}/status', [LeadController::class, 'updateStatus'])->name('leads.update-status');
         Route::post('/leads/{lead}/assign', [LeadController::class, 'assign'])->name('leads.assign');
         Route::delete('/leads/{lead}', [LeadController::class, 'destroy'])->name('leads.destroy');
+
+        // ── Pipeline / Kanban API
+        Route::get('/api/kanban', [KanbanController::class, 'index'])->name('api.kanban.index');
+        Route::put('/api/kanban/{lead}/stage', [KanbanController::class, 'updateStage'])->name('api.kanban.stage');
 
         // ── Lead Notes & Tags
         Route::post('/leads/{lead}/notes', [LeadNoteController::class, 'store'])->name('leads.notes.store');

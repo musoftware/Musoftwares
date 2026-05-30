@@ -27,7 +27,7 @@ class LeadNoteController extends Controller
             'is_pinned' => $validated['is_pinned'] ?? false,
         ]);
 
-        return redirect()->back()->with('success', 'Note added successfully.');
+        return redirect()->back()->with('success', __('crm.note_added'));
     }
 
     public function update(Request $request, Lead $lead, LeadNote $note)
@@ -39,13 +39,13 @@ class LeadNoteController extends Controller
 
         $note->update($validated);
 
-        return redirect()->back()->with('success', 'Note updated successfully.');
+        return redirect()->back()->with('success', __('crm.note_updated'));
     }
 
     public function destroy(Lead $lead, LeadNote $note)
     {
         $note->delete();
 
-        return redirect()->back()->with('success', 'Note deleted successfully.');
+        return redirect()->back()->with('success', __('crm.note_deleted'));
     }
 }

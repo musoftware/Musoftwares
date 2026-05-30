@@ -30,7 +30,7 @@ class CampaignDeliveryManager
     {
         $audience = $campaign->audience;
         if (!$audience) {
-            throw new \RuntimeException('Campaign has no audience assigned.');
+            throw new \RuntimeException(__('crm.campaign_no_audience'));
         }
 
         $count = 0;
@@ -247,7 +247,7 @@ class CampaignDeliveryManager
     protected function getNextAccount(array $accounts): WhatsAppAccount
     {
         if (empty($accounts)) {
-            throw new \RuntimeException('No connected WhatsApp accounts available for delivery.');
+            throw new \RuntimeException(__('crm.no_connected_whatsapp_accounts'));
         }
 
         $account = $accounts[$this->accountRotationIndex % count($accounts)];

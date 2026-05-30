@@ -45,7 +45,7 @@ class CampaignController extends Controller
 
         return redirect()
             ->route('crm.whatsapp-campaigns.show', $campaign->id)
-            ->with('success', 'Campaign created successfully.');
+            ->with('success', __('crm.campaign_created'));
     }
 
     public function show(WhatsAppCampaign $campaign)
@@ -70,17 +70,17 @@ class CampaignController extends Controller
     {
         $this->campaignService->update($campaign, $request->validated());
 
-        return redirect()->back()->with('success', 'Campaign updated.');
+        return redirect()->back()->with('success', __('crm.campaign_updated'));
     }
 
     public function destroy(WhatsAppCampaign $campaign)
     {
         if (!$campaign->isDraft()) {
-            return redirect()->back()->with('error', 'Only draft campaigns can be deleted.');
+            return redirect()->back()->with('error', __('crm.only_draft_campaigns_deleted'));
         }
 
         $campaign->delete();
-        return redirect()->route('crm.whatsapp-campaigns.index')->with('success', 'Campaign deleted.');
+        return redirect()->route('crm.whatsapp-campaigns.index')->with('success', __('crm.campaign_deleted'));
     }
 
     // ── Lifecycle Actions ────────────────────────────────────────
@@ -88,37 +88,37 @@ class CampaignController extends Controller
     public function start(WhatsAppCampaign $campaign)
     {
         $this->campaignService->start($campaign);
-        return redirect()->back()->with('success', 'Campaign started.');
+        return redirect()->back()->with('success', __('crm.campaign_started'));
     }
 
     public function schedule(Request $request, WhatsAppCampaign $campaign)
     {
         $request->validate(['scheduled_at' => 'required|date|after:now']);
         $this->campaignService->schedule($campaign, \Carbon\Carbon::parse($request->scheduled_at));
-        return redirect()->back()->with('success', 'Campaign scheduled.');
+        return redirect()->back()->with('success', __('crm.campaign_scheduled'));
     }
 
     public function pause(WhatsAppCampaign $campaign)
     {
         $this->campaignService->pause($campaign);
-        return redirect()->back()->with('success', 'Campaign paused.');
+        return redirect()->back()->with('success', __('crm.campaign_paused'));
     }
 
     public function resume(WhatsAppCampaign $campaign)
     {
         $this->campaignService->resume($campaign);
-        return redirect()->back()->with('success', 'Campaign resumed.');
+        return redirect()->back()->with('success', __('crm.campaign_resumed'));
     }
 
     public function cancel(WhatsAppCampaign $campaign)
     {
         $this->campaignService->cancel($campaign);
-        return redirect()->back()->with('success', 'Campaign cancelled.');
+        return redirect()->back()->with('success', __('crm.campaign_cancelled'));
     }
 
     public function duplicate(WhatsAppCampaign $campaign)
     {
         $new = $this->campaignService->duplicate($campaign);
-        return redirect()->route('crm.whatsapp-campaigns.show', $new->id)->with('success', 'Campaign duplicated.');
+        return redirect()->route('crm.whatsapp-campaigns.show', $new->id)->with('success', __('crm.campaign_duplicated'));
     }
 }

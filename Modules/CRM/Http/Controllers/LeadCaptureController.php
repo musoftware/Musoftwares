@@ -53,10 +53,10 @@ class LeadCaptureController extends Controller
             $lead->source = 'iframe_embed';
             $lead->save();
 
-            return redirect()->back()->with('success', 'Thank you! Your information has been submitted.');
+            return redirect()->back()->with('success', __('crm.lead_info_submitted'));
         } catch (\Exception $e) {
             Log::error('Lead capture failed: ' . $e->getMessage());
-            return redirect()->back()->with('error', 'Something went wrong. Please try again.');
+            return redirect()->back()->with('error', __('crm.lead_info_error'));
         }
     }
 }

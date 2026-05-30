@@ -49,7 +49,7 @@ export default function Index({ campaigns }) {
 
     return (
         <CrmLayout title="Broadcast Campaigns" activeMenu="campaigns">
-            <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
+            <div className="flex-1 space-y-4 p-8 pt-6">
             <div className="mb-6 flex justify-end">
                 <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
                     <DialogTrigger asChild>

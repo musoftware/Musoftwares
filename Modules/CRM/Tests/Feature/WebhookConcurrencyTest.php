@@ -30,20 +30,19 @@ class WebhookConcurrencyTest extends BaseTenantTestCase
         $payloads = [];
         for ($i = 0; $i < 5; $i++) {
             $payloads[] = new LeadImportData(
-                assignedToId: $agent->id,
-                branchId: $branchId,
                 data: [
                     [
                         'name' => 'High Concurrency Lead',
                         'phone' => '1234567890',
                         'source' => 'Webhook',
                     ]
-                ]
+                ],
+                sourceId: 1,
+                tenantId: $this->tenant->id,
+                assignedToId: $agent->id,
+                branchId: $branchId
             );
         }
-
-        // Set tenant context for the action
-        session(['tenant_id' => $this->tenant->id]);
 
         $importedCount = 0;
         foreach ($payloads as $payload) {

@@ -53,13 +53,13 @@ class AudienceController extends Controller
     public function update(StoreAudienceRequest $request, WhatsAppCampaignAudience $audience)
     {
         $audience->update($request->validated());
-        return redirect()->back()->with('success', 'Audience updated.');
+        return redirect()->back()->with('success', __('crm.audience_updated'));
     }
 
     public function destroy(WhatsAppCampaignAudience $audience)
     {
         $audience->delete();
-        return redirect()->back()->with('success', 'Audience deleted.');
+        return redirect()->back()->with('success', __('crm.audience_deleted'));
     }
 
     public function preview(Request $request)
