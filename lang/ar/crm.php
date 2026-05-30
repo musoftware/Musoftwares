@@ -34,6 +34,47 @@ return [
     'note_updated' => 'تم تحديث الملاحظة بنجاح.',
     'note_deleted' => 'تم حذف الملاحظة بنجاح.',
     
+    'lead_stale_warning' => 'هذا العميل لم يتم التواصل معه منذ :days أيام.',
+    'pipeline_updated' => 'تم تحديث مرحلة العميل بنجاح.',
+
+    // Manager Dashboard
+    'Agent' => 'الموظف',
+    'Calls' => 'المكالمات',
+    'Closed' => 'المغلقة',
+    'Conversion' => 'التحويل',
+    'SLA Breaches & Stale Leads' => 'تجاوزات الـ SLA والعملاء المهملين',
+    'Zero SLA Breaches' => 'لا يوجد تجاوزات SLA',
+    'All leads are being followed up on time.' => 'تتم متابعة جميع العملاء في الوقت المحدد.',
+    'hours ago' => 'ساعات مضت',
+    'days ago' => 'أيام مضت',
+    'Last touched:' => 'آخر تواصل:',
+    'View' => 'عرض',
+    
+    // Marketing Dashboard
+    'Marketing Workspace' => 'مساحة التسويق',
+    'Marketing & Growth' => 'التسويق والنمو',
+    'Campaign performance and lead acquisition.' => 'أداء الحملات واستقطاب العملاء.',
+    'Filter by Date' => 'تصفية حسب التاريخ',
+    'New Campaign' => 'حملة جديدة',
+    'Active Campaigns' => 'حملات نشطة',
+    'Leads Today' => 'عملاء اليوم',
+    'Avg Cost Per Lead' => 'متوسط تكلفة العميل',
+    'Campaign ROI' => 'عائد استثمار الحملات',
+    'Top Performing Campaigns' => 'أفضل الحملات أداءً',
+    'No active campaigns data available.' => 'لا تتوفر بيانات عن حملات نشطة.',
+
+    // Support Dashboard
+    'Support Workspace' => 'مساحة الدعم الفني',
+    'Customer Support' => 'دعم العملاء',
+    'Monitor tickets, WhatsApp messages, and response SLAs.' => 'مراقبة التذاكر، رسائل الواتساب، وأوقات الاستجابة.',
+    'Open WhatsApp Inbox' => 'فتح صندوق الواتساب',
+    'Open Tickets' => 'تذاكر مفتوحة',
+    'Unread Messages' => 'رسائل غير مقروءة',
+    'Avg Response Time' => 'متوسط وقت الاستجابة',
+    'Resolved Today' => 'تم حلها اليوم',
+    'Priority Inbox' => 'الرسائل ذات الأولوية',
+    'No priority messages at the moment.' => 'لا توجد رسائل ذات أولوية في الوقت الحالي.',
+    
     'lead_status_updated' => 'تم تحديث حالة العميل بنجاح.',
     'lead_assignment_updated' => 'تم تحديث تعيين العميل بنجاح.',
     'lead_deleted' => 'تم حذف العميل بنجاح.',

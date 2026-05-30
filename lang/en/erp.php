@@ -182,42 +182,4 @@ return [
     'team_member_added' => 'Team member :name has been added successfully.',
     'team_member_updated' => 'Team member details updated successfully.',
     'team_member_removed' => 'Team member :name has been removed.',
-    
-    // Manager Dashboard
-    'Agent' => 'Agent',
-    'Calls' => 'Calls',
-    'Closed' => 'Closed',
-    'Conversion' => 'Conversion',
-    'SLA Breaches & Stale Leads' => 'SLA Breaches & Stale Leads',
-    'Zero SLA Breaches' => 'Zero SLA Breaches',
-    'All leads are being followed up on time.' => 'All leads are being followed up on time.',
-    'hours ago' => 'hours ago',
-    'days ago' => 'days ago',
-    'Last touched:' => 'Last touched:',
-    'View' => 'View',
-    
-    // Marketing Dashboard
-    'Marketing Workspace' => 'Marketing Workspace',
-    'Marketing & Growth' => 'Marketing & Growth',
-    'Campaign performance and lead acquisition.' => 'Campaign performance and lead acquisition.',
-    'Filter by Date' => 'Filter by Date',
-    'New Campaign' => 'New Campaign',
-    'Active Campaigns' => 'Active Campaigns',
-    'Leads Today' => 'Leads Today',
-    'Avg Cost Per Lead' => 'Avg Cost Per Lead',
-    'Campaign ROI' => 'Campaign ROI',
-    'Top Performing Campaigns' => 'Top Performing Campaigns',
-    'No active campaigns data available.' => 'No active campaigns data available.',
-
-    // Support Dashboard
-    'Support Workspace' => 'Support Workspace',
-    'Customer Support' => 'Customer Support',
-    'Monitor tickets, WhatsApp messages, and response SLAs.' => 'Monitor tickets, WhatsApp messages, and response SLAs.',
-    'Open WhatsApp Inbox' => 'Open WhatsApp Inbox',
-    'Open Tickets' => 'Open Tickets',
-    'Unread Messages' => 'Unread Messages',
-    'Avg Response Time' => 'Avg Response Time',
-    'Resolved Today' => 'Resolved Today',
-    'Priority Inbox' => 'Priority Inbox',
-    'No priority messages at the moment.' => 'No priority messages at the moment.',
 ];
