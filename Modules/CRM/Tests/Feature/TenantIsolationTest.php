@@ -2,36 +2,32 @@
 
 namespace Modules\CRM\Tests\Feature;
 
-use Tests\TestCase;
+use Modules\CRM\Tests\Support\BaseTenantTestCase;
 use Modules\CRM\Models\Workspace;
 use Modules\CRM\Models\Lead;
-use App\Models\User;
 use Modules\CRM\Infrastructure\Context\TenantContext;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 
-class TenantIsolationTest extends TestCase
+class TenantIsolationTest extends BaseTenantTestCase
 {
-    use RefreshDatabase;
-
     public function test_models_automatically_scope_to_tenant_context()
     {
-        $workspace1 = Workspace::factory()->create();
+        // $this->workspace is automatically set up by BaseTenantTestCase
         $workspace2 = Workspace::factory()->create();
 
-        // Create leads bypassing scope
-        $lead1 = Lead::withoutGlobalScopes()->factory()->create(['workspace_id' => $workspace1->id, 'name' => 'Lead A']);
+        // Create a lead in the current tenant's workspace
+        $lead1 = Lead::create(['name' => 'Lead A', 'status' => 'new']); // Workspace ID should be injected by trait
+        
+        // Create a lead in another workspace (bypassing scope for setup)
         $lead2 = Lead::withoutGlobalScopes()->factory()->create(['workspace_id' => $workspace2->id, 'name' => 'Lead B']);
 
-        // Set context to workspace 1
-        app(TenantContext::class)->setWorkspaceId($workspace1->id);
-        
         $leads = Lead::all();
         
         $this->assertCount(1, $leads);
         $this->assertEquals('Lead A', $leads->first()->name);
+        $this->assertEquals($this->workspace->id, $leads->first()->workspace_id);
 
         // Switch context to workspace 2
-        app(TenantContext::class)->setWorkspaceId($workspace2->id);
+        $this->setTenantContext($workspace2->id);
         
         $leads = Lead::all();
         
@@ -41,15 +37,18 @@ class TenantIsolationTest extends TestCase
 
     public function test_jobs_maintain_tenant_isolation_without_session()
     {
-        // Session should not be required for the model to fetch context
-        $workspace = Workspace::factory()->create();
-        app(TenantContext::class)->setWorkspaceId($workspace->id);
+        // Clear session to simulate a CLI / Queue environment
+        session()->flush();
+        
+        // Assert we still have the context via the container
+        $workspaceId = app(TenantContext::class)->getWorkspaceId();
+        $this->assertEquals($this->workspace->id, $workspaceId);
 
         $lead = Lead::create([
-            'name' => 'Test Lead',
+            'name' => 'CLI Lead',
             'status' => 'new'
         ]);
 
-        $this->assertEquals($workspace->id, $lead->workspace_id);
+        $this->assertEquals($this->workspace->id, $lead->workspace_id);
     }
 }

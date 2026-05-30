@@ -6,36 +6,74 @@ use Illuminate\Support\Facades\Log;
 
 class TenantContext
 {
-    protected ?int $workspaceId = null;
+    protected ?int $tenantId = null;
+    protected ?int $branchId = null;
 
     /**
-     * Get the current active workspace ID.
+     * Get the current active tenant (workspace) ID.
      */
-    public function getWorkspaceId(): ?int
+    public function getTenantId(): ?int
     {
-        return $this->workspaceId;
+        return $this->tenantId;
     }
 
     /**
-     * Set the current active workspace ID.
+     * Legacy alias for getTenantId
+     */
+    public function getWorkspaceId(): ?int
+    {
+        return $this->getTenantId();
+    }
+
+    /**
+     * Set the current active tenant (workspace) ID.
+     */
+    public function setTenantId(?int $id): void
+    {
+        $this->tenantId = $id;
+    }
+
+    /**
+     * Legacy alias for setTenantId
      */
     public function setWorkspaceId(?int $id): void
     {
-        $this->workspaceId = $id;
+        $this->setTenantId($id);
+    }
+
+    /**
+     * Get the current active branch ID.
+     */
+    public function getBranchId(): ?int
+    {
+        return $this->branchId;
+    }
+
+    /**
+     * Set the current active branch ID.
+     */
+    public function setBranchId(?int $id): void
+    {
+        $this->branchId = $id;
     }
 
     /**
      * Run a callback within a specific workspace context without leaking it permanently.
      */
-    public function runInContext(int $workspaceId, callable $callback)
+    public function runInContext(int $tenantId, callable $callback, ?int $branchId = null)
     {
-        $previousId = $this->workspaceId;
+        $previousTenantId = $this->tenantId;
+        $previousBranchId = $this->branchId;
         
         try {
-            $this->setWorkspaceId($workspaceId);
+            $this->setTenantId($tenantId);
+            if ($branchId !== null) {
+                $this->setBranchId($branchId);
+            }
             return $callback();
         } finally {
-            $this->setWorkspaceId($previousId);
+            $this->setTenantId($previousTenantId);
+            $this->setBranchId($previousBranchId);
         }
     }
 
@@ -44,6 +82,7 @@ class TenantContext
      */
     public function clear(): void
     {
-        $this->workspaceId = null;
+        $this->tenantId = null;
+        $this->branchId = null;
     }
 }

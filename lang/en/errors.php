@@ -1,0 +1,21 @@
+<?php
+
+return [
+    'currency_configuration_missing' => 'currency_configuration_missing',
+    'erp_backup_addon_required' => 'erp_backup_addon_required',
+    'erp_smtp_addon_required' => 'erp_smtp_addon_required',
+    'insufficient_client_balance' => 'insufficient_client_balance',
+    'invoice_already_paid' => 'invoice_already_paid',
+    'invoice_must_be_issued' => 'invoice_must_be_issued',
+    'invoice_must_be_sent' => 'invoice_must_be_sent',
+    'invoice_must_be_sent_partial' => 'invoice_must_be_sent_partial',
+    'invoice_no_client' => 'invoice_no_client',
+    'invoice_no_outstanding' => 'invoice_no_outstanding',
+    'no_active_workspace' => 'no_active_workspace',
+    'only_draft_invoices_can_be_issued' => 'only_draft_invoices_can_be_issued',
+    'paid_invoice_cannot_be_deleted' => 'paid_invoice_cannot_be_deleted',
+    'smtp_settings_not_configured' => 'smtp_settings_not_configured',
+    'unauthorized_addon' => 'unauthorized_addon',
+    'unauthorized_project' => 'unauthorized_project',
+    'upgrade_to_inventory' => 'upgrade_to_inventory'
+];

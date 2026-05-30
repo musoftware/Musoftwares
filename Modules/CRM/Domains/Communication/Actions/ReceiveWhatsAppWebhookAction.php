@@ -20,7 +20,8 @@ class ReceiveWhatsAppWebhookAction
         if (!$idempotencyKey) {
             // Fallback for events without clear IDs: just dispatch it
             ProcessWhatsAppWebhookJob::dispatch($account, $payload, $eventType)
-                ->onQueue('whatsapp-incoming');
+                ->onQueue('whatsapp-incoming')
+                ->afterCommit();
             return;
         }
 
@@ -39,7 +40,8 @@ class ReceiveWhatsAppWebhookAction
 
         // Dispatch job and pass the idempotency key so the job can mark it completed
         ProcessWhatsAppWebhookJob::dispatch($account, $payload, $eventType, $idempotencyKey)
-            ->onQueue('whatsapp-incoming');
+            ->onQueue('whatsapp-incoming')
+            ->afterCommit();
     }
 
     /**

@@ -7,6 +7,7 @@ use Modules\CRM\Http\Controllers\SequenceController;
 use Modules\CRM\Http\Controllers\CampaignController;
 use Modules\CRM\Http\Controllers\LeadNoteController;
 use Modules\CRM\Http\Controllers\LeadTagController;
+use Modules\CRM\Http\Controllers\WorkspaceController;
 
 use Modules\CRM\Http\Controllers\SearchController;
 
@@ -27,6 +28,12 @@ Route::middleware(['web', 'auth', 'verified', 'onboarding', 'subscription:crm', 
     ->prefix('crm')
     ->name('crm.')
     ->group(function () {
+        // ── Workspaces ──────────────────────────────────────────────────
+        Route::get('/', [WorkspaceController::class, 'index'])->name('workspaces.index');
+        Route::get('/workspaces/collector', [WorkspaceController::class, 'collectorWorkspace'])->name('workspaces.collector');
+        Route::get('/workspaces/telesales', [WorkspaceController::class, 'telesalesWorkspace'])->name('workspaces.telesales');
+        Route::get('/workspaces/manager', [WorkspaceController::class, 'managerWorkspace'])->name('workspaces.manager');
+
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
         
         // Universal Search

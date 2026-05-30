@@ -44,27 +44,11 @@ return [
         'booking-priority-support' => ['price' => 500, 'name' => 'Priority Support', 'desc' => 'Skip the line support', 'icon' => 'Headset', 'parent' => 'booking'],
         'booking-smart-slots' => ['price' => 500, 'name' => 'Smart Suggestions', 'desc' => 'Earliest available & best match', 'icon' => 'Zap', 'parent' => 'booking'],
 
-        // ── CRM ──
-        'crm-wa-inbox' => ['price' => 500, 'name' => 'WhatsApp Inbox', 'desc' => 'Shared multi-agent inbox', 'icon' => 'MessageSquare', 'parent' => 'crm'],
-        'crm-wa-campaigns' => ['price' => 500, 'name' => 'WhatsApp Campaigns', 'desc' => 'Bulk marketing campaigns', 'icon' => 'Send', 'parent' => 'crm'],
-        'crm-automations' => ['price' => 500, 'name' => 'Automations', 'desc' => 'Trigger-based workflow rules', 'icon' => 'Zap', 'parent' => 'crm'],
-        'crm-extra-user' => ['price' => 500, 'name' => 'Additional Users', 'desc' => 'Add more agents to your team', 'icon' => 'Users', 'parent' => 'crm'],
-        'crm-advanced-pipelines' => ['price' => 500, 'name' => 'Advanced Pipelines', 'desc' => 'Multiple sales pipelines', 'icon' => 'GitMerge', 'parent' => 'crm'],
-        'crm-advanced-analytics' => ['price' => 500, 'name' => 'Advanced Analytics', 'desc' => 'Conversion & velocity metrics', 'icon' => 'BarChart', 'parent' => 'crm'],
-        'crm-custom-fields' => ['price' => 500, 'name' => 'Custom Fields', 'desc' => 'Tailor leads to your business', 'icon' => 'Database', 'parent' => 'crm'],
-        'crm-api' => ['price' => 500, 'name' => 'API Access', 'desc' => 'Connect your external systems', 'icon' => 'Code', 'parent' => 'crm'],
-        'crm-lead-scoring' => ['price' => 500, 'name' => 'Lead Scoring', 'desc' => 'Rule-based lead qualification', 'icon' => 'Star', 'parent' => 'crm'],
-        'crm-email-marketing' => ['price' => 500, 'name' => 'Email Marketing', 'desc' => 'Built-in email sequences', 'icon' => 'Mail', 'parent' => 'crm'],
-        'crm-funnel-tracking' => ['price' => 500, 'name' => 'Funnel Tracking', 'desc' => 'Drop-off analysis', 'icon' => 'Filter', 'parent' => 'crm'],
-        'crm-workflow-builder' => ['price' => 500, 'name' => 'Workflow Builder', 'desc' => 'Visual automation canvas', 'icon' => 'Workflow', 'parent' => 'crm'],
-        'crm-webhooks' => ['price' => 500, 'name' => 'Webhooks', 'desc' => 'Real-time event triggers', 'icon' => 'Webhook', 'parent' => 'crm'],
-        'crm-import-export' => ['price' => 500, 'name' => 'Advanced Export', 'desc' => 'Deep data extraction', 'icon' => 'Download', 'parent' => 'crm'],
-        'crm-activity-intelligence' => ['price' => 500, 'name' => 'Activity Intelligence', 'desc' => 'Identify inactive & cold leads', 'icon' => 'Brain', 'parent' => 'crm'],
-        'crm-shared-inbox' => ['price' => 500, 'name' => 'Shared Team Inbox', 'desc' => 'Centralized email/sms inbox', 'icon' => 'Inbox', 'parent' => 'crm'],
-        'crm-audit-logs' => ['price' => 500, 'name' => 'Audit Logs', 'desc' => 'Track every user action', 'icon' => 'History', 'parent' => 'crm'],
-        'crm-white-label' => ['price' => 500, 'name' => 'White Label', 'desc' => 'Remove CRM branding', 'icon' => 'Star', 'parent' => 'crm'],
-        'crm-multi-branch' => ['price' => 500, 'name' => 'Multi Branch', 'desc' => 'Data isolation per branch', 'icon' => 'Building2', 'parent' => 'crm'],
-        'crm-advanced-permissions' => ['price' => 500, 'name' => 'Advanced Permissions', 'desc' => 'View only own leads', 'icon' => 'Shield', 'parent' => 'crm'],
+        // ── CRM (Enterprise Operations Bundles) ──
+        'crm-sales-staff' => ['price' => 2000, 'name' => 'Sales Staff Operations', 'desc' => 'Lead collection, pipelines, and basic telesales', 'icon' => 'Users', 'parent' => 'crm'],
+        'crm-sales-management' => ['price' => 3000, 'name' => 'Sales Management & Tracking', 'desc' => 'KPIs, SLA monitoring, and branch analytics', 'icon' => 'Activity', 'parent' => 'crm'],
+        'crm-call-center' => ['price' => 4000, 'name' => 'Enterprise Call Center', 'desc' => 'Dial queues, QA, and advanced telephony', 'icon' => 'Headset', 'parent' => 'crm'],
+        'crm-advanced-operations' => ['price' => 5000, 'name' => 'Advanced Operations & Workflows', 'desc' => 'Automations, webhooks, and SLA routing engines', 'icon' => 'Settings', 'parent' => 'crm'],
 
         // ── ERP ──
         'erp-projects' => ['price' => 500, 'name' => 'Projects Management', 'desc' => 'Track client projects and budgets', 'icon' => 'Briefcase', 'parent' => 'erp'],
