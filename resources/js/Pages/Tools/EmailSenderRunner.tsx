@@ -311,7 +311,7 @@ export default function EmailSenderRunner({ tool, subscription, runtimePort, plu
                         <div className="w-6 h-6 bg-blue-600 rounded-md flex items-center justify-center shadow-sm">
                             <Mail className="w-3.5 h-3.5 text-white" />
                         </div>
-                        <span className="font-semibold text-[15px] tracking-tight">Email Sender Pro</span>
+                        <span className="font-semibold text-[15px] tracking-tight">Bulk Email Sender Pro</span>
                     </div>
                     
                     <div className="h-4 w-px bg-slate-200" />

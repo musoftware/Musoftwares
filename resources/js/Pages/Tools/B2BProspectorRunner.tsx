@@ -482,7 +482,7 @@ export default function B2BProspectorRunner({ tool, subscription, runtimePort, p
                         <div className="w-6.5 h-6.5 bg-gradient-to-tr from-teal-500 to-indigo-600 rounded-lg flex items-center justify-center shadow-md shadow-teal-500/20">
                             <Layers className="w-3.5 h-3.5 text-white" />
                         </div>
-                        <span className="font-bold text-sm tracking-tight bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">B2B Prospector</span>
+                        <span className="font-bold text-sm tracking-tight bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">B2B Leads Finder</span>
                     </div>
                     
                     <div className="h-5 w-px bg-slate-200" />

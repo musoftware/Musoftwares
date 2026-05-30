@@ -294,7 +294,7 @@ export default function WaFunnelEngineRunner({ tool }: any) {
                     <div className="w-7 h-7 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center shadow-lg shadow-blue-500/20">
                         <GitBranch className="w-4 h-4 text-white" />
                     </div>
-                    <span className="font-bold text-sm">WhatsApp Funnel Engine</span>
+                    <span className="font-bold text-sm">WhatsApp Campaigns</span>
                 </div>
                 <Button onClick={() => setShowNew(true)} className="gap-1.5 h-9 bg-blue-500 text-white hover:bg-blue-400 shadow-lg shadow-blue-500/20">
                     <Plus className="w-3.5 h-3.5" /> New Funnel

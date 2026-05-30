@@ -9,7 +9,7 @@ export default function AdLibraryMonitorRunner({ tool }: any) {
                 <div className="w-16 h-16 bg-fuchsia-500/10 border border-fuchsia-500/20 rounded-2xl flex items-center justify-center mx-auto mb-6">
                     <Megaphone className="w-8 h-8 text-fuchsia-400" />
                 </div>
-                <h1 className="text-2xl font-bold">Ad Library Monitor</h1>
+                <h1 className="text-2xl font-bold">Ads Analytics</h1>
                 <p className="text-sm text-slate-400">
                     Monitor ads across multiple platforms. This tool connects directly to your local Musoftware extension to capture ad data.
                 </p>

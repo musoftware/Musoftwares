@@ -157,7 +157,7 @@ export default function TikTokIntelligenceRunner({ tool }: any) {
                     <div className="w-7 h-7 bg-gradient-to-br from-pink-500 to-rose-600 rounded-lg flex items-center justify-center shadow-lg shadow-pink-500/30">
                         <Flame className="w-4 h-4 text-white" />
                     </div>
-                    <span className="font-bold text-sm">TikTok Intelligence Engine</span>
+                    <span className="font-bold text-sm">TikTok Analytics</span>
                 </div>
                 <div className="flex items-center gap-2">
                     <Tab active={tab === 'discover'} onClick={() => setTab('discover')}><Search className="w-3 h-3 inline mr-1" />Discover</Tab>

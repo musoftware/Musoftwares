@@ -81,7 +81,7 @@ export default function TikTokBoosterRunner({ tool }: any) {
                         <div className="w-6.5 h-6.5 bg-gradient-to-tr from-pink-500 to-rose-500 rounded-lg flex items-center justify-center shadow-md shadow-pink-500/20">
                             <Activity className="w-3.5 h-3.5 text-white" />
                         </div>
-                        <span className="font-bold text-sm tracking-tight bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">TikTok Booster</span>
+                        <span className="font-bold text-sm tracking-tight bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">TikTok Views Booster</span>
                     </div>
                 </div>
                 <div className="flex items-center gap-4">

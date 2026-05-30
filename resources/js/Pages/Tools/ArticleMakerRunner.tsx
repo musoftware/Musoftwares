@@ -477,7 +477,7 @@ export default function ArticleMakerRunner({ tool }: any) {
                     <div className="w-7 h-7 bg-gradient-to-br from-violet-500 to-indigo-600 rounded-lg flex items-center justify-center shadow-sm">
                         <FileText className="w-4 h-4 text-white" />
                     </div>
-                    <span className="font-bold text-sm text-slate-800 tracking-tight">Article Maker</span>
+                    <span className="font-bold text-sm text-slate-800 tracking-tight">AI Article Writer</span>
                 </div>
                 <div className="flex items-center gap-3">
                     {keywords.length > 0 && discoverStatus !== 'idle' && (
@@ -705,7 +705,7 @@ export default function ArticleMakerRunner({ tool }: any) {
                                 <Sparkles className="w-10 h-10 text-slate-300 mx-auto mb-4" />
                                 <h3 className="text-sm font-bold text-slate-700">Discover thousands of keyword ideas</h3>
                                 <p className="text-xs text-slate-400 mt-2 max-w-xs mx-auto">
-                                    Enter a niche keyword and let Article Maker expand it into hundreds of unique long-tail keywords using Google & YouTube autocomplete.
+                                    Enter a niche keyword and let AI Article Writer expand it into hundreds of unique long-tail keywords using Google & YouTube autocomplete.
                                 </p>
                             </div>
                         )}
