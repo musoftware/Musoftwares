@@ -8,14 +8,11 @@ use App\Models\User;
 class Contract extends Model
 {
     protected $table = 'freelance_contracts';
-    protected $fillable = ['job_id', 'proposal_id', 'client_id', 'freelancer_id', 'amount', 'currency_id', 'status', 'started_at', 'completed_at'];
+    protected $fillable = ['job_id', 'proposal_id', 'client_id', 'freelancer_id', 'contract_points', 'status', 'started_at', 'completed_at'];
 
-    protected $appends = ['formatted_amount'];
+    protected $appends = [];
 
-    public function getFormattedAmountAttribute()
-    {
-        return \App\Helpers\FinanceHelper::instance()->format_money($this->amount, $this->currency_id);
-    }
+    // Removed formatted_amount since we are using points now
 
     protected $casts = [
         'started_at' => 'datetime',
@@ -42,8 +39,5 @@ class Contract extends Model
         return $this->belongsTo(User::class, 'freelancer_id');
     }
 
-    public function currency()
-    {
-        return $this->belongsTo(\App\Models\Currency::class, 'currency_id');
-    }
+    // Currency relation removed
 }

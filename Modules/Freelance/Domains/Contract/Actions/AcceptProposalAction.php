@@ -14,7 +14,7 @@ class AcceptProposalAction
 {
     public function __construct(private AddPointsAction $addPointsAction) {}
 
-    public function execute(Proposal $proposal, User $client, int $proposalCostRefund = 2): Contract
+    public function execute(Proposal $proposal, User $client): Contract
     {
         $job = $proposal->job;
 
@@ -22,7 +22,7 @@ class AcceptProposalAction
             throw new \Exception('Unauthorized to accept proposals for this job.');
         }
 
-        return DB::transaction(function () use ($job, $proposal, $client, $proposalCostRefund) {
+        return DB::transaction(function () use ($job, $proposal, $client) {
 
             $proposal->update(['status' => 'accepted']);
             $job->update(['status' => 'in_progress']);
@@ -37,7 +37,7 @@ class AcceptProposalAction
                 if ($freelancer) {
                     $this->addPointsAction->execute(
                         $freelancer->id,
-                        $proposalCostRefund,
+                        $rejected->points_spent,
                         "Refunded staked points for job: {$job->title}",
                         'job_refund',
                         $job->id
@@ -50,8 +50,7 @@ class AcceptProposalAction
                 'proposal_id' => $proposal->id,
                 'client_id' => $job->client_id,
                 'freelancer_id' => $proposal->freelancer_id,
-                'amount' => $proposal->bid_amount,
-                'currency_id' => $proposal->currency_id,
+                'contract_points' => $proposal->proposed_budget_points,
                 'status' => 'active',
                 'started_at' => now(),
             ]);

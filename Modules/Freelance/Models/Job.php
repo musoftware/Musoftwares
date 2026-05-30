@@ -15,18 +15,15 @@ class Job extends Model
 
     protected $table = 'freelance_jobs';
 
-    protected $fillable = ['client_id', 'title', 'description', 'budget', 'currency_id', 'type', 'duration', 'status'];
+    protected $fillable = ['client_id', 'title', 'description', 'budget_points', 'min_proposal_points', 'type', 'duration', 'status'];
 
-    protected $appends = ['formatted_budget'];
+    protected $appends = [];
 
     protected $casts = [
         'status' => JobState::class,
     ];
 
-    public function getFormattedBudgetAttribute()
-    {
-        return \App\Helpers\FinanceHelper::instance()->format_money($this->budget, $this->currency_id);
-    }
+    // Removed formatted_budget since we are using points now
 
     public function client()
     {
@@ -45,8 +42,5 @@ class Job extends Model
             ->withTimestamps();
     }
 
-    public function currency()
-    {
-        return $this->belongsTo(\App\Models\Currency::class, 'currency_id');
-    }
+    // Currency relation removed
 }

@@ -15,8 +15,10 @@ class PostJobAction
 {
     public function __construct(private DeductPointsAction $deductPointsAction) {}
 
-    public function execute(PostJobData $data, User $user, int $postCost = 10): Job
+    public function execute(PostJobData $data, User $user): Job
     {
+        $postCost = 25 + $data->minProposalPoints;
+
         if ($user->points_balance < $postCost) {
             throw new \Exception('Insufficient points to post a job.');
         }
@@ -26,8 +28,8 @@ class PostJobAction
                 'client_id' => $data->clientId,
                 'title' => $data->title,
                 'description' => $data->description,
-                'budget' => $data->budget,
-                'currency_id' => $data->currencyId,
+                'budget_points' => $data->budgetPoints,
+                'min_proposal_points' => $data->minProposalPoints,
                 'type' => $data->type,
                 'duration' => $data->duration,
                 'status' => 'open',

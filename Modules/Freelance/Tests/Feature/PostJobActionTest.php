@@ -12,15 +12,15 @@ it('posts a job successfully and deducts points', function () {
     Queue::fake();
 
     $user = User::factory()->create([
-        'points_balance' => 20,
+        'points_balance' => 30,
     ]);
 
     $data = new PostJobData(
         clientId: $user->id,
         title: 'Test Job',
         description: 'Test description',
-        budget: 500,
-        currencyId: 1,
+        budgetPoints: 500,
+        minProposalPoints: 0,
         type: 'fixed',
         duration: '1 week',
         skills: []
@@ -34,12 +34,12 @@ it('posts a job successfully and deducts points', function () {
     expect($job->status)->toBe('open');
 
     // Check points deduction
-    expect($user->fresh()->points_balance)->toBe(10);
+    expect($user->fresh()->points_balance)->toBe(5); // 30 - 25
 
     // Check point transaction
     $this->assertDatabaseHas('point_transactions', [
         'user_id' => $user->id,
-        'points' => 10,
+        'points' => 25,
         'type' => 'spent',
     ]);
 
@@ -56,8 +56,8 @@ it('fails to post a job if insufficient points', function () {
         clientId: $user->id,
         title: 'Test Job',
         description: 'Test description',
-        budget: 500,
-        currencyId: 1,
+        budgetPoints: 500,
+        minProposalPoints: 0,
         type: 'fixed',
         duration: '1 week',
         skills: []

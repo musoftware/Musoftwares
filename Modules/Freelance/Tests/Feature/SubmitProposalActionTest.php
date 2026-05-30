@@ -16,8 +16,8 @@ it('submits a proposal successfully and deducts points', function () {
         'client_id' => $client->id,
         'title' => 'Test Job',
         'description' => 'Test description',
-        'budget' => 500,
-        'currency_id' => 1,
+        'budget_points' => 500,
+        'min_proposal_points' => 0,
         'type' => 'fixed',
         'status' => 'open',
     ]);
@@ -26,8 +26,8 @@ it('submits a proposal successfully and deducts points', function () {
         jobId: $job->id,
         freelancerId: $freelancer->id,
         coverLetter: 'I can do this!',
-        bidAmount: 400,
-        currencyId: 1,
+        proposedBudgetPoints: 400,
+        pointsSpent: 2,
     );
 
     $action = app(SubmitProposalAction::class);
@@ -57,8 +57,8 @@ it('fails to submit proposal if already submitted', function () {
         'client_id' => $client->id,
         'title' => 'Test Job',
         'description' => 'Test description',
-        'budget' => 500,
-        'currency_id' => 1,
+        'budget_points' => 500,
+        'min_proposal_points' => 0,
         'type' => 'fixed',
         'status' => 'open',
     ]);
@@ -66,8 +66,8 @@ it('fails to submit proposal if already submitted', function () {
     $job->proposals()->create([
         'freelancer_id' => $freelancer->id,
         'cover_letter' => 'First bid',
-        'bid_amount' => 500,
-        'currency_id' => 1,
+        'proposed_budget_points' => 500,
+        'points_spent' => 2,
         'status' => 'pending',
     ]);
 
@@ -75,8 +75,8 @@ it('fails to submit proposal if already submitted', function () {
         jobId: $job->id,
         freelancerId: $freelancer->id,
         coverLetter: 'Second bid',
-        bidAmount: 400,
-        currencyId: 1,
+        proposedBudgetPoints: 400,
+        pointsSpent: 2,
     );
 
     $action = app(SubmitProposalAction::class);

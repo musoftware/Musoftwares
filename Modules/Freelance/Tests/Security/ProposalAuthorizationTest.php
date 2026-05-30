@@ -21,8 +21,8 @@ it('prevents a user from withdrawing someone elses proposal via API', function (
         'job_id' => $job->id,
         'freelancer_id' => $freelancer1->id,
         'cover_letter' => 'My proposal',
-        'bid_amount' => 1000,
-        'currency_id' => $job->currency_id,
+        'proposed_budget_points' => 1000,
+        'points_spent' => 2,
         'status' => 'pending'
     ]);
 
@@ -49,8 +49,8 @@ it('prevents a freelancer from accepting their own proposal', function () {
         'job_id' => $job->id,
         'freelancer_id' => $freelancer->id,
         'cover_letter' => 'My proposal',
-        'bid_amount' => 1000,
-        'currency_id' => $job->currency_id,
+        'proposed_budget_points' => 1000,
+        'points_spent' => 2,
         'status' => 'pending'
     ]);
 

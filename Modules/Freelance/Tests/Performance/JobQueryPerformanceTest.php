@@ -22,8 +22,8 @@ it('loads jobs and their related counts without N+1 queries', function () {
             'client_id' => $client->id,
             'title' => "Job {$i}",
             'description' => 'Desc',
-            'budget' => 1000,
-            'currency_id' => 1,
+            'budget_points' => 1000,
+            'min_proposal_points' => 0,
             'type' => 'fixed',
             'duration' => '1_month',
             'status' => 'open'
@@ -34,8 +34,8 @@ it('loads jobs and their related counts without N+1 queries', function () {
                 'job_id' => $job->id,
                 'freelancer_id' => $freelancer->id,
                 'cover_letter' => 'Test',
-                'bid_amount' => 500,
-                'currency_id' => 1,
+                'proposed_budget_points' => 500,
+                'points_spent' => 2,
                 'status' => 'pending'
             ]);
         }

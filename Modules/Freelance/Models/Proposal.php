@@ -8,14 +8,11 @@ use App\Models\User;
 class Proposal extends Model
 {
     protected $table = 'freelance_proposals';
-    protected $fillable = ['job_id', 'freelancer_id', 'cover_letter', 'bid_amount', 'currency_id', 'status'];
+    protected $fillable = ['job_id', 'freelancer_id', 'cover_letter', 'proposed_budget_points', 'points_spent', 'status'];
 
-    protected $appends = ['formatted_bid_amount'];
+    protected $appends = [];
 
-    public function getFormattedBidAmountAttribute()
-    {
-        return \App\Helpers\FinanceHelper::instance()->format_money($this->bid_amount, $this->currency_id);
-    }
+    // Removed formatted_bid_amount since we are using points now
 
     public function job()
     {
@@ -27,8 +24,5 @@ class Proposal extends Model
         return $this->belongsTo(User::class, 'freelancer_id');
     }
 
-    public function currency()
-    {
-        return $this->belongsTo(\App\Models\Currency::class, 'currency_id');
-    }
+    // Currency relation removed
 }

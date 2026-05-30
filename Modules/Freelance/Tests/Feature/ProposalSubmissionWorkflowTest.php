@@ -17,8 +17,8 @@ it('allows a freelancer to submit a proposal via API', function () {
         'client_id' => $client->id,
         'title' => 'API Job',
         'description' => 'API desc',
-        'budget' => 1000,
-        'currency_id' => $currency->id,
+        'budget_points' => 1000,
+        'min_proposal_points' => 0,
         'type' => 'fixed',
         'duration' => '1_month',
         'status' => 'open'
@@ -26,8 +26,8 @@ it('allows a freelancer to submit a proposal via API', function () {
 
     $payload = [
         'cover_letter' => 'My proposal',
-        'bid_amount' => 800,
-        'currency_id' => $currency->id
+        proposedBudgetPoints: 800,
+        pointsSpent: 2
     ];
 
     $response = $this->actingAs($freelancer)->postJson("/api/freelance/jobs/{$job->id}/proposals", $payload);

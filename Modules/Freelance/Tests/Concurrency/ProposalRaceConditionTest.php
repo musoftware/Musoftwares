@@ -23,19 +23,19 @@ it('prevents a freelancer from submitting duplicate proposals for the same job',
     $data = new SubmitProposalData(
         freelancerId: $freelancer->id,
         coverLetter: 'I am the best fit for this.',
-        bidAmount: 1000,
-        currencyId: $currency->id
+        proposedBudgetPoints: 1000,
+        pointsSpent: 2
     );
 
     // First submission
-    $action->execute($data, $job, $freelancer, 2);
+    $action->execute($data, $job, $freelancer);
 
     // Assert proposal created
     expect(Proposal::where('job_id', $job->id)->where('freelancer_id', $freelancer->id)->count())->toBe(1);
 
     // Second submission - should fail
     try {
-        $action->execute($data, $job, $freelancer, 2);
+        $action->execute($data, $job, $freelancer);
         $this->fail('Expected an exception for duplicate proposal submission.');
     } catch (\Exception $e) {
         expect($e->getMessage())->toBe('You have already submitted a proposal for this job.');

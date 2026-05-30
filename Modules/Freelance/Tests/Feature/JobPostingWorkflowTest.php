@@ -20,8 +20,8 @@ it('allows a client to post a job and deducts points via API', function () {
     $payload = [
         'title' => 'Feature Test Job',
         'description' => 'Full workflow test',
-        'budget' => 1500,
-        'currency_id' => $currency->id,
+        'budget_points' => 1500,
+        'min_proposal_points' => 0,
         'type' => 'fixed',
         'duration' => '1_month',
         'skills' => []
@@ -44,7 +44,7 @@ it('allows a client to post a job and deducts points via API', function () {
         'status' => 'open'
     ]);
 
-    expect($client->fresh()->points_balance)->toBe(40); // Assumes cost is 10
+    expect($client->fresh()->points_balance)->toBe(25); // Assumes cost is 25
 });
 
 it('blocks job posting via API if points are insufficient', function () {
@@ -54,8 +54,8 @@ it('blocks job posting via API if points are insufficient', function () {
     $payload = [
         'title' => 'Insufficient Points Job',
         'description' => 'Should fail',
-        'budget' => 1500,
-        'currency_id' => $currency->id,
+        'budget_points' => 1500,
+        'min_proposal_points' => 0,
         'type' => 'fixed',
         'duration' => '1_month',
         'skills' => []

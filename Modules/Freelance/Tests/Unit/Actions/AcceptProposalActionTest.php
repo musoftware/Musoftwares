@@ -15,7 +15,7 @@ beforeEach(function () {
     Event::fake([ProposalAccepted::class]);
 });
 
-it('accepts a proposal, locks funds, refunds other freelancers, and creates a contract', function () {
+it('accepts a proposal, refunds other freelancers, and creates a contract', function () {
     $scenario = JobScenarioBuilder::create()
         ->withClient(points: 100, balance: 5000)
         ->withFreelancers(3, points: 50)
@@ -27,17 +27,17 @@ it('accepts a proposal, locks funds, refunds other freelancers, and creates a co
     $freelancers = $scenario->getFreelancers();
 
     // Create 3 proposals
-    $proposal1 = Proposal::create(['job_id' => $job->id, 'freelancer_id' => $freelancers[0]->id, 'cover_letter' => 'A', 'bid_amount' => 1000, 'currency_id' => $currencyId, 'status' => 'pending']);
-    $proposal2 = Proposal::create(['job_id' => $job->id, 'freelancer_id' => $freelancers[1]->id, 'cover_letter' => 'B', 'bid_amount' => 1500, 'currency_id' => $currencyId, 'status' => 'pending']);
-    $proposal3 = Proposal::create(['job_id' => $job->id, 'freelancer_id' => $freelancers[2]->id, 'cover_letter' => 'C', 'bid_amount' => 2000, 'currency_id' => $currencyId, 'status' => 'pending']);
+    $proposal1 = Proposal::create(['job_id' => $job->id, 'freelancer_id' => $freelancers[0]->id, 'cover_letter' => 'A', 'proposed_budget_points' => 1000, 'points_spent' => 2, 'status' => 'pending']);
+    $proposal2 = Proposal::create(['job_id' => $job->id, 'freelancer_id' => $freelancers[1]->id, 'cover_letter' => 'B', 'proposed_budget_points' => 1500, 'points_spent' => 3, 'status' => 'pending']);
+    $proposal3 = Proposal::create(['job_id' => $job->id, 'freelancer_id' => $freelancers[2]->id, 'cover_letter' => 'C', 'proposed_budget_points' => 2000, 'points_spent' => 4, 'status' => 'pending']);
 
     $action = app(AcceptProposalAction::class);
     
     // Accept proposal 1
-    $contract = $action->execute($proposal1, $client, proposalCostRefund: 2);
+    $contract = $action->execute($proposal1, $client);
 
     expect($contract)->toBeInstanceOf(Contract::class)
-        ->and($contract->amount)->toBe(1000.0)
+        ->and($contract->contract_points)->toBe(1000)
         ->and($contract->status)->toBe('active')
         ->and($contract->freelancer_id)->toBe($freelancers[0]->id);
 
@@ -49,9 +49,9 @@ it('accepts a proposal, locks funds, refunds other freelancers, and creates a co
         ->and($proposal2->fresh()->status)->toBe('rejected')
         ->and($proposal3->fresh()->status)->toBe('rejected');
 
-    // Other freelancers refunded points
-    expect($freelancers[1]->fresh()->points_balance)->toBe(52) // 50 + 2
-        ->and($freelancers[2]->fresh()->points_balance)->toBe(52);
+    // Other freelancers refunded points based on their points_spent
+    expect($freelancers[1]->fresh()->points_balance)->toBe(53) // 50 + 3
+        ->and($freelancers[2]->fresh()->points_balance)->toBe(54); // 50 + 4
 
     // Winning freelancer points are unchanged
     expect($freelancers[0]->fresh()->points_balance)->toBe(50);
@@ -69,9 +69,9 @@ it('throws exception if non-client tries to accept proposal', function () {
     $freelancer = $scenario->getFreelancer(0);
     $otherUser = $scenario->getFreelancer(1); // acting as random user
 
-    $proposal = Proposal::create(['job_id' => $job->id, 'freelancer_id' => $freelancer->id, 'cover_letter' => 'A', 'bid_amount' => 1000, 'currency_id' => $job->currency_id, 'status' => 'pending']);
+    $proposal = Proposal::create(['job_id' => $job->id, 'freelancer_id' => $freelancer->id, 'cover_letter' => 'A', 'proposed_budget_points' => 1000, 'points_spent' => 2, 'status' => 'pending']);
 
     $action = app(AcceptProposalAction::class);
     
-    $action->execute($proposal, $otherUser, 2);
+    $action->execute($proposal, $otherUser);
 })->throws(\Exception::class, 'Unauthorized to accept proposals for this job.');
