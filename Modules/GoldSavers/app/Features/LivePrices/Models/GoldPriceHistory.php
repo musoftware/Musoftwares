@@ -9,6 +9,8 @@ class GoldPriceHistory extends Model
 {
     use HasFactory;
 
+    protected $table = 'gold_price_history';
+
     protected $fillable = [
         'tenant_id',
         'source_id',
@@ -21,7 +23,7 @@ class GoldPriceHistory extends Model
         'close_price',
         'avg_price',
         'tick_count',
-        'currency',
+        'currency_id',
         'period_start',
         'period_end',
     ];
@@ -35,6 +37,13 @@ class GoldPriceHistory extends Model
         'period_start' => 'datetime',
         'period_end'   => 'datetime',
     ];
+
+    // ─── Relationships ───────────────────────────────────────────────────────────
+
+    public function currency()
+    {
+        return $this->belongsTo(\App\Models\Currency::class, 'currency_id');
+    }
 
     // ─── Scopes ─────────────────────────────────────────────────────────────────
 

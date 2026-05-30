@@ -24,7 +24,7 @@ return new class extends Migration
             $table->decimal('avg_price', 14, 4)->nullable();
             $table->unsignedInteger('tick_count')->default(0);
 
-            $table->string('currency', 3)->default('EGP');
+            $table->foreignId('currency_id')->default(1)->constrained('currencies')->onDelete('restrict');
             $table->timestamp('period_start')->nullable();
             $table->timestamp('period_end')->nullable();
             $table->timestamps();

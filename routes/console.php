@@ -29,5 +29,6 @@ Schedule::command(\App\Console\Commands\CompleteDeliveredMarketplaceOrders::clas
 
 
 // Gold Savers Jobs
-Schedule::job(new \Modules\GoldSavers\app\Features\LivePrices\Jobs\FetchLiveGoldPriceJob)->hourly();
+Schedule::command(\Modules\GoldSavers\app\Console\Commands\FetchLocalGoldPrices::class)->hourly();
+Schedule::command(\Modules\GoldSavers\app\Console\Commands\FetchGlobalGoldPrices::class)->hourly();
 

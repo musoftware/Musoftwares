@@ -28,8 +28,8 @@ class GoldSaversServiceProvider extends ServiceProvider
         // Register Artisan commands
         if ($this->app->runningInConsole()) {
             $this->commands([
-                FetchGoldPrices::class,
-                FetchWorldGoldPrices::class,
+                \Modules\GoldSavers\app\Console\Commands\FetchLocalGoldPrices::class,
+                \Modules\GoldSavers\app\Console\Commands\FetchGlobalGoldPrices::class,
             ]);
         }
     }
