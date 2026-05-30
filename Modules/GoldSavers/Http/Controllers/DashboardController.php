@@ -16,7 +16,7 @@ class DashboardController extends Controller
         $user = Auth::user();
 
         if (!$user->hasModuleSubscription('gold-saver')) {
-            abort(403, __('gold_saver.gold_saver_subscription_required'));
+            return redirect()->route('subscriptions.plans')->with('error', __('gold_saver.gold_saver_subscription_required'));
         }
 
         // Get latest price or fallback
