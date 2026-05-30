@@ -54,7 +54,7 @@ class FinancialController extends Controller
             'currency' => $user->currency_name()
         ];
         $payoutMethods = $user->payoutMethods()->where('status', 'approved')->get();
-        $withdrawals = $user->withdrawals()->with('payoutMethod')->latest()->paginate(15);
+        $withdrawals = $user->withdraw()->with('payoutMethod')->latest()->paginate(15);
 
         return Inertia::render('Financial/Withdrawals', [
             'withdrawals' => $withdrawals,
