@@ -57,6 +57,9 @@ const components: Record<string, React.ElementType> = {
     'telegram-tool':            lazy(() => import('./TelegramToolRunner')),
     'article-maker':            lazy(() => import('./ArticleMakerRunner')),
     'ArticleMakerRunner':       lazy(() => import('./ArticleMakerRunner')),
+    'LaragonManagerRunner':     lazy(() => import('./LaragonManagerRunner')),
+    'ObfuscatorRunner':         lazy(() => import('./ObfuscatorRunner')),
+    'DuplicateFinderRunner':    lazy(() => import('./DuplicateFinderRunner')),
 };
 
 function SetupWizard({ currentHost, onLinked }: { currentHost: string; onLinked: (ip: string) => void }) {
