@@ -10,13 +10,9 @@ interface FeedItem {
     timeAgo: string;
 }
 
-const mockFeed: FeedItem[] = [
-    { id: 1, type: 'stage_change', agentName: 'Sarah J.', leadName: 'Acme Corp', description: 'moved to Qualified', timeAgo: '2m ago' },
-    { id: 2, type: 'call', agentName: 'Mike T.', leadName: 'Global Tech', description: 'logged a 5m call', timeAgo: '15m ago' },
-    { id: 3, type: 'note', agentName: 'John D.', leadName: 'Nexus Solutions', description: 'added a note', timeAgo: '1h ago' },
-];
+export default function ActivityFeed({ feed }: { feed?: FeedItem[] }) {
+    const displayFeed = feed || [];
 
-export default function ActivityFeed() {
     const getIcon = (type: string) => {
         switch (type) {
             case 'stage_change': return <ArrowRight size={14} className="text-blue-600" />;
@@ -37,7 +33,10 @@ export default function ActivityFeed() {
             </div>
             
             <div className="flex-1 overflow-y-auto p-4 space-y-4">
-                {mockFeed.map((item) => (
+                {displayFeed.length === 0 ? (
+                    <div className="text-sm text-slate-500 text-center py-4">{__('No recent activities.')}</div>
+                ) : (
+                    displayFeed.map((item) => (
                     <div key={item.id} className="flex gap-3 text-sm">
                         <div className="mt-1 w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center shrink-0">
                             {getIcon(item.type)}
@@ -49,7 +48,8 @@ export default function ActivityFeed() {
                             <span className="text-xs text-slate-400">{item.timeAgo}</span>
                         </div>
                     </div>
-                ))}
+                    ))
+                )}
             </div>
         </div>
     );

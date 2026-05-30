@@ -7,7 +7,7 @@ import { PhoneCall, CalendarAlert, Target, Zap } from 'lucide-react';
 import { __ } from '@/lib/i18n';
 import { Card, CardHeader, CardTitle, CardContent } from '@/Components/ui/card';
 
-export default function TelesalesDashboard({ pipeline, kpis }: { pipeline: any, kpis: any }) {
+export default function TelesalesDashboard({ pipeline, kpis, activityFeed }: { pipeline: any, kpis: any, activityFeed?: any }) {
     return (
         <CrmLayout title={__('Telesales Workspace')} activeMenu="workspaces">
             <div className="flex flex-col h-full gap-6 p-8 pt-6">
@@ -65,7 +65,7 @@ export default function TelesalesDashboard({ pipeline, kpis }: { pipeline: any, 
 
                     {/* Right Sidebar (Live Feed) */}
                     <div className="w-80 hidden xl:block flex-shrink-0">
-                        <ActivityFeed />
+                        <ActivityFeed feed={activityFeed} />
                     </div>
                 </div>
 

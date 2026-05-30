@@ -6,7 +6,7 @@ import { __ } from '@/lib/i18n';
 import { Card, CardHeader, CardTitle, CardContent } from '@/Components/ui/card';
 import { Button } from '@/Components/ui/button';
 
-export default function MarketingDashboard({ stats }: { stats: any }) {
+export default function MarketingDashboard({ stats, topCampaigns }: { stats: any, topCampaigns?: any[] }) {
     return (
         <CrmLayout title={__('Marketing Workspace')} activeMenu="workspaces">
             <div className="flex flex-col h-full gap-6 p-8 pt-6">
@@ -64,9 +64,33 @@ export default function MarketingDashboard({ stats }: { stats: any }) {
                             <CardTitle className="font-semibold">{__('Top Performing Campaigns')}</CardTitle>
                         </CardHeader>
                         <CardContent className="flex-1 p-4 overflow-y-auto">
-                            <div className="flex items-center justify-center h-40 text-sm text-muted-foreground border border-dashed rounded-lg">
-                                {__('No active campaigns data available.')}
-                            </div>
+                            {topCampaigns && topCampaigns.length > 0 ? (
+                                <div className="space-y-3">
+                                    {topCampaigns.map((campaign: any, index: number) => (
+                                        <div key={index} className="flex items-center justify-between p-3 rounded-lg border hover:bg-muted/50 transition-colors">
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-8 h-8 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center shrink-0">
+                                                    <Megaphone size={14} />
+                                                </div>
+                                                <div>
+                                                    <p className="font-semibold text-sm text-foreground">{campaign.name}</p>
+                                                    <p className="text-xs text-muted-foreground">{__('Status:')} <span className="font-medium text-emerald-600">{campaign.status}</span></p>
+                                                </div>
+                                            </div>
+                                            <div className="flex flex-col items-end gap-1 w-32">
+                                                <span className="text-xs font-medium text-muted-foreground">{campaign.progress}% {__('Sent')}</span>
+                                                <div className="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
+                                                    <div className="bg-indigo-600 h-full rounded-full" style={{ width: `${campaign.progress}%` }} />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="flex items-center justify-center h-40 text-sm text-muted-foreground border border-dashed rounded-lg">
+                                    {__('No active campaigns data available.')}
+                                </div>
+                            )}
                         </CardContent>
                     </Card>
                 </div>

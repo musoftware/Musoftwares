@@ -40,7 +40,8 @@ Route::middleware(['web', 'auth', 'verified', 'onboarding', 'subscription:crm', 
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
         
         // Universal Search
-        Route::get('/search', [SearchController::class, 'index'])->name('search');
+        Route::get('/search', [SearchController::class, 'index'])->name('search.page');
+        Route::get('/api/search', [\Modules\CRM\Http\Controllers\Api\SearchController::class, 'index'])->name('search');
         
         // ── Leads
         Route::get('/leads', [LeadController::class, 'index'])->name('leads.index');
@@ -83,6 +84,10 @@ Route::middleware(['web', 'auth', 'verified', 'onboarding', 'subscription:crm', 
         Route::delete('/campaigns/{campaign}', [CampaignController::class, 'destroy'])->name('campaigns.destroy');
         Route::post('/campaigns/generate-ai-content', [CampaignController::class, 'generateAIContent'])->name('campaigns.generate-ai');
         Route::post('/campaigns/{campaign}/schedule', [CampaignController::class, 'schedule'])->name('campaigns.schedule');
+
+        // ── CRM Settings
+        Route::get('/settings', [\Modules\CRM\Http\Controllers\SettingController::class, 'index'])->name('settings.index');
+        Route::post('/settings', [\Modules\CRM\Http\Controllers\SettingController::class, 'store'])->name('settings.store');
 
         // ══════════════════════════════════════════════════════════════
         // ── WhatsApp Inbox Routes ────────────────────────────────────
