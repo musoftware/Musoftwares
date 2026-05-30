@@ -17,12 +17,14 @@ class KanbanController extends Controller
         $userId = $request->user()->id;
         $tenantId = session('tenant_id') ?? $request->user()->tenant_id;
 
-        // In a real app, stages might come from a config or database
+        // Real pipeline stages mapping to ENUM values
         $stages = [
             ['id' => 1, 'key' => 'NEW', 'name' => 'New Leads', 'color' => '#3b82f6'],
-            ['id' => 2, 'key' => 'FOLLOW_UP', 'name' => 'Follow Up', 'color' => '#f59e0b'],
-            ['id' => 3, 'key' => 'INTERESTED', 'name' => 'Interested', 'color' => '#8b5cf6'],
-            ['id' => 4, 'key' => 'NEGOTIATION', 'name' => 'Negotiation', 'color' => '#10b981'],
+            ['id' => 2, 'key' => 'NO_ANSWER', 'name' => 'No Answer', 'color' => '#ef4444'],
+            ['id' => 3, 'key' => 'FOLLOW_UP', 'name' => 'Follow Up', 'color' => '#f59e0b'],
+            ['id' => 4, 'key' => 'INTERESTED', 'name' => 'Interested', 'color' => '#8b5cf6'],
+            ['id' => 5, 'key' => 'MEETING_SCHEDULED', 'name' => 'Meeting Scheduled', 'color' => '#0ea5e9'],
+            ['id' => 6, 'key' => 'NEGOTIATION', 'name' => 'Negotiation', 'color' => '#10b981'],
         ];
 
         // Fetch leads assigned to the user
@@ -34,11 +36,17 @@ class KanbanController extends Controller
         // Map leads to stages
         $formattedStages = array_map(function ($stage) use ($leads) {
             $stageLeads = $leads->where('pipeline_stage', $stage['key'])->values()->map(function ($lead) use ($stage) {
+                // Calculate dynamic score based on attempts and status
+                $score = 100;
+                if ($lead->is_stale) $score -= 50;
+                if ($lead->call_attempts > 3) $score -= ($lead->call_attempts * 5);
+                if ($lead->sla_breach_at && now()->greaterThan($lead->sla_breach_at)) $score -= 20;
+
                 return [
                     'id' => $lead->id,
                     'name' => $lead->name,
                     'source' => $lead->source ?? 'Manual',
-                    'score' => 0, // Mock score for now
+                    'score' => max(0, $score), // Real calculated score
                     'stageId' => $stage['id'],
                     'slaBreached' => $lead->sla_breach_at ? now()->greaterThan($lead->sla_breach_at) : false,
                 ];
@@ -67,9 +75,11 @@ class KanbanController extends Controller
 
         $stageMap = [
             1 => 'NEW',
-            2 => 'FOLLOW_UP',
-            3 => 'INTERESTED',
-            4 => 'NEGOTIATION',
+            2 => 'NO_ANSWER',
+            3 => 'FOLLOW_UP',
+            4 => 'INTERESTED',
+            5 => 'MEETING_SCHEDULED',
+            6 => 'NEGOTIATION',
         ];
 
         if (array_key_exists($request->stage_id, $stageMap)) {

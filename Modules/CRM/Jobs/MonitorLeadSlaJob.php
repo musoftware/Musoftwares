@@ -45,15 +45,15 @@ class MonitorLeadSlaJob implements ShouldQueue
 
                 $leadIds = $breachedLeads->pluck('id')->toArray();
                 
-                // Group by branch for digest notification (mocked dispatch here)
+                // Group by branch for digest notification via Event
                 $branchGroups = $breachedLeads->groupBy('branch_id');
                 foreach ($branchGroups as $branchId => $leads) {
                     Log::info("SLA Digest: Branch {$branchId} has {$leads->count()} new SLA breaches.");
-                    // dispatch(new SendSlaDigestNotification($branchId, $leads->count()));
+                    event(new \Modules\CRM\Events\LeadSlaBreachedEvent($this->tenantId, $branchId, $leads->count()));
                 }
 
                 // Batch update to mark as stale
-                DB::table('leads')->whereIn('id', $leadId)->update([
+                DB::table('leads')->whereIn('id', $leadIds)->update([
                     'is_stale' => true,
                     'pipeline_stage' => 'NEW',
                 ]);

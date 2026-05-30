@@ -3,15 +3,24 @@
 namespace Modules\CRM\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use Modules\CRM\Models\LeadTag;
 use Modules\CRM\Models\Lead;
+use Illuminate\Http\Request;
+use Inertia\Inertia;
 use Illuminate\Http\Request;
 
 class LeadTagController extends Controller
 {
     public function index()
     {
-        return response()->json(LeadTag::all());
+        $tags = \Modules\CRM\Models\LeadTag::orderBy('created_at', 'desc')->get();
+        return Inertia::render('CRM/Tags/Index', [
+            'tags' => $tags
+        ]);
+    }
+
+    public function apiIndex()
+    {
+        return response()->json(\Modules\CRM\Models\LeadTag::all());
     }
 
     public function store(Request $request)

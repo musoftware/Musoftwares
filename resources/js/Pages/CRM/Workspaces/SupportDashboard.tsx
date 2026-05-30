@@ -7,7 +7,7 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/Components/ui/card';
 import { Button } from '@/Components/ui/button';
 import { Link } from '@inertiajs/react';
 
-export default function SupportDashboard({ stats }: { stats: any }) {
+export default function SupportDashboard({ stats, priorityMessages }: { stats: any, priorityMessages?: any[] }) {
     return (
         <CrmLayout title={__('Support Workspace')} activeMenu="workspaces">
             <div className="flex flex-col h-full gap-6 p-8 pt-6">
@@ -63,9 +63,33 @@ export default function SupportDashboard({ stats }: { stats: any }) {
                             <CardTitle className="font-semibold">{__('Priority Inbox')}</CardTitle>
                         </CardHeader>
                         <CardContent className="flex-1 p-4 overflow-y-auto">
-                            <div className="flex items-center justify-center h-40 text-sm text-muted-foreground border border-dashed rounded-lg">
-                                {__('No priority messages at the moment.')}
-                            </div>
+                            {priorityMessages && priorityMessages.length > 0 ? (
+                                <div className="space-y-3">
+                                    {priorityMessages.map((msg: any, index: number) => (
+                                        <div key={index} className="flex items-start gap-3 p-3 rounded-lg border hover:bg-muted/50 transition-colors">
+                                            <div className="w-8 h-8 rounded-full bg-red-100 text-red-600 flex items-center justify-center shrink-0 mt-0.5">
+                                                <AlertCircle size={14} />
+                                            </div>
+                                            <div className="flex-1 min-w-0">
+                                                <div className="flex justify-between items-center mb-1">
+                                                    <p className="font-semibold text-sm text-foreground truncate">{msg.customer}</p>
+                                                    <span className="text-xs text-muted-foreground whitespace-nowrap ml-2">{msg.timeAgo}</span>
+                                                </div>
+                                                <p className="text-sm text-slate-600 truncate">{msg.preview}</p>
+                                            </div>
+                                            <Button variant="ghost" size="sm" className="shrink-0 text-indigo-600" asChild>
+                                                <Link href={`/crm/whatsapp/conversations/${msg.id}`}>
+                                                    {__('Reply')}
+                                                </Link>
+                                            </Button>
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="flex items-center justify-center h-40 text-sm text-muted-foreground border border-dashed rounded-lg">
+                                    {__('No priority messages at the moment.')}
+                                </div>
+                            )}
                         </CardContent>
                     </Card>
                 </div>
