@@ -911,7 +911,7 @@ class SmsPaymentGatewayController extends Controller
         try {
             $apiController = app(\Modules\SmsPaymentGateway\Http\Controllers\Api\SmsPaymentGatewayPaymentHubController::class);
 
-            $allowedSenders = config('sms-payment-gateway.allowed_senders', ['Test-Sender']);
+            $allowedSenders = config('text-payment-gateway.allowed_senders', ['Test-Sender']);
             $defaultSender = !empty($allowedSenders) ? $allowedSenders[array_rand($allowedSenders)] : 'Test-Sender';
             $sender = $request->sender ?? $defaultSender;
 

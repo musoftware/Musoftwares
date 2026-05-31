@@ -86,7 +86,7 @@ class TransactionIngestionService
                 $userWhitelist = array_map('trim', explode(',', $settings->whitelist_senders));
             }
 
-            $allowedSenders = array_merge(config('sms-payment-gateway.allowed_senders', []), $userWhitelist);
+            $allowedSenders = array_merge(config('text-payment-gateway.allowed_senders', []), $userWhitelist);
             
             // Allow if whitelist is empty, otherwise must be in the list
             $isAllowedSender = empty($allowedSenders) || in_array(strtolower($senderName), array_map('strtolower', $allowedSenders));
@@ -246,7 +246,7 @@ class TransactionIngestionService
             return ['is_spoofed' => false, 'reason' => null];
         }
 
-        $tolerance = config('sms-payment-gateway.spoofing_tolerance', 100.00);
+        $tolerance = config('text-payment-gateway.spoofing_tolerance', 100.00);
         $reasons = [];
 
         $previousTransaction = null;
