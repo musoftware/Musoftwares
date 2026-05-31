@@ -225,6 +225,43 @@ class SmsPaymentGatewayController extends Controller
     }
 
     /**
+     * Update device settings (e.g. gateway type, allowed sender)
+     */
+    public function updateDevice(Request $request, $id)
+    {
+        $device = SmsPaymentGatewayDevice::where('user_id', Auth::id())
+            ->findOrFail($id);
+
+        $request->validate([
+            'device_name' => 'nullable|string|max:255',
+            'sim1_configs' => 'nullable|array',
+            'sim1_configs.*.allowed_sender' => 'nullable|string|max:100',
+            'sim2_configs' => 'nullable|array',
+            'sim2_configs.*.allowed_sender' => 'nullable|string|max:100',
+        ]);
+
+        $metadata = $device->metadata ?? [];
+        
+        if ($request->has('sim1_configs')) {
+            $metadata['sim1_configs'] = $request->sim1_configs;
+        }
+        
+        if ($request->has('sim2_configs')) {
+            $metadata['sim2_configs'] = $request->sim2_configs;
+        }
+
+        $updateData = ['metadata' => $metadata];
+        if ($request->has('device_name') && !empty($request->device_name)) {
+            $updateData['device_name'] = $request->device_name;
+        }
+
+        $device->update($updateData);
+
+        return redirect()->back()
+            ->with('success', __('erp.settings_saved_success'));
+    }
+
+    /**
      * Get transactions for a device (AJAX)
      */
     public function getTransactions($deviceId)
@@ -598,8 +635,11 @@ class SmsPaymentGatewayController extends Controller
             ]
         );
 
+        $devices = \Modules\SmsPaymentGateway\Models\SmsPaymentGatewayDevice::where('user_id', $user->id)->get();
+
         return \Inertia\Inertia::render('SmsPaymentGateway/Settings', [
-            'settings' => $settings
+            'settings' => $settings,
+            'devices' => $devices
         ]);
     }
 
@@ -616,6 +656,10 @@ class SmsPaymentGatewayController extends Controller
             'is_instapay_enabled' => 'boolean',
             'is_vodafone_cash_enabled' => 'boolean',
             'whitelist_senders' => 'nullable|string|max:1000',
+            'vodafone_cash_device_id' => 'nullable|integer|exists:sms_payment_gateway_devices,id',
+            'vodafone_cash_allowed_sender' => 'nullable|string|max:100',
+            'instapay_device_id' => 'nullable|integer|exists:sms_payment_gateway_devices,id',
+            'instapay_allowed_sender' => 'nullable|string|max:100',
         ]);
 
         $settings = \Modules\SmsPaymentGateway\Models\SmsPaymentGatewaySetting::firstOrCreate(
@@ -629,9 +673,13 @@ class SmsPaymentGatewayController extends Controller
             'is_instapay_enabled' => $request->has('is_instapay_enabled') ? $request->is_instapay_enabled : true,
             'is_vodafone_cash_enabled' => $request->has('is_vodafone_cash_enabled') ? $request->is_vodafone_cash_enabled : true,
             'whitelist_senders' => $request->whitelist_senders,
+            'vodafone_cash_device_id' => $request->vodafone_cash_device_id,
+            'vodafone_cash_allowed_sender' => $request->vodafone_cash_allowed_sender,
+            'instapay_device_id' => $request->instapay_device_id,
+            'instapay_allowed_sender' => $request->instapay_allowed_sender,
         ]);
 
-        return redirect()->back()->with('success', 'تم حفظ الإعدادات بنجاح');
+        return redirect()->back()->with('success', __('erp.settings_saved_success'));
     }
 
     /**

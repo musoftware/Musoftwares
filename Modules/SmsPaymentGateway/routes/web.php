@@ -40,6 +40,7 @@ Route::middleware(['web', 'auth', 'verified', 'onboarding', 'subscription:sms-pa
     Route::get('verification-secret-page', [SmsPaymentGatewayController::class, 'verificationSecretPage'])->name('verification-secret-page');
     Route::post('generate-qr', [SmsPaymentGatewayController::class, 'generateQrCode'])->name('generate-qr');
     Route::get('device/{id}', [SmsPaymentGatewayController::class, 'showDevice'])->name('device');
+    Route::put('device/{id}', [SmsPaymentGatewayController::class, 'updateDevice'])->name('update-device');
     Route::delete('device/{id}', [SmsPaymentGatewayController::class, 'deleteDevice'])->name('delete-device');
     Route::delete('device/{id}/transactions', [SmsPaymentGatewayController::class, 'clearTransactions'])->name('clear-transactions');
 
