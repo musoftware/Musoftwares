@@ -64,7 +64,7 @@ export default function MarketIndex({ hasLivePrices, hasHistoricalCharts, latest
                                     <div className="text-center">
                                         <h3 className="font-bold text-slate-900 text-lg">{__('Live Prices Locked')}</h3>
                                         <p className="text-sm text-slate-500 mb-4">{__('Upgrade To See Live Prices')}</p>
-                                        <Link href={route('isaas.subscriptions.index')}>
+                                        <Link href={route('subscriptions.manage')}>
                                             <Button className="bg-indigo-600 hover:bg-indigo-700">{__('Upgrade Now')}</Button>
                                         </Link>
                                     </div>
@@ -125,7 +125,7 @@ export default function MarketIndex({ hasLivePrices, hasHistoricalCharts, latest
                                     <div className="text-center">
                                         <h3 className="font-bold text-slate-900 text-lg">{__('Charts Locked')}</h3>
                                         <p className="text-sm text-slate-500 mb-4">{__('Upgrade To See Charts')}</p>
-                                        <Link href={route('isaas.subscriptions.index')}>
+                                        <Link href={route('subscriptions.manage')}>
                                             <Button className="bg-indigo-600 hover:bg-indigo-700">{__('Upgrade Now')}</Button>
                                         </Link>
                                     </div>

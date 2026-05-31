@@ -15,7 +15,7 @@ Route::middleware(['auth', 'verified'])->prefix('isaas/gold-savers')->name('isaa
     
     // Reports
     Route::get('/reports', [ReportsController::class, 'index'])->name('reports.index');
-    Route::post('/reports/download', [ReportsController::class, 'downloadPdf'])->name('reports.download');
+    Route::get('/reports/download', [ReportsController::class, 'downloadPdf'])->name('reports.download');
     
     Route::prefix('wallets')->name('wallets.')->group(function () {
         Route::get('/', [WalletController::class, 'index'])->name('index');

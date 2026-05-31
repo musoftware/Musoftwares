@@ -54,6 +54,7 @@ class AdminSettingController extends Controller
             'whatsapp_default_channel_id' => AdminSettings::GetValue('whatsapp_default_channel_id'),
             'friday_work_allowed'         => AdminSettings::GetValue('friday_work_allowed') === '1',
             'max_devices_per_tenant'      => AdminSettings::GetValue('max_devices_per_tenant') ?? 3,
+            'gemini_api_keys'             => AdminSettings::GetValue('gemini_api_keys'),
         ];
 
         return Inertia::render('Admin/Settings/Index', [
@@ -84,6 +85,7 @@ class AdminSettingController extends Controller
             'whatsapp_default_channel_id' => 'nullable|string',
             'friday_work_allowed'         => 'boolean',
             'max_devices_per_tenant'      => 'nullable|integer|min:1',
+            'gemini_api_keys'             => 'nullable|string',
         ]);
 
         $this->configService->updateSettings($validated);

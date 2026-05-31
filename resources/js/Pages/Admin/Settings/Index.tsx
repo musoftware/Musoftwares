@@ -12,6 +12,7 @@ import {
     AlertTriangle,
     Save,
     RefreshCw,
+    Lightbulb,
 } from 'lucide-react';
 
 interface Currency {
@@ -46,6 +47,7 @@ interface SettingsData {
     whatsapp_default_channel_id: string | null;
     friday_work_allowed: boolean;
     max_devices_per_tenant: number;
+    gemini_api_keys: string | null;
 }
 
 interface Props {
@@ -309,6 +311,23 @@ export default function Index({ currencies, whatsappChannels, settings }: Props)
                             <p className="text-xs text-gray-500 mt-2">
                                 Used for invoice reminders, payment confirmations, and automated notifications.
                             </p>
+                        </SectionCard>
+
+                        {/* AI Integrations */}
+                        <SectionCard title="AI Integrations" icon={Lightbulb}>
+                            <Field label="Gemini API Keys">
+                                <textarea
+                                    id="gemini_api_keys"
+                                    value={form.gemini_api_keys ?? ''}
+                                    onChange={(e) => set('gemini_api_keys', e.target.value)}
+                                    placeholder="Paste multiple keys separated by commas (e.g. AIza...,AIza...)"
+                                    rows={3}
+                                    className="block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-black focus:ring-1 focus:ring-black bg-white"
+                                />
+                                <p className="text-xs text-gray-500 mt-1">
+                                    Provide one or more Gemini API keys (comma-separated) for load-balancing AI features across multiple free tier accounts.
+                                </p>
+                            </Field>
                         </SectionCard>
                     </div>
                 </div>

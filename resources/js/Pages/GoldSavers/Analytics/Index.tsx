@@ -55,7 +55,7 @@ export default function AnalyticsIndex({ hasAnalytics, hasBuySellAnalytics, port
                                 <p className="text-slate-600 text-lg mb-8 max-w-2xl mx-auto">
                                     {__('Upgrade To See Analytics Desc')}
                                 </p>
-                                <Link href={route('isaas.subscriptions.index')}>
+                                <Link href={route('subscriptions.manage')}>
                                     <Button size="lg" className="bg-indigo-600 hover:bg-indigo-700 text-lg px-8 py-6 h-auto shadow-md">
                                         {__('Upgrade Now To Unlock')}
                                     </Button>
@@ -179,7 +179,7 @@ export default function AnalyticsIndex({ hasAnalytics, hasBuySellAnalytics, port
                                     <div className="text-center">
                                         <h3 className="font-bold text-slate-900 text-lg">{__('Buy Sell Analytics Locked')}</h3>
                                         <p className="text-sm text-slate-500 mb-4">{__('Upgrade To See Buy Sell')}</p>
-                                        <Link href={route('isaas.subscriptions.index')}>
+                                        <Link href={route('subscriptions.manage')}>
                                             <Button className="bg-indigo-600 hover:bg-indigo-700">{__('Upgrade Now')}</Button>
                                         </Link>
                                     </div>
