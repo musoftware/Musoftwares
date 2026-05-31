@@ -20,9 +20,9 @@ class WidgetController extends Controller
     /**
      * Show the payment widget iframe
      */
-    public function show($order_id)
+    public function show($uuid)
     {
-        $order = \App\Models\PaymentOrder::find($order_id);
+        $order = \App\Models\PaymentOrder::where('uuid', $uuid)->first();
 
         if (!$order) {
             abort(404, 'Invalid checkout session.');
@@ -50,20 +50,21 @@ class WidgetController extends Controller
             'vodafonePhone' => $vodafonePhone,
             'isInstapay' => $isInstapay,
             'isVodafone' => $isVodafone,
-            'redirectUrl' => route('sms-payment-gateway.widget.status', ['order_id' => $order->id]),
-            'verifyUrl' => route('sms-payment-gateway.widget.verify', ['order_id' => $order->id]),
+            'redirectUrl' => route('sms-payment-gateway.widget.status', ['uuid' => $order->uuid]),
+            'verifyUrl' => route('sms-payment-gateway.widget.verify', ['uuid' => $order->uuid]),
             'merchantName' => $user->name,
             'order_number' => $order->metadata['order_number'] ?? ('ORD-' . $order->id),
-            'currency' => $order->currency ?? 'EGP',
+            'currency' => $order->currency->code ?? 'EGP',
+            'status' => $order->status,
         ]);
     }
 
     /**
      * Poll for transaction status
      */
-    public function status($order_id)
+    public function status($uuid)
     {
-        $order = \App\Models\PaymentOrder::find($order_id);
+        $order = \App\Models\PaymentOrder::where('uuid', $uuid)->first();
 
         if (!$order) {
             return response()->json(['success' => false, 'message' => 'Invalid order'], 404);
@@ -88,13 +89,13 @@ class WidgetController extends Controller
     /**
      * Verify payment based on guest input
      */
-    public function verify(Request $request, $order_id)
+    public function verify(Request $request, $uuid)
     {
         $request->validate([
             'transaction_id' => 'required|string',
         ]);
 
-        $order = \App\Models\PaymentOrder::find($order_id);
+        $order = \App\Models\PaymentOrder::where('uuid', $uuid)->first();
 
         if (!$order) {
             return response()->json(['success' => false, 'message' => 'Invalid order'], 404);

@@ -11,11 +11,22 @@ class PaymentOrder extends Model
 {
     use HasFactory;
 
+    protected static function boot()
+    {
+        parent::boot();
+        static::creating(function ($model) {
+            if (empty($model->uuid)) {
+                $model->uuid = (string) \Illuminate\Support\Str::uuid();
+            }
+        });
+    }
+
     protected $fillable = [
+        'uuid',
         'user_id',
         'mobile_number',
         'amount',
-        'currency',
+        'currency_id',
         'status',
         'verified_at',
         'transaction_id',
@@ -68,5 +79,10 @@ class PaymentOrder extends Model
     public function isPending(): bool
     {
         return $this->status === 'pending';
+    }
+
+    public function currency()
+    {
+        return $this->belongsTo(\App\Models\Currency::class, 'currency_id');
     }
 }

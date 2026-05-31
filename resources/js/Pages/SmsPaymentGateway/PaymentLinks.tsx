@@ -10,6 +10,7 @@ import { Copy, Plus, ExternalLink } from 'lucide-react';
 
 interface PaymentOrder {
     id: number;
+    uuid: string;
     amount: string;
     status: string;
     created_at: string;
@@ -140,14 +141,14 @@ export default function PaymentLinks({ links }: Props) {
                                 </tr>
                             ) : (
                                 links.data.map((link) => {
-                                    const checkoutUrl = route('sms-payment-gateway.widget.show', { order_id: link.id });
+                                    const checkoutUrl = route('sms-payment-gateway.widget.show', { uuid: link.uuid });
                                     return (
                                         <tr key={link.id} className="hover:bg-gray-50">
                                             <td className="px-6 py-4 whitespace-nowrap text-sm font-mono text-gray-900">
                                                 {link.metadata?.order_number || ('ORD-' + link.id)}
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900">
-                                                {Number(link.amount).toFixed(2)} ج.م
+                                                {Number(link.amount).toFixed(2)} {link.currency?.symbol || ''}
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                                 {link.metadata?.customer_name || '—'}

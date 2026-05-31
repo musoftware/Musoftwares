@@ -650,7 +650,8 @@ class SmsPaymentGatewayController extends Controller
     public function paymentLinks()
     {
         $user = Auth::user();
-        $links = \App\Models\PaymentOrder::where('user_id', $user->id)
+        $links = \App\Models\PaymentOrder::with('currency')
+            ->where('user_id', $user->id)
             ->whereNotNull('metadata->is_sms_gateway')
             ->orderBy('created_at', 'desc')
             ->paginate(15);
@@ -677,7 +678,7 @@ class SmsPaymentGatewayController extends Controller
             'user_id' => $user->id,
             'mobile_number' => '00000000000', // Dummy as not used here
             'amount' => $request->amount,
-            'currency' => 'EGP',
+            'currency_id' => \App\Models\AdminSettings::business_currency(),
             'status' => 'pending',
             'metadata' => [
                 'is_sms_gateway' => true,
@@ -687,7 +688,7 @@ class SmsPaymentGatewayController extends Controller
             ]
         ]);
 
-        return redirect()->back()->with('success', 'تم إنشاء رابط الدفع بنجاح');
+        return redirect()->back()->with('success', __('erp.created_successfully'));
     }
 
     /**
