@@ -105,14 +105,10 @@ export default function Device({ device, transactions }: DeviceProps) {
                                 </div>
                                 <div>
                                     <p className="text-xs font-semibold text-slate-500 uppercase">Network Identity</p>
-                                    {(device.sim1_number || device.sim2_number) ? (
-                                        <div className="flex flex-col gap-1 mt-1">
-                                            {device.sim1_number && <p className="text-sm font-bold text-slate-800">S1: {mask(device.sim1_number, 'phone')}</p>}
-                                            {device.sim2_number && <p className="text-sm font-bold text-slate-800">S2: {mask(device.sim2_number, 'phone')}</p>}
-                                        </div>
-                                    ) : (
-                                        <p className="text-sm font-bold text-slate-800">{mask(device.phone_number, 'phone')}</p>
-                                    )}
+                                    <div className="flex flex-col gap-1 mt-1">
+                                        <p className="text-sm font-medium text-slate-500">S1: <span className="font-bold text-slate-800">{device.sim1_number ? mask(device.sim1_number, 'phone') : __('Not set')}</span></p>
+                                        <p className="text-sm font-medium text-slate-500">S2: <span className="font-bold text-slate-800">{device.sim2_number ? mask(device.sim2_number, 'phone') : __('Not set')}</span></p>
+                                    </div>
                                 </div>
                             </CardContent>
                         </Card>

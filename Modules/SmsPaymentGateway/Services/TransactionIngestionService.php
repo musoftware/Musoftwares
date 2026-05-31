@@ -189,29 +189,27 @@ class TransactionIngestionService
                 $metadata['reference_number'] = $transactionData['reference_number'];
             }
 
-            $transactionCreateData = [
-                'tenant_id' => $device->tenant_id ?? $user->id, // Use tenant_id or fallback to user_id
+            $autoSmsTransaction = SmsPaymentGatewayTransaction::create([
                 'device_id' => $device->id,
                 'user_id' => $user->id,
+                'tenant_id' => $user->tenant_id,
+                'sender' => $transactionData['sender'] ?? '',
+                'sender_name' => $smsData['sender'] ?? '',
                 'amount' => $transactionData['amount'],
-                'currency' => $transactionData['currency'],
-                'sender' => $transactionData['sender'],
+                'currency' => $transactionData['currency'] ?? 'EGP',
+                'balance' => $transactionData['balance'] ?? null,
                 'phone_number' => $phoneNumber,
                 'reference_number' => $transactionData['reference_number'] ?? null,
-                'sender_name' => $transactionData['sender_name'] ?? null,
-                'transaction_date' => $transactionDate,
                 'sms_message' => $smsData['message'] ?? '',
                 'message_id' => $smsData['message_id'] ?? null,
-                'sms_timestamp' => isset($smsData['timestamp']) ? intval($smsData['timestamp']) : null,
-                'status' => 'pending',
-                'metadata' => $metadata,
-                'is_test' => $smsData['is_test'] ?? false,
-                'balance' => $transactionData['balance'] ?? null,
+                'sms_timestamp' => $smsTimestamp,
+                'transaction_date' => $transactionDate,
+                'metadata' => $smsData,
                 'is_spoofed' => $spoofingCheck['is_spoofed'],
                 'spoofing_reason' => $spoofingCheck['reason'],
-            ];
-
-            $autoSmsTransaction = SmsPaymentGatewayTransaction::create($transactionCreateData);
+                'is_test' => $smsData['is_test'] ?? false,
+                'status' => $spoofingCheck['is_spoofed'] ? 'spoofed' : 'pending',
+            ]);
 
             Log::info('AutoSMS Payment Hub - Transaction Created', [
                 'user_id' => $user->id,

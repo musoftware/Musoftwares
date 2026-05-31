@@ -43,7 +43,7 @@ Route::middleware(['web', 'auth', 'verified', 'onboarding', 'subscription:sms-pa
     Route::delete('device/{id}', [SmsPaymentGatewayController::class, 'deleteDevice'])->name('delete-device');
     Route::delete('device/{id}/transactions', [SmsPaymentGatewayController::class, 'clearTransactions'])->name('clear-transactions');
 
-    Route::get('device/{deviceId}/transactions', [SmsPaymentGatewayController::class, 'getTransactions'])->name('transactions');
+    Route::get('device/{deviceId}/transactions', [SmsPaymentGatewayController::class, 'getTransactions'])->name('device.transactions');
     Route::get('verification-secret', [SmsPaymentGatewayController::class, 'getVerificationSecret'])->name('verification-secret');
     Route::post('verification-secret/regenerate', [SmsPaymentGatewayController::class, 'regenerateVerificationSecret'])->name('verification-secret.regenerate');
     Route::post('webhook', [SmsPaymentGatewayController::class, 'updateWebhook'])->name('webhook.update');
