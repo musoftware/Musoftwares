@@ -122,14 +122,26 @@ export default function CrmLayout({ title, activeMenu, children }: CrmLayoutProp
                         <span className="font-semibold text-slate-900 tracking-tight">{workspaceName}</span>
                     </div>
                     <div className="flex items-center gap-4">
-                        <Link
-                            href={route('dashboard')}
-                            className="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-slate-500 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors"
-                        >
-                            <ArrowLeft className="w-4 h-4" />
-                            <span className="hidden sm:inline">{__('Exit to Main Hub')}</span>
-                            <span className="sm:hidden">{__('Exit')}</span>
-                        </Link>
+                        {isTeamMember ? (
+                            <Link
+                                href={route('crm.team.logout')}
+                                method="post"
+                                as="button"
+                                className="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors"
+                            >
+                                <ArrowLeft className="w-4 h-4" />
+                                <span>{__('Logout')}</span>
+                            </Link>
+                        ) : (
+                            <Link
+                                href={route('dashboard')}
+                                className="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-slate-500 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors"
+                            >
+                                <ArrowLeft className="w-4 h-4" />
+                                <span className="hidden sm:inline">{__('Exit to Main Hub')}</span>
+                                <span className="sm:hidden">{__('Exit')}</span>
+                            </Link>
+                        )}
                     </div>
                 </div>
             </header>

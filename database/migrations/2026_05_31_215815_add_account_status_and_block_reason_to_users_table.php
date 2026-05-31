@@ -11,8 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('sms_payment_gateway_transactions', function (Blueprint $table) {
-            $table->string('status', 50)->default('pending')->change();
+        Schema::table('users', function (Blueprint $table) {
+            $table->string('account_status', 20)->default('active')->after('deleted_at')->index();
+            $table->text('block_reason')->nullable()->after('account_status');
         });
     }
 
@@ -21,8 +22,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('sms_payment_gateway_transactions', function (Blueprint $table) {
-            $table->enum('status', ['pending', 'processed', 'failed', 'spoofed'])->default('pending')->change();
+        Schema::table('users', function (Blueprint $table) {
+            $table->dropColumn(['account_status', 'block_reason']);
         });
     }
 };

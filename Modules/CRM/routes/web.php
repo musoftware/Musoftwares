@@ -45,6 +45,7 @@ Route::middleware(['web', 'auth', 'verified', 'onboarding', 'subscription:crm', 
         
         // ── Leads
         Route::get('/leads', [LeadController::class, 'index'])->name('leads.index');
+        Route::post('/leads', [LeadController::class, 'store'])->name('leads.store');
         Route::get('/leads/{lead}', [LeadController::class, 'show'])->name('leads.show');
         Route::post('/leads/{lead}/status', [LeadController::class, 'updateStatus'])->name('leads.update-status');
         Route::post('/leads/{lead}/assign', [LeadController::class, 'assign'])->name('leads.assign');

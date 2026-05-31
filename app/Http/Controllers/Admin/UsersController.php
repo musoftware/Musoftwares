@@ -758,5 +758,28 @@ class UsersController extends Controller
 
         return Inertia::render('Admin/Users/EarningAnalyze', $data);
     }
+
+    public function updateRole(Request $request, $id)
+    {
+        $user = User::findOrFail($id);
+
+        if ($user->id === Auth::id()) {
+            throw \Illuminate\Validation\ValidationException::withMessages([
+                'role' => __('errors.cannot_change_own_role'),
+            ]);
+        }
+
+        $request->validate([
+            'role' => 'required|string|in:admin,client,user,employee,manager,moderator',
+        ]);
+
+        $roleName = $request->input('role');
+        // Ensure Spatie role exists
+        \Spatie\Permission\Models\Role::findOrCreate($roleName, 'web');
+
+        $user->syncRoles([$roleName]);
+
+        return back()->with('success', __('erp.role_updated_success'));
+    }
 }
 

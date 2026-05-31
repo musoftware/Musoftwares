@@ -1,7 +1,8 @@
 import React, { PropsWithChildren, ReactNode, useState } from 'react';
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 import { ChevronRight, ArrowLeft, Lock, Menu, X } from 'lucide-react';
 import { useInertiaNotifications } from '@/hooks/useInertiaNotifications';
+import { __ } from '@/lib/i18n';
 
 interface ERPLayoutProps extends PropsWithChildren {
     title: string;
@@ -38,6 +39,10 @@ export default function ERPLayout({
     lockedAddons = [],
     children,
 }: ERPLayoutProps) {
+    const { auth } = usePage().props as any;
+    const teamMember = auth?.team_member;
+    const isTeamMember = !!teamMember;
+
     useInertiaNotifications();
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const activeMenuItem = menuItems.find(item => item.isActive);
@@ -221,18 +226,26 @@ export default function ERPLayout({
                         <span className="font-semibold text-slate-900 tracking-tight">{safeWorkspaceName} System</span>
                     </div>
                     <div className="flex items-center gap-4">
-                        {/* 
-                            This allows the client to exit their isolated ERP system 
-                            and return to the main platform portal.
-                        */}
-                        <Link 
-                            href={route('dashboard')} 
-                            className="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-slate-500 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors"
-                        >
-                            <ArrowLeft className="w-4 h-4" /> 
-                            <span className="hidden sm:inline">Exit to Main Hub</span>
-                            <span className="sm:hidden">Exit</span>
-                        </Link>
+                        {isTeamMember ? (
+                            <Link 
+                                href={route('erp.team.logout')} 
+                                method="post"
+                                as="button"
+                                className="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors"
+                            >
+                                <ArrowLeft className="w-4 h-4" /> 
+                                <span>{__('Logout')}</span>
+                            </Link>
+                        ) : (
+                            <Link 
+                                href={route('dashboard')} 
+                                className="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-slate-500 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors"
+                            >
+                                <ArrowLeft className="w-4 h-4" /> 
+                                <span className="hidden sm:inline">{__('Exit to Main Hub')}</span>
+                                <span className="sm:hidden">{__('Exit')}</span>
+                            </Link>
+                        )}
                     </div>
                 </div>
             </header>

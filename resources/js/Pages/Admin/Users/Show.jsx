@@ -23,11 +23,14 @@ import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
 import { formatMoney as formatCurrency } from '@/lib/utils';
+import { __ } from '@/lib/i18n';
 
 export default function Show({ client, stats = {}, wallets, modulePlans = [], subscriptions = [] }) {
     const [isLoginAsLoading, setIsLoginAsLoading] = useState(false);
     const [isResetPassOpen, setIsResetPassOpen] = useState(false);
     const [newPassword, setNewPassword] = useState('');
+    const [isChangeRoleOpen, setIsChangeRoleOpen] = useState(false);
+    const [selectedRole, setSelectedRole] = useState(client.role || 'client');
     
     // New Modal States
     const [isAssignTaskOpen, setIsAssignTaskOpen] = useState(false);
@@ -63,6 +66,16 @@ export default function Show({ client, stats = {}, wallets, modulePlans = [], su
         } catch (e) {
             alert('Failed to reset password.');
         }
+    };
+
+    const submitChangeRole = (e) => {
+        e.preventDefault();
+        router.post(`/admin/users/${client.id}/update-role`, { role: selectedRole }, {
+            onSuccess: () => {
+                setIsChangeRoleOpen(false);
+                alert(__("User role updated successfully!"));
+            }
+        });
     };
 
     const submitWalletTx = (e) => {
@@ -186,6 +199,10 @@ export default function Show({ client, stats = {}, wallets, modulePlans = [], su
                             <DropdownMenuItem onClick={() => { setIsResetPassOpen(true); setNewPassword(''); }}>
                                 <Key className="mr-2 h-4 w-4" />
                                 <span>Reset Password</span>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => { setSelectedRole(client.role || 'client'); setIsChangeRoleOpen(true); }}>
+                                <ShieldCheck className="mr-2 h-4 w-4" />
+                                <span>Change Role</span>
                             </DropdownMenuItem>
                             <DropdownMenuItem onClick={() => setIsAssignTaskOpen(true)}>
                                 <Briefcase className="mr-2 h-4 w-4" />
@@ -380,6 +397,41 @@ export default function Show({ client, stats = {}, wallets, modulePlans = [], su
                 </DialogContent>
             </Dialog>
 
+            <Dialog open={isChangeRoleOpen} onOpenChange={setIsChangeRoleOpen}>
+                <DialogContent>
+                    <form onSubmit={submitChangeRole}>
+                        <DialogHeader>
+                            <DialogTitle>{__("Change User Role")}</DialogTitle>
+                            <DialogDescription>
+                                {__("Change direct permissions and role access level for this user.")}
+                            </DialogDescription>
+                        </DialogHeader>
+                        <div className="py-4 space-y-4">
+                            <div>
+                                <Label>{__("Select Role")}</Label>
+                                <select 
+                                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 mt-2"
+                                    value={selectedRole}
+                                    onChange={e => setSelectedRole(e.target.value)}
+                                    required
+                                >
+                                    <option value="client">{__("Client")}</option>
+                                    <option value="user">{__("User")}</option>
+                                    <option value="admin">{__("Admin")}</option>
+                                    <option value="manager">{__("Manager")}</option>
+                                    <option value="employee">{__("Employee")}</option>
+                                    <option value="moderator">{__("Moderator")}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <DialogFooter>
+                            <Button type="button" variant="outline" onClick={() => setIsChangeRoleOpen(false)}>{__("Cancel")}</Button>
+                            <Button type="submit">{__("Update Role")}</Button>
+                        </DialogFooter>
+                    </form>
+                </DialogContent>
+            </Dialog>
+
             <Dialog open={isResetPassOpen} onOpenChange={setIsResetPassOpen}>
                 <DialogContent>
                     <DialogHeader>
@@ -540,6 +592,9 @@ export default function Show({ client, stats = {}, wallets, modulePlans = [], su
                     <div className="flex flex-wrap gap-2 justify-center md:justify-start">
                         <span className="px-3 py-1 bg-slate-100 text-slate-800 rounded-full text-xs font-bold uppercase tracking-wide border border-slate-200">
                             ID: {client.id}
+                        </span>
+                        <span className="px-3 py-1 bg-indigo-50 text-indigo-700 rounded-full text-xs font-bold uppercase tracking-wide border border-indigo-200">
+                            Role: {client.role || 'client'}
                         </span>
                         {client.kyc_verified ? (
                             <span className="px-3 py-1 bg-green-50 text-green-700 rounded-full text-xs font-bold uppercase tracking-wide border border-green-200">

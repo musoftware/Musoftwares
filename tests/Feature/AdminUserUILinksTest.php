@@ -4,12 +4,12 @@ namespace Tests\Feature;
 
 use App\Models\User;
 use Spatie\Permission\Models\Role;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class AdminUserUILinksTest extends TestCase
 {
-    use DatabaseTransactions;
+    use RefreshDatabase;
 
     protected $admin;
     protected $clientUser;
@@ -62,9 +62,9 @@ class AdminUserUILinksTest extends TestCase
 
     public function test_admin_can_access_login_as_endpoint()
     {
-        // The route list has a GET endpoint for loginas which returns an Inertia page
-        $response = $this->actingAs($this->admin)->get(route('admin.users.loginas', $this->clientUser->id));
-        $response->assertStatus(200);
+        // The endpoint performs login and redirects to the dashboard
+        $response = $this->actingAs($this->admin)->get(route('admin.users.login-as', $this->clientUser->id));
+        $response->assertRedirect(route('dashboard'));
     }
 
     public function test_admin_can_reset_user_password()

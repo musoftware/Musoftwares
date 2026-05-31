@@ -26,11 +26,10 @@ class AdminAuthSecurityTest extends TestCase
 
     public function test_regular_user_cannot_access_admin_dashboard(): void
     {
-        // A client user has role = 'client'
         $user = User::factory()->create([
-            'role' => 'client',
             'onboarding_completed' => true,
         ]);
+        $user->assignRole('client');
 
         $response = $this->actingAs($user)->get('/admin/dashboard');
 
@@ -39,9 +38,7 @@ class AdminAuthSecurityTest extends TestCase
 
     public function test_admin_can_access_admin_dashboard(): void
     {
-        // An admin user has role = 'admin'
         $admin = User::factory()->create([
-            'role' => 'admin',
             'onboarding_completed' => true,
         ]);
         $admin->assignRole('admin');
