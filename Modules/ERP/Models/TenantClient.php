@@ -15,7 +15,7 @@ class TenantClient extends TenantModel
     ];
 
     protected $appends = [
-        'balance', 'locked_balance'
+        'balance', 'locked_balance', 'avatar_url'
     ];
 
     protected static function booted()
@@ -32,6 +32,16 @@ class TenantClient extends TenantModel
     public function currency()
     {
         return $this->belongsTo(\App\Models\Currency::class, 'currency_id');
+    }
+
+    public function getAvatarUrlAttribute()
+    {
+        if (empty($this->email)) {
+            return 'https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y';
+        }
+        
+        $hash = md5(strtolower(trim($this->email)));
+        return "https://www.gravatar.com/avatar/{$hash}?d=404";
     }
 
     public function country()

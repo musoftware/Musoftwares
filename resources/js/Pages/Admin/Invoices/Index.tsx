@@ -5,6 +5,7 @@ import { Button } from '@/Components/ui/button';
 import { formatMoney as formatCurrency } from '@/lib/utils';
 import ClientActionsSheet from '@/Pages/Admin/Users/ClientActionsSheet';
 import { MoreHorizontal, FileText, CheckCircle, XCircle, ChevronDown, Plus, List, Receipt, Clock, User, ClipboardList } from 'lucide-react';
+import { Avatar, AvatarFallback, AvatarImage } from '@/Components/ui/avatar';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -373,14 +374,27 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
                                         </TableCell>
                                         <TableCell data-label="Customer">
                                             {invoice.user ? (
-                                                <button
-                                                    type="button"
-                                                    onClick={() => setSelectedClient(invoice.user)}
-                                                    className="flex items-center gap-1 font-semibold text-foreground hover:text-primary transition-colors"
-                                                >
-                                                    {invoice.user.name}
-                                                    <ChevronDown className="h-3 w-3 text-muted-foreground hidden sm:inline-block" />
-                                                </button>
+                                                <div className="flex items-center gap-3">
+                                                    <Avatar className="h-10 w-10 border border-slate-200">
+                                                        <AvatarImage src={invoice.user.avatar_url || ''} alt={invoice.user.name} />
+                                                        <AvatarFallback className="bg-blue-50 text-blue-500">
+                                                            <User className="h-5 w-5" />
+                                                        </AvatarFallback>
+                                                    </Avatar>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setSelectedClient(invoice.user)}
+                                                        className="flex flex-col text-left group"
+                                                    >
+                                                        <span className="font-semibold text-slate-900 group-hover:text-blue-600 transition-colors flex items-center gap-1">
+                                                            {invoice.user.name}
+                                                            <ChevronDown className="h-3 w-3 text-muted-foreground hidden sm:inline-block" />
+                                                        </span>
+                                                        <span className="text-sm text-slate-500 font-normal">
+                                                            {invoice.user.email}
+                                                        </span>
+                                                    </button>
+                                                </div>
                                             ) : (
                                                 <span className="font-semibold text-muted-foreground">Unknown</span>
                                             )}

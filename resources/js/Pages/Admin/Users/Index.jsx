@@ -3,7 +3,8 @@ import { Head, Link, router } from '@inertiajs/react';
 import ClientActionsSheet from './ClientActionsSheet';
 import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
 import { DataTable } from '@/Components/ui/DataTable';
-import { MoreHorizontal, Eye, Edit, LogIn, Key, Wallet, Users, FolderOpen, FileText } from 'lucide-react';
+import { MoreHorizontal, Eye, Edit, LogIn, Key, Wallet, Users, User, FolderOpen, FileText } from 'lucide-react';
+import { Avatar, AvatarFallback, AvatarImage } from '@/Components/ui/avatar';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -88,27 +89,33 @@ export default function Index({ clients, filters, stats }) {
             render: (client) => <span className="text-slate-500 font-mono text-xs">#{client.id}</span>
         },
         {
-            key: 'name',
-            label: 'Name',
+            key: 'employee',
+            label: 'EMPLOYEE',
             sortable: true,
             render: (client) => (
-                <button 
-                    onClick={() => {
-                        setSelectedClient(client);
-                        setIsSheetOpen(true);
-                    }}
-                    className="flex flex-col text-left hover:bg-slate-50 p-1 -ml-1 rounded transition-colors group"
-                >
-                    <span className="font-medium text-blue-600 group-hover:text-blue-800 transition-colors">{client.name}</span>
-                    {client.full_name && <span className="text-xs text-slate-500">{client.full_name}</span>}
-                </button>
+                <div className="flex items-center gap-3">
+                    <Avatar className="h-10 w-10 border border-slate-200">
+                        <AvatarImage src={client.avatar_url || ''} alt={client.name} />
+                        <AvatarFallback className="bg-blue-50 text-blue-500">
+                            <User className="h-5 w-5" />
+                        </AvatarFallback>
+                    </Avatar>
+                    <button 
+                        onClick={() => {
+                            setSelectedClient(client);
+                            setIsSheetOpen(true);
+                        }}
+                        className="flex flex-col text-left group"
+                    >
+                        <span className="font-semibold text-slate-900 group-hover:text-blue-600 transition-colors">
+                            {client.name}
+                        </span>
+                        <span className="text-sm text-slate-500">
+                            {client.email}
+                        </span>
+                    </button>
+                </div>
             ),
-        },
-        {
-            key: 'email',
-            label: 'Email',
-            sortable: true,
-            render: (client) => <span className="text-slate-600">{client.email}</span>,
         },
         {
             key: 'phone_number',

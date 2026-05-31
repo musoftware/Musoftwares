@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
+import { __ } from '@/lib/i18n';
 import { Head, router } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Button } from '@/Components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/Components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/Components/ui/tabs';
-import { ArrowLeft, BookOpen, Code, Terminal, Webhook } from 'lucide-react';
+import { ArrowLeft, BookOpen, Code, Terminal, Webhook, Download } from 'lucide-react';
 
 export default function Documentation() {
     return (
@@ -27,97 +28,14 @@ export default function Documentation() {
                         </Button>
                     </div>
 
-                    <Tabs defaultValue="quickstart" className="w-full">
+                    <Tabs defaultValue="simple" className="w-full">
                         <TabsList className="mb-4">
-                            <TabsTrigger value="quickstart"><Terminal className="w-4 h-4 mr-2"/> {__('sms_gateway.quick_start')}</TabsTrigger>
-                            <TabsTrigger value="widget"><Code className="w-4 h-4 mr-2"/> Javascript Widget</TabsTrigger>
-                            <TabsTrigger value="webhooks"><Webhook className="w-4 h-4 mr-2"/> {__('sms_gateway.webhooks')}</TabsTrigger>
+                            <TabsTrigger value="simple"><Code className="w-4 h-4 mr-2"/> Simple</TabsTrigger>
+                            <TabsTrigger value="advanced"><Terminal className="w-4 h-4 mr-2"/> Advanced</TabsTrigger>
                         </TabsList>
 
-                        {/* QUICK START */}
-                        <TabsContent value="quickstart">
-                            <Card>
-                                <CardHeader>
-                                    <CardTitle>SDK Integration</CardTitle>
-                                    <CardDescription>Integrate the SMS Payment Gateway directly into your backend.</CardDescription>
-                                </CardHeader>
-                                <CardContent className="space-y-6">
-                                    <div className="space-y-4">
-                                        <h3 className="text-lg font-bold text-slate-800">1. Install the SDK</h3>
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                            <div className="bg-slate-900 rounded-lg p-4">
-                                                <div className="text-xs text-slate-400 font-bold mb-2">PHP (Composer)</div>
-                                                <pre className="text-emerald-400 text-sm overflow-x-auto">
-                                                    <code>composer require musoftware/smspay-php</code>
-                                                </pre>
-                                            </div>
-                                            <div className="bg-slate-900 rounded-lg p-4">
-                                                <div className="text-xs text-slate-400 font-bold mb-2">Node.js (NPM)</div>
-                                                <pre className="text-emerald-400 text-sm overflow-x-auto">
-                                                    <code>npm install @musoftware/smspay</code>
-                                                </pre>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div className="space-y-4">
-                                        <h3 className="text-lg font-bold text-slate-800">2. Create a Checkout Session</h3>
-                                        <p className="text-slate-600 text-sm">When your customer wants to pay, create a Checkout Session on your server using your <strong>Secret Key</strong>.</p>
-                                        
-                                        <Tabs defaultValue="php" className="w-full mt-2">
-                                            <TabsList className="h-8">
-                                                <TabsTrigger value="php" className="text-xs">PHP</TabsTrigger>
-                                                <TabsTrigger value="node" className="text-xs">Node.js</TabsTrigger>
-                                            </TabsList>
-                                            <TabsContent value="php">
-                                                <div className="bg-slate-900 rounded-lg p-4 overflow-x-auto">
-                                                    <pre className="text-slate-300 text-sm">
-<code>{`$smspay = new \\SmsPay\\SmsPay('sk_live_YOUR_SECRET_KEY');
-
-$session = $smspay->checkoutSessions->create([
-    'amount' => 150.00,
-    'currency' => 'EGP',
-    'success_url' => 'https://yourwebsite.com/success?session_id={SESSION_ID}',
-    'cancel_url' => 'https://yourwebsite.com/cancel',
-    'metadata' => [
-        'order_id' => 'ORD-1234'
-    ],
-]);
-
-// Send the session.id to your frontend
-echo json_encode(['id' => $session->id]);`}</code>
-                                                    </pre>
-                                                </div>
-                                            </TabsContent>
-                                            <TabsContent value="node">
-                                                <div className="bg-slate-900 rounded-lg p-4 overflow-x-auto">
-                                                    <pre className="text-slate-300 text-sm">
-<code>{`const SmsPay = require('@musoftware/smspay');
-const smspay = new SmsPay('sk_live_YOUR_SECRET_KEY');
-
-const session = await smspay.checkoutSessions.create({
-    amount: 150.00,
-    currency: 'EGP',
-    successUrl: 'https://yourwebsite.com/success?session_id={SESSION_ID}',
-    cancelUrl: 'https://yourwebsite.com/cancel',
-    metadata: {
-        orderId: 'ORD-1234'
-    },
-});
-
-// Send the session.id to your frontend
-res.json({ id: session.id });`}</code>
-                                                    </pre>
-                                                </div>
-                                            </TabsContent>
-                                        </Tabs>
-                                    </div>
-                                </CardContent>
-                            </Card>
-                        </TabsContent>
-
-                        {/* WIDGET */}
-                        <TabsContent value="widget">
+                        {/* SIMPLE */}
+                        <TabsContent value="simple">
                             <Card>
                                 <CardHeader>
                                     <CardTitle>SmsPay.js Widget</CardTitle>
@@ -167,28 +85,120 @@ res.json({ id: session.id });`}</code>
                             </Card>
                         </TabsContent>
 
-                        {/* WEBHOOKS */}
-                        <TabsContent value="webhooks">
-                            <Card>
-                                <CardHeader>
-                                    <CardTitle>Verifying Webhooks</CardTitle>
-                                    <CardDescription>Securely receive payment confirmations.</CardDescription>
-                                </CardHeader>
-                                <CardContent>
-                                    <p className="text-slate-600 mb-4">
-                                        To securely confirm that a webhook was actually sent by our gateway, you must verify its cryptographic signature using your Webhook Secret.
-                                        <br/><br/>
-                                        <strong>Never</strong> fulfill an order without verifying the webhook signature.
-                                    </p>
-                                    
-                                    <Tabs defaultValue="php" className="w-full">
-                                        <TabsList className="h-8">
-                                            <TabsTrigger value="php" className="text-xs">PHP</TabsTrigger>
-                                            <TabsTrigger value="node" className="text-xs">Node.js</TabsTrigger>
-                                        </TabsList>
-                                        <TabsContent value="php">
-                                            <div className="bg-slate-900 rounded-lg p-4 overflow-x-auto">
-                                                <pre className="text-slate-300 text-sm">
+                        {/* ADVANCED */}
+                        <TabsContent value="advanced">
+                            <div className="space-y-6">
+                                <Card>
+                                    <CardHeader>
+                                        <CardTitle>SDK Integration (Backend)</CardTitle>
+                                        <CardDescription>Integrate the SMS Payment Gateway directly into your backend to create sessions.</CardDescription>
+                                    </CardHeader>
+                                    <CardContent className="space-y-6">
+                                        <div className="space-y-4">
+                                            <h3 className="text-lg font-bold text-slate-800">1. Download the SDK</h3>
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                <div className="bg-slate-900 rounded-lg p-4 flex flex-col justify-between items-start gap-4">
+                                                    <div>
+                                                        <div className="text-xs text-slate-400 font-bold mb-2">PHP SDK</div>
+                                                        <p className="text-slate-300 text-sm">Download the PHP SDK to integrate with your PHP backend.</p>
+                                                    </div>
+                                                    <Button variant="secondary" size="sm" asChild>
+                                                        <a href="/sdks/smspay-php.zip" download>
+                                                            <Download className="w-4 h-4 mr-2" />
+                                                            Download PHP SDK
+                                                        </a>
+                                                    </Button>
+                                                </div>
+                                                <div className="bg-slate-900 rounded-lg p-4 flex flex-col justify-between items-start gap-4">
+                                                    <div>
+                                                        <div className="text-xs text-slate-400 font-bold mb-2">Node.js SDK</div>
+                                                        <p className="text-slate-300 text-sm">Download the Node.js SDK to integrate with your Node application.</p>
+                                                    </div>
+                                                    <Button variant="secondary" size="sm" asChild>
+                                                        <a href="/sdks/smspay-node.zip" download>
+                                                            <Download className="w-4 h-4 mr-2" />
+                                                            Download Node.js SDK
+                                                        </a>
+                                                    </Button>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="space-y-4">
+                                            <h3 className="text-lg font-bold text-slate-800">2. Create a Checkout Session</h3>
+                                            <p className="text-slate-600 text-sm">When your customer wants to pay, create a Checkout Session on your server using your <strong>Secret Key</strong>.</p>
+                                            
+                                            <Tabs defaultValue="php" className="w-full mt-2">
+                                                <TabsList className="h-8">
+                                                    <TabsTrigger value="php" className="text-xs">PHP</TabsTrigger>
+                                                    <TabsTrigger value="node" className="text-xs">Node.js</TabsTrigger>
+                                                </TabsList>
+                                                <TabsContent value="php">
+                                                    <div className="bg-slate-900 rounded-lg p-4 overflow-x-auto">
+                                                        <pre className="text-slate-300 text-sm">
+<code>{`$smspay = new \\SmsPay\\SmsPay('sk_live_YOUR_SECRET_KEY');
+
+$session = $smspay->checkoutSessions->create([
+    'amount' => 150.00,
+    'currency' => 'EGP',
+    'success_url' => 'https://yourwebsite.com/success?session_id={SESSION_ID}',
+    'cancel_url' => 'https://yourwebsite.com/cancel',
+    'metadata' => [
+        'order_id' => 'ORD-1234'
+    ],
+]);
+
+// Send the session.id to your frontend
+echo json_encode(['id' => $session->id]);`}</code>
+                                                        </pre>
+                                                    </div>
+                                                </TabsContent>
+                                                <TabsContent value="node">
+                                                    <div className="bg-slate-900 rounded-lg p-4 overflow-x-auto">
+                                                        <pre className="text-slate-300 text-sm">
+<code>{`const SmsPay = require('@musoftware/smspay');
+const smspay = new SmsPay('sk_live_YOUR_SECRET_KEY');
+
+const session = await smspay.checkoutSessions.create({
+    amount: 150.00,
+    currency: 'EGP',
+    successUrl: 'https://yourwebsite.com/success?session_id={SESSION_ID}',
+    cancelUrl: 'https://yourwebsite.com/cancel',
+    metadata: {
+        orderId: 'ORD-1234'
+    },
+});
+
+// Send the session.id to your frontend
+res.json({ id: session.id });`}</code>
+                                                        </pre>
+                                                    </div>
+                                                </TabsContent>
+                                            </Tabs>
+                                        </div>
+                                    </CardContent>
+                                </Card>
+
+                                <Card>
+                                    <CardHeader>
+                                        <CardTitle>Verifying Webhooks</CardTitle>
+                                        <CardDescription>Securely receive payment confirmations.</CardDescription>
+                                    </CardHeader>
+                                    <CardContent>
+                                        <p className="text-slate-600 mb-4">
+                                            To securely confirm that a webhook was actually sent by our gateway, you must verify its cryptographic signature using your Webhook Secret.
+                                            <br/><br/>
+                                            <strong>Never</strong> fulfill an order without verifying the webhook signature.
+                                        </p>
+                                        
+                                        <Tabs defaultValue="php" className="w-full">
+                                            <TabsList className="h-8">
+                                                <TabsTrigger value="php" className="text-xs">PHP</TabsTrigger>
+                                                <TabsTrigger value="node" className="text-xs">Node.js</TabsTrigger>
+                                            </TabsList>
+                                            <TabsContent value="php">
+                                                <div className="bg-slate-900 rounded-lg p-4 overflow-x-auto">
+                                                    <pre className="text-slate-300 text-sm">
 <code>{`// 1. Get raw payload and headers
 $payload = file_get_contents('php://input');
 $signature = $_SERVER['HTTP_X_SMSPAY_SIGNATURE'];
@@ -212,12 +222,12 @@ try {
 } catch(\\SmsPay\\Exception\\SignatureVerificationException $e) {
     http_response_code(400); // Invalid signature
 }`}</code>
-                                                </pre>
-                                            </div>
-                                        </TabsContent>
-                                        <TabsContent value="node">
-                                            <div className="bg-slate-900 rounded-lg p-4 overflow-x-auto">
-                                                <pre className="text-slate-300 text-sm">
+                                                    </pre>
+                                                </div>
+                                            </TabsContent>
+                                            <TabsContent value="node">
+                                                <div className="bg-slate-900 rounded-lg p-4 overflow-x-auto">
+                                                    <pre className="text-slate-300 text-sm">
 <code>{`const express = require('express');
 const SmsPay = require('@musoftware/smspay');
 const smspay = new SmsPay('sk_live_YOUR_SECRET_KEY');
@@ -244,12 +254,13 @@ app.post('/webhook', express.raw({type: 'application/json'}), (req, res) => {
 
   res.send();
 });`}</code>
-                                                </pre>
-                                            </div>
-                                        </TabsContent>
-                                    </Tabs>
-                                </CardContent>
-                            </Card>
+                                                    </pre>
+                                                </div>
+                                            </TabsContent>
+                                        </Tabs>
+                                    </CardContent>
+                                </Card>
+                            </div>
                         </TabsContent>
                     </Tabs>
                 </div>
