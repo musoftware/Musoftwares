@@ -11,11 +11,13 @@ use Carbon\Carbon;
 
 class TransactionIngestionService
 {
-    protected SmsPaymentGatewayParserService $parserService;
+    protected DeterministicSmsParser $parser;
+    protected RealtimePaymentMatchingEngine $matchingEngine;
 
-    public function __construct(SmsPaymentGatewayParserService $parserService)
+    public function __construct(DeterministicSmsParser $parser, RealtimePaymentMatchingEngine $matchingEngine)
     {
-        $this->parserService = $parserService;
+        $this->parser = $parser;
+        $this->matchingEngine = $matchingEngine;
     }
 
     /**
@@ -96,12 +98,9 @@ class TransactionIngestionService
         }
 
         // Process SMS for transaction detection using the parser service
-        $transactionData = $this->parserService->detectTransaction($message, $senderName, $device);
+        $transactionData = $this->parser->parse($message, $senderName);
 
         $debugInfo = null;
-        if ($transactionData === null) {
-            $debugInfo = $this->parserService->getDebugInfo($message, $senderName, $device);
-        }
 
         Log::info('AutoSMS Payment Hub - SMS Received', [
             'device_id' => $device->id,
@@ -150,32 +149,7 @@ class TransactionIngestionService
                 $transactionDate = now();
             }
 
-            $orderId = null;
             $phoneNumber = $transactionData['phone_number'] ?? null;
-
-            if ($phoneNumber) {
-                $normalizedPhoneNumber = $this->normalizePhoneNumber($phoneNumber);
-                
-                // Use lockForUpdate to prevent race conditions when multiple SMS come at once
-                $orderLink = SmsPaymentGatewayOrderLink::where('user_id', $user->id)
-                    ->where('phone_number', $normalizedPhoneNumber)
-                    ->where('status', 'pending')
-                    ->lockForUpdate()
-                    ->orderBy('created_at', 'desc')
-                    ->first();
-
-                if ($orderLink) {
-                    $orderId = $orderLink->order_id;
-                    $orderLink->update(['status' => 'matched']);
-
-                    Log::info('AutoSMS Payment Hub - Order Link Matched', [
-                        'user_id' => $user->id,
-                        'order_link_id' => $orderLink->id,
-                        'order_id' => $orderId,
-                        'phone_number' => $normalizedPhoneNumber,
-                    ]);
-                }
-            }
 
             $smsTimestamp = isset($smsData['timestamp']) ? intval($smsData['timestamp']) : null;
             $spoofDetectionEnabled = $device->enable_spoof_detection ?? true;
@@ -201,10 +175,6 @@ class TransactionIngestionService
                 'simSlot' => $smsData['simSlot'] ?? null,
                 'timestamp' => $smsData['timestamp'] ?? null,
             ];
-
-            if ($orderId) {
-                $metadata['order_id'] = $orderId;
-            }
 
             if (isset($transactionData['reference_number']) && $transactionData['reference_number']) {
                 $metadata['reference_number'] = $transactionData['reference_number'];
@@ -241,6 +211,9 @@ class TransactionIngestionService
                 'amount' => $transactionData['amount'],
                 'is_spoofed' => $spoofingCheck['is_spoofed'],
             ]);
+
+            // Attempt realtime matching with an order
+            $this->matchingEngine->matchTransaction($autoSmsTransaction);
 
             // Dispatch webhook asynchronously using the dedicated service
             $webhookService = app(\Modules\SmsPaymentGateway\Services\WebhookDispatchService::class);
@@ -329,18 +302,11 @@ class TransactionIngestionService
         return ['is_spoofed' => false, 'reason' => null];
     }
 
+    /**
+     * Normalize Egyptian Phone Number
+     */
     protected function normalizePhoneNumber(string $phone): string
     {
-        $phone = preg_replace('/[^0-9]/', '', $phone);
-        if (str_starts_with($phone, '00')) {
-            $phone = substr($phone, 2);
-        }
-        if (str_starts_with($phone, '20') && strlen($phone) >= 12) {
-            $phone = '0' . substr($phone, 2);
-        }
-        if (!str_starts_with($phone, '0') && strlen($phone) == 10) {
-            $phone = '0' . $phone;
-        }
-        return $phone;
+        return $this->parser->normalizePhoneNumber($phone);
     }
 }

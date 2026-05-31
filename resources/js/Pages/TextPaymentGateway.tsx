@@ -105,17 +105,17 @@ export default function TextPaymentGateway({ devices, webhook, token, stats, rec
                     </div>
 
                     {/* Main Actions */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         <Card className="border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
                             <CardHeader>
                                 <CardTitle className="flex items-center gap-2 text-lg">
-                                    <Smartphone className="w-5 h-5 text-rose-500" /> Android Devices
+                                    <Smartphone className="w-5 h-5 text-rose-500" /> الأجهزة
                                 </CardTitle>
-                                <CardDescription>Connect Android phones to instantly read SMS receipts from local mobile wallets (e.g., Vodafone Cash).</CardDescription>
+                                <CardDescription>اربط هاتف الأندرويد لقراءة رسائل فودافون كاش وإنستاباي.</CardDescription>
                             </CardHeader>
                             <CardContent>
                                 <Button className="w-full bg-slate-900 hover:bg-slate-800" onClick={() => router.visit(route('sms-payment-gateway.devices'))}>
-                                    Manage Devices <ArrowRight className="w-4 h-4 ml-2" />
+                                    إدارة الأجهزة <ArrowRight className="w-4 h-4 ml-2 rtl:rotate-180" />
                                 </Button>
                             </CardContent>
                         </Card>
@@ -123,16 +123,27 @@ export default function TextPaymentGateway({ devices, webhook, token, stats, rec
                         <Card className="border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
                             <CardHeader>
                                 <CardTitle className="flex items-center gap-2 text-lg">
-                                    <Webhook className="w-5 h-5 text-purple-500" /> Developers & Integration
+                                    <CreditCard className="w-5 h-5 text-indigo-500" /> روابط الدفع
                                 </CardTitle>
-                                <CardDescription>Integrate your website or app. Get real-time webhook notifications for new payments.</CardDescription>
+                                <CardDescription>قم بإنشاء روابط دفع سريعة للعملاء لتحصيل المبالغ المطلوبة.</CardDescription>
                             </CardHeader>
-                            <CardContent className="flex gap-2">
-                                <Button variant="outline" className="w-full" onClick={() => router.visit(route('sms-payment-gateway.webhooks'))}>
-                                    Webhooks
+                            <CardContent>
+                                <Button variant="outline" className="w-full border-indigo-200 hover:bg-indigo-50" onClick={() => router.visit(route('sms-payment-gateway.payment-links'))}>
+                                    إنشاء رابط دفع
                                 </Button>
-                                <Button variant="outline" className="w-full" onClick={() => router.visit(route('sms-payment-gateway.verification'))}>
-                                    API Keys
+                            </CardContent>
+                        </Card>
+
+                        <Card className="border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
+                            <CardHeader>
+                                <CardTitle className="flex items-center gap-2 text-lg">
+                                    <Activity className="w-5 h-5 text-amber-500" /> الإعدادات
+                                </CardTitle>
+                                <CardDescription>ضبط رقم هاتف استقبال الأموال وتفعيل خدمات الدفع المتاحة.</CardDescription>
+                            </CardHeader>
+                            <CardContent>
+                                <Button variant="outline" className="w-full" onClick={() => router.visit(route('sms-payment-gateway.settings'))}>
+                                    إعدادات البوابة
                                 </Button>
                             </CardContent>
                         </Card>
@@ -146,7 +157,7 @@ export default function TextPaymentGateway({ devices, webhook, token, stats, rec
                                     <CardTitle className="text-lg">Recent Payments</CardTitle>
                                     <CardDescription>Real-time payment receipts captured from your devices.</CardDescription>
                                 </div>
-                                <Button variant="ghost" size="sm" onClick={() => router.visit(route('sms-payment-gateway.wallets'))} className="text-indigo-600 hover:text-indigo-700">
+                                <Button variant="ghost" size="sm" onClick={() => router.visit(route('sms-payment-gateway.transactions'))} className="text-indigo-600 hover:text-indigo-700">
                                     View All Payments <ArrowRight className="w-4 h-4 ml-1" />
                                 </Button>
                             </div>

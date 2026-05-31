@@ -5,17 +5,64 @@
          colors="true"
 >
     <testsuites>
+        <!-- ── Core Unit Tests ── -->
         <testsuite name="Unit">
             <directory>tests/Unit</directory>
             <directory>Modules/Core/Tests/Unit</directory>
-            <directory>Modules/Shared/Tests/Unit</directory>
+            <directory>Modules/Shared/tests/Unit</directory>
         </testsuite>
+
+        <!-- ── Core Feature Tests (Admin Panel + Platform) ── -->
         <testsuite name="Feature">
             <directory>tests/Feature</directory>
+            <directory>Modules/Shared/tests/Feature</directory>
+        </testsuite>
+
+        <!-- ── ERP Module (All Features + Addons) ── -->
+        <testsuite name="ERP">
             <directory>Modules/ERP/Tests/Feature</directory>
-            <directory>Modules/Shared/Tests/Feature</directory>
-            <directory>Modules/Tools/Tests/Feature</directory>
+        </testsuite>
+
+        <!-- ── Freelance Module ── -->
+        <testsuite name="Freelance">
             <directory>Modules/Freelance/Tests/Feature</directory>
+            <directory>Modules/Freelance/Tests/Unit</directory>
+            <directory>Modules/Freelance/Tests/Finance</directory>
+            <directory>Modules/Freelance/Tests/Security</directory>
+            <directory>Modules/Freelance/Tests/Concurrency</directory>
+            <directory>Modules/Freelance/Tests/Performance</directory>
+        </testsuite>
+
+        <!-- ── CRM Module ── -->
+        <testsuite name="CRM">
+            <directory>Modules/CRM/Tests/Feature</directory>
+        </testsuite>
+
+        <!-- ── Marketplace Module ── -->
+        <testsuite name="Marketplace">
+            <directory>Modules/Marketplace/Tests/Feature</directory>
+        </testsuite>
+
+        <!-- ── Booking Module ── -->
+        <testsuite name="Booking">
+            <directory>Modules/Booking/tests/Feature</directory>
+            <directory>Modules/Booking/tests/Unit</directory>
+        </testsuite>
+
+        <!-- ── Tools Module ── -->
+        <testsuite name="Tools">
+            <directory>Modules/Tools/Tests/Feature</directory>
+        </testsuite>
+
+        <!-- ── GoldSavers Module ── -->
+        <testsuite name="GoldSavers">
+            <directory>Modules/GoldSavers/Tests/Feature</directory>
+            <directory>Modules/GoldSavers/Tests/Unit</directory>
+        </testsuite>
+
+        <!-- ── SMS Payment Gateway Module ── -->
+        <testsuite name="SmsPaymentGateway">
+            <directory>Modules/SmsPaymentGateway/tests/Unit</directory>
         </testsuite>
     </testsuites>
     <source>
