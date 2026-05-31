@@ -420,7 +420,7 @@
             <div class="methods-grid">
                 @foreach($paymentMethods as $i => $method)
                 <label class="method-option">
-                    <input type="radio" name="method" value="{{ $method['id'] }}" data-phone="{{ $method['phone'] }}" {{ $i === 0 ? 'checked' : '' }}>
+                    <input type="radio" name="method" value="{{ $method['id'] }}" data-phone="{{ $method['phone'] }}" data-is-etisalat="{{ isset($method['is_etisalat']) && $method['is_etisalat'] ? 'true' : 'false' }}" {{ $i === 0 ? 'checked' : '' }}>
                     <div class="method-card">
                         <img src="{{ $method['icon'] }}" alt="{{ $method['name'] }}">
                         <span>{{ $method['name'] }}</span>
@@ -493,8 +493,7 @@
     const SENDER_HINT = @json(__('sms_gateway.sender_number_hint'));
 
     // ── Method selection ────────────────────────
-    function updateStep2UI(methodValue) {
-        const isEtisalat = methodValue === 'etisalat_cash';
+    function updateStep2UI(isEtisalat) {
         document.getElementById('step2-label-text').textContent = isEtisalat ? SENDER_LABEL : TX_LABEL;
         document.getElementById('ref-input').placeholder = isEtisalat ? SENDER_PLACEHOLDER : TX_PLACEHOLDER;
         document.getElementById('step2-hint').textContent = isEtisalat ? SENDER_HINT : TX_HINT;
@@ -503,13 +502,13 @@
     document.querySelectorAll('input[name="method"]').forEach(radio => {
         radio.addEventListener('change', e => {
             document.getElementById('wallet-display').textContent = e.target.dataset.phone;
-            updateStep2UI(e.target.value);
+            updateStep2UI(e.target.dataset.isEtisalat === 'true');
         });
     });
 
     const initialMethod = document.querySelector('input[name="method"]:checked');
     if (initialMethod) {
-        updateStep2UI(initialMethod.value);
+        updateStep2UI(initialMethod.dataset.isEtisalat === 'true');
     }
 
     // ── Copy wallet ─────────────────────────────
