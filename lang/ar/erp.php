@@ -175,6 +175,7 @@ return [
     'roles_call_center' => 'مركز الاتصال',
     'roles_account_manager' => 'مدير حسابات',
     'roles_branch_manager' => 'مدير فرع',
+    'roles_social_media' => 'سوشيال ميديا',
     'roles_legacy_manager' => 'مدير (قديم)',
     'roles_legacy_member' => 'عضو (قديم)',
     'team_capacity_reached' => 'لقد وصلت إلى الحد الأقصى لسعة الفريق وهو :limit أعضاء. يرجى ترقية سعة الفريق لإضافة المزيد.',

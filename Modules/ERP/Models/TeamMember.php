@@ -22,6 +22,7 @@ class TeamMember extends Authenticatable
     public const ROLE_CALL_CENTER = 'call_center';
     public const ROLE_ACCOUNT_MANAGER = 'account_manager';
     public const ROLE_BRANCH_MANAGER = 'branch_manager';
+    public const ROLE_SOCIAL_MEDIA = 'social_media';
 
     // Legacy roles
     public const ROLE_LEGACY_MANAGER = 'manager';
@@ -71,6 +72,7 @@ class TeamMember extends Authenticatable
             self::ROLE_CALL_CENTER => __('erp.roles_call_center'),
             self::ROLE_ACCOUNT_MANAGER => __('erp.roles_account_manager'),
             self::ROLE_BRANCH_MANAGER => __('erp.roles_branch_manager'),
+            self::ROLE_SOCIAL_MEDIA => __('erp.roles_social_media'),
         ];
     }
 
@@ -124,6 +126,7 @@ class TeamMember extends Authenticatable
             self::ROLE_CALL_CENTER,
             self::ROLE_ACCOUNT_MANAGER,
             self::ROLE_MARKETING,
+            self::ROLE_SOCIAL_MEDIA,
         ]);
     }
 

@@ -2,7 +2,7 @@
 
 namespace Modules\CRM\Infrastructure\Queue;
 
-use Modules\ERP\Models\Tenant;
+use Modules\CRM\Models\Workspace;
 use App\Services\SubscriptionService;
 use Illuminate\Support\Facades\Log;
 
@@ -17,23 +17,23 @@ class RequiresAddonMiddleware
 
     public function handle($job, $next)
     {
-        // Check if the tenant (assuming the job has a tenantId property) has an active subscription.
-        // We bypass this strict check if the job doesn't declare a tenantId to avoid crashing global jobs,
-        // but for CRM tenant jobs, they must declare it.
-        if (property_exists($job, 'tenantId')) {
-            $tenant = Tenant::find($job->tenantId);
+        // Check if the workspace owner has an active subscription for the required addon.
+        // We support both CRM workspaceId and legacy tenantId for backward compatibility.
+        $workspaceId = property_exists($job, 'workspaceId') ? $job->workspaceId : null;
 
-            if (!$tenant || !$tenant->user) {
-                Log::warning("Queue Addon Guard: Dropped job " . get_class($job) . " because tenant {$job->tenantId} is invalid or has no owner.");
+        if ($workspaceId) {
+            $workspace = Workspace::find($workspaceId);
+
+            if (!$workspace || !$workspace->owner) {
+                Log::warning("Queue Addon Guard: Dropped job " . get_class($job) . " because workspace {$workspaceId} is invalid or has no owner.");
                 return;
             }
 
             $subscriptionService = app(SubscriptionService::class);
-            $hasActiveAddon = $subscriptionService->hasActiveSubscription($tenant->user, $this->addonId);
+            $hasActiveAddon = $subscriptionService->hasActiveSubscription($workspace->owner, $this->addonId);
 
             if (!$hasActiveAddon) {
-                Log::warning("Queue Addon Guard: Dropped job " . get_class($job) . " because tenant {$job->tenantId} lacks active {$this->addonId} addon.");
-                // Drop the job silently without retrying (it's unpaid)
+                Log::warning("Queue Addon Guard: Dropped job " . get_class($job) . " because workspace {$workspaceId} lacks active {$this->addonId} addon.");
                 return;
             }
         }

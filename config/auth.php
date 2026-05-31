@@ -47,6 +47,11 @@ return [
             'driver' => 'session',
             'provider' => 'erp_team_members',
         ],
+
+        'crm_team' => [
+            'driver' => 'session',
+            'provider' => 'crm_team_members',
+        ],
     ],
 
     /*
@@ -75,6 +80,11 @@ return [
         'erp_team_members' => [
             'driver' => 'eloquent',
             'model' => Modules\ERP\Models\TeamMember::class,
+        ],
+
+        'crm_team_members' => [
+            'driver' => 'eloquent',
+            'model' => Modules\CRM\Models\CrmTeamMember::class,
         ],
 
         // 'users' => [
