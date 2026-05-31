@@ -32,6 +32,8 @@ class SmsPaymentGatewayPaymentHubController extends Controller
             'device_name' => 'nullable|string|max:255',
             'phone_number' => 'nullable|string|max:20',
             'sim_slot' => 'nullable|integer|min:0|max:1',
+            'sim1_number' => 'nullable|string|max:20',
+            'sim2_number' => 'nullable|string|max:20',
         ]);
 
         // Find device by connection code
@@ -72,6 +74,8 @@ class SmsPaymentGatewayPaymentHubController extends Controller
             'device_name' => $request->device_name ?? 'AutoSMS Device',
             'phone_number' => $request->phone_number,
             'sim_slot' => $request->sim_slot,
+            'sim1_number' => $request->sim1_number,
+            'sim2_number' => $request->sim2_number,
             'status' => 'connected',
             'connected_at' => now(),
             'last_seen_at' => now(),
@@ -92,6 +96,46 @@ class SmsPaymentGatewayPaymentHubController extends Controller
     }
 
     /**
+     * Update device info (phone numbers, sim slots)
+     * POST /api/sms-payment-gateway/update-device
+     * Public endpoint (no auth required, uses device token)
+     */
+    public function updateDevice(Request $request)
+    {
+        $request->validate([
+            'device_token' => 'required|string|max:255',
+            'phone_number' => 'nullable|string|max:20',
+            'sim_slot' => 'nullable|integer|min:0|max:1',
+            'sim1_number' => 'nullable|string|max:20',
+            'sim2_number' => 'nullable|string|max:20',
+        ]);
+
+        $device = SmsPaymentGatewayDevice::where('device_token', $request->device_token)
+            ->where('status', 'connected')
+            ->first();
+
+        if (!$device) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Device not found or not connected'
+            ], 404);
+        }
+
+        $device->update([
+            'phone_number' => $request->phone_number,
+            'sim_slot' => $request->sim_slot,
+            'sim1_number' => $request->sim1_number,
+            'sim2_number' => $request->sim2_number,
+            'last_seen_at' => now(),
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Device info updated successfully'
+        ]);
+    }
+
+    /**
      * Get allowed SMS senders
      * GET /api/sms-payment-gateway/allowed-senders
      * Public endpoint (no auth required)
@@ -100,7 +144,7 @@ class SmsPaymentGatewayPaymentHubController extends Controller
     {
         // Return array of allowed sender names
         // This can be configured in config file or database
-        $globalSenders = config('sms-payment-gateway.allowed_senders', []);
+        $globalSenders = config('text-payment-gateway.allowed_senders', []);
 
         $userSenders = [];
 
@@ -417,8 +461,8 @@ null";
         }
 
         // Validate amount
-        $minAmount = config('sms-payment-gateway.min_transaction_amount', 1);
-        $maxAmount = config('sms-payment-gateway.max_transaction_amount', 1000000);
+        $minAmount = config('text-payment-gateway.min_transaction_amount', 1);
+        $maxAmount = config('text-payment-gateway.max_transaction_amount', 1000000);
 
         if ($amount <= 0 || $amount < $minAmount || $amount > $maxAmount) {
             return null;
@@ -692,7 +736,7 @@ null";
         }
 
         // Check 4: Promotional message check
-        $exclusionPatterns = config('sms-payment-gateway.exclusion_patterns', []);
+        $exclusionPatterns = config('text-payment-gateway.exclusion_patterns', []);
         $isPromotional = false;
         $matchedPattern = null;
 
@@ -712,15 +756,15 @@ null";
         $geminiAvailable = false;
         $geminiUsed = false;
         if ($device && $device->user) {
-            $geminiAvailable = !empty($device->user->gemini_api) && config('sms-payment-gateway.enable_gemini_extraction', true);
+            $geminiAvailable = !empty($device->user->gemini_api) && config('text-payment-gateway.enable_gemini_extraction', true);
         }
         $debugInfo['checks']['gemini_available'] = $geminiAvailable;
         $debugInfo['checks']['gemini_used'] = $geminiUsed;
 
         // Check 6: Minimum amount validation
         if ($amount !== null) {
-            $minAmount = config('sms-payment-gateway.min_transaction_amount', 1);
-            $maxAmount = config('sms-payment-gateway.max_transaction_amount', 1000000);
+            $minAmount = config('text-payment-gateway.min_transaction_amount', 1);
+            $maxAmount = config('text-payment-gateway.max_transaction_amount', 1000000);
 
             if ($amount < $minAmount) {
                 $debugInfo['reasons'][] = sprintf('Amount %.2f is below minimum %.2f', $amount, $minAmount);
@@ -759,7 +803,7 @@ null";
         }
 
         // Get tolerance from config, default to 100 EGP to allow for fees, other transactions, etc.
-        $tolerance = config('sms-payment-gateway.spoofing_tolerance', 100.00);
+        $tolerance = config('text-payment-gateway.spoofing_tolerance', 100.00);
         $reasons = [];
 
         // IMPORTANT: Balance is wallet-wide (sender-based), not phone-specific
@@ -1000,7 +1044,7 @@ null";
             $smsTimestamp = isset($smsData['timestamp']) ? intval($smsData['timestamp']) : null;
 
             // Check if spoof detection is enabled for this device
-            $spoofDetectionEnabled = $device->enable_spoof_detection ?? true;
+            $spoofDetectionEnabled = false;
 
             if ($spoofDetectionEnabled) {
                 $spoofingCheck = $this->checkForSpoofing(

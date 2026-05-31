@@ -13,4 +13,6 @@ return [
     |
     */
     'android_app_url' => env('SMS_GATEWAY_ANDROID_APP_URL', '/downloads/sms-payment-gateway.apk'),
+
+
 ];

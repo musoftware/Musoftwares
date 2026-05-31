@@ -26,6 +26,9 @@ $apiRoutes = function () {
     // Device connection (public, uses connection code)
     Route::post('/connect', [SmsPaymentGatewayPaymentHubController::class, 'connect']);
 
+    // Device update info (public, uses device token)
+    Route::post('/update-device', [SmsPaymentGatewayPaymentHubController::class, 'updateDevice']);
+
     // Allowed senders (public)
     Route::get('/allowed-senders', [SmsPaymentGatewayPaymentHubController::class, 'getAllowedSenders']);
 

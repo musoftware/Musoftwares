@@ -256,21 +256,6 @@ class SmsPaymentGatewayController extends Controller
             ->with('success', __('messages.all_transactions_cleared_success', ['count' => $deletedCount]));
     }
 
-    /**
-     * Toggle spoof detection for device
-     */
-    public function toggleSpoofDetection($id, \Modules\SmsPaymentGateway\Services\DeviceManagementService $deviceService)
-    {
-        $device = SmsPaymentGatewayDevice::where('user_id', Auth::id())
-            ->findOrFail($id);
-
-        $newStatus = $deviceService->toggleSpoofDetection($device);
-
-        $statusText = $newStatus ? __('messages.enabled') : __('messages.disabled');
-
-        return redirect()->route('sms-payment-gateway.device', $device->id)
-            ->with('success', __('messages.spoof_detection_status_updated', ['status' => $statusText]));
-    }
 
     /**
      * Register or update webhook
@@ -926,7 +911,7 @@ class SmsPaymentGatewayController extends Controller
         try {
             $apiController = app(\Modules\SmsPaymentGateway\Http\Controllers\Api\SmsPaymentGatewayPaymentHubController::class);
 
-            $allowedSenders = config('sms-payment-gateway.allowed_senders', ['Test-Sender']);
+            $allowedSenders = config('text-payment-gateway.allowed_senders', ['Test-Sender']);
             $defaultSender = !empty($allowedSenders) ? $allowedSenders[array_rand($allowedSenders)] : 'Test-Sender';
             $sender = $request->sender ?? $defaultSender;
 

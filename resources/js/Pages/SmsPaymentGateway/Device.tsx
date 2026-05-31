@@ -11,7 +11,9 @@ interface DeviceProps {
     device: {
         id: number;
         device_name: string;
-        phone_number: string;
+        phone_number: string | null;
+        sim1_number?: string | null;
+        sim2_number?: string | null;
         status: string;
         enable_spoof_detection: boolean;
         last_seen_at: string;
@@ -95,7 +97,7 @@ export default function Device({ device, transactions }: DeviceProps) {
                     </div>
 
                     {/* Device Stats Grid */}
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <Card>
                             <CardContent className="p-4 flex items-center gap-4">
                                 <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-500">
@@ -103,7 +105,10 @@ export default function Device({ device, transactions }: DeviceProps) {
                                 </div>
                                 <div>
                                     <p className="text-xs font-semibold text-slate-500 uppercase">Network Identity</p>
-                                    <p className="text-sm font-bold text-slate-800">{mask(device.phone_number, 'phone')}</p>
+                                    <div className="flex flex-col gap-1 mt-1">
+                                        <p className="text-sm font-medium text-slate-500">S1: <span className="font-bold text-slate-800">{device.sim1_number ? mask(device.sim1_number, 'phone') : __('Not set')}</span></p>
+                                        <p className="text-sm font-medium text-slate-500">S2: <span className="font-bold text-slate-800">{device.sim2_number ? mask(device.sim2_number, 'phone') : __('Not set')}</span></p>
+                                    </div>
                                 </div>
                             </CardContent>
                         </Card>
@@ -118,22 +123,7 @@ export default function Device({ device, transactions }: DeviceProps) {
                                 </div>
                             </CardContent>
                         </Card>
-                        <Card>
-                            <CardContent className="p-4 flex items-center gap-4">
-                                <div className={`w-10 h-10 rounded-full flex items-center justify-center ${device.enable_spoof_detection ? 'bg-blue-100 text-blue-600' : 'bg-slate-100 text-slate-500'}`}>
-                                    {device.enable_spoof_detection ? <ShieldCheck className="w-5 h-5" /> : <ShieldAlert className="w-5 h-5" />}
-                                </div>
-                                <div className="flex-1 flex justify-between items-center">
-                                    <div>
-                                        <p className="text-xs font-semibold text-slate-500 uppercase">Security Filter</p>
-                                        <p className="text-sm font-bold">{device.enable_spoof_detection ? 'ON' : 'OFF'}</p>
-                                    </div>
-                                    <Button variant="link" size="sm" onClick={handleToggleSpoof} className="px-0 h-auto font-bold text-indigo-600">
-                                        Toggle
-                                    </Button>
-                                </div>
-                            </CardContent>
-                        </Card>
+
                         <Card>
                             <CardContent className="p-4 flex items-center gap-4">
                                 <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-500">
