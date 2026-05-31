@@ -4,7 +4,7 @@ import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
 import { Button } from '@/Components/ui/button';
 import { formatMoney as formatCurrency } from '@/lib/utils';
 import ClientActionsSheet from '@/Pages/Admin/Users/ClientActionsSheet';
-import { MoreHorizontal, FileText, CheckCircle, XCircle, ChevronDown, Plus } from 'lucide-react';
+import { MoreHorizontal, FileText, CheckCircle, XCircle, ChevronDown, Plus, List, Receipt, Clock, User, ClipboardList } from 'lucide-react';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -438,15 +438,63 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
                                                         <MoreHorizontal className="h-4 w-4" />
                                                     </Button>
                                                 </DropdownMenuTrigger>
-                                                <DropdownMenuContent align="end">
-                                                    <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                                                <DropdownMenuContent align="end" className="w-56">
+                                                    <DropdownMenuLabel>Invoice Actions</DropdownMenuLabel>
                                                     <DropdownMenuItem asChild>
                                                         <Link href={route('admin.invoices.show', invoice.id)} className="flex w-full items-center">
-                                                            <FileText className="mr-2 h-4 w-4" />
+                                                            <FileText className="mr-2 h-4 w-4 text-blue-500" />
                                                             View Details
                                                         </Link>
                                                     </DropdownMenuItem>
+                                                    
+                                                    <DropdownMenuItem asChild>
+                                                        <Link href={`/admin/invoices/create?client_id=${invoice.user_id}${invoice.project_id ? `&project_id=${invoice.project_id}` : ''}`} className="flex w-full items-center">
+                                                            <Plus className="mr-2 h-4 w-4 text-emerald-500" />
+                                                            New Invoice
+                                                        </Link>
+                                                    </DropdownMenuItem>
+                                                    
+                                                    <DropdownMenuItem asChild>
+                                                        <Link href={`/admin/invoices?client_id=${invoice.user_id}`} className="flex w-full items-center">
+                                                            <List className="mr-2 h-4 w-4 text-slate-500" />
+                                                            All Invoices
+                                                        </Link>
+                                                    </DropdownMenuItem>
+                                                
                                                     <DropdownMenuSeparator />
+                                                
+                                                    <DropdownMenuLabel>Client Reports</DropdownMenuLabel>
+                                                    <DropdownMenuItem asChild>
+                                                        <a href={`/clients/balance_sheet_print?user=${invoice.user_id}`} target="_blank" rel="noopener noreferrer" className="flex w-full items-center">
+                                                            <Receipt className="mr-2 h-4 w-4 text-sky-500" />
+                                                            Due Balance Sheet
+                                                        </a>
+                                                    </DropdownMenuItem>
+                                                    <DropdownMenuItem asChild>
+                                                        <a href={`/clients/timer_sheet_print?user=${invoice.user_id}`} target="_blank" rel="noopener noreferrer" className="flex w-full items-center">
+                                                            <Clock className="mr-2 h-4 w-4 text-amber-500" />
+                                                            Timer Balance Sheet
+                                                        </a>
+                                                    </DropdownMenuItem>
+                                                
+                                                    <DropdownMenuSeparator />
+                                                
+                                                    <DropdownMenuLabel>Profile & Tasks</DropdownMenuLabel>
+                                                    <DropdownMenuItem asChild>
+                                                        <a href={`/admin/users/${invoice.user_id}`} target="_blank" rel="noopener noreferrer" className="flex w-full items-center">
+                                                            <User className="mr-2 h-4 w-4 text-blue-500" />
+                                                            User Profile
+                                                        </a>
+                                                    </DropdownMenuItem>
+                                                    <DropdownMenuItem asChild>
+                                                        <Link href={`/admin/users/${invoice.user_id}/tasks/assign`} className="flex w-full items-center">
+                                                            <ClipboardList className="mr-2 h-4 w-4 text-emerald-500" />
+                                                            Add Tasks
+                                                        </Link>
+                                                    </DropdownMenuItem>
+                                                
+                                                    <DropdownMenuSeparator />
+                                                
                                                     {invoice.status !== 'paid' && invoice.status !== 'cancelled' && (
                                                         <DropdownMenuItem onClick={() => handleMarkPaid(invoice.id)}>
                                                             <CheckCircle className="mr-2 h-4 w-4 text-emerald-600" />
