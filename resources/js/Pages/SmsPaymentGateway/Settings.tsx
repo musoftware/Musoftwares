@@ -17,10 +17,18 @@ interface Props {
         is_instapay_enabled: boolean;
         is_vodafone_cash_enabled: boolean;
         whitelist_senders: string | null;
+        vodafone_cash_device_id: number | null;
+        vodafone_cash_allowed_sender: string | null;
+        instapay_device_id: number | null;
+        instapay_allowed_sender: string | null;
     };
+    devices: {
+        id: number;
+        name: string;
+    }[];
 }
 
-export default function Settings({ settings }: Props) {
+export default function Settings({ settings, devices }: Props) {
     const { data, setData, post, processing, errors } = useForm({
         wallet_phone_number: settings?.wallet_phone_number || '',
         instapay_phone_number: settings?.instapay_phone_number || '',
@@ -28,6 +36,10 @@ export default function Settings({ settings }: Props) {
         is_instapay_enabled: settings?.is_instapay_enabled ?? true,
         is_vodafone_cash_enabled: settings?.is_vodafone_cash_enabled ?? true,
         whitelist_senders: settings?.whitelist_senders || '',
+        vodafone_cash_device_id: settings?.vodafone_cash_device_id || '',
+        vodafone_cash_allowed_sender: settings?.vodafone_cash_allowed_sender || '',
+        instapay_device_id: settings?.instapay_device_id || '',
+        instapay_allowed_sender: settings?.instapay_allowed_sender || '',
     });
 
     const submit = (e: React.FormEvent) => {
@@ -100,6 +112,35 @@ export default function Settings({ settings }: Props) {
                                                 placeholder={__('Example: user@instapay')}
                                             />
                                             {errors.instapay_phone_number && <p className="text-sm text-red-600 mt-1">{errors.instapay_phone_number}</p>}
+                                            
+                                            <div className="mt-4 pt-4 border-t border-indigo-100">
+                                                <Label htmlFor="instapay_device_id">{__('Dedicated Device for Validation (Internal)')}</Label>
+                                                <select
+                                                    id="instapay_device_id"
+                                                    className="w-full mt-2 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                                                    value={data.instapay_device_id}
+                                                    onChange={(e) => setData('instapay_device_id', e.target.value)}
+                                                >
+                                                    <option value="">{__('Any Device')}</option>
+                                                    {devices?.map(device => (
+                                                        <option key={device.id} value={device.id}>{device.name}</option>
+                                                    ))}
+                                                </select>
+                                            </div>
+
+                                            <div className="mt-4">
+                                                <Label htmlFor="instapay_allowed_sender">{__('Dedicated Allowed Sender (Internal)')}</Label>
+                                                <Input
+                                                    id="instapay_allowed_sender"
+                                                    type="text"
+                                                    dir="ltr"
+                                                    className="text-left font-mono mt-2"
+                                                    value={data.instapay_allowed_sender}
+                                                    onChange={(e) => setData('instapay_allowed_sender', e.target.value)}
+                                                    placeholder={__('Example: InstaPay')}
+                                                />
+                                                <p className="text-xs text-gray-500 mt-1">{__('Only match transactions from this specific sender.')}</p>
+                                            </div>
                                         </div>
                                     )}
                                 </div>
@@ -128,6 +169,35 @@ export default function Settings({ settings }: Props) {
                                                 placeholder={__('Example: 01012345678')}
                                             />
                                             {errors.vodafone_cash_phone_number && <p className="text-sm text-red-600 mt-1">{errors.vodafone_cash_phone_number}</p>}
+                                            
+                                            <div className="mt-4 pt-4 border-t border-indigo-100">
+                                                <Label htmlFor="vodafone_cash_device_id">{__('Dedicated Device for Validation (Internal)')}</Label>
+                                                <select
+                                                    id="vodafone_cash_device_id"
+                                                    className="w-full mt-2 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                                                    value={data.vodafone_cash_device_id}
+                                                    onChange={(e) => setData('vodafone_cash_device_id', e.target.value)}
+                                                >
+                                                    <option value="">{__('Any Device')}</option>
+                                                    {devices?.map(device => (
+                                                        <option key={device.id} value={device.id}>{device.name}</option>
+                                                    ))}
+                                                </select>
+                                            </div>
+
+                                            <div className="mt-4">
+                                                <Label htmlFor="vodafone_cash_allowed_sender">{__('Dedicated Allowed Sender (Internal)')}</Label>
+                                                <Input
+                                                    id="vodafone_cash_allowed_sender"
+                                                    type="text"
+                                                    dir="ltr"
+                                                    className="text-left font-mono mt-2"
+                                                    value={data.vodafone_cash_allowed_sender}
+                                                    onChange={(e) => setData('vodafone_cash_allowed_sender', e.target.value)}
+                                                    placeholder={__('Example: Vodafone Cash')}
+                                                />
+                                                <p className="text-xs text-gray-500 mt-1">{__('Only match transactions from this specific sender.')}</p>
+                                            </div>
                                         </div>
                                     )}
                                 </div>
