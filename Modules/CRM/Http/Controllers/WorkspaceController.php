@@ -71,18 +71,7 @@ class WorkspaceController extends Controller
             if ($hasStaffFeature) $availableCenters[] = 'telesales';
         }
 
-        if (empty($availableCenters)) {
-            // Fallback: If they have no specialized workspaces but reached here,
-            // they at least have Core CRM access. Redirect to general dashboard.
-            return redirect()->route('crm.dashboard');
-        }
-
-        // If they only have access to exactly 1 center, save them a click and redirect directly
-        if (count($availableCenters) === 1) {
-            return redirect()->route('crm.workspaces.' . $availableCenters[0]);
-        }
-
-        // Otherwise, render the Hub so they can choose
+        // Render the Hub so they can choose
         return Inertia::render('CRM/Workspaces/Index', [
             'availableCenters' => $availableCenters
         ]);

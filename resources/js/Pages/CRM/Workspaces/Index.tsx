@@ -1,7 +1,9 @@
 import React from 'react';
 import CrmLayout from '@/Layouts/CrmLayout';
-import { PhoneCall, Users, Database, ArrowRight } from 'lucide-react';
-import { Link } from '@inertiajs/react';
+import { PhoneCall, Users, Database, ArrowRight, Briefcase } from 'lucide-react';
+import { Link, usePage } from '@inertiajs/react';
+import { ModulePageHeader } from '@/Components/ui/ModulePageHeader';
+import { UpgradeOverlay } from '@/Components/ui/UpgradeOverlay';
 import { __ } from '@/lib/i18n';
 
 interface ActionCenter {
@@ -15,6 +17,8 @@ interface ActionCenter {
 }
 
 export default function WorkspaceIndex({ availableCenters }: { availableCenters: string[] }) {
+    const { auth } = usePage().props;
+    const hasAdvancedOps = auth?.crm_features?.includes('crm-advanced-operations') ?? false;
     
     const allCenters: Record<string, ActionCenter> = {
         telesales: {
@@ -46,20 +50,41 @@ export default function WorkspaceIndex({ availableCenters }: { availableCenters:
         }
     };
 
+    if (!hasAdvancedOps) {
+        return (
+            <CrmLayout title={__('Workspaces Hub')} activeMenu="workspaces">
+                <ModulePageHeader 
+                    title={__('Workspaces')}
+                    description={__('Dedicated hubs for telesales, managers, and data collectors.')}
+                    icon={Briefcase}
+                    module="CRM"
+                />
+                <div className="px-8 pb-8">
+                    <UpgradeOverlay 
+                        title={__('Advanced Operations Required')}
+                        description={__('To use dedicated role-based Workspaces (Manager, Telesales, Collector hubs), you need the Advanced Operations add-on.')}
+                        icon={Briefcase}
+                        module="crm-advanced-operations"
+                        priceText={__('Subscribe to Advanced Operations')}
+                    />
+                </div>
+            </CrmLayout>
+        );
+    }
+
     // Filter based on what the backend provided
-    const visibleCenters = availableCenters.map(key => allCenters[key]).filter(Boolean);
+    const visibleCenters = availableCenters ? availableCenters.map(key => allCenters[key]).filter(Boolean) : [];
 
     return (
         <CrmLayout title={__('Workspaces Hub')} activeMenu="workspaces">
-            <div className="flex flex-col h-full max-w-5xl mx-auto w-full gap-8 p-8 pt-12">
-                
-                {/* Header */}
-                <div className="text-center max-w-2xl mx-auto">
-                    <h1 className="text-3xl font-bold text-slate-900 tracking-tight">{__('Select Your Workspace')}</h1>
-                    <p className="text-base text-slate-500 mt-2">
-                        {__('You have access to multiple action centers. Choose the workspace that matches your task for today.')}
-                    </p>
-                </div>
+            <ModulePageHeader 
+                title={__('Select Your Workspace')}
+                description={__('You have access to multiple action centers. Choose the workspace that matches your task for today.')}
+                icon={Briefcase}
+                module="CRM"
+            />
+            <div className="flex flex-col h-full max-w-5xl mx-auto w-full px-8 pb-8">
+
 
                 {/* Hub Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-4">

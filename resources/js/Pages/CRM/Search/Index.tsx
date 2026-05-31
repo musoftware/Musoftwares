@@ -4,10 +4,14 @@ import { __ } from '@/lib/i18n';
 import { Input } from '@/Components/ui/input';
 import { Search as SearchIcon, Loader2, Users, ArrowRight } from 'lucide-react';
 import axios from 'axios';
-import { router } from '@inertiajs/react';
+import { router, usePage } from '@inertiajs/react';
 import { Card, CardContent } from '@/Components/ui/card';
+import { UpgradeOverlay } from '@/Components/ui/UpgradeOverlay';
 
 export default function SearchIndex() {
+    const { auth } = usePage().props;
+    const hasSalesStaff = auth?.crm_features?.includes('crm-sales-staff') ?? false;
+
     const [query, setQuery] = useState('');
     const [results, setResults] = useState<any[]>([]);
     const [loading, setLoading] = useState(false);
@@ -35,6 +39,22 @@ export default function SearchIndex() {
 
         return () => clearTimeout(delayDebounceFn);
     }, [query]);
+
+    if (!hasSalesStaff) {
+        return (
+            <CrmLayout title={__('Universal Search')} activeMenu="search">
+                <div className="p-8">
+                    <UpgradeOverlay 
+                        title={__('Sales Staff Add-on Required')}
+                        description={__('To use Universal Search across leads, contacts, and campaigns, you need the Sales Staff Operations add-on.')}
+                        icon={SearchIcon}
+                        module="crm-sales-staff"
+                        priceText={__('Subscribe to Sales Staff')}
+                    />
+                </div>
+            </CrmLayout>
+        );
+    }
 
     return (
         <CrmLayout title={__('Universal Search')} activeMenu="search">

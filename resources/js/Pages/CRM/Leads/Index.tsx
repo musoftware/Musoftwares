@@ -11,11 +11,14 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/Components/ui/dropdown-menu';
+import { ModulePageHeader } from '@/Components/ui/ModulePageHeader';
+import { UpgradeOverlay } from '@/Components/ui/UpgradeOverlay';
 import { LeadSlideOver } from '@/Components/CRM/LeadSlideOver';
 import { __ } from '@/lib/i18n';
 
 export default function Index({ leads, currentTab }) {
     const { auth } = usePage().props;
+    const hasSalesStaff = auth?.crm_features?.includes('crm-sales-staff') ?? false;
     const [selectedLeadId, setSelectedLeadId] = useState<number | null>(null);
     const [isSlideOverOpen, setIsSlideOverOpen] = useState(false);
 
@@ -48,17 +51,37 @@ export default function Index({ leads, currentTab }) {
         }
     };
 
+    if (!hasSalesStaff) {
+        return (
+            <CrmLayout title={__('Leads')} activeMenu="leads">
+                <ModulePageHeader 
+                    title={__('Leads & Pipeline')}
+                    description={__('Manage and track your leads pipeline.')}
+                    icon={Users}
+                    module="CRM"
+                />
+                <div className="px-8 pb-8">
+                    <UpgradeOverlay 
+                        title={__('Sales Staff Add-on Required')}
+                        description={__('To manage leads, track pipelines, and assign salespeople, you need the Sales Staff Operations add-on.')}
+                        icon={Users}
+                        module="crm-sales-staff"
+                        priceText={__('Subscribe to Sales Staff')}
+                    />
+                </div>
+            </CrmLayout>
+        );
+    }
+
     return (
         <CrmLayout title={__('Leads')} activeMenu="leads">
-            <div className="flex-1 space-y-4 p-8 pt-6">
-                <div className="mb-6 flex items-center justify-between">
-                    <div>
-                        <h2 className="text-2xl font-bold leading-7 text-slate-900 sm:truncate sm:text-3xl sm:tracking-tight flex items-center">
-                            <Users className="mr-3 h-7 w-7 text-indigo-600" />
-                            {__('Leads CRM')}
-                        </h2>
-                    </div>
-                </div>
+            <ModulePageHeader 
+                title={__('Leads CRM')}
+                description={__('Manage and track your leads pipeline.')}
+                icon={Users}
+                module="CRM"
+            />
+            <div className="flex-1 space-y-4 px-8 pb-8">
 
                 <div className="mb-6 flex items-center justify-between">
                     <div className="flex space-x-2 bg-slate-100/50 p-1 rounded-lg border border-slate-200">

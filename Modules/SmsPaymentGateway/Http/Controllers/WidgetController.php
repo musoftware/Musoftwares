@@ -6,80 +6,62 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Modules\SmsPaymentGateway\Models\SmsPaymentGatewayTransaction;
+use Modules\SmsPaymentGateway\Models\SmsPaymentGatewayWallet;
 
 class WidgetController extends Controller
 {
     /**
      * Show the payment widget iframe
      */
-    public function show(Request $request)
+    public function show($order_number)
     {
-        $request->validate([
-            'key' => 'required|string',
-            'amount' => 'required|numeric|min:1',
-            'reference' => 'nullable|string',
-            'phone' => 'nullable|string',
-            'redirect_url' => 'nullable|url',
-        ]);
+        $order = \App\Models\PaymentOrder::where('order_number', $order_number)->first();
 
-        $user = User::where('sms-payment-gateway_verification_secret', $request->key)->first();
+        if (!$order) {
+            abort(404, 'Invalid checkout session.');
+        }
+
+        $user = User::find($order->user_id);
 
         if (!$user) {
-            abort(404, 'Invalid payment gateway key.');
+            abort(404, 'Merchant not found.');
         }
 
-        if (!$request->reference && !$request->phone) {
-            abort(400, 'Either a reference number or phone number is required.');
-        }
+        $wallets = SmsPaymentGatewayWallet::where('user_id', $user->id)
+            ->where('is_active', true)
+            ->get()
+            ->groupBy('payment_type');
 
         return view('sms-payment-gateway::widget.iframe', [
-            'amount' => $request->amount,
-            'reference' => $request->reference,
-            'phone' => $request->phone,
-            'redirectUrl' => $request->redirect_url,
-            'pollingUrl' => route('sms-payment-gateway.widget.status', $request->query()),
+            'amount' => $order->total_amount,
+            'reference' => $order->order_number,
+            'phone' => $order->customer_phone,
+            'redirectUrl' => route('sms-payment-gateway.widget.status', ['order_number' => $order->order_number]),
+            'verifyUrl' => route('sms-payment-gateway.widget.verify', ['order_number' => $order->order_number]),
             'merchantName' => $user->name,
+            'wallets' => $wallets,
+            'order_number' => $order->order_number,
+            'currency' => $order->currency ?? 'EGP',
         ]);
     }
 
     /**
      * Poll for transaction status
      */
-    public function status(Request $request)
+    public function status($order_number)
     {
-        $request->validate([
-            'key' => 'required|string',
-            'amount' => 'required|numeric|min:1',
-            'reference' => 'nullable|string',
-            'phone' => 'nullable|string',
-        ]);
+        $order = \App\Models\PaymentOrder::where('order_number', $order_number)->first();
 
-        $user = User::where('sms-payment-gateway_verification_secret', $request->key)->first();
-
-        if (!$user) {
-            return response()->json(['success' => false, 'message' => 'Invalid key'], 404);
+        if (!$order) {
+            return response()->json(['success' => false, 'message' => 'Invalid order'], 404);
         }
 
-        $query = SmsPaymentGatewayTransaction::where('user_id', $user->id)
-            ->where('amount', $request->amount)
-            ->where('created_at', '>=', now()->subHours(24)); // Only look at recent transactions
-
-        if ($request->reference) {
-            $query->where('reference_number', $request->reference);
-        }
-
-        if ($request->phone) {
-            $query->where('phone_number', $request->phone);
-        }
-
-        $transaction = $query->first();
-
-        if ($transaction) {
+        if ($order->status === 'paid' || $order->status === 'completed') {
             return response()->json([
                 'success' => true, 
                 'paid' => true,
-                'transaction_id' => $transaction->id,
-                'date' => $transaction->created_at->toIso8601String()
+                'transaction_id' => $order->transaction_id ?? null,
+                'date' => $order->paid_at ? $order->paid_at->toIso8601String() : now()->toIso8601String()
             ]);
         }
 
@@ -87,6 +69,67 @@ class WidgetController extends Controller
             'success' => true, 
             'paid' => false,
             'message' => 'Waiting for payment...'
+        ]);
+    }
+
+    /**
+     * Verify payment based on guest input
+     */
+    public function verify(Request $request, $order_number)
+    {
+        $request->validate([
+            'transaction_id' => 'required|string',
+        ]);
+
+        $order = \App\Models\PaymentOrder::where('order_number', $order_number)->first();
+
+        if (!$order) {
+            return response()->json(['success' => false, 'message' => 'Invalid order'], 404);
+        }
+
+        // Clean up transaction ID (remove spaces, etc)
+        $transactionId = trim($request->transaction_id);
+
+        $query = SmsPaymentGatewayTransaction::where('user_id', $order->user_id)
+            ->where('amount', '>=', $order->total_amount * 0.99) // Allow 1% tolerance
+            ->where('amount', '<=', $order->total_amount * 1.01)
+            ->where('status', 'pending')
+            ->where('created_at', '>=', now()->subHours(24))
+            ->where(function ($q) use ($transactionId) {
+                // Check both reference_number and phone_number columns in case the user entered their phone number instead
+                $q->where('reference_number', $transactionId)
+                  ->orWhere('phone_number', $transactionId);
+            });
+
+        $transaction = $query->first();
+
+        if ($transaction) {
+            \Illuminate\Support\Facades\DB::transaction(function () use ($order, $transaction) {
+                $order->update([
+                    'status' => 'paid',
+                    'payment_phone' => $transaction->phone_number,
+                    'sms-payment-gateway_transaction_id' => $transaction->id,
+                    'paid_at' => now(),
+                ]);
+
+                $transaction->update([
+                    'order_id' => $order->id,
+                    'status' => 'verified',
+                ]);
+            });
+
+            return response()->json([
+                'success' => true,
+                'paid' => true,
+                'transaction_id' => $transaction->id,
+                'date' => $transaction->created_at->toIso8601String()
+            ]);
+        }
+
+        return response()->json([
+            'success' => true,
+            'paid' => false,
+            'message' => 'لم يتم العثور على التحويل بعد. يرجى التأكد من الرقم المرجعي أو الانتظار قليلاً والمحاولة مرة أخرى.'
         ]);
     }
 }

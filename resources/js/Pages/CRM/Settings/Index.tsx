@@ -7,9 +7,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/Components/ui/tabs';
 import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
-import { Smartphone, Zap, Settings, Plus, QrCode, PowerOff } from 'lucide-react';
+import { Smartphone, Zap, Settings as SettingsIcon, Plus, QrCode, PowerOff } from 'lucide-react';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/Components/ui/dialog';
 import axios from 'axios';
+import { ModulePageHeader } from '@/Components/ui/ModulePageHeader';
 
 export default function SettingsIndex({ whatsapp_accounts = [], api_token, webhook_url }) {
     const [isAddingWa, setIsAddingWa] = useState(false);
@@ -66,11 +67,14 @@ export default function SettingsIndex({ whatsapp_accounts = [], api_token, webho
 
     return (
         <CrmLayout title={__('CRM Settings')} activeMenu="settings">
-            <div className="flex-1 space-y-4 p-8 pt-6">
-                <h2 className="text-2xl font-bold tracking-tight text-slate-900">{__('CRM Settings & Integrations')}</h2>
-                <p className="text-slate-500">{__('Manage your workspace settings, integrations, and WhatsApp connections.')}</p>
-
-                <Tabs defaultValue="integrations" className="space-y-4 mt-6">
+            <ModulePageHeader 
+                title={__('CRM Settings & Integrations')}
+                description={__('Manage your workspace settings, integrations, and WhatsApp connections.')}
+                icon={SettingsIcon}
+                module="CRM"
+            />
+            <div className="flex-1 space-y-4 px-8 pb-8">
+                <Tabs defaultValue="integrations" className="space-y-4">
                     <TabsList>
                         <TabsTrigger value="general">{__('General Settings')}</TabsTrigger>
                         <TabsTrigger value="integrations">{__('Integrations & API')}</TabsTrigger>

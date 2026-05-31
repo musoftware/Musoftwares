@@ -6,11 +6,15 @@ import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
 import { Tag, Plus, Trash2, Edit } from 'lucide-react';
 import { router } from '@inertiajs/react';
-import { useForm } from '@inertiajs/react';
+import { useForm, usePage } from '@inertiajs/react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/Components/ui/dialog';
 import { Label } from '@/Components/ui/label';
+import { ModulePageHeader } from '@/Components/ui/ModulePageHeader';
+import { UpgradeOverlay } from '@/Components/ui/UpgradeOverlay';
 
 export default function TagsIndex({ tags }: { tags: any[] }) {
+    const { auth } = usePage().props;
+    const hasManagementFeature = auth?.crm_features?.includes('crm-sales-management') ?? false;
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     
     const { data, setData, post, processing, errors, reset } = useForm({
@@ -40,21 +44,43 @@ export default function TagsIndex({ tags }: { tags: any[] }) {
         }
     };
 
+    if (!hasManagementFeature) {
+        return (
+            <CrmLayout title={__('Tags & Attributes')} activeMenu="tags">
+                <ModulePageHeader 
+                    title={__('Tags & Attributes')}
+                    description={__('Manage tags used to categorize leads and contacts.')}
+                    icon={Tag}
+                    module="CRM"
+                />
+                <div className="px-8 pb-8">
+                    <UpgradeOverlay 
+                        title={__('Sales Management Add-on Required')}
+                        description={__('To create and manage custom tags and attributes, you need the Sales Management & Tracking add-on.')}
+                        icon={Tag}
+                        module="crm-sales-management"
+                        priceText={__('Subscribe to Sales Management')}
+                    />
+                </div>
+            </CrmLayout>
+        );
+    }
+
     return (
         <CrmLayout title={__('Tags & Attributes')} activeMenu="tags">
-            <div className="flex flex-col h-full gap-6 p-8 pt-6">
-                
-                {/* Header */}
-                <div className="flex justify-between items-end">
-                    <div>
-                        <h1 className="text-2xl font-bold tracking-tight text-foreground">{__('Tags & Attributes')}</h1>
-                        <p className="text-sm text-muted-foreground mt-1">{__('Manage tags used to categorize leads and contacts.')}</p>
-                    </div>
+            <ModulePageHeader 
+                title={__('Tags & Attributes')}
+                description={__('Manage tags used to categorize leads and contacts.')}
+                icon={Tag}
+                module="CRM"
+                action={
                     <Button onClick={() => setIsCreateModalOpen(true)} className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white">
                         <Plus size={16} />
                         {__('Create Tag')}
                     </Button>
-                </div>
+                }
+            />
+            <div className="flex flex-col h-full px-8 pb-8">
 
                 {/* Content */}
                 <Card className="flex-1 overflow-hidden border-slate-200 shadow-sm">
