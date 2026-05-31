@@ -15,6 +15,7 @@ import {
     ClipboardList,
     Briefcase,
 } from 'lucide-react';
+import { Avatar, AvatarFallback, AvatarImage } from '@/Components/ui/avatar';
 import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
 import { Card, CardContent } from '@/Components/ui/card';
@@ -45,7 +46,7 @@ interface TaskData {
 }
 
 interface ClientData {
-    client: { id: number; name: string; email: string };
+    client: { id: number; name: string; email: string; avatar_url?: string };
     tasks: TaskData[];
 }
 
@@ -218,9 +219,12 @@ export default function AsList({ arrangedClients, clients, filters, stats, auth 
                             <div key={clientGroup.client.id}>
                                 {/* Client Header */}
                                 <div className="flex items-center gap-3 mb-4">
-                                    <div className="h-8 w-8 rounded-lg bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold text-sm">
-                                        {clientGroup.client.name.charAt(0).toUpperCase()}
-                                    </div>
+                                    <Avatar className="h-8 w-8 rounded-lg border border-slate-200">
+                                        <AvatarImage src={clientGroup.client.avatar_url} alt={clientGroup.client.name} />
+                                        <AvatarFallback className="rounded-lg bg-indigo-100 text-indigo-700 font-bold text-sm">
+                                            {clientGroup.client.name.charAt(0).toUpperCase()}
+                                        </AvatarFallback>
+                                    </Avatar>
                                     <div>
                                         <h2 className="text-base font-bold text-slate-900">{clientGroup.client.name}</h2>
                                         <span className="text-xs text-slate-400">{clientGroup.client.email}</span>

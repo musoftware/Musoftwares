@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
 import { Button } from '@/Components/ui/button';
+import { User } from 'lucide-react';
+import { Avatar, AvatarFallback, AvatarImage } from '@/Components/ui/avatar';
 import {
     Dialog,
     DialogContent,
@@ -174,7 +176,26 @@ export default function Index({ projects, clients, currentTab }) {
                                     </button>
                                 </td>
                                 <td className="p-4">
-                                    {project.client?.name || 'Unknown'}
+                                    {project.client ? (
+                                        <div className="flex items-center gap-3">
+                                            <Avatar className="h-10 w-10 border border-slate-200">
+                                                <AvatarImage src={project.client.avatar_url || ''} alt={project.client.name} />
+                                                <AvatarFallback className="bg-blue-50 text-blue-500">
+                                                    <User className="h-5 w-5" />
+                                                </AvatarFallback>
+                                            </Avatar>
+                                            <div className="flex flex-col text-left">
+                                                <span className="font-semibold text-slate-900">
+                                                    {project.client.name}
+                                                </span>
+                                                <span className="text-sm text-slate-500">
+                                                    {project.client.email}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        'Unknown'
+                                    )}
                                 </td>
                                 <td className="p-4">{project.project_balance ? formatMoney(project.project_balance, 'USD') : '-'}</td>
                                 <td className="p-4">

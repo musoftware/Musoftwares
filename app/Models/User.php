@@ -51,7 +51,20 @@ class User extends Authenticatable
     ];
 
     protected $appends = [
+        'avatar_url',
     ];
+
+    public function getAvatarUrlAttribute()
+    {
+        if ($this->avatar) {
+            return asset('storage/' . $this->avatar);
+        }
+        if (empty($this->email)) {
+            return null;
+        }
+        $hash = md5(strtolower(trim($this->email)));
+        return "https://www.gravatar.com/avatar/{$hash}?s=200&d=404";
+    }
 
     protected function casts(): array
     {

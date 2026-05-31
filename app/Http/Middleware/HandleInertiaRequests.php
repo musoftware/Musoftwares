@@ -157,6 +157,8 @@ class HandleInertiaRequests extends Middleware
                 'error' => fn () => $request->session()->get('error'),
                 'danger' => fn () => $request->session()->get('danger'),
                 'warning' => fn () => $request->session()->get('warning'),
+                'new_publishable_key' => fn () => $request->session()->get('new_publishable_key'),
+                'new_secret_key' => fn () => $request->session()->get('new_secret_key'),
             ],
         ];
     }

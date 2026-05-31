@@ -124,6 +124,7 @@ class TaskController extends Controller implements HasMiddleware
                         'id' => $task->client->id,
                         'name' => $task->client->name,
                         'email' => $task->client->email,
+                        'avatar_url' => $task->client->avatar_url,
                     ],
                     'tasks' => []
                 ];
