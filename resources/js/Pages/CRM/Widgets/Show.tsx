@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Head, Link, usePage } from '@inertiajs/react';
-import CrmLayout from '@/Layouts/CRMLayout';
+import CrmLayout from '@/Layouts/CrmLayout';
 import { __ } from '@/lib/i18n';
 import { ArrowLeft, Copy, Check, ExternalLink, Code } from 'lucide-react';
 import { Button } from '@/Components/ui/button';

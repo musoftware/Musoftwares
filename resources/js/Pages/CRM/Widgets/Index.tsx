@@ -1,16 +1,16 @@
 import React from 'react';
 import { Head, Link, usePage } from '@inertiajs/react';
-import CrmLayout from '@/Layouts/CRMLayout';
+import CrmLayout from '@/Layouts/CrmLayout';
 import { __ } from '@/lib/i18n';
 import { Plus, Code, Settings, Trash2, Globe, Activity, Link as LinkIcon, FormInput } from 'lucide-react';
-import { Button } from '@/Components/ui/button';
+import { Button, buttonVariants } from '@/Components/ui/button';
 import { Badge } from '@/Components/ui/badge';
 import { format } from 'date-fns';
 import { ModulePageHeader } from '@/Components/ui/ModulePageHeader';
 import { UpgradeOverlay } from '@/Components/ui/UpgradeOverlay';
 
 export default function Index({ widgets }: { widgets: any }) {
-    const { auth } = usePage().props;
+    const { auth } = usePage<any>().props;
     const hasAdvancedOps = auth?.crm_features?.includes('crm-advanced-operations') ?? false;
 
     if (!hasAdvancedOps) {
@@ -20,7 +20,6 @@ export default function Index({ widgets }: { widgets: any }) {
                     title={__('Web Forms')}
                     description={__('Create and manage embeddable forms to capture leads from your external websites.')}
                     icon={FormInput}
-                    module="CRM"
                 />
                 <div className="px-8 pb-8">
                     <UpgradeOverlay 
@@ -41,14 +40,11 @@ export default function Index({ widgets }: { widgets: any }) {
                 title={__('Web Forms')}
                 description={__('Create and manage embeddable forms to capture leads from your external websites.')}
                 icon={FormInput}
-                module="CRM"
-                action={
-                    <Button asChild className="gap-2 bg-indigo-600 hover:bg-indigo-700 text-white">
-                        <Link href={route('crm.widgets.create')}>
-                            <Plus className="w-4 h-4" />
-                            {__('Create New Form')}
-                        </Link>
-                    </Button>
+                actions={
+                    <Link href={route('crm.widgets.create')} className={buttonVariants({ className: "gap-2 bg-indigo-600 hover:bg-indigo-700 text-white" })}>
+                        <Plus className="w-4 h-4" />
+                        {__('Create New Form')}
+                    </Link>
                 }
             />
             <div className="space-y-6 px-8 pb-8">
@@ -106,16 +102,12 @@ export default function Index({ widgets }: { widgets: any }) {
                                         </td>
                                         <td className="px-6 py-4 text-right">
                                             <div className="flex items-center justify-end gap-2">
-                                                <Button variant="ghost" size="sm" asChild className="text-slate-500 hover:text-indigo-600">
-                                                    <Link href={route('crm.widgets.show', widget.id)} title={__('Get Embed Code')}>
-                                                        <Code className="w-4 h-4" />
-                                                    </Link>
-                                                </Button>
-                                                <Button variant="ghost" size="sm" asChild className="text-slate-500 hover:text-indigo-600">
-                                                    <Link href={route('crm.widgets.edit', widget.id)} title={__('Settings')}>
-                                                        <Settings className="w-4 h-4" />
-                                                    </Link>
-                                                </Button>
+                                                <Link href={route('crm.widgets.show', widget.id)} title={__('Get Embed Code')} className={buttonVariants({ variant: 'ghost', size: 'sm', className: 'text-slate-500 hover:text-indigo-600' })}>
+                                                    <Code className="w-4 h-4" />
+                                                </Link>
+                                                <Link href={route('crm.widgets.edit', widget.id)} title={__('Settings')} className={buttonVariants({ variant: 'ghost', size: 'sm', className: 'text-slate-500 hover:text-indigo-600' })}>
+                                                    <Settings className="w-4 h-4" />
+                                                </Link>
                                             </div>
                                         </td>
                                     </tr>
@@ -128,12 +120,10 @@ export default function Index({ widgets }: { widgets: any }) {
                                                 <Globe className="w-12 h-12 text-slate-300 mb-4" />
                                                 <p className="text-base font-medium text-slate-900">{__('No Web Forms yet')}</p>
                                                 <p className="text-sm mt-1 mb-4">{__('Create your first embeddable lead form.')}</p>
-                                                <Button asChild variant="outline">
-                                                    <Link href={route('crm.widgets.create')}>
-                                                        <Plus className="w-4 h-4 mr-2" />
-                                                        {__('Create New Form')}
-                                                    </Link>
-                                                </Button>
+                                                <Link href={route('crm.widgets.create')} className={buttonVariants({ variant: 'outline' })}>
+                                                    <Plus className="w-4 h-4 mr-2" />
+                                                    {__('Create New Form')}
+                                                </Link>
                                             </div>
                                         </td>
                                     </tr>

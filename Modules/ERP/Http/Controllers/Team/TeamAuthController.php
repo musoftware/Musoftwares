@@ -64,6 +64,9 @@ class TeamAuthController extends Controller
             \Modules\ERP\Models\TeamMember::ROLE_MARKETING => route('crm.workspaces.marketing'),
             \Modules\ERP\Models\TeamMember::ROLE_SUPPORT_AGENT => route('crm.workspaces.support'),
             \Modules\ERP\Models\TeamMember::ROLE_SUPPORT_MANAGER => route('crm.workspaces.support'),
+            \Modules\ERP\Models\TeamMember::ROLE_SOCIAL_MEDIA => route('crm.leads.index'),
+            \Modules\ERP\Models\TeamMember::ROLE_LEGACY_MANAGER => route('crm.workspaces.manager'),
+            \Modules\ERP\Models\TeamMember::ROLE_LEGACY_MEMBER => route('crm.dashboard'),
             default => route('erp.dashboard'),
         };
 

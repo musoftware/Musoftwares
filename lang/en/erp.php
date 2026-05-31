@@ -175,6 +175,7 @@ return [
     'roles_call_center' => 'Call Center Agent',
     'roles_account_manager' => 'Account Manager',
     'roles_branch_manager' => 'Branch Manager',
+    'roles_social_media' => 'Social Media',
     'roles_legacy_manager' => 'Manager (Legacy)',
     'roles_legacy_member' => 'Member (Legacy)',
     'team_capacity_reached' => 'You have reached your team capacity limit of :limit members. Please upgrade your capacity to add more.',

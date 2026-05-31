@@ -179,19 +179,15 @@ class WorkspaceController extends Controller
         
         $userId = $request->user()->id;
 
-        $tenantId = session('tenant_id');
-        if (!$tenantId) {
-            $tenant = \Modules\ERP\Models\Tenant::where('user_id', $request->user()->id)->first();
-            $tenantId = $tenant ? $tenant->id : null;
-        }
+        $workspaceId = session('crm_workspace_id');
 
-        $activeAgents = $tenantId ? DB::table('erp_team_members')
-            ->where('tenant_id', $tenantId)
+        $activeAgents = $workspaceId ? DB::table('crm_team_members')
+            ->where('workspace_id', $workspaceId)
             ->where('status', 'active')
             ->count() : 0;
 
-        $staleLeads = $tenantId ? DB::table('leads')
-            ->where('tenant_id', $tenantId)
+        $staleLeads = $workspaceId ? DB::table('leads')
+            ->where('workspace_id', $workspaceId)
             ->where('is_stale', true)
             ->select('id', 'name', 'phone', 'pipeline_stage', 'updated_at', 'assigned_to_id')
             ->orderBy('updated_at', 'asc')
@@ -202,12 +198,11 @@ class WorkspaceController extends Controller
 
         // Calculate Leaderboard
         $leaderboard = [];
-        if ($tenantId) {
-            $agents = DB::table('erp_team_members')
-                ->join('users', 'erp_team_members.user_id', '=', 'users.id')
-                ->where('erp_team_members.tenant_id', $tenantId)
-                ->where('erp_team_members.status', 'active')
-                ->select('users.id', 'users.name', 'erp_team_members.role')
+        if ($workspaceId) {
+            $agents = DB::table('crm_team_members')
+                ->where('crm_team_members.workspace_id', $workspaceId)
+                ->where('crm_team_members.status', 'active')
+                ->select('crm_team_members.id', 'crm_team_members.name', 'crm_team_members.role')
                 ->get();
 
             $kpiAction = new \Modules\CRM\Domains\WorkforceMonitoring\Actions\CalculateKpisAction();
@@ -250,24 +245,20 @@ class WorkspaceController extends Controller
 
     public function marketingWorkspace(Request $request): Response
     {
-        $tenantId = session('tenant_id');
-        if (!$tenantId) {
-            $tenant = \Modules\ERP\Models\Tenant::where('user_id', $request->user()->id)->first();
-            $tenantId = $tenant ? $tenant->id : null;
-        }
+        $workspaceId = session('crm_workspace_id');
 
         $activeCampaigns = DB::table('crm_campaigns')
-            ->where('tenant_id', $tenantId)
+            ->where('workspace_id', $workspaceId)
             ->where('status', 'ACTIVE')
             ->count();
 
         $leadsGeneratedToday = DB::table('leads')
-            ->where('tenant_id', $tenantId)
+            ->where('workspace_id', $workspaceId)
             ->whereDate('created_at', now()->toDateString())
             ->count();
 
         $topCampaigns = DB::table('crm_campaigns')
-            ->where('tenant_id', $tenantId)
+            ->where('workspace_id', $workspaceId)
             ->whereIn('status', ['ACTIVE', 'sending'])
             ->select('id', 'name', 'status', 'sent_count', 'total_recipients')
             ->orderBy('created_at', 'desc')

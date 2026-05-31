@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { Head, Link, useForm } from '@inertiajs/react';
-import CrmLayout from '@/Layouts/CRMLayout';
+import CrmLayout from '@/Layouts/CrmLayout';
 import { __ } from '@/lib/i18n';
 import { ArrowLeft, Save, Globe, Settings, Type, Palette } from 'lucide-react';
-import { Button } from '@/Components/ui/button';
+import { Button, buttonVariants } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
 import { Switch } from '@/Components/ui/switch';
@@ -12,7 +12,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/Com
 export default function Form({ widget }: { widget?: any }) {
     const isEdit = !!widget;
 
-    const { data, setData, post, put, processing, errors } = useForm({
+    const { data, setData, post, put, processing, errors, transform } = useForm({
         name: widget?.name || '',
         is_active: widget?.is_active ?? true,
         allowed_domains: widget?.allowed_domains?.join(', ') || '',
@@ -33,16 +33,16 @@ export default function Form({ widget }: { widget?: any }) {
 
     const submit = (e: React.FormEvent) => {
         e.preventDefault();
-        
-        const payload = {
-            ...data,
-            allowed_domains: data.allowed_domains ? data.allowed_domains.split(',').map((d: string) => d.trim()).filter((d: string) => d) : []
-        };
+
+        transform((formData) => ({
+            ...formData,
+            allowed_domains: formData.allowed_domains ? formData.allowed_domains.split(',').map((d: string) => d.trim()).filter((d: string) => d) : []
+        }));
 
         if (isEdit) {
-            put(route('crm.widgets.update', widget.id), { data: payload });
+            put(route('crm.widgets.update', widget.id));
         } else {
-            post(route('crm.widgets.store'), { data: payload });
+            post(route('crm.widgets.store'));
         }
     };
 
@@ -63,11 +63,9 @@ export default function Form({ widget }: { widget?: any }) {
         <CrmLayout title={isEdit ? __('Edit Form') : __('Create Form')} activeMenu="widgets">
             <div className="max-w-4xl mx-auto space-y-6 pb-12">
                 <div className="flex items-center gap-4">
-                    <Button variant="ghost" size="icon" asChild className="rounded-full">
-                        <Link href={route('crm.widgets.index')}>
-                            <ArrowLeft className="w-5 h-5" />
-                        </Link>
-                    </Button>
+                    <Link href={route('crm.widgets.index')} className={buttonVariants({ variant: 'ghost', size: 'icon', className: 'rounded-full' })}>
+                        <ArrowLeft className="w-5 h-5" />
+                    </Link>
                     <div>
                         <h1 className="text-2xl font-bold tracking-tight text-slate-900">
                             {isEdit ? __('Edit Form Settings') : __('Create New Web Form')}
