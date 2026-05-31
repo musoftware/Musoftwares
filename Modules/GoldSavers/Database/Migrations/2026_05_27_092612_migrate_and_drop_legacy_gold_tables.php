@@ -23,21 +23,19 @@ class MigrateAndDropLegacyGoldTables extends Migration
         if (Schema::hasTable('gold_prices')) {
             if (Schema::hasColumn('gold_prices', 'price_24k')) {
                 foreach ($karats as $k => $col) {
-                    \Illuminate\Support\Facades\DB::table('gold_price_history')->insertOrIgnoreUsing(
-                        ['tenant_id', 'market_key', 'interval', 'karat', 'open_price', 'high_price', 'low_price', 'close_price', 'avg_price', 'tick_count', 'currency_id', 'period_start', 'period_end', 'created_at', 'updated_at'],
-                        \Illuminate\Support\Facades\DB::table('gold_prices')
-                            ->selectRaw("1, 'local_egp', 'day', ?, " . $col . ", " . $col . ", " . $col . ", " . $col . ", " . $col . ", 0, (SELECT id FROM currencies WHERE currency = 'EGP' LIMIT 1), DATE(price_date), CONCAT(DATE(price_date), ' 23:59:59'), NOW(), NOW()", [$k])
-                            ->where($col, '>', 0)
-                    );
+                    \Illuminate\Support\Facades\DB::statement('
+                        INSERT ' . $ignoreStr . ' INTO gold_price_history 
+                        (tenant_id, market_key, `interval`, karat, open_price, high_price, low_price, close_price, avg_price, tick_count, currency_id, period_start, period_end, created_at, updated_at)
+                        SELECT 1, \'local_egp\', \'day\', ' . $k . ', ' . $col . ', ' . $col . ', ' . $col . ', ' . $col . ', ' . $col . ', 0, (SELECT id FROM currencies WHERE currency = \'EGP\' LIMIT 1), DATE(price_date), CONCAT(DATE(price_date), \' 23:59:59\'), NOW(), NOW()
+                        FROM gold_prices WHERE ' . $col . ' > 0
+                    ');
                 }
                 // Populate Gold Live Prices with the latest record
-                \Illuminate\Support\Facades\DB::table('gold_live_prices')->insertUsing(
-                    ['tenant_id', 'market_key', 'currency_id', 'price_gram_24k', 'price_gram_21k', 'price_gram_18k', 'price_gram_14k', 'fetched_at', 'created_at', 'updated_at'],
-                    \Illuminate\Support\Facades\DB::table('gold_prices')
-                        ->selectRaw("1, 'local_egp', (SELECT id FROM currencies WHERE currency = 'EGP' LIMIT 1), price_24k, price_21k, price_18k, price_14k, price_date, NOW(), NOW()")
-                        ->orderByDesc('price_date')
-                        ->limit(1)
-                );
+                \Illuminate\Support\Facades\DB::statement('
+                    INSERT INTO gold_live_prices (tenant_id, market_key, currency_id, price_gram_24k, price_gram_21k, price_gram_18k, price_gram_14k, fetched_at, created_at, updated_at)
+                    SELECT 1, \'local_egp\', (SELECT id FROM currencies WHERE currency = \'EGP\' LIMIT 1), price_24k, price_21k, price_18k, price_14k, price_date, NOW(), NOW()
+                    FROM gold_prices ORDER BY price_date DESC LIMIT 1
+                ');
             }
             Schema::dropIfExists('gold_prices');
         }
@@ -45,21 +43,19 @@ class MigrateAndDropLegacyGoldTables extends Migration
         if (Schema::hasTable('gold_world_prices')) {
             if (Schema::hasColumn('gold_world_prices', 'price_24k')) {
                 foreach ($karats as $k => $col) {
-                    \Illuminate\Support\Facades\DB::table('gold_price_history')->insertOrIgnoreUsing(
-                        ['tenant_id', 'market_key', 'interval', 'karat', 'open_price', 'high_price', 'low_price', 'close_price', 'avg_price', 'tick_count', 'currency_id', 'period_start', 'period_end', 'created_at', 'updated_at'],
-                        \Illuminate\Support\Facades\DB::table('gold_world_prices')
-                            ->selectRaw("1, 'global_usd', 'day', ?, " . $col . ", " . $col . ", " . $col . ", " . $col . ", " . $col . ", 0, (SELECT id FROM currencies WHERE currency = 'USD' LIMIT 1), DATE(price_date), CONCAT(DATE(price_date), ' 23:59:59'), NOW(), NOW()", [$k])
-                            ->where($col, '>', 0)
-                    );
+                    \Illuminate\Support\Facades\DB::statement('
+                        INSERT ' . $ignoreStr . ' INTO gold_price_history 
+                        (tenant_id, market_key, `interval`, karat, open_price, high_price, low_price, close_price, avg_price, tick_count, currency_id, period_start, period_end, created_at, updated_at)
+                        SELECT 1, \'global_usd\', \'day\', ' . $k . ', ' . $col . ', ' . $col . ', ' . $col . ', ' . $col . ', ' . $col . ', 0, (SELECT id FROM currencies WHERE currency = \'USD\' LIMIT 1), DATE(price_date), CONCAT(DATE(price_date), \' 23:59:59\'), NOW(), NOW()
+                        FROM gold_world_prices WHERE ' . $col . ' > 0
+                    ');
                 }
                 // Populate Gold Live Prices with the latest record
-                \Illuminate\Support\Facades\DB::table('gold_live_prices')->insertUsing(
-                    ['tenant_id', 'market_key', 'currency_id', 'price_gram_24k', 'price_gram_21k', 'price_gram_18k', 'price_gram_14k', 'fetched_at', 'created_at', 'updated_at'],
-                    \Illuminate\Support\Facades\DB::table('gold_world_prices')
-                        ->selectRaw("1, 'global_usd', (SELECT id FROM currencies WHERE currency = 'USD' LIMIT 1), price_24k, price_21k, price_18k, price_14k, price_date, NOW(), NOW()")
-                        ->orderByDesc('price_date')
-                        ->limit(1)
-                );
+                \Illuminate\Support\Facades\DB::statement('
+                    INSERT INTO gold_live_prices (tenant_id, market_key, currency_id, price_gram_24k, price_gram_21k, price_gram_18k, price_gram_14k, fetched_at, created_at, updated_at)
+                    SELECT 1, \'global_usd\', (SELECT id FROM currencies WHERE currency = \'USD\' LIMIT 1), price_24k, price_21k, price_18k, price_14k, price_date, NOW(), NOW()
+                    FROM gold_world_prices ORDER BY price_date DESC LIMIT 1
+                ');
             }
             Schema::dropIfExists('gold_world_prices');
         }
