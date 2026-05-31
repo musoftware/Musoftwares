@@ -141,13 +141,14 @@ class WorkspaceController extends Controller
     {
         $this->ensureAccess($request, ['Sales', 'Agent', 'Manager'], 'crm-sales-staff');
 
-        $userId = $request->user()->id;
+        $isTeam = Auth::guard('crm_team')->check();
+        $agentId = $isTeam ? Auth::guard('crm_team')->id() : $request->user()->id;
 
         $kpiAction = new CalculateKpisAction();
-        $kpis = $kpiAction->execute($userId, now()->startOfDay()->toDateTimeString(), now()->endOfDay()->toDateTimeString());
+        $kpis = $kpiAction->execute($agentId, now()->startOfDay()->toDateTimeString(), now()->endOfDay()->toDateTimeString());
         
         $activities = DB::table('crm_activities')
-            ->where('user_id', $userId)
+            ->where('user_id', $agentId)
             ->orderBy('created_at', 'desc')
             ->limit(20)
             ->get()
@@ -155,7 +156,7 @@ class WorkspaceController extends Controller
                 return [
                     'id' => $activity->id,
                     'type' => $activity->event === 'call' ? 'call' : 'stage_change',
-                    'agentName' => 'You', // Since it's the current user's activities
+                    'agentName' => 'You',
                     'leadName' => json_decode($activity->metadata, true)['lead_name'] ?? 'A lead',
                     'description' => $activity->event,
                     'timeAgo' => \Carbon\Carbon::parse($activity->created_at)->diffForHumans(),
@@ -165,7 +166,7 @@ class WorkspaceController extends Controller
         return Inertia::render('CRM/Workspaces/TelesalesDashboard', [
             'kpis' => [
                 'calls_today' => $kpis->callsMade,
-                'pending_followups' => DB::table('leads')->where('assigned_to_id', $userId)->where('pipeline_stage', 'FOLLOW_UP')->count(),
+                'pending_followups' => DB::table('leads')->where('assigned_to', $agentId)->where('pipeline_stage', 'FOLLOW_UP')->count(),
                 'conversion_rate' => $kpis->conversionRate . '%'
             ],
             'pipeline' => [],

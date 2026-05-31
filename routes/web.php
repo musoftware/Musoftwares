@@ -441,6 +441,7 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
     Route::post('/users/{id}/membership', [\App\Http\Controllers\Admin\UsersController::class, 'activateMembership'])->name('users.membership.activate');
     Route::put('/users/{id}/membership/{sub_id}', [\App\Http\Controllers\Admin\UsersController::class, 'updateMembership'])->name('users.membership.update');
     Route::delete('/users/{id}/membership/{sub_id}', [\App\Http\Controllers\Admin\UsersController::class, 'deleteMembership'])->name('users.membership.delete');
+    Route::post('/users/{id}/update-role', [\App\Http\Controllers\Admin\UsersController::class, 'updateRole'])->name('users.update-role');
 
     // ── Points Control ───────────────────────────────────────────────
     Route::get('/points_controller', [\App\Http\Controllers\Admin\AdminPointsController::class, 'index'])->name('points.index');

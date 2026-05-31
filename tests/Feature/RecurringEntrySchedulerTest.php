@@ -31,6 +31,12 @@ class RecurringEntrySchedulerTest extends TestCase
             'name'    => 'Test Corp',
             'status'  => 'active',
         ]);
+
+        $this->currencyId = DB::table('currencies')->insertGetId([
+            'currency' => 'USD',
+            'symbol' => '$',
+            'string_format' => '$%01.2f'
+        ]);
     }
 
     public function test_processes_due_recurring_entry_and_creates_log(): void
@@ -41,9 +47,9 @@ class RecurringEntrySchedulerTest extends TestCase
             'type'              => 'income',
             'title'             => 'Monthly Retainer',
             'amount'            => 500.00,
-            'amount_currency'   => 'USD',
+            'currency_id'       => $this->currencyId,
             'business_amount'   => 500.00,
-            'business_currency' => 'USD',
+            'business_currency_id' => $this->currencyId,
             'exchange_rate'     => 1.0,
             'exchange_rate_date'=> Carbon::today()->toDateString(),
             'frequency'         => 'monthly',
@@ -80,9 +86,9 @@ class RecurringEntrySchedulerTest extends TestCase
             'type'              => 'expense',
             'title'             => 'Office Rent',
             'amount'            => 1000.00,
-            'amount_currency'   => 'USD',
+            'currency_id'       => $this->currencyId,
             'business_amount'   => 1000.00,
-            'business_currency' => 'USD',
+            'business_currency_id' => $this->currencyId,
             'exchange_rate'     => 1.0,
             'exchange_rate_date'=> Carbon::today()->toDateString(),
             'frequency'         => 'monthly',
@@ -108,9 +114,9 @@ class RecurringEntrySchedulerTest extends TestCase
             'type'              => 'income',
             'title'             => 'Future Revenue',
             'amount'            => 200.00,
-            'amount_currency'   => 'USD',
+            'currency_id'       => $this->currencyId,
             'business_amount'   => 200.00,
-            'business_currency' => 'USD',
+            'business_currency_id' => $this->currencyId,
             'exchange_rate'     => 1.0,
             'exchange_rate_date'=> Carbon::today()->toDateString(),
             'frequency'         => 'monthly',
@@ -135,9 +141,9 @@ class RecurringEntrySchedulerTest extends TestCase
             'type'              => 'income',
             'title'             => 'Dry Run Revenue',
             'amount'            => 300.00,
-            'amount_currency'   => 'USD',
+            'currency_id'       => $this->currencyId,
             'business_amount'   => 300.00,
-            'business_currency' => 'USD',
+            'business_currency_id' => $this->currencyId,
             'exchange_rate'     => 1.0,
             'exchange_rate_date'=> Carbon::today()->toDateString(),
             'frequency'         => 'weekly',

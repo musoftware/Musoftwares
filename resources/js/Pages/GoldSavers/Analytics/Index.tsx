@@ -79,7 +79,7 @@ export default function AnalyticsIndex({ hasAnalytics, hasBuySellAnalytics, port
                                 <CardContent className="pt-6">
                                     <div className="h-[300px] w-full">
                                         {portfolioData.length > 0 ? (
-                                            <ResponsiveContainer width="100%" height="100%">
+                                            <ResponsiveContainer width="100%" height="100%" minWidth={0}>
                                                 <PieChart>
                                                     <Pie
                                                         data={portfolioData}
@@ -134,7 +134,7 @@ export default function AnalyticsIndex({ hasAnalytics, hasBuySellAnalytics, port
                                 <CardContent className="pt-6">
                                     <div className="h-[300px] w-full">
                                         {profitData.length > 0 ? (
-                                            <ResponsiveContainer width="100%" height="100%">
+                                            <ResponsiveContainer width="100%" height="100%" minWidth={0}>
                                                 <BarChart data={profitData} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
                                                     <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
                                                     <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 12 }} dy={10} />
@@ -189,7 +189,7 @@ export default function AnalyticsIndex({ hasAnalytics, hasBuySellAnalytics, port
                             <div className={!hasBuySellAnalytics ? "opacity-20 select-none pointer-events-none" : ""}>
                                 <div className="h-[300px] w-full">
                                     {transactionBreakdown && transactionBreakdown.length > 0 ? (
-                                        <ResponsiveContainer width="100%" height="100%">
+                                        <ResponsiveContainer width="100%" height="100%" minWidth={0}>
                                             <BarChart data={transactionBreakdown} layout="vertical" margin={{ top: 5, right: 20, bottom: 5, left: 20 }}>
                                                 <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#e2e8f0" />
                                                 <XAxis type="number" axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 12 }} />

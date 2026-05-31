@@ -39,15 +39,21 @@ class RecurringServiceTest extends TestCase
             'updated_at' => now(),
         ]);
 
+        $currencyId = DB::table('currencies')->insertGetId([
+            'currency' => 'USD',
+            'symbol' => '$',
+            'string_format' => '$%01.2f'
+        ]);
+
         $entryId = DB::table('erp_recurring_entries')->insertGetId([
             'tenant_id' => $tenantId,
             'type' => 'expense',
             'title' => 'Test Expense',
             'description' => 'Test',
             'amount' => 10,
-            'amount_currency' => 'USD',
+            'currency_id' => $currencyId,
             'business_amount' => 10,
-            'business_currency' => 'USD',
+            'business_currency_id' => $currencyId,
             'exchange_rate' => 1,
             'exchange_rate_date' => now()->toDateString(),
             'frequency' => 'monthly',
