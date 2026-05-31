@@ -36,5 +36,6 @@ return [
     'webhook_endpoint_returned_error' => 'webhook_endpoint_returned_error',
     'webhook_registered_success_v2' => 'webhook_registered_success_v2',
     'webhook_send_failed' => 'webhook_send_failed',
-    'webhook_updated_success' => 'webhook_updated_success'
+    'webhook_updated_success' => 'webhook_updated_success',
+    'device_limit_reached' => 'تم الوصول للحد الأقصى للأجهزة. لا يمكنك إضافة المزيد.',
 ];

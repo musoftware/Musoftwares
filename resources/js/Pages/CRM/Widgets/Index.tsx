@@ -2,29 +2,56 @@ import React from 'react';
 import { Head, Link, usePage } from '@inertiajs/react';
 import CrmLayout from '@/Layouts/CRMLayout';
 import { __ } from '@/lib/i18n';
-import { Plus, Code, Settings, Trash2, Globe, Activity, Link as LinkIcon } from 'lucide-react';
+import { Plus, Code, Settings, Trash2, Globe, Activity, Link as LinkIcon, FormInput } from 'lucide-react';
 import { Button } from '@/Components/ui/button';
 import { Badge } from '@/Components/ui/badge';
 import { format } from 'date-fns';
+import { ModulePageHeader } from '@/Components/ui/ModulePageHeader';
+import { UpgradeOverlay } from '@/Components/ui/UpgradeOverlay';
 
 export default function Index({ widgets }: { widgets: any }) {
+    const { auth } = usePage().props;
+    const hasAdvancedOps = auth?.crm_features?.includes('crm-advanced-operations') ?? false;
+
+    if (!hasAdvancedOps) {
+        return (
+            <CrmLayout title={__('Web Forms')} activeMenu="widgets">
+                <ModulePageHeader 
+                    title={__('Web Forms')}
+                    description={__('Create and manage embeddable forms to capture leads from your external websites.')}
+                    icon={FormInput}
+                    module="CRM"
+                />
+                <div className="px-8 pb-8">
+                    <UpgradeOverlay 
+                        title={__('Advanced Operations Required')}
+                        description={__('To create and manage Web Forms and capture leads directly into CRM, you need the Advanced Operations add-on.')}
+                        icon={FormInput}
+                        module="crm-advanced-operations"
+                        priceText={__('Subscribe to Advanced Operations')}
+                    />
+                </div>
+            </CrmLayout>
+        );
+    }
+
     return (
         <CrmLayout title={__('Web Forms')} activeMenu="widgets">
-            <div className="space-y-6">
-                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                    <div>
-                        <h1 className="text-2xl font-bold tracking-tight text-slate-900">{__('Web Forms')}</h1>
-                        <p className="text-sm text-slate-500 mt-1">
-                            {__('Create and manage embeddable forms to capture leads from your external websites.')}
-                        </p>
-                    </div>
-                    <Button asChild>
-                        <Link href={route('crm.widgets.create')} className="gap-2">
+            <ModulePageHeader 
+                title={__('Web Forms')}
+                description={__('Create and manage embeddable forms to capture leads from your external websites.')}
+                icon={FormInput}
+                module="CRM"
+                action={
+                    <Button asChild className="gap-2 bg-indigo-600 hover:bg-indigo-700 text-white">
+                        <Link href={route('crm.widgets.create')}>
                             <Plus className="w-4 h-4" />
                             {__('Create New Form')}
                         </Link>
                     </Button>
-                </div>
+                }
+            />
+            <div className="space-y-6 px-8 pb-8">
 
                 <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
                     <div className="overflow-x-auto">

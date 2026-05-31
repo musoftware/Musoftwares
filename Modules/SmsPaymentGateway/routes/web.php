@@ -6,13 +6,15 @@ use Modules\SmsPaymentGateway\Http\Controllers\WidgetController;
 
 // Public Widget Routes
 Route::middleware(['web'])->prefix('sms-payment-gateway')->name('sms-payment-gateway.')->group(function () {
-    Route::get('pay', [WidgetController::class, 'show'])->name('widget.show');
-    Route::get('pay/status', [WidgetController::class, 'status'])->name('widget.status');
+    Route::get('checkout/{order_number}', [WidgetController::class, 'show'])->name('widget.show');
+    Route::get('checkout/{order_number}/status', [WidgetController::class, 'status'])->name('widget.status');
+    Route::post('checkout/{order_number}/verify', [WidgetController::class, 'verify'])->name('widget.verify');
 });
 
 Route::middleware(['web', 'auth', 'verified', 'onboarding', 'subscription:sms-payment-gateway'])->prefix('sms-payment-gateway')->name('sms-payment-gateway.')->group(function () {
     Route::get('/', [SmsPaymentGatewayController::class, 'index'])->name('index');
     Route::get('devices', [SmsPaymentGatewayController::class, 'devices'])->name('devices');
+    Route::get('transactions', [SmsPaymentGatewayController::class, 'transactions'])->name('transactions');
     Route::get('webhooks', [SmsPaymentGatewayController::class, 'webhooks'])->name('webhooks');
     Route::get('verification', [SmsPaymentGatewayController::class, 'verification'])->name('verification');
     Route::get('documentation', [SmsPaymentGatewayController::class, 'documentation'])->name('documentation');

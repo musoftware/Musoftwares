@@ -4,7 +4,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Button } from '@/Components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/Components/ui/card';
 import {
-    Smartphone, ArrowLeft, ShieldCheck, ShieldAlert, Clock, Database, Eraser, Eye, EyeOff, AlertTriangle, CheckCircle, Code
+    Smartphone, ArrowLeft, ShieldCheck, ShieldAlert, Clock, Database, Eraser, Eye, EyeOff, AlertTriangle, CheckCircle, Code, Activity
 } from 'lucide-react';
 
 interface DeviceProps {

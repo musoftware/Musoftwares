@@ -175,6 +175,41 @@ class SmsPaymentGatewayController extends Controller
     }
 
     /**
+     * Display all transactions across all devices
+     */
+    public function transactions(Request $request)
+    {
+        $user = Auth::user();
+        
+        $query = SmsPaymentGatewayTransaction::where('user_id', $user->id)
+            ->with('device');
+
+        // Apply filters
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+        
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('reference_number', 'like', "%{$search}%")
+                  ->orWhere('sender_name', 'like', "%{$search}%")
+                  ->orWhere('sender', 'like', "%{$search}%")
+                  ->orWhere('phone_number', 'like', "%{$search}%");
+            });
+        }
+
+        $transactions = $query->orderByRaw('COALESCE(sms_timestamp, UNIX_TIMESTAMP(transaction_date) * 1000, UNIX_TIMESTAMP(created_at) * 1000) DESC')
+            ->paginate(20)
+            ->withQueryString();
+
+        return \Inertia\Inertia::render('SmsPaymentGateway/Transactions', [
+            'transactions' => $transactions,
+            'filters' => $request->only(['status', 'search'])
+        ]);
+    }
+
+    /**
      * Delete/disconnect a device
      */
     public function deleteDevice($id, \Modules\SmsPaymentGateway\Services\DeviceManagementService $deviceService)

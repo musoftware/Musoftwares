@@ -1,6 +1,7 @@
 import React from 'react';
 import { Head, Link, usePage } from '@inertiajs/react';
 import CrmLayout from '@/Layouts/CrmLayout';
+import { ModulePageHeader } from '@/Components/ui/ModulePageHeader';
 import { Users, Mail, PlayCircle, BarChart3, ArrowRight } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/Components/ui/card';
 import { __ } from '@/lib/i18n';
@@ -40,15 +41,12 @@ export default function Dashboard({ stats }) {
 
     return (
         <CrmLayout title={__('Welcome')} activeMenu="dashboard">
-            <div className="flex-1 space-y-4 p-8 pt-6">
-                <h2 className="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight flex items-center">
-                    <BarChart3 className="mr-3 h-8 w-8 text-indigo-600" />
-                    {__('CRM Dashboard')}
-                </h2>
-                <p className="mt-2 text-sm text-gray-600">
-                    {__('Overview of your marketing, leads, and automations.')}
-                </p>
-            </div>
+            <ModulePageHeader 
+                title={__('CRM Dashboard')}
+                description={__('Overview of your marketing, leads, and automations.')}
+                icon={BarChart3}
+                module="CRM"
+            />
 
             <div className="px-8 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                 {cards.map((card) => (
