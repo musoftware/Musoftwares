@@ -15,8 +15,6 @@ use BaconQrCode\Writer;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
-use Meneses\LaravelMpdf\LaravelMpdfWrapper;
-use PDF;
 
 class FileHelper
 {

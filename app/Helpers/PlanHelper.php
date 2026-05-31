@@ -12,8 +12,6 @@ use BaconQrCode\Renderer\RendererStyle\RendererStyle;
 use BaconQrCode\Writer;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Meneses\LaravelMpdf\LaravelMpdfWrapper;
-use PDF;
 
 class PlanHelper
 {
