@@ -4,7 +4,9 @@ import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/Components/ui/table";
 import { Button } from "@/Components/ui/button";
 import { Switch } from "@/Components/ui/switch";
-import { Eye, Trash2, Edit } from "lucide-react";
+import { Eye, Trash2, Edit, MoreHorizontal } from "lucide-react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/Components/ui/dropdown-menu";
+import { __ } from "@/lib/i18n";
 
 interface LandingPage {
     id: number;
@@ -39,26 +41,26 @@ export default function Index({ servicesWithLandingPages, filters, auth }: Props
     };
 
     const deletePage = (id: number) => {
-        if (confirm("Are you sure you want to delete this landing page?")) {
+        if (confirm(__("admin.confirm_delete_landing_page"))) {
             router.delete(route("admin.marketplace.service-landing-pages.destroy", id), { preserveScroll: true });
         }
     };
 
     return (
-        <AdminSidebarLayout title="Service Landing Pages" header="Service Landing Pages">
-            <Head title="Service Landing Pages" />
+        <AdminSidebarLayout title={__('admin.service_landing_pages')} header={__('admin.service_landing_pages')}>
+            <Head title={__('admin.service_landing_pages')} />
 
             <div className="space-y-6">
                 <div>
-                    <h1 className="text-2xl font-bold tracking-tight text-slate-900">Service Landing Pages</h1>
+                    <h1 className="text-2xl font-bold tracking-tight text-slate-900">{__('admin.service_landing_pages')}</h1>
                     <p className="text-sm text-slate-500 mt-1">
-                        Manage all service landing pages on the platform.
+                        {__('admin.manage_all_landing_pages')}
                     </p>
                 </div>
 
                 <div className="bg-white shadow-sm sm:rounded-xl border border-slate-200 p-6">
                     <div className="flex justify-between items-center mb-6">
-                        <h3 className="text-lg font-medium text-gray-900">Manage Landing Pages</h3>
+                        <h3 className="text-lg font-medium text-gray-900">{__('admin.manage_landing_pages')}</h3>
                         {/* You can add a search input here utilizing the `filters` prop */}
                     </div>
 
@@ -66,13 +68,13 @@ export default function Index({ servicesWithLandingPages, filters, auth }: Props
                             <Table>
                                 <TableHeader>
                                     <TableRow>
-                                        <TableHead>Service</TableHead>
-                                        <TableHead>Seller</TableHead>
-                                        <TableHead>Hero Title</TableHead>
-                                        <TableHead>Views / A/B</TableHead>
-                                        <TableHead>Leads</TableHead>
-                                        <TableHead>Status</TableHead>
-                                        <TableHead className="text-right">Actions</TableHead>
+                                        <TableHead>{__('admin.service')}</TableHead>
+                                        <TableHead>{__('admin.seller')}</TableHead>
+                                        <TableHead>{__('admin.hero_title')}</TableHead>
+                                        <TableHead>{__('admin.views_ab')}</TableHead>
+                                        <TableHead>{__('admin.leads')}</TableHead>
+                                        <TableHead>{__('admin.status')}</TableHead>
+                                        <TableHead className="text-right">{__('admin.actions')}</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
@@ -94,10 +96,10 @@ export default function Index({ servicesWithLandingPages, filters, auth }: Props
                                                 <TableCell>
                                                     {service.landing_page.variants?.length > 0 ? (
                                                         <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                                                            {service.landing_page.variants.length} Variants
+                                                            {service.landing_page.variants.length} {__('admin.variants')}
                                                         </span>
                                                     ) : (
-                                                        <span className="text-gray-500 text-sm">No A/B Test</span>
+                                                        <span className="text-gray-500 text-sm">{__('admin.no_ab_test')}</span>
                                                     )}
                                                 </TableCell>
                                                 <TableCell>
@@ -110,23 +112,33 @@ export default function Index({ servicesWithLandingPages, filters, auth }: Props
                                                     />
                                                 </TableCell>
                                                 <TableCell className="text-right">
-                                                    <div className="flex justify-end gap-2">
-                                                        <a href={`/l/${service.landing_page.slug}`} target="_blank" rel="noreferrer">
-                                                            <Button variant="outline" size="icon">
-                                                                <Eye className="w-4 h-4" />
+                                                    <DropdownMenu>
+                                                        <DropdownMenuTrigger asChild>
+                                                            <Button variant="ghost" className="h-8 w-8 p-0">
+                                                                <span className="sr-only">{__('admin.actions')}</span>
+                                                                <MoreHorizontal className="h-4 w-4" />
                                                             </Button>
-                                                        </a>
-                                                        <Button variant="outline" size="icon" className="text-red-600 hover:text-red-700 hover:bg-red-50" onClick={() => deletePage(service.landing_page.id)}>
-                                                            <Trash2 className="w-4 h-4" />
-                                                        </Button>
-                                                    </div>
+                                                        </DropdownMenuTrigger>
+                                                        <DropdownMenuContent align="end">
+                                                            <DropdownMenuItem asChild>
+                                                                <a href={`/l/${service.landing_page.slug}`} target="_blank" rel="noreferrer" className="cursor-pointer flex items-center">
+                                                                    <Eye className="w-4 h-4 mr-2" />
+                                                                    {__('admin.view')}
+                                                                </a>
+                                                            </DropdownMenuItem>
+                                                            <DropdownMenuItem onClick={() => deletePage(service.landing_page.id)} className="text-red-600 focus:text-red-700 cursor-pointer flex items-center">
+                                                                <Trash2 className="w-4 h-4 mr-2" />
+                                                                {__('admin.delete')}
+                                                            </DropdownMenuItem>
+                                                        </DropdownMenuContent>
+                                                    </DropdownMenu>
                                                 </TableCell>
                                             </TableRow>
                                         ))
                                     ) : (
                                         <TableRow>
                                             <TableCell colSpan={7} className="text-center h-24 text-gray-500">
-                                                No landing pages found.
+                                                {__('admin.no_landing_pages_found')}
                                             </TableCell>
                                         </TableRow>
                                     )}

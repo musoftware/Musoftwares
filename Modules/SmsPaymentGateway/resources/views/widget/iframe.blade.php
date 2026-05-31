@@ -124,7 +124,7 @@
     </div>
 
     @if(isset($redirectUrl) && $redirectUrl)
-        <a href="{{ $redirectUrl }}" class="inline-block w-full bg-indigo-600 text-white font-bold py-4 rounded-xl hover:bg-indigo-700 transition">العودة للموقع</a>
+        <a href="{{ $redirectUrl }}" target="_top" class="inline-block w-full bg-indigo-600 text-white font-bold py-4 rounded-xl hover:bg-indigo-700 transition">العودة للموقع</a>
     @endif
 </div>
 
@@ -227,6 +227,10 @@
                 document.getElementById('payment-container').classList.add('hidden');
                 document.getElementById('success-container').classList.remove('hidden');
                 document.getElementById('success-tx-id').innerText = data.transaction_id || transactionId;
+                
+                if (data.redirect_url) {
+                    setTimeout(() => { window.top.location.href = data.redirect_url; }, 3000);
+                }
             } else {
                 errorDiv.innerText = data.message || 'عذراً، لم نتمكن من إيجاد تحويل بهذا الرقم. تأكد من الرقم أو انتظر دقيقة وحاول مجدداً.';
                 errorDiv.classList.remove('hidden');

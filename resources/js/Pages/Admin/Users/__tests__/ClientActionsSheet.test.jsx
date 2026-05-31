@@ -54,8 +54,8 @@ describe('ClientActionsSheet', () => {
         expectLink('Swap Budgets', '/admin/transactions/transfer?user=1');
         expectLink('All Transactions', '/admin/transactions?user=1');
         
-        expectLink('Projects', '/admin/users/1/projects');
-        expectLink('Assign Tasks', '/admin/users/1/tasks/assign');
+        expectLink('Projects', '/admin/projects?user_id=1');
+        expectLink('Assign Task', '/admin/users/1/tasks/add');
         expectLink('Notes', '/admin/users/1/notes');
         expectLink('User Files', '/admin/users/1/files');
         expectLink('View Profile', '/admin/users/1');

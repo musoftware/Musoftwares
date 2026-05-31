@@ -127,14 +127,14 @@ export default function ClientActionsSheet({ client, isOpen, onClose, onLoginAs,
                             </h6>
                             <div className="flex flex-col space-y-0.5">
                                 <Link 
-                                    href={`/admin/users/${client.id}/projects`} 
+                                    href={`/admin/projects?user_id=${client.id}`} 
                                     onClick={onClose}
                                     className="flex items-center px-3 py-2 text-sm rounded-md hover:bg-slate-100 transition-colors text-slate-700 font-medium"
                                 >
                                     <LayoutDashboard className="h-4 w-4 mr-3 text-slate-500" /> Projects
                                 </Link>
                                 <Link 
-                                    href={`/admin/users/${client.id}/tasks/assign`} 
+                                    href={`/admin/users/${client.id}/tasks/add`} 
                                     onClick={onClose}
                                     className="flex items-center px-3 py-2 text-sm rounded-md hover:bg-slate-100 transition-colors text-slate-700 font-medium"
                                 >

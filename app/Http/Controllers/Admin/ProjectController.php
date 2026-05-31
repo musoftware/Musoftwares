@@ -29,6 +29,14 @@ class ProjectController extends Controller
             $query->where('archived', 0);
         }
 
+        if ($request->filled('client_id')) {
+            $query->where('user_id', $request->client_id);
+        }
+
+        if ($request->filled('user_id')) {
+            $query->where('user_id', $request->user_id);
+        }
+
         $projects = $query->latest()->get();
         $clients = User::select('id', 'name', 'email')->orderBy('name')->get();
 

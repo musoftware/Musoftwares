@@ -1,6 +1,23 @@
 <?php
 
 return [
+    'service_landing_pages' => 'Service Landing Pages',
+    'manage_landing_pages' => 'Manage Landing Pages',
+    'manage_all_landing_pages' => 'Manage all service landing pages on the platform.',
+    'service' => 'Service',
+    'seller' => 'Seller',
+    'hero_title' => 'Hero Title',
+    'views_ab' => 'Views / A/B',
+    'leads' => 'Leads',
+    'status' => 'Status',
+    'actions' => 'Actions',
+    'variants' => 'Variants',
+    'no_ab_test' => 'No A/B Test',
+    'no_landing_pages_found' => 'No landing pages found.',
+    'view' => 'View',
+    'delete' => 'Delete',
+    'confirm_delete_landing_page' => 'Are you sure you want to delete this landing page?',
+
     'approved' => 'approved',
     'overhead_hourly_rate_recalculated' => 'Overhead hourly rate cache cleared. Recalculated rate: :rate EGP/h (cached until end of day).',
     'prices_updated_for_all_clients' => 'Prices updated for all clients.',

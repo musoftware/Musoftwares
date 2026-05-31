@@ -173,7 +173,7 @@ class UsersController extends Controller
     {
         return Inertia::render('Admin/Users/Create', [
             'roles'      => ['admin', 'client'],
-            'currencies' => ['USD', 'EUR', 'GBP', 'EGP', 'AED', 'SAR'],
+            'currencies' => \App\Models\Currency::all(),
         ]);
     }
 
@@ -218,7 +218,8 @@ class UsersController extends Controller
                 'max_devices'          => $user->max_devices,
             ],
             'roles'      => ['admin', 'client'],
-            'currencies' => ['USD', 'EUR', 'GBP', 'EGP', 'AED', 'SAR'],
+            'currencies' => \App\Models\Currency::all(),
+            'plans'      => \App\Models\ModulePlan::where('is_active', true)->get(),
             'statuses'   => ['active', 'blocked', 'suspended'],
         ]);
     }
@@ -642,6 +643,11 @@ class UsersController extends Controller
         return Inertia::render('Admin/Users/Files', [
             'client' => $client,
         ]);
+    }
+
+    public function projects($id)
+    {
+        return redirect()->route('admin.projects.index', ['user_id' => $id]);
     }
 
     public function reports($id)
