@@ -11,7 +11,7 @@ import { Badge } from '@/Components/ui/badge';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/Components/ui/card';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/Components/ui/tabs';
 import { Calendar, Clock, Plus, Users, User, Mail, Phone, Stethoscope, Settings, Check, X, ShieldAlert, ArrowRight, Save, Trash2, Edit2, CalendarOff } from 'lucide-react';
-import { Switch } from '@/Components/ui/switch';
+
 
 interface EventType {
     id: number;

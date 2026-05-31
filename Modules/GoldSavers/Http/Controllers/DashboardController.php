@@ -51,12 +51,17 @@ class DashboardController extends Controller
         $hasSmartInsights = $user->hasModuleSubscription('gold-smart-insights');
         $smartInsights = [];
         if ($hasSmartInsights) {
-            // Generate some smart insights based on dummy metrics.
-            $smartInsights = [
-                ['icon' => 'TrendingUp', 'text' => __('gold_saver.insight_gold_up')],
-                ['icon' => 'Target', 'text' => __('gold_saver.insight_goal_near')],
-                ['icon' => 'Lightbulb', 'text' => __('gold_saver.insight_average_cost')],
-            ];
+            $cacheKey = "user_{$user->id}_gold_insights_" . date('Y-m-d');
+            $smartInsights = \Illuminate\Support\Facades\Cache::remember($cacheKey, now()->endOfDay(), function() use ($wallets, $totalGrams, $totalInvested, $currentValue, $totalProfit, $latestPrice) {
+                $service = new \Modules\GoldSavers\Services\GeminiInsightService();
+                $portfolioData = [
+                    'total_grams' => $totalGrams,
+                    'total_invested' => $totalInvested,
+                    'current_value' => $currentValue,
+                    'total_profit' => $totalProfit,
+                ];
+                return $service->generateInsights($wallets, $portfolioData, $latestPrice);
+            });
         }
 
         return Inertia::render('GoldSavers/Dashboard', [
