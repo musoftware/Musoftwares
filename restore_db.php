@@ -97,4 +97,68 @@ try {
     echo "No whatsapp_number column to migrate.\n";
 }
 
-echo "✅ All Done! Database is clean, imported, and migrated.\n";
+echo "✅ Database restore complete. Now running system verification tests...\n\n";
+
+// ── Step 4: Run All Tests ─────────────────────────────────────────────
+// Each suite is run individually to isolate failures to specific modules.
+
+$suites = [
+    'Unit'              => 'Core Unit Tests',
+    'Feature'           => 'Admin Panel & Platform Feature Tests',
+    'ERP'               => 'ERP Module (Clients, Invoices, Wallet, POS, Payroll, Inventory, MultiBranch)',
+    'Freelance'         => 'Freelance Module (Jobs, Proposals, Contracts, Skills, Finance, Security)',
+    'CRM'               => 'CRM Module (Leads, Campaigns, Sequences, WhatsApp)',
+    'Marketplace'       => 'Marketplace Module (Services, Orders, Escrow)',
+    'Booking'           => 'Booking Module (Reservations, Widgets, SMS, WhiteLabel)',
+    'Tools'             => 'Tools Module (Licenses, Runtime Auth)',
+    'GoldSavers'        => 'GoldSavers Module (Wallet, Prices, Calculations)',
+    'SmsPaymentGateway' => 'SMS Payment Gateway Module (Parser, Matching, Spoof Detection)',
+];
+
+$results  = [];
+$allPassed = true;
+
+foreach ($suites as $suite => $description) {
+    echo str_repeat('═', 70) . "\n";
+    echo "  ▶ Testing: {$description}\n";
+    echo "    Suite:   {$suite}\n";
+    echo str_repeat('─', 70) . "\n";
+
+    $exitCode = Artisan::call('test', [
+        '--testsuite' => $suite,
+        '--no-interaction' => true,
+    ]);
+
+    $output = trim(Artisan::output());
+    echo $output . "\n";
+
+    if ($exitCode === 0) {
+        $results[$suite] = '✅ PASSED';
+    } else {
+        $results[$suite] = '❌ FAILED';
+        $allPassed = false;
+    }
+
+    echo "\n";
+}
+
+// ── Summary Report ────────────────────────────────────────────────────
+echo "\n" . str_repeat('═', 70) . "\n";
+echo "  📊 POST-RESTORE TEST SUMMARY\n";
+echo str_repeat('═', 70) . "\n\n";
+
+foreach ($results as $suite => $status) {
+    $desc = $suites[$suite];
+    echo "  {$status}  [{$suite}] {$desc}\n";
+}
+
+echo "\n" . str_repeat('─', 70) . "\n";
+
+if ($allPassed) {
+    echo "  🎉 ALL SYSTEMS PASSED — Database restore verified successfully.\n";
+} else {
+    echo "  ⚠️  SOME SYSTEMS FAILED — Review the output above and fix before deploying.\n";
+}
+
+echo str_repeat('═', 70) . "\n";
+

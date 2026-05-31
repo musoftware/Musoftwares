@@ -597,6 +597,92 @@ class SmsPaymentGatewayController extends Controller
     }
 
     /**
+     * Display the simple settings page
+     */
+    public function settings()
+    {
+        $user = Auth::user();
+        $settings = \Modules\SmsPaymentGateway\Models\SmsPaymentGatewaySetting::firstOrCreate(
+            ['user_id' => $user->id],
+            [
+                'is_instapay_enabled' => true,
+                'is_vodafone_cash_enabled' => true,
+            ]
+        );
+
+        return \Inertia\Inertia::render('SmsPaymentGateway/Settings', [
+            'settings' => $settings
+        ]);
+    }
+
+    /**
+     * Store settings
+     */
+    public function storeSettings(Request $request)
+    {
+        $user = Auth::user();
+        $request->validate([
+            'wallet_phone_number' => 'nullable|string|max:20',
+            'is_instapay_enabled' => 'boolean',
+            'is_vodafone_cash_enabled' => 'boolean',
+        ]);
+
+        $settings = \Modules\SmsPaymentGateway\Models\SmsPaymentGatewaySetting::firstOrCreate(
+            ['user_id' => $user->id]
+        );
+
+        $settings->update([
+            'wallet_phone_number' => $request->wallet_phone_number,
+            'is_instapay_enabled' => $request->has('is_instapay_enabled') ? $request->is_instapay_enabled : true,
+            'is_vodafone_cash_enabled' => $request->has('is_vodafone_cash_enabled') ? $request->is_vodafone_cash_enabled : true,
+        ]);
+
+        return redirect()->back()->with('success', 'تم حفظ الإعدادات بنجاح');
+    }
+
+    /**
+     * Display the Create Payment Link page
+     */
+    public function paymentLinks()
+    {
+        $user = Auth::user();
+        $links = \App\Models\PaymentOrder::where('user_id', $user->id)
+            ->where('payment_module', 'sms-payment-gateway')
+            ->orderBy('created_at', 'desc')
+            ->paginate(15);
+
+        return \Inertia\Inertia::render('SmsPaymentGateway/PaymentLinks', [
+            'links' => $links
+        ]);
+    }
+
+    /**
+     * Generate a new payment link
+     */
+    public function createPaymentLink(Request $request)
+    {
+        $user = Auth::user();
+        $request->validate([
+            'amount' => 'required|numeric|min:1',
+            'customer_name' => 'nullable|string|max:255',
+        ]);
+
+        $orderNumber = 'SMS-' . strtoupper(Str::random(10));
+
+        $order = \App\Models\PaymentOrder::create([
+            'user_id' => $user->id,
+            'tenant_id' => $user->tenant_id ?? null,
+            'order_number' => $orderNumber,
+            'total_amount' => $request->amount,
+            'status' => 'pending',
+            'payment_module' => 'sms-payment-gateway',
+            'customer_name' => $request->customer_name,
+        ]);
+
+        return redirect()->back()->with('success', 'تم إنشاء رابط الدفع بنجاح');
+    }
+
+    /**
      * Display wallets management page
      * GET /client/sms-payment-gateway/wallets
      */

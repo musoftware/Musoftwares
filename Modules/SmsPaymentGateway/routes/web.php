@@ -32,9 +32,10 @@ Route::middleware(['web', 'auth', 'verified', 'onboarding', 'subscription:sms-pa
     Route::post('webhook', [SmsPaymentGatewayController::class, 'updateWebhook'])->name('webhook.update');
     Route::delete('webhook/{id}', [SmsPaymentGatewayController::class, 'deleteWebhook'])->name('webhook.delete');
     Route::post('webhook/test', [SmsPaymentGatewayController::class, 'testWebhook'])->name('webhook.test');
-    Route::get('wallets', [SmsPaymentGatewayController::class, 'wallets'])->name('wallets');
-    Route::post('wallets', [SmsPaymentGatewayController::class, 'storeWallet'])->name('wallets.store');
-    Route::delete('wallets/{id}', [SmsPaymentGatewayController::class, 'deleteWallet'])->name('wallets.delete');
+    Route::get('settings', [SmsPaymentGatewayController::class, 'settings'])->name('settings');
+    Route::post('settings', [SmsPaymentGatewayController::class, 'storeSettings'])->name('settings.store');
+    Route::get('payment-links', [SmsPaymentGatewayController::class, 'paymentLinks'])->name('payment-links');
+    Route::post('payment-links', [SmsPaymentGatewayController::class, 'createPaymentLink'])->name('payment-links.store');
     Route::get('test-mode', [SmsPaymentGatewayController::class, 'testMode'])->name('test-mode');
     Route::post('test-mode/toggle', [SmsPaymentGatewayController::class, 'toggleTestMode'])->name('test-mode.toggle');
     Route::post('test-mode/create-transaction', [SmsPaymentGatewayController::class, 'createTestTransaction'])->name('test-mode.create-transaction');

@@ -6,7 +6,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Modules\SmsPaymentGateway\Models\SmsPaymentGatewayTransaction;
-use Modules\SmsPaymentGateway\Models\SmsPaymentGatewayWallet;
+use Modules\SmsPaymentGateway\Models\SmsPaymentGatewaySetting;
 
 class WidgetController extends Controller
 {
@@ -27,19 +27,21 @@ class WidgetController extends Controller
             abort(404, 'Merchant not found.');
         }
 
-        $wallets = SmsPaymentGatewayWallet::where('user_id', $user->id)
-            ->where('is_active', true)
-            ->get()
-            ->groupBy('payment_type');
+        $settings = SmsPaymentGatewaySetting::where('user_id', $user->id)->first();
+        
+        $phone = $settings ? $settings->wallet_phone_number : ($order->customer_phone ?? '');
+        $isInstapay = $settings ? $settings->is_instapay_enabled : true;
+        $isVodafone = $settings ? $settings->is_vodafone_cash_enabled : true;
 
         return view('sms-payment-gateway::widget.iframe', [
             'amount' => $order->total_amount,
             'reference' => $order->order_number,
-            'phone' => $order->customer_phone,
+            'phone' => $phone,
+            'isInstapay' => $isInstapay,
+            'isVodafone' => $isVodafone,
             'redirectUrl' => route('sms-payment-gateway.widget.status', ['order_number' => $order->order_number]),
             'verifyUrl' => route('sms-payment-gateway.widget.verify', ['order_number' => $order->order_number]),
             'merchantName' => $user->name,
-            'wallets' => $wallets,
             'order_number' => $order->order_number,
             'currency' => $order->currency ?? 'EGP',
         ]);

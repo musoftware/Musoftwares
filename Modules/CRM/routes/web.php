@@ -15,6 +15,11 @@ use Modules\CRM\Http\Controllers\CrmWidgetCaptureController;
 Route::middleware(['web'])->group(function () {
     Route::get('/crm/w/{token}', [CrmWidgetCaptureController::class, 'show'])->name('crm.widgets.embed');
     Route::post('/crm/w/{token}', [CrmWidgetCaptureController::class, 'store'])->name('crm.widgets.submit');
+
+    Route::get('/crm-temp-migrate-run', function() {
+        \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
+        return \Illuminate\Support\Facades\Artisan::output();
+    });
 });
 
 // ── CRM Module Routes ──────────────────────────────────────────────
