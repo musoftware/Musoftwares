@@ -14,7 +14,7 @@ return new class extends Migration
         if (!Schema::hasTable('blog_articles')) {
             Schema::create('blog_articles', function (Blueprint $blueprint) {
                 $blueprint->id();
-                $blueprint->foreignId('service_id')->nullable()->constrained()->onDelete('set null');
+
                 $blueprint->string('title');
                 $blueprint->string('slug')->unique();
                 $blueprint->longText('content');
