@@ -52,7 +52,7 @@ class CheckoutSessionController extends Controller
 
             // Resolve currency
             $currencyCode = $request->currency ?? 'EGP';
-            $currency = \App\Models\Currency::where('code', strtoupper($currencyCode))->first();
+            $currency = \App\Models\Currency::where('currency', strtoupper($currencyCode))->first();
             if (!$currency) {
                 return response()->json([
                     'error' => [

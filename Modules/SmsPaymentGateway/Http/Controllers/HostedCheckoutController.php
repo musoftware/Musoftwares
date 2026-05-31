@@ -138,8 +138,22 @@ class HostedCheckoutController extends Controller
 
         $reference = trim($request->transaction_reference);
 
+        $settings = \Modules\SmsPaymentGateway\Models\SmsPaymentGatewaySetting::where('user_id', $session->user_id)->first();
+        $deviceId = null;
+        $allowedSender = null;
+
+        if ($settings && $request->payment_method) {
+            if ($request->payment_method === 'vodafone_cash') {
+                $deviceId = $settings->vodafone_cash_device_id;
+                $allowedSender = $settings->vodafone_cash_allowed_sender;
+            } elseif ($request->payment_method === 'instapay') {
+                $deviceId = $settings->instapay_device_id;
+                $allowedSender = $settings->instapay_allowed_sender;
+            }
+        }
+
         // Try to match by reference number or phone number
-        $transaction = SmsPaymentGatewayTransaction::where('user_id', $session->user_id)
+        $transactionQuery = SmsPaymentGatewayTransaction::where('user_id', $session->user_id)
             ->where('amount', '>=', $session->amount * 0.99)
             ->where('amount', '<=', $session->amount * 1.01)
             ->whereIn('status', ['pending', 'unmatched'])
@@ -147,10 +161,17 @@ class HostedCheckoutController extends Controller
             ->where(function ($q) use ($reference) {
                 $q->where('reference_number', $reference)
                   ->orWhere('phone_number', 'LIKE', '%' . substr(preg_replace('/[^0-9]/', '', $reference), -8) . '%');
-            })
-            ->whereNull('order_id')
-            ->orderBy('created_at', 'desc')
-            ->first();
+            });
+
+        if ($deviceId) {
+            $transactionQuery->where('device_id', $deviceId);
+        }
+
+        if ($allowedSender) {
+            $transactionQuery->where('sender', 'LIKE', '%' . trim($allowedSender) . '%');
+        }
+
+        $transaction = $transactionQuery->orderBy('created_at', 'desc')->first();
 
         if (!$transaction) {
             return response()->json([
@@ -166,7 +187,6 @@ class HostedCheckoutController extends Controller
 
             $transaction->update([
                 'status' => 'matched',
-                'order_id' => null, // legacy field — we use checkout sessions now
             ]);
         });
 
