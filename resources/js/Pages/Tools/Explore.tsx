@@ -13,7 +13,7 @@ import { SettingsModal } from '@/Components/Tools/SettingsModal';
 import { ContextMenu, ContextMenuState } from '@/Components/Tools/ContextMenu';
 import axios from 'axios';
 
-const DEFAULT_WALLPAPER_URL = 'https://images.unsplash.com/photo-1506744626753-143d63428987?q=80&w=2560&auto=format&fit=crop';
+const DEFAULT_WALLPAPER_URL = 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=80&w=2560&auto=format&fit=crop';
 const CELL_WIDTH = 100; // Pixels per grid column
 const CELL_HEIGHT = 110; // Pixels per grid row
 const MAX_ROWS = 6; // Rough estimate, could calculate dynamically
