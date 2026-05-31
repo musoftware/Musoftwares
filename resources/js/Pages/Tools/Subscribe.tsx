@@ -9,11 +9,12 @@ interface Props {
     tool: { slug: string; title: string; icon_url: string | null };
     plan: { id: number; name: string; price_monthly: number; price_yearly: number; features: string[] };
     walletBalance: number;
+    walletCurrency?: string;
     hasExisting: boolean;
     maxSubscriptionMonths: number | null;
 }
 
-export default function Subscribe({ tool, plan, walletBalance, hasExisting, maxSubscriptionMonths }: Props) {
+export default function Subscribe({ tool, plan, walletBalance, walletCurrency = 'USD', hasExisting, maxSubscriptionMonths }: Props) {
     const isMonthlyOnly = maxSubscriptionMonths !== null && maxSubscriptionMonths <= 1;
     const [billingCycle, setBillingCycle] = useState<'monthly' | 'yearly'>('monthly');
     const { data, setData, post, processing, errors } = useForm({
@@ -130,11 +131,10 @@ export default function Subscribe({ tool, plan, walletBalance, hasExisting, maxS
                         <p className="text-sm font-semibold text-slate-700">Payment Method</p>
                         <div className="grid grid-cols-2 gap-3">
                             {[
-                                {
                                     method: 'wallet' as const,
                                     icon: Wallet,
                                     label: 'Wallet',
-                                    sub: `Balance: ${formatMoney(walletBalance, 'USD')}`,
+                                    sub: `Balance: ${formatMoney(walletBalance, walletCurrency)}`,
                                 },
                                 {
                                     method: 'kashier' as const,

@@ -1,11 +1,15 @@
 import React, { useState } from 'react';
-import { Head, router } from '@inertiajs/react';
+import { Head, router, useForm } from '@inertiajs/react';
+import { __ } from '@/lib/i18n';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Button } from '@/Components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/Components/ui/card';
 import {
-    Smartphone, ArrowLeft, ShieldCheck, ShieldAlert, Clock, Database, Eraser, Eye, EyeOff, AlertTriangle, CheckCircle, Code, Activity
+    Smartphone, ArrowLeft, ShieldCheck, ShieldAlert, Clock, Database, Eraser, Eye, EyeOff, AlertTriangle, CheckCircle, Code, Activity, Settings, Plus, Trash2
 } from 'lucide-react';
+import { Input } from '@/Components/ui/input';
+import { Label } from '@/Components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/Components/ui/select';
 
 interface DeviceProps {
     device: {
@@ -16,6 +20,10 @@ interface DeviceProps {
         sim2_number?: string | null;
         status: string;
         enable_spoof_detection: boolean;
+        metadata?: {
+            sim1_configs?: { allowed_sender: string }[];
+            sim2_configs?: { allowed_sender: string }[];
+        };
         last_seen_at: string;
         created_at: string;
     };
@@ -30,6 +38,33 @@ interface DeviceProps {
 
 export default function Device({ device, transactions }: DeviceProps) {
     const [maskData, setMaskData] = useState(true);
+
+    const { data, setData, put, processing, errors } = useForm({
+        device_name: device.device_name || '',
+        sim1_configs: device.metadata?.sim1_configs || [],
+        sim2_configs: device.metadata?.sim2_configs || [],
+    });
+
+    const addConfig = (sim: 'sim1_configs' | 'sim2_configs') => {
+        setData(sim, [...data[sim], { allowed_sender: '' }]);
+    };
+
+    const updateConfig = (sim: 'sim1_configs' | 'sim2_configs', index: number, field: string, value: string) => {
+        const newConfigs = [...data[sim]];
+        newConfigs[index] = { ...newConfigs[index], [field]: value };
+        setData(sim, newConfigs);
+    };
+
+    const removeConfig = (sim: 'sim1_configs' | 'sim2_configs', index: number) => {
+        const newConfigs = [...data[sim]];
+        newConfigs.splice(index, 1);
+        setData(sim, newConfigs);
+    };
+
+    const submitSettings = (e: React.FormEvent) => {
+        e.preventDefault();
+        put(route('sms-payment-gateway.update-device', device.id));
+    };
 
     const handleClearTransactions = () => {
         if (confirm('Wipe all logs for this terminal?')) {
@@ -136,6 +171,156 @@ export default function Device({ device, transactions }: DeviceProps) {
                             </CardContent>
                         </Card>
                     </div>
+
+                    {/* Device Settings Form */}
+                    <Card>
+                        <CardHeader>
+                            <CardTitle className="text-lg flex items-center gap-2">
+                                <Settings className="w-5 h-5 text-indigo-500" />
+                                {__('Device Configuration')}
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <form onSubmit={submitSettings} className="space-y-6">
+                                {Object.keys(errors).length > 0 && (
+                                    <div className="bg-red-50 text-red-600 p-4 rounded-md text-sm border border-red-200">
+                                        <p className="font-semibold mb-2">Please fix the following errors:</p>
+                                        <ul className="list-disc pl-5">
+                                            {Object.entries(errors).map(([key, error]) => (
+                                                <li key={key}>{key}: {error}</li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                )}
+                                <div className="space-y-2 max-w-md">
+                                    <Label>{__('Device Name')}</Label>
+                                    <Input
+                                        value={data.device_name}
+                                        onChange={(e) => setData('device_name', e.target.value)}
+                                        placeholder={__('e.g. Branch 1 Phone')}
+                                    />
+                                    {errors.device_name && <p className="text-sm text-red-500">{errors.device_name}</p>}
+                                </div>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    {/* SIM 1 Config */}
+                                    <div className="space-y-4 p-4 border rounded-lg bg-slate-50">
+                                        <div className="flex items-center justify-between">
+                                            <div>
+                                                <h3 className="font-semibold text-slate-800">{__('SIM 1 Configuration')}</h3>
+                                                <p className="text-xs text-slate-500 mt-0.5">{device.sim1_number ? mask(device.sim1_number, 'phone') : __('Not set')}</p>
+                                            </div>
+                                            <Button type="button" variant="outline" size="sm" onClick={() => addConfig('sim1_configs')}>
+                                                <Plus className="w-4 h-4 mr-2" />
+                                                {__('Add Sender')}
+                                            </Button>
+                                        </div>
+                                        {data.sim1_configs.length === 0 && (
+                                            <p className="text-sm text-slate-500 text-center py-4">{__('No senders configured for SIM 1.')}</p>
+                                        )}
+                                        {data.sim1_configs.map((conf, idx) => (
+                                            <div key={idx} className="bg-white p-3 border rounded-md shadow-sm space-y-3 relative">
+                                                <Button 
+                                                    type="button" 
+                                                    variant="ghost" 
+                                                    size="icon" 
+                                                    className="absolute top-2 right-2 text-rose-500 hover:text-rose-700 hover:bg-rose-50"
+                                                    onClick={() => removeConfig('sim1_configs', idx)}
+                                                >
+                                                    <Trash2 className="w-4 h-4" />
+                                                </Button>
+                                                <div className="pr-8 space-y-3">
+                                                    <div className="space-y-1">
+                                                        <Label className="text-xs text-slate-500">{__('Allowed Sender')}</Label>
+                                                        <Select
+                                                            value={conf.allowed_sender || ''}
+                                                            onValueChange={(val) => updateConfig('sim1_configs', idx, 'allowed_sender', val)}
+                                                        >
+                                                            <SelectTrigger className="h-8">
+                                                                <SelectValue placeholder={__('Select Sender')} />
+                                                            </SelectTrigger>
+                                                            <SelectContent>
+                                                                <SelectItem value="VF-Cash">{__('Vodafone Cash (VF-Cash)')}</SelectItem>
+                                                                <SelectItem value="EtisalatCash">{__('e& money (Etisalat)')}</SelectItem>
+                                                                <SelectItem value="OrangeCash">{__('Orange Cash')}</SelectItem>
+                                                                <SelectItem value="WEPay">{__('WE Pay')}</SelectItem>
+                                                                <SelectItem value="NBE">{__('NBE (Al Ahly)')}</SelectItem>
+                                                                <SelectItem value="CIB">{__('CIB')}</SelectItem>
+                                                                <SelectItem value="BM">{__('Banque Misr')}</SelectItem>
+                                                                <SelectItem value="QNB">{__('QNB')}</SelectItem>
+                                                                <SelectItem value="BDC">{__('Banque du Caire')}</SelectItem>
+                                                                <SelectItem value="ADIB">{__('ADIB')}</SelectItem>
+                                                            </SelectContent>
+                                                        </Select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+
+                                    {/* SIM 2 Config */}
+                                    <div className="space-y-4 p-4 border rounded-lg bg-slate-50">
+                                        <div className="flex items-center justify-between">
+                                            <div>
+                                                <h3 className="font-semibold text-slate-800">{__('SIM 2 Configuration')}</h3>
+                                                <p className="text-xs text-slate-500 mt-0.5">{device.sim2_number ? mask(device.sim2_number, 'phone') : __('Not set')}</p>
+                                            </div>
+                                            <Button type="button" variant="outline" size="sm" onClick={() => addConfig('sim2_configs')}>
+                                                <Plus className="w-4 h-4 mr-2" />
+                                                {__('Add Sender')}
+                                            </Button>
+                                        </div>
+                                        {data.sim2_configs.length === 0 && (
+                                            <p className="text-sm text-slate-500 text-center py-4">{__('No senders configured for SIM 2.')}</p>
+                                        )}
+                                        {data.sim2_configs.map((conf, idx) => (
+                                            <div key={idx} className="bg-white p-3 border rounded-md shadow-sm space-y-3 relative">
+                                                <Button 
+                                                    type="button" 
+                                                    variant="ghost" 
+                                                    size="icon" 
+                                                    className="absolute top-2 right-2 text-rose-500 hover:text-rose-700 hover:bg-rose-50"
+                                                    onClick={() => removeConfig('sim2_configs', idx)}
+                                                >
+                                                    <Trash2 className="w-4 h-4" />
+                                                </Button>
+                                                <div className="pr-8 space-y-3">
+                                                    <div className="space-y-1">
+                                                        <Label className="text-xs text-slate-500">{__('Allowed Sender')}</Label>
+                                                        <Select
+                                                            value={conf.allowed_sender || ''}
+                                                            onValueChange={(val) => updateConfig('sim2_configs', idx, 'allowed_sender', val)}
+                                                        >
+                                                            <SelectTrigger className="h-8">
+                                                                <SelectValue placeholder={__('Select Sender')} />
+                                                            </SelectTrigger>
+                                                            <SelectContent>
+                                                                <SelectItem value="VF-Cash">{__('Vodafone Cash (VF-Cash)')}</SelectItem>
+                                                                <SelectItem value="EtisalatCash">{__('e& money (Etisalat)')}</SelectItem>
+                                                                <SelectItem value="OrangeCash">{__('Orange Cash')}</SelectItem>
+                                                                <SelectItem value="WEPay">{__('WE Pay')}</SelectItem>
+                                                                <SelectItem value="NBE">{__('NBE (Al Ahly)')}</SelectItem>
+                                                                <SelectItem value="CIB">{__('CIB')}</SelectItem>
+                                                                <SelectItem value="BM">{__('Banque Misr')}</SelectItem>
+                                                                <SelectItem value="QNB">{__('QNB')}</SelectItem>
+                                                                <SelectItem value="BDC">{__('Banque du Caire')}</SelectItem>
+                                                                <SelectItem value="ADIB">{__('ADIB')}</SelectItem>
+                                                            </SelectContent>
+                                                        </Select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                                <div className="flex justify-end">
+                                    <Button type="submit" disabled={processing}>
+                                        {processing ? __('Saving...') : __('Save Configuration')}
+                                    </Button>
+                                </div>
+                            </form>
+                        </CardContent>
+                    </Card>
 
                     {/* Transactions Log */}
                     <Card>

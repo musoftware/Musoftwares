@@ -76,7 +76,8 @@ class SubscriptionController extends Controller
             ->where('status', 'active')
             ->first();
 
-        $walletBalance = auth()->user()->walletBalance ?? 0;
+        $walletBalance = (float) auth()->user()->available_balance();
+        $walletCurrency = auth()->user()->currency_id ? (\App\Models\Currency::find(auth()->user()->currency_id)?->currency ?? 'USD') : 'USD';
 
         // Max subscription months restriction (admin-configurable per tool)
         $maxSubscriptionMonths = $tool['max_subscription_months'] ?? null;
@@ -95,6 +96,7 @@ class SubscriptionController extends Controller
                 'features'      => $plan['features'] ?? [],
             ],
             'walletBalance'         => $walletBalance,
+            'walletCurrency'        => $walletCurrency,
             'hasExisting'           => (bool) $existing,
             'maxSubscriptionMonths' => $maxSubscriptionMonths,
         ]);
