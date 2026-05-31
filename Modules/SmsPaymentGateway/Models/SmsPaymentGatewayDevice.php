@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use App\Models\User;
 
 class SmsPaymentGatewayDevice extends Model
 {
@@ -25,6 +26,8 @@ class SmsPaymentGatewayDevice extends Model
         'last_seen_at',
         'phone_number',
         'sim_slot',
+        'sim1_number',
+        'sim2_number',
         'metadata',
     ];
 
