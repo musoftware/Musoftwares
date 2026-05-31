@@ -63,6 +63,9 @@ return [
     'connection_error' => 'Connection error. Please check your internet and try again.',
     'secure_checkout' => 'Secure Payment',
     'vodafone_cash' => 'Vodafone Cash',
+    'enter_sender_number' => 'Enter sender number',
+    'sender_number_placeholder' => 'Phone number you sent from',
+    'sender_number_hint' => 'Enter the phone number you used to transfer the amount.',
 
     // ─── Documentation ─────────────────────────────────
     'integration_docs' => 'Integration Documentation',

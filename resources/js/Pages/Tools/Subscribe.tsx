@@ -109,7 +109,7 @@ export default function Subscribe({ tool, plan, walletBalance, walletCurrency = 
                         <div className="px-5 py-4">
                             <div className="flex items-end gap-1 mb-4">
                                 <span className="text-3xl font-bold text-white">
-                                    {price <= 0 ? 'Free' : formatMoney(price, 'USD')}
+                                    {price <= 0 ? 'Free' : formatMoney(price, walletCurrency)}
                                 </span>
                                 {price > 0 && (
                                     <span className="text-slate-400 text-sm mb-1">/{billingCycle === 'monthly' ? 'month' : 'year'}</span>
@@ -131,6 +131,7 @@ export default function Subscribe({ tool, plan, walletBalance, walletCurrency = 
                         <p className="text-sm font-semibold text-slate-700">Payment Method</p>
                         <div className="grid grid-cols-2 gap-3">
                             {[
+                                {
                                     method: 'wallet' as const,
                                     icon: Wallet,
                                     label: 'Wallet',
@@ -181,7 +182,7 @@ export default function Subscribe({ tool, plan, walletBalance, walletCurrency = 
                         className="w-full bg-slate-900 hover:bg-slate-800 text-white h-11"
                         disabled={processing || (data.payment_method === 'wallet' && !canPayByWallet)}
                     >
-                        {processing ? 'Processing...' : price <= 0 ? 'Get Free Access' : `Subscribe — ${formatMoney(price, 'USD')}`}
+                        {processing ? 'Processing...' : price <= 0 ? 'Get Free Access' : `Subscribe — ${formatMoney(price, walletCurrency)}`}
                     </Button>
 
                     <p className="text-xs text-slate-400 text-center flex items-center justify-center gap-1">
