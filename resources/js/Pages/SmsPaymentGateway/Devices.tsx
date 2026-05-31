@@ -156,7 +156,7 @@ export default function Devices({ devices, androidAppUrl }: DevicesProps) {
 
             {/* Add Device Modal */}
             <Dialog open={isAddModalOpen} onOpenChange={setIsAddModalOpen}>
-                <DialogContent className="sm:max-w-md">
+                <DialogContent className="sm:max-w-3xl">
                     <DialogHeader>
                         <DialogTitle className="flex items-center gap-2">
                             <QrCode className="w-5 h-5 text-indigo-600" /> {__('Connect New Device')}
@@ -180,7 +180,7 @@ export default function Devices({ devices, androidAppUrl }: DevicesProps) {
                                 
                                 <div className="w-full text-center">
                                     <p className="text-sm text-slate-500 mb-2">{__('Or enter this code manually:')}</p>
-                                    <div className="bg-slate-100 p-3 rounded-lg font-mono text-2xl font-bold tracking-widest text-slate-800">
+                                    <div className="bg-slate-100 p-3 rounded-lg font-mono text-2xl font-bold tracking-widest text-slate-800 break-all">
                                         {qrData.connection_code}
                                     </div>
                                     <p className="text-xs text-amber-600 mt-3 font-medium">
