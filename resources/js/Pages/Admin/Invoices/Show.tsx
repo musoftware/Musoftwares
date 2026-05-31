@@ -32,11 +32,11 @@ export default function Show({ invoice }: { invoice: any }) {
     useEffect(() => {
         if (invoice && invoice.items) {
             const itemsArray = Array.isArray(invoice.items) ? invoice.items : Object.values(invoice.items);
-            setItems(itemsArray.map((item: any) => ({ ...item, isNew: false })));
+            setItems(itemsArray.filter((item: any) => item && item.id).map((item: any) => ({ ...item, isNew: false })));
         }
         if (invoice && invoice.cost_lines) {
             const costLinesArray = Array.isArray(invoice.cost_lines) ? invoice.cost_lines : Object.values(invoice.cost_lines);
-            setCostLines(costLinesArray.map((line: any) => ({ ...line, isNew: false })));
+            setCostLines(costLinesArray.filter((line: any) => line && line.id).map((line: any) => ({ ...line, isNew: false })));
         }
         setDiscount(invoice.discount || 0);
         setDiscountPercentage(0);
@@ -50,7 +50,7 @@ export default function Show({ invoice }: { invoice: any }) {
     
     const handleAddQtyItem = () => {
         setIsEditing(true);
-        setItems([...items, {
+        setItems(prevItems => [...prevItems, {
             id: 'new-' + Date.now(),
             isNew: true,
             item_title: '',
@@ -63,7 +63,7 @@ export default function Show({ invoice }: { invoice: any }) {
 
     const handleAddSimpleItem = () => {
         setIsEditing(true);
-        setItems([...items, {
+        setItems(prevItems => [...prevItems, {
             id: 'new-' + Date.now(),
             isNew: true,
             item_title: '',
@@ -79,15 +79,19 @@ export default function Show({ invoice }: { invoice: any }) {
         if (!item.isNew) {
             setDeletedItems([...deletedItems, item.id]);
         }
-        const newItems = [...items];
-        newItems.splice(index, 1);
-        setItems(newItems);
+        setItems(prevItems => {
+            const newItems = [...prevItems];
+            newItems.splice(index, 1);
+            return newItems;
+        });
     };
 
     const handleItemChange = (index: number, field: string, value: any) => {
-        const newItems = [...items];
-        newItems[index][field] = value;
-        setItems(newItems);
+        setItems(prevItems => {
+            const newItems = [...prevItems];
+            newItems[index] = { ...newItems[index], [field]: value };
+            return newItems;
+        });
     };
 
     const handleMergeSelected = () => {
@@ -169,7 +173,7 @@ export default function Show({ invoice }: { invoice: any }) {
         // Reset local state to prop data
         if (invoice && invoice.items) {
             const itemsArray = Array.isArray(invoice.items) ? invoice.items : Object.values(invoice.items);
-            setItems(itemsArray.map((item: any) => ({ ...item, isNew: false })));
+            setItems(itemsArray.filter((item: any) => item && item.id).map((item: any) => ({ ...item, isNew: false })));
         }
         setDiscount(invoice.discount || 0);
         setDeletedItems([]);

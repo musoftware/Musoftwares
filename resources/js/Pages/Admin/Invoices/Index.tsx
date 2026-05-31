@@ -280,7 +280,7 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
             </div>
 
             {/* Header & Filters */}
-            <Card className="mb-4 bg-white shadow-sm">
+            <Card className="mb-4 bg-white shadow-sm overflow-visible">
                 <CardContent className="p-4">
                     <div className="flex flex-col gap-4 md:flex-row md:items-end">
                         {filters.client_id && (
@@ -559,7 +559,7 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
             </div>
 
             {/* Footer Actions & Pagination */}
-            <Card className="mt-4 bg-white shadow-sm">
+            <Card className="mt-4 bg-white shadow-sm overflow-visible">
                 <CardContent className="p-4">
                     <div className="flex flex-col gap-4 md:flex-row md:items-center">
                         <div className="flex flex-wrap items-center gap-2">
