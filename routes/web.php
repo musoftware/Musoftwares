@@ -291,6 +291,8 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
     Route::get('/invoices/archive', [\App\Http\Controllers\Admin\InvoiceController::class, 'archive'])->name('invoices.archive');
     Route::get('/invoices/create', [\App\Http\Controllers\Admin\InvoiceController::class, 'create'])->name('invoices.create');
     Route::get('/invoices/timer-details/{item_id}', [\App\Http\Controllers\Admin\InvoiceController::class, 'timerDetails'])->name('invoices.timer-details');
+    Route::post('/invoices/timer-details/{item_id}/store', [\App\Http\Controllers\Admin\InvoiceController::class, 'storeTimerDetails'])->name('invoices.timer-details.store');
+    Route::delete('/invoices/timer-details/{item_id}/{timer_id}', [\App\Http\Controllers\Admin\InvoiceController::class, 'destroyTimerDetails'])->name('invoices.timer-details.destroy');
     Route::post('/invoices/bulk-action', [\App\Http\Controllers\Admin\InvoiceController::class, 'bulkAction'])->name('invoices.bulk-action');
     Route::get('/invoices/{invoice}', [\App\Http\Controllers\Admin\InvoiceController::class, 'show'])->name('invoices.show');
     Route::get('/invoices/{invoice}/download-pdf', [\App\Http\Controllers\Admin\InvoiceController::class, 'downloadPdf'])->name('invoices.download-pdf');

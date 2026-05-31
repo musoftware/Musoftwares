@@ -14,8 +14,6 @@ use Illuminate\Http\Request as HttpRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use InvalidArgumentException;
-use Meneses\LaravelMpdf\LaravelMpdfWrapper;
-use PDF;
 
 class TextHelper
 {
@@ -472,7 +470,7 @@ class TextHelper
 
         $qr_img = null;
 
-        $pdf = \Mccarlosen\LaravelMpdf\Facades\LaravelMpdf::loadView('admin.invoices.download', compact('invoice', 'invoice_items', 'user', 'project', 'qr_img'));
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('admin.invoices.download', compact('invoice', 'invoice_items', 'user', 'project', 'qr_img'));
         return $pdf;
     }
 

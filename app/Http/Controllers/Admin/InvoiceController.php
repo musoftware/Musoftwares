@@ -541,12 +541,46 @@ class InvoiceController extends Controller
                 'id' => $item->id,
                 'item_title' => $item->item_title,
                 'invoice_id' => $item->invoice_id,
-                'invoice_number' => $item->invoice ? $item->invoice->enc_id() : null,
-                'client_name' => $item->invoice && $item->invoice->user ? $item->invoice->user->name : null,
+                'invoice_number' => $item->invoice->invoice_number,
+                'client_name' => $item->invoice->user ? $item->invoice->user->name : null,
             ],
             'timers' => $timers->values()->all(),
             'total_seconds' => $totalSeconds,
             'total_billable' => $totalBillable,
+            'hour_rate' => 25.0, // Default hour rate, can be customized later
         ]);
+    }
+
+    public function storeTimerDetails(\Illuminate\Http\Request $request, $item_id)
+    {
+        $item = \App\Models\InvoiceItem::findOrFail($item_id);
+        
+        $request->validate([
+            'sessions' => 'required|array',
+            'sessions.*.start_date' => 'required|date',
+            'sessions.*.end_date' => 'required|date',
+            'sessions.*.amount' => 'required|numeric',
+        ]);
+
+        foreach ($request->sessions as $session) {
+            \App\Models\InvoiceItemTimer::create([
+                'invoice_item_id' => $item->id,
+                'date_start' => \Carbon\Carbon::parse($session['start_date'])->toDateTimeString(),
+                'date_end' => \Carbon\Carbon::parse($session['end_date'])->toDateTimeString(),
+                'amount' => $session['amount'],
+                'project_id' => $item->invoice->project_id ?? null,
+            ]);
+        }
+
+        return redirect()->back()->with('success', __('admin.timer_sessions_saved'));
+    }
+
+    public function destroyTimerDetails($item_id, $timer_id)
+    {
+        $item = \App\Models\InvoiceItem::findOrFail($item_id);
+        $timer = \App\Models\InvoiceItemTimer::where('invoice_item_id', $item->id)->findOrFail($timer_id);
+        $timer->delete();
+
+        return redirect()->back()->with('success', __('admin.timer_session_deleted'));
     }
 }
