@@ -32,11 +32,11 @@ export default function Show({ invoice }: { invoice: any }) {
     useEffect(() => {
         if (invoice && invoice.items) {
             const itemsArray = Array.isArray(invoice.items) ? invoice.items : Object.values(invoice.items);
-            setItems(itemsArray.filter((item: any) => item && item.id).map((item: any) => ({ ...item, isNew: false })));
+            setItems(itemsArray.filter(Boolean).map((item: any) => ({ ...item, isNew: false })));
         }
         if (invoice && invoice.cost_lines) {
             const costLinesArray = Array.isArray(invoice.cost_lines) ? invoice.cost_lines : Object.values(invoice.cost_lines);
-            setCostLines(costLinesArray.filter((line: any) => line && line.id).map((line: any) => ({ ...line, isNew: false })));
+            setCostLines(costLinesArray.filter(Boolean).map((line: any) => ({ ...line, isNew: false })));
         }
         setDiscount(invoice.discount || 0);
         setDiscountPercentage(0);
@@ -51,7 +51,7 @@ export default function Show({ invoice }: { invoice: any }) {
     const handleAddQtyItem = () => {
         setIsEditing(true);
         setItems(prevItems => [...prevItems, {
-            id: 'new-' + Date.now(),
+            id: 'new-' + crypto.randomUUID(),
             isNew: true,
             item_title: '',
             item_type: 'quantity',
@@ -64,11 +64,25 @@ export default function Show({ invoice }: { invoice: any }) {
     const handleAddSimpleItem = () => {
         setIsEditing(true);
         setItems(prevItems => [...prevItems, {
-            id: 'new-' + Date.now(),
+            id: 'new-' + crypto.randomUUID(),
             isNew: true,
             item_title: '',
             item_type: 'simple',
             amount: 0,
+            qty: 1,
+            currency: invoice.currency
+        }]);
+    };
+
+    const handleAddTimerItem = () => {
+        setIsEditing(true);
+        setItems(prevItems => [...prevItems, {
+            id: 'new-' + crypto.randomUUID(),
+            isNew: true,
+            item_title: 'Time Tracking',
+            item_type: 'timer',
+            amount: 0,
+            total_amount: 0,
             qty: 1,
             currency: invoice.currency
         }]);
@@ -173,7 +187,7 @@ export default function Show({ invoice }: { invoice: any }) {
         // Reset local state to prop data
         if (invoice && invoice.items) {
             const itemsArray = Array.isArray(invoice.items) ? invoice.items : Object.values(invoice.items);
-            setItems(itemsArray.filter((item: any) => item && item.id).map((item: any) => ({ ...item, isNew: false })));
+            setItems(itemsArray.filter(Boolean).map((item: any) => ({ ...item, isNew: false })));
         }
         setDiscount(invoice.discount || 0);
         setDeletedItems([]);
@@ -366,7 +380,7 @@ export default function Show({ invoice }: { invoice: any }) {
                         </div>
                         <div className="text-xs font-bold text-gray-500 uppercase tracking-wider text-center">Total Billable Hours</div>
                         
-                        <Button onClick={() => alert('Timer module not enabled for Admin.')} variant="link" className="mt-4 text-blue-600 font-bold hover:text-blue-800">
+                        <Button onClick={handleAddTimerItem} variant="link" className="mt-4 text-blue-600 font-bold hover:text-blue-800">
                             <Plus className="w-3 h-3 mr-1" /> Add Manual Entry
                         </Button>
                     </CardContent>
@@ -438,7 +452,7 @@ export default function Show({ invoice }: { invoice: any }) {
                             <Button onClick={handleAddSimpleItem} variant="outline" size="sm" className="flex-1 sm:flex-none border-dashed hover:border-blue-300 hover:text-blue-600 hover:bg-blue-50">
                                 <Plus className="w-4 h-4 mr-2 text-blue-500" /> Simple Item
                             </Button>
-                            <Button onClick={() => alert('Timer module not enabled for Admin.')} variant="secondary" size="sm" className="hidden sm:flex bg-gray-100 text-gray-700 hover:bg-gray-200">
+                            <Button onClick={handleAddTimerItem} variant="secondary" size="sm" className="hidden sm:flex bg-gray-100 text-gray-700 hover:bg-gray-200">
                                 <Clock className="w-4 h-4 mr-2" /> Log Time
                             </Button>
                         </div>
@@ -493,10 +507,17 @@ export default function Show({ invoice }: { invoice: any }) {
                                     </td>
                                     <td className="px-4 py-3">
                                         {item.item_type === 'timer' ? (
-                                            <Link href={route('admin.invoices.timer-details', item.id)} className="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold bg-yellow-100 text-yellow-800 hover:bg-yellow-200 transition-colors cursor-pointer">
-                                                <Clock className="w-3 h-3 mr-1" />
-                                                <span className="capitalize">{item.item_type}</span>
-                                            </Link>
+                                            item.isNew ? (
+                                                <span className="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold bg-yellow-100 text-yellow-800 cursor-not-allowed opacity-70" title="Save invoice first to edit timer details">
+                                                    <Clock className="w-3 h-3 mr-1" />
+                                                    <span className="capitalize">{item.item_type} (Save First)</span>
+                                                </span>
+                                            ) : (
+                                                <Link href={route('admin.invoices.timer-details', item.id)} className="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold bg-yellow-100 text-yellow-800 hover:bg-yellow-200 transition-colors cursor-pointer" title="Click to edit timer details">
+                                                    <Clock className="w-3 h-3 mr-1" />
+                                                    <span className="capitalize">{item.item_type}</span>
+                                                </Link>
+                                            )
                                         ) : (
                                             <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold ${
                                                 item.item_type === 'quantity' ? 'bg-blue-100 text-blue-800' :
@@ -721,7 +742,7 @@ export default function Show({ invoice }: { invoice: any }) {
                                     variant="outline" 
                                     size="sm" 
                                     onClick={() => {
-                                        setCostLines([...costLines, { id: 'new-' + Date.now(), isNew: true, line_type: 'direct', amount: 0, description: '' }]);
+                                        setCostLines([...costLines, { id: 'new-' + crypto.randomUUID(), isNew: true, line_type: 'direct', amount: 0, description: '' }]);
                                     }}
                                     className="h-7 text-xs flex items-center"
                                 >
