@@ -15,7 +15,7 @@ import { CurrencyDisplay as FinancialAmount } from '@/Components/ui/CurrencyDisp
 import { cn } from '@/lib/utils';
 import { __ } from '@/lib/i18n';
 
-const SectionCard = ({ children, className, ...props }: { children: React.ReactNode, className?: string, [x: string]: any }) => <Card className={cn("shadow-sm border-gray-200 overflow-hidden", className)} {...props}>{children}</Card>;
+import { FreelanceCard } from '@/Components/Freelance/ui/FreelanceCard';
 
 function BrowseJobsContent({ jobs }: any) {
     const { auth } = usePage().props as any;
@@ -139,7 +139,7 @@ function BrowseJobsContent({ jobs }: any) {
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
                 {/* Filters Sidebar */}
                 <div className="space-y-6">
-                    <SectionCard className="p-5">
+                    <FreelanceCard className="p-5">
                         <h3 className="text-sm font-semibold text-slate-900 mb-4 flex items-center gap-2">
                             <SlidersHorizontal className="h-4 w-4" /> {__('Filters')}
                         </h3>
@@ -168,7 +168,7 @@ function BrowseJobsContent({ jobs }: any) {
                                 </div>
                             </div>
                         </div>
-                    </SectionCard>
+                    </FreelanceCard>
                 </div>
 
                 {/* Job Listings */}
@@ -192,7 +192,7 @@ function BrowseJobsContent({ jobs }: any) {
                     </div>
 
                     {!displayJobs.length ? (
-                        <SectionCard>
+                        <FreelanceCard>
                             <EmptyState
                                 icon={Search}
                                 title={__('No jobs found')}
@@ -201,10 +201,10 @@ function BrowseJobsContent({ jobs }: any) {
                                 actionIcon={Search}
                                 onClick={() => router.get('/freelance/jobs/browse')}
                             />
-                        </SectionCard>
+                        </FreelanceCard>
                     ) : (
                         displayJobs.map((job: any) => (
-                            <SectionCard key={job.id} className="group hover:border-indigo-200 transition-colors cursor-pointer" onClick={() => router.get(`/freelance/jobs/${job.id}`)}>
+                            <FreelanceCard key={job.id} interactive className="group hover:border-indigo-200 transition-colors cursor-pointer" onClick={() => router.get(`/freelance/jobs/${job.id}`)}>
                                 <div className="p-6 flex flex-col sm:flex-row sm:items-start justify-between gap-4">
                                     <div className="space-y-3 flex-1">
                                         <div className="space-y-1">
@@ -243,7 +243,7 @@ function BrowseJobsContent({ jobs }: any) {
                                         <ChevronRight className="h-5 w-5 text-indigo-400" />
                                     </div>
                                 </div>
-                            </SectionCard>
+                            </FreelanceCard>
                         ))
                     )}
                     

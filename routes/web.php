@@ -224,6 +224,15 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin/ma
     Route::delete('/categories/{category}', [\Modules\Marketplace\Http\Controllers\ServiceCategoryController::class, 'destroy'])->name('categories.destroy');
 
     // Services Admin Actions
+    Route::get('/all-services', [\App\Http\Controllers\Admin\MarketplaceServiceController::class, 'allServices'])->name('services.all');
+    Route::get('/pending-services', [\App\Http\Controllers\Admin\MarketplaceServiceController::class, 'pendingServices'])->name('services.pending');
+    Route::get('/services/{service}/edit', [\App\Http\Controllers\Admin\MarketplaceServiceController::class, 'edit'])->name('services.edit');
+    Route::put('/services/{service}', [\App\Http\Controllers\Admin\MarketplaceServiceController::class, 'update'])->name('services.update');
+    Route::post('/services/{service}/approve', [\App\Http\Controllers\Admin\MarketplaceServiceController::class, 'approve'])->name('services.approve');
+    Route::post('/services/{service}/reject', [\App\Http\Controllers\Admin\MarketplaceServiceController::class, 'reject'])->name('services.reject');
+    Route::post('/services/{service}/suspend', [\App\Http\Controllers\Admin\MarketplaceServiceController::class, 'suspend'])->name('services.suspend');
+    Route::post('/services/{service}/feature', [\App\Http\Controllers\Admin\MarketplaceServiceController::class, 'feature'])->name('services.feature');
+    Route::delete('/services/{service}', [\App\Http\Controllers\Admin\MarketplaceServiceController::class, 'destroy'])->name('services.destroy');
 
     // Orders
     Route::get('/orders', [\App\Http\Controllers\Admin\MarketplaceOrderController::class, 'index'])->name('orders.index');
@@ -280,6 +289,8 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
     Route::put('/invoices/{invoice}', [\App\Http\Controllers\Admin\InvoiceController::class, 'update'])->name('invoices.update');
     Route::post('/invoices/{invoice}/mark-paid', [\App\Http\Controllers\Admin\InvoiceController::class, 'markPaid'])->name('invoices.mark-paid');
     Route::post('/invoices/{invoice}/cancel', [\App\Http\Controllers\Admin\InvoiceController::class, 'cancel'])->name('invoices.cancel');
+    Route::post('/invoices/{invoice}/change-status', [\App\Http\Controllers\Admin\InvoiceController::class, 'changeStatus'])->name('invoices.change-status');
+    Route::post('/invoices/{invoice}/change-job-status', [\App\Http\Controllers\Admin\InvoiceController::class, 'changeJobStatus'])->name('invoices.change-job-status');
 
 
 
@@ -353,6 +364,8 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
     // ── Admin Phase 4 (Settings & Localization) ───────────────────
     Route::get('settings', [\App\Http\Controllers\Admin\AdminSettingController::class, 'index'])->name('settings.index');
     Route::post('settings', [\App\Http\Controllers\Admin\AdminSettingController::class, 'store'])->name('settings.store');
+    Route::post('settings/do-update-prices', [\App\Http\Controllers\Admin\AdminSettingController::class, 'doUpdatePrices'])->name('settings.do-update-prices');
+    Route::post('settings/recalculate-overhead-hourly-rate', [\App\Http\Controllers\Admin\AdminSettingController::class, 'recalculateOverheadHourlyRate'])->name('settings.recalculate-overhead-hourly-rate');
     
     Route::resource('language-lines', \App\Http\Controllers\Admin\AdminLanguageLineController::class)->except(['create', 'show', 'edit']);
     Route::post('language-lines/auto-translate', [\App\Http\Controllers\Admin\AdminLanguageLineController::class, 'autoTranslate'])->name('language-lines.auto-translate');
@@ -374,6 +387,7 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
         Route::post('jobs/{job}/status', [\App\Http\Controllers\Admin\FreelanceJobController::class, 'updateStatus'])->name('jobs.status');
         Route::resource('contracts', \App\Http\Controllers\Admin\FreelanceContractController::class)->only(['index', 'show', 'destroy']);
         Route::post('contracts/{contract}/status', [\App\Http\Controllers\Admin\FreelanceContractController::class, 'updateStatus'])->name('contracts.status');
+        Route::resource('proposals', \App\Http\Controllers\Admin\FreelanceProposalController::class)->only(['index', 'show', 'destroy']);
     });
 
 
@@ -385,6 +399,12 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
     Route::post('/users', [\App\Http\Controllers\Admin\UsersController::class, 'store'])->name('users.store');
     Route::get('/users/problematic', [\App\Http\Controllers\Admin\UsersController::class, 'problematic'])->name('users.problematic');
     Route::get('/users/co-work', [\App\Http\Controllers\Admin\UsersController::class, 'coWork'])->name('users.co-work');
+    Route::get('/users/legacy-coworker/{id}', [\App\Http\Controllers\Admin\UsersController::class, 'showLegacyCoWorker'])->name('users.legacy-coworker.show');
+    Route::get('/users/legacy-coworker/{id}/edit', [\App\Http\Controllers\Admin\UsersController::class, 'editLegacyCoWorker'])->name('users.legacy-coworker.edit');
+    Route::put('/users/legacy-coworker/{id}', [\App\Http\Controllers\Admin\UsersController::class, 'updateLegacyCoWorker'])->name('users.legacy-coworker.update');
+    Route::delete('/users/legacy-coworker/{id}', [\App\Http\Controllers\Admin\UsersController::class, 'deleteLegacyCoWorker'])->name('users.legacy-coworker.destroy');
+    Route::post('/users/legacy-coworker/{id}/create-user', [\App\Http\Controllers\Admin\UsersController::class, 'createUserFromCoWorker'])->name('users.legacy-coworker.create-user');
+    Route::post('/users/legacy-coworker/{id}/reset-password', [\App\Http\Controllers\Admin\UsersController::class, 'resetPasswordAndSendCredentialsForCoWorker'])->name('users.legacy-coworker.reset-password');
     Route::get('/users/earning-analyze', [\App\Http\Controllers\Admin\UsersController::class, 'earningAnalyze'])->name('users.earning-analyze');
     
     // Matches exact old links

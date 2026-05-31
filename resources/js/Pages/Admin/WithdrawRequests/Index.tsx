@@ -36,7 +36,8 @@ const statusStyles: Record<string, string> = {
 };
 
 export default function Index({ requests, filters }: Props) {
-    const { base_currency } = usePage<any>().props;
+    const { settings } = usePage<any>().props;
+    const base_currency = settings?.base_currency || 'USD';
 
     const handleFilter = (value: string) => {
         router.get(
@@ -76,12 +77,17 @@ export default function Index({ requests, filters }: Props) {
         {
             key: 'user',
             label: 'User',
-            render: (row: WithdrawRequest) => (
-                <div className="flex flex-col">
-                    <span className="font-medium text-slate-800">{row.user?.name ?? '—'}</span>
-                    <span className="text-xs text-slate-500">{row.user?.email ?? ''}</span>
-                </div>
-            ),
+            render: (row: WithdrawRequest) => 
+                row.user ? (
+                    <Link href={route('admin.users.show', row.user.id)} className="flex flex-col group cursor-pointer">
+                        <span className="font-medium text-slate-800 group-hover:text-blue-600 transition-colors">{row.user.name}</span>
+                        <span className="text-xs text-slate-500">{row.user.email}</span>
+                    </Link>
+                ) : (
+                    <div className="flex flex-col">
+                        <span className="font-medium text-slate-800">—</span>
+                    </div>
+                ),
         },
         {
             key: 'amount',

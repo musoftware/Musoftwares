@@ -21,14 +21,17 @@ Schedule::command(RenewSubscriptions::class)->dailyAt('03:00');
 Schedule::command(\App\Console\Commands\RenewPlatformSubscriptions::class)->dailyAt('03:30');
 Schedule::command(CleanupExpiredFbmbResults::class)->dailyAt('04:00');
 
+// Recurring Business Commands
+Schedule::command(\App\Console\Commands\AddRecurringCosts::class)->everyMinute();
+Schedule::command(\App\Console\Commands\AddRecurringSalaries::class)->everyMinute();
+Schedule::command(\App\Console\Commands\AddRecurringIncomes::class)->everyMinute();
+
 // Process matured referral earnings every minute
 Schedule::command(ProcessEarningsClearing::class)->everyMinute();
 
 // Auto-complete delivered marketplace orders hourly
 Schedule::command(\App\Console\Commands\CompleteDeliveredMarketplaceOrders::class)->hourly();
 
-
 // Gold Savers Jobs
 Schedule::command(\Modules\GoldSavers\app\Console\Commands\FetchLocalGoldPrices::class)->hourly();
 Schedule::command(\Modules\GoldSavers\app\Console\Commands\FetchGlobalGoldPrices::class)->hourly();
-

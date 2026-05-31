@@ -8,8 +8,13 @@ use App\Services\AdminUserService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
+use App\Models\Role;
+use App\Models\CoWorker;
+use App\Models\CoTechTag;
 use App\Http\Requests\Admin\User\StoreUserRequest;
 use App\Http\Requests\Admin\User\UpdateUserRequest;
 use App\Http\Requests\Admin\User\ToggleBlockUserRequest;
@@ -210,6 +215,7 @@ class UsersController extends Controller
                 'block_reason'         => $user->block_reason,
                 'kyc_verified'         => (bool) $user->kyc_verified,
                 'kyc_notes'            => $user->kyc_notes,
+                'max_devices'          => $user->max_devices,
             ],
             'roles'      => ['admin', 'client'],
             'currencies' => ['USD', 'EUR', 'GBP', 'EGP', 'AED', 'SAR'],
@@ -380,6 +386,190 @@ class UsersController extends Controller
             'freelancers'     => $freelancers,
             'legacyCoWorkers' => $legacyCoWorkers,
         ]);
+    }
+
+    public function showLegacyCoWorker($id)
+    {
+        $worker = \App\Models\CoWorker::with('techTags')->findOrFail($id);
+        
+        $workerData = [
+            'id'          => $worker->id,
+            'person_name' => $worker->person_name,
+            'email'       => $worker->email,
+            'mobile'      => $worker->mobile,
+            'facebook'    => $worker->facebook,
+            'linked_in'   => $worker->linked_in,
+            'whatsapp'    => $worker->whatsapp,
+            'time_from'   => $worker->time_from,
+            'time_to'     => $worker->time_to,
+            'flag_path'   => $worker->getFlagPath(),
+            'created_at'  => $worker->created_at,
+            'tech_tags'   => $worker->techTags->map(fn($t) => ['id' => $t->id, 'name' => $t->tag_name]),
+        ];
+
+        return Inertia::render('Admin/Users/LegacyCoWorkerShow', [
+            'worker' => $workerData
+        ]);
+    }
+
+    public function editLegacyCoWorker($id)
+    {
+        $worker = CoWorker::with('techTags')->findOrFail($id);
+        
+        $workerData = [
+            'id'          => $worker->id,
+            'person_name' => $worker->person_name,
+            'email'       => $worker->email,
+            'mobile'      => $worker->mobile,
+            'facebook'    => $worker->facebook,
+            'linked_in'   => $worker->linked_in,
+            'whatsapp'    => $worker->whatsapp,
+            'time_from'   => $worker->time_from,
+            'time_to'     => $worker->time_to,
+            'tech_tags'   => $worker->techTags->map(fn($t) => ['id' => $t->id, 'name' => $t->tag_name])->toArray(),
+        ];
+
+        $techTags = CoTechTag::orderBy('tag_name')->get(['id', 'tag_name'])->map(function($tag) {
+            return ['id' => $tag->id, 'name' => $tag->tag_name];
+        });
+
+        return Inertia::render('Admin/Users/LegacyCoWorkerEdit', [
+            'worker' => $workerData,
+            'techTags' => $techTags,
+        ]);
+    }
+
+    public function updateLegacyCoWorker(Request $request, $id)
+    {
+        $request->validate([
+            'person_name' => 'required|string|max:255',
+            'email' => 'nullable|email|max:255',
+            'mobile' => 'nullable|string|max:14',
+            'facebook' => 'nullable|url|max:255',
+            'linked_in' => 'nullable|url|max:255',
+            'whatsapp' => 'nullable|string|max:255',
+            'time_from' => 'nullable|string|max:255',
+            'time_to' => 'nullable|string|max:255',
+            'selectedTechTags' => 'nullable|array',
+        ]);
+
+        $worker = CoWorker::findOrFail($id);
+        
+        $worker->update($request->only([
+            'person_name', 'email', 'mobile', 'facebook', 'linked_in', 'whatsapp', 'time_from', 'time_to'
+        ]));
+
+        if ($request->has('selectedTechTags')) {
+            $worker->techTags()->sync($request->selectedTechTags);
+        }
+
+        return redirect()->route('admin.users.legacy-coworker.show', $worker->id)
+                         ->with('success', __('erp.coworker_updated_success', [], 'en') ?: 'Co-Worker updated successfully.');
+    }
+
+    public function deleteLegacyCoWorker($id)
+    {
+        $worker = CoWorker::findOrFail($id);
+        $worker->techTags()->detach();
+        $worker->delete();
+
+        return redirect()->route('admin.users.co-work')
+                         ->with('success', __('erp.coworker_deleted_success', [], 'en') ?: 'Co-Worker deleted successfully.');
+    }
+
+    public function createUserFromCoWorker($id)
+    {
+        try {
+            $coWorker = CoWorker::findOrFail($id);
+
+            if (empty($coWorker->email)) {
+                return redirect()->back()->with('error', 'Co-worker does not have an email address.');
+            }
+
+            $existingUser = User::where('email', $coWorker->email)->first();
+            if ($existingUser) {
+                return redirect()->back()->with('error', 'User with this email already exists.');
+            }
+
+            $randomPassword = Str::random(12);
+
+            $user = User::create([
+                'name' => $coWorker->person_name,
+                'email' => $coWorker->email,
+                'password' => Hash::make($randomPassword),
+                'currency' => '2', // EGP currency
+            ]);
+
+            $employeeRole = Role::createRule('Employee', 'employee');
+            $user->roles()->attach($employeeRole);
+
+            if (!empty($coWorker->whatsapp) && class_exists('\App\Services\WhatsAppNotificationService')) {
+                $this->sendCredentialsViaWhatsApp($coWorker, $user, $randomPassword);
+            }
+
+            return redirect()->back()->with('success', "User created successfully as employee. Temporary Password: $randomPassword");
+
+        } catch (\Exception $e) {
+            Log::error('Error creating user from co-worker: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            return redirect()->back()->with('error', 'Failed to create user: ' . $e->getMessage());
+        }
+    }
+
+    public function resetPasswordAndSendCredentialsForCoWorker($id)
+    {
+        try {
+            $coWorker = CoWorker::findOrFail($id);
+
+            if (empty($coWorker->email)) {
+                return redirect()->back()->with('error', 'Co-worker does not have an email address.');
+            }
+
+            $user = User::where('email', $coWorker->email)->first();
+            if (!$user) {
+                return redirect()->back()->with('error', 'User with this email does not exist.');
+            }
+
+            $randomPassword = Str::random(12);
+
+            $user->update([
+                'password' => Hash::make($randomPassword),
+            ]);
+
+            $employeeRole = Role::createRule('Employee', 'employee');
+            if (!$user->roles()->where('slug', 'employee')->exists()) {
+                $user->roles()->attach($employeeRole);
+            }
+
+            if (!empty($coWorker->whatsapp) && class_exists('\App\Services\WhatsAppNotificationService')) {
+                $this->sendCredentialsViaWhatsApp($coWorker, $user, $randomPassword, true);
+            }
+
+            return redirect()->back()->with('success', "Password reset successfully. New Password: $randomPassword");
+
+        } catch (\Exception $e) {
+            Log::error('Error resetting password: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            return redirect()->back()->with('error', 'Failed to reset password: ' . $e->getMessage());
+        }
+    }
+
+    private function sendCredentialsViaWhatsApp($coWorker, $user, $password, $isPasswordReset = false)
+    {
+        try {
+            $loginUrl = route('login');
+            
+            $message = "Hello {$coWorker->person_name},\n\n";
+            $message .= $isPasswordReset ? "Your password has been reset.\n\n" : "Your account has been created as an employee.\n\n";
+            $message .= "Login Credentials:\n";
+            $message .= "Email: {$user->email}\n";
+            $message .= "Password: {$password}\n\n";
+            $message .= "Login Link: {$loginUrl}\n\n";
+            $message .= "Please change your password after first login.\n\nThank you!";
+
+            $notificationService = app(\App\Services\WhatsAppNotificationService::class);
+            $notificationService->sendMessage($user, $message);
+        } catch (\Exception $e) {
+            Log::error('Error sending WhatsApp credentials: ' . $e->getMessage());
+        }
     }
 
     public function reset_password($id)

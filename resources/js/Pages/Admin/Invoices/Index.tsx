@@ -15,10 +15,24 @@ import {
 } from '@/Components/ui/dropdown-menu';
 import { Card, CardContent } from '@/Components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/Components/ui/table';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/Components/ui/select';
 import { StatusBadge } from '@/Components/ui/StatusBadge';
 import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
 import { PremiumCombobox } from '@/Components/ui/PremiumCombobox';
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogFooter,
+} from '@/Components/ui/dialog';
 
 const filterByOptions = [
     { value: 'all', label: 'All' },
@@ -38,7 +52,6 @@ const perPageOptions = [
 ];
 
 const bulkActionOptions = [
-    { value: '', label: 'Bulk Actions' },
     { value: 'bill_invoice', label: 'Bill Invoice' },
     { value: 'fix_calc', label: 'Fix Calc' },
     { value: 'merge', label: 'Merge' },
@@ -63,6 +76,10 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
     const [selectAll, setSelectAll] = useState(false);
     const [bulkAction, setBulkAction] = useState('');
     const [bulkActionProject, setBulkActionProject] = useState('');
+    const [statusDialog, setStatusDialog] = useState(null);
+    const [newStatus, setNewStatus] = useState('');
+    const [jobStatusDialog, setJobStatusDialog] = useState(null);
+    const [newJobStatus, setNewJobStatus] = useState('');
 
     useEffect(() => {
         if (selectAll) {
@@ -107,6 +124,32 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
         if (confirm('Are you sure you want to cancel this invoice? If it was partially paid, the user will be refunded their wallet balance.')) {
             router.post(route('admin.invoices.cancel', id));
         }
+    };
+
+    const handleChangeStatus = () => {
+        if (!statusDialog || !newStatus) return;
+        
+        router.post(route('admin.invoices.change-status', statusDialog.id), {
+            status: newStatus
+        }, {
+            preserveScroll: true,
+            onSuccess: () => {
+                setStatusDialog(null);
+            }
+        });
+    };
+
+    const handleChangeJobStatus = () => {
+        if (!jobStatusDialog || !newJobStatus) return;
+        
+        router.post(route('admin.invoices.change-job-status', jobStatusDialog.id), {
+            job_status: newJobStatus
+        }, {
+            preserveScroll: true,
+            onSuccess: () => {
+                setJobStatusDialog(null);
+            }
+        });
     };
 
     const applyBulkAction = () => {
@@ -305,6 +348,7 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
                                     <TableHead className="uppercase text-xs">Customer</TableHead>
                                     <TableHead className="uppercase text-xs">Project</TableHead>
                                     <TableHead className="uppercase text-xs">Date</TableHead>
+                                    <TableHead className="uppercase text-xs">Schedule Date</TableHead>
                                     <TableHead className="text-right uppercase text-xs">Total</TableHead>
                                     <TableHead className="text-center uppercase text-xs">Job Status</TableHead>
                                     <TableHead className="text-center uppercase text-xs">Invoice Status</TableHead>
@@ -347,6 +391,9 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
                                         <TableCell className="text-muted-foreground text-sm" data-label="Date">
                                             {new Date(invoice.created_at).toLocaleDateString()}
                                         </TableCell>
+                                        <TableCell className="text-muted-foreground text-sm" data-label="Schedule Date">
+                                            {invoice.scheduled_start_date ? new Date(invoice.scheduled_start_date).toLocaleDateString() : '-'}
+                                        </TableCell>
                                         <TableCell className="text-right" data-label="Total">
                                             <div className="flex flex-col items-end gap-1">
                                                 <span className="font-semibold text-foreground">
@@ -360,10 +407,28 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
                                             </div>
                                         </TableCell>
                                         <TableCell className="text-center" data-label="Job Status">
-                                            {getJobStatusBadge(invoice.job_status)}
+                                            <button 
+                                                type="button" 
+                                                className="hover:opacity-80 transition-opacity focus:outline-none"
+                                                onClick={() => {
+                                                    setJobStatusDialog(invoice);
+                                                    setNewJobStatus(invoice.job_status || 'pending');
+                                                }}
+                                            >
+                                                {getJobStatusBadge(invoice.job_status)}
+                                            </button>
                                         </TableCell>
                                         <TableCell className="text-center" data-label="Invoice Status">
-                                            {getStatusBadge(invoice.status)}
+                                            <button 
+                                                type="button" 
+                                                className="hover:opacity-80 transition-opacity focus:outline-none"
+                                                onClick={() => {
+                                                    setStatusDialog(invoice);
+                                                    setNewStatus(invoice.status);
+                                                }}
+                                            >
+                                                {getStatusBadge(invoice.status)}
+                                            </button>
                                         </TableCell>
                                         <TableCell className="text-right" data-label="Actions">
                                             <DropdownMenu>
@@ -402,7 +467,7 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
                                 
                                 {(filters.client_id || filters.search === 'unpaid_partial' || filters.search === 'archived') && invoices.data.length > 0 && (
                                     <TableRow className="bg-muted/30 font-semibold border-t">
-                                        <TableCell colSpan={5} className="text-right hidden sm:table-cell pr-4" data-label="Total">
+                                        <TableCell colSpan={6} className="text-right hidden sm:table-cell pr-4" data-label="Total">
                                             Total
                                         </TableCell>
                                         <TableCell className="text-right sm:hidden" data-label="Total">
@@ -437,12 +502,18 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
                     <div className="flex flex-col gap-4 md:flex-row md:items-center">
                         <div className="flex flex-wrap items-center gap-2">
                             <div className="w-48">
-                                <PremiumCombobox
-                                    value={bulkAction}
-                                    onChange={(val) => setBulkAction(String(val || ''))}
-                                    options={bulkActionOptions}
-                                    placeholder="Bulk Actions"
-                                />
+                                <Select value={bulkAction} onValueChange={(val) => setBulkAction(val)}>
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Bulk Actions" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {bulkActionOptions.map((opt) => (
+                                            <SelectItem key={opt.value} value={opt.value}>
+                                                {opt.label}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
                             </div>
 
                             {bulkAction === 'change_project' && (
@@ -492,6 +563,57 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
                 onLoginAs={handleLoginAs}
                 onResetPassword={handleResetPassword}
             />
+
+            <Dialog open={!!statusDialog} onOpenChange={(open) => !open && setStatusDialog(null)}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Change Invoice Status</DialogTitle>
+                    </DialogHeader>
+                    <div className="py-4">
+                        <Label>Status</Label>
+                        <Select value={newStatus} onValueChange={setNewStatus}>
+                            <SelectTrigger className="mt-2">
+                                <SelectValue placeholder="Select Status" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="unpaid">Unpaid</SelectItem>
+                                <SelectItem value="partially_paid">Partially Paid</SelectItem>
+                                <SelectItem value="paid">Paid</SelectItem>
+                                <SelectItem value="cancelled">Cancelled</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
+                    <DialogFooter>
+                        <Button variant="outline" onClick={() => setStatusDialog(null)}>Cancel</Button>
+                        <Button onClick={handleChangeStatus}>Save Status</Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
+            <Dialog open={!!jobStatusDialog} onOpenChange={(open) => !open && setJobStatusDialog(null)}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Change Job Status</DialogTitle>
+                    </DialogHeader>
+                    <div className="py-4">
+                        <Label>Status</Label>
+                        <Select value={newJobStatus} onValueChange={setNewJobStatus}>
+                            <SelectTrigger className="mt-2">
+                                <SelectValue placeholder="Select Status" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="pending">Pending</SelectItem>
+                                <SelectItem value="processing">Processing</SelectItem>
+                                <SelectItem value="done">Done</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
+                    <DialogFooter>
+                        <Button variant="outline" onClick={() => setJobStatusDialog(null)}>Cancel</Button>
+                        <Button onClick={handleChangeJobStatus}>Save Status</Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </AdminSidebarLayout>
     );
 }

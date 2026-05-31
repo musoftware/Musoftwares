@@ -16,28 +16,12 @@ import {
 import { useFreelanceMode } from '@/Components/Freelance/FreelanceModeContext';
 import { __ } from '@/lib/i18n';
 
+import { FreelanceCard } from '@/Components/Freelance/ui/FreelanceCard';
+import { FreelanceStatusPill } from '@/Components/Freelance/ui/FreelanceStatusPill';
+
 const AppLayout   = FreelanceLayout;
 const AppPage     = ({ children }: { children: React.ReactNode }) =>
     <div className="w-full space-y-6">{children}</div>;
-const SectionCard = ({ children, className, ...props }: { children: React.ReactNode; className?: string; [x: string]: any }) =>
-    <Card className={cn('shadow-sm border-gray-200 overflow-hidden', className)} {...props}>{children}</Card>;
-
-const STATUS_CONFIG: Record<string, { label: string; icon: React.ElementType; className: string }> = {
-    pending:  { label: 'Pending',  icon: Clock,         className: 'bg-amber-50  text-amber-700  border-amber-200'  },
-    accepted: { label: 'Accepted', icon: CheckCircle2,  className: 'bg-emerald-50 text-emerald-700 border-emerald-200' },
-    rejected: { label: 'Rejected', icon: XCircle,       className: 'bg-red-50    text-red-700    border-red-200'    },
-};
-
-function StatusPill({ status }: { status: string }) {
-    const cfg = STATUS_CONFIG[status] ?? { label: status, icon: AlertCircle, className: 'bg-slate-50 text-slate-600 border-slate-200' };
-    const Icon = cfg.icon;
-    return (
-        <span className={cn('inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold border', cfg.className)}>
-            <Icon className="h-3 w-3" />
-            {__(cfg.label)}
-        </span>
-    );
-}
 
 const FILTERS = ['all', 'pending', 'accepted', 'rejected'] as const;
 type Filter = typeof FILTERS[number];
@@ -101,7 +85,7 @@ export default function ProposalsIndex({ proposals, stats }: any) {
                     {statCards.map((s) => {
                         const Icon = s.icon;
                         return (
-                            <SectionCard key={s.label} className="p-4 flex items-center gap-3">
+                            <FreelanceCard key={s.label} className="p-4 flex items-center gap-3">
                                 <div className={cn('w-9 h-9 rounded-lg flex items-center justify-center shrink-0', s.color)}>
                                     <Icon className="h-4 w-4" />
                                 </div>
@@ -109,7 +93,7 @@ export default function ProposalsIndex({ proposals, stats }: any) {
                                     <p className="text-2xl font-black text-slate-900 leading-none">{s.value}</p>
                                     <p className="text-[11px] text-slate-500 mt-0.5">{__(s.label)}</p>
                                 </div>
-                            </SectionCard>
+                            </FreelanceCard>
                         );
                     })}
                 </div>
@@ -134,7 +118,7 @@ export default function ProposalsIndex({ proposals, stats }: any) {
 
                 {/* Proposals list */}
                 {displayed.length === 0 ? (
-                    <SectionCard>
+                    <FreelanceCard>
                         <EmptyState
                             icon={Briefcase}
                             title={__("No proposals yet")}
@@ -144,13 +128,13 @@ export default function ProposalsIndex({ proposals, stats }: any) {
                             action="/freelance/jobs/browse"
                             actionLabel={__("Browse Jobs")}
                         />
-                    </SectionCard>
+                    </FreelanceCard>
                 ) : (
                     <div className="space-y-3">
                         {displayed.map((proposal: any) => (
-                            <SectionCard
+                            <FreelanceCard
                                 key={proposal.id}
-                                className="group hover:border-indigo-200 transition-colors"
+                                interactive
                             >
                                 <div className="p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                                     <div className="flex-1 min-w-0 space-y-1">
@@ -185,7 +169,7 @@ export default function ProposalsIndex({ proposals, stats }: any) {
                                             <p className="text-[10px] text-slate-400">{__('Your Bid')}</p>
                                         </div>
 
-                                        <StatusPill status={proposal.status} />
+                                        <FreelanceStatusPill status={proposal.status} />
 
                                         {proposal.status === 'pending' && (
                                             <Button
@@ -214,7 +198,7 @@ export default function ProposalsIndex({ proposals, stats }: any) {
                                         )}
                                     </div>
                                 </div>
-                            </SectionCard>
+                            </FreelanceCard>
                         ))}
                     </div>
                 )}

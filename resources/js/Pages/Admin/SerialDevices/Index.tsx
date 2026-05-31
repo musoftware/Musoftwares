@@ -8,7 +8,7 @@ import { Input } from '@/Components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/Components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/Components/ui/table';
 import { Separator } from '@/Components/ui/separator';
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/Components/ui/sheet';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/Components/ui/dialog';
 import Pagination from '@/Components/Pagination';
 import { Search, Trash2, ToggleLeft, ToggleRight, ArrowUpDown, ChevronUp, ChevronDown, Monitor } from 'lucide-react';
 
@@ -231,8 +231,10 @@ export default function SerialDevicesIndex({ devices, filters, statuses, softwar
                                         className="cursor-pointer"
                                         onClick={() => setDetail(device)}
                                     >
-                                        <TableCell className="font-mono text-xs">
-                                            {device.device_id}
+                                        <TableCell className="font-mono text-xs" title={device.device_id}>
+                                            {device.device_id.length > 20
+                                                ? `${device.device_id.substring(0, 8)}...${device.device_id.slice(-8)}`
+                                                : device.device_id}
                                         </TableCell>
                                         <TableCell>
                                             <p className="text-sm font-medium">{device.machine_name}</p>
@@ -297,15 +299,15 @@ export default function SerialDevicesIndex({ devices, filters, statuses, softwar
 
             </div>
 
-            {/* Device Detail Sheet */}
-            <Sheet open={!!detail} onOpenChange={open => !open && setDetail(null)}>
-                <SheetContent className="w-[420px] sm:w-[480px] overflow-y-auto">
-                    <SheetHeader>
-                        <SheetTitle className="flex items-center gap-2">
+            {/* Device Detail Modal */}
+            <Dialog open={!!detail} onOpenChange={open => !open && setDetail(null)}>
+                <DialogContent className="sm:max-w-xl max-h-[90vh] overflow-y-auto">
+                    <DialogHeader>
+                        <DialogTitle className="flex items-center gap-2">
                             <Monitor className="w-4 h-4" />
                             Device Details
-                        </SheetTitle>
-                    </SheetHeader>
+                        </DialogTitle>
+                    </DialogHeader>
                     {detail && (
                         <div className="mt-6 space-y-4 text-sm">
                             <Row label="Device ID"        value={<span className="font-mono text-xs">{detail.device_id}</span>} />
@@ -344,8 +346,8 @@ export default function SerialDevicesIndex({ devices, filters, statuses, softwar
                             )}
                         </div>
                     )}
-                </SheetContent>
-            </Sheet>
+                </DialogContent>
+            </Dialog>
         </AdminSidebarLayout>
     );
 }

@@ -182,4 +182,9 @@ return [
     'team_member_added' => 'Team member :name has been added successfully.',
     'team_member_updated' => 'Team member details updated successfully.',
     'team_member_removed' => 'Team member :name has been removed.',
+
+    // Employee Todos
+    'todo_created_success' => 'Todo assigned successfully.',
+    'todo_updated_success' => 'Todo updated successfully.',
+    'todo_deleted_success' => 'Todo deleted successfully.',
 ];

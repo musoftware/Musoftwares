@@ -20,7 +20,7 @@ class DeviceManagementService
      */
     public function generateConnectionData(User $user): array
     {
-        $maxDevices = config('sms-payment-gateway.max_devices_per_tenant', 1);
+        $maxDevices = $user->max_devices ?? \App\Models\AdminSettings::GetValue('max_devices_per_tenant') ?? config('sms-payment-gateway.max_devices_per_tenant', 1);
         $currentDeviceCount = SmsPaymentGatewayDevice::where('user_id', $user->id)->count();
 
         if ($currentDeviceCount >= $maxDevices) {

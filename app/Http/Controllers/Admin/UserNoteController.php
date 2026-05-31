@@ -141,4 +141,21 @@ class UserNoteController extends Controller
             'stats'   => $this->userNoteService->getStats($userId),
         ]);
     }
+
+    /**
+     * Toggle the pinned status of a note.
+     */
+    public function togglePin(Request $request, int $userId, int $noteId): JsonResponse
+    {
+        $note = UserNote::where('user_id', $userId)->findOrFail($noteId);
+        $note->is_pinned = !$note->is_pinned;
+        $note->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Note pin status toggled.',
+            'is_pinned' => (bool) $note->is_pinned,
+            'stats'   => $this->userNoteService->getStats($userId),
+        ]);
+    }
 }

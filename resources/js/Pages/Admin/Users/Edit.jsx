@@ -45,7 +45,8 @@ export default function Edit({ user, currencies = [], plans = [] }) {
         ref_user_id: user.ref_user_id || '',
         permission: user.roles && user.roles.length > 0 ? user.roles[0].name : 'client',
         account_status: user.account_status || 'active',
-        block_reason: user.block_reason || ''
+        block_reason: user.block_reason || '',
+        max_devices: user.max_devices ?? '',
     });
 
     const handleSubmit = (e) => {
@@ -242,6 +243,10 @@ export default function Edit({ user, currencies = [], plans = [] }) {
                                 <div className="space-y-2">
                                     <Label htmlFor="postpaid_limit">Postpaid Limit</Label>
                                     <Input id="postpaid_limit" type="number" step="0.01" value={data.postpaid_limit} onChange={e => setData('postpaid_limit', e.target.value)} placeholder="Postpaid Limit" />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="max_devices">Max Devices Limit</Label>
+                                    <Input id="max_devices" type="number" step="1" min="0" value={data.max_devices} onChange={e => setData('max_devices', e.target.value)} placeholder="Leave blank for default" />
                                 </div>
                             </div>
                             <div className="flex items-center space-x-2">

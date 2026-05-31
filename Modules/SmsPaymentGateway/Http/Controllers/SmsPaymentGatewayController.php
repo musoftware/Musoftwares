@@ -627,6 +627,7 @@ class SmsPaymentGatewayController extends Controller
             'vodafone_cash_phone_number' => 'nullable|string|max:20',
             'is_instapay_enabled' => 'boolean',
             'is_vodafone_cash_enabled' => 'boolean',
+            'whitelist_senders' => 'nullable|string|max:1000',
         ]);
 
         $settings = \Modules\SmsPaymentGateway\Models\SmsPaymentGatewaySetting::firstOrCreate(
@@ -639,6 +640,7 @@ class SmsPaymentGatewayController extends Controller
             'vodafone_cash_phone_number' => $request->vodafone_cash_phone_number,
             'is_instapay_enabled' => $request->has('is_instapay_enabled') ? $request->is_instapay_enabled : true,
             'is_vodafone_cash_enabled' => $request->has('is_vodafone_cash_enabled') ? $request->is_vodafone_cash_enabled : true,
+            'whitelist_senders' => $request->whitelist_senders,
         ]);
 
         return redirect()->back()->with('success', 'تم حفظ الإعدادات بنجاح');
@@ -797,6 +799,39 @@ class SmsPaymentGatewayController extends Controller
             'testOrdersCount',
             'testTransactions'
         ));
+    }
+
+    /**
+     * Display SMS Simulator page
+     * GET /client/sms-payment-gateway/sms-simulator
+     */
+    public function smsSimulator()
+    {
+        $user = Auth::user();
+
+        // Get user's devices to select from
+        $devices = SmsPaymentGatewayDevice::where('user_id', $user->id)
+            ->where('status', 'connected')
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        // Get webhook to show if it's configured
+        $webhook = SmsPaymentGatewayWebhook::where('user_id', $user->id)
+            ->where('is_active', true)
+            ->first();
+
+        // Get the token needed for testing via API
+        $token = $user->tokens()
+            ->where('name', 'like', '%sms-payment-gateway%')
+            ->orWhere('name', 'like', '%sms%')
+            ->orderBy('created_at', 'desc')
+            ->first();
+
+        if (!$token) {
+            $token = $user->tokens()->orderBy('created_at', 'desc')->first();
+        }
+
+        return \Inertia\Inertia::render('SmsPaymentGateway/SmsSimulator', compact('devices', 'webhook', 'token'));
     }
 
     /**

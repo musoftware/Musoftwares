@@ -79,7 +79,16 @@ class TransactionIngestionService
 
         // Check if sender is in allowed list
         if (!$isTest) {
-            $allowedSenders = config('sms-payment-gateway.allowed_senders', []);
+            // Get user's whitelist settings
+            $settings = \Modules\SmsPaymentGateway\Models\SmsPaymentGatewaySetting::where('user_id', $device->user_id)->first();
+            $userWhitelist = [];
+            if ($settings && !empty($settings->whitelist_senders)) {
+                $userWhitelist = array_map('trim', explode(',', $settings->whitelist_senders));
+            }
+
+            $allowedSenders = array_merge(config('sms-payment-gateway.allowed_senders', []), $userWhitelist);
+            
+            // Allow if whitelist is empty, otherwise must be in the list
             $isAllowedSender = empty($allowedSenders) || in_array(strtolower($senderName), array_map('strtolower', $allowedSenders));
 
             if (!$isAllowedSender) {

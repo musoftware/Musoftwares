@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Head, Link, usePage } from '@inertiajs/react';
-import WorkspaceLayout from '@/Layouts/WorkspaceLayout';
+import FreelanceLayout from './Layout';
 import { 
     Briefcase,
     Clock,
@@ -145,30 +145,8 @@ export default function FreelanceDashboard({
         }
     ];
 
-    const freelancerMenuItems = [
-        { id: 'dashboard',  label: __('Dashboard'),    icon: Briefcase, href: '/freelance/dashboard',              isActive: true  },
-        { id: 'jobs',       label: __('Find Work'),     icon: Search,    href: '/freelance/jobs/browse',  isActive: false },
-        { id: 'proposals',  label: __('My Proposals'),  icon: Clock,     href: '/freelance/proposals',    isActive: false },
-        { id: 'contracts',  label: __('My Contracts'),  icon: Clock,     href: '/freelance/contracts',    isActive: false },
-        { id: 'points',     label: __('Buy Connects'),  icon: Coins,     href: '/freelance/points',       isActive: false },
-    ];
-
-    const clientMenuItems = [
-        { id: 'dashboard',  label: __('Dashboard'),       icon: Briefcase, href: '/freelance/dashboard',              isActive: true  },
-        { id: 'post-job',   label: __('Post a Job'),      icon: Plus,      href: '/freelance/jobs/create',  isActive: false },
-        { id: 'my-jobs',    label: __('My Posted Jobs'),  icon: Briefcase, href: '/freelance/jobs/my-jobs', isActive: false },
-        { id: 'contracts',  label: __('My Contracts'),    icon: Clock,     href: '/freelance/contracts',    isActive: false },
-    ];
-
-    const menuItems = isClient ? clientMenuItems : freelancerMenuItems;
-
     return (
-        <WorkspaceLayout 
-            title={__('Freelance Hub')}
-            workspaceName={__('Freelance Hub')}
-            tenantId="FR-DRAFT"
-            menuItems={menuItems}
-        >
+        <FreelanceLayout>
             <div className="space-y-8">
                 <ModulePageHeader 
                     title={`${__('Welcome back')}, ${auth?.user?.name?.split(' ')[0] || __('Partner')}`}
@@ -506,6 +484,6 @@ export default function FreelanceDashboard({
                 onClose={() => setSelectedContract(null)}
                 data={selectedContract}
             />
-        </WorkspaceLayout>
+        </FreelanceLayout>
     );
 }

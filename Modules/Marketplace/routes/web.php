@@ -24,10 +24,7 @@ Route::middleware('web')
             Route::get('/services/create',  [ServiceController::class, 'create'])->name('services.create');
             Route::post('/services',        [ServiceController::class, 'store'])->name('services.store');
 
-            // Admin actions
-            Route::post('/services/{id}/approve', [ServiceController::class, 'approve'])->name('services.approve');
-            Route::post('/services/{id}/reject',  [ServiceController::class, 'reject'])->name('services.reject');
-            Route::post('/services/{id}/feature', [ServiceController::class, 'feature'])->name('services.feature');
+
         });
 
         // ── Wildcard — always last ─────────────────────────────────────────

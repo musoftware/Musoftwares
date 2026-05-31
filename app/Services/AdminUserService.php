@@ -50,6 +50,7 @@ class AdminUserService
         $user->country             = $request->input('country');
         $user->city                = $request->input('city');
         $user->currency_id         = $request->input('currency') ?? $user->currency_id ?? 2;
+        $user->max_devices         = $request->input('max_devices');
 
         // Account control
         if ($request->has('account_status')) {

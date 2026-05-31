@@ -111,29 +111,25 @@ export default function CharityCounterIndex({ charityCounters, filters, stats }:
                 {/* Statistics Cards */}
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
                     <MetricCard
-                        title="الرصيد العام الحالي"
+                        label="الرصيد العام الحالي"
                         value={formatMoney(stats.totalBalance, 'EGP')}
                         icon={Wallet}
-                        trend="positive"
                         className="border-primary/20"
                     />
                     <MetricCard
-                        title="إجمالي التبرعات"
+                        label="إجمالي التبرعات"
                         value={formatMoney(stats.totalReceived, 'EGP')}
                         icon={TrendingUp}
-                        trend="positive"
                     />
                     <MetricCard
-                        title="إجمالي المصروفات"
+                        label="إجمالي المصروفات"
                         value={formatMoney(stats.totalSpent, 'EGP')}
                         icon={TrendingDown}
-                        trend="negative"
                     />
                     <MetricCard
-                        title="عدد المتبرعين"
+                        label="عدد المتبرعين"
                         value={stats.totalUsers.toString()}
                         icon={Users}
-                        trend="neutral"
                     />
                 </div>
 

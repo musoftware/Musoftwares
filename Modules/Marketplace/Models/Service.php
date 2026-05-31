@@ -17,7 +17,7 @@ class Service extends Model
         'seller_id', 'category_id', 'title', 'description', 'status',
         'tags', 'faq', 'requirements', 'gallery', 'video_url',
         'approved_at', 'approved_by', 'rejected_at', 'rejection_reason',
-        'suspended_at', 'suspended_by'
+        'suspended_at', 'suspended_by', 'is_featured'
     ];
 
     protected $casts = [

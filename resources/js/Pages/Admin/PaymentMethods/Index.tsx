@@ -131,15 +131,15 @@ export default function Index({ methods, filters, stats }: Props) {
             label: 'Employee',
             render: (m: PaymentMethod) =>
                 m.user ? (
-                    <div className="flex items-center gap-2">
-                        <div className="h-7 w-7 rounded-full bg-indigo-100 flex items-center justify-center flex-shrink-0">
-                            <UserIcon className="h-3.5 w-3.5 text-indigo-600" />
+                    <Link href={route('admin.users.show', m.user.id)} className="flex items-center gap-2 group cursor-pointer">
+                        <div className="h-7 w-7 rounded-full bg-indigo-100 flex items-center justify-center flex-shrink-0 group-hover:bg-indigo-600 transition-colors">
+                            <UserIcon className="h-3.5 w-3.5 text-indigo-600 group-hover:text-white transition-colors" />
                         </div>
                         <div>
-                            <p className="text-sm font-medium text-slate-700">{m.user.name}</p>
+                            <p className="text-sm font-medium text-slate-700 group-hover:text-indigo-600 transition-colors">{m.user.name}</p>
                             <p className="text-xs text-slate-400">{m.user.email}</p>
                         </div>
-                    </div>
+                    </Link>
                 ) : (
                     <span className="text-slate-400 text-sm">— deleted user</span>
                 ),

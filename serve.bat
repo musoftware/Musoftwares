@@ -15,7 +15,7 @@ set PHP_BIN=C:\tools\php83\php.exe
 
 :: Start Laravel PHP server in a new window
 echo [1/3] Starting Laravel PHP server...
-start "Laravel Server" cmd /k "%PHP_BIN% artisan serve --env=local"
+start "Laravel Server" cmd /k "%PHP_BIN% artisan serve --host=0.0.0.0 --env=local"
 
 :: Wait a moment before starting npm
 timeout /t 2 /nobreak >nul

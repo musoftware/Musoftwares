@@ -1,3 +1,4 @@
+import { __ } from '@/lib/i18n';
 import React from 'react';
 import { Head, router, Link } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
@@ -109,13 +110,11 @@ export default function TextPaymentGateway({ devices, webhook, token, stats, rec
                         <Card className="border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
                             <CardHeader>
                                 <CardTitle className="flex items-center gap-2 text-lg">
-                                    <Smartphone className="w-5 h-5 text-rose-500" /> الأجهزة
-                                </CardTitle>
-                                <CardDescription>اربط هاتف الأندرويد لقراءة رسائل فودافون كاش وإنستاباي.</CardDescription>
+                                    <Smartphone className="w-5 h-5 text-rose-500" />{__('Devices')}</CardTitle>
+                                <CardDescription>{__('Connect Android phone to read Vodafone Cash and Instapay messages.')}</CardDescription>
                             </CardHeader>
                             <CardContent>
-                                <Button className="w-full bg-slate-900 hover:bg-slate-800" onClick={() => router.visit(route('sms-payment-gateway.devices'))}>
-                                    إدارة الأجهزة <ArrowRight className="w-4 h-4 ml-2 rtl:rotate-180" />
+                                <Button className="w-full bg-slate-900 hover:bg-slate-800" onClick={() => router.visit(route('sms-payment-gateway.devices'))}>{__('Manage Devices')}<ArrowRight className="w-4 h-4 ml-2 rtl:rotate-180" />
                                 </Button>
                             </CardContent>
                         </Card>
@@ -123,28 +122,22 @@ export default function TextPaymentGateway({ devices, webhook, token, stats, rec
                         <Card className="border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
                             <CardHeader>
                                 <CardTitle className="flex items-center gap-2 text-lg">
-                                    <CreditCard className="w-5 h-5 text-indigo-500" /> روابط الدفع
-                                </CardTitle>
-                                <CardDescription>قم بإنشاء روابط دفع سريعة للعملاء لتحصيل المبالغ المطلوبة.</CardDescription>
+                                    <CreditCard className="w-5 h-5 text-indigo-500" />{__('Payment Links')}</CardTitle>
+                                <CardDescription>{__('Create quick payment links for customers to collect required amounts.')}</CardDescription>
                             </CardHeader>
                             <CardContent>
-                                <Button variant="outline" className="w-full border-indigo-200 hover:bg-indigo-50" onClick={() => router.visit(route('sms-payment-gateway.payment-links'))}>
-                                    إنشاء رابط دفع
-                                </Button>
+                                <Button variant="outline" className="w-full border-indigo-200 hover:bg-indigo-50" onClick={() => router.visit(route('sms-payment-gateway.payment-links'))}>{__('Create Payment Link')}</Button>
                             </CardContent>
                         </Card>
 
                         <Card className="border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
                             <CardHeader>
                                 <CardTitle className="flex items-center gap-2 text-lg">
-                                    <Activity className="w-5 h-5 text-amber-500" /> الإعدادات
-                                </CardTitle>
-                                <CardDescription>ضبط رقم هاتف استقبال الأموال وتفعيل خدمات الدفع المتاحة.</CardDescription>
+                                    <Activity className="w-5 h-5 text-amber-500" />{__('Settings')}</CardTitle>
+                                <CardDescription>{__('Set the receiving phone number and enable available payment services.')}</CardDescription>
                             </CardHeader>
                             <CardContent>
-                                <Button variant="outline" className="w-full" onClick={() => router.visit(route('sms-payment-gateway.settings'))}>
-                                    إعدادات البوابة
-                                </Button>
+                                <Button variant="outline" className="w-full" onClick={() => router.visit(route('sms-payment-gateway.settings'))}>{__('Gateway Settings')}</Button>
                             </CardContent>
                         </Card>
                     </div>

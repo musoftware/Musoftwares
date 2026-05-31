@@ -24,7 +24,6 @@ class AdminTaskController extends Controller
 
         $query = Todo::where('completed', false)
             ->where('paused', false)
-            ->whereNull('parent_id')
             ->whereHas('task', function ($q) {
                 $q->where('archived', false);
             })
@@ -138,7 +137,6 @@ class AdminTaskController extends Controller
         // Stats
         $totalActive = Todo::where('completed', false)
             ->where('paused', false)
-            ->whereNull('parent_id')
             ->count();
 
         return Inertia::render('Admin/Tasks/AsList', [
@@ -188,7 +186,6 @@ class AdminTaskController extends Controller
                 $q->whereBetween('start_at', [$startDate->toDateTimeString(), $endDate->toDateTimeString()])
                   ->orWhereBetween('end_at', [$startDate->toDateTimeString(), $endDate->toDateTimeString()]);
             })
-            ->whereNull('parent_id')
             ->with(['task.user', 'user']);
 
         if ($clientId) {
@@ -313,8 +310,8 @@ class AdminTaskController extends Controller
         // Fetch all platform clients with task/todo metrics
         // User has no todos() relationship, so we use raw subquery selects
         $clients = User::role('client')
-            ->selectRaw('users.*, (SELECT COUNT(*) FROM todos WHERE todos.user_id = users.id AND todos.parent_id IS NULL) as total_tasks')
-            ->selectRaw('(SELECT COUNT(*) FROM todos WHERE todos.user_id = users.id AND todos.parent_id IS NULL AND todos.completed = 1) as completed_tasks')
+            ->selectRaw('users.*, (SELECT COUNT(*) FROM todos WHERE todos.user_id = users.id) as total_tasks')
+            ->selectRaw('(SELECT COUNT(*) FROM todos WHERE todos.user_id = users.id AND todos.completed = 1) as completed_tasks')
             ->orderBy('name')
             ->get()
             ->map(function ($u) {
@@ -341,8 +338,8 @@ class AdminTaskController extends Controller
 
         if ($clientId) {
             $clientUser = User::role('client')->findOrFail($clientId);
-            $totalTasks = Todo::where('user_id', $clientUser->id)->whereNull('parent_id')->count();
-            $completedTasks = Todo::where('user_id', $clientUser->id)->whereNull('parent_id')->where('completed', true)->count();
+            $totalTasks = Todo::where('user_id', $clientUser->id)->count();
+            $completedTasks = Todo::where('user_id', $clientUser->id)->where('completed', true)->count();
             $latestTask = Task::where('user_id', $clientUser->id)->latest()->first();
 
             $selectedClient = [
@@ -358,7 +355,6 @@ class AdminTaskController extends Controller
 
             $todos = Todo::where('user_id', $clientUser->id)
                 ->where('completed', false)
-                ->whereNull('parent_id')
                 ->with('task')
                 ->orderBy('start_at', 'asc')
                 ->orderBy('created_at', 'desc')

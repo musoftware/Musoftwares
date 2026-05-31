@@ -31,10 +31,12 @@ export default function Show({ invoice }) {
 
     useEffect(() => {
         if (invoice && invoice.items) {
-            setItems(invoice.items.map(item => ({ ...item, isNew: false })));
+            const itemsArray = Array.isArray(invoice.items) ? invoice.items : Object.values(invoice.items);
+            setItems(itemsArray.map(item => ({ ...item, isNew: false })));
         }
         if (invoice && invoice.cost_lines) {
-            setCostLines(invoice.cost_lines.map(line => ({ ...line, isNew: false })));
+            const costLinesArray = Array.isArray(invoice.cost_lines) ? invoice.cost_lines : Object.values(invoice.cost_lines);
+            setCostLines(costLinesArray.map(line => ({ ...line, isNew: false })));
         }
         setDiscount(invoice.discount || 0);
         setDiscountPercentage(0);
@@ -166,7 +168,8 @@ export default function Show({ invoice }) {
     const handleCancel = () => {
         // Reset local state to prop data
         if (invoice && invoice.items) {
-            setItems(invoice.items.map(item => ({ ...item, isNew: false })));
+            const itemsArray = Array.isArray(invoice.items) ? invoice.items : Object.values(invoice.items);
+            setItems(itemsArray.map(item => ({ ...item, isNew: false })));
         }
         setDiscount(invoice.discount || 0);
         setDeletedItems([]);

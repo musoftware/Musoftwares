@@ -41,6 +41,7 @@ class User extends Authenticatable
         'kyc_notes',
         'workspace_settings',
         'can_add_freelance_skills',
+        'max_devices',
     ];
 
     protected $hidden = [
@@ -65,6 +66,7 @@ class User extends Authenticatable
             'kyc_verified_at' => 'datetime',
             'workspace_settings' => 'array',
             'can_add_freelance_skills' => 'boolean',
+            'max_devices' => 'integer',
         ];
     }
 

@@ -12,11 +12,7 @@ import { cn, formatDate } from '@/lib/utils';
 import { Briefcase, Plus, Clock, ChevronRight, FileText } from 'lucide-react';
 import { __ } from '@/lib/i18n';
 
-const SectionCard = ({ children, className, ...props }) => (
-    <Card className={cn("shadow-sm border-slate-200/60 overflow-hidden", className)} {...props}>
-        {children}
-    </Card>
-);
+import { FreelanceCard } from '@/Components/Freelance/ui/FreelanceCard';
 
 export default function MyJobs({ auth, jobs }) {
     const freelanceModeContext = useFreelanceMode();
@@ -49,7 +45,7 @@ export default function MyJobs({ auth, jobs }) {
             />
 
             {displayJobs.length === 0 ? (
-                <SectionCard>
+                <FreelanceCard>
                     <EmptyState
                         icon={Briefcase}
                         title={__("You haven't posted any jobs yet")}
@@ -58,13 +54,13 @@ export default function MyJobs({ auth, jobs }) {
                         actionLabel={__("Post a Job")}
                         actionIcon={Plus}
                     />
-                </SectionCard>
+                </FreelanceCard>
             ) : (
                 <div className="space-y-4">
                     {displayJobs.map((job) => (
-                        <SectionCard 
+                        <FreelanceCard 
                             key={job.id} 
-                            className="group hover:border-indigo-200 transition-colors cursor-pointer"
+                            interactive
                         >
                             <Link href={`/freelance/jobs/${job.id}`} className="block">
                                 <div className="p-6 flex flex-col sm:flex-row sm:items-start justify-between gap-4">
@@ -120,7 +116,7 @@ export default function MyJobs({ auth, jobs }) {
                                     </div>
                                 </div>
                             </Link>
-                        </SectionCard>
+                        </FreelanceCard>
                     ))}
                 </div>
             )}

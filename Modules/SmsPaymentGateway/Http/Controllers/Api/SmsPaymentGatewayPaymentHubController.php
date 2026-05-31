@@ -100,9 +100,47 @@ class SmsPaymentGatewayPaymentHubController extends Controller
     {
         // Return array of allowed sender names
         // This can be configured in config file or database
-        $allowedSenders = config('sms-payment-gateway.allowed_senders', [
+        $globalSenders = config('sms-payment-gateway.allowed_senders', []);
 
-        ]);
+        $userSenders = [];
+
+        // If device token is provided, get the specific user's whitelist
+        if ($request->has('device_token')) {
+            $device = SmsPaymentGatewayDevice::where('device_token', $request->device_token)
+                ->where('status', 'connected')
+                ->first();
+
+            if ($device) {
+                $settings = \Modules\SmsPaymentGateway\Models\SmsPaymentGatewaySetting::where('user_id', $device->user_id)->first();
+                if ($settings && !empty($settings->whitelist_senders)) {
+                    $parts = array_map('trim', explode(',', $settings->whitelist_senders));
+                    foreach ($parts as $part) {
+                        if (!empty($part) && !in_array($part, $userSenders)) {
+                            $userSenders[] = $part;
+                        }
+                    }
+                }
+            }
+        } else {
+            // For older app versions that don't send device_token, 
+            // we return the global senders plus a fallback union of all whitelists
+            // so the app doesn't drop the SMS locally. The real filtering will 
+            // still happen on the server per-user.
+            $settings = \Modules\SmsPaymentGateway\Models\SmsPaymentGatewaySetting::whereNotNull('whitelist_senders')
+                ->where('whitelist_senders', '!=', '')
+                ->pluck('whitelist_senders');
+
+            foreach ($settings as $list) {
+                $parts = array_map('trim', explode(',', $list));
+                foreach ($parts as $part) {
+                    if (!empty($part) && !in_array($part, $userSenders)) {
+                        $userSenders[] = $part;
+                    }
+                }
+            }
+        }
+
+        $allowedSenders = array_values(array_unique(array_merge($globalSenders, $userSenders)));
 
         // Return as array (not wrapped in object)
         return response()->json($allowedSenders);
