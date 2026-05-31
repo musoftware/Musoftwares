@@ -5,7 +5,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Button } from '@/Components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/Components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/Components/ui/tabs';
-import { ArrowLeft, BookOpen, Code, Terminal, Webhook, Download } from 'lucide-react';
+import { ArrowLeft, BookOpen, Code, Terminal, Webhook, Download, AlertTriangle } from 'lucide-react';
 
 export default function Documentation() {
     return (
@@ -263,6 +263,31 @@ app.post('/webhook', express.raw({type: 'application/json'}), (req, res) => {
                             </div>
                         </TabsContent>
                     </Tabs>
+
+                    <Card className="border-amber-200 bg-amber-50/50 dark:bg-amber-950/20 dark:border-amber-900 mt-8">
+                        <CardHeader>
+                            <CardTitle className="text-amber-800 dark:text-amber-500 flex items-center gap-2">
+                                <AlertTriangle className="w-5 h-5" /> 
+                                Security Best Practices / ممارسات الأمان
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-6 text-sm text-amber-900/80 dark:text-amber-200/80">
+                            <div>
+                                <h4 className="font-bold mb-1 text-amber-900 dark:text-amber-400">English</h4>
+                                <p>
+                                    <strong>Never rely on the frontend <code>onSuccess</code> callback to fulfill orders.</strong><br/>
+                                    Client-side code can be easily manipulated or bypassed by users (hijacking). The <code>onSuccess</code> event is strictly for UI purposes, such as redirecting the user to a "Thank You" page. To securely verify that a payment was successful, you must use <strong>Webhooks</strong> or Server-Side API verification, exactly as implemented by major gateways like Stripe.
+                                </p>
+                            </div>
+                            <div dir="rtl" className="text-right font-sans">
+                                <h4 className="font-bold mb-1 text-amber-900 dark:text-amber-400">عربي</h4>
+                                <p>
+                                    <strong>لا تعتمد أبداً على دالة <code>onSuccess</code> في واجهة المستخدم لتأكيد الطلبات.</strong><br/>
+                                    يمكن للمستخدمين التلاعب بسهولة بالكود من جهة المتصفح وتخطي عملية الدفع. حدث <code>onSuccess</code> مصمم فقط لتحسين تجربة المستخدم (مثل توجيهه لصفحة شكر). لكي تتأكد بأمان تام من نجاح الدفع، يجب عليك استخدام <strong>Webhooks</strong> أو التحقق من جانب السيرفر (Server-Side Verification)، تماماً كما تفعل بوابات الدفع العالمية مثل Stripe.
+                                </p>
+                            </div>
+                        </CardContent>
+                    </Card>
                 </div>
             </div>
         </AuthenticatedLayout>

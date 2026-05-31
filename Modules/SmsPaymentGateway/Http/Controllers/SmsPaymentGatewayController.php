@@ -293,7 +293,7 @@ class SmsPaymentGatewayController extends Controller
             // Update existing webhook
             $existingWebhook->update([
                 'webhook_url' => $request->webhook_url,
-                'webhook_secret' => $request->webhook_secret ?? $existingWebhook->webhook_secret ?? Str::random(32),
+                'webhook_secret' => $request->webhook_secret ?? $existingWebhook->webhook_secret ?? 'whsec_' . Str::random(32),
             ]);
 
             return redirect()->route('sms-payment-gateway.index')
@@ -304,7 +304,7 @@ class SmsPaymentGatewayController extends Controller
         SmsPaymentGatewayWebhook::create([
             'user_id' => $user->id,
             'webhook_url' => $request->webhook_url,
-            'webhook_secret' => $request->webhook_secret ?? Str::random(32),
+            'webhook_secret' => $request->webhook_secret ?? 'whsec_' . Str::random(32),
             'is_active' => true,
         ]);
 
@@ -663,6 +663,22 @@ class SmsPaymentGatewayController extends Controller
 
         return \Inertia\Inertia::render('SmsPaymentGateway/PaymentLinks', [
             'links' => $links
+        ]);
+    }
+
+    /**
+     * Display the API Checkout Sessions page
+     */
+    public function checkoutSessions()
+    {
+        $user = Auth::user();
+        $sessions = \Modules\SmsPaymentGateway\Models\SmsGatewayCheckoutSession::with('currency')
+            ->where('user_id', $user->id)
+            ->orderBy('created_at', 'desc')
+            ->paginate(15);
+
+        return \Inertia\Inertia::render('SmsPaymentGateway/CheckoutSessions', [
+            'sessions' => $sessions
         ]);
     }
 

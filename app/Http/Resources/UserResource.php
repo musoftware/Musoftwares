@@ -23,6 +23,7 @@ class UserResource extends JsonResource
             'id'                   => $this->id,
             'name'                 => $this->name,
             'email'                => $this->email,
+            'avatar_url'           => 'https://www.gravatar.com/avatar/' . md5(strtolower(trim($this->email))) . '?s=200&d=mp',
             'initials'             => $initials,
             'role'                 => $this->whenLoaded('roles', fn() => $this->roles->first()?->name ?? 'user', 'user'),
             'account_status'       => $this->account_status ?? 'active',
