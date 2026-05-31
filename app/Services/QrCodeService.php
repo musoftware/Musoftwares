@@ -277,17 +277,16 @@ class QrCodeService
         ];
 
         try {
-            $result = new Builder(
-                writer: new PngWriter(),
-                writerOptions: [],
-                validateResult: false,
-                data: $data,
-                encoding: new Encoding('UTF-8'),
-                errorCorrectionLevel: $errorLevelMap[$errorCorrectionLevel] ?? ErrorCorrectionLevel::Medium,
-                size: $size,
-                margin: $margin,
-                roundBlockSizeMode: RoundBlockSizeMode::Margin
-            );
+            $result = Builder::create()
+                ->writer(new PngWriter())
+                ->writerOptions([])
+                ->validateResult(false)
+                ->data($data)
+                ->encoding(new Encoding('UTF-8'))
+                ->errorCorrectionLevel($errorLevelMap[$errorCorrectionLevel] ?? ErrorCorrectionLevel::Medium)
+                ->size($size)
+                ->margin($margin)
+                ->roundBlockSizeMode(RoundBlockSizeMode::Margin);
 
             return $result->build()->getDataUri();
 
@@ -315,17 +314,16 @@ class QrCodeService
         ];
 
         try {
-            $result = new Builder(
-                writer: new PngWriter(),
-                writerOptions: [],
-                validateResult: false,
-                data: $data,
-                encoding: new Encoding('UTF-8'),
-                errorCorrectionLevel: $errorLevelMap[$errorCorrectionLevel] ?? ErrorCorrectionLevel::Medium,
-                size: $size,
-                margin: $margin,
-                roundBlockSizeMode: RoundBlockSizeMode::Margin
-            );
+            $result = Builder::create()
+                ->writer(new PngWriter())
+                ->writerOptions([])
+                ->validateResult(false)
+                ->data($data)
+                ->encoding(new Encoding('UTF-8'))
+                ->errorCorrectionLevel($errorLevelMap[$errorCorrectionLevel] ?? ErrorCorrectionLevel::Medium)
+                ->size($size)
+                ->margin($margin)
+                ->roundBlockSizeMode(RoundBlockSizeMode::Margin);
 
             return $result->build()->getString();
 
