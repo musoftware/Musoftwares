@@ -17,7 +17,7 @@ import { useFreelanceMode } from '@/Components/Freelance/FreelanceModeContext';
 import { __ } from '@/lib/i18n';
 
 import { FreelanceCard } from '@/Components/Freelance/ui/FreelanceCard';
-import { FreelanceStatusPill } from '@/Components/Freelance/ui/FreelanceStatusPill';
+import { FreelanceStatusPill, STATUS_CONFIG } from '@/Components/Freelance/ui/FreelanceStatusPill';
 
 const AppLayout   = FreelanceLayout;
 const AppPage     = ({ children }: { children: React.ReactNode }) =>

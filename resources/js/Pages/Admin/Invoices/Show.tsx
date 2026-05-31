@@ -195,7 +195,10 @@ export default function Show({ invoice }) {
     };
 
     // Derived local totals for UI while editing
-    const currentSubtotal = items.reduce((acc, item) => acc + (parseFloat(item.amount) * parseInt(item.qty || 1) || 0), 0);
+    const currentSubtotal = items.reduce((acc, item) => {
+        if (item.item_type === 'timer') return acc + (parseFloat(item.total_amount) || 0);
+        return acc + (parseFloat(item.amount) * parseInt(item.qty || 1) || 0);
+    }, 0);
     const currentTotal = currentSubtotal - parseFloat(discount || 0);
 
     return (
@@ -223,16 +226,17 @@ export default function Show({ invoice }) {
                 </div>
                 <div className="flex flex-wrap items-center gap-2 md:justify-end">
                     <div className="flex bg-gray-100 rounded-md p-1">
-                        <Button variant="ghost" size="sm" className="h-8 hover:bg-white">
+                        <Button variant="ghost" size="sm" className="h-8 hover:bg-white" onClick={() => window.open(route('admin.invoices.print-pdf', invoice.id), '_blank')}>
                             <Printer className="w-4 h-4" />
                         </Button>
-                        <Button variant="ghost" size="sm" className="h-8 hover:bg-white">
+                        <Button variant="ghost" size="sm" className="h-8 hover:bg-white" onClick={() => window.location.href = route('admin.invoices.download-pdf', invoice.id)}>
                             <Download className="w-4 h-4" />
                         </Button>
                     </div>
-                    <Button className="bg-blue-600 hover:bg-blue-700 h-10 px-4">
+                    <Button onClick={() => { navigator.clipboard.writeText(window.location.href); alert('Link copied!'); }} className="bg-blue-600 hover:bg-blue-700 h-10 px-4">
                         <Share2 className="w-4 h-4 mr-2" /> Share
                     </Button>
+
                 </div>
             </div>
 
@@ -336,7 +340,7 @@ export default function Show({ invoice }) {
                         {invoice.status !== 'paid' && (
                             <div className="mt-4 pt-4 border-t border-gray-100 flex justify-between items-center">
                                 <span className="text-xs font-bold text-gray-500 uppercase tracking-wider">Delivery Status</span>
-                                <Button variant="outline" size="sm" className="h-7 text-xs border-blue-200 text-blue-700 bg-blue-50 hover:bg-blue-100">
+                                <Button onClick={() => { const s = prompt('Enter status (done, processing, pending):', invoice.job_status || 'pending'); if(s) router.post(route('admin.invoices.change-job-status', invoice.id), { status: s }); }} variant="outline" size="sm" className="h-7 text-xs border-blue-200 text-blue-700 bg-blue-50 hover:bg-blue-100">
                                     Update Status
                                 </Button>
                             </div>
@@ -358,7 +362,7 @@ export default function Show({ invoice }) {
                         </div>
                         <div className="text-xs font-bold text-gray-500 uppercase tracking-wider text-center">Total Billable Hours</div>
                         
-                        <Button variant="link" className="mt-4 text-blue-600 font-bold hover:text-blue-800">
+                        <Button onClick={() => alert('Timer module not enabled for Admin.')} variant="link" className="mt-4 text-blue-600 font-bold hover:text-blue-800">
                             <Plus className="w-3 h-3 mr-1" /> Add Manual Entry
                         </Button>
                     </CardContent>
@@ -430,13 +434,13 @@ export default function Show({ invoice }) {
                             <Button onClick={handleAddSimpleItem} variant="outline" size="sm" className="flex-1 sm:flex-none border-dashed hover:border-blue-300 hover:text-blue-600 hover:bg-blue-50">
                                 <Plus className="w-4 h-4 mr-2 text-blue-500" /> Simple Item
                             </Button>
-                            <Button variant="secondary" size="sm" className="hidden sm:flex bg-gray-100 text-gray-700 hover:bg-gray-200">
+                            <Button onClick={() => alert('Timer module not enabled for Admin.')} variant="secondary" size="sm" className="hidden sm:flex bg-gray-100 text-gray-700 hover:bg-gray-200">
                                 <Clock className="w-4 h-4 mr-2" /> Log Time
                             </Button>
                         </div>
                     </div>
-                    <Button variant="outline" size="sm" className="w-full md:w-auto border-dashed border-green-300 text-green-700 hover:bg-green-50">
-                        <CreditCard className="w-4 h-4 mr-2" /> External Payment
+                    <Button onClick={() => { if(confirm('Mark invoice as paid?')) router.post(route('admin.invoices.mark-paid', invoice.id)); }} variant="outline" size="sm" className="w-full md:w-auto border-dashed border-green-300 text-green-700 hover:bg-green-50">
+                        <CreditCard className="w-4 h-4 mr-2" /> Mark as Paid
                     </Button>
                 </div>
             )}
@@ -484,23 +488,14 @@ export default function Show({ invoice }) {
                                         {index + 1}
                                     </td>
                                     <td className="px-4 py-3">
-                                        {item.item_type === 'timer' && item.id ? (
-                                            <a href={route('admin.invoices.timer_details', { item_id: item.id })} className="hover:opacity-80 transition-opacity">
-                                                <span className="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold bg-yellow-100 text-yellow-800">
-                                                    <Clock className="w-3 h-3 mr-1" />
-                                                    <span className="capitalize">{item.item_type}</span>
-                                                </span>
-                                            </a>
-                                        ) : (
-                                            <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold ${
-                                                item.item_type === 'timer' ? 'bg-yellow-100 text-yellow-800' :
-                                                item.item_type === 'quantity' ? 'bg-blue-100 text-blue-800' :
-                                                'bg-gray-100 text-gray-800'
-                                            }`}>
-                                                {item.item_type === 'timer' && <Clock className="w-3 h-3 mr-1" />}
-                                                <span className="capitalize">{item.item_type}</span>
-                                            </span>
-                                        )}
+                                        <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold ${
+                                            item.item_type === 'timer' ? 'bg-yellow-100 text-yellow-800' :
+                                            item.item_type === 'quantity' ? 'bg-blue-100 text-blue-800' :
+                                            'bg-gray-100 text-gray-800'
+                                        }`}>
+                                            {item.item_type === 'timer' && <Clock className="w-3 h-3 mr-1" />}
+                                            <span className="capitalize">{item.item_type}</span>
+                                        </span>
                                     </td>
                                     <td className="px-4 py-3 font-medium text-gray-900">
                                         {isEditing ? (
@@ -526,7 +521,7 @@ export default function Show({ invoice }) {
                                                 />
                                             </div>
                                         ) : (
-                                            <span className="text-gray-900">{formatCurrency(item.amount, item.currency)}</span>
+                                            <span className="text-gray-900">{formatCurrency(item.item_type === 'timer' ? (item.total_amount || 0) : item.amount, item.currency)}</span>
                                         )}
                                     </td>
                                     <td className="px-4 py-3 text-center">
@@ -545,7 +540,7 @@ export default function Show({ invoice }) {
                                         )}
                                     </td>
                                     <td className="px-4 py-3 text-right font-bold text-gray-900">
-                                        {formatCurrency((parseFloat(item.amount) || 0) * (parseInt(item.qty) || 1), item.currency)}
+                                        {formatCurrency(item.item_type === 'timer' ? (item.total_amount || 0) : (parseFloat(item.amount) || 0) * (parseInt(item.qty) || 1), item.currency)}
                                     </td>
                                     {isEditing && (
                                         <td className="px-4 py-3 text-center">

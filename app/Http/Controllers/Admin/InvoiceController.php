@@ -420,4 +420,25 @@ class InvoiceController extends Controller
 
         return redirect()->back()->with('success', 'Bulk action applied successfully.');
     }
+
+    /**
+     * Download the invoice as a PDF.
+     */
+    public function downloadPdf(Invoice $invoice)
+    {
+        $invoice->loadMissing(['user.projects', 'project', 'items.timers', 'costLines.creditUser']);
+        $pdf = \App\Helpers\TextHelper::pdfInvoice($invoice);
+        $clientName = $invoice->user ? $invoice->user->name : 'Client';
+        return $pdf->download(str_replace(' ', '-', $clientName) . '-' . $invoice->invoice_number . '.pdf');
+    }
+
+    /**
+     * Print/stream the invoice as a PDF.
+     */
+    public function printPdf(Invoice $invoice)
+    {
+        $invoice->loadMissing(['user.projects', 'project', 'items.timers', 'costLines.creditUser']);
+        $pdf = \App\Helpers\TextHelper::pdfInvoice($invoice);
+        return $pdf->stream();
+    }
 }

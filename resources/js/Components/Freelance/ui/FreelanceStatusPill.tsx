@@ -5,7 +5,7 @@ import { __ } from '@/lib/i18n';
 
 export type FreelanceStatus = 'pending' | 'accepted' | 'rejected' | 'active' | 'completed' | 'disputed' | 'terminated' | string;
 
-const STATUS_CONFIG: Record<string, { label: string; icon: React.ElementType; className: string }> = {
+export const STATUS_CONFIG: Record<string, { label: string; icon: React.ElementType; className: string }> = {
     pending:    { label: 'Pending',    icon: Clock,        className: 'bg-amber-50 text-amber-700 border-amber-200' },
     accepted:   { label: 'Accepted',   icon: CheckCircle2, className: 'bg-emerald-50 text-emerald-700 border-emerald-200' },
     rejected:   { label: 'Rejected',   icon: XCircle,      className: 'bg-red-50 text-red-700 border-red-200' },
