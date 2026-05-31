@@ -70,7 +70,7 @@
                     <label class="relative block">
                         <input type="radio" name="payment_method" value="instapay" data-phone="{{ $instapayPhone ?? ($phone ?? '') }}" class="peer sr-only payment-method-radio" required>
                         <div class="method-label border-2 border-gray-200 rounded-xl p-3 text-center flex flex-col items-center justify-center opacity-70 peer-checked:opacity-100 peer-checked:border-indigo-600 peer-checked:bg-indigo-50 peer-checked:shadow-sm">
-                            <img src="https://play-lh.googleusercontent.com/9C0DttWn3kED_0L2OQd-p0R_Q3m1Q13i-M-65wD_lIq806oHh4g6vK1o6L7Kk-b29pU" alt="Instapay" class="h-8 object-contain rounded mb-1">
+                            <img src="{{ asset('assets/images/gateways/instapay.png') }}" alt="Instapay" class="h-8 object-contain rounded mb-1">
                             <span class="text-xs font-bold text-gray-700">إنستاباي</span>
                         </div>
                     </label>
@@ -80,7 +80,7 @@
                     <label class="relative block">
                         <input type="radio" name="payment_method" value="vodafone_cash" data-phone="{{ $vodafonePhone ?? ($phone ?? '') }}" class="peer sr-only payment-method-radio" required>
                         <div class="method-label border-2 border-gray-200 rounded-xl p-3 text-center flex flex-col items-center justify-center opacity-70 peer-checked:opacity-100 peer-checked:border-indigo-600 peer-checked:bg-indigo-50 peer-checked:shadow-sm">
-                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/Vodafone_logo.svg/1200px-Vodafone_logo.svg.png" alt="Vodafone Cash" class="h-8 object-contain mb-1">
+                            <img src="{{ asset('assets/images/gateways/vodafone-cash.svg') }}" alt="Vodafone Cash" class="h-8 object-contain mb-1">
                             <span class="text-xs font-bold text-gray-700">فودافون كاش / محافظ</span>
                         </div>
                     </label>
