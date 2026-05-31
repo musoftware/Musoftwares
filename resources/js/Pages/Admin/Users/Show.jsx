@@ -277,7 +277,7 @@ export default function Show({ client, stats = {}, wallets, modulePlans = [], su
                                 <span>Swap Budgets</span>
                             </DropdownMenuItem>
                             <DropdownMenuItem asChild>
-                                <a href={`/clients/balance_sheet_print?user=${client.id}`} target="_blank" rel="noopener noreferrer" className="w-full cursor-pointer flex items-center">
+                                <a href={`/admin/users/${client.id}/balance-sheet`} target="_blank" rel="noopener noreferrer" className="w-full cursor-pointer flex items-center">
                                     <FileText className="mr-2 h-4 w-4" />
                                     <span>Due Balance Sheet</span>
                                 </a>

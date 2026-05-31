@@ -39,7 +39,7 @@ const filterByOptions = [
     { value: 'id', label: 'ID' },
     { value: 'client_name', label: 'Customer Name' },
     { value: 'date', label: 'Date' },
-    { value: 'total', label: 'Total' },
+
     { value: 'status', label: 'Invoice Status' },
     { value: 'unlinked', label: 'Unlinked Projects' }
 ];
@@ -283,7 +283,7 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
                 <CardContent className="p-4">
                     <div className="flex flex-col gap-4 md:flex-row md:items-end">
                         {filters.client_id && (
-                            <Link href={route('admin.invoices.create', { user: filters.client_id, project: filters.project_id })}>
+                            <Link href={`/admin/invoices?client_id=${filters.client_id}${filters.project_id ? `&project_id=${filters.project_id}` : ''}`}>
                                 <Button size="sm">
                                     <Plus className="mr-2 h-4 w-4" /> Add Invoice
                                 </Button>
@@ -448,14 +448,14 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
                                                     </DropdownMenuItem>
                                                     
                                                     <DropdownMenuItem asChild>
-                                                        <Link href={`/admin/invoices/create?client_id=${invoice.user_id}${invoice.project_id ? `&project_id=${invoice.project_id}` : ''}`} className="flex w-full items-center">
+                                                        <Link href={`/admin/invoices/create?client_id=${invoice.user_id || invoice.user?.id}${(invoice.project_id || invoice.project?.id) ? `&project_id=${invoice.project_id || invoice.project?.id}` : ''}`} className="flex w-full items-center">
                                                             <Plus className="mr-2 h-4 w-4 text-emerald-500" />
                                                             New Invoice
                                                         </Link>
                                                     </DropdownMenuItem>
                                                     
                                                     <DropdownMenuItem asChild>
-                                                        <Link href={`/admin/invoices?client_id=${invoice.user_id}`} className="flex w-full items-center">
+                                                        <Link href={`/admin/invoices?client_id=${invoice.user_id || invoice.user?.id}`} className="flex w-full items-center">
                                                             <List className="mr-2 h-4 w-4 text-slate-500" />
                                                             All Invoices
                                                         </Link>
@@ -465,13 +465,13 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
                                                 
                                                     <DropdownMenuLabel>Client Reports</DropdownMenuLabel>
                                                     <DropdownMenuItem asChild>
-                                                        <a href={`/clients/balance_sheet_print?user=${invoice.user_id}`} target="_blank" rel="noopener noreferrer" className="flex w-full items-center">
+                                                        <a href={`/admin/users/${invoice.user_id || invoice.user?.id}/balance-sheet`} target="_blank" rel="noopener noreferrer" className="flex w-full items-center">
                                                             <Receipt className="mr-2 h-4 w-4 text-sky-500" />
                                                             Due Balance Sheet
                                                         </a>
                                                     </DropdownMenuItem>
                                                     <DropdownMenuItem asChild>
-                                                        <a href={`/clients/timer_sheet_print?user=${invoice.user_id}`} target="_blank" rel="noopener noreferrer" className="flex w-full items-center">
+                                                        <a href={`/admin/users/${invoice.user_id || invoice.user?.id}/reports`} target="_blank" rel="noopener noreferrer" className="flex w-full items-center">
                                                             <Clock className="mr-2 h-4 w-4 text-amber-500" />
                                                             Timer Balance Sheet
                                                         </a>
@@ -481,13 +481,13 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
                                                 
                                                     <DropdownMenuLabel>Profile & Tasks</DropdownMenuLabel>
                                                     <DropdownMenuItem asChild>
-                                                        <a href={`/admin/users/${invoice.user_id}`} target="_blank" rel="noopener noreferrer" className="flex w-full items-center">
+                                                        <a href={`/admin/users/${invoice.user_id || invoice.user?.id}`} target="_blank" rel="noopener noreferrer" className="flex w-full items-center">
                                                             <User className="mr-2 h-4 w-4 text-blue-500" />
                                                             User Profile
                                                         </a>
                                                     </DropdownMenuItem>
                                                     <DropdownMenuItem asChild>
-                                                        <Link href={`/admin/users/${invoice.user_id}/tasks/assign`} className="flex w-full items-center">
+                                                        <Link href={`/admin/users/${invoice.user_id || invoice.user?.id}/tasks/add`} className="flex w-full items-center">
                                                             <ClipboardList className="mr-2 h-4 w-4 text-emerald-500" />
                                                             Add Tasks
                                                         </Link>
@@ -524,7 +524,7 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
                                         <TableCell className="text-right" data-label="Total Amount">
                                             {formatCurrency(
                                                 invoices.data.reduce((sum, inv) => sum + (Number(inv.business_amount) || Number(inv.amount) || 0), 0),
-                                                invoices.data[0]?.business_currency || invoices.data[0]?.currency || 'USD'
+                                                invoices.data[0]?.business_currency || invoices.data[0]?.currency
                                             )}
                                         </TableCell>
                                         <TableCell colSpan={3} className="hidden sm:table-cell"></TableCell>

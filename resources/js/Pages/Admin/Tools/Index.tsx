@@ -11,6 +11,7 @@ import {
     Download, Users, Star, Tag, BarChart3, Settings,
     Layers, ChevronLeft, ChevronRight, Clock,
 } from 'lucide-react';
+import { Switch } from '@/Components/ui/switch';
 
 interface Tool {
     id: number;
@@ -191,16 +192,11 @@ export default function AdminToolsIndex({ tools, categories }: Props) {
                                                     <div className="flex items-center justify-end gap-1.5">
                                                         {!tool.deleted_at && (
                                                             <>
-                                                                <button
-                                                                    onClick={() => toggleActive(tool)}
+                                                                <Switch
+                                                                    checked={tool.is_active}
+                                                                    onCheckedChange={() => toggleActive(tool)}
                                                                     title={tool.is_active ? 'Deactivate' : 'Activate'}
-                                                                    className="p-1.5 rounded-md text-text-muted hover:text-text-primary hover:bg-surface-raised transition-colors"
-                                                                >
-                                                                    {tool.is_active
-                                                                        ? <ToggleRight className="h-4 w-4 text-emerald-500" />
-                                                                        : <ToggleLeft className="h-4 w-4" />
-                                                                    }
-                                                                </button>
+                                                                />
 
                                                                 <Link
                                                                     href={route('admin.tools.edit', tool.id)}

@@ -2,8 +2,9 @@ import React, { useState, useEffect, useRef } from 'react';
 import {
     Bot, Brain, MessageSquare, Settings, Plus, Play, Square,
     Zap, Globe, Key, RefreshCw, AlertCircle, CheckCircle2,
-    ChevronDown, X, Mic, ToggleLeft, ToggleRight
+    ChevronDown, X, Mic
 } from 'lucide-react';
+import { Switch } from '@/Components/ui/switch';
 import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
 import { Badge } from '@/Components/ui/badge';
@@ -32,9 +33,10 @@ function AgentCard({ agent, onToggle, onEdit }: { agent: any; onToggle: () => vo
                     </div>
                     <p className="text-xs text-slate-500 line-clamp-1">{agent.number}</p>
                 </div>
-                <Button variant="ghost" size="icon" onClick={onToggle} className="h-6 w-6 text-slate-500 hover:text-white hover:bg-transparent transition-colors">
-                    {agent.active ? <ToggleRight className="w-5 h-5 text-indigo-400" /> : <ToggleLeft className="w-5 h-5" />}
-                </Button>
+                <Switch 
+                    checked={agent.active}
+                    onCheckedChange={onToggle}
+                />
             </div>
 
             <div className="flex flex-wrap gap-1.5 mb-4">

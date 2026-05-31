@@ -3,14 +3,31 @@
 use Illuminate\Support\Facades\Route;
 use Modules\SmsPaymentGateway\Http\Controllers\SmsPaymentGatewayController;
 use Modules\SmsPaymentGateway\Http\Controllers\WidgetController;
+use Modules\SmsPaymentGateway\Http\Controllers\HostedCheckoutController;
 
-// Public Widget Routes
+// ─── Public Widget Routes (Legacy) ─────────────────
 Route::middleware(['web'])->prefix('sms-payment-gateway')->name('sms-payment-gateway.')->group(function () {
     Route::get('checkout/{uuid}', [WidgetController::class, 'show'])->name('widget.show');
     Route::get('checkout/{uuid}/status', [WidgetController::class, 'status'])->name('widget.status');
     Route::post('checkout/{uuid}/verify', [WidgetController::class, 'verify'])->name('widget.verify');
 });
 
+// ─── Hosted Checkout (Stripe-like, public) ─────────
+Route::middleware(['web'])->group(function () {
+    Route::get('/pay/{sessionId}', [HostedCheckoutController::class, 'show'])->name('sms-gateway.checkout.show');
+    Route::post('/pay/{sessionId}/verify', [HostedCheckoutController::class, 'verify'])->name('sms-gateway.checkout.verify');
+    Route::get('/pay/{sessionId}/status', [HostedCheckoutController::class, 'status'])->name('sms-gateway.checkout.status');
+    
+    Route::get('/js/smspay.js', function () {
+        $path = module_path('SmsPaymentGateway', 'resources/assets/js/smspay.js');
+        if (!file_exists($path)) {
+            abort(404);
+        }
+        return response()->file($path, ['Content-Type' => 'application/javascript']);
+    })->name('sms-gateway.widget.js');
+});
+
+// ─── Authenticated Dashboard Routes ────────────────
 Route::middleware(['web', 'auth', 'verified', 'onboarding', 'subscription:sms-payment-gateway'])->prefix('sms-payment-gateway')->name('sms-payment-gateway.')->group(function () {
     Route::get('/', [SmsPaymentGatewayController::class, 'index'])->name('index');
     Route::get('devices', [SmsPaymentGatewayController::class, 'devices'])->name('devices');
@@ -43,5 +60,12 @@ Route::middleware(['web', 'auth', 'verified', 'onboarding', 'subscription:sms-pa
     Route::delete('test-mode/clear-data', [SmsPaymentGatewayController::class, 'clearTestData'])->name('test-mode.clear-data');
 
     Route::get('sms-simulator', [SmsPaymentGatewayController::class, 'smsSimulator'])->name('sms-simulator');
+
+    // ─── API Keys Management ───────────────────────
+    Route::get('api-keys', [SmsPaymentGatewayController::class, 'apiKeys'])->name('api-keys');
+    Route::post('api-keys', [SmsPaymentGatewayController::class, 'createApiKey'])->name('api-keys.store');
+    Route::delete('api-keys/{id}', [SmsPaymentGatewayController::class, 'deleteApiKey'])->name('api-keys.delete');
+    Route::post('api-keys/{id}/roll', [SmsPaymentGatewayController::class, 'rollApiKey'])->name('api-keys.roll');
 });
+
 

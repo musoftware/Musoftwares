@@ -284,6 +284,8 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
     Route::get('/invoices', [\App\Http\Controllers\Admin\InvoiceController::class, 'index'])->name('invoices.index');
     Route::get('/invoices/unpaid', [\App\Http\Controllers\Admin\InvoiceController::class, 'unpaid'])->name('invoices.unpaid');
     Route::get('/invoices/archive', [\App\Http\Controllers\Admin\InvoiceController::class, 'archive'])->name('invoices.archive');
+    Route::get('/invoices/create', [\App\Http\Controllers\Admin\InvoiceController::class, 'create'])->name('invoices.create');
+    Route::get('/invoices/timer-details/{item_id}', [\App\Http\Controllers\Admin\InvoiceController::class, 'timerDetails'])->name('invoices.timer-details');
     Route::post('/invoices/bulk-action', [\App\Http\Controllers\Admin\InvoiceController::class, 'bulkAction'])->name('invoices.bulk-action');
     Route::get('/invoices/{invoice}', [\App\Http\Controllers\Admin\InvoiceController::class, 'show'])->name('invoices.show');
     Route::get('/invoices/{invoice}/download-pdf', [\App\Http\Controllers\Admin\InvoiceController::class, 'downloadPdf'])->name('invoices.download-pdf');
@@ -294,6 +296,8 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
     Route::post('/invoices/{invoice}/cancel', [\App\Http\Controllers\Admin\InvoiceController::class, 'cancel'])->name('invoices.cancel');
     Route::post('/invoices/{invoice}/change-status', [\App\Http\Controllers\Admin\InvoiceController::class, 'changeStatus'])->name('invoices.change-status');
     Route::post('/invoices/{invoice}/change-job-status', [\App\Http\Controllers\Admin\InvoiceController::class, 'changeJobStatus'])->name('invoices.change-job-status');
+    Route::get('/invoices/{invoice}/notify', [\App\Http\Controllers\Admin\InvoiceController::class, 'notify'])->name('invoices.notify');
+    Route::post('/invoices/{invoice}/partial-pay', [\App\Http\Controllers\Admin\InvoiceController::class, 'partialPay'])->name('invoices.partial-pay');
 
 
 
@@ -421,6 +425,8 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
     Route::get('/users/reports/{id}', [\App\Http\Controllers\Admin\UsersController::class, 'reports'])->name('users.reports');
     Route::get('/users/{id}/tasks/add', [\App\Http\Controllers\Admin\UsersController::class, 'add_task'])->name('users.tasks.add');
     
+    Route::get('/users/{id}/balance-sheet', [\App\Http\Controllers\Admin\UsersController::class, 'balanceSheetPrint'])->name('users.balance-sheet');
+
     Route::get('/users/{id}', [\App\Http\Controllers\Admin\UsersController::class, 'show'])->name('users.show');
     Route::get('/users/{id}/edit', [\App\Http\Controllers\Admin\UsersController::class, 'edit'])->name('users.edit');
     Route::put('/users/{id}', [\App\Http\Controllers\Admin\UsersController::class, 'update'])->name('users.update');
@@ -472,12 +478,16 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
 
     // Software registry (auto-created by API, admin manages default_status)
     Route::get('/serial-softwares', [\App\Http\Controllers\Admin\SerialSoftwareController::class, 'index'])->name('serial-softwares.index');
+    Route::get('/serial-softwares/export', [\App\Http\Controllers\Admin\SerialSoftwareController::class, 'export'])->name('serial-softwares.export');
     Route::post('/serial-softwares', [\App\Http\Controllers\Admin\SerialSoftwareController::class, 'store'])->name('serial-softwares.store');
     Route::patch('/serial-softwares/{serialSoftware}/status', [\App\Http\Controllers\Admin\SerialSoftwareController::class, 'updateStatus'])->name('serial-softwares.status');
     Route::delete('/serial-softwares/{serialSoftware}', [\App\Http\Controllers\Admin\SerialSoftwareController::class, 'destroy'])->name('serial-softwares.destroy');
 
     // Device registry (auto-created by API check-in, admin manages status)
     Route::get('/serial-devices', [\App\Http\Controllers\Admin\SerialDeviceController::class, 'index'])->name('serial-devices.index');
+    Route::get('/serial-devices/export', [\App\Http\Controllers\Admin\SerialDeviceController::class, 'export'])->name('serial-devices.export');
+    Route::post('/serial-devices/bulk-status', [\App\Http\Controllers\Admin\SerialDeviceController::class, 'bulkUpdateStatus'])->name('serial-devices.bulk-status');
+    Route::post('/serial-devices/bulk-delete', [\App\Http\Controllers\Admin\SerialDeviceController::class, 'bulkDelete'])->name('serial-devices.bulk-delete');
     Route::patch('/serial-devices/{serialDevice}/status', [\App\Http\Controllers\Admin\SerialDeviceController::class, 'updateStatus'])->name('serial-devices.status');
     Route::delete('/serial-devices/{serialDevice}', [\App\Http\Controllers\Admin\SerialDeviceController::class, 'destroy'])->name('serial-devices.destroy');
 

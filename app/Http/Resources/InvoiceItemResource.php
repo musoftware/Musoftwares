@@ -20,7 +20,7 @@ class InvoiceItemResource extends JsonResource
             'item_type' => $this->item_type,
             'qty' => $this->qty,
             'amount' => $this->amount,
-            'currency' => \App\Models\Currency::find($this->invoice?->currency)?->currency ?? 'USD',
+            'currency' => \App\Models\Currency::find($this->invoice?->currency)?->currency,
             'total_amount' => $this->total(),
             'created_at' => $this->created_at,
         ];

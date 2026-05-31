@@ -12,8 +12,9 @@ import { EmptyState } from '@/Components/ui/EmptyState';
 import {
     Users, DollarSign, Copy, Check, ExternalLink, ArrowLeft,
     ShieldAlert, ShieldCheck, Shield, UserX, UserCheck,
-    TrendingUp, TrendingDown, Store, RefreshCw, ToggleLeft, ToggleRight, Wifi
+    TrendingUp, TrendingDown, Store, RefreshCw, Wifi
 } from 'lucide-react';
+import { Switch } from '@/Components/ui/switch';
 
 import { formatMoney as formatCurrency } from '@/lib/utils';
 
@@ -222,13 +223,15 @@ export default function ResellersShow({ reseller, subUsers, transactions, sharin
                                                     <StatusBadge status={statusMap[u.status] || 'neutral'} label={u.status.replace('_', ' ')} size="sm" />
                                                 </td>
                                                 <td className="px-4 py-3.5">
-                                                    <button onClick={() => toggleCheck(u.user_id)} className="flex items-center gap-1.5 text-xs">
-                                                        {u.sharing_check_enabled ? (
-                                                            <><ToggleRight className="w-4 h-4 text-primary" /> <span className="text-primary font-medium">Protected</span></>
-                                                        ) : (
-                                                            <><ToggleLeft className="w-4 h-4 text-text-muted" /> <span className="text-text-muted">Disabled</span></>
-                                                        )}
-                                                    </button>
+                                                    <div className="flex items-center gap-2">
+                                                        <Switch
+                                                            checked={u.sharing_check_enabled}
+                                                            onCheckedChange={() => toggleCheck(u.user_id)}
+                                                        />
+                                                        <span className={`text-xs ${u.sharing_check_enabled ? 'text-primary font-medium' : 'text-text-muted'}`}>
+                                                            {u.sharing_check_enabled ? 'Protected' : 'Disabled'}
+                                                        </span>
+                                                    </div>
                                                 </td>
                                                 <td className="px-4 py-3.5 text-xs text-text-muted">{u.joined_at}</td>
                                                 <td className="px-4 py-3.5 text-right">

@@ -10,7 +10,8 @@ import { Switch } from '@/Components/ui/switch';
 import { Badge } from '@/Components/ui/badge';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/Components/ui/card';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/Components/ui/tabs';
-import { Calendar, Clock, Plus, Users, User, Mail, Phone, Stethoscope, Settings, Check, X, ShieldAlert, ArrowRight, Save, Trash2, Edit2, ToggleLeft, ToggleRight, CalendarOff } from 'lucide-react';
+import { Calendar, Clock, Plus, Users, User, Mail, Phone, Stethoscope, Settings, Check, X, ShieldAlert, ArrowRight, Save, Trash2, Edit2, CalendarOff } from 'lucide-react';
+import { Switch } from '@/Components/ui/switch';
 
 interface EventType {
     id: number;
@@ -525,13 +526,12 @@ export default function Providers({ providers, eventTypes }: { providers: Bookin
                                                             </div>
                                                         </div>
 
-                                                        <button 
-                                                            onClick={() => toggleProviderActive(provider)}
-                                                            className={`touch-target p-1 rounded-md transition-colors flex items-center justify-center ${provider.is_active ? 'text-emerald-600 hover:bg-emerald-50' : 'text-slate-400 hover:bg-slate-100'}`}
-                                                            title={provider.is_active ? 'Set Inactive' : 'Set Active'}
-                                                        >
-                                                            {provider.is_active ? <ToggleRight className="w-7 h-7" /> : <ToggleLeft className="w-7 h-7" />}
-                                                        </button>
+                                                        <div className="flex items-center" title={provider.is_active ? 'Set Inactive' : 'Set Active'}>
+                                                            <Switch
+                                                                checked={provider.is_active}
+                                                                onCheckedChange={() => toggleProviderActive(provider)}
+                                                            />
+                                                        </div>
                                                     </div>
 
                                                     <div className="mt-4 space-y-2 text-sm text-slate-600 border-t border-slate-100 pt-3">

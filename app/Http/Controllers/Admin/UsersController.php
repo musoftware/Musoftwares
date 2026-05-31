@@ -722,6 +722,27 @@ class UsersController extends Controller
     }
 
     /**
+     * Generate a printable PDF balance sheet for a user showing unpaid invoices.
+     * Recovered from old project: UsersController::balance_sheet_print()
+     */
+    public function balanceSheetPrint($id)
+    {
+        $user = User::find($id);
+
+        if (!$user) {
+            return redirect()->route('admin.users.index')
+                ->with('error', __('errors.no_client_with_id'));
+        }
+
+        $invoices = $user->invoices()->whereIn('status', ['unpaid', 'partially_paid'])->get();
+
+        $unpaid = $user->unpaid_invoices_amount(true);
+
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('admin.users.balance_sheet_print', compact('user', 'unpaid', 'invoices'));
+        return $pdf->stream(__('Balance Sheet') . ' - ' . $user->name . '.pdf');
+    }
+
+    /**
      * Platform-wide Earning Analysis.
      * All business logic is delegated to EarningAnalyzeService.
      */

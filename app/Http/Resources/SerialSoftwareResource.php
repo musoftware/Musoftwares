@@ -13,10 +13,12 @@ class SerialSoftwareResource extends JsonResource
             'id'             => $this->id,
             'name'           => $this->name,
             'default_status' => $this->default_status,
-            'total_licenses' => $this->devices_count ?? 0,
-            'active_count'   => $this->devices()->where('status', 'active')->count(),
-            'inactive_count' => $this->devices()->where('status', 'inactive')->count(),
+            'total_devices'  => $this->total_devices ?? 0,
+            'active_count'   => $this->active_count ?? 0,
+            'inactive_count' => $this->inactive_count ?? 0,
+            'blocked_count'  => $this->blocked_count ?? 0,
             'created_at'     => $this->created_at?->diffForHumans(),
+            'created_at_full' => $this->created_at?->toDateTimeString(),
         ];
     }
 }
