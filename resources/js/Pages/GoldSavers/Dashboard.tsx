@@ -27,10 +27,13 @@ interface Wallet {
 }
 
 interface GoldPrice {
+    id?: number;
+    price_ounce_usd?: number;
     price_gram_24k: number;
+    price_gram_22k?: number;
     price_gram_21k: number;
     price_gram_18k: number;
-    currency_id?: number; // Adjust according to new schema
+    currency?: string;
     fetched_at?: string;
 }
 
@@ -167,14 +170,14 @@ export default function Dashboard({ wallets, latestPrice, portfolio, hasLivePric
                                 {!hasSmartInsights && <span className="px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 text-xs font-semibold uppercase">{__('Premium')}</span>}
                             </CardTitle>
                         </CardHeader>
-                        <CardContent>
+                        <CardContent className="min-h-[250px] flex flex-col justify-center">
                             {!hasSmartInsights ? (
                                 <div className="absolute inset-0 bg-white/60 backdrop-blur-[2px] flex items-center justify-center z-10 flex-col gap-2 rounded-xl">
                                     <div className="bg-white p-3 rounded-full shadow-sm border text-indigo-600">
                                         <Lock className="w-6 h-6" />
                                     </div>
                                     <p className="font-medium text-slate-800">{__('Upgrade To See Insights')}</p>
-                                    <Link href={route('isaas.subscriptions.index')} className="text-sm text-indigo-600 hover:underline">
+                                    <Link href={route('subscriptions.manage')} className="text-sm text-indigo-600 hover:underline">
                                         {__('Upgrade Now')}
                                     </Link>
                                 </div>
@@ -209,14 +212,14 @@ export default function Dashboard({ wallets, latestPrice, portfolio, hasLivePric
                                 {!hasLivePrices && <span className="px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 text-xs font-semibold uppercase">{__('Premium')}</span>}
                             </CardTitle>
                         </CardHeader>
-                        <CardContent>
+                        <CardContent className="min-h-[250px] flex flex-col justify-center">
                             {!hasLivePrices ? (
                                 <div className="absolute inset-0 bg-white/60 backdrop-blur-[2px] flex items-center justify-center z-10 rounded-xl flex-col gap-2">
                                     <div className="bg-white p-3 rounded-full shadow-sm border text-indigo-600">
                                         <ExternalLink className="w-6 h-6" />
                                     </div>
                                     <p className="font-medium text-slate-800">{__('Upgrade To See Live Prices')}</p>
-                                    <Link href={route('isaas.subscriptions.index')} className="text-sm text-indigo-600 hover:underline">
+                                    <Link href={route('subscriptions.manage')} className="text-sm text-indigo-600 hover:underline">
                                         {__('Upgrade Now')}
                                     </Link>
                                 </div>
@@ -224,19 +227,28 @@ export default function Dashboard({ wallets, latestPrice, portfolio, hasLivePric
                             
                             <div className={!hasLivePrices ? "opacity-30 select-none pointer-events-none" : ""}>
                                 {latestPrice || !hasLivePrices ? (
-                                    <div className="grid grid-cols-3 gap-4 text-center relative overflow-hidden">
+                                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-center relative pt-2">
                                         {hasLivePrices && <div className="absolute top-0 right-0 w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>}
-                                        <div className="p-4 rounded-xl bg-slate-50 border hover:border-indigo-200 hover:shadow-sm transition-all cursor-default">
-                                            <div className="text-muted-foreground text-sm font-medium mb-1">24k</div>
-                                            <div className="font-bold text-lg">{latestPrice?.price_gram_24k ?? '4,050'}</div>
+                                        <div className="p-6 rounded-xl bg-white border border-slate-200 shadow-sm">
+                                            <div className="text-slate-500 text-sm font-medium mb-2">24k {__('Purity')}</div>
+                                            <div className="font-bold text-3xl text-slate-900">{latestPrice?.price_gram_24k ?? '4,050'}</div>
+                                            <div className="text-xs text-slate-400 mt-2">{latestPrice?.currency ?? 'EGP'} / {__('G')}</div>
                                         </div>
-                                        <div className="p-4 rounded-xl bg-slate-50 border hover:border-indigo-200 hover:shadow-sm transition-all cursor-default">
-                                            <div className="text-muted-foreground text-sm font-medium mb-1">21k</div>
-                                            <div className="font-bold text-lg text-indigo-700">{latestPrice?.price_gram_21k ?? '3,550'}</div>
+                                        <div className="p-6 rounded-xl bg-indigo-50 border border-indigo-100 shadow-sm relative overflow-hidden">
+                                            <div className="absolute top-0 right-0 w-3 h-3 bg-indigo-500 rounded-bl-xl opacity-20"></div>
+                                            <div className="text-indigo-600 text-sm font-medium mb-2">21k {__('Purity')}</div>
+                                            <div className="font-bold text-3xl text-indigo-700">{latestPrice?.price_gram_21k ?? '3,550'}</div>
+                                            <div className="text-xs text-indigo-400 mt-2">{latestPrice?.currency ?? 'EGP'} / {__('G')}</div>
                                         </div>
-                                        <div className="p-4 rounded-xl bg-slate-50 border hover:border-indigo-200 hover:shadow-sm transition-all cursor-default">
-                                            <div className="text-muted-foreground text-sm font-medium mb-1">18k</div>
-                                            <div className="font-bold text-lg">{latestPrice?.price_gram_18k ?? '3,040'}</div>
+                                        <div className="p-6 rounded-xl bg-white border border-slate-200 shadow-sm">
+                                            <div className="text-slate-500 text-sm font-medium mb-2">18k {__('Purity')}</div>
+                                            <div className="font-bold text-3xl text-slate-900">{latestPrice?.price_gram_18k ?? '3,040'}</div>
+                                            <div className="text-xs text-slate-400 mt-2">{latestPrice?.currency ?? 'EGP'} / {__('G')}</div>
+                                        </div>
+                                        <div className="p-6 rounded-xl bg-slate-900 border border-slate-800 shadow-sm text-white">
+                                            <div className="text-slate-400 text-sm font-medium mb-2">{__('Global Ounce')}</div>
+                                            <div className="font-bold text-3xl">{latestPrice?.price_ounce_usd ?? '2,350'}</div>
+                                            <div className="text-xs text-slate-500 mt-2">USD / {__('Ounce')}</div>
                                         </div>
                                     </div>
                                 ) : (

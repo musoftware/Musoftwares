@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Head, Link, router } from '@inertiajs/react';
-import { Copy, Mail, MessageCircle, ChevronDown, Key, Wallet, FileText, Briefcase, Trash2, Edit } from 'lucide-react';
+import { Copy, Mail, MessageCircle, ChevronDown, Key, Wallet, FileText, Briefcase, Trash2, Edit, ShieldCheck } from 'lucide-react';
 import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
 import {
     DropdownMenu,
@@ -22,7 +22,6 @@ import {
 import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
-import AdminNotesPanel from '@/Components/AdminNotesPanel';
 import { formatMoney as formatCurrency } from '@/lib/utils';
 
 export default function Show({ client, stats = {}, wallets, modulePlans = [], subscriptions = [] }) {
@@ -883,9 +882,22 @@ export default function Show({ client, stats = {}, wallets, modulePlans = [], su
                 </div>
             </div>
 
-            <div className="mt-8">
-
-                <AdminNotesPanel noteableType="App\Models\User" noteableId={client.id} />
+            <div className="mt-8 bg-white p-6 rounded-lg border border-slate-200 flex flex-col items-center justify-center space-y-4">
+                <div className="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center text-slate-500">
+                    <ShieldCheck size={24} />
+                </div>
+                <div className="text-center">
+                    <h3 className="text-lg font-bold text-slate-900 font-sora mb-1">Secure Notes</h3>
+                    <p className="text-sm text-slate-500 mb-4 max-w-md mx-auto">
+                        View and manage end-to-end encrypted notes, passwords, and sensitive information for this user.
+                    </p>
+                    <Link 
+                        href={`/admin/users/${client.id}/notes`}
+                        className="inline-flex items-center justify-center px-4 py-2 bg-slate-900 text-white font-semibold rounded-lg hover:bg-slate-800 transition"
+                    >
+                        Open Secure Notes
+                    </Link>
+                </div>
             </div>
         </AdminSidebarLayout>
     );

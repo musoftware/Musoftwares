@@ -975,5 +975,8 @@
     "to": "to",
     "of": "of",
     "results": "results",
-    "Device": "Device"
+    "Device": "Device",
+    "Manage your secret and publishable keys for API integration.": "Manage your secret and publishable keys for API integration.",
+    "Integration Docs": "Integration Docs",
+    "Learn how to connect your application to the gateway.": "Learn how to connect your application to the gateway."
 }

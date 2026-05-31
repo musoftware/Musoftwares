@@ -116,7 +116,25 @@ const items = [
 ];
 
 export function AppSidebar() {
-  const { url } = usePage();
+  const { url, props } = usePage();
+  const { auth } = props as any;
+  const userRoles = auth?.user?.roles || [];
+  
+  // If the user is purely a moderator and not an admin
+  const isOnlyModerator = userRoles.includes('moderator') && !userRoles.includes('admin') && !userRoles.includes('super_admin');
+
+  // Filter items for moderators to ONLY see Operations -> Tickets
+  const visibleItems = isOnlyModerator
+    ? items.map(item => {
+        if (item.title === 'Operations') {
+            return {
+                ...item,
+                subItems: item.subItems?.filter(sub => sub.title === 'Tickets')
+            };
+        }
+        return null;
+    }).filter(Boolean) as typeof items
+    : items;
 
   return (
     <Sidebar>
@@ -131,7 +149,7 @@ export function AppSidebar() {
           <SidebarGroupLabel className="px-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Application</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {items.map((item) => {
+              {visibleItems.map((item) => {
                 const isActive = url === item.url || url.startsWith(item.url + '/');
                 const hasSubItems = item.subItems && item.subItems.length > 0;
                 const isGroupActive = isActive || (hasSubItems && item.subItems.some(subItem => url === subItem.url || url.startsWith(subItem.url + '/')));

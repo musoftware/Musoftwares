@@ -107,7 +107,7 @@ export default function Webhooks({ webhook }: WebhooksProps) {
                             </CardContent>
                             <CardFooter className="flex justify-between border-t p-4 bg-slate-50">
                                 {webhook ? (
-                                    <Button type="button" variant="destructive" onClick={handleDelete} className="bg-rose-600 hover:bg-rose-700">
+                                    <Button type="button" variant="destructive" onClick={handleDelete} className="bg-rose-600 hover:bg-rose-700 text-white">
                                         <Trash2 className="w-4 h-4 mr-2" />
                                         Remove Webhook
                                     </Button>

@@ -7,7 +7,7 @@ import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
 
 export default function Edit({ user, currencies = [], plans = [] }) {
-    const { data, setData, patch, processing, errors } = useForm({
+    const { data, setData, put, processing, errors } = useForm({
         name: user.name || '',
         full_name: user.full_name || '',
         email: user.email || '',
@@ -51,7 +51,7 @@ export default function Edit({ user, currencies = [], plans = [] }) {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        patch(`/admin/users/${user.id}`);
+        put(`/admin/users/${user.id}`);
     };
 
     const handleCheckboxChange = (e) => {

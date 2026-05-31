@@ -120,6 +120,36 @@ export default function ClientTasks({ clients, selectedClient, todos, filters }:
         });
     };
 
+    const handleQuickSchedule = (hours: number) => {
+        const now = new Date();
+        const end = new Date(now.getTime() + hours * 60 * 60 * 1000);
+        
+        const formatLocal = (d: Date) => {
+            return new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+        };
+
+        setCreateForm({
+            ...createForm,
+            start_at: formatLocal(now),
+            end_at: formatLocal(end)
+        });
+    };
+
+    const handleQuickScheduleExisting = (hours: number) => {
+        const now = new Date();
+        const end = new Date(now.getTime() + hours * 60 * 60 * 1000);
+        
+        const formatLocal = (d: Date) => {
+            return new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+        };
+
+        setScheduleForm({
+            ...scheduleForm,
+            start_at: formatLocal(now),
+            end_at: formatLocal(end)
+        });
+    };
+
     const handleCreateSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         if (!createForm.title || !createForm.start_at || !createForm.end_at) {
@@ -418,6 +448,12 @@ export default function ClientTasks({ clients, selectedClient, todos, filters }:
                                                                         className="h-8 text-xs"
                                                                     />
                                                                 </div>
+                                                                <div className="flex flex-wrap gap-1 mt-1">
+                                                                    <Button type="button" variant="outline" size="sm" onClick={() => handleQuickScheduleExisting(1)} className="h-6 px-2 text-[10px]">1h</Button>
+                                                                    <Button type="button" variant="outline" size="sm" onClick={() => handleQuickScheduleExisting(2)} className="h-6 px-2 text-[10px]">2h</Button>
+                                                                    <Button type="button" variant="outline" size="sm" onClick={() => handleQuickScheduleExisting(3)} className="h-6 px-2 text-[10px]">3h</Button>
+                                                                    <Button type="button" variant="outline" size="sm" onClick={() => handleQuickScheduleExisting(4)} className="h-6 px-2 text-[10px]">4h</Button>
+                                                                </div>
                                                                 <div className="flex justify-end gap-2 mt-1">
                                                                     <Button 
                                                                         variant="ghost" 
@@ -596,6 +632,14 @@ export default function ClientTasks({ clients, selectedClient, todos, filters }:
                                     required
                                 />
                             </div>
+                        </div>
+                        <div className="flex flex-wrap items-center gap-2 pt-1">
+                            <span className="text-[10px] font-bold text-slate-500 uppercase">Quick Select:</span>
+                            <Button type="button" variant="outline" size="sm" onClick={() => handleQuickSchedule(1)} className="h-7 px-2.5 text-xs">1 Hour</Button>
+                            <Button type="button" variant="outline" size="sm" onClick={() => handleQuickSchedule(2)} className="h-7 px-2.5 text-xs">2 Hours</Button>
+                            <Button type="button" variant="outline" size="sm" onClick={() => handleQuickSchedule(3)} className="h-7 px-2.5 text-xs">3 Hours</Button>
+                            <Button type="button" variant="outline" size="sm" onClick={() => handleQuickSchedule(4)} className="h-7 px-2.5 text-xs">4 Hours</Button>
+                            <Button type="button" variant="outline" size="sm" onClick={() => handleQuickSchedule(8)} className="h-7 px-2.5 text-xs">8 Hours</Button>
                         </div>
                         <DialogFooter className="pt-4">
                             <Button type="button" variant="outline" onClick={() => setIsCreateModalOpen(false)}>

@@ -23,6 +23,22 @@ interface DashboardProps {
 }
 
 export default function TextPaymentGateway({ devices, webhook, token, stats, recentTransactions, androidAppUrl }: DashboardProps) {
+    const getStatusBadge = (status: string) => {
+        switch (status) {
+            case 'verified':
+            case 'paid':
+            case 'matched':
+                return <Badge className="bg-emerald-100 text-emerald-800 hover:bg-emerald-100 border-none">{__('Verified')}</Badge>;
+            case 'pending':
+                return <Badge variant="outline" className="text-amber-600 border-amber-200 bg-amber-50">{__('Pending')}</Badge>;
+            case 'ignored':
+            case 'spoofed':
+                return <Badge variant="outline" className="text-slate-500 border-slate-200 bg-slate-50">{__('Ignored')}</Badge>;
+            default:
+                return <Badge variant="outline">{status ? status : __('Pending')}</Badge>;
+        }
+    };
+
     return (
         <AuthenticatedLayout header={<h2 className="font-semibold text-xl text-gray-800 leading-tight">{__('Payment Gateway')}</h2>}>
             <Head title={__('Payment Gateway')} />
@@ -142,11 +158,11 @@ export default function TextPaymentGateway({ devices, webhook, token, stats, rec
                         <Card className="border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
                             <CardHeader>
                                 <CardTitle className="flex items-center gap-2 text-lg">
-                                    <Key className="w-5 h-5 text-emerald-500" />{__('sms_gateway.api_keys')}</CardTitle>
-                                <CardDescription>{__('sms_gateway.api_keys_description')}</CardDescription>
+                                    <Key className="w-5 h-5 text-emerald-500" />{__('API Keys')}</CardTitle>
+                                <CardDescription>{__('Manage your secret and publishable keys for API integration.')}</CardDescription>
                             </CardHeader>
                             <CardContent>
-                                <Button variant="outline" className="w-full border-emerald-200 hover:bg-emerald-50 text-emerald-700" onClick={() => router.visit(route('sms-payment-gateway.api-keys'))}>{__('sms_gateway.api_keys')}</Button>
+                                <Button variant="outline" className="w-full border-emerald-200 hover:bg-emerald-50 text-emerald-700" onClick={() => router.visit(route('sms-payment-gateway.api-keys'))}>{__('API Keys')}</Button>
                             </CardContent>
                         </Card>
 
@@ -186,11 +202,11 @@ export default function TextPaymentGateway({ devices, webhook, token, stats, rec
                         <Card className="border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
                             <CardHeader>
                                 <CardTitle className="flex items-center gap-2 text-lg">
-                                    <ExternalLink className="w-5 h-5 text-blue-500" />{__('sms_gateway.integration_docs')}</CardTitle>
-                                <CardDescription>{__('sms_gateway.docs_subtitle')}</CardDescription>
+                                    <ExternalLink className="w-5 h-5 text-blue-500" />{__('Integration Docs')}</CardTitle>
+                                <CardDescription>{__('Learn how to connect your application to the gateway.')}</CardDescription>
                             </CardHeader>
                             <CardContent>
-                                <Button variant="outline" className="w-full border-blue-200 hover:bg-blue-50 text-blue-700" onClick={() => router.visit(route('sms-payment-gateway.documentation'))}>{__('sms_gateway.integration_docs')}</Button>
+                                <Button variant="outline" className="w-full border-blue-200 hover:bg-blue-50 text-blue-700" onClick={() => router.visit(route('sms-payment-gateway.documentation'))}>{__('Integration Docs')}</Button>
                             </CardContent>
                         </Card>
 
@@ -244,11 +260,7 @@ export default function TextPaymentGateway({ devices, webhook, token, stats, rec
                                                         {txn.amount ? formatMoney(txn.amount, txn.currency || 'EGP') : '---'}
                                                     </td>
                                                     <td className="px-6 py-4 whitespace-nowrap">
-                                                        {txn.is_valid ? (
-                                                            <Badge className="bg-emerald-50 text-emerald-700 border-emerald-200">{__('Valid')}</Badge>
-                                                        ) : (
-                                                            <Badge variant="outline" className="text-amber-600 border-amber-200 bg-amber-50">{__('Pending')}</Badge>
-                                                        )}
+                                                        {getStatusBadge(txn.status)}
                                                     </td>
                                                 </tr>
                                             ))}

@@ -22,7 +22,10 @@ export default function ReportsIndex({ hasReports, wallets }: ReportsProps) {
 
     const handleDownload = (e: React.FormEvent) => {
         e.preventDefault();
-        post(route('isaas.gold-savers.reports.download'));
+        window.location.href = route('isaas.gold-savers.reports.download', {
+            wallet_id: data.wallet_id,
+            period: data.period
+        });
     };
 
     return (

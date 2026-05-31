@@ -21,6 +21,8 @@ import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
 import { Textarea } from '@/Components/ui/textarea';
 import { useToast } from '@/Components/ui/use-toast';
+import { PremiumCombobox } from '@/Components/ui/PremiumCombobox';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/Components/ui/select';
 import {
     MoreHorizontal,
     Plus,
@@ -325,41 +327,42 @@ export default function Index({ todos, filters, stats, users }: Props) {
 
     const advancedFilters = (
         <div className="flex items-center gap-2 flex-wrap">
-            <select
-                className="h-9 rounded-md border border-slate-200 bg-white px-3 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
-                value={filters.recurring || ''}
-                onChange={(e) => handleFilter('recurring', e.target.value)}
-            >
-                <option value="">All Frequencies</option>
-                <option value="day">Daily</option>
-                <option value="week">Weekly</option>
-                <option value="month">Monthly</option>
-                <option value="year">Yearly</option>
-            </select>
+            <Select value={filters.recurring || 'all'} onValueChange={(val) => handleFilter('recurring', val === 'all' ? '' : val)}>
+                <SelectTrigger className="w-[150px] bg-white h-11 rounded-xl">
+                    <SelectValue placeholder="All Frequencies" />
+                </SelectTrigger>
+                <SelectContent>
+                    <SelectItem value="all">All Frequencies</SelectItem>
+                    <SelectItem value="day">Daily</SelectItem>
+                    <SelectItem value="week">Weekly</SelectItem>
+                    <SelectItem value="month">Monthly</SelectItem>
+                    <SelectItem value="year">Yearly</SelectItem>
+                </SelectContent>
+            </Select>
 
-            <select
-                className="h-9 rounded-md border border-slate-200 bg-white px-3 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
-                value={filters.priority || ''}
-                onChange={(e) => handleFilter('priority', e.target.value)}
-            >
-                <option value="">All Priorities</option>
-                <option value="high">High</option>
-                <option value="medium">Medium</option>
-                <option value="low">Low</option>
-            </select>
+            <Select value={filters.priority || 'all'} onValueChange={(val) => handleFilter('priority', val === 'all' ? '' : val)}>
+                <SelectTrigger className="w-[140px] bg-white h-11 rounded-xl">
+                    <SelectValue placeholder="All Priorities" />
+                </SelectTrigger>
+                <SelectContent>
+                    <SelectItem value="all">All Priorities</SelectItem>
+                    <SelectItem value="high">High</SelectItem>
+                    <SelectItem value="medium">Medium</SelectItem>
+                    <SelectItem value="low">Low</SelectItem>
+                </SelectContent>
+            </Select>
 
-            <select
-                className="h-9 rounded-md border border-slate-200 bg-white px-3 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
-                value={filters.user_id || ''}
-                onChange={(e) => handleFilter('user_id', e.target.value)}
-            >
-                <option value="">All Employees</option>
-                {users.map((u) => (
-                    <option key={u.id} value={u.id}>{u.name}</option>
-                ))}
-            </select>
+            <div className="w-[200px]">
+                <PremiumCombobox
+                    value={filters.user_id || ''}
+                    onChange={(val) => handleFilter('user_id', val ? String(val) : '')}
+                    options={users.map(u => ({ value: String(u.id), label: u.name }))}
+                    placeholder="All Employees"
+                    icon={<UserIcon className="w-4 h-4" />}
+                />
+            </div>
 
-            <Button onClick={openCreate} size="sm" className="flex items-center gap-1.5 ml-auto">
+            <Button onClick={openCreate} className="flex items-center gap-1.5 ml-auto h-11 rounded-xl">
                 <Plus className="h-4 w-4" />
                 New Todo
             </Button>
@@ -416,18 +419,13 @@ export default function Index({ todos, filters, stats, users }: Props) {
                         {/* Employee */}
                         <div className="space-y-1">
                             <Label htmlFor="et-user_id">Employee</Label>
-                            <select
-                                id="et-user_id"
-                                className="w-full h-9 rounded-md border border-slate-200 bg-white px-3 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                            <PremiumCombobox
                                 value={data.user_id}
-                                onChange={(e) => setData('user_id', e.target.value)}
-                                required
-                            >
-                                <option value="">Select employee...</option>
-                                {users.map((u) => (
-                                    <option key={u.id} value={u.id}>{u.name} — {u.email}</option>
-                                ))}
-                            </select>
+                                onChange={(val) => setData('user_id', val ? String(val) : '')}
+                                options={users.map((u) => ({ value: String(u.id), label: `${u.name} — ${u.email}` }))}
+                                placeholder="Select employee..."
+                                icon={<UserIcon className="w-4 h-4" />}
+                            />
                             {errors.user_id && <p className="text-xs text-red-500">{errors.user_id}</p>}
                         </div>
 
@@ -439,6 +437,7 @@ export default function Index({ todos, filters, stats, users }: Props) {
                                 value={data.title}
                                 onChange={(e) => setData('title', e.target.value)}
                                 placeholder="Todo title"
+                                className="h-11 rounded-xl"
                                 required
                             />
                             {errors.title && <p className="text-xs text-red-500">{errors.title}</p>}
@@ -452,7 +451,8 @@ export default function Index({ todos, filters, stats, users }: Props) {
                                 value={data.description}
                                 onChange={(e) => setData('description', e.target.value)}
                                 placeholder="Additional details…"
-                                rows={2}
+                                className="rounded-xl"
+                                rows={3}
                             />
                         </div>
 
@@ -460,34 +460,32 @@ export default function Index({ todos, filters, stats, users }: Props) {
                         <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-1">
                                 <Label htmlFor="et-priority">Priority</Label>
-                                <select
-                                    id="et-priority"
-                                    className="w-full h-9 rounded-md border border-slate-200 bg-white px-3 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
-                                    value={data.priority}
-                                    onChange={(e) => setData('priority', e.target.value)}
-                                    required
-                                >
-                                    <option value="low">Low</option>
-                                    <option value="medium">Medium</option>
-                                    <option value="high">High</option>
-                                </select>
+                                <Select value={data.priority} onValueChange={(v) => setData('priority', v)}>
+                                    <SelectTrigger className="w-full bg-white h-11 rounded-xl shadow-sm">
+                                        <SelectValue placeholder="Select priority..." />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="low">Low</SelectItem>
+                                        <SelectItem value="medium">Medium</SelectItem>
+                                        <SelectItem value="high">High</SelectItem>
+                                    </SelectContent>
+                                </Select>
                                 {errors.priority && <p className="text-xs text-red-500">{errors.priority}</p>}
                             </div>
 
                             <div className="space-y-1">
                                 <Label htmlFor="et-recurring">Recurs Every</Label>
-                                <select
-                                    id="et-recurring"
-                                    className="w-full h-9 rounded-md border border-slate-200 bg-white px-3 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
-                                    value={data.recurring}
-                                    onChange={(e) => setData('recurring', e.target.value)}
-                                    required
-                                >
-                                    <option value="day">Day</option>
-                                    <option value="week">Week</option>
-                                    <option value="month">Month</option>
-                                    <option value="year">Year</option>
-                                </select>
+                                <Select value={data.recurring} onValueChange={(v) => setData('recurring', v)}>
+                                    <SelectTrigger className="w-full bg-white h-11 rounded-xl shadow-sm">
+                                        <SelectValue placeholder="Select frequency..." />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="day">Day</SelectItem>
+                                        <SelectItem value="week">Week</SelectItem>
+                                        <SelectItem value="month">Month</SelectItem>
+                                        <SelectItem value="year">Year</SelectItem>
+                                    </SelectContent>
+                                </Select>
                                 {errors.recurring && <p className="text-xs text-red-500">{errors.recurring}</p>}
                             </div>
                         </div>
@@ -502,6 +500,7 @@ export default function Index({ todos, filters, stats, users }: Props) {
                                     min={1}
                                     value={data.recurring_times}
                                     onChange={(e) => setData('recurring_times', parseInt(e.target.value) || 1)}
+                                    className="h-11 rounded-xl"
                                     required
                                 />
                                 {errors.recurring_times && <p className="text-xs text-red-500">{errors.recurring_times}</p>}
@@ -514,6 +513,7 @@ export default function Index({ todos, filters, stats, users }: Props) {
                                     type="date"
                                     value={data.current_date}
                                     onChange={(e) => setData('current_date', e.target.value)}
+                                    className="h-11 rounded-xl"
                                     required
                                 />
                                 {errors.current_date && <p className="text-xs text-red-500">{errors.current_date}</p>}
@@ -529,6 +529,7 @@ export default function Index({ todos, filters, stats, users }: Props) {
                                     value={data.recurring_times_week}
                                     onChange={(e) => setData('recurring_times_week', e.target.value)}
                                     placeholder="Monday,Wednesday,Friday"
+                                    className="h-11 rounded-xl"
                                 />
                             </div>
                         )}
@@ -541,6 +542,7 @@ export default function Index({ todos, filters, stats, users }: Props) {
                                     value={data.recurring_times_month}
                                     onChange={(e) => setData('recurring_times_month', e.target.value)}
                                     placeholder="1,15"
+                                    className="h-11 rounded-xl"
                                 />
                             </div>
                         )}
@@ -553,6 +555,7 @@ export default function Index({ todos, filters, stats, users }: Props) {
                                     value={data.recurring_times_year}
                                     onChange={(e) => setData('recurring_times_year', e.target.value)}
                                     placeholder="1-1,25-12"
+                                    className="h-11 rounded-xl"
                                 />
                             </div>
                         )}
