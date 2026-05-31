@@ -17,12 +17,10 @@ class SequenceState extends Model
         'status',
         'current_step_order',
         'last_email_sent_at',
-        'last_whatsapp_sent_at',
     ];
 
     protected $casts = [
         'last_email_sent_at' => 'datetime',
-        'last_whatsapp_sent_at' => 'datetime',
     ];
 
     public function sequence()

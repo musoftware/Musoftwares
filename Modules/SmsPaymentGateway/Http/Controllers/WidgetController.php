@@ -7,15 +7,22 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Modules\SmsPaymentGateway\Models\SmsPaymentGatewayTransaction;
 use Modules\SmsPaymentGateway\Models\SmsPaymentGatewaySetting;
+use Modules\SmsPaymentGateway\Services\RealtimePaymentMatchingEngine;
 
 class WidgetController extends Controller
 {
+    protected RealtimePaymentMatchingEngine $matchingEngine;
+
+    public function __construct(RealtimePaymentMatchingEngine $matchingEngine)
+    {
+        $this->matchingEngine = $matchingEngine;
+    }
     /**
      * Show the payment widget iframe
      */
-    public function show($order_number)
+    public function show($order_id)
     {
-        $order = \App\Models\PaymentOrder::where('order_number', $order_number)->first();
+        $order = \App\Models\PaymentOrder::find($order_id);
 
         if (!$order) {
             abort(404, 'Invalid checkout session.');
@@ -30,19 +37,23 @@ class WidgetController extends Controller
         $settings = SmsPaymentGatewaySetting::where('user_id', $user->id)->first();
         
         $phone = $settings ? $settings->wallet_phone_number : ($order->customer_phone ?? '');
+        $instapayPhone = $settings ? ($settings->instapay_phone_number ?: $phone) : $phone;
+        $vodafonePhone = $settings ? ($settings->vodafone_cash_phone_number ?: $phone) : $phone;
         $isInstapay = $settings ? $settings->is_instapay_enabled : true;
         $isVodafone = $settings ? $settings->is_vodafone_cash_enabled : true;
 
         return view('sms-payment-gateway::widget.iframe', [
-            'amount' => $order->total_amount,
-            'reference' => $order->order_number,
+            'amount' => $order->amount,
+            'reference' => $order->metadata['order_number'] ?? ('ORD-' . $order->id),
             'phone' => $phone,
+            'instapayPhone' => $instapayPhone,
+            'vodafonePhone' => $vodafonePhone,
             'isInstapay' => $isInstapay,
             'isVodafone' => $isVodafone,
-            'redirectUrl' => route('sms-payment-gateway.widget.status', ['order_number' => $order->order_number]),
-            'verifyUrl' => route('sms-payment-gateway.widget.verify', ['order_number' => $order->order_number]),
+            'redirectUrl' => route('sms-payment-gateway.widget.status', ['order_id' => $order->id]),
+            'verifyUrl' => route('sms-payment-gateway.widget.verify', ['order_id' => $order->id]),
             'merchantName' => $user->name,
-            'order_number' => $order->order_number,
+            'order_number' => $order->metadata['order_number'] ?? ('ORD-' . $order->id),
             'currency' => $order->currency ?? 'EGP',
         ]);
     }
@@ -50,9 +61,9 @@ class WidgetController extends Controller
     /**
      * Poll for transaction status
      */
-    public function status($order_number)
+    public function status($order_id)
     {
-        $order = \App\Models\PaymentOrder::where('order_number', $order_number)->first();
+        $order = \App\Models\PaymentOrder::find($order_id);
 
         if (!$order) {
             return response()->json(['success' => false, 'message' => 'Invalid order'], 404);
@@ -77,13 +88,13 @@ class WidgetController extends Controller
     /**
      * Verify payment based on guest input
      */
-    public function verify(Request $request, $order_number)
+    public function verify(Request $request, $order_id)
     {
         $request->validate([
             'transaction_id' => 'required|string',
         ]);
 
-        $order = \App\Models\PaymentOrder::where('order_number', $order_number)->first();
+        $order = \App\Models\PaymentOrder::find($order_id);
 
         if (!$order) {
             return response()->json(['success' => false, 'message' => 'Invalid order'], 404);
@@ -92,34 +103,9 @@ class WidgetController extends Controller
         // Clean up transaction ID (remove spaces, etc)
         $transactionId = trim($request->transaction_id);
 
-        $query = SmsPaymentGatewayTransaction::where('user_id', $order->user_id)
-            ->where('amount', '>=', $order->total_amount * 0.99) // Allow 1% tolerance
-            ->where('amount', '<=', $order->total_amount * 1.01)
-            ->where('status', 'pending')
-            ->where('created_at', '>=', now()->subHours(24))
-            ->where(function ($q) use ($transactionId) {
-                // Check both reference_number and phone_number columns in case the user entered their phone number instead
-                $q->where('reference_number', $transactionId)
-                  ->orWhere('phone_number', $transactionId);
-            });
-
-        $transaction = $query->first();
+        $transaction = $this->matchingEngine->manualMatch($order, $transactionId);
 
         if ($transaction) {
-            \Illuminate\Support\Facades\DB::transaction(function () use ($order, $transaction) {
-                $order->update([
-                    'status' => 'paid',
-                    'payment_phone' => $transaction->phone_number,
-                    'sms-payment-gateway_transaction_id' => $transaction->id,
-                    'paid_at' => now(),
-                ]);
-
-                $transaction->update([
-                    'order_id' => $order->id,
-                    'status' => 'verified',
-                ]);
-            });
-
             return response()->json([
                 'success' => true,
                 'paid' => true,

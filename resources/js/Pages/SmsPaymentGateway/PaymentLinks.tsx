@@ -10,11 +10,13 @@ import { Copy, Plus, ExternalLink } from 'lucide-react';
 
 interface PaymentOrder {
     id: number;
-    order_number: string;
-    total_amount: string;
-    customer_name: string | null;
+    amount: string;
     status: string;
     created_at: string;
+    metadata: {
+        order_number?: string;
+        customer_name?: string;
+    } | null;
 }
 
 interface Props {
@@ -138,17 +140,17 @@ export default function PaymentLinks({ links }: Props) {
                                 </tr>
                             ) : (
                                 links.data.map((link) => {
-                                    const checkoutUrl = route('sms-payment-gateway.widget.show', { order_number: link.order_number });
+                                    const checkoutUrl = route('sms-payment-gateway.widget.show', { order_id: link.id });
                                     return (
                                         <tr key={link.id} className="hover:bg-gray-50">
                                             <td className="px-6 py-4 whitespace-nowrap text-sm font-mono text-gray-900">
-                                                {link.order_number}
+                                                {link.metadata?.order_number || ('ORD-' + link.id)}
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900">
-                                                {Number(link.total_amount).toFixed(2)} ج.م
+                                                {Number(link.amount).toFixed(2)} ج.م
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                {link.customer_name || '—'}
+                                                {link.metadata?.customer_name || '—'}
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap">
                                                 <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${

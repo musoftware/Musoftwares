@@ -55,34 +55,7 @@ export default function CrmLayout({ title, activeMenu, children }: CrmLayoutProp
         });
     }
 
-    // WhatsApp Inbox
-    if (hasFeature('crm.whatsapp') || hasFeature('crm-advanced-operations')) {
-        menuGroups.push({
-            title: __('WhatsApp Inbox'),
-            items: [
-                { id: 'wa-inbox', label: __('Live Inbox'), icon: MessageCircle, href: '/crm/whatsapp', isActive: activeMenu === 'wa-inbox' },
-                { id: 'wa-accounts', label: __('Connected Accounts'), icon: Smartphone, href: '/crm/whatsapp/accounts', isActive: activeMenu === 'wa-accounts' },
-                { id: 'wa-labels', label: __('Labels'), icon: Bookmark, href: '/crm/whatsapp/labels', isActive: activeMenu === 'wa-labels' },
-                { id: 'wa-quick-replies', label: __('Quick Replies'), icon: Zap, href: '/crm/whatsapp/quick-replies', isActive: activeMenu === 'wa-quick-replies' },
-                { id: 'wa-sla-policies', label: __('SLA Policies'), icon: Clock, href: '/crm/whatsapp/sla-policies', isActive: activeMenu === 'wa-sla-policies' },
-                { id: 'wa-inbox-analytics', label: __('Inbox Analytics'), icon: BarChart2, href: '/crm/whatsapp/analytics/overview', isActive: activeMenu === 'wa-inbox-analytics' },
-            ]
-        });
-    }
-
-    // WhatsApp Campaigns
-    if (hasFeature('crm.whatsapp_campaigns') || hasFeature('crm-advanced-operations')) {
-        menuGroups.push({
-            title: __('WhatsApp Campaigns'),
-            items: [
-                { id: 'wac-campaigns', label: __('Campaigns'), icon: Send, href: '/crm/whatsapp-campaigns', isActive: activeMenu === 'wac-campaigns' },
-                { id: 'wac-audiences', label: __('Audiences'), icon: UsersRound, href: '/crm/whatsapp-campaigns/audiences', isActive: activeMenu === 'wac-audiences' },
-                { id: 'wac-templates', label: __('Templates'), icon: FileText, href: '/crm/whatsapp-campaigns/templates', isActive: activeMenu === 'wac-templates' },
-                { id: 'wac-automations', label: __('Automations'), icon: Bot, href: '/crm/whatsapp-campaigns/automations', isActive: activeMenu === 'wac-automations' },
-                { id: 'wac-analytics', label: __('Campaign Analytics'), icon: PieChart, href: '/crm/whatsapp-campaigns/analytics/overview', isActive: activeMenu === 'wac-analytics' },
-            ]
-        });
-    }
+    // WhatsApp features have been disabled per user request.
 
     // System Settings
     menuGroups.push({

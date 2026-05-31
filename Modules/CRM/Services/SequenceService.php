@@ -25,10 +25,8 @@ class SequenceService
             'delay'            => $data['delay'],
             'unit'             => $data['unit'],
             'send_email'       => $data['send_email'] ?? false,
-            'send_whatsapp'    => $data['send_whatsapp'] ?? false,
             'email_subject'    => ['en' => $data['email_subject_en'] ?? ''],
             'email_content'    => ['en' => $data['email_content_en'] ?? ''],
-            'whatsapp_content' => ['en' => $data['whatsapp_content_en'] ?? ''],
         ]);
     }
 
@@ -39,10 +37,8 @@ class SequenceService
             'delay'            => $data['delay'],
             'unit'             => $data['unit'],
             'send_email'       => $data['send_email'] ?? false,
-            'send_whatsapp'    => $data['send_whatsapp'] ?? false,
             'email_subject'    => ['en' => $data['email_subject_en'] ?? ''],
             'email_content'    => ['en' => $data['email_content_en'] ?? ''],
-            'whatsapp_content' => ['en' => $data['whatsapp_content_en'] ?? ''],
         ]);
     }
 
@@ -69,10 +65,8 @@ Return ONLY valid JSON array with this structure:
     \"delay\": 1,
     \"unit\": \"day\",
     \"send_email\": true,
-    \"send_whatsapp\": false,
     \"email_subject_en\": \"...\",
-    \"email_content_en\": \"...\",
-    \"whatsapp_content_en\": \"...\"
+    \"email_content_en\": \"...\"
   }
 ]";
 
@@ -110,10 +104,8 @@ Return ONLY valid JSON array with this structure:
                 'delay'            => $step['delay'] ?? 1,
                 'unit'             => $step['unit'] ?? 'day',
                 'send_email'       => $step['send_email'] ?? false,
-                'send_whatsapp'    => $step['send_whatsapp'] ?? false,
                 'email_subject'    => ['en' => $step['email_subject_en'] ?? ''],
                 'email_content'    => ['en' => $step['email_content_en'] ?? ''],
-                'whatsapp_content' => ['en' => $step['whatsapp_content_en'] ?? ''],
             ]);
             $currentMaxOrder++;
         }

@@ -8,7 +8,7 @@ import InputLabel from '@/Components/InputLabel';
 import { Button } from '@/Components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/Components/ui/card';
 import { Badge } from '@/Components/ui/badge';
-import { Smartphone, Send } from 'lucide-react';
+import { Send } from 'lucide-react';
 
 export default function PayoutMethods({ payoutMethods }) {
     const [isCreating, setIsCreating] = useState(false);

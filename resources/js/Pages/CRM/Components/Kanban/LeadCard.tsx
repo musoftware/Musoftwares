@@ -1,6 +1,6 @@
 import React from 'react';
 import { PipelineLead } from '../../Stores/usePipelineStore';
-import { useLeadDrawerStore } from '../../Stores/useLeadDrawerStore';
+
 import { Phone, MessageCircle, Clock, AlertTriangle } from 'lucide-react';
 import { Draggable } from '@hello-pangea/dnd';
 
@@ -10,7 +10,7 @@ interface LeadCardProps {
 }
 
 export default function LeadCard({ lead, index }: LeadCardProps) {
-    const openDrawer = useLeadDrawerStore((state) => state.openDrawer);
+    const openDrawer = (id: number) => { console.log('Open drawer for lead:', id); };
 
     // Dynamic SLA coloring
     const isSLABreached = lead.slaBreached;
@@ -60,13 +60,6 @@ export default function LeadCard({ lead, index }: LeadCardProps) {
                             title="Call Lead"
                         >
                             <Phone size={14} />
-                        </button>
-                        <button 
-                            onClick={(e) => { e.stopPropagation(); /* handle WA */ }}
-                            className="p-1.5 bg-white border border-slate-200 rounded-md text-green-600 hover:bg-green-50 shadow-sm"
-                            title="WhatsApp"
-                        >
-                            <MessageCircle size={14} />
                         </button>
                     </div>
                 </div>

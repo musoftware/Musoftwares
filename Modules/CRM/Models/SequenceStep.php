@@ -16,18 +16,14 @@ class SequenceStep extends Model
         'unit',
         'order',
         'send_email',
-        'send_whatsapp',
         'email_subject',
         'email_content',
-        'whatsapp_content',
     ];
 
     protected $casts = [
         'email_subject' => 'array',
         'email_content' => 'array',
-        'whatsapp_content' => 'array',
         'send_email' => 'boolean',
-        'send_whatsapp' => 'boolean',
     ];
 
     public function sequence()

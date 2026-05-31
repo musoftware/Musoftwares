@@ -6,9 +6,9 @@ use Modules\SmsPaymentGateway\Http\Controllers\WidgetController;
 
 // Public Widget Routes
 Route::middleware(['web'])->prefix('sms-payment-gateway')->name('sms-payment-gateway.')->group(function () {
-    Route::get('checkout/{order_number}', [WidgetController::class, 'show'])->name('widget.show');
-    Route::get('checkout/{order_number}/status', [WidgetController::class, 'status'])->name('widget.status');
-    Route::post('checkout/{order_number}/verify', [WidgetController::class, 'verify'])->name('widget.verify');
+    Route::get('checkout/{order_id}', [WidgetController::class, 'show'])->name('widget.show');
+    Route::get('checkout/{order_id}/status', [WidgetController::class, 'status'])->name('widget.status');
+    Route::post('checkout/{order_id}/verify', [WidgetController::class, 'verify'])->name('widget.verify');
 });
 
 Route::middleware(['web', 'auth', 'verified', 'onboarding', 'subscription:sms-payment-gateway'])->prefix('sms-payment-gateway')->name('sms-payment-gateway.')->group(function () {

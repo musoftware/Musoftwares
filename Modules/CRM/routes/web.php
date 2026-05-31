@@ -15,11 +15,6 @@ use Modules\CRM\Http\Controllers\CrmWidgetCaptureController;
 Route::middleware(['web'])->group(function () {
     Route::get('/crm/w/{token}', [CrmWidgetCaptureController::class, 'show'])->name('crm.widgets.embed');
     Route::post('/crm/w/{token}', [CrmWidgetCaptureController::class, 'store'])->name('crm.widgets.submit');
-
-    Route::get('/crm-temp-migrate-run', function() {
-        \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
-        return \Illuminate\Support\Facades\Artisan::output();
-    });
 });
 
 // ── CRM Module Routes ──────────────────────────────────────────────
@@ -78,12 +73,4 @@ Route::middleware(['web', 'auth', 'verified', 'onboarding', 'subscription:crm', 
         
         // ── Sequences
         Route::resource('sequences', \Modules\CRM\Http\Controllers\SequenceController::class);
-
-        // ── WhatsApp 
-        Route::prefix('whatsapp')->name('whatsapp.')->group(function () {
-            Route::resource('accounts', \Modules\CRM\Http\Controllers\WhatsApp\AccountController::class);
-            Route::post('accounts/{account}/connect', [\Modules\CRM\Http\Controllers\WhatsApp\AccountController::class, 'connect'])->name('accounts.connect');
-            Route::post('accounts/{account}/disconnect', [\Modules\CRM\Http\Controllers\WhatsApp\AccountController::class, 'disconnect'])->name('accounts.disconnect');
-            Route::get('accounts/{account}/qr', [\Modules\CRM\Http\Controllers\WhatsApp\AccountController::class, 'getQrCode'])->name('accounts.qr');
-        });
 });

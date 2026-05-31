@@ -14,7 +14,6 @@ export default function Show({ campaign }) {
     const [contentForm, setContentForm] = useState({
         email_subject_en: campaign.email_subject?.en || '',
         email_content_en: campaign.email_content?.en || '',
-        whatsapp_content_en: campaign.whatsapp_content?.en || '',
     });
     
     const [isSaving, setIsSaving] = useState(false);
@@ -42,7 +41,6 @@ export default function Show({ campaign }) {
                 ...prev,
                 email_subject_en: aiContent.email_subject_en || prev.email_subject_en,
                 email_content_en: aiContent.email_content_en || prev.email_content_en,
-                whatsapp_content_en: aiContent.whatsapp_content_en || prev.whatsapp_content_en,
             }));
             
             setIsAiOpen(false);
@@ -168,56 +166,33 @@ export default function Show({ campaign }) {
             )}
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {(campaign.type === 'email' || campaign.type === 'mixed') && (
-                    <Card className={`border-t-4 border-t-blue-500 shadow-sm ${!isEditable ? 'opacity-80' : ''}`}>
-                        <CardHeader>
-                            <CardTitle>Email Content</CardTitle>
-                            <CardDescription>This will be sent to the recipient's primary email address.</CardDescription>
-                        </CardHeader>
-                        <CardContent className="space-y-4">
-                            <div className="space-y-2">
-                                <Label>Subject Line</Label>
-                                <Input 
-                                    disabled={!isEditable}
-                                    value={contentForm.email_subject_en}
-                                    onChange={e => setContentForm({...contentForm, email_subject_en: e.target.value})}
-                                    placeholder="Enter an engaging subject line..."
-                                />
-                            </div>
-                            <div className="space-y-2">
-                                <Label>Email Body</Label>
-                                <Textarea 
-                                    disabled={!isEditable}
-                                    rows={12}
-                                    value={contentForm.email_content_en}
-                                    onChange={e => setContentForm({...contentForm, email_content_en: e.target.value})}
-                                    placeholder="Write your email content here..."
-                                />
-                            </div>
-                        </CardContent>
-                    </Card>
-                )}
-
-                {(campaign.type === 'whatsapp' || campaign.type === 'mixed') && (
-                    <Card className={`border-t-4 border-t-green-500 shadow-sm ${!isEditable ? 'opacity-80' : ''}`}>
-                        <CardHeader>
-                            <CardTitle>WhatsApp Content</CardTitle>
-                            <CardDescription>Keep it short and actionable. WhatsApp formatting (*bold*, _italic_) is supported.</CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="space-y-2">
-                                <Label>Message Body</Label>
-                                <Textarea 
-                                    disabled={!isEditable}
-                                    rows={10}
-                                    value={contentForm.whatsapp_content_en}
-                                    onChange={e => setContentForm({...contentForm, whatsapp_content_en: e.target.value})}
-                                    placeholder="Write your WhatsApp message here..."
-                                />
-                            </div>
-                        </CardContent>
-                    </Card>
-                )}
+                <Card className={`border-t-4 border-t-blue-500 shadow-sm ${!isEditable ? 'opacity-80' : ''}`}>
+                    <CardHeader>
+                        <CardTitle>{__('Email Content')}</CardTitle>
+                        <CardDescription>{__('This will be sent to the recipient\'s primary email address.')}</CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                        <div className="space-y-2">
+                            <Label>{__('Subject Line')}</Label>
+                            <Input 
+                                disabled={!isEditable}
+                                value={contentForm.email_subject_en}
+                                onChange={e => setContentForm({...contentForm, email_subject_en: e.target.value})}
+                                placeholder={__('Enter an engaging subject line...')}
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <Label>{__('Email Body')}</Label>
+                            <Textarea 
+                                disabled={!isEditable}
+                                rows={12}
+                                value={contentForm.email_content_en}
+                                onChange={e => setContentForm({...contentForm, email_content_en: e.target.value})}
+                                placeholder={__('Write your email content here...')}
+                            />
+                        </div>
+                    </CardContent>
+                </Card>
             </div>
             
             {/* Delivery Stats Preview */}

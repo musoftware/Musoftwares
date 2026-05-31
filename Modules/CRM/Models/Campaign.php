@@ -24,7 +24,6 @@ class Campaign extends Model
         'scheduled_at',
         'target_audience',
         'filter_criteria',
-        'whatsapp_channel_id',
         'created_by',
         'sent_count',
         'failed_count',
@@ -60,14 +59,6 @@ class Campaign extends Model
     public function creator()
     {
         return $this->belongsTo(User::class, 'created_by');
-    }
-
-    /**
-     * Get the WhatsApp channel for this campaign
-     */
-    public function whatsappChannel()
-    {
-        return $this->belongsTo(WhatsAppChannel::class, 'whatsapp_channel_id');
     }
 
     /**

@@ -3,7 +3,7 @@
 namespace Modules\SmsPaymentGateway\Services;
 
 use Modules\SmsPaymentGateway\Models\SmsPaymentGatewayTransaction;
-use Modules\SmsPaymentGateway\Models\SmsPaymentGatewayPaymentOrder;
+use App\Models\PaymentOrder;
 use Modules\SmsPaymentGateway\Models\SmsPaymentGatewayOrderLink;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -26,88 +26,48 @@ class RealtimePaymentMatchingEngine
     protected int $timeWindowHours = 24;
 
     /**
-     * Main Entry Point: Attempt to match an incoming transaction to an unpaid order.
+     * Main Entry Point: Attempt to match a transaction manually based on user input.
      */
-    public function matchTransaction(SmsPaymentGatewayTransaction $transaction): bool
+    public function manualMatch(PaymentOrder $order, string $userInputTransactionId): ?SmsPaymentGatewayTransaction
     {
-        // 1. Prevent Transaction Replay/Duplicate Matching
-        if ($transaction->order_id !== null) {
-            Log::info("Transaction {$transaction->id} is already matched.");
-            return false;
+        // Prevent duplicate matching
+        if ($order->status === 'paid' || $order->transaction_id !== null) {
+            return null;
         }
 
-        return DB::transaction(function () use ($transaction) {
-            // Lock the transaction row to prevent race conditions during matching
-            $lockedTx = SmsPaymentGatewayTransaction::where('id', $transaction->id)
+        return DB::transaction(function () use ($order, $userInputTransactionId) {
+            // Find a transaction that matches the input (either reference number or phone number)
+            // and roughly matches the amount
+            $transaction = SmsPaymentGatewayTransaction::where('user_id', $order->user_id)
+                ->where('amount', '>=', $order->total_amount * 0.99) // 1% tolerance
+                ->where('amount', '<=', $order->total_amount * 1.01)
+                ->whereIn('status', ['pending', 'unmatched'])
+                ->where('created_at', '>=', now()->subHours($this->timeWindowHours))
+                ->where(function ($q) use ($userInputTransactionId) {
+                    $q->where('reference_number', $userInputTransactionId)
+                      ->orWhere('phone_number', $userInputTransactionId);
+                })
                 ->lockForUpdate()
                 ->first();
 
-            if ($lockedTx->order_id !== null) {
-                return false; // Matched by another concurrent process
+            if (!$transaction) {
+                return null;
             }
 
-            // 2. Find Candidate Orders using Reference OR Phone
-            $order = $this->findMatchingOrder($lockedTx);
-
-            if (!$order) {
-                Log::info("No matching order found for Transaction {$lockedTx->id}");
-                return false;
+            // Lock the order
+            $lockedOrder = PaymentOrder::where('id', $order->id)->lockForUpdate()->first();
+            if ($lockedOrder->status === 'paid') {
+                return null;
             }
 
-            // 3. Attach and Lock
-            $this->attachTransactionToOrder($order, $lockedTx);
+            // Attach and Lock
+            $this->attachTransactionToOrder($lockedOrder, $transaction);
 
-            // 4. Dispatch Realtime Events & Webhooks
-            $this->dispatchSuccessEvents($order, $lockedTx);
+            // Dispatch Events & Webhooks
+            $this->dispatchSuccessEvents($lockedOrder, $transaction);
 
-            return true;
+            return $transaction;
         });
-    }
-
-    /**
-     * Find an unpaid order matching the transaction's reference or phone,
-     * validating amount and time proximity.
-     */
-    private function findMatchingOrder(SmsPaymentGatewayTransaction $tx): ?SmsPaymentGatewayPaymentOrder
-    {
-        // Get potential order links (user sessions) or direct orders
-        $query = SmsPaymentGatewayPaymentOrder::where('user_id', $tx->user_id)
-            ->whereIn('status', ['pending', 'unpaid'])
-            ->where('created_at', '>=', now()->subHours($this->timeWindowHours))
-            ->lockForUpdate(); // Ensure order isn't concurrently matched
-
-        // Priority 1: Exact Reference Match
-        if (!empty($tx->reference_number)) {
-            $referenceMatch = clone $query;
-            $order = $referenceMatch->where('expected_reference', $tx->reference_number)->first();
-            
-            if ($order && $this->verifyAmount($order->amount, $tx->amount)) {
-                return $order;
-            }
-        }
-
-        // Priority 2: Normalized Phone Match via Order Links
-        if (!empty($tx->phone_number)) {
-            // Look up the active order link for this phone number
-            $link = SmsPaymentGatewayOrderLink::where('user_id', $tx->user_id)
-                ->where('phone_number', $tx->phone_number)
-                ->where('status', 'pending')
-                ->lockForUpdate()
-                ->first();
-
-            if ($link) {
-                $phoneMatch = clone $query;
-                $order = $phoneMatch->where('id', $link->order_id)->first();
-
-                if ($order && $this->verifyAmount($order->amount, $tx->amount)) {
-                    // Update the link to prevent reuse
-                    $link->update(['status' => 'matched']);
-                    return $order;
-                }
-            }
-        }
-
-        return null;
     }
 
     /**
@@ -122,7 +82,7 @@ class RealtimePaymentMatchingEngine
     /**
      * Atomically bind the transaction to the order and update statuses.
      */
-    private function attachTransactionToOrder(SmsPaymentGatewayPaymentOrder $order, SmsPaymentGatewayTransaction $tx): void
+    private function attachTransactionToOrder(PaymentOrder $order, SmsPaymentGatewayTransaction $tx): void
     {
         // Mark transaction as consumed
         $tx->order_id = $order->id;
@@ -141,7 +101,7 @@ class RealtimePaymentMatchingEngine
     /**
      * Trigger realtime updates for the frontend and dispatch webhooks.
      */
-    private function dispatchSuccessEvents(SmsPaymentGatewayPaymentOrder $order, SmsPaymentGatewayTransaction $tx): void
+    private function dispatchSuccessEvents(PaymentOrder $order, SmsPaymentGatewayTransaction $tx): void
     {
         // 1. Trigger WebSocket/Realtime UI Update for the Checkout Widget
         // Allows the waiting browser to instantly show "Payment Successful"
@@ -161,7 +121,7 @@ class RealtimePaymentMatchingEngine
     /**
      * Dispatch the verified payment payload to the merchant.
      */
-    private function dispatchWebhook(SmsPaymentGatewayPaymentOrder $order, SmsPaymentGatewayTransaction $tx): void
+    private function dispatchWebhook(PaymentOrder $order, SmsPaymentGatewayTransaction $tx): void
     {
         $payload = [
             'event' => 'payment.success',

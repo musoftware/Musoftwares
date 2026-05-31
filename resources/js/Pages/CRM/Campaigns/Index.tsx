@@ -72,15 +72,13 @@ export default function Index({ campaigns }) {
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <Label>Campaign Type</Label>
+                                    <Label>{__('Campaign Type')}</Label>
                                     <select 
                                         className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm"
                                         value={newCampaign.type}
                                         onChange={(e) => setNewCampaign({...newCampaign, type: e.target.value})}
                                     >
-                                        <option value="email">Email Only</option>
-                                        <option value="whatsapp">WhatsApp Only</option>
-                                        <option value="mixed">Email + WhatsApp</option>
+                                        <option value="email">{__('Email')}</option>
                                     </select>
                                 </div>
                                 <div className="space-y-2">

@@ -16,7 +16,6 @@ class Sequence extends Model
         'name',
         'is_active',
         'trigger_type',
-        'whatsapp_channel_id',
     ];
 
     public function steps()
@@ -27,10 +26,5 @@ class Sequence extends Model
     public function states()
     {
         return $this->hasMany(SequenceState::class);
-    }
-    
-    public function channel()
-    {
-        return $this->belongsTo(WhatsAppChannel::class, 'whatsapp_channel_id');
     }
 }
