@@ -12,13 +12,13 @@ class TenantIsolationTest extends BaseTenantTestCase
     public function test_models_automatically_scope_to_tenant_context()
     {
         // $this->workspace is automatically set up by BaseTenantTestCase
-        $workspace2 = Workspace::factory()->create();
+        $workspace2 = Workspace::forceCreate(['user_id' => $this->adminUser->id, 'name' => 'Other Corp']);
 
         // Create a lead in the current tenant's workspace
-        $lead1 = Lead::create(['name' => 'Lead A', 'status' => 'new']); // Workspace ID should be injected by trait
+        $lead1 = Lead::create(['name' => 'Lead A', 'status' => 'new', 'email' => 'lead_a@example.com', 'message' => 'test message']); // Workspace ID should be injected by trait
         
         // Create a lead in another workspace (bypassing scope for setup)
-        $lead2 = Lead::withoutGlobalScopes()->factory()->create(['workspace_id' => $workspace2->id, 'name' => 'Lead B']);
+        $lead2 = Lead::withoutGlobalScopes()->forceCreate(['workspace_id' => $workspace2->id, 'name' => 'Lead B', 'email' => 'lead_b@example.com', 'message' => 'test message']);
 
         $leads = Lead::all();
         
@@ -46,7 +46,9 @@ class TenantIsolationTest extends BaseTenantTestCase
 
         $lead = Lead::create([
             'name' => 'CLI Lead',
-            'status' => 'new'
+            'status' => 'new',
+            'email' => 'cli_lead@example.com',
+            'message' => 'test message'
         ]);
 
         $this->assertEquals($this->workspace->id, $lead->workspace_id);

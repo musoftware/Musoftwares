@@ -35,6 +35,7 @@ export default function CrmLayout({ title, activeMenu, children }: CrmLayoutProp
                 { id: 'leads', label: __('Leads & Pipeline'), icon: Users, href: route('crm.leads.index'), isActive: activeMenu === 'leads' },
                 { id: 'tags', label: __('Tags & Attributes'), icon: Tag, href: route('crm.tags.index'), isActive: activeMenu === 'tags' },
                 { id: 'search', label: __('Universal Search'), icon: Search, href: route('crm.search'), isActive: activeMenu === 'search' },
+                { id: 'widgets', label: __('Web Forms'), icon: FileText, href: route('crm.widgets.index'), isActive: activeMenu === 'widgets' },
             ]
         }
     ];
@@ -87,7 +88,7 @@ export default function CrmLayout({ title, activeMenu, children }: CrmLayoutProp
     menuGroups.push({
         title: __('System'),
         items: [
-            { id: 'settings', label: __('CRM Settings'), icon: Settings, href: '#', isActive: activeMenu === 'settings' },
+            { id: 'settings', label: __('CRM Settings'), icon: Settings, href: route('crm.settings.index'), isActive: activeMenu === 'settings' },
         ]
     });
 

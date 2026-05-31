@@ -11,13 +11,17 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('crm_leads', function (Blueprint $table) {
-            $table->foreignId('branch_id')->nullable()->after('workspace_id')->constrained('crm_branches')->nullOnDelete();
-        });
+        if (Schema::hasTable('leads')) {
+            Schema::table('leads', function (Blueprint $table) {
+                $table->foreignId('branch_id')->nullable()->after('workspace_id')->constrained('crm_branches')->nullOnDelete();
+            });
+        }
 
-        Schema::table('crm_whatsapp_conversations', function (Blueprint $table) {
-            $table->foreignId('branch_id')->nullable()->after('workspace_id')->constrained('crm_branches')->nullOnDelete();
-        });
+        if (Schema::hasTable('crm_whatsapp_conversations')) {
+            Schema::table('crm_whatsapp_conversations', function (Blueprint $table) {
+                $table->foreignId('branch_id')->nullable()->after('workspace_id')->constrained('crm_branches')->nullOnDelete();
+            });
+        }
     }
 
     /**
@@ -25,14 +29,18 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('crm_leads', function (Blueprint $table) {
-            $table->dropForeign(['branch_id']);
-            $table->dropColumn('branch_id');
-        });
+        if (Schema::hasTable('leads')) {
+            Schema::table('leads', function (Blueprint $table) {
+                $table->dropForeign(['branch_id']);
+                $table->dropColumn('branch_id');
+            });
+        }
 
-        Schema::table('crm_whatsapp_conversations', function (Blueprint $table) {
-            $table->dropForeign(['branch_id']);
-            $table->dropColumn('branch_id');
-        });
+        if (Schema::hasTable('crm_whatsapp_conversations')) {
+            Schema::table('crm_whatsapp_conversations', function (Blueprint $table) {
+                $table->dropForeign(['branch_id']);
+                $table->dropColumn('branch_id');
+            });
+        }
     }
 };

@@ -11,12 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('leads', function (Blueprint $table) {
-            // Hardware-level idempotency protection
-            $table->unique(['tenant_id', 'phone'], 'leads_tenant_phone_unique');
+        $indexesFound = collect(Schema::getIndexes('leads'))->pluck('name')->toArray();
 
-            // High-speed Kanban fetch index
-            $table->index(['tenant_id', 'pipeline_stage', 'assigned_to_id'], 'leads_kanban_idx');
+        Schema::table('leads', function (Blueprint $table) use ($indexesFound) {
+            if (!in_array('leads_tenant_phone_unique', $indexesFound)) {
+                $table->unique(['workspace_id', 'phone'], 'leads_tenant_phone_unique');
+            }
+
+            if (!in_array('leads_kanban_idx', $indexesFound)) {
+                $table->index(['workspace_id', 'status', 'assigned_to'], 'leads_kanban_idx');
+            }
         });
     }
 

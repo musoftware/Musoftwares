@@ -5,7 +5,7 @@ namespace Modules\CRM\Http\Controllers;
 use App\Http\Controllers\Controller;
 use Modules\CRM\Models\Sequence;
 use Modules\CRM\Models\SequenceStep;
-use App\Services\SequenceService;
+use Modules\CRM\Services\SequenceService;
 use App\Http\Requests\Admin\Sequence\StoreSequenceRequest;
 use App\Http\Requests\Admin\Sequence\StoreSequenceStepRequest;
 use App\Http\Requests\Admin\Sequence\UpdateSequenceStepRequest;

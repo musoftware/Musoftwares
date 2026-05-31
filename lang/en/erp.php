@@ -52,7 +52,7 @@ return [
     'status_completed' => 'status_completed',
     'status_pending' => 'status_pending',
     'status_rejected' => 'status_rejected',
-    'subscription_required_for_erp' => 'subscription_required_for_erp',
+    'subscription_required_for_erp' => 'An active subscription is required to access the ERP module.',
     'task_not_found' => 'task_not_found',
     'thank_you_for_using_our_application' => 'thank_you_for_using_our_application',
     'ticket_not_found' => 'ticket_not_found',

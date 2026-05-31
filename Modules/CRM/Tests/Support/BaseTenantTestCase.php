@@ -22,6 +22,10 @@ abstract class BaseTenantTestCase extends TestCase
     {
         parent::setUp();
 
+        $this->app->singleton(TenantContext::class, function () {
+            return new TenantContext();
+        });
+
         $this->setUpTenant();
     }
 
@@ -32,13 +36,20 @@ abstract class BaseTenantTestCase extends TestCase
     {
         $this->adminUser = User::factory()->create();
         
-        $this->workspace = Workspace::factory()->create([
+        $this->workspace = Workspace::forceCreate([
             'user_id' => $this->adminUser->id,
             'name' => 'Test Enterprise Corp'
         ]);
 
+        // Create mock role
+        \Illuminate\Support\Facades\DB::table('crm_roles')->insert([
+            'id' => 1,
+            'workspace_id' => $this->workspace->id,
+            'name' => 'Admin'
+        ]);
+
         // Attach user to workspace
-        $this->workspace->users()->attach($this->adminUser->id);
+        $this->workspace->users()->attach($this->adminUser->id, ['role_id' => 1]);
 
         // Authenticate the user
         $this->actingAs($this->adminUser);

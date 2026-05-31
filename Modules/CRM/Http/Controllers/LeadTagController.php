@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use Modules\CRM\Models\Lead;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use Illuminate\Http\Request;
+use Modules\CRM\Models\LeadTag;
 
 class LeadTagController extends Controller
 {

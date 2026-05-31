@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Modules\CRM\Models\Lead;
 
+class SearchController extends Controller
+{
     /**
      * Display the Universal Search UI page.
      */
@@ -13,6 +15,4 @@ use Modules\CRM\Models\Lead;
     {
         return \Inertia\Inertia::render('CRM/Search/Index');
     }
-
-
 }
