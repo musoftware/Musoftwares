@@ -58,54 +58,9 @@ class SubscriptionController extends Controller
     /**
      * Show subscription checkout page for a plan.
      */
-    public function checkout(string $slug, string $planGuid): Response
+    public function checkout(string $slug, string $planGuid): RedirectResponse
     {
-        $tool = collect(config('tools'))->firstWhere('slug', $slug);
-        if (!$tool || !($tool['is_active'] ?? false)) {
-            abort(404);
-        }
-
-        $plan = collect($tool['plans'] ?? [])->firstWhere('guid', $planGuid);
-        if (!$plan) {
-            abort(404);
-        }
-
-        // Check existing active subscription
-        $existing = ToolSubscription::where('user_id', auth()->id())
-            ->where('tool_guid', $tool['guid'])
-            ->where('status', 'active')
-            ->first();
-
-        $walletBalance = (float) auth()->user()->available_balance();
-        $walletCurrency = auth()->user()->currency_id ? (\App\Models\Currency::find(auth()->user()->currency_id)?->currency ?? 'USD') : 'USD';
-
-        $baseCurrencyId = \App\Models\AdminSettings::business_currency();
-        $userCurrencyId = auth()->user()->currency_id ?: $baseCurrencyId;
-        
-        $priceMonthly = \App\Models\CurrenciesExchange::RateToday($plan['price_monthly'], $baseCurrencyId, $userCurrencyId);
-        $priceYearly = \App\Models\CurrenciesExchange::RateToday($plan['price_yearly'], $baseCurrencyId, $userCurrencyId);
-
-        // Max subscription months restriction (admin-configurable per tool)
-        $maxSubscriptionMonths = $tool['max_subscription_months'] ?? null;
-
-        return Inertia::render('Tools/Subscribe', [
-            'tool'          => [
-                'slug'    => $tool['slug'],
-                'title'   => $tool['title'],
-                'icon_url' => $tool['icon_url'] ?? null,
-            ],
-            'plan'          => [
-                'id'            => $plan['guid'],
-                'name'          => $plan['name'],
-                'price_monthly' => $priceMonthly,
-                'price_yearly'  => $priceYearly,
-                'features'      => $plan['features'] ?? [],
-            ],
-            'walletBalance'         => $walletBalance,
-            'walletCurrency'        => $walletCurrency,
-            'hasExisting'           => (bool) $existing,
-            'maxSubscriptionMonths' => $maxSubscriptionMonths,
-        ]);
+        return redirect()->route('subscriptions.plans');
     }
 
     /**

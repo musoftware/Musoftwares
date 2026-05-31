@@ -70,6 +70,7 @@ Route::middleware(['web'])
         // Analytics Tracking endpoints
         Route::post('/s/track/cta', [\Modules\Marketplace\Http\Controllers\Seller\ServiceLandingPageAnalyticsController::class, 'trackCtaClick'])->name('landing-page.track.cta');
         Route::post('/s/track/scroll', [\Modules\Marketplace\Http\Controllers\Seller\ServiceLandingPageAnalyticsController::class, 'trackScroll'])->name('landing-page.track.scroll');
+    });
 
 // -- Admin Routes --------------------------------------------------
 Route::middleware(['web', 'auth', 'admin'])

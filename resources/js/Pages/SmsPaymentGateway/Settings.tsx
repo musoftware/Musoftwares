@@ -24,7 +24,7 @@ interface Props {
     };
     devices: {
         id: number;
-        name: string;
+        device_name: string;
     }[];
 }
 
@@ -123,7 +123,7 @@ export default function Settings({ settings, devices }: Props) {
                                                 >
                                                     <option value="">{__('Any Device')}</option>
                                                     {devices?.map(device => (
-                                                        <option key={device.id} value={device.id}>{device.name}</option>
+                                                        <option key={device.id} value={device.id}>{device.device_name}</option>
                                                     ))}
                                                 </select>
                                             </div>
@@ -180,7 +180,7 @@ export default function Settings({ settings, devices }: Props) {
                                                 >
                                                     <option value="">{__('Any Device')}</option>
                                                     {devices?.map(device => (
-                                                        <option key={device.id} value={device.id}>{device.name}</option>
+                                                        <option key={device.id} value={device.id}>{device.device_name}</option>
                                                     ))}
                                                 </select>
                                             </div>

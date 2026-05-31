@@ -15,6 +15,29 @@ use Inertia\Response as InertiaResponse;
 class AdminTaskController extends Controller
 {
     /**
+     * Recursively sanitize all string values in a data structure to valid UTF-8.
+     * This prevents "Malformed UTF-8 characters" errors during JSON serialization (Inertia).
+     */
+    private function sanitizeUtf8(mixed $data): mixed
+    {
+        if (is_string($data)) {
+            // Convert to UTF-8, replacing any invalid sequences
+            $cleaned = mb_convert_encoding($data, 'UTF-8', 'UTF-8');
+            // Remove any remaining invalid UTF-8 bytes
+            return preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F]/', '', $cleaned) ?? $data;
+        }
+
+        if (is_array($data)) {
+            return array_map(fn ($item) => $this->sanitizeUtf8($item), $data);
+        }
+
+        if ($data instanceof \Illuminate\Support\Collection) {
+            return $data->map(fn ($item) => $this->sanitizeUtf8($item));
+        }
+
+        return $data;
+    }
+    /**
      * Display a listing of active checklist items for all clients.
      */
     public function asList(Request $request): InertiaResponse
@@ -139,7 +162,7 @@ class AdminTaskController extends Controller
             ->where('paused', false)
             ->count();
 
-        return Inertia::render('Admin/Tasks/AsList', [
+        return Inertia::render('Admin/Tasks/AsList', $this->sanitizeUtf8([
             'arrangedClients' => $arrangedClients,
             'clients'         => $clients,
             'filters'         => $request->only(['search', 'client_id', 'tenant_id']),
@@ -147,7 +170,7 @@ class AdminTaskController extends Controller
                 'total_active_todos' => $totalActive,
                 'total_clients'      => count($clients),
             ],
-        ]);
+        ]));
     }
 
     /**
@@ -289,7 +312,7 @@ class AdminTaskController extends Controller
             'name' => $u->name,
         ]);
 
-        return Inertia::render('Admin/Tasks/TaskCalendar', [
+        return Inertia::render('Admin/Tasks/TaskCalendar', $this->sanitizeUtf8([
             'events'  => $events,
             'year'    => $year,
             'month'   => $month,
@@ -297,7 +320,7 @@ class AdminTaskController extends Controller
             'filters' => [
                 'client_id' => $clientId,
             ],
-        ]);
+        ]));
     }
 
     /**
@@ -315,13 +338,15 @@ class AdminTaskController extends Controller
             ->orderBy('name')
             ->get()
             ->map(function ($u) {
-                // Get initials
+                // Get initials (multibyte-safe for Arabic/non-ASCII names)
                 $words = explode(' ', $u->name);
                 $initials = '';
                 foreach ($words as $w) {
-                    $initials .= strtoupper(substr($w, 0, 1));
+                    if (mb_strlen($w, 'UTF-8') > 0) {
+                        $initials .= mb_strtoupper(mb_substr($w, 0, 1, 'UTF-8'), 'UTF-8');
+                    }
                 }
-                $initials = substr($initials, 0, 2);
+                $initials = mb_substr($initials, 0, 2, 'UTF-8');
 
                 return [
                     'id'              => $u->id,
@@ -404,14 +429,14 @@ class AdminTaskController extends Controller
                 });
         }
 
-        return Inertia::render('Admin/Tasks/ClientTasks', [
+        return Inertia::render('Admin/Tasks/ClientTasks', $this->sanitizeUtf8([
             'clients'        => $clients,
             'selectedClient' => $selectedClient,
             'todos'          => $todos,
             'filters'        => [
                 'client_id' => $clientId,
             ],
-        ]);
+        ]));
     }
 
     /**

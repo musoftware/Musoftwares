@@ -678,6 +678,14 @@ function AuthenticatedContent({
                                                         <Shield className="mr-2 h-4 w-4 text-indigo-600" /> Admin Dashboard
                                                     </DropdownMenuItem>
                                                 )}
+                                                {user?.roles?.includes('moderator') && (
+                                                    <DropdownMenuItem 
+                                                        className="cursor-pointer rounded-lg text-sm bg-blue-50 text-blue-700 focus:bg-blue-100 focus:text-blue-800 mb-1"
+                                                        render={<Link href={safeRoute('admin.tickets.index')} className="flex items-center w-full font-medium" />}
+                                                    >
+                                                        <LifeBuoy className="mr-2 h-4 w-4 text-blue-600" /> Manage Tickets
+                                                    </DropdownMenuItem>
+                                                )}
                                                 <DropdownMenuItem 
                                                     className="cursor-pointer rounded-lg text-sm"
                                                     render={<Link href={safeRoute('profile.edit')} className="flex items-center w-full" />}
