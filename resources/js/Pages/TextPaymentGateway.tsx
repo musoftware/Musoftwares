@@ -164,6 +164,17 @@ export default function TextPaymentGateway({ devices, webhook, token, stats, rec
                         <Card className="border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
                             <CardHeader>
                                 <CardTitle className="flex items-center gap-2 text-lg">
+                                    <Activity className="w-5 h-5 text-sky-500" />{__('API Sessions')}</CardTitle>
+                                <CardDescription>{__('View active and completed checkout sessions created via your API keys.')}</CardDescription>
+                            </CardHeader>
+                            <CardContent>
+                                <Button variant="outline" className="w-full border-sky-200 hover:bg-sky-50" onClick={() => router.visit(route('sms-payment-gateway.checkout-sessions'))}>{__('View API Sessions')}</Button>
+                            </CardContent>
+                        </Card>
+
+                        <Card className="border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
+                            <CardHeader>
+                                <CardTitle className="flex items-center gap-2 text-lg">
                                     <Activity className="w-5 h-5 text-amber-500" />{__('Settings')}</CardTitle>
                                 <CardDescription>{__('Set the receiving phone number and enable available payment services.')}</CardDescription>
                             </CardHeader>
@@ -180,6 +191,17 @@ export default function TextPaymentGateway({ devices, webhook, token, stats, rec
                             </CardHeader>
                             <CardContent>
                                 <Button variant="outline" className="w-full border-blue-200 hover:bg-blue-50 text-blue-700" onClick={() => router.visit(route('sms-payment-gateway.documentation'))}>{__('sms_gateway.integration_docs')}</Button>
+                            </CardContent>
+                        </Card>
+
+                        <Card className="border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
+                            <CardHeader>
+                                <CardTitle className="flex items-center gap-2 text-lg">
+                                    <Webhook className="w-5 h-5 text-purple-500" />{__('Webhooks')}</CardTitle>
+                                <CardDescription>{__('Configure webhook endpoints to receive real-time payment notifications on your server.')}</CardDescription>
+                            </CardHeader>
+                            <CardContent>
+                                <Button variant="outline" className="w-full border-purple-200 hover:bg-purple-50 text-purple-700" onClick={() => router.visit(route('sms-payment-gateway.webhooks'))}>{__('Configure Webhooks')}</Button>
                             </CardContent>
                         </Card>
                     </div>

@@ -61,6 +61,8 @@ Route::middleware(['web', 'auth', 'verified', 'onboarding', 'subscription:sms-pa
 
     Route::get('sms-simulator', [SmsPaymentGatewayController::class, 'smsSimulator'])->name('sms-simulator');
 
+    Route::get('checkout-sessions', [SmsPaymentGatewayController::class, 'checkoutSessions'])->name('checkout-sessions');
+
     // ─── API Keys Management ───────────────────────
     Route::get('api-keys', [SmsPaymentGatewayController::class, 'apiKeys'])->name('api-keys');
     Route::post('api-keys', [SmsPaymentGatewayController::class, 'createApiKey'])->name('api-keys.store');
