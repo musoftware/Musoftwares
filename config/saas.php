@@ -105,7 +105,7 @@ return [
         'affiliate-moderators'      => ['price' => 500, 'name' => 'Team Moderators',      'desc' => 'Sub-accounts for affiliates',          'icon' => 'Shield',          'parent' => 'affiliate-pos'],
         'affiliate-advanced-returns'=> ['price' => 500, 'name' => 'Advanced Returns',     'desc' => 'Automated returning & replacing',      'icon' => 'RefreshCcw',      'parent' => 'affiliate-pos'],
         'affiliate-custom-domain'   => ['price' => 500, 'name' => 'Custom Domain',        'desc' => 'Use your own domain for the store',    'icon' => 'Link',            'parent' => 'affiliate-pos'],
-        'affiliate-pos'             => ['price' => 500, 'name' => 'POS System',           'desc' => 'Cashier, barcode, & receipts',         'icon' => 'MonitorSmartphone', 'parent' => 'affiliate-pos'],
+        'affiliate-pos-system'      => ['price' => 500, 'name' => 'POS System',           'desc' => 'Cashier, barcode, & receipts',         'icon' => 'MonitorSmartphone', 'parent' => 'affiliate-pos'],
         'affiliate-whatsapp'        => ['price' => 500, 'name' => 'WhatsApp Alerts',      'desc' => 'Order & shipping notifications',       'icon' => 'MessageSquare',   'parent' => 'affiliate-pos'],
         'affiliate-analytics'       => ['price' => 500, 'name' => 'Advanced Analytics',   'desc' => 'Conversion rates & ROI tracking',      'icon' => 'BarChart',        'parent' => 'affiliate-pos'],
         'affiliate-wallet'          => ['price' => 500, 'name' => 'Advanced Wallet',      'desc' => 'Payment requests & withdrawals',       'icon' => 'Wallet',          'parent' => 'affiliate-pos'],
