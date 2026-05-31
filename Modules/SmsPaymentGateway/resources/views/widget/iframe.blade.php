@@ -68,7 +68,7 @@
                 <div class="grid grid-cols-2 gap-3">
                     @if(isset($isInstapay) && $isInstapay)
                     <label class="relative block">
-                        <input type="radio" name="payment_method" value="instapay" data-phone="{{ $instapayPhone ?? ($phone ?? '') }}" class="peer sr-only payment-method-radio" required>
+                        <input type="radio" name="payment_method" value="instapay" data-phone="{{ $instapayPhone ?? ($phone ?? '') }}" data-is-etisalat="{{ isset($isEtisalatInstapay) && $isEtisalatInstapay ? 'true' : 'false' }}" class="peer sr-only payment-method-radio" required>
                         <div class="method-label border-2 border-gray-200 rounded-xl p-3 text-center flex flex-col items-center justify-center opacity-70 peer-checked:opacity-100 peer-checked:border-indigo-600 peer-checked:bg-indigo-50 peer-checked:shadow-sm">
                             <img src="{{ asset('assets/images/gateways/instapay.png') }}" alt="Instapay" class="h-8 object-contain rounded mb-1">
                             <span class="text-xs font-bold text-gray-700">إنستاباي</span>
@@ -78,7 +78,7 @@
 
                     @if(isset($isVodafone) && $isVodafone)
                     <label class="relative block">
-                        <input type="radio" name="payment_method" value="vodafone_cash" data-phone="{{ $vodafonePhone ?? ($phone ?? '') }}" class="peer sr-only payment-method-radio" required>
+                        <input type="radio" name="payment_method" value="vodafone_cash" data-phone="{{ $vodafonePhone ?? ($phone ?? '') }}" data-is-etisalat="{{ isset($isEtisalatVodafone) && $isEtisalatVodafone ? 'true' : 'false' }}" class="peer sr-only payment-method-radio" required>
                         <div class="method-label border-2 border-gray-200 rounded-xl p-3 text-center flex flex-col items-center justify-center opacity-70 peer-checked:opacity-100 peer-checked:border-indigo-600 peer-checked:bg-indigo-50 peer-checked:shadow-sm">
                             <img src="{{ asset('assets/images/gateways/vodafone-cash.svg') }}" alt="Vodafone Cash" class="h-8 object-contain mb-1">
                             <span class="text-xs font-bold text-gray-700">فودافون كاش / محافظ</span>
@@ -90,10 +90,10 @@
 
             <!-- TRANSACTION ID -->
             <div class="mb-6">
-                <label class="block text-sm font-bold text-gray-800 mb-2">رقم العملية (Transaction ID):</label>
+                <label class="block text-sm font-bold text-gray-800 mb-2" id="tx-label-text">رقم العملية (Transaction ID):</label>
                 <input type="text" id="transaction_id" name="transaction_id" required placeholder="أدخل رقم العملية الذي ظهر لك بعد التحويل"
                        class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:border-transparent text-left font-mono tracking-wider transition shadow-sm" dir="ltr">
-                <p class="text-[10px] text-gray-500 mt-2">تجد رقم العملية في رسالة التأكيد أو إيصال التحويل.</p>
+                <p class="text-[10px] text-gray-500 mt-2" id="tx-hint-text">تجد رقم العملية في رسالة التأكيد أو إيصال التحويل.</p>
             </div>
 
             <!-- ERROR MSG -->
@@ -147,6 +147,20 @@
         }, 2000);
     }
 
+    const TX_LABEL_AR = "رقم العملية (Transaction ID):";
+    const TX_PLACEHOLDER_AR = "أدخل رقم العملية الذي ظهر لك بعد التحويل";
+    const TX_HINT_AR = "تجد رقم العملية في رسالة التأكيد أو إيصال التحويل.";
+
+    const SENDER_LABEL_AR = "أدخل رقم الهاتف المرسل:";
+    const SENDER_PLACEHOLDER_AR = "رقم الموبايل الذي قمت بالتحويل منه";
+    const SENDER_HINT_AR = "أدخل رقم الموبايل الذي قمت بتحويل المبلغ منه.";
+    
+    function updateStep2UI(isEtisalat) {
+        document.getElementById('tx-label-text').textContent = isEtisalat ? SENDER_LABEL_AR : TX_LABEL_AR;
+        document.getElementById('transaction_id').placeholder = isEtisalat ? SENDER_PLACEHOLDER_AR : TX_PLACEHOLDER_AR;
+        document.getElementById('tx-hint-text').textContent = isEtisalat ? SENDER_HINT_AR : TX_HINT_AR;
+    }
+
     // Update displayed phone number based on selected method
     document.addEventListener('DOMContentLoaded', () => {
         const radios = document.querySelectorAll('.payment-method-radio');
@@ -156,6 +170,7 @@
             radio.addEventListener('change', (e) => {
                 if (e.target.checked && e.target.dataset.phone) {
                     walletNumberDisplay.innerText = e.target.dataset.phone;
+                    updateStep2UI(e.target.dataset.isEtisalat === 'true');
                 }
             });
         });
@@ -167,6 +182,10 @@
             if (firstAvailable.dataset.phone) {
                 walletNumberDisplay.innerText = firstAvailable.dataset.phone;
             }
+            updateStep2UI(firstAvailable.dataset.isEtisalat === 'true');
+        } else if (document.querySelector('.payment-method-radio:checked')) {
+            const checkedRadio = document.querySelector('.payment-method-radio:checked');
+            updateStep2UI(checkedRadio.dataset.isEtisalat === 'true');
         }
     });
 

@@ -71,21 +71,37 @@ class HostedCheckoutController extends Controller
 
         if (in_array('instapay', $paymentMethodTypes) && ($settings?->is_instapay_enabled ?? true)) {
             $walletNumbers['instapay'] = $settings->instapay_phone_number ?? $defaultPhone;
+            $isEtisalatInstapay = false;
+            if ($settings && $settings->instapay_allowed_sender) {
+                $isEtisalatInstapay = stripos($settings->instapay_allowed_sender, 'EtisalatCash') !== false || stripos($settings->instapay_allowed_sender, 'e& money') !== false;
+            }
+            if (!$isEtisalatInstapay && $this->isPhoneEtisalatCash($session->user_id, $walletNumbers['instapay'])) {
+                $isEtisalatInstapay = true;
+            }
             $paymentMethods[] = [
                 'id' => 'instapay',
                 'name' => 'InstaPay',
                 'icon' => asset('assets/images/gateways/instapay.png'),
                 'phone' => $walletNumbers['instapay'],
+                'is_etisalat' => $isEtisalatInstapay,
             ];
         }
 
         if (in_array('vodafone_cash', $paymentMethodTypes) && ($settings?->is_vodafone_cash_enabled ?? true)) {
             $walletNumbers['vodafone_cash'] = $settings->vodafone_cash_phone_number ?? $defaultPhone;
+            $isEtisalatVodafone = false;
+            if ($settings && $settings->vodafone_cash_allowed_sender) {
+                $isEtisalatVodafone = stripos($settings->vodafone_cash_allowed_sender, 'EtisalatCash') !== false || stripos($settings->vodafone_cash_allowed_sender, 'e& money') !== false;
+            }
+            if (!$isEtisalatVodafone && $this->isPhoneEtisalatCash($session->user_id, $walletNumbers['vodafone_cash'])) {
+                $isEtisalatVodafone = true;
+            }
             $paymentMethods[] = [
                 'id' => 'vodafone_cash',
                 'name' => __('sms_gateway.vodafone_cash'),
                 'icon' => asset('assets/images/gateways/vodafone-cash.svg'),
                 'phone' => $walletNumbers['vodafone_cash'],
+                'is_etisalat' => $isEtisalatVodafone,
             ];
         }
 
@@ -159,8 +175,11 @@ class HostedCheckoutController extends Controller
             ->whereIn('status', ['pending', 'unmatched'])
             ->where('created_at', '>=', now()->subHours(24))
             ->where(function ($q) use ($reference) {
-                $q->where('reference_number', $reference)
-                  ->orWhere('phone_number', 'LIKE', '%' . substr(preg_replace('/[^0-9]/', '', $reference), -8) . '%');
+                $q->where('reference_number', $reference);
+                $numericRef = preg_replace('/[^0-9]/', '', $reference);
+                if (strlen($numericRef) >= 6) {
+                    $q->orWhere('phone_number', 'LIKE', '%' . substr($numericRef, -8) . '%');
+                }
             });
 
         if ($deviceId) {
@@ -308,5 +327,44 @@ class HostedCheckoutController extends Controller
                 $webhook->increment('failure_count');
             }
         }
+    }
+
+    private function isPhoneEtisalatCash($userId, $phone)
+    {
+        if (empty($phone)) return false;
+        
+        $numericPhone = preg_replace('/[^0-9]/', '', $phone);
+        if (strlen($numericPhone) < 8) return false;
+        $searchPhone = substr($numericPhone, -8);
+
+        $device = \Modules\SmsPaymentGateway\Models\SmsPaymentGatewayDevice::where('user_id', $userId)
+            ->where(function($q) use ($searchPhone) {
+                $q->where('sim1_number', 'LIKE', '%' . $searchPhone . '%')
+                  ->orWhere('sim2_number', 'LIKE', '%' . $searchPhone . '%');
+            })->first();
+
+        if ($device) {
+            $sim1Match = strpos(preg_replace('/[^0-9]/', '', $device->sim1_number ?? ''), $searchPhone) !== false;
+            $sim2Match = strpos(preg_replace('/[^0-9]/', '', $device->sim2_number ?? ''), $searchPhone) !== false;
+            
+            $metadata = $device->metadata ?? [];
+            if ($sim1Match && !empty($metadata['sim1_configs']) && is_array($metadata['sim1_configs'])) {
+                foreach ($metadata['sim1_configs'] as $config) {
+                    if (isset($config['allowed_sender'])) {
+                        $sender = $config['allowed_sender'];
+                        if (stripos($sender, 'Etisalat') !== false || stripos($sender, 'e&') !== false) return true;
+                    }
+                }
+            }
+            if ($sim2Match && !empty($metadata['sim2_configs']) && is_array($metadata['sim2_configs'])) {
+                foreach ($metadata['sim2_configs'] as $config) {
+                    if (isset($config['allowed_sender'])) {
+                        $sender = $config['allowed_sender'];
+                        if (stripos($sender, 'Etisalat') !== false || stripos($sender, 'e&') !== false) return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
 }
