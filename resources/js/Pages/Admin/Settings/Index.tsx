@@ -11,6 +11,7 @@ import {
     Clock,
     AlertTriangle,
     Save,
+    RefreshCw,
 } from 'lucide-react';
 
 interface Currency {
@@ -44,6 +45,7 @@ interface SettingsData {
     gumroad: string | null;
     whatsapp_default_channel_id: string | null;
     friday_work_allowed: boolean;
+    max_devices_per_tenant: number;
 }
 
 interface Props {
@@ -265,6 +267,20 @@ export default function Index({ currencies, whatsappChannels, settings }: Props)
                                         The derived overhead hourly rate (EGP) is cached. Use Recalculate below if needed.
                                     </p>
                                 </Field>
+                                <Field label="Max Devices Per Tenant (Default)">
+                                    <Input
+                                        id="max_devices_per_tenant"
+                                        type="number"
+                                        min="1"
+                                        step="1"
+                                        value={form.max_devices_per_tenant ?? ''}
+                                        onChange={(e) => set('max_devices_per_tenant', parseInt(e.target.value) || 1)}
+                                        placeholder="1"
+                                    />
+                                    <p className="text-xs text-gray-500 mt-1">
+                                        The global default number of allowed devices per user (can be overridden in User Edit page).
+                                    </p>
+                                </Field>
                                 <Toggle
                                     id="friday_work_allowed"
                                     label="Friday Work Allowed"
@@ -436,6 +452,22 @@ export default function Index({ currencies, whatsappChannels, settings }: Props)
                         </div>
                         <Button type="submit" variant="destructive" className="w-full">
                             Update All
+                        </Button>
+                    </form>
+                </SectionCard>
+
+                {/* Recalculate Overhead Rate */}
+                <SectionCard title="Overhead Hourly Rate" icon={RefreshCw}>
+                    <p className="text-sm font-medium text-gray-700 mb-4">
+                        Clears the daily server cache and recomputes the overhead hourly rate (EGP) from latest cost data (last 6 months).
+                    </p>
+                    <form onSubmit={(e) => {
+                        e.preventDefault();
+                        if (!confirm('Are you sure you want to recalculate the overhead hourly rate?')) return;
+                        router.post(route('admin.settings.recalculate-overhead-hourly-rate'));
+                    }} className="space-y-4">
+                        <Button type="submit" variant="outline" className="w-full">
+                            Recalculate Rate
                         </Button>
                     </form>
                 </SectionCard>

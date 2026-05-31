@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Head, router, useForm } from '@inertiajs/react';
+import { Head, router, useForm, Link } from '@inertiajs/react';
 import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
 import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
@@ -345,15 +345,15 @@ export default function Index({ users, search }: Props) {
                                     >
                                         {/* User */}
                                         <td className="px-4 py-3">
-                                            <div className="flex items-center gap-3">
-                                                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-900 text-white text-xs font-bold flex-shrink-0">
+                                            <Link href={route('admin.users.show', user.id)} className="flex items-center gap-3 group">
+                                                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-900 text-white text-xs font-bold flex-shrink-0 group-hover:bg-blue-600 transition-colors">
                                                     {user.name.charAt(0).toUpperCase()}
                                                 </div>
                                                 <div>
-                                                    <div className="font-medium text-slate-900">{user.name}</div>
+                                                    <div className="font-medium text-slate-900 group-hover:text-blue-600 transition-colors">{user.name}</div>
                                                     <div className="text-[11px] text-slate-400">{user.email}</div>
                                                 </div>
-                                            </div>
+                                            </Link>
                                         </td>
 
                                         {/* Balance */}

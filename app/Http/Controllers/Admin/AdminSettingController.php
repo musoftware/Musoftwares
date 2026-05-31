@@ -53,6 +53,7 @@ class AdminSettingController extends Controller
             'gumroad'                     => AdminSettings::GetValue('gumroad'),
             'whatsapp_default_channel_id' => AdminSettings::GetValue('whatsapp_default_channel_id'),
             'friday_work_allowed'         => AdminSettings::GetValue('friday_work_allowed') === '1',
+            'max_devices_per_tenant'      => AdminSettings::GetValue('max_devices_per_tenant') ?? 1,
         ];
 
         return Inertia::render('Admin/Settings/Index', [
@@ -82,6 +83,7 @@ class AdminSettingController extends Controller
             'gumroad'                     => 'nullable|string',
             'whatsapp_default_channel_id' => 'nullable|string',
             'friday_work_allowed'         => 'boolean',
+            'max_devices_per_tenant'      => 'nullable|integer|min:1',
         ]);
 
         $this->configService->updateSettings($validated);
@@ -118,6 +120,14 @@ class AdminSettingController extends Controller
                 ->update(['hour_rate' => $rate]);
         }
 
-        return redirect()->back()->with('success', 'Prices updated for all clients.');
+        return redirect()->back()->with('success', __('admin.prices_updated_for_all_clients'));
+    }
+
+    public function recalculateOverheadHourlyRate()
+    {
+        \App\Helpers\FinanceHelper::forgetCachedOverheadHourlyRate();
+        $rate = \App\Helpers\FinanceHelper::calculateOverheadHourlyRate();
+
+        return redirect()->back()->with('success', __('admin.overhead_hourly_rate_recalculated', ['rate' => $rate]));
     }
 }

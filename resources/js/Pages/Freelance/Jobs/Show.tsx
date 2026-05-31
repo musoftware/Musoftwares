@@ -2,7 +2,9 @@ import React, { useState } from 'react';
 import { Head, useForm, router, Link } from '@inertiajs/react';
 import FreelanceLayout from '../Layout';
 import { useFreelanceMode } from '@/Components/Freelance/FreelanceModeContext';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/Components/ui/card';
+import { CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/Components/ui/card';
+import { FreelanceCard } from '@/Components/Freelance/ui/FreelanceCard';
+import { FreelanceStatusPill } from '@/Components/Freelance/ui/FreelanceStatusPill';
 import { Badge } from '@/Components/ui/badge';
 import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
@@ -57,7 +59,7 @@ function ShowJobContent({ auth, job, pointsCost }: any) {
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
                     {/* Left Column (Job Details - 8 cols) */}
                     <div className="lg:col-span-8 space-y-6">
-                        <Card className="shadow-sm border-slate-200/60 overflow-hidden">
+                        <FreelanceCard>
                             <CardHeader className="bg-slate-50/50 border-b border-slate-100 pb-6">
                                 <div className="flex justify-between items-start gap-4">
                                     <div className="space-y-1">
@@ -90,7 +92,7 @@ function ShowJobContent({ auth, job, pointsCost }: any) {
                                     </div>
                                 </div>
                             </CardContent>
-                        </Card>
+                        </FreelanceCard>
 
                         {/* Client View: Proposals Management */}
                         {isClient && (
@@ -101,16 +103,16 @@ function ShowJobContent({ auth, job, pointsCost }: any) {
                                 </h2>
 
                                 {!job.proposals || job.proposals.length === 0 ? (
-                                    <Card className="border-dashed shadow-none bg-slate-50 border-slate-200">
+                                    <FreelanceCard className="border-dashed shadow-none bg-slate-50 border-slate-200">
                                         <CardContent className="py-12 flex flex-col items-center justify-center text-slate-500">
                                             <FileText className="h-10 w-10 text-slate-300 mb-3" />
                                             <p className="font-medium">{__('No proposals received yet.')}</p>
                                         </CardContent>
-                                    </Card>
+                                    </FreelanceCard>
                                 ) : (
                                     <div className="space-y-4">
                                         {job.proposals.map((proposal: any) => (
-                                            <Card key={proposal.id} className="shadow-sm border-slate-200/70 hover:border-indigo-200 transition-colors overflow-hidden">
+                                            <FreelanceCard key={proposal.id} interactive>
                                                 <CardContent className="p-6">
                                                     <div className="flex justify-between items-start mb-4">
                                                         <div className="space-y-1">
@@ -144,7 +146,7 @@ function ShowJobContent({ auth, job, pointsCost }: any) {
                                                         </div>
                                                     )}
                                                 </CardContent>
-                                            </Card>
+                                            </FreelanceCard>
                                         ))}
                                     </div>
                                 )}
@@ -154,7 +156,7 @@ function ShowJobContent({ auth, job, pointsCost }: any) {
 
                     {/* Right Column (Actions - 4 cols) */}
                     <div className="lg:col-span-4 space-y-6">
-                        <Card className="shadow-sm border-slate-200/60 sticky top-6">
+                        <FreelanceCard className="sticky top-6">
                             <CardHeader className="border-b border-slate-100 bg-slate-50/50 pb-5">
                                 <CardTitle className="text-base font-semibold text-slate-900">{__('Project Overview')}</CardTitle>
                             </CardHeader>
@@ -273,7 +275,7 @@ function ShowJobContent({ auth, job, pointsCost }: any) {
                                     )}
                                 </CardFooter>
                             )}
-                        </Card>
+                        </FreelanceCard>
                     </div>
                 </div>
             </div>

@@ -182,4 +182,9 @@ return [
     'team_member_added' => 'تم إضافة عضو الفريق :name بنجاح.',
     'team_member_updated' => 'تم تحديث تفاصيل عضو الفريق بنجاح.',
     'team_member_removed' => 'تم إزالة عضو الفريق :name بنجاح.',
+
+    // Employee Todos
+    'todo_created_success' => 'تم إضافة المهمة بنجاح.',
+    'todo_updated_success' => 'تم تحديث المهمة بنجاح.',
+    'todo_deleted_success' => 'تم حذف المهمة بنجاح.',
 ];

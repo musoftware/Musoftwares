@@ -41,5 +41,7 @@ Route::middleware(['web', 'auth', 'verified', 'onboarding', 'subscription:sms-pa
     Route::post('test-mode/create-transaction', [SmsPaymentGatewayController::class, 'createTestTransaction'])->name('test-mode.create-transaction');
     Route::post('test-mode/send-webhook', [SmsPaymentGatewayController::class, 'sendTestWebhook'])->name('test-mode.send-webhook');
     Route::delete('test-mode/clear-data', [SmsPaymentGatewayController::class, 'clearTestData'])->name('test-mode.clear-data');
+
+    Route::get('sms-simulator', [SmsPaymentGatewayController::class, 'smsSimulator'])->name('sms-simulator');
 });
 

@@ -54,130 +54,127 @@ export default function ClientActionsSheet({ client, isOpen, onClose, onLoginAs,
                     </div>
                 </DialogHeader>
 
-                <div className="p-6 space-y-6 max-h-[85vh] overflow-y-auto">
-                    {/* Finance & Billing */}
-                    <div className="space-y-4">
-                        <div className="flex items-center gap-2">
-                            <Wallet className="h-4 w-4 text-slate-800" />
-                            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500">
-                                Finance & Billing
-                            </h3>
-                            <Separator className="flex-1" />
+                <div className="p-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {/* Finance & Billing Column */}
+                        <div>
+                            <h6 className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-3 px-3">
+                                Finance
+                            </h6>
+                            <div className="flex flex-col space-y-0.5">
+                                <Link 
+                                    href={`/admin/invoices/create?user=${client.id}`} 
+                                    onClick={onClose}
+                                    className="flex items-center px-3 py-2 text-sm rounded-md hover:bg-slate-100 transition-colors text-slate-700 font-medium"
+                                >
+                                    <FilePlus className="h-4 w-4 mr-3 text-slate-500" /> New Invoice
+                                </Link>
+                                <Link 
+                                    href={`/admin/transactions/create?user=${client.id}&type=receive`} 
+                                    onClick={onClose}
+                                    className="flex items-center px-3 py-2 text-sm rounded-md hover:bg-slate-100 transition-colors text-slate-700 font-medium"
+                                >
+                                    <Wallet className="h-4 w-4 mr-3 text-slate-500" /> Receive Money
+                                </Link>
+                                <Link 
+                                    href={`/admin/transactions/create?user=${client.id}&type=send-money`} 
+                                    onClick={onClose}
+                                    className="flex items-center px-3 py-2 text-sm rounded-md hover:bg-slate-100 transition-colors text-slate-700 font-medium"
+                                >
+                                    <Banknote className="h-4 w-4 mr-3 text-slate-500" /> Send Money
+                                </Link>
+                                <Link 
+                                    href={`/admin/transactions/create?user=${client.id}&type=refund`} 
+                                    onClick={onClose}
+                                    className="flex items-center px-3 py-2 text-sm rounded-md hover:bg-slate-100 transition-colors text-slate-700 font-medium"
+                                >
+                                    <RotateCcw className="h-4 w-4 mr-3 text-slate-500" /> Refund Money
+                                </Link>
+                                <Link 
+                                    href={`/admin/invoices?client_id=${client.id}`} 
+                                    onClick={onClose}
+                                    className="flex items-center px-3 py-2 text-sm rounded-md hover:bg-slate-100 transition-colors text-slate-700 font-medium"
+                                >
+                                    <FileText className="h-4 w-4 mr-3 text-slate-500" /> Invoices
+                                </Link>
+                                <Link 
+                                    href={`/admin/transactions/transfer?user=${client.id}`} 
+                                    onClick={onClose}
+                                    className="flex items-center px-3 py-2 text-sm rounded-md hover:bg-slate-100 transition-colors text-slate-700 font-medium"
+                                >
+                                    <Shuffle className="h-4 w-4 mr-3 text-slate-500" /> Swap Budgets
+                                </Link>
+                                <Link 
+                                    href={`/admin/transactions?user=${client.id}`} 
+                                    onClick={onClose}
+                                    className="flex items-center px-3 py-2 text-sm rounded-md hover:bg-slate-100 transition-colors text-slate-700 font-medium"
+                                >
+                                    <Receipt className="h-4 w-4 mr-3 text-slate-500" /> All Transactions
+                                </Link>
+                                <button 
+                                    onClick={() => { onClose(); onResetPassword(client.id); }}
+                                    className="flex items-center px-3 py-2 text-sm rounded-md hover:bg-slate-100 transition-colors text-slate-700 font-medium w-full text-left"
+                                >
+                                    <Key className="h-4 w-4 mr-3 text-slate-500" /> Reset Password
+                                </button>
+                            </div>
                         </div>
-                        
-                        <div className="grid grid-cols-2 gap-3">
-                            <Button variant="outline" className="flex-col items-start h-auto py-3 px-4 gap-2 bg-white hover:bg-slate-50 hover:text-black hover:border-slate-300 transition-colors shadow-sm" asChild>
-                                <Link href={`/admin/invoices/create?user=${client.id}`}>
-                                    <FilePlus className="h-4 w-4 text-slate-800" /> 
-                                    <span className="font-normal text-slate-700">New Invoice</span>
-                                </Link>
-                            </Button>
-                            <Button variant="outline" className="flex-col items-start h-auto py-3 px-4 gap-2 bg-white hover:bg-slate-50 hover:text-black hover:border-slate-300 transition-colors shadow-sm" asChild>
-                                <Link href={`/admin/transactions/create?user=${client.id}&type=receive`}>
-                                    <Coins className="h-4 w-4 text-slate-800" /> 
-                                    <span className="font-normal text-slate-700">Receive Money</span>
-                                </Link>
-                            </Button>
-                            <Button variant="outline" className="flex-col items-start h-auto py-3 px-4 gap-2 bg-white hover:bg-slate-50 hover:text-black hover:border-slate-300 transition-colors shadow-sm" asChild>
-                                <Link href={`/admin/transactions/create?user=${client.id}&type=send-money`}>
-                                    <Banknote className="h-4 w-4 text-slate-800" /> 
-                                    <span className="font-normal text-slate-700">Send Money</span>
-                                </Link>
-                            </Button>
-                            <Button variant="outline" className="flex-col items-start h-auto py-3 px-4 gap-2 bg-white hover:bg-slate-50 hover:text-black hover:border-slate-300 transition-colors shadow-sm" asChild>
-                                <Link href={`/admin/transactions/create?user=${client.id}&type=refund`}>
-                                    <RotateCcw className="h-4 w-4 text-slate-800" /> 
-                                    <span className="font-normal text-slate-700">Refund Money</span>
-                                </Link>
-                            </Button>
-                            <Button variant="outline" className="flex-col items-start h-auto py-3 px-4 gap-2 bg-white hover:bg-slate-50 hover:text-black hover:border-slate-300 transition-colors shadow-sm" asChild>
-                                <Link href={`/admin/invoices?user=${client.id}`}>
-                                    <FileText className="h-4 w-4 text-slate-800" /> 
-                                    <span className="font-normal text-slate-700">Invoices</span>
-                                </Link>
-                            </Button>
-                            <Button variant="outline" className="flex-col items-start h-auto py-3 px-4 gap-2 bg-white hover:bg-slate-50 hover:text-black hover:border-slate-300 transition-colors shadow-sm" asChild>
-                                <Link href={`/admin/transactions/transfer?user=${client.id}`}>
-                                    <Shuffle className="h-4 w-4 text-slate-800" /> 
-                                    <span className="font-normal text-slate-700">Swap Budgets</span>
-                                </Link>
-                            </Button>
-                            <Button variant="outline" className="flex-col items-start h-auto py-3 px-4 gap-2 bg-white hover:bg-slate-50 hover:text-black hover:border-slate-300 transition-colors shadow-sm" asChild>
-                                <Link href={`/admin/transactions?user=${client.id}`}>
-                                    <Receipt className="h-4 w-4 text-slate-800" /> 
-                                    <span className="font-normal text-slate-700">All Transactions</span>
-                                </Link>
-                            </Button>
-                        </div>
-                    </div>
 
-                    {/* Workflow */}
-                    <div className="space-y-4 pt-2">
-                        <div className="flex items-center gap-2">
-                            <LayoutDashboard className="h-4 w-4 text-slate-800" />
-                            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500">
-                                Workflow
-                            </h3>
-                            <Separator className="flex-1" />
-                        </div>
-                        <div className="grid grid-cols-2 gap-3">
-                            <Button variant="outline" className="flex-col items-start h-auto py-3 px-4 gap-2 bg-white hover:bg-slate-50 hover:text-black hover:border-slate-300 transition-colors shadow-sm" asChild>
-                                <Link href={`/admin/users/${client.id}/projects`}>
-                                    <LayoutDashboard className="h-4 w-4 text-slate-800" /> 
-                                    <span className="font-normal text-slate-700">Projects</span>
+                        {/* Account & Tools Column */}
+                        <div>
+                            <h6 className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-3 px-3">
+                                Account & Tools
+                            </h6>
+                            <div className="flex flex-col space-y-0.5">
+                                <Link 
+                                    href={`/admin/users/${client.id}/projects`} 
+                                    onClick={onClose}
+                                    className="flex items-center px-3 py-2 text-sm rounded-md hover:bg-slate-100 transition-colors text-slate-700 font-medium"
+                                >
+                                    <LayoutDashboard className="h-4 w-4 mr-3 text-slate-500" /> Projects
                                 </Link>
-                            </Button>
-                            <Button variant="outline" className="flex-col items-start h-auto py-3 px-4 gap-2 bg-white hover:bg-slate-50 hover:text-black hover:border-slate-300 transition-colors shadow-sm" asChild>
-                                <Link href={`/admin/users/${client.id}/tasks/assign`}>
-                                    <ListTodo className="h-4 w-4 text-slate-800" /> 
-                                    <span className="font-normal text-slate-700">Assign Tasks</span>
+                                <Link 
+                                    href={`/admin/users/${client.id}/tasks/assign`} 
+                                    onClick={onClose}
+                                    className="flex items-center px-3 py-2 text-sm rounded-md hover:bg-slate-100 transition-colors text-slate-700 font-medium"
+                                >
+                                    <ListTodo className="h-4 w-4 mr-3 text-slate-500" /> Assign Task
                                 </Link>
-                            </Button>
-                            <Button variant="outline" className="flex-col items-start h-auto py-3 px-4 gap-2 bg-white hover:bg-slate-50 hover:text-black hover:border-slate-300 transition-colors shadow-sm" asChild>
-                                <Link href={`/admin/users/${client.id}/notes`}>
-                                    <ClipboardEdit className="h-4 w-4 text-slate-800" /> 
-                                    <span className="font-normal text-slate-700">Notes</span>
+                                <Link 
+                                    href={`/admin/users/${client.id}/notes`} 
+                                    onClick={onClose}
+                                    className="flex items-center px-3 py-2 text-sm rounded-md hover:bg-slate-100 transition-colors text-slate-700 font-medium"
+                                >
+                                    <ClipboardEdit className="h-4 w-4 mr-3 text-slate-500" /> Notes
                                 </Link>
-                            </Button>
-                            <Button variant="outline" className="flex-col items-start h-auto py-3 px-4 gap-2 bg-white hover:bg-slate-50 hover:text-black hover:border-slate-300 transition-colors shadow-sm" asChild>
-                                <Link href={`/admin/users/${client.id}/files`}>
-                                    <Folder className="h-4 w-4 text-slate-800" /> 
-                                    <span className="font-normal text-slate-700">User Files</span>
+                                <Link 
+                                    href={`/admin/users/${client.id}/files`} 
+                                    onClick={onClose}
+                                    className="flex items-center px-3 py-2 text-sm rounded-md hover:bg-slate-100 transition-colors text-slate-700 font-medium"
+                                >
+                                    <Folder className="h-4 w-4 mr-3 text-slate-500" /> Files
                                 </Link>
-                            </Button>
-                        </div>
-                    </div>
-
-                    {/* Account */}
-                    <div className="space-y-4 pt-2">
-                        <div className="flex items-center gap-2">
-                            <User className="h-4 w-4 text-slate-800" />
-                            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500">
-                                Account
-                            </h3>
-                            <Separator className="flex-1" />
-                        </div>
-                        <div className="grid grid-cols-2 gap-3">
-                            <Button variant="outline" className="flex-col items-start h-auto py-3 px-4 gap-2 bg-white hover:bg-slate-50 hover:text-black hover:border-slate-300 transition-colors shadow-sm" asChild>
-                                <Link href={`/admin/users/${client.id}`}>
-                                    <User className="h-4 w-4 text-slate-800" /> 
-                                    <span className="font-normal text-slate-700">View Profile</span>
+                                <Link 
+                                    href={`/admin/users/${client.id}`} 
+                                    onClick={onClose}
+                                    className="flex items-center px-3 py-2 text-sm rounded-md hover:bg-slate-100 transition-colors text-slate-700 font-medium"
+                                >
+                                    <User className="h-4 w-4 mr-3 text-slate-500" /> View Profile
                                 </Link>
-                            </Button>
-                            <Button variant="outline" className="flex-col items-start h-auto py-3 px-4 gap-2 bg-white hover:bg-slate-50 hover:text-black hover:border-slate-300 transition-colors shadow-sm" asChild>
-                                <Link href={`/admin/users/${client.id}/edit`}>
-                                    <ClipboardEdit className="h-4 w-4 text-slate-800" /> 
-                                    <span className="font-normal text-slate-700">Edit Client</span>
+                                <Link 
+                                    href={`/admin/users/${client.id}/edit`} 
+                                    onClick={onClose}
+                                    className="flex items-center px-3 py-2 text-sm rounded-md hover:bg-slate-100 transition-colors text-slate-700 font-medium"
+                                >
+                                    <ClipboardEdit className="h-4 w-4 mr-3 text-slate-500" /> Edit Profile
                                 </Link>
-                            </Button>
-                            <Button variant="outline" className="flex-col items-start h-auto py-3 px-4 gap-2 bg-white hover:bg-slate-50 hover:text-black hover:border-slate-300 transition-colors shadow-sm" onClick={() => onLoginAs(client.id)}>
-                                <LogIn className="h-4 w-4 text-slate-800" /> 
-                                <span className="font-normal text-slate-700">Login As</span>
-                            </Button>
-                            <Button variant="outline" className="flex-col items-start h-auto py-3 px-4 gap-2 bg-white hover:bg-slate-50 hover:text-black hover:border-slate-300 transition-colors shadow-sm" onClick={() => onResetPassword(client.id)}>
-                                <Key className="h-4 w-4 text-slate-800" /> 
-                                <span className="font-normal text-slate-700">Reset Password</span>
-                            </Button>
+                                <button 
+                                    onClick={() => { onClose(); onLoginAs(client.id); }}
+                                    className="flex items-center px-3 py-2 text-sm rounded-md hover:bg-slate-100 transition-colors text-slate-700 font-medium w-full text-left"
+                                >
+                                    <LogIn className="h-4 w-4 mr-3 text-slate-500" /> Login As
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>

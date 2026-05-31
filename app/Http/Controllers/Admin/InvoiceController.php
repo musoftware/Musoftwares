@@ -178,7 +178,7 @@ class InvoiceController extends Controller
         $invoice->load(['user.projects', 'project', 'items.timers', 'costLines.creditUser']);
         
         return Inertia::render('Admin/Invoices/Show', [
-            'invoice' => new InvoiceResource($invoice)
+            'invoice' => (new InvoiceResource($invoice))->resolve()
         ]);
     }
 
@@ -222,6 +222,44 @@ class InvoiceController extends Controller
         }
 
         return redirect()->back()->with('success', 'Invoice cancelled successfully.');
+    }
+
+    /**
+     * Change invoice status directly.
+     */
+    public function changeStatus(Request $request, Invoice $invoice)
+    {
+        $request->validate(['status' => 'required|in:unpaid,partially_paid,paid,cancelled']);
+        
+        try {
+            if ($request->status === 'paid' && $invoice->status !== 'paid') {
+                $this->invoiceService->markPaid($invoice);
+            } elseif ($request->status === 'cancelled' && $invoice->status !== 'cancelled') {
+                $this->invoiceService->cancelInvoice($invoice);
+            } else {
+                $invoice->update(['status' => $request->status]);
+            }
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', $e->getMessage());
+        }
+
+        return redirect()->back()->with('success', 'Invoice status updated successfully.');
+    }
+
+    /**
+     * Change invoice job status directly.
+     */
+    public function changeJobStatus(Request $request, Invoice $invoice)
+    {
+        $request->validate(['job_status' => 'required|in:pending,processing,done']);
+        
+        try {
+            $invoice->update(['job_status' => $request->job_status]);
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', $e->getMessage());
+        }
+
+        return redirect()->back()->with('success', 'Job status updated successfully.');
     }
 
     /**

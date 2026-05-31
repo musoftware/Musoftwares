@@ -26,6 +26,7 @@ class UserNote extends Model
         'original_category',
         'title',
         'content',
+        'is_pinned',
     ];
 
     /** Valid active categories (excludes 'archived') */

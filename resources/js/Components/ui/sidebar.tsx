@@ -525,7 +525,7 @@ const SidebarMenuButton = React.forwardRef<
       },
       props
     ),
-    render: !tooltip ? render : <TooltipTrigger render={render} />,
+    render: render,
     state: {
       slot: "sidebar-menu-button",
       sidebar: "menu-button",
@@ -546,7 +546,7 @@ const SidebarMenuButton = React.forwardRef<
 
   return (
     <Tooltip>
-      {comp}
+      <TooltipTrigger asChild>{comp}</TooltipTrigger>
       <TooltipContent
         side="right"
         align="center"

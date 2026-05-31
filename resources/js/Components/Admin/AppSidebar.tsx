@@ -50,17 +50,6 @@ const items = [
     ]
   },
   { 
-    title: "CRM System", 
-    url: "/crm/dashboard", 
-    icon: Users,
-    subItems: [
-        { title: "CRM Dashboard", url: "/crm/dashboard", fullReload: true },
-        { title: "Leads", url: "/crm/leads", fullReload: true },
-        { title: "Sequences", url: "/crm/sequences", fullReload: true },
-        { title: "Campaigns", url: "/crm/campaigns", fullReload: true },
-    ]
-  },
-  { 
     title: "Operations", 
     url: "/admin/operations", 
     icon: Briefcase,

@@ -15,29 +15,12 @@ import {
     Briefcase, AlertCircle, DollarSign, ShieldAlert, Activity,
 } from 'lucide-react';
 
+import { FreelanceCard } from '@/Components/Freelance/ui/FreelanceCard';
+import { FreelanceStatusPill } from '@/Components/Freelance/ui/FreelanceStatusPill';
+
 const AppLayout   = FreelanceLayout;
 const AppPage     = ({ children }: { children: React.ReactNode }) =>
     <div className="w-full space-y-6">{children}</div>;
-const SectionCard = ({ children, className, ...props }: { children: React.ReactNode; className?: string; [x: string]: any }) =>
-    <Card className={cn('shadow-sm border-gray-200 overflow-hidden', className)} {...props}>{children}</Card>;
-
-const STATUS_CONFIG: Record<string, { label: string; icon: React.ElementType; className: string }> = {
-    active:    { label: __('Active'),    icon: Activity,     className: 'bg-emerald-50 text-emerald-700 border-emerald-200' },
-    completed: { label: __('Completed'), icon: CheckCircle2, className: 'bg-blue-50   text-blue-700   border-blue-200'    },
-    disputed:  { label: __('Disputed'),  icon: ShieldAlert,  className: 'bg-red-50    text-red-700    border-red-200'     },
-    terminated:{ label: __('Terminated'),icon: XCircle,      className: 'bg-slate-100 text-slate-600  border-slate-200'   },
-};
-
-function StatusPill({ status }: { status: string }) {
-    const cfg = STATUS_CONFIG[status] ?? { label: status, icon: AlertCircle, className: 'bg-slate-50 text-slate-600 border-slate-200' };
-    const Icon = cfg.icon;
-    return (
-        <span className={cn('inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold border', cfg.className)}>
-            <Icon className="h-3 w-3" />
-            {cfg.label}
-        </span>
-    );
-}
 
 function ProgressBar({ value }: { value: number }) {
     const pct = Math.min(100, Math.max(0, value));
@@ -96,7 +79,7 @@ export default function ContractsIndex({ contracts, stats }: any) {
                     {statCards.map((s) => {
                         const Icon = s.icon;
                         return (
-                            <SectionCard key={s.label} className="p-4 flex items-center gap-3">
+                            <FreelanceCard key={s.label} className="p-4 flex items-center gap-3">
                                 <div className={cn('w-9 h-9 rounded-lg flex items-center justify-center shrink-0', s.color)}>
                                     <Icon className="h-4 w-4" />
                                 </div>
@@ -112,7 +95,7 @@ export default function ContractsIndex({ contracts, stats }: any) {
                                     )}
                                     <p className="text-[11px] text-slate-500 mt-0.5">{s.label}</p>
                                 </div>
-                            </SectionCard>
+                            </FreelanceCard>
                         );
                     })}
                 </div>
@@ -132,7 +115,7 @@ export default function ContractsIndex({ contracts, stats }: any) {
                                         : 'bg-white text-slate-600 border-slate-200 hover:border-slate-300'
                                 )}
                             >
-                                {f === 'all' ? `${__('All')} (${count})` : `${STATUS_CONFIG[f]?.label ?? f} (${count})`}
+                                {f === 'all' ? `${__('All')} (${count})` : `${__(f)} (${count})`}
                             </button>
                         );
                     })}
@@ -140,17 +123,17 @@ export default function ContractsIndex({ contracts, stats }: any) {
 
                 {/* Contracts list */}
                 {displayed.length === 0 ? (
-                    <SectionCard>
+                    <FreelanceCard>
                         <EmptyState
                             icon={Briefcase}
                             title={__('No contracts yet')}
                             description={filter === 'all'
                                 ? __('You don\'t have any contracts. Submit proposals on open jobs to start working.')
-                                : `${__('No')} ${STATUS_CONFIG[filter]?.label ?? filter} ${__('contracts to display.')}`}
+                                : `${__('No')} ${filter} ${__('contracts to display.')}`}
                             action="/freelance/jobs/browse"
                             actionLabel={__('Browse Jobs')}
                         />
-                    </SectionCard>
+                    </FreelanceCard>
                 ) : (
                     <div className="space-y-3">
                         {displayed.map((contract: any) => {
@@ -162,9 +145,9 @@ export default function ContractsIndex({ contracts, stats }: any) {
                                               : 0;
 
                             return (
-                                <SectionCard
+                                <FreelanceCard
                                     key={contract.id}
-                                    className="group hover:border-indigo-200 transition-colors"
+                                    interactive
                                 >
                                     <div className="p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                                         <div className="flex-1 min-w-0 space-y-1.5">
@@ -214,7 +197,7 @@ export default function ContractsIndex({ contracts, stats }: any) {
                                                 <p className="text-[10px] text-slate-400">{__('Contract Value')}</p>
                                             </div>
 
-                                            <StatusPill status={contract.status} />
+                                            <FreelanceStatusPill status={contract.status} />
 
                                             <Link
                                                 href={`/freelance/contracts/${contract.id}`}
@@ -225,7 +208,7 @@ export default function ContractsIndex({ contracts, stats }: any) {
                                             </Link>
                                         </div>
                                     </div>
-                                </SectionCard>
+                                </FreelanceCard>
                             );
                         })}
                     </div>
