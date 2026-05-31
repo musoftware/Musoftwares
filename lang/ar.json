@@ -975,5 +975,8 @@
     "to": "إلى",
     "of": "من",
     "results": "نتائج",
-    "Device": "الجهاز"
+    "Device": "الجهاز",
+    "Manage your secret and publishable keys for API integration.": "إدارة المفاتيح السرية والعامة لربط التطبيقات.",
+    "Integration Docs": "مستندات الربط",
+    "Learn how to connect your application to the gateway.": "تعلم كيفية ربط تطبيقك ببوابة الدفع."
 }

@@ -1,6 +1,23 @@
 <?php
 
 return [
+    'service_landing_pages' => 'صفحات هبوط الخدمات',
+    'manage_landing_pages' => 'إدارة صفحات الهبوط',
+    'manage_all_landing_pages' => 'إدارة جميع صفحات هبوط الخدمات على المنصة.',
+    'service' => 'الخدمة',
+    'seller' => 'البائع',
+    'hero_title' => 'عنوان الصفحة',
+    'views_ab' => 'المشاهدات / A/B',
+    'leads' => 'العملاء المحتملين',
+    'status' => 'الحالة',
+    'actions' => 'إجراءات',
+    'variants' => 'النسخ المختلفة',
+    'no_ab_test' => 'لا يوجد اختبار A/B',
+    'no_landing_pages_found' => 'لا توجد صفحات هبوط.',
+    'view' => 'عرض',
+    'delete' => 'حذف',
+    'confirm_delete_landing_page' => 'هل أنت متأكد من رغبتك في حذف صفحة الهبوط هذه؟',
+
     'approved' => 'approved',
     'overhead_hourly_rate_recalculated' => 'تم مسح ذاكرة التخزين المؤقت للسعر. السعر المحدث: :rate جنيه مصري/ساعة (مؤقت حتى نهاية اليوم).',
     'prices_updated_for_all_clients' => 'تم تحديث أسعار الساعة لجميع العملاء بنجاح.',

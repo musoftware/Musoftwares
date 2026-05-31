@@ -253,6 +253,12 @@ if (file_exists(base_path('Modules/CRM/routes/web.php'))) {
     require base_path('Modules/CRM/routes/web.php');
 }
 
+// Admin Tickets (Accessible by Admin and Moderator)
+Route::middleware(['auth', 'verified', 'onboarding', 'role:admin|super_admin|moderator'])->prefix('admin')->name('admin.')->group(function () {
+    Route::resource('tickets', \App\Http\Controllers\Admin\AdminTicketController::class)->only(['index', 'show', 'update']);
+    Route::post('tickets/{ticket}/reply', [\App\Http\Controllers\Admin\AdminTicketController::class, 'reply'])->name('tickets.reply');
+});
+
 // Admin Routes
 Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [\App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard');
@@ -271,6 +277,10 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
     Route::resource('/blog-articles', \App\Http\Controllers\Admin\AdminBlogArticleController::class)->only(['index']);
 
     // ── Admin Employee Todos ────────────────────────────────────────
+    Route::get('/employee-todos', [\App\Http\Controllers\Admin\EmployeeTodoController::class, 'index'])->name('employee-todos.index');
+    Route::post('/employee-todos', [\App\Http\Controllers\Admin\EmployeeTodoController::class, 'store'])->name('employee-todos.store');
+    Route::put('/employee-todos/{employeeTodo}', [\App\Http\Controllers\Admin\EmployeeTodoController::class, 'update'])->name('employee-todos.update');
+    Route::delete('/employee-todos/{employeeTodo}', [\App\Http\Controllers\Admin\EmployeeTodoController::class, 'destroy'])->name('employee-todos.destroy');
 
     // ── Admin Projects ──────────────────────────────────────────────
     Route::resource('/projects', \App\Http\Controllers\Admin\ProjectController::class)->except(['create', 'edit', 'show']);
@@ -356,9 +366,7 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
     Route::post('/busy-times/{busyTime}/toggle-active', [\App\Http\Controllers\Admin\AdminBusyTimesController::class, 'toggleActive'])->name('busy-times.toggle-active');
     Route::delete('/busy-times/{busyTime}', [\App\Http\Controllers\Admin\AdminBusyTimesController::class, 'destroy'])->name('busy-times.destroy');
 
-    // ── Admin Phase 3 (Support & Communication) ───────────────────
-    Route::resource('tickets', \App\Http\Controllers\Admin\AdminTicketController::class)->only(['index', 'show', 'update']);
-    Route::post('tickets/{ticket}/reply', [\App\Http\Controllers\Admin\AdminTicketController::class, 'reply'])->name('tickets.reply');
+
     
     Route::resource('vouchers', \App\Http\Controllers\Admin\AdminVoucherController::class);
 
@@ -423,6 +431,7 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
     Route::delete('/users/{user}/referrals/{referred_user}/unlink', [\App\Http\Controllers\Admin\UsersController::class, 'unlink_referral'])->name('users.referrals.unlink');
     Route::get('/users/files/{id}', [\App\Http\Controllers\Admin\UsersController::class, 'files'])->name('users.files');
     Route::get('/users/reports/{id}', [\App\Http\Controllers\Admin\UsersController::class, 'reports'])->name('users.reports');
+    Route::get('/users/{id}/projects', [\App\Http\Controllers\Admin\UsersController::class, 'projects'])->name('users.projects');
     Route::get('/users/{id}/tasks/add', [\App\Http\Controllers\Admin\UsersController::class, 'add_task'])->name('users.tasks.add');
     
     Route::get('/users/{id}/balance-sheet', [\App\Http\Controllers\Admin\UsersController::class, 'balanceSheetPrint'])->name('users.balance-sheet');
