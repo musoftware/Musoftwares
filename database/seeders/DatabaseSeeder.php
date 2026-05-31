@@ -17,7 +17,7 @@ class DatabaseSeeder extends Seeder
             SiteSettingsSeeder::class,
             AdminUserSeeder::class,
             ModulePlanSeeder::class,
-            PlatformPlanSeeder::class,
+            // PlatformPlanSeeder::class,
         ]);
 
         $client = \App\Models\User::firstOrCreate(
@@ -25,7 +25,6 @@ class DatabaseSeeder extends Seeder
             [
                 'name' => 'Client User',
                 'password' => bcrypt('password'),
-                'role' => 'client',
                 'email_verified_at' => now(),
             ]
         );
