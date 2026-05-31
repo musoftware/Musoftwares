@@ -133,14 +133,10 @@ export default function Devices({ devices, androidAppUrl }: DevicesProps) {
                                                 <div className={`mt-1 w-3 h-3 rounded-full flex-shrink-0 ${device.status === 'connected' ? 'bg-emerald-500' : 'bg-slate-300'}`} />
                                                 <div>
                                                     <h3 className="font-bold text-lg text-slate-800">{device.device_name || __('Generic Android')}</h3>
-                                                    {(device.sim1_number || device.sim2_number) ? (
-                                                        <div className="mt-1 space-y-1">
-                                                            {device.sim1_number && <p className="text-sm font-mono text-slate-500">SIM 1: {device.sim1_number}</p>}
-                                                            {device.sim2_number && <p className="text-sm font-mono text-slate-500">SIM 2: {device.sim2_number}</p>}
-                                                        </div>
-                                                    ) : (
-                                                        <p className="text-sm font-mono text-slate-500 mt-1">{device.phone_number || __('No SIM/Number')}</p>
-                                                    )}
+                                                    <div className="mt-1 space-y-1">
+                                                        <p className="text-sm font-medium text-slate-700">SIM 1: <span className="font-mono text-slate-500">{device.sim1_number || __('Not set')}</span></p>
+                                                        <p className="text-sm font-medium text-slate-700">SIM 2: <span className="font-mono text-slate-500">{device.sim2_number || __('Not set')}</span></p>
+                                                    </div>
                                                     <p className="text-xs text-slate-400 mt-2">{__('Added')}: {new Date(device.created_at).toLocaleDateString()}</p>
                                                 </div>
                                             </div>

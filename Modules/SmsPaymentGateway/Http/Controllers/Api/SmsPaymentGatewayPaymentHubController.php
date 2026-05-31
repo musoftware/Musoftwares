@@ -96,6 +96,46 @@ class SmsPaymentGatewayPaymentHubController extends Controller
     }
 
     /**
+     * Update device info (phone numbers, sim slots)
+     * POST /api/sms-payment-gateway/update-device
+     * Public endpoint (no auth required, uses device token)
+     */
+    public function updateDevice(Request $request)
+    {
+        $request->validate([
+            'device_token' => 'required|string|max:255',
+            'phone_number' => 'nullable|string|max:20',
+            'sim_slot' => 'nullable|integer|min:0|max:1',
+            'sim1_number' => 'nullable|string|max:20',
+            'sim2_number' => 'nullable|string|max:20',
+        ]);
+
+        $device = SmsPaymentGatewayDevice::where('device_token', $request->device_token)
+            ->where('status', 'connected')
+            ->first();
+
+        if (!$device) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Device not found or not connected'
+            ], 404);
+        }
+
+        $device->update([
+            'phone_number' => $request->phone_number,
+            'sim_slot' => $request->sim_slot,
+            'sim1_number' => $request->sim1_number,
+            'sim2_number' => $request->sim2_number,
+            'last_seen_at' => now(),
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Device info updated successfully'
+        ]);
+    }
+
+    /**
      * Get allowed SMS senders
      * GET /api/sms-payment-gateway/allowed-senders
      * Public endpoint (no auth required)
