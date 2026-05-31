@@ -104,7 +104,7 @@ class SmsPaymentGatewayPaymentHubController extends Controller
     {
         // Return array of allowed sender names
         // This can be configured in config file or database
-        $globalSenders = config('sms-payment-gateway.allowed_senders', []);
+        $globalSenders = config('text-payment-gateway.allowed_senders', []);
 
         $userSenders = [];
 
@@ -421,8 +421,8 @@ null";
         }
 
         // Validate amount
-        $minAmount = config('sms-payment-gateway.min_transaction_amount', 1);
-        $maxAmount = config('sms-payment-gateway.max_transaction_amount', 1000000);
+        $minAmount = config('text-payment-gateway.min_transaction_amount', 1);
+        $maxAmount = config('text-payment-gateway.max_transaction_amount', 1000000);
 
         if ($amount <= 0 || $amount < $minAmount || $amount > $maxAmount) {
             return null;
@@ -696,7 +696,7 @@ null";
         }
 
         // Check 4: Promotional message check
-        $exclusionPatterns = config('sms-payment-gateway.exclusion_patterns', []);
+        $exclusionPatterns = config('text-payment-gateway.exclusion_patterns', []);
         $isPromotional = false;
         $matchedPattern = null;
 
@@ -716,15 +716,15 @@ null";
         $geminiAvailable = false;
         $geminiUsed = false;
         if ($device && $device->user) {
-            $geminiAvailable = !empty($device->user->gemini_api) && config('sms-payment-gateway.enable_gemini_extraction', true);
+            $geminiAvailable = !empty($device->user->gemini_api) && config('text-payment-gateway.enable_gemini_extraction', true);
         }
         $debugInfo['checks']['gemini_available'] = $geminiAvailable;
         $debugInfo['checks']['gemini_used'] = $geminiUsed;
 
         // Check 6: Minimum amount validation
         if ($amount !== null) {
-            $minAmount = config('sms-payment-gateway.min_transaction_amount', 1);
-            $maxAmount = config('sms-payment-gateway.max_transaction_amount', 1000000);
+            $minAmount = config('text-payment-gateway.min_transaction_amount', 1);
+            $maxAmount = config('text-payment-gateway.max_transaction_amount', 1000000);
 
             if ($amount < $minAmount) {
                 $debugInfo['reasons'][] = sprintf('Amount %.2f is below minimum %.2f', $amount, $minAmount);
@@ -763,7 +763,7 @@ null";
         }
 
         // Get tolerance from config, default to 100 EGP to allow for fees, other transactions, etc.
-        $tolerance = config('sms-payment-gateway.spoofing_tolerance', 100.00);
+        $tolerance = config('text-payment-gateway.spoofing_tolerance', 100.00);
         $reasons = [];
 
         // IMPORTANT: Balance is wallet-wide (sender-based), not phone-specific
