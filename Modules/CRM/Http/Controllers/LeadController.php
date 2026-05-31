@@ -4,7 +4,7 @@ namespace Modules\CRM\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use Modules\CRM\Models\Lead;
-use App\Services\LeadService;
+use Modules\CRM\Services\LeadService;
 use App\Http\Requests\CRM\Lead\UpdateLeadStatusRequest;
 use App\Http\Resources\LeadResource;
 use Illuminate\Http\Request;

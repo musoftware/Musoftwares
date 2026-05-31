@@ -25,7 +25,7 @@ import {
 } from 'lucide-react';
 import CommandPalette from '@/Components/CommandPalette';
 import ProductTourModal from '@/Components/ProductTourModal';
-import { FloatingQuickAdd } from '@/Components/CRM/FloatingQuickAdd';
+
 import axios from 'axios';
 import FreelanceModeToggle from '@/Components/Freelance/FreelanceModeToggle';
 import MarketplaceModeToggle from '@/Components/Marketplace/MarketplaceModeToggle';
@@ -374,7 +374,7 @@ function AuthenticatedContent({
                                                     "p-0 outline-none border transition-colors duration-150 cursor-pointer",
                                                     isCrmActive ? "bg-indigo-50/80 border-indigo-100" : "hover:bg-slate-50 border-transparent"
                                                 )}
-                                                render={<Link href={safeRoute('crm.dashboard')} className="flex items-start gap-3 p-2.5 rounded-lg w-full" />}
+                                                render={<Link href={activeModules.crm ? safeRoute('crm.dashboard') : safeRoute('subscriptions.plans', { module: 'crm' })} className="flex items-start gap-3 p-2.5 rounded-lg w-full" />}
                                             >
                                                 <div className={cn(
                                                     "w-8 h-8 rounded-md flex items-center justify-center shrink-0 transition-colors",
@@ -386,9 +386,10 @@ function AuthenticatedContent({
                                                     <div className="flex items-center justify-between">
                                                         <p className={cn("text-sm font-medium", isCrmActive ? "text-indigo-900" : "text-slate-900")}>Lead Gen CRM</p>
                                                         {isCrmActive && <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-indigo-100 text-indigo-700">Active</span>}
+                                                        {!activeModules.crm && <Lock className="w-3.5 h-3.5 text-slate-400" />}
                                                     </div>
                                                     <p className={cn("text-xs truncate", isCrmActive ? "text-indigo-700/70" : "text-slate-500")}>
-                                                        Capture leads and manage campaigns
+                                                        {!activeModules.crm ? 'Subscribe to access' : 'Capture leads and manage campaigns'}
                                                     </p>
                                                 </div>
                                             </DropdownMenuItem>
@@ -762,7 +763,7 @@ function AuthenticatedContent({
             />
 
             <CommandPalette />
-            <FloatingQuickAdd />
+
             <Toaster />
         </div>
     );

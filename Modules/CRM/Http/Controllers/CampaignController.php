@@ -4,7 +4,7 @@ namespace Modules\CRM\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use Modules\CRM\Models\Campaign;
-use App\Services\CampaignService;
+use Modules\CRM\Services\CampaignService;
 use App\Http\Requests\Admin\Campaign\StoreCampaignRequest;
 use App\Http\Requests\Admin\Campaign\UpdateCampaignRequest;
 use App\Http\Requests\Admin\Campaign\GenerateAICampaignRequest;
@@ -29,7 +29,7 @@ class CampaignController extends Controller
     {
         $campaign = $this->campaignService->createCampaign($request->validated());
         
-        return redirect()->route('admin.campaigns.show', $campaign->id)->with('success', __('crm.campaign_created'));
+        return redirect()->route('crm.campaigns.show', $campaign->id)->with('success', __('crm.campaign_created'));
     }
 
     public function show(Campaign $campaign)
@@ -50,7 +50,7 @@ class CampaignController extends Controller
     public function destroy(Campaign $campaign)
     {
         $this->campaignService->deleteCampaign($campaign);
-        return redirect()->route('admin.campaigns.index')->with('success', __('crm.campaign_deleted'));
+        return redirect()->route('crm.campaigns.index')->with('success', __('crm.campaign_deleted'));
     }
 
     // -- AI Generation --

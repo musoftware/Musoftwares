@@ -52,6 +52,9 @@ class ActivityLogger
 
     protected function dispatchWebhooks(int $workspaceId, string $event, Activity $activity)
     {
+        if (!\Illuminate\Support\Facades\Schema::hasTable('crm_webhooks')) {
+            return;
+        }
         // Find webhooks in this workspace that subscribe to this specific event (or all events '*')
         $webhooks = \Modules\CRM\Models\Webhook::where('workspace_id', $workspaceId)
             ->where('is_active', true)

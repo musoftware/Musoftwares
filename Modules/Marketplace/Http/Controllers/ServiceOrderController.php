@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Modules\Marketplace\Models\ServiceOrder;
 use Modules\Marketplace\Models\ServicePackage;
-use App\Services\FinancialTransactionService;
+use Modules\Marketplace\Services\FinancialTransactionService;
 use App\Models\Conversation;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;

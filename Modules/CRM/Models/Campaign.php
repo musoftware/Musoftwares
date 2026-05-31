@@ -5,14 +5,14 @@ namespace Modules\CRM\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use App\Traits\BelongsToTenant;
+use Modules\CRM\app\Traits\BelongsToWorkspace;
 
 class Campaign extends Model
 {
-    use HasFactory, SoftDeletes, BelongsToTenant;
+    use HasFactory, SoftDeletes, BelongsToWorkspace;
 
     protected $fillable = [
-        'user_id',
+        'workspace_id',
         'embed_token',
         'form_title',
         'form_description',

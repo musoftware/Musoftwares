@@ -16,6 +16,7 @@ class Lead extends Model
         'workspace_id',
         'branch_id',
         'campaign_id',
+        'crm_widget_id',
         'source',
         'name',
         'email',
@@ -105,5 +106,13 @@ class Lead extends Model
     public function branch()
     {
         return $this->belongsTo(Branch::class);
+    }
+
+    /**
+     * Get the widget that generated this lead
+     */
+    public function widget()
+    {
+        return $this->belongsTo(CrmWidget::class, 'crm_widget_id');
     }
 }

@@ -10,7 +10,7 @@ Route::middleware(['web'])->prefix('sms-payment-gateway')->name('sms-payment-gat
     Route::get('pay/status', [WidgetController::class, 'status'])->name('widget.status');
 });
 
-Route::middleware(['web', 'auth', 'verified', 'onboarding', 'subscription:intelligence'])->prefix('sms-payment-gateway')->name('sms-payment-gateway.')->group(function () {
+Route::middleware(['web', 'auth', 'verified', 'onboarding', 'subscription:sms-payment-gateway'])->prefix('sms-payment-gateway')->name('sms-payment-gateway.')->group(function () {
     Route::get('/', [SmsPaymentGatewayController::class, 'index'])->name('index');
     Route::get('devices', [SmsPaymentGatewayController::class, 'devices'])->name('devices');
     Route::get('webhooks', [SmsPaymentGatewayController::class, 'webhooks'])->name('webhooks');

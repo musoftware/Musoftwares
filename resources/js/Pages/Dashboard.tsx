@@ -324,7 +324,7 @@ export default function Dashboard({
                             <h2 className="text-xl font-bold text-slate-900 mb-6">Account Activity (Last 6 Months)</h2>
                             
                             <div className="h-[300px] w-full">
-                                <ResponsiveContainer width="100%" height="100%">
+                                <ResponsiveContainer width="100%" height="100%" minHeight={300}>
                                     <BarChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                                         <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
                                         <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#64748b' }} dy={10} />
