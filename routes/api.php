@@ -95,3 +95,7 @@ Route::get('bing-daily-images', function () {
     return response()->json($images ?: []);
 })->name('api.bing-daily-images');
 
+if (file_exists(base_path('Modules/CRM/routes/api.php'))) {
+    require base_path('Modules/CRM/routes/api.php');
+}
+

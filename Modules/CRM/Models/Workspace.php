@@ -44,4 +44,12 @@ class Workspace extends Model
     {
         return $this->hasMany(Role::class);
     }
+
+    /**
+     * CRM Team Members assigned to this workspace.
+     */
+    public function teamMembers()
+    {
+        return $this->hasMany(CrmTeamMember::class);
+    }
 }

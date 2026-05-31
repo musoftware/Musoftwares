@@ -49,6 +49,7 @@ return [
         'crm-sales-management' => ['price' => 300, 'name' => 'Sales Management & Tracking', 'desc' => 'KPIs, SLA monitoring, and branch analytics', 'icon' => 'Activity', 'parent' => 'crm'],
         'crm-call-center' => ['price' => 400, 'name' => 'Enterprise Call Center', 'desc' => 'Dial queues, QA, and advanced telephony', 'icon' => 'Headset', 'parent' => 'crm'],
         'crm-advanced-operations' => ['price' => 500, 'name' => 'Advanced Operations & Workflows', 'desc' => 'Automations, webhooks, and SLA routing engines', 'icon' => 'Settings', 'parent' => 'crm'],
+        'crm-advanced-roles' => ['price' => 300, 'name' => 'Advanced Roles', 'desc' => 'Unlock manager and admin team roles', 'icon' => 'Shield', 'parent' => 'crm'],
 
         // ── ERP ──
         'erp-projects' => ['price' => 500, 'name' => 'Projects Management', 'desc' => 'Track client projects and budgets', 'icon' => 'Briefcase', 'parent' => 'erp'],

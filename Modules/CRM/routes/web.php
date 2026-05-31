@@ -17,8 +17,15 @@ Route::middleware(['web'])->group(function () {
     Route::post('/crm/w/{token}', [CrmWidgetCaptureController::class, 'store'])->name('crm.widgets.submit');
 });
 
+// ── CRM Team Portal Auth (Public — No auth required) ──────────────
+Route::middleware(['web'])->prefix('crm/portal')->name('crm.team.')->group(function () {
+    Route::get('login', [\Modules\CRM\Http\Controllers\CrmTeamAuthController::class, 'showLogin'])->name('login');
+    Route::post('login', [\Modules\CRM\Http\Controllers\CrmTeamAuthController::class, 'login'])->name('login.store');
+    Route::post('logout', [\Modules\CRM\Http\Controllers\CrmTeamAuthController::class, 'logout'])->name('logout');
+});
+
 // ── CRM Module Routes ──────────────────────────────────────────────
-Route::middleware(['web', 'auth', 'verified', 'onboarding', 'subscription:crm', \Modules\CRM\Http\Middleware\WorkspaceMiddleware::class])
+Route::middleware(['web', 'auth', 'verified', 'onboarding', 'subscription:crm', \Modules\CRM\Http\Middleware\ShareCrmTeamSession::class, \Modules\CRM\Http\Middleware\WorkspaceMiddleware::class])
     ->prefix('crm')
     ->name('crm.')
     ->group(function () {
@@ -57,6 +64,9 @@ Route::middleware(['web', 'auth', 'verified', 'onboarding', 'subscription:crm', 
         Route::delete('/tags/{tag}', [LeadTagController::class, 'destroy'])->name('tags.destroy');
         Route::post('/leads/{lead}/tags/attach', [LeadTagController::class, 'attach'])->name('leads.tags.attach');
         Route::delete('/leads/{lead}/tags/{tag}/detach', [LeadTagController::class, 'detach'])->name('leads.tags.detach');
+
+        // ── CRM Team Management
+        Route::resource('team-members', \Modules\CRM\Http\Controllers\CrmTeamController::class)->except(['show', 'create', 'edit']);
 
         // ── CRM Web Widgets
         Route::resource('widgets', CrmWidgetController::class);
