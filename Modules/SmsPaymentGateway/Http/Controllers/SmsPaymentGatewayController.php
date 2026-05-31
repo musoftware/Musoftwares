@@ -256,21 +256,6 @@ class SmsPaymentGatewayController extends Controller
             ->with('success', __('messages.all_transactions_cleared_success', ['count' => $deletedCount]));
     }
 
-    /**
-     * Toggle spoof detection for device
-     */
-    public function toggleSpoofDetection($id, \Modules\SmsPaymentGateway\Services\DeviceManagementService $deviceService)
-    {
-        $device = SmsPaymentGatewayDevice::where('user_id', Auth::id())
-            ->findOrFail($id);
-
-        $newStatus = $deviceService->toggleSpoofDetection($device);
-
-        $statusText = $newStatus ? __('messages.enabled') : __('messages.disabled');
-
-        return redirect()->route('sms-payment-gateway.device', $device->id)
-            ->with('success', __('messages.spoof_detection_status_updated', ['status' => $statusText]));
-    }
 
     /**
      * Register or update webhook

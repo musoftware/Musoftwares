@@ -25,6 +25,8 @@ class SmsPaymentGatewayDevice extends Model
         'last_seen_at',
         'phone_number',
         'sim_slot',
+        'sim1_number',
+        'sim2_number',
         'metadata',
     ];
 

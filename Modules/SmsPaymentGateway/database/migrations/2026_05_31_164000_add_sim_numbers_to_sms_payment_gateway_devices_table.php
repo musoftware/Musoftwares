@@ -12,7 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('sms_payment_gateway_devices', function (Blueprint $table) {
-            $table->boolean('enable_spoof_detection')->default(false)->after('status');
+            $table->string('sim1_number', 20)->nullable()->after('phone_number');
+            $table->string('sim2_number', 20)->nullable()->after('sim1_number');
         });
     }
 
@@ -22,7 +23,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('sms_payment_gateway_devices', function (Blueprint $table) {
-            $table->dropColumn('enable_spoof_detection');
+            $table->dropColumn(['sim1_number', 'sim2_number']);
         });
     }
 };

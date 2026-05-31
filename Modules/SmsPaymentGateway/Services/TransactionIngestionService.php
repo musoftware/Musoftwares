@@ -161,7 +161,7 @@ class TransactionIngestionService
             $phoneNumber = $transactionData['phone_number'] ?? null;
 
             $smsTimestamp = isset($smsData['timestamp']) ? intval($smsData['timestamp']) : null;
-            $spoofDetectionEnabled = $device->enable_spoof_detection ?? true;
+            $spoofDetectionEnabled = false; // Disabled completely as per user request
 
             if ($spoofDetectionEnabled) {
                 $spoofingCheck = $this->checkForSpoofing(

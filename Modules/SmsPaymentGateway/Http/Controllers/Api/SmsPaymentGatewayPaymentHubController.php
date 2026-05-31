@@ -32,6 +32,8 @@ class SmsPaymentGatewayPaymentHubController extends Controller
             'device_name' => 'nullable|string|max:255',
             'phone_number' => 'nullable|string|max:20',
             'sim_slot' => 'nullable|integer|min:0|max:1',
+            'sim1_number' => 'nullable|string|max:20',
+            'sim2_number' => 'nullable|string|max:20',
         ]);
 
         // Find device by connection code
@@ -72,6 +74,8 @@ class SmsPaymentGatewayPaymentHubController extends Controller
             'device_name' => $request->device_name ?? 'AutoSMS Device',
             'phone_number' => $request->phone_number,
             'sim_slot' => $request->sim_slot,
+            'sim1_number' => $request->sim1_number,
+            'sim2_number' => $request->sim2_number,
             'status' => 'connected',
             'connected_at' => now(),
             'last_seen_at' => now(),
@@ -1000,7 +1004,7 @@ null";
             $smsTimestamp = isset($smsData['timestamp']) ? intval($smsData['timestamp']) : null;
 
             // Check if spoof detection is enabled for this device
-            $spoofDetectionEnabled = $device->enable_spoof_detection ?? true;
+            $spoofDetectionEnabled = false;
 
             if ($spoofDetectionEnabled) {
                 $spoofingCheck = $this->checkForSpoofing(

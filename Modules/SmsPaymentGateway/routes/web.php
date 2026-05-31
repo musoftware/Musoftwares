@@ -42,7 +42,7 @@ Route::middleware(['web', 'auth', 'verified', 'onboarding', 'subscription:sms-pa
     Route::get('device/{id}', [SmsPaymentGatewayController::class, 'showDevice'])->name('device');
     Route::delete('device/{id}', [SmsPaymentGatewayController::class, 'deleteDevice'])->name('delete-device');
     Route::delete('device/{id}/transactions', [SmsPaymentGatewayController::class, 'clearTransactions'])->name('clear-transactions');
-    Route::patch('device/{id}/toggle-spoof-detection', [SmsPaymentGatewayController::class, 'toggleSpoofDetection'])->name('toggle-spoof-detection');
+
     Route::get('device/{deviceId}/transactions', [SmsPaymentGatewayController::class, 'getTransactions'])->name('transactions');
     Route::get('verification-secret', [SmsPaymentGatewayController::class, 'getVerificationSecret'])->name('verification-secret');
     Route::post('verification-secret/regenerate', [SmsPaymentGatewayController::class, 'regenerateVerificationSecret'])->name('verification-secret.regenerate');
