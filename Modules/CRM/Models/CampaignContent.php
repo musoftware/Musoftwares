@@ -14,7 +14,6 @@ class CampaignContent extends Model
         'language',
         'email_subject',
         'email_body',
-        'whatsapp_message',
     ];
 
     /**
@@ -41,27 +40,4 @@ class CampaignContent extends Model
         return $this->email_body;
     }
 
-    /**
-     * Get the WhatsApp message
-     */
-    public function getWhatsAppMessage()
-    {
-        return $this->whatsapp_message;
-    }
-
-    /**
-     * Check if this content has email content
-     */
-    public function hasEmailContent()
-    {
-        return !empty($this->email_subject) && !empty($this->email_body);
-    }
-
-    /**
-     * Check if this content has WhatsApp content
-     */
-    public function hasWhatsAppContent()
-    {
-        return !empty($this->whatsapp_message);
-    }
 }

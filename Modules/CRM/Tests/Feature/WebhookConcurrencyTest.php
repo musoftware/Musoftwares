@@ -24,7 +24,7 @@ class WebhookConcurrencyTest extends BaseTenantTestCase
         ]);
         UserSubscription::factory()->create(['user_id' => $agent->id, 'module_id' => 'crm-sales-staff']);
 
-        // Simulate 5 duplicate concurrent payloads (e.g., WhatsApp retries)
+        // Simulate 5 duplicate concurrent payloads (e.g., webhook retries)
         $action = new ProcessLeadImportAction();
         
         $payloads = [];

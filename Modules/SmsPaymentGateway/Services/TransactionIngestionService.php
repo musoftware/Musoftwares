@@ -212,8 +212,7 @@ class TransactionIngestionService
                 'is_spoofed' => $spoofingCheck['is_spoofed'],
             ]);
 
-            // Attempt realtime matching with an order
-            $this->matchingEngine->matchTransaction($autoSmsTransaction);
+            // Realtime matching was removed here because the flow is strictly manual now via the Widget.
 
             // Dispatch webhook asynchronously using the dedicated service
             $webhookService = app(\Modules\SmsPaymentGateway\Services\WebhookDispatchService::class);

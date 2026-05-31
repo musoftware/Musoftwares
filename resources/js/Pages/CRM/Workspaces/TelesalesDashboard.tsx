@@ -3,7 +3,7 @@ import CrmLayout from '@/Layouts/CrmLayout';
 import KPICard from '../Components/Widgets/KPICard';
 import ActivityFeed from '../Components/Widgets/ActivityFeed';
 import PipelineBoard from '../Components/Kanban/PipelineBoard';
-import { PhoneCall, CalendarAlert, Target, Zap } from 'lucide-react';
+import { PhoneCall, Calendar, Target, Zap } from 'lucide-react';
 import { __ } from '@/lib/i18n';
 import { Card, CardHeader, CardTitle, CardContent } from '@/Components/ui/card';
 
@@ -31,7 +31,7 @@ export default function TelesalesDashboard({ pipeline, kpis, activityFeed }: { p
                     <KPICard 
                         title={__('Pending Follow-ups')} 
                         value={kpis?.pending_followups ?? 0} 
-                        icon={CalendarAlert} 
+                        icon={Calendar} 
                         colorClass="bg-red-100 text-red-600" 
                     />
                     <KPICard 

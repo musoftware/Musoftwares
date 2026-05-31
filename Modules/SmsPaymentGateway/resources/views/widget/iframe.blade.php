@@ -53,6 +53,7 @@
             
             <div class="mt-3 bg-white border border-blue-100 rounded-lg p-3 flex justify-between items-center shadow-sm">
                 <div class="font-mono text-xl font-bold tracking-widest text-gray-900" dir="ltr" id="wallet-number">
+                    <!-- Default to phone, will be updated by JS if a method is selected -->
                     {{ $phone ?? 'غير متوفر' }}
                 </div>
                 <button type="button" onclick="copyNumber()" class="bg-blue-100 hover:bg-blue-200 text-blue-700 text-xs font-bold py-1 px-3 rounded transition">
@@ -62,13 +63,12 @@
         </div>
 
         <form id="verify-form" onsubmit="submitVerification(event)">
-            <!-- METHOD SELECTION -->
             <div class="mb-5">
                 <label class="block text-sm font-bold text-gray-800 mb-3">اختر طريقة التحويل التي استخدمتها:</label>
                 <div class="grid grid-cols-2 gap-3">
                     @if(isset($isInstapay) && $isInstapay)
                     <label class="relative block">
-                        <input type="radio" name="payment_method" value="instapay" class="peer sr-only" required>
+                        <input type="radio" name="payment_method" value="instapay" data-phone="{{ $instapayPhone ?? ($phone ?? '') }}" class="peer sr-only payment-method-radio" required>
                         <div class="method-label border-2 border-gray-200 rounded-xl p-3 text-center flex flex-col items-center justify-center opacity-70 peer-checked:opacity-100 peer-checked:border-indigo-600 peer-checked:bg-indigo-50 peer-checked:shadow-sm">
                             <img src="https://play-lh.googleusercontent.com/9C0DttWn3kED_0L2OQd-p0R_Q3m1Q13i-M-65wD_lIq806oHh4g6vK1o6L7Kk-b29pU" alt="Instapay" class="h-8 object-contain rounded mb-1">
                             <span class="text-xs font-bold text-gray-700">إنستاباي</span>
@@ -78,7 +78,7 @@
 
                     @if(isset($isVodafone) && $isVodafone)
                     <label class="relative block">
-                        <input type="radio" name="payment_method" value="vodafone_cash" class="peer sr-only" required>
+                        <input type="radio" name="payment_method" value="vodafone_cash" data-phone="{{ $vodafonePhone ?? ($phone ?? '') }}" class="peer sr-only payment-method-radio" required>
                         <div class="method-label border-2 border-gray-200 rounded-xl p-3 text-center flex flex-col items-center justify-center opacity-70 peer-checked:opacity-100 peer-checked:border-indigo-600 peer-checked:bg-indigo-50 peer-checked:shadow-sm">
                             <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/Vodafone_logo.svg/1200px-Vodafone_logo.svg.png" alt="Vodafone Cash" class="h-8 object-contain mb-1">
                             <span class="text-xs font-bold text-gray-700">فودافون كاش / محافظ</span>
@@ -146,6 +146,29 @@
             btn.classList.remove('bg-green-100', 'text-green-700');
         }, 2000);
     }
+
+    // Update displayed phone number based on selected method
+    document.addEventListener('DOMContentLoaded', () => {
+        const radios = document.querySelectorAll('.payment-method-radio');
+        const walletNumberDisplay = document.getElementById('wallet-number');
+        
+        radios.forEach(radio => {
+            radio.addEventListener('change', (e) => {
+                if (e.target.checked && e.target.dataset.phone) {
+                    walletNumberDisplay.innerText = e.target.dataset.phone;
+                }
+            });
+        });
+        
+        // Trigger for default checked or first available
+        const firstAvailable = document.querySelector('.payment-method-radio');
+        if (firstAvailable && !document.querySelector('.payment-method-radio:checked')) {
+            firstAvailable.checked = true;
+            if (firstAvailable.dataset.phone) {
+                walletNumberDisplay.innerText = firstAvailable.dataset.phone;
+            }
+        }
+    });
 
     async function submitVerification(e) {
         e.preventDefault();

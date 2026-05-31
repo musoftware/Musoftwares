@@ -16,15 +16,9 @@ export default function SupportDashboard({ stats, priorityMessages }: { stats: a
                 <div className="flex justify-between items-end">
                     <div>
                         <h1 className="text-2xl font-bold tracking-tight text-foreground">{__('Customer Support')}</h1>
-                        <p className="text-sm text-muted-foreground mt-1">{__('Monitor tickets, WhatsApp messages, and response SLAs.')}</p>
+                        <p className="text-sm text-muted-foreground mt-1">{__('Monitor tickets and response SLAs.')}</p>
                     </div>
                     <div className="flex items-center gap-2">
-                        <Button className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white" asChild>
-                            <Link href="/crm/whatsapp">
-                                <MessageSquare size={16} />
-                                {__('Open WhatsApp Inbox')}
-                            </Link>
-                        </Button>
                     </div>
                 </div>
 
@@ -77,10 +71,8 @@ export default function SupportDashboard({ stats, priorityMessages }: { stats: a
                                                 </div>
                                                 <p className="text-sm text-slate-600 truncate">{msg.preview}</p>
                                             </div>
-                                            <Button variant="ghost" size="sm" className="shrink-0 text-indigo-600" asChild>
-                                                <Link href={`/crm/whatsapp/conversations/${msg.id}`}>
+                                            <Button variant="ghost" size="sm" className="shrink-0 text-indigo-600">
                                                     {__('Reply')}
-                                                </Link>
                                             </Button>
                                         </div>
                                     ))}

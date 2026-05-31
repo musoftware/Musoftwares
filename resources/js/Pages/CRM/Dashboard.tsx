@@ -21,7 +21,7 @@ export default function Dashboard({ stats }) {
         },
         {
             title: __('Campaigns'),
-            description: __('Email and WhatsApp marketing campaigns'),
+            description: __('Email marketing campaigns'),
             icon: Mail,
             href: route('crm.campaigns.index'),
             stats: `${stats.active_campaigns} ${__('Active Campaigns')}`,

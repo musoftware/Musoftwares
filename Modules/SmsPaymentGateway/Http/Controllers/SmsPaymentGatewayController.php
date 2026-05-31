@@ -623,6 +623,8 @@ class SmsPaymentGatewayController extends Controller
         $user = Auth::user();
         $request->validate([
             'wallet_phone_number' => 'nullable|string|max:20',
+            'instapay_phone_number' => 'nullable|string|max:20',
+            'vodafone_cash_phone_number' => 'nullable|string|max:20',
             'is_instapay_enabled' => 'boolean',
             'is_vodafone_cash_enabled' => 'boolean',
         ]);
@@ -633,6 +635,8 @@ class SmsPaymentGatewayController extends Controller
 
         $settings->update([
             'wallet_phone_number' => $request->wallet_phone_number,
+            'instapay_phone_number' => $request->instapay_phone_number,
+            'vodafone_cash_phone_number' => $request->vodafone_cash_phone_number,
             'is_instapay_enabled' => $request->has('is_instapay_enabled') ? $request->is_instapay_enabled : true,
             'is_vodafone_cash_enabled' => $request->has('is_vodafone_cash_enabled') ? $request->is_vodafone_cash_enabled : true,
         ]);
@@ -647,7 +651,7 @@ class SmsPaymentGatewayController extends Controller
     {
         $user = Auth::user();
         $links = \App\Models\PaymentOrder::where('user_id', $user->id)
-            ->where('payment_module', 'sms-payment-gateway')
+            ->whereNotNull('metadata->is_sms_gateway')
             ->orderBy('created_at', 'desc')
             ->paginate(15);
 
@@ -671,12 +675,16 @@ class SmsPaymentGatewayController extends Controller
 
         $order = \App\Models\PaymentOrder::create([
             'user_id' => $user->id,
-            'tenant_id' => $user->tenant_id ?? null,
-            'order_number' => $orderNumber,
-            'total_amount' => $request->amount,
+            'mobile_number' => '00000000000', // Dummy as not used here
+            'amount' => $request->amount,
+            'currency' => 'EGP',
             'status' => 'pending',
-            'payment_module' => 'sms-payment-gateway',
-            'customer_name' => $request->customer_name,
+            'metadata' => [
+                'is_sms_gateway' => true,
+                'order_number' => $orderNumber,
+                'customer_name' => $request->customer_name,
+                'description' => $request->description,
+            ]
         ]);
 
         return redirect()->back()->with('success', 'تم إنشاء رابط الدفع بنجاح');

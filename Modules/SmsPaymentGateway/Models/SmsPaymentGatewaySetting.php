@@ -12,6 +12,8 @@ class SmsPaymentGatewaySetting extends Model
         'user_id',
         'tenant_id',
         'wallet_phone_number',
+        'instapay_phone_number',
+        'vodafone_cash_phone_number',
         'is_instapay_enabled',
         'is_vodafone_cash_enabled',
     ];

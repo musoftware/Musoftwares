@@ -48,7 +48,7 @@ export default function Index({ sequences }) {
                         <form onSubmit={handleCreate}>
                             <DialogHeader>
                                 <DialogTitle>Create New Sequence</DialogTitle>
-                                <DialogDescription>A sequence is a series of automated emails or WhatsApp messages sent over time.</DialogDescription>
+                                <DialogDescription>{__('A sequence is a series of automated emails sent over time.')}</DialogDescription>
                             </DialogHeader>
                             <div className="space-y-4 py-4">
                                 <div className="space-y-2">

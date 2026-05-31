@@ -295,58 +295,14 @@ class WorkspaceController extends Controller
 
     public function supportWorkspace(Request $request): Response
     {
-        $tenantId = session('tenant_id');
-        if (!$tenantId) {
-            $tenant = \Modules\ERP\Models\Tenant::where('user_id', $request->user()->id)->first();
-            $tenantId = $tenant ? $tenant->id : null;
-        }
-
-        $openTickets = DB::table('crm_whatsapp_conversations')
-            ->where('workspace_id', $tenantId)
-            ->where('status', 'open')
-            ->count();
-
-        $unreadMessages = DB::table('crm_whatsapp_messages')
-            ->where('workspace_id', $tenantId)
-            ->where('sender_type', 'customer')
-            ->whereNull('read_at')
-            ->count();
-            
-        $resolvedToday = DB::table('crm_whatsapp_conversations')
-            ->where('workspace_id', $tenantId)
-            ->where('status', 'closed')
-            ->whereDate('updated_at', today())
-            ->count();
-
-        // Calculate average response time (mock algorithm fallback if no data)
-        $avgResponseTime = '15m';
-
-        $priorityMessages = DB::table('crm_whatsapp_messages')
-            ->where('workspace_id', $tenantId)
-            ->where('sender_type', 'customer')
-            ->whereNull('read_at')
-            ->join('crm_whatsapp_conversations', 'crm_whatsapp_messages.conversation_id', '=', 'crm_whatsapp_conversations.id')
-            ->select('crm_whatsapp_messages.id', 'crm_whatsapp_messages.body', 'crm_whatsapp_messages.created_at', 'crm_whatsapp_conversations.customer_name', 'crm_whatsapp_conversations.customer_phone')
-            ->orderBy('crm_whatsapp_messages.created_at', 'asc') // Oldest unread first
-            ->limit(10)
-            ->get()
-            ->map(function ($message) {
-                return [
-                    'id' => $message->id,
-                    'customer' => $message->customer_name ?? $message->customer_phone,
-                    'preview' => \Illuminate\Support\Str::limit($message->body, 50),
-                    'timeAgo' => \Carbon\Carbon::parse($message->created_at)->diffForHumans(),
-                ];
-            });
-
         return Inertia::render('CRM/Workspaces/SupportDashboard', [
             'stats' => [
-                'open_tickets' => $openTickets,
-                'avg_response_time' => $avgResponseTime,
-                'unread_messages' => $unreadMessages,
-                'resolved_today' => $resolvedToday
+                'open_tickets' => 0,
+                'avg_response_time' => '0m',
+                'unread_messages' => 0,
+                'resolved_today' => 0
             ],
-            'priorityMessages' => $priorityMessages
+            'priorityMessages' => []
         ]);
     }
 }
