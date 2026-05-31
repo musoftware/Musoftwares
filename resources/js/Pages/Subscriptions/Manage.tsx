@@ -171,9 +171,9 @@ export default function Manage({ subscriptions, invoices, walletBalance, currenc
                                                         </span>
                                                     </div>
                                                     <h4 className="text-lg font-bold tracking-tight mt-1 text-text-primary">{sub.plan_name}</h4>
-                                                    <p className="text-sm font-semibold text-primary">
+                                                    <div className="text-sm font-semibold text-primary">
                                                         <CurrencyDisplay amount={sub.amount} currency={sub.currency} /> /{sub.billing_cycle === 'yearly' ? 'year' : 'month'}
-                                                    </p>
+                                                    </div>
                                                 </div>
 
                                                 <div>

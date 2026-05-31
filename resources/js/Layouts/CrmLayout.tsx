@@ -3,7 +3,7 @@ import { Head, Link, usePage } from '@inertiajs/react';
 import {
     ChevronRight, ArrowLeft, LayoutDashboard, Users, Mail, PlayCircle, Settings,
     Search, Tag, MessageCircle, Smartphone, Bookmark, Zap, Clock, BarChart2,
-    UsersRound, FileText, Bot, PieChart, Send, Activity
+    UsersRound, FileText, Bot, PieChart, Send, Activity, UserPlus
 } from 'lucide-react';
 import { useInertiaNotifications } from '@/hooks/useInertiaNotifications';
 import { CrmCommandPalette } from '@/Components/CRM/CrmCommandPalette';
@@ -15,37 +15,69 @@ interface CrmLayoutProps extends PropsWithChildren {
 }
 
 export default function CrmLayout({ title, activeMenu, children }: CrmLayoutProps) {
-    const { crm_features } = usePage().props as any;
+    const { crm_features, auth } = usePage().props as any;
     useInertiaNotifications();
     const workspaceName = "CRM Workspace";
     const tenantId = 'DRAFT';
     const [cmdOpen, setCmdOpen] = React.useState(false);
 
+    const teamMember = auth?.crm_team_member;
+    const memberRole = teamMember?.role;
+    const isTeamMember = !!teamMember;
+
     const hasFeature = (featureName: string) => {
         return crm_features?.includes(featureName) || crm_features?.[featureName] === true;
     };
 
+    /**
+     * Role-based menu access map.
+     * If user is NOT a team member (owner), they see everything.
+     * If user IS a team member, they see only items matching their role.
+     */
+    const roleMenuAccess: Record<string, string[]> = {
+        'member': ['dashboard', 'leads'],
+        'social_media': ['dashboard', 'leads'],
+        'sales_agent': ['dashboard', 'leads', 'tags', 'search'],
+        'call_center': ['dashboard', 'leads', 'tags', 'search'],
+        'support_agent': ['dashboard', 'leads', 'search'],
+        'support_manager': ['dashboard', 'leads', 'search', 'settings'],
+        'sales_manager': ['dashboard', 'workspaces', 'leads', 'tags', 'search', 'widgets', 'campaigns', 'sequences'],
+        'marketing': ['dashboard', 'leads', 'campaigns', 'widgets'],
+        'manager': ['dashboard', 'workspaces', 'leads', 'tags', 'search', 'widgets', 'team', 'campaigns', 'sequences', 'settings'],
+        'admin': ['dashboard', 'workspaces', 'leads', 'tags', 'search', 'widgets', 'team', 'campaigns', 'sequences', 'settings'],
+    };
+
+    const canSeeMenu = (menuId: string) => {
+        if (!isTeamMember) return true; // Owner sees everything
+        const allowed = roleMenuAccess[memberRole] || roleMenuAccess['member'];
+        return allowed.includes(menuId);
+    };
+
     // Define grouped menu structure
-    const menuGroups = [
-        {
+    const allCoreItems = [
+        { id: 'dashboard', label: __('Dashboard'), icon: LayoutDashboard, href: route('crm.dashboard'), isActive: activeMenu === 'dashboard' },
+        { id: 'workspaces', label: __('Workspaces'), icon: Activity, href: route('crm.workspaces.index'), isActive: activeMenu === 'workspaces' },
+        { id: 'leads', label: __('Leads & Pipeline'), icon: Users, href: route('crm.leads.index'), isActive: activeMenu === 'leads' },
+        { id: 'tags', label: __('Tags & Attributes'), icon: Tag, href: route('crm.tags.index'), isActive: activeMenu === 'tags' },
+        { id: 'search', label: __('Universal Search'), icon: Search, href: route('crm.search.page'), isActive: activeMenu === 'search' },
+        { id: 'widgets', label: __('Web Forms'), icon: FileText, href: route('crm.widgets.index'), isActive: activeMenu === 'widgets' },
+    ].filter(item => canSeeMenu(item.id));
+
+    const menuGroups: { title: string; items: typeof allCoreItems }[] = [];
+
+    if (allCoreItems.length > 0) {
+        menuGroups.push({
             title: __('Core Operations'),
-            items: [
-                { id: 'dashboard', label: __('Dashboard'), icon: LayoutDashboard, href: route('crm.dashboard'), isActive: activeMenu === 'dashboard' },
-                { id: 'workspaces', label: __('Workspaces'), icon: Activity, href: route('crm.workspaces.index'), isActive: activeMenu === 'workspaces' },
-                { id: 'leads', label: __('Leads & Pipeline'), icon: Users, href: route('crm.leads.index'), isActive: activeMenu === 'leads' },
-                { id: 'tags', label: __('Tags & Attributes'), icon: Tag, href: route('crm.tags.index'), isActive: activeMenu === 'tags' },
-                { id: 'search', label: __('Universal Search'), icon: Search, href: route('crm.search'), isActive: activeMenu === 'search' },
-                { id: 'widgets', label: __('Web Forms'), icon: FileText, href: route('crm.widgets.index'), isActive: activeMenu === 'widgets' },
-            ]
-        }
-    ];
+            items: allCoreItems
+        });
+    }
 
     // Advanced Operations / Automations
-    const advancedItems = [];
-    if (hasFeature('crm.campaigns.whatsapp') || hasFeature('crm.campaigns.email') || hasFeature('crm-advanced-operations')) {
+    const advancedItems: typeof allCoreItems = [];
+    if ((hasFeature('crm.campaigns.whatsapp') || hasFeature('crm.campaigns.email') || hasFeature('crm-advanced-operations')) && canSeeMenu('campaigns')) {
         advancedItems.push({ id: 'campaigns', label: __('Broadcast Campaigns'), icon: Mail, href: route('crm.campaigns.index'), isActive: activeMenu === 'campaigns' });
     }
-    if (hasFeature('crm.automations') || hasFeature('crm-advanced-operations')) {
+    if ((hasFeature('crm.automations') || hasFeature('crm-advanced-operations')) && canSeeMenu('sequences')) {
         advancedItems.push({ id: 'sequences', label: __('Automated Sequences'), icon: PlayCircle, href: route('crm.sequences.index'), isActive: activeMenu === 'sequences' });
     }
     if (advancedItems.length > 0) {
@@ -55,15 +87,24 @@ export default function CrmLayout({ title, activeMenu, children }: CrmLayoutProp
         });
     }
 
-    // WhatsApp features have been disabled per user request.
+    // System Settings & Team
+    const systemItems: typeof allCoreItems = [];
 
-    // System Settings
-    menuGroups.push({
-        title: __('System'),
-        items: [
-            { id: 'settings', label: __('CRM Settings'), icon: Settings, href: route('crm.settings.index'), isActive: activeMenu === 'settings' },
-        ]
-    });
+    // Team Members — only visible to workspace owner (not team members)
+    if (!isTeamMember) {
+        systemItems.push({ id: 'team', label: __('crm.team_members'), icon: UserPlus, href: route('crm.team-members.index'), isActive: activeMenu === 'team' });
+    }
+
+    if (canSeeMenu('settings')) {
+        systemItems.push({ id: 'settings', label: __('CRM Settings'), icon: Settings, href: route('crm.settings.index'), isActive: activeMenu === 'settings' });
+    }
+
+    if (systemItems.length > 0) {
+        menuGroups.push({
+            title: __('System'),
+            items: systemItems
+        });
+    }
 
     const activeMenuLabel = menuGroups.flatMap(g => g.items).find(item => item.isActive)?.label || __('Workspace');
 

@@ -16,8 +16,8 @@ class LeadNoteController extends Controller
             'is_pinned' => 'boolean',
         ]);
 
-        $authorId = session('erp_team_member_id') ?? auth()->id();
-        $authorType = session('erp_team_member_id') ? 'Modules\ERP\Models\TeamMember' : 'App\Models\User';
+        $authorId = session('crm_team_member_id') ?? auth()->id();
+        $authorType = session('crm_team_member_id') ? 'Modules\CRM\Models\CrmTeamMember' : 'App\Models\User';
 
         $lead->notes()->create([
             'user_id' => auth()->id(), // Tenant Owner

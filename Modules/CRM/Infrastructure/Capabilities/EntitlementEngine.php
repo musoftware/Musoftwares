@@ -77,9 +77,9 @@ class EntitlementEngine
             return $user;
         }
 
-        // 2. If ERP team member is authenticated, get their tenant owner
-        if (auth('erp_team')->check()) {
-            return auth('erp_team')->user()?->tenant?->user;
+        // 2. If CRM team member is authenticated, get their workspace owner
+        if (auth('crm_team')->check()) {
+            return auth('crm_team')->user()?->workspace?->owner;
         }
 
         // 3. Fallback to TenantContext to look up the workspace owner

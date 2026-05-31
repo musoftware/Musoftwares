@@ -33,6 +33,10 @@ class HandleInertiaRequests extends Middleware
         if (auth('erp_team')->check()) {
             $user = auth('erp_team')->user()?->tenant?->user;
         }
+        if (auth('crm_team')->check()) {
+            $crmMember = auth('crm_team')->user();
+            $user = $crmMember?->workspace?->owner ?? $user;
+        }
 
         return [
             ...parent::share($request),
@@ -42,6 +46,7 @@ class HandleInertiaRequests extends Middleware
                     'roles' => $user->roles->pluck('name')->map(fn($r) => strtolower($r))->toArray(),
                 ]) : null,
                 'team_member' => \Illuminate\Support\Facades\Auth::guard('erp_team')->user(),
+                'crm_team_member' => \Illuminate\Support\Facades\Auth::guard('crm_team')->user(),
                 'is_impersonating' => session()->has('impersonator_id'),
                 'active_modules' => function () use ($user) {
                     if (!$user) return [];
