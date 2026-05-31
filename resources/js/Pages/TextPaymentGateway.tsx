@@ -4,7 +4,7 @@ import { Head, router, Link } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/Components/ui/card';
 import { Button } from '@/Components/ui/button';
-import { Smartphone, Webhook, Key, Activity, CreditCard, ArrowRight, ShieldCheck } from 'lucide-react';
+import { Smartphone, Webhook, Key, Activity, CreditCard, ArrowRight, ShieldCheck, Download, ExternalLink } from 'lucide-react';
 import { Badge } from '@/Components/ui/badge';
 import { formatMoney } from '@/lib/utils';
 
@@ -19,22 +19,42 @@ interface DashboardProps {
         webhook_configured: boolean;
     };
     recentTransactions: any[];
+    androidAppUrl: string | null;
 }
 
-export default function TextPaymentGateway({ devices, webhook, token, stats, recentTransactions }: DashboardProps) {
+export default function TextPaymentGateway({ devices, webhook, token, stats, recentTransactions, androidAppUrl }: DashboardProps) {
     return (
-        <AuthenticatedLayout header={<h2 className="font-semibold text-xl text-gray-800 leading-tight">Payment Gateway</h2>}>
-            <Head title="Payment Gateway" />
+        <AuthenticatedLayout header={<h2 className="font-semibold text-xl text-gray-800 leading-tight">{__('Payment Gateway')}</h2>}>
+            <Head title={__('Payment Gateway')} />
 
             <div className="py-8 md:py-12 bg-slate-50/50 min-h-[calc(100vh-65px)]">
                 <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
                     {/* Header Section */}
-                    <div>
-                        <h1 className="text-3xl font-bold text-slate-900 tracking-tight flex items-center gap-2">
-                            <ShieldCheck className="w-8 h-8 text-rose-600" />
-                            Your Own Payment Gateway
-                        </h1>
-                        <p className="text-slate-500 mt-2 text-lg">A Stripe alternative powered by your Android phones. Receive local wallet payments automatically via SMS.</p>
+                    <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
+                        <div>
+                            <h1 className="text-3xl font-bold text-slate-900 tracking-tight flex items-center gap-2">
+                                <ShieldCheck className="w-8 h-8 text-rose-600" />
+                                {__('Your Own Payment Gateway')}
+                            </h1>
+                            <p className="text-slate-500 mt-2 text-lg max-w-2xl">{__('A Stripe alternative powered by your Android phones. Receive local wallet payments automatically via SMS.')}</p>
+                        </div>
+
+                        {/* Simple Download Button */}
+                        {androidAppUrl && (
+                            <a
+                                href={androidAppUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-3 px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl transition-all shadow-sm hover:shadow-md flex-shrink-0 border border-slate-700 group"
+                            >
+                                <Smartphone className="w-6 h-6 text-emerald-400" />
+                                <div className="flex flex-col items-start text-left">
+                                    <span className="text-[10px] font-medium text-slate-300 uppercase tracking-wider leading-none">{__('Download App')}</span>
+                                    <span className="text-sm font-bold leading-tight">{__('Android APK')}</span>
+                                </div>
+                                <Download className="w-4 h-4 ml-2 opacity-50 group-hover:opacity-100 transition-opacity rtl:mr-2 rtl:ml-0" />
+                            </a>
+                        )}
                     </div>
 
                     {/* Stats Grid */}
@@ -46,7 +66,7 @@ export default function TextPaymentGateway({ devices, webhook, token, stats, rec
                                         <Smartphone className="w-6 h-6 text-emerald-600" />
                                     </div>
                                     <div>
-                                        <p className="text-sm font-medium text-slate-500">Connected Devices</p>
+                                        <p className="text-sm font-medium text-slate-500">{__('Connected Devices')}</p>
                                         <h3 className="text-2xl font-bold text-slate-900">{stats.connected_devices} / {stats.total_devices}</h3>
                                     </div>
                                 </div>
@@ -59,7 +79,7 @@ export default function TextPaymentGateway({ devices, webhook, token, stats, rec
                                         <Activity className="w-6 h-6 text-indigo-600" />
                                     </div>
                                     <div>
-                                        <p className="text-sm font-medium text-slate-500">Total Payments</p>
+                                        <p className="text-sm font-medium text-slate-500">{__('Total Payments')}</p>
                                         <h3 className="text-2xl font-bold text-slate-900">{stats.total_transactions}</h3>
                                     </div>
                                 </div>
@@ -72,12 +92,12 @@ export default function TextPaymentGateway({ devices, webhook, token, stats, rec
                                         <Webhook className="w-6 h-6 text-purple-600" />
                                     </div>
                                     <div>
-                                        <p className="text-sm font-medium text-slate-500">Webhook Status</p>
+                                        <p className="text-sm font-medium text-slate-500">{__('Webhook Status')}</p>
                                         <h3 className="text-lg font-bold text-slate-900 mt-1">
                                             {stats.webhook_configured ? (
-                                                <Badge className="bg-emerald-100 text-emerald-700 hover:bg-emerald-200 border-none">Active</Badge>
+                                                <Badge className="bg-emerald-100 text-emerald-700 hover:bg-emerald-200 border-none">{__('Active')}</Badge>
                                             ) : (
-                                                <Badge variant="outline" className="text-slate-500 border-slate-200">Not Configured</Badge>
+                                                <Badge variant="outline" className="text-slate-500 border-slate-200">{__('Not Configured')}</Badge>
                                             )}
                                         </h3>
                                     </div>
@@ -91,12 +111,12 @@ export default function TextPaymentGateway({ devices, webhook, token, stats, rec
                                         <CreditCard className="w-6 h-6 text-amber-600" />
                                     </div>
                                     <div>
-                                        <p className="text-sm font-medium text-slate-500">API Access</p>
+                                        <p className="text-sm font-medium text-slate-500">{__('API Access')}</p>
                                         <h3 className="text-lg font-bold text-slate-900 mt-1">
                                             {token ? (
-                                                <Badge className="bg-amber-100 text-amber-700 hover:bg-amber-200 border-none">Ready</Badge>
+                                                <Badge className="bg-amber-100 text-amber-700 hover:bg-amber-200 border-none">{__('Ready')}</Badge>
                                             ) : (
-                                                <Badge variant="outline" className="text-rose-500 border-rose-200">Missing Token</Badge>
+                                                <Badge variant="outline" className="text-rose-500 border-rose-200">{__('Missing Token')}</Badge>
                                             )}
                                         </h3>
                                     </div>
@@ -122,6 +142,17 @@ export default function TextPaymentGateway({ devices, webhook, token, stats, rec
                         <Card className="border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
                             <CardHeader>
                                 <CardTitle className="flex items-center gap-2 text-lg">
+                                    <Key className="w-5 h-5 text-emerald-500" />{__('sms_gateway.api_keys')}</CardTitle>
+                                <CardDescription>{__('sms_gateway.api_keys_description')}</CardDescription>
+                            </CardHeader>
+                            <CardContent>
+                                <Button variant="outline" className="w-full border-emerald-200 hover:bg-emerald-50 text-emerald-700" onClick={() => router.visit(route('sms-payment-gateway.api-keys'))}>{__('sms_gateway.api_keys')}</Button>
+                            </CardContent>
+                        </Card>
+
+                        <Card className="border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
+                            <CardHeader>
+                                <CardTitle className="flex items-center gap-2 text-lg">
                                     <CreditCard className="w-5 h-5 text-indigo-500" />{__('Payment Links')}</CardTitle>
                                 <CardDescription>{__('Create quick payment links for customers to collect required amounts.')}</CardDescription>
                             </CardHeader>
@@ -140,6 +171,17 @@ export default function TextPaymentGateway({ devices, webhook, token, stats, rec
                                 <Button variant="outline" className="w-full" onClick={() => router.visit(route('sms-payment-gateway.settings'))}>{__('Gateway Settings')}</Button>
                             </CardContent>
                         </Card>
+
+                        <Card className="border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
+                            <CardHeader>
+                                <CardTitle className="flex items-center gap-2 text-lg">
+                                    <ExternalLink className="w-5 h-5 text-blue-500" />{__('sms_gateway.integration_docs')}</CardTitle>
+                                <CardDescription>{__('sms_gateway.docs_subtitle')}</CardDescription>
+                            </CardHeader>
+                            <CardContent>
+                                <Button variant="outline" className="w-full border-blue-200 hover:bg-blue-50 text-blue-700" onClick={() => router.visit(route('sms-payment-gateway.documentation'))}>{__('sms_gateway.integration_docs')}</Button>
+                            </CardContent>
+                        </Card>
                     </div>
 
                     {/* Recent Transactions Table */}
@@ -147,11 +189,11 @@ export default function TextPaymentGateway({ devices, webhook, token, stats, rec
                         <CardHeader className="bg-slate-50/50 border-b border-slate-100">
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <CardTitle className="text-lg">Recent Payments</CardTitle>
-                                    <CardDescription>Real-time payment receipts captured from your devices.</CardDescription>
+                                    <CardTitle className="text-lg">{__('Recent Payments')}</CardTitle>
+                                    <CardDescription>{__('Real-time payment receipts captured from your devices.')}</CardDescription>
                                 </div>
                                 <Button variant="ghost" size="sm" onClick={() => router.visit(route('sms-payment-gateway.transactions'))} className="text-indigo-600 hover:text-indigo-700">
-                                    View All Payments <ArrowRight className="w-4 h-4 ml-1" />
+                                    {__('View All Payments')} <ArrowRight className="w-4 h-4 ml-1" />
                                 </Button>
                             </div>
                         </CardHeader>
@@ -161,10 +203,10 @@ export default function TextPaymentGateway({ devices, webhook, token, stats, rec
                                     <table className="w-full text-sm text-left">
                                         <thead className="text-xs text-slate-500 uppercase bg-slate-50 border-b border-slate-100">
                                             <tr>
-                                                <th className="px-6 py-4 font-medium">Date</th>
-                                                <th className="px-6 py-4 font-medium">Sender</th>
-                                                <th className="px-6 py-4 font-medium">Amount</th>
-                                                <th className="px-6 py-4 font-medium">Status</th>
+                                                <th className="px-6 py-4 font-medium">{__('Date')}</th>
+                                                <th className="px-6 py-4 font-medium">{__('Sender')}</th>
+                                                <th className="px-6 py-4 font-medium">{__('Amount')}</th>
+                                                <th className="px-6 py-4 font-medium">{__('Status')}</th>
                                             </tr>
                                         </thead>
                                         <tbody className="divide-y divide-slate-100">
@@ -181,9 +223,9 @@ export default function TextPaymentGateway({ devices, webhook, token, stats, rec
                                                     </td>
                                                     <td className="px-6 py-4 whitespace-nowrap">
                                                         {txn.is_valid ? (
-                                                            <Badge className="bg-emerald-50 text-emerald-700 border-emerald-200">Valid</Badge>
+                                                            <Badge className="bg-emerald-50 text-emerald-700 border-emerald-200">{__('Valid')}</Badge>
                                                         ) : (
-                                                            <Badge variant="outline" className="text-amber-600 border-amber-200 bg-amber-50">Pending</Badge>
+                                                            <Badge variant="outline" className="text-amber-600 border-amber-200 bg-amber-50">{__('Pending')}</Badge>
                                                         )}
                                                     </td>
                                                 </tr>
@@ -194,7 +236,7 @@ export default function TextPaymentGateway({ devices, webhook, token, stats, rec
                             ) : (
                                 <div className="text-center py-12">
                                     <Activity className="w-10 h-10 text-slate-300 mx-auto mb-3" />
-                                    <p className="text-slate-500">No transactions recorded yet.</p>
+                                    <p className="text-slate-500">{__('No transactions recorded yet.')}</p>
                                 </div>
                             )}
                         </CardContent>
@@ -204,3 +246,4 @@ export default function TextPaymentGateway({ devices, webhook, token, stats, rec
         </AuthenticatedLayout>
     );
 }
+

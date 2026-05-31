@@ -1,0 +1,43 @@
+{
+    "name": "musoftware/smspay-php",
+    "description": "PHP SDK for the SmsPay SMS Payment Gateway — accept mobile wallet payments via SMS verification.",
+    "type": "library",
+    "license": "MIT",
+    "keywords": [
+        "smspay",
+        "sms",
+        "payment",
+        "gateway",
+        "mobile-wallet",
+        "checkout"
+    ],
+    "authors": [
+        {
+            "name": "Musoftware",
+            "email": "support@musoftwares.com"
+        }
+    ],
+    "require": {
+        "php": ">=7.4",
+        "ext-curl": "*",
+        "ext-json": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "SmsPay\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "SmsPay\\Tests\\": "tests/"
+        }
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^9.5 || ^10.0"
+    },
+    "scripts": {
+        "test": "phpunit"
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}

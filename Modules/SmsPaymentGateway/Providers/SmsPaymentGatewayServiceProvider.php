@@ -34,6 +34,18 @@ class SmsPaymentGatewayServiceProvider extends ModuleServiceProvider
         RouteServiceProvider::class,
     ];
 
+    public function boot(): void
+    {
+        parent::boot();
+
+        // Register the API key authentication middleware alias
+        $router = $this->app['router'];
+        $router->aliasMiddleware(
+            'sms-gateway.api-key',
+            \Modules\SmsPaymentGateway\Http\Middleware\AuthenticateApiKey::class
+        );
+    }
+
     /**
      * Define module schedules.
      * 

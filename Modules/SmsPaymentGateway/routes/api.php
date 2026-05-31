@@ -103,3 +103,25 @@ Route::prefix('v1/sms-payment-gateway')->group($apiRoutes);
 // ==============================================
 Route::prefix('sms-payment-gateway')->group($apiRoutes);
 Route::prefix('auto-sms')->group($apiRoutes);
+
+// ==============================================
+// CHECKOUT SESSIONS API (Stripe-like, API Key Auth)
+// ==============================================
+
+use Modules\SmsPaymentGateway\Http\Controllers\Api\CheckoutSessionController;
+
+// Secret key required (sk_*) — full access
+Route::middleware('sms-gateway.api-key:secret')
+    ->prefix('v1/sms-gateway/checkout/sessions')
+    ->group(function () {
+        Route::post('/', [CheckoutSessionController::class, 'create']);
+        Route::post('/{sessionId}/expire', [CheckoutSessionController::class, 'expire']);
+    });
+
+// Publishable or secret key (pk_* or sk_*) — read access
+Route::middleware('sms-gateway.api-key')
+    ->prefix('v1/sms-gateway/checkout/sessions')
+    ->group(function () {
+        Route::get('/{sessionId}', [CheckoutSessionController::class, 'show']);
+        Route::get('/{sessionId}/poll', [CheckoutSessionController::class, 'poll']);
+    });

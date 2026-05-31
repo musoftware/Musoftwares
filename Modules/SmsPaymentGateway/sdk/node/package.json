@@ -1,0 +1,55 @@
+{
+  "name": "@musoftware/smspay",
+  "version": "1.0.0",
+  "description": "Official Node.js SDK for SmsPay — SMS-based mobile wallet payment gateway",
+  "author": "Musoftwares",
+  "license": "MIT",
+  "main": "dist/cjs/index.js",
+  "module": "dist/esm/index.js",
+  "types": "dist/types/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/esm/index.js",
+      "require": "./dist/cjs/index.js",
+      "types": "./dist/types/index.d.ts"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "scripts": {
+    "build:cjs": "tsc -p tsconfig.cjs.json",
+    "build:esm": "tsc -p tsconfig.esm.json",
+    "build:types": "tsc -p tsconfig.types.json",
+    "build": "npm run build:cjs && npm run build:esm && npm run build:types",
+    "test": "npx jest --config jest.config.js",
+    "prepublishOnly": "npm run build"
+  },
+  "devDependencies": {
+    "@types/node": "^18.0.0",
+    "typescript": "^5.0.0",
+    "jest": "^29.0.0",
+    "@types/jest": "^29.0.0",
+    "ts-jest": "^29.0.0"
+  },
+  "keywords": [
+    "smspay",
+    "sms",
+    "payment",
+    "gateway",
+    "mobile-wallet",
+    "egypt",
+    "vodafone-cash",
+    "instapay",
+    "musoftwares"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/musoftwares/smspay-node"
+  },
+  "homepage": "https://www.musoftwares.com/smspay/docs"
+}

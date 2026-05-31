@@ -73,7 +73,8 @@ class SmsPaymentGatewayController extends Controller
             'webhook' => $webhook,
             'token' => $token,
             'stats' => $stats,
-            'recentTransactions' => $recentTransactions
+            'recentTransactions' => $recentTransactions,
+            'androidAppUrl' => config('sms-payment-gateway.android_app_url'),
         ]);
     }
 
@@ -442,7 +443,9 @@ class SmsPaymentGatewayController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
-        return \Inertia\Inertia::render('SmsPaymentGateway/Devices', compact('devices'));
+        $androidAppUrl = config('sms-payment-gateway.android_app_url');
+
+        return \Inertia\Inertia::render('SmsPaymentGateway/Devices', compact('devices', 'androidAppUrl'));
     }
 
     /**
@@ -1093,7 +1096,103 @@ class SmsPaymentGatewayController extends Controller
 
         return true;
     }
+
+    // ─── API Keys Management ───────────────────────────
+
+    /**
+     * Display the API Keys management page
+     * GET /sms-payment-gateway/api-keys
+     */
+    public function apiKeys()
+    {
+        $user = Auth::user();
+
+        $apiKeys = \Modules\SmsPaymentGateway\Models\SmsGatewayApiKey::where('user_id', $user->id)
+            ->orderBy('created_at', 'desc')
+            ->get()
+            ->map(function ($key) {
+                return [
+                    'id' => $key->id,
+                    'name' => $key->name,
+                    'publishable_key' => $key->publishable_key,
+                    'secret_key_last_four' => $key->secret_key_last_four,
+                    'is_test' => $key->is_test,
+                    'is_active' => $key->is_active,
+                    'last_used_at' => $key->last_used_at?->toIso8601String(),
+                    'created_at' => $key->created_at->toIso8601String(),
+                ];
+            });
+
+        return \Inertia\Inertia::render('SmsPaymentGateway/ApiKeys', [
+            'apiKeys' => $apiKeys,
+        ]);
+    }
+
+    /**
+     * Create a new API key pair
+     * POST /sms-payment-gateway/api-keys
+     */
+    public function createApiKey(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'is_test' => 'boolean',
+        ]);
+
+        $user = Auth::user();
+
+        // Limit: max 10 active keys per user
+        $activeCount = \Modules\SmsPaymentGateway\Models\SmsGatewayApiKey::where('user_id', $user->id)
+            ->where('is_active', true)
+            ->count();
+
+        if ($activeCount >= 10) {
+            return redirect()->back()->with('error', __('sms_gateway.api_key_limit_reached'));
+        }
+
+        $result = \Modules\SmsPaymentGateway\Models\SmsGatewayApiKey::generateKeyPair(
+            $user->id,
+            $request->name,
+            $request->is_test ?? false
+        );
+
+        // Flash the secret key — it will only be shown ONCE
+        return redirect()->back()
+            ->with('success', __('sms_gateway.api_key_created'))
+            ->with('new_publishable_key', $result['publishable_key'])
+            ->with('new_secret_key', $result['secret_key']);
+    }
+
+    /**
+     * Delete (deactivate) an API key
+     * DELETE /sms-payment-gateway/api-keys/{id}
+     */
+    public function deleteApiKey($id)
+    {
+        $apiKey = \Modules\SmsPaymentGateway\Models\SmsGatewayApiKey::where('id', $id)
+            ->where('user_id', Auth::id())
+            ->firstOrFail();
+
+        $apiKey->deactivate();
+        $apiKey->delete(); // Soft delete
+
+        return redirect()->back()->with('success', __('sms_gateway.api_key_deleted'));
+    }
+
+    /**
+     * Roll (regenerate) the secret key
+     * POST /sms-payment-gateway/api-keys/{id}/roll
+     */
+    public function rollApiKey($id)
+    {
+        $apiKey = \Modules\SmsPaymentGateway\Models\SmsGatewayApiKey::where('id', $id)
+            ->where('user_id', Auth::id())
+            ->firstOrFail();
+
+        $newSecret = $apiKey->rollSecretKey();
+
+        return redirect()->back()
+            ->with('success', __('sms_gateway.api_key_rolled'))
+            ->with('new_secret_key', $newSecret);
+    }
 }
-
-
-

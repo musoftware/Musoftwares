@@ -12,31 +12,31 @@ import {
     ChartLine, AlertCircle, Network, Calculator, Merge
 } from 'lucide-react';
 
-export default function Show({ invoice }) {
+export default function Show({ invoice }: { invoice: any }) {
     // Editable state
     const [isEditing, setIsEditing] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
     
     // Local copy of items for inline editing
-    const [items, setItems] = useState([]);
-    const [deletedItems, setDeletedItems] = useState([]);
-    const [discount, setDiscount] = useState(0);
+    const [items, setItems] = useState<any[]>([]);
+    const [deletedItems, setDeletedItems] = useState<(string|number)[]>([]);
+    const [discount, setDiscount] = useState<any>(0);
     const [discountPercentage, setDiscountPercentage] = useState(0);
     
-    const [costLines, setCostLines] = useState([]);
-    const [deletedCostLines, setDeletedCostLines] = useState([]);
+    const [costLines, setCostLines] = useState<any[]>([]);
+    const [deletedCostLines, setDeletedCostLines] = useState<(string|number)[]>([]);
     
-    const [selectedItemsForMerge, setSelectedItemsForMerge] = useState([]);
+    const [selectedItemsForMerge, setSelectedItemsForMerge] = useState<number[]>([]);
     const [showPricingInsights, setShowPricingInsights] = useState(false);
 
     useEffect(() => {
         if (invoice && invoice.items) {
             const itemsArray = Array.isArray(invoice.items) ? invoice.items : Object.values(invoice.items);
-            setItems(itemsArray.map(item => ({ ...item, isNew: false })));
+            setItems(itemsArray.map((item: any) => ({ ...item, isNew: false })));
         }
         if (invoice && invoice.cost_lines) {
             const costLinesArray = Array.isArray(invoice.cost_lines) ? invoice.cost_lines : Object.values(invoice.cost_lines);
-            setCostLines(costLinesArray.map(line => ({ ...line, isNew: false })));
+            setCostLines(costLinesArray.map((line: any) => ({ ...line, isNew: false })));
         }
         setDiscount(invoice.discount || 0);
         setDiscountPercentage(0);
@@ -74,7 +74,7 @@ export default function Show({ invoice }) {
         }]);
     };
 
-    const handleDeleteItem = (index) => {
+    const handleDeleteItem = (index: number) => {
         const item = items[index];
         if (!item.isNew) {
             setDeletedItems([...deletedItems, item.id]);
@@ -84,7 +84,7 @@ export default function Show({ invoice }) {
         setItems(newItems);
     };
 
-    const handleItemChange = (index, field, value) => {
+    const handleItemChange = (index: number, field: string, value: any) => {
         const newItems = [...items];
         newItems[index][field] = value;
         setItems(newItems);
@@ -121,7 +121,7 @@ export default function Show({ invoice }) {
         setSelectedItemsForMerge([]);
     };
 
-    const toggleItemForMerge = (index) => {
+    const toggleItemForMerge = (index: number) => {
         if (selectedItemsForMerge.includes(index)) {
             setSelectedItemsForMerge(selectedItemsForMerge.filter(i => i !== index));
         } else {
@@ -169,14 +169,14 @@ export default function Show({ invoice }) {
         // Reset local state to prop data
         if (invoice && invoice.items) {
             const itemsArray = Array.isArray(invoice.items) ? invoice.items : Object.values(invoice.items);
-            setItems(itemsArray.map(item => ({ ...item, isNew: false })));
+            setItems(itemsArray.map((item: any) => ({ ...item, isNew: false })));
         }
         setDiscount(invoice.discount || 0);
         setDeletedItems([]);
         setIsEditing(false);
     };
 
-    const getStatusBadge = (status) => {
+    const getStatusBadge = (status: string) => {
         switch (status) {
             case 'paid': return <span className="inline-flex items-center rounded-full bg-green-500 px-3 py-1 text-sm font-medium text-white">Paid</span>;
             case 'partially_paid': return <span className="inline-flex items-center rounded-full bg-yellow-400 px-3 py-1 text-sm font-medium text-black">Partially Paid</span>;
@@ -186,7 +186,7 @@ export default function Show({ invoice }) {
         }
     };
 
-    const getJobStatusBadge = (status) => {
+    const getJobStatusBadge = (status: string) => {
         switch (status) {
             case 'done': return <span className="inline-flex items-center rounded-full bg-green-100 px-3 py-1 text-sm font-medium text-green-800">Done</span>;
             case 'processing': return <span className="inline-flex items-center rounded-full bg-yellow-100 px-3 py-1 text-sm font-medium text-yellow-800">Processing</span>;
@@ -340,7 +340,7 @@ export default function Show({ invoice }) {
                         {invoice.status !== 'paid' && (
                             <div className="mt-4 pt-4 border-t border-gray-100 flex justify-between items-center">
                                 <span className="text-xs font-bold text-gray-500 uppercase tracking-wider">Delivery Status</span>
-                                <Button onClick={() => { const s = prompt('Enter status (done, processing, pending):', invoice.job_status || 'pending'); if(s) router.post(route('admin.invoices.change-job-status', invoice.id), { status: s }); }} variant="outline" size="sm" className="h-7 text-xs border-blue-200 text-blue-700 bg-blue-50 hover:bg-blue-100">
+                                <Button onClick={() => { const s = prompt('Enter job status (done, processing, pending):', invoice.job_status || 'pending'); if(s) router.post(route('admin.invoices.change-job-status', invoice.id), { job_status: s }); }} variant="outline" size="sm" className="h-7 text-xs border-blue-200 text-blue-700 bg-blue-50 hover:bg-blue-100">
                                     Update Status
                                 </Button>
                             </div>
@@ -488,14 +488,19 @@ export default function Show({ invoice }) {
                                         {index + 1}
                                     </td>
                                     <td className="px-4 py-3">
-                                        <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold ${
-                                            item.item_type === 'timer' ? 'bg-yellow-100 text-yellow-800' :
-                                            item.item_type === 'quantity' ? 'bg-blue-100 text-blue-800' :
-                                            'bg-gray-100 text-gray-800'
-                                        }`}>
-                                            {item.item_type === 'timer' && <Clock className="w-3 h-3 mr-1" />}
-                                            <span className="capitalize">{item.item_type}</span>
-                                        </span>
+                                        {item.item_type === 'timer' ? (
+                                            <Link href={route('admin.invoices.timer-details', item.id)} className="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold bg-yellow-100 text-yellow-800 hover:bg-yellow-200 transition-colors cursor-pointer">
+                                                <Clock className="w-3 h-3 mr-1" />
+                                                <span className="capitalize">{item.item_type}</span>
+                                            </Link>
+                                        ) : (
+                                            <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold ${
+                                                item.item_type === 'quantity' ? 'bg-blue-100 text-blue-800' :
+                                                'bg-gray-100 text-gray-800'
+                                            }`}>
+                                                <span className="capitalize">{item.item_type}</span>
+                                            </span>
+                                        )}
                                     </td>
                                     <td className="px-4 py-3 font-medium text-gray-900">
                                         {isEditing ? (
@@ -553,7 +558,7 @@ export default function Show({ invoice }) {
                             ))}
                             {items.length === 0 && !isEditing && (
                                 <tr>
-                                    <td colSpan="6" className="px-4 py-8 text-center text-gray-500">
+                                    <td colSpan={6} className="px-4 py-8 text-center text-gray-500">
                                         No items added to this invoice yet.
                                     </td>
                                 </tr>
@@ -562,7 +567,7 @@ export default function Show({ invoice }) {
                         {isEditing && (
                             <tfoot className="bg-gray-50 border-t">
                                 <tr>
-                                    <td colSpan="7" className="px-4 py-3">
+                                    <td colSpan={7} className="px-4 py-3">
                                         <div className="flex justify-between items-center">
                                             <div className="text-sm text-gray-500">
                                                 Draft Total: <span className="font-bold text-gray-900">{formatCurrency(currentTotal, invoice.currency)}</span>
@@ -840,6 +845,134 @@ export default function Show({ invoice }) {
                             </div>
                         </CardContent>
                     </Card>
+                </div>
+            )}
+
+            {/* Sticky Action Bar */}
+            <div className="bg-white border rounded-lg p-4 mb-6 shadow-sm">
+                <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+                    {/* Totals */}
+                    <div className="flex flex-wrap items-center gap-6 text-center md:text-left">
+                        <div className="flex flex-col">
+                            <span className="text-xs font-bold text-gray-500 uppercase tracking-wider">Total Amount</span>
+                            <span className="text-xl font-black text-gray-900">{formatCurrency(invoice.amount, invoice.currency)}</span>
+                        </div>
+                        {invoice.status === 'partially_paid' && (
+                            <div className="flex flex-col">
+                                <span className="text-xs font-bold text-red-600 uppercase tracking-wider">Remaining Due</span>
+                                <span className="text-xl font-black text-red-600">{formatCurrency(invoice.amount - invoice.paid_amount, invoice.currency)}</span>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Action Buttons */}
+                    <div className="flex flex-wrap gap-2 items-center justify-center md:justify-end">
+                        {invoice.status === 'unpaid' && (
+                            <>
+                                <Button 
+                                    onClick={() => { if(confirm('Bill this invoice from client balance?')) router.post(route('admin.invoices.mark-paid', invoice.id)); }}
+                                    className="bg-blue-600 hover:bg-blue-700"
+                                >
+                                    <Check className="w-4 h-4 mr-2" /> Mark Paid / Bill
+                                </Button>
+                                <Button 
+                                    onClick={() => {
+                                        const amt = prompt('Enter partial payment amount:', String(invoice.amount));
+                                        if (amt && parseFloat(amt) > 0) {
+                                            router.post(route('admin.invoices.partial-pay', invoice.id), { amount: parseFloat(amt) });
+                                        }
+                                    }}
+                                    variant="outline"
+                                >
+                                    <CreditCard className="w-4 h-4 mr-2" /> Partial Pay
+                                </Button>
+                            </>
+                        )}
+                        {invoice.status === 'partially_paid' && (
+                            <Button 
+                                onClick={() => {
+                                    const remaining = invoice.amount - (invoice.paid_amount || 0);
+                                    const amt = prompt('Enter payment amount:', String(remaining));
+                                    if (amt && parseFloat(amt) > 0) {
+                                        router.post(route('admin.invoices.partial-pay', invoice.id), { amount: parseFloat(amt) });
+                                    }
+                                }}
+                                className="bg-blue-600 hover:bg-blue-700"
+                            >
+                                <Plus className="w-4 h-4 mr-2" /> Add Payment
+                            </Button>
+                        )}
+
+                        {invoice.status !== 'cancelled' && (
+                            <div className="hidden md:block w-px h-8 bg-gray-200 mx-1"></div>
+                        )}
+
+                        {invoice.user?.id && invoice.user.projects && invoice.user.projects.length > 0 && (
+                            <Button 
+                                variant="outline"
+                                onClick={() => {
+                                    const projectOptions = invoice.user.projects.map((p: any) => `${p.id}: ${p.project_name}`).join('\n');
+                                    const projectId = prompt('Transfer to project (enter project ID):\n' + projectOptions, invoice.project?.id || '');
+                                    if (projectId !== null) {
+                                        router.post(route('admin.invoices.bulk-action'), { 
+                                            action: 'change_project', 
+                                            invoices: [invoice.id], 
+                                            project_id: projectId || null 
+                                        });
+                                    }
+                                }}
+                            >
+                                Transfer
+                            </Button>
+                        )}
+
+                        {invoice.status !== 'cancelled' && !invoice.is_published && (
+                            <Link href={route('admin.invoices.notify', invoice.id)}>
+                                <Button variant="outline" title="Notify Client">
+                                    <Share2 className="w-4 h-4" />
+                                </Button>
+                            </Link>
+                        )}
+                        {invoice.is_published === 1 && (
+                            <span className="inline-flex items-center text-green-600" title="Notification Sent">
+                                <Check className="w-4 h-4" />
+                            </span>
+                        )}
+                    </div>
+                </div>
+            </div>
+
+            {/* Danger Zone */}
+            {(invoice.status === 'paid' || invoice.status === 'partially_paid' || (items.length === 0 && invoice.status === 'unpaid')) && (
+                <div className="border border-red-200 bg-red-50 rounded-lg overflow-hidden mb-6">
+                    <div className="px-4 py-3 border-b border-red-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+                        <div className="flex items-center gap-2">
+                            <div className="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0">
+                                <AlertCircle className="w-4 h-4 text-red-600" />
+                            </div>
+                            <span className="font-bold text-red-600 uppercase text-xs tracking-wider">Danger Zone</span>
+                        </div>
+                        <span className="text-sm text-red-500 font-medium">Irreversible actions</span>
+                    </div>
+                    <div className="p-4 flex flex-col sm:flex-row justify-end gap-3 items-stretch sm:items-center">
+                        {(invoice.status === 'paid' || invoice.status === 'partially_paid') && (
+                            <div className="sm:mr-auto text-sm text-gray-500">Cancelling will void all related transactions.</div>
+                        )}
+                        <Button 
+                            variant="outline"
+                            className="border-red-300 text-red-600 hover:bg-red-100 w-full sm:w-auto justify-center"
+                            onClick={() => { if(confirm('Are you sure you want to cancel this invoice? This action is irreversible.')) router.post(route('admin.invoices.cancel', invoice.id)); }}
+                        >
+                            <X className="w-4 h-4 mr-2" /> Cancel Invoice
+                        </Button>
+                        <Button 
+                            variant="outline"
+                            className="border-red-300 text-red-600 hover:bg-red-100 w-full sm:w-auto justify-center"
+                            onClick={() => { if(confirm('Are you sure you want to DELETE this invoice? This cannot be undone.')) router.post(route('admin.invoices.bulk-action'), { action: 'delete', invoices: [invoice.id] }); }}
+                        >
+                            <Trash2 className="w-4 h-4 mr-2" /> Delete Invoice
+                        </Button>
+                    </div>
                 </div>
             )}
             

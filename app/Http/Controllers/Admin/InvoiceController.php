@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\InvoiceResource;
 use App\Models\Invoice;
+use App\Models\User;
+use App\Models\Project;
 use App\Services\InvoiceService;
 use App\Http\Requests\Admin\Invoice\UpdateInvoiceRequest;
 use Illuminate\Http\Request;
@@ -171,6 +173,33 @@ class InvoiceController extends Controller
     }
 
     /**
+     * Create a new blank invoice for the given client and redirect to its show page.
+     * Mirrors the legacy system behavior: no form, instant creation.
+     */
+    public function create(Request $request)
+    {
+        $client = User::find($request->input('client_id'));
+        if (!$client) {
+            return redirect()->route('admin.invoices.index')
+                ->with('error', __('admin.client_not_found'));
+        }
+
+        $project = $request->filled('project_id')
+            ? Project::where('id', $request->input('project_id'))->first()
+            : null;
+
+        try {
+            $invoice = Invoice::createInvoice($client, $project, null);
+            return redirect()->route('admin.invoices.show', $invoice->id)
+                ->with('success', __('admin.invoice_created'));
+        } catch (\Exception $e) {
+            \Log::error('Invoice creation failed: ' . $e->getMessage());
+            return redirect()->back()
+                ->with('error', __('admin.invoice_creation_failed'));
+        }
+    }
+
+    /**
      * Display the specified invoice.
      */
     public function show(Invoice $invoice)
@@ -190,10 +219,11 @@ class InvoiceController extends Controller
         try {
             $this->invoiceService->updateInvoice($invoice, $request->validated());
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', $e->getMessage());
+            \Log::error('Invoice update failed: ' . $e->getMessage());
+            return redirect()->back()->with('error', __('admin.invoice_update_failed'));
         }
 
-        return redirect()->back()->with('success', 'Invoice updated successfully.');
+        return redirect()->back()->with('success', __('admin.invoice_updated'));
     }
 
     /**
@@ -207,7 +237,7 @@ class InvoiceController extends Controller
             return redirect()->back()->with('error', $e->getMessage());
         }
 
-        return redirect()->back()->with('success', 'Invoice marked as paid.');
+        return redirect()->back()->with('success', __('admin.invoice_marked_paid'));
     }
 
     /**
@@ -221,7 +251,7 @@ class InvoiceController extends Controller
             return redirect()->back()->with('error', $e->getMessage());
         }
 
-        return redirect()->back()->with('success', 'Invoice cancelled successfully.');
+        return redirect()->back()->with('success', __('admin.invoice_cancelled'));
     }
 
     /**
@@ -243,7 +273,7 @@ class InvoiceController extends Controller
             return redirect()->back()->with('error', $e->getMessage());
         }
 
-        return redirect()->back()->with('success', 'Invoice status updated successfully.');
+        return redirect()->back()->with('success', __('admin.invoice_status_updated'));
     }
 
     /**
@@ -259,7 +289,7 @@ class InvoiceController extends Controller
             return redirect()->back()->with('error', $e->getMessage());
         }
 
-        return redirect()->back()->with('success', 'Job status updated successfully.');
+        return redirect()->back()->with('success', __('admin.job_status_updated'));
     }
 
     /**
@@ -278,7 +308,7 @@ class InvoiceController extends Controller
         $invoices = Invoice::whereIn('id', $invoiceIds)->get();
 
         if ($invoices->isEmpty()) {
-            return redirect()->back()->with('error', 'No invoices selected.');
+            return redirect()->back()->with('error', __('admin.no_invoices_selected'));
         }
 
         $whatsapp_invoices_by_user = [];
@@ -294,11 +324,11 @@ class InvoiceController extends Controller
                 $inv->save();
             } elseif ($action == 'split') {
                 if ($inv->status != 'unpaid') {
-                    return redirect()->back()->with('error', 'Unpaid invoices can not be merged'); // Matching legacy typo for parity
+                    return redirect()->back()->with('error', __('admin.only_unpaid_can_be_split'));
                 }
             } elseif ($action == 'merge') {
                 if ($inv->status != 'unpaid') {
-                    return redirect()->back()->with('error', 'Unpaid invoices can not be merged');
+                    return redirect()->back()->with('error', __('admin.only_unpaid_can_be_merged'));
                 }
             } elseif ($action == 'fix_calc') {
                 if ($inv->status == 'unpaid') {
@@ -307,7 +337,7 @@ class InvoiceController extends Controller
                 }
             } elseif ($action == 'bill_invoice') {
                 if ($inv->status == 'paid') {
-                    return redirect()->back()->with('error', 'Invoice is already paid');
+                    return redirect()->back()->with('error', __('admin.invoice_already_paid'));
                 }
                 $client_balance = $inv->user->balance($inv->currency);
                 $invoice_total = $inv->unpaid_total();
@@ -316,9 +346,9 @@ class InvoiceController extends Controller
                     $inv->bill_invoice();
                 } else {
                     if (((float)$inv->total() == 0)) {
-                        return redirect()->back()->with('error', 'Invoice total is ' . round($invoice_total, 3));
+                        return redirect()->back()->with('error', __('admin.invoice_total_zero'));
                     } else {
-                        return redirect()->back()->with('error', $inv->user->name . '\'s balance "' . round($client_balance, 3) . '" is less than invoice total "' . round($invoice_total, 3) . '"');
+                        return redirect()->back()->with('error', __('admin.insufficient_balance'));
                     }
                 }
             } elseif ($action == 'change_project') {
@@ -328,18 +358,18 @@ class InvoiceController extends Controller
                 } else {
                     $exist_project = $inv->user->projects()->find($projectId);
                     if ($exist_project == null) {
-                        return redirect()->back()->with('error', 'Project is not associated to this client');
+                        return redirect()->back()->with('error', __('admin.project_not_associated'));
                     } else {
                         $inv->transfer_to_project($projectId);
                     }
                 }
             } elseif ($action == 'convert_to_transaction') {
                 if ($inv->status == 'paid') {
-                    return redirect()->back()->with('error', 'Cannot convert paid invoice to transaction');
+                    return redirect()->back()->with('error', __('admin.cannot_convert_paid_invoice'));
                 }
                 $invoice_total = $inv->unpaid_total();
                 if ($invoice_total <= 0) {
-                    return redirect()->back()->with('error', 'Invoice has no unpaid amount to convert');
+                    return redirect()->back()->with('error', __('admin.no_unpaid_amount'));
                 }
                 $project = $inv->project;
                 $inv->user->add_balance(
@@ -354,7 +384,7 @@ class InvoiceController extends Controller
                 $inv->save();
             } elseif ($action == 'send_whatsapp_reminder') {
                 if ($inv->status != 'unpaid' && $inv->status != 'partially_paid') {
-                    return redirect()->back()->with('error', 'Only unpaid or partially paid invoices can be sent for WhatsApp reminder.'); // Changed to error for Inertia
+                    return redirect()->back()->with('error', __('admin.only_unpaid_for_whatsapp'));
                 }
                 $userId = $inv->user_id;
                 if (!isset($whatsapp_invoices_by_user[$userId])) {
@@ -382,10 +412,10 @@ class InvoiceController extends Controller
             $first_invoice = $invoices->first();
             foreach ($invoices as $inv) {
                 if ($inv->user_id != $first_invoice->user_id) {
-                    return redirect()->back()->with('error', 'Different Client\'s invoices can\'t be merged');
+                    return redirect()->back()->with('error', __('admin.different_clients_cant_merge'));
                 }
                 if ($inv->project_id != $first_invoice->project_id) {
-                    return redirect()->back()->with('error', 'Different Project\'s invoices can\'t be merged');
+                    return redirect()->back()->with('error', __('admin.different_projects_cant_merge'));
                 }
             }
 
@@ -411,14 +441,14 @@ class InvoiceController extends Controller
                 if ($client) {
                     $result = $reminderService->sendInvoiceReminder($client, collect($userInvoices));
                     if (!$result['success']) {
-                        return redirect()->back()->with('error', 'Failed to send WhatsApp reminder to ' . $result['client_name'] . ': ' . $result['message']);
+                        return redirect()->back()->with('error', __('admin.whatsapp_reminder_failed', ['name' => $result['client_name']]));
                     }
                 }
             }
-            return redirect()->back()->with('success', 'WhatsApp reminders sent successfully.');
+            return redirect()->back()->with('success', __('admin.whatsapp_reminders_sent'));
         }
 
-        return redirect()->back()->with('success', 'Bulk action applied successfully.');
+        return redirect()->back()->with('success', __('admin.bulk_action_applied'));
     }
 
     /**
@@ -440,5 +470,83 @@ class InvoiceController extends Controller
         $invoice->loadMissing(['user.projects', 'project', 'items.timers', 'costLines.creditUser']);
         $pdf = \App\Helpers\TextHelper::pdfInvoice($invoice);
         return $pdf->stream();
+    }
+
+    /**
+     * Notify client about their invoice (mark as published).
+     */
+    public function notify(Invoice $invoice)
+    {
+        $invoice->update(['is_published' => 1]);
+        return redirect()->back()->with('success', __('admin.notification_sent'));
+    }
+
+    /**
+     * Record a partial payment on an invoice.
+     */
+    public function partialPay(Request $request, Invoice $invoice)
+    {
+        $request->validate([
+            'amount' => 'required|numeric|min:0.01',
+        ]);
+
+        $amount = (float) $request->amount;
+        $unpaidTotal = $invoice->unpaid_total();
+
+        if ($amount > $unpaidTotal) {
+            return redirect()->back()->with('error', __('admin.amount_exceeds_unpaid'));
+        }
+
+        try {
+            if (method_exists($invoice, 'partially_bill_invoice')) {
+                $invoice->partially_bill_invoice($amount);
+            } else {
+                $invoice->paid = ($invoice->paid ?? 0) + $amount;
+                $invoice->unpaid = $invoice->total() - $invoice->paid;
+                $invoice->status = ($invoice->paid >= $invoice->total()) ? 'paid' : 'partially_paid';
+                $invoice->save();
+            }
+        } catch (\Exception $e) {
+            \Log::error('Partial payment failed: ' . $e->getMessage());
+            return redirect()->back()->with('error', __('admin.partial_payment_failed'));
+        }
+
+        return redirect()->back()->with('success', __('admin.partial_payment_recorded'));
+    }
+
+    /**
+     * Show timer details for an invoice item.
+     */
+    public function timerDetails($item_id)
+    {
+        $item = \App\Models\InvoiceItem::with(['timers', 'invoice.user'])->findOrFail($item_id);
+        
+        $timers = $item->timers->map(function ($timer) {
+            return [
+                'id' => $timer->id,
+                'start_date' => $timer->start_date,
+                'end_date' => $timer->end_date,
+                'amount' => (float) $timer->amount,
+                'duration_seconds' => $timer->start_date && $timer->end_date
+                    ? \Carbon\Carbon::parse($timer->end_date)->diffInSeconds(\Carbon\Carbon::parse($timer->start_date))
+                    : 0,
+            ];
+        });
+
+        $totalSeconds = $timers->sum('duration_seconds');
+        $totalBillable = $timers->sum('amount');
+
+        return \Inertia\Inertia::render('Admin/Invoices/TimerDetails', [
+            'item' => [
+                'id' => $item->id,
+                'item_title' => $item->item_title,
+                'invoice_id' => $item->invoice_id,
+                'invoice_number' => $item->invoice ? $item->invoice->enc_id() : null,
+                'client_name' => $item->invoice && $item->invoice->user ? $item->invoice->user->name : null,
+            ],
+            'timers' => $timers->values()->all(),
+            'total_seconds' => $totalSeconds,
+            'total_billable' => $totalBillable,
+        ]);
     }
 }

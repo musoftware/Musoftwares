@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
-import { Head, router } from '@inertiajs/react';
+import React, { useState, useCallback } from 'react';
+import { Head, Link, router } from '@inertiajs/react';
 import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
+import { __ } from '@/lib/i18n';
 import { Badge } from '@/Components/ui/badge';
 import { Button } from '@/Components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/Components/ui/card';
@@ -9,25 +10,102 @@ import { Label } from '@/Components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/Components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/Components/ui/table';
 import { Separator } from '@/Components/ui/separator';
-import { Layers, Plus, Trash2 } from 'lucide-react';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from '@/Components/ui/dropdown-menu';
+import Pagination from '@/Components/Pagination';
+import {
+    Layers,
+    Plus,
+    MoreHorizontal,
+    Download,
+    X,
+    ChevronUp,
+    ChevronDown,
+    Monitor,
+    Trash2,
+    Eye,
+    ChevronsUpDown,
+} from 'lucide-react';
 
 interface Software {
     id: number;
     name: string;
     default_status: string;
-    total_licenses: number;
+    total_devices: number;
     active_count: number;
     inactive_count: number;
+    blocked_count: number;
     created_at: string;
+    created_at_full: string;
+}
+
+interface PaginatedData {
+    data: Software[];
+    links: any[];
+    meta?: any;
+    current_page: number;
+    last_page: number;
+    per_page: number;
+    total: number;
+}
+
+interface Stats {
+    total_softwares: number;
+    total_devices_all: number;
+    active_devices_all: number;
+    inactive_devices_all: number;
+    blocked_devices_all: number;
+}
+
+interface Filters {
+    search: string;
+    default_status: string | null;
+    sort_by: string;
+    direction: string;
+    per_page: number;
 }
 
 interface Props {
-    softwares: { data: Software[]; links: any[]; meta: any };
-    filters: Record<string, any>;
+    softwares: PaginatedData;
+    filters: Filters;
+    stats: Stats;
 }
 
-export default function SerialSoftwaresIndex({ softwares, filters }: Props) {
+export default function SerialSoftwaresIndex({ softwares, filters, stats }: Props) {
     const [form, setForm] = useState({ name: '', default_status: 'active' });
+    const [showAddForm, setShowAddForm] = useState(false);
+    const [search, setSearch] = useState(filters.search || '');
+
+    // Check if any filter is active
+    const hasActiveFilters = !!(filters.search || filters.default_status);
+
+    const applyFilters = useCallback((newFilters: Partial<Filters>) => {
+        router.get(
+            route('admin.serial-softwares.index'),
+            { ...filters, ...newFilters, page: 1 },
+            { preserveState: true, preserveScroll: true }
+        );
+    }, [filters]);
+
+    const handleSearch = useCallback((e: React.FormEvent) => {
+        e.preventDefault();
+        applyFilters({ search });
+    }, [search, applyFilters]);
+
+    const handleSort = useCallback((column: string) => {
+        const direction = filters.sort_by === column && filters.direction === 'asc' ? 'desc' : 'asc';
+        applyFilters({ sort_by: column, direction });
+    }, [filters, applyFilters]);
+
+    const clearFilters = useCallback(() => {
+        setSearch('');
+        router.get(route('admin.serial-softwares.index'), {}, { preserveState: true, preserveScroll: true });
+    }, []);
 
     const store = (e: React.FormEvent) => {
         e.preventDefault();
@@ -37,142 +115,365 @@ export default function SerialSoftwaresIndex({ softwares, filters }: Props) {
     };
 
     const updateStatus = (sw: Software, status: string) => {
-        router.patch(route('admin.serial-softwares.status', sw.id), { status });
+        router.patch(route('admin.serial-softwares.status', sw.id), { status }, { preserveScroll: true });
     };
 
     const destroy = (sw: Software) => {
-        if (!confirm(`Delete software "${sw.name}"? This will also delete all associated device records.`)) return;
-        router.delete(route('admin.serial-softwares.destroy', sw.id));
+        if (!confirm(__('Delete software ":name"? This will also delete all associated device records.', { name: sw.name }))) return;
+        router.delete(route('admin.serial-softwares.destroy', sw.id), { preserveScroll: true });
+    };
+
+    const SortHeader = ({ column, children }: { column: string; children: React.ReactNode }) => {
+        const isActive = filters.sort_by === column;
+        return (
+            <button
+                onClick={() => handleSort(column)}
+                className="inline-flex items-center gap-1 hover:text-foreground transition-colors text-xs font-medium uppercase tracking-wide"
+            >
+                {children}
+                {isActive ? (
+                    filters.direction === 'asc' ? (
+                        <ChevronUp className="w-3 h-3" />
+                    ) : (
+                        <ChevronDown className="w-3 h-3" />
+                    )
+                ) : (
+                    <ChevronsUpDown className="w-3 h-3 opacity-40" />
+                )}
+            </button>
+        );
     };
 
     return (
-        <AdminSidebarLayout title="Serial Softwares" header="Serial Softwares">
-            <Head title="Serial Softwares" />
+        <AdminSidebarLayout title={__('Serial Softwares')} header={__('Serial Softwares')}>
+            <Head title={__('Serial Softwares')} />
 
-            <div className="p-6 space-y-6">
-
+            <div className="p-4 sm:p-6 space-y-6">
                 {/* Header */}
                 <div>
-                    <h1 className="text-2xl font-bold tracking-tight">Serial Softwares</h1>
+                    <h1 className="text-2xl font-bold tracking-tight">{__('Serial Softwares')}</h1>
                     <p className="text-muted-foreground text-sm mt-1">
-                        Software registry — auto-created on first API check-in
+                        {__('Software registry — auto-created on first API check-in')}
                     </p>
                 </div>
 
                 <Separator />
 
-                {/* Add Software */}
+                {/* Stats Cards */}
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+                    <Card>
+                        <CardContent className="p-4">
+                            <p className="text-xs text-muted-foreground font-medium">{__('Total Softwares')}</p>
+                            <p className="text-2xl font-bold mt-1">{stats.total_softwares}</p>
+                        </CardContent>
+                    </Card>
+                    <Card>
+                        <CardContent className="p-4">
+                            <p className="text-xs text-muted-foreground font-medium">{__('Total Devices')}</p>
+                            <p className="text-2xl font-bold mt-1">{stats.total_devices_all}</p>
+                        </CardContent>
+                    </Card>
+                    <Card>
+                        <CardContent className="p-4">
+                            <p className="text-xs text-muted-foreground font-medium">{__('Active Devices')}</p>
+                            <p className="text-2xl font-bold mt-1 text-green-600">{stats.active_devices_all}</p>
+                        </CardContent>
+                    </Card>
+                    <Card>
+                        <CardContent className="p-4">
+                            <p className="text-xs text-muted-foreground font-medium">{__('Inactive Devices')}</p>
+                            <p className="text-2xl font-bold mt-1">{stats.inactive_devices_all}</p>
+                        </CardContent>
+                    </Card>
+                    <Card>
+                        <CardContent className="p-4">
+                            <p className="text-xs text-muted-foreground font-medium">{__('Blocked Devices')}</p>
+                            <p className="text-2xl font-bold mt-1 text-red-600">{stats.blocked_devices_all}</p>
+                        </CardContent>
+                    </Card>
+                </div>
+
+                {/* Add Software (Collapsible) */}
                 <Card>
-                    <CardHeader className="pb-3">
-                        <CardTitle className="text-sm font-semibold">Add Software Manually</CardTitle>
+                    <CardHeader
+                        className="pb-3 cursor-pointer select-none"
+                        onClick={() => setShowAddForm(!showAddForm)}
+                    >
+                        <div className="flex items-center justify-between">
+                            <CardTitle className="text-sm font-semibold">{__('Add Software Manually')}</CardTitle>
+                            <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
+                                {showAddForm ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                            </Button>
+                        </div>
                     </CardHeader>
-                    <CardContent>
-                        <form onSubmit={store} className="flex flex-wrap gap-3 items-end">
-                            <div className="flex-1 min-w-48">
-                                <Label className="text-xs mb-1 block">Software Name</Label>
-                                <Input
-                                    placeholder="e.g. MyApp.exe"
-                                    value={form.name}
-                                    onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
-                                    required
-                                />
-                            </div>
-                            <div className="w-40">
-                                <Label className="text-xs mb-1 block">Default Status</Label>
+                    {showAddForm && (
+                        <CardContent>
+                            <form onSubmit={store} className="flex flex-col sm:flex-row flex-wrap gap-3 items-end">
+                                <div className="flex-1 min-w-48 w-full sm:w-auto">
+                                    <Label className="text-xs mb-1 block">{__('Software Name')}</Label>
+                                    <Input
+                                        placeholder={__('e.g. MyApp.exe')}
+                                        value={form.name}
+                                        onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
+                                        required
+                                    />
+                                </div>
+                                <div className="w-full sm:w-40">
+                                    <Label className="text-xs mb-1 block">{__('Default Status')}</Label>
+                                    <Select
+                                        value={form.default_status}
+                                        onValueChange={v => setForm(f => ({ ...f, default_status: v || 'active' }))}
+                                    >
+                                        <SelectTrigger>
+                                            <SelectValue />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="active">{__('Active')}</SelectItem>
+                                            <SelectItem value="inactive">{__('Inactive')}</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                                <Button type="submit" className="gap-2 w-full sm:w-auto">
+                                    <Plus className="w-4 h-4" /> {__('Add')}
+                                </Button>
+                            </form>
+                        </CardContent>
+                    )}
+                </Card>
+
+                {/* Filter Bar */}
+                <Card>
+                    <CardContent className="p-4">
+                        <div className="flex flex-col sm:flex-row flex-wrap gap-3 items-end">
+                            {/* Search */}
+                            <form onSubmit={handleSearch} className="flex-1 min-w-48 w-full sm:w-auto">
+                                <Label className="text-xs mb-1 block">{__('Search')}</Label>
+                                <div className="flex gap-2">
+                                    <Input
+                                        placeholder={__('Search by software name...')}
+                                        value={search}
+                                        onChange={e => setSearch(e.target.value)}
+                                        className="flex-1"
+                                    />
+                                    <Button type="submit" variant="outline" size="sm" className="px-3 shrink-0">
+                                        {__('Go')}
+                                    </Button>
+                                </div>
+                            </form>
+
+                            {/* Status Filter */}
+                            <div className="w-full sm:w-36">
+                                <Label className="text-xs mb-1 block">{__('Default Status')}</Label>
                                 <Select
-                                    value={form.default_status}
-                                    onValueChange={v => setForm(f => ({ ...f, default_status: v || 'active' }))}
+                                    value={filters.default_status || 'all'}
+                                    onValueChange={v => applyFilters({ default_status: v === 'all' ? null : v })}
                                 >
                                     <SelectTrigger>
                                         <SelectValue />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="active">Active</SelectItem>
-                                        <SelectItem value="inactive">Inactive</SelectItem>
+                                        <SelectItem value="all">{__('All')}</SelectItem>
+                                        <SelectItem value="active">{__('Active')}</SelectItem>
+                                        <SelectItem value="inactive">{__('Inactive')}</SelectItem>
                                     </SelectContent>
                                 </Select>
                             </div>
-                            <Button type="submit" className="gap-2">
-                                <Plus className="w-4 h-4" /> Add
-                            </Button>
-                        </form>
+
+                            {/* Per Page */}
+                            <div className="w-full sm:w-28">
+                                <Label className="text-xs mb-1 block">{__('Per Page')}</Label>
+                                <Select
+                                    value={String(filters.per_page)}
+                                    onValueChange={v => applyFilters({ per_page: parseInt(v ?? '20') })}
+                                >
+                                    <SelectTrigger>
+                                        <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="10">10</SelectItem>
+                                        <SelectItem value="20">20</SelectItem>
+                                        <SelectItem value="50">50</SelectItem>
+                                        <SelectItem value="100">100</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+
+                            {/* Action Buttons */}
+                            <div className="flex gap-2 w-full sm:w-auto">
+                                <a
+                                    href={route('admin.serial-softwares.export')}
+                                    className="inline-flex items-center justify-center gap-2 rounded-md border px-3 py-2 text-sm font-medium hover:bg-muted transition-colors w-full sm:w-auto"
+                                >
+                                    <Download className="w-4 h-4" />
+                                    {__('Export CSV')}
+                                </a>
+
+                                {hasActiveFilters && (
+                                    <Button variant="ghost" size="sm" onClick={clearFilters} className="gap-1 shrink-0">
+                                        <X className="w-3 h-3" />
+                                        {__('Clear')}
+                                    </Button>
+                                )}
+                            </div>
+                        </div>
                     </CardContent>
                 </Card>
 
                 {/* Table */}
                 <Card>
                     <CardContent className="p-0">
-                        <Table>
-                            <TableHeader>
-                                <TableRow>
-                                    <TableHead>Software</TableHead>
-                                    <TableHead className="text-center">Total Devices</TableHead>
-                                    <TableHead className="text-center">Active</TableHead>
-                                    <TableHead className="text-center">Inactive</TableHead>
-                                    <TableHead>Default Status</TableHead>
-                                    <TableHead>Registered</TableHead>
-                                    <TableHead className="text-right">Actions</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {softwares.data.length === 0 && (
+                        <div className="overflow-x-auto">
+                            <Table>
+                                <TableHeader>
                                     <TableRow>
-                                        <TableCell colSpan={7} className="text-center py-12 text-muted-foreground">
-                                            No software registered yet.
-                                        </TableCell>
+                                        <TableHead>
+                                            <SortHeader column="name">{__('Software')}</SortHeader>
+                                        </TableHead>
+                                        <TableHead className="text-center">
+                                            <SortHeader column="total_devices">{__('Total')}</SortHeader>
+                                        </TableHead>
+                                        <TableHead className="text-center">
+                                            <SortHeader column="active_count">{__('Active')}</SortHeader>
+                                        </TableHead>
+                                        <TableHead className="text-center hidden sm:table-cell">{__('Inactive')}</TableHead>
+                                        <TableHead className="text-center hidden sm:table-cell">{__('Blocked')}</TableHead>
+                                        <TableHead className="hidden md:table-cell">
+                                            <SortHeader column="default_status">{__('Default Status')}</SortHeader>
+                                        </TableHead>
+                                        <TableHead className="hidden lg:table-cell">
+                                            <SortHeader column="created_at">{__('Registered')}</SortHeader>
+                                        </TableHead>
+                                        <TableHead className="w-10"></TableHead>
                                     </TableRow>
-                                )}
-                                {softwares.data.map(sw => (
-                                    <TableRow key={sw.id}>
-                                        <TableCell>
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-8 h-8 rounded-lg border flex items-center justify-center bg-muted">
-                                                    <Layers className="w-4 h-4 text-muted-foreground" />
+                                </TableHeader>
+                                <TableBody>
+                                    {softwares.data.length === 0 && (
+                                        <TableRow>
+                                            <TableCell colSpan={8} className="text-center py-16 text-muted-foreground">
+                                                <div className="flex flex-col items-center gap-2">
+                                                    <Layers className="w-8 h-8 opacity-30" />
+                                                    <p>{__('No software registered yet.')}</p>
+                                                    {hasActiveFilters && (
+                                                        <Button variant="link" size="sm" onClick={clearFilters}>
+                                                            {__('Clear filters')}
+                                                        </Button>
+                                                    )}
                                                 </div>
-                                                <span className="font-medium">{sw.name}</span>
-                                            </div>
-                                        </TableCell>
-                                        <TableCell className="text-center">{sw.total_licenses}</TableCell>
-                                        <TableCell className="text-center">
-                                            <span className="text-green-600 font-medium">{sw.active_count}</span>
-                                        </TableCell>
-                                        <TableCell className="text-center text-muted-foreground">
-                                            {sw.inactive_count}
-                                        </TableCell>
-                                        <TableCell>
-                                            <Select
-                                                value={sw.default_status}
-                                                onValueChange={v => updateStatus(sw, v || 'active')}
-                                            >
-                                                <SelectTrigger className="w-28 h-7 text-xs">
-                                                    <SelectValue />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    <SelectItem value="active">Active</SelectItem>
-                                                    <SelectItem value="inactive">Inactive</SelectItem>
-                                                </SelectContent>
-                                            </Select>
-                                        </TableCell>
-                                        <TableCell className="text-muted-foreground text-xs">
-                                            {sw.created_at}
-                                        </TableCell>
-                                        <TableCell className="text-right">
-                                            <Button
-                                                size="sm"
-                                                variant="ghost"
-                                                className="text-red-600 hover:text-red-700 hover:bg-red-50 w-8 h-8 p-0"
-                                                onClick={() => destroy(sw)}
-                                            >
-                                                <Trash2 className="w-3.5 h-3.5" />
-                                            </Button>
-                                        </TableCell>
-                                    </TableRow>
-                                ))}
-                            </TableBody>
-                        </Table>
+                                            </TableCell>
+                                        </TableRow>
+                                    )}
+                                    {softwares.data.map(sw => (
+                                        <TableRow key={sw.id}>
+                                            {/* Software Name - links to devices */}
+                                            <TableCell>
+                                                <Link
+                                                    href={route('admin.serial-devices.index', { software_id: sw.id })}
+                                                    className="flex items-center gap-3 hover:underline"
+                                                >
+                                                    <div className="w-8 h-8 rounded-lg border flex items-center justify-center bg-muted shrink-0">
+                                                        <Layers className="w-4 h-4 text-muted-foreground" />
+                                                    </div>
+                                                    <span className="font-medium">{sw.name}</span>
+                                                </Link>
+                                            </TableCell>
+
+                                            {/* Total Devices */}
+                                            <TableCell className="text-center font-medium">
+                                                {sw.total_devices}
+                                            </TableCell>
+
+                                            {/* Active */}
+                                            <TableCell className="text-center">
+                                                <span className="text-green-600 font-medium">{sw.active_count}</span>
+                                            </TableCell>
+
+                                            {/* Inactive */}
+                                            <TableCell className="text-center text-muted-foreground hidden sm:table-cell">
+                                                {sw.inactive_count}
+                                            </TableCell>
+
+                                            {/* Blocked */}
+                                            <TableCell className="text-center hidden sm:table-cell">
+                                                <span className={sw.blocked_count > 0 ? 'text-red-600 font-medium' : 'text-muted-foreground'}>
+                                                    {sw.blocked_count}
+                                                </span>
+                                            </TableCell>
+
+                                            {/* Default Status (inline select) */}
+                                            <TableCell className="hidden md:table-cell">
+                                                <Select
+                                                    value={sw.default_status}
+                                                    onValueChange={v => updateStatus(sw, v || 'active')}
+                                                >
+                                                    <SelectTrigger className="w-28 h-7 text-xs">
+                                                        <SelectValue />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        <SelectItem value="active">{__('Active')}</SelectItem>
+                                                        <SelectItem value="inactive">{__('Inactive')}</SelectItem>
+                                                    </SelectContent>
+                                                </Select>
+                                            </TableCell>
+
+                                            {/* Registered */}
+                                            <TableCell className="text-muted-foreground text-xs hidden lg:table-cell" title={sw.created_at_full}>
+                                                {sw.created_at}
+                                            </TableCell>
+
+                                            {/* Actions Dropdown */}
+                                            <TableCell>
+                                                <DropdownMenu>
+                                                    <DropdownMenuTrigger render={<Button variant="ghost" className="h-8 w-8 p-0" />}>
+                                                        <span className="sr-only">{__('Open menu')}</span>
+                                                        <MoreHorizontal className="h-4 w-4" />
+                                                    </DropdownMenuTrigger>
+                                                    <DropdownMenuContent align="end" side="bottom">
+                                                        <DropdownMenuItem
+                                                            onClick={() => router.visit(route('admin.serial-devices.index', { software_id: sw.id }))}
+                                                        >
+                                                            <Eye className="w-4 h-4 mr-2" />
+                                                            {__('View Devices')}
+                                                        </DropdownMenuItem>
+
+                                                        {/* Mobile: show status changer in dropdown */}
+                                                        <div className="md:hidden px-1.5 py-1">
+                                                            <p className="text-xs text-muted-foreground mb-1">{__('Default Status')}</p>
+                                                            <Select
+                                                                value={sw.default_status}
+                                                                onValueChange={v => updateStatus(sw, v || 'active')}
+                                                            >
+                                                                <SelectTrigger className="w-full h-7 text-xs">
+                                                                    <SelectValue />
+                                                                </SelectTrigger>
+                                                                <SelectContent>
+                                                                    <SelectItem value="active">{__('Active')}</SelectItem>
+                                                                    <SelectItem value="inactive">{__('Inactive')}</SelectItem>
+                                                                </SelectContent>
+                                                            </Select>
+                                                        </div>
+
+                                                        <DropdownMenuSeparator />
+
+                                                        <DropdownMenuItem
+                                                            variant="destructive"
+                                                            onClick={() => destroy(sw)}
+                                                        >
+                                                            <Trash2 className="w-4 h-4 mr-2" />
+                                                            {__('Delete')}
+                                                        </DropdownMenuItem>
+                                                    </DropdownMenuContent>
+                                                </DropdownMenu>
+                                            </TableCell>
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
+                        </div>
                     </CardContent>
                 </Card>
 
+                {/* Pagination */}
+                <Pagination links={softwares.links} />
             </div>
         </AdminSidebarLayout>
     );
