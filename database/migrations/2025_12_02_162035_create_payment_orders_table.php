@@ -21,7 +21,7 @@ return new class extends Migration
             $table->enum('status', ['pending', 'verified', 'failed', 'expired'])->default('pending');
             $table->timestamp('verified_at')->nullable();
             $table->bigInteger('transaction_id')->unsigned()->nullable();
-            $table->foreign('transaction_id')->references('id')->on('auto_sms_transactions')->onDelete('set null');
+            $table->foreign('transaction_id')->references('id')->on('sms_payment_gateway_transactions')->onDelete('set null');
             $table->timestamp('expires_at')->nullable();
             $table->json('metadata')->nullable();
             $table->timestamps();

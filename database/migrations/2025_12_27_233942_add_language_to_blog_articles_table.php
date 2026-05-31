@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::table('blog_articles', function (Blueprint $table) {
             if (!Schema::hasColumn('blog_articles', 'language')) {
-                $table->string('language', 5)->default('en')->after('service_id');
+                $table->string('language', 5)->default('en');
             }
             if (!Schema::hasColumn('blog_articles', 'group_id')) {
                 $table->uuid('group_id')->nullable()->after('language'); // To group translations together
