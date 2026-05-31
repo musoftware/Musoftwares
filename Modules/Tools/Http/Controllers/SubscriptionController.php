@@ -79,6 +79,12 @@ class SubscriptionController extends Controller
         $walletBalance = (float) auth()->user()->available_balance();
         $walletCurrency = auth()->user()->currency_id ? (\App\Models\Currency::find(auth()->user()->currency_id)?->currency ?? 'USD') : 'USD';
 
+        $baseCurrencyId = \App\Models\AdminSettings::business_currency();
+        $userCurrencyId = auth()->user()->currency_id ?: $baseCurrencyId;
+        
+        $priceMonthly = \App\Models\CurrenciesExchange::RateToday($plan['price_monthly'], $baseCurrencyId, $userCurrencyId);
+        $priceYearly = \App\Models\CurrenciesExchange::RateToday($plan['price_yearly'], $baseCurrencyId, $userCurrencyId);
+
         // Max subscription months restriction (admin-configurable per tool)
         $maxSubscriptionMonths = $tool['max_subscription_months'] ?? null;
 
@@ -91,8 +97,8 @@ class SubscriptionController extends Controller
             'plan'          => [
                 'id'            => $plan['guid'],
                 'name'          => $plan['name'],
-                'price_monthly' => $plan['price_monthly'],
-                'price_yearly'  => $plan['price_yearly'],
+                'price_monthly' => $priceMonthly,
+                'price_yearly'  => $priceYearly,
                 'features'      => $plan['features'] ?? [],
             ],
             'walletBalance'         => $walletBalance,
@@ -123,9 +129,15 @@ class SubscriptionController extends Controller
             return back()->with('error', __('tools.monthly_only_restriction'));
         }
 
+        $baseCurrencyId = \App\Models\AdminSettings::business_currency();
+        $userCurrencyId = auth()->user()->currency_id ?: $baseCurrencyId;
+        
+        $priceMonthly = \App\Models\CurrenciesExchange::RateToday($plan['price_monthly'], $baseCurrencyId, $userCurrencyId);
+        $priceYearly = \App\Models\CurrenciesExchange::RateToday($plan['price_yearly'], $baseCurrencyId, $userCurrencyId);
+
         $price = $request->input('billing_cycle') === 'yearly'
-            ? $plan['price_yearly']
-            : $plan['price_monthly'];
+            ? $priceYearly
+            : $priceMonthly;
 
         $isFree = $price <= 0;
 
@@ -146,14 +158,13 @@ class SubscriptionController extends Controller
 
         $expiresAt = now()->addMonth($request->billing_cycle === 'yearly' ? 12 : 1);
 
-        DB::transaction(function () use ($tool, $plan, $request, $price, $expiresAt, $isFree) {
+        DB::transaction(function () use ($tool, $plan, $request, $price, $expiresAt, $isFree, $userCurrencyId) {
             if (!$isFree && $request->payment_method === 'wallet') {
                 $user   = auth()->user();
-                $wallet = $user->wallet ?? $user->createWallet();
-                if ($wallet->balance < $price) {
+                if ($user->available_balance() < $price) {
                     abort(422, 'Insufficient wallet balance.');
                 }
-                $wallet->decrement('balance', $price);
+                $user->add_balance(-1 * $price, "Subscribe to Tool: {$tool['title']}", 'used');
             }
             // Kashier: handled client-side with webhook — not deducted here.
 

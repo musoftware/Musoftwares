@@ -440,10 +440,10 @@
         <div class="step-section">
             <div class="step-label">
                 <span class="step-number">2</span>
-                {{ __('sms_gateway.enter_transaction_reference') }}
+                <span id="step2-label-text">{{ __('sms_gateway.enter_transaction_reference') }}</span>
             </div>
             <input type="text" id="ref-input" class="form-input" placeholder="{{ __('sms_gateway.reference_placeholder') }}">
-            <div class="input-hint">{{ __('sms_gateway.reference_hint') }}</div>
+            <div class="input-hint" id="step2-hint">{{ __('sms_gateway.reference_hint') }}</div>
         </div>
 
         {{-- Alert --}}
@@ -484,12 +484,33 @@
     const CSRF = document.querySelector('meta[name="csrf-token"]').content;
     const EXPIRES_AT = @json($expiresAt);
 
+    const TX_LABEL = @json(__('sms_gateway.enter_transaction_reference'));
+    const TX_PLACEHOLDER = @json(__('sms_gateway.reference_placeholder'));
+    const TX_HINT = @json(__('sms_gateway.reference_hint'));
+
+    const SENDER_LABEL = @json(__('sms_gateway.enter_sender_number'));
+    const SENDER_PLACEHOLDER = @json(__('sms_gateway.sender_number_placeholder'));
+    const SENDER_HINT = @json(__('sms_gateway.sender_number_hint'));
+
     // ── Method selection ────────────────────────
+    function updateStep2UI(methodValue) {
+        const isEtisalat = methodValue === 'etisalat_cash';
+        document.getElementById('step2-label-text').textContent = isEtisalat ? SENDER_LABEL : TX_LABEL;
+        document.getElementById('ref-input').placeholder = isEtisalat ? SENDER_PLACEHOLDER : TX_PLACEHOLDER;
+        document.getElementById('step2-hint').textContent = isEtisalat ? SENDER_HINT : TX_HINT;
+    }
+
     document.querySelectorAll('input[name="method"]').forEach(radio => {
         radio.addEventListener('change', e => {
             document.getElementById('wallet-display').textContent = e.target.dataset.phone;
+            updateStep2UI(e.target.value);
         });
     });
+
+    const initialMethod = document.querySelector('input[name="method"]:checked');
+    if (initialMethod) {
+        updateStep2UI(initialMethod.value);
+    }
 
     // ── Copy wallet ─────────────────────────────
     function copyWallet() {

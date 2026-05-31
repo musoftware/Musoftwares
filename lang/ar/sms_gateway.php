@@ -63,6 +63,9 @@ return [
     'connection_error' => 'خطأ في الاتصال. يرجى التأكد من الإنترنت والمحاولة مرة أخرى.',
     'secure_checkout' => 'دفع آمن',
     'vodafone_cash' => 'فودافون كاش',
+    'enter_sender_number' => 'أدخل رقم الهاتف المرسل',
+    'sender_number_placeholder' => 'رقم الموبايل الذي قمت بالتحويل منه',
+    'sender_number_hint' => 'أدخل رقم الموبايل الذي قمت بتحويل المبلغ منه.',
 
     // ─── Documentation ─────────────────────────────────
     'integration_docs' => 'وثائق الربط',
