@@ -135,7 +135,7 @@ export default function MarketIndex({ hasLivePrices, hasHistoricalCharts, latest
                             <div className={!hasHistoricalCharts ? "opacity-20 select-none pointer-events-none" : ""}>
                                 <div className="h-[400px] w-full">
                                     {historicalData && historicalData.length > 0 ? (
-                                        <ResponsiveContainer width="100%" height="100%">
+                                        <ResponsiveContainer width="100%" height="100%" minWidth={0}>
                                             <LineChart data={historicalData} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
                                                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
                                                 <XAxis 

@@ -159,4 +159,16 @@ return [
     'login_success' => 'أهلا بيك!',
     'logout_success' => 'تم تسجيل خروجك.',
     'account_suspended' => 'حسابك موقوف. تواصل مع مديرك.',
+    
+    // إضافة عميل يدوياً
+    'create_lead' => 'إضافة عميل',
+    'add_new_lead' => 'إضافة عميل جديد',
+    'lead_created_success' => 'تم إضافة العميل بنجاح.',
+    'lead_creation_failed' => 'فشل إضافة العميل. يرجى المحاولة مرة أخرى.',
+    'lead_name' => 'اسم العميل',
+    'lead_email' => 'البريد الإلكتروني',
+    'lead_phone' => 'رقم الهاتف',
+    'lead_company' => 'اسم الشركة',
+    'lead_message' => 'ملاحظات / رسالة',
+    'submitting' => 'جاري الإرسال...',
 ];

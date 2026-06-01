@@ -159,4 +159,16 @@ return [
     'login_success' => 'Welcome back!',
     'logout_success' => 'You have been logged out.',
     'account_suspended' => 'Your account has been suspended. Contact your manager.',
+    
+    // Manual Lead Creation
+    'create_lead' => 'Create Lead',
+    'add_new_lead' => 'Add New Lead',
+    'lead_created_success' => 'Lead has been added successfully.',
+    'lead_creation_failed' => 'Failed to add lead. Please try again.',
+    'lead_name' => 'Lead Name',
+    'lead_email' => 'Email Address',
+    'lead_phone' => 'Phone Number',
+    'lead_company' => 'Company Name',
+    'lead_message' => 'Notes / Message',
+    'submitting' => 'Submitting...',
 ];

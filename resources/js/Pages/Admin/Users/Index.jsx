@@ -3,7 +3,17 @@ import { Head, Link, router } from '@inertiajs/react';
 import ClientActionsSheet from './ClientActionsSheet';
 import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
 import { DataTable } from '@/Components/ui/DataTable';
-import { MoreHorizontal, Eye, Edit, LogIn, Key, Wallet, Users, User, FolderOpen, FileText } from 'lucide-react';
+import { MoreHorizontal, Eye, Edit, LogIn, Key, Wallet, Users, User, FolderOpen, FileText, ShieldCheck } from 'lucide-react';
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogDescription,
+    DialogFooter,
+} from '@/Components/ui/dialog';
+import { Label } from '@/Components/ui/label';
+import { __ } from '@/lib/i18n';
 import { Avatar, AvatarFallback, AvatarImage } from '@/Components/ui/avatar';
 import {
     DropdownMenu,
@@ -23,6 +33,9 @@ export default function Index({ clients, filters, stats }) {
     const { toast } = useToast();
     const [selectedClient, setSelectedClient] = useState(null);
     const [isSheetOpen, setIsSheetOpen] = useState(false);
+    const [isChangeRoleOpen, setIsChangeRoleOpen] = useState(false);
+    const [selectedRoleUser, setSelectedRoleUser] = useState(null);
+    const [selectedRole, setSelectedRole] = useState('client');
 
     const handleSearch = (search) => {
         router.get(
@@ -78,6 +91,28 @@ export default function Index({ clients, filters, stats }) {
         }
     };
 
+    const handleUpdateRoleSubmit = (e) => {
+        e.preventDefault();
+        if (!selectedRoleUser) return;
+        router.post(`/admin/users/${selectedRoleUser.id}/update-role`, { role: selectedRole }, {
+            onSuccess: () => {
+                setIsChangeRoleOpen(false);
+                setSelectedRoleUser(null);
+                toast({
+                    title: __("Success"),
+                    description: __("Role updated successfully."),
+                });
+            },
+            onError: () => {
+                toast({
+                    title: __("Error"),
+                    description: __("Failed to update role."),
+                    variant: "destructive"
+                });
+            }
+        });
+    };
+
 
 
     const columns = [
@@ -110,9 +145,14 @@ export default function Index({ clients, filters, stats }) {
                         <span className="font-semibold text-slate-900 group-hover:text-blue-600 transition-colors">
                             {client.name}
                         </span>
-                        <span className="text-sm text-slate-500">
-                            {client.email}
-                        </span>
+                        <div className="flex items-center gap-2 mt-0.5">
+                            <span className="text-sm text-slate-500">
+                                {client.email}
+                            </span>
+                            <span className="px-1.5 py-0.5 bg-indigo-50 text-indigo-700 rounded-full text-[9px] font-black uppercase border border-indigo-100/50 tracking-wider">
+                                {client.role || 'client'}
+                            </span>
+                        </div>
                     </button>
                 </div>
             ),
@@ -176,6 +216,9 @@ export default function Index({ clients, filters, stats }) {
                             </DropdownMenuItem>
                             <DropdownMenuItem onClick={() => handleResetPassword(client.id)}>
                                 <Key className="mr-2 h-4 w-4" /> Reset Password
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => { setSelectedRoleUser(client); setSelectedRole(client.role || 'client'); setIsChangeRoleOpen(true); }}>
+                                <ShieldCheck className="mr-2 h-4 w-4" /> Change Role
                             </DropdownMenuItem>
                         </DropdownMenuGroup>
 
@@ -292,7 +335,52 @@ export default function Index({ clients, filters, stats }) {
                     setIsSheetOpen(false);
                     handleResetPassword(id);
                 }}
+                onChangeRole={(user) => {
+                    setSelectedRoleUser(user);
+                    setSelectedRole(user.role || 'client');
+                    setIsChangeRoleOpen(true);
+                }}
             />
+
+            <Dialog open={isChangeRoleOpen} onOpenChange={setIsChangeRoleOpen}>
+                <DialogContent>
+                    <form onSubmit={handleUpdateRoleSubmit}>
+                        <DialogHeader>
+                            <DialogTitle>{__("Change User Role")}</DialogTitle>
+                            <DialogDescription>
+                                {__("Change direct permissions and role access level for this user.")}
+                            </DialogDescription>
+                        </DialogHeader>
+                        {selectedRoleUser && (
+                            <div className="py-4 space-y-4">
+                                <p className="text-sm text-slate-600">
+                                    {__("Changing role for:")} <strong className="text-slate-900">{selectedRoleUser.name}</strong>
+                                </p>
+                                <div>
+                                    <Label>{__("Select Role")}</Label>
+                                    <select 
+                                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 mt-2"
+                                        value={selectedRole}
+                                        onChange={e => setSelectedRole(e.target.value)}
+                                        required
+                                    >
+                                        <option value="client">{__("Client")}</option>
+                                        <option value="user">{__("User")}</option>
+                                        <option value="admin">{__("Admin")}</option>
+                                        <option value="manager">{__("Manager")}</option>
+                                        <option value="employee">{__("Employee")}</option>
+                                        <option value="moderator">{__("Moderator")}</option>
+                                    </select>
+                                </div>
+                            </div>
+                        )}
+                        <DialogFooter>
+                            <Button type="button" variant="outline" onClick={() => setIsChangeRoleOpen(false)}>{__("Cancel")}</Button>
+                            <Button type="submit">{__("Update Role")}</Button>
+                        </DialogFooter>
+                    </form>
+                </DialogContent>
+            </Dialog>
         </AdminSidebarLayout>
     );
 }

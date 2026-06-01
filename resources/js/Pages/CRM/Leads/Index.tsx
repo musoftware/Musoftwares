@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { Head, Link, router, usePage } from '@inertiajs/react';
+import { Head, Link, router, usePage, useForm } from '@inertiajs/react';
 import CrmLayout from '@/Layouts/CrmLayout';
 import { Button } from '@/Components/ui/button';
-import { MoreHorizontal, Trash2, Edit2, Mail, Phone, Users } from 'lucide-react';
+import { MoreHorizontal, Trash2, Edit2, Mail, Phone, Users, Plus } from 'lucide-react';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -14,6 +14,17 @@ import {
 import { ModulePageHeader } from '@/Components/ui/ModulePageHeader';
 import { UpgradeOverlay } from '@/Components/ui/UpgradeOverlay';
 import { LeadSlideOver } from '@/Components/CRM/LeadSlideOver';
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+    DialogFooter,
+} from '@/Components/ui/dialog';
+import { Input } from '@/Components/ui/input';
+import { Label } from '@/Components/ui/label';
+import { Textarea } from '@/Components/ui/textarea';
 import { __ } from '@/lib/i18n';
 
 export default function Index({ leads, currentTab }) {
@@ -21,6 +32,25 @@ export default function Index({ leads, currentTab }) {
     const hasSalesStaff = auth?.crm_features?.includes('crm-sales-staff') ?? false;
     const [selectedLeadId, setSelectedLeadId] = useState<number | null>(null);
     const [isSlideOverOpen, setIsSlideOverOpen] = useState(false);
+    const [isCreateOpen, setIsCreateOpen] = useState(false);
+
+    const { data, setData, post, processing, errors, reset } = useForm({
+        name: '',
+        email: '',
+        phone: '',
+        company: '',
+        message: '',
+    });
+
+    const handleCreateSubmit = (e) => {
+        e.preventDefault();
+        post(route('crm.leads.store'), {
+            onSuccess: () => {
+                setIsCreateOpen(false);
+                reset();
+            },
+        });
+    };
 
     const handleStatusUpdate = (id, status) => {
         router.post(route('crm.leads.update-status', id), { status });
@@ -80,6 +110,102 @@ export default function Index({ leads, currentTab }) {
                 description={__('Manage and track your leads pipeline.')}
                 icon={Users}
                 module="CRM"
+                actions={
+                    <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
+                        <DialogTrigger asChild>
+                            <Button className="bg-indigo-600 hover:bg-indigo-700 text-white font-medium flex items-center gap-1.5 shadow-sm rounded-lg py-2 px-4 transition duration-150">
+                                <Plus className="h-4 w-4" />
+                                {__('crm.create_lead')}
+                            </Button>
+                        </DialogTrigger>
+                        <DialogContent className="sm:max-w-md max-w-full">
+                            <DialogHeader>
+                                <DialogTitle className="text-xl font-semibold text-slate-900 mb-1">{__('crm.add_new_lead')}</DialogTitle>
+                            </DialogHeader>
+                            <form onSubmit={handleCreateSubmit} className="space-y-4 py-2">
+                                <div className="space-y-1">
+                                    <Label htmlFor="name" className="text-slate-700 font-medium">{__('crm.lead_name')} <span className="text-red-500">*</span></Label>
+                                    <Input 
+                                        id="name"
+                                        type="text"
+                                        value={data.name}
+                                        onChange={e => setData('name', e.target.value)}
+                                        placeholder={__('crm.lead_name')}
+                                        required
+                                        className="w-full"
+                                    />
+                                    {errors.name && <div className="text-xs text-red-500 mt-1">{errors.name}</div>}
+                                </div>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div className="space-y-1">
+                                        <Label htmlFor="phone" className="text-slate-700 font-medium">{__('crm.lead_phone')}</Label>
+                                        <Input 
+                                            id="phone"
+                                            type="tel"
+                                            value={data.phone}
+                                            onChange={e => setData('phone', e.target.value)}
+                                            placeholder={__('crm.lead_phone')}
+                                            className="w-full"
+                                        />
+                                        {errors.phone && <div className="text-xs text-red-500 mt-1">{errors.phone}</div>}
+                                    </div>
+                                    <div className="space-y-1">
+                                        <Label htmlFor="email" className="text-slate-700 font-medium">{__('crm.lead_email')}</Label>
+                                        <Input 
+                                            id="email"
+                                            type="email"
+                                            value={data.email}
+                                            onChange={e => setData('email', e.target.value)}
+                                            placeholder={__('crm.lead_email')}
+                                            className="w-full"
+                                        />
+                                        {errors.email && <div className="text-xs text-red-500 mt-1">{errors.email}</div>}
+                                    </div>
+                                </div>
+                                <div className="space-y-1">
+                                    <Label htmlFor="company" className="text-slate-700 font-medium">{__('crm.lead_company')}</Label>
+                                    <Input 
+                                        id="company"
+                                        type="text"
+                                        value={data.company}
+                                        onChange={e => setData('company', e.target.value)}
+                                        placeholder={__('crm.lead_company')}
+                                        className="w-full"
+                                    />
+                                    {errors.company && <div className="text-xs text-red-500 mt-1">{errors.company}</div>}
+                                </div>
+                                <div className="space-y-1">
+                                    <Label htmlFor="message" className="text-slate-700 font-medium">{__('crm.lead_message')}</Label>
+                                    <Textarea 
+                                        id="message"
+                                        value={data.message}
+                                        onChange={e => setData('message', e.target.value)}
+                                        placeholder={__('crm.lead_message')}
+                                        className="w-full min-h-20"
+                                    />
+                                    {errors.message && <div className="text-xs text-red-500 mt-1">{errors.message}</div>}
+                                </div>
+                                <DialogFooter className="mt-6 flex flex-row items-center justify-end gap-2 border-t pt-4">
+                                    <Button 
+                                        type="button" 
+                                        variant="outline" 
+                                        onClick={() => setIsCreateOpen(false)}
+                                        className="border-slate-200 hover:bg-slate-50 transition-colors"
+                                    >
+                                        {__('crm.cancel')}
+                                    </Button>
+                                    <Button 
+                                        type="submit" 
+                                        disabled={processing}
+                                        className="bg-indigo-600 hover:bg-indigo-700 text-white transition-colors"
+                                    >
+                                        {processing ? __('crm.submitting') : __('crm.create_lead')}
+                                    </Button>
+                                </DialogFooter>
+                            </form>
+                        </DialogContent>
+                    </Dialog>
+                }
             />
             <div className="flex-1 space-y-4 px-8 pb-8">
 

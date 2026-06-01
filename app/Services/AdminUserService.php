@@ -76,13 +76,12 @@ class AdminUserService
         $user->save();
     }
 
-    /**
-     * Sync the user's Spatie role from the permission field.
-     */
     private function applyRoles(User $user, Request $request): void
     {
         if ($request->filled('role')) {
             $roleName = $request->input('role');
+            // Ensure the Spatie role exists first so syncRoles does not fail
+            \Spatie\Permission\Models\Role::findOrCreate($roleName, 'web');
             // Sync a single role (replaces any previous role)
             $user->syncRoles([$roleName]);
             // The role column doesn't exist, we only use Spatie roles.

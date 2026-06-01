@@ -27,10 +27,12 @@ import {
     Folder,
     User,
     LogIn,
-    Key
+    Key,
+    ShieldCheck
 } from 'lucide-react';
+import { __ } from '@/lib/i18n';
 
-export default function ClientActionsSheet({ client, isOpen, onClose, onLoginAs, onResetPassword }) {
+export default function ClientActionsSheet({ client, isOpen, onClose, onLoginAs, onResetPassword, onChangeRole }) {
     if (!client) return null;
 
     return (
@@ -115,7 +117,13 @@ export default function ClientActionsSheet({ client, isOpen, onClose, onLoginAs,
                                     onClick={() => { onClose(); onResetPassword(client.id); }}
                                     className="flex items-center px-3 py-2 text-sm rounded-md hover:bg-slate-100 transition-colors text-slate-700 font-medium w-full text-left"
                                 >
-                                    <Key className="h-4 w-4 mr-3 text-slate-500" /> Reset Password
+                                    <Key className="h-4 w-4 mr-3 text-slate-500" /> {__("Reset Password")}
+                                </button>
+                                <button 
+                                    onClick={() => { onClose(); onChangeRole(client); }}
+                                    className="flex items-center px-3 py-2 text-sm rounded-md hover:bg-slate-100 transition-colors text-slate-700 font-medium w-full text-left"
+                                >
+                                    <ShieldCheck className="h-4 w-4 mr-3 text-slate-500" /> {__("Change Role")}
                                 </button>
                             </div>
                         </div>

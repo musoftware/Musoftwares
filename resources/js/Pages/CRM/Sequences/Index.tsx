@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { __ } from '@/lib/i18n';
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import CrmLayout from '@/Layouts/CrmLayout';
 import { Button } from '@/Components/ui/button';
@@ -15,12 +16,14 @@ import {
 import { Input } from "@/Components/ui/input";
 import { Label } from "@/Components/ui/label";
 
-export default function Index({ sequences }) {
+declare const route: any;
+
+export default function Index({ sequences }: { sequences: any }) {
     const { auth } = usePage().props as any;
     const [isCreateOpen, setIsCreateOpen] = React.useState(false);
     const [newSequence, setNewSequence] = React.useState({ name: '', trigger_type: 'manual', is_active: false });
 
-    const handleCreate = (e) => {
+    const handleCreate = (e: React.FormEvent) => {
         e.preventDefault();
         router.post(route('crm.sequences.store'), newSequence, {
             onSuccess: () => {
@@ -30,7 +33,7 @@ export default function Index({ sequences }) {
         });
     };
 
-    const handleDelete = (id) => {
+    const handleDelete = (id: string | number) => {
         if (confirm('Are you sure you want to delete this sequence?')) {
             router.delete(route('crm.sequences.destroy', id));
         }
@@ -82,7 +85,7 @@ export default function Index({ sequences }) {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {sequences.data.map(seq => (
+                {sequences.data.map((seq: any) => (
                     <div key={seq.id} className="bg-white rounded-lg shadow border overflow-hidden flex flex-col">
                         <div className="p-5 flex-1">
                             <div className="flex justify-between items-start mb-4">

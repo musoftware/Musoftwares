@@ -33,6 +33,48 @@ class LeadController extends Controller
         ]);
     }
 
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'nullable|email|max:255',
+            'phone' => 'nullable|string|max:50',
+            'company' => 'nullable|string|max:255',
+            'message' => 'nullable|string',
+        ]);
+
+        try {
+            $isTeam = \Illuminate\Support\Facades\Auth::guard('crm_team')->check();
+            $agentId = $isTeam ? \Illuminate\Support\Facades\Auth::guard('crm_team')->id() : auth()->id();
+
+            $lead = new Lead();
+            $lead->fill([
+                'name' => $validated['name'],
+                'email' => $validated['email'] ?? null,
+                'phone' => $validated['phone'] ?? null,
+                'company' => $validated['company'] ?? null,
+                'message' => $validated['message'] ?? '',
+                'status' => 'new',
+                'pipeline_stage' => 'NEW',
+                'source' => 'Manual',
+                'assigned_to' => $agentId,
+            ]);
+
+            $tenantContext = app(\Modules\CRM\Infrastructure\Context\TenantContext::class);
+            $lead->workspace_id = $tenantContext->getWorkspaceId() ?? session('crm_workspace_id');
+            if ($tenantContext->getBranchId()) {
+                $lead->branch_id = $tenantContext->getBranchId();
+            }
+
+            $lead->save();
+
+            return redirect()->back()->with('success', __('crm.lead_created_success'));
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error("Failed to manually create lead: " . $e->getMessage());
+            return redirect()->back()->with('error', __('crm.lead_creation_failed'));
+        }
+    }
+
     public function show(Lead $lead, \Modules\CRM\app\Core\TimelineEngine $timeline)
     {
         $lead->load(['notes.author', 'tags', 'assignee']);

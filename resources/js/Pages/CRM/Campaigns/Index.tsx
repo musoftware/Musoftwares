@@ -14,6 +14,7 @@ import {
 } from "@/Components/ui/dialog";
 import { Input } from "@/Components/ui/input";
 import { Label } from "@/Components/ui/label";
+import { __ } from '@/lib/i18n';
 
 export default function Index({ campaigns }) {
     const { auth } = usePage().props as any;
@@ -31,7 +32,7 @@ export default function Index({ campaigns }) {
     };
 
     const handleDelete = (id) => {
-        if (confirm('Are you sure you want to delete this campaign?')) {
+        if (confirm(__('Are you sure you want to delete this campaign?'))) {
             router.delete(route('crm.campaigns.destroy', id));
         }
     };
@@ -48,27 +49,27 @@ export default function Index({ campaigns }) {
     };
 
     return (
-        <CrmLayout title="Broadcast Campaigns" activeMenu="campaigns">
+        <CrmLayout title={__('Broadcast Campaigns')} activeMenu="campaigns">
             <div className="flex-1 space-y-4 p-8 pt-6">
             <div className="mb-6 flex justify-end">
                 <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
                     <DialogTrigger asChild>
-                        <Button><Plus className="w-4 h-4 mr-2" /> Create Campaign</Button>
+                        <Button><Plus className="w-4 h-4 mr-2" /> {__('Create Campaign')}</Button>
                     </DialogTrigger>
                     <DialogContent>
                         <form onSubmit={handleCreate}>
                             <DialogHeader>
-                                <DialogTitle>Create New Broadcast Campaign</DialogTitle>
-                                <DialogDescription>Send a one-time message to a specific audience segment.</DialogDescription>
+                                <DialogTitle>{__('Create New Broadcast Campaign')}</DialogTitle>
+                                <DialogDescription>{__('Send a one-time message to a specific audience segment.')}</DialogDescription>
                             </DialogHeader>
                             <div className="space-y-4 py-4">
                                 <div className="space-y-2">
-                                    <Label>Campaign Name</Label>
+                                    <Label>{__('Campaign Name')}</Label>
                                     <Input 
                                         required 
                                         value={newCampaign.name} 
                                         onChange={(e) => setNewCampaign({...newCampaign, name: e.target.value})} 
-                                        placeholder="e.g. Summer Sale 2026" 
+                                        placeholder={__('e.g. Summer Sale 2026')} 
                                     />
                                 </div>
                                 <div className="space-y-2">
@@ -82,20 +83,20 @@ export default function Index({ campaigns }) {
                                     </select>
                                 </div>
                                 <div className="space-y-2">
-                                    <Label>Target Audience</Label>
+                                    <Label>{__('Target Audience')}</Label>
                                     <select 
                                         className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm"
                                         value={newCampaign.target_audience}
                                         onChange={(e) => setNewCampaign({...newCampaign, target_audience: e.target.value})}
                                     >
-                                        <option value="all_leads">All Leads</option>
-                                        <option value="active_users">Active Users</option>
-                                        <option value="subscribers">Newsletter Subscribers</option>
+                                        <option value="all_leads">{__('All Leads')}</option>
+                                        <option value="active_users">{__('Active Users')}</option>
+                                        <option value="subscribers">{__('Newsletter Subscribers')}</option>
                                     </select>
                                 </div>
                             </div>
                             <DialogFooter>
-                                <Button type="submit">Create Campaign</Button>
+                                <Button type="submit">{__('Create Campaign')}</Button>
                             </DialogFooter>
                         </form>
                     </DialogContent>
@@ -116,18 +117,18 @@ export default function Index({ campaigns }) {
                             <div className="space-y-3 mb-6">
                                 <div className="flex items-center text-sm text-gray-500">
                                     <Send className="w-4 h-4 mr-2 text-indigo-400" />
-                                    <span>Type: <span className="font-medium text-gray-700 capitalize">{campaign.type}</span></span>
+                                    <span>{__('Type:')} <span className="font-medium text-gray-700 capitalize">{campaign.type}</span></span>
                                 </div>
                                 <div className="flex items-center text-sm text-gray-500">
                                     <Users className="w-4 h-4 mr-2 text-blue-400" />
-                                    <span>Audience: <span className="font-medium text-gray-700">{campaign.target_audience.replace('_', ' ')}</span></span>
+                                    <span>{__('Audience:')} <span className="font-medium text-gray-700">{campaign.target_audience.replace('_', ' ')}</span></span>
                                 </div>
                                 <div className="flex items-center text-sm text-gray-500">
                                     <Clock className="w-4 h-4 mr-2 text-gray-400" />
                                     <span>
-                                        {campaign.status === 'scheduled' ? `Scheduled: ${new Date(campaign.scheduled_at).toLocaleString()}` : 
-                                         campaign.status === 'completed' ? `Finished: ${new Date(campaign.completed_at).toLocaleDateString()}` : 
-                                         'Not Scheduled'}
+                                        {campaign.status === 'scheduled' ? `${__('Scheduled')}: ${new Date(campaign.scheduled_at).toLocaleString()}` : 
+                                         campaign.status === 'completed' ? `${__('Finished')}: ${new Date(campaign.completed_at).toLocaleDateString()}` : 
+                                         __('Not Scheduled')}
                                     </span>
                                 </div>
                             </div>
@@ -139,7 +140,7 @@ export default function Index({ campaigns }) {
                             </Button>
                             <Link href={route('crm.campaigns.show', campaign.id)}>
                                 <Button size="sm" variant="outline">
-                                    <Edit className="w-4 h-4 mr-2" /> Manage Content
+                                    <Edit className="w-4 h-4 mr-2" /> {__('Manage Content')}
                                 </Button>
                             </Link>
                         </div>
@@ -149,8 +150,8 @@ export default function Index({ campaigns }) {
                 {campaigns.data.length === 0 && (
                     <div className="col-span-full py-12 text-center text-gray-500 bg-white rounded-lg border shadow-sm">
                         <Send className="w-12 h-12 mx-auto text-gray-300 mb-3" />
-                        <h3 className="text-lg font-medium text-gray-900">No Campaigns Found</h3>
-                        <p className="mt-1">Create your first broadcast campaign to reach your audience.</p>
+                        <h3 className="text-lg font-medium text-gray-900">{__('No Campaigns Found')}</h3>
+                        <p className="mt-1">{__('Create your first broadcast campaign to reach your audience.')}</p>
                     </div>
                 )}
             </div>
