@@ -3,7 +3,7 @@
 namespace Modules\ERP\Tests\Feature\MultiBranch;
 
 use Tests\TestCase;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Modules\ERP\Models\Branch;
 use Modules\ERP\Models\BranchManager;
 use App\Models\User;
@@ -12,7 +12,7 @@ use Modules\ERP\app\Features\MultiBranch\Services\BranchPermissionResolver;
 
 class BranchPermissionResolverTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     public function test_tenant_admin_has_global_access()
     {

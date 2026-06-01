@@ -9,12 +9,12 @@ use Modules\Booking\app\Features\WaConfirm\Models\BookingWaActionToken;
 use Modules\Booking\app\Features\WaConfirm\Services\WhatsAppConfirmationActionProcessor;
 use Modules\Booking\app\Features\WaConfirm\Events\BookingConfirmedByCustomer;
 use Modules\Booking\app\Features\WaConfirm\Events\BookingCancelledByCustomer;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Event;
 
 class WhatsAppConfirmationActionProcessorTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     public function test_it_confirms_booking_and_fires_event()
     {

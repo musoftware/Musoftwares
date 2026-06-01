@@ -5,13 +5,13 @@ namespace Tests\Feature\Admin;
 use App\Models\User;
 use App\Models\Transaction;
 use App\Models\Project;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Tests\TestCase;
 use Database\Seeders\RolesAndPermissionsSeeder;
 
 class AdminTransactionTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     protected User $admin;
     protected User $clientUser;

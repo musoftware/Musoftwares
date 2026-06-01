@@ -6,13 +6,13 @@ use Tests\TestCase;
 use Modules\Booking\Models\Booking;
 use Modules\Booking\app\Features\WaConfirm\Models\BookingWaConfirmation;
 use Modules\Booking\app\Features\WaConfirm\Services\ConfirmationTokenManager;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Carbon\Carbon;
 use Exception;
 
 class ConfirmationTokenManagerTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     public function test_it_generates_and_validates_tokens_securely()
     {

@@ -1,12 +1,12 @@
 <?php
 
-uses(\Tests\TestCase::class, \Illuminate\Foundation\Testing\RefreshDatabase::class);
+uses(\Tests\TestCase::class, \Illuminate\Foundation\Testing\DatabaseTransactions::class);
 
 use Modules\Freelance\Domains\Proposal\Actions\SubmitProposalAction;
 use Modules\Freelance\Domains\Proposal\DTOs\SubmitProposalData;
 use Modules\Freelance\Tests\Builders\JobScenarioBuilder;
 use Modules\Freelance\Models\Proposal;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 
 use Modules\Freelance\Domains\Finance\Actions\DeductPointsAction;
 

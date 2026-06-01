@@ -3,14 +3,14 @@
 namespace Modules\SmsPaymentGateway\Tests\Feature;
 
 use Tests\TestCase;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use App\Models\User;
 use Modules\SmsPaymentGateway\Models\SmsGatewayApiKey;
 use Modules\SmsPaymentGateway\Models\SmsGatewayCheckoutSession;
 
 class CheckoutSessionApiTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     protected $user;
     protected $apiKey;
@@ -23,6 +23,8 @@ class CheckoutSessionApiTest extends TestCase
         
         // Generate test API Key
         $this->apiKey = SmsGatewayApiKey::generateKeyPair($this->user->id, 'Test Key', true);
+        
+        \App\Models\Currency::firstOrCreate(['currency' => 'EGP'], ['name' => 'Egyptian Pound', 'symbol' => 'EGP']);
     }
 
     public function test_can_create_checkout_session_with_valid_api_key()
@@ -30,7 +32,7 @@ class CheckoutSessionApiTest extends TestCase
         $payload = [
             'amount' => 150.50,
             'currency' => 'EGP',
-            'success_url' => 'https://example.com/success?session_id={SESSION_ID}',
+            'success_url' => 'https://example.com/success',
             'cancel_url' => 'https://example.com/cancel',
             'customer_name' => 'Ahmed Mohamed',
             'customer_email' => 'ahmed@example.com',

@@ -3,14 +3,14 @@
 namespace Modules\CRM\Tests\Support;
 
 use Tests\TestCase;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Modules\CRM\Models\Workspace;
 use App\Models\User;
 use Modules\CRM\Infrastructure\Context\TenantContext;
 
 abstract class BaseTenantTestCase extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     protected Workspace $workspace;
     protected User $adminUser;

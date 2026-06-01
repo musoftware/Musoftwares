@@ -3,7 +3,7 @@
 namespace Modules\ERP\Tests\Feature;
 
 use App\Models\User;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\File;
@@ -14,19 +14,12 @@ use Tests\TestCase;
 
 class BackupControllerTest extends TestCase
 {
+    use DatabaseTransactions;
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->artisan('migrate:fresh', [
-            '--path' => [
-                'database/migrations',
-                'Modules/Core/Database/Migrations',
-                'Modules/ERP/Database/Migrations',
-            ]
-        ]);
-        
-        $this->seed(\Database\Seeders\CurrenciesSeeder::class);
+        // Removed migrate:fresh to protect the live database schema
         $this->withoutMiddleware();
     }
 

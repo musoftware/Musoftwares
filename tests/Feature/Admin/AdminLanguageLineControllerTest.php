@@ -4,12 +4,12 @@ namespace Tests\Feature\Admin;
 
 use App\Models\LanguageLine;
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Tests\TestCase;
 
 class AdminLanguageLineControllerTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     protected User $admin;
     protected User $clientUser;

@@ -3,14 +3,14 @@
 namespace Modules\Booking\tests\Unit\Booking\GroupSessions;
 
 use Tests\TestCase;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Modules\Booking\app\Features\GroupSessions\Models\GroupSession;
 use Modules\Booking\app\Features\GroupSessions\Services\GroupCapacityManager;
 use Illuminate\Support\Carbon;
 
 class GroupCapacityManagerTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     public function test_prevents_securing_seat_if_at_capacity()
     {

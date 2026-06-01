@@ -3,9 +3,9 @@
 namespace Modules\SmsPaymentGateway\Tests\Unit;
 
 use Tests\TestCase;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Modules\SmsPaymentGateway\Models\SmsPaymentGatewayTransaction;
-use Modules\SmsPaymentGateway\Models\SmsPaymentGatewayPaymentOrder;
+use App\Models\PaymentOrder;
 use Modules\SmsPaymentGateway\Models\SmsPaymentGatewayOrderLink;
 use Modules\SmsPaymentGateway\Services\RealtimePaymentMatchingEngine;
 use Illuminate\Support\Facades\Event;
@@ -13,7 +13,7 @@ use App\Models\User;
 
 class RealtimePaymentMatchingEngineTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     protected RealtimePaymentMatchingEngine $engine;
 
@@ -32,8 +32,9 @@ class RealtimePaymentMatchingEngineTest extends TestCase
         $user = User::factory()->create();
 
         // 1. Create an Order
-        $order = SmsPaymentGatewayPaymentOrder::create([
+        $order = PaymentOrder::create([
             'user_id' => $user->id,
+            'mobile_number' => '01012345678',
             'amount' => 488.00,
             'status' => 'pending',
             'payment_link_id' => 1
@@ -52,32 +53,26 @@ class RealtimePaymentMatchingEngineTest extends TestCase
             'user_id' => $user->id,
             'amount' => 488.00,
             'phone_number' => '01092270741',
-            'order_id' => null,
             'status' => 'pending'
         ]);
 
         // 4. Run the Engine
-        $matched = $this->engine->matchTransaction($transaction);
+        $matchedTx = $this->engine->manualMatch($order, '01092270741');
 
-        $this->assertTrue($matched);
+        $this->assertNotNull($matchedTx);
 
         // 5. Assertions
         $this->assertDatabaseHas('sms_payment_gateway_transactions', [
             'id' => $transaction->id,
-            'order_id' => $order->id,
             'status' => 'matched'
         ]);
 
-        $this->assertDatabaseHas('sms_payment_gateway_payment_orders', [
+        $this->assertDatabaseHas('payment_orders', [
             'id' => $order->id,
             'transaction_id' => $transaction->id,
-            'status' => 'paid'
+            'status' => 'verified'
         ]);
 
-        $this->assertDatabaseHas('sms_payment_gateway_order_links', [
-            'order_id' => $order->id,
-            'status' => 'matched'
-        ]);
 
         Event::assertDispatched('SmsPaymentGateway.OrderPaid');
     }
@@ -90,8 +85,9 @@ class RealtimePaymentMatchingEngineTest extends TestCase
         $user = User::factory()->create();
 
         // 1. Create an Order with expected reference
-        $order = SmsPaymentGatewayPaymentOrder::create([
+        $order = PaymentOrder::create([
             'user_id' => $user->id,
+            'mobile_number' => '01012345678',
             'amount' => 3000.00,
             'status' => 'pending',
             'payment_link_id' => 1,
@@ -103,19 +99,18 @@ class RealtimePaymentMatchingEngineTest extends TestCase
             'user_id' => $user->id,
             'amount' => 3000.00,
             'reference_number' => '015847083619',
-            'order_id' => null,
             'status' => 'pending'
         ]);
 
         // 4. Run the Engine
-        $matched = $this->engine->matchTransaction($transaction);
+        $matchedTx = $this->engine->manualMatch($order, '015847083619');
 
-        $this->assertTrue($matched);
+        $this->assertNotNull($matchedTx);
 
-        $this->assertDatabaseHas('sms_payment_gateway_payment_orders', [
+        $this->assertDatabaseHas('payment_orders', [
             'id' => $order->id,
             'transaction_id' => $transaction->id,
-            'status' => 'paid'
+            'status' => 'verified'
         ]);
     }
 
@@ -126,8 +121,9 @@ class RealtimePaymentMatchingEngineTest extends TestCase
     {
         $user = User::factory()->create();
 
-        $order = SmsPaymentGatewayPaymentOrder::create([
+        $order = PaymentOrder::create([
             'user_id' => $user->id,
+            'mobile_number' => '01012345678',
             'amount' => 500.00, // Expected 500
             'status' => 'pending',
             'payment_link_id' => 1
@@ -144,15 +140,14 @@ class RealtimePaymentMatchingEngineTest extends TestCase
             'user_id' => $user->id,
             'amount' => 400.00, // Received 400
             'phone_number' => '01012345678',
-            'order_id' => null,
             'status' => 'pending'
         ]);
 
-        $matched = $this->engine->matchTransaction($transaction);
+        $matchedTx = $this->engine->manualMatch($order, '01012345678');
 
-        $this->assertFalse($matched); // Should not match due to amount mismatch
+        $this->assertNull($matchedTx); // Should not match due to amount mismatch
 
-        $this->assertDatabaseHas('sms_payment_gateway_payment_orders', [
+        $this->assertDatabaseHas('payment_orders', [
             'id' => $order->id,
             'status' => 'pending' // Remains unpaid
         ]);

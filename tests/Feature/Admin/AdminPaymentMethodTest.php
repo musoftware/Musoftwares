@@ -4,13 +4,13 @@ namespace Tests\Feature\Admin;
 
 use App\Models\User;
 use App\Models\UserPaymentMethod;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Tests\TestCase;
 use Database\Seeders\RolesAndPermissionsSeeder;
 
 class AdminPaymentMethodTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     protected User $admin;
     protected User $clientUser;

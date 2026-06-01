@@ -83,7 +83,9 @@ class TransactionIngestionService
             $settings = \Modules\SmsPaymentGateway\Models\SmsPaymentGatewaySetting::where('user_id', $device->user_id)->first();
             $userWhitelist = [];
             if ($settings && !empty($settings->whitelist_senders)) {
-                $userWhitelist = array_map('trim', explode(',', $settings->whitelist_senders));
+                $userWhitelist = is_array($settings->whitelist_senders) 
+                    ? $settings->whitelist_senders 
+                    : array_map('trim', explode(',', $settings->whitelist_senders));
             }
 
             $allowedSenders = array_merge(config('text-payment-gateway.allowed_senders', []), $userWhitelist);
@@ -196,7 +198,7 @@ class TransactionIngestionService
                 'sender' => $transactionData['sender'] ?? '',
                 'sender_name' => $smsData['sender'] ?? '',
                 'amount' => $transactionData['amount'],
-                'currency' => $transactionData['currency'] ?? 'EGP',
+                'currency_id' => \App\Models\Currency::where('currency', strtoupper($transactionData['currency'] ?? 'EGP'))->value('id') ?? 1,
                 'balance' => $transactionData['balance'] ?? null,
                 'phone_number' => $phoneNumber,
                 'reference_number' => $transactionData['reference_number'] ?? null,

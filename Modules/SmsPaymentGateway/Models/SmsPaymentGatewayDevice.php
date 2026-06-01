@@ -12,6 +12,11 @@ class SmsPaymentGatewayDevice extends Model
 {
     use HasFactory;
 
+    protected static function newFactory()
+    {
+        return \Modules\SmsPaymentGateway\Database\factories\SmsPaymentGatewayDeviceFactory::new();
+    }
+
     protected $table = 'sms_payment_gateway_devices';
     protected $fillable = [
         'tenant_id',

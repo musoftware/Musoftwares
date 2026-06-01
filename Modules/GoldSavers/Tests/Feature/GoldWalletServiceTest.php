@@ -3,10 +3,10 @@
 use Modules\GoldSavers\Services\GoldWalletService;
 use Modules\GoldSavers\Models\GoldWallet;
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
 
-uses(Tests\TestCase::class, RefreshDatabase::class);
+uses(Tests\TestCase::class, DatabaseTransactions::class);
 
 beforeEach(function () {
     $this->service = new GoldWalletService();

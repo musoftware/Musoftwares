@@ -19,7 +19,7 @@ export default function Crm({ canLogin, canRegister }) {
                             A centralized infrastructure for managing customer data, tracking interactions, and accelerating sales cycles. Built for scale and operational clarity.
                         </p>
                         <div className="flex flex-col sm:flex-row gap-4">
-                            <a href="mailto:sales@musoftwares.com">
+                            <a href="mailto:admin@musoftwares.com">
                                 <Button size="lg" className="w-full sm:w-auto bg-slate-900 hover:bg-slate-800 text-white rounded-full px-10 h-14 text-base font-semibold transition-all">
                                     Contact Sales
                                 </Button>

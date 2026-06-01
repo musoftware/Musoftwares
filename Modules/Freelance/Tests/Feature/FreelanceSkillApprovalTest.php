@@ -1,6 +1,6 @@
 <?php
 
-uses(\Tests\TestCase::class, \Illuminate\Foundation\Testing\RefreshDatabase::class);
+uses(\Tests\TestCase::class, \Illuminate\Foundation\Testing\DatabaseTransactions::class);
 
 use Modules\Freelance\Models\Skill;
 use App\Models\User;

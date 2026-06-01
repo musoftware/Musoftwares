@@ -5,12 +5,12 @@ namespace Tests\Feature\Admin;
 use App\Models\AdminSettings;
 use App\Models\Currency;
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Tests\TestCase;
 
 class AdminSettingControllerTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     protected User $admin;
     protected User $clientUser;

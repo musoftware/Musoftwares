@@ -7,7 +7,7 @@ use App\Events\WithdrawalApproved;
 use App\Models\User;
 use App\Notifications\InvoicePaidNotification;
 use App\Notifications\WithdrawalApprovedNotification;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Notification;
 use Modules\ERP\Models\Tenant;
@@ -16,7 +16,7 @@ use Tests\TestCase;
 
 class NotificationTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     protected function setUp(): void
     {

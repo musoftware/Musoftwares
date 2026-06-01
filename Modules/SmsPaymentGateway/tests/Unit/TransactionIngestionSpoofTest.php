@@ -3,7 +3,7 @@
 namespace Modules\SmsPaymentGateway\Tests\Unit;
 
 use Tests\TestCase;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Modules\SmsPaymentGateway\Models\SmsPaymentGatewayTransaction;
 use Modules\SmsPaymentGateway\Services\TransactionIngestionService;
 use Modules\SmsPaymentGateway\Services\DeterministicSmsParser;
@@ -13,7 +13,7 @@ use App\Models\User;
 
 class TransactionIngestionSpoofTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     protected TransactionIngestionService $service;
 
@@ -87,8 +87,8 @@ class TransactionIngestionSpoofTest extends TestCase
         $result = $this->invokeCheckForSpoofing('VF-Cash', 2616.01, 50.00, $user->id);
 
         $this->assertTrue($result['is_spoofed']);
-        $this->assertStringContainsString('Balance mismatch (backward): Expected 871.49', $result['reason']);
-        $this->assertStringContainsString('received 2616.01', $result['reason']);
+        $this->assertStringContainsString('Balance mismatch: Expected 871.49', $result['reason']);
+        $this->assertStringContainsString('got 2616.01', $result['reason']);
     }
 
     /**

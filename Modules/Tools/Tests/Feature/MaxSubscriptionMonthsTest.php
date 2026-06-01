@@ -5,11 +5,11 @@ namespace Modules\Tools\Tests\Feature;
 use App\Models\User;
 use Inertia\Testing\AssertableInertia;
 use Tests\TestCase;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 
 class MaxSubscriptionMonthsTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     protected User $user;
 

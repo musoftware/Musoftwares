@@ -2,7 +2,7 @@
 
 namespace Tests\Feature\Subscriptions;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Tests\TestCase;
 use App\Models\User;
 use App\Models\Plan;
@@ -12,7 +12,7 @@ use App\Models\Currency;
 
 class AddonSubscriptionTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     protected $user;
     protected $tenant;

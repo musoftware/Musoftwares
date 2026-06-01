@@ -18,7 +18,7 @@ export default function Healthcare({ canLogin, canRegister }) {
                             Secure, compliant, and reliable systems for clinics and hospitals. Manage patient records, appointments, and billing with uncompromising data security.
                         </p>
                         <div className="flex flex-col sm:flex-row gap-4">
-                            <a href="mailto:sales@musoftwares.com">
+                            <a href="mailto:admin@musoftwares.com">
                                 <Button size="lg" className="w-full sm:w-auto bg-slate-900 hover:bg-slate-800 text-white rounded-full px-10 h-14 text-base font-semibold transition-all">
                                     Discuss Healthcare Needs
                                 </Button>

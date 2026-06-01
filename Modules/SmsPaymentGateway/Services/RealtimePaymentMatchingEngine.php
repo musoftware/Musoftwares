@@ -39,8 +39,8 @@ class RealtimePaymentMatchingEngine
             // Find a transaction that matches the input (either reference number or phone number)
             // and roughly matches the amount
             $transaction = SmsPaymentGatewayTransaction::where('user_id', $order->user_id)
-                ->where('amount', '>=', $order->total_amount * 0.99) // 1% tolerance
-                ->where('amount', '<=', $order->total_amount * 1.01)
+                ->where('amount', '>=', $order->amount * 0.99) // 1% tolerance
+                ->where('amount', '<=', $order->amount * 1.01)
                 ->whereIn('status', ['pending', 'unmatched'])
                 ->where('created_at', '>=', now()->subHours($this->timeWindowHours))
                 ->where(function ($q) use ($userInputTransactionId) {
@@ -85,14 +85,12 @@ class RealtimePaymentMatchingEngine
     private function attachTransactionToOrder(PaymentOrder $order, SmsPaymentGatewayTransaction $tx): void
     {
         // Mark transaction as consumed
-        $tx->order_id = $order->id;
         $tx->status = 'matched';
         $tx->save();
 
-        // Mark order as paid
-        $order->status = 'paid';
+        // Mark order as verified
+        $order->status = 'verified';
         $order->transaction_id = $tx->id;
-        $order->paid_at = now();
         $order->save();
 
         Log::info("Successfully matched Transaction {$tx->id} to Order {$order->id}");
@@ -109,7 +107,7 @@ class RealtimePaymentMatchingEngine
             'order_id' => $order->id,
             'payment_link_id' => $order->payment_link_id,
             'transaction_id' => $tx->id,
-            'status' => 'paid'
+            'status' => 'verified',
         ]);
 
         // 2. Dispatch Webhook to the Merchant's External System

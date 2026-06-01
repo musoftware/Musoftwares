@@ -2,7 +2,7 @@
 
 namespace Tests\Feature\Booking\WhiteLabel;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Tests\TestCase;
 use Modules\Booking\app\Features\WhiteLabel\Models\WhiteLabelAsset;
 use Modules\Booking\app\Features\WhiteLabel\Http\Middleware\EnforceWhiteLabelLimits;
@@ -13,7 +13,7 @@ use App\Models\Tenant;
 
 class TenantIsolationWhiteLabelTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     public function test_enforce_white_label_limits_blocks_when_feature_disabled()
     {

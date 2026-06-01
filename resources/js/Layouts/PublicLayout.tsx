@@ -212,7 +212,7 @@ export default function PublicLayout({ children, auth: propAuth }: PublicLayoutP
                                 <Link href="/login" className="block w-full">
                                     <Button variant="outline" className="w-full rounded-full h-12">Client Login</Button>
                                 </Link>
-                                <a href="mailto:sales@musoftwares.com" className="block w-full">
+                                <a href="mailto:admin@musoftwares.com" className="block w-full">
                                     <Button className="w-full bg-slate-900 text-white rounded-full h-12">Explore Solutions</Button>
                                 </a>
                             </>
@@ -278,8 +278,8 @@ export default function PublicLayout({ children, auth: propAuth }: PublicLayoutP
                             <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900 mb-6">Resources</h3>
                             <ul className="space-y-4">
                                 <li><Link href="/solutions" className="text-sm hover:text-slate-900 transition-colors">Case Studies</Link></li>
-                                <li><a href="mailto:sales@musoftwares.com" className="text-sm hover:text-slate-900 transition-colors">Documentation</a></li>
-                                <li><a href="mailto:sales@musoftwares.com" className="text-sm hover:text-slate-900 transition-colors">API Reference</a></li>
+                                <li><a href="mailto:admin@musoftwares.com" className="text-sm hover:text-slate-900 transition-colors">Documentation</a></li>
+                                <li><a href="mailto:admin@musoftwares.com" className="text-sm hover:text-slate-900 transition-colors">API Reference</a></li>
                                 <li><Link href="/company" className="text-sm hover:text-slate-900 transition-colors">Security</Link></li>
                             </ul>
                         </div>

@@ -2,9 +2,9 @@
 
 use App\Models\User;
 use Modules\GoldSavers\Models\GoldSaver;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 
-uses(Tests\TestCase::class, RefreshDatabase::class);
+uses(Tests\TestCase::class, DatabaseTransactions::class);
 
 beforeEach(function () {
     $this->user = User::factory()->create();

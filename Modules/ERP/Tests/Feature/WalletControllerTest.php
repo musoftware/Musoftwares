@@ -3,7 +3,7 @@
 namespace Modules\ERP\Tests\Feature;
 
 use App\Models\User;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Modules\ERP\Models\WalletTransaction;
 use Modules\ERP\Models\TenantClient;
 use Modules\ERP\Models\Tenant;
@@ -11,17 +11,12 @@ use Tests\TestCase;
 
 class WalletControllerTest extends TestCase
 {
+    use DatabaseTransactions;
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->artisan('migrate:fresh', [
-            '--path' => [
-                'database/migrations',
-                'Modules/Core/Database/Migrations',
-                'Modules/ERP/Database/Migrations',
-            ]
-        ]);
+        // Removed migrate:fresh
         
         $this->seed(\Database\Seeders\CurrenciesSeeder::class);
         $this->withoutMiddleware();

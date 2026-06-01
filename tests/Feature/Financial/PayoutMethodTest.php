@@ -4,12 +4,12 @@ namespace Tests\Feature\Financial;
 
 use App\Models\User;
 use App\Models\PayoutMethod;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Tests\TestCase;
 
 class PayoutMethodTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     protected $user;
 

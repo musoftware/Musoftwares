@@ -31,7 +31,7 @@ export default function Contact({ canLogin, canRegister }) {
                             </div>
                             <h3 className="text-lg font-bold text-slate-900 mb-2">Sales Inquiries</h3>
                             <p className="text-slate-600 font-light mb-6 flex-1">Email our solutions team for pricing, architecture reviews, and platform demos.</p>
-                            <a href="mailto:sales@musoftwares.com" className="text-slate-900 font-semibold hover:underline">sales@musoftwares.com</a>
+                            <a href="mailto:admin@musoftwares.com" className="text-slate-900 font-semibold hover:underline">admin@musoftwares.com</a>
                         </div>
                         
                         <div className="bg-white p-8 rounded-2xl border border-slate-100 shadow-sm flex flex-col items-start text-left">
@@ -40,7 +40,10 @@ export default function Contact({ canLogin, canRegister }) {
                             </div>
                             <h3 className="text-lg font-bold text-slate-900 mb-2">Technical Support</h3>
                             <p className="text-slate-600 font-light mb-6 flex-1">For existing enterprise clients requiring critical infrastructure support.</p>
-                            <a href="mailto:support@musoftwares.com" className="text-slate-900 font-semibold hover:underline">support@musoftwares.com</a>
+                            <div className="flex flex-col space-y-2 mt-auto">
+                                <a href="tel:+201015218548" className="text-slate-900 font-semibold hover:underline">Call: +201015218548</a>
+                                <a href="https://wa.me/201015218548" target="_blank" rel="noreferrer" className="text-slate-900 font-semibold hover:underline">WhatsApp: +201015218548</a>
+                            </div>
                         </div>
 
                         <div className="bg-white p-8 rounded-2xl border border-slate-100 shadow-sm flex flex-col items-start text-left">

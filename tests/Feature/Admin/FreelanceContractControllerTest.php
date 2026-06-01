@@ -7,12 +7,12 @@ use App\Models\Currency;
 use Modules\Freelance\Models\Job;
 use Modules\Freelance\Models\Proposal;
 use Modules\Freelance\Models\Contract;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Tests\TestCase;
 
 class FreelanceContractControllerTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     protected User $admin;
     protected User $clientUser;

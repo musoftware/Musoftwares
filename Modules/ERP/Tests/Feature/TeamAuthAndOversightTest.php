@@ -3,7 +3,7 @@
 namespace Modules\ERP\Tests\Feature;
 
 use App\Models\User;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Modules\ERP\Models\Tenant;
@@ -13,22 +13,12 @@ use Tests\TestCase;
 
 class TeamAuthAndOversightTest extends TestCase
 {
+    use DatabaseTransactions;
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->artisan('migrate:fresh', [
-            '--path' => [
-                'database/migrations',
-                'Modules/Booking/database/migrations',
-                'Modules/Core/Database/Migrations',
-                'Modules/ERP/Database/Migrations',
-                'Modules/Freelance/Database/Migrations',
-                'Modules/Intelligence/database/migrations',
-                'Modules/Marketplace/Database/Migrations',
-                'Modules/Tools/Database/Migrations',
-            ]
-        ]);
+        // Removed migrate:fresh
     }
 
     public function test_team_member_can_login_with_correct_credentials(): void

@@ -3,7 +3,7 @@
 namespace Modules\Booking\tests\Feature\Booking\Widget;
 
 use Tests\TestCase;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Event;
 use Modules\Booking\app\Features\Widget\Models\BookingWidget;
 use Modules\Booking\app\Features\Widget\Models\BookingWidgetDomain;
@@ -13,7 +13,7 @@ use Modules\Booking\app\Features\Widget\Events\WidgetViewed;
 
 class WidgetBookingFlowTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     public function test_public_user_can_view_and_book_via_widget()
     {

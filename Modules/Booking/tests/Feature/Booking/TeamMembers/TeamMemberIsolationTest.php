@@ -3,13 +3,13 @@
 namespace Modules\Booking\tests\Feature\Booking\TeamMembers;
 
 use Tests\TestCase;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use App\Models\User;
 use Modules\Booking\app\Features\TeamMembers\Models\BookingTeamMember;
 
 class TeamMemberIsolationTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     public function test_tenant_cannot_see_other_tenants_team_members()
     {

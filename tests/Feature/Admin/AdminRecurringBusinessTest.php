@@ -6,13 +6,13 @@ use App\Models\User;
 use App\Models\RecurringCost;
 use App\Models\RecurringIncome;
 use App\Models\RecurringSalary;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Tests\TestCase;
 use Database\Seeders\RolesAndPermissionsSeeder;
 
 class AdminRecurringBusinessTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     protected User $admin;
     protected User $clientUser;

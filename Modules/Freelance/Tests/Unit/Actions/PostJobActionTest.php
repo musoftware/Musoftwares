@@ -1,6 +1,6 @@
 <?php
 
-uses(\Tests\TestCase::class, \Illuminate\Foundation\Testing\RefreshDatabase::class);
+uses(\Tests\TestCase::class, \Illuminate\Foundation\Testing\DatabaseTransactions::class);
 
 use Modules\Freelance\Domains\Job\Actions\PostJobAction;
 use Modules\Freelance\Domains\Job\DTOs\PostJobData;
@@ -11,7 +11,7 @@ use App\Models\User;
 use Modules\Freelance\Models\Job;
 use Modules\Freelance\Models\Skill;
 use Illuminate\Support\Facades\Queue;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 
 
 

@@ -2,7 +2,7 @@
 
 namespace Modules\ERP\Tests\Feature;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Tests\TestCase;
 use Modules\ERP\Models\Tenant;
 use Modules\ERP\Models\TeamMember;
@@ -13,7 +13,7 @@ use App\Models\Currency;
 
 class PayrollTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     protected function setUp(): void
     {

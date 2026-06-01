@@ -6,11 +6,11 @@ use Tests\TestCase;
 use Modules\Booking\Models\Booking;
 use Modules\Booking\app\Features\WaConfirm\Models\BookingWaConfirmation;
 use Modules\Booking\app\Features\WaConfirm\Services\ConfirmationTokenManager;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 
 class BookingCustomerConfirmationFlowTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     public function test_customer_can_click_link_to_confirm_appointment()
     {

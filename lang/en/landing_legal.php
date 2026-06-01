@@ -35,7 +35,7 @@ return [
     'privacy_intl_transfers_body' => 'As a global infrastructure provider, we may transfer your data across international borders to data centers distributed globally. All cross-border transfers are protected by Standard Contractual Clauses (SCCs), binding corporate rules, and equivalent adequacy mechanisms to ensure your data receives the same level of protection regardless of its geographic location.',
     
     'privacy_contact_title' => '8. Contact Our Privacy Team',
-    'privacy_contact_body' => 'For legal inquiries, data subject requests, or questions regarding our security and privacy practices, please reach out to our dedicated Data Protection Officer (DPO) and Privacy Team at legal@musoftware.com.',
+    'privacy_contact_body' => 'For legal inquiries, data subject requests, or questions regarding our security and privacy practices, please reach out to our dedicated Data Protection Officer (DPO) and Privacy Team at admin@musoftwares.com.',
 
 
     // Terms of Service

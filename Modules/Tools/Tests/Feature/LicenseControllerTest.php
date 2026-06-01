@@ -7,10 +7,11 @@ use Illuminate\Support\Str;
 use Modules\Tools\Models\ActivatedDevice;
 use Modules\Tools\Models\ToolLicense;
 use Tests\TestCase;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 
 class LicenseControllerTest extends TestCase
 {
+    use DatabaseTransactions;
     protected User $user;
     protected ToolLicense $license;
 
@@ -18,14 +19,7 @@ class LicenseControllerTest extends TestCase
     {
         parent::setUp();
 
-        $this->artisan('migrate:fresh', [
-            '--path' => [
-                'Modules/Tools/Database/Migrations',
-                'database/migrations',
-                'Modules/Core/Database/Migrations',
-                'Modules/ERP/Database/Migrations',
-            ]
-        ]);
+        // Removed migrate:fresh
 
         $this->user = User::factory()->create();
         
