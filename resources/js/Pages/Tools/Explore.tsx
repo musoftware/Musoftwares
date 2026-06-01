@@ -748,7 +748,7 @@ export default function Explore({ tools, categories, subscribedSlugs, hasBrowser
     return (
         <div 
             className="h-screen w-screen overflow-hidden bg-slate-900 bg-cover bg-center flex flex-col font-['Inter',sans-serif]"
-            style={{ backgroundImage: `url(${wallpaperUrl})` }}
+            style={{ backgroundImage: wallpaperUrl ? `url(${wallpaperUrl})` : 'none' }}
             onClick={() => {
                 setIsStartMenuOpen(false);
                 setSelectedItemIds([]);

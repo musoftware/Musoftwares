@@ -21,6 +21,7 @@ const DEFAULT_WALLPAPERS = [
     'https://images.unsplash.com/photo-1472214103451-9374bd1c798e?q=80&w=2560&auto=format&fit=crop',
     'https://images.unsplash.com/photo-1518837695005-2083093ee35b?q=80&w=2560&auto=format&fit=crop',
     'https://images.unsplash.com/photo-1493246507139-91e8fad9978e?q=80&w=2560&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1506744626753-143d4eb2c842?q=80&w=2560&auto=format&fit=crop',
 ];
 
 export function SettingsModal({ isOpen, onClose, showPrayerTimes, onTogglePrayerTimes, wallpaperUrl, onWallpaperChange, prayerCity, prayerCountry, prayerMethod, onPrayerSettingsChange, openWithOneClick, onToggleOneClick }: SettingsModalProps) {
@@ -32,7 +33,7 @@ export function SettingsModal({ isOpen, onClose, showPrayerTimes, onTogglePrayer
                 .then(res => res.json())
                 .then(data => {
                     if (data && data.length > 0) {
-                        setWallpapers(data.slice(0, 4));
+                        setWallpapers(data.slice(0, 5));
                     }
                 })
                 .catch(err => console.error("Failed to fetch bing images", err));
@@ -146,7 +147,14 @@ export function SettingsModal({ isOpen, onClose, showPrayerTimes, onTogglePrayer
                         <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
                             <ImageIcon className="w-5 h-5 text-purple-400" /> Wallpaper
                         </h3>
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                            <div 
+                                onClick={() => onWallpaperChange('')}
+                                className={`relative h-24 rounded-xl overflow-hidden cursor-pointer group border-2 transition-all flex flex-col items-center justify-center bg-[#1c1c1c] ${!wallpaperUrl ? 'border-blue-500 shadow-[0_0_15px_rgba(59,130,246,0.5)]' : 'border-white/10 hover:border-white/20'}`}
+                            >
+                                <X className="w-6 h-6 text-slate-400 group-hover:text-white transition-colors mb-1" />
+                                <span className="text-xs font-medium text-slate-400 group-hover:text-white transition-colors">None</span>
+                            </div>
                             {displayWallpapers.map((url, idx) => (
                                 <div 
                                     key={idx}

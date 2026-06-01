@@ -1,9 +1,16 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, router } from '@inertiajs/react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/Components/ui/card';
 import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/Components/ui/select";
 import { formatNumber } from '@/lib/utils';
 import { __ } from '@/lib/i18n';
 import { ArrowLeft, Wallet, TrendingUp, TrendingDown, Settings, MoreHorizontal, Trash, Edit } from 'lucide-react';
@@ -141,7 +148,7 @@ export default function ShowWallet({ wallet, hasGoalTracking }: ShowProps) {
                     </div>
 
                     {isEditingWallet && (
-                        <Card className="border-indigo-200 shadow-sm">
+                        <Card>
                             <CardHeader>
                                 <CardTitle className="text-lg">{__('Edit Wallet Settings')}</CardTitle>
                             </CardHeader>
@@ -158,16 +165,20 @@ export default function ShowWallet({ wallet, hasGoalTracking }: ShowProps) {
                                         </div>
                                         <div className="space-y-2">
                                             <label className="text-sm font-medium">{__('Goal Type')}</label>
-                                            <select 
-                                                className="w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                                                value={editWalletData.goal_type}
-                                                onChange={e => setEditWalletData({...editWalletData, goal_type: e.target.value})}
+                                            <Select 
+                                                value={editWalletData.goal_type} 
+                                                onValueChange={value => setEditWalletData({...editWalletData, goal_type: value})}
                                             >
-                                                <option value="Investment">{__('Investment')}</option>
-                                                <option value="Savings">{__('Savings')}</option>
-                                                <option value="Trading">{__('Trading')}</option>
-                                                <option value="Retirement">{__('Retirement')}</option>
-                                            </select>
+                                                <SelectTrigger className="w-full">
+                                                    <SelectValue placeholder={__('Select Goal Type')} />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    <SelectItem value="Investment">{__('Investment')}</SelectItem>
+                                                    <SelectItem value="Savings">{__('Savings')}</SelectItem>
+                                                    <SelectItem value="Trading">{__('Trading')}</SelectItem>
+                                                    <SelectItem value="Retirement">{__('Retirement')}</SelectItem>
+                                                </SelectContent>
+                                            </Select>
                                         </div>
                                         {hasGoalTracking && (
                                             <div className="grid grid-cols-2 gap-4">
@@ -206,7 +217,7 @@ export default function ShowWallet({ wallet, hasGoalTracking }: ShowProps) {
                     )}
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <Card className="hover:-translate-y-1 hover:shadow-lg transition-all duration-300 cursor-default">
+                        <Card>
                             <CardHeader className="pb-2">
                                 <CardTitle className="text-sm font-medium text-muted-foreground">{__('Total Grams')}</CardTitle>
                             </CardHeader>
@@ -214,7 +225,7 @@ export default function ShowWallet({ wallet, hasGoalTracking }: ShowProps) {
                                 <div className="text-3xl font-bold text-indigo-700">{wallet.balance_grams} {__('G')}</div>
                             </CardContent>
                         </Card>
-                        <Card className="hover:-translate-y-1 hover:shadow-lg transition-all duration-300 cursor-default">
+                        <Card>
                             <CardHeader className="pb-2">
                                 <CardTitle className="text-sm font-medium text-muted-foreground">{__('Total Investment Value')}</CardTitle>
                             </CardHeader>
@@ -222,7 +233,7 @@ export default function ShowWallet({ wallet, hasGoalTracking }: ShowProps) {
                                 <div className="text-3xl font-bold">{formatNumber(wallet.balance_amount)} <span className="text-lg text-muted-foreground">{wallet.currency}</span></div>
                             </CardContent>
                         </Card>
-                        <Card className="hover:-translate-y-1 hover:shadow-lg transition-all duration-300 cursor-default">
+                        <Card>
                             <CardHeader className="pb-2">
                                 <CardTitle className="text-sm font-medium text-muted-foreground">{__('Goal Progress')}</CardTitle>
                             </CardHeader>
@@ -241,7 +252,7 @@ export default function ShowWallet({ wallet, hasGoalTracking }: ShowProps) {
                     </div>
 
                     {isCreatingTx && (
-                        <Card className="border-indigo-200 shadow-sm">
+                        <Card>
                             <CardHeader>
                                 <CardTitle className="text-lg">{__('Add New Transaction')}</CardTitle>
                             </CardHeader>
@@ -250,14 +261,18 @@ export default function ShowWallet({ wallet, hasGoalTracking }: ShowProps) {
                                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                         <div className="space-y-2">
                                             <label className="text-sm font-medium">{__('Type')}</label>
-                                            <select 
-                                                className="w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                                                value={newTx.type}
-                                                onChange={e => setNewTx({...newTx, type: e.target.value as 'buy' | 'sell'})}
+                                            <Select 
+                                                value={newTx.type} 
+                                                onValueChange={(value: 'buy' | 'sell') => setNewTx({...newTx, type: value})}
                                             >
-                                                <option value="buy">{__('Buy')}</option>
-                                                <option value="sell">{__('Sell')}</option>
-                                            </select>
+                                                <SelectTrigger className="w-full">
+                                                    <SelectValue placeholder={__('Select Type')} />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    <SelectItem value="buy">{__('Buy')}</SelectItem>
+                                                    <SelectItem value="sell">{__('Sell')}</SelectItem>
+                                                </SelectContent>
+                                            </Select>
                                         </div>
                                         <div className="space-y-2">
                                             <label className="text-sm font-medium">{__('Grams')}</label>
@@ -269,16 +284,20 @@ export default function ShowWallet({ wallet, hasGoalTracking }: ShowProps) {
                                         </div>
                                         <div className="space-y-2">
                                             <label className="text-sm font-medium">{__('Karat')}</label>
-                                            <select 
-                                                className="w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                                                value={newTx.karat}
-                                                onChange={e => setNewTx({...newTx, karat: e.target.value})}
+                                            <Select 
+                                                value={String(newTx.karat)} 
+                                                onValueChange={value => setNewTx({...newTx, karat: value})}
                                             >
-                                                <option value="18">18k</option>
-                                                <option value="21">21k</option>
-                                                <option value="22">22k</option>
-                                                <option value="24">24k</option>
-                                            </select>
+                                                <SelectTrigger className="w-full">
+                                                    <SelectValue placeholder={__('Select Karat')} />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    <SelectItem value="18">18k</SelectItem>
+                                                    <SelectItem value="21">21k</SelectItem>
+                                                    <SelectItem value="22">22k</SelectItem>
+                                                    <SelectItem value="24">24k</SelectItem>
+                                                </SelectContent>
+                                            </Select>
                                         </div>
                                         <div className="space-y-2">
                                             <label className="text-sm font-medium">{__('Price Per Gram')} ({wallet.currency})</label>
@@ -420,14 +439,18 @@ export default function ShowWallet({ wallet, hasGoalTracking }: ShowProps) {
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div className="space-y-2">
                                         <label className="text-sm font-medium">{__('Type')}</label>
-                                        <select 
-                                            className="w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                                            value={editingTx.type}
-                                            onChange={e => setEditingTx({...editingTx, type: e.target.value as 'buy' | 'sell'})}
+                                        <Select 
+                                            value={editingTx.type} 
+                                            onValueChange={(value: 'buy' | 'sell') => setEditingTx({...editingTx, type: value})}
                                         >
-                                            <option value="buy">{__('Buy')}</option>
-                                            <option value="sell">{__('Sell')}</option>
-                                        </select>
+                                            <SelectTrigger className="w-full">
+                                                <SelectValue placeholder={__('Select Type')} />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="buy">{__('Buy')}</SelectItem>
+                                                <SelectItem value="sell">{__('Sell')}</SelectItem>
+                                            </SelectContent>
+                                        </Select>
                                     </div>
                                     <div className="space-y-2">
                                         <label className="text-sm font-medium">{__('Grams')}</label>
@@ -439,16 +462,20 @@ export default function ShowWallet({ wallet, hasGoalTracking }: ShowProps) {
                                     </div>
                                     <div className="space-y-2">
                                         <label className="text-sm font-medium">{__('Karat')}</label>
-                                        <select 
-                                            className="w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                                            value={editingTx.karat}
-                                            onChange={e => setEditingTx({...editingTx, karat: parseInt(e.target.value)})}
+                                        <Select 
+                                            value={String(editingTx.karat)} 
+                                            onValueChange={value => setEditingTx({...editingTx, karat: parseInt(value)})}
                                         >
-                                            <option value="18">18k</option>
-                                            <option value="21">21k</option>
-                                            <option value="22">22k</option>
-                                            <option value="24">24k</option>
-                                        </select>
+                                            <SelectTrigger className="w-full">
+                                                <SelectValue placeholder={__('Select Karat')} />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="18">18k</SelectItem>
+                                                <SelectItem value="21">21k</SelectItem>
+                                                <SelectItem value="22">22k</SelectItem>
+                                                <SelectItem value="24">24k</SelectItem>
+                                            </SelectContent>
+                                        </Select>
                                     </div>
                                     <div className="space-y-2">
                                         <label className="text-sm font-medium">{__('Price Per Gram')} ({wallet.currency})</label>
