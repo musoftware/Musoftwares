@@ -29,7 +29,7 @@ interface Props {
 }
 
 export default function Downloads({ availableTools, downloads }: Props) {
-    const host = typeof window !== 'undefined' ? (window.localStorage.getItem('musoftware_runtime_host') || '127.0.0.1') : '127.0.0.1';
+    const host = typeof window !== 'undefined' ? ((window as any).MUSOFTWARE_RUNTIME_HOST || '127.0.0.1') : '127.0.0.1';
 
     return (
         <ToolsPublicLayout title={__('general.my_tools')} activeNav="downloads">

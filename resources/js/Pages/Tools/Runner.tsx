@@ -395,7 +395,7 @@ export default function Runner({ tool, subscription, runtimePort, pluginSlug }: 
 
     const checkConnectivity = async () => {
         setStatus('checking');
-        const host = typeof window !== 'undefined' ? (window.localStorage.getItem('musoftware_runtime_host') || '127.0.0.1') : '127.0.0.1';
+        const host = typeof window !== 'undefined' ? ((window as any).MUSOFTWARE_RUNTIME_HOST || '127.0.0.1') : '127.0.0.1';
         
         const isLocalDeveloper = typeof window !== 'undefined' && (window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost');
         if (host === '127.0.0.1' && !isLocalDeveloper) {
@@ -415,7 +415,7 @@ export default function Runner({ tool, subscription, runtimePort, pluginSlug }: 
         if (typeof window !== 'undefined') {
             const mobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
             setIsMobile(mobile);
-            const host = window.localStorage.getItem('musoftware_runtime_host') || '127.0.0.1';
+            const host = (window as any).MUSOFTWARE_RUNTIME_HOST || '127.0.0.1';
             setCurrentHost(host);
             
             if (mobile) {

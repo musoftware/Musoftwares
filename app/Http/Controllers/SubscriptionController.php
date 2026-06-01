@@ -113,7 +113,7 @@ class SubscriptionController extends Controller
         ]);
     }
 
-    private function calculateCustomPriceBackend($selectedItems, $billingCycle, $currencyId)
+    private function calculateCustomPriceBackend($selectedItems, $billingCycle, $currencyId, $returnArray = false)
     {
         $usdCurrency = \App\Models\Currency::where('currency', 'USD')->first();
         $usdCurrencyId = $usdCurrency ? $usdCurrency->id : 1;
@@ -137,22 +137,18 @@ class SubscriptionController extends Controller
             array_map(fn($addon) => $addon['price'], config('saas.addons', []))
         );
         
-        $totalUsd = 0;
-        $toolsCount = 0;
-        $toolsTotalEGP = 0;
-        
         $configTools = config('tools', []);
+        $baseMonthlyEGP = 0;
+        $toolsMonthlyEGP = [];
 
         foreach ($selectedItems as $item) {
             if (isset($basePricesEGP[$item])) {
-                $totalUsd += ($basePricesEGP[$item] / 10) / $egpRate; // Convert Monthly EGP to USD
+                $baseMonthlyEGP += ($basePricesEGP[$item] / 10);
             } elseif (str_starts_with($item, 'tool-')) {
                 $guid = preg_replace('/^tool-/', '', $item);
                 $tool = $configTools[$guid] ?? null;
                 $isFree = $tool['is_free'] ?? false;
                 if (!$isFree && $tool) {
-                    $toolsCount++;
-                    
                     $toolMonthlyPrice = 100; // Fallback
                     if (isset($tool['plans']) && is_array($tool['plans']) && count($tool['plans']) > 0) {
                         $firstPlan = reset($tool['plans']);
@@ -160,30 +156,55 @@ class SubscriptionController extends Controller
                             $toolMonthlyPrice = $firstPlan['price_monthly'];
                         }
                     }
-                    $toolsTotalEGP += $toolMonthlyPrice;
+                    $toolsMonthlyEGP[] = $toolMonthlyPrice;
                 }
             }
         }
 
-        // Apply tool volume discount
-        if ($toolsCount > 0) {
-            $discountPercent = min(50, ($toolsCount - 1) * 10);
-            $toolsTotalEGP = $toolsTotalEGP * (1 - ($discountPercent / 100));
-            $totalUsd += ($toolsTotalEGP / $egpRate); // Convert discounted total EGP to USD
-        }
-
+        $months = 1;
         $multiplier = 1;
         if ($billingCycle === '6_months') {
+            $months = 6;
             $multiplier = 6;
         } elseif ($billingCycle === '1_year') {
+            $months = 12;
             $multiplier = 10; // 2 months free
-        } elseif ($billingCycle === '1_month') {
-            $multiplier = 1;
         }
 
-        $totalUsd = $totalUsd * $multiplier;
+        // Apply progressive tool volume discount
+        rsort($toolsMonthlyEGP);
+        $toolsBaseTotalMonthlyEGP = 0;
+        $toolsDiscountedTotalMonthlyEGP = 0;
+
+        foreach ($toolsMonthlyEGP as $index => $price) {
+            $toolsBaseTotalMonthlyEGP += $price;
+            $discountPercent = min(50, $index * 10);
+            $toolsDiscountedTotalMonthlyEGP += $price * (1 - ($discountPercent / 100));
+        }
+
+        $subtotalMonthlyEGP = $baseMonthlyEGP + $toolsDiscountedTotalMonthlyEGP;
         
-        return $totalUsd * $rate;
+        $originalTotalEGP = ($baseMonthlyEGP + $toolsBaseTotalMonthlyEGP) * $months;
+        $totalEGP = $subtotalMonthlyEGP * $multiplier;
+        
+        $toolsDiscountEGP = ($toolsBaseTotalMonthlyEGP - $toolsDiscountedTotalMonthlyEGP) * $months;
+        $annualDiscountEGP = ($subtotalMonthlyEGP * $months) - ($subtotalMonthlyEGP * $multiplier);
+
+        $toTargetCurrency = function($amountEgp) use ($egpRate, $rate) {
+            $usd = $amountEgp / $egpRate;
+            return $usd * $rate;
+        };
+
+        if ($returnArray) {
+            return [
+                'subtotal' => $toTargetCurrency($subtotalMonthlyEGP * $months),
+                'tools_discount' => $toTargetCurrency($toolsDiscountEGP),
+                'annual_discount' => $toTargetCurrency($annualDiscountEGP),
+                'total' => $toTargetCurrency($totalEGP),
+            ];
+        }
+
+        return $toTargetCurrency($totalEGP);
     }
 
     private function validateAddonParents($items, $user = null)
@@ -412,7 +433,48 @@ class SubscriptionController extends Controller
 
     public function calculateCustomPrice(Request $request)
     {
-        return response()->json(['total' => 0, 'breakdown' => []]);
+        $request->validate([
+            'items' => 'nullable|array',
+            'billing_cycle' => 'required|string',
+        ]);
+
+        $user = Auth::user();
+        $currencyId = 1; // Default to USD
+        $currencyCode = 'USD';
+        
+        if ($user) {
+            $egpCurrency = \App\Models\Currency::where('currency', 'EGP')->first();
+            $egpCurrencyId = $egpCurrency ? $egpCurrency->id : 1;
+            
+            $currencyId = $user->currency_id ?: $egpCurrencyId;
+            $userCurrency = \App\Models\Currency::find($currencyId);
+            $currencyCode = $userCurrency ? $userCurrency->currency : 'USD';
+        }
+
+        $items = $request->input('items', []);
+        $billingCycle = $request->input('billing_cycle', '1_month');
+
+        if (empty($items)) {
+            return response()->json([
+                'toolsDiscount' => 0,
+                'annualDiscount' => 0,
+                'total' => 0
+            ]);
+        }
+
+        $breakdown = $this->calculateCustomPriceBackend($items, $billingCycle, $currencyId, true);
+
+        if ($currencyCode !== 'EGP') {
+            $breakdown['total'] = psychological_price($breakdown['total']);
+        } else {
+            $breakdown['total'] = round($breakdown['total']);
+        }
+
+        return response()->json([
+            'toolsDiscount' => $breakdown['tools_discount'],
+            'annualDiscount' => $breakdown['annual_discount'],
+            'total' => $breakdown['total']
+        ]);
     }
 
     public function checkoutKashier(Request $request)

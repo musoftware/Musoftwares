@@ -97,7 +97,7 @@ export default function InboxWorkspace({ callRPC, daemonConnected, sessions, sel
     // ── Dedicated WebSocket for REAL-TIME inbox ──────────────────────────────
     useEffect(() => {
         const host = typeof window !== 'undefined'
-            ? (window.localStorage.getItem('musoftware_runtime_host') || '127.0.0.1')
+            ? ((window as any).MUSOFTWARE_RUNTIME_HOST || '127.0.0.1')
             : '127.0.0.1';
         let ws: WebSocket | null = null;
         let reconnectTimer: any = null;

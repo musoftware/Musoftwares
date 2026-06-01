@@ -26,7 +26,7 @@ export function useRuntimeWS(pluginSlug: string, onBroadcast?: ((event: string, 
     }, []);
 
     useEffect(() => {
-        const host = typeof window !== 'undefined' ? (window.localStorage.getItem('musoftware_runtime_host') || '127.0.0.1') : '127.0.0.1';
+        const host = typeof window !== 'undefined' ? ((window as any).MUSOFTWARE_RUNTIME_HOST || '127.0.0.1') : '127.0.0.1';
         const socket = new WebSocket(`ws://${host}:18401/ws`);
 
         socket.onopen = () => setConnected(true);

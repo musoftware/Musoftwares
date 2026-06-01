@@ -27,7 +27,7 @@ export function RuntimePluginModals({ installingPlugin, loginRequired, setLoginR
                 setErrorMsg('');
             }
             try {
-                const host = typeof window !== 'undefined' ? (window.localStorage.getItem('musoftware_runtime_host') || '127.0.0.1') : '127.0.0.1';
+                const host = typeof window !== 'undefined' ? ((window as any).MUSOFTWARE_RUNTIME_HOST || '127.0.0.1') : '127.0.0.1';
                 const response = await fetch(`http://${host}:18400/auth/start`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' }
