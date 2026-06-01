@@ -29,7 +29,7 @@ class UserResource extends JsonResource
             'account_status'       => $this->account_status ?? 'active',
             'block_reason'         => $this->when($request->routeIs('admin.users.show') || $request->routeIs('admin.users.reports') || $request->routeIs('admin.users.problematic'), $this->block_reason),
             'email_verified_at'    => $this->when($request->routeIs('admin.users.show') || $request->routeIs('admin.users.reports'), $this->email_verified_at),
-            'phone'                => $this->when($request->routeIs('admin.users.show') || $request->routeIs('admin.users.reports'), $this->phone),
+            'phone'                => $this->when($request->routeIs('admin.users.show') || $request->routeIs('admin.users.reports'), $this->phone_number),
             'mobile_1'             => $this->when($request->routeIs('admin.users.show') || $request->routeIs('admin.users.reports'), $this->mobile_1),
             'mobile_2'             => $this->when($request->routeIs('admin.users.show') || $request->routeIs('admin.users.reports'), $this->mobile_2),
             'whatsapp_number'      => $this->whatsapp_number,

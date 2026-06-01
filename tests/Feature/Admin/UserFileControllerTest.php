@@ -73,7 +73,7 @@ class UserFileControllerTest extends TestCase
         Storage::disk('local')->put("user-files/{$this->clientUser->id}/old.pdf", 'content');
 
         $response = $this->actingAs($this->admin)->post("/admin/users/{$this->clientUser->id}/files/rename", [
-            'path' => 'old.pdf',
+            'path' => "user-files/{$this->clientUser->id}/old.pdf",
             'new_name' => 'new.pdf'
         ]);
 
@@ -87,8 +87,8 @@ class UserFileControllerTest extends TestCase
         Storage::disk('local')->makeDirectory("user-files/{$this->clientUser->id}/dest");
 
         $response = $this->actingAs($this->admin)->post("/admin/users/{$this->clientUser->id}/files/move", [
-            'paths' => ['file.pdf'],
-            'destination' => 'dest'
+            'paths' => ["user-files/{$this->clientUser->id}/file.pdf"],
+            'destination' => "user-files/{$this->clientUser->id}/dest"
         ]);
 
         $response->assertStatus(200)
@@ -100,7 +100,7 @@ class UserFileControllerTest extends TestCase
         Storage::disk('local')->put("user-files/{$this->clientUser->id}/delete.pdf", 'content');
 
         $response = $this->actingAs($this->admin)->delete("/admin/users/{$this->clientUser->id}/files", [
-            'paths' => ['delete.pdf']
+            'paths' => ["user-files/{$this->clientUser->id}/delete.pdf"]
         ]);
 
         $response->assertStatus(200)
@@ -111,7 +111,7 @@ class UserFileControllerTest extends TestCase
     {
         Storage::disk('local')->put("user-files/{$this->clientUser->id}/test.txt", 'hello world');
 
-        $response = $this->actingAs($this->admin)->get("/admin/users/{$this->clientUser->id}/files/download?paths[]=test.txt");
+        $response = $this->actingAs($this->admin)->get("/admin/users/{$this->clientUser->id}/files/download?paths[]=user-files/{$this->clientUser->id}/test.txt");
 
         $response->assertStatus(200);
     }
