@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { __ } from '@/lib/i18n';
 import { useToast } from './ui/use-toast';
 import { ToastAction } from './ui/toast';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from './ui/dialog';
