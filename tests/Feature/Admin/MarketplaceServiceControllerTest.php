@@ -43,19 +43,19 @@ class MarketplaceServiceControllerTest extends TestCase
 
     public function test_admin_can_view_all_services(): void
     {
-        $response = $this->actingAs($this->admin)->get('/admin/marketplace/services');
+        $response = $this->actingAs($this->admin)->get('/admin/marketplace/all-services');
         $response->assertStatus(200);
     }
 
     public function test_non_admin_cannot_view_all_services(): void
     {
-        $response = $this->actingAs($this->sellerUser)->get('/admin/marketplace/services');
+        $response = $this->actingAs($this->sellerUser)->get('/admin/marketplace/all-services');
         $response->assertStatus(403);
     }
 
     public function test_admin_can_view_pending_services(): void
     {
-        $response = $this->actingAs($this->admin)->get('/admin/marketplace/services/pending');
+        $response = $this->actingAs($this->admin)->get('/admin/marketplace/pending-services');
         $response->assertStatus(200);
     }
 
@@ -131,6 +131,6 @@ class MarketplaceServiceControllerTest extends TestCase
 
         $response->assertRedirect();
         $response->assertSessionHas('success');
-        $this->assertDatabaseMissing('marketplace_services', ['id' => $this->service->id]);
+        $this->assertSoftDeleted('marketplace_services', ['id' => $this->service->id]);
     }
 }

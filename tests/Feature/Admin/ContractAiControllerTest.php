@@ -23,9 +23,9 @@ class ContractAiControllerTest extends TestCase
         // Setting openai key so it bypasses the empty key check
         $this->admin = User::factory()->create([
             'onboarding_completed' => true,
-            'default_ai_model' => 'openai',
-            'openai_api_key' => 'test-key',
         ]);
+        \App\Models\AdminSettings::SetValue('default_ai_model', 'openai');
+        \App\Models\AdminSettings::SetValue('openai_api_key', 'test-key');
         $this->admin->assignRole('admin');
 
         $this->clientUser = User::factory()->create(['onboarding_completed' => true]);
@@ -101,9 +101,8 @@ class ContractAiControllerTest extends TestCase
         // Admin with no key
         $adminNoKey = User::factory()->create([
             'onboarding_completed' => true,
-            'default_ai_model' => 'openai',
-            'openai_api_key' => null,
         ]);
+        \App\Models\AdminSettings::SetValue('openai_api_key', null);
         $adminNoKey->assignRole('admin');
 
         $response = $this->actingAs($adminNoKey)->postJson('/admin/contract-ai/generate', [

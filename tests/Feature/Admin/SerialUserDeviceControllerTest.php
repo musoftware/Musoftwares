@@ -48,11 +48,12 @@ class SerialUserDeviceControllerTest extends TestCase
 
     public function test_admin_can_store_serial_user_device()
     {
-        $device = SerialDevice::create(['device_id' => 'DEV123', 'status' => 'active', 'machine_name' => 'Machine 1']);
+        $device = SerialDevice::factory()->create(['device_id' => 'DEV123', 'status' => 'active', 'machine_name' => 'Machine 1']);
 
         $response = $this->actingAs($this->admin)->post('/admin/serial-user-devices', [
             'user_id' => $this->clientUser->id,
             'device_id' => $device->device_id,
+            'status' => 'active',
             'notes' => 'Test assignment'
         ]);
 
@@ -67,7 +68,7 @@ class SerialUserDeviceControllerTest extends TestCase
 
     public function test_admin_can_update_status()
     {
-        $device = SerialDevice::create(['device_id' => 'DEV123', 'status' => 'active', 'machine_name' => 'Machine 1']);
+        $device = SerialDevice::factory()->create(['device_id' => 'DEV123', 'status' => 'active', 'machine_name' => 'Machine 1']);
         $assignment = SerialUserDevice::create([
             'user_id' => $this->clientUser->id,
             'device_id' => $device->device_id,
@@ -88,7 +89,7 @@ class SerialUserDeviceControllerTest extends TestCase
 
     public function test_admin_can_delete_assignment()
     {
-        $device = SerialDevice::create(['device_id' => 'DEV123', 'status' => 'active', 'machine_name' => 'Machine 1']);
+        $device = SerialDevice::factory()->create(['device_id' => 'DEV123', 'status' => 'active', 'machine_name' => 'Machine 1']);
         $assignment = SerialUserDevice::create([
             'user_id' => $this->clientUser->id,
             'device_id' => $device->device_id,
@@ -112,7 +113,7 @@ class SerialUserDeviceControllerTest extends TestCase
 
     public function test_admin_can_update_user_status()
     {
-        $device = SerialDevice::create(['device_id' => 'DEV123', 'status' => 'active', 'machine_name' => 'Machine 1']);
+        $device = SerialDevice::factory()->create(['device_id' => 'DEV123', 'status' => 'active', 'machine_name' => 'Machine 1']);
         $assignment = SerialUserDevice::create([
             'user_id' => $this->clientUser->id,
             'device_id' => $device->device_id,

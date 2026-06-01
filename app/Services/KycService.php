@@ -30,7 +30,7 @@ class KycService
         // Mark all pending docs as rejected
         $user->kycDocuments()->where('status', 'pending')->update([
             'status'           => 'rejected',
-            'rejection_reason' => $reason
+            'admin_notes'      => $reason
         ]);
     }
 }

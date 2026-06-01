@@ -16,7 +16,7 @@ class StoreResellerRequest extends FormRequest
         return [
             'user_id'  => ['required', 'exists:users,id'],
             'name'     => ['required', 'string', 'max:191'],
-            'currency' => ['required', 'string', 'max:10'],
+            'currency_id' => ['required', 'integer', 'exists:currencies,id'],
             'notes'    => ['nullable', 'string'],
         ];
     }

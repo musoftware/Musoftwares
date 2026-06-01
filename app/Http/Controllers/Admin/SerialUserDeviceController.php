@@ -189,9 +189,10 @@ class SerialUserDeviceController extends Controller
      */
     public function updateUserStatus(UpdateUserSerialStatusRequest $request, User $user): RedirectResponse
     {
-        $this->serialUserDeviceService->updateUserStatus($user, $request->validated('status'));
+        $status = $request->validated('status');
+        $this->serialUserDeviceService->updateUserStatus($user, $status);
 
-        return back()->with('success', "All devices for {$user->name} set to {$validated['status']}.");
+        return back()->with('success', "All devices for {$user->name} set to {$status}.");
     }
 
     /**

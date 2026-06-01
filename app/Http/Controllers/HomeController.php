@@ -10,7 +10,151 @@ use Inertia\Inertia;
 
 class HomeController extends Controller
 {
-    public function index(\Illuminate\Http\Request $request, \App\Services\IpGeolocationService $geoService)
+    public function index()
+    {
+        return Inertia::render('Public/Home', [
+            'canLogin' => Route::has('login'),
+            'canRegister' => Route::has('register'),
+        ]);
+    }
+
+    public function platforms()
+    {
+        return Inertia::render('Public/Platforms', [
+            'canLogin' => Route::has('login'),
+            'canRegister' => Route::has('register'),
+        ]);
+    }
+
+    public function platformCrm()
+    {
+        return Inertia::render('Public/Platforms/Crm', [
+            'canLogin' => Route::has('login'),
+            'canRegister' => Route::has('register'),
+        ]);
+    }
+
+    public function platformErp()
+    {
+        return Inertia::render('Public/Platforms/Erp', [
+            'canLogin' => Route::has('login'),
+            'canRegister' => Route::has('register'),
+        ]);
+    }
+
+    public function platformCloud()
+    {
+        return Inertia::render('Public/Platforms/Cloud', [
+            'canLogin' => Route::has('login'),
+            'canRegister' => Route::has('register'),
+        ]);
+    }
+
+    public function solutions()
+    {
+        return Inertia::render('Public/Solutions', [
+            'canLogin' => Route::has('login'),
+            'canRegister' => Route::has('register'),
+        ]);
+    }
+
+    public function solutionHealthcare()
+    {
+        return Inertia::render('Public/Solutions/Healthcare', [
+            'canLogin' => Route::has('login'),
+            'canRegister' => Route::has('register'),
+        ]);
+    }
+
+    public function solutionEducation()
+    {
+        return Inertia::render('Public/Solutions/Education', [
+            'canLogin' => Route::has('login'),
+            'canRegister' => Route::has('register'),
+        ]);
+    }
+
+    public function solutionEcommerce()
+    {
+        return Inertia::render('Public/Solutions/Ecommerce', [
+            'canLogin' => Route::has('login'),
+            'canRegister' => Route::has('register'),
+        ]);
+    }
+
+    public function solutionRealEstate()
+    {
+        return Inertia::render('Public/Solutions/RealEstate', [
+            'canLogin' => Route::has('login'),
+            'canRegister' => Route::has('register'),
+        ]);
+    }
+
+    public function solutionFinance()
+    {
+        return Inertia::render('Public/Solutions/Finance', [
+            'canLogin' => Route::has('login'),
+            'canRegister' => Route::has('register'),
+        ]);
+    }
+
+    public function company()
+    {
+        return Inertia::render('Public/Company', [
+            'canLogin' => Route::has('login'),
+            'canRegister' => Route::has('register'),
+        ]);
+    }
+
+    public function companyAbout()
+    {
+        return Inertia::render('Public/Company/About', [
+            'canLogin' => Route::has('login'),
+            'canRegister' => Route::has('register'),
+        ]);
+    }
+
+    public function companyCareers()
+    {
+        return Inertia::render('Public/Company/Careers', [
+            'canLogin' => Route::has('login'),
+            'canRegister' => Route::has('register'),
+        ]);
+    }
+
+    public function companyContact()
+    {
+        return Inertia::render('Public/Company/Contact', [
+            'canLogin' => Route::has('login'),
+            'canRegister' => Route::has('register'),
+        ]);
+    }
+
+    public function privacyPolicy()
+    {
+        return Inertia::render('Public/Legal/Privacy', [
+            'canLogin' => Route::has('login'),
+            'canRegister' => Route::has('register'),
+        ]);
+    }
+
+    public function termsOfService()
+    {
+        return Inertia::render('Public/Legal/Terms', [
+            'canLogin' => Route::has('login'),
+            'canRegister' => Route::has('register'),
+        ]);
+    }
+
+    public function cookiePolicy()
+    {
+        return Inertia::render('Public/Legal/Cookies', [
+            'canLogin' => Route::has('login'),
+            'canRegister' => Route::has('register'),
+        ]);
+    }
+
+    public function pricing(\Illuminate\Http\Request $request, \App\Services\IpGeolocationService $geoService)
     {
         $user = Auth::user();
         
@@ -64,7 +208,7 @@ class HomeController extends Controller
         $pricingService = new \App\Services\PricingService();
         $serviceItems = $pricingService->getServiceItems($convertPrice);
 
-        return Inertia::render('Public/Home', [
+        return Inertia::render('Public/Pricing', [
             'canLogin' => Route::has('login'),
             'canRegister' => Route::has('register'),
             'serviceItems' => $serviceItems,

@@ -42,6 +42,7 @@ class User extends Authenticatable
         'workspace_settings',
         'can_add_freelance_skills',
         'max_devices',
+        'temp_valid_until',
     ];
 
     protected $hidden = [

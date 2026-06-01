@@ -48,6 +48,7 @@ class UserNoteControllerTest extends TestCase
     public function test_admin_can_store_user_note()
     {
         $response = $this->actingAs($this->admin)->postJson("/admin/users/{$this->clientUser->id}/notes", [
+            'title' => 'Test Note',
             'category' => 'notes',
             'content' => 'This is a test note.'
         ]);
@@ -55,6 +56,7 @@ class UserNoteControllerTest extends TestCase
         $response->assertStatus(200)->assertJson(['success' => true]);
         $this->assertDatabaseHas('user_notes', [
             'user_id' => $this->clientUser->id,
+            'title' => 'Test Note',
             'content' => 'This is a test note.',
             'category' => 'notes'
         ]);
@@ -64,6 +66,7 @@ class UserNoteControllerTest extends TestCase
     {
         $note = UserNote::create([
             'user_id' => $this->clientUser->id,
+            'title' => 'Test Note',
             'category' => 'notes',
             'content' => 'Delete me'
         ]);
@@ -80,6 +83,7 @@ class UserNoteControllerTest extends TestCase
     {
         $note = UserNote::create([
             'user_id' => $this->clientUser->id,
+            'title' => 'Test Note',
             'category' => 'notes',
             'content' => 'Archive me'
         ]);
@@ -98,6 +102,7 @@ class UserNoteControllerTest extends TestCase
     {
         $note = UserNote::create([
             'user_id' => $this->clientUser->id,
+            'title' => 'Test Note',
             'category' => 'archived',
             'original_category' => 'notes',
             'content' => 'Unarchive me'
@@ -118,6 +123,7 @@ class UserNoteControllerTest extends TestCase
     {
         $note = UserNote::create([
             'user_id' => $this->clientUser->id,
+            'title' => 'Test Note',
             'category' => 'notes',
             'content' => 'Pin me',
             'is_pinned' => false

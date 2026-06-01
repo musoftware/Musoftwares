@@ -60,7 +60,7 @@ class UserFileControllerTest extends TestCase
     public function test_admin_can_create_new_folder()
     {
         $response = $this->actingAs($this->admin)->post("/admin/users/{$this->clientUser->id}/files/folder", [
-            'name' => 'New Folder',
+            'name' => 'New_Folder',
             'parent' => ''
         ]);
 

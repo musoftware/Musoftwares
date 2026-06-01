@@ -19,14 +19,7 @@ trait IsPlatformClient
                     });
     }
 
-    public function platformWallet()
-    {
-        return $this->hasOne(\Modules\ERP\Models\ClientWallet::class, 'client_id')
-                    ->where(function ($q) {
-                        $q->whereNull('tenant_id')
-                          ->orWhere('tenant_id', Tenant::platformId());
-                    });
-    }
+
 
     public function tickets()
     {

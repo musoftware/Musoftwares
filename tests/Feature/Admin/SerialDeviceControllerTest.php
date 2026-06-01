@@ -41,7 +41,7 @@ class SerialDeviceControllerTest extends TestCase
 
     public function test_admin_can_update_serial_device_status()
     {
-        $device = SerialDevice::create([
+        $device = SerialDevice::factory()->create([
             'device_id' => 'DEV123',
             'status' => 'active',
             'machine_name' => 'Machine 1',
@@ -61,7 +61,7 @@ class SerialDeviceControllerTest extends TestCase
 
     public function test_admin_can_delete_serial_device()
     {
-        $device = SerialDevice::create([
+        $device = SerialDevice::factory()->create([
             'device_id' => 'DEV123',
             'status' => 'active',
             'machine_name' => 'Machine 1',
@@ -85,8 +85,8 @@ class SerialDeviceControllerTest extends TestCase
 
     public function test_admin_can_bulk_update_status()
     {
-        $device1 = SerialDevice::create(['device_id' => 'DEV1', 'status' => 'active', 'machine_name' => 'Machine 1']);
-        $device2 = SerialDevice::create(['device_id' => 'DEV2', 'status' => 'active', 'machine_name' => 'Machine 2']);
+        $device1 = SerialDevice::factory()->create(['device_id' => 'DEV1', 'status' => 'active', 'machine_name' => 'Machine 1']);
+        $device2 = SerialDevice::factory()->create(['device_id' => 'DEV2', 'status' => 'active', 'machine_name' => 'Machine 2']);
 
         $response = $this->actingAs($this->admin)->post('/admin/serial-devices/bulk-status', [
             'ids' => [$device1->id, $device2->id],
@@ -101,8 +101,8 @@ class SerialDeviceControllerTest extends TestCase
 
     public function test_admin_can_bulk_delete()
     {
-        $device1 = SerialDevice::create(['device_id' => 'DEV1', 'status' => 'active', 'machine_name' => 'Machine 1']);
-        $device2 = SerialDevice::create(['device_id' => 'DEV2', 'status' => 'active', 'machine_name' => 'Machine 2']);
+        $device1 = SerialDevice::factory()->create(['device_id' => 'DEV1', 'status' => 'active', 'machine_name' => 'Machine 1']);
+        $device2 = SerialDevice::factory()->create(['device_id' => 'DEV2', 'status' => 'active', 'machine_name' => 'Machine 2']);
 
         $response = $this->actingAs($this->admin)->post('/admin/serial-devices/bulk-delete', [
             'ids' => [$device1->id, $device2->id]

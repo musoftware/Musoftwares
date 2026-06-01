@@ -29,13 +29,13 @@ class ProjectControllerTest extends TestCase
 
     public function test_admin_can_view_projects_index(): void
     {
-        $response = $this->actingAs($this->admin)->get(route('projects.index'));
+        $response = $this->actingAs($this->admin)->get(route('admin.projects.index'));
         $response->assertStatus(200);
     }
 
     public function test_non_admin_cannot_view_projects_index(): void
     {
-        $response = $this->actingAs($this->clientUser)->get(route('projects.index'));
+        $response = $this->actingAs($this->clientUser)->get(route('admin.projects.index'));
         $response->assertStatus(403);
     }
 
@@ -47,7 +47,7 @@ class ProjectControllerTest extends TestCase
             'description' => 'A great website project.',
         ];
 
-        $response = $this->actingAs($this->admin)->post(route('projects.store'), $payload);
+        $response = $this->actingAs($this->admin)->post(route('admin.projects.store'), $payload);
 
         $response->assertRedirect();
         $response->assertSessionHas('success');
@@ -65,7 +65,7 @@ class ProjectControllerTest extends TestCase
             'project_name' => '', // Required
         ];
 
-        $response = $this->actingAs($this->admin)->post(route('projects.store'), $payload);
+        $response = $this->actingAs($this->admin)->post(route('admin.projects.store'), $payload);
 
         $response->assertSessionHasErrors('project_name');
     }
@@ -82,7 +82,7 @@ class ProjectControllerTest extends TestCase
             'user_id' => $this->clientUser->id,
         ];
 
-        $response = $this->actingAs($this->admin)->put(route('projects.update', $project->id), $payload);
+        $response = $this->actingAs($this->admin)->put(route('admin.projects.update', $project->id), $payload);
 
         $response->assertRedirect();
         $response->assertSessionHas('success');
@@ -98,7 +98,7 @@ class ProjectControllerTest extends TestCase
             'archived' => false,
         ]);
 
-        $response = $this->actingAs($this->admin)->post(route('projects.archive', $project->id));
+        $response = $this->actingAs($this->admin)->post(route('admin.projects.archive', $project->id));
 
         $response->assertRedirect();
         $response->assertSessionHas('success');
@@ -114,7 +114,7 @@ class ProjectControllerTest extends TestCase
             'archived' => true,
         ]);
 
-        $response = $this->actingAs($this->admin)->post(route('projects.restore', $project->id));
+        $response = $this->actingAs($this->admin)->post(route('admin.projects.restore', $project->id));
 
         $response->assertRedirect();
         $response->assertSessionHas('success');
@@ -129,11 +129,11 @@ class ProjectControllerTest extends TestCase
             'project_name' => 'Delete Me',
         ]);
 
-        $response = $this->actingAs($this->admin)->delete(route('projects.destroy', $project->id));
+        $response = $this->actingAs($this->admin)->delete(route('admin.projects.destroy', $project->id));
 
         $response->assertRedirect();
         $response->assertSessionHas('success');
 
-        $this->assertDatabaseMissing('projects', ['id' => $project->id]);
+        $this->assertSoftDeleted('projects', ['id' => $project->id]);
     }
 }

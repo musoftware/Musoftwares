@@ -50,7 +50,8 @@ class FreelanceContractControllerTest extends TestCase
             'description' => 'Test Desc',
             'budget' => 100,
             'currency_id' => $currency->id,
-            'status' => 'published',
+            'status' => 'open',
+            'type' => 'fixed',
         ]);
 
         $this->proposal = Proposal::create([
@@ -72,6 +73,7 @@ class FreelanceContractControllerTest extends TestCase
             'currency_id' => $currency->id,
             'contract_points' => 100,
             'status' => 'active',
+            'started_at' => now(),
         ]);
     }
 
@@ -117,7 +119,7 @@ class FreelanceContractControllerTest extends TestCase
     {
         $this->contract->update(['status' => 'disputed']);
 
-        $response = $this->actingAs($this->admin)->post("/admin/freelance/contracts/{$this->contract->id}/resolve", [
+        $response = $this->actingAs($this->admin)->post("/admin/freelance/contracts/{$this->contract->id}/resolve-dispute", [
             'resolution' => 'refund_client'
         ]);
 
