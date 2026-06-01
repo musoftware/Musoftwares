@@ -2,6 +2,7 @@ import React from 'react';
 import { Head, Link } from '@inertiajs/react';
 import ToolsPublicLayout from '@/Layouts/ToolsPublicLayout';
 import { Button } from '@/Components/ui/button';
+import { __ } from '@/lib/i18n';
 import { 
     Download, 
     Chrome, 

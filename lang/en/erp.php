@@ -1,6 +1,8 @@
 <?php
 
 return [
+    'created_successfully' => 'created_successfully',
+    'settings_saved_success' => 'settings_saved_success',
     'bonus_added_success' => 'bonus_added_success',
     'branch_created' => 'branch_created',
     'cannot_delete_client_open_invoices' => 'cannot_delete_client_open_invoices',
@@ -164,8 +166,6 @@ return [
     'payment_due_upon_receipt' => 'Payment due upon receipt.',
     'page_x_of_y' => 'Page {PAGE_NUM} of {PAGE_COUNT}',
     'manual_wallet_transaction' => 'Manual wallet transaction',
-    
-    // Team Roles & Capacity
     'roles_admin' => 'CRM Admin',
     'roles_sales_agent' => 'Sales Agent',
     'roles_sales_manager' => 'Sales Manager',
@@ -183,10 +183,8 @@ return [
     'team_member_added' => 'Team member :name has been added successfully.',
     'team_member_updated' => 'Team member details updated successfully.',
     'team_member_removed' => 'Team member :name has been removed.',
-
-    // Employee Todos
     'todo_created_success' => 'Todo assigned successfully.',
     'todo_updated_success' => 'Todo updated successfully.',
     'todo_deleted_success' => 'Todo deleted successfully.',
-    'role_updated_success' => 'Permissions/Role updated successfully.',
+    'role_updated_success' => 'Permissions/Role updated successfully.'
 ];

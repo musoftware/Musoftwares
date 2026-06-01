@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Loader2, Sparkles, ArrowLeft } from 'lucide-react';
+import { __ } from '@/lib/i18n';
 
 export default function Create() {
     const { data, setData, post, processing, errors } = useForm({

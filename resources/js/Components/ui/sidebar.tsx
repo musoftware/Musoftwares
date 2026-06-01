@@ -1,3 +1,4 @@
+import { __ } from '@/lib/i18n';
 "use client"
 
 import * as React from "react"

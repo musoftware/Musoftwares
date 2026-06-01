@@ -4,6 +4,7 @@ import { Button } from '@/Components/ui/button';
 import { Card, CardContent } from '@/Components/ui/card';
 import { CheckCircle2, Calendar, Clock, ArrowRight } from 'lucide-react';
 import { format } from 'date-fns';
+import { __ } from '@/lib/i18n';
 
 export default function Success({ booking }: any) {
     const { eventType } = booking;

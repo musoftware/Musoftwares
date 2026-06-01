@@ -1,5 +1,6 @@
 import React from 'react';
 import { ShieldCheck, Sparkles } from 'lucide-react';
+import { __ } from '@/lib/i18n';
 
 export default function ScorecardWorkspace({ t, campaignResult }: any) {
     if (!campaignResult) return null;

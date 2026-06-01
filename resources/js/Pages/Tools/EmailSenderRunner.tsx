@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 
 import { useRuntimeWS } from '@/hooks/useRuntimeWS';
 import { RuntimePluginModals } from '@/Components/Tools/RuntimePluginModals';
+import { __ } from '@/lib/i18n';
 
 export default function EmailSenderRunner({ tool, subscription, runtimePort, pluginSlug = 'email-sender' }: any) {
     const [activeTab, setActiveTab] = useState('dashboard');

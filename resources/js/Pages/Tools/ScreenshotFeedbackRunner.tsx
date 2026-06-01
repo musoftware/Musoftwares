@@ -5,6 +5,7 @@ import { Badge } from '@/Components/ui/badge';
 import { Textarea } from '@/Components/ui/textarea';
 import { useRuntimeWS } from '@/hooks/useRuntimeWS';
 import { RuntimePluginModals } from '@/Components/Tools/RuntimePluginModals';
+import { __ } from '@/lib/i18n';
 
 export default function ScreenshotFeedbackRunner({ tool, subscription, runtimePort, pluginSlug }: any) {
     const [activeTab, setActiveTab] = useState('projects');

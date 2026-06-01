@@ -3,6 +3,7 @@ import { PipelineLead } from '../../Stores/usePipelineStore';
 
 import { Phone, MessageCircle, Clock, AlertTriangle } from 'lucide-react';
 import { Draggable } from '@hello-pangea/dnd';
+import { __ } from '@/lib/i18n';
 
 interface LeadCardProps {
     lead: PipelineLead;

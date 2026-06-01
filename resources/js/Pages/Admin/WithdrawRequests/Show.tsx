@@ -5,6 +5,7 @@ import { Button } from '@/Components/ui/button';
 import { useToast } from '@/Components/ui/use-toast';
 import { ArrowLeft, User, Wallet, Calendar, FileText, CheckCircle, XCircle, Clock } from 'lucide-react';
 import { formatMoney as formatCurrency } from '@/lib/utils';
+import { __ } from '@/lib/i18n';
 
 interface WithdrawRequest {
     id: number;

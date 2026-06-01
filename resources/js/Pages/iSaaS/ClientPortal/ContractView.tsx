@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { formatMoney } from '@/lib/utils';
 import { CheckCircle, Clock, CheckSquare } from 'lucide-react';
+import { __ } from '@/lib/i18n';
 
 interface Contract {
     uuid: string;

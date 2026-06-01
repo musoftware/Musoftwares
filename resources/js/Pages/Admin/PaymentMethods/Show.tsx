@@ -3,6 +3,7 @@ import { Head, Link, router } from '@inertiajs/react';
 import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
 import { Button } from '@/Components/ui/button';
 import { useToast } from '@/Components/ui/use-toast';
+import { __ } from '@/lib/i18n';
 import {
     ArrowLeft,
     CheckCircle,

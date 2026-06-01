@@ -14,6 +14,7 @@ import { Label } from '@/Components/ui/label';
 import { Switch } from '@/Components/ui/switch';
 import { Textarea } from '@/Components/ui/textarea';
 import { Badge } from '@/Components/ui/badge';
+import { __ } from '@/lib/i18n';
 
 // ── Step indicator component ─────────────────────────────────────────────
 function StepIndicator({ steps, currentStep, locale }: { steps: { label: string; icon: any }[]; currentStep: number; locale: string }) {

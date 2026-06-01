@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { X, Image as ImageIcon, Settings as SettingsIcon } from 'lucide-react';
+import { __ } from '@/lib/i18n';
 
 interface SettingsModalProps {
     isOpen: boolean;

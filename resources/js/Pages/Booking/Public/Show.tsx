@@ -7,6 +7,7 @@ import { Textarea } from '@/Components/ui/textarea';
 import { Card, CardContent } from '@/Components/ui/card';
 import { CalendarIcon, Clock, CreditCard, ChevronRight, ChevronLeft, Globe, User, Stethoscope, CheckCircle2, AlertCircle } from 'lucide-react';
 import { format, addDays, startOfToday } from 'date-fns';
+import { __ } from '@/lib/i18n';
 
 export default function Show({ host, eventType }: any) {
     const [selectedDate, setSelectedDate] = useState<Date | null>(null);

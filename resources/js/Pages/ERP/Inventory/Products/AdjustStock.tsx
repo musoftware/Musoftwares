@@ -3,6 +3,7 @@ import { useERPMenu } from '@/hooks/useERPMenu';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { ArrowLeft } from 'lucide-react';
 import InputError from '@/components/InputError';
+import { __ } from '@/lib/i18n';
 
 export default function AdjustStock({ product }: { product: any }) {
     const { menuItems, lockedAddons, workspaceName, tenantId } = useERPMenu('inventory');

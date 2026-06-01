@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { ArrowDownLeft, ArrowUpRight, Undo2, Receipt, Coins, Plus, Trash2, Calculator, StickyNote, TrendingUp } from 'lucide-react';
 import { CurrencyDisplay } from '@/Components/ui/CurrencyDisplay';
 import TransactionEntryForm from './Components/TransactionEntryForm';
+import { __ } from '@/lib/i18n';
 
 interface Props {
     user: any;

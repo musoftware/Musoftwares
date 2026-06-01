@@ -25,6 +25,7 @@ import { Card, CardContent } from '@/Components/ui/card';
 import { Badge } from '@/Components/ui/badge';
 import { toast } from 'sonner';
 import { formatMoney as formatCurrency } from '@/lib/utils';
+import { __ } from '@/lib/i18n';
 
 interface Client {
     id: number;

@@ -4,6 +4,7 @@ import { Label } from '@/Components/ui/label';
 import { cn } from '@/lib/utils';
 import { Trash2, Plus, Info } from 'lucide-react';
 import { emptyPackage } from '../Create';
+import { __ } from '@/lib/i18n';
 
 const CURRENCIES = [
     { id: 1, code: 'USD' },

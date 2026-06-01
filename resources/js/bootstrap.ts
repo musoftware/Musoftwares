@@ -1,6 +1,8 @@
 import axios from 'axios';
+import { __ } from '@/lib/i18n';
 
 window.axios = axios;
+window.__ = __;
 
 window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 

@@ -7,6 +7,7 @@ import { Input } from "@/Components/ui/input";
 import { Label } from "@/Components/ui/label";
 import { PremiumCombobox } from '@/Components/ui/PremiumCombobox';
 import { formatMoney as formatCurrency } from '@/lib/utils';
+import { __ } from '@/lib/i18n';
 import { 
     Printer, Download, Share2, User, MapPin, Phone, Folder, Receipt, 
     Clock, Layers, Plus, CreditCard, List, Edit2, Check, X, Trash2,
@@ -29,7 +30,19 @@ export default function Show({ invoice }: { invoice: any }) {
     // Feature states
     const [selectedItemsForMerge, setSelectedItemsForMerge] = useState<number[]>([]);
     const [showPricingInsights, setShowPricingInsights] = useState(false);
-
+    
+    // Pay Service state
+    const [showPayServiceModal, setShowPayServiceModal] = useState(false);
+    const [payServiceForm, setPayServiceForm] = useState({
+        service_amount: '0',
+        currency: '1', // default to USD (assuming 1 is USD based on calc)
+        service_pay_source: 'wallet',
+        service_pay_dest: 'cib_swype',
+        service_revenue: '0'
+    });
+    const [payServicePreview, setPayServicePreview] = useState<{ cost: number, total: number, total_usd: number } | null>(null);
+    const [isCalculatingPayService, setIsCalculatingPayService] = useState(false);
+    const [isSubmittingPayService, setIsSubmittingPayService] = useState(false);
     const resetState = () => {
         if (invoice && invoice.items) {
             const itemsSource = invoice.items.data ? invoice.items.data : invoice.items;
@@ -147,6 +160,45 @@ export default function Show({ invoice }: { invoice: any }) {
         const remainingItems = items.filter((_, idx) => !selectedItemsForMerge.includes(idx));
         setItems([...remainingItems, mergedItem]);
         setSelectedItemsForMerge([]);
+    };
+
+    useEffect(() => {
+        if (!showPayServiceModal) return;
+        
+        const timeoutId = setTimeout(() => {
+            setIsCalculatingPayService(true);
+            window.axios.post(route('admin.invoices.pay-service.calculate', invoice.id), payServiceForm)
+                .then(res => {
+                    setPayServicePreview(res.data);
+                })
+                .catch(err => {
+                    console.error('Failed to calculate pay service', err);
+                })
+                .finally(() => {
+                    setIsCalculatingPayService(false);
+                });
+        }, 500);
+        
+        return () => clearTimeout(timeoutId);
+    }, [payServiceForm, showPayServiceModal, invoice.id]);
+
+    const handlePayServiceSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        setIsSubmittingPayService(true);
+        router.post(route('admin.invoices.pay-service.store', invoice.id), payServiceForm as any, {
+            preserveScroll: true,
+            onSuccess: () => {
+                setShowPayServiceModal(false);
+                setPayServiceForm({
+                    service_amount: '0',
+                    currency: '1',
+                    service_pay_source: 'wallet',
+                    service_pay_dest: 'cib_swype',
+                    service_revenue: '0'
+                });
+            },
+            onFinish: () => setIsSubmittingPayService(false)
+        });
     };
 
     const toggleItemForMerge = (index: number) => {
@@ -446,6 +498,8 @@ export default function Show({ invoice }: { invoice: any }) {
                                 <Layers className="w-4 h-4 mr-2 text-blue-500" />{__('general.qty_item')}</Button>
                             <Button onClick={handleAddSimpleItem} variant="outline" size="sm" className="flex-1 sm:flex-none border-dashed hover:border-blue-300 hover:text-blue-600 hover:bg-blue-50">
                                 <Plus className="w-4 h-4 mr-2 text-blue-500" />{__('general.simple_item')}</Button>
+                            <Button onClick={() => setShowPayServiceModal(true)} variant="outline" size="sm" className="hidden sm:flex border-dashed hover:border-green-300 hover:text-green-600 hover:bg-green-50">
+                                <CreditCard className="w-4 h-4 mr-2 text-green-500" />{__('general.pay_service')}</Button>
                             <Button onClick={handleAddTimerItem} variant="secondary" size="sm" className="hidden sm:flex bg-gray-100 text-gray-700 hover:bg-gray-200">
                                 <Clock className="w-4 h-4 mr-2" />{__('general.log_time')}</Button>
                         </div>
@@ -869,7 +923,7 @@ export default function Show({ invoice }: { invoice: any }) {
                                     <div className="text-center py-6 text-sm text-gray-500 border border-dashed rounded-md bg-gray-50">{__('general.no_internal_cost_lines_recorded')}</div>
                                 )}
                                 
-                                {isUnpaid && costLines.length > 0 && (
+                                {isUnpaid && (costLines.length > 0 || deletedCostLines.length > 0) && (
                                     <div className="mt-4">
                                         <Button type="button" onClick={handleSave} disabled={isSaving} className="w-full h-10 bg-black text-white hover:bg-gray-900 font-bold tracking-wider flex items-center justify-center">
                                             <Calculator className="w-4 h-4 mr-2" />{__('general.save_cost_lines')}</Button>

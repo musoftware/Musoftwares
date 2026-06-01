@@ -21,6 +21,7 @@ import { Input } from '@/Components/ui/input';
 import { Card, CardContent } from '@/Components/ui/card';
 import { Badge } from '@/Components/ui/badge';
 import axios from 'axios';
+import { __ } from '@/lib/i18n';
 
 interface TodoItem {
     id: number;

@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { formatMoney } from '@/lib/utils';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { FileText, Plus } from 'lucide-react';
+import { __ } from '@/lib/i18n';
 
 interface Proposal {
     id: number;

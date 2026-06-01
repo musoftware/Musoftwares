@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/Components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/Components/ui/table';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/Components/ui/select';
 import { Package, Truck, CheckCircle2, Clock, MapPin, User, ArrowLeft, RefreshCw } from 'lucide-react';
+import { __ } from '@/lib/i18n';
 
 export default function OrderShow({ order }: any) {
     const handleStatusUpdate = (newStatus: string) => {

@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/Components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/Components/ui/table';
 import { Input } from '@/Components/ui/input';
 import { PackagePlus, Edit2, Package } from 'lucide-react';
+import { __ } from '@/lib/i18n';
 
 export default function VendorProductsIndex({ products }: any) {
     const [search, setSearch] = useState('');

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Radar } from 'lucide-react';
 import { Button } from '@/Components/ui/button';
+import { __ } from '@/lib/i18n';
 
 export default function CompetitorTrackerRunner({ tool }: any) {
     return (

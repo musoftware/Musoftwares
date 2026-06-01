@@ -11,6 +11,7 @@ import { Input } from '@/Components/ui/input';
 import { Badge } from '@/Components/ui/badge';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/Components/ui/tabs';
 import { Textarea } from '@/Components/ui/textarea';
+import { __ } from '@/lib/i18n';
 
 const getRuntimeHost = () => typeof window !== 'undefined' ? (window.localStorage.getItem('musoftware_runtime_host') || '127.0.0.1') : '127.0.0.1';
 const getWsUrl       = () => `ws://${getRuntimeHost()}:18401/ws`;

@@ -7,6 +7,7 @@ import Pagination from '@/Components/Pagination';
 import { Badge } from '@/Components/ui/badge';
 import { ExternalLink, Search, FileText, Plus, MoreHorizontal, Pencil, Trash2 } from 'lucide-react';
 import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle } from '@/Components/ui/dialog';
+import { __ } from '@/lib/i18n';
 export default function Index({ articles, filters }) {
     const [search, setSearch] = useState(filters.q || '');
 

@@ -4,6 +4,7 @@ import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
 import { OperationalCard } from '@/Components/ui/OperationalCard';
 import { Clock, CalendarCheck, BarChart2 } from 'lucide-react';
 import axios from 'axios';
+import { __ } from '@/lib/i18n';
 
 export default function HoursCalendar({ years, auth }: any) {
     const [selectedYear, setSelectedYear] = useState<number>(years[0] || new Date().getFullYear());

@@ -6,6 +6,7 @@ import { Badge } from '@/Components/ui/badge';
 import { EmptyState } from '@/Components/ui/EmptyState';
 import { Download, ShoppingBag, Receipt, XCircle, Calculator } from 'lucide-react';
 import { formatMoney } from '@/lib/utils';
+import { __ } from '@/lib/i18n';
 
 interface Subscription {
     id: number; plan_name: string; billing_cycle: string; amount_paid: number;

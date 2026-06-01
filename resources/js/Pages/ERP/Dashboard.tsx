@@ -74,6 +74,7 @@ import { OperationalCard } from '@/Components/ui/OperationalCard';
 import { StatusBadge } from '@/Components/ui/StatusBadge';
 import { AsyncCombobox } from '@/Components/ui/AsyncCombobox';
 import { useERPMenu } from '@/hooks/useERPMenu';
+import { __ } from '@/lib/i18n';
 
 const __ = (key: string) => key;
 

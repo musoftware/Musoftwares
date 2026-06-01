@@ -3,6 +3,7 @@ import { CommandDialog, CommandEmpty, CommandGroup, CommandInput, CommandItem, C
 import { Search, Loader2, Users } from 'lucide-react';
 import axios from 'axios';
 import { router } from '@inertiajs/react';
+import { __ } from '@/lib/i18n';
 
 export function CrmCommandPalette({ open, setOpen, onOpenLead }) {
     const [query, setQuery] = useState('');

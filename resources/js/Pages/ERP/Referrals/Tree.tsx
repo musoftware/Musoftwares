@@ -3,6 +3,7 @@ import { useERPMenu } from '@/hooks/useERPMenu';
 import { Head, Link } from '@inertiajs/react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/Components/ui/card';
 import { ArrowLeft, Network, Users } from 'lucide-react';
+import { __ } from '@/lib/i18n';
 
 const __ = (key: string) => key;
 

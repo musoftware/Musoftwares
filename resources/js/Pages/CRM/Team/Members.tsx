@@ -6,6 +6,7 @@ import { ConfirmModal } from '@/Components/ui/ConfirmModal';
 import { OperationalCard } from '@/Components/ui/OperationalCard';
 import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
+import { __ } from '@/lib/i18n';
 import {
     Users, UserPlus, X, Loader2, Lock, Unlock,
     Shield, Key, AlertCircle, Briefcase,

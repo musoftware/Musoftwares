@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Switch } from '@/Components/ui/switch';
 import { Plus, Trash2, Calculator, ArrowRightLeft, Percent, Layers, MinusCircle } from 'lucide-react';
 import { CurrencyDisplay } from '@/Components/ui/CurrencyDisplay';
+import { __ } from '@/lib/i18n';
 
 interface Project {
     id: number;

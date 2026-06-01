@@ -11,6 +11,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useRuntimeStatus } from '@/hooks/useRuntimeStatus';
+import { __ } from '@/lib/i18n';
 import {
     Download, WifiOff, CheckCircle2,
     Loader2, AlertCircle, RefreshCw,

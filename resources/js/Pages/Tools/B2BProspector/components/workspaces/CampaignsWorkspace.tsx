@@ -6,6 +6,7 @@ import { Badge } from '@/Components/ui/badge';
 import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
 import { B2BCampaign, B2BCampaignStats } from '../../types/b2b.types';
+import { __ } from '@/lib/i18n';
 
 interface CampaignsWorkspaceProps {
     campaigns: B2BCampaign[];

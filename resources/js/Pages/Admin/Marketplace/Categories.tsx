@@ -1,6 +1,7 @@
 import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
 import { Head, router } from '@inertiajs/react';
 import { useState } from 'react';
+import { __ } from '@/lib/i18n';
 
 export default function Categories({ categories }: any) {
     const [name, setName] = useState('');

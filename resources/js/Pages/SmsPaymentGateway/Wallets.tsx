@@ -5,6 +5,7 @@ import { Button } from '@/Components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/Components/ui/card';
 import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
+import { __ } from '@/lib/i18n';
 import {
     ArrowLeft, Wallet, Plus, Trash2, Smartphone
 } from 'lucide-react';

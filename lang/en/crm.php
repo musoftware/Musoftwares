@@ -1,10 +1,30 @@
 <?php
 
 return [
+    'actions' => 'actions',
+    'company' => 'company',
+    'custom_field_created' => 'custom_field_created',
+    'custom_field_deleted' => 'custom_field_deleted',
+    'custom_field_updated' => 'custom_field_updated',
+    'customer_deleted' => 'customer_deleted',
+    'customers' => 'customers',
+    'email' => 'email',
+    'name' => 'name',
+    'no_pipelines_found' => 'no_pipelines_found',
+    'pipeline_created' => 'pipeline_created',
+    'pipeline_deleted' => 'pipeline_deleted',
+    'pipelines' => 'pipelines',
+    'settings_saved_successfully' => 'settings_saved_successfully',
+    'total_value' => 'total_value',
+    'view' => 'view',
+    'widget_created' => 'widget_created',
+    'widget_created_successfully' => 'widget_created_successfully',
+    'widget_deleted' => 'widget_deleted',
+    'widget_deleted_successfully' => 'widget_deleted_successfully',
+    'widget_updated' => 'widget_updated',
+    'widget_updated_successfully' => 'widget_updated_successfully',
     'lead_stale_warning' => 'This lead has been stale for :days days.',
     'pipeline_updated' => 'Pipeline stage updated successfully.',
-
-    // Manager Dashboard
     'Agent' => 'Agent',
     'Calls' => 'Calls',
     'Closed' => 'Closed',
@@ -16,8 +36,6 @@ return [
     'days ago' => 'days ago',
     'Last touched:' => 'Last touched:',
     'View' => 'View',
-    
-    // Marketing Dashboard
     'Marketing Workspace' => 'Marketing Workspace',
     'Marketing & Growth' => 'Marketing & Growth',
     'Campaign performance and lead acquisition.' => 'Campaign performance and lead acquisition.',
@@ -29,8 +47,6 @@ return [
     'Campaign ROI' => 'Campaign ROI',
     'Top Performing Campaigns' => 'Top Performing Campaigns',
     'No active campaigns data available.' => 'No active campaigns data available.',
-
-    // Support Dashboard
     'Support Workspace' => 'Support Workspace',
     'Customer Support' => 'Customer Support',
     'Monitor tickets, WhatsApp messages, and response SLAs.' => 'Monitor tickets, WhatsApp messages, and response SLAs.',
@@ -41,11 +57,9 @@ return [
     'Resolved Today' => 'Resolved Today',
     'Priority Inbox' => 'Priority Inbox',
     'No priority messages at the moment.' => 'No priority messages at the moment.',
-
     'template_created' => 'Template created successfully.',
     'template_updated' => 'Template updated successfully.',
     'template_deleted' => 'Template deleted successfully.',
-    
     'campaign_created' => 'Campaign created successfully.',
     'campaign_updated' => 'Campaign updated successfully.',
     'only_draft_campaigns_deleted' => 'Only draft campaigns can be deleted.',
@@ -57,33 +71,25 @@ return [
     'campaign_cancelled' => 'Campaign cancelled successfully.',
     'campaign_duplicated' => 'Campaign duplicated successfully.',
     'campaign_content_saved' => 'Campaign content saved successfully.',
-    
     'audience_updated' => 'Audience updated successfully.',
     'audience_deleted' => 'Audience deleted successfully.',
-    
     'sequence_created' => 'Sequence created successfully.',
     'sequence_deleted' => 'Sequence deleted successfully.',
     'step_added' => 'Step added successfully.',
     'step_updated' => 'Step updated successfully.',
     'step_deleted' => 'Step deleted successfully.',
     'ai_steps_applied' => 'AI steps applied successfully.',
-    
     'tag_added' => 'Tag added to lead successfully.',
     'tag_removed' => 'Tag removed from lead successfully.',
-    
     'note_added' => 'Note added successfully.',
     'note_updated' => 'Note updated successfully.',
     'note_deleted' => 'Note deleted successfully.',
-    
     'lead_status_updated' => 'Lead status updated successfully.',
     'lead_assignment_updated' => 'Lead assignment updated successfully.',
     'lead_deleted' => 'Lead deleted successfully.',
-    
     'lead_info_submitted' => 'Thank you! Your information has been submitted.',
     'lead_info_error' => 'Something went wrong. Please try again.',
-    
     'no_workspace_access' => 'You do not have access to any CRM workspace. Please contact support or upgrade your subscription.',
-    
     'campaign_edit_state_error' => 'Campaign can only be edited in draft or paused state.',
     'campaign_schedule_draft_error' => 'Only draft campaigns can be scheduled.',
     'campaign_not_running' => 'Campaign is not running.',
@@ -92,8 +98,6 @@ return [
     'campaign_validation_failed' => 'Campaign validation failed: :errors',
     'campaign_no_audience' => 'Campaign has no audience assigned.',
     'no_connected_whatsapp_accounts' => 'No connected WhatsApp accounts available for delivery.',
-
-    // ── CRM Team Management ──
     'team_members' => 'Team Members',
     'team_members_desc' => 'Invite employees and assign CRM roles with specific access levels.',
     'invite_member' => 'Invite Member',
@@ -131,8 +135,6 @@ return [
     'advanced_roles' => 'Advanced Roles',
     'advanced_roles_locked' => 'Advanced Roles (Requires Addon)',
     'advanced_roles_unlock' => 'Get the Advanced Roles addon to unlock manager roles.',
-
-    // CRM Role Labels
     'role_member' => 'Member',
     'role_telesales' => 'Telesales',
     'role_social_media' => 'Social Media',
@@ -140,8 +142,6 @@ return [
     'role_support_manager' => 'Support Manager',
     'role_sales_manager' => 'Sales Manager',
     'role_manager' => 'Manager',
-
-    // CRM Role Descriptions
     'role_member_desc' => 'Basic access — view leads and add notes',
     'role_telesales_desc' => 'Make calls, manage pipeline, update lead status',
     'role_social_media_desc' => 'Add leads from social media ads and campaigns',
@@ -149,8 +149,6 @@ return [
     'role_support_manager_desc' => 'Manage support team and oversee tickets',
     'role_sales_manager_desc' => 'Manage sales team, assign leads, view KPIs',
     'role_manager_desc' => 'Full access to all CRM features',
-
-    // CRM Team Login
     'team_login_title' => 'Team Login',
     'team_login_subtitle' => 'Sign in to your CRM workspace',
     'team_login_button' => 'Sign In',
@@ -159,8 +157,6 @@ return [
     'login_success' => 'Welcome back!',
     'logout_success' => 'You have been logged out.',
     'account_suspended' => 'Your account has been suspended. Contact your manager.',
-    
-    // Manual Lead Creation
     'create_lead' => 'Create Lead',
     'add_new_lead' => 'Add New Lead',
     'lead_created_success' => 'Lead has been added successfully.',
@@ -170,5 +166,5 @@ return [
     'lead_phone' => 'Phone Number',
     'lead_company' => 'Company Name',
     'lead_message' => 'Notes / Message',
-    'submitting' => 'Submitting...',
+    'submitting' => 'Submitting...'
 ];

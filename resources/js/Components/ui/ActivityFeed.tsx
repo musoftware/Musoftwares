@@ -1,5 +1,6 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
+import { __ } from '@/lib/i18n';
 import {
     Receipt, Wallet, ShoppingBag, FileText, CheckSquare,
     Calendar, ArrowUpRight, Users, Package, Zap, Activity,

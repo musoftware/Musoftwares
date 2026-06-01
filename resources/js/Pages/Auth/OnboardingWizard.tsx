@@ -12,6 +12,7 @@ import { Input } from '@/Components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/Components/ui/card';
 import ApplicationLogo from '@/Components/ApplicationLogo';
 import { PremiumCombobox } from '@/Components/ui/PremiumCombobox';
+import { __ } from '@/lib/i18n';
 
 interface UserData {
     id: number;

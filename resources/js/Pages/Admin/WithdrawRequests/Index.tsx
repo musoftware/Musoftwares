@@ -11,6 +11,7 @@ import {
 } from '@/Components/ui/dropdown-menu';
 import { MoreHorizontal, Eye } from 'lucide-react';
 import { formatMoney as formatCurrency } from '@/lib/utils';
+import { __ } from '@/lib/i18n';
 
 interface WithdrawRequest {
     id: number;

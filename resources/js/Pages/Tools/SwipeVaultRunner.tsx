@@ -14,6 +14,7 @@ import {
 } from '@/Components/ui/dialog';
 import { useRuntimeWS } from '@/hooks/useRuntimeWS';
 import { RuntimePluginModals } from '@/Components/Tools/RuntimePluginModals';
+import { __ } from '@/lib/i18n';
 
 const COLLECTION_COLORS = [
     '#f59e0b', '#ef4444', '#3b82f6', '#10b981', '#8b5cf6',

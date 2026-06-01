@@ -11,6 +11,7 @@ import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
 import { Badge } from '@/Components/ui/badge';
 import { Label } from '@/Components/ui/label';
+import { __ } from '@/lib/i18n';
 
 // Dynamic import for tool runner components based on the DB field `runner_component`
 const components: Record<string, React.ElementType> = {

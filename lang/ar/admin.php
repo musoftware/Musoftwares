@@ -1,6 +1,10 @@
 <?php
 
 return [
+    'only_unpaid_invoices_can_be_edited' => 'only_unpaid_invoices_can_be_edited',
+    'service_added_successfully' => 'service_added_successfully',
+    'timer_session_deleted' => 'timer_session_deleted',
+    'timer_sessions_saved' => 'timer_sessions_saved',
     'service_landing_pages' => 'صفحات هبوط الخدمات',
     'manage_landing_pages' => 'إدارة صفحات الهبوط',
     'manage_all_landing_pages' => 'إدارة جميع صفحات هبوط الخدمات على المنصة.',
@@ -17,12 +21,9 @@ return [
     'view' => 'عرض',
     'delete' => 'حذف',
     'confirm_delete_landing_page' => 'هل أنت متأكد من رغبتك في حذف صفحة الهبوط هذه؟',
-
     'approved' => 'approved',
     'overhead_hourly_rate_recalculated' => 'تم مسح ذاكرة التخزين المؤقت للسعر. السعر المحدث: :rate جنيه مصري/ساعة (مؤقت حتى نهاية اليوم).',
     'prices_updated_for_all_clients' => 'تم تحديث أسعار الساعة لجميع العملاء بنجاح.',
-
-    // إدارة الفواتير
     'invoice_updated' => 'تم تحديث الفاتورة بنجاح.',
     'invoice_marked_paid' => 'تم تحديد الفاتورة كمدفوعة.',
     'invoice_cancelled' => 'تم إلغاء الفاتورة بنجاح.',
@@ -43,8 +44,6 @@ return [
     'amount_exceeds_unpaid' => 'المبلغ يتجاوز الرصيد غير المدفوع المتبقي.',
     'partial_payment_failed' => 'فشل في تسجيل الدفعة الجزئية. يرجى المحاولة مرة أخرى.',
     'partial_payment_recorded' => 'تم تسجيل الدفعة الجزئية بنجاح.',
-
-    // أخطاء الإجراءات الجماعية
     'only_unpaid_can_be_split' => 'يمكن تقسيم الفواتير غير المدفوعة فقط.',
     'only_unpaid_can_be_merged' => 'يمكن دمج الفواتير غير المدفوعة فقط.',
     'invoice_total_zero' => 'إجمالي الفاتورة صفر.',
@@ -53,8 +52,6 @@ return [
     'different_clients_cant_merge' => 'لا يمكن دمج فواتير من عملاء مختلفين.',
     'different_projects_cant_merge' => 'لا يمكن دمج فواتير من مشاريع مختلفة.',
     'whatsapp_reminder_failed' => 'فشل في إرسال تذكير واتساب إلى :name.',
-
-    // Marketplace Services translations
     'active' => 'نشط',
     'pending' => 'قيد الانتظار',
     'suspended' => 'موقوف',
@@ -92,20 +89,18 @@ return [
     'of' => 'من',
     'services_count' => 'خدمات',
     'approve_service' => 'اعتماد الخدمة',
-    'approve_service_desc' => 'الخدمة ":title" ستصبح مرئية للجميع في السوق فوراً.',
+    'approve_service_desc' => 'الخدمة \":title\" ستصبح مرئية للجميع في السوق فوراً.',
     'reject_service' => 'رفض الخدمة',
-    'reject_service_desc' => 'الخدمة ":title" سيتم رفضها. لن يتمكن البائع من إعادة التقديم بدون تعديلات.',
+    'reject_service_desc' => 'الخدمة \":title\" سيتم رفضها. لن يتمكن البائع من إعادة التقديم بدون تعديلات.',
     'suspend_service' => 'إيقاف الخدمة',
-    'suspend_service_desc' => 'الخدمة ":title" سيتم إخفاؤها من السوق. لن تتأثر الطلبات الحالية.',
+    'suspend_service_desc' => 'الخدمة \":title\" سيتم إخفاؤها من السوق. لن تتأثر الطلبات الحالية.',
     'toggle_featured' => 'تبديل التمييز',
-    'toggle_featured_desc' => 'تحديث حالة التمييز للخدمة ":title".',
+    'toggle_featured_desc' => 'تحديث حالة التمييز للخدمة \":title\".',
     'delete_service' => 'حذف الخدمة',
-    'delete_service_desc' => 'سيتم حذف الخدمة ":title" وجميع باقاتها نهائياً. لا يمكن التراجع عن هذا الإجراء.',
+    'delete_service_desc' => 'سيتم حذف الخدمة \":title\" وجميع باقاتها نهائياً. لا يمكن التراجع عن هذا الإجراء.',
     'delete_permanently' => 'حذف نهائي',
     'confirm' => 'تأكيد',
     'cost_line_recorded_success' => 'تم تسجيل سطر التكلفة كمدفوع بنجاح.',
-    
-    // المشتركون
     'subscribers' => 'المشتركون',
     'user' => 'المستخدم',
     'total_monthly' => 'إجمالي الاشتراك الشهري المتوقع',
@@ -116,4 +111,5 @@ return [
     'mo' => 'شهر',
     'no_active_services' => 'لا توجد خدمات نشطة.',
     'no_subscribers_found' => 'لا يوجد مشتركون.',
+    'service_payment_added_successfully' => 'تم إضافة تكلفة الخدمة بنجاح.'
 ];

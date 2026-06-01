@@ -6,6 +6,7 @@ import { EmptyState } from '@/Components/ui/EmptyState';
 import { StatusBadge } from '@/Components/ui/StatusBadge';
 import { CurrencyDisplay } from '@/Components/ui/CurrencyDisplay';
 import { ArrowLeft, TrendingUp, Users } from 'lucide-react';
+import { __ } from '@/lib/i18n';
 
 const __ = (key: string) => key;
 

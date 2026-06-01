@@ -1,6 +1,7 @@
 import React from 'react';
 import { Layers } from 'lucide-react';
 import { Button } from '@/Components/ui/button';
+import { __ } from '@/lib/i18n';
 
 interface HeaderProps {
     activeTab: 'campaigns' | 'leads' | 'inboxes' | 'outreach' | 'linked-profiles';

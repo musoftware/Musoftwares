@@ -5,6 +5,7 @@ import { useInertiaNotifications } from '@/hooks/useInertiaNotifications';
 import { Button } from '@/Components/ui/button';
 import { RuntimeStatusBanner } from '@/Components/Tools/RuntimeStatusBanner';
 import { Download, CreditCard, LayoutGrid, LogIn, UserPlus, ArrowUpRight, LifeBuoy } from 'lucide-react';
+import { __ } from '@/lib/i18n';
 
 interface ToolsPublicLayoutProps extends PropsWithChildren {
     title: string;

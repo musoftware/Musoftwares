@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { router } from '@inertiajs/react';
 import { Button } from '@/Components/ui/button';
 import { CheckCircle2, LogIn, Zap, Lock } from 'lucide-react';
+import { __ } from '@/lib/i18n';
 
 interface PricingPlan {
     id: number;

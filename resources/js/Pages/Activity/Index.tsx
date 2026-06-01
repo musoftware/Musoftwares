@@ -4,6 +4,7 @@ import { Head, Link, router } from '@inertiajs/react';
 import { ActivityFeed, ActivityEventItem } from '@/Components/ui/ActivityFeed';
 import { cn } from '@/lib/utils';
 import { Activity, Filter } from 'lucide-react';
+import { __ } from '@/lib/i18n';
 
 interface PaginatedActivities {
     data: ActivityEventItem[];

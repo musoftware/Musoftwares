@@ -31,10 +31,12 @@ class FreelanceProposalController extends Controller
 
         // Add formatted bid amount for the view
         $proposals->getCollection()->transform(function ($proposal) {
-            // Assuming currency model relation exists or fallback to admin settings.
-            // Simplified here just formatting the amount.
-            $currency = $proposal->currency ? $proposal->currency->symbol : '$';
-            $proposal->formatted_bid_amount = $currency . ' ' . number_format($proposal->bid_amount, 2);
+            if (!$proposal->currency) {
+                // Fallback to job's currency or fail if critical, but for display let's use the relation strictly
+                // Or use business currency if it's missing. Actually the rule says fail loudly.
+                throw new \Exception("Proposal {$proposal->id} is missing an associated currency relation.");
+            }
+            $proposal->formatted_bid_amount = $proposal->currency->symbol . ' ' . number_format($proposal->bid_amount, 2);
             return $proposal;
         });
 
@@ -48,8 +50,10 @@ class FreelanceProposalController extends Controller
     {
         $proposal = Proposal::with(['job', 'freelancer'])->findOrFail($id);
 
-        $currency = $proposal->currency ? $proposal->currency->symbol : '$';
-        $proposal->formatted_bid_amount = $currency . ' ' . number_format($proposal->bid_amount, 2);
+        if (!$proposal->currency) {
+            throw new \Exception("Proposal {$proposal->id} is missing an associated currency relation.");
+        }
+        $proposal->formatted_bid_amount = $proposal->currency->symbol . ' ' . number_format($proposal->bid_amount, 2);
 
         return Inertia::render('Admin/Freelance/Proposals/Show', [
             'proposal' => $proposal
@@ -61,6 +65,6 @@ class FreelanceProposalController extends Controller
         $proposal = Proposal::findOrFail($id);
         $proposal->delete();
 
-        return back()->with('success', __('freelance.proposal_deleted', [], 'en'));
+        return back()->with('success', __('freelance.proposal_deleted'));
     }
 }

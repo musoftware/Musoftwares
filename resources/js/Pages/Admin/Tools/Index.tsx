@@ -12,6 +12,7 @@ import {
     Layers, ChevronLeft, ChevronRight, Clock,
 } from 'lucide-react';
 import { Switch } from '@/Components/ui/switch';
+import { __ } from '@/lib/i18n';
 
 interface Tool {
     id: number;

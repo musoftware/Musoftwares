@@ -1,6 +1,7 @@
 import MarketplaceLayout from '@/Layouts/MarketplaceLayout';
 import { Head, Link, router } from '@inertiajs/react';
 import { MouseEvent as ReactMouseEvent, useRef, useState } from 'react';
+import { __ } from '@/lib/i18n';
 
 export default function Browse({ services, categories, filters }: any) {
     const [search, setSearch] = useState(filters.search || '');

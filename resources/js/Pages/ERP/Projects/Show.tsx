@@ -15,6 +15,7 @@ import {
 import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
 import { Textarea } from '@/Components/ui/textarea';
+import { __ } from '@/lib/i18n';
 import {
     ArrowLeft, Briefcase, FileText, CheckCircle2, Clock, DollarSign,
     MessageSquare, Activity, ChevronRight, Edit2, ShieldAlert,

@@ -1,6 +1,7 @@
 import MarketplaceLayout from '@/Layouts/MarketplaceLayout';
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import { useState } from 'react';
+import { __ } from '@/lib/i18n';
 
 export default function Show({ service }: any) {
     const { auth } = usePage().props as any;

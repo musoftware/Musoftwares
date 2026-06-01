@@ -7,6 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Input } from '@/Components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/Components/ui/select';
 import { Package, Truck, CheckCircle2, Clock, XCircle, Eye } from 'lucide-react';
+import { __ } from '@/lib/i18n';
 
 export default function VendorOrdersIndex({ orders, filters }: any) {
     const [status, setStatus] = useState(filters?.status || 'all');

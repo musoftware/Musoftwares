@@ -17,6 +17,7 @@ import {
 import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
 import { Card, CardContent } from '@/Components/ui/card';
+import { __ } from '@/lib/i18n';
 
 interface Tenant {
     id: number;

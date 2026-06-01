@@ -6,6 +6,7 @@ import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
 import { Textarea } from '@/Components/ui/textarea';
 import { Badge } from '@/Components/ui/badge';
+import { __ } from '@/lib/i18n';
 
 interface ContactItem {
     id: number;

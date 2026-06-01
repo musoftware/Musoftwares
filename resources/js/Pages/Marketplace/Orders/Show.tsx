@@ -2,6 +2,7 @@ import { StatusBadge } from '@/Components/ui/StatusBadge';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, router, usePage } from '@inertiajs/react';
 import { useState } from 'react';
+import { __ } from '@/lib/i18n';
 
 export default function Show({ order, conversation }: any) {
     const { auth } = usePage().props as any;

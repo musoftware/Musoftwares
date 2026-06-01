@@ -4,6 +4,7 @@ import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
 import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
+import { __ } from '@/lib/i18n';
 import {
     Building2,
     CreditCard,

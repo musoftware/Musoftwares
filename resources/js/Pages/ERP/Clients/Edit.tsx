@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/Com
 import { Input } from '@/Components/ui/input';
 import { ArrowLeft, Edit2 } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/Components/ui/select';
+import { __ } from '@/lib/i18n';
 
 export default function EditClient({ client, currencies }: { client: any, currencies: any[] }) {
     const [form, setForm] = useState({

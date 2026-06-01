@@ -10,6 +10,7 @@ import {
     DropdownMenuTrigger,
 } from '@/Components/ui/dropdown-menu';
 import { useToast } from '@/Components/ui/use-toast';
+import { __ } from '@/lib/i18n';
 import {
     MoreHorizontal,
     Eye,

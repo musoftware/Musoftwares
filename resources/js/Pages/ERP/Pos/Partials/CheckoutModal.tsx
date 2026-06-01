@@ -7,6 +7,7 @@ import { Switch } from '@/components/ui/switch';
 import { formatMoney as formatCurrency } from '@/lib/utils';
 import { Banknote, CreditCard, Wallet } from 'lucide-react';
 import { ClientAutocomplete } from '@/components/ClientAutocomplete';
+import { __ } from '@/lib/i18n';
 
 interface CheckoutModalProps {
     isOpen: boolean;

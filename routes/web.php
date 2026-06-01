@@ -354,7 +354,8 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
     Route::post('/invoices/{invoice}/change-job-status', [\App\Http\Controllers\Admin\InvoiceController::class, 'changeJobStatus'])->name('invoices.change-job-status');
     Route::get('/invoices/{invoice}/notify', [\App\Http\Controllers\Admin\InvoiceController::class, 'notify'])->name('invoices.notify');
     Route::post('/invoices/{invoice}/partial-pay', [\App\Http\Controllers\Admin\InvoiceController::class, 'partialPay'])->name('invoices.partial-pay');
-
+    Route::post('/invoices/{invoice}/pay-service/calculate', [\App\Http\Controllers\Admin\InvoiceController::class, 'calculatePayService'])->name('invoices.pay-service.calculate');
+    Route::post('/invoices/{invoice}/pay-service/store', [\App\Http\Controllers\Admin\InvoiceController::class, 'storePayService'])->name('invoices.pay-service.store');
 
 
 

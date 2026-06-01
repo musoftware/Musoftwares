@@ -4,6 +4,7 @@ import { Button } from '@/Components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/Components/ui/card';
 import { CheckCircle2, Wallet, CreditCard, ShieldCheck, ArrowRight, Clock } from 'lucide-react';
 import { format } from 'date-fns';
+import { __ } from '@/lib/i18n';
 
 export default function Checkout({ booking, walletBalance }: any) {
     const { eventType } = booking;

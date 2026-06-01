@@ -3,6 +3,7 @@ import { Search, Loader2, Trash2, CheckCircle, FileWarning, Copy, HardDrive } fr
 import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
 import { Badge } from '@/Components/ui/badge';
+import { __ } from '@/lib/i18n';
 
 const getRuntimeHost = () => typeof window !== 'undefined' ? (window.localStorage.getItem('musoftware_runtime_host') || '127.0.0.1') : '127.0.0.1';
 const getWsUrl       = () => `ws://${getRuntimeHost()}:18401/ws`;

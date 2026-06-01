@@ -5,6 +5,7 @@ import { useERPMenu } from '@/hooks/useERPMenu';
 import { Button } from '@/Components/ui/button';
 import { Card, CardContent } from '@/Components/ui/card';
 import { AlertCircle, ArrowLeft } from 'lucide-react';
+import { __ } from '@/lib/i18n';
 
 interface Props {
     message: string;

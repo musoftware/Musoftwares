@@ -29,6 +29,7 @@ import ProductTourModal from '@/Components/ProductTourModal';
 import axios from 'axios';
 import FreelanceModeToggle from '@/Components/Freelance/FreelanceModeToggle';
 import MarketplaceModeToggle from '@/Components/Marketplace/MarketplaceModeToggle';
+import { __ } from '@/lib/i18n';
 
 export default function Authenticated(props: PropsWithChildren<{ header?: ReactNode }>) {
     return (

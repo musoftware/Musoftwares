@@ -12,6 +12,7 @@ import {
     DialogFooter,
 } from '@/Components/ui/dialog';
 import { Coins, History, Search, X, TrendingUp, TrendingDown, Minus } from 'lucide-react';
+import { __ } from '@/lib/i18n';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 

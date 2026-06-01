@@ -1,6 +1,10 @@
 <?php
 
 return [
+    'database_error' => 'database_error',
+    'feature_not_subscribed' => 'feature_not_subscribed',
+    'no_client_with_id' => 'no_client_with_id',
+    'unauthorized_role_access' => 'unauthorized_role_access',
     'currency_configuration_missing' => 'currency_configuration_missing',
     'erp_backup_addon_required' => 'erp_backup_addon_required',
     'erp_smtp_addon_required' => 'erp_smtp_addon_required',
@@ -18,5 +22,5 @@ return [
     'unauthorized_addon' => 'unauthorized_addon',
     'unauthorized_project' => 'unauthorized_project',
     'upgrade_to_inventory' => 'upgrade_to_inventory',
-    'cannot_change_own_role' => 'لا يمكنك تغيير الصلاحيات/الدور الخاص بحسابك.',
+    'cannot_change_own_role' => 'لا يمكنك تغيير الصلاحيات/الدور الخاص بحسابك.'
 ];

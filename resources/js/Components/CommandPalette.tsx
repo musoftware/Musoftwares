@@ -3,6 +3,7 @@ import axios from 'axios';
 import { Command } from 'cmdk';
 import { Search } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { __ } from '@/lib/i18n';
 
 export default function CommandPalette() {
     const [open, setOpen] = useState(false);

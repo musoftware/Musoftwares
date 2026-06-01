@@ -10,6 +10,7 @@ import { DownloadPanel } from '@/Components/Tools/DownloadPanel';
 import { PlatformBadges } from '@/Components/Tools/PlatformBadge';
 import { Cpu } from 'lucide-react';
 import { Card } from '@/Components/ui/card';
+import { __ } from '@/lib/i18n';
 
 interface PricingPlan {
     id: number; name: string; price_monthly: number; price_yearly: number;

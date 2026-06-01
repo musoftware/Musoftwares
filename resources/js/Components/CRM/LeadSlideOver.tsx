@@ -7,6 +7,7 @@ import axios from 'axios';
 import { ScrollArea } from '@/Components/ui/scroll-area';
 import { Textarea } from '@/Components/ui/textarea';
 import { router } from '@inertiajs/react';
+import { __ } from '@/lib/i18n';
 
 interface LeadSlideOverProps {
     leadId: number | null;

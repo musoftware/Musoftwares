@@ -1,6 +1,8 @@
 <?php
 
 return [
+    'created_successfully' => 'created_successfully',
+    'settings_saved_success' => 'settings_saved_success',
     'bonus_added_success' => 'bonus_added_success',
     'branch_created' => 'branch_created',
     'cannot_delete_client_open_invoices' => 'cannot_delete_client_open_invoices',
@@ -164,8 +166,6 @@ return [
     'payment_due_upon_receipt' => 'يستحق الدفع عند الاستلام.',
     'page_x_of_y' => 'صفحة {PAGE_NUM} من {PAGE_COUNT}',
     'manual_wallet_transaction' => 'معاملة محفظة يدوية',
-
-    // Team Roles & Capacity
     'roles_admin' => 'مدير النظام',
     'roles_sales_agent' => 'وكيل مبيعات',
     'roles_sales_manager' => 'مدير مبيعات',
@@ -183,10 +183,8 @@ return [
     'team_member_added' => 'تم إضافة عضو الفريق :name بنجاح.',
     'team_member_updated' => 'تم تحديث تفاصيل عضو الفريق بنجاح.',
     'team_member_removed' => 'تم إزالة عضو الفريق :name بنجاح.',
-
-    // Employee Todos
     'todo_created_success' => 'تم إضافة المهمة بنجاح.',
     'todo_updated_success' => 'تم تحديث المهمة بنجاح.',
     'todo_deleted_success' => 'تم حذف المهمة بنجاح.',
-    'role_updated_success' => 'تم تحديث الصلاحيات/الدور بنجاح.',
+    'role_updated_success' => 'تم تحديث الصلاحيات/الدور بنجاح.'
 ];

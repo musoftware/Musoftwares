@@ -12,6 +12,7 @@ import { formatMoney } from '@/lib/utils';
 import { SettingsModal } from '@/Components/Tools/SettingsModal';
 import { ContextMenu, ContextMenuState } from '@/Components/Tools/ContextMenu';
 import axios from 'axios';
+import { __ } from '@/lib/i18n';
 
 const DEFAULT_WALLPAPER_URL = 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=80&w=2560&auto=format&fit=crop';
 const CELL_WIDTH = 100; // Pixels per grid column

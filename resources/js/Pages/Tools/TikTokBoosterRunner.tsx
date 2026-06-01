@@ -6,6 +6,7 @@ import { Badge } from '@/Components/ui/badge';
 
 import { useRuntimeWS } from '@/hooks/useRuntimeWS';
 import { RuntimePluginModals } from '@/Components/Tools/RuntimePluginModals';
+import { __ } from '@/lib/i18n';
 
 export default function TikTokBoosterRunner({ tool }: any) {
     const { connected: agentConnected, callRPC, installingPlugin, loginRequired, setLoginRequired } = useRuntimeWS('tiktok-booster');

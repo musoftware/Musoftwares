@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/Com
 import { Input } from '@/Components/ui/input';
 import { Textarea } from '@/Components/ui/textarea';
 import { ArrowLeft, DollarSign } from 'lucide-react';
+import { __ } from '@/lib/i18n';
 
 export default function CreateExpense() {
     const [form, setForm] = useState({

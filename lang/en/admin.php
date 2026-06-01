@@ -1,6 +1,10 @@
 <?php
 
 return [
+    'only_unpaid_invoices_can_be_edited' => 'only_unpaid_invoices_can_be_edited',
+    'service_added_successfully' => 'service_added_successfully',
+    'timer_session_deleted' => 'timer_session_deleted',
+    'timer_sessions_saved' => 'timer_sessions_saved',
     'service_landing_pages' => 'Service Landing Pages',
     'manage_landing_pages' => 'Manage Landing Pages',
     'manage_all_landing_pages' => 'Manage all service landing pages on the platform.',
@@ -17,12 +21,9 @@ return [
     'view' => 'View',
     'delete' => 'Delete',
     'confirm_delete_landing_page' => 'Are you sure you want to delete this landing page?',
-
     'approved' => 'approved',
     'overhead_hourly_rate_recalculated' => 'Overhead hourly rate cache cleared. Recalculated rate: :rate EGP/h (cached until end of day).',
     'prices_updated_for_all_clients' => 'Prices updated for all clients.',
-
-    // Invoice management
     'invoice_updated' => 'Invoice updated successfully.',
     'invoice_marked_paid' => 'Invoice marked as paid.',
     'invoice_cancelled' => 'Invoice cancelled successfully.',
@@ -43,8 +44,6 @@ return [
     'amount_exceeds_unpaid' => 'The amount exceeds the remaining unpaid balance.',
     'partial_payment_failed' => 'Failed to record partial payment. Please try again.',
     'partial_payment_recorded' => 'Partial payment recorded successfully.',
-
-    // Bulk action errors
     'only_unpaid_can_be_split' => 'Only unpaid invoices can be split.',
     'only_unpaid_can_be_merged' => 'Only unpaid invoices can be merged.',
     'invoice_total_zero' => 'Invoice total is zero.',
@@ -53,8 +52,6 @@ return [
     'different_clients_cant_merge' => 'Invoices from different clients cannot be merged.',
     'different_projects_cant_merge' => 'Invoices from different projects cannot be merged.',
     'whatsapp_reminder_failed' => 'Failed to send WhatsApp reminder to :name.',
-
-    // Marketplace Services translations
     'active' => 'Active',
     'pending' => 'Pending',
     'suspended' => 'Suspended',
@@ -92,20 +89,18 @@ return [
     'of' => 'of',
     'services_count' => 'services',
     'approve_service' => 'Approve Service',
-    'approve_service_desc' => '":title" will become publicly visible on the marketplace immediately.',
+    'approve_service_desc' => '\":title\" will become publicly visible on the marketplace immediately.',
     'reject_service' => 'Reject Service',
-    'reject_service_desc' => '":title" will be marked as rejected. The seller will not be able to resubmit without changes.',
+    'reject_service_desc' => '\":title\" will be marked as rejected. The seller will not be able to resubmit without changes.',
     'suspend_service' => 'Suspend Service',
-    'suspend_service_desc' => '":title" will be hidden from the marketplace. Existing orders won\'t be affected.',
+    'suspend_service_desc' => '\":title\" will be hidden from the marketplace. Existing orders won\'t be affected.',
     'toggle_featured' => 'Toggle Featured',
-    'toggle_featured_desc' => 'Update the featured status for ":title".',
+    'toggle_featured_desc' => 'Update the featured status for \":title\".',
     'delete_service' => 'Delete Service',
-    'delete_service_desc' => 'This will permanently delete ":title" and all its packages. This action cannot be undone.',
+    'delete_service_desc' => 'This will permanently delete \":title\" and all its packages. This action cannot be undone.',
     'delete_permanently' => 'Delete Permanently',
     'confirm' => 'Confirm',
     'cost_line_recorded_success' => 'Cost line recorded as paid successfully.',
-    
-    // Subscribers
     'subscribers' => 'Subscribers',
     'user' => 'User',
     'total_monthly' => 'Total Expected Monthly',
@@ -116,4 +111,5 @@ return [
     'mo' => 'mo',
     'no_active_services' => 'No active services.',
     'no_subscribers_found' => 'No subscribers found.',
+    'service_payment_added_successfully' => 'Service payment added successfully.'
 ];

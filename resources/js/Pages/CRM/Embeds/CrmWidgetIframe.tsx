@@ -6,6 +6,7 @@ import { Label } from '@/Components/ui/label';
 import { Textarea } from '@/Components/ui/textarea';
 import { CheckCircle2, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { __ } from '@/lib/i18n';
 
 export default function CrmWidgetIframe({ widget, token, flash }: { widget: any, token: string, flash: any }) {
     const config = widget.form_config || {};

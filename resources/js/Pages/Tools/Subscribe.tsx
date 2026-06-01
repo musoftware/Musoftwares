@@ -4,6 +4,7 @@ import ToolsPublicLayout from '@/Layouts/ToolsPublicLayout';
 import { Button } from '@/Components/ui/button';
 import { CheckCircle2, CreditCard, Wallet, AlertCircle, ArrowLeft, Shield } from 'lucide-react';
 import { formatMoney } from '@/lib/utils';
+import { __ } from '@/lib/i18n';
 
 interface Props {
     tool: { slug: string; title: string; icon_url: string | null };

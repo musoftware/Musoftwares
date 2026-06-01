@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Command } from 'cmdk';
 import { Search, User, CheckSquare, Send, Settings, LogOut } from 'lucide-react';
 import { router } from '@inertiajs/react';
+import { __ } from '@/lib/i18n';
 
 export function CommandPalette() {
     const [open, setOpen] = useState(false);

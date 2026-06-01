@@ -10,6 +10,7 @@ import { Alert, AlertTitle, AlertDescription } from '@/Components/ui/alert';
 import { ArrowLeft, Wallet, CreditCard, ChevronRight, FileText, CheckCircle2, ShieldAlert } from 'lucide-react';
 import axios from 'axios';
 import { useToast } from '@/Components/ui/use-toast';
+import { __ } from '@/lib/i18n';
 
 interface InvoiceItem {
     title: string;

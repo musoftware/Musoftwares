@@ -6,6 +6,7 @@ import { Search } from 'lucide-react';
 import { router } from '@inertiajs/react';
 
 import { formatMoney as formatCurrency } from '@/lib/utils';
+import { __ } from '@/lib/i18n';
 
 interface Product {
     id: number;

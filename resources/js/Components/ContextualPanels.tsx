@@ -26,6 +26,7 @@ import {
     Star
 } from 'lucide-react';
 import React from 'react';
+import { __ } from '@/lib/i18n';
 
 interface QuickViewProps {
     isOpen: boolean;

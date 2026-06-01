@@ -13,6 +13,7 @@ import { OperationalCard } from '@/Components/ui/OperationalCard';
 import { EmptyState } from '@/Components/ui/EmptyState';
 import { ActivityFeed } from '@/Components/ui/ActivityFeed';
 import { CurrencyDisplay } from '@/Components/ui/CurrencyDisplay';
+import { __ } from '@/lib/i18n';
 import { 
     BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend
 } from 'recharts';

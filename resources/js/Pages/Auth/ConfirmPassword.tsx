@@ -5,6 +5,7 @@ import GuestLayout from '@/Layouts/GuestLayout';
 import { Head, useForm } from '@inertiajs/react';
 import { FormEventHandler, useState } from 'react';
 import { Eye, EyeOff, Loader2 } from 'lucide-react';
+import { __ } from '@/lib/i18n';
 
 export default function ConfirmPassword() {
     const { data, setData, post, processing, errors, reset } = useForm({

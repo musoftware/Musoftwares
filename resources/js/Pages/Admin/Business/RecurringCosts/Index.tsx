@@ -4,6 +4,7 @@ import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
 import { Button } from '@/Components/ui/button';
 import { Trash2, Edit, Plus, DollarSign, TrendingDown, Clock, Search, X, Calendar, ArrowLeft, Eye } from 'lucide-react';
 import { formatMoney as formatCurrency } from '@/lib/utils';
+import { __ } from '@/lib/i18n';
 
 export default function Index({ costs, currencies, categories, stats }) {
     const { errors } = usePage().props;

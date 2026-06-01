@@ -2,6 +2,7 @@ import React from 'react';
 import ERPLayout from '@/Layouts/ERPLayout';
 import { Head } from '@inertiajs/react';
 import { KanbanBoard } from '../Components/KanbanBoard';
+import { __ } from '@/lib/i18n';
 
 export default function PipelinesIndex({ pipelines }: { pipelines: any[] }) {
     return (

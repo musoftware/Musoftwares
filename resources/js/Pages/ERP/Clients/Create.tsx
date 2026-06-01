@@ -9,6 +9,7 @@ import {
     UserPlus,
 } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/Components/ui/select';
+import { __ } from '@/lib/i18n';
 
 interface Props {
     currencies: Array<{ id: number; currency: string; name: string }>;

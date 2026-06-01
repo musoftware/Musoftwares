@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/Com
 import { Input } from '@/Components/ui/input';
 import { ArrowLeft, Database } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/Components/ui/select';
+import { __ } from '@/lib/i18n';
 
 export default function CreateStorageProvider() {
     const [form, setForm] = useState({

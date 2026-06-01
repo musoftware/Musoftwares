@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { X, Minus, Square, ExternalLink } from 'lucide-react';
+import { __ } from '@/lib/i18n';
 
 interface WindowModalProps {
     isOpen: boolean;

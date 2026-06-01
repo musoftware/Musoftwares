@@ -8,6 +8,7 @@ import { Label } from '@/Components/ui/label';
 import { Textarea } from '@/Components/ui/textarea';
 import { LoadingButton } from '@/Components/ui/LoadingButton';
 import { Switch } from '@/Components/ui/switch';
+import { __ } from '@/lib/i18n';
 
 export default function Create() {
     const { wallet, settings } = usePage<any>().props;

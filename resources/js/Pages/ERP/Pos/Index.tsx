@@ -6,6 +6,7 @@ import ProductGrid from './Partials/ProductGrid';
 import CartSidebar from './Partials/CartSidebar';
 import CheckoutModal from './Partials/CheckoutModal';
 import { toast } from 'sonner';
+import { __ } from '@/lib/i18n';
 
 const __ = (key: string) => key;
 

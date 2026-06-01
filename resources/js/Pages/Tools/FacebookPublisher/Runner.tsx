@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/Com
 import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/Components/ui/tabs';
+import { __ } from '@/lib/i18n';
 
 export default function Runner({ tool, userPlan }: { tool: any; userPlan: any }) {
     const { connected: isConnected, callRPC: sendRpc, installingPlugin, loginRequired, setLoginRequired } = useRuntimeWS('facebook-publisher');

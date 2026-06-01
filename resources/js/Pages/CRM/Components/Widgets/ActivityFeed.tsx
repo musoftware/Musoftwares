@@ -1,5 +1,6 @@
 import React from 'react';
 import { Activity, Phone, ArrowRight, MessageSquare } from 'lucide-react';
+import { __ } from '@/lib/i18n';
 
 interface FeedItem {
     id: number;

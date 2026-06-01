@@ -3,14 +3,16 @@ import { Head, Link, router } from '@inertiajs/react';
 import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
 import { Button } from '@/Components/ui/button';
 import { Trash2, ArrowLeft } from 'lucide-react';
+import { ConfirmModal } from '@/Components/ui/ConfirmModal';
 import { __ } from '@/lib/i18n';
 
 export default function Show({ proposal }: { proposal: any }) {
 
+    const [deleteConfirm, setDeleteConfirm] = React.useState<boolean>(false);
+
     const handleDelete = () => {
-        if (confirm('Are you sure you want to delete this proposal permanently?')) {
-            router.delete(route('admin.freelance.proposals.destroy', proposal.id));
-        }
+        router.delete(route('admin.freelance.proposals.destroy', proposal.id));
+        setDeleteConfirm(false);
     };
 
     return (
@@ -43,7 +45,7 @@ export default function Show({ proposal }: { proposal: any }) {
                               'bg-yellow-100 text-yellow-800'}`}>
                             {proposal.status}
                         </span>
-                        <Button variant="destructive" size="sm" onClick={handleDelete} className="flex items-center gap-2">
+                        <Button variant="destructive" size="sm" onClick={() => setDeleteConfirm(true)} className="flex items-center gap-2">
                             <Trash2 className="h-4 w-4" /> {__('freelance.delete', undefined, 'Delete')}
                         </Button>
                     </div>
@@ -76,6 +78,17 @@ export default function Show({ proposal }: { proposal: any }) {
                     </div>
                 </div>
             </div>
+
+            <ConfirmModal 
+                isOpen={deleteConfirm} 
+                onCancel={() => setDeleteConfirm(false)}
+                onConfirm={handleDelete}
+                title={__('freelance.confirm_delete_proposal')}
+                description={__('freelance.confirm_delete_proposal_msg')}
+                confirmLabel={__('freelance.delete')}
+                cancelLabel={__('freelance.cancel')}
+                variant="danger"
+            />
         </AdminSidebarLayout>
     );
 }

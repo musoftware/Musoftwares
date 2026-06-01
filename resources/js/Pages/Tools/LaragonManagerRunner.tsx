@@ -6,6 +6,7 @@ import {
 import { Button } from '@/Components/ui/button';
 import { Badge } from '@/Components/ui/badge';
 import { Input } from '@/Components/ui/input';
+import { __ } from '@/lib/i18n';
 
 const getRuntimeHost = () => typeof window !== 'undefined' ? (window.localStorage.getItem('musoftware_runtime_host') || '127.0.0.1') : '127.0.0.1';
 const getWsUrl       = () => `ws://${getRuntimeHost()}:18401/ws`;

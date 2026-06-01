@@ -5,6 +5,7 @@ import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator, DropdownMenuLabel } from '@/Components/ui/dropdown-menu';
 import { Eye, Trash2, MoreHorizontal } from 'lucide-react';
+import { ConfirmModal } from '@/Components/ui/ConfirmModal';
 import { __ } from '@/lib/i18n';
 
 export default function Index({ contracts, filters }: any) {
@@ -16,9 +17,12 @@ export default function Index({ contracts, filters }: any) {
         router.get(route('admin.freelance.contracts.index'), { search, status }, { preserveState: true });
     };
 
-    const handleDelete = (id: any) => {
-        if (confirm('Are you sure you want to delete this contract permanently?')) {
-            router.delete(route('admin.freelance.contracts.destroy', id));
+    const [deleteConfirm, setDeleteConfirm] = useState<any>(null);
+
+    const handleDelete = () => {
+        if (deleteConfirm) {
+            router.delete(route('admin.freelance.contracts.destroy', deleteConfirm));
+            setDeleteConfirm(null);
         }
     };
 
@@ -90,7 +94,7 @@ export default function Index({ contracts, filters }: any) {
                                           contract.status === 'disputed' ? 'bg-red-100 text-red-800' :
                                           contract.status === 'cancelled' ? 'bg-gray-100 text-gray-800' :
                                           'bg-blue-100 text-blue-800'}`}>
-                                        {contract.status}
+                                        {__('freelance.' + contract.status) || contract.status}
                                     </span>
                                 </td>
                                 <td className="p-4 text-gray-500">{new Date(contract.created_at).toLocaleDateString()}</td>
@@ -112,7 +116,7 @@ export default function Index({ contracts, filters }: any) {
                                                 </Link>
                                             </DropdownMenuItem>
                                             <DropdownMenuSeparator />
-                                            <DropdownMenuItem onClick={() => handleDelete(contract.id)} className="text-red-600 focus:text-red-600 focus:bg-red-50 cursor-pointer">
+                                            <DropdownMenuItem onClick={() => setDeleteConfirm(contract.id)} className="text-red-600 focus:text-red-600 focus:bg-red-50 cursor-pointer">
                                                 <Trash2 className="mr-2 h-4 w-4" />
                                                 <span>{__('freelance.delete')}</span>
                                             </DropdownMenuItem>
@@ -135,7 +139,11 @@ export default function Index({ contracts, filters }: any) {
             {contracts.links && contracts.links.length > 3 && (
                 <div className="mt-4 flex justify-between items-center">
                     <div className="text-sm text-gray-500">
-                        Showing {contracts.from || 0} to {contracts.to || 0} of {contracts.total} results
+                        {__('freelance.showing_results_of', {
+                            first: contracts.from || 0,
+                            last: contracts.to || 0,
+                            total: contracts.total
+                        })}
                     </div>
                     <div className="flex space-x-1">
                         {contracts.links.map((link: any, idx: number) => (
@@ -149,6 +157,17 @@ export default function Index({ contracts, filters }: any) {
                     </div>
                 </div>
             )}
+
+            <ConfirmModal 
+                isOpen={!!deleteConfirm} 
+                onCancel={() => setDeleteConfirm(null)}
+                onConfirm={handleDelete}
+                title={__('freelance.confirm_delete_contract', undefined, 'Delete Contract?')}
+                description={__('freelance.confirm_delete_contract_msg', undefined, 'Are you sure you want to delete this contract permanently?')}
+                confirmLabel={__('freelance.delete')}
+                cancelLabel={__('freelance.cancel')}
+                variant="danger"
+            />
         </AdminSidebarLayout>
     );
 }

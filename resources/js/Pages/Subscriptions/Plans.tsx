@@ -20,6 +20,7 @@ import {
     RefreshCw, PieChart
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { __ } from '@/lib/i18n';
 
 interface ServiceItem {
     id: string;

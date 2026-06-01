@@ -7,6 +7,7 @@ import { Button } from '@/Components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/Components/ui/card';
 import { FolderOpen, Plus, Calendar, DollarSign, Clock, CheckCircle, ArrowRight } from 'lucide-react';
 import { formatMoney } from '@/lib/utils';
+import { __ } from '@/lib/i18n';
 
 interface Project {
     id: number;

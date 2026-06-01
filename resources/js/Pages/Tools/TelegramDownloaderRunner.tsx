@@ -8,6 +8,7 @@ import { Badge } from '@/Components/ui/badge';
 
 import { useRuntimeWS } from '@/hooks/useRuntimeWS';
 import { RuntimePluginModals } from '@/Components/Tools/RuntimePluginModals';
+import { __ } from '@/lib/i18n';
 
 export default function TelegramDownloaderRunner({ tool, subscription, runtimePort, pluginSlug }: any) {
     const [activeTab, setActiveTab] = useState<'auth' | 'channels'>('auth');

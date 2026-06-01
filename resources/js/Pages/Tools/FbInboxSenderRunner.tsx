@@ -10,6 +10,7 @@ import { Input } from '@/Components/ui/input';
 import { Badge } from '@/Components/ui/badge';
 import { Label } from '@/Components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/Components/ui/card';
+import { __ } from '@/lib/i18n';
 import {
     Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogClose,
 } from '@/Components/ui/dialog';

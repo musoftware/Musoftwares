@@ -7,6 +7,7 @@ import { Badge } from '@/Components/ui/badge';
 import { Calendar, Clock, Copy, Plus, MoreHorizontal, Users, CalendarOff } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/Components/ui/dropdown-menu';
 import { CurrencyDisplay } from '@/Components/ui/CurrencyDisplay';
+import { __ } from '@/lib/i18n';
 
 interface EventType {
     id: number;

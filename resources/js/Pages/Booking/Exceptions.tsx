@@ -8,6 +8,7 @@ import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/Components/ui/select';
 import { Calendar, Clock, Users, CalendarOff, Plus, Trash2 } from 'lucide-react';
+import { __ } from '@/lib/i18n';
 
 interface ExceptionsProps {
     providers: any[];

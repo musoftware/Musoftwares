@@ -7,6 +7,7 @@ import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
 import { StatusBadge } from '@/Components/ui/StatusBadge';
+import { __ } from '@/lib/i18n';
 import {
     Package, BarChart3, Users, Settings,
     Plus, X, Upload, CheckCircle2,

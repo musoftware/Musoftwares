@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { usePipelineStore } from '../../Stores/usePipelineStore';
 import PipelineColumn from './PipelineColumn';
 import { DragDropContext, DropResult } from '@hello-pangea/dnd';
+import { __ } from '@/lib/i18n';
 
 export default function PipelineBoard() {
     const { stages, isLoading, fetchPipeline } = usePipelineStore();

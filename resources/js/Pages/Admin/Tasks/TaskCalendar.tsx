@@ -15,6 +15,7 @@ import {
 import { Button } from '@/Components/ui/button';
 import { Card, CardContent } from '@/Components/ui/card';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isToday, addMonths, subMonths, startOfWeek, endOfWeek } from 'date-fns';
+import { __ } from '@/lib/i18n';
 
 interface TaskEvent {
     id: number;

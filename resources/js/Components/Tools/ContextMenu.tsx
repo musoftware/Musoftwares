@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { Pencil, Copy, Trash2, Settings, MonitorUp, LayoutGrid, FolderPlus, ArrowRightLeft } from 'lucide-react';
+import { __ } from '@/lib/i18n';
 
 export type ContextMenuType = 'desktop' | 'icon' | 'folder';
 

@@ -8,6 +8,7 @@ import { Card } from '@/Components/ui/card';
 import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
 import { Badge } from '@/Components/ui/badge';
+import { __ } from '@/lib/i18n';
 
 function formatTime(dateStr: string) {
     if (!dateStr) return '';

@@ -4,6 +4,7 @@ import { Button } from '@/Components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/Components/ui/card';
 import { Input } from '@/Components/ui/input';
 import { ArrowLeft, Save, Edit3 } from 'lucide-react';
+import { __ } from '@/lib/i18n';
 
 export default function VendorProductsEdit({ product }: any) {
     const { data, setData, put, processing, errors } = useForm({

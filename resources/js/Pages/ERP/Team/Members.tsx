@@ -35,6 +35,7 @@ import { Card, CardContent } from '@/Components/ui/card';
 import { OperationalCard } from '@/Components/ui/OperationalCard';
 import { ConfirmModal } from '@/Components/ui/ConfirmModal';
 import { useERPMenu } from '@/hooks/useERPMenu';
+import { __ } from '@/lib/i18n';
 
 interface TeamMember {
     id: number;
