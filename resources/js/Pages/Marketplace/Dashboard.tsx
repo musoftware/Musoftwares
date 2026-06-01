@@ -259,6 +259,21 @@ export default function MarketplaceDashboard({
                                 <AlertCircle className="h-4 w-4 text-slate-500" />{__('general.getting_started')}</div>
                             <p>{__('general.create_and_publish_your_gig_listings_clients_can_purchase_standard_tiered_packages_directly_escrow_funds_are_protected_and_payouts_clear_immediately_once_work_is_approved')}</p>
                         </div>
+
+                        {!isClient && (
+                            <div className="bg-emerald-50 border border-emerald-100 rounded-2xl p-5 text-sm leading-relaxed text-emerald-800 space-y-2">
+                                <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-1.5 font-semibold text-emerald-900">
+                                        <Wallet className="h-4 w-4 text-emerald-600" />
+                                        {__('Link verified payout source')}
+                                    </div>
+                                    <Link href="/financial/payout-methods" className="text-emerald-700 hover:text-emerald-900 bg-emerald-100 hover:bg-emerald-200 px-3 py-1 rounded-full text-xs font-medium transition-colors">
+                                        {__('Setup Now')}
+                                    </Link>
+                                </div>
+                                <p className="text-emerald-700">{__('Set up Direct Debit for automated settlement clearance and receive your escrow payouts instantly.')}</p>
+                            </div>
+                        )}
                     </div>
                 </div>
 

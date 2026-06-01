@@ -769,7 +769,6 @@ export default function Show({ client, stats = {}, wallets, modulePlans = [], su
                                         <div className="text-xs text-green-700">Current Step: {client.active_mail_sequence.step || 1}</div>
                                     </div>
                                 </div>
-                                <Button variant="outline" className="w-full text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200" onClick={() => alert("Opt out functionality not implemented.")}>{__('general.opt_out_user')}</Button>
                             </div>
                         ) : (
                             <div>
@@ -779,7 +778,6 @@ export default function Show({ client, stats = {}, wallets, modulePlans = [], su
                                     </div>
                                     <div className="text-sm font-medium">{__('general.no_active_mail_sequence')}</div>
                                 </div>
-                                <Button className="w-full bg-slate-900 text-white hover:bg-slate-800" onClick={() => alert("Enroll functionality not implemented.")}>{__('general.opt_in_default_sequence')}</Button>
                             </div>
                         )}
                     </div>

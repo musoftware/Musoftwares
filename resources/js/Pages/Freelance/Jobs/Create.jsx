@@ -126,15 +126,7 @@ export default function CreateJob({ auth, currencies = [], egpToPreferredRate = 
                         <div>
                             <label className="block text-sm font-bold text-gray-700 mb-1">{__('Description')}</label>
                             <div className="border border-gray-300 rounded-lg shadow-sm overflow-hidden focus-within:ring-1 focus-within:ring-indigo-500 focus-within:border-indigo-500">
-                                {/* Mock Toolbar */}
-                                <div className="bg-gray-50 border-b px-3 py-2 flex gap-2 text-gray-600">
-                                    <button type="button" className="p-1 hover:bg-gray-200 rounded font-bold">B</button>
-                                    <button type="button" className="p-1 hover:bg-gray-200 rounded italic">I</button>
-                                    <button type="button" className="p-1 hover:bg-gray-200 rounded underline">U</button>
-                                    <span className="w-px bg-gray-300 my-1 mx-1"></span>
-                                    <button type="button" className="p-1 hover:bg-gray-200 rounded">1.</button>
-                                    <button type="button" className="p-1 hover:bg-gray-200 rounded">•</button>
-                                </div>
+                                {/* Simple Textarea without mock toolbar */}
                                 <textarea
                                     value={data.description}
                                     onChange={e => setData('description', e.target.value)}

@@ -978,5 +978,9 @@
     "Device": "الجهاز",
     "Manage your secret and publishable keys for API integration.": "إدارة المفاتيح السرية والعامة لربط التطبيقات.",
     "Integration Docs": "مستندات الربط",
-    "Learn how to connect your application to the gateway.": "تعلم كيفية ربط تطبيقك ببوابة الدفع."
+    "Learn how to connect your application to the gateway.": "تعلم كيفية ربط تطبيقك ببوابة الدفع.",
+    "Top up your balance": "اشحن رصيدك",
+    "Purchase points to continue bidding on projects.": "قم بشراء النقاط للاستمرار في تقديم العروض على المشاريع.",
+    "Setup Now": "إعداد الآن",
+    "Set up Direct Debit for automated settlement clearance and receive your escrow payouts instantly.": "قم بإعداد الخصم المباشر للتسوية التلقائية واستلم مدفوعاتك المحتجزة فورًا."
 }

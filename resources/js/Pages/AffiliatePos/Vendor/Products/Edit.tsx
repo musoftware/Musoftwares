@@ -15,9 +15,7 @@ export default function VendorProductsEdit({ product }: any) {
 
     const submit = (e: React.FormEvent) => {
         e.preventDefault();
-        // Since we only have stock update API currently, let's assume a full update method exists or will be added.
-        // I will just stub it to a generic update route.
-        alert('Product details update logic will trigger here');
+        put(route('affiliate_pos.vendor.products.update', { product: product.id }));
     };
 
     return (

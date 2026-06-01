@@ -15,9 +15,7 @@ export default function OrderShow({ order }: any) {
         }
     };
 
-    const handleItemAction = (itemStatus: string) => {
-        alert(`Bulk action ${itemStatus} on items will be implemented here.`);
-    };
+
 
     const TimelineStep = ({ title, active, isLast }: { title: string, active: boolean, isLast?: boolean }) => (
         <div className="flex flex-col items-center">
@@ -109,12 +107,6 @@ export default function OrderShow({ order }: any) {
                     <CardHeader className="bg-gray-50/50 border-b p-4 flex flex-row items-center justify-between">
                         <CardTitle className="text-lg flex items-center gap-2">
                             <Package className="w-5 h-5 text-gray-500" />{__('general.order_items')}</CardTitle>
-                        <div className="flex gap-2">
-                            <Button variant="outline" size="sm" onClick={() => handleItemAction('returning')} className="text-orange-600 hover:text-orange-700 hover:bg-orange-50 border-orange-200">{__('general.partial_return')}</Button>
-                            <Button variant="outline" size="sm" onClick={() => handleItemAction('replacing')} className="text-blue-600 hover:text-blue-700 hover:bg-blue-50 border-blue-200">
-                                <RefreshCw className="w-3.5 h-3.5 mr-1.5" /> Replace
-                            </Button>
-                        </div>
                     </CardHeader>
                     <CardContent className="p-0">
                         <Table>

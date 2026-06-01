@@ -5,10 +5,7 @@ import { __ } from '@/lib/i18n';
 
 export default function Show({ service }: any) {
     const { auth } = usePage().props as any;
-    const userBalance = auth?.user?.balance || 0; // Mock balance if not properly passed from backend or real
-
-    // Default mock balance for display purposes in case it's not set
-    const displayBalance = userBalance > 0 ? userBalance : 125.0;
+    const displayBalance = userBalance;
 
     const [activeTab, setActiveTab] = useState<'overview' | 'reviews'>(
         'overview',
@@ -128,13 +125,13 @@ export default function Show({ service }: any) {
                                     onClick={() => setActiveTab('overview')}
                                     className={`border-b-2 px-1 py-4 text-sm font-medium whitespace-nowrap transition-colors ${activeTab === 'overview' ? 'border-indigo-500 text-indigo-600' : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'}`}
                                 >
-                                    Overview
+                                    {__('general.overview')}
                                 </button>
                                 <button
                                     onClick={() => setActiveTab('reviews')}
                                     className={`border-b-2 px-1 py-4 text-sm font-medium whitespace-nowrap transition-colors ${activeTab === 'reviews' ? 'border-indigo-500 text-indigo-600' : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'}`}
                                 >
-                                    Reviews (128)
+                                    {__('general.reviews')}
                                 </button>
                             </nav>
                         </div>
@@ -279,103 +276,33 @@ export default function Show({ service }: any) {
                                                 </div>
 
                                                 <ul className="mb-8 space-y-3">
-                                                    <li className="flex items-start text-sm text-gray-600">
-                                                        <svg
-                                                            className="mr-2 h-5 w-5 shrink-0 text-green-500"
-                                                            fill="none"
-                                                            stroke="currentColor"
-                                                            viewBox="0 0 24 24"
-                                                        >
-                                                            <path
-                                                                strokeLinecap="round"
-                                                                strokeLinejoin="round"
-                                                                strokeWidth="2"
-                                                                d="M5 13l4 4L19 7"
-                                                            ></path>
-                                                        </svg>
-                                                        Feature inclusion 1
-                                                    </li>
-                                                    <li className="flex items-start text-sm text-gray-600">
-                                                        <svg
-                                                            className="mr-2 h-5 w-5 shrink-0 text-green-500"
-                                                            fill="none"
-                                                            stroke="currentColor"
-                                                            viewBox="0 0 24 24"
-                                                        >
-                                                            <path
-                                                                strokeLinecap="round"
-                                                                strokeLinejoin="round"
-                                                                strokeWidth="2"
-                                                                d="M5 13l4 4L19 7"
-                                                            ></path>
-                                                        </svg>
-                                                        Feature inclusion 2
-                                                    </li>
-                                                    <li className="flex items-start text-sm text-gray-600">
-                                                        <svg
-                                                            className="mr-2 h-5 w-5 shrink-0 text-green-500"
-                                                            fill="none"
-                                                            stroke="currentColor"
-                                                            viewBox="0 0 24 24"
-                                                        >
-                                                            <path
-                                                                strokeLinecap="round"
-                                                                strokeLinejoin="round"
-                                                                strokeWidth="2"
-                                                                d="M5 13l4 4L19 7"
-                                                            ></path>
-                                                        </svg>
-                                                        Feature inclusion 3
-                                                    </li>
+                                                    {/* Feature inclusions would be rendered here from selectedPackage */}
                                                 </ul>
 
                                                 <div className="mb-6 flex items-center justify-between rounded-lg border border-gray-100 bg-gray-50 p-4">
                                                     <span className="text-sm font-medium text-gray-700">
-                                                        Your balance:
+                                                        {__('general.your_balance')}:
                                                     </span>
                                                     <span className="text-sm font-bold text-gray-900">
-                                                        $
-                                                        {displayBalance.toFixed(
-                                                            2,
-                                                        )}
+                                                        ${displayBalance.toFixed(2)}
                                                     </span>
                                                 </div>
 
                                                 {displayBalance >=
                                                 selectedPackage.price ? (
                                                     <button
-                                                        onClick={() =>
-                                                            handleBuyNow(
-                                                                selectedPackage.id,
-                                                            )
-                                                        }
+                                                        onClick={() => handleBuyNow(selectedPackage.id)}
                                                         className="flex w-full items-center justify-center gap-2 rounded-lg bg-indigo-600 px-4 py-3 font-bold text-white transition hover:bg-indigo-700"
                                                     >
-                                                        Continue — $
-                                                        {Number(selectedPackage.price).toFixed(2)}
-                                                        <svg
-                                                            className="h-5 w-5"
-                                                            fill="none"
-                                                            stroke="currentColor"
-                                                            viewBox="0 0 24 24"
-                                                        >
-                                                            <path
-                                                                strokeLinecap="round"
-                                                                strokeLinejoin="round"
-                                                                strokeWidth="2"
-                                                                d="M14 5l7 7m0 0l-7 7m7-7H3"
-                                                            ></path>
+                                                        {__('general.continue')} — ${Number(selectedPackage.price).toFixed(2)}
+                                                        <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
                                                         </svg>
                                                     </button>
                                                 ) : (
                                                     <div className="space-y-3">
                                                         <div className="text-center text-sm font-medium text-red-600">
-                                                            Need $
-                                                            {(
-                                                                selectedPackage.price -
-                                                                displayBalance
-                                                            ).toFixed(2)}{' '}
-                                                            more to purchase
+                                                            {__('general.need_more_balance', { amount: (selectedPackage.price - displayBalance).toFixed(2) })}
                                                         </div>
                                                         <button className="w-full rounded-lg bg-amber-500 px-4 py-3 font-bold text-white transition hover:bg-amber-600">{__('general.top_up_wallet')}</button>
                                                     </div>
@@ -385,8 +312,7 @@ export default function Show({ service }: any) {
                                     </>
                                 ) : (
                                     <div className="p-8 text-center text-gray-500">
-                                        No packages available for this service
-                                        yet.
+                                        {__('general.no_packages_available_for_this_service_yet')}
                                     </div>
                                 )}
                             </div>

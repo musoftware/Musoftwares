@@ -11,12 +11,7 @@ import { __ } from '@/lib/i18n';
 export default function VendorProductsIndex({ products }: any) {
     const [search, setSearch] = useState('');
 
-    const handleStockUpdate = (skuId: number, qty: number) => {
-        // Wait, the API endpoint is products/{product}/stock, so we need product ID. 
-        // For simplicity, let's assume the user edits stock in a modal. 
-        // I'll build a basic placeholder for now.
-        alert('Stock update modal will open here for SKU ' + skuId);
-    };
+
 
     return (
         <div className="p-6 max-w-7xl mx-auto space-y-6">

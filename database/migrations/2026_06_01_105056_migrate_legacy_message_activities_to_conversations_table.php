@@ -74,7 +74,7 @@ return new class extends Migration
                 
                 $conversation->messages()->create([
                     'sender_id'  => $activity->user_id,
-                    'body'       => clone_string($body),
+                    'body'       => $body ?? '',
                     'attachment' => $attachment,
                     'is_system'  => false,
                     'created_at' => $activity->created_at,
@@ -103,9 +103,3 @@ return new class extends Migration
         // 
     }
 };
-
-if (!function_exists('clone_string')) {
-    function clone_string($str) {
-        return $str ?? '';
-    }
-}

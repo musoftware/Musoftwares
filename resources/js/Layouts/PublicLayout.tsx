@@ -82,14 +82,12 @@ export default function PublicLayout({ children, auth: propAuth }: PublicLayoutP
     return (
         <div className="flex min-h-screen flex-col bg-white text-slate-900 antialiased font-sans">
             {/* Enterprise Header */}
-            <header 
-                className={`sticky top-0 w-full transition-all duration-300 ${
-                    mobileMenuOpen ? 'z-40' : 'z-50'
-                } ${
-                    scrolled 
-                        ? 'border-b border-slate-200 bg-white/95 backdrop-blur-xl py-3 shadow-sm' 
+            <header
+                className={`sticky top-0 w-full transition-all duration-300 ${mobileMenuOpen ? 'z-40' : 'z-50'
+                    } ${scrolled
+                        ? 'border-b border-slate-200 bg-white/95 backdrop-blur-xl py-3 shadow-sm'
                         : 'border-b border-transparent bg-transparent py-5'
-                }`}
+                    }`}
                 onMouseLeave={() => setActiveDropdown(null)}
             >
                 <div className="mx-auto flex max-w-[90rem] items-center justify-between px-4 sm:px-6 lg:px-8">
@@ -156,7 +154,7 @@ export default function PublicLayout({ children, auth: propAuth }: PublicLayoutP
 
                 {/* Desktop Mega Menu Dropdowns */}
                 {activeDropdown && (
-                    <div 
+                    <div
                         className="hidden lg:block absolute top-full left-0 w-full bg-white border-b border-slate-200 shadow-xl shadow-slate-200/20 animate-in fade-in slide-in-from-top-2 duration-200"
                         onMouseEnter={() => setActiveDropdown(activeDropdown)}
                         onMouseLeave={() => setActiveDropdown(null)}

@@ -54,15 +54,7 @@ export default function FreelanceDashboard({
     const activeContracts = initialContracts || [];
     const upcomingBookings = initialBookings || [];
 
-    const recentActivities = initialActivities && initialActivities.length > 0 ? initialActivities : [
-        {
-            id: 'mock_1',
-            description: 'Welcome to your new fully operational workspace.',
-            created_at: new Date().toISOString(),
-            color: 'indigo',
-            icon: 'activity'
-        }
-    ];
+    const recentActivities = initialActivities && initialActivities.length > 0 ? initialActivities : [];
 
     // 2. Client Data Setup
     const clientData = initialClientData || {
@@ -83,15 +75,7 @@ export default function FreelanceDashboard({
 
     const clientActivities = clientData.recentActivities && clientData.recentActivities.length > 0 
         ? clientData.recentActivities 
-        : [
-            {
-                id: 'mock_c1',
-                description: 'Welcome to your new client dashboard.',
-                created_at: new Date().toISOString(),
-                color: 'indigo',
-                icon: 'activity'
-            }
-        ];
+        : [];
 
     // Convert string icon names/types for Activities dynamically
     const mapActivities = (list: any[]) => {
@@ -118,11 +102,11 @@ export default function FreelanceDashboard({
         },
         {
             id: 2,
-            title: __('Link verified payout source'),
-            description: __('Set up Direct Debit for automated settlement clearance.'),
-            href: '/financial/payout-methods',
-            icon: CreditCard,
-            color: 'text-emerald-600 bg-emerald-50/80'
+            title: __('Top up your balance'),
+            description: __('Purchase points to continue bidding on projects.'),
+            href: '/financial/add-balance',
+            icon: Coins,
+            color: 'text-indigo-600 bg-indigo-50/80'
         }
     ];
 

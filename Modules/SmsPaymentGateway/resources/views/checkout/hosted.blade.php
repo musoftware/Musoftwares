@@ -467,7 +467,7 @@
         </div>
         <div class="success-title">{{ __('sms_gateway.payment_successful') }}</div>
         <div class="success-subtitle">{{ __('sms_gateway.payment_confirmed_message') }}</div>
-        <a href="#" class="success-btn" id="success-redirect" style="display:none">{{ __('sms_gateway.return_to_merchant') }}</a>
+        <a href="javascript:void(0)" class="success-btn" id="success-redirect" style="display:none">{{ __('sms_gateway.return_to_merchant') }}</a>
     </div>
 
     <div class="checkout-footer">
