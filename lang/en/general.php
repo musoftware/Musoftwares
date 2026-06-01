@@ -4642,4 +4642,10 @@ return [
   'save_service' => 'Save Service',
   'calculating' => 'Calculating',
   'cib_swype' => 'CIB Swype',
+  'confirm_bill_balance' => 'Are you sure you want to bill this invoice from the client\'s balance?',
+  'confirm_mark_paid' => 'Are you sure you want to mark this invoice as paid?',
+  'enter_payment_amount' => 'Enter the payment amount:',
+  'amount' => 'Amount',
+  'confirm' => 'Confirm',
+  'cancel' => 'Cancel',
 ];

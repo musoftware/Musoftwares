@@ -681,7 +681,7 @@ class UsersController extends Controller
             'duration_days' => 'required|integer|min:1',
         ]);
 
-        $serviceItems = app(\App\Http\Controllers\SubscriptionController::class)->getServiceItems();
+        $serviceItems = app(\App\Services\PricingService::class)->getServiceItems();
         $plan = collect($serviceItems)->firstWhere('id', $request->object);
 
         if (!$plan) {

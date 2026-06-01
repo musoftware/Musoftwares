@@ -29,6 +29,7 @@ interface Props {
         item_title: string;
         invoice_id: number;
         invoice_number: string | null;
+        invoice_status: string;
         client_name: string | null;
     };
     invoice_currency: Currency | null;
@@ -220,7 +221,7 @@ export default function TimerDetails({ item, invoice_currency, timers: initialTi
                             {__('general.unsaved_sessions')}
                         </div>
                     )}
-                    <Button onClick={handleSave} disabled={!hasUnsavedChanges || isSaving} className="bg-blue-600 hover:bg-blue-700">
+                    <Button onClick={handleSave} disabled={!hasUnsavedChanges || isSaving || item.invoice_status === 'cancelled'} className="bg-blue-600 hover:bg-blue-700">
                         <Save className="w-4 h-4 mr-2" /> {__('general.save_sessions')}
                     </Button>
                 </div>
@@ -234,7 +235,7 @@ export default function TimerDetails({ item, invoice_currency, timers: initialTi
                         {/* Live Timer Controls */}
                         <div className="flex items-center gap-4">
                             {!isRunning ? (
-                                <Button size="lg" onClick={handleStart} className="bg-green-600 hover:bg-green-700 h-14 px-8 shadow-sm">
+                                <Button size="lg" onClick={handleStart} disabled={item.invoice_status === 'cancelled'} className="bg-green-600 hover:bg-green-700 h-14 px-8 shadow-sm">
                                     <Play className="w-5 h-5 mr-2" /> {__('general.start_timer')}
                                 </Button>
                             ) : (
@@ -266,6 +267,7 @@ export default function TimerDetails({ item, invoice_currency, timers: initialTi
                                     value={rate}
                                     onChange={(e) => setRate(parseFloat(e.target.value) || 0)}
                                     className="w-20 bg-white"
+                                    disabled={item.invoice_status === 'cancelled'}
                                 />
                             </div>
                             <div>
@@ -277,6 +279,7 @@ export default function TimerDetails({ item, invoice_currency, timers: initialTi
                                     value={manualHours}
                                     onChange={(e) => setManualHours(e.target.value)}
                                     className="w-16 bg-white"
+                                    disabled={item.invoice_status === 'cancelled'}
                                 />
                             </div>
                             <div>
@@ -289,9 +292,10 @@ export default function TimerDetails({ item, invoice_currency, timers: initialTi
                                     value={manualMinutes}
                                     onChange={(e) => setManualMinutes(e.target.value)}
                                     className="w-16 bg-white"
+                                    disabled={item.invoice_status === 'cancelled'}
                                 />
                             </div>
-                            <Button onClick={handleAddManual} variant="outline" className="bg-white border-dashed">
+                            <Button onClick={handleAddManual} variant="outline" disabled={item.invoice_status === 'cancelled'} className="bg-white border-dashed">
                                 <Plus className="w-4 h-4 mr-2 text-blue-500" /> {__('general.add_duration')}
                             </Button>
                         </div>
@@ -416,9 +420,11 @@ export default function TimerDetails({ item, invoice_currency, timers: initialTi
                                                 {formatCurrency(timer.amount, invoice_currency?.code)}
                                             </td>
                                             <td className="px-4 py-3 text-center">
-                                                <Button variant="ghost" size="sm" onClick={() => handleDelete(index)} className="h-8 w-8 p-0 text-gray-400 hover:text-red-600 hover:bg-red-50">
-                                                    <X className="h-4 w-4" />
-                                                </Button>
+                                                {item.invoice_status !== 'cancelled' && (
+                                                    <Button variant="ghost" size="sm" onClick={() => handleDelete(index)} className="h-8 w-8 p-0 text-gray-400 hover:text-red-600 hover:bg-red-50">
+                                                        <X className="h-4 w-4" />
+                                                    </Button>
+                                                )}
                                             </td>
                                         </tr>
                                     );

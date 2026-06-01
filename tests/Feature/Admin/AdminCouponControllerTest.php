@@ -4,6 +4,7 @@ namespace Tests\Feature\Admin;
 
 use App\Models\User;
 use App\Models\Coupon;
+use App\Models\Currency;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -11,126 +12,127 @@ class AdminCouponControllerTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected User $admin;
+    protected User $clientUser;
+    protected Currency $currency;
+
     protected function setUp(): void
     {
         parent::setUp();
         $this->seed(\Database\Seeders\RolesAndPermissionsSeeder::class);
+
+        $this->admin = User::factory()->create(['onboarding_completed' => true]);
+        $this->admin->assignRole('admin');
+
+        $this->clientUser = User::factory()->create(['onboarding_completed' => true]);
+        $this->clientUser->assignRole('client');
+
+        $this->currency = Currency::create([
+            'currency' => 'USD',
+            'symbol' => '$',
+            'string_format' => '%v $'
+        ]);
     }
 
-    private function createAdmin()
+    public function test_admin_can_view_coupons_index(): void
     {
-        $admin = User::factory()->create(['onboarding_completed' => true]);
-        $admin->assignRole('admin');
-        return $admin;
-    }
-
-    public function test_admin_can_access_coupons_index()
-    {
-        $admin = $this->createAdmin();
-
-        $response = $this->actingAs($admin)->get(route('admin.coupons.index'));
-
+        $response = $this->actingAs($this->admin)->get(route('admin.coupons.index'));
         $response->assertStatus(200);
     }
 
-    public function test_non_admin_cannot_access_coupons_index()
+    public function test_non_admin_cannot_view_coupons_index(): void
     {
-        $user = User::factory()->create(['onboarding_completed' => true]);
-
-        $response = $this->actingAs($user)->get(route('admin.coupons.index'));
-
+        $response = $this->actingAs($this->clientUser)->get(route('admin.coupons.index'));
         $response->assertStatus(403);
     }
 
-    public function test_admin_can_store_coupon()
+    public function test_admin_can_store_new_coupon(): void
     {
-        $admin = $this->createAdmin();
-
-        $payload = [
-            'name' => 'Summer Sale',
-            'code' => 'SUMMER2026',
+        $response = $this->actingAs($this->admin)->post(route('admin.coupons.store'), [
+            'name' => 'Test Coupon',
+            'code' => 'TEST10',
             'type' => 'percentage',
-            'discount_percentage' => 20,
-            'currency' => 1,
+            'discount_percentage' => 10,
+            'currency' => $this->currency->id,
             'is_active' => true,
-        ];
+        ]);
 
-        $response = $this->actingAs($admin)->post(route('admin.coupons.store'), $payload);
-
-        $response->assertSessionHasNoErrors();
-        $response->assertStatus(302);
+        $response->assertRedirect();
+        $response->assertSessionHas('success');
 
         $this->assertDatabaseHas('coupons', [
-            'code' => 'SUMMER2026',
-            'type' => 'percentage',
+            'name' => 'Test Coupon',
+            'code' => 'TEST10',
         ]);
     }
 
-    public function test_admin_can_access_coupon_show_page()
+    public function test_store_coupon_requires_name(): void
     {
-        $admin = $this->createAdmin();
-        $coupon = Coupon::create([
-            'name' => 'Test Coupon',
-            'code' => 'TESTCODE',
-            'type' => 'fixed',
-            'discount_amount' => 50,
-            'currency_id' => 1,
+        $response = $this->actingAs($this->admin)->post(route('admin.coupons.store'), [
+            'type' => 'percentage',
+            'discount_percentage' => 10,
+            'currency' => $this->currency->id,
         ]);
 
-        $response = $this->actingAs($admin)->get(route('admin.coupons.show', $coupon->id));
+        $response->assertSessionHasErrors('name');
+    }
 
+    public function test_admin_can_view_coupon_details(): void
+    {
+        $coupon = Coupon::create([
+            'name' => 'Test',
+            'code' => 'TEST' . rand(100,999),
+            'type' => 'fixed',
+            'discount_amount' => 5,
+            'currency_id' => $this->currency->id,
+        ]);
+
+        $response = $this->actingAs($this->admin)->get(route('admin.coupons.show', $coupon->id));
         $response->assertStatus(200);
     }
 
-    public function test_admin_can_update_coupon()
+    public function test_admin_can_update_coupon(): void
     {
-        $admin = $this->createAdmin();
         $coupon = Coupon::create([
-            'name' => 'Old Coupon',
-            'code' => 'OLDCODE',
+            'name' => 'Old Name',
+            'code' => 'OLD_CODE_' . rand(100, 999),
             'type' => 'fixed',
-            'discount_amount' => 10,
-            'currency_id' => 1,
+            'discount_amount' => 5,
+            'currency_id' => $this->currency->id,
         ]);
 
-        $payload = [
-            'name' => 'Updated Coupon',
-            'code' => 'OLDCODE',
+        $response = $this->actingAs($this->admin)->put(route('admin.coupons.update', $coupon->id), [
+            'name' => 'New Name',
+            'code' => 'NEW_CODE_' . rand(100, 999),
             'type' => 'fixed',
-            'discount_amount' => 20,
-            'currency' => 1,
-            'is_active' => true,
-        ];
+            'discount_amount' => 10,
+            'currency' => $this->currency->id,
+        ]);
 
-        $response = $this->actingAs($admin)->put(route('admin.coupons.update', $coupon->id), $payload);
-
-        $response->assertSessionHasNoErrors();
-        $response->assertStatus(302);
+        $response->assertRedirect();
+        $response->assertSessionHas('success');
 
         $this->assertDatabaseHas('coupons', [
             'id' => $coupon->id,
-            'name' => 'Updated Coupon',
-            'discount_amount' => 20,
+            'name' => 'New Name',
+            'discount_amount' => 10,
         ]);
     }
 
-    public function test_admin_can_delete_coupon()
+    public function test_admin_can_delete_coupon(): void
     {
-        $admin = $this->createAdmin();
         $coupon = Coupon::create([
             'name' => 'To Delete',
-            'code' => 'DELETE',
+            'code' => 'DELETE_CODE_' . rand(100, 999),
             'type' => 'fixed',
-            'discount_amount' => 10,
-            'currency_id' => 1,
+            'currency_id' => $this->currency->id,
         ]);
 
-        $response = $this->actingAs($admin)->delete(route('admin.coupons.destroy', $coupon->id));
+        $response = $this->actingAs($this->admin)->delete(route('admin.coupons.destroy', $coupon->id));
 
         $response->assertRedirect(route('admin.coupons.index'));
+        $response->assertSessionHas('success');
 
-        $this->assertSoftDeleted('coupons', [
-            'id' => $coupon->id,
-        ]);
+        $this->assertSoftDeleted('coupons', ['id' => $coupon->id]);
     }
 }

@@ -327,8 +327,37 @@ class DashboardService
             ->pluck('object')
             ->toArray();
 
+        $usdCurrency = \App\Models\Currency::where('currency', 'USD')->first();
+        $usdCurrencyId = $usdCurrency ? $usdCurrency->id : 1;
+        
+        $egpCurrency = \App\Models\Currency::where('currency', 'EGP')->first();
+        $egpCurrencyId = $egpCurrency ? $egpCurrency->id : 1;
+        
+        $userCurrencyId = $user->currency_id ?: $egpCurrencyId;
+        $userCurrency = \App\Models\Currency::find($userCurrencyId);
+        $currencyCode = $userCurrency ? $userCurrency->currency : 'USD';
+        
+        $rate = 1.0;
+        if ($usdCurrency && $userCurrencyId && $usdCurrency->id != $userCurrencyId) {
+            $rate = \App\Models\CurrenciesExchange::RateToday(1, $usdCurrency->id, $userCurrencyId);
+        }
+
+        $egpRate = 50; // Fallback
+        if ($usdCurrency && $egpCurrencyId) {
+            $egpRate = \App\Models\CurrenciesExchange::RateToday(1, $usdCurrency->id, $egpCurrencyId) ?: 50;
+        }
+
+        $convertPrice = function($egpPrice) use ($egpRate, $rate, $currencyCode) {
+            if ($currencyCode === 'EGP') {
+                return round($egpPrice);
+            }
+            $usdPrice = $egpPrice / $egpRate;
+            $converted = $usdPrice * $rate;
+            return psychological_price($converted);
+        };
+
         $erpMonthly = 0;
-        $serviceItems = app(\App\Services\PricingService::class)->getServiceItems();
+        $serviceItems = app(\App\Services\PricingService::class)->getServiceItems($convertPrice);
         foreach ($activeObjects as $object) {
             $item = collect($serviceItems)->firstWhere('id', $object);
             if ($item) {

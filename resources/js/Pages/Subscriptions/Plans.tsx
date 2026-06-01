@@ -21,7 +21,6 @@ import {
     RefreshCw, PieChart
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { __ } from '@/lib/i18n';
 
 interface ServiceItem {
     id: string;
@@ -148,9 +147,9 @@ export default function Plans({ serviceItems, activeSubscription, walletBalance,
                             }
                         };
 
-                        const hasOnlyTools = selectedItems.length > 0 && selectedItems.every(id => id.startsWith('tool-'));
+                        const hasAnyTools = selectedItems.length > 0 && selectedItems.some(id => id.startsWith('tool-'));
 
-                        if (isEligibleForTrial && !hasOnlyTools) {
+                        if (isEligibleForTrial && !hasAnyTools) {
                             return (
                                 <Button
                                     onClick={handleStartTrial}

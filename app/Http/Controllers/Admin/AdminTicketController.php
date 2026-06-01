@@ -37,7 +37,7 @@ class AdminTicketController extends Controller
     {
         $ticket->load(['user', 'conversation.messages.sender']);
 
-        $supportAgents = \App\Models\User::role(['admin', 'moderator'])->get(['id', 'name', 'avatar']);
+        $supportAgents = \App\Models\User::role(['admin', 'moderator'])->get(['id', 'name', 'email']);
         $cannedResponses = \App\Models\TicketCannedResponse::all();
 
         return Inertia::render('Admin/Tickets/Show', [

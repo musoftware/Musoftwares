@@ -586,6 +586,7 @@ class InvoiceController extends Controller
                 'item_title' => $item->item_title,
                 'invoice_id' => $item->invoice_id,
                 'invoice_number' => $item->invoice->invoice_number,
+                'invoice_status' => $item->invoice->status,
                 'client_name' => $item->invoice->user ? $item->invoice->user->name : null,
             ],
             'invoice_currency' => $item->invoice->relationLoaded('currency') && $item->invoice->getRelation('currency') ? [
@@ -605,6 +606,10 @@ class InvoiceController extends Controller
     {
         $item = \App\Models\InvoiceItem::findOrFail($item_id);
         
+        if ($item->invoice && $item->invoice->status === 'cancelled') {
+            return redirect()->back()->with('error', __('admin.cannot_modify_cancelled_invoice'));
+        }
+
         $request->validate([
             'sessions' => 'required|array',
             'sessions.*.start_date' => 'required|date',
@@ -630,6 +635,11 @@ class InvoiceController extends Controller
     public function destroyTimerDetails($item_id, $timer_id)
     {
         $item = \App\Models\InvoiceItem::findOrFail($item_id);
+        
+        if ($item->invoice && $item->invoice->status === 'cancelled') {
+            return redirect()->back()->with('error', __('admin.cannot_modify_cancelled_invoice'));
+        }
+
         $timer = \App\Models\InvoiceItemTimer::where('invoice_item_id', $item->id)->findOrFail($timer_id);
         $timer->delete();
 

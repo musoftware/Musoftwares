@@ -6,90 +6,196 @@ use App\Models\User;
 use App\Models\Ticket;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 
 class AdminTicketControllerTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected User $admin;
+    protected User $clientUser;
+
     protected function setUp(): void
     {
         parent::setUp();
+
         $this->seed(\Database\Seeders\RolesAndPermissionsSeeder::class);
+
+        $this->admin = User::factory()->create(['onboarding_completed' => true]);
+        $this->admin->assignRole('admin');
+
+        $this->clientUser = User::factory()->create(['onboarding_completed' => true]);
+        $this->clientUser->assignRole('client');
     }
 
-    private function createAdmin()
+    public function test_admin_can_view_tickets_index(): void
     {
-        $admin = User::factory()->create(['onboarding_completed' => true]);
-        $admin->assignRole('admin');
-        return $admin;
+        $response = $this->actingAs($this->admin)->get(route('tickets.index'));
+        $response->assertStatus(200);
     }
 
-    private function createClient()
+    public function test_non_admin_cannot_view_tickets_index(): void
     {
-        $client = User::factory()->create(['onboarding_completed' => true]);
-        $client->assignRole('client');
-        return $client;
-    }
-
-    public function test_admin_can_access_tickets_index()
-    {
-        $admin = $this->createAdmin();
-
-        $response = $this->actingAs($admin)->get(route('admin.tickets.index'));
-
-        $response->assertSuccessful();
-    }
-
-    public function test_non_admin_cannot_access_tickets_index()
-    {
-        $client = $this->createClient();
-
-        $response = $this->actingAs($client)->get(route('admin.tickets.index'));
-
+        $response = $this->actingAs($this->clientUser)->get(route('tickets.index'));
         $response->assertStatus(403);
     }
 
-    public function test_admin_can_view_ticket()
+    public function test_admin_can_view_ticket_show(): void
     {
-        $admin = $this->createAdmin();
-        $client = $this->createClient();
-
-        $ticket = Ticket::forceCreate([
-            'user_id' => $client->id,
-            'ticket_subject' => 'Test Ticket',
-            'ticket_message' => 'test body',
+        $ticket = Ticket::create([
+            'user_id' => $this->clientUser->id,
+            'ticket_subject' => 'Help me',
+            'ticket_message' => 'Need help',
             'ticket_status' => 'open',
-            'priority' => 'medium'
+            'priority' => 'low',
         ]);
 
-        $response = $this->actingAs($admin)->get(route('admin.tickets.show', $ticket->id));
-
-        $response->assertSuccessful();
+        $response = $this->actingAs($this->admin)->get(route('tickets.show', $ticket->id));
+        $response->assertStatus(200);
     }
 
-    public function test_admin_can_update_ticket_action_close()
+    public function test_admin_can_update_ticket_status(): void
     {
-        $admin = $this->createAdmin();
-        $client = $this->createClient();
-
-        $ticket = Ticket::forceCreate([
-            'user_id' => $client->id,
-            'ticket_subject' => 'Test Ticket',
-            'ticket_message' => 'test body',
+        $ticket = Ticket::create([
+            'user_id' => $this->clientUser->id,
+            'ticket_subject' => 'Help me',
+            'ticket_message' => 'Need help',
             'ticket_status' => 'open',
-            'priority' => 'medium'
+            'priority' => 'low',
         ]);
 
-        $response = $this->actingAs($admin)->put(route('admin.tickets.update', $ticket->id), [
-            'action' => 'close'
+        $response = $this->actingAs($this->admin)->put(route('tickets.update', $ticket->id), [
+            'action' => 'close',
+            'comment' => 'Closing ticket',
         ]);
 
         $response->assertRedirect();
         $response->assertSessionHas('success');
-        
-        $this->assertDatabaseHas('tickets', [
-            'id' => $ticket->id,
-            'ticket_status' => 'closed'
+
+        $this->assertEquals('closed', $ticket->fresh()->ticket_status);
+    }
+
+    public function test_admin_update_ticket_validation(): void
+    {
+        $ticket = Ticket::create([
+            'user_id' => $this->clientUser->id,
+            'ticket_subject' => 'Help me',
+            'ticket_message' => 'Need help',
+            'ticket_status' => 'open',
+            'priority' => 'low',
         ]);
+
+        $response = $this->actingAs($this->admin)->put(route('tickets.update', $ticket->id), [
+            'action' => 'invalid_action',
+        ]);
+
+        $response->assertSessionHasErrors('action');
+    }
+
+    public function test_admin_can_reply_to_ticket(): void
+    {
+        $ticket = Ticket::create([
+            'user_id' => $this->clientUser->id,
+            'ticket_subject' => 'Help me',
+            'ticket_message' => 'Need help',
+            'ticket_status' => 'open',
+            'priority' => 'low',
+        ]);
+        
+        $ticket->conversation()->create([
+            'status' => 'open',
+            'subject' => 'Help me',
+            'user_id' => $this->clientUser->id,
+        ]);
+
+        $response = $this->actingAs($this->admin)->post(route('tickets.reply', $ticket->id), [
+            'body' => 'Here is the answer',
+            'is_internal' => false,
+        ]);
+
+        $response->assertRedirect();
+        $response->assertSessionHas('success');
+    }
+
+    public function test_admin_reply_ticket_validation(): void
+    {
+        $ticket = Ticket::create([
+            'user_id' => $this->clientUser->id,
+            'ticket_subject' => 'Help me',
+            'ticket_message' => 'Need help',
+            'ticket_status' => 'open',
+            'priority' => 'low',
+        ]);
+
+        $response = $this->actingAs($this->admin)->post(route('tickets.reply', $ticket->id), [
+            'body' => '',
+            'is_internal' => false,
+        ]);
+
+        $response->assertSessionHasErrors('body');
+    }
+
+    public function test_admin_can_assign_ticket(): void
+    {
+        $ticket = Ticket::create([
+            'user_id' => $this->clientUser->id,
+            'ticket_subject' => 'Help me',
+            'ticket_message' => 'Need help',
+            'ticket_status' => 'open',
+            'priority' => 'low',
+        ]);
+
+        $response = $this->actingAs($this->admin)->post(route('tickets.assign', $ticket->id), [
+            'assigned_employee_id' => $this->admin->id,
+        ]);
+
+        $response->assertRedirect();
+        $response->assertSessionHas('success');
+
+        $this->assertEquals($this->admin->id, $ticket->fresh()->assigned_employee_id);
+    }
+
+    public function test_admin_assign_ticket_validation(): void
+    {
+        $ticket = Ticket::create([
+            'user_id' => $this->clientUser->id,
+            'ticket_subject' => 'Help me',
+            'ticket_message' => 'Need help',
+            'ticket_status' => 'open',
+            'priority' => 'low',
+        ]);
+
+        $response = $this->actingAs($this->admin)->post(route('tickets.assign', $ticket->id), [
+            'assigned_employee_id' => 99999, // Invalid ID
+        ]);
+
+        $response->assertSessionHasErrors('assigned_employee_id');
+    }
+
+    public function test_admin_can_add_canned_response(): void
+    {
+        $response = $this->actingAs($this->admin)->post(route('tickets.canned-responses.store'), [
+            'title' => 'Greeting',
+            'body' => 'Hello there!',
+        ]);
+
+        $response->assertRedirect();
+        $response->assertSessionHas('success');
+
+        $this->assertDatabaseHas('ticket_canned_responses', [
+            'title' => 'Greeting',
+            'body' => 'Hello there!',
+        ]);
+    }
+
+    public function test_admin_add_canned_response_validation(): void
+    {
+        $response = $this->actingAs($this->admin)->post(route('tickets.canned-responses.store'), [
+            'title' => '',
+            'body' => 'Hello there!',
+        ]);
+
+        $response->assertSessionHasErrors('title');
     }
 }
