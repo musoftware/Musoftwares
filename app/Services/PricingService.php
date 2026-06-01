@@ -85,14 +85,27 @@ class PricingService
 
             $isFree = $tool['is_free'] ?? false;
 
+            $monthlyPriceEGP = $toolBasePrice / 10;
+            $yearlyPriceEGP = $toolBasePrice;
+
+            if (isset($tool['plans']) && is_array($tool['plans']) && count($tool['plans']) > 0) {
+                $firstPlan = reset($tool['plans']);
+                if (isset($firstPlan['price_monthly'])) {
+                    $monthlyPriceEGP = $firstPlan['price_monthly'];
+                }
+                if (isset($firstPlan['price_yearly'])) {
+                    $yearlyPriceEGP = $firstPlan['price_yearly'];
+                }
+            }
+
             $items[] = [
                 'id' => 'tool-' . $guid,
                 'slug' => $tool['slug'] ?? $guid,
                 'name' => $tool['title'] ?? 'Unknown Tool',
                 'type' => 'tool',
                 'description' => null,
-                'monthly_price' => $isFree ? 0 : $convertPrice($toolBasePrice / 10),
-                'yearly_price' => $isFree ? 0 : $convertPrice($toolBasePrice),
+                'monthly_price' => $isFree ? 0 : $convertPrice($monthlyPriceEGP),
+                'yearly_price' => $isFree ? 0 : $convertPrice($yearlyPriceEGP),
                 'icon' => 'Wrench',
             ];
         }
