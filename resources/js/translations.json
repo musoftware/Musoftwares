@@ -138,7 +138,8 @@
             "expires": "ينتهي في",
             "mo": "شهر",
             "no_active_services": "لا توجد خدمات نشطة.",
-            "no_subscribers_found": "لا يوجد مشتركون."
+            "no_subscribers_found": "لا يوجد مشتركون.",
+            "service_payment_added_successfully": "تم إضافة تكلفة الخدمة بنجاح."
         },
         "auth": {
             "failed": "failed",
@@ -6869,7 +6870,8 @@
             "expires": "Expires",
             "mo": "mo",
             "no_active_services": "No active services.",
-            "no_subscribers_found": "No subscribers found."
+            "no_subscribers_found": "No subscribers found.",
+            "service_payment_added_successfully": "Service payment added successfully."
         },
         "auth": {
             "failed": "failed",
