@@ -65,6 +65,7 @@ export default function PricingBuilder({
     proratedRefund = 0
 }: PricingBuilderProps) {
     const [billing, setBilling] = useState<'1_month' | '6_months' | '1_year'>('1_month');
+    const [isCartExpanded, setIsCartExpanded] = useState(false);
     
     // Determine default selected items (e.g., ERP and CRM) plus any module passed via URL
     const activeItems = useMemo(() => {
@@ -127,6 +128,22 @@ export default function PricingBuilder({
             setSelectedItems(prev => {
                 const nonTools = prev.filter(id => !toolIds.includes(id));
                 return [...nonTools, ...toolIds];
+            });
+        }
+    };
+
+    const handleSelectAllAddons = (moduleId: string) => {
+        const moduleAddonsIds = addons.filter(a => a.parent_id === moduleId).map(a => a.id);
+        if (moduleAddonsIds.length === 0) return;
+        
+        const allSelected = moduleAddonsIds.every(id => selectedItems.includes(id));
+        
+        if (allSelected) {
+            setSelectedItems(prev => prev.filter(id => !moduleAddonsIds.includes(id)));
+        } else {
+            setSelectedItems(prev => {
+                const nonAddons = prev.filter(id => !moduleAddonsIds.includes(id));
+                return [...nonAddons, ...moduleAddonsIds];
             });
         }
     };
@@ -272,10 +289,20 @@ export default function PricingBuilder({
                                     {/* Add-ons Section */}
                                     {moduleAddons.length > 0 && (isModuleSelected || (isNewSystem ? false : activeSubscription?.owned_features?.find(f => f.id === module.id)?.status === 'active')) && (
                                         <div className="mt-4 pl-4 md:pl-8 border-l-[3px] border-indigo-100 ml-4 md:ml-6 pb-2 animate-in slide-in-from-top-4 fade-in duration-300">
-                                            <h4 className="text-sm font-bold text-slate-800 mb-3 flex items-center gap-2 tracking-tight">
-                                                <Sparkles className="w-4 h-4 text-indigo-500" /> 
-                                                Power up {module.name}
-                                            </h4>
+                                            <div className="flex items-center justify-between mb-3">
+                                                <h4 className="text-sm font-bold text-slate-800 flex items-center gap-2 tracking-tight">
+                                                    <Sparkles className="w-4 h-4 text-indigo-500" /> 
+                                                    Power up {module.name}
+                                                </h4>
+                                                <Button 
+                                                    variant="ghost" 
+                                                    size="sm" 
+                                                    className="h-7 text-xs px-2 text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50"
+                                                    onClick={(e) => { e.stopPropagation(); handleSelectAllAddons(module.id); }}
+                                                >
+                                                    {moduleAddons.every(a => selectedItems.includes(a.id)) ? __('Deselect All') : __('Select All Add-ons')}
+                                                </Button>
+                                            </div>
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                                                 {moduleAddons.map(addon => renderItemCard(addon, true))}
                                             </div>
@@ -353,7 +380,7 @@ export default function PricingBuilder({
                             </div>
                         ) : (
                             <div className="space-y-4">
-                                {selectedItems.map(id => {
+                                {selectedItems.slice(0, isCartExpanded ? undefined : 5).map(id => {
                                     const item = serviceItems.find(i => i.id === id);
                                     if (!item) return null;
                                     
@@ -371,6 +398,15 @@ export default function PricingBuilder({
                                         </div>
                                     );
                                 })}
+
+                                {selectedItems.length > 5 && (
+                                    <button
+                                        onClick={() => setIsCartExpanded(!isCartExpanded)}
+                                        className="text-xs text-indigo-600 hover:text-indigo-700 font-medium w-full text-left py-1"
+                                    >
+                                        {isCartExpanded ? __('Show less') : `+${selectedItems.length - 5} ${__('more items')}`}
+                                    </button>
+                                )}
                                 
                                 <div className="border-t border-slate-100 pt-4 mt-4" />
                                 
