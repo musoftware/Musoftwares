@@ -139,6 +139,7 @@ class SubscriptionController extends Controller
         
         $totalUsd = 0;
         $toolsCount = 0;
+        $toolsTotalEGP = 0;
         
         $configTools = config('tools', []);
 
@@ -149,17 +150,25 @@ class SubscriptionController extends Controller
                 $guid = preg_replace('/^tool-/', '', $item);
                 $tool = $configTools[$guid] ?? null;
                 $isFree = $tool['is_free'] ?? false;
-                if (!$isFree) {
+                if (!$isFree && $tool) {
                     $toolsCount++;
+                    
+                    $toolMonthlyPrice = 100; // Fallback
+                    if (isset($tool['plans']) && is_array($tool['plans']) && count($tool['plans']) > 0) {
+                        $firstPlan = reset($tool['plans']);
+                        if (isset($firstPlan['price_monthly'])) {
+                            $toolMonthlyPrice = $firstPlan['price_monthly'];
+                        }
+                    }
+                    $toolsTotalEGP += $toolMonthlyPrice;
                 }
             }
         }
 
         // Apply tool volume discount
         if ($toolsCount > 0) {
-            $toolBaseMonthlyEGP = 100; // 1000 yearly / 10
             $discountPercent = min(50, ($toolsCount - 1) * 10);
-            $toolsTotalEGP = ($toolBaseMonthlyEGP * $toolsCount) * (1 - ($discountPercent / 100));
+            $toolsTotalEGP = $toolsTotalEGP * (1 - ($discountPercent / 100));
             $totalUsd += ($toolsTotalEGP / $egpRate); // Convert discounted total EGP to USD
         }
 

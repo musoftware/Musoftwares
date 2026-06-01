@@ -38,7 +38,7 @@ return [
                 'guid' => '9e8b5cfc-30e4-4bf3-944c-a11214d6b58f',
                 'name' => 'Creator Intelligence',
                 'price_monthly' => 100,
-                'price_yearly' => 0,
+                'price_yearly' => 1000,
                 'is_popular' => false,
                 'features' => array (
   0 => 'Creator Discovery Engine',
@@ -51,7 +51,7 @@ return [
                 'guid' => '8b4ae73a-fbf6-4fc9-8752-88590a7ce10a',
                 'name' => 'Market Intelligence',
                 'price_monthly' => 100,
-                'price_yearly' => 0,
+                'price_yearly' => 1000,
                 'is_popular' => true,
                 'features' => array (
   0 => 'Lead Enrichment Pipeline',
@@ -101,7 +101,7 @@ return [
                 'guid' => '48e3a0de-67c3-48a0-9bcc-573ea4748bd6',
                 'name' => 'Prospector',
                 'price_monthly' => 100,
-                'price_yearly' => 0,
+                'price_yearly' => 1000,
                 'is_popular' => false,
                 'features' => array (
   0 => '10,000 scrapes/day',
@@ -114,7 +114,7 @@ return [
                 'guid' => '2ceadfb7-e5d1-46fc-a246-59436007fd57',
                 'name' => 'Enterprise Intelligence',
                 'price_monthly' => 100,
-                'price_yearly' => 0,
+                'price_yearly' => 1000,
                 'is_popular' => true,
                 'features' => array (
   0 => 'Unlimited scraping limits',
@@ -163,7 +163,7 @@ return [
                 'guid' => 'bac44854-dbc4-4689-996a-d8cf9593c4be',
                 'name' => 'Watcher',
                 'price_monthly' => 100,
-                'price_yearly' => 0,
+                'price_yearly' => 1000,
                 'is_popular' => false,
                 'features' => array (
   0 => '5 competitors',
@@ -174,7 +174,7 @@ return [
                 'guid' => '6f6387c2-ea22-4e80-ad67-547b885500f0',
                 'name' => 'Hunter',
                 'price_monthly' => 100,
-                'price_yearly' => 0,
+                'price_yearly' => 1000,
                 'is_popular' => true,
                 'features' => array (
   0 => 'Unlimited competitors',
@@ -223,7 +223,7 @@ return [
                 'guid' => '9a95a2ab-42c7-4a8e-bc47-79b8e3e5470d',
                 'name' => 'Starter',
                 'price_monthly' => 250,
-                'price_yearly' => 0,
+                'price_yearly' => 1000,
                 'is_popular' => false,
                 'features' => array (
   0 => '1 Connected Number',
@@ -235,7 +235,7 @@ return [
                 'guid' => 'd71b5ed6-e3df-43d5-b14c-333fd4f32d17',
                 'name' => 'Enterprise',
                 'price_monthly' => 250,
-                'price_yearly' => 0,
+                'price_yearly' => 1000,
                 'is_popular' => true,
                 'features' => array (
   0 => 'Unlimited Numbers',
@@ -288,7 +288,7 @@ Get a Viral Score (0-100) with detailed per-dimension breakdown.',
                 'guid' => '496bab34-d90e-46d9-b2cc-1779da9ddb62',
                 'name' => 'Free',
                 'price_monthly' => 100,
-                'price_yearly' => 0,
+                'price_yearly' => 1000,
                 'is_popular' => false,
                 'features' => array (
   0 => '3 analyses/day',
@@ -299,7 +299,7 @@ Get a Viral Score (0-100) with detailed per-dimension breakdown.',
                 'guid' => '25e290eb-7429-4110-8e3b-fba92d9621e4',
                 'name' => 'Pro',
                 'price_monthly' => 100,
-                'price_yearly' => 0,
+                'price_yearly' => 1000,
                 'is_popular' => true,
                 'features' => array (
   0 => 'Unlimited analyses',
@@ -349,7 +349,7 @@ Get a Viral Score (0-100) with detailed per-dimension breakdown.',
                 'guid' => '9c7070a2-53e2-490b-9da2-37a1806d3ce5',
                 'name' => 'Free',
                 'price_monthly' => 100,
-                'price_yearly' => 0,
+                'price_yearly' => 1000,
                 'is_popular' => false,
                 'features' => array (
   0 => '5 analyses/day',
@@ -360,7 +360,7 @@ Get a Viral Score (0-100) with detailed per-dimension breakdown.',
                 'guid' => 'df148830-7a9b-4406-bfb7-ddecc6577cfb',
                 'name' => 'Pro',
                 'price_monthly' => 100,
-                'price_yearly' => 0,
+                'price_yearly' => 1000,
                 'is_popular' => true,
                 'features' => array (
   0 => 'Unlimited analyses',
@@ -412,7 +412,7 @@ Not copying content — copying the psychology.
                 'guid' => '5a1e6dfb-4889-4f28-bcce-5d778aa93214',
                 'name' => 'Free',
                 'price_monthly' => 100,
-                'price_yearly' => 0,
+                'price_yearly' => 1000,
                 'is_popular' => false,
                 'features' => array (
   0 => '3 extractions/day',
@@ -422,7 +422,7 @@ Not copying content — copying the psychology.
                 'guid' => '4640844a-c4cd-4df1-b84f-944c4771d899',
                 'name' => 'Pro',
                 'price_monthly' => 100,
-                'price_yearly' => 0,
+                'price_yearly' => 1000,
                 'is_popular' => true,
                 'features' => array (
   0 => 'Unlimited extractions',
@@ -471,7 +471,7 @@ Not copying content — copying the psychology.
                 'guid' => 'e4feca57-36c8-4152-b243-39c44063c6f3',
                 'name' => 'Free Live Stream Capture',
                 'price_monthly' => 100,
-                'price_yearly' => 0,
+                'price_yearly' => 1000,
                 'is_popular' => true,
                 'features' => array (
   0 => 'Unlimited Playlist Indexing',
@@ -519,7 +519,7 @@ Not copying content — copying the psychology.
                 'guid' => '1b25fd48-2ec8-49da-b3c2-ef153b4088be',
                 'name' => 'Free Reviewer',
                 'price_monthly' => 100,
-                'price_yearly' => 0,
+                'price_yearly' => 1000,
                 'is_popular' => true,
                 'features' => array (
   0 => 'Unlimited Pins',
@@ -569,7 +569,7 @@ Not copying content — copying the psychology.
                 'guid' => '8107329a-d69b-4c9a-9ecb-a41fd56bbc60',
                 'name' => 'Free',
                 'price_monthly' => 100,
-                'price_yearly' => 0,
+                'price_yearly' => 1000,
                 'is_popular' => true,
                 'features' => array (
   0 => 'Unlimited extractions',
@@ -610,7 +610,7 @@ Not copying content — copying the psychology.
                 'guid' => '123e4567-e89b-12d3-a456-426614174001',
                 'name' => 'Free',
                 'price_monthly' => 100,
-                'price_yearly' => 0,
+                'price_yearly' => 1000,
                 'is_popular' => true,
                 'features' => [
                     'Unlimited Campaigns',
@@ -651,7 +651,7 @@ Not copying content — copying the psychology.
                 'guid' => 'fbe12345-0000-0000-0000-000000000001',
                 'name' => 'Free',
                 'price_monthly' => 100,
-                'price_yearly' => 0,
+                'price_yearly' => 1000,
                 'is_popular' => true,
                 'features' => [
                     'Unlimited Extractions',
@@ -697,7 +697,7 @@ Not copying content — copying the psychology.
                 'guid' => '734d284a-d83a-4a5e-b2d9-1c94b79cfb72',
                 'name' => 'Free',
                 'price_monthly' => 100,
-                'price_yearly' => 0,
+                'price_yearly' => 1000,
                 'is_popular' => true,
                 'features' => [
                     'Unlimited Searches',
@@ -739,7 +739,7 @@ Not copying content — copying the psychology.
                 'guid' => '2f2b3e44-1234-4a5b-9c76-26c2688e3d8f',
                 'name' => 'Free',
                 'price_monthly' => 100,
-                'price_yearly' => 0,
+                'price_yearly' => 1000,
                 'is_popular' => true,
                 'features' => [
                     'Unlimited rows',
@@ -784,7 +784,7 @@ Not copying content — copying the psychology.
                 'guid' => '3f9c48b2-1a2b-4c3d-8e5f-123456789abc',
                 'name' => 'Pro Auto Publisher',
                 'price_monthly' => 100,
-                'price_yearly' => 0,
+                'price_yearly' => 1000,
                 'is_popular' => true,
                 'features' => [
                     'Unlimited Uploads',
@@ -831,7 +831,7 @@ Not copying content — copying the psychology.
                 'guid' => 'f7091a13-4c92-4840-89dc-555e88863f82',
                 'name' => 'Free',
                 'price_monthly' => 100,
-                'price_yearly' => 0,
+                'price_yearly' => 1000,
                 'is_popular' => true,
                 'features' => [
                     'Unlimited Domain Checks',
@@ -876,7 +876,7 @@ Not copying content — copying the psychology.
                 'guid' => '2a188f11-2e6b-4cf7-8d2a-43bc0e3d93b1',
                 'name' => 'Free',
                 'price_monthly' => 100,
-                'price_yearly' => 0,
+                'price_yearly' => 1000,
                 'is_popular' => true,
                 'features' => [
                     'Unlimited Searches',
@@ -922,7 +922,7 @@ Not copying content — copying the psychology.
                 'guid' => '5c34e8d3-5a04-44b2-b430-8d594bbcd621',
                 'name' => 'Free',
                 'price_monthly' => 100,
-                'price_yearly' => 0,
+                'price_yearly' => 1000,
                 'is_popular' => true,
                 'features' => [
                     'Unlimited Campaigns',
@@ -968,7 +968,7 @@ Not copying content — copying the psychology.
                 'guid' => 'f2a24d5b-11c5-4a8f-b9b2-a4f6d4d1e7e4',
                 'name' => 'Free Downloader',
                 'price_monthly' => 100,
-                'price_yearly' => 0,
+                'price_yearly' => 1000,
                 'is_popular' => true,
                 'features' => [
                     'Unlimited Downloads',
@@ -1013,7 +1013,7 @@ Not copying content — copying the psychology.
                 'guid' => '5c1417a8-8e60-4e58-944a-3a3f5a54db52',
                 'name' => 'Free',
                 'price_monthly' => 100,
-                'price_yearly' => 0,
+                'price_yearly' => 1000,
                 'is_popular' => true,
                 'features' => [
                     'Unlimited Searches',
@@ -1059,7 +1059,7 @@ Not copying content — copying the psychology.
                 'guid' => 'a1b2c3d4-1111-4aaa-bbbb-111111111112',
                 'name' => 'Free',
                 'price_monthly' => 100,
-                'price_yearly' => 0,
+                'price_yearly' => 1000,
                 'is_popular' => true,
                 'features' => [
                     'Unlimited Extractions',
@@ -1103,8 +1103,8 @@ Not copying content — copying the psychology.
             'a1b2c3d4-2222-4aaa-bbbb-222222222223' => [
                 'guid' => 'a1b2c3d4-2222-4aaa-bbbb-222222222223',
                 'name' => 'Pro',
-                'price_monthly' => 350,
-                'price_yearly' => 0,
+                'price_monthly' => 1000,
+                'price_yearly' => 10000,
                 'is_popular' => true,
                 'features' => [
                     'Unlimited Downloads',
@@ -1151,7 +1151,7 @@ Not copying content — copying the psychology.
                 'guid' => 'a1b2c3d4-3333-4aaa-bbbb-333333333334',
                 'name' => 'Free',
                 'price_monthly' => 100,
-                'price_yearly' => 0,
+                'price_yearly' => 1000,
                 'is_popular' => true,
                 'features' => [
                     'Unlimited Extractions',
@@ -1197,7 +1197,7 @@ Not copying content — copying the psychology.
                 'guid' => 'a1b2c3d4-4444-4aaa-bbbb-444444444445',
                 'name' => 'Free',
                 'price_monthly' => 250,
-                'price_yearly' => 0,
+                'price_yearly' => 1000,
                 'is_popular' => true,
                 'features' => [
                     'Unlimited Conversations',
@@ -1245,7 +1245,7 @@ Not copying content — copying the psychology.
                 'guid' => 'a1b2c3d4-5555-4aaa-bbbb-555555555556',
                 'name' => 'Free',
                 'price_monthly' => 250,
-                'price_yearly' => 0,
+                'price_yearly' => 1000,
                 'is_popular' => true,
                 'features' => [
                     'Unlimited Funnels',
@@ -1293,7 +1293,7 @@ Not copying content — copying the psychology.
                 'guid' => 'a1b2c3d4-6666-4aaa-bbbb-666666666667',
                 'name' => 'Free',
                 'price_monthly' => 250,
-                'price_yearly' => 0,
+                'price_yearly' => 1000,
                 'is_popular' => true,
                 'features' => [
                     'Unlimited Warmup Sessions',
@@ -1341,7 +1341,7 @@ Not copying content — copying the psychology.
                 'guid' => 'a1b2c3d4-7777-4aaa-bbbb-777777777778',
                 'name' => 'Free',
                 'price_monthly' => 100,
-                'price_yearly' => 0,
+                'price_yearly' => 1000,
                 'is_popular' => true,
                 'features' => [
                     'Unlimited Messages',
@@ -1389,7 +1389,7 @@ Not copying content — copying the psychology.
                 'guid' => 'a1b2c3d4-8888-4aaa-bbbb-888888888889',
                 'name' => 'Free',
                 'price_monthly' => 100,
-                'price_yearly' => 0,
+                'price_yearly' => 1000,
                 'is_popular' => true,
                 'features' => [
                     'Unlimited Operations',
@@ -1436,7 +1436,7 @@ Not copying content — copying the psychology.
                 'guid' => 'a1b2c3d4-9999-4aaa-bbbb-999999999990',
                 'name' => 'Free',
                 'price_monthly' => 100,
-                'price_yearly' => 0,
+                'price_yearly' => 1000,
                 'is_popular' => true,
                 'features' => [
                     'Unlimited Extractions',
@@ -1484,7 +1484,7 @@ Not copying content — copying the psychology.
                 'guid' => 'a1b2c3d4-aaaa-4aaa-bbbb-aaaaaaaaaaab',
                 'name' => 'Free',
                 'price_monthly' => 100,
-                'price_yearly' => 0,
+                'price_yearly' => 1000,
                 'is_popular' => true,
                 'features' => [
                     'Unlimited Messages',
@@ -1531,7 +1531,7 @@ Not copying content — copying the psychology.
                 'guid' => 'a1b2c3d4-bbbb-4aaa-bbbb-bbbbbbbbbbbc',
                 'name' => 'Free',
                 'price_monthly' => 100,
-                'price_yearly' => 0,
+                'price_yearly' => 1000,
                 'is_popular' => true,
                 'features' => [
                     'Unlimited Articles',
@@ -1576,7 +1576,7 @@ Not copying content — copying the psychology.
                 'guid' => 'a1b2c3d4-cccc-4aaa-bbbb-cccccccccccd',
                 'name' => 'Free',
                 'price_monthly' => 100,
-                'price_yearly' => 0,
+                'price_yearly' => 1000,
                 'is_popular' => true,
                 'features' => [
                     'Unlimited Tracking',
@@ -1621,7 +1621,7 @@ Not copying content — copying the psychology.
                 'guid' => 'a1b2c3d4-dddd-4aaa-bbbb-ddddddddddde',
                 'name' => 'Free',
                 'price_monthly' => 100,
-                'price_yearly' => 0,
+                'price_yearly' => 1000,
                 'is_popular' => true,
                 'features' => [
                     'Unlimited Monitoring',
@@ -1666,7 +1666,7 @@ Not copying content — copying the psychology.
                 'guid' => 'a1b2c3d4-eeee-4aaa-bbbb-eeeeeeeeeeef',
                 'name' => 'Free',
                 'price_monthly' => 100,
-                'price_yearly' => 0,
+                'price_yearly' => 1000,
                 'is_popular' => true,
                 'features' => [
                     'Unlimited Searches',
@@ -1711,7 +1711,7 @@ Not copying content — copying the psychology.
                 'guid' => 'a1b2c3d4-ffff-4aaa-bbbb-ffffffffffff',
                 'name' => 'Free',
                 'price_monthly' => 100,
-                'price_yearly' => 0,
+                'price_yearly' => 1000,
                 'is_popular' => true,
                 'features' => [
                     'Unlimited Saves',
@@ -1740,7 +1740,7 @@ Not copying content — copying the psychology.
                 'guid' => '33fc05d4-e756-4a97-be62-dab6e02a9e08',
                 'name' => 'Free',
                 'price_monthly' => 0,
-                'price_yearly' => 0,
+                'price_yearly' => 1000,
                 'is_popular' => true,
                 'features' => ['Unlimited Scans', 'Local DB Storage'],
             ],
@@ -1766,7 +1766,7 @@ Not copying content — copying the psychology.
                 'guid' => '13e16a75-3ea3-4449-8fba-3ba7fcfbbbde',
                 'name' => 'Free',
                 'price_monthly' => 0,
-                'price_yearly' => 0,
+                'price_yearly' => 1000,
                 'is_popular' => true,
                 'features' => ['Unlimited Obfuscation'],
             ],
@@ -1792,7 +1792,7 @@ Not copying content — copying the psychology.
                 'guid' => '39ff7878-86e3-4c7a-821b-58357e0eca03',
                 'name' => 'Free',
                 'price_monthly' => 0,
-                'price_yearly' => 0,
+                'price_yearly' => 1000,
                 'is_popular' => true,
                 'features' => ['Unlimited Scans'],
             ],
@@ -1833,7 +1833,7 @@ Not copying content — copying the psychology.
                 'guid' => '50c3d9a1-7788-444f-8a43-9828557a2c6e',
                 'name' => 'Free',
                 'price_monthly' => 0,
-                'price_yearly' => 0,
+                'price_yearly' => 1000,
                 'is_popular' => true,
                 'features' => [
                     'Unlimited use',
