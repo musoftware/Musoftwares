@@ -60,6 +60,10 @@ class SubscriptionController extends Controller
      */
     public function checkout(string $slug, string $planGuid): RedirectResponse
     {
+        $tool = collect(config('tools'))->firstWhere('slug', $slug);
+        if ($tool) {
+            return redirect()->route('subscriptions.plans', ['module' => 'tool-' . $tool['guid']]);
+        }
         return redirect()->route('subscriptions.plans');
     }
 
