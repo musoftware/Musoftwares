@@ -16,12 +16,34 @@ import { Input } from "@/Components/ui/input";
 import { Label } from "@/Components/ui/label";
 import { __ } from '@/lib/i18n';
 
-export default function Index({ campaigns }) {
+interface Campaign {
+    id: number;
+    name: string;
+    type: string;
+    status: string;
+    target_audience: string;
+    scheduled_at: string | null;
+    completed_at: string | null;
+}
+
+interface PaginatedData<T> {
+    data: T[];
+    current_page: number;
+    last_page: number;
+    per_page: number;
+    total: number;
+}
+
+interface Props {
+    campaigns: PaginatedData<Campaign>;
+}
+
+export default function Index({ campaigns }: Props) {
     const { auth } = usePage().props as any;
     const [isCreateOpen, setIsCreateOpen] = React.useState(false);
     const [newCampaign, setNewCampaign] = React.useState({ name: '', type: 'email', target_audience: 'all_leads' });
 
-    const handleCreate = (e) => {
+    const handleCreate = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         router.post(route('crm.campaigns.store'), newCampaign, {
             onSuccess: () => {
@@ -31,13 +53,13 @@ export default function Index({ campaigns }) {
         });
     };
 
-    const handleDelete = (id) => {
+    const handleDelete = (id: number) => {
         if (confirm(__('general.are_you_sure_you_want_to_delete_this_campaign'))) {
             router.delete(route('crm.campaigns.destroy', id));
         }
     };
 
-    const getStatusColor = (status) => {
+    const getStatusColor = (status: string) => {
         switch (status) {
             case 'draft': return 'bg-gray-100 text-gray-800';
             case 'scheduled': return 'bg-blue-100 text-blue-800';
@@ -104,7 +126,7 @@ export default function Index({ campaigns }) {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {campaigns.data.map(campaign => (
+                {campaigns.data.map((campaign: Campaign) => (
                     <div key={campaign.id} className="bg-white rounded-lg shadow border overflow-hidden flex flex-col">
                         <div className="p-5 flex-1">
                             <div className="flex justify-between items-start mb-4">
@@ -126,8 +148,8 @@ export default function Index({ campaigns }) {
                                 <div className="flex items-center text-sm text-gray-500">
                                     <Clock className="w-4 h-4 mr-2 text-gray-400" />
                                     <span>
-                                        {campaign.status === 'scheduled' ? `${__('general.scheduled')}: ${new Date(campaign.scheduled_at).toLocaleString()}` : 
-                                         campaign.status === 'completed' ? `${__('general.finished')}: ${new Date(campaign.completed_at).toLocaleDateString()}` : 
+                                        {campaign.status === 'scheduled' ? `${__('general.scheduled')}: ${new Date(campaign.scheduled_at!).toLocaleString()}` : 
+                                         campaign.status === 'completed' ? `${__('general.finished')}: ${new Date(campaign.completed_at!).toLocaleDateString()}` : 
                                          __('general.not_scheduled')}
                                     </span>
                                 </div>
