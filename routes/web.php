@@ -765,10 +765,10 @@ Route::middleware(['auth', 'verified'])->prefix('api')->group(function () {
     // Route::post('/conversations/{id}/messages', [\App\Http\Controllers\MessageController::class, 'store']);
 
     // Admin Notes
-    // Route::get('/admin-notes', [\App\Http\Controllers\AdminNoteController::class, 'index']);
-    // Route::post('/admin-notes', [\App\Http\Controllers\AdminNoteController::class, 'store']);
-    // Route::patch('/admin-notes/{note}/pin', [\App\Http\Controllers\AdminNoteController::class, 'togglePin']);
-    // Route::delete('/admin-notes/{note}', [\App\Http\Controllers\AdminNoteController::class, 'destroy']);
+    Route::get('/admin-notes', [\App\Http\Controllers\AdminNoteController::class, 'index']);
+    Route::post('/admin-notes', [\App\Http\Controllers\AdminNoteController::class, 'store']);
+    Route::patch('/admin-notes/{note}/pin', [\App\Http\Controllers\AdminNoteController::class, 'togglePin']);
+    Route::delete('/admin-notes/{note}', [\App\Http\Controllers\AdminNoteController::class, 'destroy']);
 });
 
 // New API routes for polling

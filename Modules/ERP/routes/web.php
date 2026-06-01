@@ -49,6 +49,10 @@ Route::middleware(['web', 'auth:web,erp_team', 'tenant.active'])
         Route::resource('recurring', \Modules\ERP\Http\Controllers\RecurringController::class);
 
         // ── Withdrawals ──
+        Route::post('withdrawals/{withdrawal}/approve', [\Modules\ERP\Http\Controllers\WithdrawalController::class, 'approve'])->name('withdrawals.approve');
+        Route::post('withdrawals/{withdrawal}/mark-paid', [\Modules\ERP\Http\Controllers\WithdrawalController::class, 'markPaid'])->name('withdrawals.mark-paid');
+        Route::post('withdrawals/{withdrawal}/reject', [\Modules\ERP\Http\Controllers\WithdrawalController::class, 'reject'])->name('withdrawals.reject');
+        Route::post('withdrawals/{withdrawal}/cancel', [\Modules\ERP\Http\Controllers\WithdrawalController::class, 'cancel'])->name('withdrawals.cancel');
         Route::resource('withdrawals', \Modules\ERP\Http\Controllers\WithdrawalController::class);
 
         // ── Payment Methods ──

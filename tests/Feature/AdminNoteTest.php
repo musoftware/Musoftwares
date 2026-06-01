@@ -39,7 +39,7 @@ class AdminNoteTest extends TestCase
             'name' => 'Fraudulent Client Corp',
             'email' => 'suspicious@corp.com',
             'phone' => '+1555000000',
-            'currency' => 'USD',
+            'currency_id' => 1,
             'address' => 'Unknown St',
         ]);
     }
