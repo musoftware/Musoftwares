@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 
 const getRuntimeHost = () =>
-    typeof window !== 'undefined' ? (window.localStorage.getItem('musoftware_runtime_host') || '127.0.0.1') : '127.0.0.1';
+    typeof window !== 'undefined' ? ((window as any).MUSOFTWARE_RUNTIME_HOST || '127.0.0.1') : '127.0.0.1';
 const getWsUrl = () => `ws://${getRuntimeHost()}:18401/ws`;
 
 export function useRuntimeRPC(pluginSlug: string) {

@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
+import axios from 'axios';
 import { cn } from '@/lib/utils';
 import { Button } from '@/Components/ui/button';
 import { Link } from '@inertiajs/react';
@@ -130,13 +131,6 @@ export default function PricingBuilder({
         }
     };
 
-    const multiplier = useMemo(() => {
-        if (billing === '1_month') return 1;
-        if (billing === '6_months') return 6;
-        if (billing === '1_year') return 10; // 2 months free
-        return 1;
-    }, [billing]);
-
     const months = useMemo(() => {
         if (billing === '1_month') return 1;
         if (billing === '6_months') return 6;
@@ -148,57 +142,41 @@ export default function PricingBuilder({
         return item.monthly_price * months;
     };
 
-    const subtotal = useMemo(() => {
-        let baseSubtotal = 0;
-        let paidToolsCount = 0;
-        let toolsBaseTotal = 0;
+    const [calcResult, setCalcResult] = useState<{toolsDiscount: number, annualDiscount: number, total: number} | null>(null);
+    const [isCalculating, setIsCalculating] = useState(false);
 
-        selectedItems.forEach((id) => {
-            const item = serviceItems.find((i) => i.id === id);
-            if (item) {
-                if (item.type === 'tool') {
-                    if (item.monthly_price > 0) {
-                        paidToolsCount++;
-                        toolsBaseTotal += item.monthly_price;
-                    }
-                } else {
-                    baseSubtotal += item.monthly_price;
+    useEffect(() => {
+        let isMounted = true;
+        const fetchCalc = async () => {
+            if (selectedItems.length === 0) {
+                if (isMounted) setCalcResult(null);
+                return;
+            }
+            setIsCalculating(true);
+            try {
+                const res = await axios.post('/subscriptions/calculate-custom', {
+                    items: selectedItems,
+                    billing_cycle: billing
+                });
+                if (isMounted) {
+                    setCalcResult(res.data);
                 }
+            } catch (e) {
+                console.error("Pricing calculation error:", e);
+            } finally {
+                if (isMounted) setIsCalculating(false);
             }
-        });
+        };
+        const timer = setTimeout(fetchCalc, 300);
+        return () => {
+            isMounted = false;
+            clearTimeout(timer);
+        };
+    }, [selectedItems, billing]);
 
-        let toolsSubtotal = 0;
-        if (paidToolsCount > 0) {
-            const discountPercent = Math.min(50, (paidToolsCount - 1) * 10);
-            toolsSubtotal = toolsBaseTotal * (1 - (discountPercent / 100));
-        }
-
-        return baseSubtotal + toolsSubtotal;
-    }, [selectedItems, serviceItems]);
-
-    const toolsDiscount = useMemo(() => {
-        let paidToolsCount = 0;
-        let toolsBaseTotal = 0;
-        
-        selectedItems.forEach((id) => {
-            const item = serviceItems.find((i) => i.id === id);
-            if (item && item.type === 'tool' && item.monthly_price > 0) {
-                paidToolsCount++;
-                toolsBaseTotal += item.monthly_price;
-            }
-        });
-
-        if (paidToolsCount <= 1) return 0;
-        
-        const discountPercent = Math.min(50, (paidToolsCount - 1) * 10);
-        const discountedToolsPrice = toolsBaseTotal * (1 - (discountPercent / 100));
-        
-        return (toolsBaseTotal - discountedToolsPrice) * months;
-    }, [selectedItems, serviceItems, months]);
-
-    const total = subtotal * multiplier;
-    const originalTotal = subtotal * months;
-    const discount = originalTotal - total;
+    const toolsDiscount = calcResult?.toolsDiscount || 0;
+    const discount = calcResult?.annualDiscount || 0;
+    const total = calcResult?.total || 0;
 
     const renderItemCard = (item: ServiceItem, isAddon: boolean = false) => {
         const isSelected = selectedItems.includes(item.id);
@@ -419,7 +397,7 @@ export default function PricingBuilder({
 
                                 <div className="flex justify-between items-end">
                                     <span className="text-base font-medium text-slate-900">{__('general.total_to_pay')}</span>
-                                    <div className="text-right">
+                                    <div className={cn("text-right", isCalculating && "opacity-50 transition-opacity")}>
                                         <span className="text-3xl font-bold tracking-tight text-indigo-600">
                                             {Math.max(0, total - (!isNewSystem ? proratedRefund : 0)).toFixed(2)}
                                         </span>

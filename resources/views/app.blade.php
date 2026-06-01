@@ -21,6 +21,24 @@
         <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
 
         <!-- Scripts -->
+        @php
+            $runtimeHost = '127.0.0.1';
+            $user = auth()->user();
+            if (!$user && auth('erp_team')->check()) {
+                $user = auth('erp_team')->user()?->tenant?->user;
+            }
+            if (!$user && auth('crm_team')->check()) {
+                $crmMember = auth('crm_team')->user();
+                $user = $crmMember?->workspace?->owner;
+            }
+            if ($user && is_array($user->workspace_settings) && isset($user->workspace_settings['runtimeHost'])) {
+                $runtimeHost = $user->workspace_settings['runtimeHost'];
+            }
+        @endphp
+        <script>
+            window.MUSOFTWARE_RUNTIME_HOST = @json($runtimeHost);
+        </script>
+
         @routes
         @viteReactRefresh
         @php

@@ -13,7 +13,7 @@ import { Switch } from '@/Components/ui/switch';
 import { Textarea } from '@/Components/ui/textarea';
 import { __ } from '@/lib/i18n';
 
-const getRuntimeHost = () => typeof window !== 'undefined' ? (window.localStorage.getItem('musoftware_runtime_host') || '127.0.0.1') : '127.0.0.1';
+const getRuntimeHost = () => typeof window !== 'undefined' ? ((window as any).MUSOFTWARE_RUNTIME_HOST || '127.0.0.1') : '127.0.0.1';
 const getRuntimeHttp = () => `http://${getRuntimeHost()}:18400`;
 const getWsUrl       = () => `ws://${getRuntimeHost()}:18401/ws`;
 

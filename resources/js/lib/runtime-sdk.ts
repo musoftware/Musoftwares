@@ -49,7 +49,7 @@ class MusoftwareRuntimeSDK {
 
     get runtimeHost(): string {
         if (typeof window !== 'undefined') {
-            return window.localStorage.getItem('musoftware_runtime_host') || '127.0.0.1';
+            return (window as any).MUSOFTWARE_RUNTIME_HOST || '127.0.0.1';
         }
         return '127.0.0.1';
     }
@@ -65,7 +65,7 @@ class MusoftwareRuntimeSDK {
     setHost(host: string) {
         if (typeof window !== 'undefined') {
             const cleanHost = host.trim().replace(/^https?:\/\//i, '').replace(/:1840[0-9]/, '');
-            window.localStorage.setItem('musoftware_runtime_host', cleanHost);
+            (window as any).MUSOFTWARE_RUNTIME_HOST = cleanHost;
             this.disconnect();
             this.connect();
         }

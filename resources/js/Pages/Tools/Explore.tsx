@@ -125,7 +125,6 @@ export default function Explore({ tools, categories, subscribedSlugs, hasBrowser
     const [prayerCountry, setPrayerCountry] = useState(workspaceSettings?.prayerCountry || 'Egypt');
     const [prayerMethod, setPrayerMethod] = useState(workspaceSettings?.prayerMethod || '5');
 
-    // Desktop Settings Sync Wrapper
     const saveSettings = (
         newItems: DesktopItem[], 
         prayerTimes: boolean, 
@@ -133,7 +132,9 @@ export default function Explore({ tools, categories, subscribedSlugs, hasBrowser
         city = prayerCity,
         country = prayerCountry,
         method = prayerMethod,
-        oneClick = openWithOneClick
+        oneClick = openWithOneClick,
+        host = runtimeHost,
+        windows = activeWindows
     ) => {
         axios.post(route('tools.workspace.settings.save'), {
             settings: {
@@ -143,7 +144,9 @@ export default function Explore({ tools, categories, subscribedSlugs, hasBrowser
                 prayerCity: city,
                 prayerCountry: country,
                 prayerMethod: method,
-                openWithOneClick: oneClick
+                openWithOneClick: oneClick,
+                runtimeHost: host,
+                activeWindows: windows
             }
         }).catch(err => console.error("Failed to save workspace settings:", err));
     };
@@ -170,10 +173,15 @@ export default function Explore({ tools, categories, subscribedSlugs, hasBrowser
     const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
     const [wallpaperUrl, setWallpaperUrl] = useState(workspaceSettings?.wallpaperUrl || DEFAULT_WALLPAPER_URL);
     const [openWithOneClick, setOpenWithOneClick] = useState(workspaceSettings?.openWithOneClick || false);
+    const [runtimeHost, setRuntimeHost] = useState(workspaceSettings?.runtimeHost || '127.0.0.1');
     
     // Window Manager State
-    const [activeWindows, setActiveWindows] = useState<{ id: string; slug: string; title: string; iconUrl?: string | null; isMinimized: boolean; isMaximized: boolean; zIndex: number }[]>([]);
-    const [maxZIndex, setMaxZIndex] = useState(10);
+    const [activeWindows, setActiveWindows] = useState<{ id: string; slug: string; title: string; iconUrl?: string | null; isMinimized: boolean; isMaximized: boolean; zIndex: number }[]>(workspaceSettings?.activeWindows || []);
+    const [maxZIndex, setMaxZIndex] = useState(() => {
+        const windows = workspaceSettings?.activeWindows || [];
+        if (windows.length === 0) return 10;
+        return Math.max(10, ...windows.map((w: any) => w.zIndex || 10));
+    });
     
     // Advanced Desktop Features State
     const [selectedItemIds, setSelectedItemIds] = useState<string[]>([]);
@@ -480,17 +488,15 @@ export default function Explore({ tools, categories, subscribedSlugs, hasBrowser
         }
     }, [tools.data]);
 
-    // Persist layout on change
+    // Persist layout and windows on change
     const isFirstRender = useRef(true);
     useEffect(() => {
         if (isFirstRender.current) {
             isFirstRender.current = false;
             return;
         }
-        if (desktopItems.length > 0) {
-            saveSettings(desktopItems, showPrayerTimes, wallpaperUrl);
-        }
-    }, [desktopItems]);
+        saveSettings(desktopItems, showPrayerTimes, wallpaperUrl, prayerCity, prayerCountry, prayerMethod, openWithOneClick, runtimeHost, activeWindows);
+    }, [desktopItems, activeWindows, runtimeHost]);
 
     const handleCreateFolder = () => {
         const { x, y } = findNextAvailableCell(desktopItems);
@@ -1160,6 +1166,11 @@ export default function Explore({ tools, categories, subscribedSlugs, hasBrowser
                 onPrayerSettingsChange={handlePrayerSettingsChange}
                 openWithOneClick={openWithOneClick}
                 onToggleOneClick={handleToggleOneClick}
+                runtimeHost={runtimeHost}
+                onRuntimeHostChange={(host) => {
+                    setRuntimeHost(host);
+                    saveSettings(desktopItems, showPrayerTimes, wallpaperUrl, prayerCity, prayerCountry, prayerMethod, openWithOneClick, host);
+                }}
             />
 
             <ContextMenu 

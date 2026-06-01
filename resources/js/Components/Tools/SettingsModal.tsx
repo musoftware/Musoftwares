@@ -15,6 +15,8 @@ interface SettingsModalProps {
     onPrayerSettingsChange: (city: string, country: string, method: string) => void;
     openWithOneClick: boolean;
     onToggleOneClick: () => void;
+    runtimeHost: string;
+    onRuntimeHostChange: (host: string) => void;
 }
 
 const DEFAULT_WALLPAPERS = [
@@ -25,7 +27,7 @@ const DEFAULT_WALLPAPERS = [
     'https://images.unsplash.com/photo-1506744626753-143d4eb2c842?q=80&w=2560&auto=format&fit=crop',
 ];
 
-export function SettingsModal({ isOpen, onClose, showPrayerTimes, onTogglePrayerTimes, wallpaperUrl, onWallpaperChange, prayerCity, prayerCountry, prayerMethod, onPrayerSettingsChange, openWithOneClick, onToggleOneClick }: SettingsModalProps) {
+export function SettingsModal({ isOpen, onClose, showPrayerTimes, onTogglePrayerTimes, wallpaperUrl, onWallpaperChange, prayerCity, prayerCountry, prayerMethod, onPrayerSettingsChange, openWithOneClick, onToggleOneClick, runtimeHost, onRuntimeHostChange }: SettingsModalProps) {
     const [wallpapers, setWallpapers] = useState<string[]>([]);
 
     useEffect(() => {
@@ -88,6 +90,22 @@ export function SettingsModal({ isOpen, onClose, showPrayerTimes, onTogglePrayer
                                     <input type="checkbox" className="sr-only peer" checked={showPrayerTimes} onChange={onTogglePrayerTimes} />
                                     <div className="w-11 h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
                                 </label>
+                            </div>
+
+                            <div className="flex items-center justify-between mt-2 pt-3 border-t border-white/10">
+                                <div>
+                                    <h4 className="font-medium">{__('general.runtime_host_ip')}</h4>
+                                    <p className="text-xs text-slate-400 mt-1">{__('general.the_local_ip_address_of_your_musoftware_runtime_agent')}</p>
+                                </div>
+                                <div className="w-48">
+                                    <input 
+                                        type="text"
+                                        value={runtimeHost}
+                                        onChange={(e) => onRuntimeHostChange(e.target.value)}
+                                        className="w-full bg-[#1c1c1c] border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500 transition-colors text-right"
+                                        placeholder="127.0.0.1"
+                                    />
+                                </div>
                             </div>
                             
                             {showPrayerTimes && (
