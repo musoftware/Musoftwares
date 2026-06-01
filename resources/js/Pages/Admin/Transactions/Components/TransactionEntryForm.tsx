@@ -58,6 +58,10 @@ export default function TransactionEntryForm({ user, selectedProject, activeProj
         data: [] as any[]
     });
 
+    useEffect(() => {
+        setData('type', type);
+    }, [type]);
+
     const feeSources = [
         { id: 'upwork', label: 'Upwork', icon: 'fas fa-briefcase', color: '#14a800', hint: '20% Platform Fee', fee_rate: 0.20, fee_text: '20%' },
         { id: 'paypal', label: 'Paypal', icon: 'fab fa-paypal', color: '#003087', hint: 'Transaction Fee', fee_rate: 0.05, fee_text: '5%' },
@@ -109,12 +113,13 @@ export default function TransactionEntryForm({ user, selectedProject, activeProj
 
     // Calculate Exchange
     const applyExchange = () => {
-        const ex = exchanges.find(e => e.from_currency_id.toString() === exchangeFromCurrency && e.to_currency_id === user.currency_id);
+        const targetCurrencyId = user.currency_id || businessCurrency.id;
+        const ex = exchanges.find(e => e.currency1.toString() === exchangeFromCurrency && e.currency2.toString() === targetCurrencyId.toString());
         // Fallback or complex logic here if needed, for now just simple conversion
         if (ex && exchangeAmount) {
             const num = parseFloat(exchangeAmount);
             if (!isNaN(num)) {
-                setAmount((num * ex.exchange_rate).toFixed(2));
+                setAmount((num * ex.rate).toFixed(2));
                 setShowExchange(false);
             }
         }
@@ -182,7 +187,9 @@ export default function TransactionEntryForm({ user, selectedProject, activeProj
                                 <Label className="text-xs text-muted-foreground uppercase tracking-wider font-bold">From Currency</Label>
                                 <Select value={exchangeFromCurrency} onValueChange={setExchangeFromCurrency}>
                                     <SelectTrigger className="bg-white">
-                                        <SelectValue placeholder="Select currency..." />
+                                        <SelectValue placeholder="Select currency...">
+                                            {exchangeFromCurrency ? currencies.find(c => c.id.toString() === exchangeFromCurrency)?.currency : "Select currency..."}
+                                        </SelectValue>
                                     </SelectTrigger>
                                     <SelectContent>
                                         {currencies.map(c => (

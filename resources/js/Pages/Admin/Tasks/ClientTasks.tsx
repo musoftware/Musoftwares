@@ -16,8 +16,8 @@ import {
     ChevronRight,
     RotateCcw,
     ShieldCheck,
-    Clock,
-    Loader2,
+    Trash2,
+    PlusCircle,
 } from 'lucide-react';
 import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
@@ -25,9 +25,6 @@ import { Card, CardContent } from '@/Components/ui/card';
 import { Badge } from '@/Components/ui/badge';
 import { toast } from 'sonner';
 import { formatMoney as formatCurrency } from '@/lib/utils';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from '@/Components/ui/dialog';
-import { Label } from '@/Components/ui/label';
-import { Textarea } from '@/Components/ui/textarea';
 
 interface Client {
     id: number;
@@ -63,6 +60,7 @@ interface SelectedClient {
     email: string;
     balance: number;
     currency: string;
+    hourly_rate?: number;
     total_tasks: number;
     completed_tasks: number;
     latest_task_id: number | null;
@@ -78,96 +76,60 @@ interface Props {
 export default function ClientTasks({ clients, selectedClient, todos, filters }: Props) {
     const [search, setSearch] = useState('');
     const [refundingId, setRefundingId] = useState<number | null>(null);
-    const [schedulingId, setSchedulingId] = useState<number | null>(null);
-    const [submitting, setSubmitting] = useState(false);
-    const [scheduleForm, setScheduleForm] = useState({ start_at: '', end_at: '' });
+    const [newTodoTitle, setNewTodoTitle] = useState('');
 
-    const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-    const [createForm, setCreateForm] = useState({ title: '', description: '', start_at: '', end_at: '' });
-    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [scheduleData, setScheduleData] = useState({
+        title: '',
+        date: new Date().toISOString().split('T')[0],
+        start_time: '',
+        end_time: '',
+    });
+    const [submittingFocus, setSubmittingFocus] = useState(false);
+    const [scheduleErrors, setScheduleErrors] = useState<any>({});
+    const [estimatedCost, setEstimatedCost] = useState(0);
 
-    const formatForInput = (dateStr: string | null) => {
-        if (!dateStr) return '';
-        const d = new Date(dateStr);
-        return new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
-    };
-
-    const openScheduleForm = (todo: TodoItem) => {
-        setSchedulingId(todo.id);
-        setSubmitting(false);
-        setScheduleForm({
-            start_at: formatForInput(todo.start_at),
-            end_at: formatForInput(todo.end_at),
-        });
-    };
-
-    const handleScheduleSubmit = (todoId: number) => {
-        if (!scheduleForm.start_at || !scheduleForm.end_at) {
-            toast.error('Both start and end times are required.');
-            return;
-        }
-        setSubmitting(true);
-        router.post(route('admin.tasks.todos.schedule', todoId), scheduleForm, {
-            onSuccess: () => {
-                toast.success('Time scheduled successfully!');
-                setSchedulingId(null);
-                setSubmitting(false);
-            },
-            onError: (errors: any) => {
-                toast.error(errors.start_at || errors.end_at || 'Failed to schedule time.');
-                setSubmitting(false);
+    React.useEffect(() => {
+        if (scheduleData.start_time && scheduleData.end_time && selectedClient?.hourly_rate) {
+            const start = new Date(`${scheduleData.date}T${scheduleData.start_time}`);
+            const end = new Date(`${scheduleData.date}T${scheduleData.end_time}`);
+            if (end > start) {
+                const diffMs = end.getTime() - start.getTime();
+                const diffHrs = diffMs / 1000 / 60 / 60;
+                setEstimatedCost(diffHrs * selectedClient.hourly_rate);
+            } else {
+                setEstimatedCost(0);
             }
-        });
-    };
-
-    const handleQuickSchedule = (hours: number) => {
-        const now = new Date();
-        const end = new Date(now.getTime() + hours * 60 * 60 * 1000);
-        
-        const formatLocal = (d: Date) => {
-            return new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
-        };
-
-        setCreateForm({
-            ...createForm,
-            start_at: formatLocal(now),
-            end_at: formatLocal(end)
-        });
-    };
-
-    const handleQuickScheduleExisting = (hours: number) => {
-        const now = new Date();
-        const end = new Date(now.getTime() + hours * 60 * 60 * 1000);
-        
-        const formatLocal = (d: Date) => {
-            return new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
-        };
-
-        setScheduleForm({
-            ...scheduleForm,
-            start_at: formatLocal(now),
-            end_at: formatLocal(end)
-        });
-    };
-
-    const handleCreateSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!createForm.title || !createForm.start_at || !createForm.end_at) {
-            toast.error('Title, start time, and end time are required.');
-            return;
+        } else {
+            setEstimatedCost(0);
         }
-        setIsSubmitting(true);
-        router.post(route('admin.tasks.client-tasks.store', selectedClient?.id), createForm, {
+    }, [scheduleData.date, scheduleData.start_time, scheduleData.end_time, selectedClient?.hourly_rate]);
+
+    const submitFocusTask = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!selectedClient) return;
+        setSubmittingFocus(true);
+        setScheduleErrors({});
+
+        const start_at = `${scheduleData.date} ${scheduleData.start_time}:00`;
+        const end_at = `${scheduleData.date} ${scheduleData.end_time}:00`;
+
+        router.post(safeRoute('admin.tasks.client-tasks.store', selectedClient.id, `/admin/tasks/client-tasks/${selectedClient.id}/todos`), {
+            title: scheduleData.title,
+            start_at,
+            end_at
+        }, {
+            preserveScroll: true,
             onSuccess: () => {
-                toast.success('Scheduled task created and billed successfully!');
-                setIsCreateModalOpen(false);
-                setCreateForm({ title: '', description: '', start_at: '', end_at: '' });
-                setIsSubmitting(false);
+                toast.success('Scheduled task booked successfully!');
+                setScheduleData({ ...scheduleData, title: '', start_time: '', end_time: '' });
+                setSubmittingFocus(false);
             },
-            onError: (errors: any) => {
-                setIsSubmitting(false);
-                const errMsg = errors.error || errors.end_at || errors.start_at || errors.title || 'Failed to create task.';
-                toast.error(errMsg);
+            onError: (errs: any) => {
+                setScheduleErrors(errs);
+                if (errs.error) toast.error(errs.error);
+                else if (errs.start_at) toast.error(errs.start_at);
+                else toast.error('Please fix the validation errors.');
+                setSubmittingFocus(false);
             }
         });
     };
@@ -199,6 +161,46 @@ export default function ClientTasks({ clients, selectedClient, todos, filters }:
                 }
             });
         }
+    };
+
+    const handleDeleteTodo = (todoId: number) => {
+        if (confirm('Are you sure you want to remove this item from the queue?')) {
+            router.delete(route('admin.tasks.todos.destroy', todoId), {
+                onSuccess: () => toast.success('Task removed from queue.'),
+                onError: (errors: any) => toast.error(errors.error || 'Failed to delete task.')
+            });
+        }
+    };
+
+    const handlePayTodo = (todoId: number) => {
+        if (confirm('Are you sure you want to confirm and schedule this task? The amount will be deducted from the client balance.')) {
+            router.post(route('admin.tasks.todos.pay-schedule', todoId), {}, {
+                onSuccess: () => toast.success('Task scheduled and billed successfully!'),
+                onError: (errors: any) => toast.error(errors.error || 'Failed to process task payment.')
+            });
+        }
+    };
+
+    const handleToggleComplete = (todoId: number, currentStatus: boolean) => {
+        router.post(route('admin.tasks.todos.complete', todoId), { completed: !currentStatus }, {
+            preserveScroll: true,
+            onSuccess: () => toast.success('Task status updated.'),
+            onError: () => toast.error('Failed to update task status.')
+        });
+    };
+
+    const handleAddUnpaidTodo = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!selectedClient || !newTodoTitle.trim()) return;
+
+        router.post(route('admin.tasks.client-tasks.store-unpaid', selectedClient.id), { title: newTodoTitle }, {
+            preserveScroll: true,
+            onSuccess: () => {
+                toast.success('Task added to the queue.');
+                setNewTodoTitle('');
+            },
+            onError: (errors: any) => toast.error(errors.error || 'Failed to add task.')
+        });
     };
 
     const filteredClients = clients.filter(c => 
@@ -319,50 +321,130 @@ export default function ClientTasks({ clients, selectedClient, todos, filters }:
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
                         {/* Queue list (2 cols) */}
                         <div className="lg:col-span-2 space-y-6">
-                            {/* Create New Task card */}
-                            <Card className="rounded-xl border border-indigo-100 bg-indigo-50/20 shadow-none">
-                                <CardContent className="p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                                    <div>
-                                        <h3 className="font-bold text-indigo-900 text-base">Create Task for {selectedClient.name}</h3>
-                                        <p className="text-xs text-indigo-700 mt-1">Jump to the task board builder to create a new milestone queue, or schedule an immediate focus time.</p>
-                                    </div>
-                                    <div className="flex items-center gap-2 shrink-0 flex-wrap">
-                                        <Button 
-                                            onClick={() => setIsCreateModalOpen(true)}
-                                            className="px-4 h-9 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold"
-                                        >
-                                            <Clock className="h-4 w-4 me-2" /> Schedule Focus Time
-                                        </Button>
-                                        <Link 
-                                            href={safeRoute('admin.projects.index', {}, '/admin/projects')}
-                                            className="inline-flex items-center justify-center px-4 h-9 rounded-lg border border-indigo-200 hover:bg-indigo-100 text-indigo-700 text-xs font-semibold"
-                                        >
-                                            Task Board
-                                        </Link>
-                                    </div>
+                            {/* Schedule Focus Time Form */}
+                            <Card className="rounded-xl border border-indigo-200 bg-white shadow-sm overflow-hidden">
+                                <div className="bg-indigo-50 px-5 py-3 border-b border-indigo-100 flex items-center justify-between">
+                                    <h3 className="font-bold text-indigo-900 flex items-center gap-2">
+                                        <CalendarCheck className="h-4 w-4 text-indigo-600" />
+                                        Schedule Focus Time
+                                    </h3>
+                                    <span className="text-xs font-semibold bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-full">
+                                        Hourly Rate: {formatCurrency(selectedClient.hourly_rate || 0, selectedClient.currency)}/hr
+                                    </span>
+                                </div>
+                                <CardContent className="p-5">
+                                    <form onSubmit={submitFocusTask} className="space-y-4">
+                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                            <div className="space-y-1.5">
+                                                <label className="text-xs font-semibold text-slate-700 uppercase">Target Date</label>
+                                                <Input 
+                                                    type="date" 
+                                                    value={scheduleData.date}
+                                                    onChange={e => setScheduleData({...scheduleData, date: e.target.value})}
+                                                    className="border-slate-200 h-9"
+                                                    required
+                                                />
+                                            </div>
+                                            <div className="space-y-1.5">
+                                                <label className="text-xs font-semibold text-slate-700 uppercase">Start Time</label>
+                                                <Input 
+                                                    type="time" 
+                                                    value={scheduleData.start_time}
+                                                    onChange={e => setScheduleData({...scheduleData, start_time: e.target.value})}
+                                                    className="border-slate-200 h-9"
+                                                    required
+                                                />
+                                            </div>
+                                            <div className="space-y-1.5">
+                                                <label className="text-xs font-semibold text-slate-700 uppercase">End Time</label>
+                                                <Input 
+                                                    type="time" 
+                                                    value={scheduleData.end_time}
+                                                    onChange={e => setScheduleData({...scheduleData, end_time: e.target.value})}
+                                                    className="border-slate-200 h-9"
+                                                    required
+                                                />
+                                            </div>
+                                        </div>
+
+                                        {estimatedCost > 0 && (
+                                            <div className="bg-slate-50 p-3 rounded-lg border border-slate-100 flex items-center justify-between">
+                                                <span className="text-sm text-slate-600 font-semibold">Estimated Investment:</span>
+                                                <div className="flex items-center gap-3">
+                                                    <span className="text-lg font-bold text-slate-900">
+                                                        {formatCurrency(estimatedCost, selectedClient.currency)}
+                                                    </span>
+                                                    <span className={`text-xs font-bold px-2 py-1 rounded ${selectedClient.balance >= estimatedCost ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'}`}>
+                                                        Available: {formatCurrency(selectedClient.balance, selectedClient.currency)}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        <div className="flex gap-2">
+                                            <div className="flex-grow space-y-1.5">
+                                                <Input 
+                                                    type="text" 
+                                                    value={scheduleData.title}
+                                                    onChange={e => setScheduleData({...scheduleData, title: e.target.value})}
+                                                    placeholder="Describe the specific engineering outcome..."
+                                                    className="border-slate-200 h-10"
+                                                    required
+                                                />
+                                                {scheduleErrors?.title && <p className="text-xs text-rose-600">{scheduleErrors.title}</p>}
+                                            </div>
+                                            <Button 
+                                                type="submit" 
+                                                disabled={submittingFocus || (estimatedCost > 0 && selectedClient.balance < estimatedCost)}
+                                                className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold h-10 px-6 shrink-0"
+                                            >
+                                                {submittingFocus ? 'Booking...' : 'Book Time'}
+                                            </Button>
+                                        </div>
+                                    </form>
                                 </CardContent>
                             </Card>
 
                             {/* Sprint items */}
                             <div className="space-y-4">
-                                <div className="flex items-center justify-between">
+                                <div className="flex items-center justify-between mb-2">
                                     <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
                                         <Activity className="h-5 w-5 text-slate-700" />
-                                        Active Sprint Queue
+                                        Active Sprint Items
                                     </h2>
-                                    <Badge variant="outline" className="bg-slate-50 border-slate-200 font-semibold px-2 py-0.5 rounded text-xs">
-                                        {todos.length} Active Items
+                                    <Badge variant="outline" className="bg-slate-900 text-white font-semibold px-2 py-0.5 rounded text-xs">
+                                        {todos.length}
                                     </Badge>
                                 </div>
+
+                                {/* Add Unpaid Todo Form */}
+                                <form onSubmit={handleAddUnpaidTodo} className="flex gap-2 mb-4">
+                                    <Input
+                                        type="text"
+                                        value={newTodoTitle}
+                                        onChange={e => setNewTodoTitle(e.target.value)}
+                                        placeholder="Add an item to the queue..."
+                                        className="flex-grow rounded-lg shadow-sm bg-white"
+                                    />
+                                    <Button type="submit" disabled={!newTodoTitle.trim()} className="bg-slate-800 hover:bg-slate-900 text-white rounded-lg px-4 shadow-sm flex-shrink-0">
+                                        <PlusCircle className="h-4 w-4 mr-2" /> Add to Queue
+                                    </Button>
+                                </form>
 
                                 {todos.length === 0 ? (
                                     <Card className="rounded-xl border border-dashed border-slate-300 bg-white shadow-sm">
                                         <CardContent className="flex flex-col items-center justify-center p-16 text-center">
                                             <CheckCircle2 className="h-12 w-12 text-slate-300 mb-4" />
-                                            <h3 className="font-semibold text-slate-700 text-sm">Queue is Empty</h3>
-                                            <p className="text-xs text-slate-400 max-w-xs mt-1">
-                                                All items are completed or no tasks have been created for this client.
+                                            <h3 className="font-semibold text-slate-700 text-sm">The queue is empty</h3>
+                                            <p className="text-xs text-slate-400 max-w-xs mt-1 mb-4">
+                                                Create the first task for this client to get started.
                                             </p>
+                                            <Link 
+                                                href={`/admin/projects?client_id=${selectedClient.id}`}
+                                                className="inline-flex items-center justify-center px-4 h-9 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold"
+                                            >
+                                                <ListTodo className="h-4 w-4 me-2" /> Create First Task
+                                            </Link>
                                         </CardContent>
                                     </Card>
                                 ) : (
@@ -372,35 +454,52 @@ export default function ClientTasks({ clients, selectedClient, todos, filters }:
                                                 <CardContent className="p-5 flex flex-col md:flex-row md:items-start justify-between gap-4">
                                                     <div className="space-y-2 flex-grow min-w-0">
                                                         <div className="flex flex-wrap items-center gap-2">
-                                                            <Badge variant="outline" className="bg-slate-100 text-slate-600 border-slate-200 text-[10px] font-bold px-1.5 py-0.5">
-                                                                📌 {todo.task_name}
-                                                            </Badge>
-                                                            {todo.is_paid ? (
-                                                                <Badge className="bg-emerald-100 text-emerald-700 border border-emerald-200 text-[10px] font-bold px-1.5 py-0.5 shadow-none hover:bg-emerald-100">
-                                                                    Paid
-                                                                </Badge>
+                                                            {!todo.is_paid ? (
+                                                                <>
+                                                                    <Badge className="bg-rose-600 hover:bg-rose-700 text-white text-[10px] font-bold px-2 py-1 rounded-none uppercase">
+                                                                        AWAITING SCHEDULING
+                                                                    </Badge>
+                                                                    <span className="text-xs font-bold text-slate-500">
+                                                                        {todo.start_at ? new Date(todo.start_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '—'}
+                                                                    </span>
+                                                                </>
                                                             ) : (
-                                                                <Badge variant="outline" className="bg-slate-100 text-slate-500 border-slate-200 text-[10px] font-bold px-1.5 py-0.5">
-                                                                    Unpaid
-                                                                </Badge>
-                                                            )}
-                                                            {todo.start_at ? (
-                                                                <Badge className="bg-indigo-50 text-indigo-700 border border-indigo-200 text-[10px] font-bold px-1.5 py-0.5 shadow-none hover:bg-indigo-50 flex items-center gap-0.5">
-                                                                    <CalendarCheck className="h-2.5 w-2.5" /> Scheduled
-                                                                </Badge>
-                                                            ) : (
-                                                                <Badge variant="outline" className="bg-amber-50 text-amber-600 border-amber-200 text-[10px] font-bold px-1.5 py-0.5">
-                                                                    Awaiting Scheduling
-                                                                </Badge>
+                                                                <>
+                                                                    <Badge variant="outline" className="bg-slate-100 text-slate-600 border-slate-200 text-[10px] font-bold px-1.5 py-0.5">
+                                                                        📌 {todo.task_name}
+                                                                    </Badge>
+                                                                    <Badge className="bg-emerald-100 text-emerald-700 border border-emerald-200 text-[10px] font-bold px-1.5 py-0.5 shadow-none hover:bg-emerald-100">
+                                                                        Paid
+                                                                    </Badge>
+                                                                    {todo.start_at ? (
+                                                                        <Badge className="bg-indigo-50 text-indigo-700 border border-indigo-200 text-[10px] font-bold px-1.5 py-0.5 shadow-none hover:bg-indigo-50 flex items-center gap-0.5">
+                                                                            <CalendarCheck className="h-2.5 w-2.5" /> Scheduled
+                                                                        </Badge>
+                                                                    ) : (
+                                                                        <Badge variant="outline" className="bg-amber-50 text-amber-600 border-amber-200 text-[10px] font-bold px-1.5 py-0.5">
+                                                                            Awaiting Scheduling
+                                                                        </Badge>
+                                                                    )}
+                                                                </>
                                                             )}
                                                             {todo.refunded && (
-                                                                <Badge className="bg-rose-100 text-rose-700 border border-rose-200 text-[10px] font-bold px-1.5 py-0.5 shadow-none hover:bg-rose-100">
-                                                                    Refunded
+                                                                <Badge className="bg-emerald-600 text-white text-[10px] font-bold px-2 py-1 shadow-none rounded-none uppercase">
+                                                                    REFUNDED
                                                                 </Badge>
                                                             )}
+                                                            <div className="ml-auto md:hidden">
+                                                                <span className="font-bold text-slate-900">
+                                                                    {formatCurrency(todo.cost_in_client_currency, todo.client_currency)}
+                                                                </span>
+                                                            </div>
                                                         </div>
 
-                                                        <h3 className="font-bold text-slate-900 text-sm">{todo.title}</h3>
+                                                        <div className="flex justify-between items-center">
+                                                            <h3 className="font-bold text-slate-900 text-sm">{todo.title}</h3>
+                                                            <span className="font-bold text-slate-900 hidden md:inline-block">
+                                                                {formatCurrency(todo.cost_in_client_currency, todo.client_currency)}
+                                                            </span>
+                                                        </div>
                                                         
                                                         {todo.description && (
                                                             <p className="text-xs text-slate-500 leading-relaxed max-w-xl">
@@ -409,13 +508,7 @@ export default function ClientTasks({ clients, selectedClient, todos, filters }:
                                                         )}
 
                                                         <div className="flex flex-wrap items-center gap-3 pt-2 text-[11px] text-slate-400 font-medium">
-                                                            {todo.cost > 0 && (
-                                                                <span className="flex items-center gap-0.5 text-emerald-600 font-semibold">
-                                                                    <DollarSign className="h-3.5 w-3.5" />
-                                                                    {formatCurrency(todo.cost_in_client_currency, todo.client_currency)}
-                                                                </span>
-                                                            )}
-                                                            {(todo.start_at || todo.end_at) && (
+                                                            {todo.is_paid && (todo.start_at || todo.end_at) && (
                                                                 <span className="flex items-center gap-1">
                                                                     <Calendar className="h-3.5 w-3.5" />
                                                                     {todo.start_at ? new Date(todo.start_at).toLocaleString() : '—'}
@@ -428,75 +521,47 @@ export default function ClientTasks({ clients, selectedClient, todos, filters }:
 
                                                     {/* Actions */}
                                                     <div className="flex-shrink-0 self-end md:self-start flex flex-col gap-2 items-end">
-                                                        {schedulingId === todo.id ? (
-                                                            <div className="flex flex-col gap-2 p-3 bg-slate-50 border border-slate-200 rounded-lg min-w-[240px]">
-                                                                <div className="space-y-1">
-                                                                    <label className="text-[10px] font-bold text-slate-500 uppercase">Start Time</label>
-                                                                    <Input 
-                                                                        type="datetime-local" 
-                                                                        value={scheduleForm.start_at}
-                                                                        onChange={(e) => setScheduleForm({...scheduleForm, start_at: e.target.value})}
-                                                                        className="h-8 text-xs"
-                                                                    />
-                                                                </div>
-                                                                <div className="space-y-1">
-                                                                    <label className="text-[10px] font-bold text-slate-500 uppercase">End Time</label>
-                                                                    <Input 
-                                                                        type="datetime-local" 
-                                                                        value={scheduleForm.end_at}
-                                                                        onChange={(e) => setScheduleForm({...scheduleForm, end_at: e.target.value})}
-                                                                        className="h-8 text-xs"
-                                                                    />
-                                                                </div>
-                                                                <div className="flex flex-wrap gap-1 mt-1">
-                                                                    <Button type="button" variant="outline" size="sm" onClick={() => handleQuickScheduleExisting(1)} className="h-6 px-2 text-[10px]">1h</Button>
-                                                                    <Button type="button" variant="outline" size="sm" onClick={() => handleQuickScheduleExisting(2)} className="h-6 px-2 text-[10px]">2h</Button>
-                                                                    <Button type="button" variant="outline" size="sm" onClick={() => handleQuickScheduleExisting(3)} className="h-6 px-2 text-[10px]">3h</Button>
-                                                                    <Button type="button" variant="outline" size="sm" onClick={() => handleQuickScheduleExisting(4)} className="h-6 px-2 text-[10px]">4h</Button>
-                                                                </div>
-                                                                <div className="flex justify-end gap-2 mt-1">
-                                                                    <Button 
-                                                                        variant="ghost" 
-                                                                        size="sm" 
-                                                                        onClick={() => setSchedulingId(null)}
-                                                                        disabled={submitting}
-                                                                        className="h-7 px-2 text-xs text-slate-500"
-                                                                    >
-                                                                        Cancel
-                                                                    </Button>
-                                                                    <Button 
-                                                                        size="sm" 
-                                                                        onClick={() => handleScheduleSubmit(todo.id)}
-                                                                        disabled={submitting}
-                                                                        className="h-7 px-3 text-xs bg-indigo-600 hover:bg-indigo-700 text-white flex items-center gap-1.5"
-                                                                    >
-                                                                        {submitting ? (
-                                                                            <><Loader2 className="h-3 w-3 animate-spin" /> Saving...</>
-                                                                        ) : 'Save Schedule'}
-                                                                    </Button>
-                                                                </div>
-                                                            </div>
-                                                        ) : (
-                                                            <>
+                                                        <Link
+                                                            href={safeRoute('admin.projects.index', { project: todo.task_id }, '/admin/projects')}
+                                                            className="inline-flex items-center justify-center bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs h-8 px-3 rounded-lg shadow-sm"
+                                                        >
+                                                            <Search className="h-3.5 w-3.5 me-1" /> View Task
+                                                        </Link>
+                                                        {todo.is_paid && !todo.refunded && (
+                                                            <Button
+                                                                onClick={() => handleToggleComplete(todo.id, todo.completed)}
+                                                                className={`font-semibold text-xs h-8 px-3 rounded-lg flex items-center gap-1.5 border shadow-sm mt-1 ${todo.completed ? 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border-emerald-200' : 'bg-white text-slate-700 hover:bg-slate-50 border-slate-200'}`}
+                                                            >
+                                                                <CheckCircle2 className="h-3.5 w-3.5" />
+                                                                {todo.completed ? 'Completed' : 'Mark Complete'}
+                                                            </Button>
+                                                        )}
+                                                        {todo.is_paid && !todo.refunded && todo.show_refund && (
+                                                            <Button
+                                                                onClick={() => handleRefund(todo.id)}
+                                                                disabled={refundingId === todo.id}
+                                                                className="bg-white hover:bg-slate-50 text-slate-700 font-semibold text-xs h-8 px-3 rounded-lg flex items-center gap-1.5 border shadow-sm mt-1"
+                                                            >
+                                                                <RotateCcw className="h-3.5 w-3.5" />
+                                                                {refundingId === todo.id ? 'Refunding...' : 'Refund'}
+                                                            </Button>
+                                                        )}
+                                                        {!todo.is_paid && (
+                                                            <div className="flex flex-col gap-2 mt-1">
                                                                 <Button
-                                                                    onClick={() => openScheduleForm(todo)}
-                                                                    variant="outline"
-                                                                    className="font-semibold text-xs h-8 px-3 rounded-lg flex items-center gap-1.5 border-slate-200 shadow-sm hover:bg-slate-50"
+                                                                    onClick={() => handlePayTodo(todo.id)}
+                                                                    className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs h-8 px-3 rounded-lg flex items-center gap-1.5 shadow-sm"
                                                                 >
-                                                                    <Clock className="h-3.5 w-3.5" />
-                                                                    Schedule Time
+                                                                    <Wallet className="h-3.5 w-3.5" /> Confirm & Schedule
                                                                 </Button>
-                                                                {todo.is_paid && !todo.refunded && todo.show_refund && (
-                                                                    <Button
-                                                                        onClick={() => handleRefund(todo.id)}
-                                                                        disabled={refundingId === todo.id}
-                                                                        className="bg-rose-600 hover:bg-rose-700 text-white font-semibold text-xs h-8 px-3 rounded-lg flex items-center gap-1.5 border-0 shadow-sm"
-                                                                    >
-                                                                        <RotateCcw className="h-3.5 w-3.5" />
-                                                                        {refundingId === todo.id ? 'Refunding...' : 'Refund Remaining'}
-                                                                    </Button>
-                                                                )}
-                                                            </>
+                                                                <Button
+                                                                    onClick={() => handleDeleteTodo(todo.id)}
+                                                                    variant="destructive"
+                                                                    className="font-semibold text-xs h-8 px-3 rounded-lg flex items-center gap-1.5 shadow-sm"
+                                                                >
+                                                                    <Trash2 className="h-3.5 w-3.5" /> Delete Item
+                                                                </Button>
+                                                            </div>
                                                         )}
                                                     </div>
                                                 </CardContent>
@@ -509,149 +574,50 @@ export default function ClientTasks({ clients, selectedClient, todos, filters }:
 
                         {/* Admin Info details card (1 col) */}
                         <div className="space-y-6">
-                            <Card className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
-                                <div className="bg-slate-900 px-6 py-4 flex items-center gap-3 text-white border-b border-slate-800">
-                                    <ShieldCheck className="h-5 w-5 text-indigo-400" />
+                            <Card className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden mt-0">
+                                <div className="bg-white px-5 py-3 flex items-center gap-3 border-b border-slate-100">
+                                    <ShieldCheck className="h-5 w-5 text-slate-700" />
                                     <div>
-                                        <h3 className="font-bold text-xs uppercase tracking-wider text-slate-400">Admin Privileges</h3>
-                                        <h2 className="font-bold text-sm text-white mt-0.5">Control Panel</h2>
+                                        <h3 className="font-bold text-[10px] uppercase tracking-wider text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full inline-block mb-1">Admin View</h3>
+                                        <h2 className="font-bold text-sm text-slate-800 leading-none">Managing Tasks for: {selectedClient.name}</h2>
                                     </div>
                                 </div>
-                                <CardContent className="p-6 space-y-5">
-                                    <div className="space-y-1">
-                                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Client Email</span>
-                                        <p className="text-sm font-bold text-slate-800 break-all">{selectedClient.email}</p>
-                                    </div>
-
-                                    <div className="space-y-1">
-                                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Available Balance</span>
-                                        <div className="flex items-baseline gap-1.5">
-                                            <Wallet className="h-4 w-4 text-emerald-600 self-center" />
-                                            <p className="text-lg font-bold text-emerald-600">
+                                <CardContent className="p-5 space-y-4">
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div className="space-y-1">
+                                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Email</span>
+                                            <p className="text-sm font-bold text-slate-800 break-all">{selectedClient.email}</p>
+                                        </div>
+                                        <div className="space-y-1">
+                                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Available Balance</span>
+                                            <p className={`text-sm font-bold ${selectedClient.balance <= 0 ? 'text-rose-600' : 'text-emerald-600'}`}>
                                                 {formatCurrency(selectedClient.balance, selectedClient.currency)}
                                             </p>
                                         </div>
-                                    </div>
-
-                                    <div className="grid grid-cols-2 gap-4 pt-4 border-t border-slate-100">
-                                        <div className="space-y-0.5">
+                                        <div className="space-y-1">
                                             <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Total Tasks</span>
-                                            <p className="text-base font-bold text-slate-800">{selectedClient.total_tasks}</p>
+                                            <p className="text-sm font-bold text-slate-800">{selectedClient.total_tasks}</p>
                                         </div>
-                                        <div className="space-y-0.5">
+                                        <div className="space-y-1">
                                             <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Completed Tasks</span>
-                                            <p className="text-base font-bold text-slate-800">{selectedClient.completed_tasks}</p>
+                                            <p className="text-sm font-bold text-slate-800">{selectedClient.completed_tasks}</p>
                                         </div>
                                     </div>
 
-                                    <div className="pt-4 border-t border-slate-100 flex flex-col gap-2">
+                                    <div className="pt-4 flex flex-col gap-2">
                                         <Link 
                                             href={`/admin/projects?client_id=${selectedClient.id}`}
-                                            className="inline-flex items-center justify-center w-full h-9 rounded-lg border border-slate-200 hover:bg-slate-50 transition-colors text-xs font-semibold text-slate-700"
+                                            className="inline-flex items-center justify-center w-full h-9 rounded-lg border border-slate-200 bg-slate-50 hover:bg-slate-100 transition-colors text-xs font-semibold text-slate-700 uppercase"
                                         >
-                                            All Client Projects <ChevronRight className="h-3.5 w-3.5 ml-1 text-slate-400" />
-                                        </Link>
-                                        <Link 
-                                            href={`/admin/users/reports/${selectedClient.id}`}
-                                            className="inline-flex items-center justify-center w-full h-9 rounded-lg border border-slate-200 hover:bg-slate-50 transition-colors text-xs font-semibold text-slate-700"
-                                        >
-                                            All Client Tasks & Reports <ChevronRight className="h-3.5 w-3.5 ml-1 text-slate-400" />
+                                            <ListTodo className="h-4 w-4 me-2" /> All Client Tasks
                                         </Link>
                                     </div>
-                                </CardContent>
-                            </Card>
-
-                            {/* Policy Banner */}
-                            <Card className="rounded-xl border border-slate-200 bg-amber-50/20 shadow-none">
-                                <CardContent className="p-5 space-y-3">
-                                    <div className="flex items-center gap-2 text-amber-800">
-                                        <AlertCircle className="h-5 w-5 shrink-0" />
-                                        <h3 className="font-bold text-xs uppercase tracking-wider">Refund Policy Rules</h3>
-                                    </div>
-                                    <ul className="list-disc pl-5 space-y-1.5 text-xs text-slate-600">
-                                        <li>Full refund is granted if the checklist item is paid but has no scheduling window booked.</li>
-                                        <li>Full refund is granted if the scheduled end time is in the future.</li>
-                                        <li>Partial refund is calculated dynamically based on remaining minutes if currently in progress.</li>
-                                        <li>No refund is possible if the scheduled duration has already fully elapsed.</li>
-                                    </ul>
                                 </CardContent>
                             </Card>
                         </div>
                     </div>
                 )}
             </div>
-
-            {/* Create Scheduled Task Modal */}
-            <Dialog open={isCreateModalOpen} onOpenChange={setIsCreateModalOpen}>
-                <DialogContent className="sm:max-w-[425px]">
-                    <DialogHeader>
-                        <DialogTitle>Schedule Focus Time</DialogTitle>
-                        <DialogDescription>
-                            Create a new focus task for {selectedClient?.name}. The cost will be automatically calculated and deducted from their balance.
-                        </DialogDescription>
-                    </DialogHeader>
-                    <form onSubmit={handleCreateSubmit} className="space-y-4 pt-4">
-                        <div className="space-y-2">
-                            <Label htmlFor="title">Task Title</Label>
-                            <Input 
-                                id="title" 
-                                value={createForm.title}
-                                onChange={e => setCreateForm({...createForm, title: e.target.value})}
-                                placeholder="e.g. Server Setup & Configuration"
-                                required
-                            />
-                        </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="description">Description (Optional)</Label>
-                            <Textarea 
-                                id="description" 
-                                value={createForm.description}
-                                onChange={e => setCreateForm({...createForm, description: e.target.value})}
-                                placeholder="Details about what will be done..."
-                                rows={3}
-                            />
-                        </div>
-                        <div className="grid grid-cols-2 gap-4">
-                            <div className="space-y-2">
-                                <Label htmlFor="start_at">Start Time</Label>
-                                <Input 
-                                    id="start_at" 
-                                    type="datetime-local" 
-                                    value={createForm.start_at}
-                                    onChange={e => setCreateForm({...createForm, start_at: e.target.value})}
-                                    required
-                                />
-                            </div>
-                            <div className="space-y-2">
-                                <Label htmlFor="end_at">End Time</Label>
-                                <Input 
-                                    id="end_at" 
-                                    type="datetime-local" 
-                                    value={createForm.end_at}
-                                    onChange={e => setCreateForm({...createForm, end_at: e.target.value})}
-                                    required
-                                />
-                            </div>
-                        </div>
-                        <div className="flex flex-wrap items-center gap-2 pt-1">
-                            <span className="text-[10px] font-bold text-slate-500 uppercase">Quick Select:</span>
-                            <Button type="button" variant="outline" size="sm" onClick={() => handleQuickSchedule(1)} className="h-7 px-2.5 text-xs">1 Hour</Button>
-                            <Button type="button" variant="outline" size="sm" onClick={() => handleQuickSchedule(2)} className="h-7 px-2.5 text-xs">2 Hours</Button>
-                            <Button type="button" variant="outline" size="sm" onClick={() => handleQuickSchedule(3)} className="h-7 px-2.5 text-xs">3 Hours</Button>
-                            <Button type="button" variant="outline" size="sm" onClick={() => handleQuickSchedule(4)} className="h-7 px-2.5 text-xs">4 Hours</Button>
-                            <Button type="button" variant="outline" size="sm" onClick={() => handleQuickSchedule(8)} className="h-7 px-2.5 text-xs">8 Hours</Button>
-                        </div>
-                        <DialogFooter className="pt-4">
-                            <Button type="button" variant="outline" onClick={() => setIsCreateModalOpen(false)}>
-                                Cancel
-                            </Button>
-                            <Button type="submit" disabled={isSubmitting} className="bg-indigo-600 hover:bg-indigo-700 text-white">
-                                {isSubmitting ? 'Creating...' : 'Create & Bill Client'}
-                            </Button>
-                        </DialogFooter>
-                    </form>
-                </DialogContent>
-            </Dialog>
         </AdminSidebarLayout>
     );
 }

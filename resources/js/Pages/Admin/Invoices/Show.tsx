@@ -5,6 +5,7 @@ import { Button } from '@/Components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/Components/ui/card';
 import { Input } from "@/Components/ui/input";
 import { Label } from "@/Components/ui/label";
+import { PremiumCombobox } from '@/Components/ui/PremiumCombobox';
 import { formatMoney as formatCurrency } from '@/lib/utils';
 import { 
     Printer, Download, Share2, User, MapPin, Phone, Folder, Receipt, 
@@ -19,21 +20,21 @@ export default function Show({ invoice }: { invoice: any }) {
     
     // Local copy of items for inline editing
     const [items, setItems] = useState<any[]>([]);
-    const [deletedItems, setDeletedItems] = useState<(string|number)[]>([]);
-    const [discount, setDiscount] = useState<any>(0);
-    const [discountPercentage, setDiscountPercentage] = useState(0);
-    
     const [costLines, setCostLines] = useState<any[]>([]);
-    const [deletedCostLines, setDeletedCostLines] = useState<(string|number)[]>([]);
+    const [discount, setDiscount] = useState<number>(0);
+    const [discountPercentage, setDiscountPercentage] = useState<number>(0);
+    const [deletedItems, setDeletedItems] = useState<number[]>([]);
+    const [deletedCostLines, setDeletedCostLines] = useState<number[]>([]);
     
+    // Feature states
     const [selectedItemsForMerge, setSelectedItemsForMerge] = useState<number[]>([]);
     const [showPricingInsights, setShowPricingInsights] = useState(false);
 
-    useEffect(() => {
+    const resetState = () => {
         if (invoice && invoice.items) {
             const itemsSource = invoice.items.data ? invoice.items.data : invoice.items;
             const itemsArray = Array.isArray(itemsSource) ? itemsSource : Object.values(itemsSource);
-            setItems(itemsArray.filter((item: any) => item && item.item_type).map((item: any) => ({ ...item, isNew: false })));
+            setItems(itemsArray.filter(Boolean).map((item: any) => ({ ...item, isNew: false })));
         }
         if (invoice && invoice.cost_lines) {
             const costLinesSource = invoice.cost_lines.data ? invoice.cost_lines.data : invoice.cost_lines;
@@ -46,6 +47,10 @@ export default function Show({ invoice }: { invoice: any }) {
         setDeletedCostLines([]);
         setSelectedItemsForMerge([]);
         setIsEditing(false);
+    };
+
+    useEffect(() => {
+        resetState();
     }, [invoice]);
 
     const isUnpaid = invoice.status === 'unpaid';
@@ -189,14 +194,7 @@ export default function Show({ invoice }: { invoice: any }) {
     };
 
     const handleCancel = () => {
-        // Reset local state to prop data
-        if (invoice && invoice.items) {
-            const itemsArray = Array.isArray(invoice.items) ? invoice.items : Object.values(invoice.items);
-            setItems(itemsArray.filter((item: any) => item && item.item_type).map((item: any) => ({ ...item, isNew: false })));
-        }
-        setDiscount(invoice.discount || 0);
-        setDeletedItems([]);
-        setIsEditing(false);
+        resetState();
     };
 
     const getStatusBadge = (status: string) => {
@@ -222,7 +220,7 @@ export default function Show({ invoice }: { invoice: any }) {
         if (item.item_type === 'timer') return acc + (parseFloat(item.total_amount) || 0);
         return acc + (parseFloat(item.amount) * parseInt(item.qty || 1) || 0);
     }, 0);
-    const currentTotal = currentSubtotal - parseFloat(discount || 0);
+    const currentTotal = currentSubtotal + parseFloat(invoice.tax || 0) - parseFloat(discount || 0);
 
     return (
         <AdminSidebarLayout title={`Invoice #${invoice.invoice_number}`} header="Invoice Management">
@@ -323,12 +321,12 @@ export default function Show({ invoice }: { invoice: any }) {
                         <div className="bg-gray-50 rounded-lg p-4 mb-4">
                             <div className="flex justify-between items-baseline">
                                 <span className="text-xs font-bold text-gray-500 uppercase tracking-wider">Total Payable</span>
-                                <span className="text-2xl font-black text-gray-900">{formatCurrency(invoice.amount, invoice.currency)}</span>
+                                <span className="text-2xl font-black text-gray-900">{formatCurrency(currentTotal, invoice.currency)}</span>
                             </div>
                             {invoice.status === 'partially_paid' && (
                                 <div className="flex justify-between items-center mt-3 pt-3 border-t border-gray-200">
                                     <span className="text-xs font-bold text-red-600 flex items-center"><Clock className="w-3 h-3 mr-1" /> Remaining Due</span>
-                                    <span className="font-bold text-red-600">{formatCurrency(invoice.amount - invoice.paid_amount, invoice.currency)}</span>
+                                    <span className="font-bold text-red-600">{formatCurrency(currentTotal - invoice.paid_amount, invoice.currency)}</span>
                                 </div>
                             )}
                         </div>
@@ -664,7 +662,7 @@ export default function Show({ invoice }: { invoice: any }) {
                                                     setDiscount(e.target.value);
                                                     setDiscountPercentage(0);
                                                 }}
-                                                disabled={!isEditing}
+                                                disabled={!isUnpaid}
                                             />
                                         </div>
                                     </div>
@@ -681,13 +679,13 @@ export default function Show({ invoice }: { invoice: any }) {
                                                     const base = parseFloat(invoice.sub_total) + parseFloat(invoice.tax || 0);
                                                     setDiscount((base * pct / 100).toFixed(2));
                                                 }}
-                                                disabled={!isEditing}
+                                                disabled={!isUnpaid}
                                                 placeholder="%"
                                             />
                                             <span className="bg-gray-100 border border-l-0 border-gray-300 rounded-r-md px-3 py-2 text-sm text-gray-500 h-10">%</span>
                                         </div>
                                     </div>
-                                    {isEditing && (
+                                    {isUnpaid && (
                                         <Button type="button" onClick={handleSave} disabled={isSaving} className="h-10 bg-gray-900 text-white hover:bg-gray-800 w-full sm:w-auto">
                                             Update
                                         </Button>
@@ -742,17 +740,29 @@ export default function Show({ invoice }: { invoice: any }) {
                             <CardTitle className="text-base flex items-center text-gray-700">
                                 <Calculator className="w-4 h-4 mr-2 text-gray-400" /> Internal Cost Lines
                             </CardTitle>
-                            {isEditing && (
-                                <Button 
-                                    variant="outline" 
-                                    size="sm" 
-                                    onClick={() => {
-                                        setCostLines([...costLines, { id: 'new-' + crypto.randomUUID(), isNew: true, line_type: 'direct', amount: 0, description: '' }]);
-                                    }}
-                                    className="h-7 text-xs flex items-center"
-                                >
-                                    <Plus className="w-3 h-3 mr-1" /> Add Cost Line
-                                </Button>
+                            {isUnpaid && (
+                                <div className="flex gap-2">
+                                    <Button 
+                                        variant="outline" 
+                                        size="sm" 
+                                        onClick={() => {
+                                            setCostLines([...costLines, { id: 'new-' + crypto.randomUUID(), isNew: true, line_type: 'direct', amount: 0, description: '' }]);
+                                        }}
+                                        className="h-8 text-xs font-semibold uppercase tracking-wider bg-white"
+                                    >
+                                        Add Direct Cost
+                                    </Button>
+                                    <Button 
+                                        variant="outline" 
+                                        size="sm" 
+                                        onClick={() => {
+                                            setCostLines([...costLines, { id: 'new-' + crypto.randomUUID(), isNew: true, line_type: 'user_credit', amount: 0, description: '', credit_user_id: '' }]);
+                                        }}
+                                        className="h-8 text-xs font-semibold uppercase tracking-wider bg-white"
+                                    >
+                                        Add Team Credit
+                                    </Button>
+                                </div>
                             )}
                         </CardHeader>
                         <CardContent className="pt-4">
@@ -761,7 +771,7 @@ export default function Show({ invoice }: { invoice: any }) {
                             <div className="space-y-3">
                                 {costLines.map((line, index) => (
                                     <div key={line.id || index} className="p-3 bg-gray-50 border border-gray-200 rounded-md">
-                                        {line.locked || !isEditing ? (
+                                        {line.locked || !isUnpaid ? (
                                             <div>
                                                 <div className="flex justify-between items-center mb-1">
                                                     <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold ${
@@ -839,19 +849,40 @@ export default function Show({ invoice }: { invoice: any }) {
                                                 {line.line_type === 'user_credit' && (
                                                     <div className="flex sm:flex-row gap-3">
                                                         <div className="w-full sm:w-1/2">
-                                                            <Label className="text-xs text-gray-500">Credit User ID</Label>
-                                                            <Input 
-                                                                type="number"
+                                                            <Label className="text-xs text-gray-500">Credit User</Label>
+                                                            <PremiumCombobox
                                                                 value={line.credit_user_id || ''}
-                                                                onChange={(e) => {
+                                                                options={line.credit_user_id && line.credit_user_name ? [{ value: line.credit_user_id, label: line.credit_user_name }] : []}
+                                                                onChange={(val, opt) => {
                                                                     const newLines = [...costLines];
-                                                                    newLines[index].credit_user_id = e.target.value;
+                                                                    newLines[index].credit_user_id = val as string;
+                                                                    if (opt && opt.name) {
+                                                                        newLines[index].credit_user_name = opt.name;
+                                                                    }
                                                                     setCostLines(newLines);
                                                                 }}
-                                                                placeholder="Enter User ID..."
+                                                                asyncEndpoint={route('admin.resellers.search-users')}
+                                                                placeholder="Search User..."
+                                                                searchPlaceholder="Search by name or email..."
                                                                 className="h-9"
                                                             />
                                                         </div>
+                                                    </div>
+                                                )}
+                                                {line.line_type === 'direct' && !line.locked && !line.isNew && invoice.status !== 'paid' && invoice.status !== 'cancelled' && (
+                                                    <div className="mt-3 flex items-center gap-3">
+                                                        <Button 
+                                                            type="button"
+                                                            onClick={(e) => {
+                                                                e.preventDefault();
+                                                                router.post(route('invoices.cost-lines.record-paid', { invoice: invoice.id, line: line.id }));
+                                                            }}
+                                                            className="bg-emerald-500 hover:bg-emerald-600 text-white h-8 px-3 text-xs font-semibold"
+                                                        >
+                                                            <Receipt className="w-3.5 h-3.5 mr-1.5" />
+                                                            Record as paid
+                                                        </Button>
+                                                        <span className="text-xs text-gray-500 font-medium">Creates a client payment for this amount.</span>
                                                     </div>
                                                 )}
                                             </div>
@@ -859,16 +890,16 @@ export default function Show({ invoice }: { invoice: any }) {
                                     </div>
                                 ))}
                                 
-                                {costLines.length === 0 && !isEditing && (
+                                {costLines.length === 0 && (
                                     <div className="text-center py-6 text-sm text-gray-500 border border-dashed rounded-md bg-gray-50">
                                         No internal cost lines recorded.
                                     </div>
                                 )}
                                 
-                                {isEditing && costLines.length > 0 && (
-                                    <div className="flex justify-end mt-4">
-                                        <Button type="button" onClick={handleSave} disabled={isSaving} className="bg-blue-600 hover:bg-blue-700">
-                                            Save Costs
+                                {isUnpaid && costLines.length > 0 && (
+                                    <div className="mt-4">
+                                        <Button type="button" onClick={handleSave} disabled={isSaving} className="w-full h-10 bg-black text-white hover:bg-gray-900 font-bold tracking-wider flex items-center justify-center">
+                                            <Calculator className="w-4 h-4 mr-2" /> Save cost lines
                                         </Button>
                                     </div>
                                 )}
@@ -903,7 +934,13 @@ export default function Show({ invoice }: { invoice: any }) {
                                     onClick={() => { if(confirm('Bill this invoice from client balance?')) router.post(route('admin.invoices.mark-paid', invoice.id)); }}
                                     className="bg-blue-600 hover:bg-blue-700"
                                 >
-                                    <Check className="w-4 h-4 mr-2" /> Mark Paid / Bill
+                                    <Check className="w-4 h-4 mr-2" /> Bill from Balance
+                                </Button>
+                                <Button 
+                                    variant="outline"
+                                    onClick={() => { if(confirm('Mark this invoice as paid externally?')) router.post(route('admin.invoices.external-pay', invoice.id)); }}
+                                >
+                                    <Receipt className="w-4 h-4 mr-2" /> External Pay
                                 </Button>
                                 <Button 
                                     onClick={() => {

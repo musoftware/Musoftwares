@@ -103,4 +103,17 @@ return [
     'delete_service_desc' => 'سيتم حذف الخدمة ":title" وجميع باقاتها نهائياً. لا يمكن التراجع عن هذا الإجراء.',
     'delete_permanently' => 'حذف نهائي',
     'confirm' => 'تأكيد',
+    'cost_line_recorded_success' => 'تم تسجيل سطر التكلفة كمدفوع بنجاح.',
+    
+    // المشتركون
+    'subscribers' => 'المشتركون',
+    'user' => 'المستخدم',
+    'total_monthly' => 'إجمالي الاشتراك الشهري المتوقع',
+    'first_expire_date' => 'تاريخ أول انتهاء',
+    'view_services' => 'عرض الخدمات',
+    'user_services' => 'خدمات :name',
+    'expires' => 'ينتهي في',
+    'mo' => 'شهر',
+    'no_active_services' => 'لا توجد خدمات نشطة.',
+    'no_subscribers_found' => 'لا يوجد مشتركون.',
 ];

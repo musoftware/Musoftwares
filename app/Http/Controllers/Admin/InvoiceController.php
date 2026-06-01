@@ -110,7 +110,7 @@ class InvoiceController extends Controller
             ->through(fn ($invoice) => (new InvoiceResource($invoice))->resolve());
 
         $projects = $request->filled('client_id') 
-            ? \App\Models\Project::whereHas('users', fn($q) => $q->where('users.id', $request->client_id))->get()
+            ? \App\Models\Project::where('user_id', $request->client_id)->get()
             : \App\Models\Project::all();
 
         return Inertia::render('Admin/Invoices/Index', [
@@ -135,7 +135,7 @@ class InvoiceController extends Controller
             ->through(fn ($invoice) => (new InvoiceResource($invoice))->resolve());
 
         $projects = $request->filled('client_id') 
-            ? \App\Models\Project::whereHas('users', fn($q) => $q->where('users.id', $request->client_id))->get()
+            ? \App\Models\Project::where('user_id', $request->client_id)->get()
             : \App\Models\Project::all();
 
         return Inertia::render('Admin/Invoices/Index', [
@@ -160,7 +160,7 @@ class InvoiceController extends Controller
             ->through(fn ($invoice) => (new InvoiceResource($invoice))->resolve());
 
         $projects = $request->filled('client_id') 
-            ? \App\Models\Project::whereHas('users', fn($q) => $q->where('users.id', $request->client_id))->get()
+            ? \App\Models\Project::where('user_id', $request->client_id)->get()
             : \App\Models\Project::all();
 
         return Inertia::render('Admin/Invoices/Index', [
@@ -178,7 +178,8 @@ class InvoiceController extends Controller
      */
     public function create(Request $request)
     {
-        $client = User::find($request->input('client_id'));
+        $clientId = $request->input('client_id') ?? $request->input('user') ?? $request->input('user_id');
+        $client = User::find($clientId);
         if (!$client) {
             return redirect()->route('admin.invoices.index')
                 ->with('error', __('admin.client_not_found'));
@@ -227,12 +228,31 @@ class InvoiceController extends Controller
     }
 
     /**
-     * Mark an invoice as paid manually.
+     * Bill invoice from client's balance
      */
     public function markPaid(Request $request, Invoice $invoice)
     {
         try {
-            $this->invoiceService->markPaid($invoice);
+            $client_balance = $invoice->user->balance($invoice->currency_id);
+            if (((float)$client_balance >= (float)$invoice->unpaid_total()) && ((float)$invoice->unpaid_total() > 0)) {
+                $invoice->bill_invoice();
+            } else {
+                return redirect()->back()->with('error', __('admin.insufficient_balance'));
+            }
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', $e->getMessage());
+        }
+
+        return redirect()->back()->with('success', __('admin.invoice_marked_paid'));
+    }
+
+    /**
+     * Mark an invoice as paid manually (external pay).
+     */
+    public function externalPay(Request $request, Invoice $invoice)
+    {
+        try {
+            $invoice->mark_as_paid();
         } catch (\Exception $e) {
             return redirect()->back()->with('error', $e->getMessage());
         }
@@ -339,7 +359,7 @@ class InvoiceController extends Controller
                 if ($inv->status == 'paid') {
                     return redirect()->back()->with('error', __('admin.invoice_already_paid'));
                 }
-                $client_balance = $inv->user->balance($inv->currency);
+                $client_balance = $inv->user->balance($inv->currency_id);
                 $invoice_total = $inv->unpaid_total();
 
                 if (((float)$client_balance >= (float)$inv->unpaid_total()) && ((float)$inv->unpaid_total() > 0)) {
@@ -376,7 +396,7 @@ class InvoiceController extends Controller
                     -1 * $invoice_total,
                     'Invoice #' . $inv->id . ' converted to transaction',
                     'used',
-                    $inv->currency,
+                    $inv->currency_id,
                     $project
                 );
                 $inv->paid = $inv->total();
@@ -519,22 +539,46 @@ class InvoiceController extends Controller
      */
     public function timerDetails($item_id)
     {
-        $item = \App\Models\InvoiceItem::with(['timers', 'invoice.user'])->findOrFail($item_id);
+        $item = \App\Models\InvoiceItem::with(['timers', 'invoice.user', 'invoice.currency'])->findOrFail($item_id);
         
         $timers = $item->timers->map(function ($timer) {
             return [
                 'id' => $timer->id,
-                'start_date' => $timer->start_date,
-                'end_date' => $timer->end_date,
+                'start_date' => $timer->date_start,
+                'end_date' => $timer->date_end,
                 'amount' => (float) $timer->amount,
-                'duration_seconds' => $timer->start_date && $timer->end_date
-                    ? \Carbon\Carbon::parse($timer->end_date)->diffInSeconds(\Carbon\Carbon::parse($timer->start_date))
+                'duration_seconds' => $timer->date_start && $timer->date_end
+                    ? abs(\Carbon\Carbon::parse($timer->date_end)->diffInSeconds(\Carbon\Carbon::parse($timer->date_start)))
                     : 0,
             ];
         });
 
         $totalSeconds = $timers->sum('duration_seconds');
         $totalBillable = $timers->sum('amount');
+
+        $first_start = $item->timers->min('date_start');
+        $last_end = $item->timers->max('date_end');
+        $spanSeconds = 0;
+        if ($first_start && $last_end) {
+            $spanSeconds = abs(\Carbon\Carbon::parse($last_end)->diffInSeconds(\Carbon\Carbon::parse($first_start)));
+        }
+
+        $hour_rate = 0;
+        $user = $item->invoice->user;
+        if ($user && (float) ($user->booking_rate ?? 0) > 0) {
+            $hour_rate = \App\Models\CurrenciesExchange::RateToday(
+                $user->booking_rate,
+                $user->booking_rate_currency_id ?? $user->currency_id ?? 1,
+                $item->invoice->currency_id
+            );
+        } else {
+            $baseRate = \App\Helpers\FinanceHelper::calculateOverheadHourlyRate();
+            $hour_rate = \App\Models\CurrenciesExchange::RateToday(
+                $baseRate,
+                \App\Models\AdminSettings::GetValue('business_currency', 2),
+                $item->invoice->currency_id
+            );
+        }
 
         return \Inertia\Inertia::render('Admin/Invoices/TimerDetails', [
             'item' => [
@@ -544,10 +588,16 @@ class InvoiceController extends Controller
                 'invoice_number' => $item->invoice->invoice_number,
                 'client_name' => $item->invoice->user ? $item->invoice->user->name : null,
             ],
+            'invoice_currency' => $item->invoice->relationLoaded('currency') && $item->invoice->getRelation('currency') ? [
+                'id' => $item->invoice->getRelation('currency')->id,
+                'code' => $item->invoice->getRelation('currency')->currency ?? $item->invoice->getRelation('currency')->code,
+                'symbol' => $item->invoice->getRelation('currency')->symbol,
+            ] : null,
             'timers' => $timers->values()->all(),
             'total_seconds' => $totalSeconds,
             'total_billable' => $totalBillable,
-            'hour_rate' => 25.0, // Default hour rate, can be customized later
+            'span_seconds' => $spanSeconds,
+            'hour_rate' => round($hour_rate, 2),
         ]);
     }
 
@@ -570,7 +620,7 @@ class InvoiceController extends Controller
                 'amount' => $session['amount'],
                 'project_id' => $item->invoice->project_id ?? null,
                 'user_id' => \Illuminate\Support\Facades\Auth::id(),
-                'currency_id' => $item->invoice->currency,
+                'currency_id' => $item->invoice->currency_id,
             ]);
         }
 
@@ -597,5 +647,14 @@ class InvoiceController extends Controller
         $item->save();
 
         return redirect()->route('admin.invoices.timer-details', $item->id);
+    }
+
+    public function recordCostLinePaid(\App\Models\Invoice $invoice, $line)
+    {
+        $result = $invoice->postDirectCostLineNow((int) $line);
+        if ($result['ok']) {
+            return redirect()->back()->with('success', __('admin.cost_line_recorded_success'));
+        }
+        return redirect()->back()->with('error', $result['message']);
     }
 }

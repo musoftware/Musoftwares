@@ -362,28 +362,6 @@ export default function PricingBuilder({
                             ))}
                         </div>
 
-                        {activeSubscription?.owned_features && activeSubscription.owned_features.length > 0 && (
-                            <div className="mt-4 flex flex-col gap-2 p-3 bg-white border border-slate-200 rounded-xl">
-                                <label className="flex items-center gap-3 cursor-pointer">
-                                    <input 
-                                        type="radio" 
-                                        className="text-indigo-600 focus:ring-indigo-500" 
-                                        checked={!isNewSystem} 
-                                        onChange={() => onSystemTypeChange?.(false)}
-                                    />
-                                    <span className="text-sm font-medium text-slate-700">Upgrade Current System</span>
-                                </label>
-                                <label className="flex items-center gap-3 cursor-pointer">
-                                    <input 
-                                        type="radio" 
-                                        className="text-indigo-600 focus:ring-indigo-500" 
-                                        checked={isNewSystem} 
-                                        onChange={() => onSystemTypeChange?.(true)}
-                                    />
-                                    <span className="text-sm font-medium text-slate-700">Create New System</span>
-                                </label>
-                            </div>
-                        )}
                     </div>
                     
                     <div className="p-6">

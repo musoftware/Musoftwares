@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Head, Link, router } from '@inertiajs/react';
 import { Copy, Mail, MessageCircle, ChevronDown, Key, Wallet, FileText, Briefcase, Trash2, Edit, ShieldCheck } from 'lucide-react';
 import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
+import HiddenAmount from '@/Components/HiddenAmount';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -729,7 +730,10 @@ export default function Show({ client, stats = {}, wallets, modulePlans = [], su
                             </div>
                             <div className="flex justify-between items-center pb-2 border-b border-slate-100">
                                 <span className="text-slate-500 text-sm">Total Spend</span>
-                                <span className="font-bold text-slate-900 font-jetbrains">{formatCurrency((client.total_paid || 0) - (client.total_cost || 0), client.currency)}</span>
+                                <HiddenAmount 
+                                    amount={formatCurrency((client.total_paid || 0) - (client.total_cost || 0), client.currency)}
+                                    hiddenText={__("Hidden")}
+                                />
                             </div>
                             <div className="flex justify-between items-center pb-2 border-b border-slate-100">
                                 <span className="text-slate-500 text-sm">Remaining</span>

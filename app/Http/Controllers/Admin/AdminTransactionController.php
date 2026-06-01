@@ -36,6 +36,13 @@ class AdminTransactionController extends Controller
         }
 
         $exchanges = CurrenciesExchange::Today();
+        if (count($exchanges) == 0) {
+            $exchanges = CurrenciesExchange::whereIn('id', function ($query) {
+                $query->select(\Illuminate\Support\Facades\DB::raw('MAX(id)'))
+                      ->from('currencies_exchanges')
+                      ->groupBy('currency1', 'currency2');
+            })->get();
+        }
         
         $hourRate = $user->hour_rate ?? 0;
         $recommendedHourRate = AdminSettings::GetRecommendedHourlyRate($user->currency);

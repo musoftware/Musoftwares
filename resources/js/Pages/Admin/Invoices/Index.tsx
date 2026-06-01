@@ -395,11 +395,16 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
                                         </TableCell>
                                         <TableCell className="text-right" data-label="Total">
                                             <div className="flex flex-col items-end gap-1">
-                                                <span className="font-semibold text-foreground">
-                                                    {formatCurrency(invoice.business_amount || invoice.amount, invoice.business_currency || invoice.currency)}
+                                                <span className="font-semibold text-emerald-600">
+                                                    {formatCurrency(invoice.amount, invoice.currency)}
                                                 </span>
+                                                {(invoice.business_currency && invoice.business_currency !== invoice.currency) && (
+                                                    <span className="text-xs text-muted-foreground font-medium" title="Business Currency">
+                                                        ~ {formatCurrency(invoice.business_amount || invoice.amount, invoice.business_currency)}
+                                                    </span>
+                                                )}
                                                 {invoice.status === 'partially_paid' && (
-                                                    <span className="text-xs text-primary bg-primary/10 px-2 py-0.5 rounded border border-primary/20">
+                                                    <span className="text-xs text-primary bg-primary/10 px-2 py-0.5 rounded border border-primary/20 mt-1">
                                                         Paid {formatCurrency(invoice.paid_amount, invoice.currency)}
                                                     </span>
                                                 )}

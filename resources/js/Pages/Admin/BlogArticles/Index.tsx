@@ -5,8 +5,8 @@ import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
 import Pagination from '@/Components/Pagination';
 import { Badge } from '@/Components/ui/badge';
-import { ExternalLink, Search, FileText } from 'lucide-react';
-
+import { ExternalLink, Search, FileText, Plus, MoreHorizontal, Pencil, Trash2 } from 'lucide-react';
+import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle } from '@/Components/ui/dialog';
 export default function Index({ articles, filters }) {
     const [search, setSearch] = useState(filters.q || '');
 
@@ -29,6 +29,12 @@ export default function Index({ articles, filters }) {
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                     <Button type="submit" className="ml-2 h-10">Search</Button>
                 </form>
+                <Link href={route('admin.blog-articles.create')}>
+                    <Button className="h-10 gap-2">
+                        <Plus className="h-4 w-4" />
+                        Add Article
+                    </Button>
+                </Link>
             </div>
 
             <div className="overflow-hidden rounded-lg bg-white shadow border border-gray-200">
@@ -81,12 +87,39 @@ export default function Index({ articles, filters }) {
                                         )}
                                     </td>
                                     <td className="p-4 text-right">
-                                        <a href={route('blog.show', { slug: article.slug })} target="_blank" rel="noopener noreferrer">
-                                            <Button variant="ghost" size="sm" className="gap-2 text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50">
-                                                <ExternalLink className="h-4 w-4" />
-                                                View
-                                            </Button>
-                                        </a>
+                                        <Dialog>
+                                            <DialogTrigger asChild>
+                                                <Button variant="ghost" className="h-8 w-8 p-0">
+                                                    <span className="sr-only">Open menu</span>
+                                                    <MoreHorizontal className="h-4 w-4" />
+                                                </Button>
+                                            </DialogTrigger>
+                                            <DialogContent className="sm:max-w-xs">
+                                                <DialogHeader>
+                                                    <DialogTitle>Actions</DialogTitle>
+                                                </DialogHeader>
+                                                <div className="flex flex-col gap-2 py-2">
+                                                    <a href={route('blog.show', { slug: article.slug })} target="_blank" rel="noopener noreferrer" className="w-full">
+                                                        <Button variant="outline" className="w-full justify-start gap-2">
+                                                            <ExternalLink className="h-4 w-4" />
+                                                            View
+                                                        </Button>
+                                                    </a>
+                                                    <Link href={route('admin.blog-articles.edit', article.id)} className="w-full">
+                                                        <Button variant="outline" className="w-full justify-start gap-2">
+                                                            <Pencil className="h-4 w-4" />
+                                                            Edit
+                                                        </Button>
+                                                    </Link>
+                                                    <Link href={route('admin.blog-articles.destroy', article.id)} method="delete" as="button" className="w-full">
+                                                        <Button variant="destructive" className="w-full justify-start gap-2">
+                                                            <Trash2 className="h-4 w-4" />
+                                                            Delete
+                                                        </Button>
+                                                    </Link>
+                                                </div>
+                                            </DialogContent>
+                                        </Dialog>
                                     </td>
                                 </tr>
                             ))}

@@ -103,4 +103,17 @@ return [
     'delete_service_desc' => 'This will permanently delete ":title" and all its packages. This action cannot be undone.',
     'delete_permanently' => 'Delete Permanently',
     'confirm' => 'Confirm',
+    'cost_line_recorded_success' => 'Cost line recorded as paid successfully.',
+    
+    // Subscribers
+    'subscribers' => 'Subscribers',
+    'user' => 'User',
+    'total_monthly' => 'Total Expected Monthly',
+    'first_expire_date' => 'First Expire Date',
+    'view_services' => 'View Services',
+    'user_services' => ':name\'s Services',
+    'expires' => 'Expires',
+    'mo' => 'mo',
+    'no_active_services' => 'No active services.',
+    'no_subscribers_found' => 'No subscribers found.',
 ];

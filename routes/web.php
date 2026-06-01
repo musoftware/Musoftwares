@@ -595,6 +595,9 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
     Route::get('/tasks/calendar', [\App\Http\Controllers\Admin\AdminTaskController::class, 'calendar'])->name('tasks.calendar');
     Route::get('/tasks/client-tasks', [\App\Http\Controllers\Admin\AdminTaskController::class, 'clientTasks'])->name('tasks.client-tasks');
     Route::post('/tasks/client-tasks/{client}/todos', [\App\Http\Controllers\Admin\AdminTaskController::class, 'storeClientTodo'])->name('tasks.client-tasks.store');
+    Route::post('/tasks/client-tasks/{client}/todos-unpaid', [\App\Http\Controllers\Admin\AdminTaskController::class, 'storeUnpaidTodo'])->name('tasks.client-tasks.store-unpaid');
+    Route::post('/tasks/todos/{todo}/pay-schedule', [\App\Http\Controllers\Admin\AdminTaskController::class, 'payAndScheduleTodo'])->name('tasks.todos.pay-schedule');
+    Route::delete('/tasks/todos/{todo}', [\App\Http\Controllers\Admin\AdminTaskController::class, 'destroyTodo'])->name('tasks.todos.destroy');
     Route::post('/tasks/todos/{todo}/refund', [\App\Http\Controllers\Admin\AdminTaskController::class, 'refundTodo'])->name('tasks.todos.refund');
     Route::post('/tasks/todos/{todo}/schedule', [\App\Http\Controllers\Admin\AdminTaskController::class, 'scheduleTodo'])->name('tasks.todos.schedule');
 

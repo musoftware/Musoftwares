@@ -99,13 +99,7 @@ export default function ClientActionsSheet({ client, isOpen, onClose, onLoginAs,
                                 >
                                     <FileText className="h-4 w-4 mr-3 text-slate-500" /> Invoices
                                 </Link>
-                                <Link 
-                                    href={`/admin/transactions/transfer?user=${client.id}`} 
-                                    onClick={onClose}
-                                    className="flex items-center px-3 py-2 text-sm rounded-md hover:bg-slate-100 transition-colors text-slate-700 font-medium"
-                                >
-                                    <Shuffle className="h-4 w-4 mr-3 text-slate-500" /> Swap Budgets
-                                </Link>
+
                                 <Link 
                                     href={`/admin/transactions?user=${client.id}`} 
                                     onClick={onClose}

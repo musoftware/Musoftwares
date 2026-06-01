@@ -76,7 +76,7 @@ class TransactionService
                 }
             }
 
-            if ($request->has('unpaid_invoices') && $request->get('unpaid_invoices') === 'true') {
+            if ($request->boolean('unpaid_invoices')) {
                 $user->try_pay_unpaid_invoices();
             }
         });

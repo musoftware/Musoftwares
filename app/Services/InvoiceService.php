@@ -81,7 +81,11 @@ class InvoiceService
             }
 
             // Recalculate invoice totals via helper or model methods if necessary
-            $invoice->fresh()->update_total(); // assuming update_total or similar exists on Invoice
+            $invoice = $invoice->fresh();
+            if ($invoice->status === 'unpaid') {
+                $invoice->unpaid = $invoice->total();
+                $invoice->save();
+            }
         });
     }
 

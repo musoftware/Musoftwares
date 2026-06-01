@@ -77,7 +77,7 @@ const ICON_MAP: Record<string, React.ElementType> = {
 
 export default function Plans({ serviceItems, activeSubscription, walletBalance, currency, proratedRefund = 0, isEligibleForTrial = false }: PlansProps) {
     const [billing, setBilling] = useState<'1_month' | '6_months' | '1_year'>('1_month');
-    const [isNewSystem, setIsNewSystem] = useState<boolean>(false);
+    const [isNewSystem, setIsNewSystem] = useState<boolean>(!activeSubscription?.owned_features?.length);
     
     return (
         <AuthenticatedLayout header={undefined}>
