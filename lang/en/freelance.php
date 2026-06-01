@@ -174,5 +174,9 @@ return [
     'published' => 'Published',
     'open' => 'Open',
     'in_progress' => 'In Progress',
-    'suspended' => 'Suspended'
+    'suspended' => 'Suspended',
+    'admin_points_credit_log' => 'Admin Credit — :reason — :time',
+    'admin_points_deduction_log' => 'Admin Deduction — :reason — :time',
+    'points_added_success' => ':amount points added for :name.',
+    'points_deducted_success' => ':amount points deducted for :name.'
 ];

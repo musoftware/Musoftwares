@@ -5,6 +5,7 @@ import { Button } from '@/Components/ui/button';
 import { Trash2, ArrowLeft } from 'lucide-react';
 import { ConfirmModal } from '@/Components/ui/ConfirmModal';
 import { __ } from '@/lib/i18n';
+import { formatMoney as formatCurrency } from '@/lib/utils';
 
 export default function Show({ proposal }: { proposal: any }) {
 
@@ -66,7 +67,7 @@ export default function Show({ proposal }: { proposal: any }) {
                     
                     <div className="bg-gray-50 p-4 rounded-md">
                         <h3 className="text-sm font-bold text-gray-700 mb-2 uppercase tracking-wide">{__('freelance.bid_details', undefined, 'Bid Details')}</h3>
-                        <p className="text-2xl font-bold text-gray-900 mb-1">{proposal.formatted_bid_amount}</p>
+                        <p className="text-2xl font-bold text-gray-900 mb-1">{formatCurrency(proposal.bid_amount, proposal.currency)}</p>
                         <p className="text-sm text-gray-600">{__('freelance.estimated_duration', undefined, 'Estimated Duration:')} {proposal.estimated_duration || __('freelance.not_specified', undefined, 'Not specified')}</p>
                     </div>
                 </div>
