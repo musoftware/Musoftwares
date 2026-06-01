@@ -298,6 +298,8 @@ if (file_exists(base_path('Modules/CRM/routes/web.php'))) {
 Route::middleware(['auth', 'verified', 'onboarding', 'moderator'])->prefix('admin')->name('admin.')->group(function () {
     Route::resource('tickets', \App\Http\Controllers\Admin\AdminTicketController::class)->only(['index', 'show', 'update']);
     Route::post('tickets/{ticket}/reply', [\App\Http\Controllers\Admin\AdminTicketController::class, 'reply'])->name('tickets.reply');
+    Route::post('tickets/{ticket}/assign', [\App\Http\Controllers\Admin\AdminTicketController::class, 'assign'])->name('tickets.assign');
+    Route::post('tickets/canned-responses', [\App\Http\Controllers\Admin\AdminTicketController::class, 'addCannedResponse'])->name('tickets.canned-responses.store');
 });
 
 // Admin Routes
