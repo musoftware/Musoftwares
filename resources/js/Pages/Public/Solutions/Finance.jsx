@@ -18,7 +18,7 @@ export default function Finance({ canLogin, canRegister }) {
                             Bank-grade ledger accuracy and security. We build platforms that handle high-frequency transactions with perfect consistency and regulatory compliance.
                         </p>
                         <div className="flex flex-col sm:flex-row gap-4">
-                            <a href="mailto:sales@musoftwares.com">
+                            <a href="mailto:admin@musoftwares.com">
                                 <Button size="lg" className="w-full sm:w-auto bg-slate-900 hover:bg-slate-800 text-white rounded-full px-10 h-14 text-base font-semibold transition-all">
                                     Discuss Financial Needs
                                 </Button>

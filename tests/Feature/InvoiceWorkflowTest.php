@@ -3,7 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Modules\ERP\Models\Tenant;
 use Modules\ERP\Models\TenantClient;
 use Modules\ERP\Models\Invoice;
@@ -12,7 +12,7 @@ use Tests\TestCase;
 
 class InvoiceWorkflowTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     protected User $user;
     protected Tenant $tenant;

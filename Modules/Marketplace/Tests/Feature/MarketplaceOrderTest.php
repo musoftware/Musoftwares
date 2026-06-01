@@ -2,7 +2,7 @@
 
 namespace Modules\Marketplace\Tests\Feature;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Tests\TestCase;
 use App\Models\User;
 use Modules\Marketplace\Models\Service;
@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\DB;
 
 class MarketplaceOrderTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     public function test_buyer_can_place_order_with_sufficient_balance()
     {

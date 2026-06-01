@@ -1,4 +1,4 @@
-﻿import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 import axios from 'axios';
 import { Head, usePage } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
@@ -60,7 +60,7 @@ export default function ISaasIndex() {
 
     const hasBalance = pointsBalance > 0;
 
-    // ── File parsing to estimate ID count ──────────────────────────────────
+    // -- File parsing to estimate ID count ----------------------------------
     const estimateIdCount = useCallback((f: File) => {
         const reader = new FileReader();
         reader.onload = (e) => {
@@ -80,7 +80,7 @@ export default function ISaasIndex() {
         reader.readAsText(f);
     }, []);
 
-    // ── File selection handlers ────────────────────────────────────────────
+    // -- File selection handlers --------------------------------------------
     const handleFileSelect = useCallback((f: File) => {
         const ext = f.name.split('.').pop()?.toLowerCase();
         if (ext !== 'txt' && ext !== 'csv') {
@@ -112,7 +112,7 @@ export default function ISaasIndex() {
         }
     };
 
-    // ── Drag and drop handlers ─────────────────────────────────────────────
+    // -- Drag and drop handlers ---------------------------------------------
     const handleDragEnter = useCallback((e: React.DragEvent) => {
         e.preventDefault(); e.stopPropagation(); setIsDragging(true);
     }, []);
@@ -139,7 +139,7 @@ export default function ISaasIndex() {
         if (fileInputRef.current) fileInputRef.current.value = '';
     };
 
-    // ── Process submission ─────────────────────────────────────────────────
+    // -- Process submission -------------------------------------------------
     const submit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!file) {
@@ -180,7 +180,7 @@ export default function ISaasIndex() {
         setActiveTab('lookup');
     };
 
-    // ── Format helpers ─────────────────────────────────────────────────────
+    // -- Format helpers -----------------------------------------------------
     const formatFileSize = (bytes: number) => {
         if (bytes < 1024) return `${bytes} B`;
         if (bytes < 1048576) return `${(bytes / 1024).toFixed(1)} KB`;
@@ -190,7 +190,7 @@ export default function ISaasIndex() {
     const formatDate = (iso: string) => {
         const d = new Date(iso);
         return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
-            + ' · '
+            + ' � '
             + d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
     };
 
@@ -211,7 +211,7 @@ export default function ISaasIndex() {
             <div className="py-8 md:py-12">
                 <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
 
-                    {/* ── Hero Header ── */}
+                    {/* -- Hero Header -- */}
                     <div className="relative mb-6">
                         <div className="absolute -top-4 -left-4 w-24 h-24 bg-indigo-500/10 rounded-full blur-2xl" />
                         <div className="absolute -top-2 right-8 w-16 h-16 bg-purple-500/10 rounded-full blur-xl" />
@@ -226,7 +226,7 @@ export default function ISaasIndex() {
                         </div>
                     </div>
 
-                    {/* ── Stats Bar ── */}
+                    {/* -- Stats Bar -- */}
                     <div className="grid grid-cols-2 gap-3 mb-6">
                         <div className={cn(
                             "relative overflow-hidden rounded-xl border p-4 transition-all",
@@ -261,7 +261,7 @@ export default function ISaasIndex() {
                         </div>
                     </div>
 
-                    {/* ── Tabs ── */}
+                    {/* -- Tabs -- */}
                     <div className="flex items-center gap-1 mb-6 bg-slate-100 p-1 rounded-xl">
                         <button
                             onClick={() => setActiveTab('lookup')}
@@ -297,12 +297,12 @@ export default function ISaasIndex() {
                         </button>
                     </div>
 
-                    {/* ══════════════════════════════════════════════════════ */}
+                    {/* ------------------------------------------------------ */}
                     {/* TAB: NEW LOOKUP                                        */}
-                    {/* ══════════════════════════════════════════════════════ */}
+                    {/* ------------------------------------------------------ */}
                     {activeTab === 'lookup' && (
                         <>
-                            {/* ── Step Indicator ── */}
+                            {/* -- Step Indicator -- */}
                             <div className="flex items-center gap-2 mb-6 px-1">
                                 {[
                                     { label: 'Upload', icon: UploadCloud, step: 'upload' },
@@ -335,7 +335,7 @@ export default function ISaasIndex() {
                                 })}
                             </div>
 
-                            {/* ── Error Alert ── */}
+                            {/* -- Error Alert -- */}
                             {errorMessage && (
                                 <Alert variant="destructive" className="mb-6 animate-in fade-in slide-in-from-top-2 duration-300">
                                     <AlertCircle className="h-4 w-4" />
@@ -344,7 +344,7 @@ export default function ISaasIndex() {
                                 </Alert>
                             )}
 
-                            {/* ── Main Card ── */}
+                            {/* -- Main Card -- */}
                             <div className="relative">
                                 <div className={cn(
                                     "absolute inset-0 rounded-2xl transition-opacity duration-500",
@@ -556,9 +556,9 @@ export default function ISaasIndex() {
                         </>
                     )}
 
-                    {/* ══════════════════════════════════════════════════════ */}
+                    {/* ------------------------------------------------------ */}
                     {/* TAB: HISTORY                                           */}
-                    {/* ══════════════════════════════════════════════════════ */}
+                    {/* ------------------------------------------------------ */}
                     {activeTab === 'history' && (
                         <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
                             {history.length === 0 ? (
@@ -672,7 +672,7 @@ export default function ISaasIndex() {
                         </div>
                     )}
 
-                    {/* ── Info Footer ── */}
+                    {/* -- Info Footer -- */}
                     {activeTab === 'lookup' && (
                         <div className="mt-6 text-center">
                             <p className="text-xs text-slate-400">{__('general.results_are_saved_for_24_hours_switch_to_the_history_tab_to_re_download_anytime')}</p>

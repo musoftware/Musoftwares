@@ -6,22 +6,18 @@ use App\Models\User;
 use Modules\ERP\Models\Tenant;
 use Modules\ERP\Models\TenantClient;
 use Modules\ERP\Models\Product;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Tests\TestCase;
 
 class PosTest extends TestCase
 {
+    use DatabaseTransactions;
     protected function setUp(): void
     {
         parent::setUp();
         $this->withoutVite();
 
-        $this->artisan('migrate:fresh', [
-            '--path' => [
-                'database/migrations',
-                'Modules/Core/Database/Migrations',
-                'Modules/ERP/Database/Migrations',
-            ]
-        ]);
+        // Removed migrate:fresh
         
         $this->seed(\Database\Seeders\CurrenciesSeeder::class);
     }

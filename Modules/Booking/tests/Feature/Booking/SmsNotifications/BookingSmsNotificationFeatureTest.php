@@ -3,7 +3,7 @@
 namespace Modules\Booking\tests\Feature\Booking\SmsNotifications;
 
 use Tests\TestCase;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Queue;
 use Modules\Booking\Models\Booking;
 use App\Models\User;
@@ -14,7 +14,7 @@ use Modules\Booking\app\Features\SmsNotifications\Jobs\SendSmsJob;
 
 class BookingSmsNotificationFeatureTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     public function test_booking_triggers_sms_job()
     {

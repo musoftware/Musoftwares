@@ -116,11 +116,11 @@ it('skips duplicate prices within 30 seconds', function () {
 
 it('marks prices stale after 30 minutes', function () {
     $stalePrice = new GoldLivePrice([
-        'fetched_at' => now()->subMinutes(31)
+        'fetched_at' => now()->subHours(2)->toDateTimeString()
     ]);
 
     $freshPrice = new GoldLivePrice([
-        'fetched_at' => now()->subMinutes(5)
+        'fetched_at' => now()->subMinutes(5)->toDateTimeString()
     ]);
 
     expect($this->aggregator->isStale($stalePrice))->toBeTrue()

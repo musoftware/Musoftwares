@@ -3,12 +3,12 @@
 namespace Modules\Booking\tests\Feature\Booking\GcalSync;
 
 use Tests\TestCase;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use App\Models\User;
 
 class GoogleOAuthFlowTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     public function test_tenant_cannot_redirect_if_no_feature_flag()
     {

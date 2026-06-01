@@ -11,12 +11,12 @@ use Modules\Booking\Models\Booking;
 use Modules\Booking\Models\BookingEventType;
 use App\Models\User;
 use Carbon\Carbon;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Event;
 
 class BookingAnalyticsTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     public function test_listener_increments_metrics_correctly()
     {

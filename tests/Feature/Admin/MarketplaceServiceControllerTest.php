@@ -5,12 +5,12 @@ namespace Tests\Feature\Admin;
 use App\Models\User;
 use Modules\Marketplace\Models\Service;
 use Modules\Marketplace\Models\ServiceCategory;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Tests\TestCase;
 
 class MarketplaceServiceControllerTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     protected User $admin;
     protected User $sellerUser;

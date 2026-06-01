@@ -3,12 +3,12 @@
 namespace Modules\Booking\tests\Feature\Booking\GcalSync;
 
 use Tests\TestCase;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Modules\Booking\app\Features\GcalSync\Services\CalendarAvailabilityImporter;
 
 class CalendarConflictResolverTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     public function test_imported_busy_slots_prevent_public_booking()
     {

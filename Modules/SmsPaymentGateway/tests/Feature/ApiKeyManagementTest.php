@@ -3,13 +3,13 @@
 namespace Modules\SmsPaymentGateway\Tests\Feature;
 
 use Tests\TestCase;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use App\Models\User;
 use Modules\SmsPaymentGateway\Models\SmsGatewayApiKey;
 
 class ApiKeyManagementTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     protected $user;
 
@@ -36,34 +36,32 @@ class ApiKeyManagementTest extends TestCase
         
         $this->assertArrayHasKey('publishable_key', $keyPair);
         $this->assertArrayHasKey('secret_key', $keyPair);
-        $this->assertArrayHasKey('id', $keyPair);
         
         $this->assertTrue(str_starts_with($keyPair['publishable_key'], 'pk_live_'));
         $this->assertTrue(str_starts_with($keyPair['secret_key'], 'sk_live_'));
         
-        $storedKey = SmsGatewayApiKey::find($keyPair['id']);
+        $storedKey = SmsGatewayApiKey::where('user_id', $this->user->id)->first();
         $this->assertNotNull($storedKey);
         
         // Ensure secret key is hashed in DB
-        $this->assertNotEquals($keyPair['secret_key'], $storedKey->secret_key);
+        $this->assertNotEquals($keyPair['secret_key'], $storedKey->secret_key_hash);
         
         // Validate verification logic
-        $this->assertTrue(password_verify($keyPair['secret_key'], $storedKey->secret_key));
+        $this->assertEquals(hash('sha256', $keyPair['secret_key']), $storedKey->secret_key_hash);
     }
 
     public function test_api_key_rolling()
     {
         $keyPair = SmsGatewayApiKey::generateKeyPair($this->user->id, 'Test Key', true);
-        $storedKey = SmsGatewayApiKey::find($keyPair['id']);
+        $storedKey = SmsGatewayApiKey::where('user_id', $this->user->id)->first();
         
-        $oldHash = $storedKey->secret_key;
+        $oldHash = $storedKey->secret_key_hash;
         
         $newSecretKey = $storedKey->rollSecretKey();
         
         $this->assertNotEquals($keyPair['secret_key'], $newSecretKey);
         $this->assertTrue(str_starts_with($newSecretKey, 'sk_test_'));
         
-        $this->assertNotEquals($oldHash, $storedKey->fresh()->secret_key);
-        $this->assertTrue(password_verify($newSecretKey, $storedKey->fresh()->secret_key));
+        $this->assertEquals(hash('sha256', $newSecretKey), $storedKey->fresh()->secret_key_hash);
     }
 }

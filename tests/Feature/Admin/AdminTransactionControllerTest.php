@@ -5,13 +5,13 @@ namespace Tests\Feature\Admin;
 use App\Models\User;
 use App\Models\Transaction;
 use App\Models\Project;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Tests\TestCase;
 use App\Models\Currency;
 
 class AdminTransactionControllerTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     protected function setUp(): void
     {

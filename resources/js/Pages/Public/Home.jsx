@@ -140,7 +140,7 @@ export default function Home({ serviceItems = [], currency = 'USD' }) {
                     <p className="text-xl text-slate-500 font-light mb-10 max-w-2xl mx-auto">
                         Contact our team to discuss your software requirements.
                     </p>
-                    <a href="mailto:sales@musoftwares.com">
+                    <a href="mailto:admin@musoftwares.com">
                         <Button size="lg" className="bg-slate-900 hover:bg-slate-800 text-white rounded-full px-12 h-16 text-lg font-bold shadow-xl transition-all">
                             Contact Solutions Team
                         </Button>

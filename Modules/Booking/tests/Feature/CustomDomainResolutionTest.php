@@ -6,11 +6,11 @@ use Tests\TestCase;
 use Modules\Booking\Models\TenantDomain;
 use Illuminate\Http\Request;
 use Modules\Booking\Http\Middleware\ResolveTenantDomain;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 
 class CustomDomainResolutionTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     public function test_middleware_resolves_custom_domain_to_tenant()
     {

@@ -2,7 +2,7 @@
 
 namespace Tests\Feature\CRM;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 use App\Models\User;
@@ -10,7 +10,7 @@ use Modules\CRM\Models\Campaign;
 
 class CampaignTest extends TestCase
 {
-    use RefreshDatabase, WithFaker;
+    use DatabaseTransactions, WithFaker;
 
     public function test_campaign_multi_tenancy_isolation()
     {

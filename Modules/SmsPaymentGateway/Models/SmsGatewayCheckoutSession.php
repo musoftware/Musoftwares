@@ -52,7 +52,8 @@ class SmsGatewayCheckoutSession extends Model
 
         static::creating(function ($model) {
             if (empty($model->session_id)) {
-                $model->session_id = 'cs_' . Str::random(24);
+                $prefix = $model->is_test ? 'cs_test_' : 'cs_live_';
+                $model->session_id = $prefix . Str::random(24);
             }
             if (empty($model->expires_at)) {
                 $model->expires_at = now()->addMinutes(30);

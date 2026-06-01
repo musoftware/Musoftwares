@@ -69,7 +69,7 @@ export default function Privacy({ canLogin, canRegister }) {
                         <div>
                             <h2 className="text-2xl font-bold text-slate-900 mb-4">{__('landing_legal.privacy_contact_title')}</h2>
                             <p className="text-slate-600 leading-relaxed mb-6">{__('landing_legal.privacy_contact_body')}</p>
-                            <a href="mailto:legal@musoftwares.com" className="inline-flex items-center justify-center h-10 px-6 rounded-lg bg-slate-900 text-white font-medium hover:bg-slate-800 transition-colors">
+                            <a href="mailto:admin@musoftwares.com" className="inline-flex items-center justify-center h-10 px-6 rounded-lg bg-slate-900 text-white font-medium hover:bg-slate-800 transition-colors">
                                 {__('landing_legal.contact_support')}
                             </a>
                         </div>

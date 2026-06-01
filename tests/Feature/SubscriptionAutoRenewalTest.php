@@ -3,7 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Artisan;
 use App\Models\ModulePlan;
 use App\Models\UserSubscription;
@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\DB;
 
 class SubscriptionAutoRenewalTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     protected User $user;
     protected ModulePlan $freePlan;

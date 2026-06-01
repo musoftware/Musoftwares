@@ -2,7 +2,7 @@
 
 namespace Modules\ERP\Tests\Feature;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Tests\TestCase;
 use Modules\ERP\Models\Tenant;
 use App\Models\User;
@@ -12,7 +12,7 @@ use App\Models\UserSubscription;
 
 class InventoryTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     protected $user;
     protected $tenant;

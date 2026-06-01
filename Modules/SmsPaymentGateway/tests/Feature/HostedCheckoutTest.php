@@ -3,14 +3,14 @@
 namespace Modules\SmsPaymentGateway\Tests\Feature;
 
 use Tests\TestCase;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use App\Models\User;
 use Modules\SmsPaymentGateway\Models\SmsGatewayCheckoutSession;
 use Modules\SmsPaymentGateway\Models\SmsPaymentGatewayTransaction;
 
 class HostedCheckoutTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     protected $user;
     protected $session;
@@ -59,14 +59,13 @@ class HostedCheckoutTest extends TestCase
     public function test_can_verify_payment_and_complete_session()
     {
         // Create an unmatched transaction that matches the session amount
-        $transaction = SmsPaymentGatewayTransaction::create([
+        $transaction = SmsPaymentGatewayTransaction::factory()->create([
             'user_id' => $this->user->id,
-            'device_id' => 1,
             'sender' => 'VodafoneCash',
             'amount' => 350.00,
             'reference_number' => 'REF123456789',
             'status' => 'unmatched',
-            'is_valid' => true,
+            'sms_message' => 'تم استلام مبلغ',
         ]);
 
         $response = $this->postJson('/pay/' . $this->session->session_id . '/verify', [

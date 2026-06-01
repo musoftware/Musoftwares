@@ -3,12 +3,12 @@
 namespace Tests\Feature\BookingRules;
 
 use Tests\TestCase;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Modules\Booking\app\Features\BookingRules\Models\BookingAdvancedRule;
 
 class BookingAdvancedRulesFlowTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     public function test_it_creates_a_booking_rule()
     {

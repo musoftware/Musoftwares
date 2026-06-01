@@ -3,7 +3,7 @@
 namespace Modules\Booking\tests\Feature\Booking\Recurring;
 
 use Tests\TestCase;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Modules\Booking\app\Features\Recurring\Models\RecurringSeries;
 use Modules\Booking\app\Features\Recurring\Models\RecurringException;
 use Modules\Booking\app\Features\Recurring\Services\RecurringConflictResolver;
@@ -14,7 +14,7 @@ use Modules\Booking\app\Features\Recurring\Events\OccurrenceSkipped;
 
 class RecurringConflictResolverTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     public function test_resolver_detects_existing_booking_conflict()
     {

@@ -5,11 +5,11 @@ namespace Modules\Booking\Tests\Feature;
 use Tests\TestCase;
 use App\Models\User;
 use Modules\Booking\Models\BookingPageConfig;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 
 class BookingProfileTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     public function test_booking_profile_resolves_by_slug()
     {
