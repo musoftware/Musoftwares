@@ -53,7 +53,7 @@ interface Ticket {
 
 interface Props {
     ticket: Ticket;
-    supportAgents: { id: number; name: string; avatar: string }[];
+    supportAgents: { id: number; name: string; email?: string; avatar?: string }[];
     cannedResponses: { id: number; title: string; body: string }[];
 }
 

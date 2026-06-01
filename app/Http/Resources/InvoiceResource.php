@@ -45,6 +45,9 @@ class InvoiceResource extends JsonResource
             'revenue' => method_exists($this->resource, 'revenue') ? $this->revenue() : ($this->total() - $this->cost),
             'cost' => $this->cost ?? 0,
             
+            // Reference Data
+            'currencies' => \App\Models\Currency::all()->pluck('currency', 'id')->toArray(),
+
             // Pricing Insights
             'fair_price' => $this->calculateFairPrice(),
             'min_price' => $this->calculateMinPrice(),

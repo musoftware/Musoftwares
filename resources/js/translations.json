@@ -138,7 +138,8 @@
             "expires": "ينتهي في",
             "mo": "شهر",
             "no_active_services": "لا توجد خدمات نشطة.",
-            "no_subscribers_found": "لا يوجد مشتركون."
+            "no_subscribers_found": "لا يوجد مشتركون.",
+            "service_payment_added_successfully": "تم إضافة تكلفة الخدمة بنجاح."
         },
         "auth": {
             "failed": "failed",
@@ -4434,7 +4435,7 @@
             "smart_price_calculator": "Smart Price Calculator",
             "ai_cost_estimator": "AI Cost Estimator",
             "describe_the_project_requirements_in_detail_the_ai_will_generate_a_structured_breakdown_and_pricing_in_egp": "Describe the project requirements in detail. The AI will generate a structured breakdown and pricing in EGP.",
-            "calculating": "Calculating...",
+            "calculating": "جاري الحساب",
             "calculate_with_ai": "Calculate with AI",
             "saved_proposals": "Saved Proposals",
             "converted_to_contract": "Converted to Contract",
@@ -5355,7 +5356,24 @@
             "client_charge": "رسوم العميل",
             "approx_usd": "التقريب بالدولار",
             "enter_details_to_calculate": "أدخل التفاصيل لحساب التكلفة...",
-            "add_service_charge": "إضافة تكلفة الخدمة"
+            "add_service_charge": "إضافة تكلفة الخدمة",
+            "pay_service": "دفع خدمة",
+            "pay_service_desc": "تسجيل دفع خدمة خاصة بهذه الفاتورة.",
+            "service_pay_source": "مصدر الدفع",
+            "service_pay_dest": "وجهة الدفع",
+            "revenue": "هامش الربح",
+            "service_cost": "تكلفة الخدمة",
+            "invoice_total_addition": "الإضافة لإجمالي الفاتورة",
+            "business_currency_total": "الإجمالي بالعملة الأساسية",
+            "enter_details_to_preview": "أدخل التفاصيل لمعاينة الحساب...",
+            "save_service": "حفظ الخدمة",
+            "cib_swype": "CIB Swype",
+            "confirm_bill_balance": "هل أنت متأكد من رغبتك في دفع هذه الفاتورة من رصيد العميل؟",
+            "confirm_mark_paid": "هل أنت متأكد من رغبتك في تحديد هذه الفاتورة كمدفوعة؟",
+            "enter_payment_amount": "أدخل مبلغ الدفع:",
+            "amount": "المبلغ",
+            "confirm": "تأكيد",
+            "cancel": "إلغاء"
         },
         "gold_saver": {
             "gold_saver_portfolio": "محفظة مدخرات الذهب",
@@ -6869,7 +6887,8 @@
             "expires": "Expires",
             "mo": "mo",
             "no_active_services": "No active services.",
-            "no_subscribers_found": "No subscribers found."
+            "no_subscribers_found": "No subscribers found.",
+            "service_payment_added_successfully": "Service payment added successfully."
         },
         "auth": {
             "failed": "failed",
@@ -11165,7 +11184,7 @@
             "smart_price_calculator": "Smart Price Calculator",
             "ai_cost_estimator": "AI Cost Estimator",
             "describe_the_project_requirements_in_detail_the_ai_will_generate_a_structured_breakdown_and_pricing_in_egp": "Describe the project requirements in detail. The AI will generate a structured breakdown and pricing in EGP.",
-            "calculating": "Calculating...",
+            "calculating": "Calculating",
             "calculate_with_ai": "Calculate with AI",
             "saved_proposals": "Saved Proposals",
             "converted_to_contract": "Converted to Contract",
@@ -12086,7 +12105,24 @@
             "client_charge": "Client Charge",
             "approx_usd": "Approx USD",
             "enter_details_to_calculate": "Enter details to calculate...",
-            "add_service_charge": "Add Service Charge"
+            "add_service_charge": "Add Service Charge",
+            "pay_service": "Pay Service",
+            "pay_service_desc": "Record a service payment for this invoice.",
+            "service_pay_source": "Payment Source",
+            "service_pay_dest": "Payment Destination",
+            "revenue": "Revenue Margin",
+            "service_cost": "Service Cost",
+            "invoice_total_addition": "Total Addition to Invoice",
+            "business_currency_total": "Total in Base Currency",
+            "enter_details_to_preview": "Enter details to preview calculation...",
+            "save_service": "Save Service",
+            "cib_swype": "CIB Swype",
+            "confirm_bill_balance": "Are you sure you want to bill this invoice from the client's balance?",
+            "confirm_mark_paid": "Are you sure you want to mark this invoice as paid?",
+            "enter_payment_amount": "Enter the payment amount:",
+            "amount": "Amount",
+            "confirm": "Confirm",
+            "cancel": "Cancel"
         },
         "gold_saver": {
             "gold_saver_portfolio": "Gold Saver Portfolio",

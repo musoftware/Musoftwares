@@ -36,7 +36,7 @@ export default function Show({ invoice }: { invoice: any }) {
     const [showPayServiceModal, setShowPayServiceModal] = useState(false);
     const [payServiceForm, setPayServiceForm] = useState({
         service_amount: '0',
-        currency: '1', // default to USD (assuming 1 is USD based on calc)
+        currency: String(invoice.currency_id), // Default to invoice's currency
         service_pay_source: 'wallet',
         service_pay_dest: 'cib_swype',
         service_revenue: '0'
@@ -44,6 +44,18 @@ export default function Show({ invoice }: { invoice: any }) {
     const [payServicePreview, setPayServicePreview] = useState<{ cost: number, total: number, total_usd: number } | null>(null);
     const [isCalculatingPayService, setIsCalculatingPayService] = useState(false);
     const [isSubmittingPayService, setIsSubmittingPayService] = useState(false);
+
+    // Action Modal state
+    const [actionModal, setActionModal] = useState<{
+        isOpen: boolean;
+        type: 'bill_balance' | 'partial_pay' | null;
+        amount: string;
+    }>({
+        isOpen: false,
+        type: null,
+        amount: ''
+    });
+
     const resetState = () => {
         if (invoice && invoice.items) {
             const itemsSource = invoice.items.data ? invoice.items.data : invoice.items;
@@ -192,7 +204,7 @@ export default function Show({ invoice }: { invoice: any }) {
                 setShowPayServiceModal(false);
                 setPayServiceForm({
                     service_amount: '0',
-                    currency: '1',
+                    currency: String(invoice.currency_id),
                     service_pay_source: 'wallet',
                     service_pay_dest: 'cib_swype',
                     service_revenue: '0'
@@ -958,22 +970,12 @@ export default function Show({ invoice }: { invoice: any }) {
                         {invoice.status === 'unpaid' && (
                             <>
                                 <Button 
-                                    onClick={() => { if(confirm('Bill this invoice from client balance?')) router.post(route('admin.invoices.mark-paid', invoice.id)); }}
-                                    className="bg-blue-600 hover:bg-blue-700"
+                                    onClick={() => setActionModal({ isOpen: true, type: 'bill_balance', amount: '' })}
+                                    className="bg-blue-600 hover:bg-blue-700 text-white"
                                 >
                                     <Check className="w-4 h-4 mr-2" />{__('general.bill_from_balance')}</Button>
                                 <Button 
-                                    variant="outline"
-                                    onClick={() => { if(confirm('Mark this invoice as paid externally?')) router.post(route('admin.invoices.external-pay', invoice.id)); }}
-                                >
-                                    <Receipt className="w-4 h-4 mr-2" />{__('general.external_pay')}</Button>
-                                <Button 
-                                    onClick={() => {
-                                        const amt = prompt('Enter partial payment amount:', String(invoice.amount));
-                                        if (amt && parseFloat(amt) > 0) {
-                                            router.post(route('admin.invoices.partial-pay', invoice.id), { amount: parseFloat(amt) });
-                                        }
-                                    }}
+                                    onClick={() => setActionModal({ isOpen: true, type: 'partial_pay', amount: String(invoice.amount) })}
                                     variant="outline"
                                 >
                                     <CreditCard className="w-4 h-4 mr-2" />{__('general.partial_pay')}</Button>
@@ -983,12 +985,9 @@ export default function Show({ invoice }: { invoice: any }) {
                             <Button 
                                 onClick={() => {
                                     const remaining = invoice.amount - (invoice.paid_amount || 0);
-                                    const amt = prompt('Enter payment amount:', String(remaining));
-                                    if (amt && parseFloat(amt) > 0) {
-                                        router.post(route('admin.invoices.partial-pay', invoice.id), { amount: parseFloat(amt) });
-                                    }
+                                    setActionModal({ isOpen: true, type: 'partial_pay', amount: String(remaining) });
                                 }}
-                                className="bg-blue-600 hover:bg-blue-700"
+                                className="bg-blue-600 hover:bg-blue-700 text-white"
                             >
                                 <Plus className="w-4 h-4 mr-2" />{__('general.add_payment')}</Button>
                         )}
@@ -1188,6 +1187,58 @@ export default function Show({ invoice }: { invoice: any }) {
                             className="bg-green-600 hover:bg-green-700 text-white"
                         >
                             {isSubmittingPayService ? __('general.saving') + '...' : __('general.save_service')}
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
+            {/* Action Modal */}
+            <Dialog open={actionModal.isOpen} onOpenChange={(open) => setActionModal(prev => ({ ...prev, isOpen: open }))}>
+                <DialogContent className="sm:max-w-md">
+                    <DialogHeader>
+                        <DialogTitle>
+                            {actionModal.type === 'bill_balance' ? __('general.bill_from_balance') :
+                             __('general.partial_pay')}
+                        </DialogTitle>
+                        <DialogDescription>
+                            {actionModal.type === 'bill_balance' ? __('general.confirm_bill_balance') :
+                             __('general.enter_payment_amount')}
+                        </DialogDescription>
+                    </DialogHeader>
+
+                    {actionModal.type === 'partial_pay' && (
+                        <div className="py-4">
+                            <Label htmlFor="payment_amount" className="mb-2 block">{__('general.amount')}</Label>
+                            <Input
+                                id="payment_amount"
+                                type="number"
+                                step="0.01"
+                                min="0.01"
+                                value={actionModal.amount}
+                                onChange={(e) => setActionModal(prev => ({ ...prev, amount: e.target.value }))}
+                            />
+                        </div>
+                    )}
+
+                    <DialogFooter>
+                        <Button variant="outline" onClick={() => setActionModal(prev => ({ ...prev, isOpen: false }))}>
+                            {__('general.cancel')}
+                        </Button>
+                        <Button
+                            className="bg-blue-600 hover:bg-blue-700 text-white"
+                            onClick={() => {
+                                if (actionModal.type === 'bill_balance') {
+                                    router.post(route('admin.invoices.mark-paid', invoice.id));
+                                } else if (actionModal.type === 'partial_pay') {
+                                    const amt = parseFloat(actionModal.amount);
+                                    if (amt > 0) {
+                                        router.post(route('admin.invoices.partial-pay', invoice.id), { amount: amt });
+                                    }
+                                }
+                                setActionModal(prev => ({ ...prev, isOpen: false }));
+                            }}
+                        >
+                            {__('general.confirm')}
                         </Button>
                     </DialogFooter>
                 </DialogContent>

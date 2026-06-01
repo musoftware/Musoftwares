@@ -68,7 +68,7 @@ class AdminTransactionController extends Controller
         if ($type === 'income') {
             $transactions = $this->transactionService->getIncomeTransactions($filters)
                                  ->withQueryString()
-                                 ->through(fn($t) => clone (new TransactionResource($t))->resolve());
+                                 ->through(fn($t) => (new TransactionResource($t))->resolve());
             
             return Inertia::render('Admin/Transactions/Income', [
                 'transactions' => $transactions,
@@ -78,7 +78,7 @@ class AdminTransactionController extends Controller
             // Reusing TransactionResource or create CostTransactionResource if needed
             $transactions = $this->transactionService->getCostTransactions($filters)
                                  ->withQueryString()
-                                 ->through(fn($t) => clone (new TransactionResource($t))->resolve());
+                                 ->through(fn($t) => (new TransactionResource($t))->resolve());
             
             return Inertia::render('Admin/Transactions/Cost', [
                 'transactions' => $transactions,
@@ -90,8 +90,8 @@ class AdminTransactionController extends Controller
             $cost = $this->transactionService->getCostTransactions($filters);
             
             return Inertia::render('Admin/Transactions/Revenue', [
-                'income' => $income->through(fn($t) => clone (new TransactionResource($t))->resolve()),
-                'cost' => $cost->through(fn($t) => clone (new TransactionResource($t))->resolve()),
+                'income' => $income->through(fn($t) => (new TransactionResource($t))->resolve()),
+                'cost' => $cost->through(fn($t) => (new TransactionResource($t))->resolve()),
                 'filters' => $filters,
                 'businessCurrency' => Currency::find(AdminSettings::business_currency()),
             ]);

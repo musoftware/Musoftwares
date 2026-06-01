@@ -4642,4 +4642,10 @@ return [
   'save_service' => 'حفظ الخدمة',
   'calculating' => 'جاري الحساب',
   'cib_swype' => 'CIB Swype',
+  'confirm_bill_balance' => 'هل أنت متأكد من رغبتك في دفع هذه الفاتورة من رصيد العميل؟',
+  'confirm_mark_paid' => 'هل أنت متأكد من رغبتك في تحديد هذه الفاتورة كمدفوعة؟',
+  'enter_payment_amount' => 'أدخل مبلغ الدفع:',
+  'amount' => 'المبلغ',
+  'confirm' => 'تأكيد',
+  'cancel' => 'إلغاء',
 ];

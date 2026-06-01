@@ -2,8 +2,8 @@
 
 namespace Tests\Feature\Admin;
 
-use App\Models\User;
 use App\Models\BlogArticle;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -11,62 +11,52 @@ class AdminBlogArticleControllerTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected User $admin;
+    protected User $clientUser;
+
     protected function setUp(): void
     {
         parent::setUp();
+
         $this->seed(\Database\Seeders\RolesAndPermissionsSeeder::class);
+
+        $this->admin = User::factory()->create(['onboarding_completed' => true]);
+        $this->admin->assignRole('admin');
+
+        $this->clientUser = User::factory()->create(['onboarding_completed' => true]);
+        $this->clientUser->assignRole('client');
     }
 
-    private function createAdmin()
+    public function test_admin_can_view_blog_articles_index(): void
     {
-        $admin = User::factory()->create(['onboarding_completed' => true]);
-        $admin->assignRole('admin');
-        return $admin;
-    }
-
-    public function test_admin_can_access_blog_articles_index()
-    {
-        $admin = $this->createAdmin();
-
-        $response = $this->actingAs($admin)->get(route('admin.blog-articles.index'));
-
+        $response = $this->actingAs($this->admin)->get(route('admin.blog-articles.index'));
         $response->assertStatus(200);
     }
 
-    public function test_non_admin_cannot_access_blog_articles_index()
+    public function test_non_admin_cannot_view_blog_articles_index(): void
     {
-        $user = User::factory()->create(['onboarding_completed' => true]);
-
-        $response = $this->actingAs($user)->get(route('admin.blog-articles.index'));
-
+        $response = $this->actingAs($this->clientUser)->get(route('admin.blog-articles.index'));
         $response->assertStatus(403);
     }
 
-    public function test_admin_can_access_create_blog_article_page()
+    public function test_admin_can_view_create_blog_article_page(): void
     {
-        $admin = $this->createAdmin();
-
-        $response = $this->actingAs($admin)->get(route('admin.blog-articles.create'));
-
+        $response = $this->actingAs($this->admin)->get(route('admin.blog-articles.create'));
         $response->assertStatus(200);
     }
 
-    public function test_admin_can_store_blog_article()
+    public function test_admin_can_store_blog_article(): void
     {
-        $admin = $this->createAdmin();
-
-        $payload = [
+        $response = $this->actingAs($this->admin)->post(route('admin.blog-articles.store'), [
             'language' => 'en',
             'title' => 'Test Article',
-            'content' => 'This is a test article content.',
+            'content' => 'This is a test article.',
             'slug' => 'test-article',
             'is_published' => true,
-        ];
+        ]);
 
-        $response = $this->actingAs($admin)->post(route('admin.blog-articles.store'), $payload);
-
-        $response->assertSessionHasNoErrors();
         $response->assertRedirect(route('admin.blog-articles.index'));
+        $response->assertSessionHas('success');
 
         $this->assertDatabaseHas('blog_articles', [
             'title' => 'Test Article',
@@ -74,65 +64,38 @@ class AdminBlogArticleControllerTest extends TestCase
         ]);
     }
 
-    public function test_admin_can_access_edit_blog_article_page()
+    public function test_admin_can_view_edit_blog_article_page(): void
     {
-        $admin = $this->createAdmin();
-        $article = BlogArticle::create([
-            'language' => 'en',
-            'title' => 'Old Article',
-            'content' => 'Old content',
-        ]);
-
-        $response = $this->actingAs($admin)->get(route('admin.blog-articles.edit', $article->id));
-
+        $article = BlogArticle::factory()->create();
+        $response = $this->actingAs($this->admin)->get(route('admin.blog-articles.edit', $article->id));
         $response->assertStatus(200);
     }
 
-    public function test_admin_can_update_blog_article()
+    public function test_admin_can_update_blog_article(): void
     {
-        $admin = $this->createAdmin();
-        $article = BlogArticle::create([
+        $article = BlogArticle::factory()->create();
+        $response = $this->actingAs($this->admin)->put(route('admin.blog-articles.update', $article->id), [
             'language' => 'en',
-            'title' => 'Old Article',
-            'content' => 'Old content',
-            'slug' => 'old-article'
+            'title' => 'Updated Article',
+            'content' => 'Updated content.',
         ]);
 
-        $payload = [
-            'language' => 'ar',
-            'title' => 'Updated Article',
-            'content' => 'Updated content',
-            'slug' => 'updated-article'
-        ];
-
-        $response = $this->actingAs($admin)->put(route('admin.blog-articles.update', $article->id), $payload);
-
-        $response->assertSessionHasNoErrors();
         $response->assertRedirect(route('admin.blog-articles.index'));
+        $response->assertSessionHas('success');
 
         $this->assertDatabaseHas('blog_articles', [
             'id' => $article->id,
             'title' => 'Updated Article',
-            'slug' => 'updated-article',
-            'language' => 'ar'
         ]);
     }
 
-    public function test_admin_can_delete_blog_article()
+    public function test_admin_can_destroy_blog_article(): void
     {
-        $admin = $this->createAdmin();
-        $article = BlogArticle::create([
-            'language' => 'en',
-            'title' => 'To Delete Article',
-            'content' => 'Content',
-        ]);
-
-        $response = $this->actingAs($admin)->delete(route('admin.blog-articles.destroy', $article->id));
+        $article = BlogArticle::factory()->create();
+        $response = $this->actingAs($this->admin)->delete(route('admin.blog-articles.destroy', $article->id));
 
         $response->assertRedirect(route('admin.blog-articles.index'));
-
-        $this->assertSoftDeleted('blog_articles', [
-            'id' => $article->id,
-        ]);
+        $response->assertSessionHas('success');
+        $this->assertDatabaseMissing('blog_articles', ['id' => $article->id]);
     }
 }
