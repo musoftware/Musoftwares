@@ -154,7 +154,7 @@ export default function MarketIndex({ hasLivePrices, hasHistoricalCharts, latest
                                                 />
                                                 <RechartsTooltip 
                                                     contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
-                                                    formatter={(value: number) => [`${value} EGP`, '24k Price']}
+                                                    formatter={(value: number | string | (number | string)[] | undefined) => [`${value ?? 0} EGP`, '24k Price']}
                                                 />
                                                 <Line 
                                                     type="monotone" 
