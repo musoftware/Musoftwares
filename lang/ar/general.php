@@ -4627,4 +4627,19 @@ return [
   'approx_usd' => 'التقريب بالدولار',
   'enter_details_to_calculate' => 'أدخل التفاصيل لحساب التكلفة...',
   'add_service_charge' => 'إضافة تكلفة الخدمة',
+
+  // Pay Service Modal
+  'pay_service' => 'دفع خدمة',
+  'pay_service_desc' => 'تسجيل دفع خدمة خاصة بهذه الفاتورة.',
+  'service_pay_source' => 'مصدر الدفع',
+  'service_pay_dest' => 'وجهة الدفع',
+  'revenue' => 'هامش الربح',
+  'calculation_preview' => 'معاينة الحساب',
+  'service_cost' => 'تكلفة الخدمة',
+  'invoice_total_addition' => 'الإضافة لإجمالي الفاتورة',
+  'business_currency_total' => 'الإجمالي بالعملة الأساسية',
+  'enter_details_to_preview' => 'أدخل التفاصيل لمعاينة الحساب...',
+  'save_service' => 'حفظ الخدمة',
+  'calculating' => 'جاري الحساب',
+  'cib_swype' => 'CIB Swype',
 ];

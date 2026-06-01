@@ -3,6 +3,7 @@ import { Head, Link, router } from '@inertiajs/react';
 import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
 import { Button } from '@/Components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/Components/ui/card';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/Components/ui/dialog';
 import { Input } from "@/Components/ui/input";
 import { Label } from "@/Components/ui/label";
 import { PremiumCombobox } from '@/Components/ui/PremiumCombobox';
@@ -1063,6 +1064,135 @@ export default function Show({ invoice }: { invoice: any }) {
                 </div>
             )}
             
+            {/* Pay Service Modal */}
+            <Dialog open={showPayServiceModal} onOpenChange={setShowPayServiceModal}>
+                <DialogContent className="sm:max-w-[600px] bg-white">
+                    <DialogHeader>
+                        <DialogTitle className="flex items-center text-green-700">
+                            <CreditCard className="w-5 h-5 mr-2" />
+                            {__('general.pay_service')}
+                        </DialogTitle>
+                        <DialogDescription>
+                            {__('general.pay_service_desc', { default: 'Record a service payment for this invoice.' })}
+                        </DialogDescription>
+                    </DialogHeader>
+
+                    <div className="grid gap-4 py-4">
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                                <Label>{__('general.service_amount')}</Label>
+                                <Input 
+                                    type="number" 
+                                    min="0"
+                                    value={payServiceForm.service_amount}
+                                    onChange={e => setPayServiceForm({...payServiceForm, service_amount: e.target.value})}
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <Label>{__('general.currency')}</Label>
+                                <select 
+                                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                                    value={payServiceForm.currency}
+                                    onChange={e => setPayServiceForm({...payServiceForm, currency: e.target.value})}
+                                >
+                                    {invoice.currencies && Object.keys(invoice.currencies).map(cId => (
+                                        <option key={cId} value={cId}>{invoice.currencies[cId]}</option>
+                                    ))}
+                                </select>
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                                <Label>{__('general.service_pay_source')}</Label>
+                                <select 
+                                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                                    value={payServiceForm.service_pay_source}
+                                    onChange={e => setPayServiceForm({...payServiceForm, service_pay_source: e.target.value})}
+                                >
+                                    <option value="wallet">{__('general.wallet')}</option>
+                                    <option value="cash">{__('general.cash')}</option>
+                                    <option value="cib_swype">{__('general.cib_swype')}</option>
+                                    <option value="bank_transfer">{__('general.bank_transfer')}</option>
+                                    <option value="paypal">{__('general.paypal')}</option>
+                                </select>
+                            </div>
+                            <div className="space-y-2">
+                                <Label>{__('general.service_pay_dest')}</Label>
+                                <select 
+                                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                                    value={payServiceForm.service_pay_dest}
+                                    onChange={e => setPayServiceForm({...payServiceForm, service_pay_dest: e.target.value})}
+                                >
+                                    <option value="wallet">{__('general.wallet')}</option>
+                                    <option value="cash">{__('general.cash')}</option>
+                                    <option value="cib_swype">{__('general.cib_swype')}</option>
+                                    <option value="bank_transfer">{__('general.bank_transfer')}</option>
+                                    <option value="paypal">{__('general.paypal')}</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div className="space-y-2">
+                            <Label>{__('general.revenue')}</Label>
+                            <Input 
+                                type="number" 
+                                min="0"
+                                value={payServiceForm.service_revenue}
+                                onChange={e => setPayServiceForm({...payServiceForm, service_revenue: e.target.value})}
+                            />
+                        </div>
+
+                        {/* Live Calculation Preview */}
+                        <div className="mt-4 p-4 bg-gray-50 border border-gray-200 rounded-lg">
+                            <h4 className="text-sm font-semibold text-gray-700 mb-2 flex items-center">
+                                <Calculator className="w-4 h-4 mr-2" />
+                                {__('general.calculation_preview')}
+                            </h4>
+                            {isCalculatingPayService ? (
+                                <div className="text-sm text-gray-500">{__('general.calculating')}...</div>
+                            ) : payServicePreview ? (
+                                <div className="space-y-2 text-sm">
+                                    <div className="flex justify-between">
+                                        <span className="text-gray-500">{__('general.service_cost')}</span>
+                                        <span className="font-medium text-red-600">
+                                            {formatCurrency(payServicePreview.cost, { code: payServicePreview.invoice_currency || 'USD' })}
+                                        </span>
+                                    </div>
+                                    <div className="flex justify-between font-semibold border-t pt-2 mt-2">
+                                        <span className="text-gray-700">{__('general.invoice_total_addition')}</span>
+                                        <span className="text-green-600">
+                                            {formatCurrency(payServicePreview.total, { code: payServicePreview.invoice_currency || 'USD' })}
+                                        </span>
+                                    </div>
+                                    <div className="flex justify-between text-xs text-gray-400 mt-1">
+                                        <span>{__('general.business_currency_total')}</span>
+                                        <span>
+                                            {formatCurrency(payServicePreview.total_usd, { code: 'USD' })} {/* Assuming USD as base for display purpose here */}
+                                        </span>
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="text-sm text-gray-500 italic">{__('general.enter_details_to_preview')}</div>
+                            )}
+                        </div>
+                    </div>
+
+                    <DialogFooter>
+                        <Button variant="outline" onClick={() => setShowPayServiceModal(false)}>
+                            {__('general.cancel')}
+                        </Button>
+                        <Button 
+                            onClick={handlePayServiceSubmit} 
+                            disabled={isSubmittingPayService || isCalculatingPayService}
+                            className="bg-green-600 hover:bg-green-700 text-white"
+                        >
+                            {isSubmittingPayService ? __('general.saving') + '...' : __('general.save_service')}
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
         </AdminSidebarLayout>
     );
 }
