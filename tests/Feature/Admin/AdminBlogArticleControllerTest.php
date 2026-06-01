@@ -96,6 +96,6 @@ class AdminBlogArticleControllerTest extends TestCase
 
         $response->assertRedirect(route('admin.blog-articles.index'));
         $response->assertSessionHas('success');
-        $this->assertDatabaseMissing('blog_articles', ['id' => $article->id]);
+        $this->assertSoftDeleted('blog_articles', ['id' => $article->id]);
     }
 }

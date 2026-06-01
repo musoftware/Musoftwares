@@ -3,7 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\User;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Modules\ERP\Models\Tenant;
@@ -15,13 +15,12 @@ use Tests\TestCase;
 
 class WithdrawalWorkflowTest extends TestCase
 {
-    use DatabaseTransactions;
+    use RefreshDatabase;
 
     protected User $user;
     protected User $admin;
     protected Tenant $tenant;
     protected TenantClient $client;
-    protected ClientWallet $wallet;
     protected PaymentMethod $paymentMethod;
 
     protected function setUp(): void
@@ -54,12 +53,18 @@ class WithdrawalWorkflowTest extends TestCase
             'address' => '456 West Ave',
         ]);
 
-        $this->wallet = ClientWallet::create([
+        \Modules\ERP\Models\WalletTransaction::create([
             'tenant_id' => $this->tenant->id,
             'client_id' => $this->client->id,
-            'balance' => 2000.00,
-            'currency' => 'USD',
-            'locked_balance' => 0.00,
+            'type' => 'received',
+            'direction' => 'credit',
+            'amount' => 2000.00,
+            'currency_id' => 1,
+            'business_amount' => 2000.00,
+            'business_currency_id' => 1,
+            'exchange_rate' => 1.0,
+            'exchange_rate_date' => now()->toDateString(),
+            'created_by' => $this->admin->id,
         ]);
 
         $this->paymentMethod = PaymentMethod::create([
@@ -161,18 +166,19 @@ class WithdrawalWorkflowTest extends TestCase
 
         $response = $this->actingAs($this->admin)
             ->withSession(['tenant_id' => $this->tenant->id])
-            ->post(route('erp.withdrawals.markPaid', $withdrawal->id), [
+            ->post(route('erp.withdrawals.mark-paid', $withdrawal->id), [
                 'reference' => 'TXN-BANK-1002',
                 'proof' => $proofFile,
             ]);
 
+        $response->assertSessionHasNoErrors();
         $response->assertStatus(302);
         $this->assertEquals('paid', $withdrawal->fresh()->status);
         $this->assertEquals('TXN-BANK-1002', $withdrawal->fresh()->reference);
         $this->assertNotNull($withdrawal->fresh()->proof_path);
 
         // Verify balance was deducted
-        $this->assertEquals(1500.00, $this->wallet->fresh()->balance);
+        $this->assertEquals(1500.00, $this->client->fresh()->balance());
     }
 
     public function test_admin_can_reject_withdrawal(): void

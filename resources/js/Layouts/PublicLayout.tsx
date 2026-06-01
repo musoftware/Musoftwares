@@ -4,7 +4,6 @@ import { Link, usePage } from '@inertiajs/react';
 import { PropsWithChildren, useEffect, useState } from 'react';
 import { Menu, X, ArrowRight, Sparkles, CheckCircle2 } from 'lucide-react';
 import ApplicationLogo from '@/Components/ApplicationLogo';
-import { __ } from '@/lib/i18n';
 
 interface PublicLayoutProps extends PropsWithChildren {
     auth?: {
