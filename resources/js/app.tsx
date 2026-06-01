@@ -5,6 +5,7 @@ import { createInertiaApp } from '@inertiajs/react';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { createRoot } from 'react-dom/client';
 import { Toaster } from '@/Components/ui/toaster';
+import { Toaster as SonnerToaster } from 'sonner';
 import { GlobalErrorHandler } from '@/Components/GlobalErrorHandler';
 import { FreelanceModeProvider } from '@/Components/Freelance/FreelanceModeContext';
 import { MarketplaceModeProvider } from '@/Components/Marketplace/MarketplaceModeContext';
@@ -67,6 +68,7 @@ createInertiaApp({
                 <FreelanceModeProvider>
                     <App {...props} />
                     <Toaster />
+                    <SonnerToaster position="top-center" richColors />
                     <GlobalErrorHandler />
                 </FreelanceModeProvider>
             </MarketplaceModeProvider>

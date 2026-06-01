@@ -50,7 +50,10 @@ class SupportDeskService
             
             if (!$conversation) {
                 // If it doesn't have a conversation yet (legacy ticket), create one
-                $conversation = $ticket->conversation()->create([]);
+                $conversation = $ticket->conversation()->create([
+                    'type' => 'ticket',
+                    'status' => 'active'
+                ]);
             }
 
             $message = $conversation->messages()->create([

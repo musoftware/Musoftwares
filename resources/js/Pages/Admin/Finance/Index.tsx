@@ -1144,7 +1144,7 @@ export default function Index({ entries, categories, users, currentTab, stats, a
                                     <div className="text-sm font-semibold text-slate-800 flex items-center gap-1.5">
                                         {selectedDetailEntry.type === 'received' ? (
                                             <span className="text-green-700 bg-green-50 px-2 py-0.5 rounded border border-green-200 inline-flex items-center text-xs font-bold">
-                                                <ArrowUpRight className="w-3 h-3 mr-1" /> Deposit / Income
+                                                <TrendingUp className="w-3 h-3 mr-1" /> Deposit / Income
                                             </span>
                                         ) : selectedDetailEntry.type === 'refunded' ? (
                                             <span className="text-red-700 bg-red-50 px-2 py-0.5 rounded border border-red-200 inline-flex items-center text-xs font-bold">
@@ -1156,7 +1156,7 @@ export default function Index({ entries, categories, users, currentTab, stats, a
                                             </span>
                                         ) : (
                                             <span className="text-slate-700 bg-slate-50 px-2 py-0.5 rounded border border-slate-200 inline-flex items-center text-xs font-bold">
-                                                <ArrowDownRight className="w-3 h-3 mr-1" /> Expense
+                                                <TrendingDown className="w-3 h-3 mr-1" /> Expense
                                             </span>
                                         )}
                                     </div>

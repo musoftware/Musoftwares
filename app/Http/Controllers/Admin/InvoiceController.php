@@ -569,6 +569,8 @@ class InvoiceController extends Controller
                 'date_end' => \Carbon\Carbon::parse($session['end_date'])->toDateTimeString(),
                 'amount' => $session['amount'],
                 'project_id' => $item->invoice->project_id ?? null,
+                'user_id' => \Illuminate\Support\Facades\Auth::id(),
+                'currency_id' => $item->invoice->currency,
             ]);
         }
 
@@ -582,5 +584,18 @@ class InvoiceController extends Controller
         $timer->delete();
 
         return redirect()->back()->with('success', __('admin.timer_session_deleted'));
+    }
+
+    public function createTimerItem(\App\Models\Invoice $invoice)
+    {
+        $item = new \App\Models\InvoiceItem();
+        $item->invoice_id = $invoice->id;
+        $item->item_title = 'Time Tracking';
+        $item->item_type = 'timer';
+        $item->amount = 0;
+        $item->qty = 1;
+        $item->save();
+
+        return redirect()->route('admin.invoices.timer-details', $item->id);
     }
 }

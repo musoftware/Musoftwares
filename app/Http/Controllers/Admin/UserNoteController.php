@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
-use Modules\CRM\Models\UserNote;
+use App\Models\UserNote;
 use App\Services\UserNoteService;
 use App\Http\Requests\Admin\User\StoreUserNoteRequest;
 use App\Http\Resources\UserNoteResource;

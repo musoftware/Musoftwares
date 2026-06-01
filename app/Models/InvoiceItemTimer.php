@@ -10,7 +10,7 @@ class InvoiceItemTimer extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['invoice_item_id', 'date_start', 'date_end', 'amount', 'project_id'];
+    protected $fillable = ['invoice_item_id', 'date_start', 'date_end', 'amount', 'project_id', 'user_id', 'currency_id', 'business_amount', 'business_calculated'];
 
     public function invoiceItem()
     {

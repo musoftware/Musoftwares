@@ -18,7 +18,7 @@ function secondsToTime(seconds) {
 export default function Reports({ client, dates = [], unpaid = 0 }) {
     const userBalance = Number(client.user_balance) || 0;
     const totalPaid = Number(client.total_paid) || 0;
-    const hourRate = Number(client.hour_rate_client) || 1; // prevent div by zero
+    const hourRate = Number(client.hour_rate) || 1; // prevent div by zero
     const currency = client.currency || 'USD';
 
     return (

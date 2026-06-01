@@ -40,7 +40,7 @@ class TicketResource extends JsonResource
                 return [
                     'id'       => $conv->id,
                     'messages' => $conv->relationLoaded('messages')
-                        ? MessageResource::collection($conv->messages)
+                        ? MessageResource::collection($conv->messages)->resolve()
                         : [],
                 ];
             }),

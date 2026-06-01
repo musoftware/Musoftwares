@@ -2,6 +2,7 @@
 
 namespace Modules\Marketplace\Http\Controllers\Seller;
 
+use App\Http\Controllers\Controller;
 use Modules\Marketplace\Models\Service;
 use Modules\Marketplace\Models\ServiceLandingPage;
 use Modules\Marketplace\Models\ServiceLandingQuestion;
@@ -536,4 +537,5 @@ class ServiceLandingPageController extends Controller
      * Track Scroll Depth (AJAX endpoint)
      */
 }
+
 
