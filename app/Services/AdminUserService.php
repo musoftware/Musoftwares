@@ -42,7 +42,6 @@ class AdminUserService
     {
         $user->name                = $request->input('name');
         $user->email               = $request->input('email');
-        $user->phone               = $request->input('phone');
         $user->mobile_1            = $request->input('mobile_1');
         $user->mobile_2            = $request->input('mobile_2');
         $user->whatsapp_number     = $request->input('whatsapp_number');
