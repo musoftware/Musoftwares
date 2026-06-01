@@ -43,16 +43,16 @@ class SupportDeskService
         return $query->paginate($perPage);
     }
 
-    public function replyToTicket(Ticket $ticket, int $adminId, string $body, ?string $attachment = null): Message
+    public function replyToTicket(Ticket $ticket, int $adminId, string $body, ?string $attachment = null, bool $isInternal = false): Message
     {
-        return DB::transaction(function () use ($ticket, $adminId, $body, $attachment) {
+        return DB::transaction(function () use ($ticket, $adminId, $body, $attachment, $isInternal) {
             $conversation = $ticket->conversation;
             
             if (!$conversation) {
                 // If it doesn't have a conversation yet (legacy ticket), create one
                 $conversation = $ticket->conversation()->create([
-                    'type' => 'ticket',
-                    'status' => 'active'
+                    'type' => 'support_ticket',
+                    'status' => 'open'
                 ]);
             }
 
@@ -61,12 +61,15 @@ class SupportDeskService
                 'body'       => $body,
                 'attachment' => $attachment,
                 'is_system'  => false,
+                'is_internal'=> $isInternal,
             ]);
 
-            // Update ticket status
-            $ticket->update([
-                'ticket_status' => 'agent_replied',
-            ]);
+            // Update ticket status only if not internal note
+            if (!$isInternal) {
+                $ticket->update([
+                    'ticket_status' => 'agent_replied',
+                ]);
+            }
 
             return $message;
         });

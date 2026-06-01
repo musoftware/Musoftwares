@@ -3,10 +3,19 @@ import { Link, router } from '@inertiajs/react';
 import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
 import { Button } from '@/Components/ui/button';
 import { useToast } from '@/Components/ui/use-toast';
+import { marked } from 'marked';
+import DOMPurify from 'dompurify';
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogFooter,
+} from "@/Components/ui/dialog";
 import {
     ArrowLeft, CheckCircle, RotateCcw, Send, Paperclip, X,
     AlertTriangle, Clock, MessageSquare, User, Calendar, Tag,
-    Star, ExternalLink, FileText, Image as ImageIcon, Zap,
+    Star, ExternalLink, FileText, Image as ImageIcon, Zap, Lock
 } from 'lucide-react';
 
 /* ─── Types ─────────────────────────────────────────────────── */
@@ -15,6 +24,7 @@ interface Message {
     body: string;
     attachment?: string | null;
     is_system: boolean;
+    is_internal: boolean;
     sender: { id: number; name: string; email: string; avatar?: string | null } | null;
     created_at: string;
 }
@@ -31,6 +41,7 @@ interface Ticket {
     display_email: string;
     is_urgent: boolean;
     needs_attention: boolean;
+    assigned_employee_id?: number | null;
     rate?: number | null;
     closed_at?: string | null;
     created_at: string;
@@ -39,7 +50,11 @@ interface Ticket {
     conversation?: { id: number; messages: Message[] } | null;
 }
 
-interface Props { ticket: Ticket }
+interface Props {
+    ticket: Ticket;
+    supportAgents: { id: number; name: string; avatar: string }[];
+    cannedResponses: { id: number; title: string; body: string }[];
+}
 
 /* ─── Helpers ───────────────────────────────────────────────── */
 function initials(name: string): string {
@@ -61,6 +76,10 @@ function fullDate(iso: string): string {
 function isImageFile(path: string): boolean {
     return /\.(png|jpe?g|gif|webp|svg)$/i.test(path);
 }
+
+const renderMarkdown = (text: string) => {
+    return { __html: DOMPurify.sanitize(marked.parse(text, { breaks: true }) as string) };
+};
 
 /* ─── Maps ──────────────────────────────────────────────────── */
 const STATUS_STYLES: Record<string, { badge: string; dot: string; label: string }> = {
@@ -114,11 +133,18 @@ function AttachmentLink({ path }: { path: string }) {
 }
 
 /* ─── Main ──────────────────────────────────────────────────── */
-export default function Show({ ticket }: Props) {
+export default function Show({ ticket, supportAgents, cannedResponses }: Props) {
     const { toast } = useToast();
     const [replyBody, setReplyBody] = useState('');
-    const [attachment, setAttachment] = useState<File | null>(null);
+    const [attachments, setAttachments] = useState<File[]>([]);
+    const [isInternal, setIsInternal] = useState(false);
     const [submitting, setSubmitting] = useState(false);
+    
+    // Modals & Assign state
+    const [closeModalOpen, setCloseModalOpen] = useState(false);
+    const [closeComment, setCloseComment] = useState('');
+    const [assigningId, setAssigningId] = useState<string | number>('');
+
     const fileInputRef = useRef<HTMLInputElement>(null);
     const bottomRef = useRef<HTMLDivElement>(null);
 
@@ -128,28 +154,43 @@ export default function Show({ ticket }: Props) {
     const priorityMeta = PRIORITY_STYLES[ticket.priority]     ?? PRIORITY_STYLES.low;
     const isClosed = ticket.ticket_status === 'closed';
 
+    // HTTP Polling every 60 seconds
+    useEffect(() => {
+        const interval = setInterval(() => {
+            router.reload({ only: ['ticket'], preserveScroll: true, preserveState: true });
+        }, 60000);
+        return () => clearInterval(interval);
+    }, []);
+
     useEffect(() => {
         bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
     }, [messages.length]);
 
     const handleReply = useCallback((e?: React.FormEvent) => {
         e?.preventDefault();
-        if (!replyBody.trim() || submitting) return;
+        if ((!replyBody.trim() && attachments.length === 0) || submitting) return;
+        
         const data = new FormData();
-        data.append('body', replyBody);
-        if (attachment) data.append('attachment', attachment);
+        if (replyBody.trim()) data.append('body', replyBody);
+        data.append('is_internal', isInternal ? '1' : '0');
+        
+        attachments.forEach((file, index) => {
+            data.append(`attachments[${index}]`, file);
+        });
+
         setSubmitting(true);
-        router.post(`/admin/tickets/${ticket.id}/reply`, data, {
+        router.post(`/admin/tickets/${ticket.id}/reply`, data as any, {
             forceFormData: true,
             onSuccess: () => {
                 setReplyBody('');
-                setAttachment(null);
+                setAttachments([]);
+                setIsInternal(false);
                 toast({ title: 'Reply sent successfully.' });
             },
             onError: () => toast({ title: 'Failed to send reply', variant: 'destructive' }),
             onFinish: () => setSubmitting(false),
         });
-    }, [replyBody, attachment, submitting, ticket.id, toast]);
+    }, [replyBody, attachments, isInternal, submitting, ticket.id, toast]);
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
         if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
@@ -158,10 +199,24 @@ export default function Show({ ticket }: Props) {
         }
     };
 
-    const handleClose = () => {
-        if (!confirm('Close this ticket?')) return;
-        router.put(`/admin/tickets/${ticket.id}`, { action: 'close' }, {
-            onSuccess: () => toast({ title: 'Ticket closed.' }),
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files) {
+            setAttachments(prev => [...prev, ...Array.from(e.target.files!)]);
+        }
+        if (fileInputRef.current) fileInputRef.current.value = ''; // Reset
+    };
+
+    const removeFile = (index: number) => {
+        setAttachments(prev => prev.filter((_, i) => i !== index));
+    };
+
+    const handleCloseConfirm = () => {
+        router.put(`/admin/tickets/${ticket.id}`, { action: 'close', comment: closeComment }, {
+            onSuccess: () => {
+                toast({ title: 'Ticket closed.' });
+                setCloseModalOpen(false);
+                setCloseComment('');
+            },
             onError:   () => toast({ title: 'Action failed.', variant: 'destructive' }),
         });
     };
@@ -171,6 +226,25 @@ export default function Show({ ticket }: Props) {
             onSuccess: () => toast({ title: 'Ticket reopened.' }),
             onError:   () => toast({ title: 'Action failed.', variant: 'destructive' }),
         });
+    };
+
+    const handleAssign = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        const empId = e.target.value;
+        if (!empId) return;
+        setAssigningId(empId);
+        router.post(`/admin/tickets/${ticket.id}/assign`, { assigned_employee_id: empId }, {
+            onSuccess: () => toast({ title: 'Ticket assigned.' }),
+            onError: () => toast({ title: 'Failed to assign.', variant: 'destructive' }),
+            onFinish: () => setAssigningId('')
+        });
+    };
+
+    const insertCannedResponse = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        const text = e.target.value;
+        if (text) {
+            setReplyBody(prev => prev + (prev ? '\n\n' : '') + text);
+            e.target.value = ''; // reset select
+        }
     };
 
     return (
@@ -191,7 +265,7 @@ export default function Show({ ticket }: Props) {
                         {statusMeta.label}
                     </span>
                     {!isClosed ? (
-                        <Button size="sm" variant="outline" onClick={handleClose}
+                        <Button size="sm" variant="outline" onClick={() => setCloseModalOpen(true)}
                             className="border-emerald-200 text-emerald-700 hover:bg-emerald-50">
                             <CheckCircle className="mr-1.5 h-4 w-4" /> Close Ticket
                         </Button>
@@ -244,9 +318,10 @@ export default function Show({ ticket }: Props) {
                                 {priorityMeta.icon} {ticket.priority_text}
                             </span>
                         </div>
-                        <div className="px-6 py-5 text-sm text-slate-700 leading-relaxed whitespace-pre-wrap">
-                            {ticket.ticket_message}
-                        </div>
+                        <div 
+                            className="px-6 py-5 text-sm text-slate-700 leading-relaxed overflow-hidden"
+                            dangerouslySetInnerHTML={renderMarkdown(ticket.ticket_message)}
+                        />
                     </div>
 
                     {/* Thread count separator */}
@@ -283,6 +358,15 @@ export default function Show({ ticket }: Props) {
                             }
 
                             const isAdminMsg = msg.sender && msg.sender.id !== ticket.user?.id;
+                            
+                            // Style differences for Internal Notes
+                            const isInternal = msg.is_internal;
+                            const bubbleBg = isInternal 
+                                ? 'bg-amber-50 border border-amber-200 text-amber-900 rounded-tr-none' 
+                                : isAdminMsg
+                                    ? 'bg-indigo-600 text-white rounded-tr-none'
+                                    : 'bg-white border border-slate-200 text-slate-800 rounded-tl-none';
+
                             return (
                                 <div key={msg.id} className={`flex gap-3 ${isAdminMsg ? 'flex-row-reverse' : 'flex-row'}`}>
                                     <Avatar name={msg.sender?.name ?? 'User'} size="sm" />
@@ -296,17 +380,19 @@ export default function Show({ ticket }: Props) {
                                                     Support Agent
                                                 </span>
                                             )}
+                                            {isInternal && (
+                                                <span className="flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-semibold text-amber-700">
+                                                    <Lock className="h-3 w-3" /> Private Note
+                                                </span>
+                                            )}
                                             <span className="text-[10px] text-slate-400" title={fullDate(msg.created_at)}>
                                                 {relativeTime(msg.created_at)}
                                             </span>
                                         </div>
-                                        <div className={`rounded-2xl px-4 py-3 text-sm leading-relaxed whitespace-pre-wrap shadow-sm ${
-                                            isAdminMsg
-                                                ? 'bg-indigo-600 text-white rounded-tr-none'
-                                                : 'bg-white border border-slate-200 text-slate-800 rounded-tl-none'
-                                        }`}>
-                                            {msg.body}
-                                        </div>
+                                        <div 
+                                            className={`rounded-2xl px-4 py-3 text-sm leading-relaxed shadow-sm overflow-hidden prose prose-sm max-w-none ${bubbleBg}`}
+                                            dangerouslySetInnerHTML={renderMarkdown(msg.body)}
+                                        />
                                         {msg.attachment && <AttachmentLink path={msg.attachment} />}
                                     </div>
                                 </div>
@@ -317,20 +403,70 @@ export default function Show({ ticket }: Props) {
 
                     {/* Reply composer */}
                     {!isClosed ? (
-                        <div className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
-                            <div className="border-b border-slate-100 px-5 py-3">
-                                <span className="text-xs font-semibold uppercase tracking-widest text-slate-400">Reply as Support Agent</span>
+                        <div className={`rounded-2xl border transition-colors shadow-sm overflow-hidden ${isInternal ? 'border-amber-300 bg-amber-50' : 'border-slate-200 bg-white'}`}>
+                            <div className={`border-b px-5 py-3 flex items-center justify-between ${isInternal ? 'border-amber-200' : 'border-slate-100'}`}>
+                                <span className="text-xs font-semibold uppercase tracking-widest text-slate-400 flex items-center gap-2">
+                                    {isInternal ? <Lock className="h-3.5 w-3.5 text-amber-500" /> : <MessageSquare className="h-3.5 w-3.5" />}
+                                    {isInternal ? 'Internal Note (Hidden from client)' : 'Reply to Client'}
+                                </span>
+                                <div className="flex items-center gap-2">
+                                    <label className="text-xs text-slate-500 flex items-center gap-1.5 cursor-pointer select-none">
+                                        <input 
+                                            type="checkbox" 
+                                            checked={isInternal}
+                                            onChange={(e) => setIsInternal(e.target.checked)}
+                                            className="rounded text-amber-500 border-slate-300 focus:ring-amber-500 h-3.5 w-3.5"
+                                        />
+                                        Internal Note
+                                    </label>
+                                </div>
                             </div>
                             <form onSubmit={handleReply} className="p-4 space-y-3">
+                                
+                                {/* Quick Replies Dropdown */}
+                                {cannedResponses.length > 0 && !isInternal && (
+                                    <div className="flex justify-end mb-1">
+                                        <select 
+                                            className="text-xs border-slate-200 rounded-lg py-1 pl-2 pr-6 text-slate-600 bg-slate-50 focus:ring-indigo-200"
+                                            onChange={insertCannedResponse}
+                                            defaultValue=""
+                                        >
+                                            <option value="" disabled>Insert Quick Reply...</option>
+                                            {cannedResponses.map(cr => (
+                                                <option key={cr.id} value={cr.body}>{cr.title}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                )}
+
                                 <textarea
-                                    className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-800 placeholder-slate-400 focus:bg-white focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 resize-none transition-all outline-none"
+                                    className={`w-full rounded-xl border px-4 py-3 text-sm text-slate-800 placeholder-slate-400 focus:ring-2 resize-none transition-all outline-none ${
+                                        isInternal 
+                                            ? 'bg-amber-100/50 border-amber-200 focus:border-amber-400 focus:ring-amber-100 focus:bg-white' 
+                                            : 'bg-slate-50 border-slate-200 focus:border-indigo-400 focus:ring-indigo-100 focus:bg-white'
+                                    }`}
                                     rows={5}
-                                    placeholder="Type your reply… (Ctrl+Enter to send)"
+                                    placeholder={isInternal ? "Type an internal note for the team..." : "Type your reply... (Markdown supported. Ctrl+Enter to send)"}
                                     value={replyBody}
                                     onChange={(e) => setReplyBody(e.target.value)}
                                     onKeyDown={handleKeyDown}
-                                    required
                                 />
+                                
+                                {/* Attachments List */}
+                                {attachments.length > 0 && (
+                                    <div className="flex flex-wrap gap-2 pt-1">
+                                        {attachments.map((file, idx) => (
+                                            <span key={idx} className="inline-flex items-center gap-1.5 rounded-md bg-slate-100 px-2.5 py-1 text-xs text-slate-600 border border-slate-200">
+                                                <Paperclip className="h-3 w-3 text-slate-400" />
+                                                <span className="truncate max-w-[120px]">{file.name}</span>
+                                                <button type="button" onClick={() => removeFile(idx)} className="text-slate-400 hover:text-red-500">
+                                                    <X className="h-3 w-3" />
+                                                </button>
+                                            </span>
+                                        ))}
+                                    </div>
+                                )}
+
                                 <div className="flex items-center justify-between gap-3">
                                     <div className="flex items-center gap-2">
                                         <button
@@ -339,25 +475,14 @@ export default function Show({ ticket }: Props) {
                                             className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs text-slate-600 hover:bg-slate-50 hover:border-slate-300 transition-colors"
                                         >
                                             <Paperclip className="h-3.5 w-3.5" />
-                                            {attachment ? attachment.name : 'Attach file'}
+                                            Attach Files
                                         </button>
-                                        {attachment && (
-                                            <button
-                                                type="button"
-                                                onClick={() => {
-                                                    setAttachment(null);
-                                                    if (fileInputRef.current) fileInputRef.current.value = '';
-                                                }}
-                                                className="text-slate-400 hover:text-red-500 transition-colors"
-                                            >
-                                                <X className="h-4 w-4" />
-                                            </button>
-                                        )}
                                         <input
                                             ref={fileInputRef}
                                             type="file"
+                                            multiple
                                             className="hidden"
-                                            onChange={(e) => setAttachment(e.target.files?.[0] ?? null)}
+                                            onChange={handleFileChange}
                                         />
                                     </div>
                                     <div className="flex items-center gap-3">
@@ -365,8 +490,12 @@ export default function Show({ ticket }: Props) {
                                         <Button
                                             type="submit"
                                             size="sm"
-                                            disabled={submitting || !replyBody.trim()}
-                                            className="bg-indigo-600 hover:bg-indigo-700 text-white min-w-[110px]"
+                                            disabled={submitting || (!replyBody.trim() && attachments.length === 0)}
+                                            className={`text-white min-w-[110px] ${
+                                                isInternal 
+                                                    ? 'bg-amber-600 hover:bg-amber-700' 
+                                                    : 'bg-indigo-600 hover:bg-indigo-700'
+                                            }`}
                                         >
                                             {submitting ? (
                                                 <span className="flex items-center gap-1.5">
@@ -376,7 +505,7 @@ export default function Show({ ticket }: Props) {
                                             ) : (
                                                 <span className="flex items-center gap-1.5">
                                                     <Send className="h-3.5 w-3.5" />
-                                                    Send Reply
+                                                    {isInternal ? 'Save Note' : 'Send Reply'}
                                                 </span>
                                             )}
                                         </Button>
@@ -443,16 +572,6 @@ export default function Show({ ticket }: Props) {
                                     <dd className="text-xs text-slate-700" title={fullDate(ticket.closed_at)}>{relativeTime(ticket.closed_at)}</dd>
                                 </div>
                             )}
-                            {ticket.rate != null && (
-                                <div className="flex items-center justify-between px-5 py-3">
-                                    <dt className="flex items-center gap-2 text-xs text-slate-500"><Star className="h-3.5 w-3.5" /> Rating</dt>
-                                    <dd className="flex items-center gap-0.5">
-                                        {[1,2,3,4,5].map((n) => (
-                                            <Star key={n} className={`h-3.5 w-3.5 ${n <= (ticket.rate ?? 0) ? 'fill-amber-400 text-amber-400' : 'text-slate-200'}`} />
-                                        ))}
-                                    </dd>
-                                </div>
-                            )}
                         </dl>
                     </div>
 
@@ -480,6 +599,26 @@ export default function Show({ ticket }: Props) {
                         </div>
                     </div>
 
+                    {/* Assignment */}
+                    <div className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+                        <div className="border-b border-slate-100 px-5 py-3">
+                            <h3 className="text-xs font-bold uppercase tracking-widest text-slate-400">Assignment</h3>
+                        </div>
+                        <div className="px-5 py-4">
+                            <select 
+                                className="w-full text-sm rounded-lg border-slate-200 focus:ring-indigo-200 disabled:opacity-50"
+                                value={ticket.assigned_employee_id ?? ''}
+                                onChange={handleAssign}
+                                disabled={!!assigningId}
+                            >
+                                <option value="">-- Unassigned --</option>
+                                {supportAgents.map(emp => (
+                                    <option key={emp.id} value={emp.id}>{emp.name}</option>
+                                ))}
+                            </select>
+                        </div>
+                    </div>
+
                     {/* Quick actions */}
                     <div className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
                         <div className="border-b border-slate-100 px-5 py-3">
@@ -488,7 +627,7 @@ export default function Show({ ticket }: Props) {
                         <div className="p-4 space-y-2">
                             {!isClosed ? (
                                 <button
-                                    onClick={handleClose}
+                                    onClick={() => setCloseModalOpen(true)}
                                     className="w-full flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium text-emerald-700 bg-emerald-50 hover:bg-emerald-100 transition-colors border border-emerald-200"
                                 >
                                     <CheckCircle className="h-4 w-4" /> Mark as Resolved
@@ -513,6 +652,37 @@ export default function Show({ ticket }: Props) {
                     <p className="text-center text-xs text-slate-400">Ticket #{ticket.id}</p>
                 </div>
             </div>
+
+            {/* Close Ticket Modal */}
+            <Dialog open={closeModalOpen} onOpenChange={setCloseModalOpen}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Close Ticket</DialogTitle>
+                    </DialogHeader>
+                    <div className="py-4">
+                        <p className="text-sm text-slate-600 mb-4">
+                            You are about to mark this ticket as resolved. You can optionally send a final comment to the user before closing it.
+                        </p>
+                        <textarea
+                            className="w-full rounded-lg border-slate-200 text-sm focus:ring-emerald-200 focus:border-emerald-400 placeholder-slate-400"
+                            rows={4}
+                            placeholder="Optional final comment..."
+                            value={closeComment}
+                            onChange={(e) => setCloseComment(e.target.value)}
+                        />
+                    </div>
+                    <DialogFooter>
+                        <Button variant="outline" onClick={() => setCloseModalOpen(false)}>Cancel</Button>
+                        <Button 
+                            onClick={handleCloseConfirm}
+                            className="bg-emerald-600 hover:bg-emerald-700 text-white"
+                        >
+                            Close Ticket
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
         </AdminSidebarLayout>
     );
 }
