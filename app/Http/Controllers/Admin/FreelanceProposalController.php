@@ -31,12 +31,6 @@ class FreelanceProposalController extends Controller
 
         // Add formatted bid amount for the view
         $proposals->getCollection()->transform(function ($proposal) {
-            if (!$proposal->currency) {
-                // Fallback to job's currency or fail if critical, but for display let's use the relation strictly
-                // Or use business currency if it's missing. Actually the rule says fail loudly.
-                throw new \Exception("Proposal {$proposal->id} is missing an associated currency relation.");
-            }
-            $proposal->formatted_bid_amount = $proposal->currency->symbol . ' ' . number_format($proposal->bid_amount, 2);
             return $proposal;
         });
 
@@ -50,10 +44,7 @@ class FreelanceProposalController extends Controller
     {
         $proposal = Proposal::with(['job', 'freelancer'])->findOrFail($id);
 
-        if (!$proposal->currency) {
-            throw new \Exception("Proposal {$proposal->id} is missing an associated currency relation.");
-        }
-        $proposal->formatted_bid_amount = $proposal->currency->symbol . ' ' . number_format($proposal->bid_amount, 2);
+        // Currency logic removed, relying on points or frontend formatting
 
         return Inertia::render('Admin/Freelance/Proposals/Show', [
             'proposal' => $proposal

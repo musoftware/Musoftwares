@@ -174,5 +174,9 @@ return [
     'published' => 'منشور',
     'open' => 'مفتوح',
     'in_progress' => 'قيد التنفيذ',
-    'suspended' => 'موقوف'
+    'suspended' => 'موقوف',
+    'admin_points_credit_log' => 'إيداع من الإدارة — :reason — :time',
+    'admin_points_deduction_log' => 'خصم من الإدارة — :reason — :time',
+    'points_added_success' => 'تم إضافة :amount نقطة لـ :name.',
+    'points_deducted_success' => 'تم خصم :amount نقطة من :name.'
 ];

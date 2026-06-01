@@ -57,13 +57,13 @@ class FreelanceContractController extends Controller
 
         $contract->update(['status' => $request->status]);
 
-        return back()->with('success', __('freelance.contract_status_updated', [], 'en'));
+        return back()->with('success', __('freelance.contract_status_updated'));
     }
 
     public function destroy(Contract $contract)
     {
         $contract->delete();
-        return redirect()->route('admin.freelance.contracts.index')->with('success', __('freelance.contract_deleted', [], 'en'));
+        return redirect()->route('admin.freelance.contracts.index')->with('success', __('freelance.contract_deleted'));
     }
 
     public function resolveDispute(Request $request, Contract $contract, AddPointsAction $addPointsAction)
@@ -73,7 +73,7 @@ class FreelanceContractController extends Controller
         ]);
 
         if ($contract->status !== 'disputed') {
-            return back()->with('error', __('freelance.contract_not_disputed', [], 'en'));
+            return back()->with('error', __('freelance.contract_not_disputed'));
         }
 
         $points = $contract->contract_points;
@@ -81,21 +81,21 @@ class FreelanceContractController extends Controller
         try {
             DB::transaction(function () use ($request, $contract, $points, $addPointsAction) {
                 if ($request->resolution === 'refund_client') {
-                    $addPointsAction->execute($contract->client_id, $points, __('freelance.dispute_refund', [], 'en'), 'contract_dispute', $contract->id);
+                    $addPointsAction->execute($contract->client_id, $points, __('freelance.dispute_refund'), 'contract_dispute', $contract->id);
                     $contract->update(['status' => 'cancelled']);
                 } elseif ($request->resolution === 'pay_freelancer') {
-                    $addPointsAction->execute($contract->freelancer_id, $points, __('freelance.dispute_payment', [], 'en'), 'contract_dispute', $contract->id);
+                    $addPointsAction->execute($contract->freelancer_id, $points, __('freelance.dispute_payment'), 'contract_dispute', $contract->id);
                     $contract->update(['status' => 'completed', 'completed_at' => now()]);
                 } elseif ($request->resolution === 'split') {
                     $half = intval($points / 2);
                     $remainder = $points - $half;
-                    $addPointsAction->execute($contract->client_id, $half, __('freelance.dispute_split_refund', [], 'en'), 'contract_dispute', $contract->id);
-                    $addPointsAction->execute($contract->freelancer_id, $remainder, __('freelance.dispute_split_payment', [], 'en'), 'contract_dispute', $contract->id);
+                    $addPointsAction->execute($contract->client_id, $half, __('freelance.dispute_split_refund'), 'contract_dispute', $contract->id);
+                    $addPointsAction->execute($contract->freelancer_id, $remainder, __('freelance.dispute_split_payment'), 'contract_dispute', $contract->id);
                     $contract->update(['status' => 'cancelled']);
                 }
             });
 
-            return back()->with('success', __('freelance.dispute_resolved_success', [], 'en'));
+            return back()->with('success', __('freelance.dispute_resolved_success'));
         } catch (\Exception $e) {
             return back()->with('error', $e->getMessage());
         }

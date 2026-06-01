@@ -13,7 +13,7 @@
     RewriteCond %{THE_REQUEST} ^[A-Z]{3,}\s/public/([^\s?]*) [NC]
     RewriteRule ^ /%1 [R=301,L,NE]
 
-
+   
     # Redirect non-www to www and enforce HTTPS (exclude API routes for CORS)
     RewriteCond %{HTTP_HOST} ^musoftwares.com$ [NC]
     RewriteCond %{REQUEST_URI} !^/api/

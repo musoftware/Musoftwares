@@ -48,7 +48,7 @@ class AdminPointsController extends Controller
 
         $amount = (int) $validated['amount'];
         $reason = trim($validated['reason']);
-        $label  = ($amount > 0 ? 'Admin Credit' : 'Admin Deduction') . " — {$reason} — " . now()->format('Y-m-d H:i');
+        $label = $amount > 0 ? __('freelance.admin_points_credit_log', ['reason' => $reason, 'time' => now()->format('Y-m-d H:i')]) : __('freelance.admin_points_deduction_log', ['reason' => $reason, 'time' => now()->format('Y-m-d H:i')]);
 
         $user->increment('points_balance', $amount);
 
@@ -59,10 +59,13 @@ class AdminPointsController extends Controller
             'description' => $label,
         ]);
 
-        $direction = $amount > 0 ? 'added' : 'deducted';
-        $abs       = abs($amount);
+        $abs = abs($amount);
 
-        return back()->with('success', "{$abs} points {$direction} for {$user->name}.");
+        if ($amount > 0) {
+            return back()->with('success', __('freelance.points_added_success', ['amount' => $abs, 'name' => $user->name]));
+        } else {
+            return back()->with('success', __('freelance.points_deducted_success', ['amount' => $abs, 'name' => $user->name]));
+        }
     }
 
     /**
