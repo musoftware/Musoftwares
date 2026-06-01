@@ -55,7 +55,25 @@ class AdminServiceLandingPageController extends Controller
 
         return Inertia::render('Admin/Marketplace/ServiceLandingPages/Index', [
             'servicesWithLandingPages' => $servicesWithLandingPages,
-            'filters' => $request->only(['q'])
+            'filters' => $request->only(['q']),
+            'translations' => [
+                'service_landing_pages' => __('admin.service_landing_pages'),
+                'manage_landing_pages' => __('admin.manage_landing_pages'),
+                'manage_all_landing_pages' => __('admin.manage_all_landing_pages'),
+                'service' => __('admin.service'),
+                'seller' => __('admin.seller'),
+                'hero_title' => __('admin.hero_title'),
+                'views_ab' => __('admin.views_ab'),
+                'leads' => __('admin.leads'),
+                'status' => __('admin.status'),
+                'actions' => __('admin.actions'),
+                'variants' => __('admin.variants'),
+                'no_ab_test' => __('admin.no_ab_test'),
+                'no_landing_pages_found' => __('admin.no_landing_pages_found'),
+                'view' => __('admin.view'),
+                'delete' => __('admin.delete'),
+                'confirm_delete' => __('admin.confirm_delete_landing_page'),
+            ],
         ]);
     }
 

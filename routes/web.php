@@ -210,6 +210,47 @@ Route::prefix('marketplace')->name('marketplace.')->group(function () {
     Route::get('/services/{id}', [\Modules\Marketplace\Http\Controllers\ServiceController::class, 'show'])->name('services.show');
 });
 
+// -- Seller Landing Pages ------------------------------------------
+Route::middleware(['web', 'auth'])
+    ->prefix('marketplace')
+    ->name('marketplace.')
+    ->group(function () {
+        // CRUD
+        Route::get('/landing-pages', [\Modules\Marketplace\Http\Controllers\Seller\ServiceLandingPageController::class, 'index'])->name('landing-pages.index');
+        Route::get('/landing-pages/create/{service}', [\Modules\Marketplace\Http\Controllers\Seller\ServiceLandingPageController::class, 'create'])->name('landing-pages.create');
+        Route::post('/landing-pages/{service}', [\Modules\Marketplace\Http\Controllers\Seller\ServiceLandingPageController::class, 'store'])->name('landing-pages.store');
+        Route::get('/landing-pages/{service}/edit/{landingPage?}', [\Modules\Marketplace\Http\Controllers\Seller\ServiceLandingPageController::class, 'edit'])->name('landing-pages.edit');
+        Route::put('/landing-pages/{service}/{landingPage?}', [\Modules\Marketplace\Http\Controllers\Seller\ServiceLandingPageController::class, 'update'])->name('landing-pages.update');
+        Route::post('/landing-pages/{landingPage}/duplicate', [\Modules\Marketplace\Http\Controllers\Seller\ServiceLandingPageController::class, 'duplicate'])->name('landing-pages.duplicate');
+
+        // Submissions
+        Route::get('/landing-pages/{service}/submissions', [\Modules\Marketplace\Http\Controllers\Seller\ServiceLandingPageSubmissionController::class, 'submissions'])->name('landing-pages.submissions');
+        Route::delete('/landing-pages/submissions/{submission}', [\Modules\Marketplace\Http\Controllers\Seller\ServiceLandingPageSubmissionController::class, 'destroySubmission'])->name('landing-pages.submissions.destroy');
+        Route::get('/landing-pages/{service}/submissions/export', [\Modules\Marketplace\Http\Controllers\Seller\ServiceLandingPageSubmissionController::class, 'exportSubmissions'])->name('landing-pages.submissions.export');
+
+        // Analytics
+        Route::get('/landing-pages/{service}/analytics', [\Modules\Marketplace\Http\Controllers\Seller\ServiceLandingPageAnalyticsController::class, 'analytics'])->name('landing-pages.analytics');
+
+        // AI Generation
+        Route::post('/landing-pages/{service}/generate-questions', [\Modules\Marketplace\Http\Controllers\Seller\ServiceLandingPageAIController::class, 'generateQuestions'])->name('landing-pages.generate-questions');
+        Route::post('/landing-pages/{service}/generate-faqs', [\Modules\Marketplace\Http\Controllers\Seller\ServiceLandingPageAIController::class, 'generateFAQs'])->name('landing-pages.generate-faqs');
+        Route::post('/landing-pages/{service}/generate-pricing', [\Modules\Marketplace\Http\Controllers\Seller\ServiceLandingPageAIController::class, 'generatePricingTables'])->name('landing-pages.generate-pricing');
+        Route::post('/landing-pages/{service}/generate-content', [\Modules\Marketplace\Http\Controllers\Seller\ServiceLandingPageAIController::class, 'generateLandingPageContent'])->name('landing-pages.generate-content');
+    });
+
+// -- Public Landing Page Routes ------------------------------------
+Route::middleware(['web'])
+    ->name('services.')
+    ->group(function () {
+        Route::get('/s/{slug}', [\Modules\Marketplace\Http\Controllers\Seller\ServiceLandingPagePublicController::class, 'show'])->name('landing-page.show');
+        Route::get('/s/preview/{template}', [\Modules\Marketplace\Http\Controllers\Seller\ServiceLandingPagePublicController::class, 'previewTemplate'])->name('landing-page.preview');
+        Route::post('/s/{slug}/submit', [\Modules\Marketplace\Http\Controllers\Seller\ServiceLandingPageSubmissionController::class, 'submitForm'])->name('landing-page.submit');
+        
+        // Analytics Tracking endpoints
+        Route::post('/s/track/cta', [\Modules\Marketplace\Http\Controllers\Seller\ServiceLandingPageAnalyticsController::class, 'trackCtaClick'])->name('landing-page.track.cta');
+        Route::post('/s/track/scroll', [\Modules\Marketplace\Http\Controllers\Seller\ServiceLandingPageAnalyticsController::class, 'trackScroll'])->name('landing-page.track.scroll');
+    });
+
 // Marketplace Admin Routes
 Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin/marketplace')->name('admin.marketplace.')->group(function () {
     // Categories
@@ -234,6 +275,11 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin/ma
     Route::get('/orders/{order}', [\App\Http\Controllers\Admin\MarketplaceOrderController::class, 'show'])->name('orders.show');
     Route::post('/orders/{order}/dispute', [\App\Http\Controllers\Admin\MarketplaceOrderController::class, 'resolveDispute'])->name('orders.dispute.resolve');
 
+    // Admin Service Landing Pages
+    Route::get('/service-landing-pages', [\Modules\Marketplace\Http\Controllers\Admin\AdminServiceLandingPageController::class, 'index'])->name('service-landing-pages.index');
+    Route::post('/service-landing-pages/{landingPage}/toggle-status', [\Modules\Marketplace\Http\Controllers\Admin\AdminServiceLandingPageController::class, 'toggleStatus'])->name('service-landing-pages.toggle-status');
+    Route::delete('/service-landing-pages/{landingPage}', [\Modules\Marketplace\Http\Controllers\Admin\AdminServiceLandingPageController::class, 'destroy'])->name('service-landing-pages.destroy');
+
     // Admin Views
 });
 
@@ -249,7 +295,7 @@ if (file_exists(base_path('Modules/CRM/routes/web.php'))) {
 }
 
 // Admin Tickets (Accessible by Admin and Moderator)
-Route::middleware(['auth', 'verified', 'onboarding', 'role:admin|super_admin|moderator'])->prefix('admin')->name('admin.')->group(function () {
+Route::middleware(['auth', 'verified', 'onboarding', 'moderator'])->prefix('admin')->name('admin.')->group(function () {
     Route::resource('tickets', \App\Http\Controllers\Admin\AdminTicketController::class)->only(['index', 'show', 'update']);
     Route::post('tickets/{ticket}/reply', [\App\Http\Controllers\Admin\AdminTicketController::class, 'reply'])->name('tickets.reply');
 });
@@ -293,6 +339,7 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
     Route::get('/invoices/timer-details/{item_id}', [\App\Http\Controllers\Admin\InvoiceController::class, 'timerDetails'])->name('invoices.timer-details');
     Route::post('/invoices/timer-details/{item_id}/store', [\App\Http\Controllers\Admin\InvoiceController::class, 'storeTimerDetails'])->name('invoices.timer-details.store');
     Route::delete('/invoices/timer-details/{item_id}/{timer_id}', [\App\Http\Controllers\Admin\InvoiceController::class, 'destroyTimerDetails'])->name('invoices.timer-details.destroy');
+    Route::post('/invoices/{invoice}/create-timer', [\App\Http\Controllers\Admin\InvoiceController::class, 'createTimerItem'])->name('invoices.create-timer');
     Route::post('/invoices/bulk-action', [\App\Http\Controllers\Admin\InvoiceController::class, 'bulkAction'])->name('invoices.bulk-action');
     Route::get('/invoices/{invoice}', [\App\Http\Controllers\Admin\InvoiceController::class, 'show'])->name('invoices.show');
     Route::get('/invoices/{invoice}/download-pdf', [\App\Http\Controllers\Admin\InvoiceController::class, 'downloadPdf'])->name('invoices.download-pdf');
@@ -427,7 +474,7 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
     Route::get('/users/{id}/referrals', [\App\Http\Controllers\Admin\UsersController::class, 'referrals'])->name('users.referrals');
     Route::delete('/users/{user}/referrals/{referred_user}/unlink', [\App\Http\Controllers\Admin\UsersController::class, 'unlink_referral'])->name('users.referrals.unlink');
     Route::get('/users/files/{id}', [\App\Http\Controllers\Admin\UsersController::class, 'files'])->name('users.files');
-    Route::get('/users/reports/{id}', [\App\Http\Controllers\Admin\UsersController::class, 'reports'])->name('users.reports');
+    Route::get('/users/{id}/reports', [\App\Http\Controllers\Admin\UsersController::class, 'reports'])->name('users.reports');
     Route::get('/users/{id}/projects', [\App\Http\Controllers\Admin\UsersController::class, 'projects'])->name('users.projects');
     Route::get('/users/{id}/tasks/add', [\App\Http\Controllers\Admin\UsersController::class, 'add_task'])->name('users.tasks.add');
     

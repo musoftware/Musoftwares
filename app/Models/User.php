@@ -470,6 +470,15 @@ class User extends Authenticatable
     }
 
     /**
+     * Legacy referral calculation method.
+     * Preserved to prevent undefined method errors in Invoice.php.
+     */
+    public function calc_ref($amount, $invoice_id, $currency_id)
+    {
+        // Modern referral logic is handled elsewhere (e.g. at invoice generation)
+    }
+
+    /**
      * Route notifications for the FCM channel.
      *
      * @param  \Illuminate\Notifications\Notification  $notification

@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use Modules\CRM\Models\UserNote;
+use App\Models\UserNote;
 use Illuminate\Support\Facades\Auth;
 
 class UserNoteService

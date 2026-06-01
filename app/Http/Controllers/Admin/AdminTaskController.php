@@ -371,7 +371,7 @@ class AdminTaskController extends Controller
                 'id'              => $clientUser->id,
                 'name'            => $clientUser->name,
                 'email'           => $clientUser->email,
-                'balance'         => (float) $clientUser->user_balance,
+                'balance'         => (float) $clientUser->available_balance(),
                 'currency'        => $clientUser->currency_name(),
                 'total_tasks'     => $totalTasks,
                 'completed_tasks' => $completedTasks,
@@ -681,7 +681,7 @@ class AdminTaskController extends Controller
 
                 $durationHours = $end->diffInMinutes($start) / 60;
                 
-                $rateEgp = \App\Helper\FinanceHelper::calculateOverheadHourlyRate();
+                $rateEgp = \App\Helpers\FinanceHelper::calculateOverheadHourlyRate();
                 if ((float) $client->booking_rate > 0 && ($client->booking_rate_expires_at === null || now('Africa/Cairo')->startOfDay()->lte(\Carbon\Carbon::parse($client->booking_rate_expires_at)->startOfDay()))) {
                     $rateEgp = (float) \App\Models\CurrenciesExchange::RateToday($client->booking_rate, $client->booking_rate_currency ?? $client->currency ?? 1, 2);
                 } else if ($client->hasSubscription() && $client->plan) {
@@ -692,7 +692,7 @@ class AdminTaskController extends Controller
                 $cost = round($cost, 2);
                 $currencyId = 2; 
                 
-                $fh = \App\Helper\FinanceHelper::instance();
+                $fh = \App\Helpers\FinanceHelper::instance();
                 $baseCost = $fh->price_fixer($cost, $currencyId);
                 
                 $commission = 0;
@@ -755,7 +755,7 @@ class AdminTaskController extends Controller
                     $timer->date_start = $start->toDateTimeString();
                     $timer->date_end = $end->toDateTimeString();
                     $timer->amount = round($amountInUserCurrency, 2);
-                    $timer->currency = $invoice->currency;
+                    $timer->currency_id = $invoice->currency;
                     $item->timers()->save($timer);
 
                     $invoice->unpaid = $invoice->total();

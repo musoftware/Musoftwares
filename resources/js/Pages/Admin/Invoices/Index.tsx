@@ -77,8 +77,6 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
     const [selectAll, setSelectAll] = useState(false);
     const [bulkAction, setBulkAction] = useState('');
     const [bulkActionProject, setBulkActionProject] = useState('');
-    const [statusDialog, setStatusDialog] = useState(null);
-    const [newStatus, setNewStatus] = useState('');
     const [jobStatusDialog, setJobStatusDialog] = useState(null);
     const [newJobStatus, setNewJobStatus] = useState('');
 
@@ -125,19 +123,6 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
         if (confirm('Are you sure you want to cancel this invoice? If it was partially paid, the user will be refunded their wallet balance.')) {
             router.post(route('admin.invoices.cancel', id));
         }
-    };
-
-    const handleChangeStatus = () => {
-        if (!statusDialog || !newStatus) return;
-        
-        router.post(route('admin.invoices.change-status', statusDialog.id), {
-            status: newStatus
-        }, {
-            preserveScroll: true,
-            onSuccess: () => {
-                setStatusDialog(null);
-            }
-        });
     };
 
     const handleChangeJobStatus = () => {
@@ -433,16 +418,9 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
                                             </button>
                                         </TableCell>
                                         <TableCell className="text-center" data-label="Invoice Status">
-                                            <button 
-                                                type="button" 
-                                                className="hover:opacity-80 transition-opacity focus:outline-none"
-                                                onClick={() => {
-                                                    setStatusDialog(invoice);
-                                                    setNewStatus(invoice.status);
-                                                }}
-                                            >
+                                            <div className="inline-block">
                                                 {getStatusBadge(invoice.status)}
-                                            </button>
+                                            </div>
                                         </TableCell>
                                         <TableCell className="text-right" data-label="Actions">
                                             <DropdownMenu>
@@ -625,32 +603,6 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
                 onLoginAs={handleLoginAs}
                 onResetPassword={handleResetPassword}
             />
-
-            <Dialog open={!!statusDialog} onOpenChange={(open) => !open && setStatusDialog(null)}>
-                <DialogContent>
-                    <DialogHeader>
-                        <DialogTitle>Change Invoice Status</DialogTitle>
-                    </DialogHeader>
-                    <div className="py-4">
-                        <Label>Status</Label>
-                        <Select value={newStatus} onValueChange={setNewStatus}>
-                            <SelectTrigger className="mt-2">
-                                <SelectValue placeholder="Select Status" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="unpaid">Unpaid</SelectItem>
-                                <SelectItem value="partially_paid">Partially Paid</SelectItem>
-                                <SelectItem value="paid">Paid</SelectItem>
-                                <SelectItem value="cancelled">Cancelled</SelectItem>
-                            </SelectContent>
-                        </Select>
-                    </div>
-                    <DialogFooter>
-                        <Button variant="outline" onClick={() => setStatusDialog(null)}>Cancel</Button>
-                        <Button onClick={handleChangeStatus}>Save Status</Button>
-                    </DialogFooter>
-                </DialogContent>
-            </Dialog>
 
             <Dialog open={!!jobStatusDialog} onOpenChange={(open) => !open && setJobStatusDialog(null)}>
                 <DialogContent>

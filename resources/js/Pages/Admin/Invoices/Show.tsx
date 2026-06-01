@@ -31,11 +31,13 @@ export default function Show({ invoice }: { invoice: any }) {
 
     useEffect(() => {
         if (invoice && invoice.items) {
-            const itemsArray = Array.isArray(invoice.items) ? invoice.items : Object.values(invoice.items);
-            setItems(itemsArray.filter(Boolean).map((item: any) => ({ ...item, isNew: false })));
+            const itemsSource = invoice.items.data ? invoice.items.data : invoice.items;
+            const itemsArray = Array.isArray(itemsSource) ? itemsSource : Object.values(itemsSource);
+            setItems(itemsArray.filter((item: any) => item && item.item_type).map((item: any) => ({ ...item, isNew: false })));
         }
         if (invoice && invoice.cost_lines) {
-            const costLinesArray = Array.isArray(invoice.cost_lines) ? invoice.cost_lines : Object.values(invoice.cost_lines);
+            const costLinesSource = invoice.cost_lines.data ? invoice.cost_lines.data : invoice.cost_lines;
+            const costLinesArray = Array.isArray(costLinesSource) ? costLinesSource : Object.values(costLinesSource);
             setCostLines(costLinesArray.filter(Boolean).map((line: any) => ({ ...line, isNew: false })));
         }
         setDiscount(invoice.discount || 0);
@@ -50,7 +52,7 @@ export default function Show({ invoice }: { invoice: any }) {
     
     const handleAddQtyItem = () => {
         setIsEditing(true);
-        setItems(prevItems => [...prevItems, {
+        const newItem = {
             id: 'new-' + crypto.randomUUID(),
             isNew: true,
             item_title: '',
@@ -58,12 +60,16 @@ export default function Show({ invoice }: { invoice: any }) {
             amount: 0,
             qty: 1,
             currency: invoice.currency
-        }]);
+        };
+        setItems(prevItems => {
+            const validItems = prevItems.filter(i => i && i.item_type);
+            return [...validItems, newItem];
+        });
     };
 
     const handleAddSimpleItem = () => {
         setIsEditing(true);
-        setItems(prevItems => [...prevItems, {
+        const newItem = {
             id: 'new-' + crypto.randomUUID(),
             isNew: true,
             item_title: '',
@@ -71,21 +77,20 @@ export default function Show({ invoice }: { invoice: any }) {
             amount: 0,
             qty: 1,
             currency: invoice.currency
-        }]);
+        };
+        setItems(prevItems => {
+            const validItems = prevItems.filter(i => i && i.item_type);
+            return [...validItems, newItem];
+        });
     };
 
     const handleAddTimerItem = () => {
-        setIsEditing(true);
-        setItems(prevItems => [...prevItems, {
-            id: 'new-' + crypto.randomUUID(),
-            isNew: true,
-            item_title: 'Time Tracking',
-            item_type: 'timer',
-            amount: 0,
-            total_amount: 0,
-            qty: 1,
-            currency: invoice.currency
-        }]);
+        if (isEditing) {
+            if (!confirm('You are in edit mode and may have unsaved changes. Do you want to continue and open the Timer page? Unsaved edits will be lost.')) {
+                return;
+            }
+        }
+        router.post(route('admin.invoices.create-timer', invoice.id));
     };
 
     const handleDeleteItem = (index: number) => {
@@ -187,7 +192,7 @@ export default function Show({ invoice }: { invoice: any }) {
         // Reset local state to prop data
         if (invoice && invoice.items) {
             const itemsArray = Array.isArray(invoice.items) ? invoice.items : Object.values(invoice.items);
-            setItems(itemsArray.filter(Boolean).map((item: any) => ({ ...item, isNew: false })));
+            setItems(itemsArray.filter((item: any) => item && item.item_type).map((item: any) => ({ ...item, isNew: false })));
         }
         setDiscount(invoice.discount || 0);
         setDeletedItems([]);

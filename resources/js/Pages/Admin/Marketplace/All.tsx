@@ -1,5 +1,6 @@
 import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
 import { Head, router } from '@inertiajs/react';
+import { __ } from '@/lib/i18n';
 import { useState } from 'react';
 import {
     Table,
@@ -51,31 +52,19 @@ function getStatusBadge(status: string) {
     switch (status) {
         case 'active':
             return (
-                <Badge className="bg-green-50 text-green-700 border border-green-200 font-medium capitalize">
-                    <CheckCircle2 className="h-3 w-3 mr-1" />
-                    Active
-                </Badge>
+                <Badge className="bg-green-50 text-green-700 border border-green-200 font-medium capitalize"><CheckCircle2 className="h-3 w-3 mr-1" />{__('admin.active')}</Badge>
             );
         case 'draft':
             return (
-                <Badge className="bg-amber-50 text-amber-700 border border-amber-200 font-medium capitalize">
-                    <Clock className="h-3 w-3 mr-1" />
-                    Pending
-                </Badge>
+                <Badge className="bg-amber-50 text-amber-700 border border-amber-200 font-medium capitalize"><Clock className="h-3 w-3 mr-1" />{__('admin.pending')}</Badge>
             );
         case 'suspended':
             return (
-                <Badge className="bg-red-50 text-red-700 border border-red-200 font-medium capitalize">
-                    <Ban className="h-3 w-3 mr-1" />
-                    Suspended
-                </Badge>
+                <Badge className="bg-red-50 text-red-700 border border-red-200 font-medium capitalize"><Ban className="h-3 w-3 mr-1" />{__('admin.suspended')}</Badge>
             );
         case 'rejected':
             return (
-                <Badge className="bg-slate-100 text-slate-600 border border-slate-200 font-medium capitalize">
-                    <XCircle className="h-3 w-3 mr-1" />
-                    Rejected
-                </Badge>
+                <Badge className="bg-slate-100 text-slate-600 border border-slate-200 font-medium capitalize"><XCircle className="h-3 w-3 mr-1" />{__('admin.rejected')}</Badge>
             );
         default:
             return (
@@ -209,33 +198,33 @@ export default function All({ auth, services, categories, filters, stats }: any)
 
     const confirmMeta: Record<string, { title: string; description: string; label: string; variant: 'danger' | 'default' }> = {
         approve: {
-            title:       'Approve Service',
-            description: `"${confirm?.title}" will become publicly visible on the marketplace immediately.`,
-            label:       'Approve',
+            title: __('admin.approve_service'),
+            description: __('admin.approve_service_desc', { title: confirm?.title || '' }),
+            label: __('admin.approve'),
             variant:     'default',
         },
         reject: {
-            title:       'Reject Service',
-            description: `"${confirm?.title}" will be marked as rejected. The seller will not be able to resubmit without changes.`,
-            label:       'Reject',
+            title: __('admin.reject_service'),
+            description: __('admin.reject_service_desc', { title: confirm?.title || '' }),
+            label: __('admin.reject'),
             variant:     'danger',
         },
         suspend: {
-            title:       'Suspend Service',
-            description: `"${confirm?.title}" will be hidden from the marketplace. Existing orders won't be affected.`,
-            label:       'Suspend',
+            title: __('admin.suspend_service'),
+            description: __('admin.suspend_service_desc', { title: confirm?.title || '' }),
+            label: __('admin.suspend'),
             variant:     'danger',
         },
         feature: {
-            title:       'Toggle Featured',
-            description: `Update the featured status for "${confirm?.title}".`,
-            label:       'Confirm',
+            title: __('admin.toggle_featured'),
+            description: __('admin.toggle_featured_desc', { title: confirm?.title || '' }),
+            label: __('admin.confirm'),
             variant:     'default',
         },
         delete: {
-            title:       'Delete Service',
-            description: `This will permanently delete "${confirm?.title}" and all its packages. This action cannot be undone.`,
-            label:       'Delete Permanently',
+            title: __('admin.delete_service'),
+            description: __('admin.delete_service_desc', { title: confirm?.title || '' }),
+            label: __('admin.delete_permanently'),
             variant:     'danger',
         },
     };
@@ -247,8 +236,8 @@ export default function All({ auth, services, categories, filters, stats }: any)
     // ── Render ────────────────────────────────────────────────────────────────
 
     return (
-        <AdminSidebarLayout user={auth?.user} title="All Services" header="Marketplace Services">
-            <Head title="All Services — Marketplace" />
+        <AdminSidebarLayout user={auth?.user} title={__('admin.all_services')} header={__('admin.marketplace_services')}>
+            <Head title={__('admin.all_services_marketplace')} />
 
             <div className="py-8 bg-slate-50 min-h-screen">
                 <div className="mx-auto max-w-7xl sm:px-6 lg:px-8 space-y-6">
@@ -256,45 +245,45 @@ export default function All({ auth, services, categories, filters, stats }: any)
                     {/* ── Page Header ─────────────────────────────────────── */}
                     <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                         <div>
-                            <h1 className="text-2xl font-bold text-slate-900">All Services</h1>
+                            <h1 className="text-2xl font-bold text-slate-900">{__('admin.all_services')}</h1>
                             <p className="text-sm text-slate-500 mt-0.5">
-                                Manage, approve, and moderate marketplace services.
+                                {__('admin.manage_approve_moderate_services')}
                             </p>
                         </div>
                         <Badge variant="secondary" className="bg-slate-200 text-slate-800 text-sm px-3 py-1.5 shrink-0">
-                            {services.total ?? 0} total
+                            {services.total ?? 0} {__('admin.total')}
                         </Badge>
                     </div>
 
                     {/* ── Stats Cards ──────────────────────────────────────── */}
                     <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
                         <MetricCard
-                            label="Total"
+                            label={__('admin.total')}
                             value={stats?.total ?? 0}
                             icon={ShoppingBag}
                         />
                         <MetricCard
-                            label="Active"
+                            label={__('admin.active')}
                             value={stats?.active ?? 0}
                             icon={CheckCircle2}
                         />
                         <MetricCard
-                            label="Pending"
+                            label={__('admin.pending')}
                             value={stats?.pending ?? 0}
                             icon={Clock}
                         />
                         <MetricCard
-                            label="Suspended"
+                            label={__('admin.suspended')}
                             value={stats?.suspended ?? 0}
                             icon={Ban}
                         />
                         <MetricCard
-                            label="Rejected"
+                            label={__('admin.rejected')}
                             value={stats?.rejected ?? 0}
                             icon={AlertCircle}
                         />
                         <MetricCard
-                            label="Featured"
+                            label={__('admin.featured')}
                             value={stats?.featured ?? 0}
                             icon={Star}
                         />
@@ -307,7 +296,7 @@ export default function All({ auth, services, categories, filters, stats }: any)
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 pointer-events-none" />
                             <Input
                                 id="services-search"
-                                placeholder="Search by title or seller..."
+                                placeholder={__('admin.search_title_seller')}
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
                                 onKeyDown={(e) => e.key === 'Enter' && applyFilters({ search })}
@@ -330,14 +319,14 @@ export default function All({ auth, services, categories, filters, stats }: any)
                                 onValueChange={(val) => { setStatus(val); applyFilters({ status: val }); }}
                             >
                                 <SelectTrigger id="services-status-filter" className="bg-slate-50 border-slate-200">
-                                    <SelectValue placeholder="Status" />
+                                    <SelectValue placeholder={__('admin.status')} />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="all">All Statuses</SelectItem>
-                                    <SelectItem value="active">Active</SelectItem>
-                                    <SelectItem value="draft">Pending</SelectItem>
-                                    <SelectItem value="suspended">Suspended</SelectItem>
-                                    <SelectItem value="rejected">Rejected</SelectItem>
+                                    <SelectItem value="all">{__('admin.all_statuses')}</SelectItem>
+                                    <SelectItem value="active">{__('admin.active')}</SelectItem>
+                                    <SelectItem value="draft">{__('admin.pending')}</SelectItem>
+                                    <SelectItem value="suspended">{__('admin.suspended')}</SelectItem>
+                                    <SelectItem value="rejected">{__('admin.rejected')}</SelectItem>
                                 </SelectContent>
                             </Select>
                         </div>
@@ -349,10 +338,10 @@ export default function All({ auth, services, categories, filters, stats }: any)
                                 onValueChange={(val) => { setCategoryId(val); applyFilters({ category_id: val }); }}
                             >
                                 <SelectTrigger id="services-category-filter" className="bg-slate-50 border-slate-200">
-                                    <SelectValue placeholder="Category" />
+                                    <SelectValue placeholder={__('admin.category')} />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="all">All Categories</SelectItem>
+                                    <SelectItem value="all">{__('admin.all_categories')}</SelectItem>
                                     {categories?.map((c: any) => (
                                         <SelectItem key={c.id} value={c.id.toString()}>{c.name}</SelectItem>
                                     ))}
@@ -367,9 +356,7 @@ export default function All({ auth, services, categories, filters, stats }: any)
                                 onClick={clearFilters}
                                 className="text-slate-500 hover:text-black shrink-0 gap-1.5"
                             >
-                                <FilterX className="h-4 w-4" />
-                                Clear
-                            </Button>
+                                <FilterX className="h-4 w-4" />{__('admin.clear')}</Button>
                         )}
                     </div>
 
@@ -384,19 +371,19 @@ export default function All({ auth, services, categories, filters, stats }: any)
                                         onClick={() => handleSort('title')}
                                     >
                                         <div className="flex items-center gap-1">
-                                            Service
+                                            {__('admin.service')}
                                             <SortIcon col="title" />
                                         </div>
                                     </TableHead>
-                                    <TableHead>Seller</TableHead>
-                                    <TableHead>Category</TableHead>
-                                    <TableHead>Packages / Price</TableHead>
+                                    <TableHead>{__('admin.seller')}</TableHead>
+                                    <TableHead>{__('admin.category')}</TableHead>
+                                    <TableHead>{__('admin.packages_price')}</TableHead>
                                     <TableHead
                                         className="cursor-pointer hover:bg-slate-100 transition-colors select-none"
                                         onClick={() => handleSort('orders_count')}
                                     >
                                         <div className="flex items-center gap-1">
-                                            Orders
+                                            {__('admin.orders')}
                                             <SortIcon col="orders_count" />
                                         </div>
                                     </TableHead>
@@ -405,7 +392,7 @@ export default function All({ auth, services, categories, filters, stats }: any)
                                         onClick={() => handleSort('status')}
                                     >
                                         <div className="flex items-center gap-1">
-                                            Status
+                                            {__('admin.status')}
                                             <SortIcon col="status" />
                                         </div>
                                     </TableHead>
@@ -414,11 +401,11 @@ export default function All({ auth, services, categories, filters, stats }: any)
                                         onClick={() => handleSort('created_at')}
                                     >
                                         <div className="flex items-center gap-1">
-                                            Date
+                                            {__('admin.date')}
                                             <SortIcon col="created_at" />
                                         </div>
                                     </TableHead>
-                                    <TableHead className="text-right w-[60px]">Actions</TableHead>
+                                    <TableHead className="text-right w-[60px]">{__('admin.actions')}</TableHead>
                                 </TableRow>
                             </TableHeader>
 
@@ -444,9 +431,7 @@ export default function All({ auth, services, categories, filters, stats }: any)
                                                             <span className="text-xs text-slate-400 font-mono">#{service.id}</span>
                                                             {service.is_featured && (
                                                                 <Badge className="text-[10px] px-1 py-0 h-4 bg-amber-50 text-amber-600 border border-amber-200 font-medium">
-                                                                    <Star className="h-2.5 w-2.5 mr-0.5 fill-current" />
-                                                                    Featured
-                                                                </Badge>
+                                                                    <Star className="h-2.5 w-2.5 mr-0.5 fill-current" />{__('admin.featured')}</Badge>
                                                             )}
                                                         </div>
                                                     </div>
@@ -461,14 +446,14 @@ export default function All({ auth, services, categories, filters, stats }: any)
                                                         <div className="text-xs text-slate-400 truncate max-w-[140px]">{service.seller.email}</div>
                                                     </div>
                                                 ) : (
-                                                    <span className="text-slate-400 italic text-sm">Unknown</span>
+                                                    <span className="text-slate-400 italic text-sm">{__('admin.unknown')}</span>
                                                 )}
                                             </TableCell>
 
                                             {/* Category */}
                                             <TableCell>
                                                 <Badge variant="secondary" className="bg-slate-100 text-slate-700 font-normal text-xs">
-                                                    {service.category?.name || 'Uncategorized'}
+                                                    {service.category?.name || __('admin.uncategorized')}
                                                 </Badge>
                                             </TableCell>
 
@@ -476,12 +461,12 @@ export default function All({ auth, services, categories, filters, stats }: any)
                                             <TableCell>
                                                 <div className="flex flex-col gap-0.5">
                                                     <span className="font-semibold text-slate-800 text-sm">
-                                                        {getBasePrice(service.packages) ?? <span className="text-slate-400 font-normal italic text-xs">No packages</span>}
+                                                        {getBasePrice(service.packages) ?? <span className="text-slate-400 font-normal italic text-xs">{__('admin.no_packages')}</span>}
                                                     </span>
                                                     {service.packages?.length > 0 && (
                                                         <span className="text-xs text-slate-400 flex items-center gap-1">
                                                             <Package className="h-3 w-3" />
-                                                            {service.packages.length} pkg{service.packages.length !== 1 ? 's' : ''}
+                                                            {service.packages.length} {service.packages.length !== 1 ? __('admin.pkgs') : __('admin.pkg')}
                                                         </span>
                                                     )}
                                                 </div>
@@ -532,19 +517,13 @@ export default function All({ auth, services, categories, filters, stats }: any)
                                                         <DropdownMenuItem
                                                             onClick={() => router.get(route('marketplace.services.show', service.id))}
                                                             className="gap-2 cursor-pointer"
-                                                        >
-                                                            <Eye className="h-4 w-4" />
-                                                            View Service
-                                                        </DropdownMenuItem>
+                                                        ><Eye className="h-4 w-4" /> {__('admin.view_service')}</DropdownMenuItem>
 
                                                         {/* Edit */}
                                                         <DropdownMenuItem
                                                             onClick={() => router.get(route('admin.marketplace.services.edit', service.id))}
                                                             className="gap-2 cursor-pointer"
-                                                        >
-                                                            <Pencil className="h-4 w-4" />
-                                                            Edit Service
-                                                        </DropdownMenuItem>
+                                                        ><Pencil className="h-4 w-4" /> {__('admin.edit_service')}</DropdownMenuItem>
 
                                                         {/* Feature toggle */}
                                                         <DropdownMenuItem
@@ -552,9 +531,9 @@ export default function All({ auth, services, categories, filters, stats }: any)
                                                             className="gap-2 cursor-pointer"
                                                         >
                                                             {service.is_featured ? (
-                                                                <><StarOff className="h-4 w-4 text-amber-500" /> Unfeature</>
+                                                                <><StarOff className="h-4 w-4 text-amber-500" /> {__('admin.unfeature')}</>
                                                             ) : (
-                                                                <><Star className="h-4 w-4" /> Feature</>
+                                                                <><Star className="h-4 w-4" /> {__('admin.feature')}</>
                                                             )}
                                                         </DropdownMenuItem>
 
@@ -567,7 +546,7 @@ export default function All({ auth, services, categories, filters, stats }: any)
                                                                 className="gap-2 cursor-pointer text-green-700 focus:text-green-700 focus:bg-green-50"
                                                             >
                                                                 <Check className="h-4 w-4" />
-                                                                {service.status === 'suspended' ? 'Restore' : 'Approve'}
+                                                                {service.status === 'suspended' ? __('admin.restore') : __('admin.approve')}
                                                             </DropdownMenuItem>
                                                         )}
 
@@ -575,20 +554,14 @@ export default function All({ auth, services, categories, filters, stats }: any)
                                                             <DropdownMenuItem
                                                                 onClick={() => openConfirm('reject', service)}
                                                                 className="gap-2 cursor-pointer text-slate-700"
-                                                            >
-                                                                <X className="h-4 w-4" />
-                                                                Reject
-                                                            </DropdownMenuItem>
+                                                            ><X className="h-4 w-4" /> {__('admin.reject')}</DropdownMenuItem>
                                                         )}
 
                                                         {service.status === 'active' && (
                                                             <DropdownMenuItem
                                                                 onClick={() => openConfirm('suspend', service)}
                                                                 className="gap-2 cursor-pointer text-amber-700 focus:text-amber-700 focus:bg-amber-50"
-                                                            >
-                                                                <Ban className="h-4 w-4" />
-                                                                Suspend
-                                                            </DropdownMenuItem>
+                                                            ><Ban className="h-4 w-4" /> {__('admin.suspend')}</DropdownMenuItem>
                                                         )}
 
                                                         <DropdownMenuSeparator />
@@ -597,10 +570,7 @@ export default function All({ auth, services, categories, filters, stats }: any)
                                                         <DropdownMenuItem
                                                             onClick={() => openConfirm('delete', service)}
                                                             className="gap-2 cursor-pointer text-red-600 focus:text-red-700 focus:bg-red-50"
-                                                        >
-                                                            <Trash2 className="h-4 w-4" />
-                                                            Delete
-                                                        </DropdownMenuItem>
+                                                        ><Trash2 className="h-4 w-4" /> {__('admin.delete')}</DropdownMenuItem>
                                                     </DropdownMenuContent>
                                                 </DropdownMenu>
                                             </TableCell>
@@ -611,14 +581,12 @@ export default function All({ auth, services, categories, filters, stats }: any)
                                         <TableCell colSpan={8} className="h-40 text-center">
                                             <div className="flex flex-col items-center justify-center gap-2 text-slate-400">
                                                 <Search className="h-8 w-8 text-slate-200" />
-                                                <p className="text-sm font-medium text-slate-500">No services found</p>
+                                                <p className="text-sm font-medium text-slate-500">{__('admin.no_services_found')}</p>
                                                 {hasActiveFilters && (
                                                     <button
                                                         onClick={clearFilters}
                                                         className="text-xs text-slate-400 hover:text-black underline underline-offset-2"
-                                                    >
-                                                        Clear filters
-                                                    </button>
+                                                    >{__('admin.clear_filters')}</button>
                                                 )}
                                             </div>
                                         </TableCell>
@@ -631,13 +599,7 @@ export default function All({ auth, services, categories, filters, stats }: any)
                         {services.links && services.links.length > 3 && (
                             <div className="border-t border-slate-200 bg-slate-50 px-4 py-3 flex flex-col sm:flex-row items-center justify-between gap-3">
                                 <div className="text-sm text-slate-500">
-                                    Showing{' '}
-                                    <span className="font-medium text-slate-900">{services.from ?? 0}</span>
-                                    {' '}–{' '}
-                                    <span className="font-medium text-slate-900">{services.to ?? 0}</span>
-                                    {' '}of{' '}
-                                    <span className="font-medium text-slate-900">{services.total}</span>
-                                    {' '}services
+                                    {__('admin.showing')} {' '}<span className="font-medium text-slate-900">{services.from ?? 0}</span>{' '}-{' '}<span className="font-medium text-slate-900">{services.to ?? 0}</span>{' '}{__('admin.of')}{' '}<span className="font-medium text-slate-900">{services.total}</span>{' '}{__('admin.services_count')}
                                 </div>
                                 <div className="flex gap-1 flex-wrap justify-center">
                                     {services.links.map((link: any, idx: number) => (
