@@ -4,8 +4,6 @@ import { useToast } from './ui/use-toast';
 import { ToastAction } from './ui/toast';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from './ui/dialog';
 import { Button } from './ui/button';
-import { __ } from '@/lib/i18n';
-
 export function GlobalErrorHandler() {
     const { toast } = useToast();
     const [sessionExpired, setSessionExpired] = useState(false);

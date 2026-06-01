@@ -682,7 +682,7 @@ class InvoiceController extends Controller
             'total' => round($calc['total'], 2),
             'total_usd' => round($calc['total_usd'], 2),
             'invoice_currency_id' => $invoice->currency_id,
-            'invoice_currency' => $invoice->currency ? $invoice->currency->currency : null,
+            'invoice_currency' => $invoice->currency()->first() ? $invoice->currency()->first()->currency : null,
         ]);
     }
 
