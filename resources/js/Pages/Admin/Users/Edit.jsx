@@ -43,7 +43,7 @@ export default function Edit({ user, currencies = [], plans = [] }) {
         affiliate_commission_percentage: user.affiliate_commission_percentage || 1.00,
         add_commission_to_total: user.add_commission_to_total === '1' || user.add_commission_to_total === true,
         ref_user_id: user.ref_user_id || '',
-        permission: user.roles && user.roles.length > 0 ? user.roles[0].name : 'client',
+        role: user.role || 'client',
         account_status: user.account_status || 'active',
         block_reason: user.block_reason || '',
         max_devices: user.max_devices ?? '',
@@ -333,13 +333,14 @@ export default function Edit({ user, currencies = [], plans = [] }) {
                                     <Input id="ref_user_id" value={data.ref_user_id} onChange={e => setData('ref_user_id', e.target.value)} />
                                 </div>
                                 <div className="space-y-2">
-                                    <Label htmlFor="permission">Permission</Label>
-                                    <select id="permission" value={data.permission} onChange={e => setData('permission', e.target.value)} className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2">
+                                    <Label htmlFor="role">Permission / Role</Label>
+                                    <select id="role" value={data.role} onChange={e => setData('role', e.target.value)} className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2">
                                         <option value="client">Client</option>
                                         <option value="user">User</option>
                                         <option value="admin">Admin</option>
                                         <option value="manager">Manager</option>
                                         <option value="employee">Employee</option>
+                                        <option value="moderator">Moderator</option>
                                     </select>
                                 </div>
                                 <div className="space-y-2">

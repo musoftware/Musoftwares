@@ -188,4 +188,5 @@ return [
     'todo_created_success' => 'تم إضافة المهمة بنجاح.',
     'todo_updated_success' => 'تم تحديث المهمة بنجاح.',
     'todo_deleted_success' => 'تم حذف المهمة بنجاح.',
+    'role_updated_success' => 'تم تحديث الصلاحيات/الدور بنجاح.',
 ];

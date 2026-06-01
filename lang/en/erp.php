@@ -188,4 +188,5 @@ return [
     'todo_created_success' => 'Todo assigned successfully.',
     'todo_updated_success' => 'Todo updated successfully.',
     'todo_deleted_success' => 'Todo deleted successfully.',
+    'role_updated_success' => 'Permissions/Role updated successfully.',
 ];

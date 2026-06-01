@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
 import { Button } from '@/Components/ui/button';
-import { Trash2, Edit, Plus, DollarSign, TrendingDown, TrendingUp, Users, CheckCircle2, AlertCircle, Clock, Search, X, ChevronUp, ChevronDown, Eye, ExternalLink, FileText, Layers, Calendar, RefreshCw, ChevronLeft, ChevronRight, CalendarDays } from 'lucide-react';
+import { Trash2, Edit, Plus, DollarSign, TrendingDown, TrendingUp, Users, CheckCircle2, AlertCircle, Clock, Search, X, ChevronUp, ChevronDown, Eye, ExternalLink, FileText, Layers, Calendar, RefreshCw, ChevronLeft, ChevronRight, CalendarDays, ArrowUpRight, ArrowDownRight } from 'lucide-react';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isToday, addMonths, subMonths, startOfWeek, endOfWeek } from 'date-fns';
 import { formatMoney as formatCurrency } from '@/lib/utils';
 import {
@@ -39,7 +39,9 @@ import {
 import { Input } from "@/Components/ui/input";
 import { Label } from "@/Components/ui/label";
 
-export default function Index({ entries, categories, users, currentTab, stats, all_currencies, filters, calendarEvents = {}, year = new Date().getFullYear(), month = new Date().getMonth() + 1 }) {
+declare const route: any;
+
+export default function Index({ entries, categories, users, currentTab, stats, all_currencies, filters, calendarEvents = {}, year = new Date().getFullYear(), month = new Date().getMonth() + 1 }: { entries: any; categories: any; users: any; currentTab: string; stats: any; all_currencies: any; filters: any; calendarEvents?: any; year?: number; month?: number }) {
     const { errors } = usePage().props;
     const categoriesList = Array.isArray(categories) ? categories : (categories ? Object.values(categories) : []);
     const currenciesList = Array.isArray(all_currencies) ? all_currencies : (all_currencies ? Object.values(all_currencies) : []);
@@ -47,18 +49,18 @@ export default function Index({ entries, categories, users, currentTab, stats, a
     // Recharts configurations
     const COLORS = ['#09090b', '#27272a', '#52525b', '#71717a', '#a1a1aa', '#d4d4d8', '#e4e4e7'];
 
-    const formatYAxis = (value) => {
+    const formatYAxis = (value: number): string => {
         if (value >= 1000000) return `${(value / 1000000).toFixed(1)}M`;
         if (value >= 1000) return `${(value / 1000).toFixed(0)}k`;
-        return value;
+        return String(value);
     };
 
-    const CustomTooltip = ({ active, payload, label }) => {
+    const CustomTooltip = ({ active, payload, label }: { active?: boolean; payload?: any[]; label?: any }) => {
         if (active && payload && payload.length) {
             return (
                 <div className="bg-black text-white p-3 rounded-lg border border-slate-850 shadow-xl text-xs">
                     <p className="font-semibold mb-2 border-b border-slate-800 pb-1">{label}</p>
-                    {payload.map((entry, idx) => (
+                    {payload.map((entry: any, idx: number) => (
                         <div key={idx} className="flex justify-between items-center gap-4 py-0.5">
                             <span className="text-slate-400 capitalize">{entry.name}:</span>
                             <span className="font-mono font-semibold">
@@ -76,9 +78,9 @@ export default function Index({ entries, categories, users, currentTab, stats, a
         if (currentTab === 'income') {
             return stats.income_categories || [];
         } else if (currentTab === 'salaries') {
-            const employeeMap = {};
+            const employeeMap: Record<string, number> = {};
             if (entries.data) {
-                entries.data.forEach(entry => {
+                entries.data.forEach((entry: any) => {
                     if (entry.user) {
                         const name = entry.user.name;
                         employeeMap[name] = (employeeMap[name] || 0) + parseFloat(entry.amount);
@@ -141,15 +143,15 @@ export default function Index({ entries, categories, users, currentTab, stats, a
 
     // Detail Panel State
     const [isDetailOpen, setIsDetailOpen] = useState(false);
-    const [selectedDetailEntry, setSelectedDetailEntry] = useState(null);
+    const [selectedDetailEntry, setSelectedDetailEntry] = useState<any>(null);
 
-    const openDetails = (entry) => {
+    const openDetails = (entry: any) => {
         setSelectedDetailEntry(entry);
         setIsDetailOpen(true);
     };
 
     // Handle Route Tab Changes
-    const handleTabChange = (tab) => {
+    const handleTabChange = (tab: string) => {
         router.get(route('admin.finance.index'), { tab }, { preserveState: false });
     };
 
@@ -182,7 +184,7 @@ export default function Index({ entries, categories, users, currentTab, stats, a
         }, { preserveState: true });
     };
 
-    const handleDayClick = (day) => {
+    const handleDayClick = (day: Date) => {
         const formattedDate = format(day, 'yyyy-MM-dd');
         setNewEntry(prev => ({
             ...prev,
@@ -213,7 +215,7 @@ export default function Index({ entries, categories, users, currentTab, stats, a
     };
 
     // Toggle Sort column/direction
-    const handleSort = (field) => {
+    const handleSort = (field: string) => {
         let newDir = 'desc';
         if (filters.sort_by === field) {
             newDir = filters.sort_dir === 'asc' ? 'desc' : 'asc';
@@ -228,12 +230,12 @@ export default function Index({ entries, categories, users, currentTab, stats, a
         }, { preserveState: true });
     };
 
-    const renderSortIcon = (field) => {
+    const renderSortIcon = (field: string) => {
         if (filters.sort_by !== field) return null;
         return filters.sort_dir === 'asc' ? <ChevronUp className="w-3.5 h-3.5 ml-1 inline" /> : <ChevronDown className="w-3.5 h-3.5 ml-1 inline" />;
     };
 
-    const handleCreate = (e) => {
+    const handleCreate = (e: React.FormEvent) => {
         e.preventDefault();
         router.post(route('admin.finance.store'), {
             ...newEntry,
@@ -259,7 +261,7 @@ export default function Index({ entries, categories, users, currentTab, stats, a
         });
     };
 
-    const openEdit = (entry) => {
+    const openEdit = (entry: any) => {
         const matchingCategory = categoriesList.find(c => c.name.toLowerCase() === entry.category?.name?.toLowerCase());
         const catOption = matchingCategory ? matchingCategory.id : 'custom';
         
@@ -281,7 +283,7 @@ export default function Index({ entries, categories, users, currentTab, stats, a
         setIsEditOpen(true);
     };
 
-    const handleUpdate = (e) => {
+    const handleUpdate = (e: React.FormEvent) => {
         e.preventDefault();
         router.put(route('admin.finance.update', editingEntry.id), {
             ...editingEntry
@@ -292,25 +294,25 @@ export default function Index({ entries, categories, users, currentTab, stats, a
         });
     };
 
-    const handleDelete = (id) => {
+    const handleDelete = (id: any) => {
         if (confirm('Are you sure you want to delete this record?')) {
             const entryType = currentTab === 'income' ? 'income' : (currentTab === 'salaries' ? 'salary' : 'expense');
             router.delete(route('admin.finance.destroy', { entry: id, type: entryType }));
         }
     };
 
-    const handleMarkPaid = (id, fromDetails = false) => {
+    const handleMarkPaid = (id: any, fromDetails = false) => {
         const entryType = currentTab === 'income' ? 'income' : (currentTab === 'salaries' ? 'salary' : 'expense');
         router.post(route('admin.finance.mark-paid', { entry: id, type: entryType }), {}, {
             onSuccess: () => {
                 if (fromDetails && selectedDetailEntry) {
-                    setSelectedDetailEntry(prev => prev ? { ...prev, status: 'completed' } : null);
+                    setSelectedDetailEntry((prev: any) => prev ? { ...prev, status: 'completed' } : null);
                 }
             }
         });
     };
 
-    const getStatusBadge = (status) => {
+    const getStatusBadge = (status: string) => {
         switch (status) {
             case 'completed': return <span className="bg-green-50 text-green-700 border border-green-200 px-2 py-0.5 rounded text-xs font-medium inline-flex items-center w-fit"><CheckCircle2 className="w-3 h-3 mr-1"/> Completed</span>;
             case 'pending': return <span className="bg-amber-50 text-amber-700 border border-amber-200 px-2 py-0.5 rounded text-xs font-medium inline-flex items-center w-fit"><Clock className="w-3 h-3 mr-1"/> Pending</span>;
@@ -392,7 +394,7 @@ export default function Index({ entries, categories, users, currentTab, stats, a
                             <p className="text-xs text-gray-500 mb-4 font-normal">Historical comparison of net income, expenses, and payroll in {stats.business_currency_code}</p>
                         </div>
                         <div className="h-[260px] w-full">
-                            <ResponsiveContainer width="100%" height="100%">
+                            <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={260}>
                                 <AreaChart data={stats.monthly_trends || []} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                                     <defs>
                                         <linearGradient id="colorIncome" x1="0" y1="0" x2="0" y2="1">
@@ -436,10 +438,10 @@ export default function Index({ entries, categories, users, currentTab, stats, a
                                     <div className="absolute inset-0 flex flex-col items-center justify-center">
                                         <span className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">Total</span>
                                         <span className="text-sm font-extrabold text-slate-900 font-mono">
-                                            {formatCurrency(categoryAllocationData.reduce((sum, item) => sum + item.value, 0), stats.business_currency_code)}
+                                            {formatCurrency(categoryAllocationData.reduce((sum: number, item: any) => sum + item.value, 0), stats.business_currency_code)}
                                         </span>
                                     </div>
-                                    <ResponsiveContainer width="100%" height="100%">
+                                    <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={120}>
                                         <PieChart>
                                             <Pie
                                                 data={categoryAllocationData}
@@ -450,7 +452,7 @@ export default function Index({ entries, categories, users, currentTab, stats, a
                                                 paddingAngle={3}
                                                 dataKey="value"
                                             >
-                                                {categoryAllocationData.map((entry, index) => (
+                                                {categoryAllocationData.map((entry: any, index: number) => (
                                                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                                                 ))}
                                             </Pie>
@@ -461,8 +463,8 @@ export default function Index({ entries, categories, users, currentTab, stats, a
 
                                 {/* Legend */}
                                 <div className="mt-2 space-y-1 max-h-[100px] overflow-y-auto pr-1">
-                                    {categoryAllocationData.slice(0, 4).map((entry, index) => {
-                                        const total = categoryAllocationData.reduce((sum, item) => sum + item.value, 0);
+                                    {categoryAllocationData.slice(0, 4).map((entry: any, index: number) => {
+                                        const total = categoryAllocationData.reduce((sum: number, item: any) => sum + item.value, 0);
                                         const percentage = total > 0 ? ((entry.value / total) * 100).toFixed(1) : 0;
                                         return (
                                             <div key={index} className="flex justify-between items-center text-[11px] text-slate-650 font-normal">
@@ -494,8 +496,8 @@ export default function Index({ entries, categories, users, currentTab, stats, a
                                 <div className="space-y-2">
                                     {/* Segmented Progress Bar */}
                                     <div className="w-full h-2 rounded-full overflow-hidden flex bg-slate-100">
-                                        {statusDistributionData.map((item, idx) => {
-                                            const totalAmount = statusDistributionData.reduce((sum, s) => sum + s.amount, 0);
+                                        {statusDistributionData.map((item: any, idx: number) => {
+                                            const totalAmount = statusDistributionData.reduce((sum: number, s: any) => sum + s.amount, 0);
                                             const pct = totalAmount > 0 ? (item.amount / totalAmount) * 100 : 0;
                                             if (pct === 0) return null;
                                             
@@ -517,7 +519,7 @@ export default function Index({ entries, categories, users, currentTab, stats, a
                                     
                                     {/* Numbers Legend */}
                                     <div className="flex flex-wrap gap-x-3 gap-y-1">
-                                        {statusDistributionData.map((item, idx) => {
+                                        {statusDistributionData.map((item: any, idx: number) => {
                                             let dotColor = 'bg-slate-300';
                                             let textColor = 'text-slate-650';
                                             if (item.status.toLowerCase() === 'completed') { dotColor = 'bg-green-600'; textColor = 'text-green-700'; }
@@ -584,7 +586,7 @@ export default function Index({ entries, categories, users, currentTab, stats, a
                                 onChange={e => setSelectedUserFilter(e.target.value)}
                             >
                                 <option value="">All Users</option>
-                                {users.map(u => <option key={u.id} value={u.id}>{u.name}</option>)}
+                                {users.map((u: any) => <option key={u.id} value={u.id}>{u.name}</option>)}
                             </select>
 
                             <Button onClick={applyFilters} variant="secondary" size="sm" className="h-9">Filter</Button>
@@ -685,7 +687,7 @@ export default function Index({ entries, categories, users, currentTab, stats, a
                                         </Label>
                                         <select id="create-user" className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm bg-white h-10" value={newEntry.user_id} onChange={e => setNewEntry({...newEntry, user_id: e.target.value})} required={currentTab === 'salaries' || newEntry.type === 'salary'}>
                                             <option value="">Select User...</option>
-                                            {users.map(u => <option key={u.id} value={u.id}>{u.name} ({u.email})</option>)}
+                                            {users.map((u: any) => <option key={u.id} value={u.id}>{u.name} ({u.email})</option>)}
                                         </select>
                                         {errors.user_id && <span className="text-red-600 text-xs block">{errors.user_id}</span>}
                                     </div>
@@ -776,7 +778,7 @@ export default function Index({ entries, categories, users, currentTab, stats, a
                             </tr>
                         </thead>
                         <tbody className="bg-white divide-y divide-gray-200">
-                            {entries.data.map((entry) => (
+                            {entries.data.map((entry: any) => (
                                 <tr key={entry.id} className="hover:bg-gray-50">
                                     <td className="px-6 py-4 whitespace-nowrap cursor-pointer" onClick={() => openDetails(entry)}>
                                         <div className="text-sm font-medium text-gray-900">{entry.title}</div>
@@ -836,7 +838,7 @@ export default function Index({ entries, categories, users, currentTab, stats, a
                             ))}
                             {entries.data.length === 0 && (
                                 <tr>
-                                    <td colSpan="7" className="px-6 py-12 text-center text-gray-500">
+                                    <td colSpan={7} className="px-6 py-12 text-center text-gray-500">
                                         <DollarSign className="w-12 h-12 mx-auto text-gray-300 mb-3" />
                                         <h3 className="text-lg font-medium text-gray-900">No records found</h3>
                                         <p className="mt-1">Create a new entry to start tracking your finances.</p>
@@ -855,7 +857,7 @@ export default function Index({ entries, categories, users, currentTab, stats, a
                         Showing {entries.from} to {entries.to} of {entries.total} entries
                     </div>
                     <div className="flex space-x-1">
-                        {entries.links.map((link, idx) => {
+                        {entries.links.map((link: any, idx: number) => {
                             if (link.url === null) {
                                 return (
                                     <span
@@ -946,7 +948,7 @@ export default function Index({ entries, categories, users, currentTab, stats, a
                                             </div>
 
                                             <div className="flex-1 space-y-1 overflow-y-auto max-h-[110px] styled-scrollbar">
-                                                {dayEvents.map((event) => {
+                                                {dayEvents.map((event: any) => {
                                                     let bgClass = 'bg-red-50 text-red-700 border-red-100';
                                                     if (event.type === 'income') {
                                                         bgClass = 'bg-green-50 text-green-700 border-green-100';
@@ -1066,7 +1068,7 @@ export default function Index({ entries, categories, users, currentTab, stats, a
                                 </Label>
                                 <select id="edit-user" className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm bg-white h-10" value={editingEntry.user_id} onChange={e => setEditingEntry({...editingEntry, user_id: e.target.value})} required={currentTab === 'salaries' || editingEntry.type === 'salary'}>
                                     <option value="">Select User...</option>
-                                    {users.map(u => <option key={u.id} value={u.id}>{u.name} ({u.email})</option>)}
+                                    {users.map((u: any) => <option key={u.id} value={u.id}>{u.name} ({u.email})</option>)}
                                 </select>
                                 {errors.user_id && <span className="text-red-600 text-xs block">{errors.user_id}</span>}
                             </div>

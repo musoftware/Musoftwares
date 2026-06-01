@@ -27,10 +27,14 @@ class KanbanController extends Controller
             ['id' => 6, 'key' => 'NEGOTIATION', 'name' => 'Negotiation', 'color' => '#10b981'],
         ];
 
+        $isTeam = \Illuminate\Support\Facades\Auth::guard('crm_team')->check();
+        $agentId = $isTeam ? \Illuminate\Support\Facades\Auth::guard('crm_team')->id() : $request->user()->id;
+        $tenantId = session('tenant_id') ?? $request->user()->tenant_id;
+
         // Fetch leads assigned to the user
         $leads = Lead::where('tenant_id', $tenantId)
-            ->where('assigned_to_id', $userId)
-            ->select('id', 'name', 'source', 'pipeline_stage', 'sla_breach_at')
+            ->where('assigned_to', $agentId)
+            ->select('id', 'name', 'source', 'pipeline_stage', 'sla_breach_at', 'is_stale', 'call_attempts')
             ->get();
 
         // Map leads to stages

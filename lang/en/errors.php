@@ -17,5 +17,6 @@ return [
     'smtp_settings_not_configured' => 'smtp_settings_not_configured',
     'unauthorized_addon' => 'unauthorized_addon',
     'unauthorized_project' => 'unauthorized_project',
-    'upgrade_to_inventory' => 'upgrade_to_inventory'
+    'upgrade_to_inventory' => 'upgrade_to_inventory',
+    'cannot_change_own_role' => 'You cannot change your own role/permissions.',
 ];
