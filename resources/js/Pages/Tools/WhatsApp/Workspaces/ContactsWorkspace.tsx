@@ -575,7 +575,7 @@ export default function ContactsWorkspace({ t, locale, callRPC, daemonConnected,
                             </div>
                             <div className="space-y-2">
                                 <Label className="flex items-center gap-1"><Tag className="w-3 h-3" /> {isRtl ? 'العلامات' : 'Tags'}</Label>
-                                <Input value={formTags} onChange={e => setFormTags(e.target.value)} placeholder="VIP, Lead, Customer" className="rounded-xl text-start text-xs" />
+                                <Input value={formTags} onChange={e => setFormTags(e.target.value)} placeholder={__('general.vip_lead_customer')} className="rounded-xl text-start text-xs" />
                             </div>
                             <div className="space-y-2 sm:col-span-2">
                                 <Label className="flex items-center gap-1"><StickyNote className="w-3 h-3" /> {isRtl ? 'ملاحظات' : 'Notes'}</Label>

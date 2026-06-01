@@ -84,7 +84,7 @@ function MemberCard({ member, idx }: { member: any; idx: number }) {
                     <p className="text-xs font-semibold text-slate-800 truncate">{`${member.first_name || ''} ${member.last_name || ''}`.trim() || '—'}</p>
                 </div>
                 <div className="min-w-0">
-                    <p className="text-[9px] font-black uppercase tracking-wider text-slate-400 mb-0.5">User ID</p>
+                    <p className="text-[9px] font-black uppercase tracking-wider text-slate-400 mb-0.5">{__('general.user_id')}</p>
                     <p className="text-xs font-mono text-slate-600 truncate">{member.user_id || '—'}</p>
                 </div>
                 <div className="min-w-0">
@@ -117,7 +117,7 @@ function MemberCard({ member, idx }: { member: any; idx: number }) {
                 </div>
             </div>
             <Button variant="ghost" size="icon" onClick={copyRow}
-                className="opacity-0 group-hover:opacity-100 transition-opacity h-8 w-8 hover:bg-slate-100" title="Copy row">
+                className="opacity-0 group-hover:opacity-100 transition-opacity h-8 w-8 hover:bg-slate-100" title={__('general.copy_row')}>
                 {copied ? <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" /> : <Clipboard className="w-3.5 h-3.5 text-slate-400" />}
             </Button>
         </div>
@@ -132,8 +132,7 @@ function MembersTable({ members, status, onExport }: { members: any[]; status?: 
             <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
                 <h3 className="font-bold text-slate-800 text-sm">{members.length} Members</h3>
                 <Button onClick={onExport} className="h-8 gap-1.5 px-3 bg-slate-900 text-white hover:bg-slate-800 text-xs font-bold">
-                    <Download className="w-3.5 h-3.5" /> Export CSV
-                </Button>
+                    <Download className="w-3.5 h-3.5" />{__('general.export_csv')}</Button>
             </div>
             <div className="hidden md:grid grid-cols-6 gap-3 px-5 py-2 bg-slate-50 border-b border-slate-100">
                 {['Name', 'User ID', 'Phone', 'Username', 'Group', 'Profile'].map(h => (
@@ -459,8 +458,8 @@ export default function TelegramToolRunner({ tool }: any) {
                             <Send className="w-6 h-6" />
                         </div>
                         <div>
-                            <h1 className="text-xl md:text-2xl font-black text-slate-900 tracking-tight">Telegram Tool</h1>
-                            <p className="text-xs text-slate-500 font-medium">Extract members · Send messages · Manage sessions</p>
+                            <h1 className="text-xl md:text-2xl font-black text-slate-900 tracking-tight">{__('general.telegram_tool')}</h1>
+                            <p className="text-xs text-slate-500 font-medium">{__('general.extract_members_send_messages_manage_sessions')}</p>
                         </div>
                         <div className="ml-auto flex items-center gap-2">
                             <Badge variant={connected ? 'default' : 'destructive'} className="gap-1.5 font-bold text-[10px]">
@@ -502,18 +501,18 @@ export default function TelegramToolRunner({ tool }: any) {
                                     <Users className="w-4 h-4 text-white" />
                                 </div>
                                 <div>
-                                    <h2 className="text-sm font-bold text-slate-800">Group Member Extraction</h2>
-                                    <p className="text-[10px] text-slate-400 font-medium">Select account & groups, then extract all members</p>
+                                    <h2 className="text-sm font-bold text-slate-800">{__('general.group_member_extraction')}</h2>
+                                    <p className="text-[10px] text-slate-400 font-medium">{__('general.select_account_groups_then_extract_all_members')}</p>
                                 </div>
                             </div>
 
                             {/* Session Picker */}
                             <div className="space-y-2">
-                                <label className="text-[10px] font-black uppercase tracking-wider text-slate-400">Active Session</label>
+                                <label className="text-[10px] font-black uppercase tracking-wider text-slate-400">{__('general.active_session')}</label>
                                 {connectedSessions.length === 0 ? (
                                     <div className="text-xs text-amber-600 bg-amber-50 border border-amber-200 rounded-xl p-3 flex items-center gap-2">
                                         <AlertCircle className="w-4 h-4 shrink-0" />
-                                        <span>No connected sessions. Go to <button onClick={() => setActiveTab('sessions')} className="font-bold underline">Sessions</button> tab to add one.</span>
+                                        <span>{__('general.no_connected_sessions_go_to')}<button onClick={() => setActiveTab('sessions')} className="font-bold underline">Sessions</button>{__('general.tab_to_add_one')}</span>
                                     </div>
                                 ) : (
                                     <div className="flex flex-wrap gap-2">
@@ -577,8 +576,7 @@ export default function TelegramToolRunner({ tool }: any) {
                                 <div className="flex items-center gap-3 pt-2 border-t border-slate-100">
                                     {extractStatus === 'running' ? (
                                         <Button onClick={handleStopExtraction} variant="destructive" className="gap-1.5 text-xs font-bold">
-                                            <Square className="w-3.5 h-3.5" /> Stop Extraction
-                                        </Button>
+                                            <Square className="w-3.5 h-3.5" />{__('general.stop_extraction')}</Button>
                                     ) : (
                                         <Button onClick={handleStartExtraction} disabled={selectedGroups.size === 0}
                                             className="gap-1.5 bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 text-white text-xs font-bold shadow-lg shadow-blue-500/20">
@@ -595,10 +593,10 @@ export default function TelegramToolRunner({ tool }: any) {
                         {/* Stats */}
                         {members.length > 0 && (
                             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                                <StatCard label="Total Members" value={members.length} icon={Users} color="bg-blue-50/80 border-blue-200/60" />
-                                <StatCard label="With Phone" value={members.filter(m => m.phone).length} icon={Phone} color="bg-emerald-50/80 border-emerald-200/60" />
-                                <StatCard label="With Username" value={members.filter(m => m.username).length} icon={AtSign} color="bg-purple-50/80 border-purple-200/60" />
-                                <StatCard label="Unique Groups" value={new Set(members.map(m => m.group_name)).size} icon={Globe2} color="bg-amber-50/80 border-amber-200/60" />
+                                <StatCard label={__('general.total_members')} value={members.length} icon={Users} color="bg-blue-50/80 border-blue-200/60" />
+                                <StatCard label={__('general.with_phone')} value={members.filter(m => m.phone).length} icon={Phone} color="bg-emerald-50/80 border-emerald-200/60" />
+                                <StatCard label={__('general.with_username')} value={members.filter(m => m.username).length} icon={AtSign} color="bg-purple-50/80 border-purple-200/60" />
+                                <StatCard label={__('general.unique_groups')} value={new Set(members.map(m => m.group_name)).size} icon={Globe2} color="bg-amber-50/80 border-amber-200/60" />
                             </div>
                         )}
 
@@ -616,8 +614,8 @@ export default function TelegramToolRunner({ tool }: any) {
                                     <MessageCircle className="w-4 h-4 text-white" />
                                 </div>
                                 <div>
-                                    <h2 className="text-sm font-bold text-slate-800">Message Sender</h2>
-                                    <p className="text-[10px] text-slate-400 font-medium">Send messages to contacts with multi-session rotation</p>
+                                    <h2 className="text-sm font-bold text-slate-800">{__('general.message_sender')}</h2>
+                                    <p className="text-[10px] text-slate-400 font-medium">{__('general.send_messages_to_contacts_with_multi_session_rotation')}</p>
                                 </div>
                             </div>
 
@@ -627,7 +625,7 @@ export default function TelegramToolRunner({ tool }: any) {
                                 {connectedSessions.length === 0 ? (
                                     <div className="text-xs text-amber-600 bg-amber-50 border border-amber-200 rounded-xl p-3 flex items-center gap-2">
                                         <AlertCircle className="w-4 h-4 shrink-0" />
-                                        <span>No connected sessions available.</span>
+                                        <span>{__('general.no_connected_sessions_available')}</span>
                                     </div>
                                 ) : (
                                     <div className="flex flex-wrap gap-2">
@@ -665,7 +663,7 @@ export default function TelegramToolRunner({ tool }: any) {
                             <div className="space-y-2">
                                 <label className="text-[10px] font-black uppercase tracking-wider text-slate-400">Message</label>
                                 <Textarea value={messageText} onChange={e => setMessageText(e.target.value)}
-                                    placeholder="Type your message here..." rows={4} className="text-xs resize-y" />
+                                    placeholder={__('general.type_your_message_here')} rows={4} className="text-xs resize-y" />
                             </div>
 
                             {/* Delay */}
@@ -686,14 +684,12 @@ export default function TelegramToolRunner({ tool }: any) {
                             <div className="flex items-center gap-3 pt-2 border-t border-slate-100">
                                 {sendStatus === 'running' ? (
                                     <Button onClick={handleStopSending} variant="destructive" className="gap-1.5 text-xs font-bold">
-                                        <Square className="w-3.5 h-3.5" /> Stop Sending
-                                    </Button>
+                                        <Square className="w-3.5 h-3.5" />{__('general.stop_sending')}</Button>
                                 ) : (
                                     <Button onClick={handleStartSending}
                                         disabled={!sendSessions.length || !recipientsText.trim() || !messageText.trim()}
                                         className="gap-1.5 bg-gradient-to-r from-violet-600 to-pink-500 hover:from-violet-700 hover:to-pink-600 text-white text-xs font-bold shadow-lg shadow-violet-500/20">
-                                        <Send className="w-3.5 h-3.5" /> Start Sending
-                                    </Button>
+                                        <Send className="w-3.5 h-3.5" />{__('general.start_sending')}</Button>
                                 )}
                             </div>
                         </div>
@@ -710,7 +706,7 @@ export default function TelegramToolRunner({ tool }: any) {
                                 {/* Send Log */}
                                 <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
                                     <div className="px-5 py-4 border-b border-slate-100">
-                                        <h3 className="font-bold text-slate-800 text-sm">Send Log</h3>
+                                        <h3 className="font-bold text-slate-800 text-sm">{__('general.send_log')}</h3>
                                     </div>
                                     <div className="divide-y divide-slate-100 max-h-[40vh] overflow-y-auto">
                                         {sendLogs.map((log, i) => (
@@ -747,8 +743,8 @@ export default function TelegramToolRunner({ tool }: any) {
                                     <Shield className="w-4 h-4 text-white" />
                                 </div>
                                 <div>
-                                    <h2 className="text-sm font-bold text-slate-800">Telegram Sessions</h2>
-                                    <p className="text-[10px] text-slate-400 font-medium">Add and manage your Telegram accounts</p>
+                                    <h2 className="text-sm font-bold text-slate-800">{__('general.telegram_sessions')}</h2>
+                                    <p className="text-[10px] text-slate-400 font-medium">{__('general.add_and_manage_your_telegram_accounts')}</p>
                                 </div>
                             </div>
 
@@ -789,8 +785,8 @@ export default function TelegramToolRunner({ tool }: any) {
                                 {sessions.length === 0 ? (
                                     <div className="text-center py-10 text-slate-400">
                                         <Shield className="w-8 h-8 mx-auto mb-2 opacity-30" />
-                                        <p className="text-xs font-medium">No sessions added yet</p>
-                                        <p className="text-[10px]">Add a Telegram phone number to get started</p>
+                                        <p className="text-xs font-medium">{__('general.no_sessions_added_yet')}</p>
+                                        <p className="text-[10px]">{__('general.add_a_telegram_phone_number_to_get_started')}</p>
                                     </div>
                                 ) : sessions.map(s => (
                                     <div key={s.phone} className="flex items-center gap-4 p-4 border border-slate-200 rounded-xl hover:bg-slate-50/50 transition-colors">
@@ -822,8 +818,7 @@ export default function TelegramToolRunner({ tool }: any) {
                             <div className="space-y-4">
                                 <Button variant="ghost" onClick={() => { setSelectedCampaign(null); setCampaignMembers([]); }}
                                     className="gap-1.5 text-xs font-bold text-slate-600 hover:text-slate-800">
-                                    <ArrowLeft className="w-3.5 h-3.5" /> Back to History
-                                </Button>
+                                    <ArrowLeft className="w-3.5 h-3.5" />{__('general.back_to_history')}</Button>
                                 <div className="bg-white border border-slate-200 rounded-2xl shadow-sm p-5">
                                     <div className="flex items-center gap-3 mb-3">
                                         <Badge variant={selectedCampaign.type === 'extract' ? 'default' : 'secondary'} className="text-[10px] font-bold capitalize">
@@ -847,8 +842,8 @@ export default function TelegramToolRunner({ tool }: any) {
                                             <History className="w-4 h-4 text-white" />
                                         </div>
                                         <div>
-                                            <h2 className="text-sm font-bold text-slate-800">Campaign History</h2>
-                                            <p className="text-[10px] text-slate-400 font-medium">Past extraction and sending campaigns</p>
+                                            <h2 className="text-sm font-bold text-slate-800">{__('general.campaign_history')}</h2>
+                                            <p className="text-[10px] text-slate-400 font-medium">{__('general.past_extraction_and_sending_campaigns')}</p>
                                         </div>
                                     </div>
                                     <Button variant="ghost" onClick={handleLoadCampaigns} disabled={loadingCampaigns} className="gap-1 text-xs">
@@ -860,8 +855,8 @@ export default function TelegramToolRunner({ tool }: any) {
                                     {campaigns.length === 0 ? (
                                         <div className="text-center py-10 text-slate-400">
                                             <History className="w-8 h-8 mx-auto mb-2 opacity-30" />
-                                            <p className="text-xs font-medium">No campaigns yet</p>
-                                            <p className="text-[10px]">Start an extraction or send campaign to see it here</p>
+                                            <p className="text-xs font-medium">{__('general.no_campaigns_yet')}</p>
+                                            <p className="text-[10px]">{__('general.start_an_extraction_or_send_campaign_to_see_it_here')}</p>
                                         </div>
                                     ) : campaigns.map(c => (
                                         <button key={c.id} onClick={() => handleViewCampaign(c)}

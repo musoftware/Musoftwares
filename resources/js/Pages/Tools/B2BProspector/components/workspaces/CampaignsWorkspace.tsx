@@ -36,22 +36,19 @@ export function CampaignsWorkspace(props: CampaignsWorkspaceProps) {
         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-300">
             <div className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-2xl font-bold tracking-tight bg-gradient-to-r from-slate-950 to-slate-800 bg-clip-text text-transparent">Lead Finder</h1>
-                    <p className="text-xs text-slate-500 mt-1">Create searching sequences to discover target accounts and verify their email data privately.</p>
+                    <h1 className="text-2xl font-bold tracking-tight bg-gradient-to-r from-slate-950 to-slate-800 bg-clip-text text-transparent">{__('general.lead_finder')}</h1>
+                    <p className="text-xs text-slate-500 mt-1">{__('general.create_searching_sequences_to_discover_target_accounts_and_verify_their_email_data_privately')}</p>
                 </div>
                 <Button onClick={() => props.setShowNewCampaignModal(true)} className="gap-1.5">
-                    <Plus className="w-4 h-4" /> New Search Campaign
-                </Button>
+                    <Plus className="w-4 h-4" />{__('general.new_search_campaign')}</Button>
             </div>
 
             {props.campaigns.length === 0 ? (
                 <Card className="py-24 text-center border-dashed">
                     <Users className="w-10 h-10 text-slate-300 mx-auto mb-4" />
-                    <h3 className="text-sm font-bold text-slate-900">No campaigns launched yet</h3>
-                    <p className="text-xs text-slate-500 mt-1.5 max-w-xs mx-auto">Create your first Lead Finder campaign to start sourcing verified emails locally.</p>
-                    <Button onClick={() => props.setShowNewCampaignModal(true)} className="mt-6">
-                        Create Campaign
-                    </Button>
+                    <h3 className="text-sm font-bold text-slate-900">{__('general.no_campaigns_launched_yet')}</h3>
+                    <p className="text-xs text-slate-500 mt-1.5 max-w-xs mx-auto">{__('general.create_your_first_lead_finder_campaign_to_start_sourcing_verified_emails_locally')}</p>
+                    <Button onClick={() => props.setShowNewCampaignModal(true)} className="mt-6">{__('general.create_campaign')}</Button>
                 </Card>
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -94,7 +91,7 @@ export function CampaignsWorkspace(props: CampaignsWorkspaceProps) {
                                             <span className="text-slate-900 text-sm font-bold block mt-0.5">{stats.total}</span>
                                         </div>
                                         <div className="bg-emerald-50/20 p-2.5 rounded-xl border border-emerald-100/30 text-center">
-                                            <span className="text-emerald-700/60 text-[10px] font-semibold block">Clean Emails</span>
+                                            <span className="text-emerald-700/60 text-[10px] font-semibold block">{__('general.clean_emails')}</span>
                                             <span className="text-emerald-700 text-sm font-bold block mt-0.5">{stats.valid}</span>
                                         </div>
                                         <div className="bg-slate-50/50 p-2.5 rounded-xl border border-slate-100 text-center">
@@ -109,8 +106,7 @@ export function CampaignsWorkspace(props: CampaignsWorkspaceProps) {
                                         variant="ghost" size="sm"
                                         onClick={() => props.onViewLeads(camp.id)}
                                         className="text-xs text-slate-500 hover:text-slate-900"
-                                    >
-                                        View Leads <ChevronRight className="w-3.5 h-3.5 ml-1" />
+                                    >{__('general.view_leads')}<ChevronRight className="w-3.5 h-3.5 ml-1" />
                                     </Button>
                                     
                                     {isRunning ? (
@@ -119,16 +115,14 @@ export function CampaignsWorkspace(props: CampaignsWorkspaceProps) {
                                             onClick={() => props.handleStopCampaign(camp.id)}
                                             className="h-8 bg-rose-50 hover:bg-rose-100 text-rose-700 border-rose-100 text-[11px]"
                                         >
-                                            <Square className="w-3 h-3 fill-rose-700 mr-1" /> Pause Search
-                                        </Button>
+                                            <Square className="w-3 h-3 fill-rose-700 mr-1" />{__('general.pause_search')}</Button>
                                     ) : (
                                         <Button 
                                             variant="outline" size="sm"
                                             onClick={() => props.handleStartCampaign(camp.id)}
                                             className="h-8 bg-teal-50 hover:bg-teal-100 text-teal-700 border-teal-100 text-[11px]"
                                         >
-                                            <Play className="w-3 h-3 fill-teal-700 mr-1" /> Launch Scraper
-                                        </Button>
+                                            <Play className="w-3 h-3 fill-teal-700 mr-1" />{__('general.launch_scraper')}</Button>
                                     )}
                                 </div>
                             </Card>
@@ -142,7 +136,7 @@ export function CampaignsWorkspace(props: CampaignsWorkspaceProps) {
                 <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200">
                     <div className="bg-white w-full max-w-lg rounded-2xl shadow-xl overflow-hidden border border-slate-200/80 animate-in zoom-in-95 duration-200">
                         <div className="px-6 py-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
-                            <h3 className="font-bold text-slate-900 text-sm tracking-tight">New Search Campaign</h3>
+                            <h3 className="font-bold text-slate-900 text-sm tracking-tight">{__('general.new_search_campaign')}</h3>
                             <Button
                                 variant="ghost" size="icon"
                                 onClick={() => props.setShowNewCampaignModal(false)}
@@ -151,34 +145,30 @@ export function CampaignsWorkspace(props: CampaignsWorkspaceProps) {
                         </div>
                         <form onSubmit={props.handleCreateCampaign} className="p-6 space-y-4 text-xs">
                             <div className="space-y-1">
-                                <Label>Campaign Name</Label>
-                                <Input type="text" required placeholder="e.g. US Tech Founders" value={props.newCampName} onChange={e => props.setNewCampName(e.target.value)} />
+                                <Label>{__('general.campaign_name')}</Label>
+                                <Input type="text" required placeholder={__('general.e_g_us_tech_founders')} value={props.newCampName} onChange={e => props.setNewCampName(e.target.value)} />
                             </div>
                             <div className="space-y-1">
                                 <Label>Target Search Keyword (Job title or company domain)</Label>
-                                <Input type="text" required placeholder="e.g. Chief Executive Officer" value={props.newCampKeyword} onChange={e => props.setNewCampKeyword(e.target.value)} />
+                                <Input type="text" required placeholder={__('general.e_g_chief_executive_officer')} value={props.newCampKeyword} onChange={e => props.setNewCampKeyword(e.target.value)} />
                             </div>
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="space-y-1">
-                                    <Label>Country Filter</Label>
+                                    <Label>{__('general.country_filter')}</Label>
                                     <Input type="text" placeholder="USA" value={props.newCampCountry} onChange={e => props.setNewCampCountry(e.target.value)} />
                                 </div>
                                 <div className="space-y-1">
                                     <Label>City Filter (Optional)</Label>
-                                    <Input type="text" placeholder="San Francisco" value={props.newCampCity} onChange={e => props.setNewCampCity(e.target.value)} />
+                                    <Input type="text" placeholder={__('general.san_francisco')} value={props.newCampCity} onChange={e => props.setNewCampCity(e.target.value)} />
                                 </div>
                             </div>
                             <div className="space-y-2">
-                                <Label>Lead Search Sources</Label>
+                                <Label>{__('general.lead_search_sources')}</Label>
                                 <div className="flex items-center gap-3">
                                     <Button type="button" variant={props.newCampSources.includes('linkedin') ? 'default' : 'outline'} onClick={() => props.toggleSource('linkedin')} className="gap-1.5">
-                                        <CheckCircle className={`w-3.5 h-3.5 ${props.newCampSources.includes('linkedin') ? 'text-teal-400' : 'opacity-30'}`} />
-                                        LinkedIn Profile Search
-                                    </Button>
+                                        <CheckCircle className={`w-3.5 h-3.5 ${props.newCampSources.includes('linkedin') ? 'text-teal-400' : 'opacity-30'}`} />{__('general.linkedin_profile_search')}</Button>
                                     <Button type="button" variant={props.newCampSources.includes('google_maps') ? 'default' : 'outline'} onClick={() => props.toggleSource('google_maps')} className="gap-1.5">
-                                        <CheckCircle className={`w-3.5 h-3.5 ${props.newCampSources.includes('google_maps') ? 'text-teal-400' : 'opacity-30'}`} />
-                                        Google Maps Places
-                                    </Button>
+                                        <CheckCircle className={`w-3.5 h-3.5 ${props.newCampSources.includes('google_maps') ? 'text-teal-400' : 'opacity-30'}`} />{__('general.google_maps_places')}</Button>
                                 </div>
                             </div>
                             <div className="space-y-1 max-w-[200px]">
@@ -187,7 +177,7 @@ export function CampaignsWorkspace(props: CampaignsWorkspaceProps) {
                             </div>
                             <div className="pt-4 border-t border-slate-100 flex items-center justify-end gap-3.5">
                                 <Button type="button" variant="ghost" onClick={() => props.setShowNewCampaignModal(false)}>Cancel</Button>
-                                <Button type="submit">Save Draft Campaign</Button>
+                                <Button type="submit">{__('general.save_draft_campaign')}</Button>
                             </div>
                         </form>
                     </div>

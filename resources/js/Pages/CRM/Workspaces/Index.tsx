@@ -23,8 +23,8 @@ export default function WorkspaceIndex({ availableCenters }: { availableCenters:
     const allCenters: Record<string, ActionCenter> = {
         telesales: {
             id: 'telesales',
-            title: __('Telesales Workspace'),
-            description: __('Your daily action center. Make calls, manage your pipeline, and handle follow-ups.'),
+            title: __('general.telesales_workspace'),
+            description: __('general.your_daily_action_center_make_calls_manage_your_pipeline_and_handle_follow_ups'),
             icon: PhoneCall,
             href: route('crm.workspaces.telesales'),
             colorClass: 'text-indigo-600',
@@ -32,8 +32,8 @@ export default function WorkspaceIndex({ availableCenters }: { availableCenters:
         },
         manager: {
             id: 'manager',
-            title: __('Manager Workspace'),
-            description: __('Oversee branch performance, monitor SLAs, and track agent conversion metrics.'),
+            title: __('general.manager_workspace'),
+            description: __('general.oversee_branch_performance_monitor_slas_and_track_agent_conversion_metrics'),
             icon: Users,
             href: route('crm.workspaces.manager'),
             colorClass: 'text-rose-600',
@@ -41,8 +41,8 @@ export default function WorkspaceIndex({ availableCenters }: { availableCenters:
         },
         collector: {
             id: 'collector',
-            title: __('Collector Workspace'),
-            description: __('Manage incoming data, import bulk lead lists, and handle duplicate prevention.'),
+            title: __('general.collector_workspace'),
+            description: __('general.manage_incoming_data_import_bulk_lead_lists_and_handle_duplicate_prevention'),
             icon: Database,
             href: route('crm.workspaces.collector'),
             colorClass: 'text-emerald-600',
@@ -52,20 +52,20 @@ export default function WorkspaceIndex({ availableCenters }: { availableCenters:
 
     if (!hasAdvancedOps) {
         return (
-            <CrmLayout title={__('Workspaces Hub')} activeMenu="workspaces">
+            <CrmLayout title={__('general.workspaces_hub')} activeMenu="workspaces">
                 <ModulePageHeader 
-                    title={__('Workspaces')}
-                    description={__('Dedicated hubs for telesales, managers, and data collectors.')}
+                    title={__('general.workspaces')}
+                    description={__('general.dedicated_hubs_for_telesales_managers_and_data_collectors')}
                     icon={Briefcase}
                     module="CRM"
                 />
                 <div className="px-8 pb-8">
                     <UpgradeOverlay 
-                        title={__('Advanced Operations Required')}
-                        description={__('To use dedicated role-based Workspaces (Manager, Telesales, Collector hubs), you need the Advanced Operations add-on.')}
+                        title={__('general.advanced_operations_required')}
+                        description={__('general.to_use_dedicated_role_based_workspaces_manager_telesales_collector_hubs_you_need_the_advanced_operations_add_on')}
                         icon={Briefcase}
                         module="crm-advanced-operations"
-                        priceText={__('Subscribe to Advanced Operations')}
+                        priceText={__('general.subscribe_to_advanced_operations')}
                     />
                 </div>
             </CrmLayout>
@@ -76,10 +76,10 @@ export default function WorkspaceIndex({ availableCenters }: { availableCenters:
     const visibleCenters = availableCenters ? availableCenters.map(key => allCenters[key]).filter(Boolean) : [];
 
     return (
-        <CrmLayout title={__('Workspaces Hub')} activeMenu="workspaces">
+        <CrmLayout title={__('general.workspaces_hub')} activeMenu="workspaces">
             <ModulePageHeader 
-                title={__('Select Your Workspace')}
-                description={__('You have access to multiple action centers. Choose the workspace that matches your task for today.')}
+                title={__('general.select_your_workspace')}
+                description={__('general.you_have_access_to_multiple_action_centers_choose_the_workspace_that_matches_your_task_for_today')}
                 icon={Briefcase}
                 module="CRM"
             />
@@ -104,7 +104,7 @@ export default function WorkspaceIndex({ availableCenters }: { availableCenters:
                             </p>
 
                             <div className="flex items-center text-sm font-semibold text-indigo-600 group-hover:text-indigo-700 transition-colors">
-                                {__('Enter Workspace')}
+                                {__('general.enter_workspace')}
                                 <ArrowRight size={16} className="ml-1 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300" />
                             </div>
                         </Link>
@@ -116,9 +116,9 @@ export default function WorkspaceIndex({ availableCenters }: { availableCenters:
                         <div className="w-16 h-16 bg-slate-100 text-slate-400 rounded-full flex items-center justify-center mb-4">
                             <Users size={32} />
                         </div>
-                        <h3 className="text-lg font-semibold text-slate-800">{__('No Workspaces Available')}</h3>
+                        <h3 className="text-lg font-semibold text-slate-800">{__('general.no_workspaces_available')}</h3>
                         <p className="text-sm text-slate-500 mt-1 max-w-md">
-                            {__('You currently do not have access to any specialized workspaces. Please contact your administrator to assign a role to your account.')}
+                            {__('general.you_currently_do_not_have_access_to_any_specialized_workspaces_please_contact_your_administrator_to_assign_a_role_to_your_account')}
                         </p>
                     </div>
                 )}

@@ -25,8 +25,8 @@ export default function GalleryStep({ data, setData, errors }: any) {
     return (
         <div className="space-y-10">
             <div>
-                <h2 className="text-2xl font-bold text-slate-900 mb-1">Showcase Your Services</h2>
-                <p className="text-sm text-slate-500">Encourage buyers to choose your service by featuring a variety of your work.</p>
+                <h2 className="text-2xl font-bold text-slate-900 mb-1">{__('general.showcase_your_services')}</h2>
+                <p className="text-sm text-slate-500">{__('general.encourage_buyers_to_choose_your_service_by_featuring_a_variety_of_your_work')}</p>
             </div>
 
             <div className="space-y-4">
@@ -34,7 +34,7 @@ export default function GalleryStep({ data, setData, errors }: any) {
                     <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2 mb-1">
                         <ImageIcon className="w-5 h-5 text-indigo-500" /> Images (up to 5)
                     </h3>
-                    <p className="text-sm text-slate-500 mb-4">Get noticed by the right buyers with visual examples of your services.</p>
+                    <p className="text-sm text-slate-500 mb-4">{__('general.get_noticed_by_the_right_buyers_with_visual_examples_of_your_services')}</p>
                 </div>
 
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
@@ -65,14 +65,14 @@ export default function GalleryStep({ data, setData, errors }: any) {
                         >
                             <input {...getInputProps()} />
                             <UploadCloud className={`w-8 h-8 mb-3 ${isDragActive ? 'text-indigo-500' : 'text-slate-400'}`} />
-                            <p className="text-sm font-bold text-slate-700">Drag & drop photos or</p>
+                            <p className="text-sm font-bold text-slate-700">{__('general.drag_drop_photos_or')}</p>
                             <p className="text-sm font-bold text-indigo-600 mb-1">Browse</p>
-                            <p className="text-[10px] text-slate-400 uppercase tracking-wider font-bold">Max 5MB</p>
+                            <p className="text-[10px] text-slate-400 uppercase tracking-wider font-bold">{__('general.max_5mb')}</p>
                         </div>
                     )}
                 </div>
                 {errors.gallery && <p className="text-xs text-red-500 font-medium">{errors.gallery}</p>}
-                {(errors as any)['gallery.0'] && <p className="text-xs text-red-500 font-medium">Please upload at least one image.</p>}
+                {(errors as any)['gallery.0'] && <p className="text-xs text-red-500 font-medium">{__('general.please_upload_at_least_one_image')}</p>}
             </div>
 
             <div className="border-t border-slate-200 pt-10 space-y-4">
@@ -80,15 +80,15 @@ export default function GalleryStep({ data, setData, errors }: any) {
                     <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2 mb-1">
                         <Video className="w-5 h-5 text-indigo-500" /> Video (Optional)
                     </h3>
-                    <p className="text-sm text-slate-500">Capture buyers' attention with a video that showcases your service.</p>
+                    <p className="text-sm text-slate-500">{__('general.capture_buyers_attention_with_a_video_that_showcases_your_service')}</p>
                 </div>
 
                 <div className="space-y-2 max-w-xl">
-                    <Label className="text-xs font-bold text-slate-600 uppercase tracking-wider">YouTube or Vimeo URL</Label>
+                    <Label className="text-xs font-bold text-slate-600 uppercase tracking-wider">{__('general.youtube_or_vimeo_url')}</Label>
                     <Input
                         value={data.video_url || ''}
                         onChange={e => setData('video_url', e.target.value)}
-                        placeholder="https://youtube.com/watch?v=..."
+                        placeholder={__('general.https_youtube_com_watch_v')}
                         className="h-12"
                     />
                     {errors.video_url && <p className="text-xs text-red-500 font-medium">{errors.video_url}</p>}

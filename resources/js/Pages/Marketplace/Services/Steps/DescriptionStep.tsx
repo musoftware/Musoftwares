@@ -38,7 +38,7 @@ export default function DescriptionStep({ data, setData, errors }: any) {
             <div className="space-y-4">
                 <div>
                     <h2 className="text-2xl font-bold text-slate-900 mb-1">Description</h2>
-                    <p className="text-sm text-slate-500">Briefly Describe Your Service.</p>
+                    <p className="text-sm text-slate-500">{__('general.briefly_describe_your_service')}</p>
                 </div>
 
                 <div className="space-y-2">
@@ -46,7 +46,7 @@ export default function DescriptionStep({ data, setData, errors }: any) {
                         value={data.description}
                         onChange={e => setData('description', e.target.value)}
                         rows={12}
-                        placeholder="Tell buyers exactly what you will deliver..."
+                        placeholder={__('general.tell_buyers_exactly_what_you_will_deliver')}
                         className={cn(
                             'w-full rounded-2xl border bg-white px-5 py-4 text-sm resize-y focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all leading-relaxed shadow-sm',
                             errors.description ? 'border-red-400' : 'border-slate-200'
@@ -66,9 +66,8 @@ export default function DescriptionStep({ data, setData, errors }: any) {
                 <div className="flex items-center justify-between">
                     <div>
                         <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-                            <ListChecks className="w-5 h-5 text-indigo-500" /> Buyer Requirements
-                        </h3>
-                        <p className="text-sm text-slate-500">Tell buyers what you need to get started.</p>
+                            <ListChecks className="w-5 h-5 text-indigo-500" />{__('general.buyer_requirements')}</h3>
+                        <p className="text-sm text-slate-500">{__('general.tell_buyers_what_you_need_to_get_started')}</p>
                     </div>
                     {data.requirements.length < 10 && (
                         <button type="button" onClick={addReq} className="text-sm font-bold text-indigo-600 bg-indigo-50 px-3 py-1.5 rounded-lg hover:bg-indigo-100 transition-colors">
@@ -83,7 +82,7 @@ export default function DescriptionStep({ data, setData, errors }: any) {
                             <Input 
                                 value={req} 
                                 onChange={e => updateReq(i, e.target.value)} 
-                                placeholder="e.g. Please provide your brand guidelines..."
+                                placeholder={__('general.e_g_please_provide_your_brand_guidelines')}
                                 className="bg-white"
                             />
                             <button type="button" onClick={() => removeReq(i)} className="p-2.5 text-slate-400 hover:text-red-500 hover:bg-white rounded-lg transition-colors">
@@ -92,9 +91,7 @@ export default function DescriptionStep({ data, setData, errors }: any) {
                         </div>
                     ))}
                     {data.requirements.length === 0 && (
-                        <div className="text-center py-6 border-2 border-dashed border-slate-200 rounded-2xl text-slate-400 text-sm">
-                            No requirements added yet.
-                        </div>
+                        <div className="text-center py-6 border-2 border-dashed border-slate-200 rounded-2xl text-slate-400 text-sm">{__('general.no_requirements_added_yet')}</div>
                     )}
                 </div>
             </div>
@@ -103,9 +100,8 @@ export default function DescriptionStep({ data, setData, errors }: any) {
                 <div className="flex items-center justify-between">
                     <div>
                         <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-                            <HelpCircle className="w-5 h-5 text-indigo-500" /> Frequently Asked Questions
-                        </h3>
-                        <p className="text-sm text-slate-500">Add Q&A to answer common questions from buyers.</p>
+                            <HelpCircle className="w-5 h-5 text-indigo-500" />{__('general.frequently_asked_questions')}</h3>
+                        <p className="text-sm text-slate-500">{__('general.add_q_a_to_answer_common_questions_from_buyers')}</p>
                     </div>
                     {data.faq.length < 10 && (
                         <button type="button" onClick={addFaq} className="text-sm font-bold text-indigo-600 bg-indigo-50 px-3 py-1.5 rounded-lg hover:bg-indigo-100 transition-colors">
@@ -125,7 +121,7 @@ export default function DescriptionStep({ data, setData, errors }: any) {
                                 <Input 
                                     value={item.question} 
                                     onChange={e => updateFaq(i, 'question', e.target.value)} 
-                                    placeholder="e.g. Do you provide source files?"
+                                    placeholder={__('general.e_g_do_you_provide_source_files')}
                                     className="h-10 font-medium"
                                 />
                             </div>
@@ -134,7 +130,7 @@ export default function DescriptionStep({ data, setData, errors }: any) {
                                 <textarea
                                     value={item.answer}
                                     onChange={e => updateFaq(i, 'answer', e.target.value)}
-                                    placeholder="e.g. Yes, all packages include the source files."
+                                    placeholder={__('general.e_g_yes_all_packages_include_the_source_files')}
                                     rows={2}
                                     className="w-full rounded-xl border border-input bg-background px-3 py-2 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all"
                                 />
@@ -142,9 +138,7 @@ export default function DescriptionStep({ data, setData, errors }: any) {
                         </div>
                     ))}
                     {data.faq.length === 0 && (
-                        <div className="text-center py-6 border-2 border-dashed border-slate-200 rounded-2xl text-slate-400 text-sm">
-                            No FAQs added yet.
-                        </div>
+                        <div className="text-center py-6 border-2 border-dashed border-slate-200 rounded-2xl text-slate-400 text-sm">{__('general.no_faqs_added_yet')}</div>
                     )}
                 </div>
             </div>

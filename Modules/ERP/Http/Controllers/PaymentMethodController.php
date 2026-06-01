@@ -28,7 +28,7 @@ class PaymentMethodController extends Controller
         $client = TenantClient::where('user_id', Auth::id())->first();
 
         if (!$client) {
-            abort(403, 'No client record is linked to your account.');
+            abort(403, __('general.no_client_record_is_linked_to_your_account'));
         }
 
         return $client;
@@ -83,7 +83,7 @@ class PaymentMethodController extends Controller
             'status'              => 'pending_review', // M1 fix: was 'pending', DB enum is 'pending_review'
         ]);
 
-        return back()->with('success', 'Payment method added. Awaiting admin review.');
+        return back()->with('success', __('general.payment_method_added_awaiting_admin_review'));
     }
 
     public function update(Request $request, PaymentMethod $paymentMethod)
@@ -91,7 +91,7 @@ class PaymentMethodController extends Controller
         $client = $this->resolveClient();
 
         if ($paymentMethod->client_id !== $client->id) {
-            abort(403, 'Unauthorized access to payment method.');
+            abort(403, __('general.unauthorized_access_to_payment_method'));
         }
 
         $request->validate([
@@ -104,7 +104,7 @@ class PaymentMethodController extends Controller
 
         $paymentMethod->update(['is_default' => $request->boolean('is_default')]);
 
-        return back()->with('success', 'Payment method updated.');
+        return back()->with('success', __('general.payment_method_updated'));
     }
 
     public function destroy(Request $request, PaymentMethod $paymentMethod)
@@ -112,12 +112,12 @@ class PaymentMethodController extends Controller
         $client = $this->resolveClient();
 
         if ($paymentMethod->client_id !== $client->id) {
-            abort(403, 'Unauthorized access to payment method.');
+            abort(403, __('general.unauthorized_access_to_payment_method'));
         }
 
         $paymentMethod->delete();
 
-        return back()->with('success', 'Payment method removed.');
+        return back()->with('success', __('general.payment_method_removed'));
     }
 
     // ── Admin Methods (M9 fix: requires tenant ownership) ─────────────
@@ -134,7 +134,7 @@ class PaymentMethodController extends Controller
             'reviewed_at' => now(),
         ]);
 
-        return back()->with('success', 'Payment method approved.');
+        return back()->with('success', __('general.payment_method_approved'));
     }
 
     public function reject(Request $request, PaymentMethod $paymentMethod)
@@ -154,7 +154,7 @@ class PaymentMethodController extends Controller
             'reviewed_at'    => now(),
         ]);
 
-        return back()->with('success', 'Payment method rejected.');
+        return back()->with('success', __('general.payment_method_rejected'));
     }
 
     private function authorizePaymentMethod(PaymentMethod $paymentMethod, Tenant $tenant): void
@@ -164,7 +164,7 @@ class PaymentMethodController extends Controller
             ->exists();
 
         if (!$clientBelongsToTenant) {
-            abort(403, 'Unauthorized access to this payment method.');
+            abort(403, __('general.unauthorized_access_to_this_payment_method'));
         }
     }
 }

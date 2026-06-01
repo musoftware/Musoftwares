@@ -24,9 +24,9 @@
                             <tr>
                                 <th class="px-4 py-3">Serial</th>
                                 <th class="py-3">Status</th>
-                                <th class="py-3">Order ID</th>
-                                <th class="py-3">Expires At</th>
-                                <th class="py-3">Sold At</th>
+                                <th class="py-3">{{ __('general.order_id') }}</th>
+                                <th class="py-3">{{ __('general.expires_at') }}</th>
+                                <th class="py-3">{{ __('general.sold_at') }}</th>
                                 <th class="text-end px-4 py-3">Actions</th>
                             </tr>
                         </thead>
@@ -94,9 +94,7 @@
                             @empty
                                 <tr>
                                     <td colspan="6" class="text-center py-5 text-muted">
-                                        <i class="ti ti-database-off fs-1 mb-3 d-block"></i>
-                                        No serial numbers found.
-                                    </td>
+                                        <i class="ti ti-database-off fs-1 mb-3 d-block"></i>{{ __('general.no_serial_numbers_found') }}</td>
                                 </tr>
                             @endforelse
                         </tbody>
@@ -118,24 +116,24 @@
                 @csrf
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title">Add Serials</h5>
+                        <h5 class="modal-title">{{ __('general.add_serials') }}</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
                         <div class="mb-3">
                             <label for="serials" class="form-label">Serial Numbers (One per line)</label>
                             <textarea class="form-control" id="serials" name="serials" rows="10" required
-                                placeholder="XXXX-XXXX-XXXX-XXXX"></textarea>
+                                placeholder="{{ __('general.xxxx_xxxx_xxxx_xxxx') }}"></textarea>
                         </div>
                         <div class="mb-3">
                             <label for="expires_at" class="form-label">Expiration Date (Optional)</label>
                             <input type="date" class="form-control" id="expires_at" name="expires_at">
-                            <div class="form-text">Leave blank if these serials do not expire.</div>
+                            <div class="form-text">{{ __('general.leave_blank_if_these_serials_do_not_expire') }}</div>
                         </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-primary">Add Serials</button>
+                        <button type="submit" class="btn btn-primary">{{ __('general.add_serials') }}</button>
                     </div>
                 </div>
             </form>

@@ -181,7 +181,7 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
             case 'paid':
                 return <StatusBadge status="paid" />;
             case 'partially_paid':
-                return <StatusBadge status="partially_paid" label="Partially Paid" className="bg-amber-50 text-amber-700 border-amber-100" />;
+                return <StatusBadge status="partially_paid" label={__('general.partially_paid')} className="bg-amber-50 text-amber-700 border-amber-100" />;
             case 'cancelled':
                 return <StatusBadge status="cancelled" />;
             case 'unpaid':
@@ -210,13 +210,13 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
     };
 
     return (
-        <AdminSidebarLayout title="Platform Invoices" header="Invoices Manager">
+        <AdminSidebarLayout title={__('general.platform_invoices')} header="Invoices Manager">
             
             {stats && (
                 <div className="mb-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
                     <Card>
                         <CardContent className="p-5">
-                            <dt className="text-sm font-medium text-muted-foreground truncate">Total Invoices</dt>
+                            <dt className="text-sm font-medium text-muted-foreground truncate">{__('general.total_invoices')}</dt>
                             <dd className="mt-1 text-3xl font-semibold text-foreground">{stats.total}</dd>
                         </CardContent>
                     </Card>
@@ -234,7 +234,7 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
                     </Card>
                     <Card>
                         <CardContent className="p-5">
-                            <dt className="text-sm font-medium text-muted-foreground truncate">Partially Paid</dt>
+                            <dt className="text-sm font-medium text-muted-foreground truncate">{__('general.partially_paid')}</dt>
                             <dd className="mt-1 text-3xl font-semibold text-foreground">{stats.partially_paid}</dd>
                         </CardContent>
                     </Card>
@@ -246,9 +246,7 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
                     <Link
                         href={buildTabUrl('all')}
                         className={`rounded-md px-4 py-2 text-sm font-medium transition-colors ${currentTab === 'all' ? 'bg-primary text-primary-foreground shadow-sm' : 'bg-muted text-muted-foreground hover:bg-muted/80'}`}
-                    >
-                        All Invoices
-                    </Link>
+                    >{__('general.all_invoices')}</Link>
                     <Link
                         href={buildTabUrl('unpaid')}
                         className={`rounded-md px-4 py-2 text-sm font-medium transition-colors ${currentTab === 'unpaid' ? 'bg-primary text-primary-foreground shadow-sm' : 'bg-muted text-muted-foreground hover:bg-muted/80'}`}
@@ -258,9 +256,7 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
                     <Link
                         href={buildTabUrl('archive')}
                         className={`rounded-md px-4 py-2 text-sm font-medium transition-colors ${currentTab === 'archive' ? 'bg-primary text-primary-foreground shadow-sm' : 'bg-muted text-muted-foreground hover:bg-muted/80'}`}
-                    >
-                        Archived / Cancelled
-                    </Link>
+                    >{__('general.archived_cancelled')}</Link>
                 </div>
             </div>
 
@@ -271,18 +267,17 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
                         {filters.client_id && (
                             <Link href={`/admin/invoices?client_id=${filters.client_id}${filters.project_id ? `&project_id=${filters.project_id}` : ''}`}>
                                 <Button size="sm">
-                                    <Plus className="mr-2 h-4 w-4" /> Add Invoice
-                                </Button>
+                                    <Plus className="mr-2 h-4 w-4" />{__('general.add_invoice')}</Button>
                             </Link>
                         )}
 
                         <div className="w-full md:w-48">
-                            <Label className="mb-2 block text-xs uppercase text-muted-foreground">Filter By</Label>
+                            <Label className="mb-2 block text-xs uppercase text-muted-foreground">{__('general.filter_by')}</Label>
                             <PremiumCombobox
                                 value={filterBy}
                                 onChange={(val) => { setFilterBy(String(val)); setTimeout(handleFilter, 50); }}
                                 options={filterByOptions}
-                                placeholder="Select filter..."
+                                placeholder={__('general.select_filter')}
                             />
                         </div>
 
@@ -292,7 +287,7 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
                                 value={perPage}
                                 onChange={(val) => { setPerPage(String(val)); setTimeout(handleFilter, 50); }}
                                 options={perPageOptions}
-                                placeholder="Per page"
+                                placeholder={__('general.per_page')}
                             />
                         </div>
 
@@ -301,7 +296,7 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
                             <Input
                                 type="text"
                                 className="h-9"
-                                placeholder="Search invoices..."
+                                placeholder={__('general.search_invoices')}
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
                                 onKeyDown={(e) => {
@@ -334,10 +329,10 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
                                     <TableHead className="uppercase text-xs">Customer</TableHead>
                                     <TableHead className="uppercase text-xs">Project</TableHead>
                                     <TableHead className="uppercase text-xs">Date</TableHead>
-                                    <TableHead className="uppercase text-xs">Schedule Date</TableHead>
+                                    <TableHead className="uppercase text-xs">{__('general.schedule_date')}</TableHead>
                                     <TableHead className="text-right uppercase text-xs">Total</TableHead>
-                                    <TableHead className="text-center uppercase text-xs">Job Status</TableHead>
-                                    <TableHead className="text-center uppercase text-xs">Invoice Status</TableHead>
+                                    <TableHead className="text-center uppercase text-xs">{__('general.job_status')}</TableHead>
+                                    <TableHead className="text-center uppercase text-xs">{__('general.invoice_status')}</TableHead>
                                     <TableHead className="text-right uppercase text-xs">Actions</TableHead>
                                 </TableRow>
                             </TableHeader>
@@ -390,7 +385,7 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
                                         <TableCell className="text-muted-foreground text-sm" data-label="Date">
                                             {new Date(invoice.created_at).toLocaleDateString()}
                                         </TableCell>
-                                        <TableCell className="text-muted-foreground text-sm" data-label="Schedule Date">
+                                        <TableCell className="text-muted-foreground text-sm" data-label={__('general.schedule_date')}>
                                             {invoice.scheduled_start_date ? new Date(invoice.scheduled_start_date).toLocaleDateString() : '-'}
                                         </TableCell>
                                         <TableCell className="text-right" data-label="Total">
@@ -399,7 +394,7 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
                                                     {formatCurrency(invoice.amount, invoice.currency)}
                                                 </span>
                                                 {(invoice.business_currency && invoice.business_currency !== invoice.currency) && (
-                                                    <span className="text-xs text-muted-foreground font-medium" title="Business Currency">
+                                                    <span className="text-xs text-muted-foreground font-medium" title={__('general.business_currency')}>
                                                         ~ {formatCurrency(invoice.business_amount || invoice.amount, invoice.business_currency)}
                                                     </span>
                                                 )}
@@ -410,7 +405,7 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
                                                 )}
                                             </div>
                                         </TableCell>
-                                        <TableCell className="text-center" data-label="Job Status">
+                                        <TableCell className="text-center" data-label={__('general.job_status')}>
                                             <button 
                                                 type="button" 
                                                 className="hover:opacity-80 transition-opacity focus:outline-none"
@@ -422,7 +417,7 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
                                                 {getJobStatusBadge(invoice.job_status)}
                                             </button>
                                         </TableCell>
-                                        <TableCell className="text-center" data-label="Invoice Status">
+                                        <TableCell className="text-center" data-label={__('general.invoice_status')}>
                                             <div className="inline-block">
                                                 {getStatusBadge(invoice.status)}
                                             </div>
@@ -431,78 +426,60 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
                                             <DropdownMenu>
                                                 <DropdownMenuTrigger asChild>
                                                     <Button variant="ghost" className="h-8 w-8 p-0">
-                                                        <span className="sr-only">Open menu</span>
+                                                        <span className="sr-only">{__('general.open_menu')}</span>
                                                         <MoreHorizontal className="h-4 w-4" />
                                                     </Button>
                                                 </DropdownMenuTrigger>
                                                 <DropdownMenuContent align="end" className="w-56">
-                                                    <DropdownMenuLabel>Invoice Actions</DropdownMenuLabel>
+                                                    <DropdownMenuLabel>{__('general.invoice_actions')}</DropdownMenuLabel>
                                                     <DropdownMenuItem asChild>
                                                         <Link href={route('admin.invoices.show', invoice.id)} className="flex w-full items-center">
-                                                            <FileText className="mr-2 h-4 w-4 text-blue-500" />
-                                                            View Details
-                                                        </Link>
+                                                            <FileText className="mr-2 h-4 w-4 text-blue-500" />{__('general.view_details')}</Link>
                                                     </DropdownMenuItem>
                                                     
                                                     <DropdownMenuItem asChild>
                                                         <Link href={`/admin/invoices/create?client_id=${invoice.user_id || invoice.user?.id}${(invoice.project_id || invoice.project?.id) ? `&project_id=${invoice.project_id || invoice.project?.id}` : ''}`} className="flex w-full items-center">
-                                                            <Plus className="mr-2 h-4 w-4 text-emerald-500" />
-                                                            New Invoice
-                                                        </Link>
+                                                            <Plus className="mr-2 h-4 w-4 text-emerald-500" />{__('general.new_invoice')}</Link>
                                                     </DropdownMenuItem>
                                                     
                                                     <DropdownMenuItem asChild>
                                                         <Link href={`/admin/invoices?client_id=${invoice.user_id || invoice.user?.id}`} className="flex w-full items-center">
-                                                            <List className="mr-2 h-4 w-4 text-slate-500" />
-                                                            All Invoices
-                                                        </Link>
+                                                            <List className="mr-2 h-4 w-4 text-slate-500" />{__('general.all_invoices')}</Link>
                                                     </DropdownMenuItem>
                                                 
                                                     <DropdownMenuSeparator />
                                                 
-                                                    <DropdownMenuLabel>Client Reports</DropdownMenuLabel>
+                                                    <DropdownMenuLabel>{__('general.client_reports')}</DropdownMenuLabel>
                                                     <DropdownMenuItem asChild>
                                                         <a href={`/admin/users/${invoice.user_id || invoice.user?.id}/balance-sheet`} target="_blank" rel="noopener noreferrer" className="flex w-full items-center">
-                                                            <Receipt className="mr-2 h-4 w-4 text-sky-500" />
-                                                            Due Balance Sheet
-                                                        </a>
+                                                            <Receipt className="mr-2 h-4 w-4 text-sky-500" />{__('general.due_balance_sheet')}</a>
                                                     </DropdownMenuItem>
                                                     <DropdownMenuItem asChild>
                                                         <a href={`/admin/users/${invoice.user_id || invoice.user?.id}/reports`} target="_blank" rel="noopener noreferrer" className="flex w-full items-center">
-                                                            <Clock className="mr-2 h-4 w-4 text-amber-500" />
-                                                            Timer Balance Sheet
-                                                        </a>
+                                                            <Clock className="mr-2 h-4 w-4 text-amber-500" />{__('general.timer_balance_sheet')}</a>
                                                     </DropdownMenuItem>
                                                 
                                                     <DropdownMenuSeparator />
                                                 
-                                                    <DropdownMenuLabel>Profile & Tasks</DropdownMenuLabel>
+                                                    <DropdownMenuLabel>{__('general.profile_tasks')}</DropdownMenuLabel>
                                                     <DropdownMenuItem asChild>
                                                         <a href={`/admin/users/${invoice.user_id || invoice.user?.id}`} target="_blank" rel="noopener noreferrer" className="flex w-full items-center">
-                                                            <User className="mr-2 h-4 w-4 text-blue-500" />
-                                                            User Profile
-                                                        </a>
+                                                            <User className="mr-2 h-4 w-4 text-blue-500" />{__('general.user_profile')}</a>
                                                     </DropdownMenuItem>
                                                     <DropdownMenuItem asChild>
                                                         <Link href={`/admin/users/${invoice.user_id || invoice.user?.id}/tasks/add`} className="flex w-full items-center">
-                                                            <ClipboardList className="mr-2 h-4 w-4 text-emerald-500" />
-                                                            Add Tasks
-                                                        </Link>
+                                                            <ClipboardList className="mr-2 h-4 w-4 text-emerald-500" />{__('general.add_tasks')}</Link>
                                                     </DropdownMenuItem>
                                                 
                                                     <DropdownMenuSeparator />
                                                 
                                                     {invoice.status !== 'paid' && invoice.status !== 'cancelled' && (
                                                         <DropdownMenuItem onClick={() => handleMarkPaid(invoice.id)}>
-                                                            <CheckCircle className="mr-2 h-4 w-4 text-emerald-600" />
-                                                            Mark as Paid
-                                                        </DropdownMenuItem>
+                                                            <CheckCircle className="mr-2 h-4 w-4 text-emerald-600" />{__('general.mark_as_paid')}</DropdownMenuItem>
                                                     )}
                                                     {invoice.status !== 'cancelled' && (
                                                         <DropdownMenuItem onClick={() => handleCancel(invoice.id)} className="text-red-600 focus:text-red-600">
-                                                            <XCircle className="mr-2 h-4 w-4" />
-                                                            Cancel Invoice
-                                                        </DropdownMenuItem>
+                                                            <XCircle className="mr-2 h-4 w-4" />{__('general.cancel_invoice')}</DropdownMenuItem>
                                                     )}
                                                 </DropdownMenuContent>
                                             </DropdownMenu>
@@ -518,7 +495,7 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
                                         <TableCell className="text-right sm:hidden" data-label="Total">
                                             Total
                                         </TableCell>
-                                        <TableCell className="text-right" data-label="Total Amount">
+                                        <TableCell className="text-right" data-label={__('general.total_amount')}>
                                             {formatCurrency(
                                                 invoices.data.reduce((sum, inv) => sum + (Number(inv.business_amount) || Number(inv.amount) || 0), 0),
                                                 invoices.data[0]?.business_currency || invoices.data[0]?.currency
@@ -530,9 +507,7 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
 
                                 {invoices.data.length === 0 && (
                                     <TableRow>
-                                        <TableCell colSpan={9} className="h-24 text-center text-muted-foreground">
-                                            No invoices found.
-                                        </TableCell>
+                                        <TableCell colSpan={9} className="h-24 text-center text-muted-foreground">{__('general.no_invoices_found')}</TableCell>
                                     </TableRow>
                                 )}
                             </TableBody>
@@ -549,7 +524,7 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
                             <div className="w-48">
                                 <Select value={bulkAction} onValueChange={(val) => setBulkAction(val)}>
                                     <SelectTrigger>
-                                        <SelectValue placeholder="Bulk Actions" />
+                                        <SelectValue placeholder={__('general.bulk_actions')} />
                                     </SelectTrigger>
                                     <SelectContent>
                                         {bulkActionOptions.map((opt) => (
@@ -567,7 +542,7 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
                                         value={bulkActionProject}
                                         onChange={(val) => setBulkActionProject(String(val || ''))}
                                         options={projects.map(p => ({ value: String(p.id), label: p.project_name }))}
-                                        placeholder="Select Project"
+                                        placeholder={__('general.select_project')}
                                     />
                                 </div>
                             )}
@@ -612,13 +587,13 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
             <Dialog open={!!jobStatusDialog} onOpenChange={(open) => !open && setJobStatusDialog(null)}>
                 <DialogContent>
                     <DialogHeader>
-                        <DialogTitle>Change Job Status</DialogTitle>
+                        <DialogTitle>{__('general.change_job_status')}</DialogTitle>
                     </DialogHeader>
                     <div className="py-4">
                         <Label>Status</Label>
                         <Select value={newJobStatus} onValueChange={setNewJobStatus}>
                             <SelectTrigger className="mt-2">
-                                <SelectValue placeholder="Select Status" />
+                                <SelectValue placeholder={__('general.select_status')} />
                             </SelectTrigger>
                             <SelectContent>
                                 <SelectItem value="pending">Pending</SelectItem>
@@ -629,7 +604,7 @@ export default function Index({ invoices, currentTab, filters = {}, stats, proje
                     </div>
                     <DialogFooter>
                         <Button variant="outline" onClick={() => setJobStatusDialog(null)}>Cancel</Button>
-                        <Button onClick={handleChangeJobStatus}>Save Status</Button>
+                        <Button onClick={handleChangeJobStatus}>{__('general.save_status')}</Button>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>

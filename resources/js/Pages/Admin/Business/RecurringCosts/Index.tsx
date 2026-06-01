@@ -39,13 +39,12 @@ export default function Index({ costs, currencies, categories, stats }) {
 
 
     return (
-        <AdminSidebarLayout title="Recurring Costs" header="Business Operations">
-            <Head title="Admin Recurring Costs" />
+        <AdminSidebarLayout title={__('general.recurring_costs')} header="Business Operations">
+            <Head title={__('general.admin_recurring_costs')} />
 
             <div className="mb-4">
                 <Link href={route('admin.finance.index')} className="text-sm text-gray-500 hover:text-black flex items-center gap-1">
-                    <ArrowLeft className="w-4 h-4" /> Back to Financial Ledger
-                </Link>
+                    <ArrowLeft className="w-4 h-4" />{__('general.back_to_financial_ledger')}</Link>
             </div>
 
             {/* Top Stats Cards */}
@@ -55,7 +54,7 @@ export default function Index({ costs, currencies, categories, stats }) {
                         <DollarSign className="w-6 h-6" />
                     </div>
                     <div>
-                        <p className="text-sm text-gray-500 font-medium uppercase tracking-wider">Estimated Monthly Overheads</p>
+                        <p className="text-sm text-gray-500 font-medium uppercase tracking-wider">{__('general.estimated_monthly_overheads')}</p>
                         <h3 className="text-2xl font-bold text-slate-900">{stats.monthly_total}</h3>
                     </div>
                 </div>
@@ -64,7 +63,7 @@ export default function Index({ costs, currencies, categories, stats }) {
                         <TrendingDown className="w-6 h-6" />
                     </div>
                     <div>
-                        <p className="text-sm text-gray-500 font-medium uppercase tracking-wider">Estimated Annual Overheads</p>
+                        <p className="text-sm text-gray-500 font-medium uppercase tracking-wider">{__('general.estimated_annual_overheads')}</p>
                         <h3 className="text-2xl font-bold text-slate-900">{stats.annual_total}</h3>
                     </div>
                 </div>
@@ -73,14 +72,13 @@ export default function Index({ costs, currencies, categories, stats }) {
             {/* Title & Actions Bar */}
             <div className="flex justify-between items-center mb-6">
                 <div>
-                    <h2 className="text-xl font-bold text-slate-900">Active Recurring Costs</h2>
-                    <p className="text-sm text-gray-500 mt-1">Manage repeated automated business expenses and schedules.</p>
+                    <h2 className="text-xl font-bold text-slate-900">{__('general.active_recurring_costs')}</h2>
+                    <p className="text-sm text-gray-500 mt-1">{__('general.manage_repeated_automated_business_expenses_and_schedules')}</p>
                 </div>
 
                 <Link href={route('admin.recurring_costs.create')}>
                     <Button className="bg-black hover:bg-slate-800 text-white h-9">
-                        <Plus className="w-4 h-4 mr-2" /> Add Recurring Cost
-                    </Button>
+                        <Plus className="w-4 h-4 mr-2" />{__('general.add_recurring_cost')}</Button>
                 </Link>
             </div>
 
@@ -89,12 +87,8 @@ export default function Index({ costs, currencies, categories, stats }) {
                 <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-gray-50">
                         <tr>
-                            <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider select-none">
-                                Title & Schedule
-                            </th>
-                            <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider select-none">
-                                Start Date
-                            </th>
+                            <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider select-none">{__('general.title_schedule')}</th>
+                            <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider select-none">{__('general.start_date')}</th>
                             <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider select-none">
                                 Category
                             </th>
@@ -127,13 +121,11 @@ export default function Index({ costs, currencies, categories, stats }) {
                                     </span>
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-center">
-                                    <span className="text-xs font-medium text-slate-600 bg-slate-100 px-2.5 py-1 rounded-full">
-                                        Active Log
-                                    </span>
+                                    <span className="text-xs font-medium text-slate-600 bg-slate-100 px-2.5 py-1 rounded-full">{__('general.active_log')}</span>
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                     <Link href={route('admin.recurring_costs.view', cost.id)}>
-                                        <Button variant="ghost" size="sm" className="text-slate-700 hover:text-black mr-1" title="View Details">
+                                        <Button variant="ghost" size="sm" className="text-slate-700 hover:text-black mr-1" title={__('general.view_details')}>
                                             <Eye className="w-4 h-4" />
                                         </Button>
                                     </Link>
@@ -142,10 +134,10 @@ export default function Index({ costs, currencies, categories, stats }) {
                                             <Edit className="w-4 h-4" />
                                         </Button>
                                     </Link>
-                                    <Button variant="ghost" size="sm" className="text-orange-600 hover:text-orange-900 mr-1" onClick={() => handleDelete(cost.id)} title="Delete Schedule Only">
+                                    <Button variant="ghost" size="sm" className="text-orange-600 hover:text-orange-900 mr-1" onClick={() => handleDelete(cost.id)} title={__('general.delete_schedule_only')}>
                                         <Trash2 className="w-4 h-4" />
                                     </Button>
-                                    <Button variant="ghost" size="sm" className="text-red-600 hover:text-red-900" onClick={() => handleDeleteWithTransactions(cost.id)} title="Delete Everything">
+                                    <Button variant="ghost" size="sm" className="text-red-600 hover:text-red-900" onClick={() => handleDeleteWithTransactions(cost.id)} title={__('general.delete_everything')}>
                                         <Trash2 className="w-4 h-4 border border-red-200 rounded p-0.5" />
                                     </Button>
                                 </td>
@@ -155,8 +147,8 @@ export default function Index({ costs, currencies, categories, stats }) {
                             <tr>
                                 <td colSpan={6} className="px-6 py-12 text-center text-gray-500">
                                     <Calendar className="w-12 h-12 mx-auto text-gray-300 mb-3" />
-                                    <h3 className="text-lg font-medium text-gray-900">No recurring costs found</h3>
-                                    <p className="mt-1">Add a new schedule to start managing automated overheads.</p>
+                                    <h3 className="text-lg font-medium text-gray-900">{__('general.no_recurring_costs_found')}</h3>
+                                    <p className="mt-1">{__('general.add_a_new_schedule_to_start_managing_automated_overheads')}</p>
                                 </td>
                             </tr>
                         )}

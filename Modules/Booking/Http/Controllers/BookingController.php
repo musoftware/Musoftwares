@@ -493,7 +493,7 @@ class BookingController extends Controller
 
         event(new \Modules\Booking\Events\BookingStatusChanged($booking, $booking->status));
 
-        return back()->with('success', 'Booking status updated successfully.');
+        return back()->with('success', __('general.booking_status_updated_successfully'));
     }
 
     /**
@@ -520,7 +520,7 @@ class BookingController extends Controller
 
         event(new \Modules\Booking\Events\BookingStatusChanged($booking, $booking->status, true));
 
-        return back()->with('success', 'Booking rescheduled successfully.');
+        return back()->with('success', __('general.booking_rescheduled_successfully'));
     }
 
     /**
@@ -541,7 +541,7 @@ class BookingController extends Controller
         $booking->internal_notes = $request->internal_notes;
         $booking->save();
 
-        return back()->with('success', 'Notes updated successfully.');
+        return back()->with('success', __('general.notes_updated_successfully'));
     }
 
     /**
@@ -555,7 +555,7 @@ class BookingController extends Controller
             abort(403);
         }
 
-        return back()->with('success', 'Project created successfully from this booking.');
+        return back()->with('success', __('general.project_created_successfully_from_this_booking'));
     }
 
     /**
@@ -569,7 +569,7 @@ class BookingController extends Controller
             abort(403);
         }
 
-        return back()->with('success', 'Invoice created successfully for this booking.');
+        return back()->with('success', __('general.invoice_created_successfully_for_this_booking'));
     }
     
     /**

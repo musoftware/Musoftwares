@@ -84,7 +84,7 @@ class AdminPaymentMethodController extends Controller
             $this->sendStatusNotification($paymentMethod, $newStatus);
         }
 
-        return redirect()->back()->with('success', 'Payment method status updated.');
+        return redirect()->back()->with('success', __('general.payment_method_status_updated'));
     }
 
     /**

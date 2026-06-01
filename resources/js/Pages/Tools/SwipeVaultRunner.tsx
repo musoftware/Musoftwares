@@ -301,7 +301,7 @@ export default function SwipeVaultRunner({ tool, subscription, runtimePort, plug
             <div className="min-h-screen bg-[#0c0c0e] flex items-center justify-center font-sans">
                 <div className="text-center space-y-4">
                     <div className="w-8 h-8 border-2 border-amber-500 border-t-transparent rounded-full animate-spin mx-auto" />
-                    <p className="text-sm font-medium text-slate-500">Connecting to Runtime Engine...</p>
+                    <p className="text-sm font-medium text-slate-500">{__('general.connecting_to_runtime_engine')}</p>
                 </div>
             </div>
         );
@@ -322,7 +322,7 @@ export default function SwipeVaultRunner({ tool, subscription, runtimePort, plug
                         <div className="w-7 h-7 bg-gradient-to-br from-amber-500 to-orange-600 rounded-lg flex items-center justify-center shadow-lg shadow-amber-500/20">
                             <Bookmark className="w-3.5 h-3.5 text-white" />
                         </div>
-                        <span className="font-bold text-sm tracking-tight text-white">Ads Library</span>
+                        <span className="font-bold text-sm tracking-tight text-white">{__('general.ads_library')}</span>
                     </div>
 
                     <div className="h-4 w-px bg-white/10" />
@@ -379,14 +379,13 @@ export default function SwipeVaultRunner({ tool, subscription, runtimePort, plug
                         <div className="flex items-center justify-between flex-wrap gap-4">
                             <div>
                                 <h1 className="text-2xl md:text-3xl font-black tracking-tight text-white">Collections</h1>
-                                <p className="text-sm text-slate-500 mt-1">Organize your creative inspiration into themed boards.</p>
+                                <p className="text-sm text-slate-500 mt-1">{__('general.organize_your_creative_inspiration_into_themed_boards')}</p>
                             </div>
                             <Button
                                 onClick={() => setShowNewCollection(true)}
                                 className="gap-1.5 h-9 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white border-0 shadow-lg shadow-amber-500/20 font-bold text-xs"
                             >
-                                <Plus className="w-4 h-4" /> New Collection
-                            </Button>
+                                <Plus className="w-4 h-4" />{__('general.new_collection')}</Button>
                         </div>
 
                         {/* Quick Access: All + Uncategorized */}
@@ -400,7 +399,7 @@ export default function SwipeVaultRunner({ tool, subscription, runtimePort, plug
                                         <Grid3X3 className="w-5 h-5 text-slate-300" />
                                     </div>
                                     <div>
-                                        <h3 className="text-sm font-bold text-white">All Swipes</h3>
+                                        <h3 className="text-sm font-bold text-white">{__('general.all_swipes')}</h3>
                                         <p className="text-xs text-slate-500">{stats?.totalSwipes || 0} items</p>
                                     </div>
                                 </div>
@@ -425,8 +424,8 @@ export default function SwipeVaultRunner({ tool, subscription, runtimePort, plug
                         {collections.length === 0 ? (
                             <div className="py-20 text-center border border-dashed border-white/10 rounded-2xl bg-white/[0.02]">
                                 <Bookmark className="w-8 h-8 text-slate-700 mx-auto mb-3" />
-                                <h3 className="text-sm font-bold text-slate-300">No collections yet</h3>
-                                <p className="text-xs text-slate-500 mt-1">Create a collection to start organizing your swipe file.</p>
+                                <h3 className="text-sm font-bold text-slate-300">{__('general.no_collections_yet')}</h3>
+                                <p className="text-xs text-slate-500 mt-1">{__('general.create_a_collection_to_start_organizing_your_swipe_file')}</p>
                             </div>
                         ) : (
                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -483,7 +482,7 @@ export default function SwipeVaultRunner({ tool, subscription, runtimePort, plug
                         {/* Tags Cloud */}
                         {allTags.length > 0 && (
                             <div className="pt-4 border-t border-white/[0.06]">
-                                <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3">Popular Tags</h3>
+                                <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3">{__('general.popular_tags')}</h3>
                                 <div className="flex flex-wrap gap-2">
                                     {allTags.slice(0, 20).map(t => (
                                         <button
@@ -519,7 +518,7 @@ export default function SwipeVaultRunner({ tool, subscription, runtimePort, plug
                                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
                                     <Input
                                         type="text"
-                                        placeholder="Search swipes..."
+                                        placeholder={__('general.search_swipes')}
                                         value={searchQuery}
                                         onChange={(e) => setSearchQuery(e.target.value)}
                                         className="pl-9 h-9 bg-white/[0.04] border-white/[0.08] text-white placeholder:text-slate-600 text-sm focus:border-amber-500/50 focus:ring-amber-500/20"
@@ -559,8 +558,7 @@ export default function SwipeVaultRunner({ tool, subscription, runtimePort, plug
                                     onClick={() => { resetAddForm(); setShowAddSwipe(true); }}
                                     className="gap-1.5 h-9 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white border-0 shadow-lg shadow-amber-500/20 font-bold text-xs"
                                 >
-                                    <Plus className="w-4 h-4" /> Add Swipe
-                                </Button>
+                                    <Plus className="w-4 h-4" />{__('general.add_swipe')}</Button>
                             </div>
                         </div>
 
@@ -572,14 +570,13 @@ export default function SwipeVaultRunner({ tool, subscription, runtimePort, plug
                         ) : swipes.length === 0 ? (
                             <div className="py-20 text-center border border-dashed border-white/10 rounded-2xl bg-white/[0.02]">
                                 <ImageIcon className="w-8 h-8 text-slate-700 mx-auto mb-3" />
-                                <h3 className="text-sm font-bold text-slate-300">No swipes found</h3>
-                                <p className="text-xs text-slate-500 mt-1">Upload creative inspiration to build your swipe file.</p>
+                                <h3 className="text-sm font-bold text-slate-300">{__('general.no_swipes_found')}</h3>
+                                <p className="text-xs text-slate-500 mt-1">{__('general.upload_creative_inspiration_to_build_your_swipe_file')}</p>
                                 <Button
                                     onClick={() => { resetAddForm(); setShowAddSwipe(true); }}
                                     className="mt-4 gap-1.5 h-9 bg-white/10 hover:bg-white/15 text-white border border-white/10 font-medium text-xs"
                                 >
-                                    <Upload className="w-4 h-4" /> Add Your First Swipe
-                                </Button>
+                                    <Upload className="w-4 h-4" />{__('general.add_your_first_swipe')}</Button>
                             </div>
                         ) : viewMode === 'grid' ? (
                             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
@@ -701,8 +698,8 @@ export default function SwipeVaultRunner({ tool, subscription, runtimePort, plug
             <Dialog open={showNewCollection} onOpenChange={setShowNewCollection}>
                 <DialogContent className="bg-[#1a1a1e] border-white/10 text-white max-w-sm">
                     <DialogHeader>
-                        <DialogTitle className="text-white">New Collection</DialogTitle>
-                        <DialogDescription className="text-slate-400 text-xs">Create a themed board to organize your swipes.</DialogDescription>
+                        <DialogTitle className="text-white">{__('general.new_collection')}</DialogTitle>
+                        <DialogDescription className="text-slate-400 text-xs">{__('general.create_a_themed_board_to_organize_your_swipes')}</DialogDescription>
                     </DialogHeader>
                     <div className="space-y-4 pt-2">
                         <div>
@@ -710,7 +707,7 @@ export default function SwipeVaultRunner({ tool, subscription, runtimePort, plug
                             <Input
                                 value={newCollectionName}
                                 onChange={(e) => setNewCollectionName(e.target.value)}
-                                placeholder="e.g. Landing Pages, Ad Creatives..."
+                                placeholder={__('general.e_g_landing_pages_ad_creatives')}
                                 className="bg-white/[0.04] border-white/[0.08] text-white placeholder:text-slate-600"
                                 onKeyDown={(e) => e.key === 'Enter' && handleCreateCollection()}
                             />
@@ -740,8 +737,8 @@ export default function SwipeVaultRunner({ tool, subscription, runtimePort, plug
             <Dialog open={showAddSwipe} onOpenChange={setShowAddSwipe}>
                 <DialogContent className="bg-[#1a1a1e] border-white/10 text-white max-w-lg">
                     <DialogHeader>
-                        <DialogTitle className="text-white">Add Swipe</DialogTitle>
-                        <DialogDescription className="text-slate-400 text-xs">Save a piece of creative inspiration to your vault.</DialogDescription>
+                        <DialogTitle className="text-white">{__('general.add_swipe')}</DialogTitle>
+                        <DialogDescription className="text-slate-400 text-xs">{__('general.save_a_piece_of_creative_inspiration_to_your_vault')}</DialogDescription>
                     </DialogHeader>
                     <div className="space-y-4 pt-2 max-h-[60vh] overflow-y-auto">
                         {/* Image upload */}
@@ -765,8 +762,8 @@ export default function SwipeVaultRunner({ tool, subscription, runtimePort, plug
                                     className="w-full py-8 border-2 border-dashed border-white/10 rounded-xl text-center hover:border-amber-500/30 hover:bg-amber-500/5 transition-all"
                                 >
                                     <Upload className="w-6 h-6 text-slate-600 mx-auto mb-2" />
-                                    <p className="text-xs text-slate-500">Click to upload an image</p>
-                                    <p className="text-[10px] text-slate-600 mt-0.5">PNG, JPG, WebP, or GIF</p>
+                                    <p className="text-xs text-slate-500">{__('general.click_to_upload_an_image')}</p>
+                                    <p className="text-[10px] text-slate-600 mt-0.5">{__('general.png_jpg_webp_or_gif')}</p>
                                 </button>
                             )}
                         </div>
@@ -776,7 +773,7 @@ export default function SwipeVaultRunner({ tool, subscription, runtimePort, plug
                             <Input
                                 value={addTitle}
                                 onChange={(e) => setAddTitle(e.target.value)}
-                                placeholder="e.g. Nike Landing Page Hero Section"
+                                placeholder={__('general.e_g_nike_landing_page_hero_section')}
                                 className="bg-white/[0.04] border-white/[0.08] text-white placeholder:text-slate-600"
                             />
                         </div>
@@ -786,7 +783,7 @@ export default function SwipeVaultRunner({ tool, subscription, runtimePort, plug
                             <Input
                                 value={addUrl}
                                 onChange={(e) => setAddUrl(e.target.value)}
-                                placeholder="https://..."
+                                placeholder={__('general.https')}
                                 className="bg-white/[0.04] border-white/[0.08] text-white placeholder:text-slate-600"
                             />
                         </div>
@@ -796,7 +793,7 @@ export default function SwipeVaultRunner({ tool, subscription, runtimePort, plug
                             <Textarea
                                 value={addNotes}
                                 onChange={(e) => setAddNotes(e.target.value)}
-                                placeholder="Why did this catch your eye? What pattern or technique is used?"
+                                placeholder={__('general.why_did_this_catch_your_eye_what_pattern_or_technique_is_used')}
                                 rows={3}
                                 className="bg-white/[0.04] border-white/[0.08] text-white placeholder:text-slate-600 resize-none"
                             />
@@ -807,14 +804,14 @@ export default function SwipeVaultRunner({ tool, subscription, runtimePort, plug
                             <Input
                                 value={addTags}
                                 onChange={(e) => setAddTags(e.target.value)}
-                                placeholder="e.g. landing-page, hero, dark-mode"
+                                placeholder={__('general.e_g_landing_page_hero_dark_mode')}
                                 className="bg-white/[0.04] border-white/[0.08] text-white placeholder:text-slate-600"
                             />
                         </div>
                     </div>
                     <DialogFooter className="pt-4">
                         <Button variant="ghost" onClick={() => setShowAddSwipe(false)} className="text-slate-400 hover:text-white">Cancel</Button>
-                        <Button onClick={handleAddSwipe} disabled={!addBase64 && !addUrl.trim() && !addTitle.trim()} className="bg-gradient-to-r from-amber-500 to-orange-600 text-white border-0 font-bold">Save Swipe</Button>
+                        <Button onClick={handleAddSwipe} disabled={!addBase64 && !addUrl.trim() && !addTitle.trim()} className="bg-gradient-to-r from-amber-500 to-orange-600 text-white border-0 font-bold">{__('general.save_swipe')}</Button>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
@@ -823,8 +820,8 @@ export default function SwipeVaultRunner({ tool, subscription, runtimePort, plug
             <Dialog open={showEditSwipe} onOpenChange={setShowEditSwipe}>
                 <DialogContent className="bg-[#1a1a1e] border-white/10 text-white max-w-md">
                     <DialogHeader>
-                        <DialogTitle className="text-white">Edit Swipe</DialogTitle>
-                        <DialogDescription className="text-slate-400 text-xs">Update this swipe's metadata.</DialogDescription>
+                        <DialogTitle className="text-white">{__('general.edit_swipe')}</DialogTitle>
+                        <DialogDescription className="text-slate-400 text-xs">{__('general.update_this_swipe_s_metadata')}</DialogDescription>
                     </DialogHeader>
                     <div className="space-y-4 pt-2">
                         <div>
@@ -842,7 +839,7 @@ export default function SwipeVaultRunner({ tool, subscription, runtimePort, plug
                     </div>
                     <DialogFooter className="pt-4">
                         <Button variant="ghost" onClick={() => setShowEditSwipe(false)} className="text-slate-400 hover:text-white">Cancel</Button>
-                        <Button onClick={handleUpdateSwipe} className="bg-gradient-to-r from-amber-500 to-orange-600 text-white border-0 font-bold">Save Changes</Button>
+                        <Button onClick={handleUpdateSwipe} className="bg-gradient-to-r from-amber-500 to-orange-600 text-white border-0 font-bold">{__('general.save_changes')}</Button>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
@@ -851,8 +848,8 @@ export default function SwipeVaultRunner({ tool, subscription, runtimePort, plug
             <Dialog open={showMoveSwipe} onOpenChange={setShowMoveSwipe}>
                 <DialogContent className="bg-[#1a1a1e] border-white/10 text-white max-w-xs">
                     <DialogHeader>
-                        <DialogTitle className="text-white">Move to Collection</DialogTitle>
-                        <DialogDescription className="text-slate-400 text-xs">Choose a destination collection.</DialogDescription>
+                        <DialogTitle className="text-white">{__('general.move_to_collection')}</DialogTitle>
+                        <DialogDescription className="text-slate-400 text-xs">{__('general.choose_a_destination_collection')}</DialogDescription>
                     </DialogHeader>
                     <div className="space-y-1.5 pt-2 max-h-[40vh] overflow-y-auto">
                         <button
@@ -938,8 +935,7 @@ function SwipeCard({ swipe, onOpen, onEdit, onDelete, onMove, collectionColor }:
                                     <Edit3 className="w-4 h-4" /> Edit
                                 </Button>
                                 <Button variant="outline" className="justify-start bg-white/[0.04] border-white/10 text-slate-300 hover:text-white hover:bg-white/[0.08] gap-2" onClick={(e) => { e.stopPropagation(); onMove(); }}>
-                                    <MoveRight className="w-4 h-4" /> Move to Collection
-                                </Button>
+                                    <MoveRight className="w-4 h-4" />{__('general.move_to_collection')}</Button>
                                 <Button variant="destructive" className="justify-start gap-2" onClick={(e) => { e.stopPropagation(); onDelete(); }}>
                                     <Trash2 className="w-4 h-4" /> Delete
                                 </Button>

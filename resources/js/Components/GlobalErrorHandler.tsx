@@ -59,15 +59,11 @@ export function GlobalErrorHandler() {
         <Dialog open={sessionExpired} onOpenChange={setSessionExpired}>
             <DialogContent className="sm:max-w-[425px]">
                 <DialogHeader>
-                    <DialogTitle className="font-sora text-slate-900 text-xl">Your session has expired</DialogTitle>
-                    <DialogDescription className="font-dm-sans text-slate-500">
-                        Please log in again to continue working. Your unsaved changes will be preserved.
-                    </DialogDescription>
+                    <DialogTitle className="font-sora text-slate-900 text-xl">{__('general.your_session_has_expired')}</DialogTitle>
+                    <DialogDescription className="font-dm-sans text-slate-500">{__('general.please_log_in_again_to_continue_working_your_unsaved_changes_will_be_preserved')}</DialogDescription>
                 </DialogHeader>
                 <DialogFooter>
-                    <Button onClick={handleLoginAgain} className="bg-indigo-600 hover:bg-indigo-700 text-white font-dm-sans">
-                        Log in again
-                    </Button>
+                    <Button onClick={handleLoginAgain} className="bg-indigo-600 hover:bg-indigo-700 text-white font-dm-sans">{__('general.log_in_again')}</Button>
                 </DialogFooter>
             </DialogContent>
         </Dialog>

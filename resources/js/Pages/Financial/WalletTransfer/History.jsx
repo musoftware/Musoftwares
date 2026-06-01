@@ -10,20 +10,19 @@ import { Button } from '@/Components/ui/button';
 export default function History({ transfers }) {
     return (
         <AuthenticatedLayout header="P2P Transfer History">
-            <Head title="Transfer History" />
+            <Head title={__('general.transfer_history')} />
 
             <div className="max-w-[1200px] mx-auto px-4 py-8 space-y-8">
                 
                 {/* Header */}
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                     <div className="space-y-1">
-                        <h1 className="text-2xl font-semibold tracking-tight">Transfer Ledger</h1>
-                        <p className="text-sm text-muted-foreground">Manage and track your peer-to-peer wallet transfers.</p>
+                        <h1 className="text-2xl font-semibold tracking-tight">{__('general.transfer_ledger')}</h1>
+                        <p className="text-sm text-muted-foreground">{__('general.manage_and_track_your_peer_to_peer_wallet_transfers')}</p>
                     </div>
                     <Button asChild className="shadow-none gap-2">
                         <Link href={route('financial.transfer.create')}>
-                            <Send className="w-4 h-4" /> Send Money
-                        </Link>
+                            <Send className="w-4 h-4" />{__('general.send_money')}</Link>
                     </Button>
                 </div>
 
@@ -32,9 +31,8 @@ export default function History({ transfers }) {
                     <CardHeader className="flex flex-row items-center justify-between">
                         <div className="space-y-1">
                             <CardTitle className="text-base font-semibold flex items-center gap-2">
-                                <HistoryIcon className="w-4 h-4 text-muted-foreground" /> Recent P2P Transactions
-                            </CardTitle>
-                            <CardDescription>Records of wallet balances sent or received from other users.</CardDescription>
+                                <HistoryIcon className="w-4 h-4 text-muted-foreground" />{__('general.recent_p2p_transactions')}</CardTitle>
+                            <CardDescription>{__('general.records_of_wallet_balances_sent_or_received_from_other_users')}</CardDescription>
                         </div>
                         <Badge variant="secondary" className="font-normal">{transfers.total || 0} Transfers</Badge>
                     </CardHeader>
@@ -44,12 +42,12 @@ export default function History({ transfers }) {
                             <TableHeader>
                                 <TableRow>
                                     <TableHead className="pl-6">Type</TableHead>
-                                    <TableHead>Recipient / Sender</TableHead>
-                                    <TableHead>Reason / Memo</TableHead>
+                                    <TableHead>{__('general.recipient_sender')}</TableHead>
+                                    <TableHead>{__('general.reason_memo')}</TableHead>
                                     <TableHead>Amount</TableHead>
-                                    <TableHead>Fees Paid</TableHead>
+                                    <TableHead>{__('general.fees_paid')}</TableHead>
                                     <TableHead>Status</TableHead>
-                                    <TableHead>Processed Date</TableHead>
+                                    <TableHead>{__('general.processed_date')}</TableHead>
                                     <TableHead className="pr-6 text-right">Actions</TableHead>
                                 </TableRow>
                             </TableHeader>
@@ -62,13 +60,11 @@ export default function History({ transfers }) {
                                                     <Send className="w-6 h-6" />
                                                 </div>
                                                 <div className="space-y-1">
-                                                    <h3 className="font-semibold text-sm text-foreground">No P2P Transfers yet</h3>
-                                                    <p className="text-xs text-muted-foreground max-w-xs mx-auto">
-                                                        You haven't made any balance transfers with other accounts on the platform.
-                                                    </p>
+                                                    <h3 className="font-semibold text-sm text-foreground">{__('general.no_p2p_transfers_yet')}</h3>
+                                                    <p className="text-xs text-muted-foreground max-w-xs mx-auto">{__('general.you_haven_t_made_any_balance_transfers_with_other_accounts_on_the_platform')}</p>
                                                 </div>
                                                 <Button variant="outline" size="sm" asChild className="shadow-none mt-2">
-                                                    <Link href={route('financial.transfer.create')}>Send your first transfer</Link>
+                                                    <Link href={route('financial.transfer.create')}>{__('general.send_your_first_transfer')}</Link>
                                                 </Button>
                                             </div>
                                         </TableCell>

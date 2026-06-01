@@ -43,7 +43,7 @@ export default function ContractView({ contract }: Props) {
 
             <div className="max-w-4xl mx-auto">
                 <div className="text-center mb-10">
-                    <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">Project Contract</h1>
+                    <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">{__('general.project_contract')}</h1>
                     <p className="mt-2 text-sm text-gray-500">Reference: {contract.reference || `CTR-${contract.uuid.split('-')[0]}`}</p>
                 </div>
 
@@ -54,7 +54,7 @@ export default function ContractView({ contract }: Props) {
                             <p className="text-gray-600 mt-1">Prepared for: <span className="font-semibold text-gray-900">{contract.client_name}</span></p>
                         </div>
                         <div className="text-left md:text-right">
-                            <p className="text-sm text-gray-500 uppercase tracking-wider font-semibold">Total Amount</p>
+                            <p className="text-sm text-gray-500 uppercase tracking-wider font-semibold">{__('general.total_amount')}</p>
                             <p className="text-3xl font-bold text-gray-900 mt-1">{formatMoney(contract.total_amount, contract.currency)}</p>
                         </div>
                     </div>
@@ -71,9 +71,8 @@ export default function ContractView({ contract }: Props) {
                                 <div className="flex items-center">
                                     <CheckCircle className="h-8 w-8 text-green-500 mr-4" />
                                     <div>
-                                        <h3 className="text-lg font-medium text-green-800">Contract Signed</h3>
-                                        <p className="mt-1 text-sm text-green-700">
-                                            Signed by <span className="font-semibold">{contract.client_signature}</span> on {new Date(contract.signed_at!).toLocaleString()}
+                                        <h3 className="text-lg font-medium text-green-800">{__('general.contract_signed')}</h3>
+                                        <p className="mt-1 text-sm text-green-700">{__('general.signed_by')}<span className="font-semibold">{contract.client_signature}</span> on {new Date(contract.signed_at!).toLocaleString()}
                                         </p>
                                     </div>
                                 </div>
@@ -82,17 +81,13 @@ export default function ContractView({ contract }: Props) {
                             <Card className="border-0 shadow-none bg-transparent">
                                 <CardHeader className="px-0 pt-0">
                                     <CardTitle className="text-xl flex items-center">
-                                        <CheckSquare className="mr-2 h-5 w-5 text-gray-700" />
-                                        Digital Signature
-                                    </CardTitle>
-                                    <CardDescription className="text-base text-gray-600">
-                                        By typing your full name below and clicking 'Sign Contract', you agree to be legally bound by the terms above.
-                                    </CardDescription>
+                                        <CheckSquare className="mr-2 h-5 w-5 text-gray-700" />{__('general.digital_signature')}</CardTitle>
+                                    <CardDescription className="text-base text-gray-600">{__('general.by_typing_your_full_name_below_and_clicking_sign_contract_you_agree_to_be_legally_bound_by_the_terms_above')}</CardDescription>
                                 </CardHeader>
                                 <form onSubmit={submit}>
                                     <CardContent className="px-0 pb-6">
                                         <div className="max-w-md">
-                                            <Label htmlFor="signature_name" className="text-sm font-semibold text-gray-700">Full Legal Name</Label>
+                                            <Label htmlFor="signature_name" className="text-sm font-semibold text-gray-700">{__('general.full_legal_name')}</Label>
                                             <Input
                                                 id="signature_name"
                                                 value={data.signature_name}
@@ -116,7 +111,7 @@ export default function ContractView({ contract }: Props) {
                 </div>
 
                 <div className="mt-8 text-center text-sm text-gray-500">
-                    <p>Powered by <span className="font-semibold text-gray-900">Musoftware</span> Freelance iSAAS</p>
+                    <p>{__('general.powered_by')}<span className="font-semibold text-gray-900">Musoftware</span>{__('general.freelance_isaas')}</p>
                 </div>
             </div>
         </div>

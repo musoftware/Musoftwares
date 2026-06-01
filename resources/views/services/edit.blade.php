@@ -273,8 +273,7 @@
                                         <div class="mt-2">
                                             <a href="{{ $service->service_link }}" target="_blank" rel="noopener noreferrer"
                                                 class="small text-decoration-none">
-                                                <i class="ti ti-external-link me-1"></i> Open Current Link
-                                            </a>
+                                                <i class="ti ti-external-link me-1"></i>{{ __('general.open_current_link') }}</a>
                                         </div>
                                     @endif
                                 </div>
@@ -288,7 +287,7 @@
                                     <div class="row g-3 mb-3 pb-3 border-bottom extra-row">
                                         <div class="col-md-4">
                                             <input type="text" name="extras[{{ $index }}][title]" class="form-control"
-                                                placeholder="Title (e.g., Fast Delivery)" value="{{ $extra->title }}" required>
+                                                placeholder="{{ __('general.title_e_g_fast_delivery') }}" value="{{ $extra->title }}" required>
                                         </div>
                                         <div class="col-md-3">
                                             <div class="input-group">
@@ -305,9 +304,8 @@
                                         </div>
                                         <div class="col-md-3">
                                             <input type="number" name="extras[{{ $index }}][duration_days]" class="form-control"
-                                                placeholder="Extra Days" min="0" value="{{ $extra->duration_days }}">
-                                            <div class="form-text mt-0" style="font-size: 0.75rem;">Duration added to delivery
-                                            </div>
+                                                placeholder="{{ __('general.extra_days') }}" min="0" value="{{ $extra->duration_days }}">
+                                            <div class="form-text mt-0" style="font-size: 0.75rem;">{{ __('general.duration_added_to_delivery') }}</div>
                                         </div>
                                         <div class="col-md-2 d-flex align-items-center">
                                             <button type="button" class="btn btn-outline-danger btn-sm w-100"
@@ -319,8 +317,7 @@
                                 @endforeach
                             </div>
                             <button type="button" class="btn btn-outline-success btn-sm mt-2" id="btn-add-extra">
-                                <i class="ti ti-plus me-1"></i> Add Service Extra
-                            </button>
+                                <i class="ti ti-plus me-1"></i>{{ __('general.add_service_extra') }}</button>
                     </x-client.form-card>
 
                     <!-- Service FAQs -->
@@ -346,19 +343,16 @@
                                 @endforeach
                             </div>
                             <button type="button" class="btn btn-outline-info btn-sm mt-2" id="btn-add-faq">
-                                <i class="ti ti-plus me-1"></i> Add FAQ
-                            </button>
+                                <i class="ti ti-plus me-1"></i>{{ __('general.add_faq') }}</button>
                     </x-client.form-card>
 
                     <x-client.form-card icon="photo" iconClass="text-warning" title="{{ __('services.form.gallery_title') }}" class="mb-5">
                             <div class="mb-4">
-                                <label class="form-label fw-bold">
-                                    Service Gallery 
-                                    <span class="badge bg-secondary ms-2">
+                                <label class="form-label fw-bold">{{ __('general.service_gallery') }}<span class="badge bg-secondary ms-2">
                                         <span id="imageCount">{{ $service->images->count() }}</span>/5
                                     </span>
                                 </label>
-                                <div class="form-text">Upload up to 5 images. Max size 2MB each. JPG, PNG, WebP supported.</div>
+                                <div class="form-text">{{ __('general.upload_up_to_5_images_max_size_2mb_each_jpg_png_webp_supported') }}</div>
                             </div>
 
                             <!-- Current Images Gallery -->
@@ -378,7 +372,7 @@
                                                 <div class="image-actions">
                                                     @if(!$img->is_main)
                                                         <button type="button" class="btn btn-sm btn-primary set-main-btn" 
-                                                                data-id="{{ $img->id }}" title="Set as Main">
+                                                                data-id="{{ $img->id }}" title="{{ __('general.set_as_main') }}">
                                                             <i class="ti ti-star"></i>
                                                         </button>
                                                     @endif
@@ -394,7 +388,7 @@
                             </div>
 
                             <div class="mb-2">
-                                <label class="form-label fw-bold">Additional Images</label>
+                                <label class="form-label fw-bold">{{ __('general.additional_images') }}</label>
                                 @if($service->images->count() > 0)
                                     <div class="row g-2 mb-3" id="existingImages">
                                         @foreach($service->images as $img)
@@ -414,7 +408,7 @@
                                 @endif
                                 <input type="file" id="images" name="images[]" class="form-control" accept="image/*"
                                     multiple>
-                                <div class="form-text">Selection allows multiple images. Max 1Mb each.</div>
+                                <div class="form-text">{{ __('general.selection_allows_multiple_images_max_1mb_each') }}</div>
                             </div>
                     </x-client.form-card>
 
@@ -1058,7 +1052,7 @@
                 row.className = 'row g-3 mb-3 pb-3 border-bottom extra-row';
                 row.innerHTML = `
                             <div class="col-md-4">
-                                <input type="text" name="extras[${extraCount}][title]" class="form-control" placeholder="Title (e.g., Fast Delivery)" required>
+                                <input type="text" name="extras[${extraCount}][title]" class="form-control" placeholder="{{ __('general.title_e_g_fast_delivery') }}" required>
                             </div>
                             <div class="col-md-3">
                                 <div class="input-group">
@@ -1067,8 +1061,8 @@
                                 </div>
                             </div>
                             <div class="col-md-3">
-                                <input type="number" name="extras[${extraCount}][duration_days]" class="form-control" placeholder="Extra Days" min="0">
-                                <div class="form-text mt-0" style="font-size: 0.75rem;">Duration added to delivery</div>
+                                <input type="number" name="extras[${extraCount}][duration_days]" class="form-control" placeholder="{{ __('general.extra_days') }}" min="0">
+                                <div class="form-text mt-0" style="font-size: 0.75rem;">{{ __('general.duration_added_to_delivery') }}</div>
                             </div>
                             <div class="col-md-2 d-flex align-items-center">
                                 <button type="button" class="btn btn-outline-danger btn-sm w-100" onclick="this.closest('.extra-row').remove()" aria-label="Delete">

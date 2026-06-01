@@ -19,7 +19,7 @@ export default function LeaderboardTable({ leaderboard = [] }: { leaderboard: Le
         return (
             <div className="flex flex-col items-center justify-center h-40 text-sm text-muted-foreground border border-dashed rounded-lg bg-slate-50/50">
                 <Trophy className="w-8 h-8 mb-2 text-slate-300" />
-                {__('No agent data available for this branch.')}
+                {__('general.no_agent_data_available_for_this_branch')}
             </div>
         );
     }
@@ -37,10 +37,10 @@ export default function LeaderboardTable({ leaderboard = [] }: { leaderboard: Le
                 <TableHeader className="bg-slate-50">
                     <TableRow>
                         <TableHead className="w-12 text-center">#</TableHead>
-                        <TableHead>{__('Agent')}</TableHead>
-                        <TableHead className="text-center">{__('Calls')}</TableHead>
+                        <TableHead>{__('general.agent')}</TableHead>
+                        <TableHead className="text-center">{__('general.calls')}</TableHead>
                         <TableHead className="text-center">{__('Closed')}</TableHead>
-                        <TableHead className="text-right">{__('Conversion')}</TableHead>
+                        <TableHead className="text-right">{__('general.conversion')}</TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>

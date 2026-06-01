@@ -57,7 +57,7 @@ export default function Login() {
                                     <Input
                                         type="email"
                                         required
-                                        placeholder="name@company.com"
+                                        placeholder={__('general.name_company_com')}
                                         value={form.data.email}
                                         onChange={e => form.setData('email', e.target.value)}
                                         className="pl-10 bg-white/[0.04] border-white/[0.08] text-white placeholder:text-slate-500 focus:border-indigo-500/50 focus:ring-indigo-500/20 h-11"

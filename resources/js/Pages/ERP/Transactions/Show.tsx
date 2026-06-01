@@ -60,13 +60,11 @@ export default function ShowTransaction({ transaction }: Props) {
             <div className="max-w-5xl mx-auto space-y-6">
                 <ModulePageHeader
                     title={`Transaction ${transaction.reference_id}`}
-                    description="Detailed view of the ledger transaction."
+                    description={__('general.detailed_view_of_the_ledger_transaction')}
                     icon={Activity}
                     actions={
                         <Button variant="outline" size="sm" onClick={() => router.get(route('erp.dashboard', { section: 'transactions' }))}>
-                            <ArrowLeft className="w-4 h-4 mr-2" />
-                            Back to Ledger
-                        </Button>
+                            <ArrowLeft className="w-4 h-4 mr-2" />{__('general.back_to_ledger')}</Button>
                     }
                 />
 
@@ -89,16 +87,12 @@ export default function ShowTransaction({ transaction }: Props) {
                                 <div className="grid grid-cols-2 gap-8 py-4">
                                     <div>
                                         <span className="text-sm font-medium text-slate-500 flex items-center mb-1">
-                                            <Hash className="w-4 h-4 mr-2" />
-                                            Reference ID
-                                        </span>
+                                            <Hash className="w-4 h-4 mr-2" />{__('general.reference_id')}</span>
                                         <span className="text-lg font-mono font-semibold text-slate-900">{transaction.reference_id}</span>
                                     </div>
                                     <div>
                                         <span className="text-sm font-medium text-slate-500 flex items-center mb-1">
-                                            <DollarSign className="w-4 h-4 mr-2" />
-                                            Business Amount
-                                        </span>
+                                            <DollarSign className="w-4 h-4 mr-2" />{__('general.business_amount')}</span>
                                         <span className={`text-2xl font-bold tracking-tight ${isCredit ? 'text-emerald-600' : 'text-rose-600'}`}>
                                             {isCredit ? '+' : '-'}
                                             <CurrencyDisplay amount={transaction.business_amount} currency={transaction.business_currency} />
@@ -121,9 +115,7 @@ export default function ShowTransaction({ transaction }: Props) {
 
                                     <div>
                                         <span className="text-sm font-medium text-slate-500 flex items-center mb-1">
-                                            <Calendar className="w-4 h-4 mr-2" />
-                                            Date & Time
-                                        </span>
+                                            <Calendar className="w-4 h-4 mr-2" />{__('general.date_time_1')}</span>
                                         <span className="text-base font-medium text-slate-900">{transaction.date}</span>
                                     </div>
                                 </div>
@@ -138,7 +130,7 @@ export default function ShowTransaction({ transaction }: Props) {
                             </CardHeader>
                             <CardContent className="space-y-4">
                                 <div>
-                                    <span className="text-xs text-slate-500 block uppercase tracking-wider font-medium mb-1">Original Amount</span>
+                                    <span className="text-xs text-slate-500 block uppercase tracking-wider font-medium mb-1">{__('general.original_amount')}</span>
                                     <div className="font-semibold text-slate-900">
                                         <CurrencyDisplay amount={transaction.amount} currency={transaction.client_currency} />
                                     </div>
@@ -155,7 +147,7 @@ export default function ShowTransaction({ transaction }: Props) {
                                 </div>
 
                                 <div className="border-t border-slate-100 pt-4">
-                                    <span className="text-xs text-slate-500 block uppercase tracking-wider font-medium mb-1">Source Reference</span>
+                                    <span className="text-xs text-slate-500 block uppercase tracking-wider font-medium mb-1">{__('general.source_reference')}</span>
                                     <div className="flex items-center gap-2">
                                         <FileText className="w-4 h-4 text-slate-400" />
                                         <span className="text-sm font-medium text-slate-700 capitalize">
@@ -167,9 +159,7 @@ export default function ShowTransaction({ transaction }: Props) {
                                         <Link 
                                             href={route('erp.invoices.show', transaction.reference_id_raw)} 
                                             className="text-xs text-indigo-600 hover:underline mt-1 inline-block"
-                                        >
-                                            View related invoice
-                                        </Link>
+                                        >{__('general.view_related_invoice')}</Link>
                                     )}
                                 </div>
                             </CardContent>

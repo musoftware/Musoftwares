@@ -32,9 +32,7 @@ export default function Error({ status }: { status: number }) {
                     <Link
                         href="/"
                         className="inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:outline-none"
-                    >
-                        Go back home
-                    </Link>
+                    >{__('general.go_back_home')}</Link>
                 </div>
             </div>
         </div>

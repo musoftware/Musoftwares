@@ -99,7 +99,7 @@ export function ClientAutocomplete({
                 <PopoverContent className="w-[300px] p-0 bg-white border border-slate-200 shadow-md">
                     <Command shouldFilter={false}>
                         <CommandInput
-                            placeholder="Type to search clients..."
+                            placeholder={__('general.type_to_search_clients')}
                             value={search}
                             onValueChange={setSearch}
                             className="text-slate-900 border-none outline-none focus:ring-0"
@@ -107,15 +107,11 @@ export function ClientAutocomplete({
                         <CommandList className="max-h-60 overflow-y-auto">
                             {isLoading && (
                                 <div className="flex items-center justify-center p-4 text-xs text-slate-500">
-                                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                                    Searching...
-                                </div>
+                                    <Loader2 className="h-4 w-4 animate-spin mr-2" />{__('general.searching')}</div>
                             )}
                             
                             {!isLoading && clients.length === 0 && (
-                                <CommandEmpty className="py-4 text-center text-xs text-slate-500">
-                                    No clients found.
-                                </CommandEmpty>
+                                <CommandEmpty className="py-4 text-center text-xs text-slate-500">{__('general.no_clients_found')}</CommandEmpty>
                             )}
 
                             {!isLoading && clients.length > 0 && (

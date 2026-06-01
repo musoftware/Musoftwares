@@ -970,7 +970,7 @@ export default function CampaignWorkspace({
                                                             const val = e.target.value;
                                                             setDripSteps(prev => prev.map((s, i) => i === index ? { ...s, media_url: val } : s));
                                                         }}
-                                                        placeholder="https://..."
+                                                        placeholder={__('general.https')}
                                                         className="h-9 text-xs focus-visible:ring-teal-500 border-slate-200 rounded-xl"
                                                     />
                                                 </div>
@@ -1522,7 +1522,7 @@ export default function CampaignWorkspace({
                                             type="text"
                                             value={testNumber}
                                             onChange={e => setTestNumber(e.target.value.replace(/[^0-9]/g, ''))}
-                                            placeholder="e.g. 966500000000"
+                                            placeholder={__('general.e_g_966500000000')}
                                             className="h-10 focus-visible:ring-teal-500 border-muted font-mono text-xs flex-1 rounded-xl"
                                         />
                                         <Button

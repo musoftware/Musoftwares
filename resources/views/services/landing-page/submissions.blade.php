@@ -18,22 +18,18 @@
             <div class="card bg-light">
                 <div class="card-header d-flex justify-content-between align-items-center flex-wrap">
                     <h4 class="card-title mb-0">
-                        <i class="ti ti-file-text me-2"></i>Form Submissions
-                        <span class="badge bg-primary ms-2">{{ $submissions->total() }}</span>
+                        <i class="ti ti-file-text me-2"></i>{{ __('general.form_submissions') }}<span class="badge bg-primary ms-2">{{ $submissions->total() }}</span>
                     </h4>
                     <div class="d-flex gap-2 flex-wrap">
                         <a href="{{ route('services.landing-page.edit', $service) }}" class="btn btn-secondary btn-sm">
-                            <i class="ti ti-arrow-left me-1"></i> Back to Landing Page
-                        </a>
+                            <i class="ti ti-arrow-left me-1"></i>{{ __('general.back_to_landing_page') }}</a>
                         <a href="{{ route('services.mine') }}" class="btn btn-outline-secondary btn-sm">
-                            <i class="ti ti-list me-1"></i> Back to Services
-                        </a>
+                            <i class="ti ti-list me-1"></i>{{ __('general.back_to_services') }}</a>
                         @if($submissions->count() > 0)
                             <a href="{{ route('services.landing-page.submissions.export', $service) }}"
                                class="btn btn-success btn-sm"
-                               title="Export to CSV">
-                                <i class="ti ti-download me-1"></i> Export CSV
-                            </a>
+                               title="{{ __('general.export_to_csv') }}">
+                                <i class="ti ti-download me-1"></i>{{ __('general.export_csv') }}</a>
                         @endif
                     </div>
                 </div>
@@ -50,10 +46,10 @@
                                                id="search"
                                                name="search"
                                                value="{{ request('search') }}"
-                                               placeholder="Name, email, or phone...">
+                                               placeholder="{{ __('general.name_email_or_phone') }}">
                                     </div>
                                     <div class="col-md-3">
-                                        <label for="date_from" class="form-label small">From Date</label>
+                                        <label for="date_from" class="form-label small">{{ __('general.from_date') }}</label>
                                         <input type="date"
                                                class="form-control form-control-sm"
                                                id="date_from"
@@ -61,7 +57,7 @@
                                                value="{{ request('date_from') }}">
                                     </div>
                                     <div class="col-md-3">
-                                        <label for="date_to" class="form-label small">To Date</label>
+                                        <label for="date_to" class="form-label small">{{ __('general.to_date') }}</label>
                                         <input type="date"
                                                class="form-control form-control-sm"
                                                id="date_to"
@@ -79,8 +75,7 @@
                                 @if(request()->hasAny(['search', 'date_from', 'date_to']))
                                     <div class="mt-2">
                                         <a href="{{ route('services.landing-page.submissions', $service) }}" class="btn btn-link btn-sm p-0 text-decoration-none">
-                                            <i class="ti ti-x me-1"></i> Clear filters
-                                        </a>
+                                            <i class="ti ti-x me-1"></i>{{ __('general.clear_filters') }}</a>
                                     </div>
                                 @endif
                             </form>
@@ -92,11 +87,11 @@
                                 <thead>
                                     <tr>
                                         <th style="width: 5%;">#</th>
-                                        <th style="width: 15%;">Submitted By</th>
-                                        <th style="width: 20%;">Contact Info</th>
+                                        <th style="width: 15%;">{{ __('general.submitted_by') }}</th>
+                                        <th style="width: 20%;">{{ __('general.contact_info') }}</th>
                                         <th style="width: 15%;">Answers</th>
-                                        <th style="width: 15%;">Submitted At</th>
-                                        <th style="width: 10%;">IP Address</th>
+                                        <th style="width: 15%;">{{ __('general.submitted_at') }}</th>
+                                        <th style="width: 10%;">{{ __('general.ip_address') }}</th>
                                         <th style="width: 20%;" class="text-end">Actions</th>
                                     </tr>
                                 </thead>
@@ -133,7 +128,7 @@
                                                                    target="_blank" rel="noopener noreferrer"
                                                                    class="ms-2 btn btn-sm"
                                                                    style="background-color: #25D366; border-color: #25D366; color: white; padding: 0.15rem 0.5rem; font-size: 0.75rem;"
-                                                                   title="Send WhatsApp message">
+                                                                   title="{{ __('general.send_whatsapp_message') }}">
                                                                     <i class="ti ti-brand-whatsapp me-1"></i>WhatsApp
                                                                 </a>
                                                             @endif
@@ -156,8 +151,7 @@
                                                         data-ip="{{ e($submission->ip_address ?? 'N/A') }}"
                                                         data-user-agent="{{ e($submission->user_agent ?? 'N/A') }}"
                                                         data-form-data="{{ json_encode($submission->form_data ?? []) }}">
-                                                    <i class="ti ti-eye me-1"></i> View Answers
-                                                </button>
+                                                    <i class="ti ti-eye me-1"></i>{{ __('general.view_answers') }}</button>
                                             </td>
                                             <td>
                                                 <div>
@@ -181,7 +175,7 @@
                                                     @if($submission->submitted_by_email)
                                                         <a href="mailto:{{ e($submission->submitted_by_email) }}"
                                                            class="btn btn-sm btn-outline-primary"
-                                                           title="Send email">
+                                                           title="{{ __('general.send_email') }}">
                                                             <i class="ti ti-mail"></i>
                                                         </a>
                                                     @endif
@@ -199,7 +193,7 @@
                                                                    target="_blank" rel="noopener noreferrer"
                                                                    class="btn btn-sm"
                                                                    style="background-color: #25D366; border-color: #25D366; color: white;"
-                                                                   title="Send WhatsApp message">
+                                                                   title="{{ __('general.send_whatsapp_message') }}">
                                                                     <i class="ti ti-brand-whatsapp"></i>
                                                                 </a>
                                                             @endif
@@ -212,7 +206,7 @@
                                                         @method('DELETE')
                                                         <button type="submit"
                                                                 class="btn btn-sm btn-outline-danger"
-                                                                title="Delete submission">
+                                                                title="{{ __('general.delete_submission') }}">
                                                             <i class="ti ti-trash"></i>
                                                         </button>
                                                     </form>
@@ -244,14 +238,12 @@
                             </p>
                             @if(request()->hasAny(['search', 'date_from', 'date_to']))
                                 <a href="{{ route('services.landing-page.submissions', $service) }}" class="btn btn-outline-primary">
-                                    <i class="ti ti-x me-2"></i> Clear Filters
-                                </a>
+                                    <i class="ti ti-x me-2"></i>{{ __('general.clear_filters_1') }}</a>
                             @else
                                 <a href="{{ route('services.landing-page.show', $landingPage->slug) }}"
                                    target="_blank" rel="noopener noreferrer"
                                    class="btn btn-primary">
-                                    <i class="ti ti-external-link me-2"></i>View Landing Page
-                                </a>
+                                    <i class="ti ti-external-link me-2"></i>{{ __('general.view_landing_page') }}</a>
                             @endif
                         </div>
                     @endif

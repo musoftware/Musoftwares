@@ -42,7 +42,7 @@ export default function CreateFile() {
     const { menuItems, lockedAddons, workspaceName, tenantId } = useERPMenu('documents');
 
     return (
-        <ERPLayout title="Upload Document" workspaceName={workspaceName} tenantId={tenantId} menuItems={menuItems} lockedAddons={lockedAddons}>
+        <ERPLayout title={__('general.upload_document')} workspaceName={workspaceName} tenantId={tenantId} menuItems={menuItems} lockedAddons={lockedAddons}>
 
             <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8 space-y-6">
                 <div className="flex items-center gap-4">
@@ -50,19 +50,16 @@ export default function CreateFile() {
                         <ArrowLeft className="w-5 h-5" />
                     </Link>
                     <div>
-                        <h1 className="text-2xl font-bold text-slate-900">Upload Document</h1>
-                        <p className="text-slate-500 text-sm mt-0.5">Upload a new file to your tenant storage.</p>
+                        <h1 className="text-2xl font-bold text-slate-900">{__('general.upload_document')}</h1>
+                        <p className="text-slate-500 text-sm mt-0.5">{__('general.upload_a_new_file_to_your_tenant_storage')}</p>
                     </div>
                 </div>
 
                 <Card className="bg-white border border-slate-200 shadow-sm">
                     <CardHeader>
                         <CardTitle className="text-slate-900 flex items-center gap-2">
-                            <UploadCloud className="w-5 h-5" /> File Upload
-                        </CardTitle>
-                        <CardDescription className="text-slate-500">
-                            Select a file from your computer and assign a category.
-                        </CardDescription>
+                            <UploadCloud className="w-5 h-5" />{__('general.file_upload')}</CardTitle>
+                        <CardDescription className="text-slate-500">{__('general.select_a_file_from_your_computer_and_assign_a_category')}</CardDescription>
                     </CardHeader>
                     <CardContent>
                         <form onSubmit={handleSubmit} className="space-y-6">
@@ -78,15 +75,15 @@ export default function CreateFile() {
                             </div>
                             
                             <div className="space-y-2">
-                                <label className="text-sm font-medium text-slate-700">Document Category</label>
+                                <label className="text-sm font-medium text-slate-700">{__('general.document_category')}</label>
                                 <Select value={form.type} onValueChange={(val) => setForm({...form, type: val})}>
                                     <SelectTrigger className="bg-white border-slate-200 text-slate-900">
-                                        <SelectValue placeholder="Select Category" />
+                                        <SelectValue placeholder={__('general.select_category')} />
                                     </SelectTrigger>
                                     <SelectContent className="bg-white border-slate-200 text-slate-900">
                                         <SelectItem value="Document">Document</SelectItem>
-                                        <SelectItem value="Design Asset">Design Asset</SelectItem>
-                                        <SelectItem value="Invoice PDF">Invoice PDF</SelectItem>
+                                        <SelectItem value="Design Asset">{__('general.design_asset')}</SelectItem>
+                                        <SelectItem value="Invoice PDF">{__('general.invoice_pdf')}</SelectItem>
                                         <SelectItem value="Brief">Brief</SelectItem>
                                         <SelectItem value="Contract">Contract</SelectItem>
                                     </SelectContent>

@@ -325,7 +325,7 @@ class SubscriptionController extends Controller
                 }
             });
 
-            return redirect()->route('subscriptions.manage')->with('success', "Subscribed to modules successfully!");
+            return redirect()->route('subscriptions.manage')->with('success', __('general.subscribed_to_modules_successfully'));
 
         } catch (\Exception $e) {
             Log::error('Platform subscription failed: ' . $e->getMessage());
@@ -396,7 +396,7 @@ class SubscriptionController extends Controller
                 }
             });
 
-            return redirect()->route('subscriptions.manage')->with('success', "Your 14-day free trial has started!");
+            return redirect()->route('subscriptions.manage')->with('success', __('general.your_14_day_free_trial_has_started'));
         } catch (\Exception $e) {
             Log::error('Trial start failed: ' . $e->getMessage());
             return back()->withErrors(['error' => 'An error occurred: ' . $e->getMessage()]);
@@ -578,12 +578,12 @@ class SubscriptionController extends Controller
 
     public function kashierSuccess(Request $request)
     {
-        return redirect()->route('subscriptions.manage')->with('success', 'Payment successful!');
+        return redirect()->route('subscriptions.manage')->with('success', __('general.payment_successful'));
     }
 
     public function kashierFailure(Request $request)
     {
-        return redirect()->route('subscriptions.plans')->with('error', 'Payment failed or was canceled.');
+        return redirect()->route('subscriptions.plans')->with('error', __('general.payment_failed_or_was_canceled'));
     }
 
     /**
@@ -642,7 +642,7 @@ class SubscriptionController extends Controller
         $user->subscription_force = 0;
         $user->save();
 
-        return back()->with('success', 'Your subscription auto-renewal has been cancelled.');
+        return back()->with('success', __('general.your_subscription_auto_renewal_has_been_cancelled'));
     }
 
     /**

@@ -46,12 +46,12 @@ class TenantBackupController extends Controller
             $data = json_decode($fileContent, true);
 
             if (json_last_error() !== JSON_ERROR_NONE) {
-                return redirect()->back()->with('error', 'Invalid JSON file.');
+                return redirect()->back()->with('error', __('general.invalid_json_file'));
             }
 
             $this->dataService->importData($request->user()->id, $data);
 
-            return redirect()->back()->with('success', 'Data successfully restored! Your CRM and ERP records have been updated.');
+            return redirect()->back()->with('success', __('general.data_successfully_restored_your_crm_and_erp_records_have_been_updated'));
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Restore failed: ' . $e->getMessage());
         }

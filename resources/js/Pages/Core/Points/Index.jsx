@@ -66,8 +66,8 @@ export default function PointsIndex({ auth, tiers = [], quickPackages = [], tran
         <AuthenticatedLayout header="Buy Points">
             <AppPage>
                 <PageHeader 
-                    title="Buy Points" 
-                    subtitle="Use points for job applications, proposal boosts, iSAAS lookups, and premium marketplace tools."
+                    title={__('general.buy_points')} 
+                    subtitle={__('general.use_points_for_job_applications_proposal_boosts_isaas_lookups_and_premium_marketplace_tools')}
                     icon={Zap}
                 />
 
@@ -78,9 +78,7 @@ export default function PointsIndex({ auth, tiers = [], quickPackages = [], tran
                         </div>
                         <CardHeader>
                             <CardTitle className="flex items-center gap-2 text-primary-foreground/80 text-sm font-medium">
-                                <TrendingUp className="w-4 h-4" />
-                                Active Points Balance
-                            </CardTitle>
+                                <TrendingUp className="w-4 h-4" />{__('general.active_points_balance')}</CardTitle>
                         </CardHeader>
                         <CardContent>
                             <div className="text-5xl lg:text-6xl font-bold tracking-tight mb-2">
@@ -93,7 +91,7 @@ export default function PointsIndex({ auth, tiers = [], quickPackages = [], tran
                                     <Wallet className="w-4 h-4" />
                                 </div>
                                 <div>
-                                    <p className="text-xs text-primary-foreground/70 uppercase tracking-wider">Wallet Balance</p>
+                                    <p className="text-xs text-primary-foreground/70 uppercase tracking-wider">{__('general.wallet_balance')}</p>
                                     <div className="font-semibold"><FinancialAmount amount={wallet_balance} currency={globalCurrency} /></div>
                                 </div>
                             </div>
@@ -103,10 +101,8 @@ export default function PointsIndex({ auth, tiers = [], quickPackages = [], tran
                     <Card>
                         <CardHeader>
                             <CardTitle className="flex items-center gap-2">
-                                <BadgePercent className="w-5 h-5 text-primary" />
-                                Volume Pricing
-                            </CardTitle>
-                            <CardDescription>Buy more, save more on every point.</CardDescription>
+                                <BadgePercent className="w-5 h-5 text-primary" />{__('general.volume_pricing')}</CardTitle>
+                            <CardDescription>{__('general.buy_more_save_more_on_every_point')}</CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-2">
                             {tiers.map((tier, i) => {
@@ -146,8 +142,8 @@ export default function PointsIndex({ auth, tiers = [], quickPackages = [], tran
 
                 <Tabs defaultValue="packages" className="mb-8">
                     <TabsList className="grid w-full grid-cols-2 lg:w-[400px]">
-                        <TabsTrigger value="packages">Quick Packages</TabsTrigger>
-                        <TabsTrigger value="custom">Custom Amount</TabsTrigger>
+                        <TabsTrigger value="packages">{__('general.quick_packages')}</TabsTrigger>
+                        <TabsTrigger value="custom">{__('general.custom_amount')}</TabsTrigger>
                     </TabsList>
                     
                     <TabsContent value="packages" className="mt-6">
@@ -163,7 +159,7 @@ export default function PointsIndex({ auth, tiers = [], quickPackages = [], tran
                                         )}
                                         {isBest && (
                                             <div className="absolute top-3 right-3">
-                                                <Badge variant="default" className="shadow-sm">Best Value</Badge>
+                                                <Badge variant="default" className="shadow-sm">{__('general.best_value')}</Badge>
                                             </div>
                                         )}
                                         {!isBest && pkg.discount_percent > 0 && (
@@ -184,13 +180,12 @@ export default function PointsIndex({ auth, tiers = [], quickPackages = [], tran
                                                     <FinancialAmount amount={pkg.full_price} currency={globalCurrency} />
                                                 </div>
                                             )}
-                                            <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">You Pay</div>
+                                            <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">{__('general.you_pay')}</div>
                                             <div className="text-3xl font-bold mb-1 text-slate-900">
                                                 <FinancialAmount amount={pkg.total_cost} currency={globalCurrency} />
                                             </div>
                                             <div className="text-xs text-muted-foreground mb-4">
-                                                <FinancialAmount amount={pkg.price_per_point} currency={globalCurrency} /> per point
-                                            </div>
+                                                <FinancialAmount amount={pkg.price_per_point} currency={globalCurrency} />{__('general.per_point')}</div>
                                             {pkg.savings > 0 && (
                                                 <div className="inline-flex items-center gap-1 text-xs font-medium text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-md mb-2">
                                                     <CheckCircle2 className="w-3 h-3" />
@@ -205,9 +200,9 @@ export default function PointsIndex({ auth, tiers = [], quickPackages = [], tran
                                                 onClick={() => handleQuickBuy(pkg)}
                                             >
                                                 {canAfford ? (
-                                                    <span className="flex items-center gap-2">Pay <FinancialAmount amount={pkg.total_cost} currency={globalCurrency} /> via Wallet <Wallet className="w-4 h-4" /></span>
+                                                    <span className="flex items-center gap-2">Pay <FinancialAmount amount={pkg.total_cost} currency={globalCurrency} />{__('general.via_wallet')}<Wallet className="w-4 h-4" /></span>
                                                 ) : (
-                                                    <span className="flex items-center gap-2">Pay <FinancialAmount amount={pkg.total_cost} currency={globalCurrency} /> via Kashier <CreditCard className="w-4 h-4" /></span>
+                                                    <span className="flex items-center gap-2">Pay <FinancialAmount amount={pkg.total_cost} currency={globalCurrency} />{__('general.via_kashier')}<CreditCard className="w-4 h-4" /></span>
                                                 )}
                                             </Button>
                                         </CardFooter>
@@ -223,19 +218,19 @@ export default function PointsIndex({ auth, tiers = [], quickPackages = [], tran
                                 <div className="mx-auto w-12 h-12 bg-muted rounded-full flex items-center justify-center mb-4 text-foreground">
                                     <RefreshCcw className="w-5 h-5" />
                                 </div>
-                                <CardTitle>Choose Your Amount</CardTitle>
-                                <CardDescription>Enter any number of points. Buy more to unlock better rates!</CardDescription>
+                                <CardTitle>{__('general.choose_your_amount')}</CardTitle>
+                                <CardDescription>{__('general.enter_any_number_of_points_buy_more_to_unlock_better_rates')}</CardDescription>
                             </CardHeader>
                             <CardContent className="space-y-6">
                                 <div>
-                                    <label className="block text-sm font-medium mb-2">Number of Points</label>
+                                    <label className="block text-sm font-medium mb-2">{__('general.number_of_points')}</label>
                                     <div className="relative">
                                         <Input
                                             type="number"
                                             value={customPoints}
                                             onChange={(e) => setCustomPoints(e.target.value)}
                                             className="text-lg py-6 px-4"
-                                            placeholder="e.g. 500"
+                                            placeholder={__('general.e_g_500')}
                                             min="1"
                                         />
                                         <div className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground font-medium">
@@ -247,7 +242,7 @@ export default function PointsIndex({ auth, tiers = [], quickPackages = [], tran
                                 {customPricing && (
                                     <div className="bg-muted/50 rounded-lg p-5 space-y-3">
                                         <div className="flex justify-between items-center">
-                                            <span className="text-sm text-muted-foreground">Price per point</span>
+                                            <span className="text-sm text-muted-foreground">{__('general.price_per_point')}</span>
                                             <span className="text-sm font-semibold">
                                                 <FinancialAmount amount={customPricing.pricePerPoint} currency={globalCurrency} />
                                             </span>
@@ -255,7 +250,7 @@ export default function PointsIndex({ auth, tiers = [], quickPackages = [], tran
 
                                         {customPricing.discountPercent > 0 && (
                                             <div className="flex justify-between items-center">
-                                                <span className="text-sm text-muted-foreground">Full price</span>
+                                                <span className="text-sm text-muted-foreground">{__('general.full_price')}</span>
                                                 <span className="text-sm text-muted-foreground line-through">
                                                     <FinancialAmount amount={customPricing.fullPrice} currency={globalCurrency} />
                                                 </span>
@@ -264,7 +259,7 @@ export default function PointsIndex({ auth, tiers = [], quickPackages = [], tran
 
                                         <div className="border-t border-border pt-3 mt-3 flex justify-between items-end">
                                             <div>
-                                                <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider mb-1">You Pay</p>
+                                                <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider mb-1">{__('general.you_pay')}</p>
                                                 <div className="text-3xl font-bold text-slate-900">
                                                     <FinancialAmount amount={customPricing.totalCost} currency={globalCurrency} />
                                                 </div>
@@ -279,17 +274,14 @@ export default function PointsIndex({ auth, tiers = [], quickPackages = [], tran
 
                                         {customPricing.savings > 0 && (
                                             <div className="flex items-center justify-center gap-2 py-1.5 px-3 bg-emerald-50 text-emerald-700 text-xs font-medium rounded-md mt-2">
-                                                <Sparkles className="w-3 h-3" />
-                                                You save <FinancialAmount amount={customPricing.savings} currency={globalCurrency} /> ({customPricing.discountPercent}% off)
+                                                <Sparkles className="w-3 h-3" />{__('general.you_save')}<FinancialAmount amount={customPricing.savings} currency={globalCurrency} /> ({customPricing.discountPercent}% off)
                                             </div>
                                         )}
                                     </div>
                                 )}
 
                                 {!customPricing && customPoints && (
-                                    <div className="text-center py-4 text-sm text-muted-foreground">
-                                        Enter a valid number of points to see pricing.
-                                    </div>
+                                    <div className="text-center py-4 text-sm text-muted-foreground">{__('general.enter_a_valid_number_of_points_to_see_pricing')}</div>
                                 )}
                             </CardContent>
                             <CardFooter>
@@ -300,9 +292,9 @@ export default function PointsIndex({ auth, tiers = [], quickPackages = [], tran
                                     onClick={handleCustomPurchase}
                                 >
                                     {customPricing && wallet_balance >= customPricing.totalCost ? (
-                                        <span className="flex items-center gap-2">Pay <FinancialAmount amount={customPricing.totalCost} currency={globalCurrency} /> via Wallet <Wallet className="w-4 h-4" /></span>
+                                        <span className="flex items-center gap-2">Pay <FinancialAmount amount={customPricing.totalCost} currency={globalCurrency} />{__('general.via_wallet')}<Wallet className="w-4 h-4" /></span>
                                     ) : (
-                                        <span className="flex items-center gap-2">Pay <FinancialAmount amount={customPricing?.totalCost || 0} currency={globalCurrency} /> via Kashier <CreditCard className="w-4 h-4" /></span>
+                                        <span className="flex items-center gap-2">Pay <FinancialAmount amount={customPricing?.totalCost || 0} currency={globalCurrency} />{__('general.via_kashier')}<CreditCard className="w-4 h-4" /></span>
                                     )}
                                 </Button>
                             </CardFooter>
@@ -331,7 +323,7 @@ export default function PointsIndex({ auth, tiers = [], quickPackages = [], tran
                                         <TableCell colSpan={3} className="h-32 text-center">
                                             <div className="flex flex-col items-center justify-center text-muted-foreground">
                                                 <History className="w-8 h-8 mb-2 opacity-50" />
-                                                <p>No transactions found.</p>
+                                                <p>{__('general.no_transactions_found')}</p>
                                             </div>
                                         </TableCell>
                                     </TableRow>

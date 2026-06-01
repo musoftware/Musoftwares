@@ -32,23 +32,17 @@ export default function ResetPassword({
 
     return (
         <GuestLayout>
-            <Head title="Reset password" />
+            <Head title={__('general.reset_password_1')} />
 
             <div className="space-y-6">
                 <div className="space-y-1.5">
-                    <h1 className="text-xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">
-                        Set new password
-                    </h1>
-                    <p className="text-xs text-zinc-500 dark:text-zinc-400 font-normal">
-                        Choose a secure key to protect your workspace.
-                    </p>
+                    <h1 className="text-xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">{__('general.set_new_password')}</h1>
+                    <p className="text-xs text-zinc-500 dark:text-zinc-400 font-normal">{__('general.choose_a_secure_key_to_protect_your_workspace')}</p>
                 </div>
 
                 <form onSubmit={submit} className="space-y-4">
                     <div className="space-y-2">
-                        <Label htmlFor="email" className="text-xs font-medium text-zinc-600 dark:text-zinc-400">
-                            Email address
-                        </Label>
+                        <Label htmlFor="email" className="text-xs font-medium text-zinc-600 dark:text-zinc-400">{__('general.email_address_1')}</Label>
                         <Input
                             id="email"
                             type="email"
@@ -64,9 +58,7 @@ export default function ResetPassword({
                     </div>
 
                     <div className="space-y-2">
-                        <Label htmlFor="password" className="text-xs font-medium text-zinc-600 dark:text-zinc-400">
-                            New password
-                        </Label>
+                        <Label htmlFor="password" className="text-xs font-medium text-zinc-600 dark:text-zinc-400">{__('general.new_password')}</Label>
                         <div className="relative">
                             <Input
                                 id="password"
@@ -94,9 +86,7 @@ export default function ResetPassword({
                     </div>
 
                     <div className="space-y-2">
-                        <Label htmlFor="password_confirmation" className="text-xs font-medium text-zinc-600 dark:text-zinc-400">
-                            Confirm password
-                        </Label>
+                        <Label htmlFor="password_confirmation" className="text-xs font-medium text-zinc-600 dark:text-zinc-400">{__('general.confirm_password')}</Label>
                         <Input
                             id="password_confirmation"
                             type={showPassword ? 'text' : 'password'}
@@ -121,10 +111,10 @@ export default function ResetPassword({
                             {processing ? (
                                 <>
                                     <Loader2 className="w-4 h-4 animate-spin text-zinc-400 dark:text-zinc-600" />
-                                    <span>Resetting password...</span>
+                                    <span>{__('general.resetting_password')}</span>
                                 </>
                             ) : (
-                                <span>Reset password</span>
+                                <span>{__('general.reset_password_1')}</span>
                             )}
                         </Button>
                     </div>

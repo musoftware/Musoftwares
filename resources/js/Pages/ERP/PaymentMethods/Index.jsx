@@ -86,7 +86,7 @@ export default function Index({ auth, paymentMethods, currencies = [] }) {
     const { menuItems, lockedAddons, workspaceName, tenantId } = useERPMenu('settings');
 
     return (
-        <ERPLayout title="Payment Methods" workspaceName={workspaceName} tenantId={tenantId} menuItems={menuItems} lockedAddons={lockedAddons}>
+        <ERPLayout title={__('general.payment_methods')} workspaceName={workspaceName} tenantId={tenantId} menuItems={menuItems} lockedAddons={lockedAddons}>
 
             <div className="py-12">
                 <div className="max-w-[1000px] mx-auto px-4 sm:px-6 lg:px-8 space-y-10 font-sans">
@@ -96,38 +96,35 @@ export default function Index({ auth, paymentMethods, currencies = [] }) {
                     {/* ──────────────────────────────────────────────────────── */}
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-6">
                         <div>
-                            <h1 className="text-2xl font-semibold text-slate-900 tracking-tight">Bank Accounts</h1>
-                            <p className="text-sm text-slate-500 mt-1">Manage where you receive your automated withdrawals.</p>
+                            <h1 className="text-2xl font-semibold text-slate-900 tracking-tight">{__('general.bank_accounts')}</h1>
+                            <p className="text-sm text-slate-500 mt-1">{__('general.manage_where_you_receive_your_automated_withdrawals')}</p>
                         </div>
 
                         <Sheet open={isAddOpen} onOpenChange={setIsAddOpen}>
                             <SheetTrigger asChild>
                                 <Button className="shadow-sm bg-slate-900 text-white hover:bg-slate-800 transition-colors">
-                                    <Plus className="w-4 h-4 mr-2" /> Add Bank Account
-                                </Button>
+                                    <Plus className="w-4 h-4 mr-2" />{__('general.add_bank_account')}</Button>
                             </SheetTrigger>
                             <SheetContent className="sm:max-w-lg overflow-y-auto">
                                 <SheetHeader>
-                                    <SheetTitle>Add Bank Account</SheetTitle>
-                                    <SheetDescription>
-                                        Enter your bank details accurately. Accounts require manual approval by our team.
-                                    </SheetDescription>
+                                    <SheetTitle>{__('general.add_bank_account')}</SheetTitle>
+                                    <SheetDescription>{__('general.enter_your_bank_details_accurately_accounts_require_manual_approval_by_our_team')}</SheetDescription>
                                 </SheetHeader>
 
                                 <form onSubmit={onSubmit} className="space-y-4 py-6">
                                     <div className="grid grid-cols-2 gap-4">
                                         <div className="grid gap-2 col-span-2">
-                                            <Label htmlFor="bank_name">Bank Name</Label>
+                                            <Label htmlFor="bank_name">{__('general.bank_name')}</Label>
                                             <Input id="bank_name" className="shadow-none border-slate-200" value={data.bank_name} onChange={e => setData('bank_name', e.target.value)} required />
                                             {errors.bank_name && <p className="text-xs text-rose-500">{errors.bank_name}</p>}
                                         </div>
                                         <div className="grid gap-2 col-span-2">
-                                            <Label htmlFor="holder">Account Holder Name</Label>
+                                            <Label htmlFor="holder">{__('general.account_holder_name')}</Label>
                                             <Input id="holder" className="shadow-none border-slate-200" value={data.account_holder_name} onChange={e => setData('account_holder_name', e.target.value)} required />
                                             {errors.account_holder_name && <p className="text-xs text-rose-500">{errors.account_holder_name}</p>}
                                         </div>
                                         <div className="grid gap-2">
-                                            <Label htmlFor="acc_num">Account Number</Label>
+                                            <Label htmlFor="acc_num">{__('general.account_number')}</Label>
                                             <Input id="acc_num" className="shadow-none border-slate-200" value={data.account_number} onChange={e => setData('account_number', e.target.value)} required />
                                             {errors.account_number && <p className="text-xs text-rose-500">{errors.account_number}</p>}
                                         </div>
@@ -137,15 +134,15 @@ export default function Index({ auth, paymentMethods, currencies = [] }) {
                                             {errors.iban && <p className="text-xs text-rose-500">{errors.iban}</p>}
                                         </div>
                                         <div className="grid gap-2">
-                                            <Label htmlFor="swift">SWIFT / BIC</Label>
+                                            <Label htmlFor="swift">{__('general.swift_bic')}</Label>
                                             <Input id="swift" className="shadow-none border-slate-200" value={data.swift_code} onChange={e => setData('swift_code', e.target.value)} />
                                         </div>
                                         <div className="grid gap-2">
-                                            <Label htmlFor="branch">Branch Name</Label>
+                                            <Label htmlFor="branch">{__('general.branch_name')}</Label>
                                             <Input id="branch" className="shadow-none border-slate-200" value={data.branch_name} onChange={e => setData('branch_name', e.target.value)} />
                                         </div>
                                         <div className="grid gap-2">
-                                            <Label htmlFor="country">Bank Country</Label>
+                                            <Label htmlFor="country">{__('general.bank_country')}</Label>
                                             <select
                                                 id="country"
                                                 className="flex h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm shadow-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
@@ -153,10 +150,10 @@ export default function Index({ auth, paymentMethods, currencies = [] }) {
                                                 onChange={e => setData('bank_country', e.target.value)}
                                             >
                                                 <option value="EG">Egypt</option>
-                                                <option value="US">United States</option>
-                                                <option value="GB">United Kingdom</option>
+                                                <option value="US">{__('general.united_states')}</option>
+                                                <option value="GB">{__('general.united_kingdom')}</option>
                                                 <option value="AE">UAE</option>
-                                                <option value="SA">Saudi Arabia</option>
+                                                <option value="SA">{__('general.saudi_arabia')}</option>
                                             </select>
                                         </div>
                                         <div className="grid gap-2">
@@ -177,7 +174,7 @@ export default function Index({ auth, paymentMethods, currencies = [] }) {
                                     </div>
 
                                     <div className="grid gap-2">
-                                        <Label htmlFor="notes">Additional Notes</Label>
+                                        <Label htmlFor="notes">{__('general.additional_notes')}</Label>
                                         <Textarea id="notes" className="shadow-none border-slate-200" value={data.notes} onChange={e => setData('notes', e.target.value)} />
                                     </div>
 
@@ -189,11 +186,11 @@ export default function Index({ auth, paymentMethods, currencies = [] }) {
                                             onChange={e => setData('is_default', e.target.checked)}
                                             className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-600"
                                         />
-                                        <Label htmlFor="def" className="text-sm font-medium text-slate-700">Set as default for withdrawals</Label>
+                                        <Label htmlFor="def" className="text-sm font-medium text-slate-700">{__('general.set_as_default_for_withdrawals')}</Label>
                                     </div>
 
                                     <SheetFooter className="pt-4">
-                                        <Button type="submit" className="w-full shadow-sm bg-slate-900 text-white hover:bg-slate-800" disabled={processing}>Save Bank Account</Button>
+                                        <Button type="submit" className="w-full shadow-sm bg-slate-900 text-white hover:bg-slate-800" disabled={processing}>{__('general.save_bank_account')}</Button>
                                     </SheetFooter>
                                 </form>
                             </SheetContent>
@@ -253,8 +250,7 @@ export default function Index({ auth, paymentMethods, currencies = [] }) {
                                             <DropdownMenuContent align="end">
                                                 {!pm.is_default && pm.status === 'approved' && (
                                                     <DropdownMenuItem onClick={() => setDefault(pm)} className="cursor-pointer">
-                                                        <Check className="w-4 h-4 mr-2 text-indigo-600" /> Set Default
-                                                    </DropdownMenuItem>
+                                                        <Check className="w-4 h-4 mr-2 text-indigo-600" />{__('general.set_default')}</DropdownMenuItem>
                                                 )}
                                                 <DropdownMenuItem className="text-rose-600 focus:bg-rose-50 cursor-pointer" onClick={() => deletePM(pm)}>
                                                     <Trash2 className="w-4 h-4 mr-2 text-rose-600" /> Delete
@@ -279,12 +275,10 @@ export default function Index({ auth, paymentMethods, currencies = [] }) {
                                     <Banknote className="w-8 h-8 text-slate-400" />
                                 </div>
                                 <div>
-                                    <p className="font-semibold text-slate-900 text-lg">No bank accounts added</p>
-                                    <p className="text-sm text-slate-500 mt-1">Add a bank account to start receiving withdrawals.</p>
+                                    <p className="font-semibold text-slate-900 text-lg">{__('general.no_bank_accounts_added')}</p>
+                                    <p className="text-sm text-slate-500 mt-1">{__('general.add_a_bank_account_to_start_receiving_withdrawals')}</p>
                                 </div>
-                                <Button variant="outline" onClick={() => setIsAddOpen(true)} className="shadow-sm border-slate-200 mt-2">
-                                    Add your first account
-                                </Button>
+                                <Button variant="outline" onClick={() => setIsAddOpen(true)} className="shadow-sm border-slate-200 mt-2">{__('general.add_your_first_account')}</Button>
                             </div>
                         )}
                     </div>

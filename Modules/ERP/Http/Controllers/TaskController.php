@@ -109,11 +109,11 @@ class TaskController extends Controller
         $task = $this->taskService->createTask($request->validated(), $tenant);
 
         if ($request->input('quick_add') || $request->ajax() || $request->has('redirect_back')) {
-            return redirect()->back()->with('success', 'Task created.');
+            return redirect()->back()->with('success', __('general.task_created'));
         }
 
         return redirect()->route('erp.tasks.show', $task->id)
-            ->with('success', 'Task created.');
+            ->with('success', __('general.task_created'));
     }
 
     public function update(UpdateTaskRequest $request, ERPTask $task)
@@ -123,7 +123,7 @@ class TaskController extends Controller
 
         $this->taskService->updateTask($task, $request->validated(), $tenant);
 
-        return back()->with('success', 'Task updated.');
+        return back()->with('success', __('general.task_updated'));
     }
 
     public function archive(ERPTask $task)
@@ -131,7 +131,7 @@ class TaskController extends Controller
         $this->authorize('update', $task);
 
         $this->taskService->archiveTask($task);
-        return back()->with('success', 'Task archived.');
+        return back()->with('success', __('general.task_archived'));
     }
 
     public function unarchive(ERPTask $task)
@@ -139,7 +139,7 @@ class TaskController extends Controller
         $this->authorize('update', $task);
 
         $this->taskService->unarchiveTask($task);
-        return back()->with('success', 'Task restored.');
+        return back()->with('success', __('general.task_restored'));
     }
 
     public function destroy(ERPTask $task)
@@ -147,7 +147,7 @@ class TaskController extends Controller
         $this->authorize('delete', $task);
 
         $this->taskService->deleteTask($task);
-        return redirect()->route('erp.tasks.index')->with('success', 'Task deleted.');
+        return redirect()->route('erp.tasks.index')->with('success', __('general.task_deleted'));
     }
 
     // ── Todo Item CRUD ───────────────────────────────────────────────
@@ -189,7 +189,7 @@ class TaskController extends Controller
     {
         $this->authorize('update', $task);
         if ($item->task_id !== $task->id) {
-            abort(403, 'Unauthorized access.');
+            abort(403, __('general.unauthorized_access'));
         }
 
         $validated = $request->validate([
@@ -217,7 +217,7 @@ class TaskController extends Controller
     {
         $this->authorize('update', $task);
         if ($item->task_id !== $task->id) {
-            abort(403, 'Unauthorized access.');
+            abort(403, __('general.unauthorized_access'));
         }
 
         $item = $this->taskService->completeItem($item, $request->boolean('completed'));
@@ -248,7 +248,7 @@ class TaskController extends Controller
     {
         $this->authorize('update', $task);
         if ($item->task_id !== $task->id) {
-            abort(403, 'Unauthorized access.');
+            abort(403, __('general.unauthorized_access'));
         }
 
         $this->taskService->pauseItem($item);
@@ -263,7 +263,7 @@ class TaskController extends Controller
     {
         $this->authorize('update', $task);
         if ($item->task_id !== $task->id) {
-            abort(403, 'Unauthorized access.');
+            abort(403, __('general.unauthorized_access'));
         }
 
         $this->taskService->resumeItem($item);
@@ -278,7 +278,7 @@ class TaskController extends Controller
     {
         $this->authorize('update', $task);
         if ($item->task_id !== $task->id) {
-            abort(403, 'Unauthorized access.');
+            abort(403, __('general.unauthorized_access'));
         }
 
         try {

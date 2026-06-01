@@ -19,7 +19,7 @@ interface CourseIndexProps {
 export default function CourseIndex({ courses }: CourseIndexProps) {
     return (
         <AuthenticatedLayout
-            header={<h2 className="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">Written Courses</h2>}
+            header={<h2 className="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">{__('general.written_courses')}</h2>}
         >
             <Head title="Courses" />
 
@@ -54,13 +54,9 @@ export default function CourseIndex({ courses }: CourseIndexProps) {
                                             <Link
                                                 href={`/written-courses/${course.slug}/modules/${course.modules[0].slug}/lessons/${course.modules[0].lessons[0].slug}`}
                                                 className="w-full flex justify-center items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800 transition-colors"
-                                            >
-                                                Start Course
-                                            </Link>
+                                            >{__('general.start_course')}</Link>
                                         ) : (
-                                            <button disabled className="w-full flex justify-center items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-gray-500 bg-gray-200 dark:bg-gray-700 dark:text-gray-400 cursor-not-allowed">
-                                                Coming Soon
-                                            </button>
+                                            <button disabled className="w-full flex justify-center items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-gray-500 bg-gray-200 dark:bg-gray-700 dark:text-gray-400 cursor-not-allowed">{__('general.coming_soon')}</button>
                                         )}
                                     </div>
                                 </div>
@@ -71,8 +67,8 @@ export default function CourseIndex({ courses }: CourseIndexProps) {
                                 <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                                     <path vectorEffect="non-scaling-stroke" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
                                 </svg>
-                                <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-gray-100">No courses</h3>
-                                <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">Get started by creating a new course via the AI Generator.</p>
+                                <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-gray-100">{__('general.no_courses')}</h3>
+                                <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">{__('general.get_started_by_creating_a_new_course_via_the_ai_generator')}</p>
                             </div>
                         )}
                     </div>

@@ -55,9 +55,7 @@ export default function Welcome({
                                         <Link
                                             href={route('login')}
                                             className="rounded-md px-3 py-2 text-black ring-1 ring-transparent transition hover:text-black/70 focus:outline-none focus-visible:ring-[#FF2D20] dark:text-white dark:hover:text-white/80 dark:focus-visible:ring-white"
-                                        >
-                                            Log in
-                                        </Link>
+                                        >{__('general.log_in')}</Link>
                                         <Link
                                             href={route('register')}
                                             className="rounded-md px-3 py-2 text-black ring-1 ring-transparent transition hover:text-black/70 focus:outline-none focus-visible:ring-[#FF2D20] dark:text-white dark:hover:text-white/80 dark:focus-visible:ring-white"
@@ -218,9 +216,7 @@ export default function Welcome({
                                     </div>
 
                                     <div className="pt-3 sm:pt-5">
-                                        <h2 className="text-xl font-semibold text-black dark:text-white">
-                                            Laravel News
-                                        </h2>
+                                        <h2 className="text-xl font-semibold text-black dark:text-white">{__('general.laravel_news')}</h2>
 
                                         <p className="mt-4 text-sm/relaxed">
                                             Laravel News is a community driven
@@ -262,9 +258,7 @@ export default function Welcome({
                                     </div>
 
                                     <div className="pt-3 sm:pt-5">
-                                        <h2 className="text-xl font-semibold text-black dark:text-white">
-                                            Vibrant Ecosystem
-                                        </h2>
+                                        <h2 className="text-xl font-semibold text-black dark:text-white">{__('general.vibrant_ecosystem')}</h2>
 
                                         <p className="mt-4 text-sm/relaxed">
                                             Laravel's robust library of

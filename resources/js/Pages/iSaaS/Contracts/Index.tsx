@@ -40,15 +40,13 @@ export default function Index({ contracts, currentTab }) {
 
     return (
         <AuthenticatedLayout>
-            <Head title="Contracts Manager" />
+            <Head title={__('general.contracts_manager')} />
             
             <div className="mx-auto w-full max-w-7xl space-y-8 px-4 py-8 sm:px-6 lg:px-8">
                 <div className="mb-2">
-                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-slate-100 text-slate-600 mb-3 border border-slate-200">
-                        Freelance Tools
-                    </span>
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-slate-100 text-slate-600 mb-3 border border-slate-200">{__('general.freelance_tools')}</span>
                     <div className="flex items-baseline gap-3">
-                        <h1 className="text-3xl font-bold tracking-tight text-slate-900">Contracts Manager</h1>
+                        <h1 className="text-3xl font-bold tracking-tight text-slate-900">{__('general.contracts_manager')}</h1>
                         <span className="text-slate-500 font-medium">/ iSAAS</span>
                     </div>
                 </div>
@@ -58,9 +56,7 @@ export default function Index({ contracts, currentTab }) {
                         <Link
                             href={route('isaas.contracts.index', { status: 'all' })}
                             className={`rounded-md px-4 py-2 text-sm font-medium ${currentTab === 'all' ? 'bg-slate-900 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
-                        >
-                            All Contracts
-                        </Link>
+                        >{__('general.all_contracts')}</Link>
                         <Link
                             href={route('isaas.contracts.index', { status: 'draft' })}
                             className={`rounded-md px-4 py-2 text-sm font-medium ${currentTab === 'draft' ? 'bg-slate-900 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
@@ -92,11 +88,11 @@ export default function Index({ contracts, currentTab }) {
                         <thead className="border-b bg-gray-50/55">
                             <tr>
                                 <th className="p-4 font-semibold text-slate-600">Reference</th>
-                                <th className="p-4 font-semibold text-slate-600">Client / User</th>
+                                <th className="p-4 font-semibold text-slate-600">{__('general.client_user')}</th>
                                 <th className="p-4 font-semibold text-slate-600">Project</th>
                                 <th className="p-4 font-semibold text-slate-600 text-right">Amount</th>
                                 <th className="p-4 font-semibold text-slate-600 text-center">Status</th>
-                                <th className="p-4 font-semibold text-slate-600 text-center">Valid Until</th>
+                                <th className="p-4 font-semibold text-slate-600 text-center">{__('general.valid_until')}</th>
                                 <th className="p-4 font-semibold text-slate-600 text-right">Actions</th>
                             </tr>
                         </thead>
@@ -123,40 +119,30 @@ export default function Index({ contracts, currentTab }) {
                                         <DropdownMenu>
                                             <DropdownMenuTrigger asChild>
                                                 <Button variant="ghost" className="h-8 w-8 p-0">
-                                                    <span className="sr-only">Open menu</span>
+                                                    <span className="sr-only">{__('general.open_menu')}</span>
                                                     <MoreHorizontal className="h-4 w-4" />
                                                 </Button>
                                             </DropdownMenuTrigger>
                                             <DropdownMenuContent align="end">
                                                 <DropdownMenuLabel>Actions</DropdownMenuLabel>
                                                 <DropdownMenuItem onClick={() => router.get(route('isaas.contracts.edit', contract.id))}>
-                                                    <FileText className="mr-2 h-4 w-4" />
-                                                    View / Edit
-                                                </DropdownMenuItem>
+                                                    <FileText className="mr-2 h-4 w-4" />{__('general.view_edit')}</DropdownMenuItem>
                                                 <DropdownMenuSeparator />
                                                 {contract.status === 'draft' && (
                                                     <DropdownMenuItem onClick={() => handleStatusUpdate(contract.id, 'sent')}>
-                                                        <Send className="mr-2 h-4 w-4 text-blue-600" />
-                                                        Mark as Sent
-                                                    </DropdownMenuItem>
+                                                        <Send className="mr-2 h-4 w-4 text-blue-600" />{__('general.mark_as_sent')}</DropdownMenuItem>
                                                 )}
                                                 {contract.status === 'sent' && (
                                                     <DropdownMenuItem onClick={() => handleStatusUpdate(contract.id, 'signed')}>
-                                                        <CheckCircle className="mr-2 h-4 w-4 text-green-600" />
-                                                        Mark as Signed
-                                                    </DropdownMenuItem>
+                                                        <CheckCircle className="mr-2 h-4 w-4 text-green-600" />{__('general.mark_as_signed')}</DropdownMenuItem>
                                                 )}
                                                 {contract.status !== 'cancelled' && (
                                                     <DropdownMenuItem onClick={() => handleStatusUpdate(contract.id, 'cancelled')} className="text-yellow-600">
-                                                        <XCircle className="mr-2 h-4 w-4" />
-                                                        Cancel Contract
-                                                    </DropdownMenuItem>
+                                                        <XCircle className="mr-2 h-4 w-4" />{__('general.cancel_contract')}</DropdownMenuItem>
                                                 )}
                                                 <DropdownMenuSeparator />
                                                 <DropdownMenuItem onClick={() => handleDelete(contract.id)} className="text-red-600">
-                                                    <Trash2 className="mr-2 h-4 w-4" />
-                                                    Delete Contract
-                                                </DropdownMenuItem>
+                                                    <Trash2 className="mr-2 h-4 w-4" />{__('general.delete_contract')}</DropdownMenuItem>
                                             </DropdownMenuContent>
                                         </DropdownMenu>
                                     </td>
@@ -164,9 +150,7 @@ export default function Index({ contracts, currentTab }) {
                             ))}
                             {contracts.data.length === 0 && (
                                 <tr>
-                                    <td colSpan={7} className="p-8 text-center text-gray-500">
-                                        No contracts found.
-                                    </td>
+                                    <td colSpan={7} className="p-8 text-center text-gray-500">{__('general.no_contracts_found')}</td>
                                 </tr>
                             )}
                         </tbody>

@@ -56,18 +56,18 @@ export default function CrmLayout({ title, activeMenu, children }: CrmLayoutProp
     // Define grouped menu structure
     const allCoreItems = [
         { id: 'dashboard', label: __('Dashboard'), icon: LayoutDashboard, href: route('crm.dashboard'), isActive: activeMenu === 'dashboard' },
-        { id: 'workspaces', label: __('Workspaces'), icon: Activity, href: route('crm.workspaces.index'), isActive: activeMenu === 'workspaces' },
-        { id: 'leads', label: __('Leads & Pipeline'), icon: Users, href: route('crm.leads.index'), isActive: activeMenu === 'leads' },
-        { id: 'tags', label: __('Tags & Attributes'), icon: Tag, href: route('crm.tags.index'), isActive: activeMenu === 'tags' },
-        { id: 'search', label: __('Universal Search'), icon: Search, href: route('crm.search.page'), isActive: activeMenu === 'search' },
-        { id: 'widgets', label: __('Web Forms'), icon: FileText, href: route('crm.widgets.index'), isActive: activeMenu === 'widgets' },
+        { id: 'workspaces', label: __('general.workspaces'), icon: Activity, href: route('crm.workspaces.index'), isActive: activeMenu === 'workspaces' },
+        { id: 'leads', label: __('general.leads_pipeline'), icon: Users, href: route('crm.leads.index'), isActive: activeMenu === 'leads' },
+        { id: 'tags', label: __('general.tags_attributes'), icon: Tag, href: route('crm.tags.index'), isActive: activeMenu === 'tags' },
+        { id: 'search', label: __('general.universal_search'), icon: Search, href: route('crm.search.page'), isActive: activeMenu === 'search' },
+        { id: 'widgets', label: __('general.web_forms'), icon: FileText, href: route('crm.widgets.index'), isActive: activeMenu === 'widgets' },
     ].filter(item => canSeeMenu(item.id));
 
     const menuGroups: { title: string; items: typeof allCoreItems }[] = [];
 
     if (allCoreItems.length > 0) {
         menuGroups.push({
-            title: __('Core Operations'),
+            title: __('general.core_operations'),
             items: allCoreItems
         });
     }
@@ -75,14 +75,14 @@ export default function CrmLayout({ title, activeMenu, children }: CrmLayoutProp
     // Advanced Operations / Automations
     const advancedItems: typeof allCoreItems = [];
     if ((hasFeature('crm.campaigns.whatsapp') || hasFeature('crm.campaigns.email') || hasFeature('crm-advanced-operations')) && canSeeMenu('campaigns')) {
-        advancedItems.push({ id: 'campaigns', label: __('Broadcast Campaigns'), icon: Mail, href: route('crm.campaigns.index'), isActive: activeMenu === 'campaigns' });
+        advancedItems.push({ id: 'campaigns', label: __('general.broadcast_campaigns'), icon: Mail, href: route('crm.campaigns.index'), isActive: activeMenu === 'campaigns' });
     }
     if ((hasFeature('crm.automations') || hasFeature('crm-advanced-operations')) && canSeeMenu('sequences')) {
-        advancedItems.push({ id: 'sequences', label: __('Automated Sequences'), icon: PlayCircle, href: route('crm.sequences.index'), isActive: activeMenu === 'sequences' });
+        advancedItems.push({ id: 'sequences', label: __('general.automated_sequences'), icon: PlayCircle, href: route('crm.sequences.index'), isActive: activeMenu === 'sequences' });
     }
     if (advancedItems.length > 0) {
         menuGroups.push({
-            title: __('Advanced Operations'),
+            title: __('general.advanced_operations'),
             items: advancedItems
         });
     }
@@ -96,17 +96,17 @@ export default function CrmLayout({ title, activeMenu, children }: CrmLayoutProp
     }
 
     if (canSeeMenu('settings')) {
-        systemItems.push({ id: 'settings', label: __('CRM Settings'), icon: Settings, href: route('crm.settings.index'), isActive: activeMenu === 'settings' });
+        systemItems.push({ id: 'settings', label: __('general.crm_settings'), icon: Settings, href: route('crm.settings.index'), isActive: activeMenu === 'settings' });
     }
 
     if (systemItems.length > 0) {
         menuGroups.push({
-            title: __('System'),
+            title: __('general.system'),
             items: systemItems
         });
     }
 
-    const activeMenuLabel = menuGroups.flatMap(g => g.items).find(item => item.isActive)?.label || __('Workspace');
+    const activeMenuLabel = menuGroups.flatMap(g => g.items).find(item => item.isActive)?.label || __('general.workspace');
 
     return (
         <div className="min-h-screen bg-slate-50 font-sans text-slate-900 flex flex-col">
@@ -130,7 +130,7 @@ export default function CrmLayout({ title, activeMenu, children }: CrmLayoutProp
                                 className="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors"
                             >
                                 <ArrowLeft className="w-4 h-4" />
-                                <span>{__('Logout')}</span>
+                                <span>{__('general.logout')}</span>
                             </Link>
                         ) : (
                             <Link
@@ -138,8 +138,8 @@ export default function CrmLayout({ title, activeMenu, children }: CrmLayoutProp
                                 className="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-slate-500 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors"
                             >
                                 <ArrowLeft className="w-4 h-4" />
-                                <span className="hidden sm:inline">{__('Exit to Main Hub')}</span>
-                                <span className="sm:hidden">{__('Exit')}</span>
+                                <span className="hidden sm:inline">{__('general.exit_to_main_hub')}</span>
+                                <span className="sm:hidden">{__('general.exit')}</span>
                             </Link>
                         )}
                     </div>

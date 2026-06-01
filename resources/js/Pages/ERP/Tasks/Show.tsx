@@ -328,9 +328,7 @@ export default function Show({ task: initialTask, todos: initialTodos, completio
                         href={route('erp.tasks.index')} 
                         className="text-muted-foreground hover:text-foreground text-xs flex items-center gap-1 transition-colors"
                     >
-                        <ChevronLeft className="h-4 w-4" />
-                        Back to Task Boards
-                    </Link>
+                        <ChevronLeft className="h-4 w-4" />{__('general.back_to_task_boards')}</Link>
 
                     {errorMessage && (
                         <div className="flex items-center gap-1.5 text-rose-600 bg-rose-50 border border-rose-200 px-3 py-1.5 rounded-md text-xs animate-shake">
@@ -352,19 +350,15 @@ export default function Show({ task: initialTask, todos: initialTodos, completio
                             size="sm"
                             className="shadow-none h-8 text-xs gap-1.5"
                         >
-                            <Edit3 className="h-3.5 w-3.5" />
-                            Edit Board
-                        </Button>
+                            <Edit3 className="h-3.5 w-3.5" />{__('general.edit_board')}</Button>
                         <Button 
                             onClick={handleDeleteBoard}
                             variant="outline" 
                             size="sm"
                             className="shadow-none h-8 text-xs gap-1.5 text-rose-500 hover:text-rose-600 hover:bg-rose-50 border-border"
-                            title="Delete Board"
+                            title={__('general.delete_board')}
                         >
-                            <Trash2 className="h-3.5 w-3.5" />
-                            Delete Board
-                        </Button>
+                            <Trash2 className="h-3.5 w-3.5" />{__('general.delete_board')}</Button>
                     </div>
 
                     <CardContent className="p-6 md:p-8 space-y-6">
@@ -383,7 +377,7 @@ export default function Show({ task: initialTask, todos: initialTodos, completio
                         {/* Visual statistics grid */}
                         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 border-t border-border pt-6">
                             <div className="space-y-1">
-                                <span className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider">Client Assignee</span>
+                                <span className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider">{__('general.client_assignee')}</span>
                                 <div className="text-xs font-semibold text-foreground flex items-center gap-1.5">
                                     <FileText className="h-4 w-4 text-primary/70" />
                                     <span>{task.client?.name || "Not assigned"}</span>
@@ -391,7 +385,7 @@ export default function Show({ task: initialTask, todos: initialTodos, completio
                             </div>
                             
                             <div className="space-y-1">
-                                <span className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider">Target Due Date</span>
+                                <span className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider">{__('general.target_due_date')}</span>
                                 <div className="text-xs font-semibold text-foreground flex items-center gap-1.5">
                                     <Calendar className="h-4 w-4 text-primary/70" />
                                     <span>{task.due_date || "No limit"}</span>
@@ -399,14 +393,14 @@ export default function Show({ task: initialTask, todos: initialTodos, completio
                             </div>
 
                             <div className="space-y-1">
-                                <span className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider">Board Status</span>
+                                <span className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider">{__('general.board_status')}</span>
                                 <div className="pt-0.5">
                                     <Badge className="bg-primary/10 text-primary border-primary/20 shadow-none capitalize font-semibold text-[10px]">{task.status.replace('_', ' ')}</Badge>
                                 </div>
                             </div>
 
                             <div className="space-y-1">
-                                <span className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider">Created By</span>
+                                <span className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider">{__('general.created_by')}</span>
                                 <div className="text-xs font-semibold text-foreground italic">
                                     {task.creator || "System"}
                                 </div>
@@ -420,7 +414,7 @@ export default function Show({ task: initialTask, todos: initialTodos, completio
                     {/* Completion percent card */}
                     <Card className="shadow-none border-border md:col-span-1 bg-muted/10">
                         <CardHeader className="p-5 pb-3">
-                            <CardTitle className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Completion Ratio</CardTitle>
+                            <CardTitle className="text-xs font-bold uppercase tracking-wider text-muted-foreground">{__('general.completion_ratio')}</CardTitle>
                         </CardHeader>
                         <CardContent className="p-5 pt-0 space-y-4">
                             <div className="flex items-baseline gap-2">
@@ -436,15 +430,15 @@ export default function Show({ task: initialTask, todos: initialTodos, completio
                             </div>
 
                             <div className="flex justify-between items-center text-xs text-muted-foreground border-t border-border/60 pt-3">
-                                <span>Total Tasks</span>
+                                <span>{__('general.total_tasks')}</span>
                                 <span className="font-semibold text-foreground">{todos.length}</span>
                             </div>
                             <div className="flex justify-between items-center text-xs text-muted-foreground">
-                                <span>Completed Items</span>
+                                <span>{__('general.completed_items')}</span>
                                 <span className="font-semibold text-emerald-600">{todos.filter(t => t.completed).length}</span>
                             </div>
                             <div className="flex justify-between items-center text-xs text-muted-foreground">
-                                <span>Pending / Open</span>
+                                <span>{__('general.pending_open')}</span>
                                 <span className="font-semibold text-amber-600">{todos.filter(t => !t.completed).length}</span>
                             </div>
                         </CardContent>
@@ -454,23 +448,21 @@ export default function Show({ task: initialTask, todos: initialTodos, completio
                     <Card className="shadow-none border-border md:col-span-2">
                         <CardHeader className="p-5 pb-2 flex flex-row items-center justify-between">
                             <div className="space-y-0.5">
-                                <CardTitle className="text-sm font-bold">Board Checklist Items</CardTitle>
-                                <CardDescription className="text-[11px]">Track itemized milestones or deliverables for this board.</CardDescription>
+                                <CardTitle className="text-sm font-bold">{__('general.board_checklist_items')}</CardTitle>
+                                <CardDescription className="text-[11px]">{__('general.track_itemized_milestones_or_deliverables_for_this_board')}</CardDescription>
                             </div>
                             <Button 
                                 onClick={openAddTodo}
                                 size="sm" 
                                 className="shadow-none h-8 text-xs gap-1"
                             >
-                                <Plus className="h-3.5 w-3.5" />
-                                Add Item
-                            </Button>
+                                <Plus className="h-3.5 w-3.5" />{__('general.add_item')}</Button>
                         </CardHeader>
                         <CardContent className="p-5 pt-0 space-y-2">
                             {todos.length === 0 ? (
                                 <div className="py-12 text-center text-muted-foreground text-xs italic space-y-2">
                                     <FileText className="h-8 w-8 text-muted-foreground/30 mx-auto" />
-                                    <p>No checklist items added yet. Click &quot;Add Item&quot; to populate your board.</p>
+                                    <p>{__('general.no_checklist_items_added_yet_click_quot_add_item_quot_to_populate_your_board')}</p>
                                 </div>
                             ) : (
                                 <div className="space-y-3 pt-2">
@@ -516,7 +508,7 @@ export default function Show({ task: initialTask, todos: initialTodos, completio
                                                             )}
                                                             
                                                             {todo.is_paid && (
-                                                                <span className="px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide bg-emerald-100 text-emerald-800 border border-emerald-200">Paid Milestone</span>
+                                                                <span className="px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide bg-emerald-100 text-emerald-800 border border-emerald-200">{__('general.paid_milestone')}</span>
                                                             )}
                                                         </div>
 
@@ -573,7 +565,7 @@ export default function Show({ task: initialTask, todos: initialTodos, completio
                                                         variant="ghost" 
                                                         size="icon" 
                                                         className="h-8 w-8 text-zinc-500 hover:text-primary"
-                                                        title="Edit Details"
+                                                        title={__('general.edit_details')}
                                                     >
                                                         <Edit3 className="h-3.5 w-3.5" />
                                                     </Button>
@@ -583,7 +575,7 @@ export default function Show({ task: initialTask, todos: initialTodos, completio
                                                         variant="ghost" 
                                                         size="icon" 
                                                         className="h-8 w-8 text-rose-500 hover:text-rose-700 hover:bg-rose-50 disabled:opacity-30"
-                                                        title="Delete Todo"
+                                                        title={__('general.delete_todo')}
                                                         disabled={todo.is_paid}
                                                     >
                                                         <Trash2 className="h-3.5 w-3.5" />
@@ -604,18 +596,14 @@ export default function Show({ task: initialTask, todos: initialTodos, completio
                 <DialogContent className="sm:max-w-[480px]">
                     <DialogHeader>
                         <DialogTitle className="flex items-center gap-2">
-                            <Edit3 className="h-5 w-5 text-primary" />
-                            Edit Board Details
-                        </DialogTitle>
-                        <DialogDescription className="text-xs">
-                            Update the global settings, title, status, and due date of this client task board.
-                        </DialogDescription>
+                            <Edit3 className="h-5 w-5 text-primary" />{__('general.edit_board_details')}</DialogTitle>
+                        <DialogDescription className="text-xs">{__('general.update_the_global_settings_title_status_and_due_date_of_this_client_task_board')}</DialogDescription>
                     </DialogHeader>
 
                     <form onSubmit={handleEditBoardSubmit} className="space-y-4 py-2 text-xs">
                         {/* Name */}
                         <div className="space-y-1.5">
-                            <Label htmlFor="edit_task_name" className="text-xs font-semibold text-foreground">Task Board Title</Label>
+                            <Label htmlFor="edit_task_name" className="text-xs font-semibold text-foreground">{__('general.task_board_title')}</Label>
                             <Input 
                                 id="edit_task_name"
                                 value={boardForm.data.task_name}
@@ -665,7 +653,7 @@ export default function Show({ task: initialTask, todos: initialTodos, completio
                                     className="w-full rounded-md border border-input bg-transparent px-3 py-1.5 text-xs shadow-none focus:outline-none focus:ring-1 focus:ring-ring"
                                 >
                                     <option value="open">Open</option>
-                                    <option value="in_progress">In Progress</option>
+                                    <option value="in_progress">{__('general.in_progress')}</option>
                                     <option value="review">Review</option>
                                     <option value="completed">Completed</option>
                                     <option value="archived">Archived</option>
@@ -674,7 +662,7 @@ export default function Show({ task: initialTask, todos: initialTodos, completio
 
                             {/* Due Date */}
                             <div className="space-y-1.5 col-span-1">
-                                <Label htmlFor="edit_due_date" className="text-xs font-semibold text-foreground">Due Date</Label>
+                                <Label htmlFor="edit_due_date" className="text-xs font-semibold text-foreground">{__('general.due_date')}</Label>
                                 <Input 
                                     id="edit_due_date"
                                     type="date"
@@ -693,9 +681,7 @@ export default function Show({ task: initialTask, todos: initialTodos, completio
                                 className="shadow-none text-xs text-rose-500 hover:text-rose-600 hover:bg-rose-50 px-2"
                                 disabled={boardForm.processing}
                             >
-                                <Trash2 className="h-3.5 w-3.5 mr-1.5" />
-                                Delete Board
-                            </Button>
+                                <Trash2 className="h-3.5 w-3.5 mr-1.5" />{__('general.delete_board')}</Button>
                             <div className="flex items-center gap-2">
                                 <Button 
                                     type="button" 
@@ -728,20 +714,18 @@ export default function Show({ task: initialTask, todos: initialTodos, completio
                             {editingTodo ? <Edit3 className="h-5 w-5 text-primary" /> : <Plus className="h-5 w-5 text-primary" />}
                             {editingTodo ? "Edit Todo Checklist Item" : "Add Todo Checklist Item"}
                         </DialogTitle>
-                        <DialogDescription className="text-xs">
-                            Define specific actions, cost estimates, milestone dates, or tags for this item.
-                        </DialogDescription>
+                        <DialogDescription className="text-xs">{__('general.define_specific_actions_cost_estimates_milestone_dates_or_tags_for_this_item')}</DialogDescription>
                     </DialogHeader>
 
                     <form onSubmit={handleTodoSubmit} className="space-y-4 py-2 text-xs">
                         {/* Title */}
                         <div className="space-y-1.5">
-                            <Label htmlFor="todo_title" className="text-xs font-semibold text-foreground">Todo Title / Task</Label>
+                            <Label htmlFor="todo_title" className="text-xs font-semibold text-foreground">{__('general.todo_title_task')}</Label>
                             <Input 
                                 id="todo_title"
                                 value={todoData.title}
                                 onChange={(e) => setTodoData({ ...todoData, title: e.target.value })}
-                                placeholder="e.g. Integrate Stripe Checkout SDK"
+                                placeholder={__('general.e_g_integrate_stripe_checkout_sdk')}
                                 className="shadow-none h-9 text-xs"
                                 required
                             />
@@ -754,7 +738,7 @@ export default function Show({ task: initialTask, todos: initialTodos, completio
                                 id="todo_description"
                                 value={todoData.description}
                                 onChange={(e) => setTodoData({ ...todoData, description: e.target.value })}
-                                placeholder="Add specific technical steps, links, or context..."
+                                placeholder={__('general.add_specific_technical_steps_links_or_context')}
                                 className="shadow-none text-xs min-h-[70px] resize-none"
                             />
                         </div>
@@ -778,7 +762,7 @@ export default function Show({ task: initialTask, todos: initialTodos, completio
 
                             {/* Cost */}
                             <div className="space-y-1.5 col-span-1">
-                                <Label htmlFor="todo_cost" className="text-xs font-semibold text-foreground">Milestone Price</Label>
+                                <Label htmlFor="todo_cost" className="text-xs font-semibold text-foreground">{__('general.milestone_price')}</Label>
                                 <Input 
                                     id="todo_cost"
                                     type="number"
@@ -812,7 +796,7 @@ export default function Show({ task: initialTask, todos: initialTodos, completio
                         <div className="grid grid-cols-2 gap-4">
                             {/* Start At */}
                             <div className="space-y-1.5">
-                                <Label htmlFor="todo_start_at" className="text-xs font-semibold text-foreground">Start Date</Label>
+                                <Label htmlFor="todo_start_at" className="text-xs font-semibold text-foreground">{__('general.start_date')}</Label>
                                 <Input 
                                     id="todo_start_at"
                                     type="date"
@@ -824,7 +808,7 @@ export default function Show({ task: initialTask, todos: initialTodos, completio
 
                             {/* End At */}
                             <div className="space-y-1.5">
-                                <Label htmlFor="todo_end_at" className="text-xs font-semibold text-foreground">Completion Date</Label>
+                                <Label htmlFor="todo_end_at" className="text-xs font-semibold text-foreground">{__('general.completion_date')}</Label>
                                 <Input 
                                     id="todo_end_at"
                                     type="date"
@@ -837,12 +821,12 @@ export default function Show({ task: initialTask, todos: initialTodos, completio
 
                         {/* Tags */}
                         <div className="space-y-1.5">
-                            <Label htmlFor="todo_tags" className="text-xs font-semibold text-foreground">Tags / Keywords</Label>
+                            <Label htmlFor="todo_tags" className="text-xs font-semibold text-foreground">{__('general.tags_keywords')}</Label>
                             <Input 
                                 id="todo_tags"
                                 value={todoData.tagsInput}
                                 onChange={(e) => setTodoData({ ...todoData, tagsInput: e.target.value })}
-                                placeholder="comma separated (e.g. backend, security, api)"
+                                placeholder={__('general.comma_separated_e_g_backend_security_api')}
                                 className="shadow-none h-9 text-xs"
                             />
                         </div>

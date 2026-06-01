@@ -180,11 +180,11 @@ export default function TextPaymentGateway({ devices, webhook, token, stats, rec
                         <Card className="border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
                             <CardHeader>
                                 <CardTitle className="flex items-center gap-2 text-lg">
-                                    <Activity className="w-5 h-5 text-sky-500" />{__('API Sessions')}</CardTitle>
-                                <CardDescription>{__('View active and completed checkout sessions created via your API keys.')}</CardDescription>
+                                    <Activity className="w-5 h-5 text-sky-500" />{__('general.api_sessions')}</CardTitle>
+                                <CardDescription>{__('general.view_active_and_completed_checkout_sessions_created_via_your_api_keys')}</CardDescription>
                             </CardHeader>
                             <CardContent>
-                                <Button variant="outline" className="w-full border-sky-200 hover:bg-sky-50" onClick={() => router.visit(route('sms-payment-gateway.checkout-sessions'))}>{__('View API Sessions')}</Button>
+                                <Button variant="outline" className="w-full border-sky-200 hover:bg-sky-50" onClick={() => router.visit(route('sms-payment-gateway.checkout-sessions'))}>{__('general.view_api_sessions')}</Button>
                             </CardContent>
                         </Card>
 
@@ -213,11 +213,11 @@ export default function TextPaymentGateway({ devices, webhook, token, stats, rec
                         <Card className="border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
                             <CardHeader>
                                 <CardTitle className="flex items-center gap-2 text-lg">
-                                    <Webhook className="w-5 h-5 text-purple-500" />{__('Webhooks')}</CardTitle>
-                                <CardDescription>{__('Configure webhook endpoints to receive real-time payment notifications on your server.')}</CardDescription>
+                                    <Webhook className="w-5 h-5 text-purple-500" />{__('general.webhooks')}</CardTitle>
+                                <CardDescription>{__('general.configure_webhook_endpoints_to_receive_real_time_payment_notifications_on_your_server')}</CardDescription>
                             </CardHeader>
                             <CardContent>
-                                <Button variant="outline" className="w-full border-purple-200 hover:bg-purple-50 text-purple-700" onClick={() => router.visit(route('sms-payment-gateway.webhooks'))}>{__('Configure Webhooks')}</Button>
+                                <Button variant="outline" className="w-full border-purple-200 hover:bg-purple-50 text-purple-700" onClick={() => router.visit(route('sms-payment-gateway.webhooks'))}>{__('general.configure_webhooks')}</Button>
                             </CardContent>
                         </Card>
                     </div>

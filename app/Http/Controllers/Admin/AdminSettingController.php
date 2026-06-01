@@ -90,7 +90,7 @@ class AdminSettingController extends Controller
 
         $this->configService->updateSettings($validated);
 
-        return redirect()->back()->with('success', 'Settings updated successfully.');
+        return redirect()->back()->with('success', __('general.settings_updated_successfully'));
     }
 
     public function updatePrices()

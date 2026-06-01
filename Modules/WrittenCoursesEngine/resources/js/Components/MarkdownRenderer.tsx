@@ -61,9 +61,7 @@ export default function MarkdownRenderer({ content }: MarkdownRendererProps) {
                             return (
                                 <div className="p-6 border border-blue-200 dark:border-blue-900 bg-blue-50 dark:bg-blue-950 rounded-lg my-6 shadow-sm">
                                     <h4 className="flex items-center gap-2 text-blue-800 dark:text-blue-300 font-bold mb-4">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-                                        Knowledge Check
-                                    </h4>
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>{__('general.knowledge_check')}</h4>
                                     <div className="text-gray-700 dark:text-gray-300">
                                         {children}
                                     </div>

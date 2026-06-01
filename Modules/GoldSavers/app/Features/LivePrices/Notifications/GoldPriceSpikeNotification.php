@@ -29,7 +29,7 @@ class GoldPriceSpikeNotification extends Notification
             ->line("An abnormal price was detected for market **{$this->marketKey}**.")
             ->line("Detected price: **{$this->detectedPrice} EGP/gram** (change: {$this->changePct}%)")
             ->line("Anomaly type: {$this->anomalyType}")
-            ->line('This price has been **blocked** and the live price was NOT updated.')
+            ->line(__('general.this_price_has_been_blocked_and_the_live_price_was_not_updated'))
             ->action('View Price Events', url('/isaas/gold-savers/live-prices/events'));
     }
 

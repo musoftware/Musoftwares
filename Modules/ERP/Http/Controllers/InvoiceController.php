@@ -421,7 +421,7 @@ class InvoiceController extends Controller
     {
         $tenant = $this->resolveTenant();
         if ($invoice->tenant_id !== $tenant->id) {
-            abort(403, 'Unauthorized access to invoice.');
+            abort(403, __('general.unauthorized_access_to_invoice'));
         }
 
         // M3 fix: use timestamp suffix to avoid unique(tenant_id, invoice_number) constraint
@@ -466,7 +466,7 @@ class InvoiceController extends Controller
     {
         $tenant = $this->resolveTenant();
         if ($invoice->tenant_id !== $tenant->id) {
-            abort(403, 'Unauthorized access to invoice.');
+            abort(403, __('general.unauthorized_access_to_invoice'));
         }
 
         if ($invoice->status === 'paid') {

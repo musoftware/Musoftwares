@@ -141,7 +141,7 @@ class SerialSoftwareController extends Controller
     {
         $this->serialSoftwareService->updateStatus($serialSoftware, $request->validated('status'));
 
-        return back()->with('success', __('Software default status updated.'));
+        return back()->with('success', __('general.software_default_status_updated'));
     }
 
     /**
@@ -151,13 +151,13 @@ class SerialSoftwareController extends Controller
     {
         $this->serialSoftwareService->createSoftware($request->validated());
 
-        return back()->with('success', __('Software added successfully.'));
+        return back()->with('success', __('general.software_added_successfully'));
     }
 
     public function destroy(SerialSoftware $serialSoftware): RedirectResponse
     {
         $this->serialSoftwareService->deleteSoftware($serialSoftware);
 
-        return back()->with('success', __('Software deleted successfully.'));
+        return back()->with('success', __('general.software_deleted_successfully'));
     }
 }

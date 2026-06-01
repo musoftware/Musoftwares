@@ -243,10 +243,10 @@
                             <h4 class="gallery-title">{{ __('Portfolio & Samples') }}</h4>
                             @if($portfolioItems->count() > 1)
                                 <div class="gallery-controls">
-                                    <button class="gallery-btn gallery-btn-prev" id="galleryPrev" aria-label="Previous image">
+                                    <button class="gallery-btn gallery-btn-prev" id="galleryPrev" aria-label="{{ __('general.previous_image') }}">
                                         <i class="ti ti-chevron-left"></i>
                                     </button>
-                                    <button class="gallery-btn gallery-btn-next" id="galleryNext" aria-label="Next image">
+                                    <button class="gallery-btn gallery-btn-next" id="galleryNext" aria-label="{{ __('general.next_image') }}">
                                         <i class="ti ti-chevron-right"></i>
                                     </button>
                                 </div>

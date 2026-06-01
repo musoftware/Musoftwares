@@ -33,7 +33,7 @@ export default function LegacyCoWorkerShow({ worker }) {
     };
 
     return (
-        <AdminSidebarLayout title="Legacy Co-Worker Details" header="Co-Worker Details">
+        <AdminSidebarLayout title={__('general.legacy_co_worker_details')} header="Co-Worker Details">
             <Head title={`Co-Worker - ${worker.person_name}`} />
 
             <div className="mb-6">
@@ -41,9 +41,7 @@ export default function LegacyCoWorkerShow({ worker }) {
                     href="/admin/users/co-work"
                     className="inline-flex items-center text-sm font-medium text-slate-500 hover:text-slate-900 transition-colors"
                 >
-                    <ArrowLeft className="w-4 h-4 mr-1" />
-                    Back to Co-Work
-                </Link>
+                    <ArrowLeft className="w-4 h-4 mr-1" />{__('general.back_to_co_work')}</Link>
             </div>
 
             <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden max-w-4xl">
@@ -67,9 +65,7 @@ export default function LegacyCoWorkerShow({ worker }) {
                     <div className="flex items-center gap-2 mt-4 sm:mt-0">
                         <Link href={`/admin/users/legacy-coworker/${worker.id}/edit`}>
                             <Button variant="outline" size="sm" className="hidden sm:flex items-center gap-2">
-                                <Edit className="w-4 h-4" />
-                                Edit Co-Worker
-                            </Button>
+                                <Edit className="w-4 h-4" />{__('general.edit_co_worker')}</Button>
                         </Link>
                         
                         <DropdownMenu>
@@ -83,19 +79,15 @@ export default function LegacyCoWorkerShow({ worker }) {
                                 <DropdownMenuSeparator />
                                 <DropdownMenuItem asChild>
                                     <Link href={`/admin/users/legacy-coworker/${worker.id}/edit`} className="cursor-pointer flex items-center">
-                                        <Edit className="w-4 h-4 mr-2 text-slate-500" /> Edit Co-Worker
-                                    </Link>
+                                        <Edit className="w-4 h-4 mr-2 text-slate-500" />{__('general.edit_co_worker')}</Link>
                                 </DropdownMenuItem>
                                 <DropdownMenuItem onClick={() => setIsCreateUserDialogOpen(true)} className="cursor-pointer">
-                                    <UserPlus className="w-4 h-4 mr-2 text-slate-500" /> Create User Account
-                                </DropdownMenuItem>
+                                    <UserPlus className="w-4 h-4 mr-2 text-slate-500" />{__('general.create_user_account')}</DropdownMenuItem>
                                 <DropdownMenuItem onClick={() => setIsResetPasswordDialogOpen(true)} className="cursor-pointer">
-                                    <KeyRound className="w-4 h-4 mr-2 text-slate-500" /> Reset Password
-                                </DropdownMenuItem>
+                                    <KeyRound className="w-4 h-4 mr-2 text-slate-500" />{__('general.reset_password')}</DropdownMenuItem>
                                 <DropdownMenuSeparator />
                                 <DropdownMenuItem onClick={() => setIsDeleteDialogOpen(true)} className="cursor-pointer text-red-600 focus:text-red-700 focus:bg-red-50">
-                                    <Trash2 className="w-4 h-4 mr-2" /> Delete Co-Worker
-                                </DropdownMenuItem>
+                                    <Trash2 className="w-4 h-4 mr-2" />{__('general.delete_co_worker')}</DropdownMenuItem>
                             </DropdownMenuContent>
                         </DropdownMenu>
                     </div>
@@ -106,7 +98,7 @@ export default function LegacyCoWorkerShow({ worker }) {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                         {/* Contact Info */}
                         <div className="space-y-6">
-                            <h2 className="text-sm font-semibold uppercase tracking-wider text-slate-400">Contact Information</h2>
+                            <h2 className="text-sm font-semibold uppercase tracking-wider text-slate-400">{__('general.contact_information')}</h2>
                             
                             <div className="space-y-4">
                                 {worker.email && (
@@ -115,7 +107,7 @@ export default function LegacyCoWorkerShow({ worker }) {
                                             <Mail className="w-5 h-5" />
                                         </div>
                                         <div>
-                                            <p className="text-xs font-medium text-slate-500 mb-0.5">Email Address</p>
+                                            <p className="text-xs font-medium text-slate-500 mb-0.5">{__('general.email_address')}</p>
                                             <p className="text-slate-900 font-medium break-all">{worker.email}</p>
                                         </div>
                                     </div>
@@ -127,7 +119,7 @@ export default function LegacyCoWorkerShow({ worker }) {
                                             <Phone className="w-5 h-5" />
                                         </div>
                                         <div>
-                                            <p className="text-xs font-medium text-slate-500 mb-0.5">Mobile Number</p>
+                                            <p className="text-xs font-medium text-slate-500 mb-0.5">{__('general.mobile_number')}</p>
                                             <p className="text-slate-900 font-medium flex items-center gap-2">
                                                 {worker.flag_path && (
                                                     <img src={worker.flag_path} alt="flag" className="w-5 h-3.5 object-cover rounded-sm shadow-sm" />
@@ -152,9 +144,7 @@ export default function LegacyCoWorkerShow({ worker }) {
                                                 target="_blank"
                                                 rel="noopener noreferrer"
                                                 className="text-green-600 font-medium hover:underline inline-flex items-center gap-1"
-                                            >
-                                                Message on WhatsApp
-                                                <ExternalLink className="w-3.5 h-3.5" />
+                                            >{__('general.message_on_whatsapp')}<ExternalLink className="w-3.5 h-3.5" />
                                             </a>
                                         </div>
                                     </div>
@@ -164,7 +154,7 @@ export default function LegacyCoWorkerShow({ worker }) {
 
                         {/* Social & Work Info */}
                         <div className="space-y-6">
-                            <h2 className="text-sm font-semibold uppercase tracking-wider text-slate-400">Social & Availability</h2>
+                            <h2 className="text-sm font-semibold uppercase tracking-wider text-slate-400">{__('general.social_availability')}</h2>
 
                             <div className="space-y-4">
                                 {(worker.facebook || worker.linked_in) && (
@@ -173,18 +163,16 @@ export default function LegacyCoWorkerShow({ worker }) {
                                             <ExternalLink className="w-5 h-5" />
                                         </div>
                                         <div className="space-y-2">
-                                            <p className="text-xs font-medium text-slate-500 mb-0.5">Social Profiles</p>
+                                            <p className="text-xs font-medium text-slate-500 mb-0.5">{__('general.social_profiles')}</p>
                                             {worker.facebook && (
                                                 <div>
-                                                    <a href={worker.facebook} target="_blank" rel="noopener noreferrer" className="text-blue-600 font-medium hover:underline inline-flex items-center gap-1">
-                                                        Facebook Profile <ExternalLink className="w-3.5 h-3.5" />
+                                                    <a href={worker.facebook} target="_blank" rel="noopener noreferrer" className="text-blue-600 font-medium hover:underline inline-flex items-center gap-1">{__('general.facebook_profile')}<ExternalLink className="w-3.5 h-3.5" />
                                                     </a>
                                                 </div>
                                             )}
                                             {worker.linked_in && (
                                                 <div>
-                                                    <a href={worker.linked_in} target="_blank" rel="noopener noreferrer" className="text-sky-700 font-medium hover:underline inline-flex items-center gap-1">
-                                                        LinkedIn Profile <ExternalLink className="w-3.5 h-3.5" />
+                                                    <a href={worker.linked_in} target="_blank" rel="noopener noreferrer" className="text-sky-700 font-medium hover:underline inline-flex items-center gap-1">{__('general.linkedin_profile')}<ExternalLink className="w-3.5 h-3.5" />
                                                     </a>
                                                 </div>
                                             )}
@@ -198,7 +186,7 @@ export default function LegacyCoWorkerShow({ worker }) {
                                             <Clock className="w-5 h-5" />
                                         </div>
                                         <div>
-                                            <p className="text-xs font-medium text-slate-500 mb-0.5">Available Hours</p>
+                                            <p className="text-xs font-medium text-slate-500 mb-0.5">{__('general.available_hours')}</p>
                                             <p className="text-slate-900 font-medium">
                                                 {worker.time_from || '?'} to {worker.time_to || '?'}
                                             </p>
@@ -212,7 +200,7 @@ export default function LegacyCoWorkerShow({ worker }) {
                     {/* Tech Tags */}
                     {worker.tech_tags?.length > 0 && (
                         <div className="mt-8 pt-8 border-t border-slate-100">
-                            <h2 className="text-sm font-semibold uppercase tracking-wider text-slate-400 mb-4">Technical Skills & Tags</h2>
+                            <h2 className="text-sm font-semibold uppercase tracking-wider text-slate-400 mb-4">{__('general.technical_skills_tags')}</h2>
                             <div className="flex flex-wrap gap-2">
                                 {worker.tech_tags.map(t => (
                                     <span key={t.id} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium bg-emerald-50 text-emerald-700 border border-emerald-100">
@@ -230,7 +218,7 @@ export default function LegacyCoWorkerShow({ worker }) {
                 isOpen={isDeleteDialogOpen}
                 onCancel={() => setIsDeleteDialogOpen(false)}
                 onConfirm={handleDelete}
-                title="Delete Legacy Co-Worker"
+                title={__('general.delete_legacy_co_worker')}
                 description={`Are you sure you want to delete ${worker.person_name}? This action cannot be undone.`}
                 confirmLabel="Delete"
                 variant="danger"
@@ -240,7 +228,7 @@ export default function LegacyCoWorkerShow({ worker }) {
                 isOpen={isCreateUserDialogOpen}
                 onCancel={() => setIsCreateUserDialogOpen(false)}
                 onConfirm={handleCreateUser}
-                title="Create User Account"
+                title={__('general.create_user_account')}
                 description={`Are you sure you want to create an Employee user account for ${worker.person_name}? Credentials will be generated and sent via WhatsApp if available.`}
                 confirmLabel="Create User"
             />
@@ -249,7 +237,7 @@ export default function LegacyCoWorkerShow({ worker }) {
                 isOpen={isResetPasswordDialogOpen}
                 onCancel={() => setIsResetPasswordDialogOpen(false)}
                 onConfirm={handleResetPassword}
-                title="Reset Password & Send Credentials"
+                title={__('general.reset_password_send_credentials')}
                 description={`Are you sure you want to reset the password for ${worker.person_name}'s account? New credentials will be generated and sent via WhatsApp if available.`}
                 confirmLabel="Reset Password"
             />

@@ -44,7 +44,7 @@ export default function VendorOrderShow({ order }: any) {
                         <div className="absolute top-5 left-16 right-16 h-0.5 bg-gray-100 z-0"></div>
                         <div className="absolute top-5 left-16 right-16 h-0.5 bg-blue-600 z-0 transition-all duration-500" style={{ width: order.status === 'new' ? '0%' : order.status === 'preparing' ? '33%' : order.status === 'shipping' ? '66%' : '100%' }}></div>
                         
-                        <div className="relative z-10"><TimelineStep title="New Order" active={true} /></div>
+                        <div className="relative z-10"><TimelineStep title={__('general.new_order')} active={true} /></div>
                         <div className="relative z-10"><TimelineStep title="Preparing" active={['preparing', 'shipping', 'delivered'].includes(order.status)} /></div>
                         <div className="relative z-10"><TimelineStep title="Shipping" active={['shipping', 'delivered'].includes(order.status)} /></div>
                         <div className="relative z-10"><TimelineStep title="Delivered" active={order.status === 'delivered'} isLast={true} /></div>
@@ -57,8 +57,7 @@ export default function VendorOrderShow({ order }: any) {
                 <Card className="shadow-sm border-gray-200 col-span-1">
                     <CardHeader className="bg-gray-50/50 border-b p-4">
                         <CardTitle className="text-lg flex items-center gap-2">
-                            <User className="w-5 h-5 text-gray-500" /> Customer Details
-                        </CardTitle>
+                            <User className="w-5 h-5 text-gray-500" />{__('general.customer_details')}</CardTitle>
                     </CardHeader>
                     <CardContent className="p-5 space-y-4">
                         <div>
@@ -67,8 +66,7 @@ export default function VendorOrderShow({ order }: any) {
                         </div>
                         <div>
                             <div className="text-sm text-gray-500 flex items-center gap-1 mt-4">
-                                <MapPin className="w-4 h-4" /> Shipping Address
-                            </div>
+                                <MapPin className="w-4 h-4" />{__('general.shipping_address')}</div>
                             <div className="font-medium text-gray-900 mt-1">{order.customer_governorate}</div>
                             <div className="text-sm text-gray-600 mt-1 bg-gray-50 p-2 rounded-lg border border-gray-100">
                                 {order.customer_address}
@@ -81,8 +79,7 @@ export default function VendorOrderShow({ order }: any) {
                 <Card className="shadow-sm border-gray-200 col-span-1 md:col-span-2">
                     <CardHeader className="bg-gray-50/50 border-b p-4">
                         <CardTitle className="text-lg flex items-center gap-2">
-                            <Package className="w-5 h-5 text-gray-500" /> Your Items in this Order
-                        </CardTitle>
+                            <Package className="w-5 h-5 text-gray-500" />{__('general.your_items_in_this_order')}</CardTitle>
                     </CardHeader>
                     <CardContent className="p-0">
                         <Table>
@@ -91,7 +88,7 @@ export default function VendorOrderShow({ order }: any) {
                                     <TableHead className="font-semibold text-gray-600">Product</TableHead>
                                     <TableHead className="font-semibold text-gray-600 text-center">Qty</TableHead>
                                     <TableHead className="font-semibold text-gray-600 text-right">Price</TableHead>
-                                    <TableHead className="font-semibold text-gray-600 text-right">Total Revenue</TableHead>
+                                    <TableHead className="font-semibold text-gray-600 text-right">{__('general.total_revenue')}</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>

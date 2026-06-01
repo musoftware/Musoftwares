@@ -129,7 +129,7 @@ export default function AdminToolEdit({ tool, categories }: Props) {
 
                 {/* Tool Edit Form */}
                 <form onSubmit={handleUpdate} className="space-y-5">
-                    <OperationalCard title="Basic Information">
+                    <OperationalCard title={__('general.basic_information')}>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div className="space-y-1.5 sm:col-span-2">
                                 <Label htmlFor="title" className="text-xs font-semibold">Title *</Label>
@@ -143,7 +143,7 @@ export default function AdminToolEdit({ tool, categories }: Props) {
                             </div>
 
                             <div className="space-y-1.5 sm:col-span-2">
-                                <Label htmlFor="short_description" className="text-xs font-semibold">Short Description</Label>
+                                <Label htmlFor="short_description" className="text-xs font-semibold">{__('general.short_description')}</Label>
                                 <Input
                                     id="short_description"
                                     value={data.short_description}
@@ -154,7 +154,7 @@ export default function AdminToolEdit({ tool, categories }: Props) {
                             </div>
 
                             <div className="space-y-1.5 sm:col-span-2">
-                                <Label htmlFor="description" className="text-xs font-semibold">Full Description</Label>
+                                <Label htmlFor="description" className="text-xs font-semibold">{__('general.full_description')}</Label>
                                 <textarea
                                     id="description"
                                     value={data.description}
@@ -166,7 +166,7 @@ export default function AdminToolEdit({ tool, categories }: Props) {
                         </div>
                     </OperationalCard>
 
-                    <OperationalCard title="Classification &amp; Availability">
+                    <OperationalCard title={__('general.classification_amp_availability')}>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div className="space-y-1.5">
                                 <Label className="text-xs font-semibold">Category *</Label>
@@ -182,7 +182,7 @@ export default function AdminToolEdit({ tool, categories }: Props) {
                             </div>
 
                             <div className="space-y-1.5">
-                                <Label className="text-xs font-semibold">Max Devices</Label>
+                                <Label className="text-xs font-semibold">{__('general.max_devices')}</Label>
                                 <Input
                                     type="number"
                                     min={1} max={100}
@@ -191,7 +191,7 @@ export default function AdminToolEdit({ tool, categories }: Props) {
                             </div>
 
                             <div className="space-y-2">
-                                <Label className="text-xs font-semibold">Supported OS</Label>
+                                <Label className="text-xs font-semibold">{__('general.supported_os')}</Label>
                                 <div className="flex gap-2 flex-wrap">
                                     {OS_OPTIONS.map(os => (
                                         <button
@@ -232,10 +232,8 @@ export default function AdminToolEdit({ tool, categories }: Props) {
                             </div>
 
                             <div className="space-y-1.5 sm:col-span-2">
-                                <Label className="text-xs font-semibold">Max Subscription Duration</Label>
-                                <p className="text-xs text-text-muted mb-1.5">
-                                    Restrict how long users can subscribe. Set to 1 month to prevent yearly subscriptions.
-                                </p>
+                                <Label className="text-xs font-semibold">{__('general.max_subscription_duration')}</Label>
+                                <p className="text-xs text-text-muted mb-1.5">{__('general.restrict_how_long_users_can_subscribe_set_to_1_month_to_prevent_yearly_subscriptions')}</p>
                                 <select
                                     value={data.max_subscription_months ?? ''}
                                     onChange={e => {
@@ -258,7 +256,7 @@ export default function AdminToolEdit({ tool, categories }: Props) {
                                     value={newFeature}
                                     onChange={e => setNewFeature(e.target.value)}
                                     onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), addItem('features', newFeature, () => setNewFeature('')))}
-                                    placeholder="e.g. Proxy rotation built-in"
+                                    placeholder={__('general.e_g_proxy_rotation_built_in')}
                                     className="h-9 text-sm flex-1"
                                 />
                                 <Button type="button" variant="outline" size="sm" className="h-9 gap-1"
@@ -273,19 +271,19 @@ export default function AdminToolEdit({ tool, categories }: Props) {
                                         <button type="button" onClick={() => removeItem('features', i)} className="hover:text-red-500 transition-colors"><X className="h-3 w-3" /></button>
                                     </span>
                                 ))}
-                                {data.features.length === 0 && <p className="text-xs text-text-muted italic">No features added.</p>}
+                                {data.features.length === 0 && <p className="text-xs text-text-muted italic">{__('general.no_features_added')}</p>}
                             </div>
                         </div>
                     </OperationalCard>
 
-                    <OperationalCard title="System Requirements">
+                    <OperationalCard title={__('general.system_requirements')}>
                         <div className="space-y-3">
                             <div className="flex gap-2">
                                 <Input
                                     value={newRequirement}
                                     onChange={e => setNewRequirement(e.target.value)}
                                     onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), addItem('requirements', newRequirement, () => setNewRequirement('')))}
-                                    placeholder="e.g. Windows 10 / macOS 12+"
+                                    placeholder={__('general.e_g_windows_10_macos_12')}
                                     className="h-9 text-sm flex-1"
                                 />
                                 <Button type="button" variant="outline" size="sm" className="h-9 gap-1"
@@ -300,7 +298,7 @@ export default function AdminToolEdit({ tool, categories }: Props) {
                                         <button type="button" onClick={() => removeItem('requirements', i)} className="hover:text-red-500 transition-colors"><X className="h-3 w-3" /></button>
                                     </span>
                                 ))}
-                                {data.requirements.length === 0 && <p className="text-xs text-text-muted italic">No requirements added.</p>}
+                                {data.requirements.length === 0 && <p className="text-xs text-text-muted italic">{__('general.no_requirements_added')}</p>}
                             </div>
                         </div>
                     </OperationalCard>
@@ -317,7 +315,7 @@ export default function AdminToolEdit({ tool, categories }: Props) {
 
                 {/* Version Upload */}
                 <form onSubmit={handleVersionUpload}>
-                    <OperationalCard title="Upload New Release Version">
+                    <OperationalCard title={__('general.upload_new_release_version')}>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div className="space-y-1.5">
                                 <Label htmlFor="version" className="text-xs font-semibold">Version Number *</Label>
@@ -363,7 +361,7 @@ export default function AdminToolEdit({ tool, categories }: Props) {
                                         onChange={e => versionForm.setData('is_beta', e.target.checked)}
                                         className="w-4 h-4 rounded border-slate-300"
                                     />
-                                    <span className="text-sm font-medium">Beta release</span>
+                                    <span className="text-sm font-medium">{__('general.beta_release')}</span>
                                 </label>
                                 <label className="flex items-center gap-2 cursor-pointer">
                                     <input
@@ -372,7 +370,7 @@ export default function AdminToolEdit({ tool, categories }: Props) {
                                         onChange={e => versionForm.setData('set_latest', e.target.checked)}
                                         className="w-4 h-4 rounded border-slate-300"
                                     />
-                                    <span className="text-sm font-medium">Set as latest</span>
+                                    <span className="text-sm font-medium">{__('general.set_as_latest')}</span>
                                 </label>
                             </div>
                         </div>

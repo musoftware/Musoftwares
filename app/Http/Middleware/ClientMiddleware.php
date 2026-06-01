@@ -16,7 +16,7 @@ class ClientMiddleware
     public function handle(Request $request, Closure $next): Response
     {
         if (!auth()->check() || auth()->user()->role !== 'client') {
-            abort(403, 'Unauthorized access.');
+            abort(403, __('general.unauthorized_access'));
         }
 
         return $next($request);

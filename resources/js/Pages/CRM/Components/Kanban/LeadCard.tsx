@@ -57,7 +57,7 @@ export default function LeadCard({ lead, index }: LeadCardProps) {
                         <button 
                             onClick={(e) => { e.stopPropagation(); /* handle call */ }}
                             className="p-1.5 bg-white border border-slate-200 rounded-md text-blue-600 hover:bg-blue-50 shadow-sm"
-                            title="Call Lead"
+                            title={__('general.call_lead')}
                         >
                             <Phone size={14} />
                         </button>

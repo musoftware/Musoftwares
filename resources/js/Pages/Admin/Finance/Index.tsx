@@ -322,8 +322,8 @@ export default function Index({ entries, categories, users, currentTab, stats, a
     };
 
     return (
-        <AdminSidebarLayout title="Financial Operations" header="Financial Ledger">
-            <Head title="Admin Financial Ledger" />
+        <AdminSidebarLayout title={__('general.financial_operations')} header="Financial Ledger">
+            <Head title={__('general.admin_financial_ledger')} />
             
             {/* Top Stats Cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
@@ -332,7 +332,7 @@ export default function Index({ entries, categories, users, currentTab, stats, a
                         <TrendingUp className="w-6 h-6" />
                     </div>
                     <div>
-                        <p className="text-sm text-gray-500 font-medium uppercase tracking-wider">Monthly Net Income</p>
+                        <p className="text-sm text-gray-500 font-medium uppercase tracking-wider">{__('general.monthly_net_income')}</p>
                         <h3 className="text-2xl font-bold text-slate-900">{formatCurrency(stats.total_monthly_income, stats.business_currency_code)}</h3>
                     </div>
                 </div>
@@ -341,7 +341,7 @@ export default function Index({ entries, categories, users, currentTab, stats, a
                         <TrendingDown className="w-6 h-6" />
                     </div>
                     <div>
-                        <p className="text-sm text-gray-500 font-medium uppercase tracking-wider">Monthly Expenses</p>
+                        <p className="text-sm text-gray-500 font-medium uppercase tracking-wider">{__('general.monthly_expenses')}</p>
                         <h3 className="text-2xl font-bold text-slate-900">{formatCurrency(stats.total_monthly_expenses, stats.business_currency_code)}</h3>
                     </div>
                 </div>
@@ -350,7 +350,7 @@ export default function Index({ entries, categories, users, currentTab, stats, a
                         <Users className="w-6 h-6" />
                     </div>
                     <div>
-                        <p className="text-sm text-gray-500 font-medium uppercase tracking-wider">Monthly Payroll</p>
+                        <p className="text-sm text-gray-500 font-medium uppercase tracking-wider">{__('general.monthly_payroll')}</p>
                         <h3 className="text-2xl font-bold text-slate-900">{formatCurrency(stats.total_monthly_salaries, stats.business_currency_code)}</h3>
                     </div>
                 </div>
@@ -361,27 +361,19 @@ export default function Index({ entries, categories, users, currentTab, stats, a
                 <button
                     onClick={() => handleTabChange('expenses')}
                     className={`py-3 px-6 font-medium text-sm border-b-2 transition-colors ${currentTab === 'expenses' ? 'border-black text-black font-semibold' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-200'}`}
-                >
-                    Costs & Expenses
-                </button>
+                >{__('general.costs_expenses')}</button>
                 <button
                     onClick={() => handleTabChange('income')}
                     className={`py-3 px-6 font-medium text-sm border-b-2 transition-colors ${currentTab === 'income' ? 'border-black text-black font-semibold' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-200'}`}
-                >
-                    Income Streams
-                </button>
+                >{__('general.income_streams')}</button>
                 <button
                     onClick={() => handleTabChange('salaries')}
                     className={`py-3 px-6 font-medium text-sm border-b-2 transition-colors ${currentTab === 'salaries' ? 'border-black text-black font-semibold' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-200'}`}
-                >
-                    Employee Payroll
-                </button>
+                >{__('general.employee_payroll')}</button>
                 <button
                     onClick={() => handleTabChange('calendar')}
                     className={`py-3 px-6 font-medium text-sm border-b-2 transition-colors ${currentTab === 'calendar' ? 'border-black text-black font-semibold' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-200'}`}
-                >
-                    Financial Calendar
-                </button>
+                >{__('general.financial_calendar')}</button>
             </div>
 
             {/* Visual Charts Dashboard Section */}
@@ -424,7 +416,7 @@ export default function Index({ entries, categories, users, currentTab, stats, a
                         {categoryAllocationData.length === 0 ? (
                             <div className="flex-1 flex flex-col items-center justify-center py-10">
                                 <DollarSign className="w-10 h-10 text-slate-355 mb-2 opacity-50" />
-                                <div className="text-xs text-slate-450 italic font-normal">No allocation statistics for this month</div>
+                                <div className="text-xs text-slate-450 italic font-normal">{__('general.no_allocation_statistics_for_this_month')}</div>
                             </div>
                         ) : (
                             <div>
@@ -489,9 +481,9 @@ export default function Index({ entries, categories, users, currentTab, stats, a
 
                         {/* Status Health Distribution */}
                         <div className="mt-4 pt-4 border-t border-slate-100">
-                            <h4 className="text-[11px] font-semibold text-slate-700 uppercase tracking-wider mb-2">Ledger Status Health</h4>
+                            <h4 className="text-[11px] font-semibold text-slate-700 uppercase tracking-wider mb-2">{__('general.ledger_status_health')}</h4>
                             {statusDistributionData.length === 0 ? (
-                                <div className="text-xs text-slate-400 italic font-normal">No ledger status data for this month</div>
+                                <div className="text-xs text-slate-400 italic font-normal">{__('general.no_ledger_status_data_for_this_month')}</div>
                             ) : (
                                 <div className="space-y-2">
                                     {/* Segmented Progress Bar */}
@@ -552,7 +544,7 @@ export default function Index({ entries, categories, users, currentTab, stats, a
                             <div className="relative flex-1 max-w-[240px]">
                                 <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-400" />
                                 <Input
-                                    placeholder="Search by reason..."
+                                    placeholder={__('general.search_by_reason')}
                                     className="pl-8 h-9 text-sm"
                                     value={searchTerm}
                                     onChange={e => setSearchTerm(e.target.value)}
@@ -565,7 +557,7 @@ export default function Index({ entries, categories, users, currentTab, stats, a
                                 value={selectedCategoryFilter}
                                 onChange={e => setSelectedCategoryFilter(e.target.value)}
                             >
-                                <option value="">All Categories</option>
+                                <option value="">{__('general.all_categories')}</option>
                                 {categoriesList.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                             </select>
 
@@ -574,7 +566,7 @@ export default function Index({ entries, categories, users, currentTab, stats, a
                                 value={selectedStatusFilter}
                                 onChange={e => setSelectedStatusFilter(e.target.value)}
                             >
-                                <option value="">All Statuses</option>
+                                <option value="">{__('general.all_statuses')}</option>
                                 <option value="completed">Completed</option>
                                 <option value="pending">Pending</option>
                                 <option value="overdue">Overdue</option>
@@ -585,7 +577,7 @@ export default function Index({ entries, categories, users, currentTab, stats, a
                                 value={selectedUserFilter}
                                 onChange={e => setSelectedUserFilter(e.target.value)}
                             >
-                                <option value="">All Users</option>
+                                <option value="">{__('general.all_users')}</option>
                                 {users.map((u: any) => <option key={u.id} value={u.id}>{u.name}</option>)}
                             </select>
 
@@ -600,8 +592,7 @@ export default function Index({ entries, categories, users, currentTab, stats, a
                     ) : (
                         <div className="flex items-center gap-2 flex-1">
                             <span className="text-xs font-semibold text-gray-500 flex items-center gap-1.5 bg-slate-50 border border-slate-200 rounded px-2.5 py-1">
-                                <CalendarDays className="w-4 h-4 text-black mr-1" /> Click any day on the calendar to log a transaction.
-                            </span>
+                                <CalendarDays className="w-4 h-4 text-black mr-1" />{__('general.click_any_day_on_the_calendar_to_log_a_transaction')}</span>
                         </div>
                     )}
 
@@ -614,7 +605,7 @@ export default function Index({ entries, categories, users, currentTab, stats, a
                         <DialogContent className="sm:max-w-[425px]">
                             <form onSubmit={handleCreate}>
                                 <DialogHeader>
-                                    <DialogTitle>Add New Ledger Record</DialogTitle>
+                                    <DialogTitle>{__('general.add_new_ledger_record')}</DialogTitle>
                                     <DialogDescription>
                                         Create a new {currentTab === 'income' ? 'income stream' : 'expense entry'} in the ledger.
                                     </DialogDescription>
@@ -622,22 +613,22 @@ export default function Index({ entries, categories, users, currentTab, stats, a
                                 <div className="space-y-4 py-4">
                                     {currentTab === 'calendar' && (
                                         <div className="space-y-2">
-                                            <Label htmlFor="create-type">Transaction Type</Label>
+                                            <Label htmlFor="create-type">{__('general.transaction_type')}</Label>
                                             <select 
                                                 id="create-type" 
                                                 className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm bg-white h-10" 
                                                 value={newEntry.type} 
                                                 onChange={e => setNewEntry({...newEntry, type: e.target.value})}
                                             >
-                                                <option value="expense">Costs & Expenses</option>
-                                                <option value="income">Income Streams</option>
-                                                <option value="salary">Employee Payroll</option>
+                                                <option value="expense">{__('general.costs_expenses')}</option>
+                                                <option value="income">{__('general.income_streams')}</option>
+                                                <option value="salary">{__('general.employee_payroll')}</option>
                                             </select>
                                         </div>
                                     )}
                                     <div className="space-y-2">
-                                        <Label htmlFor="create-title">Description / Title</Label>
-                                        <Input id="create-title" required value={newEntry.title} onChange={e => setNewEntry({...newEntry, title: e.target.value})} placeholder="e.g. Server Hosting" />
+                                        <Label htmlFor="create-title">{__('general.description_title')}</Label>
+                                        <Input id="create-title" required value={newEntry.title} onChange={e => setNewEntry({...newEntry, title: e.target.value})} placeholder={__('general.e_g_server_hosting')} />
                                         {errors.title && <span className="text-red-600 text-xs block">{errors.title}</span>}
                                     </div>
                                     <div className="grid grid-cols-2 gap-4">
@@ -656,7 +647,7 @@ export default function Index({ entries, categories, users, currentTab, stats, a
 
                                     {(currentTab !== 'salaries' && newEntry.type !== 'salary') && (
                                         <div className="space-y-2">
-                                            <Label>Category / Reason</Label>
+                                            <Label>{__('general.category_reason')}</Label>
                                             <div className="grid grid-cols-2 gap-2">
                                                 <select className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm bg-white h-10" value={createCategoryOption} onChange={e => {
                                                     setCreateCategoryOption(e.target.value);
@@ -670,7 +661,7 @@ export default function Index({ entries, categories, users, currentTab, stats, a
                                                     <option value="custom">-- Custom Category --</option>
                                                 </select>
                                                 {createCategoryOption === 'custom' && (
-                                                    <Input required placeholder="Enter category..." value={newEntry.category_id} onChange={e => setNewEntry({...newEntry, category_id: e.target.value})} />
+                                                    <Input required placeholder={__('general.enter_category')} value={newEntry.category_id} onChange={e => setNewEntry({...newEntry, category_id: e.target.value})} />
                                                 )}
                                             </div>
                                             {errors.category_id && <span className="text-red-600 text-xs block">{errors.category_id}</span>}
@@ -686,7 +677,7 @@ export default function Index({ entries, categories, users, currentTab, stats, a
                                                     : 'User/Vendor (Optional)')}
                                         </Label>
                                         <select id="create-user" className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm bg-white h-10" value={newEntry.user_id} onChange={e => setNewEntry({...newEntry, user_id: e.target.value})} required={currentTab === 'salaries' || newEntry.type === 'salary'}>
-                                            <option value="">Select User...</option>
+                                            <option value="">{__('general.select_user')}</option>
                                             {users.map((u: any) => <option key={u.id} value={u.id}>{u.name} ({u.email})</option>)}
                                         </select>
                                         {errors.user_id && <span className="text-red-600 text-xs block">{errors.user_id}</span>}
@@ -696,19 +687,19 @@ export default function Index({ entries, categories, users, currentTab, stats, a
                                         <div className="space-y-2">
                                             <Label htmlFor="create-status">Status</Label>
                                             <select id="create-status" className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm bg-white h-10" value={newEntry.status} onChange={e => setNewEntry({...newEntry, status: e.target.value})}>
-                                                <option value="completed">Completed / Paid</option>
+                                                <option value="completed">{__('general.completed_paid')}</option>
                                                 <option value="pending">Pending</option>
                                                 <option value="overdue">Overdue</option>
                                             </select>
                                         </div>
                                         <div className="space-y-2">
-                                            <Label htmlFor="create-due">Due Date</Label>
+                                            <Label htmlFor="create-due">{__('general.due_date')}</Label>
                                             <Input id="create-due" type="date" value={newEntry.due_date} onChange={e => setNewEntry({...newEntry, due_date: e.target.value})} />
                                         </div>
                                     </div>
 
                                     <div className="space-y-2">
-                                        <Label htmlFor="create-tx-date">Transaction Date</Label>
+                                        <Label htmlFor="create-tx-date">{__('general.transaction_date')}</Label>
                                         <Input id="create-tx-date" type="date" required value={newEntry.transaction_date} onChange={e => setNewEntry({...newEntry, transaction_date: e.target.value})} />
                                         {errors.transaction_date && <span className="text-red-600 text-xs block">{errors.transaction_date}</span>}
                                     </div>
@@ -723,7 +714,7 @@ export default function Index({ entries, categories, users, currentTab, stats, a
                                                     checked={newEntry.is_recurring}
                                                     onChange={e => setNewEntry({...newEntry, is_recurring: e.target.checked})}
                                                 />
-                                                <Label htmlFor="create-recurring" className="cursor-pointer font-medium">Recurring Expense</Label>
+                                                <Label htmlFor="create-recurring" className="cursor-pointer font-medium">{__('general.recurring_expense')}</Label>
                                             </div>
                                             {newEntry.is_recurring && (
                                                 <div className="space-y-2">
@@ -740,7 +731,7 @@ export default function Index({ entries, categories, users, currentTab, stats, a
                                     )}
                                 </div>
                                 <DialogFooter>
-                                    <Button type="submit" className="bg-black hover:bg-slate-800 text-white w-full">Save Record</Button>
+                                    <Button type="submit" className="bg-black hover:bg-slate-800 text-white w-full">{__('general.save_record')}</Button>
                                 </DialogFooter>
                             </form>
                         </DialogContent>
@@ -819,7 +810,7 @@ export default function Index({ entries, categories, users, currentTab, stats, a
                                         {getStatusBadge(entry.status)}
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                        <Button variant="ghost" size="sm" title="View Details" className="text-slate-500 hover:text-black hover:bg-slate-50 mr-1" onClick={() => openDetails(entry)}>
+                                        <Button variant="ghost" size="sm" title={__('general.view_details')} className="text-slate-500 hover:text-black hover:bg-slate-50 mr-1" onClick={() => openDetails(entry)}>
                                             <Eye className="w-4 h-4" />
                                         </Button>
                                         {entry.status === 'pending' && (
@@ -840,8 +831,8 @@ export default function Index({ entries, categories, users, currentTab, stats, a
                                 <tr>
                                     <td colSpan={7} className="px-6 py-12 text-center text-gray-500">
                                         <DollarSign className="w-12 h-12 mx-auto text-gray-300 mb-3" />
-                                        <h3 className="text-lg font-medium text-gray-900">No records found</h3>
-                                        <p className="mt-1">Create a new entry to start tracking your finances.</p>
+                                        <h3 className="text-lg font-medium text-gray-900">{__('general.no_records_found')}</h3>
+                                        <p className="mt-1">{__('general.create_a_new_entry_to_start_tracking_your_finances')}</p>
                                     </td>
                                 </tr>
                             )}
@@ -941,7 +932,7 @@ export default function Index({ entries, categories, users, currentTab, stats, a
                                                             ? 'bg-black text-white shadow font-bold'
                                                             : 'text-gray-700'
                                                     }`}
-                                                    title="Click to add record on this day"
+                                                    title={__('general.click_to_add_record_on_this_day')}
                                                 >
                                                     {format(day, 'd')}
                                                 </button>
@@ -995,29 +986,27 @@ export default function Index({ entries, categories, users, currentTab, stats, a
                 <DialogContent className="sm:max-w-[425px]">
                     <form onSubmit={handleUpdate}>
                         <DialogHeader>
-                            <DialogTitle>Edit Ledger Record</DialogTitle>
-                            <DialogDescription>
-                                Modify the selected transaction record in the ledger.
-                            </DialogDescription>
+                            <DialogTitle>{__('general.edit_ledger_record')}</DialogTitle>
+                            <DialogDescription>{__('general.modify_the_selected_transaction_record_in_the_ledger')}</DialogDescription>
                         </DialogHeader>
                         <div className="space-y-4 py-4">
                             {currentTab === 'calendar' && (
                                 <div className="space-y-2">
-                                    <Label htmlFor="edit-type">Transaction Type</Label>
+                                    <Label htmlFor="edit-type">{__('general.transaction_type')}</Label>
                                     <select 
                                         id="edit-type" 
                                         className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm bg-white h-10" 
                                         value={editingEntry.type} 
                                         onChange={e => setEditingEntry({...editingEntry, type: e.target.value})}
                                     >
-                                        <option value="expense">Costs & Expenses</option>
-                                        <option value="income">Income Streams</option>
-                                        <option value="salary">Employee Payroll</option>
+                                        <option value="expense">{__('general.costs_expenses')}</option>
+                                        <option value="income">{__('general.income_streams')}</option>
+                                        <option value="salary">{__('general.employee_payroll')}</option>
                                     </select>
                                 </div>
                             )}
                             <div className="space-y-2">
-                                <Label htmlFor="edit-title">Description / Title</Label>
+                                <Label htmlFor="edit-title">{__('general.description_title')}</Label>
                                 <Input id="edit-title" required value={editingEntry.title} onChange={e => setEditingEntry({...editingEntry, title: e.target.value})} />
                                 {errors.title && <span className="text-red-600 text-xs block">{errors.title}</span>}
                             </div>
@@ -1037,7 +1026,7 @@ export default function Index({ entries, categories, users, currentTab, stats, a
 
                             {(currentTab !== 'salaries' && editingEntry.type !== 'salary') && (
                                 <div className="space-y-2">
-                                    <Label>Category / Reason</Label>
+                                    <Label>{__('general.category_reason')}</Label>
                                     <div className="grid grid-cols-2 gap-2">
                                         <select className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm bg-white h-10" value={editCategoryOption} onChange={e => {
                                             setEditCategoryOption(e.target.value);
@@ -1051,7 +1040,7 @@ export default function Index({ entries, categories, users, currentTab, stats, a
                                             <option value="custom">-- Custom Category --</option>
                                         </select>
                                         {editCategoryOption === 'custom' && (
-                                            <Input required placeholder="Enter category..." value={editingEntry.category_id} onChange={e => setEditingEntry({...editingEntry, category_id: e.target.value})} />
+                                            <Input required placeholder={__('general.enter_category')} value={editingEntry.category_id} onChange={e => setEditingEntry({...editingEntry, category_id: e.target.value})} />
                                         )}
                                     </div>
                                     {errors.category_id && <span className="text-red-600 text-xs block">{errors.category_id}</span>}
@@ -1067,7 +1056,7 @@ export default function Index({ entries, categories, users, currentTab, stats, a
                                             : 'User/Vendor (Optional)')}
                                 </Label>
                                 <select id="edit-user" className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm bg-white h-10" value={editingEntry.user_id} onChange={e => setEditingEntry({...editingEntry, user_id: e.target.value})} required={currentTab === 'salaries' || editingEntry.type === 'salary'}>
-                                    <option value="">Select User...</option>
+                                    <option value="">{__('general.select_user')}</option>
                                     {users.map((u: any) => <option key={u.id} value={u.id}>{u.name} ({u.email})</option>)}
                                 </select>
                                 {errors.user_id && <span className="text-red-600 text-xs block">{errors.user_id}</span>}
@@ -1077,25 +1066,25 @@ export default function Index({ entries, categories, users, currentTab, stats, a
                                 <div className="space-y-2">
                                     <Label htmlFor="edit-status">Status</Label>
                                     <select id="edit-status" className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm bg-white h-10" value={editingEntry.status} onChange={e => setEditingEntry({...editingEntry, status: e.target.value})}>
-                                        <option value="completed">Completed / Paid</option>
+                                        <option value="completed">{__('general.completed_paid')}</option>
                                         <option value="pending">Pending</option>
                                         <option value="overdue">Overdue</option>
                                     </select>
                                 </div>
                                 <div className="space-y-2">
-                                    <Label htmlFor="edit-due">Due Date</Label>
+                                    <Label htmlFor="edit-due">{__('general.due_date')}</Label>
                                     <Input id="edit-due" type="date" value={editingEntry.due_date} onChange={e => setEditingEntry({...editingEntry, due_date: e.target.value})} />
                                 </div>
                             </div>
 
                             <div className="space-y-2">
-                                <Label htmlFor="edit-tx-date">Transaction Date</Label>
+                                <Label htmlFor="edit-tx-date">{__('general.transaction_date')}</Label>
                                 <Input id="edit-tx-date" type="date" required value={editingEntry.transaction_date} onChange={e => setEditingEntry({...editingEntry, transaction_date: e.target.value})} />
                                 {errors.transaction_date && <span className="text-red-600 text-xs block">{errors.transaction_date}</span>}
                             </div>
                         </div>
                         <DialogFooter>
-                            <Button type="submit" className="bg-black hover:bg-slate-800 text-white w-full">Update Record</Button>
+                            <Button type="submit" className="bg-black hover:bg-slate-800 text-white w-full">{__('general.update_record')}</Button>
                         </DialogFooter>
                     </form>
                 </DialogContent>
@@ -1108,9 +1097,7 @@ export default function Index({ entries, categories, users, currentTab, stats, a
                         <div className="space-y-6 pt-4">
                             <SheetHeader className="text-left border-b pb-4">
                                 <div className="flex items-center justify-between mb-2">
-                                    <span className="text-xs font-semibold text-gray-400 uppercase tracking-widest">
-                                        Transaction Details
-                                    </span>
+                                    <span className="text-xs font-semibold text-gray-400 uppercase tracking-widest">{__('general.transaction_details')}</span>
                                     {getStatusBadge(selectedDetailEntry.status)}
                                 </div>
                                 <SheetTitle className="text-xl font-bold text-slate-900">
@@ -1146,8 +1133,7 @@ export default function Index({ entries, categories, users, currentTab, stats, a
                                     <div className="text-sm font-semibold text-slate-800 flex items-center gap-1.5">
                                         {selectedDetailEntry.type === 'received' ? (
                                             <span className="text-green-700 bg-green-50 px-2 py-0.5 rounded border border-green-200 inline-flex items-center text-xs font-bold">
-                                                <TrendingUp className="w-3 h-3 mr-1" /> Deposit / Income
-                                            </span>
+                                                <TrendingUp className="w-3 h-3 mr-1" />{__('general.deposit_income')}</span>
                                         ) : selectedDetailEntry.type === 'refunded' ? (
                                             <span className="text-red-700 bg-red-50 px-2 py-0.5 rounded border border-red-200 inline-flex items-center text-xs font-bold">
                                                 Refund
@@ -1170,14 +1156,14 @@ export default function Index({ entries, categories, users, currentTab, stats, a
                                     </div>
                                 </div>
                                 <div className="space-y-1">
-                                    <div className="text-xs text-gray-400 font-medium">Transaction Date</div>
+                                    <div className="text-xs text-gray-400 font-medium">{__('general.transaction_date')}</div>
                                     <div className="text-sm font-semibold text-slate-800 flex items-center gap-1.5">
                                         <Calendar className="w-3.5 h-3.5 text-gray-400" />
                                         {new Date(selectedDetailEntry.created_at).toLocaleDateString()}
                                     </div>
                                 </div>
                                 <div className="space-y-1">
-                                    <div className="text-xs text-gray-400 font-medium">Due Date</div>
+                                    <div className="text-xs text-gray-400 font-medium">{__('general.due_date')}</div>
                                     <div className="text-sm font-semibold text-slate-800 flex items-center gap-1.5">
                                         <Calendar className="w-3.5 h-3.5 text-gray-400" />
                                         {selectedDetailEntry.next_due_date ? new Date(selectedDetailEntry.next_due_date).toLocaleDateString() : 'N/A'}
@@ -1188,7 +1174,7 @@ export default function Index({ entries, categories, users, currentTab, stats, a
                                         <div className="text-xs text-gray-400 font-medium">Recurrence</div>
                                         <div className="text-sm font-semibold text-slate-800 flex items-center gap-1.5">
                                             <RefreshCw className="w-3.5 h-3.5 text-slate-500" />
-                                            <span>This is a recurring transaction.</span>
+                                            <span>{__('general.this_is_a_recurring_transaction')}</span>
                                         </div>
                                     </div>
                                 )}
@@ -1200,9 +1186,7 @@ export default function Index({ entries, categories, users, currentTab, stats, a
                                     <div className="flex items-center justify-between border-b pb-2">
                                         <div className="flex items-center gap-1.5">
                                             <Users className="w-4 h-4 text-slate-500" />
-                                            <span className="text-xs font-bold text-slate-700 uppercase tracking-wider">
-                                                Associated User / Client
-                                            </span>
+                                            <span className="text-xs font-bold text-slate-700 uppercase tracking-wider">{__('general.associated_user_client')}</span>
                                         </div>
                                         <Link
                                             href={route('admin.users.show', selectedDetailEntry.user.id)}
@@ -1237,8 +1221,7 @@ export default function Index({ entries, categories, users, currentTab, stats, a
                                             href={route('admin.users.reports', selectedDetailEntry.user.id)}
                                             className="col-span-2 inline-flex items-center justify-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 hover:text-black transition-colors"
                                         >
-                                            <DollarSign className="w-3.5 h-3.5" /> Financial Statement / Report
-                                        </Link>
+                                            <DollarSign className="w-3.5 h-3.5" />{__('general.financial_statement_report')}</Link>
                                     </div>
                                 </div>
                             )}
@@ -1249,9 +1232,7 @@ export default function Index({ entries, categories, users, currentTab, stats, a
                                     <div className="flex items-center justify-between border-b pb-2">
                                         <div className="flex items-center gap-1.5">
                                             <Layers className="w-4 h-4 text-slate-500" />
-                                            <span className="text-xs font-bold text-slate-700 uppercase tracking-wider">
-                                                Linked Project
-                                            </span>
+                                            <span className="text-xs font-bold text-slate-700 uppercase tracking-wider">{__('general.linked_project')}</span>
                                         </div>
                                     </div>
                                     <div>
@@ -1262,9 +1243,7 @@ export default function Index({ entries, categories, users, currentTab, stats, a
                                     <Link
                                         href={route('admin.projects.index')}
                                         className="inline-flex w-full items-center justify-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 hover:text-black transition-colors"
-                                    >
-                                        Go to Projects Manager
-                                    </Link>
+                                    >{__('general.go_to_projects_manager')}</Link>
                                 </div>
                             )}
 
@@ -1277,8 +1256,7 @@ export default function Index({ entries, categories, users, currentTab, stats, a
                                             handleMarkPaid(selectedDetailEntry.id, true);
                                         }}
                                     >
-                                        <CheckCircle2 className="w-4 h-4 mr-2" /> Mark as Paid / Completed
-                                    </Button>
+                                        <CheckCircle2 className="w-4 h-4 mr-2" />{__('general.mark_as_paid_completed')}</Button>
                                 )}
                                 <div className="flex gap-2">
                                     <Button
@@ -1288,8 +1266,7 @@ export default function Index({ entries, categories, users, currentTab, stats, a
                                             openEdit(selectedDetailEntry);
                                         }}
                                     >
-                                        <Edit className="w-4 h-4 mr-2" /> Edit Record
-                                    </Button>
+                                        <Edit className="w-4 h-4 mr-2" />{__('general.edit_record')}</Button>
                                     <Button
                                         variant="outline"
                                         className="flex-1 font-semibold border-red-200 text-red-600 hover:bg-red-50 hover:text-red-900"

@@ -31,7 +31,7 @@ export default function Referrals({ client, referrals }) {
     };
 
     return (
-        <AdminSidebarLayout title="User Referrals" header="User Referrals">
+        <AdminSidebarLayout title={__('general.user_referrals')} header="User Referrals">
             <Head title={`Referrals - ${client.name}`} />
 
             <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
@@ -42,7 +42,7 @@ export default function Referrals({ client, referrals }) {
                             <ArrowLeft className="h-6 w-6" />
                         </Link>
                         <div>
-                            <h2 className="text-2xl font-bold text-gray-900">Manage Referrals</h2>
+                            <h2 className="text-2xl font-bold text-gray-900">{__('general.manage_referrals')}</h2>
                             <p className="text-sm text-gray-500">View and manage users referred by {client.name}</p>
                         </div>
                     </div>
@@ -50,7 +50,7 @@ export default function Referrals({ client, referrals }) {
 
                 <Card>
                     <CardHeader>
-                        <CardTitle>Referred Users</CardTitle>
+                        <CardTitle>{__('general.referred_users')}</CardTitle>
                     </CardHeader>
                     <CardContent className="p-0">
                         {referrals.data.length > 0 ? (
@@ -60,9 +60,9 @@ export default function Referrals({ client, referrals }) {
                                         <TableRow className="bg-gray-50">
                                             <TableHead className="w-16">ID</TableHead>
                                             <TableHead>User</TableHead>
-                                            <TableHead>Joined Date</TableHead>
+                                            <TableHead>{__('general.joined_date')}</TableHead>
                                             <TableHead>Email</TableHead>
-                                            <TableHead>Commission Earned</TableHead>
+                                            <TableHead>{__('general.commission_earned')}</TableHead>
                                             <TableHead className="text-right">Actions</TableHead>
                                         </TableRow>
                                     </TableHeader>
@@ -113,18 +113,12 @@ export default function Referrals({ client, referrals }) {
                                                         <DropdownMenuContent align="end">
                                                             <DropdownMenuItem asChild>
                                                                 <Link href={`/admin/users/${referral.id}`}>
-                                                                    <User className="mr-2 h-4 w-4" />
-                                                                    View Profile
-                                                                </Link>
+                                                                    <User className="mr-2 h-4 w-4" />{__('general.view_profile_1')}</Link>
                                                             </DropdownMenuItem>
                                                             <DropdownMenuItem onClick={() => handleUnlink(referral.id)} className="text-orange-600 focus:text-orange-600">
-                                                                <Unlink className="mr-2 h-4 w-4" />
-                                                                Remove Referral
-                                                            </DropdownMenuItem>
+                                                                <Unlink className="mr-2 h-4 w-4" />{__('general.remove_referral')}</DropdownMenuItem>
                                                             <DropdownMenuItem onClick={() => handleDelete(referral.id)} className="text-red-600 focus:text-red-600">
-                                                                <Trash2 className="mr-2 h-4 w-4" />
-                                                                Delete User Account
-                                                            </DropdownMenuItem>
+                                                                <Trash2 className="mr-2 h-4 w-4" />{__('general.delete_user_account')}</DropdownMenuItem>
                                                         </DropdownMenuContent>
                                                     </DropdownMenu>
                                                 </TableCell>
@@ -141,8 +135,8 @@ export default function Referrals({ client, referrals }) {
                         ) : (
                             <div className="p-12 text-center">
                                 <User className="mx-auto h-12 w-12 text-gray-300 mb-4" />
-                                <h3 className="text-lg font-medium text-gray-900">No referrals found</h3>
-                                <p className="mt-1 text-sm text-gray-500">This user hasn't referred anyone yet.</p>
+                                <h3 className="text-lg font-medium text-gray-900">{__('general.no_referrals_found')}</h3>
+                                <p className="mt-1 text-sm text-gray-500">{__('general.this_user_hasn_t_referred_anyone_yet')}</p>
                             </div>
                         )}
                     </CardContent>

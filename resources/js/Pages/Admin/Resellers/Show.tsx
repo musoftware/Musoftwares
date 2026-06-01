@@ -105,7 +105,7 @@ export default function ResellersShow({ reseller, subUsers, transactions, sharin
                 {/* Balance Banner */}
                 <div className={`rounded-xl px-6 py-4 flex items-center justify-between border ${reseller.balance <= 0 ? 'bg-red-50 border-red-200' : 'bg-emerald-50 border-emerald-200'}`}>
                     <div>
-                        <p className="text-xs font-semibold uppercase tracking-wider text-text-muted mb-1">Pre-paid Balance</p>
+                        <p className="text-xs font-semibold uppercase tracking-wider text-text-muted mb-1">{__('general.pre_paid_balance')}</p>
                         <p className={`text-3xl font-bold font-mono ${reseller.balance <= 0 ? 'text-red-600' : 'text-emerald-700'}`}>
                             {formatCurrency(reseller.balance, reseller.currency)}
                         </p>
@@ -114,7 +114,7 @@ export default function ResellersShow({ reseller, subUsers, transactions, sharin
                         )}
                     </div>
                     <div className="text-right">
-                        <p className="text-xs text-text-muted">Active sub-users</p>
+                        <p className="text-xs text-text-muted">{__('general.active_sub_users_1')}</p>
                         <p className="text-2xl font-bold text-text-primary">{reseller.active_users}</p>
                         <p className="text-xs text-text-muted mt-0.5">of {reseller.total_users} total</p>
                     </div>
@@ -142,11 +142,10 @@ export default function ResellersShow({ reseller, subUsers, transactions, sharin
                 {tab === 'overview' && (
                     <div className="space-y-4">
                         {/* iFrame URL */}
-                        <OperationalCard title="Portal URL (iFrame Embed)">
+                        <OperationalCard title={__('general.portal_url_iframe_embed')}>
                             <p className="text-xs text-text-muted mb-3">
                                 Share this URL with the reseller. Their sub-users access the full tools platform through this link.
-                                It can also be embedded as an <code className="bg-surface-raised px-1 py-0.5 rounded text-[11px]">&lt;iframe&gt;</code> on their website.
-                            </p>
+                                It can also be embedded as an <code className="bg-surface-raised px-1 py-0.5 rounded text-[11px]">&lt;iframe&gt;</code>{__('general.on_their_website')}</p>
                             <div className="flex items-center gap-2">
                                 <div className="flex-1 bg-surface-raised border border-border rounded-lg px-3 py-2 font-mono text-xs text-text-primary break-all">
                                     {iframeUrl}
@@ -178,17 +177,16 @@ export default function ResellersShow({ reseller, subUsers, transactions, sharin
                         )}
 
                         {/* Anti-sharing info */}
-                        <OperationalCard title="Anti-Sharing Protection">
+                        <OperationalCard title={__('general.anti_sharing_protection')}>
                             <div className="flex items-start gap-3">
                                 <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center shrink-0">
                                     <Shield className="w-5 h-5 text-blue-500" />
                                 </div>
                                 <div className="text-sm text-text-muted space-y-1">
-                                    <p>The platform automatically detects account sharing by monitoring <strong className="text-text-primary">concurrent active sessions</strong>.</p>
-                                    <p>If the same sub-user account is detected actively using the platform from <strong className="text-text-primary">2+ different IP addresses simultaneously</strong> (within a 5-minute window), the account is immediately flagged and blocked.</p>
+                                    <p>{__('general.the_platform_automatically_detects_account_sharing_by_monitoring')}<strong className="text-text-primary">{__('general.concurrent_active_sessions')}</strong>.</p>
+                                    <p>{__('general.if_the_same_sub_user_account_is_detected_actively_using_the_platform_from')}<strong className="text-text-primary">2+ different IP addresses simultaneously</strong> (within a 5-minute window), the account is immediately flagged and blocked.</p>
                                     <p className="text-xs bg-surface-raised rounded-lg p-2 border border-border mt-2">
-                                        🔄 <strong>Dynamic IPs are safe</strong> — the system only flags <em>simultaneous</em> usage, not IP changes between sessions.
-                                    </p>
+                                        🔄 <strong>{__('general.dynamic_ips_are_safe')}</strong> — the system only flags <em>simultaneous</em>{__('general.usage_not_ip_changes_between_sessions')}</p>
                                 </div>
                             </div>
                         </OperationalCard>
@@ -199,7 +197,7 @@ export default function ResellersShow({ reseller, subUsers, transactions, sharin
                 {tab === 'users' && (
                     <OperationalCard noPadding>
                         {!subUsers?.data?.length ? (
-                            <EmptyState icon={Users} title="No sub-users yet" description="Sub-users appear here once they register through the reseller portal." />
+                            <EmptyState icon={Users} title={__('general.no_sub_users_yet')} description={__('general.sub_users_appear_here_once_they_register_through_the_reseller_portal')} />
                         ) : (
                             <div className="overflow-x-auto">
                                 <table className="w-full text-sm">
@@ -207,7 +205,7 @@ export default function ResellersShow({ reseller, subUsers, transactions, sharin
                                         <tr className="border-b border-border/60">
                                             <th className="text-left px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">User</th>
                                             <th className="text-left px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">Status</th>
-                                            <th className="text-left px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">Anti-Sharing</th>
+                                            <th className="text-left px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">{__('general.anti_sharing')}</th>
                                             <th className="text-left px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">Joined</th>
                                             <th className="text-right px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">Actions</th>
                                         </tr>
@@ -260,18 +258,16 @@ export default function ResellersShow({ reseller, subUsers, transactions, sharin
                 {tab === 'flagged' && (
                     <OperationalCard noPadding>
                         {!sharingFlagged?.length ? (
-                            <EmptyState icon={ShieldCheck} title="No sharing violations" description="All sub-users are within policy." />
+                            <EmptyState icon={ShieldCheck} title={__('general.no_sharing_violations')} description={__('general.all_sub_users_are_within_policy')} />
                         ) : (
                             <div className="overflow-x-auto">
                                 <div className="px-4 py-3 bg-red-50 border-b border-red-200 flex items-center gap-2 text-red-700 text-xs font-medium">
-                                    <ShieldAlert className="w-4 h-4" />
-                                    These accounts were caught using the platform simultaneously from multiple IPs — likely account sharing.
-                                </div>
+                                    <ShieldAlert className="w-4 h-4" />{__('general.these_accounts_were_caught_using_the_platform_simultaneously_from_multiple_ips_likely_account_sharing')}</div>
                                 <table className="w-full text-sm">
                                     <thead>
                                         <tr className="border-b border-border/60">
                                             <th className="text-left px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">User</th>
-                                            <th className="text-left px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">Flagged IPs</th>
+                                            <th className="text-left px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">{__('general.flagged_ips')}</th>
                                             <th className="text-left px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">Detected</th>
                                             <th className="text-right px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">Actions</th>
                                         </tr>
@@ -299,8 +295,7 @@ export default function ResellersShow({ reseller, subUsers, transactions, sharin
                                                             onClick={() => clearFlag(u.user_id)}
                                                             className="text-xs text-primary hover:underline font-semibold flex items-center gap-1"
                                                         >
-                                                            <RefreshCw className="w-3.5 h-3.5" /> Clear & Restore
-                                                        </button>
+                                                            <RefreshCw className="w-3.5 h-3.5" />{__('general.clear_restore')}</button>
                                                         <button
                                                             onClick={() => suspendUser(u.user_id)}
                                                             className="text-xs text-red-600 hover:underline font-semibold flex items-center gap-1"
@@ -322,7 +317,7 @@ export default function ResellersShow({ reseller, subUsers, transactions, sharin
                 {tab === 'transactions' && (
                     <OperationalCard noPadding>
                         {!transactions?.data?.length ? (
-                            <EmptyState icon={DollarSign} title="No transactions yet" description="Balance top-ups and usage charges will appear here." />
+                            <EmptyState icon={DollarSign} title={__('general.no_transactions_yet')} description={__('general.balance_top_ups_and_usage_charges_will_appear_here')} />
                         ) : (
                             <div className="overflow-x-auto">
                                 <table className="w-full text-sm">
@@ -330,9 +325,9 @@ export default function ResellersShow({ reseller, subUsers, transactions, sharin
                                         <tr className="border-b border-border/60">
                                             <th className="text-left px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">Type</th>
                                             <th className="text-left px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">Description</th>
-                                            <th className="text-left px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">Sub-User</th>
+                                            <th className="text-left px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">{__('general.sub_user')}</th>
                                             <th className="text-right px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">Amount</th>
-                                            <th className="text-right px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">Balance After</th>
+                                            <th className="text-right px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">{__('general.balance_after')}</th>
                                             <th className="text-right px-4 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">Date</th>
                                         </tr>
                                     </thead>
@@ -372,13 +367,13 @@ export default function ResellersShow({ reseller, subUsers, transactions, sharin
                 {/* ─── Top-Up Balance ─── */}
                 {tab === 'balance' && (
                     <div className="max-w-md">
-                        <OperationalCard title="Adjust Reseller Balance">
+                        <OperationalCard title={__('general.adjust_reseller_balance')}>
                             <p className="text-xs text-text-muted mb-4">
                                 Current balance: <strong className={`font-mono ${reseller.balance <= 0 ? 'text-red-600' : 'text-emerald-600'}`}>{formatCurrency(reseller.balance, reseller.currency)}</strong>
                             </p>
                             <form onSubmit={submitBalance} className="space-y-4">
                                 <div className="space-y-1.5">
-                                    <Label htmlFor="type">Transaction Type</Label>
+                                    <Label htmlFor="type">{__('general.transaction_type')}</Label>
                                     <select
                                         id="type"
                                         value={balanceForm.type}
@@ -407,7 +402,7 @@ export default function ResellersShow({ reseller, subUsers, transactions, sharin
                                     <Textarea
                                         id="tx_desc"
                                         rows={2}
-                                        placeholder="Reason for this adjustment..."
+                                        placeholder={__('general.reason_for_this_adjustment')}
                                         value={balanceForm.description}
                                         onChange={e => setBalanceForm(f => ({ ...f, description: e.target.value }))}
                                     />

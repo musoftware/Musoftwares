@@ -86,7 +86,7 @@ class AdminServiceLandingPageController extends Controller
             'is_active' => !$landingPage->is_active
         ]);
 
-        return back()->with('success', 'Landing page status updated successfully.');
+        return back()->with('success', __('general.landing_page_status_updated_successfully'));
     }
 
     /**
@@ -96,6 +96,6 @@ class AdminServiceLandingPageController extends Controller
     {
         $landingPage->delete();
 
-        return back()->with('success', 'Landing page deleted successfully.');
+        return back()->with('success', __('general.landing_page_deleted_successfully'));
     }
 }

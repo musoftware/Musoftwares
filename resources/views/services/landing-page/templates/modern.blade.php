@@ -377,7 +377,7 @@
             @if($showGallery && ($landingPage->service->images->count() > 0 || $landingPage->service->image))
                 <div class="container">
                     <div class="section-padding">
-                        <h2 class="text-center mb-4">Our Service Gallery</h2>
+                        <h2 class="text-center mb-4">{{ __('general.our_service_gallery') }}</h2>
                         <div class="service-gallery">
                             @foreach($landingPage->service->images as $image)
                                 <img alt="{{ $landingPage->hero_title }}" src="{{ asset($image->image_path) }}">
@@ -397,7 +397,7 @@
             @if($showPricing && $landingPage->pricingTables->count() > 0)
                 <div class="container">
                     <div class="section-padding">
-                        <h2 class="text-center mb-4">Pricing Plans</h2>
+                        <h2 class="text-center mb-4">{{ __('general.pricing_plans') }}</h2>
                         <div class="pricing-grid">
                             @foreach($landingPage->pricingTables as $pricing)
                                 <div class="pricing-card {{ $pricing->is_popular ? 'popular' : '' }}">
@@ -433,7 +433,7 @@
             @if($showFaq && $landingPage->faqs->count() > 0)
                 <div class="container">
                     <div class="section-padding">
-                        <h2 class="text-center mb-4">Frequently Asked Questions</h2>
+                        <h2 class="text-center mb-4">{{ __('general.frequently_asked_questions') }}</h2>
                         <div class="row">
                             <div class="col-lg-8 mx-auto">
                                 @foreach($landingPage->faqs as $faq)
@@ -466,7 +466,7 @@
             @if($showTestimonials && $landingPage->service->approvedReviews->count() > 0)
                 <div class="container">
                     <div class="section-padding">
-                        <h2 class="text-center mb-4">What Our Clients Say</h2>
+                        <h2 class="text-center mb-4">{{ __('general.what_our_clients_say') }}</h2>
                         <div class="row">
                             @foreach($landingPage->service->approvedReviews as $review)
                                 <div class="col-md-4 mb-4">

@@ -146,7 +146,7 @@ export default function Index({ tickets, filters, stats }: Props) {
                         className="font-semibold text-slate-800 hover:text-indigo-600 transition-colors truncate max-w-xs flex items-center gap-1.5"
                     >
                         {t.needs_attention && (
-                            <span className="flex-shrink-0 h-2 w-2 rounded-full bg-red-500" title="Needs attention" />
+                            <span className="flex-shrink-0 h-2 w-2 rounded-full bg-red-500" title={__('general.needs_attention')} />
                         )}
                         {t.is_urgent && (
                             <Zap className="flex-shrink-0 h-3 w-3 text-red-500" title="Urgent" />
@@ -209,13 +209,11 @@ export default function Index({ tickets, filters, stats }: Props) {
                         <DropdownMenuSeparator />
                         <DropdownMenuItem asChild>
                             <Link href={`/admin/tickets/${t.id}`} className="flex items-center">
-                                <Eye className="mr-2 h-4 w-4" /> View Ticket
-                            </Link>
+                                <Eye className="mr-2 h-4 w-4" />{__('general.view_ticket')}</Link>
                         </DropdownMenuItem>
                         {t.ticket_status !== 'closed' ? (
                             <DropdownMenuItem onClick={() => handleClose(t.id)} className="text-emerald-700 focus:text-emerald-800">
-                                <CheckCircle className="mr-2 h-4 w-4" /> Close Ticket
-                            </DropdownMenuItem>
+                                <CheckCircle className="mr-2 h-4 w-4" />{__('general.close_ticket')}</DropdownMenuItem>
                         ) : (
                             <DropdownMenuItem onClick={() => handleReopen(t.id)} className="text-amber-700 focus:text-amber-800">
                                 <RotateCcw className="mr-2 h-4 w-4" /> Reopen
@@ -235,10 +233,10 @@ export default function Index({ tickets, filters, stats }: Props) {
                 value={filters.status || ''}
                 onChange={(e) => applyFilter({ status: e.target.value })}
             >
-                <option value="">All Statuses</option>
+                <option value="">{__('general.all_statuses')}</option>
                 <option value="open">Open</option>
-                <option value="user_replied">User Replied</option>
-                <option value="agent_replied">Agent Replied</option>
+                <option value="user_replied">{__('general.user_replied')}</option>
+                <option value="agent_replied">{__('general.agent_replied')}</option>
                 <option value="closed">Closed</option>
             </select>
             <select
@@ -246,7 +244,7 @@ export default function Index({ tickets, filters, stats }: Props) {
                 value={filters.priority || ''}
                 onChange={(e) => applyFilter({ priority: e.target.value })}
             >
-                <option value="">All Priorities</option>
+                <option value="">{__('general.all_priorities')}</option>
                 <option value="high">🔴 High</option>
                 <option value="medium">🟡 Medium</option>
                 <option value="low">🟢 Low</option>
@@ -257,14 +255,14 @@ export default function Index({ tickets, filters, stats }: Props) {
     const hasUrgent = tickets.data.some((t: Ticket) => t.is_urgent);
 
     return (
-        <AdminSidebarLayout title="Support Tickets" header="Support Desk">
+        <AdminSidebarLayout title={__('general.support_tickets')} header="Support Desk">
 
             {/* ── Urgent alert ── */}
             {hasUrgent && (
                 <div className="mb-5 flex items-center gap-2.5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
                     <Zap className="h-4 w-4 text-red-500 flex-shrink-0" />
                     <span>
-                        <strong>Urgent tickets require attention</strong> — some high-priority tickets have been waiting too long.
+                        <strong>{__('general.urgent_tickets_require_attention')}</strong> — some high-priority tickets have been waiting too long.
                     </span>
                 </div>
             )}

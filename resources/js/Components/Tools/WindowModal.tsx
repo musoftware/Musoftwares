@@ -163,7 +163,7 @@ export function WindowModal({
                         <button 
                             onClick={(e) => { e.stopPropagation(); onNewTab(); }}
                             className="h-full px-3 hover:bg-slate-200 text-slate-600 transition-colors flex items-center"
-                            title="Open in new tab"
+                            title={__('general.open_in_new_tab')}
                         >
                             <ExternalLink className="w-3.5 h-3.5" />
                         </button>

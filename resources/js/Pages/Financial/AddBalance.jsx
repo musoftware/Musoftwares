@@ -56,7 +56,7 @@ export default function AddBalance({ wallet }) {
 
     return (
         <AuthenticatedLayout header={undefined}>
-            <Head title="Add Balance" />
+            <Head title={__('general.add_balance')} />
 
             <div className="max-w-2xl mx-auto px-4 py-8 space-y-6">
                 {/* Header */}
@@ -65,19 +65,16 @@ export default function AddBalance({ wallet }) {
                         href={safeRoute('dashboard', undefined, '/dashboard')}
                         className="inline-flex items-center text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
                     >
-                        <ArrowLeft className="mr-2 h-4 w-4" /> Back to Dashboard
-                    </Link>
-                    <h1 className="text-2xl font-semibold tracking-tight">Add Balance</h1>
-                    <p className="text-sm text-muted-foreground">
-                        Top up your wallet to pay for subscriptions and platform services.
-                    </p>
+                        <ArrowLeft className="mr-2 h-4 w-4" />{__('general.back_to_dashboard')}</Link>
+                    <h1 className="text-2xl font-semibold tracking-tight">{__('general.add_balance')}</h1>
+                    <p className="text-sm text-muted-foreground">{__('general.top_up_your_wallet_to_pay_for_subscriptions_and_platform_services')}</p>
                 </div>
 
                 {/* Current Wallet Balance */}
                 <Card className="shadow-none border-slate-200 bg-gradient-to-r from-slate-900 to-slate-800 text-white">
                     <CardContent className="p-6 flex items-center justify-between">
                         <div>
-                            <p className="text-sm font-medium text-slate-400 mb-1">Current Wallet Balance</p>
+                            <p className="text-sm font-medium text-slate-400 mb-1">{__('general.current_wallet_balance')}</p>
                             <div className="text-3xl font-bold tracking-tight">
                                 {formatMoney(walletBalance, walletCurrency)}
                             </div>
@@ -93,7 +90,7 @@ export default function AddBalance({ wallet }) {
                     <div className="flex items-start gap-3 p-4 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm">
                         <AlertCircle className="w-5 h-5 shrink-0 mt-0.5 text-red-500" />
                         <div>
-                            <strong className="font-semibold block mb-1">Payment Error</strong>
+                            <strong className="font-semibold block mb-1">{__('general.payment_error')}</strong>
                             {Object.values(errors).map((err, i) => (
                                 <p key={i}>{err}</p>
                             ))}
@@ -107,8 +104,8 @@ export default function AddBalance({ wallet }) {
                     {/* Amount Selection */}
                     <Card className="shadow-none border-slate-200">
                         <CardHeader className="pb-4">
-                            <CardTitle className="text-base font-semibold">Select Amount</CardTitle>
-                            <CardDescription>Choose a preset or enter a custom amount to deposit.</CardDescription>
+                            <CardTitle className="text-base font-semibold">{__('general.select_amount')}</CardTitle>
+                            <CardDescription>{__('general.choose_a_preset_or_enter_a_custom_amount_to_deposit')}</CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-4">
                             <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
@@ -130,7 +127,7 @@ export default function AddBalance({ wallet }) {
                             </div>
 
                             <div className="space-y-1.5 max-w-xs">
-                                <Label htmlFor="custom-amount" className="text-sm font-medium">Custom Amount</Label>
+                                <Label htmlFor="custom-amount" className="text-sm font-medium">{__('general.custom_amount')}</Label>
                                 <div className="relative">
                                     <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 font-medium text-sm pointer-events-none">
                                         {walletCurrency}
@@ -170,8 +167,8 @@ export default function AddBalance({ wallet }) {
                     {/* Payment Method — Kashier only */}
                     <Card className="shadow-none border-slate-200">
                         <CardHeader className="pb-4">
-                            <CardTitle className="text-base font-semibold">Payment Method</CardTitle>
-                            <CardDescription>Payments are processed securely via Kashier.</CardDescription>
+                            <CardTitle className="text-base font-semibold">{__('general.payment_method')}</CardTitle>
+                            <CardDescription>{__('general.payments_are_processed_securely_via_kashier')}</CardDescription>
                         </CardHeader>
                         <CardContent>
                             <div className="flex items-center gap-4 p-4 rounded-xl border-2 border-primary bg-primary/5">
@@ -179,8 +176,8 @@ export default function AddBalance({ wallet }) {
                                     <CreditCard className="w-5 h-5 text-white" />
                                 </div>
                                 <div>
-                                    <p className="text-sm font-semibold text-slate-900">Kashier — Card &amp; Wallet</p>
-                                    <p className="text-xs text-slate-500">Visa, Mastercard, and digital wallets accepted</p>
+                                    <p className="text-sm font-semibold text-slate-900">{__('general.kashier_card_amp_wallet')}</p>
+                                    <p className="text-xs text-slate-500">{__('general.visa_mastercard_and_digital_wallets_accepted')}</p>
                                 </div>
                                 <div className="ml-auto w-2 h-2 rounded-full bg-emerald-500" />
                             </div>

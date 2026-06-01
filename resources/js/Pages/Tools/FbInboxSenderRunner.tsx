@@ -134,8 +134,8 @@ export default function FbInboxSenderRunner({ tool }: any) {
                                 <Inbox className="w-4 h-4 text-white" />
                             </div>
                             <div>
-                                <h1 className="text-sm font-bold tracking-tight">Messenger Bulk Sender</h1>
-                                <p className="text-[10px] text-white/40 font-medium">Page Inbox Automation</p>
+                                <h1 className="text-sm font-bold tracking-tight">{__('general.messenger_bulk_sender')}</h1>
+                                <p className="text-[10px] text-white/40 font-medium">{__('general.page_inbox_automation')}</p>
                             </div>
                         </div>
                         <div className="flex items-center gap-3">
@@ -145,7 +145,7 @@ export default function FbInboxSenderRunner({ tool }: any) {
                                 value={selectedProfileId || ''}
                                 onChange={e => setSelectedProfileId(Number(e.target.value) || null)}
                             >
-                                {profiles.length === 0 && <option value="">No profiles</option>}
+                                {profiles.length === 0 && <option value="">{__('general.no_profiles')}</option>}
                                 {profiles.map(p => (
                                     <option key={p.id} value={p.id} className="bg-[#1a1a2e]">{p.name} ({p.page_id})</option>
                                 ))}
@@ -327,8 +327,7 @@ function InboxTab({ call, onEvent, profileId, profiles, onProfilesChange }: any)
                     </Button>
                 )}
                 <Button onClick={() => setShowLoadByIds(true)} variant="outline" className="font-bold text-xs gap-2 h-9 rounded-xl border-white/10 text-white/70 hover:bg-white/5" disabled={!profileId}>
-                    <Hash className="w-3.5 h-3.5" /> Load by IDs
-                </Button>
+                    <Hash className="w-3.5 h-3.5" />{__('general.load_by_ids')}</Button>
                 <Button onClick={() => setShowFilter(true)} variant="outline" className="font-bold text-xs gap-2 h-9 rounded-xl border-white/10 text-white/70 hover:bg-white/5" disabled={!profileId}>
                     <Filter className="w-3.5 h-3.5" /> Filter
                 </Button>
@@ -336,8 +335,7 @@ function InboxTab({ call, onEvent, profileId, profiles, onProfilesChange }: any)
                     <Download className="w-3.5 h-3.5" /> Export
                 </Button>
                 <Button onClick={() => setShowAddProfile(true)} variant="outline" className="font-bold text-xs gap-2 h-9 rounded-xl border-white/10 text-white/70 hover:bg-white/5">
-                    <Plus className="w-3.5 h-3.5" /> Add Profile
-                </Button>
+                    <Plus className="w-3.5 h-3.5" />{__('general.add_profile')}</Button>
                 {selectedUsers.size > 0 && (
                     <Button onClick={handleDeleteSelected} variant="destructive" className="font-bold text-xs gap-2 h-9 rounded-xl">
                         <Trash2 className="w-3.5 h-3.5" /> Delete ({selectedUsers.size})
@@ -347,7 +345,7 @@ function InboxTab({ call, onEvent, profileId, profiles, onProfilesChange }: any)
 
             {/* Max Count Input */}
             <div className="flex items-center gap-3">
-                <Label className="text-[10px] font-bold uppercase tracking-wider text-white/40">Max Users</Label>
+                <Label className="text-[10px] font-bold uppercase tracking-wider text-white/40">{__('general.max_users')}</Label>
                 <Input
                     type="number" value={maxCount} onChange={e => setMaxCount(Number(e.target.value) || 500)}
                     className="w-28 h-8 bg-white/5 border-white/10 text-white text-xs"
@@ -360,8 +358,7 @@ function InboxTab({ call, onEvent, profileId, profiles, onProfilesChange }: any)
                 <div className="bg-blue-500/10 border border-blue-500/20 rounded-2xl p-4 space-y-2 animate-in fade-in">
                     <div className="flex items-center justify-between text-xs">
                         <span className="font-bold text-blue-400 flex items-center gap-2">
-                            <Loader2 className="w-3.5 h-3.5 animate-spin" /> Loading inbox...
-                        </span>
+                            <Loader2 className="w-3.5 h-3.5 animate-spin" />{__('general.loading_inbox')}</span>
                         <span className="font-mono text-blue-300">{loadingProgress} / {maxCount}</span>
                     </div>
                     <div className="h-1.5 bg-blue-500/20 rounded-full overflow-hidden">
@@ -384,13 +381,13 @@ function InboxTab({ call, onEvent, profileId, profiles, onProfilesChange }: any)
                                 </th>
                                 <th className="text-left px-4 py-3 text-[10px] font-bold uppercase tracking-wider text-white/30">Name</th>
                                 <th className="text-left px-4 py-3 text-[10px] font-bold uppercase tracking-wider text-white/30 hidden md:table-cell">Message</th>
-                                <th className="text-left px-4 py-3 text-[10px] font-bold uppercase tracking-wider text-white/30 hidden lg:table-cell">User ID</th>
+                                <th className="text-left px-4 py-3 text-[10px] font-bold uppercase tracking-wider text-white/30 hidden lg:table-cell">{__('general.user_id')}</th>
                                 <th className="text-left px-4 py-3 text-[10px] font-bold uppercase tracking-wider text-white/30">Status</th>
                             </tr>
                         </thead>
                         <tbody>
                             {users.length === 0 ? (
-                                <tr><td colSpan={5} className="px-4 py-12 text-center text-xs text-white/20">No inbox users loaded. Click &quot;Load Inbox&quot; to start.</td></tr>
+                                <tr><td colSpan={5} className="px-4 py-12 text-center text-xs text-white/20">{__('general.no_inbox_users_loaded_click_quot_load_inbox_quot_to_start')}</td></tr>
                             ) : users.slice(0, 200).map(user => (
                                 <tr key={user.id} className="border-b border-white/[0.03] hover:bg-white/[0.02] transition-colors">
                                     <td className="px-4 py-2.5">
@@ -435,42 +432,42 @@ function InboxTab({ call, onEvent, profileId, profiles, onProfilesChange }: any)
             {/* Add Profile Dialog */}
             <Dialog open={showAddProfile} onOpenChange={setShowAddProfile}>
                 <DialogContent className="bg-[#1a1a2e] border-white/10 text-white">
-                    <DialogHeader><DialogTitle className="text-sm font-bold">Add Facebook Page Profile</DialogTitle></DialogHeader>
+                    <DialogHeader><DialogTitle className="text-sm font-bold">{__('general.add_facebook_page_profile')}</DialogTitle></DialogHeader>
                     <div className="space-y-4">
-                        <div><Label className="text-[10px] font-bold uppercase text-white/50">Profile Name</Label><Input value={newProfileName} onChange={e => setNewProfileName(e.target.value)} placeholder="My Business Page" className="bg-white/5 border-white/10 text-white mt-1" /></div>
-                        <div><Label className="text-[10px] font-bold uppercase text-white/50">Page ID</Label><Input value={newPageId} onChange={e => setNewPageId(e.target.value)} placeholder="123456789" className="bg-white/5 border-white/10 text-white mt-1" /></div>
+                        <div><Label className="text-[10px] font-bold uppercase text-white/50">{__('general.profile_name')}</Label><Input value={newProfileName} onChange={e => setNewProfileName(e.target.value)} placeholder={__('general.my_business_page')} className="bg-white/5 border-white/10 text-white mt-1" /></div>
+                        <div><Label className="text-[10px] font-bold uppercase text-white/50">{__('general.page_id')}</Label><Input value={newPageId} onChange={e => setNewPageId(e.target.value)} placeholder="123456789" className="bg-white/5 border-white/10 text-white mt-1" /></div>
                     </div>
-                    <DialogFooter><Button onClick={handleAddProfile} className="bg-blue-600 hover:bg-blue-700 font-bold text-xs">Create Profile</Button></DialogFooter>
+                    <DialogFooter><Button onClick={handleAddProfile} className="bg-blue-600 hover:bg-blue-700 font-bold text-xs">{__('general.create_profile')}</Button></DialogFooter>
                 </DialogContent>
             </Dialog>
 
             {/* Load by IDs Dialog */}
             <Dialog open={showLoadByIds} onOpenChange={setShowLoadByIds}>
                 <DialogContent className="bg-[#1a1a2e] border-white/10 text-white">
-                    <DialogHeader><DialogTitle className="text-sm font-bold">Load Users by Facebook IDs</DialogTitle></DialogHeader>
+                    <DialogHeader><DialogTitle className="text-sm font-bold">{__('general.load_users_by_facebook_ids')}</DialogTitle></DialogHeader>
                     <div><Label className="text-[10px] font-bold uppercase text-white/50">User IDs (one per line)</Label>
                         <textarea value={manualIds} onChange={e => setManualIds(e.target.value)} placeholder={"100001234567890\n100009876543210"} rows={8}
                             className="w-full mt-1 p-3 bg-white/5 border border-white/10 rounded-lg text-xs font-mono text-white resize-none focus:outline-none focus:ring-1 focus:ring-blue-500" />
                     </div>
-                    <DialogFooter><Button onClick={handleLoadByIds} className="bg-blue-600 hover:bg-blue-700 font-bold text-xs">Load IDs</Button></DialogFooter>
+                    <DialogFooter><Button onClick={handleLoadByIds} className="bg-blue-600 hover:bg-blue-700 font-bold text-xs">{__('general.load_ids')}</Button></DialogFooter>
                 </DialogContent>
             </Dialog>
 
             {/* Filter Dialog */}
             <Dialog open={showFilter} onOpenChange={setShowFilter}>
                 <DialogContent className="bg-[#1a1a2e] border-white/10 text-white">
-                    <DialogHeader><DialogTitle className="text-sm font-bold">Filter Inbox Users</DialogTitle></DialogHeader>
+                    <DialogHeader><DialogTitle className="text-sm font-bold">{__('general.filter_inbox_users')}</DialogTitle></DialogHeader>
                     <div className="space-y-4">
                         <div><Label className="text-[10px] font-bold uppercase text-emerald-400">Allow List (one per line)</Label>
-                            <textarea value={allowPatterns} onChange={e => setAllowPatterns(e.target.value)} placeholder="Keep users whose message contains..." rows={4}
+                            <textarea value={allowPatterns} onChange={e => setAllowPatterns(e.target.value)} placeholder={__('general.keep_users_whose_message_contains')} rows={4}
                                 className="w-full mt-1 p-3 bg-white/5 border border-white/10 rounded-lg text-xs text-white resize-none focus:outline-none focus:ring-1 focus:ring-emerald-500" />
                         </div>
                         <div><Label className="text-[10px] font-bold uppercase text-red-400">Block List (one per line)</Label>
-                            <textarea value={blockPatterns} onChange={e => setBlockPatterns(e.target.value)} placeholder="Remove users whose message contains..." rows={4}
+                            <textarea value={blockPatterns} onChange={e => setBlockPatterns(e.target.value)} placeholder={__('general.remove_users_whose_message_contains')} rows={4}
                                 className="w-full mt-1 p-3 bg-white/5 border border-white/10 rounded-lg text-xs text-white resize-none focus:outline-none focus:ring-1 focus:ring-red-500" />
                         </div>
                     </div>
-                    <DialogFooter><Button onClick={handleApplyFilters} className="bg-blue-600 hover:bg-blue-700 font-bold text-xs">Apply Filters</Button></DialogFooter>
+                    <DialogFooter><Button onClick={handleApplyFilters} className="bg-blue-600 hover:bg-blue-700 font-bold text-xs">{__('general.apply_filters')}</Button></DialogFooter>
                 </DialogContent>
             </Dialog>
         </div>
@@ -542,14 +539,13 @@ function CampaignsTab({ call, onEvent, profileId }: any) {
             <div className="flex justify-between items-center">
                 <h2 className="text-lg font-bold tracking-tight">Campaigns</h2>
                 <Button onClick={() => setShowCreate(true)} className="bg-blue-600 hover:bg-blue-700 font-bold text-xs gap-2 h-9 rounded-xl" disabled={!profileId}>
-                    <Plus className="w-3.5 h-3.5" /> New Campaign
-                </Button>
+                    <Plus className="w-3.5 h-3.5" />{__('general.new_campaign')}</Button>
             </div>
 
             {campaigns.length === 0 ? (
                 <div className="bg-white/[0.02] border border-white/5 rounded-2xl p-12 text-center">
                     <Send className="w-8 h-8 text-white/10 mx-auto mb-3" />
-                    <p className="text-xs text-white/20">No campaigns yet. Create one to start sending.</p>
+                    <p className="text-xs text-white/20">{__('general.no_campaigns_yet_create_one_to_start_sending')}</p>
                 </div>
             ) : (
                 <div className="grid gap-4">
@@ -604,11 +600,11 @@ function CampaignsTab({ call, onEvent, profileId }: any) {
             {/* Create Campaign Dialog */}
             <Dialog open={showCreate} onOpenChange={setShowCreate}>
                 <DialogContent className="bg-[#1a1a2e] border-white/10 text-white max-w-lg">
-                    <DialogHeader><DialogTitle className="text-sm font-bold">Create Campaign</DialogTitle></DialogHeader>
+                    <DialogHeader><DialogTitle className="text-sm font-bold">{__('general.create_campaign')}</DialogTitle></DialogHeader>
                     <div className="space-y-4 max-h-[60vh] overflow-y-auto pr-2">
-                        <div><Label className="text-[10px] font-bold uppercase text-white/50">Campaign Name</Label><Input value={name} onChange={e => setName(e.target.value)} placeholder="My Campaign" className="bg-white/5 border-white/10 text-white mt-1" /></div>
+                        <div><Label className="text-[10px] font-bold uppercase text-white/50">{__('general.campaign_name')}</Label><Input value={name} onChange={e => setName(e.target.value)} placeholder={__('general.my_campaign')} className="bg-white/5 border-white/10 text-white mt-1" /></div>
 
-                        <div><Label className="text-[10px] font-bold uppercase text-white/50">Sender Mode</Label>
+                        <div><Label className="text-[10px] font-bold uppercase text-white/50">{__('general.sender_mode')}</Label>
                             <div className="flex gap-2 mt-1">
                                 {['www', 'm', 'mbasic'].map(m => (
                                     <Button key={m} variant={senderMode === m ? 'default' : 'outline'} onClick={() => setSenderMode(m)}
@@ -624,7 +620,7 @@ function CampaignsTab({ call, onEvent, profileId }: any) {
 
                         <div>
                             <Label className="text-[10px] font-bold uppercase text-white/50">Message Templates (Rotation)</Label>
-                            <p className="text-[10px] text-white/30 mt-0.5 mb-2">Use $$NAME$$ to insert the recipient&apos;s name</p>
+                            <p className="text-[10px] text-white/30 mt-0.5 mb-2">{__('general.use_name_to_insert_the_recipient_apos_s_name')}</p>
                             {messages.map((msg, idx) => (
                                 <div key={idx} className="flex gap-2 mb-2">
                                     <textarea value={msg} onChange={e => { const n = [...messages]; n[idx] = e.target.value; setMessages(n); }} rows={2}
@@ -637,11 +633,10 @@ function CampaignsTab({ call, onEvent, profileId }: any) {
                                 </div>
                             ))}
                             <Button variant="outline" className="text-xs border-white/10 text-white/50 gap-1.5 h-8" onClick={() => setMessages([...messages, ''])}>
-                                <Plus className="w-3 h-3" /> Add Template
-                            </Button>
+                                <Plus className="w-3 h-3" />{__('general.add_template')}</Button>
                         </div>
                     </div>
-                    <DialogFooter><Button onClick={handleCreate} className="bg-blue-600 hover:bg-blue-700 font-bold text-xs">Create Campaign</Button></DialogFooter>
+                    <DialogFooter><Button onClick={handleCreate} className="bg-blue-600 hover:bg-blue-700 font-bold text-xs">{__('general.create_campaign')}</Button></DialogFooter>
                 </DialogContent>
             </Dialog>
         </div>
@@ -698,27 +693,26 @@ function WatchTab({ call, onEvent, profileId }: any) {
             {/* Config */}
             <Card className="bg-white/[0.02] border-white/5">
                 <CardHeader className="pb-3">
-                    <CardTitle className="text-sm font-bold text-white/90 flex items-center gap-2"><Radio className="w-4 h-4 text-blue-400" /> Watch Configuration</CardTitle>
-                    <CardDescription className="text-xs text-white/30">Monitor your inbox for new messages and POST found user IDs to a webhook.</CardDescription>
+                    <CardTitle className="text-sm font-bold text-white/90 flex items-center gap-2"><Radio className="w-4 h-4 text-blue-400" />{__('general.watch_configuration')}</CardTitle>
+                    <CardDescription className="text-xs text-white/30">{__('general.monitor_your_inbox_for_new_messages_and_post_found_user_ids_to_a_webhook')}</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                    <div><Label className="text-[10px] font-bold uppercase text-white/50">Webhook URL</Label><Input value={webhookUrl} onChange={e => setWebhookUrl(e.target.value)} placeholder="https://your-api.com/webhook" className="bg-white/5 border-white/10 text-white mt-1 font-mono" /></div>
+                    <div><Label className="text-[10px] font-bold uppercase text-white/50">{__('general.webhook_url')}</Label><Input value={webhookUrl} onChange={e => setWebhookUrl(e.target.value)} placeholder={__('general.https_your_api_com_webhook')} className="bg-white/5 border-white/10 text-white mt-1 font-mono" /></div>
                     <div className="grid grid-cols-2 gap-3">
                         <div><Label className="text-[10px] font-bold uppercase text-white/50">Interval (seconds)</Label><Input type="number" value={intervalSec} onChange={e => setIntervalSec(Number(e.target.value))} className="bg-white/5 border-white/10 text-white mt-1" /></div>
-                        <div><Label className="text-[10px] font-bold uppercase text-white/50">Max Count</Label><Input type="number" value={maxCount} onChange={e => setMaxCount(Number(e.target.value))} className="bg-white/5 border-white/10 text-white mt-1" /></div>
+                        <div><Label className="text-[10px] font-bold uppercase text-white/50">{__('general.max_count')}</Label><Input type="number" value={maxCount} onChange={e => setMaxCount(Number(e.target.value))} className="bg-white/5 border-white/10 text-white mt-1" /></div>
                     </div>
                 </CardContent>
                 <CardFooter>
                     <Button onClick={handleStartWatch} className="bg-blue-600 hover:bg-blue-700 font-bold text-xs gap-2 rounded-xl" disabled={!profileId}>
-                        <Eye className="w-3.5 h-3.5" /> Start Watching
-                    </Button>
+                        <Eye className="w-3.5 h-3.5" />{__('general.start_watching')}</Button>
                 </CardFooter>
             </Card>
 
             {/* Active Sessions */}
             {sessions.length > 0 && (
                 <div className="space-y-3">
-                    <h3 className="text-xs font-bold uppercase tracking-wider text-white/40">Watch Sessions</h3>
+                    <h3 className="text-xs font-bold uppercase tracking-wider text-white/40">{__('general.watch_sessions')}</h3>
                     {sessions.map(s => (
                         <div key={s.id} className="bg-white/[0.02] border border-white/5 rounded-xl p-4 flex items-center justify-between">
                             <div className="space-y-1">
@@ -729,7 +723,7 @@ function WatchTab({ call, onEvent, profileId }: any) {
                                 {s.webhook_url && <p className="text-[10px] font-mono text-white/20 truncate max-w-xs">{s.webhook_url}</p>}
                             </div>
                             <div className="flex gap-2">
-                                <Button variant="outline" size="sm" className="text-xs border-white/10 text-white/50 h-7" onClick={() => loadResults(s.id)}>View Results</Button>
+                                <Button variant="outline" size="sm" className="text-xs border-white/10 text-white/50 h-7" onClick={() => loadResults(s.id)}>{__('general.view_results')}</Button>
                                 {s.status === 'running' && <Button variant="destructive" size="sm" className="text-xs h-7" onClick={() => handleStopWatch(s.id)}>Stop</Button>}
                             </div>
                         </div>
@@ -747,8 +741,8 @@ function WatchTab({ call, onEvent, profileId }: any) {
                         <thead>
                             <tr className="border-b border-white/5">
                                 <th className="text-left px-4 py-2 text-[10px] font-bold uppercase text-white/30">Name</th>
-                                <th className="text-left px-4 py-2 text-[10px] font-bold uppercase text-white/30">FB User ID</th>
-                                <th className="text-left px-4 py-2 text-[10px] font-bold uppercase text-white/30">Found At</th>
+                                <th className="text-left px-4 py-2 text-[10px] font-bold uppercase text-white/30">{__('general.fb_user_id')}</th>
+                                <th className="text-left px-4 py-2 text-[10px] font-bold uppercase text-white/30">{__('general.found_at')}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -793,7 +787,7 @@ function LogsTab({ call, profileId }: any) {
 
     return (
         <div className="space-y-6">
-            <h2 className="text-lg font-bold tracking-tight">Campaign Logs</h2>
+            <h2 className="text-lg font-bold tracking-tight">{__('general.campaign_logs')}</h2>
 
             <div className="flex gap-2 flex-wrap">
                 {campaigns.map(c => (
@@ -811,7 +805,7 @@ function LogsTab({ call, profileId }: any) {
                         <thead>
                             <tr className="border-b border-white/5">
                                 <th className="text-left px-4 py-3 text-[10px] font-bold uppercase text-white/30">User</th>
-                                <th className="text-left px-4 py-3 text-[10px] font-bold uppercase text-white/30 hidden md:table-cell">FB ID</th>
+                                <th className="text-left px-4 py-3 text-[10px] font-bold uppercase text-white/30 hidden md:table-cell">{__('general.fb_id')}</th>
                                 <th className="text-left px-4 py-3 text-[10px] font-bold uppercase text-white/30">Status</th>
                                 <th className="text-left px-4 py-3 text-[10px] font-bold uppercase text-white/30 hidden md:table-cell">Error</th>
                                 <th className="text-left px-4 py-3 text-[10px] font-bold uppercase text-white/30">Time</th>
@@ -886,12 +880,12 @@ function SettingsTab({ call, profiles, onProfilesChange }: any) {
             {/* Profiles Management */}
             <Card className="bg-white/[0.02] border-white/5">
                 <CardHeader className="pb-3">
-                    <CardTitle className="text-sm font-bold text-white/90">Manage Profiles</CardTitle>
-                    <CardDescription className="text-xs text-white/30">Each profile represents a Facebook Page with its own browser session.</CardDescription>
+                    <CardTitle className="text-sm font-bold text-white/90">{__('general.manage_profiles')}</CardTitle>
+                    <CardDescription className="text-xs text-white/30">{__('general.each_profile_represents_a_facebook_page_with_its_own_browser_session')}</CardDescription>
                 </CardHeader>
                 <CardContent>
                     {profiles.length === 0 ? (
-                        <p className="text-xs text-white/20 text-center py-4">No profiles created yet.</p>
+                        <p className="text-xs text-white/20 text-center py-4">{__('general.no_profiles_created_yet')}</p>
                     ) : (
                         <div className="space-y-2">
                             {profiles.map((p: Profile) => (
@@ -907,17 +901,14 @@ function SettingsTab({ call, profiles, onProfilesChange }: any) {
                                             </Button>
                                         </DialogTrigger>
                                         <DialogContent className="bg-[#1a1a2e] border-white/10 text-white sm:max-w-xs">
-                                            <DialogHeader><DialogTitle className="text-sm">Profile Actions</DialogTitle></DialogHeader>
+                                            <DialogHeader><DialogTitle className="text-sm">{__('general.profile_actions')}</DialogTitle></DialogHeader>
                                             <div className="flex flex-col gap-2 py-2">
                                                 <Button variant="outline" className="justify-start border-white/10 text-white/70" onClick={async () => { try { await call('launchBrowser', { profileId: p.id }); } catch {} }}>
-                                                    <Globe className="w-4 h-4 mr-2" /> Launch Browser
-                                                </Button>
+                                                    <Globe className="w-4 h-4 mr-2" />{__('general.launch_browser')}</Button>
                                                 <Button variant="outline" className="justify-start border-white/10 text-white/70" onClick={async () => { try { await call('closeBrowser', { profileId: p.id }); } catch {} }}>
-                                                    <X className="w-4 h-4 mr-2" /> Close Browser
-                                                </Button>
+                                                    <X className="w-4 h-4 mr-2" />{__('general.close_browser')}</Button>
                                                 <Button variant="destructive" className="justify-start" onClick={() => handleDeleteProfile(p.id)}>
-                                                    <Trash2 className="w-4 h-4 mr-2" /> Delete Profile
-                                                </Button>
+                                                    <Trash2 className="w-4 h-4 mr-2" />{__('general.delete_profile')}</Button>
                                             </div>
                                         </DialogContent>
                                     </Dialog>

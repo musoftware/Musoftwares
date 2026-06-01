@@ -14,31 +14,29 @@ export default function BranchManagement({ branches }: Props) {
 
     return (
         <ERPLayout 
-            title="Branch Management"
+            title={__('general.branch_management')}
             menuItems={menuItems}
             lockedAddons={lockedAddons}
             workspaceName={workspaceName}
             tenantId={tenantId}
         >
-            <Head title="Branch Management - ERP" />
+            <Head title={__('general.branch_management_erp')} />
 
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
                 <div>
-                    <h1 className="text-2xl font-semibold text-slate-900 tracking-tight">Branch Management</h1>
-                    <p className="text-sm text-slate-500 mt-1">Configure locations, operating hours, and assign managers.</p>
+                    <h1 className="text-2xl font-semibold text-slate-900 tracking-tight">{__('general.branch_management')}</h1>
+                    <p className="text-sm text-slate-500 mt-1">{__('general.configure_locations_operating_hours_and_assign_managers')}</p>
                 </div>
 
                 <Button size="sm">
-                    <Plus className="w-4 h-4 mr-2" />
-                    Add Branch
-                </Button>
+                    <Plus className="w-4 h-4 mr-2" />{__('general.add_branch')}</Button>
             </div>
 
             <div className="bg-white border rounded-xl overflow-hidden shadow-sm">
                 <table className="w-full text-sm text-left">
                     <thead className="bg-slate-50 border-b">
                         <tr>
-                            <th className="px-6 py-3 font-medium text-slate-500">Branch Name</th>
+                            <th className="px-6 py-3 font-medium text-slate-500">{__('general.branch_name')}</th>
                             <th className="px-6 py-3 font-medium text-slate-500">Type</th>
                             <th className="px-6 py-3 font-medium text-slate-500">Timezone</th>
                             <th className="px-6 py-3 font-medium text-slate-500">Status</th>
@@ -48,9 +46,7 @@ export default function BranchManagement({ branches }: Props) {
                     <tbody className="divide-y divide-slate-100">
                         {branches.length === 0 ? (
                             <tr>
-                                <td colSpan={5} className="px-6 py-8 text-center text-slate-500">
-                                    No branches configured yet.
-                                </td>
+                                <td colSpan={5} className="px-6 py-8 text-center text-slate-500">{__('general.no_branches_configured_yet')}</td>
                             </tr>
                         ) : (
                             branches.map((branch) => (
@@ -64,7 +60,7 @@ export default function BranchManagement({ branches }: Props) {
                                         </span>
                                     </td>
                                     <td className="px-6 py-4 text-right">
-                                        <button className="text-blue-600 hover:text-blue-800 font-medium text-sm">Edit Settings</button>
+                                        <button className="text-blue-600 hover:text-blue-800 font-medium text-sm">{__('general.edit_settings')}</button>
                                     </td>
                                 </tr>
                             ))

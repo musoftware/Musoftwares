@@ -44,7 +44,7 @@ export default function CreateClient({ currencies, tenant, hasMultiCurrency = fa
 
     return (
         <ERPLayout
-            title="Add Client"
+            title={__('general.add_client')}
             workspaceName={workspaceName}
             tenantId={tenantId}
             menuItems={menuItems}
@@ -53,47 +53,44 @@ export default function CreateClient({ currencies, tenant, hasMultiCurrency = fa
             <div className="space-y-6">
                 {/* Page Header */}
                 <div>
-                    <h2 className="text-2xl font-semibold text-slate-900 tracking-tight">Add New Client</h2>
-                    <p className="text-sm text-slate-500 mt-1">Register a new client in your workspace.</p>
+                    <h2 className="text-2xl font-semibold text-slate-900 tracking-tight">{__('general.add_new_client')}</h2>
+                    <p className="text-sm text-slate-500 mt-1">{__('general.register_a_new_client_in_your_workspace')}</p>
                 </div>
 
                 {/* Form Card */}
                 <Card className="bg-white border border-slate-200 shadow-sm">
                     <CardHeader>
                         <CardTitle className="text-slate-900 flex items-center gap-2">
-                            <UserPlus className="w-5 h-5" /> Client Details
-                        </CardTitle>
-                        <CardDescription className="text-slate-500">
-                            Provide the necessary information to setup the client profile and wallet.
-                        </CardDescription>
+                            <UserPlus className="w-5 h-5" />{__('general.client_details')}</CardTitle>
+                        <CardDescription className="text-slate-500">{__('general.provide_the_necessary_information_to_setup_the_client_profile_and_wallet')}</CardDescription>
                     </CardHeader>
                     <CardContent>
                         <form onSubmit={handleSubmit} className="space-y-6">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div className="space-y-2">
-                                    <label className="text-sm font-medium text-slate-700">Client/Company Name <span className="text-red-500">*</span></label>
+                                    <label className="text-sm font-medium text-slate-700">{__('general.client_company_name')}<span className="text-red-500">*</span></label>
                                     <Input
                                         required
                                         value={form.name}
                                         onChange={e => setForm({...form, name: e.target.value})}
-                                        placeholder="Acme Corp"
+                                        placeholder={__('general.acme_corp')}
                                         className="bg-white border-slate-200 text-slate-900"
                                     />
                                     {errors.name && <p className="text-xs text-red-500">{errors.name}</p>}
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-sm font-medium text-slate-700">Email Address</label>
+                                    <label className="text-sm font-medium text-slate-700">{__('general.email_address')}</label>
                                     <Input
                                         type="email"
                                         value={form.email}
                                         onChange={e => setForm({...form, email: e.target.value})}
-                                        placeholder="contact@acme.com"
+                                        placeholder={__('general.contact_acme_com')}
                                         className="bg-white border-slate-200 text-slate-900"
                                     />
                                     {errors.email && <p className="text-xs text-red-500">{errors.email}</p>}
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-sm font-medium text-slate-700">Phone Number</label>
+                                    <label className="text-sm font-medium text-slate-700">{__('general.phone_number')}</label>
                                     <Input
                                         value={form.phone}
                                         onChange={e => setForm({...form, phone: e.target.value})}
@@ -104,10 +101,10 @@ export default function CreateClient({ currencies, tenant, hasMultiCurrency = fa
                                 </div>
                                 {hasMultiCurrency && (
                                 <div className="space-y-2 md:col-span-2">
-                                    <label className="text-sm font-medium text-slate-700">Billing Currency <span className="text-red-500">*</span></label>
+                                    <label className="text-sm font-medium text-slate-700">{__('general.billing_currency')}<span className="text-red-500">*</span></label>
                                     <Select value={form.currency} onValueChange={(val) => setForm({...form, currency: val})}>
                                         <SelectTrigger className="bg-white border-slate-200 text-slate-900">
-                                            <SelectValue placeholder="Select currency" />
+                                            <SelectValue placeholder={__('general.select_currency_1')} />
                                         </SelectTrigger>
                                         <SelectContent className="bg-white border-slate-200 text-slate-900">
                                             {currencies.map(c => (

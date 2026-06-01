@@ -9,14 +9,11 @@
             <div class="d-flex justify-content-between align-items-center">
                 <div>
                     <h1 class="h2 mb-2">
-                        <i class="fas fa-pager text-primary me-2"></i>
-                        My Service Landing Pages
-                    </h1>
-                    <p class="text-muted">Manage and view all your service landing pages</p>
+                        <i class="fas fa-pager text-primary me-2"></i>{{ __('general.my_service_landing_pages') }}</h1>
+                    <p class="text-muted">{{ __('general.manage_and_view_all_your_service_landing_pages') }}</p>
                 </div>
                 <a href="{{ route('services.mine') }}" class="btn btn-outline-primary">
-                    <i class="fas fa-plus me-1"></i> Create New Landing Page
-                </a>
+                    <i class="fas fa-plus me-1"></i>{{ __('general.create_new_landing_page') }}</a>
             </div>
         </div>
     </div>
@@ -59,8 +56,7 @@
                                 
                                 @if($landingPage->ab_testing_enabled)
                                     <span class="badge bg-info">
-                                        <i class="fas fa-flask me-1"></i> A/B Testing
-                                    </span>
+                                        <i class="fas fa-flask me-1"></i>{{ __('general.a_b_testing') }}</span>
                                 @endif
                             </div>
 
@@ -109,12 +105,10 @@
                                 <a href="{{ route('services.landing-page.show', $landingPage->slug) }}" 
                                    class="btn btn-sm btn-outline-primary" 
                                    target="_blank" rel="noopener noreferrer">
-                                    <i class="fas fa-external-link-alt me-1"></i> View Landing Page
-                                </a>
+                                    <i class="fas fa-external-link-alt me-1"></i>{{ __('general.view_landing_page') }}</a>
                                 <a href="{{ route('services.landing-page.edit', $service) }}" 
                                    class="btn btn-sm btn-primary">
-                                    <i class="fas fa-edit me-1"></i> Edit Landing Page
-                                </a>
+                                    <i class="fas fa-edit me-1"></i>{{ __('general.edit_landing_page') }}</a>
                                 @if($submissionsCount > 0)
                                     <a href="{{ route('services.landing-page.submissions', $service) }}" 
                                        class="btn btn-sm btn-success">
@@ -125,8 +119,7 @@
                                 {{-- Analytics/Tracking Button --}}
                                 <a href="{{ route('services.landing-page.analytics', $service) }}" 
                                    class="btn btn-sm btn-warning">
-                                    <i class="fas fa-chart-line me-1"></i> View Analytics
-                                </a>
+                                    <i class="fas fa-chart-line me-1"></i>{{ __('general.view_analytics') }}</a>
                                 
                                 @if($variantsCount > 0)
                                     <button class="btn btn-sm btn-info" type="button" 
@@ -143,8 +136,7 @@
                                 <div class="collapse mt-3" id="variants-{{ $landingPage->id }}">
                                     <div class="variants-list">
                                         <h6 class="fw-bold mb-2 text-primary">
-                                            <i class="fas fa-flask me-1"></i> A/B Test Variants
-                                        </h6>
+                                            <i class="fas fa-flask me-1"></i>{{ __('general.a_b_test_variants') }}</h6>
                                         <div class="list-group list-group-flush">
                                             @foreach($landingPage->variants as $variant)
                                                 <div class="list-group-item px-0 py-2">
@@ -181,13 +173,13 @@
                                                                 <a href="{{ route('services.landing-page.show', $variant->slug) }}" 
                                                                    class="btn btn-outline-success btn-sm" 
                                                                    target="_blank" rel="noopener noreferrer"
-                                                                   title="View this variant">
+                                                                   title="{{ __('general.view_this_variant') }}">
                                                                     <i class="fas fa-external-link-alt"></i>
                                                                 </a>
                                                             @endif
                                                             <a href="{{ route('services.landing-page.edit', ['service' => $service, 'landingPage' => $variant]) }}" 
                                                                class="btn btn-outline-primary btn-sm"
-                                                               title="Edit this variant">
+                                                               title="{{ __('general.edit_this_variant') }}">
                                                                 <i class="fas fa-edit"></i>
                                                             </a>
                                                         </div>
@@ -221,13 +213,10 @@
             <div class="col-md-8 offset-md-2 text-center py-5">
                 <div class="empty-state">
                     <i class="fas fa-pager fa-4x text-muted mb-3"></i>
-                    <h3>No Landing Pages Yet</h3>
-                    <p class="text-muted mb-4">
-                        Start creating beautiful landing pages for your services to convert more visitors into customers.
-                    </p>
+                    <h3>{{ __('general.no_landing_pages_yet') }}</h3>
+                    <p class="text-muted mb-4">{{ __('general.start_creating_beautiful_landing_pages_for_your_services_to_convert_more_visitors_into_customers') }}</p>
                     <a href="{{ route('services.mine') }}" class="btn btn-primary btn-lg">
-                        <i class="fas fa-plus me-2"></i> Create Your First Landing Page
-                    </a>
+                        <i class="fas fa-plus me-2"></i>{{ __('general.create_your_first_landing_page') }}</a>
                 </div>
             </div>
         </div>

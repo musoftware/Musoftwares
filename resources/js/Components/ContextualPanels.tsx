@@ -110,7 +110,7 @@ export function InvoiceQuickView({ isOpen, onClose, data }: QuickViewProps) {
                 {/* Status card */}
                 <div className="flex items-center justify-between rounded-xl border border-border bg-gray-50/50 p-4">
                     <div>
-                        <div className="text-text-muted text-[11px] font-semibold uppercase tracking-wider">Amount Due</div>
+                        <div className="text-text-muted text-[11px] font-semibold uppercase tracking-wider">{__('general.amount_due')}</div>
                         <div className="font-mono text-xl font-bold text-text-primary mt-0.5">
                             {formatMoney(data.amount, data.currency || 'USD')}
                         </div>
@@ -122,18 +122,18 @@ export function InvoiceQuickView({ isOpen, onClose, data }: QuickViewProps) {
 
                 {/* Details list */}
                 <div className="space-y-4">
-                    <h4 className="font-semibold text-text-primary">Overview Details</h4>
+                    <h4 className="font-semibold text-text-primary">{__('general.overview_details')}</h4>
                     <div className="grid grid-cols-2 gap-4 border-t border-border/60 pt-3">
                         <div>
-                            <span className="text-text-muted text-[11px] block">Client Name</span>
+                            <span className="text-text-muted text-[11px] block">{__('general.client_name')}</span>
                             <span className="font-medium text-text-primary mt-0.5 block">{data.clientName}</span>
                         </div>
                         <div>
-                            <span className="text-text-muted text-[11px] block">Issued Date</span>
+                            <span className="text-text-muted text-[11px] block">{__('general.issued_date')}</span>
                             <span className="font-medium text-text-primary mt-0.5 block">{formatDate(data.issuedDate)}</span>
                         </div>
                         <div className="mt-2">
-                            <span className="text-text-muted text-[11px] block">Due Date</span>
+                            <span className="text-text-muted text-[11px] block">{__('general.due_date')}</span>
                             <span className="font-medium text-text-primary mt-0.5 block">{formatDate(data.dueDate)}</span>
                         </div>
                         <div className="mt-2">
@@ -145,7 +145,7 @@ export function InvoiceQuickView({ isOpen, onClose, data }: QuickViewProps) {
 
                 {/* Invoice items */}
                 <div className="space-y-3">
-                    <h4 className="font-semibold text-text-primary">Line Items</h4>
+                    <h4 className="font-semibold text-text-primary">{__('general.line_items')}</h4>
                     <div className="divide-y divide-border/60 rounded-xl border border-border bg-white px-4">
                         {(data.items || [
                             { description: 'SaaS Platform Development Architecture', qty: 1, rate: data.amount }
@@ -165,14 +165,14 @@ export function InvoiceQuickView({ isOpen, onClose, data }: QuickViewProps) {
 
                 {/* Status Timeline */}
                 <div className="space-y-4">
-                    <h4 className="font-semibold text-text-primary">Invoice Timeline</h4>
+                    <h4 className="font-semibold text-text-primary">{__('general.invoice_timeline')}</h4>
                     <div className="relative border-l border-border pl-4 space-y-4 ml-2">
                         <div className="relative">
                             <div className="absolute -left-[21px] mt-0.5 bg-emerald-500 text-white rounded-full p-0.5 border-4 border-white">
                                 <CheckCircle2 className="h-3 w-3" />
                             </div>
                             <span className="text-text-muted text-[11px] block">{formatDate(data.issuedDate)}</span>
-                            <span className="font-medium text-text-primary text-xs block">Invoice drafted & sent to client</span>
+                            <span className="font-medium text-text-primary text-xs block">{__('general.invoice_drafted_sent_to_client')}</span>
                         </div>
                         {data.status === 'paid' ? (
                             <div className="relative">
@@ -180,14 +180,14 @@ export function InvoiceQuickView({ isOpen, onClose, data }: QuickViewProps) {
                                     <CheckCircle2 className="h-3 w-3" />
                                 </div>
                                 <span className="text-text-muted text-[11px] block">{formatDate(data.dueDate)}</span>
-                                <span className="font-medium text-text-primary text-xs block">Payment received successfully via Wallet Credit</span>
+                                <span className="font-medium text-text-primary text-xs block">{__('general.payment_received_successfully_via_wallet_credit')}</span>
                             </div>
                         ) : (
                             <div className="relative">
                                 <div className="absolute -left-[21px] mt-0.5 bg-gray-300 text-white rounded-full p-0.5 border-4 border-white">
                                     <Clock className="h-3 w-3" />
                                 </div>
-                                <span className="text-text-muted text-[11px] block">Awaiting client payment</span>
+                                <span className="text-text-muted text-[11px] block">{__('general.awaiting_client_payment')}</span>
                                 <span className="font-medium text-text-muted text-xs block">Overdue notification scheduled for {formatDate(data.dueDate)}</span>
                             </div>
                         )}
@@ -196,12 +196,8 @@ export function InvoiceQuickView({ isOpen, onClose, data }: QuickViewProps) {
 
                 {/* Quick actions */}
                 <div className="flex gap-3 border-t border-border pt-4">
-                    <Button className="flex-1 text-xs py-2 bg-primary hover:bg-primary-hover text-white">
-                        Send Reminder
-                    </Button>
-                    <Button variant="outline" className="flex-1 text-xs py-2">
-                        Download PDF
-                    </Button>
+                    <Button className="flex-1 text-xs py-2 bg-primary hover:bg-primary-hover text-white">{__('general.send_reminder')}</Button>
+                    <Button variant="outline" className="flex-1 text-xs py-2">{__('general.download_pdf')}</Button>
                 </div>
             </div>
         </SlideOver>
@@ -212,14 +208,14 @@ export function WalletQuickView({ isOpen, onClose, data }: QuickViewProps) {
     if (!data) return null;
 
     return (
-        <SlideOver isOpen={isOpen} onClose={onClose} title="SaaS Wallet Center" icon={Wallet}>
+        <SlideOver isOpen={isOpen} onClose={onClose} title={__('general.saas_wallet_center')} icon={Wallet}>
             <div className="space-y-6">
                 {/* Total balance card */}
                 <div className="rounded-2xl bg-gradient-to-br from-slate-900 via-slate-800 to-indigo-950 p-6 text-white shadow-xl relative overflow-hidden">
                     <div className="absolute right-0 top-0 translate-x-4 -translate-y-4 opacity-10">
                         <Wallet className="h-36 w-36" />
                     </div>
-                    <div className="text-[11px] font-semibold uppercase tracking-wider text-indigo-200">Unified Wallet Balance</div>
+                    <div className="text-[11px] font-semibold uppercase tracking-wider text-indigo-200">{__('general.unified_wallet_balance')}</div>
                     <div className="font-mono text-3xl font-bold mt-1 text-white">
                         {formatMoney(data.balance, 'USD')}
                     </div>
@@ -233,18 +229,18 @@ export function WalletQuickView({ isOpen, onClose, data }: QuickViewProps) {
 
                 {/* Account Details */}
                 <div className="space-y-3">
-                    <h4 className="font-semibold text-text-primary">Ledger Breakdown</h4>
+                    <h4 className="font-semibold text-text-primary">{__('general.ledger_breakdown')}</h4>
                     <div className="space-y-2.5">
                         <div className="flex justify-between border-b border-border/40 pb-2.5">
-                            <span className="text-text-muted">Available Funds</span>
+                            <span className="text-text-muted">{__('general.available_funds')}</span>
                             <span className="font-mono font-medium text-text-primary">{formatMoney(data.balance * 0.9, 'USD')}</span>
                         </div>
                         <div className="flex justify-between border-b border-border/40 pb-2.5">
-                            <span className="text-text-muted">Referral Bonus Credit</span>
+                            <span className="text-text-muted">{__('general.referral_bonus_credit')}</span>
                             <span className="font-mono font-medium text-text-primary">{formatMoney(data.balance * 0.1, 'USD')}</span>
                         </div>
                         <div className="flex justify-between border-b border-border/40 pb-2.5">
-                            <span className="text-text-muted">Total Withdrawals Paid</span>
+                            <span className="text-text-muted">{__('general.total_withdrawals_paid')}</span>
                             <span className="font-mono font-medium text-text-primary">$1,250.00</span>
                         </div>
                     </div>
@@ -253,8 +249,7 @@ export function WalletQuickView({ isOpen, onClose, data }: QuickViewProps) {
                 {/* Recent transaction history log */}
                 <div className="space-y-3">
                     <h4 className="font-semibold text-text-primary flex items-center gap-2">
-                        <History className="h-4 w-4 text-text-muted" /> Wallet Activity
-                    </h4>
+                        <History className="h-4 w-4 text-text-muted" />{__('general.wallet_activity')}</h4>
                     <div className="divide-y divide-border/60 rounded-xl border border-border bg-slate-50/50 px-4">
                         {(data.transactions || [
                             { desc: 'Invoice payment credit INV-201', amount: 850.00, date: '2026-05-15', type: 'credit' },
@@ -276,12 +271,8 @@ export function WalletQuickView({ isOpen, onClose, data }: QuickViewProps) {
 
                 {/* Transfer triggers */}
                 <div className="flex gap-3 border-t border-border pt-4">
-                    <Button className="flex-1 text-xs py-2 bg-slate-900 hover:bg-slate-800 text-white">
-                        Withdraw Funds
-                    </Button>
-                    <Button variant="outline" className="flex-1 text-xs py-2">
-                        Add Deposit
-                    </Button>
+                    <Button className="flex-1 text-xs py-2 bg-slate-900 hover:bg-slate-800 text-white">{__('general.withdraw_funds')}</Button>
+                    <Button variant="outline" className="flex-1 text-xs py-2">{__('general.add_deposit')}</Button>
                 </div>
             </div>
         </SlideOver>
@@ -300,7 +291,7 @@ export function ContractQuickView({ isOpen, onClose, data }: QuickViewProps) {
                 <div className="rounded-xl border border-border bg-gray-50/50 p-4">
                     <div className="flex items-start justify-between">
                         <div>
-                            <span className="text-text-muted text-[11px] block">Client Name</span>
+                            <span className="text-text-muted text-[11px] block">{__('general.client_name')}</span>
                             <span className="font-semibold text-text-primary block mt-0.5">{data.clientName}</span>
                         </div>
                         <Badge className="bg-indigo-50 border-indigo-200 text-indigo-700 capitalize text-[10px] px-2.5 py-0.5 rounded-full">
@@ -311,13 +302,13 @@ export function ContractQuickView({ isOpen, onClose, data }: QuickViewProps) {
                     {/* Contract price */}
                     <div className="mt-4 grid grid-cols-2 gap-4 border-t border-border/60 pt-3 text-xs">
                         <div>
-                            <span className="text-text-muted block">Contract Value</span>
+                            <span className="text-text-muted block">{__('general.contract_value')}</span>
                             <span className="font-mono font-bold text-text-primary text-sm mt-0.5 block">
                                 {formatMoney(data.value || 3500, 'USD')}
                             </span>
                         </div>
                         <div>
-                            <span className="text-text-muted block">Active Timer Log</span>
+                            <span className="text-text-muted block">{__('general.active_timer_log')}</span>
                             <span className="font-mono font-medium text-text-primary text-sm mt-0.5 flex items-center gap-1 block">
                                 <Clock className="h-3.5 w-3.5 text-emerald-500 animate-pulse" /> 18h 45m
                             </span>
@@ -328,7 +319,7 @@ export function ContractQuickView({ isOpen, onClose, data }: QuickViewProps) {
                 {/* Progress bar */}
                 <div className="space-y-2">
                     <div className="flex justify-between text-xs">
-                        <span className="text-text-secondary font-medium">Milestone Progress</span>
+                        <span className="text-text-secondary font-medium">{__('general.milestone_progress')}</span>
                         <span className="font-mono font-semibold text-text-primary">{progressValue}%</span>
                     </div>
                     <div className="h-2 w-full rounded-full bg-slate-100 overflow-hidden">
@@ -341,19 +332,19 @@ export function ContractQuickView({ isOpen, onClose, data }: QuickViewProps) {
 
                 {/* Milestones checklists */}
                 <div className="space-y-3">
-                    <h4 className="font-semibold text-text-primary">Project Milestones</h4>
+                    <h4 className="font-semibold text-text-primary">{__('general.project_milestones')}</h4>
                     <div className="space-y-2.5 text-xs">
                         <div className="flex items-center gap-3 p-2.5 rounded-lg border border-emerald-100 bg-emerald-50/20">
                             <CheckCircle2 className="h-4.5 w-4.5 text-emerald-500 shrink-0" />
                             <div className="flex-1">
-                                <div className="font-medium text-text-primary line-through opacity-60">Phase 1: Brand UX Wireframes & Architecture</div>
+                                <div className="font-medium text-text-primary line-through opacity-60">{__('general.phase_1_brand_ux_wireframes_architecture')}</div>
                                 <div className="text-[10px] text-emerald-700">Completed May 5, 2026</div>
                             </div>
                         </div>
                         <div className="flex items-center gap-3 p-2.5 rounded-lg border border-emerald-100 bg-emerald-50/20">
                             <CheckCircle2 className="h-4.5 w-4.5 text-emerald-500 shrink-0" />
                             <div className="flex-1">
-                                <div className="font-medium text-text-primary line-through opacity-60">Phase 2: Database Schema & Modular Migrations</div>
+                                <div className="font-medium text-text-primary line-through opacity-60">{__('general.phase_2_database_schema_modular_migrations')}</div>
                                 <div className="text-[10px] text-emerald-700">Completed May 12, 2026</div>
                             </div>
                         </div>
@@ -362,14 +353,14 @@ export function ContractQuickView({ isOpen, onClose, data }: QuickViewProps) {
                                 <div className="h-2 w-2 rounded-full bg-primary" />
                             </div>
                             <div className="flex-1">
-                                <div className="font-medium text-text-primary">Phase 3: Client Dashboard Shell Architecture Refactor</div>
-                                <div className="text-[10px] text-primary font-semibold">Currently In Progress</div>
+                                <div className="font-medium text-text-primary">{__('general.phase_3_client_dashboard_shell_architecture_refactor')}</div>
+                                <div className="text-[10px] text-primary font-semibold">{__('general.currently_in_progress')}</div>
                             </div>
                         </div>
                         <div className="flex items-center gap-3 p-2.5 rounded-lg border border-border bg-white opacity-50">
                             <div className="h-4.5 w-4.5 rounded-full border border-border shrink-0" />
                             <div className="flex-1">
-                                <div className="font-medium text-text-secondary">Phase 4: Launch Production Build & QA Integration</div>
+                                <div className="font-medium text-text-secondary">{__('general.phase_4_launch_production_build_qa_integration')}</div>
                                 <div className="text-[10px] text-text-muted">Target: May 25, 2026</div>
                             </div>
                         </div>
@@ -378,12 +369,8 @@ export function ContractQuickView({ isOpen, onClose, data }: QuickViewProps) {
 
                 {/* Operations triggers */}
                 <div className="flex gap-3 border-t border-border pt-4">
-                    <Button className="flex-1 text-xs py-2 bg-primary hover:bg-primary-hover text-white">
-                        Submit Deliverable
-                    </Button>
-                    <Button variant="outline" className="flex-1 text-xs py-2 text-rose-600 hover:text-rose-700 hover:bg-rose-50 border-rose-200">
-                        Dispute Contract
-                    </Button>
+                    <Button className="flex-1 text-xs py-2 bg-primary hover:bg-primary-hover text-white">{__('general.submit_deliverable')}</Button>
+                    <Button variant="outline" className="flex-1 text-xs py-2 text-rose-600 hover:text-rose-700 hover:bg-rose-50 border-rose-200">{__('general.dispute_contract')}</Button>
                 </div>
             </div>
         </SlideOver>
@@ -405,16 +392,14 @@ export function CustomerQuickView({ isOpen, onClose, data }: QuickViewProps) {
                         <h4 className="font-sora text-sm font-bold text-text-primary">{data.name}</h4>
                         <span className="text-text-muted text-xs block mt-0.5">{data.company || 'Musoftware LLC'}</span>
                         <div className="flex items-center gap-1.5 mt-2">
-                            <Badge className="bg-emerald-50 text-emerald-700 border-emerald-200 capitalize text-[9px] font-semibold py-0 rounded-full">
-                                Verified Client
-                            </Badge>
+                            <Badge className="bg-emerald-50 text-emerald-700 border-emerald-200 capitalize text-[9px] font-semibold py-0 rounded-full">{__('general.verified_client')}</Badge>
                         </div>
                     </div>
                 </div>
 
                 {/* Contact list details */}
                 <div className="space-y-3.5">
-                    <h4 className="font-semibold text-text-primary">Contact Coordinates</h4>
+                    <h4 className="font-semibold text-text-primary">{__('general.contact_coordinates')}</h4>
                     <div className="space-y-3 text-xs">
                         <div className="flex items-center gap-3 text-text-secondary">
                             <Mail className="h-4 w-4 text-text-muted" />
@@ -433,16 +418,16 @@ export function CustomerQuickView({ isOpen, onClose, data }: QuickViewProps) {
 
                 {/* Core operational financial metrics with this client */}
                 <div className="space-y-3">
-                    <h4 className="font-semibold text-text-primary">Financial Relationship</h4>
+                    <h4 className="font-semibold text-text-primary">{__('general.financial_relationship')}</h4>
                     <div className="grid grid-cols-2 gap-4">
                         <div className="rounded-xl border border-border bg-white p-3.5 text-center">
-                            <span className="text-text-muted text-[11px] block">Total Invoiced</span>
+                            <span className="text-text-muted text-[11px] block">{__('general.total_invoiced')}</span>
                             <span className="font-mono text-sm font-bold text-text-primary block mt-1">
                                 {formatMoney(data.totalInvoiced || 4800, 'USD')}
                             </span>
                         </div>
                         <div className="rounded-xl border border-border bg-white p-3.5 text-center">
-                            <span className="text-text-muted text-[11px] block">Paid Balance</span>
+                            <span className="text-text-muted text-[11px] block">{__('general.paid_balance')}</span>
                             <span className="font-mono text-sm font-bold text-emerald-600 block mt-1">
                                 {formatMoney(data.totalPaid || 3950, 'USD')}
                             </span>
@@ -453,19 +438,18 @@ export function CustomerQuickView({ isOpen, onClose, data }: QuickViewProps) {
                 {/* Recent relationship events */}
                 <div className="space-y-3">
                     <h4 className="font-semibold text-text-primary flex items-center gap-2">
-                        <Activity className="h-4 w-4 text-text-muted" /> Recent Activities
-                    </h4>
+                        <Activity className="h-4 w-4 text-text-muted" />{__('general.recent_activities')}</h4>
                     <div className="divide-y divide-border/60 rounded-xl border border-border bg-slate-50/50 px-4">
                         <div className="py-2.5 text-xs flex justify-between">
-                            <span className="text-text-primary">Contract "SaaS Design Shell" launched</span>
+                            <span className="text-text-primary">{__('general.contract_saas_design_shell_launched')}</span>
                             <span className="text-[10px] text-text-muted self-center">May 12</span>
                         </div>
                         <div className="py-2.5 text-xs flex justify-between">
-                            <span className="text-text-primary">Invoice INV-302 paid by client</span>
+                            <span className="text-text-primary">{__('general.invoice_inv_302_paid_by_client')}</span>
                             <span className="text-[10px] text-text-muted self-center">May 08</span>
                         </div>
                         <div className="py-2.5 text-xs flex justify-between">
-                            <span className="text-text-primary">Support ticket reopened: Stripe hook lag</span>
+                            <span className="text-text-primary">{__('general.support_ticket_reopened_stripe_hook_lag')}</span>
                             <span className="text-[10px] text-text-muted self-center">May 01</span>
                         </div>
                     </div>
@@ -474,11 +458,8 @@ export function CustomerQuickView({ isOpen, onClose, data }: QuickViewProps) {
                 {/* Message / Chat triggers */}
                 <div className="flex gap-3 border-t border-border pt-4">
                     <Button className="flex-1 text-xs py-2 bg-primary hover:bg-primary-hover text-white flex items-center justify-center gap-2">
-                        <MessageSquare className="h-4 w-4" /> Message Client
-                    </Button>
-                    <Button variant="outline" className="flex-1 text-xs py-2">
-                        View ERP File
-                    </Button>
+                        <MessageSquare className="h-4 w-4" />{__('general.message_client')}</Button>
+                    <Button variant="outline" className="flex-1 text-xs py-2">{__('general.view_erp_file')}</Button>
                 </div>
             </div>
         </SlideOver>
@@ -494,7 +475,7 @@ export function ServiceQuickView({ isOpen, onClose, data }: QuickViewProps) {
                 {/* Title & Image banner */}
                 <div className="rounded-xl border border-border overflow-hidden bg-slate-50">
                     <div className="p-4 space-y-1">
-                        <div className="text-[10px] uppercase font-bold text-indigo-600 tracking-wider">Marketplace Gig</div>
+                        <div className="text-[10px] uppercase font-bold text-indigo-600 tracking-wider">{__('general.marketplace_gig')}</div>
                         <h4 className="font-sora text-sm font-bold text-text-primary leading-tight">{data.title}</h4>
                         <div className="flex items-center gap-1 mt-2 text-xs text-text-secondary">
                             <span className="font-semibold text-text-primary">{data.sellerName || 'Mahmoud'}</span>
@@ -508,7 +489,7 @@ export function ServiceQuickView({ isOpen, onClose, data }: QuickViewProps) {
 
                 {/* Scope details */}
                 <div className="space-y-3">
-                    <h4 className="font-semibold text-text-primary">Service Capabilities</h4>
+                    <h4 className="font-semibold text-text-primary">{__('general.service_capabilities')}</h4>
                     <p className="text-text-secondary text-xs leading-normal">
                         {data.description || 'Full stack design conversion and platform optimization. Fully coded in clean responsive React/TailwindCSS structures.'}
                     </p>
@@ -519,11 +500,11 @@ export function ServiceQuickView({ isOpen, onClose, data }: QuickViewProps) {
                         </div>
                         <div className="flex items-center gap-2 text-text-secondary">
                             <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0" />
-                            <span>Framer Motion Micro-animations included</span>
+                            <span>{__('general.framer_motion_micro_animations_included')}</span>
                         </div>
                         <div className="flex items-center gap-2 text-text-secondary">
                             <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0" />
-                            <span>Clean modular components & type definitions</span>
+                            <span>{__('general.clean_modular_components_type_definitions')}</span>
                         </div>
                     </div>
                 </div>
@@ -532,28 +513,25 @@ export function ServiceQuickView({ isOpen, onClose, data }: QuickViewProps) {
                 <div className="rounded-xl border border-indigo-100 bg-indigo-50/20 p-3.5 text-xs flex gap-3">
                     <Lock className="h-5 w-5 text-indigo-500 shrink-0 mt-0.5" />
                     <div>
-                        <span className="font-bold text-indigo-900 block">Unified Escrow Safe Protection</span>
-                        <p className="text-indigo-700/80 text-[10px] mt-0.5 leading-snug">
-                            Funds are locked in escrow and only released to the expert when you review and approve the project deliverable.
-                        </p>
+                        <span className="font-bold text-indigo-900 block">{__('general.unified_escrow_safe_protection')}</span>
+                        <p className="text-indigo-700/80 text-[10px] mt-0.5 leading-snug">{__('general.funds_are_locked_in_escrow_and_only_released_to_the_expert_when_you_review_and_approve_the_project_deliverable')}</p>
                     </div>
                 </div>
 
                 {/* Pricing Packages Matrix */}
                 <div className="space-y-3">
-                    <h4 className="font-semibold text-text-primary">Pricing Tiers</h4>
+                    <h4 className="font-semibold text-text-primary">{__('general.pricing_tiers')}</h4>
                     <div className="divide-y divide-border/60 rounded-xl border border-border bg-white overflow-hidden text-xs">
                         <div className="flex justify-between p-3 bg-slate-50/50">
                             <div>
-                                <span className="font-bold text-text-primary">Basic Conversion</span>
+                                <span className="font-bold text-text-primary">{__('general.basic_conversion')}</span>
                                 <p className="text-[10px] text-text-muted mt-0.5">3 screens, standard styling</p>
                             </div>
                             <span className="font-mono font-bold text-text-primary self-center">$450.00</span>
                         </div>
                         <div className="flex justify-between p-3 border-l-2 border-indigo-500 bg-indigo-50/5">
                             <div>
-                                <span className="font-bold text-indigo-950 flex items-center gap-1">
-                                    Standard Full Core <Badge className="bg-indigo-100 text-indigo-700 text-[8px] font-bold py-0">POPULAR</Badge>
+                                <span className="font-bold text-indigo-950 flex items-center gap-1">{__('general.standard_full_core')}<Badge className="bg-indigo-100 text-indigo-700 text-[8px] font-bold py-0">POPULAR</Badge>
                                 </span>
                                 <p className="text-[10px] text-text-muted mt-0.5">10 screens, advanced layouts, state controls</p>
                             </div>
@@ -561,8 +539,8 @@ export function ServiceQuickView({ isOpen, onClose, data }: QuickViewProps) {
                         </div>
                         <div className="flex justify-between p-3">
                             <div>
-                                <span className="font-bold text-text-primary">Enterprise Refactor</span>
-                                <p className="text-[10px] text-text-muted mt-0.5">Complete system architecture overhaul</p>
+                                <span className="font-bold text-text-primary">{__('general.enterprise_refactor')}</span>
+                                <p className="text-[10px] text-text-muted mt-0.5">{__('general.complete_system_architecture_overhaul')}</p>
                             </div>
                             <span className="font-mono font-bold text-text-primary self-center">$1,500.00</span>
                         </div>
@@ -571,12 +549,8 @@ export function ServiceQuickView({ isOpen, onClose, data }: QuickViewProps) {
 
                 {/* Purchase quick CTA */}
                 <div className="flex gap-3 border-t border-border pt-4">
-                    <Button className="flex-1 text-xs py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold">
-                        Purchase Service
-                    </Button>
-                    <Button variant="outline" className="flex-1 text-xs py-2 text-text-primary">
-                        Contact Seller
-                    </Button>
+                    <Button className="flex-1 text-xs py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold">{__('general.purchase_service')}</Button>
+                    <Button variant="outline" className="flex-1 text-xs py-2 text-text-primary">{__('general.contact_seller')}</Button>
                 </div>
             </div>
         </SlideOver>

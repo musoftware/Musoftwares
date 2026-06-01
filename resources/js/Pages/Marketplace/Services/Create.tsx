@@ -63,7 +63,7 @@ export default function CreateService({ categories, seller }: Props) {
 
     return (
         <AuthenticatedLayout header={undefined}>
-            <Head title="Publish a Service" />
+            <Head title={__('general.publish_a_service')} />
 
             <div className="min-h-screen bg-slate-50">
                 {/* Top bar */}
@@ -72,7 +72,7 @@ export default function CreateService({ categories, seller }: Props) {
                         <Link href="/marketplace/dashboard" className="flex items-center gap-2 text-sm text-slate-500 hover:text-slate-900 transition-colors">
                             <ArrowLeft className="w-4 h-4" /> Back
                         </Link>
-                        <h1 className="text-base font-semibold text-slate-900">Publish a Service</h1>
+                        <h1 className="text-base font-semibold text-slate-900">{__('general.publish_a_service')}</h1>
                         <div className="text-xs text-slate-400">Step {step} of {STEPS.length}</div>
                     </div>
 
@@ -148,7 +148,7 @@ export default function CreateService({ categories, seller }: Props) {
 
                         {/* Live Preview Panel (Sticky on right) */}
                         <div className="hidden lg:block w-[350px] sticky top-32 shrink-0">
-                            <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-3">Live Preview</h3>
+                            <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-3">{__('general.live_preview')}</h3>
                             <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow">
                                 {/* Thumbnail */}
                                 <div className="aspect-[4/3] bg-slate-100 relative overflow-hidden flex items-center justify-center">
@@ -157,7 +157,7 @@ export default function CreateService({ categories, seller }: Props) {
                                     ) : (
                                         <div className="text-slate-400 flex flex-col items-center">
                                             <span className="text-4xl mb-2">📸</span>
-                                            <span className="text-xs font-medium">Image Preview</span>
+                                            <span className="text-xs font-medium">{__('general.image_preview')}</span>
                                         </div>
                                     )}
                                     {selectedCategory && (
@@ -186,7 +186,7 @@ export default function CreateService({ categories, seller }: Props) {
 
                                     {/* Footer */}
                                     <div className="flex items-center justify-between pt-3 border-t border-slate-100">
-                                        <div className="text-xs text-slate-500 font-medium">STARTING AT</div>
+                                        <div className="text-xs text-slate-500 font-medium">{__('general.starting_at_1')}</div>
                                         <div className="text-lg font-bold text-slate-900">{currency} {displayPrice}</div>
                                     </div>
                                 </div>

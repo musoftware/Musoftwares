@@ -110,7 +110,7 @@ class ServiceOrderController extends Controller
 
             event(new MarketplaceOrderPlaced($order));
 
-            return redirect()->route('marketplace.orders.show', $order->id)->with('success', 'Order placed successfully.');
+            return redirect()->route('marketplace.orders.show', $order->id)->with('success', __('general.order_placed_successfully'));
         } catch (\Exception $e) {
             DB::rollBack();
             return redirect()->back()->withErrors(['error' => 'Order failed: ' . $e->getMessage()]);
@@ -138,7 +138,7 @@ class ServiceOrderController extends Controller
             'delivery_payload' => $payload
         ]);
 
-        return redirect()->back()->with('success', 'Order marked as delivered.');
+        return redirect()->back()->with('success', __('general.order_marked_as_delivered'));
     }
 
     public function complete(ServiceOrder $order, EscrowService $escrowService)
@@ -146,7 +146,7 @@ class ServiceOrderController extends Controller
         $this->authorize('complete', $order);
 
         if ($order->status === ServiceOrderStatus::COMPLETED) {
-            return redirect()->back()->with('error', 'Order already completed.');
+            return redirect()->back()->with('error', __('general.order_already_completed'));
         }
 
         DB::beginTransaction();
@@ -169,7 +169,7 @@ class ServiceOrderController extends Controller
 
         event(new MarketplaceOrderCompleted($order));
 
-        return redirect()->back()->with('success', 'Order completed.');
+        return redirect()->back()->with('success', __('general.order_completed'));
     }
 
     public function dispute(ServiceOrder $order, EscrowService $escrowService)
@@ -185,7 +185,7 @@ class ServiceOrderController extends Controller
             $escrowService->dispute($escrow);
         }
 
-        return redirect()->back()->with('success', 'Order is now in dispute.');
+        return redirect()->back()->with('success', __('general.order_is_now_in_dispute'));
     }
 }
 

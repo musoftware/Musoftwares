@@ -78,8 +78,8 @@ export default function ProjectsIndex({ projects }: Props) {
                 {projects.length === 0 ? (
                     <div className="text-center py-20">
                         <FolderOpen className="w-12 h-12 text-slate-300 mx-auto mb-4" />
-                        <p className="text-slate-600 text-lg font-medium">No projects yet</p>
-                        <p className="text-slate-500 text-sm mt-1">Projects are created when converting appointments or from client profiles.</p>
+                        <p className="text-slate-600 text-lg font-medium">{__('general.no_projects_yet')}</p>
+                        <p className="text-slate-500 text-sm mt-1">{__('general.projects_are_created_when_converting_appointments_or_from_client_profiles')}</p>
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

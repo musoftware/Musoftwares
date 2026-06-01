@@ -115,7 +115,7 @@ export default function WalletsIndex({ wallets, hasMultiWallets, hasGoalTracking
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                             <Card>
                                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                                    <CardTitle className="text-sm font-medium">{__('Total Gold Saved')}</CardTitle>
+                                    <CardTitle className="text-sm font-medium">{__('general.total_gold_saved')}</CardTitle>
                                     <Scale className="w-4 h-4 text-muted-foreground" />
                                 </CardHeader>
                                 <CardContent>
@@ -126,7 +126,7 @@ export default function WalletsIndex({ wallets, hasMultiWallets, hasGoalTracking
                             {hasGoalTracking && (
                                 <Card>
                                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                                        <CardTitle className="text-sm font-medium">{__('Overall Goals Progress')}</CardTitle>
+                                        <CardTitle className="text-sm font-medium">{__('general.overall_goals_progress')}</CardTitle>
                                         <Target className="w-4 h-4 text-muted-foreground" />
                                     </CardHeader>
                                     <CardContent>
@@ -161,7 +161,7 @@ export default function WalletsIndex({ wallets, hasMultiWallets, hasGoalTracking
                                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
                                 <Input 
                                     className="pl-9 bg-slate-50 border-slate-200 focus-visible:ring-indigo-500" 
-                                    placeholder={__('Search wallets...')}
+                                    placeholder={__('general.search_wallets')}
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
                                 />
@@ -171,7 +171,7 @@ export default function WalletsIndex({ wallets, hasMultiWallets, hasGoalTracking
                                     <LayoutGrid className="w-4 h-4 text-slate-400" />
                                     <Select value={goalFilter} onValueChange={(value) => setGoalFilter(value)}>
                                         <SelectTrigger className="w-[180px] bg-slate-50 border-slate-200">
-                                            <SelectValue placeholder={__('Filter by Goal')} />
+                                            <SelectValue placeholder={__('general.filter_by_goal')} />
                                         </SelectTrigger>
                                         <SelectContent>
                                             {goalTypes.map(type => (
@@ -184,13 +184,13 @@ export default function WalletsIndex({ wallets, hasMultiWallets, hasGoalTracking
                                     <ArrowUpDown className="w-4 h-4 text-slate-400" />
                                     <Select value={sortBy} onValueChange={(value) => setSortBy(value)}>
                                         <SelectTrigger className="w-[180px] bg-slate-50 border-slate-200">
-                                            <SelectValue placeholder={__('Sort by')} />
+                                            <SelectValue placeholder={__('general.sort_by')} />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            <SelectItem value="recent">{__('Recent')}</SelectItem>
-                                            <SelectItem value="balance_desc">{__('Highest Balance')}</SelectItem>
-                                            <SelectItem value="balance_asc">{__('Lowest Balance')}</SelectItem>
-                                            {hasGoalTracking && <SelectItem value="target_progress">{__('Closest to Goal')}</SelectItem>}
+                                            <SelectItem value="recent">{__('general.recent')}</SelectItem>
+                                            <SelectItem value="balance_desc">{__('general.highest_balance')}</SelectItem>
+                                            <SelectItem value="balance_asc">{__('general.lowest_balance')}</SelectItem>
+                                            {hasGoalTracking && <SelectItem value="target_progress">{__('general.closest_to_goal')}</SelectItem>}
                                         </SelectContent>
                                     </Select>
                                 </div>
@@ -218,7 +218,7 @@ export default function WalletsIndex({ wallets, hasMultiWallets, hasGoalTracking
                                                 <Input 
                                                     value={newWallet.name} 
                                                     onChange={e => setNewWallet({...newWallet, name: e.target.value})} 
-                                                    placeholder={__('e.g., Kids College Fund')}
+                                                    placeholder={__('general.e_g_kids_college_fund')}
                                                     className="bg-white"
                                                     required 
                                                 />
@@ -230,14 +230,14 @@ export default function WalletsIndex({ wallets, hasMultiWallets, hasGoalTracking
                                                     onValueChange={value => setNewWallet({...newWallet, goal_type: value})}
                                                 >
                                                     <SelectTrigger className="w-full bg-white">
-                                                        <SelectValue placeholder={__('Select Goal Type')} />
+                                                        <SelectValue placeholder={__('general.select_goal_type')} />
                                                     </SelectTrigger>
                                                     <SelectContent>
                                                         <SelectItem value="Investment">{__('Investment')}</SelectItem>
                                                         <SelectItem value="Wedding">{__('Wedding')}</SelectItem>
                                                         <SelectItem value="Emergency">{__('Emergency')}</SelectItem>
                                                         <SelectItem value="Kids">{__('Kids Savings')}</SelectItem>
-                                                        <SelectItem value="Hajj">{__('Hajj / Umrah')}</SelectItem>
+                                                        <SelectItem value="Hajj">{__('general.hajj_umrah')}</SelectItem>
                                                         <SelectItem value="Retirement">{__('Retirement')}</SelectItem>
                                                     </SelectContent>
                                                 </Select>
@@ -250,12 +250,12 @@ export default function WalletsIndex({ wallets, hasMultiWallets, hasGoalTracking
                                                         step="0.01"
                                                         value={newWallet.target_grams} 
                                                         onChange={e => setNewWallet({...newWallet, target_grams: e.target.value})} 
-                                                        placeholder={__('e.g., 50.00')}
+                                                        placeholder={__('general.e_g_50_00')}
                                                         className="bg-white"
                                                     />
                                                 </div>
                                             )}
-                                            <Button type="submit" className="bg-indigo-600 hover:bg-indigo-700 text-white w-full md:w-auto">{__('Save Wallet')}</Button>
+                                            <Button type="submit" className="bg-indigo-600 hover:bg-indigo-700 text-white w-full md:w-auto">{__('general.save_wallet')}</Button>
                                         </form>
                                     </CardContent>
                                 </Card>
@@ -275,10 +275,10 @@ export default function WalletsIndex({ wallets, hasMultiWallets, hasGoalTracking
                             </div>
                             <h3 className="text-2xl font-bold text-slate-800 mb-2">{__('No Wallets Yet')}</h3>
                             <p className="text-muted-foreground max-w-md mb-8">
-                                {__('Start your gold saving journey by creating your first wallet. You can organize your savings by goals like kids, emergency, or long-term investment.')}
+                                {__('general.start_your_gold_saving_journey_by_creating_your_first_wallet_you_can_organize_your_savings_by_goals_like_kids_emergency_or_long_term_investment')}
                             </p>
                             <Button size="lg" onClick={() => setIsCreating(true)} className="bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-200 gap-2">
-                                <Plus className="w-5 h-5" /> {__('Create Your First Wallet')}
+                                <Plus className="w-5 h-5" /> {__('general.create_your_first_wallet')}
                             </Button>
                         </motion.div>
                     )}
@@ -344,7 +344,7 @@ export default function WalletsIndex({ wallets, hasMultiWallets, hasGoalTracking
                     {wallets.length > 0 && filteredWallets.length === 0 && (
                         <div className="text-center py-12 text-slate-500 bg-white rounded-xl border border-dashed border-slate-200">
                             <Search className="w-8 h-8 mx-auto text-slate-300 mb-3" />
-                            <p>{__('No wallets match your filters.')}</p>
+                            <p>{__('general.no_wallets_match_your_filters')}</p>
                             <Button variant="link" onClick={() => { setSearchQuery(''); setGoalFilter('All'); }} className="mt-2">
                                 {__('Clear Filters')}
                             </Button>

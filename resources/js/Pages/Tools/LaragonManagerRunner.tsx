@@ -106,7 +106,7 @@ export default function LaragonManagerRunner({ tool }: any) {
         <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex items-center justify-center font-sans">
             <div className="text-center space-y-3">
                 <div className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto" />
-                <p className="text-sm font-semibold text-slate-500">Connecting to Runtime...</p>
+                <p className="text-sm font-semibold text-slate-500">{__('general.connecting_to_runtime')}</p>
             </div>
         </div>
     );
@@ -118,13 +118,13 @@ export default function LaragonManagerRunner({ tool }: any) {
                     <div className="w-7 h-7 bg-blue-500 rounded-lg flex items-center justify-center shadow-sm">
                         <Folder className="w-4 h-4 text-white" />
                     </div>
-                    <span className="font-bold text-sm text-slate-800 dark:text-slate-200 tracking-tight">Local Server Manager</span>
+                    <span className="font-bold text-sm text-slate-800 dark:text-slate-200 tracking-tight">{__('general.local_server_manager')}</span>
                 </div>
                 <div className="flex items-center gap-3">
                     <Input 
                         value={rootPath}
                         onChange={(e) => setRootPath(e.target.value)}
-                        placeholder="C:\laragon\www"
+                        placeholder={__('general.c_laragon_www')}
                         className="h-8 w-48 text-xs font-mono"
                     />
                     <Button
@@ -181,8 +181,7 @@ export default function LaragonManagerRunner({ tool }: any) {
                                     className="flex-1 text-xs h-8"
                                     onClick={() => window.open(p.localUrl, '_blank')}
                                 >
-                                    <Globe2 className="w-3.5 h-3.5 mr-1.5 text-blue-500" /> Open Web
-                                </Button>
+                                    <Globe2 className="w-3.5 h-3.5 mr-1.5 text-blue-500" />{__('general.open_web')}</Button>
                             </div>
                         </div>
                     ))}
@@ -191,8 +190,8 @@ export default function LaragonManagerRunner({ tool }: any) {
                 {projects.length === 0 && !loading && !errorMsg && (
                     <div className="text-center py-20">
                         <FolderOpen className="w-12 h-12 text-slate-300 mx-auto mb-3" />
-                        <h3 className="text-lg font-bold text-slate-600">No Projects Found</h3>
-                        <p className="text-slate-400 text-sm mt-1">Make sure Laragon is installed at C:\laragon\www</p>
+                        <h3 className="text-lg font-bold text-slate-600">{__('general.no_projects_found_1')}</h3>
+                        <p className="text-slate-400 text-sm mt-1">{__('general.make_sure_laragon_is_installed_at_c_laragon_www')}</p>
                     </div>
                 )}
             </div>

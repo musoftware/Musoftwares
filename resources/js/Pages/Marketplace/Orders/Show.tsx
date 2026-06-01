@@ -110,9 +110,7 @@ export default function Show({ order, conversation }: any) {
                                 </div>
                                 <div
                                     className={`text-center ${currentStepIndex >= 1 ? 'font-bold text-indigo-600' : ''}`}
-                                >
-                                    In Progress
-                                </div>
+                                >{__('general.in_progress')}</div>
                                 <div
                                     className={`text-center ${currentStepIndex >= 2 ? 'font-bold text-indigo-600' : ''}`}
                                 >
@@ -145,9 +143,7 @@ export default function Show({ order, conversation }: any) {
                                             strokeWidth="2"
                                             d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
                                         ></path>
-                                    </svg>
-                                    Buyer Requirements
-                                </h4>
+                                    </svg>{__('general.buyer_requirements')}</h4>
                                 <div className="rounded-lg border border-gray-100 bg-gray-50 p-4 text-sm text-gray-700">
                                     <p>
                                         I need a clean and modern logo for my
@@ -174,9 +170,7 @@ export default function Show({ order, conversation }: any) {
                                                 strokeWidth="2"
                                                 d="M5 13l4 4L19 7"
                                             ></path>
-                                        </svg>
-                                        Delivery from Seller
-                                    </h4>
+                                        </svg>{__('general.delivery_from_seller')}</h4>
 
                                     <div className="mb-6">
                                         <h5 className="mb-2 text-sm font-medium text-gray-700">
@@ -218,9 +212,7 @@ export default function Show({ order, conversation }: any) {
                                                         strokeWidth="2"
                                                         d="M5 13l4 4L19 7"
                                                     ></path>
-                                                </svg>
-                                                Accept & Complete
-                                            </button>
+                                                </svg>{__('general.accept_complete')}</button>
                                             <button
                                                 onClick={handleRequestRevision}
                                                 className="flex flex-1 items-center justify-center gap-2 rounded-lg border-2 border-indigo-600 bg-white px-4 py-2.5 font-bold text-indigo-600 transition hover:bg-indigo-50"
@@ -237,9 +229,7 @@ export default function Show({ order, conversation }: any) {
                                                         strokeWidth="2"
                                                         d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
                                                     ></path>
-                                                </svg>
-                                                Request Revision
-                                            </button>
+                                                </svg>{__('general.request_revision')}</button>
                                         </div>
                                     )}
                                 </div>
@@ -261,13 +251,9 @@ export default function Show({ order, conversation }: any) {
                                                 strokeWidth="2"
                                                 d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
                                             ></path>
-                                        </svg>
-                                        Order Messages
-                                    </h4>
+                                        </svg>{__('general.order_messages')}</h4>
                                     <span className="flex items-center gap-1 rounded-full bg-green-100 px-2 py-1 text-xs font-medium text-green-800">
-                                        <span className="h-2 w-2 animate-pulse rounded-full bg-green-500"></span>
-                                        Real-time active
-                                    </span>
+                                        <span className="h-2 w-2 animate-pulse rounded-full bg-green-500"></span>{__('general.real_time_active')}</span>
                                 </div>
 
                                 <div className="flex flex-1 flex-col gap-4 overflow-y-auto bg-gray-50 p-4">
@@ -331,9 +317,7 @@ export default function Show({ order, conversation }: any) {
                                                     d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
                                                 ></path>
                                             </svg>
-                                            <p className="text-sm">
-                                                No messages yet. Say hello!
-                                            </p>
+                                            <p className="text-sm">{__('general.no_messages_yet_say_hello')}</p>
                                         </div>
                                     )}
                                 </div>
@@ -389,7 +373,7 @@ export default function Show({ order, conversation }: any) {
                                         <input
                                             type="text"
                                             name="body"
-                                            placeholder="Type your message..."
+                                            placeholder={__('general.type_your_message')}
                                             autoComplete="off"
                                             className="flex-1 rounded-full border-gray-300 bg-gray-50 px-4 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                                         />
@@ -422,9 +406,7 @@ export default function Show({ order, conversation }: any) {
                                 {/* Order Info Card */}
                                 <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
                                     <div className="flex items-center justify-between border-b border-gray-200 bg-gray-50 p-4">
-                                        <h4 className="font-bold text-gray-900">
-                                            Order Details
-                                        </h4>
+                                        <h4 className="font-bold text-gray-900">{__('general.order_details')}</h4>
                                         <span className="rounded bg-gray-200 px-2 py-1 font-mono text-xs text-gray-500">
                                             #
                                             {order.id
@@ -456,9 +438,7 @@ export default function Show({ order, conversation }: any) {
                                                         strokeWidth="2"
                                                         d="M5 13l4 4L19 7"
                                                     ></path>
-                                                </svg>
-                                                Source files included
-                                            </div>
+                                                </svg>{__('general.source_files_included')}</div>
                                             <div className="flex items-start text-sm text-gray-600">
                                                 <svg
                                                     className="mr-2 h-5 w-5 shrink-0 text-green-500"
@@ -488,9 +468,7 @@ export default function Show({ order, conversation }: any) {
                                                         strokeWidth="2"
                                                         d="M5 13l4 4L19 7"
                                                     ></path>
-                                                </svg>
-                                                Commercial use
-                                            </div>
+                                                </svg>{__('general.commercial_use')}</div>
                                         </div>
 
                                         <div className="mb-6 border-t border-gray-100 pt-4">
@@ -511,9 +489,7 @@ export default function Show({ order, conversation }: any) {
                                                         </span>
                                                     </div>
                                                     <div className="flex justify-between border-t border-gray-100 pt-2 font-bold text-gray-900">
-                                                        <span>
-                                                            Your Earnings
-                                                        </span>
+                                                        <span>{__('general.your_earnings')}</span>
                                                         <span>
                                                             {order.formatted_seller_earnings}
                                                         </span>
@@ -521,7 +497,7 @@ export default function Show({ order, conversation }: any) {
                                                 </div>
                                             ) : (
                                                 <div className="flex justify-between text-lg font-bold text-gray-900">
-                                                    <span>Total Paid</span>
+                                                    <span>{__('general.total_paid')}</span>
                                                     <span>
                                                         {order.formatted_amount}
                                                     </span>
@@ -581,20 +557,16 @@ export default function Show({ order, conversation }: any) {
                                                         d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"
                                                     ></path>
                                                 </svg>
-                                                <h4 className="font-bold text-indigo-900">
-                                                    Submit Delivery
-                                                </h4>
+                                                <h4 className="font-bold text-indigo-900">{__('general.submit_delivery')}</h4>
                                             </div>
                                             <div className="p-6">
                                                 <form onSubmit={handleDeliver}>
                                                     <div className="mb-4">
-                                                        <label className="mb-2 block text-sm font-medium text-gray-700">
-                                                            Delivery Note
-                                                        </label>
+                                                        <label className="mb-2 block text-sm font-medium text-gray-700">{__('general.delivery_note')}</label>
                                                         <textarea
                                                             className="w-full rounded-lg border-gray-300 text-sm shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                                                             rows={4}
-                                                            placeholder="Describe what you are delivering..."
+                                                            placeholder={__('general.describe_what_you_are_delivering')}
                                                             value={deliveryNote}
                                                             onChange={(e) =>
                                                                 setDeliveryNote(
@@ -612,15 +584,13 @@ export default function Show({ order, conversation }: any) {
                                                         <input
                                                             type="url"
                                                             className="w-full rounded-lg border-gray-300 text-sm shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                                            placeholder="https://..."
+                                                            placeholder={__('general.https')}
                                                             value={deliveryLinks}
                                                             onChange={(e) => setDeliveryLinks(e.target.value)}
                                                         />
                                                     </div>
                                                     <div className="mb-6">
-                                                        <label className="mb-2 block text-sm font-medium text-gray-700">
-                                                            Upload Files
-                                                        </label>
+                                                        <label className="mb-2 block text-sm font-medium text-gray-700">{__('general.upload_files')}</label>
                                                         <div className="cursor-pointer rounded-lg border-2 border-dashed border-gray-300 p-6 text-center transition hover:bg-gray-50">
                                                             <svg
                                                                 className="mx-auto mb-2 h-8 w-8 text-gray-400"
@@ -662,9 +632,7 @@ export default function Show({ order, conversation }: any) {
                                                                 strokeWidth="2"
                                                                 d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
                                                             ></path>
-                                                        </svg>
-                                                        Send Delivery
-                                                    </button>
+                                                        </svg>{__('general.send_delivery')}</button>
                                                 </form>
                                             </div>
                                         </div>
@@ -682,9 +650,7 @@ export default function Show({ order, conversation }: any) {
                                             )
                                         }
                                         className="text-xs text-gray-500 underline transition hover:text-red-600"
-                                    >
-                                        Having issues? Dispute Order
-                                    </button>
+                                    >{__('general.having_issues_dispute_order')}</button>
                                 </div>
                             </div>
                         </div>

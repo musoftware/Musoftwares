@@ -43,44 +43,39 @@ export default function Smtp({ smtp }) {
     };
 
     return (
-        <ERPLayout title="SMTP Settings" workspaceName={workspaceName} tenantId={tenantId} menuItems={menuItems} lockedAddons={lockedAddons}>
+        <ERPLayout title={__('general.smtp_settings')} workspaceName={workspaceName} tenantId={tenantId} menuItems={menuItems} lockedAddons={lockedAddons}>
             <div className="max-w-4xl mx-auto px-4 py-10">
                 <div className="mb-8">
                     <h1 className="text-2xl font-bold tracking-tight">Email Delivery (SMTP)</h1>
-                    <p className="text-muted-foreground mt-1">
-                        Configure your SMTP server to send invoices and notifications directly from your own email address.
-                    </p>
+                    <p className="text-muted-foreground mt-1">{__('general.configure_your_smtp_server_to_send_invoices_and_notifications_directly_from_your_own_email_address')}</p>
                 </div>
 
                 <form onSubmit={handleSubmit} className="space-y-6">
                     <Card>
                         <CardHeader>
                             <CardTitle className="flex items-center gap-2">
-                                <Mail className="h-5 w-5 text-primary" /> Sender Identity
-                            </CardTitle>
-                            <CardDescription>
-                                This information will appear as the sender when clients receive your emails.
-                            </CardDescription>
+                                <Mail className="h-5 w-5 text-primary" />{__('general.sender_identity')}</CardTitle>
+                            <CardDescription>{__('general.this_information_will_appear_as_the_sender_when_clients_receive_your_emails')}</CardDescription>
                         </CardHeader>
                         <CardContent className="grid gap-6 md:grid-cols-2">
                             <div className="space-y-2">
-                                <Label htmlFor="from_name">Sender Name <span className="text-destructive">*</span></Label>
+                                <Label htmlFor="from_name">{__('general.sender_name')}<span className="text-destructive">*</span></Label>
                                 <Input
                                     id="from_name"
                                     value={data.from_name}
                                     onChange={e => setData('from_name', e.target.value)}
-                                    placeholder="e.g. Acme Corp Billing"
+                                    placeholder={__('general.e_g_acme_corp_billing')}
                                 />
                                 {errors.from_name && <p className="text-xs text-destructive">{errors.from_name}</p>}
                             </div>
                             <div className="space-y-2">
-                                <Label htmlFor="from_address">Sender Email <span className="text-destructive">*</span></Label>
+                                <Label htmlFor="from_address">{__('general.sender_email')}<span className="text-destructive">*</span></Label>
                                 <Input
                                     id="from_address"
                                     type="email"
                                     value={data.from_address}
                                     onChange={e => setData('from_address', e.target.value)}
-                                    placeholder="e.g. billing@acmecorp.com"
+                                    placeholder={__('general.e_g_billing_acmecorp_com')}
                                 />
                                 {errors.from_address && <p className="text-xs text-destructive">{errors.from_address}</p>}
                             </div>
@@ -90,32 +85,29 @@ export default function Smtp({ smtp }) {
                     <Card>
                         <CardHeader>
                             <CardTitle className="flex items-center gap-2">
-                                <Shield className="h-5 w-5 text-primary" /> Server Credentials
-                            </CardTitle>
-                            <CardDescription>
-                                Enter your SMTP server details. You can find these in your email provider's settings.
-                            </CardDescription>
+                                <Shield className="h-5 w-5 text-primary" />{__('general.server_credentials')}</CardTitle>
+                            <CardDescription>{__('general.enter_your_smtp_server_details_you_can_find_these_in_your_email_provider_s_settings')}</CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-6">
                             <div className="grid gap-6 md:grid-cols-2">
                                 <div className="space-y-2">
-                                    <Label htmlFor="host">SMTP Host <span className="text-destructive">*</span></Label>
+                                    <Label htmlFor="host">{__('general.smtp_host')}<span className="text-destructive">*</span></Label>
                                     <Input
                                         id="host"
                                         value={data.host}
                                         onChange={e => setData('host', e.target.value)}
-                                        placeholder="e.g. smtp.gmail.com"
+                                        placeholder={__('general.e_g_smtp_gmail_com')}
                                     />
                                     {errors.host && <p className="text-xs text-destructive">{errors.host}</p>}
                                 </div>
                                 <div className="space-y-2">
-                                    <Label htmlFor="port">SMTP Port <span className="text-destructive">*</span></Label>
+                                    <Label htmlFor="port">{__('general.smtp_port')}<span className="text-destructive">*</span></Label>
                                     <Input
                                         id="port"
                                         type="number"
                                         value={data.port}
                                         onChange={e => setData('port', e.target.value)}
-                                        placeholder="e.g. 587"
+                                        placeholder={__('general.e_g_587')}
                                     />
                                     {errors.port && <p className="text-xs text-destructive">{errors.port}</p>}
                                 </div>
@@ -128,7 +120,7 @@ export default function Smtp({ smtp }) {
                                         id="username"
                                         value={data.username}
                                         onChange={e => setData('username', e.target.value)}
-                                        placeholder="Your SMTP username"
+                                        placeholder={__('general.your_smtp_username')}
                                     />
                                     {errors.username && <p className="text-xs text-destructive">{errors.username}</p>}
                                 </div>
@@ -164,8 +156,7 @@ export default function Smtp({ smtp }) {
 
                     <div className="flex justify-end gap-4">
                         <Button type="submit" disabled={processing} className="w-full sm:w-auto">
-                            <Save className="mr-2 h-4 w-4" /> Save Settings
-                        </Button>
+                            <Save className="mr-2 h-4 w-4" />{__('general.save_settings')}</Button>
                     </div>
                 </form>
             </div>

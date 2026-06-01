@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Investment Report</title>
+    <title>{{ __('general.investment_report') }}</title>
     <style>
         body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #333; line-height: 1.6; }
         .header { text-align: center; border-bottom: 2px solid #333; padding-bottom: 20px; margin-bottom: 30px; }
@@ -20,13 +20,13 @@
 </head>
 <body>
     <div class="header">
-        <h1>Gold Investment Report</h1>
+        <h1>{{ __('general.gold_investment_report') }}</h1>
         <div class="meta">Generated for: {{ $user->name }} | Date: {{ now()->format('M d, Y') }}</div>
         <div class="meta">Period: {{ ucfirst($period) }} | Wallet: {{ $walletName }}</div>
     </div>
 
     <div class="section">
-        <h2 class="section-title">Portfolio Summary</h2>
+        <h2 class="section-title">{{ __('general.portfolio_summary') }}</h2>
         <div class="summary-box">
             <div class="summary-item"><span class="summary-label">Total Wallets:</span> {{ $stats['total_wallets'] }}</div>
             <div class="summary-item"><span class="summary-label">Total Grams:</span> {{ number_format($stats['total_grams'], 2) }} g</div>
@@ -37,7 +37,7 @@
     </div>
 
     <div class="section">
-        <h2 class="section-title">Recent Transactions</h2>
+        <h2 class="section-title">{{ __('general.recent_transactions') }}</h2>
         @if(count($transactions) > 0)
         <table>
             <thead>
@@ -60,7 +60,7 @@
             </tbody>
         </table>
         @else
-        <p>No transactions found for this period.</p>
+        <p>{{ __('general.no_transactions_found_for_this_period') }}</p>
         @endif
     </div>
 </body>

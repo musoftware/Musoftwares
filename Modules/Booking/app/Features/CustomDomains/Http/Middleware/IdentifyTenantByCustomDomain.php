@@ -35,12 +35,12 @@ class IdentifyTenantByCustomDomain
         $customDomain = $this->repository->findActiveDomain($host);
 
         if (!$customDomain) {
-            abort(404, 'Domain not configured or verified.');
+            abort(404, __('general.domain_not_configured_or_verified'));
         }
 
         // Verify the SaaS feature is still active for this tenant
         if (!feature('booking-custom-domain', $customDomain->tenant_id)) {
-            abort(403, 'Custom domain feature is locked for this account.');
+            abort(403, __('general.custom_domain_feature_is_locked_for_this_account'));
         }
         
         // At this point, we've identified the tenant. We can inject the tenant context 

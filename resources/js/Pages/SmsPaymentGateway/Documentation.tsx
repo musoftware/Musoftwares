@@ -38,8 +38,8 @@ export default function Documentation() {
                         <TabsContent value="simple">
                             <Card>
                                 <CardHeader>
-                                    <CardTitle>SmsPay.js Widget</CardTitle>
-                                    <CardDescription>Embed the payment flow in your frontend without redirecting the user.</CardDescription>
+                                    <CardTitle>{__('general.smspay_js_widget')}</CardTitle>
+                                    <CardDescription>{__('general.embed_the_payment_flow_in_your_frontend_without_redirecting_the_user')}</CardDescription>
                                 </CardHeader>
                                 <CardContent>
                                     <div className="space-y-4">
@@ -51,11 +51,11 @@ export default function Documentation() {
                                         </div>
 
                                         <h3 className="text-lg font-bold text-slate-800 mt-6">2. Trigger Checkout</h3>
-                                        <p className="text-slate-600 text-sm">Use the session ID you created on your backend and your <strong>Publishable Key</strong>.</p>
+                                        <p className="text-slate-600 text-sm">{__('general.use_the_session_id_you_created_on_your_backend_and_your')}<strong>{__('general.publishable_key')}</strong>.</p>
                                         
                                         <div className="bg-slate-900 rounded-lg p-4 overflow-x-auto">
                                             <pre className="text-slate-300 text-sm">
-<code>{`<button id="pay-button">Pay Now</button>
+<code>{`<button id="pay-button">{__('general.pay_now')}</button>
 
 <script>
   // Initialize with your PUBLISHABLE KEY
@@ -91,7 +91,7 @@ export default function Documentation() {
                                 <Card>
                                     <CardHeader>
                                         <CardTitle>SDK Integration (Backend)</CardTitle>
-                                        <CardDescription>Integrate the SMS Payment Gateway directly into your backend to create sessions.</CardDescription>
+                                        <CardDescription>{__('general.integrate_the_sms_payment_gateway_directly_into_your_backend_to_create_sessions')}</CardDescription>
                                     </CardHeader>
                                     <CardContent className="space-y-6">
                                         <div className="space-y-4">
@@ -99,26 +99,22 @@ export default function Documentation() {
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                                 <div className="bg-slate-900 rounded-lg p-4 flex flex-col justify-between items-start gap-4">
                                                     <div>
-                                                        <div className="text-xs text-slate-400 font-bold mb-2">PHP SDK</div>
-                                                        <p className="text-slate-300 text-sm">Download the PHP SDK to integrate with your PHP backend.</p>
+                                                        <div className="text-xs text-slate-400 font-bold mb-2">{__('general.php_sdk')}</div>
+                                                        <p className="text-slate-300 text-sm">{__('general.download_the_php_sdk_to_integrate_with_your_php_backend')}</p>
                                                     </div>
                                                     <Button variant="secondary" size="sm" asChild>
                                                         <a href="/sdks/smspay-php.zip" download>
-                                                            <Download className="w-4 h-4 mr-2" />
-                                                            Download PHP SDK
-                                                        </a>
+                                                            <Download className="w-4 h-4 mr-2" />{__('general.download_php_sdk')}</a>
                                                     </Button>
                                                 </div>
                                                 <div className="bg-slate-900 rounded-lg p-4 flex flex-col justify-between items-start gap-4">
                                                     <div>
-                                                        <div className="text-xs text-slate-400 font-bold mb-2">Node.js SDK</div>
-                                                        <p className="text-slate-300 text-sm">Download the Node.js SDK to integrate with your Node application.</p>
+                                                        <div className="text-xs text-slate-400 font-bold mb-2">{__('general.node_js_sdk')}</div>
+                                                        <p className="text-slate-300 text-sm">{__('general.download_the_node_js_sdk_to_integrate_with_your_node_application')}</p>
                                                     </div>
                                                     <Button variant="secondary" size="sm" asChild>
                                                         <a href="/sdks/smspay-node.zip" download>
-                                                            <Download className="w-4 h-4 mr-2" />
-                                                            Download Node.js SDK
-                                                        </a>
+                                                            <Download className="w-4 h-4 mr-2" />{__('general.download_node_js_sdk')}</a>
                                                     </Button>
                                                 </div>
                                             </div>
@@ -126,12 +122,12 @@ export default function Documentation() {
 
                                         <div className="space-y-4">
                                             <h3 className="text-lg font-bold text-slate-800">2. Create a Checkout Session</h3>
-                                            <p className="text-slate-600 text-sm">When your customer wants to pay, create a Checkout Session on your server using your <strong>Secret Key</strong>.</p>
+                                            <p className="text-slate-600 text-sm">{__('general.when_your_customer_wants_to_pay_create_a_checkout_session_on_your_server_using_your')}<strong>{__('general.secret_key')}</strong>.</p>
                                             
                                             <Tabs defaultValue="php" className="w-full mt-2">
                                                 <TabsList className="h-8">
                                                     <TabsTrigger value="php" className="text-xs">PHP</TabsTrigger>
-                                                    <TabsTrigger value="node" className="text-xs">Node.js</TabsTrigger>
+                                                    <TabsTrigger value="node" className="text-xs">{__('general.node_js')}</TabsTrigger>
                                                 </TabsList>
                                                 <TabsContent value="php">
                                                     <div className="bg-slate-900 rounded-lg p-4 overflow-x-auto">
@@ -181,20 +177,17 @@ res.json({ id: session.id });`}</code>
 
                                 <Card>
                                     <CardHeader>
-                                        <CardTitle>Verifying Webhooks</CardTitle>
-                                        <CardDescription>Securely receive payment confirmations.</CardDescription>
+                                        <CardTitle>{__('general.verifying_webhooks')}</CardTitle>
+                                        <CardDescription>{__('general.securely_receive_payment_confirmations')}</CardDescription>
                                     </CardHeader>
                                     <CardContent>
-                                        <p className="text-slate-600 mb-4">
-                                            To securely confirm that a webhook was actually sent by our gateway, you must verify its cryptographic signature using your Webhook Secret.
-                                            <br/><br/>
-                                            <strong>Never</strong> fulfill an order without verifying the webhook signature.
-                                        </p>
+                                        <p className="text-slate-600 mb-4">{__('general.to_securely_confirm_that_a_webhook_was_actually_sent_by_our_gateway_you_must_verify_its_cryptographic_signature_using_your_webhook_secret')}<br/><br/>
+                                            <strong>Never</strong>{__('general.fulfill_an_order_without_verifying_the_webhook_signature')}</p>
                                         
                                         <Tabs defaultValue="php" className="w-full">
                                             <TabsList className="h-8">
                                                 <TabsTrigger value="php" className="text-xs">PHP</TabsTrigger>
-                                                <TabsTrigger value="node" className="text-xs">Node.js</TabsTrigger>
+                                                <TabsTrigger value="node" className="text-xs">{__('general.node_js')}</TabsTrigger>
                                             </TabsList>
                                             <TabsContent value="php">
                                                 <div className="bg-slate-900 rounded-lg p-4 overflow-x-auto">
@@ -275,9 +268,7 @@ app.post('/webhook', express.raw({type: 'application/json'}), (req, res) => {
                             <div>
                                 <h4 className="font-bold mb-1 text-amber-900 dark:text-amber-400">English</h4>
                                 <p>
-                                    <strong>Never rely on the frontend <code>onSuccess</code> callback to fulfill orders.</strong><br/>
-                                    Client-side code can be easily manipulated or bypassed by users (hijacking). The <code>onSuccess</code> event is strictly for UI purposes, such as redirecting the user to a "Thank You" page. To securely verify that a payment was successful, you must use <strong>Webhooks</strong> or Server-Side API verification, exactly as implemented by major gateways like Stripe.
-                                </p>
+                                    <strong>{__('general.never_rely_on_the_frontend')}<code>onSuccess</code>{__('general.callback_to_fulfill_orders')}</strong><br/>{__('general.client_side_code_can_be_easily_manipulated_or_bypassed_by_users_hijacking_the')}<code>onSuccess</code>{__('general.event_is_strictly_for_ui_purposes_such_as_redirecting_the_user_to_a_thank_you_page_to_securely_verify_that_a_payment_was_successful_you_must_use')}<strong>Webhooks</strong>{__('general.or_server_side_api_verification_exactly_as_implemented_by_major_gateways_like_stripe')}</p>
                             </div>
                             <div dir="rtl" className="text-right font-sans">
                                 <h4 className="font-bold mb-1 text-amber-900 dark:text-amber-400">عربي</h4>

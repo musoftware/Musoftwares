@@ -15,7 +15,7 @@ export function B2BProspectorHeader({ activeTab, setActiveTab }: HeaderProps) {
                     <div className="w-6.5 h-6.5 bg-gradient-to-tr from-teal-500 to-indigo-600 rounded-lg flex items-center justify-center shadow-md shadow-teal-500/20">
                         <Layers className="w-3.5 h-3.5 text-white" />
                     </div>
-                    <span className="font-bold text-sm tracking-tight bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">B2B Leads Finder</span>
+                    <span className="font-bold text-sm tracking-tight bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">{__('general.b2b_leads_finder')}</span>
                 </div>
                 
                 <div className="h-5 w-px bg-slate-200" />
@@ -25,44 +25,34 @@ export function B2BProspectorHeader({ activeTab, setActiveTab }: HeaderProps) {
                         variant={activeTab === 'campaigns' ? 'default' : 'ghost'}
                         size="sm"
                         onClick={() => setActiveTab('campaigns')}
-                    >
-                        Find Leads
-                    </Button>
+                    >{__('general.find_leads')}</Button>
                     <Button 
                         variant={activeTab === 'leads' ? 'default' : 'ghost'}
                         size="sm"
                         onClick={() => setActiveTab('leads')}
-                    >
-                        Lead Manager
-                    </Button>
+                    >{__('general.lead_manager')}</Button>
                     <Button 
                         variant={activeTab === 'inboxes' ? 'default' : 'ghost'}
                         size="sm"
                         onClick={() => setActiveTab('inboxes')}
-                    >
-                        Sending Mailboxes
-                    </Button>
+                    >{__('general.sending_mailboxes')}</Button>
                     <Button 
                         variant={activeTab === 'outreach' ? 'default' : 'ghost'}
                         size="sm"
                         onClick={() => setActiveTab('outreach')}
-                    >
-                        Outreach Sequences
-                    </Button>
+                    >{__('general.outreach_sequences')}</Button>
                     <Button 
                         variant={activeTab === 'linked-profiles' ? 'default' : 'ghost'}
                         size="sm"
                         onClick={() => setActiveTab('linked-profiles')}
-                    >
-                        LinkedIn Profile
-                    </Button>
+                    >{__('general.linkedin_profile')}</Button>
                 </nav>
             </div>
 
             <div className="flex items-center gap-4">
                 <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-100 text-emerald-800">
                     <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                    <span className="text-[10px] font-bold uppercase tracking-wider font-mono">Secure SQLite Active</span>
+                    <span className="text-[10px] font-bold uppercase tracking-wider font-mono">{__('general.secure_sqlite_active')}</span>
                 </div>
             </div>
         </header>

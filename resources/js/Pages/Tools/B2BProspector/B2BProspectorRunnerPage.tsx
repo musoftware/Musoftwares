@@ -71,8 +71,8 @@ export default function B2BProspectorRunnerPage({ tool, subscription, runtimePor
             <div className="min-h-screen bg-[#F8FAFC] flex items-center justify-center font-sans">
                 <div className="text-center space-y-4">
                     <div className="w-10 h-10 border-2 border-slate-900 border-t-transparent rounded-full animate-spin mx-auto" />
-                    <p className="text-sm font-semibold text-slate-600">Syncing with Local Runtime Agent...</p>
-                    <p className="text-xs text-slate-400">Make sure your Musoftware Runtime is running on your machine.</p>
+                    <p className="text-sm font-semibold text-slate-600">{__('general.syncing_with_local_runtime_agent')}</p>
+                    <p className="text-xs text-slate-400">{__('general.make_sure_your_musoftware_runtime_is_running_on_your_machine')}</p>
                 </div>
             </div>
         );

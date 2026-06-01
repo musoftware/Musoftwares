@@ -124,7 +124,7 @@ export default function ObfuscatorRunner({ tool }: any) {
         <div className="min-h-screen bg-slate-50 dark:bg-slate-950 font-sans">
             <div className="h-14 bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 flex items-center px-6 sticky top-0 z-10">
                 <Shield className="w-5 h-5 text-indigo-500 mr-2" />
-                <span className="font-bold text-sm">JS Code Protector</span>
+                <span className="font-bold text-sm">{__('general.js_code_protector')}</span>
             </div>
 
             <div className="max-w-3xl mx-auto px-4 py-8">
@@ -133,12 +133,12 @@ export default function ObfuscatorRunner({ tool }: any) {
                     
                     <div className="space-y-4 mb-6">
                         <div>
-                            <label className="text-xs font-bold text-slate-500 uppercase">Source File or Directory</label>
+                            <label className="text-xs font-bold text-slate-500 uppercase">{__('general.source_file_or_directory')}</label>
                             <div className="flex gap-2 mt-1">
                                 <Input 
                                     value={sourcePath} 
                                     onChange={e => setSourcePath(e.target.value)} 
-                                    placeholder="C:\projects\my-app\src" 
+                                    placeholder={__('general.c_projects_my_app_src')} 
                                     className="flex-1"
                                 />
                                 <Button onClick={handleScan} variant="secondary">Scan</Button>
@@ -152,17 +152,17 @@ export default function ObfuscatorRunner({ tool }: any) {
                         )}
 
                         <div>
-                            <label className="text-xs font-bold text-slate-500 uppercase">Output Directory</label>
+                            <label className="text-xs font-bold text-slate-500 uppercase">{__('general.output_directory')}</label>
                             <Input 
                                 value={outputPath} 
                                 onChange={e => setOutputPath(e.target.value)} 
-                                placeholder="C:\projects\my-app\dist" 
+                                placeholder={__('general.c_projects_my_app_dist')} 
                                 className="mt-1"
                             />
                         </div>
 
                         <div>
-                            <label className="text-xs font-bold text-slate-500 uppercase">Obfuscation Level</label>
+                            <label className="text-xs font-bold text-slate-500 uppercase">{__('general.obfuscation_level')}</label>
                             <Select value={level} onValueChange={setLevel}>
                                 <SelectTrigger className="mt-1">
                                     <SelectValue />
@@ -194,8 +194,7 @@ export default function ObfuscatorRunner({ tool }: any) {
                             </div>
                         ) : (
                             <Button onClick={handleStart} className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold h-11" disabled={!scanResult || scanResult.count === 0}>
-                                <Play className="w-4 h-4 mr-2" /> Start Obfuscation
-                            </Button>
+                                <Play className="w-4 h-4 mr-2" />{__('general.start_obfuscation')}</Button>
                         )}
                         
                         {errorMsg && <p className="mt-4 text-sm text-red-500 font-medium">{errorMsg}</p>}

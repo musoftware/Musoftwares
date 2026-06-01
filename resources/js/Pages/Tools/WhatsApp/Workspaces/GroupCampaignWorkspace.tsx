@@ -220,7 +220,7 @@ export default function GroupCampaignWorkspace({ callRPC, sessions, t, locale }:
                             {mediaType !== 'text' && (
                                 <div className="space-y-2">
                                     <Label>{t.groupCampaign.mediaUrlLabel}</Label>
-                                    <Input value={mediaUrl} onChange={e => setMediaUrl(e.target.value)} placeholder="https://example.com/promo.jpg" className="font-mono text-start" />
+                                    <Input value={mediaUrl} onChange={e => setMediaUrl(e.target.value)} placeholder={__('general.https_example_com_promo_jpg')} className="font-mono text-start" />
                                 </div>
                             )}
 

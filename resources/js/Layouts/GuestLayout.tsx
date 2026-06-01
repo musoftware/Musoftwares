@@ -22,12 +22,8 @@ export default function Guest({ children }: PropsWithChildren) {
                 <div className="my-auto max-w-sm space-y-8 py-8">
                     <AuthIllustration />
                     <div className="space-y-2">
-                        <p className="text-sm font-medium tracking-tight text-zinc-900 dark:text-zinc-100">
-                            Enterprise operations, simplified.
-                        </p>
-                        <p className="text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed font-normal">
-                            Streamlined workspace management, automated client interactions, and secure invoicing in one quiet, utility-first environment.
-                        </p>
+                        <p className="text-sm font-medium tracking-tight text-zinc-900 dark:text-zinc-100">{__('general.enterprise_operations_simplified')}</p>
+                        <p className="text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed font-normal">{__('general.streamlined_workspace_management_automated_client_interactions_and_secure_invoicing_in_one_quiet_utility_first_environment')}</p>
                     </div>
                 </div>
 

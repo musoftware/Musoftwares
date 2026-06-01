@@ -23,9 +23,7 @@ function StatusBadge({ day, score, status }: { day: number; score: number; statu
     }
     if (day > 0 || status === 'running') {
         return (
-            <Badge variant="outline" className="text-[10px] font-extrabold px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border-amber-500/20">
-                Warming Up
-            </Badge>
+            <Badge variant="outline" className="text-[10px] font-extrabold px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border-amber-500/20">{__('general.warming_up')}</Badge>
         );
     }
     return (
@@ -84,7 +82,7 @@ function NumberCard({ number, onRemove }: { number: any; onRemove: () => void })
                 </div>
                 <div className="text-center">
                     <p className="text-sm font-black text-white">{number.msgs_today ?? '0'}</p>
-                    <p className="text-[9px] font-black uppercase tracking-wider text-slate-500">Sent Today</p>
+                    <p className="text-[9px] font-black uppercase tracking-wider text-slate-500">{__('general.sent_today')}</p>
                 </div>
                 <div className="text-center">
                     <p className={`text-sm font-black ${
@@ -94,7 +92,7 @@ function NumberCard({ number, onRemove }: { number: any; onRemove: () => void })
                         {(number.trust_score ?? 70) >= 80 ? 'Highly Secure' :
                          (number.trust_score ?? 70) >= 50 ? 'Secure' : 'Needs Attention'}
                     </p>
-                    <p className="text-[9px] font-black uppercase tracking-wider text-slate-500">Safety Status</p>
+                    <p className="text-[9px] font-black uppercase tracking-wider text-slate-500">{__('general.safety_status')}</p>
                 </div>
             </div>
 
@@ -106,8 +104,7 @@ function NumberCard({ number, onRemove }: { number: any; onRemove: () => void })
                     </Button>
                 ) : (
                     <Button variant="outline" className="flex-1 h-9 bg-green-500/10 border-green-500/20 text-green-400 hover:bg-green-500/15 hover:text-green-400">
-                        <Play className="w-3 h-3 mr-1.5" /> Resume Warmup
-                    </Button>
+                        <Play className="w-3 h-3 mr-1.5" />{__('general.resume_warmup')}</Button>
                 )}
                 <Button variant="outline" size="icon" className="h-9 w-10 bg-slate-800 border-slate-700 text-slate-400 hover:bg-slate-700 hover:text-slate-300">
                     <Activity className="w-3.5 h-3.5" />
@@ -125,18 +122,18 @@ function AddNumberModal({ onClose, onAdd }: { onClose: () => void; onAdd: (n: an
         <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
             <div className="w-full max-w-sm bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-5">
                 <div className="flex items-center justify-between">
-                    <h3 className="text-sm font-bold text-white flex items-center gap-2"><Plus className="w-4 h-4 text-green-400" /> Connect Number to Warmup Pool</h3>
+                    <h3 className="text-sm font-bold text-white flex items-center gap-2"><Plus className="w-4 h-4 text-green-400" />{__('general.connect_number_to_warmup_pool')}</h3>
                     <Button variant="ghost" size="icon" onClick={onClose} className="h-6 w-6 text-slate-500 hover:text-white hover:bg-transparent"><X className="w-4 h-4" /></Button>
                 </div>
                 <div className="space-y-3">
                     <div>
-                        <label className="text-[10px] font-black uppercase tracking-wider text-slate-500 block mb-1.5">Phone Number</label>
+                        <label className="text-[10px] font-black uppercase tracking-wider text-slate-500 block mb-1.5">{__('general.phone_number')}</label>
                         <Input type="text" value={phone} onChange={e => setPhone(e.target.value)} placeholder="+1 555 000 0000"
                             className="h-10 text-sm bg-slate-800 border-slate-700 focus-visible:ring-green-500 text-white font-mono" />
                     </div>
                     <div>
                         <label className="text-[10px] font-black uppercase tracking-wider text-slate-500 block mb-1.5">Label (optional)</label>
-                        <Input type="text" value={label} onChange={e => setLabel(e.target.value)} placeholder="Marketing #1, Agency client..."
+                        <Input type="text" value={label} onChange={e => setLabel(e.target.value)} placeholder={__('general.marketing_1_agency_client')}
                             className="h-10 text-sm bg-slate-800 border-slate-700 focus-visible:ring-green-500 text-white" />
                     </div>
                 </div>
@@ -144,9 +141,7 @@ function AddNumberModal({ onClose, onAdd }: { onClose: () => void; onAdd: (n: an
                     <Button variant="outline" onClick={onClose} className="flex-1 h-10 border-slate-800 text-slate-400 hover:bg-slate-800 hover:text-slate-400">Cancel</Button>
                     <Button onClick={() => { if (!phone.trim()) return; onAdd({ phone: phone.trim(), label: label.trim(), status: 'idle', warmup_day: 0, trust_grade: 'C', trust_score: 40, ban_risk: 5, msgs_today: 0 }); onClose(); }}
                         disabled={!phone.trim()}
-                        className="flex-1 h-10 bg-green-500 text-white hover:bg-green-600">
-                        Connect Number
-                    </Button>
+                        className="flex-1 h-10 bg-green-500 text-white hover:bg-green-600">{__('general.connect_number')}</Button>
                 </div>
             </div>
         </div>
@@ -215,7 +210,7 @@ export default function WaWarmupRunner({ tool }: any) {
         <div className="min-h-screen bg-slate-950 flex items-center justify-center">
             <div className="text-center space-y-3">
                 <div className="w-8 h-8 border-2 border-green-500 border-t-transparent rounded-full animate-spin mx-auto" />
-                <p className="text-sm font-semibold text-slate-500">Connecting to Runtime...</p>
+                <p className="text-sm font-semibold text-slate-500">{__('general.connecting_to_runtime')}</p>
             </div>
         </div>
     );
@@ -230,11 +225,10 @@ export default function WaWarmupRunner({ tool }: any) {
                     <div className="w-7 h-7 bg-gradient-to-br from-green-500 to-emerald-600 rounded-lg flex items-center justify-center shadow-lg shadow-green-500/20">
                         <Thermometer className="w-4 h-4 text-white" />
                     </div>
-                    <span className="font-bold text-sm">WhatsApp Number Warmup</span>
+                    <span className="font-bold text-sm">{__('general.whatsapp_number_warmup')}</span>
                 </div>
                 <Button onClick={() => setShowAdd(true)} className="gap-1.5 h-9 bg-green-500 text-white hover:bg-green-600 shadow-lg shadow-green-500/20">
-                    <Plus className="w-3.5 h-3.5" /> Connect Number
-                </Button>
+                    <Plus className="w-3.5 h-3.5" />{__('general.connect_number')}</Button>
             </div>
 
             <div className="max-w-5xl mx-auto px-4 py-8 space-y-6">
@@ -260,8 +254,8 @@ export default function WaWarmupRunner({ tool }: any) {
                 <div className="bg-gradient-to-r from-green-500/10 to-emerald-500/5 border border-green-500/20 rounded-2xl p-4 flex items-start gap-3">
                     <Clock className="w-5 h-5 text-green-400 shrink-0 mt-0.5" />
                     <div>
-                        <p className="text-sm font-bold text-green-300">Auto-Warmup Schedule</p>
-                        <p className="text-xs text-slate-400 mt-0.5">Gradually increases message limits over 14 days to build a natural, safe reputation for your numbers. Runs automatically between 9 AM and 9 PM to match real human activity.</p>
+                        <p className="text-sm font-bold text-green-300">{__('general.auto_warmup_schedule')}</p>
+                        <p className="text-xs text-slate-400 mt-0.5">{__('general.gradually_increases_message_limits_over_14_days_to_build_a_natural_safe_reputation_for_your_numbers_runs_automatically_between_9_am_and_9_pm_to_match_real_human_activity')}</p>
                     </div>
                 </div>
 
@@ -275,11 +269,10 @@ export default function WaWarmupRunner({ tool }: any) {
                 ) : (
                     <div className="py-24 text-center border border-dashed border-slate-800 rounded-2xl">
                         <Thermometer className="w-10 h-10 text-slate-700 mx-auto mb-4" />
-                        <h3 className="text-sm font-bold text-slate-400">No WhatsApp numbers connected yet</h3>
-                        <p className="text-xs text-slate-600 mt-2 max-w-sm mx-auto">Connect a WhatsApp number to start building a safe sending reputation. Warming up is recommended before launching campaign messaging.</p>
+                        <h3 className="text-sm font-bold text-slate-400">{__('general.no_whatsapp_numbers_connected_yet')}</h3>
+                        <p className="text-xs text-slate-600 mt-2 max-w-sm mx-auto">{__('general.connect_a_whatsapp_number_to_start_building_a_safe_sending_reputation_warming_up_is_recommended_before_launching_campaign_messaging')}</p>
                         <Button onClick={() => setShowAdd(true)} className="mt-6 gap-2 h-10 bg-green-500 text-white hover:bg-green-600 mx-auto shadow-lg shadow-green-500/20">
-                            <Plus className="w-4 h-4" /> Connect First Number
-                        </Button>
+                            <Plus className="w-4 h-4" />{__('general.connect_first_number')}</Button>
                     </div>
                 )}
             </div>

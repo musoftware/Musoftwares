@@ -44,7 +44,7 @@ export default function Exceptions({ providers, exceptions }: ExceptionsProps) {
 
     return (
         <WorkspaceLayout
-            title="Booking Exceptions"
+            title={__('general.booking_exceptions')}
             workspaceName="Booking Settings"
             tenantId="SYS-BOOKING"
             menuItems={[
@@ -55,26 +55,24 @@ export default function Exceptions({ providers, exceptions }: ExceptionsProps) {
                 { id: 'exceptions', label: 'Exceptions', icon: CalendarOff, href: '/booking/exceptions', isActive: true },
             ]}
         >
-            <Head title="Exceptions & Days Off" />
+            <Head title={__('general.exceptions_days_off')} />
             
             <div className="space-y-8">
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center">
                     <div>
-                        <h1 className="text-2xl font-bold tracking-tight">Exceptions & Days Off</h1>
-                        <p className="text-muted-foreground">Manage holidays, vacations, and custom overrides for your providers.</p>
+                        <h1 className="text-2xl font-bold tracking-tight">{__('general.exceptions_days_off')}</h1>
+                        <p className="text-muted-foreground">{__('general.manage_holidays_vacations_and_custom_overrides_for_your_providers')}</p>
                     </div>
                     <div className="mt-4 sm:mt-0">
                         <Button onClick={() => setIsAdding(!isAdding)} className="bg-slate-900 text-white hover:bg-slate-800">
-                            <Plus className="w-4 h-4 mr-2" />
-                            Add Exception
-                        </Button>
+                            <Plus className="w-4 h-4 mr-2" />{__('general.add_exception')}</Button>
                     </div>
                 </div>
 
                 {isAdding && (
                     <Card className="border-slate-200 shadow-sm">
                         <CardHeader>
-                            <CardTitle className="text-lg">Add New Exception</CardTitle>
+                            <CardTitle className="text-lg">{__('general.add_new_exception')}</CardTitle>
                         </CardHeader>
                         <CardContent>
                             <form onSubmit={submit} className="space-y-4">
@@ -83,7 +81,7 @@ export default function Exceptions({ providers, exceptions }: ExceptionsProps) {
                                         <Label>Provider</Label>
                                         <Select onValueChange={(value) => setData('booking_provider_id', value)} value={data.booking_provider_id}>
                                             <SelectTrigger>
-                                                <SelectValue placeholder="Select Provider" />
+                                                <SelectValue placeholder={__('general.select_provider')} />
                                             </SelectTrigger>
                                             <SelectContent>
                                                 {providers.map((p) => (
@@ -95,22 +93,22 @@ export default function Exceptions({ providers, exceptions }: ExceptionsProps) {
                                     </div>
                                     <div className="space-y-2">
                                         <Label>Reason (Optional)</Label>
-                                        <Input value={data.reason} onChange={e => setData('reason', e.target.value)} placeholder="e.g. Vacation, Sick Leave" />
+                                        <Input value={data.reason} onChange={e => setData('reason', e.target.value)} placeholder={__('general.e_g_vacation_sick_leave')} />
                                     </div>
                                     <div className="space-y-2">
-                                        <Label>Start Date & Time</Label>
+                                        <Label>{__('general.start_date_time')}</Label>
                                         <Input type="datetime-local" value={data.starts_at} onChange={e => setData('starts_at', e.target.value)} />
                                         {errors.starts_at && <p className="text-sm text-red-500">{errors.starts_at}</p>}
                                     </div>
                                     <div className="space-y-2">
-                                        <Label>End Date & Time</Label>
+                                        <Label>{__('general.end_date_time')}</Label>
                                         <Input type="datetime-local" value={data.ends_at} onChange={e => setData('ends_at', e.target.value)} />
                                         {errors.ends_at && <p className="text-sm text-red-500">{errors.ends_at}</p>}
                                     </div>
                                 </div>
                                 <div className="flex justify-end gap-2 pt-4">
                                     <Button type="button" variant="outline" onClick={() => setIsAdding(false)}>Cancel</Button>
-                                    <Button type="submit" disabled={processing} className="bg-slate-900 hover:bg-slate-800 text-white">Save Exception</Button>
+                                    <Button type="submit" disabled={processing} className="bg-slate-900 hover:bg-slate-800 text-white">{__('general.save_exception')}</Button>
                                 </div>
                             </form>
                         </CardContent>
@@ -119,13 +117,11 @@ export default function Exceptions({ providers, exceptions }: ExceptionsProps) {
 
                 <Card>
                     <CardHeader>
-                        <CardTitle>Upcoming Blocked Dates</CardTitle>
+                        <CardTitle>{__('general.upcoming_blocked_dates')}</CardTitle>
                     </CardHeader>
                     <CardContent>
                         {exceptions.length === 0 ? (
-                            <div className="text-center py-8 text-slate-500 text-sm">
-                                No exceptions found. Providers will use their standard weekly schedule.
-                            </div>
+                            <div className="text-center py-8 text-slate-500 text-sm">{__('general.no_exceptions_found_providers_will_use_their_standard_weekly_schedule')}</div>
                         ) : (
                             <div className="space-y-4">
                                 {exceptions.map((ex) => (

@@ -73,7 +73,7 @@ class DownloadController extends Controller
             ->exists();
 
         if (!$hasAccess) {
-            return back()->with('error', 'You need an active subscription to download this tool.');
+            return back()->with('error', __('general.you_need_an_active_subscription_to_download_this_tool'));
         }
 
         // Build signed URL (15 min TTL)
@@ -92,7 +92,7 @@ class DownloadController extends Controller
     public function serve(Request $request, string $slug, int $versionId): StreamedResponse|RedirectResponse
     {
         if (!$request->hasValidSignature()) {
-            abort(403, 'Download link has expired. Please generate a new one.');
+            abort(403, __('general.download_link_has_expired_please_generate_a_new_one'));
         }
 
         $tool = collect(config('tools'))->firstWhere('slug', $slug);
@@ -111,7 +111,7 @@ class DownloadController extends Controller
             return response()->download($publicFilePathZip, "{$slug}.zip");
         }
 
-        return back()->with('error', 'File not found on server. Please contact support.');
+        return back()->with('error', __('general.file_not_found_on_server_please_contact_support'));
     }
 
     /**
@@ -130,7 +130,7 @@ class DownloadController extends Controller
             if (file_exists($publicFilePath)) {
                 return response()->download($publicFilePath, 'musoftware-browser-runtime.zip');
             }
-            abort(404, 'Extension build not found. Please contact support.');
+            abort(404, __('general.extension_build_not_found_please_contact_support'));
         }
 
         $platform = match(true) {

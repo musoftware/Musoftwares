@@ -25,20 +25,19 @@ export default function OverviewStep({ data, setData, errors, categories }: any)
     return (
         <div className="space-y-8">
             <div>
-                <h2 className="text-2xl font-bold text-slate-900 mb-1">What are you offering?</h2>
-                <p className="text-sm text-slate-500">Start strong with a clear title, category, and relevant search tags.</p>
+                <h2 className="text-2xl font-bold text-slate-900 mb-1">{__('general.what_are_you_offering')}</h2>
+                <p className="text-sm text-slate-500">{__('general.start_strong_with_a_clear_title_category_and_relevant_search_tags')}</p>
             </div>
 
             <div className="space-y-3">
-                <Label className="text-sm font-semibold text-slate-700">
-                    Service Title <span className="text-red-500">*</span>
+                <Label className="text-sm font-semibold text-slate-700">{__('general.service_title')}<span className="text-red-500">*</span>
                 </Label>
                 <div className="relative">
-                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 font-medium">I will</span>
+                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 font-medium">{__('general.i_will')}</span>
                     <Input
                         value={data.title}
                         onChange={e => setData('title', e.target.value)}
-                        placeholder="design a professional logo for your brand"
+                        placeholder={__('general.design_a_professional_logo_for_your_brand')}
                         maxLength={80}
                         className={cn('h-14 text-base pl-14 font-medium', errors.title && 'border-red-400 focus-visible:ring-red-400')}
                     />
@@ -78,7 +77,7 @@ export default function OverviewStep({ data, setData, errors, categories }: any)
 
             <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                    <Label className="text-sm font-semibold text-slate-700">Search Tags</Label>
+                    <Label className="text-sm font-semibold text-slate-700">{__('general.search_tags')}</Label>
                     <span className="text-xs text-slate-500">{data.tags.length}/5 tags</span>
                 </div>
                 <div className="flex flex-wrap gap-2 mb-2">
@@ -95,11 +94,11 @@ export default function OverviewStep({ data, setData, errors, categories }: any)
                     value={tagInput}
                     onChange={e => setTagInput(e.target.value)}
                     onKeyDown={addTag}
-                    placeholder="Enter keywords and press Enter..."
+                    placeholder={__('general.enter_keywords_and_press_enter')}
                     disabled={data.tags.length >= 5}
                     className="h-12"
                 />
-                <p className="text-xs text-slate-500">Use up to 5 relevant tags so buyers can easily find your service.</p>
+                <p className="text-xs text-slate-500">{__('general.use_up_to_5_relevant_tags_so_buyers_can_easily_find_your_service')}</p>
                 {errors.tags && <p className="text-xs text-red-500 font-medium">{errors.tags}</p>}
             </div>
         </div>

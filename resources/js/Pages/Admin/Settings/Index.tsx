@@ -175,7 +175,7 @@ export default function Index({ currencies, whatsappChannels, settings }: Props)
 
     return (
         <AdminSidebarLayout title="Settings" header="System Settings">
-            <Head title="Admin — Settings" />
+            <Head title={__('general.admin_settings')} />
 
             {/* Flash message */}
             {flash?.success && (
@@ -188,26 +188,26 @@ export default function Index({ currencies, whatsappChannels, settings }: Props)
                 {/* Row 1: Business + Work */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     {/* Business Information */}
-                    <SectionCard title="Business Information" icon={Building2}>
+                    <SectionCard title={__('general.business_information')} icon={Building2}>
                         <div className="space-y-4">
-                            <Field label="Business Name">
+                            <Field label={__('general.business_name')}>
                                 <Input
                                     id="business_name"
                                     value={form.business_name ?? ''}
                                     onChange={(e) => set('business_name', e.target.value)}
-                                    placeholder="e.g. Musoftware"
+                                    placeholder={__('general.e_g_musoftware')}
                                 />
                             </Field>
-                            <Field label="Business Address">
+                            <Field label={__('general.business_address')}>
                                 <Input
                                     id="business_address"
                                     value={form.business_address ?? ''}
                                     onChange={(e) => set('business_address', e.target.value)}
-                                    placeholder="e.g. Suez, Egypt"
+                                    placeholder={__('general.e_g_suez_egypt')}
                                 />
                             </Field>
                             <div className="grid grid-cols-2 gap-4">
-                                <Field label="Business Phone">
+                                <Field label={__('general.business_phone')}>
                                     <Input
                                         id="business_phone"
                                         value={form.business_phone ?? ''}
@@ -215,18 +215,18 @@ export default function Index({ currencies, whatsappChannels, settings }: Props)
                                         placeholder="+201..."
                                     />
                                 </Field>
-                                <Field label="Business Email">
+                                <Field label={__('general.business_email')}>
                                     <Input
                                         id="business_email"
                                         type="email"
                                         value={form.business_email ?? ''}
                                         onChange={(e) => set('business_email', e.target.value)}
-                                        placeholder="admin@example.com"
+                                        placeholder={__('general.admin_example_com')}
                                     />
                                 </Field>
                             </div>
                             <div className="grid grid-cols-2 gap-4">
-                                <Field label="Business Tax (%)">
+                                <Field label={__('general.business_tax')}>
                                     <Input
                                         id="business_tax"
                                         type="number"
@@ -237,7 +237,7 @@ export default function Index({ currencies, whatsappChannels, settings }: Props)
                                     />
                                 </Field>
                                 <SelectField
-                                    label="Client Default Currency"
+                                    label={__('general.client_default_currency')}
                                     name="business_currency"
                                     value={form.business_currency ?? ''}
                                     onChange={(v) => set('business_currency', v)}
@@ -255,9 +255,9 @@ export default function Index({ currencies, whatsappChannels, settings }: Props)
 
                     {/* Project & Work Settings */}
                     <div className="space-y-6">
-                        <SectionCard title="Project & Work Settings" icon={Clock}>
+                        <SectionCard title={__('general.project_work_settings')} icon={Clock}>
                             <div className="space-y-5">
-                                <Field label="Default Overhead Cost (%)">
+                                <Field label={__('general.default_overhead_cost')}>
                                     <Input
                                         id="overhead_cost_default"
                                         type="number"
@@ -265,11 +265,9 @@ export default function Index({ currencies, whatsappChannels, settings }: Props)
                                         onChange={(e) => set('overhead_cost_default', e.target.value)}
                                         placeholder="150"
                                     />
-                                    <p className="text-xs text-gray-500 mt-1">
-                                        The derived overhead hourly rate (EGP) is cached. Use Recalculate below if needed.
-                                    </p>
+                                    <p className="text-xs text-gray-500 mt-1">{__('general.the_derived_overhead_hourly_rate_egp_is_cached_use_recalculate_below_if_needed')}</p>
                                 </Field>
-                                <Field label="Max Devices Per Tenant (Default)">
+                                <Field label={__('general.max_devices_per_tenant_default')}>
                                     <Input
                                         id="max_devices_per_tenant"
                                         type="number"
@@ -279,24 +277,22 @@ export default function Index({ currencies, whatsappChannels, settings }: Props)
                                         onChange={(e) => set('max_devices_per_tenant', parseInt(e.target.value) || 1)}
                                         placeholder="1"
                                     />
-                                    <p className="text-xs text-gray-500 mt-1">
-                                        The global default number of allowed devices per user (can be overridden in User Edit page).
-                                    </p>
+                                    <p className="text-xs text-gray-500 mt-1">{__('general.the_global_default_number_of_allowed_devices_per_user_can_be_overridden_in_user_edit_page')}</p>
                                 </Field>
                                 <Toggle
                                     id="friday_work_allowed"
-                                    label="Friday Work Allowed"
+                                    label={__('general.friday_work_allowed')}
                                     checked={form.friday_work_allowed}
                                     onChange={(v) => set('friday_work_allowed', v)}
-                                    description="When disabled, Friday is treated as a non-working day for timers and scheduling."
+                                    description={__('general.when_disabled_friday_is_treated_as_a_non_working_day_for_timers_and_scheduling')}
                                 />
                             </div>
                         </SectionCard>
 
                         {/* WhatsApp Integration */}
-                        <SectionCard title="WhatsApp Integration" icon={MessageCircle}>
+                        <SectionCard title={__('general.whatsapp_integration')} icon={MessageCircle}>
                             <SelectField
-                                label="Default WhatsApp Channel"
+                                label={__('general.default_whatsapp_channel')}
                                 name="whatsapp_default_channel_id"
                                 value={form.whatsapp_default_channel_id ?? ''}
                                 onChange={(v) => set('whatsapp_default_channel_id', v)}
@@ -308,50 +304,46 @@ export default function Index({ currencies, whatsappChannels, settings }: Props)
                                     </option>
                                 ))}
                             </SelectField>
-                            <p className="text-xs text-gray-500 mt-2">
-                                Used for invoice reminders, payment confirmations, and automated notifications.
-                            </p>
+                            <p className="text-xs text-gray-500 mt-2">{__('general.used_for_invoice_reminders_payment_confirmations_and_automated_notifications')}</p>
                         </SectionCard>
 
                         {/* AI Integrations */}
-                        <SectionCard title="AI Integrations" icon={Lightbulb}>
-                            <Field label="Gemini API Keys">
+                        <SectionCard title={__('general.ai_integrations')} icon={Lightbulb}>
+                            <Field label={__('general.gemini_api_keys')}>
                                 <textarea
                                     id="gemini_api_keys"
                                     value={form.gemini_api_keys ?? ''}
                                     onChange={(e) => set('gemini_api_keys', e.target.value)}
-                                    placeholder="Paste multiple keys separated by commas (e.g. AIza...,AIza...)"
+                                    placeholder={__('general.paste_multiple_keys_separated_by_commas_e_g_aiza_aiza')}
                                     rows={3}
                                     className="block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-black focus:ring-1 focus:ring-black bg-white"
                                 />
-                                <p className="text-xs text-gray-500 mt-1">
-                                    Provide one or more Gemini API keys (comma-separated) for load-balancing AI features across multiple free tier accounts.
-                                </p>
+                                <p className="text-xs text-gray-500 mt-1">{__('general.provide_one_or_more_gemini_api_keys_comma_separated_for_load_balancing_ai_features_across_multiple_free_tier_accounts')}</p>
                             </Field>
                         </SectionCard>
                     </div>
                 </div>
 
                 {/* Payment & Checkout Settings */}
-                <SectionCard title="Payment & Checkout Settings" icon={CreditCard}>
+                <SectionCard title={__('general.payment_checkout_settings')} icon={CreditCard}>
                     <div className="space-y-5">
                         {/* Gateway toggles */}
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 pb-5 border-b border-gray-100">
                             <Toggle
                                 id="ownwallet"
-                                label="Own Wallet Active"
+                                label={__('general.own_wallet_active')}
                                 checked={form.ownwallet}
                                 onChange={(v) => set('ownwallet', v)}
                             />
                             <Toggle
                                 id="payoneer_active"
-                                label="Payoneer Active"
+                                label={__('general.payoneer_active')}
                                 checked={form.payoneer_active}
                                 onChange={(v) => set('payoneer_active', v)}
                             />
                             <Toggle
                                 id="paymob_active"
-                                label="PayMob Active"
+                                label={__('general.paymob_active')}
                                 checked={form.paymob_active}
                                 onChange={(v) => set('paymob_active', v)}
                             />
@@ -359,52 +351,50 @@ export default function Index({ currencies, whatsappChannels, settings }: Props)
 
                         {/* Gateway credentials */}
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <Field label="Gumroad URL">
+                            <Field label={__('general.gumroad_url')}>
                                 <Input
                                     id="gumroad"
                                     value={form.gumroad ?? ''}
                                     onChange={(e) => set('gumroad', e.target.value)}
-                                    placeholder="https://gumroad.com/..."
+                                    placeholder={__('general.https_gumroad_com')}
                                 />
                             </Field>
-                            <Field label="PayMob Secret Token">
+                            <Field label={__('general.paymob_secret_token')}>
                                 <Input
                                     id="paymob_token"
                                     value={form.paymob_token ?? ''}
                                     onChange={(e) => set('paymob_token', e.target.value)}
-                                    placeholder="PayMob API token"
+                                    placeholder={__('general.paymob_api_token')}
                                 />
                             </Field>
                         </div>
 
                         {/* PayMob details */}
                         <div>
-                            <p className="text-xs font-semibold uppercase text-gray-400 tracking-widest mb-3 border-b border-gray-100 pb-2">
-                                PayMob Integration Details
-                            </p>
+                            <p className="text-xs font-semibold uppercase text-gray-400 tracking-widest mb-3 border-b border-gray-100 pb-2">{__('general.paymob_integration_details')}</p>
                             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                                <Field label="Card Iframe ID">
+                                <Field label={__('general.card_iframe_id')}>
                                     <Input
                                         id="paymob_card_iframe"
                                         value={form.paymob_card_iframe ?? ''}
                                         onChange={(e) => set('paymob_card_iframe', e.target.value)}
-                                        placeholder="Iframe ID"
+                                        placeholder={__('general.iframe_id')}
                                     />
                                 </Field>
-                                <Field label="Card Integration ID">
+                                <Field label={__('general.card_integration_id')}>
                                     <Input
                                         id="paymob_card_integration"
                                         value={form.paymob_card_integration ?? ''}
                                         onChange={(e) => set('paymob_card_integration', e.target.value)}
-                                        placeholder="Integration ID"
+                                        placeholder={__('general.integration_id')}
                                     />
                                 </Field>
-                                <Field label="Wallet Integration ID">
+                                <Field label={__('general.wallet_integration_id')}>
                                     <Input
                                         id="paymob_wallet_integration"
                                         value={form.paymob_wallet_integration ?? ''}
                                         onChange={(e) => set('paymob_wallet_integration', e.target.value)}
-                                        placeholder="Wallet Integration ID"
+                                        placeholder={__('general.wallet_integration_id')}
                                     />
                                 </Field>
                             </div>
@@ -415,9 +405,7 @@ export default function Index({ currencies, whatsappChannels, settings }: Props)
                 {/* Save button */}
                 <div className="flex justify-center py-2">
                     <Button type="submit" size="lg" className="px-10 gap-2">
-                        <Save className="h-4 w-4" />
-                        Save All Settings
-                    </Button>
+                        <Save className="h-4 w-4" />{__('general.save_all_settings')}</Button>
                 </div>
             </form>
 
@@ -426,14 +414,12 @@ export default function Index({ currencies, whatsappChannels, settings }: Props)
             {/* Danger / Utility zone */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Bulk Hourly Rate Update */}
-                <SectionCard title="Bulk Hourly Rate Update" icon={AlertTriangle}>
+                <SectionCard title={__('general.bulk_hourly_rate_update')} icon={AlertTriangle}>
                     <p className="text-sm font-semibold text-red-600 mb-4 flex items-center gap-1">
-                        <AlertTriangle className="h-4 w-4 shrink-0" />
-                        Warning: This will update the hourly rate for ALL clients and optionally ALL open projects.
-                    </p>
+                        <AlertTriangle className="h-4 w-4 shrink-0" />{__('general.warning_this_will_update_the_hourly_rate_for_all_clients_and_optionally_all_open_projects')}</p>
                     <form onSubmit={handleBulkPriceUpdate} className="space-y-4">
                         <div className="grid grid-cols-2 gap-4">
-                            <Field label="New Hour Rate">
+                            <Field label={__('general.new_hour_rate')}>
                                 <Input
                                     id="bulk_hour_rate"
                                     type="number"
@@ -465,29 +451,21 @@ export default function Index({ currencies, whatsappChannels, settings }: Props)
                                 onChange={(e) => setUpdateProjects(e.target.checked)}
                                 className="rounded border-gray-300 text-black focus:ring-black"
                             />
-                            <Label htmlFor="bulk_update_projects" className="text-sm font-medium cursor-pointer">
-                                Update open projects too
-                            </Label>
+                            <Label htmlFor="bulk_update_projects" className="text-sm font-medium cursor-pointer">{__('general.update_open_projects_too')}</Label>
                         </div>
-                        <Button type="submit" variant="destructive" className="w-full">
-                            Update All
-                        </Button>
+                        <Button type="submit" variant="destructive" className="w-full">{__('general.update_all')}</Button>
                     </form>
                 </SectionCard>
 
                 {/* Recalculate Overhead Rate */}
-                <SectionCard title="Overhead Hourly Rate" icon={RefreshCw}>
-                    <p className="text-sm font-medium text-gray-700 mb-4">
-                        Clears the daily server cache and recomputes the overhead hourly rate (EGP) from latest cost data (last 6 months).
-                    </p>
+                <SectionCard title={__('general.overhead_hourly_rate')} icon={RefreshCw}>
+                    <p className="text-sm font-medium text-gray-700 mb-4">{__('general.clears_the_daily_server_cache_and_recomputes_the_overhead_hourly_rate_egp_from_latest_cost_data_last_6_months')}</p>
                     <form onSubmit={(e) => {
                         e.preventDefault();
                         if (!confirm('Are you sure you want to recalculate the overhead hourly rate?')) return;
                         router.post(route('admin.settings.recalculate-overhead-hourly-rate'));
                     }} className="space-y-4">
-                        <Button type="submit" variant="outline" className="w-full">
-                            Recalculate Rate
-                        </Button>
+                        <Button type="submit" variant="outline" className="w-full">{__('general.recalculate_rate')}</Button>
                     </form>
                 </SectionCard>
             </div>

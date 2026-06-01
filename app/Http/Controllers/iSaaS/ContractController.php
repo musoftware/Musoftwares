@@ -32,14 +32,14 @@ class ContractController extends Controller
         $contract = $this->contractService->createContract($data);
 
         return redirect()->route('isaas.contracts.edit', $contract->id)
-            ->with('success', 'Contract created successfully.');
+            ->with('success', __('general.contract_created_successfully'));
     }
 
     public function edit(Contract $contract)
     {
         // Enforce data isolation
         if ($contract->user_id !== Auth::id()) {
-            abort(403, 'Unauthorized action.');
+            abort(403, __('general.unauthorized_action'));
         }
 
         $contract->load('user');
@@ -54,13 +54,13 @@ class ContractController extends Controller
     {
         // Enforce data isolation
         if ($contract->user_id !== Auth::id()) {
-            abort(403, 'Unauthorized action.');
+            abort(403, __('general.unauthorized_action'));
         }
 
         $this->contractService->updateContract($contract, $request->validated());
 
         return redirect()->route('isaas.contracts.index')
-            ->with('success', 'Contract updated successfully.');
+            ->with('success', __('general.contract_updated_successfully'));
     }
 
     public function index(Request $request)
@@ -103,24 +103,24 @@ class ContractController extends Controller
     {
         // Enforce data isolation
         if ($contract->user_id !== Auth::id()) {
-            abort(403, 'Unauthorized action.');
+            abort(403, __('general.unauthorized_action'));
         }
 
         $this->contractService->updateStatus($contract, $request->validated('status'));
 
-        return redirect()->back()->with('success', 'Contract status updated.');
+        return redirect()->back()->with('success', __('general.contract_status_updated'));
     }
 
     public function destroy(Contract $contract)
     {
         // Enforce data isolation
         if ($contract->user_id !== Auth::id()) {
-            abort(403, 'Unauthorized action.');
+            abort(403, __('general.unauthorized_action'));
         }
 
         $this->contractService->deleteContract($contract);
 
-        return redirect()->back()->with('success', 'Contract deleted successfully.');
+        return redirect()->back()->with('success', __('general.contract_deleted_successfully'));
     }
 
     public function searchUsers(Request $request)

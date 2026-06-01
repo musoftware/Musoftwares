@@ -15,12 +15,12 @@ class UserSkillController extends Controller
         ]);
 
         $request->user()->freelanceSkills()->syncWithoutDetaching([$validated['skill_id']]);
-        return back()->with('success', 'Skill added to your profile.');
+        return back()->with('success', __('general.skill_added_to_your_profile'));
     }
 
     public function destroy(Request $request, $skillId)
     {
         $request->user()->freelanceSkills()->detach($skillId);
-        return back()->with('success', 'Skill removed from your profile.');
+        return back()->with('success', __('general.skill_removed_from_your_profile'));
     }
 }

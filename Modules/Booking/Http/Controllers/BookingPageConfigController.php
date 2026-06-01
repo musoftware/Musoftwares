@@ -66,6 +66,6 @@ class BookingPageConfigController extends Controller
             $config->save();
         }
 
-        return back()->with('success', 'Booking page configuration updated successfully.');
+        return back()->with('success', __('general.booking_page_configuration_updated_successfully'));
     }
 }

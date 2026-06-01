@@ -757,7 +757,7 @@ export default function Explore({ tools, categories, subscribedSlugs, hasBrowser
             }}
             onContextMenu={handleDesktopContextMenu}
         >
-            <Head title="Tools Workspace" />
+            <Head title={__('general.tools_workspace')} />
 
             {/* Desktop Area */}
             <div 
@@ -883,7 +883,7 @@ export default function Explore({ tools, categories, subscribedSlugs, hasBrowser
                             </div>
                             <div>
                                 <h3 className="text-white font-medium">Musoftware</h3>
-                                <p className="text-xs text-slate-400">Tools Workspace</p>
+                                <p className="text-xs text-slate-400">{__('general.tools_workspace')}</p>
                             </div>
                         </div>
                         
@@ -893,21 +893,21 @@ export default function Explore({ tools, categories, subscribedSlugs, hasBrowser
                                 className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-white/10 text-slate-200 transition-colors"
                             >
                                 <span className="text-lg">📊</span>
-                                <span className="text-sm font-medium">Main Dashboard</span>
+                                <span className="text-sm font-medium">{__('general.main_dashboard')}</span>
                             </Link>
                             <Link 
                                 href={route('tools.downloads')} 
                                 className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-white/10 text-slate-200 transition-colors"
                             >
                                 <span className="text-lg">⬇️</span>
-                                <span className="text-sm font-medium">Downloads & History</span>
+                                <span className="text-sm font-medium">{__('general.downloads_history')}</span>
                             </Link>
                             <Link 
                                 href="/" 
                                 className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-white/10 text-slate-200 transition-colors"
                             >
                                 <span className="text-lg">🏠</span>
-                                <span className="text-sm font-medium">Back to Website</span>
+                                <span className="text-sm font-medium">{__('general.back_to_website')}</span>
                             </Link>
                             <div className="h-px bg-white/10 my-1 mx-2"></div>
                             <button 
@@ -922,7 +922,7 @@ export default function Explore({ tools, categories, subscribedSlugs, hasBrowser
                                 className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-white/10 text-slate-200 transition-colors text-left mt-1"
                             >
                                 <span className="text-lg">⚙️</span>
-                                <span className="text-sm font-medium">Desktop Settings</span>
+                                <span className="text-sm font-medium">{__('general.desktop_settings')}</span>
                             </button>
                         </div>
                     </div>
@@ -944,9 +944,7 @@ export default function Explore({ tools, categories, subscribedSlugs, hasBrowser
                             onClick={handleCreateFolder}
                             className="h-10 px-3 flex items-center justify-center text-slate-300 hover:bg-white/10 rounded transition-colors text-xs font-medium gap-2"
                         >
-                            <FolderPlus className="w-4 h-4 text-yellow-400" />
-                            New Folder
-                        </button>
+                            <FolderPlus className="w-4 h-4 text-yellow-400" />{__('general.new_folder')}</button>
                     </div>
 
                     {/* Running Apps */}
@@ -985,11 +983,11 @@ export default function Explore({ tools, categories, subscribedSlugs, hasBrowser
                         <div 
                             onContextMenu={handleHidePrayerTimes}
                             className="flex items-center gap-3 px-4 border-r border-white/10 mr-2 h-full cursor-pointer hover:bg-white/5 transition-colors"
-                            title="Right-click to hide"
+                            title={__('general.right_click_to_hide')}
                         >
                             <span className="text-lg">🕌</span>
                             <div className="flex flex-col items-start justify-center">
-                                <span className="text-[10px] text-slate-400 font-medium tracking-wide uppercase">Next Prayer</span>
+                                <span className="text-[10px] text-slate-400 font-medium tracking-wide uppercase">{__('general.next_prayer')}</span>
                                 <div className="flex items-center gap-2">
                                     <span className="font-bold text-amber-400">{nextPrayer.name}</span>
                                     <span className="text-white font-semibold">{formatPrayerTime(nextPrayer.time)}</span>
@@ -1001,7 +999,7 @@ export default function Explore({ tools, categories, subscribedSlugs, hasBrowser
                     <button 
                         onClick={toggleFullscreen}
                         className="h-full px-3 flex items-center justify-center hover:bg-white/10 transition-colors text-slate-300"
-                        title="Toggle Fullscreen"
+                        title={__('general.toggle_fullscreen')}
                     >
                         {isFullscreen ? <Minimize className="w-4 h-4" /> : <Maximize className="w-4 h-4" />}
                     </button>
@@ -1047,9 +1045,7 @@ export default function Explore({ tools, categories, subscribedSlugs, hasBrowser
                     );
                 })}
                 {openFolder?.childrenSlugs?.length === 0 && (
-                    <div className="w-full h-full flex items-center justify-center text-white/50 text-sm">
-                        Empty Folder
-                    </div>
+                    <div className="w-full h-full flex items-center justify-center text-white/50 text-sm">{__('general.empty_folder')}</div>
                 )}
             </FolderModal>
 
@@ -1122,7 +1118,7 @@ export default function Explore({ tools, categories, subscribedSlugs, hasBrowser
                                 </div>
                             ) : (
                                 <div className="bg-white rounded-xl border border-slate-200 p-4 flex items-center justify-between">
-                                    <span className="font-semibold text-slate-900">Starting at</span>
+                                    <span className="font-semibold text-slate-900">{__('general.starting_at')}</span>
                                     <span className="text-lg font-bold text-slate-900">
                                         {selectedTool.starting_price <= 0 ? 'Free' : `${formatMoney(selectedTool.starting_price, businessCurrency)}/mo`}
                                     </span>
@@ -1133,15 +1129,11 @@ export default function Explore({ tools, categories, subscribedSlugs, hasBrowser
                                 <Button 
                                     onClick={handleSubscribeAction}
                                     className="w-full h-11 bg-slate-900 hover:bg-slate-800 text-white"
-                                >
-                                    Proceed to Subscribe
-                                </Button>
+                                >{__('general.proceed_to_subscribe')}</Button>
                             </div>
 
                             <p className="text-xs text-slate-400 text-center flex items-center justify-center gap-1 mt-2">
-                                <Shield className="h-3 w-3" />
-                                Safe & Secure Checkout
-                            </p>
+                                <Shield className="h-3 w-3" />{__('general.safe_secure_checkout')}</p>
                         </div>
                     </div>
                 )}

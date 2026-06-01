@@ -1,7 +1,7 @@
 @extends('shared::layouts.master')
 
 @section('content')
-    <h1>Hello World</h1>
+    <h1>{{ __('general.hello_world') }}</h1>
 
     <p>Module: {!! config('shared.name') !!}</p>
 @endsection

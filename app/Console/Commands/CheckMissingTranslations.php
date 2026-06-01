@@ -13,7 +13,7 @@ class CheckMissingTranslations extends Command
      *
      * @var string
      */
-    protected $signature = 'translations:check {--write : Whether to add missing keys to language files with empty values}';
+    protected $signature = 'translations:check {--write : Whether to add missing keys to language files with empty values} {--report : Export a JSON report of the missing translations}';
 
     /**
      * The console command description.
@@ -132,6 +132,20 @@ class CheckMissingTranslations extends Command
         if (!$hasMissing) {
             $this->info("\nAll good! No missing translations found.");
             return 0;
+        }
+
+        if ($this->option('report')) {
+            $reportPath = storage_path('logs/missing_translations_report.json');
+            
+            $reportData = [
+                'locales_checked' => $locales,
+                'total_keys_found' => count($foundKeys),
+                'missing_by_locale' => $missing,
+                'key_locations' => array_flip($foundKeys) // we need the locations
+            ];
+            
+            file_put_contents($reportPath, json_encode($reportData, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+            $this->info("\nReport generated successfully: {$reportPath}");
         }
 
         if ($this->option('write')) {

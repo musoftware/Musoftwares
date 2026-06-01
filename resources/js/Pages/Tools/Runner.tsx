@@ -114,16 +114,10 @@ function SetupWizard({ currentHost, onLinked }: { currentHost: string; onLinked:
                 <CardHeader className="text-center space-y-3 pb-6 border-b border-border/50">
                     <div className="flex justify-center">
                         <Badge variant="secondary" className="gap-1.5 font-semibold">
-                            <Smartphone className="w-3.5 h-3.5 animate-pulse text-primary" />
-                            Remote Control Mode
-                        </Badge>
+                            <Smartphone className="w-3.5 h-3.5 animate-pulse text-primary" />{__('general.remote_control_mode')}</Badge>
                     </div>
-                    <CardTitle className="text-2xl md:text-3xl font-black tracking-tight">
-                        Link to Windows PC
-                    </CardTitle>
-                    <CardDescription className="text-xs md:text-sm max-w-sm mx-auto leading-relaxed">
-                        Android devices cannot run local code tools directly. Link this device securely to the Musoftware Runtime running on your PC.
-                    </CardDescription>
+                    <CardTitle className="text-2xl md:text-3xl font-black tracking-tight">{__('general.link_to_windows_pc')}</CardTitle>
+                    <CardDescription className="text-xs md:text-sm max-w-sm mx-auto leading-relaxed">{__('general.android_devices_cannot_run_local_code_tools_directly_link_this_device_securely_to_the_musoftware_runtime_running_on_your_pc')}</CardDescription>
                 </CardHeader>
 
                 <CardContent className="space-y-8 pt-6">
@@ -133,7 +127,7 @@ function SetupWizard({ currentHost, onLinked }: { currentHost: string; onLinked:
                             <div className="w-12 h-12 rounded-2xl bg-background border flex items-center justify-center text-primary shadow-sm">
                                 <Laptop className="w-6 h-6" />
                             </div>
-                            <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Windows PC</span>
+                            <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">{__('general.windows_pc')}</span>
                         </div>
 
                         {/* Linking indicator */}
@@ -156,13 +150,13 @@ function SetupWizard({ currentHost, onLinked }: { currentHost: string; onLinked:
                             <div className="w-12 h-12 rounded-2xl bg-background border flex items-center justify-center text-emerald-500 shadow-sm">
                                 <Smartphone className="w-6 h-6" />
                             </div>
-                            <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Android App</span>
+                            <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">{__('general.android_app')}</span>
                         </div>
                     </div>
 
                     {/* Steps Section */}
                     <div className="space-y-6">
-                        <h2 className="text-xs font-extrabold uppercase tracking-widest text-muted-foreground">Setup Walkthrough</h2>
+                        <h2 className="text-xs font-extrabold uppercase tracking-widest text-muted-foreground">{__('general.setup_walkthrough')}</h2>
                         
                         <div className="space-y-5">
                             {/* Step 1 */}
@@ -171,10 +165,8 @@ function SetupWizard({ currentHost, onLinked }: { currentHost: string; onLinked:
                                     1
                                 </div>
                                 <div className="space-y-1">
-                                    <h3 className="text-sm font-bold">Connect to Same Wi-Fi</h3>
-                                    <p className="text-xs text-muted-foreground leading-relaxed">
-                                        Your PC and Android device must reside on the exact same local wireless or Ethernet network.
-                                    </p>
+                                    <h3 className="text-sm font-bold">{__('general.connect_to_same_wi_fi')}</h3>
+                                    <p className="text-xs text-muted-foreground leading-relaxed">{__('general.your_pc_and_android_device_must_reside_on_the_exact_same_local_wireless_or_ethernet_network')}</p>
                                 </div>
                             </div>
 
@@ -184,7 +176,7 @@ function SetupWizard({ currentHost, onLinked }: { currentHost: string; onLinked:
                                     2
                                 </div>
                                 <div className="space-y-2.5 w-full min-w-0">
-                                    <h3 className="text-sm font-bold">Open Windows Firewall Exception</h3>
+                                    <h3 className="text-sm font-bold">{__('general.open_windows_firewall_exception')}</h3>
                                     <p className="text-xs text-muted-foreground leading-relaxed">
                                         Windows blocks incoming local traffic by default. Run **PowerShell as Administrator** on your PC and paste the following exception rule:
                                     </p>
@@ -198,7 +190,7 @@ function SetupWizard({ currentHost, onLinked }: { currentHost: string; onLinked:
                                             size="icon"
                                             onClick={handleCopy}
                                             className="absolute right-2 top-1/2 -translate-y-1/2 h-7 w-7 bg-background/80 hover:bg-background shadow-sm"
-                                            title="Copy PowerShell command"
+                                            title={__('general.copy_powershell_command')}
                                         >
                                             {copied ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
                                         </Button>
@@ -212,10 +204,8 @@ function SetupWizard({ currentHost, onLinked }: { currentHost: string; onLinked:
                                     3
                                 </div>
                                 <div className="space-y-3 w-full">
-                                    <h3 className="text-sm font-bold">Enter Windows Host IP</h3>
-                                    <p className="text-xs text-muted-foreground leading-relaxed">
-                                        Type the local IP address of your Windows PC. The `musoftware-runtime` printed this address in your command line on startup.
-                                    </p>
+                                    <h3 className="text-sm font-bold">{__('general.enter_windows_host_ip')}</h3>
+                                    <p className="text-xs text-muted-foreground leading-relaxed">{__('general.type_the_local_ip_address_of_your_windows_pc_the_musoftware_runtime_printed_this_address_in_your_command_line_on_startup')}</p>
                                     
                                     <form onSubmit={handleLink} className="space-y-3">
                                         <div className="flex gap-2">
@@ -223,7 +213,7 @@ function SetupWizard({ currentHost, onLinked }: { currentHost: string; onLinked:
                                                 <Wifi className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                                                 <Input 
                                                     type="text" 
-                                                    placeholder="e.g. 192.168.1.15" 
+                                                    placeholder={__('general.e_g_192_168_1_15')} 
                                                     value={ipInput}
                                                     onChange={e => setIpInput(e.target.value)}
                                                     disabled={testing || success}
@@ -237,7 +227,7 @@ function SetupWizard({ currentHost, onLinked }: { currentHost: string; onLinked:
                                                 className="shrink-0 gap-1.5 uppercase text-[10px] tracking-wider font-black"
                                             >
                                                 {testing ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <LinkIcon className="w-3.5 h-3.5" />}
-                                                <span>Link PC</span>
+                                                <span>{__('general.link_pc')}</span>
                                             </Button>
                                         </div>
                                     </form>
@@ -246,7 +236,7 @@ function SetupWizard({ currentHost, onLinked }: { currentHost: string; onLinked:
                                     {success && (
                                         <div className="p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-xl text-xs text-emerald-600 dark:text-emerald-400 flex items-center gap-2 animate-in fade-in duration-300">
                                             <Check className="w-4 h-4 shrink-0" />
-                                            <span className="font-semibold">Linked Successfully! Launching runner...</span>
+                                            <span className="font-semibold">{__('general.linked_successfully_launching_runner')}</span>
                                         </div>
                                     )}
 
@@ -255,7 +245,7 @@ function SetupWizard({ currentHost, onLinked }: { currentHost: string; onLinked:
                                         <div className="p-3.5 bg-destructive/10 border border-destructive/20 rounded-xl text-xs text-destructive flex items-start gap-2.5 animate-in fade-in duration-300">
                                             <AlertCircle className="w-4.5 h-4.5 shrink-0 mt-0.5" />
                                             <div className="space-y-1">
-                                                <p className="font-bold">Connection Verification Failed</p>
+                                                <p className="font-bold">{__('general.connection_verification_failed')}</p>
                                                 <p className="text-[11px] opacity-95 leading-relaxed">{errorMsg}</p>
                                             </div>
                                         </div>
@@ -338,22 +328,20 @@ function FloatingBadge({ host, onDisconnect }: { host: string; onDisconnect: () 
                         <CardHeader className="pb-4">
                             <CardTitle className="text-sm flex items-center gap-1.5">
                                 <Laptop className="w-4 h-4 text-primary" />
-                                <span>Linked PC Status</span>
+                                <span>{__('general.linked_pc_status')}</span>
                             </CardTitle>
-                            <CardDescription className="text-xs">
-                                Update the connection details or unlink this Android controller.
-                            </CardDescription>
+                            <CardDescription className="text-xs">{__('general.update_the_connection_details_or_unlink_this_android_controller')}</CardDescription>
                         </CardHeader>
 
                         <CardContent>
                             <form onSubmit={handleSave} className="space-y-4">
                                 <div className="space-y-2">
-                                    <Label className="text-[10px] font-bold uppercase tracking-wider">PC Local IP Address</Label>
+                                    <Label className="text-[10px] font-bold uppercase tracking-wider">{__('general.pc_local_ip_address')}</Label>
                                     <div className="relative">
                                         <Wifi className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                                         <Input 
                                             type="text" 
-                                            placeholder="e.g. 192.168.1.15" 
+                                            placeholder={__('general.e_g_192_168_1_15')} 
                                             value={ipInput}
                                             onChange={e => setIpInput(e.target.value)}
                                             disabled={testing || success}
@@ -363,7 +351,7 @@ function FloatingBadge({ host, onDisconnect }: { host: string; onDisconnect: () 
                                 </div>
 
                                 {success && (
-                                    <p className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 animate-pulse text-center">Connection Verified! Reloading...</p>
+                                    <p className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 animate-pulse text-center">{__('general.connection_verified_reloading')}</p>
                                 )}
 
                                 {errorMsg && (
@@ -376,9 +364,7 @@ function FloatingBadge({ host, onDisconnect }: { host: string; onDisconnect: () 
                                         variant="destructive"
                                         onClick={onDisconnect}
                                         className="flex-1 text-xs font-bold"
-                                    >
-                                        Disconnect PC
-                                    </Button>
+                                    >{__('general.disconnect_pc')}</Button>
                                     
                                     <Button 
                                         type="submit"
@@ -386,7 +372,7 @@ function FloatingBadge({ host, onDisconnect }: { host: string; onDisconnect: () 
                                         className="flex-1 text-xs font-bold gap-1"
                                     >
                                         {testing && <RefreshCw className="w-3 h-3 animate-spin" />}
-                                        <span>Update IP</span>
+                                        <span>{__('general.update_ip')}</span>
                                     </Button>
                                 </div>
                             </form>
@@ -456,7 +442,7 @@ export default function Runner({ tool, subscription, runtimePort, pluginSlug }: 
         return (
             <div className="min-h-screen bg-background flex items-center justify-center p-8 font-sans">
                 <div className="text-center max-w-md">
-                    <h1 className="text-2xl font-bold text-foreground mb-2">Component Not Found</h1>
+                    <h1 className="text-2xl font-bold text-foreground mb-2">{__('general.component_not_found')}</h1>
                     <p className="text-muted-foreground">The interface for {tool.title} could not be loaded because the component "{tool.runner_component}" does not exist.</p>
                 </div>
             </div>
@@ -468,7 +454,7 @@ export default function Runner({ tool, subscription, runtimePort, pluginSlug }: 
             <div className="min-h-screen bg-background flex items-center justify-center text-foreground">
                 <div className="text-center space-y-4">
                     <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin mx-auto" />
-                    <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest animate-pulse">Checking Local PC Connection...</p>
+                    <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest animate-pulse">{__('general.checking_local_pc_connection')}</p>
                 </div>
             </div>
         );

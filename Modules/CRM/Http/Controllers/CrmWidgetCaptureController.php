@@ -32,7 +32,7 @@ class CrmWidgetCaptureController extends Controller
                 }
             }
             if (!$isAllowed) {
-                abort(403, 'Widget not allowed on this domain.');
+                abort(403, __('general.widget_not_allowed_on_this_domain'));
             }
         }
 

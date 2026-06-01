@@ -76,7 +76,7 @@ class JobMatchedNotification extends Notification implements ShouldQueue
                     ->subject('New Job Matched Your Skills!')
                     ->line('A new job matching your skills has just been posted: ' . $this->job->title)
                     ->action('View Job', route('freelance.jobs.show', $this->job->id))
-                    ->line('Submit your proposal to win this job!');
+                    ->line(__('general.submit_your_proposal_to_win_this_job'));
     }
 
     /**

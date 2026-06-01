@@ -15,8 +15,8 @@ export default function NotFound({ message, section = 'overview' }: Props) {
     const { menuItems, lockedAddons, workspaceName, tenantId } = useERPMenu(section);
 
     return (
-        <ERPLayout title="Not Found" workspaceName={workspaceName} tenantId={tenantId} menuItems={menuItems} lockedAddons={lockedAddons}>
-            <Head title="Not Found" />
+        <ERPLayout title={__('general.not_found')} workspaceName={workspaceName} tenantId={tenantId} menuItems={menuItems} lockedAddons={lockedAddons}>
+            <Head title={__('general.not_found')} />
 
             <div className="max-w-3xl mx-auto px-4 py-16">
                 <Card className="bg-white border border-slate-200 shadow-sm">
@@ -26,16 +26,14 @@ export default function NotFound({ message, section = 'overview' }: Props) {
                         </div>
                         
                         <div className="space-y-2">
-                            <h1 className="text-xl font-bold text-slate-900">Resource Not Found</h1>
+                            <h1 className="text-xl font-bold text-slate-900">{__('general.resource_not_found')}</h1>
                             <p className="text-slate-500 text-sm">{message}</p>
                         </div>
 
                         <div className="pt-4">
                             <Link href={route('erp.dashboard', { section })}>
                                 <Button className="gap-2 bg-slate-900 hover:bg-slate-800 text-white shadow-none">
-                                    <ArrowLeft className="w-4 h-4" />
-                                    Go Back to Dashboard
-                                </Button>
+                                    <ArrowLeft className="w-4 h-4" />{__('general.go_back_to_dashboard')}</Button>
                             </Link>
                         </div>
                     </CardContent>

@@ -86,7 +86,7 @@ export default function Show({ tenant, clients, invoices, teamMembers, tasks, au
     };
 
     return (
-        <AdminSidebarLayout title="ERP Client" header="ERP Client">
+        <AdminSidebarLayout title={__('general.erp_client')} header="ERP Client">
             <Head title={`Oversight — ${tenant.name}`} />
 
             <div className="space-y-6">
@@ -96,8 +96,7 @@ export default function Show({ tenant, clients, invoices, teamMembers, tasks, au
                         href={route('admin.erp.index')}
                         className="inline-flex items-center gap-1 text-xs font-semibold text-slate-500 hover:text-slate-900 transition-colors"
                     >
-                        <ArrowLeft className="h-4 w-4" /> Back to Registry
-                    </Link>
+                        <ArrowLeft className="h-4 w-4" />{__('general.back_to_registry')}</Link>
                 </div>
 
                 {/* Workspace Profile Header */}
@@ -135,7 +134,7 @@ export default function Show({ tenant, clients, invoices, teamMembers, tasks, au
                             
                             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 shrink-0">
                                 <div className="bg-slate-50 border border-slate-100 rounded-lg p-3 text-center sm:text-left">
-                                    <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider block">Workspace Revenue</span>
+                                    <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider block">{__('general.workspace_revenue')}</span>
                                     <span className="text-lg font-mono font-bold text-slate-900">
                                         {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(tenant.revenue)}
                                     </span>
@@ -144,8 +143,7 @@ export default function Show({ tenant, clients, invoices, teamMembers, tasks, au
                                     onClick={handleImpersonate}
                                     className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold flex items-center justify-center gap-2 py-5 shadow-none border-0"
                                 >
-                                    <Zap className="h-4 w-4" /> Impersonate Workspace
-                                </Button>
+                                    <Zap className="h-4 w-4" />{__('general.impersonate_workspace')}</Button>
                             </div>
                         </div>
                     </CardContent>
@@ -203,19 +201,17 @@ export default function Show({ tenant, clients, invoices, teamMembers, tasks, au
                             <table className="w-full text-left text-sm border-collapse">
                                 <thead>
                                     <tr className="bg-slate-50 border-b border-slate-100 text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                                        <th className="px-6 py-3.5">Client Name</th>
+                                        <th className="px-6 py-3.5">{__('general.client_name')}</th>
                                         <th className="px-6 py-3.5">Email</th>
                                         <th className="px-6 py-3.5">Phone</th>
-                                        <th className="px-6 py-3.5 text-center">Wallet Currency</th>
-                                        <th className="px-6 py-3.5 text-center">Invoices Count</th>
+                                        <th className="px-6 py-3.5 text-center">{__('general.wallet_currency')}</th>
+                                        <th className="px-6 py-3.5 text-center">{__('general.invoices_count')}</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-slate-100">
                                     {clients.length === 0 ? (
                                         <tr>
-                                            <td colSpan={5} className="px-6 py-12 text-center text-slate-500 text-xs font-medium">
-                                                No clients registered in this workspace.
-                                            </td>
+                                            <td colSpan={5} className="px-6 py-12 text-center text-slate-500 text-xs font-medium">{__('general.no_clients_registered_in_this_workspace')}</td>
                                         </tr>
                                     ) : (
                                         clients.map((client) => (
@@ -251,19 +247,17 @@ export default function Show({ tenant, clients, invoices, teamMembers, tasks, au
                             <table className="w-full text-left text-sm border-collapse">
                                 <thead>
                                     <tr className="bg-slate-50 border-b border-slate-100 text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                                        <th className="px-6 py-3.5">Invoice Number</th>
+                                        <th className="px-6 py-3.5">{__('general.invoice_number')}</th>
                                         <th className="px-6 py-3.5">Client</th>
                                         <th className="px-6 py-3.5 text-right">Amount</th>
                                         <th className="px-6 py-3.5">Status</th>
-                                        <th className="px-6 py-3.5">Issued At</th>
+                                        <th className="px-6 py-3.5">{__('general.issued_at')}</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-slate-100">
                                     {invoices.length === 0 ? (
                                         <tr>
-                                            <td colSpan={5} className="px-6 py-12 text-center text-slate-500 text-xs font-medium">
-                                                No invoices created in this workspace.
-                                            </td>
+                                            <td colSpan={5} className="px-6 py-12 text-center text-slate-500 text-xs font-medium">{__('general.no_invoices_created_in_this_workspace')}</td>
                                         </tr>
                                     ) : (
                                         invoices.map((invoice) => (
@@ -306,15 +300,13 @@ export default function Show({ tenant, clients, invoices, teamMembers, tasks, au
                                         <th className="px-6 py-3.5">Email</th>
                                         <th className="px-6 py-3.5">Role</th>
                                         <th className="px-6 py-3.5">Status</th>
-                                        <th className="px-6 py-3.5">Last Login</th>
+                                        <th className="px-6 py-3.5">{__('general.last_login')}</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-slate-100">
                                     {teamMembers.length === 0 ? (
                                         <tr>
-                                            <td colSpan={5} className="px-6 py-12 text-center text-slate-500 text-xs font-medium">
-                                                No team members registered in this workspace.
-                                            </td>
+                                            <td colSpan={5} className="px-6 py-12 text-center text-slate-500 text-xs font-medium">{__('general.no_team_members_registered_in_this_workspace')}</td>
                                         </tr>
                                     ) : (
                                         teamMembers.map((member) => (
@@ -361,18 +353,16 @@ export default function Show({ tenant, clients, invoices, teamMembers, tasks, au
                             <table className="w-full text-left text-sm border-collapse">
                                 <thead>
                                     <tr className="bg-slate-50 border-b border-slate-100 text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                                        <th className="px-6 py-3.5">Task Title</th>
+                                        <th className="px-6 py-3.5">{__('general.task_title')}</th>
                                         <th className="px-6 py-3.5">Priority</th>
                                         <th className="px-6 py-3.5">Status</th>
-                                        <th className="px-6 py-3.5">Due Date</th>
+                                        <th className="px-6 py-3.5">{__('general.due_date')}</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-slate-100">
                                     {tasks.length === 0 ? (
                                         <tr>
-                                            <td colSpan={4} className="px-6 py-12 text-center text-slate-500 text-xs font-medium">
-                                                No tasks created in this workspace.
-                                            </td>
+                                            <td colSpan={4} className="px-6 py-12 text-center text-slate-500 text-xs font-medium">{__('general.no_tasks_created_in_this_workspace')}</td>
                                         </tr>
                                     ) : (
                                         tasks.map((task) => (

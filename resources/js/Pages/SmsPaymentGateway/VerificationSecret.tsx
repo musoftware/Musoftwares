@@ -26,30 +26,25 @@ export default function VerificationSecret({ secret }: VerificationSecretProps) 
     };
 
     return (
-        <AuthenticatedLayout header={<h2 className="font-semibold text-xl text-gray-800 leading-tight">Security Credentials</h2>}>
-            <Head title="Security Secret - Text Payment Gateway" />
+        <AuthenticatedLayout header={<h2 className="font-semibold text-xl text-gray-800 leading-tight">{__('general.security_credentials')}</h2>}>
+            <Head title={__('general.security_secret_text_payment_gateway')} />
 
             <div className="py-8 md:py-12">
                 <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                         <div>
                             <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
-                                <KeyRound className="w-6 h-6 text-indigo-600" />
-                                HMAC Verification Secret
-                            </h1>
-                            <p className="text-slate-500 mt-1">Used to verify that webhook requests actually originated from Text Payment Gateway.</p>
+                                <KeyRound className="w-6 h-6 text-indigo-600" />{__('general.hmac_verification_secret')}</h1>
+                            <p className="text-slate-500 mt-1">{__('general.used_to_verify_that_webhook_requests_actually_originated_from_text_payment_gateway')}</p>
                         </div>
                         <Button variant="outline" onClick={() => router.visit(route('sms-payment-gateway.index'))}>
-                            <ArrowLeft className="w-4 h-4 mr-2" />
-                            Back to Dashboard
-                        </Button>
+                            <ArrowLeft className="w-4 h-4 mr-2" />{__('general.back_to_dashboard')}</Button>
                     </div>
 
                     <Card className="border-indigo-100 shadow-lg shadow-indigo-100/50">
                         <CardHeader className="bg-indigo-50/50 border-b border-indigo-100 pb-8">
-                            <CardTitle className="text-indigo-900">Your Signature Key</CardTitle>
-                            <CardDescription className="text-indigo-700/80">
-                                When we send an HTTP POST to your webhook endpoint, we include an <code>X-Text Payment Gateway-Signature</code> header. 
+                            <CardTitle className="text-indigo-900">{__('general.your_signature_key')}</CardTitle>
+                            <CardDescription className="text-indigo-700/80">{__('general.when_we_send_an_http_post_to_your_webhook_endpoint_we_include_an')}<code>{__('general.x_text_payment_gateway_signature')}</code> header. 
                                 Compute an HMAC SHA256 signature of the raw JSON payload using this secret to verify authenticity.
                             </CardDescription>
                         </CardHeader>
@@ -77,9 +72,7 @@ export default function VerificationSecret({ secret }: VerificationSecretProps) 
                             <Alert className="bg-amber-50 border-amber-200 text-amber-800">
                                 <ShieldAlert className="h-4 w-4 text-amber-600" />
                                 <AlertDescription>
-                                    <strong className="block mb-1">Never expose this secret publicly.</strong>
-                                    Do not commit this secret to client-side code like JavaScript or mobile apps. It must only reside on your backend server.
-                                </AlertDescription>
+                                    <strong className="block mb-1">{__('general.never_expose_this_secret_publicly')}</strong>{__('general.do_not_commit_this_secret_to_client_side_code_like_javascript_or_mobile_apps_it_must_only_reside_on_your_backend_server')}</AlertDescription>
                             </Alert>
                         </CardContent>
                     </Card>

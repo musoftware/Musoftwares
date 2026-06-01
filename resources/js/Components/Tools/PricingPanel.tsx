@@ -36,7 +36,7 @@ export function PricingPanel({ plans, toolSlug, isAuthed }: PricingPanelProps) {
         <div className="space-y-4">
             {/* Billing toggle */}
             <div className="flex items-center justify-between">
-                <h3 className="text-sm font-semibold text-slate-900">Choose a Plan</h3>
+                <h3 className="text-sm font-semibold text-slate-900">{__('general.choose_a_plan')}</h3>
                 <div className="flex items-center bg-slate-100 rounded-lg p-0.5 gap-0.5">
                     {(['monthly', 'yearly'] as const).map(c => (
                         <button
@@ -143,9 +143,7 @@ export function PricingPanel({ plans, toolSlug, isAuthed }: PricingPanelProps) {
                                         `Get ${plan.name}`
                                     ) : (
                                         <>
-                                            <LogIn className="h-3.5 w-3.5 mr-1.5" />
-                                            Sign in to subscribe
-                                        </>
+                                            <LogIn className="h-3.5 w-3.5 mr-1.5" />{__('general.sign_in_to_subscribe')}</>
                                     )}
                                 </Button>
                             </div>
@@ -158,8 +156,7 @@ export function PricingPanel({ plans, toolSlug, isAuthed }: PricingPanelProps) {
                 <div className="flex items-center gap-2 p-3 rounded-lg bg-slate-50 border border-slate-200">
                     <Lock className="h-3.5 w-3.5 text-slate-400 flex-shrink-0" />
                     <p className="text-xs text-slate-500">
-                        <button className="underline text-slate-700 hover:text-slate-900" onClick={() => router.visit(route('register'))}>Create a free account</button> to subscribe and download.
-                    </p>
+                        <button className="underline text-slate-700 hover:text-slate-900" onClick={() => router.visit(route('register'))}>{__('general.create_a_free_account')}</button>{__('general.to_subscribe_and_download')}</p>
                 </div>
             )}
         </div>

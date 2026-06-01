@@ -56,7 +56,7 @@ class ProjectProposalController extends Controller
             'status' => 'draft',
         ]);
 
-        return redirect()->route('isaas.proposals.show', $proposal->id)->with('success', 'AI Estimate generated successfully.');
+        return redirect()->route('isaas.proposals.show', $proposal->id)->with('success', __('general.ai_estimate_generated_successfully'));
     }
 
     public function show(Request $request, $id)
@@ -81,7 +81,7 @@ class ProjectProposalController extends Controller
 
         $proposal->update($request->only(['ai_estimate', 'total_amount', 'project_name', 'client_name']));
 
-        return back()->with('success', 'Proposal updated successfully.');
+        return back()->with('success', __('general.proposal_updated_successfully'));
     }
 
     public function convert(Request $request, $id)
@@ -111,7 +111,7 @@ class ProjectProposalController extends Controller
 
             DB::commit();
 
-            return redirect()->route('isaas.contracts.edit', $contract->id)->with('success', 'Proposal successfully converted to contract.');
+            return redirect()->route('isaas.contracts.edit', $contract->id)->with('success', __('general.proposal_successfully_converted_to_contract'));
         } catch (\Exception $e) {
             DB::rollBack();
             return back()->withErrors(['error' => 'Failed to convert to contract: ' . $e->getMessage()]);
@@ -123,6 +123,6 @@ class ProjectProposalController extends Controller
         $proposal = ProjectProposal::where('user_id', $request->user()->id)->findOrFail($id);
         $proposal->delete();
 
-        return redirect()->route('isaas.proposals.index')->with('success', 'Proposal deleted.');
+        return redirect()->route('isaas.proposals.index')->with('success', __('general.proposal_deleted'));
     }
 }

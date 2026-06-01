@@ -9,12 +9,11 @@ export default function QueueManager({ queueItems }) {
         <div className="p-6 max-w-5xl mx-auto space-y-6">
             <div className="flex justify-between items-center">
                 <div>
-                    <h1 className="text-3xl font-bold tracking-tight">Live Queue Manager</h1>
-                    <p className="text-muted-foreground mt-2">Realtime sorting based on VIP weights and emergency flags.</p>
+                    <h1 className="text-3xl font-bold tracking-tight">{__('general.live_queue_manager')}</h1>
+                    <p className="text-muted-foreground mt-2">{__('general.realtime_sorting_based_on_vip_weights_and_emergency_flags')}</p>
                 </div>
                 <Button variant="destructive">
-                    <AlertCircle className="mr-2 h-4 w-4" /> Trigger Emergency
-                </Button>
+                    <AlertCircle className="mr-2 h-4 w-4" />{__('general.trigger_emergency')}</Button>
             </div>
 
             <div className="space-y-4">

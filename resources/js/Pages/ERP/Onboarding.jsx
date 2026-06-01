@@ -36,7 +36,7 @@ export default function Onboarding({ currencies = [] }) {
     const { menuItems, lockedAddons, workspaceName, tenantId } = useERPMenu('overview');
 
     return (
-        <ERPLayout title="Configure ERP" workspaceName={workspaceName} tenantId={tenantId} menuItems={menuItems} lockedAddons={lockedAddons}>
+        <ERPLayout title={__('general.configure_erp')} workspaceName={workspaceName} tenantId={tenantId} menuItems={menuItems} lockedAddons={lockedAddons}>
 
             <div className="py-12 px-4 max-w-2xl mx-auto">
                 <Card className="shadow-none border bg-card text-card-foreground">
@@ -64,23 +64,23 @@ export default function Onboarding({ currencies = [] }) {
                         {step === 1 && (
                             <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2">
                                 <div className="space-y-1">
-                                    <h3 className="text-2xl font-bold tracking-tight">Business Setup</h3>
-                                    <p className="text-sm text-muted-foreground">Configure your foundational workspace settings.</p>
+                                    <h3 className="text-2xl font-bold tracking-tight">{__('general.business_setup')}</h3>
+                                    <p className="text-sm text-muted-foreground">{__('general.configure_your_foundational_workspace_settings')}</p>
                                 </div>
                                 <div className="space-y-4">
                                     <div className="space-y-2">
-                                        <Label htmlFor="businessName">Business Name</Label>
+                                        <Label htmlFor="businessName">{__('general.business_name')}</Label>
                                         <Input
                                             id="businessName"
                                             value={data.businessName}
                                             onChange={e => setData('businessName', e.target.value)}
-                                            placeholder="Acme Inc"
+                                            placeholder={__('general.acme_inc')}
                                             required
                                         />
                                         {errors.businessName && <p className="text-xs text-destructive">{errors.businessName}</p>}
                                     </div>
                                     <div className="space-y-2">
-                                        <Label htmlFor="baseCurrency">Base Currency</Label>
+                                        <Label htmlFor="baseCurrency">{__('general.base_currency')}</Label>
                                         <select
                                             id="baseCurrency"
                                             value={data.baseCurrency}
@@ -116,9 +116,9 @@ export default function Onboarding({ currencies = [] }) {
                                             className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
                                         >
                                             <option value="UTC">UTC</option>
-                                            <option value="Europe/London">Europe/London</option>
-                                            <option value="America/New_York">America/New_York</option>
-                                            <option value="Africa/Cairo">Africa/Cairo</option>
+                                            <option value="Europe/London">{__('general.europe_london')}</option>
+                                            <option value="America/New_York">{__('general.america_new_york')}</option>
+                                            <option value="Africa/Cairo">{__('general.africa_cairo')}</option>
                                         </select>
                                         {errors.timezone && <p className="text-xs text-destructive">{errors.timezone}</p>}
                                     </div>
@@ -137,16 +137,16 @@ export default function Onboarding({ currencies = [] }) {
                             <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2">
                                 <div className="space-y-1">
                                     <h3 className="text-2xl font-bold tracking-tight">Add First Client (Optional)</h3>
-                                    <p className="text-sm text-muted-foreground">Create a profile for your first tenant client.</p>
+                                    <p className="text-sm text-muted-foreground">{__('general.create_a_profile_for_your_first_tenant_client')}</p>
                                 </div>
                                 <div className="space-y-4">
                                     <div className="space-y-2">
-                                        <Label htmlFor="clientName">Client Name</Label>
+                                        <Label htmlFor="clientName">{__('general.client_name')}</Label>
                                         <Input
                                             id="clientName"
                                             value={data.clientName}
                                             onChange={e => setData('clientName', e.target.value)}
-                                            placeholder="John Doe"
+                                            placeholder={__('general.john_doe')}
                                         />
                                     </div>
                                     <div className="space-y-2">
@@ -156,7 +156,7 @@ export default function Onboarding({ currencies = [] }) {
                                             type="email"
                                             value={data.clientEmail}
                                             onChange={e => setData('clientEmail', e.target.value)}
-                                            placeholder="john@example.com"
+                                            placeholder={__('general.john_example_com')}
                                         />
                                     </div>
                                     <div className="space-y-2">
@@ -215,12 +215,12 @@ export default function Onboarding({ currencies = [] }) {
                                 </div>
                                 <div className="space-y-4">
                                     <div className="space-y-2">
-                                        <Label htmlFor="invoiceDesc">Title / Description</Label>
+                                        <Label htmlFor="invoiceDesc">{__('general.title_description')}</Label>
                                         <Input
                                             id="invoiceDesc"
                                             value={data.invoiceDesc}
                                             onChange={e => setData('invoiceDesc', e.target.value)}
-                                            placeholder="Web Design Services"
+                                            placeholder={__('general.web_design_services')}
                                         />
                                     </div>
                                     <div className="space-y-2">
@@ -264,7 +264,7 @@ export default function Onboarding({ currencies = [] }) {
                             <div className="text-center space-y-6 py-8 animate-in zoom-in-95">
                                 <div className="space-y-2">
                                     <h3 className="text-3xl font-bold tracking-tight text-primary">Ready to launch! 🎉</h3>
-                                    <p className="text-muted-foreground">Review your configuration summary before entering your Workspace.</p>
+                                    <p className="text-muted-foreground">{__('general.review_your_configuration_summary_before_entering_your_workspace')}</p>
                                 </div>
                                 <div className="bg-muted p-5 rounded-xl text-left inline-block w-full max-w-sm mx-auto border border-border">
                                     <h4 className="font-semibold text-foreground mb-3 text-sm">Summary</h4>

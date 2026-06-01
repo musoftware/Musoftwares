@@ -12,29 +12,29 @@ import { ModulePageHeader } from '@/Components/ui/ModulePageHeader';
 
 export default function SettingsIndex({ api_token, webhook_url }) {
     return (
-        <CrmLayout title={__('CRM Settings')} activeMenu="settings">
+        <CrmLayout title={__('general.crm_settings')} activeMenu="settings">
             <ModulePageHeader 
-                title={__('CRM Settings & Integrations')}
-                description={__('Manage your workspace settings and integrations.')}
+                title={__('general.crm_settings_integrations')}
+                description={__('general.manage_your_workspace_settings_and_integrations')}
                 icon={SettingsIcon}
                 module="CRM"
             />
             <div className="flex-1 space-y-4 px-8 pb-8">
                 <Tabs defaultValue="integrations" className="space-y-4">
                     <TabsList>
-                        <TabsTrigger value="general">{__('General Settings')}</TabsTrigger>
-                        <TabsTrigger value="integrations">{__('Integrations & API')}</TabsTrigger>
+                        <TabsTrigger value="general">{__('general.general_settings')}</TabsTrigger>
+                        <TabsTrigger value="integrations">{__('general.integrations_api')}</TabsTrigger>
                     </TabsList>
 
                     <TabsContent value="general" className="space-y-4">
                         <Card>
                             <CardHeader>
-                                <CardTitle>{__('General Settings')}</CardTitle>
-                                <CardDescription>{__('Basic configuration for your CRM workspace.')}</CardDescription>
+                                <CardTitle>{__('general.general_settings')}</CardTitle>
+                                <CardDescription>{__('general.basic_configuration_for_your_crm_workspace')}</CardDescription>
                             </CardHeader>
                             <CardContent className="space-y-4">
                                 <div className="space-y-2">
-                                    <Label>{__('Workspace Name')}</Label>
+                                    <Label>{__('general.workspace_name')}</Label>
                                     <Input defaultValue="CRM Workspace" disabled />
                                 </div>
                             </CardContent>
@@ -47,12 +47,12 @@ export default function SettingsIndex({ api_token, webhook_url }) {
                     <TabsContent value="integrations" className="space-y-4">
                         <Card>
                             <CardHeader>
-                                <CardTitle>{__('API Access & Webhooks')}</CardTitle>
-                                <CardDescription>{__('Connect your CRM with Zapier, Make, or custom apps.')}</CardDescription>
+                                <CardTitle>{__('general.api_access_webhooks')}</CardTitle>
+                                <CardDescription>{__('general.connect_your_crm_with_zapier_make_or_custom_apps')}</CardDescription>
                             </CardHeader>
                             <CardContent className="space-y-4">
                                 <div className="space-y-2">
-                                    <Label>{__('API Token')}</Label>
+                                    <Label>{__('general.api_token')}</Label>
                                     <div className="flex gap-2">
                                         <Input readOnly value={api_token} className="font-mono text-sm" />
                                         <Button variant="outline" onClick={() => navigator.clipboard.writeText(api_token)}>
@@ -61,14 +61,14 @@ export default function SettingsIndex({ api_token, webhook_url }) {
                                     </div>
                                 </div>
                                 <div className="space-y-2">
-                                    <Label>{__('Incoming Webhook URL')}</Label>
+                                    <Label>{__('general.incoming_webhook_url')}</Label>
                                     <div className="flex gap-2">
                                         <Input readOnly value={webhook_url} className="font-mono text-sm" />
                                         <Button variant="outline" onClick={() => navigator.clipboard.writeText(webhook_url)}>
                                             {__('Copy')}
                                         </Button>
                                     </div>
-                                    <p className="text-xs text-slate-500 mt-1">{__('Send POST requests to this URL to create leads.')}</p>
+                                    <p className="text-xs text-slate-500 mt-1">{__('general.send_post_requests_to_this_url_to_create_leads')}</p>
                                 </div>
                             </CardContent>
                         </Card>

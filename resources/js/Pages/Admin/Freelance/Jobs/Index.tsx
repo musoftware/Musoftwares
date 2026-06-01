@@ -4,21 +4,27 @@ import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
 import { Button, buttonVariants } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator, DropdownMenuLabel } from '@/Components/ui/dropdown-menu';
-import { Eye, Trash2, CheckCircle, XCircle, AlertCircle, MoreHorizontal, Edit, RefreshCw } from 'lucide-react';
+import { Eye, Trash2, CheckCircle, XCircle, AlertCircle, MoreHorizontal, Edit, RefreshCw, Plus } from 'lucide-react';
+import { ConfirmModal } from '@/Components/ui/ConfirmModal';
 import { __ } from '@/lib/i18n';
 
 export default function Index({ jobs, filters }: any) {
     const [search, setSearch] = useState(filters.search || '');
     const [status, setStatus] = useState(filters.status || 'all');
+    
+    // Alert Dialog States
+    const [deleteConfirm, setDeleteConfirm] = useState<{ open: boolean; id: any }>({ open: false, id: null });
+    const [refundConfirm, setRefundConfirm] = useState<{ open: boolean; id: any }>({ open: false, id: null });
 
     const handleSearch = (e: any) => {
         e.preventDefault();
         router.get(route('admin.freelance.jobs.index'), { search, status }, { preserveState: true });
     };
 
-    const handleDelete = (id: any) => {
-        if (confirm('Are you sure you want to delete this job permanently?')) {
-            router.delete(route('admin.freelance.jobs.destroy', id));
+    const handleDelete = () => {
+        if (deleteConfirm.id) {
+            router.delete(route('admin.freelance.jobs.destroy', deleteConfirm.id));
+            setDeleteConfirm({ open: false, id: null });
         }
     };
 
@@ -28,16 +34,28 @@ export default function Index({ jobs, filters }: any) {
         });
     };
 
-    const forceRefund = (id: any) => {
-        if (confirm('Are you sure you want to cancel this job and force refund points to the client?')) {
-            router.post(route('admin.freelance.jobs.force-refund', id), {}, {
+    const forceRefund = () => {
+        if (refundConfirm.id) {
+            router.post(route('admin.freelance.jobs.force-refund', refundConfirm.id), {}, {
                 preserveScroll: true
             });
+            setRefundConfirm({ open: false, id: null });
         }
     };
 
     return (
-        <AdminSidebarLayout title={__('freelance.admin_jobs')} header={__('freelance.manage_jobs')}>
+        <AdminSidebarLayout 
+            title={__('freelance.admin_jobs')} 
+            header={__('freelance.manage_jobs')}
+            actions={
+                <Link href={route('admin.freelance.jobs.create')}>
+                    <Button size="sm" className="shadow-none">
+                        <Plus className="mr-1.5 h-3.5 w-3.5" />
+                        {__('freelance.create_job')}
+                    </Button>
+                </Link>
+            }
+        >
             <div className="mb-6 flex items-center justify-between">
                 <form onSubmit={handleSearch} className="flex space-x-2 w-full max-w-2xl">
                     <Input 
@@ -52,13 +70,13 @@ export default function Index({ jobs, filters }: any) {
                         className="rounded-md border-gray-300 shadow-sm focus:border-slate-500 focus:ring-slate-500 sm:text-sm"
                     >
                         <option value="all">{__('freelance.all_statuses')}</option>
-                        <option value="draft">Draft</option>
-                        <option value="published">Published</option>
-                        <option value="open">Open</option>
-                        <option value="in_progress">In Progress</option>
-                        <option value="completed">Completed</option>
-                        <option value="cancelled">Cancelled</option>
-                        <option value="suspended">Suspended</option>
+                        <option value="draft">{__('freelance.draft')}</option>
+                        <option value="published">{__('freelance.published')}</option>
+                        <option value="open">{__('freelance.open')}</option>
+                        <option value="in_progress">{__('freelance.in_progress')}</option>
+                        <option value="completed">{__('freelance.completed')}</option>
+                        <option value="cancelled">{__('freelance.cancelled')}</option>
+                        <option value="suspended">{__('freelance.suspended')}</option>
                     </select>
                     <Button type="submit" variant="secondary">{__('freelance.filter')}</Button>
                     {(search || status !== 'all') && (
@@ -93,12 +111,13 @@ export default function Index({ jobs, filters }: any) {
                                 <td className="p-4 font-medium text-slate-900">{job.formatted_budget}</td>
                                 <td className="p-4">{job.proposals_count || 0}</td>
                                 <td className="p-4 capitalize">
-                                    <span className={`inline-flex rounded-full px-2 text-xs font-semibold leading-5 
+                                    <span className={`inline-flex rounded-full px-2 py-0.5 text-xs font-semibold leading-5 
                                         ${job.status === 'published' || job.status === 'open' ? 'bg-green-100 text-green-800' : 
                                           job.status === 'suspended' ? 'bg-red-100 text-red-800' :
                                           job.status === 'completed' ? 'bg-blue-100 text-blue-800' :
+                                          job.status === 'in_progress' ? 'bg-indigo-100 text-indigo-800' :
                                           'bg-gray-100 text-gray-800'}`}>
-                                        {job.status.replace('_', ' ')}
+                                        {__('freelance.' + job.status) || job.status.replace('_', ' ')}
                                     </span>
                                 </td>
                                 <td className="p-4 text-gray-500">{new Date(job.created_at).toLocaleDateString()}</td>
@@ -106,7 +125,7 @@ export default function Index({ jobs, filters }: any) {
                                     <DropdownMenu>
                                         <DropdownMenuTrigger asChild>
                                             <Button variant="ghost" className="h-8 w-8 p-0">
-                                                <span className="sr-only">Open menu</span>
+                                                <span className="sr-only">{__('general.open_menu')}</span>
                                                 <MoreHorizontal className="h-4 w-4" />
                                             </Button>
                                         </DropdownMenuTrigger>
@@ -142,14 +161,14 @@ export default function Index({ jobs, filters }: any) {
                                             )}
 
                                             {(job.status === 'published' || job.status === 'open' || job.status === 'suspended') && (
-                                                <DropdownMenuItem onClick={() => forceRefund(job.id)} className="text-orange-600 focus:text-orange-600 focus:bg-orange-50 cursor-pointer">
+                                                <DropdownMenuItem onClick={() => setRefundConfirm({ open: true, id: job.id })} className="text-orange-600 focus:text-orange-600 focus:bg-orange-50 cursor-pointer">
                                                     <RefreshCw className="mr-2 h-4 w-4" />
                                                     <span>{__('freelance.force_refund')}</span>
                                                 </DropdownMenuItem>
                                             )}
 
                                             <DropdownMenuSeparator />
-                                            <DropdownMenuItem onClick={() => handleDelete(job.id)} className="text-red-600 focus:text-red-600 focus:bg-red-50 cursor-pointer">
+                                            <DropdownMenuItem onClick={() => setDeleteConfirm({ open: true, id: job.id })} className="text-red-600 focus:text-red-600 focus:bg-red-50 cursor-pointer">
                                                 <Trash2 className="mr-2 h-4 w-4" />
                                                 <span>{__('freelance.delete')}</span>
                                             </DropdownMenuItem>
@@ -172,20 +191,49 @@ export default function Index({ jobs, filters }: any) {
             {jobs.links && jobs.links.length > 3 && (
                 <div className="mt-4 flex justify-between items-center">
                     <div className="text-sm text-gray-500">
-                        Showing {jobs.from || 0} to {jobs.to || 0} of {jobs.total} results
+                        {__('freelance.showing_results', { from: jobs.from || 0, to: jobs.to || 0, total: jobs.total })}
                     </div>
                     <div className="flex space-x-1">
-                        {jobs.links.map((link: any, idx: number) => (
-                            <Link 
-                                key={idx}
-                                href={link.url || '#'}
-                                className={`px-3 py-1 rounded text-sm transition ${link.active ? 'bg-slate-900 text-white shadow-sm' : !link.url ? 'cursor-not-allowed opacity-50 text-slate-300 pointer-events-none' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
-                                dangerouslySetInnerHTML={{ __html: link.label }}
-                            />
-                        ))}
+                        {jobs.links.map((link: any, idx: number) => {
+                            let label = link.label;
+                            if (label.includes('Previous')) label = '&laquo;';
+                            if (label.includes('Next')) label = '&raquo;';
+                            return (
+                                <Link 
+                                    key={idx}
+                                    href={link.url || '#'}
+                                    className={`px-3 py-1 rounded text-sm transition ${link.active ? 'bg-slate-900 text-white shadow-sm' : !link.url ? 'cursor-not-allowed opacity-50 text-slate-300 pointer-events-none' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
+                                    dangerouslySetInnerHTML={{ __html: label }}
+                                />
+                            );
+                        })}
                     </div>
                 </div>
             )}
+
+            {/* Delete Confirmation Modal */}
+            <ConfirmModal 
+                isOpen={deleteConfirm.open} 
+                onCancel={() => setDeleteConfirm({ open: false, id: null })}
+                onConfirm={handleDelete}
+                title={__('freelance.confirm_delete_job')}
+                description={__('freelance.confirm_delete_job_msg')}
+                confirmLabel={__('freelance.delete')}
+                cancelLabel={__('freelance.cancel')}
+                variant="danger"
+            />
+
+            {/* Refund Confirmation Modal */}
+            <ConfirmModal 
+                isOpen={refundConfirm.open} 
+                onCancel={() => setRefundConfirm({ open: false, id: null })}
+                onConfirm={forceRefund}
+                title={__('freelance.confirm_force_refund')}
+                description={__('freelance.confirm_force_refund_msg')}
+                confirmLabel={__('freelance.force_refund')}
+                cancelLabel={__('freelance.cancel')}
+                variant="danger"
+            />
         </AdminSidebarLayout>
     );
 }

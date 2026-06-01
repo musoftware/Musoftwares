@@ -46,24 +46,21 @@ export default function RuntimeConnect({ code, port, userName, userEmail, succes
     if (missingCode) {
         return (
             <div className="min-h-screen bg-slate-950 flex items-center justify-center p-6 dark">
-                <Head title="Runtime Connection Required — musoftware" />
+                <Head title={__('general.runtime_connection_required_musoftware')} />
                 <div className="w-full max-w-md space-y-6">
                     <div className="text-center space-y-4">
                         <div className="mx-auto w-16 h-16 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center">
                             <Terminal className="w-8 h-8 text-amber-400" />
                         </div>
                         <div>
-                            <h1 className="text-2xl font-semibold text-white">Device Code Required</h1>
-                            <p className="mt-2 text-slate-400 text-sm">
-                                This page needs to be opened from the Musoftware Runtime<br />
-                                running on your computer.
-                            </p>
+                            <h1 className="text-2xl font-semibold text-white">{__('general.device_code_required')}</h1>
+                            <p className="mt-2 text-slate-400 text-sm">{__('general.this_page_needs_to_be_opened_from_the_musoftware_runtime')}<br />{__('general.running_on_your_computer')}</p>
                         </div>
                     </div>
 
                     <Card className="border-slate-800 bg-slate-900/60">
                         <CardContent className="p-5 space-y-4">
-                            <p className="text-xs text-slate-500 uppercase tracking-wider">How to connect</p>
+                            <p className="text-xs text-slate-500 uppercase tracking-wider">{__('general.how_to_connect')}</p>
                             {[
                                 { step: '1', text: 'Open the Musoftware Runtime on your desktop' },
                                 { step: '2', text: 'Right-click the tray icon and select "Connect Account"' },
@@ -93,16 +90,14 @@ export default function RuntimeConnect({ code, port, userName, userEmail, succes
                             variant="outline"
                             className="flex-1 border-slate-700 bg-transparent text-slate-400 hover:bg-slate-800 hover:text-white"
                         >
-                            <Link href={route('tools.explore')}>Browse Tools</Link>
+                            <Link href={route('tools.explore')}>{__('general.browse_tools')}</Link>
                         </Button>
                         <Button
                             asChild
                             className="flex-1 bg-indigo-600 text-white hover:bg-indigo-500 gap-2"
                         >
                             <a href={route('tools.download.agent', 'node')}>
-                                <Download className="w-4 h-4" />
-                                Get Runtime
-                            </a>
+                                <Download className="w-4 h-4" />{__('general.get_runtime')}</a>
                         </Button>
                     </div>
                 </div>
@@ -113,17 +108,14 @@ export default function RuntimeConnect({ code, port, userName, userEmail, succes
     if (success) {
         return (
             <div className="min-h-screen bg-slate-950 flex items-center justify-center p-6 dark">
-                <Head title="Runtime Connected — musoftware" />
+                <Head title={__('general.runtime_connected_musoftware')} />
                 <div className="w-full max-w-md text-center space-y-6">
                     <div className="mx-auto w-16 h-16 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
                         <CheckCircle2 className="w-8 h-8 text-emerald-400" />
                     </div>
                     <div>
-                        <h1 className="text-2xl font-semibold text-white">Connected!</h1>
-                        <p className="mt-2 text-slate-400 text-sm">
-                            The Musoftware Runtime is now connected to your account.<br />
-                            You can close this window.
-                        </p>
+                        <h1 className="text-2xl font-semibold text-white">{__('general.connected')}</h1>
+                        <p className="mt-2 text-slate-400 text-sm">{__('general.the_musoftware_runtime_is_now_connected_to_your_account')}<br />{__('general.you_can_close_this_window')}</p>
                     </div>
                     <Card className="border-slate-800 bg-slate-900/60 text-left">
                         <CardContent className="p-4 space-y-2">
@@ -133,11 +125,11 @@ export default function RuntimeConnect({ code, port, userName, userEmail, succes
                             </div>
                             <div className="flex items-center gap-2 text-sm">
                                 <div className="w-2 h-2 rounded-full bg-emerald-400" />
-                                <span className="text-slate-300">Syncing your plugins...</span>
+                                <span className="text-slate-300">{__('general.syncing_your_plugins')}</span>
                             </div>
                         </CardContent>
                     </Card>
-                    <p className="text-xs text-slate-600">You can close this window</p>
+                    <p className="text-xs text-slate-600">{__('general.you_can_close_this_window_1')}</p>
                 </div>
             </div>
         );
@@ -145,7 +137,7 @@ export default function RuntimeConnect({ code, port, userName, userEmail, succes
 
     return (
         <div className="min-h-screen bg-slate-950 flex items-center justify-center p-6 dark">
-            <Head title="Connect Runtime — musoftware" />
+            <Head title={__('general.connect_runtime_musoftware')} />
 
             <div className="w-full max-w-md space-y-6">
                 <div className="text-center space-y-4">
@@ -162,17 +154,14 @@ export default function RuntimeConnect({ code, port, userName, userEmail, succes
                     </div>
 
                     <div>
-                        <h1 className="text-2xl font-semibold text-white">Connect Runtime</h1>
-                        <p className="mt-1.5 text-slate-400 text-sm">
-                            Allow the Musoftware Runtime running on your computer<br />
-                            to access your account.
-                        </p>
+                        <h1 className="text-2xl font-semibold text-white">{__('general.connect_runtime')}</h1>
+                        <p className="mt-1.5 text-slate-400 text-sm">{__('general.allow_the_musoftware_runtime_running_on_your_computer')}<br />{__('general.to_access_your_account')}</p>
                     </div>
                 </div>
 
                 <Card className="border-slate-800 bg-slate-900/60">
                     <CardContent className="p-4">
-                        <p className="text-xs text-slate-500 uppercase tracking-wider mb-3">Connecting as</p>
+                        <p className="text-xs text-slate-500 uppercase tracking-wider mb-3">{__('general.connecting_as')}</p>
                         <div className="flex items-center gap-3">
                             <div className="w-9 h-9 rounded-full bg-indigo-500/20 border border-indigo-500/30 flex items-center justify-center text-indigo-300 font-semibold text-sm">
                                 {userName.charAt(0).toUpperCase()}
@@ -187,7 +176,7 @@ export default function RuntimeConnect({ code, port, userName, userEmail, succes
 
                 <Card className="border-slate-800 bg-slate-900/60">
                     <CardContent className="p-4 space-y-2.5">
-                        <p className="text-xs text-slate-500 uppercase tracking-wider mb-1">This will allow the runtime to</p>
+                        <p className="text-xs text-slate-500 uppercase tracking-wider mb-1">{__('general.this_will_allow_the_runtime_to')}</p>
                         {[
                             'Sync your subscribed plugins automatically',
                             'Verify plugin licenses before execution',
@@ -215,8 +204,8 @@ export default function RuntimeConnect({ code, port, userName, userEmail, succes
                         <div className="flex items-start gap-2.5 text-sm text-red-400">
                             <AlertCircle className="w-5 h-5 shrink-0 mt-0.5" />
                             <div className="space-y-1">
-                                <p className="font-semibold">Runtime not responding</p>
-                                <p className="text-xs text-red-400/80">Make sure the Musoftware Runtime is open on your computer.</p>
+                                <p className="font-semibold">{__('general.runtime_not_responding')}</p>
+                                <p className="text-xs text-red-400/80">{__('general.make_sure_the_musoftware_runtime_is_open_on_your_computer')}</p>
                             </div>
                         </div>
                         <Button
@@ -224,9 +213,7 @@ export default function RuntimeConnect({ code, port, userName, userEmail, succes
                             className="w-full bg-red-500/20 text-red-400 hover:bg-red-500/30 gap-2"
                         >
                             <a href="musoftware://open">
-                                <Terminal className="w-4 h-4" />
-                                Launch Runtime App
-                            </a>
+                                <Terminal className="w-4 h-4" />{__('general.launch_runtime_app')}</a>
                         </Button>
                     </div>
                 )}
@@ -247,15 +234,12 @@ export default function RuntimeConnect({ code, port, userName, userEmail, succes
                     >
                         {loading ? (
                             <>
-                                <Loader2 className="w-4 h-4 animate-spin" />
-                                Connecting...
-                            </>
+                                <Loader2 className="w-4 h-4 animate-spin" />{__('general.connecting')}</>
                         ) : 'Allow Access'}
                     </Button>
                 </div>
 
-                <p className="text-center text-xs text-slate-600">
-                    Runtime detected on <code className="font-mono">127.0.0.1:{port}</code>
+                <p className="text-center text-xs text-slate-600">{__('general.runtime_detected_on')}<code className="font-mono">127.0.0.1:{port}</code>
                 </p>
             </div>
         </div>

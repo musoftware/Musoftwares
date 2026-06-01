@@ -187,7 +187,7 @@ class UsersController extends Controller
         $this->adminUserService->createFromRequest($request);
 
         return redirect()->route('admin.users.index')
-            ->with('success', 'User created successfully.');
+            ->with('success', __('general.user_created_successfully'));
     }
 
     /**
@@ -234,7 +234,7 @@ class UsersController extends Controller
         $this->adminUserService->updateFromRequest($user, $request);
 
         return redirect()->route('admin.users.show', $user->id)
-            ->with('success', 'User updated successfully.');
+            ->with('success', __('general.user_updated_successfully'));
     }
 
     /**
@@ -252,7 +252,7 @@ class UsersController extends Controller
         $user->delete();
 
         return redirect()->route('admin.users.index')
-            ->with('success', 'User deleted.');
+            ->with('success', __('general.user_deleted'));
     }
 
     /**
@@ -484,12 +484,12 @@ class UsersController extends Controller
             $coWorker = CoWorker::findOrFail($id);
 
             if (empty($coWorker->email)) {
-                return redirect()->back()->with('error', 'Co-worker does not have an email address.');
+                return redirect()->back()->with('error', __('general.co_worker_does_not_have_an_email_address'));
             }
 
             $existingUser = User::where('email', $coWorker->email)->first();
             if ($existingUser) {
-                return redirect()->back()->with('error', 'User with this email already exists.');
+                return redirect()->back()->with('error', __('general.user_with_this_email_already_exists'));
             }
 
             $randomPassword = Str::random(12);
@@ -508,7 +508,7 @@ class UsersController extends Controller
                 $this->sendCredentialsViaWhatsApp($coWorker, $user, $randomPassword);
             }
 
-            return redirect()->back()->with('success', "User created successfully as employee. Temporary Password: $randomPassword");
+            return redirect()->back()->with('success', __('general.user_created_successfully_as_employee_temporary_password_randompassword'));
 
         } catch (\Exception $e) {
             Log::error('Error creating user from co-worker: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
@@ -522,12 +522,12 @@ class UsersController extends Controller
             $coWorker = CoWorker::findOrFail($id);
 
             if (empty($coWorker->email)) {
-                return redirect()->back()->with('error', 'Co-worker does not have an email address.');
+                return redirect()->back()->with('error', __('general.co_worker_does_not_have_an_email_address'));
             }
 
             $user = User::where('email', $coWorker->email)->first();
             if (!$user) {
-                return redirect()->back()->with('error', 'User with this email does not exist.');
+                return redirect()->back()->with('error', __('general.user_with_this_email_does_not_exist'));
             }
 
             $randomPassword = Str::random(12);
@@ -545,7 +545,7 @@ class UsersController extends Controller
                 $this->sendCredentialsViaWhatsApp($coWorker, $user, $randomPassword, true);
             }
 
-            return redirect()->back()->with('success', "Password reset successfully. New Password: $randomPassword");
+            return redirect()->back()->with('success', __('general.password_reset_successfully_new_password_randompassword'));
 
         } catch (\Exception $e) {
             Log::error('Error resetting password: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
@@ -631,10 +631,10 @@ class UsersController extends Controller
             $referred_user->ref_user_id = null;
             $referred_user->save();
 
-            return back()->with('success', 'Referral removed successfully.');
+            return back()->with('success', __('general.referral_removed_successfully'));
         }
 
-        return back()->with('error', 'User is not referred by this user.');
+        return back()->with('error', __('general.user_is_not_referred_by_this_user'));
     }
 
     public function files($id)
@@ -669,7 +669,7 @@ class UsersController extends Controller
         $user = User::findOrFail($id);
         $this->adminUserService->addTask($user, $request->input('title'), $request->input('description'));
 
-        return back()->with('success', 'Task created successfully.');
+        return back()->with('success', __('general.task_created_successfully'));
     }
 
     public function activateMembership(Request $request, $id)
@@ -715,7 +715,7 @@ class UsersController extends Controller
             'expires_at' => $request->expires_at,
         ]);
 
-        return back()->with('success', "Membership updated successfully.");
+        return back()->with('success', __('general.membership_updated_successfully'));
     }
 
     public function deleteMembership($id, $sub_id)
@@ -724,7 +724,7 @@ class UsersController extends Controller
         $subscription = \App\Models\UserSubscription::where('user_id', $user->id)->findOrFail($sub_id);
         $subscription->delete();
 
-        return back()->with('success', "Membership deleted successfully.");
+        return back()->with('success', __('general.membership_deleted_successfully'));
     }
 
     /**
@@ -745,7 +745,7 @@ class UsersController extends Controller
         $unpaid = $user->unpaid_invoices_amount(true);
 
         $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('admin.users.balance_sheet_print', compact('user', 'unpaid', 'invoices'));
-        return $pdf->stream(__('Balance Sheet') . ' - ' . $user->name . '.pdf');
+        return $pdf->stream(__('general.balance_sheet') . ' - ' . $user->name . '.pdf');
     }
 
     /**

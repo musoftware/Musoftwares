@@ -121,13 +121,12 @@ export default function Index({ incomes, currencies, categories, stats }) {
     const yearDaysList = getYearDaysList();
 
     return (
-        <AdminSidebarLayout title="Recurring Income" header="Business Operations">
-            <Head title="Admin Recurring Income" />
+        <AdminSidebarLayout title={__('general.recurring_income')} header="Business Operations">
+            <Head title={__('general.admin_recurring_income')} />
 
             <div className="mb-4">
                 <Link href={route('admin.finance.index')} className="text-sm text-gray-500 hover:text-black flex items-center gap-1">
-                    <ArrowLeft className="w-4 h-4" /> Back to Financial Ledger
-                </Link>
+                    <ArrowLeft className="w-4 h-4" />{__('general.back_to_financial_ledger')}</Link>
             </div>
 
             {/* Top Stats Cards */}
@@ -137,7 +136,7 @@ export default function Index({ incomes, currencies, categories, stats }) {
                         <DollarSign className="w-6 h-6" />
                     </div>
                     <div>
-                        <p className="text-sm text-gray-500 font-medium uppercase tracking-wider">Estimated Monthly Revenue</p>
+                        <p className="text-sm text-gray-500 font-medium uppercase tracking-wider">{__('general.estimated_monthly_revenue')}</p>
                         <h3 className="text-2xl font-bold text-slate-900">{stats.monthly_total}</h3>
                     </div>
                 </div>
@@ -146,7 +145,7 @@ export default function Index({ incomes, currencies, categories, stats }) {
                         <TrendingUp className="w-6 h-6" />
                     </div>
                     <div>
-                        <p className="text-sm text-gray-500 font-medium uppercase tracking-wider">Estimated Annual Revenue</p>
+                        <p className="text-sm text-gray-500 font-medium uppercase tracking-wider">{__('general.estimated_annual_revenue')}</p>
                         <h3 className="text-2xl font-bold text-slate-900">{stats.annual_total}</h3>
                     </div>
                 </div>
@@ -155,28 +154,25 @@ export default function Index({ incomes, currencies, categories, stats }) {
             {/* Title & Actions Bar */}
             <div className="flex justify-between items-center mb-6">
                 <div>
-                    <h2 className="text-xl font-bold text-slate-900">Active Recurring Income</h2>
-                    <p className="text-sm text-gray-500 mt-1">Manage repeated automated business receipts and client retainers.</p>
+                    <h2 className="text-xl font-bold text-slate-900">{__('general.active_recurring_income')}</h2>
+                    <p className="text-sm text-gray-500 mt-1">{__('general.manage_repeated_automated_business_receipts_and_client_retainers')}</p>
                 </div>
 
                 <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
                     <DialogTrigger asChild>
                         <Button className="bg-black hover:bg-slate-800 text-white h-9">
-                            <Plus className="w-4 h-4 mr-2" /> Add Recurring Income
-                        </Button>
+                            <Plus className="w-4 h-4 mr-2" />{__('general.add_recurring_income')}</Button>
                     </DialogTrigger>
                     <DialogContent className="sm:max-w-[450px] max-h-[85vh] overflow-y-auto">
                         <form onSubmit={handleCreate}>
                             <DialogHeader>
-                                <DialogTitle>Add Recurring Income</DialogTitle>
-                                <DialogDescription>
-                                    Add a new recurring revenue entry that repeats automatically.
-                                </DialogDescription>
+                                <DialogTitle>{__('general.add_recurring_income')}</DialogTitle>
+                                <DialogDescription>{__('general.add_a_new_recurring_revenue_entry_that_repeats_automatically')}</DialogDescription>
                             </DialogHeader>
                             <div className="space-y-4 py-4">
                                 <div className="space-y-2">
-                                    <Label htmlFor="title">Title / Description</Label>
-                                    <Input id="title" required value={newIncome.title} onChange={e => setNewIncome({...newIncome, title: e.target.value})} placeholder="e.g. Monthly SaaS Subscription" />
+                                    <Label htmlFor="title">{__('general.title_description')}</Label>
+                                    <Input id="title" required value={newIncome.title} onChange={e => setNewIncome({...newIncome, title: e.target.value})} placeholder={__('general.e_g_monthly_saas_subscription')} />
                                     {errors.title && <span className="text-red-600 text-xs block">{errors.title}</span>}
                                 </div>
                                 <div className="grid grid-cols-2 gap-4">
@@ -194,7 +190,7 @@ export default function Index({ incomes, currencies, categories, stats }) {
                                 </div>
 
                                 <div className="space-y-2">
-                                    <Label>Category / Reason</Label>
+                                    <Label>{__('general.category_reason')}</Label>
                                     <div className="grid grid-cols-2 gap-2">
                                         <select className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm bg-white h-10" value={createReasonOption} onChange={e => {
                                             setCreateReasonOption(e.target.value);
@@ -209,14 +205,14 @@ export default function Index({ incomes, currencies, categories, stats }) {
                                             <option value="custom">-- Custom Reason --</option>
                                         </select>
                                         {createReasonOption === 'custom' && (
-                                            <Input required placeholder="Specify reason..." value={newIncome.custom_reason} onChange={e => setNewIncome({...newIncome, custom_reason: e.target.value})} />
+                                            <Input required placeholder={__('general.specify_reason')} value={newIncome.custom_reason} onChange={e => setNewIncome({...newIncome, custom_reason: e.target.value})} />
                                         )}
                                     </div>
                                     {errors.reason_choice && <span className="text-red-600 text-xs block">{errors.reason_choice}</span>}
                                 </div>
 
                                 <div className="space-y-2">
-                                    <Label htmlFor="start_date">Start Date</Label>
+                                    <Label htmlFor="start_date">{__('general.start_date')}</Label>
                                     <Input id="start_date" type="date" required value={newIncome.start_date} onChange={e => setNewIncome({...newIncome, start_date: e.target.value})} />
                                     {errors.start_date && <span className="text-red-600 text-xs block">{errors.start_date}</span>}
                                 </div>
@@ -243,7 +239,7 @@ export default function Index({ incomes, currencies, categories, stats }) {
 
                                 {newIncome.recurring === 'week' && (
                                     <div className="space-y-2">
-                                        <Label htmlFor="week-days">Specific Week Days</Label>
+                                        <Label htmlFor="week-days">{__('general.specific_week_days')}</Label>
                                         <select
                                             id="week-days"
                                             multiple
@@ -256,13 +252,13 @@ export default function Index({ incomes, currencies, categories, stats }) {
                                         >
                                             {weekDays.map(wd => <option key={wd} value={wd}>{wd}</option>)}
                                         </select>
-                                        <span className="text-xs text-gray-400">Hold Ctrl/Cmd to select multiple days.</span>
+                                        <span className="text-xs text-gray-400">{__('general.hold_ctrl_cmd_to_select_multiple_days')}</span>
                                     </div>
                                 )}
 
                                 {newIncome.recurring === 'month' && (
                                     <div className="space-y-2">
-                                        <Label htmlFor="month-days">Specific Month Days</Label>
+                                        <Label htmlFor="month-days">{__('general.specific_month_days')}</Label>
                                         <select
                                             id="month-days"
                                             multiple
@@ -275,13 +271,13 @@ export default function Index({ incomes, currencies, categories, stats }) {
                                         >
                                             {monthDays.map(d => <option key={d} value={d.toString()}>{d.toString().padStart(2, '0')}</option>)}
                                         </select>
-                                        <span className="text-xs text-gray-400">Hold Ctrl/Cmd to select multiple days.</span>
+                                        <span className="text-xs text-gray-400">{__('general.hold_ctrl_cmd_to_select_multiple_days')}</span>
                                     </div>
                                 )}
 
                                 {newIncome.recurring === 'year' && (
                                     <div className="space-y-2">
-                                        <Label htmlFor="year-days">Specific Year Dates</Label>
+                                        <Label htmlFor="year-days">{__('general.specific_year_dates')}</Label>
                                         <select
                                             id="year-days"
                                             multiple
@@ -294,12 +290,12 @@ export default function Index({ incomes, currencies, categories, stats }) {
                                         >
                                             {yearDaysList.map(yd => <option key={yd.val} value={yd.val}>{yd.label}</option>)}
                                         </select>
-                                        <span className="text-xs text-gray-400">Hold Ctrl/Cmd to select multiple dates.</span>
+                                        <span className="text-xs text-gray-400">{__('general.hold_ctrl_cmd_to_select_multiple_dates')}</span>
                                     </div>
                                 )}
                             </div>
                             <DialogFooter>
-                                <Button type="submit" className="bg-black hover:bg-slate-800 text-white w-full">Create Recurring Income</Button>
+                                <Button type="submit" className="bg-black hover:bg-slate-800 text-white w-full">{__('general.create_recurring_income')}</Button>
                             </DialogFooter>
                         </form>
                     </DialogContent>
@@ -311,12 +307,8 @@ export default function Index({ incomes, currencies, categories, stats }) {
                 <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-gray-50">
                         <tr>
-                            <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider select-none">
-                                Title & Schedule
-                            </th>
-                            <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider select-none">
-                                Start Date
-                            </th>
+                            <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider select-none">{__('general.title_schedule')}</th>
+                            <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider select-none">{__('general.start_date')}</th>
                             <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider select-none">
                                 Category
                             </th>
@@ -349,13 +341,11 @@ export default function Index({ incomes, currencies, categories, stats }) {
                                     </span>
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-center">
-                                    <span className="text-xs font-medium text-slate-600 bg-slate-100 px-2.5 py-1 rounded-full">
-                                        Active Log
-                                    </span>
+                                    <span className="text-xs font-medium text-slate-600 bg-slate-100 px-2.5 py-1 rounded-full">{__('general.active_log')}</span>
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                     <Link href={route('admin.recurring_income.view', income.id)}>
-                                        <Button variant="ghost" size="sm" className="text-slate-700 hover:text-black mr-1" title="View Details">
+                                        <Button variant="ghost" size="sm" className="text-slate-700 hover:text-black mr-1" title={__('general.view_details')}>
                                             <Eye className="w-4 h-4" />
                                         </Button>
                                     </Link>
@@ -364,10 +354,10 @@ export default function Index({ incomes, currencies, categories, stats }) {
                                             <Edit className="w-4 h-4" />
                                         </Button>
                                     </Link>
-                                    <Button variant="ghost" size="sm" className="text-orange-600 hover:text-orange-900 mr-1" onClick={() => handleDelete(income.id)} title="Delete Schedule Only">
+                                    <Button variant="ghost" size="sm" className="text-orange-600 hover:text-orange-900 mr-1" onClick={() => handleDelete(income.id)} title={__('general.delete_schedule_only')}>
                                         <Trash2 className="w-4 h-4" />
                                     </Button>
-                                    <Button variant="ghost" size="sm" className="text-red-600 hover:text-red-900" onClick={() => handleDeleteWithTransactions(income.id)} title="Delete Everything">
+                                    <Button variant="ghost" size="sm" className="text-red-600 hover:text-red-900" onClick={() => handleDeleteWithTransactions(income.id)} title={__('general.delete_everything')}>
                                         <Trash2 className="w-4 h-4 border border-red-200 rounded p-0.5" />
                                     </Button>
                                 </td>
@@ -377,8 +367,8 @@ export default function Index({ incomes, currencies, categories, stats }) {
                             <tr>
                                 <td colSpan={6} className="px-6 py-12 text-center text-gray-500">
                                     <Calendar className="w-12 h-12 mx-auto text-gray-300 mb-3" />
-                                    <h3 className="text-lg font-medium text-gray-900">No recurring income found</h3>
-                                    <p className="mt-1">Add a new schedule to start managing automated revenue streams.</p>
+                                    <h3 className="text-lg font-medium text-gray-900">{__('general.no_recurring_income_found')}</h3>
+                                    <p className="mt-1">{__('general.add_a_new_schedule_to_start_managing_automated_revenue_streams')}</p>
                                 </td>
                             </tr>
                         )}

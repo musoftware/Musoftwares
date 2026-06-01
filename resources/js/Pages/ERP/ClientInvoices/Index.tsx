@@ -76,7 +76,7 @@ export default function Index({
 }: IndexProps) {
     if (no_client) {
         return (
-            <ERPLayout title="Billing Portal" workspaceName="Workspace" tenantId="ACTIVE" menuItems={[]}>
+            <ERPLayout title={__('general.billing_portal')} workspaceName="Workspace" tenantId="ACTIVE" menuItems={[]}>
                 <div className="max-w-[800px] mx-auto px-4 sm:px-6 py-20 font-sans">
                     <Card className="border border-red-100 shadow-xl rounded-2xl overflow-hidden bg-white">
                         <CardContent className="p-8 flex flex-col items-center text-center space-y-6">
@@ -84,10 +84,8 @@ export default function Index({
                                 <AlertCircle className="w-8 h-8" />
                             </div>
                             <div className="space-y-2">
-                                <h1 className="text-2xl font-bold text-slate-900">Portal Account Unresolved</h1>
-                                <p className="text-sm text-slate-500 max-w-md">
-                                    Your Musoftware platform account is registered but hasn't been associated with an active client billing account by a tenant admin yet.
-                                </p>
+                                <h1 className="text-2xl font-bold text-slate-900">{__('general.portal_account_unresolved')}</h1>
+                                <p className="text-sm text-slate-500 max-w-md">{__('general.your_musoftware_platform_account_is_registered_but_hasn_t_been_associated_with_an_active_client_billing_account_by_a_tenant_admin_yet')}</p>
                             </div>
                             <div className="text-xs text-slate-400 bg-slate-50 border border-slate-100 rounded-lg p-3 w-full">
                                 Request your account representative or tenant admin to register your client profile using your email: <span className="font-semibold">{auth.user.email}</span>
@@ -214,15 +212,13 @@ export default function Index({
     const { menuItems, lockedAddons, workspaceName, tenantId } = useERPMenu('invoices');
 
     return (
-        <ERPLayout title="Billing & Invoices" workspaceName={workspaceName} tenantId={tenantId} menuItems={menuItems} lockedAddons={lockedAddons}>
+        <ERPLayout title={__('general.billing_invoices')} workspaceName={workspaceName} tenantId={tenantId} menuItems={menuItems} lockedAddons={lockedAddons}>
             <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 py-10 font-sans space-y-8">
                 
                 {/* Header */}
                 <div>
-                    <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Billing & Invoices</h1>
-                    <p className="text-sm text-slate-500 mt-1">
-                        View outstanding statements and settle balances securely using your wallet.
-                    </p>
+                    <h1 className="text-2xl font-bold text-slate-900 tracking-tight">{__('general.billing_invoices')}</h1>
+                    <p className="text-sm text-slate-500 mt-1">{__('general.view_outstanding_statements_and_settle_balances_securely_using_your_wallet')}</p>
                 </div>
 
                 {/* Dashboard Stats Panel */}
@@ -230,13 +226,11 @@ export default function Index({
                     {/* wallet Balance */}
                     <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm flex items-center justify-between">
                         <div className="space-y-1.5">
-                            <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider block">Wallet Balance</span>
+                            <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider block">{__('general.wallet_balance')}</span>
                             <span className="text-3xl font-bold text-slate-900 tracking-tight">
                                 <CurrencyDisplay amount={client_balance} currency={wallet_currency} />
                             </span>
-                            <p className="text-xs text-slate-400 leading-normal">
-                                Your current available balance, which can be used to settle outstanding invoices and platform services.
-                            </p>
+                            <p className="text-xs text-slate-400 leading-normal">{__('general.your_current_available_balance_which_can_be_used_to_settle_outstanding_invoices_and_platform_services')}</p>
                         </div>
                         <div className="w-12 h-12 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center">
                             <Wallet className="w-6 h-6" />
@@ -246,13 +240,11 @@ export default function Index({
                     {/* Outstanding Balance */}
                     <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm flex items-center justify-between">
                         <div className="space-y-1.5">
-                            <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider block">Total Outstanding Invoices</span>
+                            <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider block">{__('general.total_outstanding_invoices')}</span>
                             <span className="text-3xl font-bold text-slate-900 tracking-tight">
                                 <CurrencyDisplay amount={totalOutstanding} currency={wallet_currency} />
                             </span>
-                            <p className="text-xs text-slate-400 leading-normal">
-                                Settle outstanding payments instantly with your wallet balance.
-                            </p>
+                            <p className="text-xs text-slate-400 leading-normal">{__('general.settle_outstanding_payments_instantly_with_your_wallet_balance')}</p>
                         </div>
                         <div className="w-12 h-12 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center">
                             <FileText className="w-6 h-6" />
@@ -263,7 +255,7 @@ export default function Index({
                 {/* Invoices List Table */}
                 <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 space-y-6">
                     <div className="flex items-center justify-between">
-                        <h2 className="text-lg font-semibold text-slate-900">Billing History</h2>
+                        <h2 className="text-lg font-semibold text-slate-900">{__('general.billing_history')}</h2>
                     </div>
 
                     <DataTable

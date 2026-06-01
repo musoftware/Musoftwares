@@ -30,23 +30,17 @@ export default function Register() {
 
             <div className="space-y-6">
                 <div className="space-y-1.5">
-                    <h1 className="text-xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">
-                        Create your account
-                    </h1>
-                    <p className="text-xs text-zinc-500 dark:text-zinc-400 font-normal">
-                        Manage invoices, wallet, and services from one workspace.
-                    </p>
+                    <h1 className="text-xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">{__('general.create_your_account')}</h1>
+                    <p className="text-xs text-zinc-500 dark:text-zinc-400 font-normal">{__('general.manage_invoices_wallet_and_services_from_one_workspace')}</p>
                 </div>
 
                 <form onSubmit={submit} className="space-y-4">
                     <div className="space-y-2">
-                        <Label htmlFor="name" className="text-xs font-medium text-zinc-600 dark:text-zinc-400">
-                            Full name
-                        </Label>
+                        <Label htmlFor="name" className="text-xs font-medium text-zinc-600 dark:text-zinc-400">{__('general.full_name_1')}</Label>
                         <Input
                             id="name"
                             name="name"
-                            placeholder="John Doe"
+                            placeholder={__('general.john_doe')}
                             value={data.name}
                             autoComplete="name"
                             autoFocus
@@ -60,14 +54,12 @@ export default function Register() {
                     </div>
 
                     <div className="space-y-2">
-                        <Label htmlFor="email" className="text-xs font-medium text-zinc-600 dark:text-zinc-400">
-                            Email address
-                        </Label>
+                        <Label htmlFor="email" className="text-xs font-medium text-zinc-600 dark:text-zinc-400">{__('general.email_address_1')}</Label>
                         <Input
                             id="email"
                             type="email"
                             name="email"
-                            placeholder="name@company.com"
+                            placeholder={__('general.name_company_com')}
                             value={data.email}
                             autoComplete="username"
                             onChange={(e) => setData('email', e.target.value)}
@@ -110,9 +102,7 @@ export default function Register() {
                     </div>
 
                     <div className="space-y-2">
-                        <Label htmlFor="password_confirmation" className="text-xs font-medium text-zinc-600 dark:text-zinc-400">
-                            Confirm password
-                        </Label>
+                        <Label htmlFor="password_confirmation" className="text-xs font-medium text-zinc-600 dark:text-zinc-400">{__('general.confirm_password')}</Label>
                         <Input
                             id="password_confirmation"
                             type={showPassword ? 'text' : 'password'}
@@ -138,10 +128,10 @@ export default function Register() {
                             {processing ? (
                                 <>
                                     <Loader2 className="w-4 h-4 animate-spin text-zinc-400 dark:text-zinc-600" />
-                                    <span>Creating account...</span>
+                                    <span>{__('general.creating_account')}</span>
                                 </>
                             ) : (
-                                <span>Create account</span>
+                                <span>{__('general.create_account_1')}</span>
                             )}
                         </Button>
                     </div>
@@ -153,9 +143,7 @@ export default function Register() {
                         <Link
                             href={route('login')}
                             className="font-medium text-zinc-900 hover:underline dark:text-zinc-100"
-                        >
-                            Log in
-                        </Link>
+                        >{__('general.log_in')}</Link>
                     </p>
                 </div>
             </div>

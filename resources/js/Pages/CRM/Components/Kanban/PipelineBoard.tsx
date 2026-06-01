@@ -32,7 +32,7 @@ export default function PipelineBoard() {
     };
 
     if (isLoading) {
-        return <div className="flex items-center justify-center h-full text-slate-500">Loading pipeline...</div>;
+        return <div className="flex items-center justify-center h-full text-slate-500">{__('general.loading_pipeline')}</div>;
     }
 
     return (

@@ -80,7 +80,7 @@ export default function Edit({ auth, service, categories }: Props) {
     };
 
     return (
-        <AdminSidebarLayout user={auth?.user} title="Edit Service" header="Edit Service">
+        <AdminSidebarLayout user={auth?.user} title={__('general.edit_service')} header="Edit Service">
             <Head title={`Edit Service: ${service.title}`} />
 
             <div className="py-8 bg-slate-50 min-h-screen">
@@ -96,7 +96,7 @@ export default function Edit({ auth, service, categories }: Props) {
                             </Link>
                             <div>
                                 <h1 className="text-2xl font-bold text-slate-900">Edit Service #{service.id}</h1>
-                                <p className="text-sm text-slate-500">Make changes to the service details or packages.</p>
+                                <p className="text-sm text-slate-500">{__('general.make_changes_to_the_service_details_or_packages')}</p>
                             </div>
                         </div>
                         <Button 
@@ -113,11 +113,11 @@ export default function Edit({ auth, service, categories }: Props) {
                         
                         {/* Basic Info */}
                         <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
-                            <h2 className="text-lg font-semibold text-slate-900 border-b border-slate-100 pb-2">Basic Information</h2>
+                            <h2 className="text-lg font-semibold text-slate-900 border-b border-slate-100 pb-2">{__('general.basic_information')}</h2>
                             
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div className="space-y-2">
-                                    <Label htmlFor="title">Service Title <span className="text-red-500">*</span></Label>
+                                    <Label htmlFor="title">{__('general.service_title')}<span className="text-red-500">*</span></Label>
                                     <Input
                                         id="title"
                                         value={data.title}
@@ -132,7 +132,7 @@ export default function Edit({ auth, service, categories }: Props) {
                                     <Label htmlFor="status">Status <span className="text-red-500">*</span></Label>
                                     <Select value={data.status} onValueChange={(val) => setData('status', val)}>
                                         <SelectTrigger className={errors.status ? 'border-red-500' : ''}>
-                                            <SelectValue placeholder="Select Status" />
+                                            <SelectValue placeholder={__('general.select_status')} />
                                         </SelectTrigger>
                                         <SelectContent>
                                             <SelectItem value="active">Active</SelectItem>
@@ -148,7 +148,7 @@ export default function Edit({ auth, service, categories }: Props) {
                                     <Label htmlFor="category_id">Category <span className="text-red-500">*</span></Label>
                                     <Select value={data.category_id} onValueChange={(val) => setData('category_id', val)}>
                                         <SelectTrigger className={errors.category_id ? 'border-red-500' : ''}>
-                                            <SelectValue placeholder="Select Category" />
+                                            <SelectValue placeholder={__('general.select_category')} />
                                         </SelectTrigger>
                                         <SelectContent>
                                             {categories.map((c) => (
@@ -177,11 +177,10 @@ export default function Edit({ auth, service, categories }: Props) {
                         {/* Packages */}
                         <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
                             <div className="flex items-center justify-between border-b border-slate-100 pb-2">
-                                <h2 className="text-lg font-semibold text-slate-900">Service Packages</h2>
+                                <h2 className="text-lg font-semibold text-slate-900">{__('general.service_packages')}</h2>
                                 {data.packages.length < 3 && (
                                     <Button type="button" variant="outline" size="sm" onClick={addPackage} className="gap-1 h-8">
-                                        <Plus className="w-3.5 h-3.5" /> Add Package
-                                    </Button>
+                                        <Plus className="w-3.5 h-3.5" />{__('general.add_package')}</Button>
                                 )}
                             </div>
 
@@ -195,7 +194,7 @@ export default function Edit({ auth, service, categories }: Props) {
                                                 type="button" 
                                                 onClick={() => removePackage(index)}
                                                 className="absolute top-3 right-3 text-slate-400 hover:text-red-500 transition-colors bg-white p-1.5 rounded-md border border-slate-200 shadow-sm"
-                                                title="Remove Package"
+                                                title={__('general.remove_package')}
                                             >
                                                 <Trash2 className="w-4 h-4" />
                                             </button>
@@ -205,11 +204,11 @@ export default function Edit({ auth, service, categories }: Props) {
                                         
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                             <div className="space-y-2">
-                                                <Label>Package Name <span className="text-red-500">*</span></Label>
+                                                <Label>{__('general.package_name')}<span className="text-red-500">*</span></Label>
                                                 <Input 
                                                     value={pkg.name} 
                                                     onChange={(e) => updatePackage(index, 'name', e.target.value)} 
-                                                    placeholder="e.g. Basic Logo"
+                                                    placeholder={__('general.e_g_basic_logo')}
                                                     required
                                                 />
                                                 {/* @ts-ignore */}
@@ -234,7 +233,7 @@ export default function Edit({ auth, service, categories }: Props) {
                                             </div>
 
                                             <div className="space-y-2">
-                                                <Label>Delivery Days <span className="text-red-500">*</span></Label>
+                                                <Label>{__('general.delivery_days')}<span className="text-red-500">*</span></Label>
                                                 <Input 
                                                     type="number" 
                                                     min="1"
@@ -247,7 +246,7 @@ export default function Edit({ auth, service, categories }: Props) {
                                             </div>
 
                                             <div className="space-y-2 md:col-span-2">
-                                                <Label>Package Description <span className="text-red-500">*</span></Label>
+                                                <Label>{__('general.package_description')}<span className="text-red-500">*</span></Label>
                                                 <Textarea 
                                                     value={pkg.description} 
                                                     onChange={(e) => updatePackage(index, 'description', e.target.value)} 

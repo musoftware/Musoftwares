@@ -38,16 +38,16 @@ export default function SerialUserDevicesByUser({ users, filters }: Props) {
     };
 
     return (
-        <AdminSidebarLayout title="Devices By User" header="Devices By User">
-            <Head title="Devices By User" />
+        <AdminSidebarLayout title={__('general.devices_by_user_1')} header="Devices By User">
+            <Head title={__('general.devices_by_user_1')} />
             <div className="min-h-screen bg-zinc-950 p-6 space-y-6">
                 <div className="flex items-center gap-4">
                     <Link href={route('admin.serial-user-devices.index')} className="text-zinc-400 hover:text-white transition-colors">
                         <ArrowLeft className="w-5 h-5" />
                     </Link>
                     <div>
-                        <h1 className="text-2xl font-bold text-white tracking-tight">Devices by User</h1>
-                        <p className="text-zinc-400 text-sm mt-1">Bulk manage all device assignments per user</p>
+                        <h1 className="text-2xl font-bold text-white tracking-tight">{__('general.devices_by_user')}</h1>
+                        <p className="text-zinc-400 text-sm mt-1">{__('general.bulk_manage_all_device_assignments_per_user')}</p>
                     </div>
                 </div>
 
@@ -55,7 +55,7 @@ export default function SerialUserDevicesByUser({ users, filters }: Props) {
                 <div className="relative max-w-sm">
                     <Input
                         className="bg-zinc-900 border-zinc-700 text-white placeholder:text-zinc-500"
-                        placeholder="Search users..."
+                        placeholder={__('general.search_users')}
                         value={search}
                         onChange={e => setSearch(e.target.value)}
                         onKeyDown={e => e.key === 'Enter' && applyFilter('search', search)}
@@ -65,7 +65,7 @@ export default function SerialUserDevicesByUser({ users, filters }: Props) {
                 {/* User Cards */}
                 <div className="space-y-3">
                     {users.data.length === 0 && (
-                        <div className="text-center py-16 text-zinc-500">No users with device assignments.</div>
+                        <div className="text-center py-16 text-zinc-500">{__('general.no_users_with_device_assignments')}</div>
                     )}
                     {users.data.map(user => (
                         <Card key={user.id} className="bg-zinc-900 border-zinc-800">
@@ -94,18 +94,12 @@ export default function SerialUserDevicesByUser({ users, filters }: Props) {
                                 <div className="flex items-center gap-2">
                                     <Button size="sm" variant="ghost"
                                         className="text-emerald-400 hover:bg-emerald-500/10 text-xs h-8 px-3"
-                                        onClick={() => updateAllStatus(user, 'active')}>
-                                        Activate All
-                                    </Button>
+                                        onClick={() => updateAllStatus(user, 'active')}>{__('general.activate_all')}</Button>
                                     <Button size="sm" variant="ghost"
                                         className="text-red-400 hover:bg-red-500/10 text-xs h-8 px-3"
-                                        onClick={() => updateAllStatus(user, 'inactive')}>
-                                        Deactivate All
-                                    </Button>
+                                        onClick={() => updateAllStatus(user, 'inactive')}>{__('general.deactivate_all')}</Button>
                                     <Link href={route('admin.serial-user-devices.index', { user_id: user.id })}>
-                                        <Button size="sm" variant="outline" className="border-zinc-700 text-zinc-300 hover:text-white hover:bg-zinc-800 h-8 text-xs">
-                                            View Devices
-                                        </Button>
+                                        <Button size="sm" variant="outline" className="border-zinc-700 text-zinc-300 hover:text-white hover:bg-zinc-800 h-8 text-xs">{__('general.view_devices')}</Button>
                                     </Link>
                                 </div>
                             </CardContent>

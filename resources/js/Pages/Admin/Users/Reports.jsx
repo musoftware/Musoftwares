@@ -22,7 +22,7 @@ export default function Reports({ client, dates = [], unpaid = 0 }) {
     const currency = client.currency || 'USD';
 
     return (
-        <AdminSidebarLayout title="User Reports" header="User Reports">
+        <AdminSidebarLayout title={__('general.user_reports')} header="User Reports">
             <Head title={`Reports - ${client.name}`} />
 
             <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
@@ -33,7 +33,7 @@ export default function Reports({ client, dates = [], unpaid = 0 }) {
                             <ArrowLeft className="h-6 w-6" />
                         </Link>
                         <div>
-                            <h2 className="text-2xl font-bold text-gray-900">Timer Reports</h2>
+                            <h2 className="text-2xl font-bold text-gray-900">{__('general.timer_reports')}</h2>
                             <p className="text-sm text-gray-500">View time tracking reports for {client.name}</p>
                         </div>
                     </div>
@@ -41,26 +41,26 @@ export default function Reports({ client, dates = [], unpaid = 0 }) {
 
                 <Card className="mb-6">
                     <CardHeader>
-                        <CardTitle>Financial Summary</CardTitle>
+                        <CardTitle>{__('general.financial_summary')}</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                             <div className="p-4 bg-gray-50 rounded-lg border border-gray-100">
-                                <p className="text-sm text-gray-500 mb-1 font-medium">Account Balance</p>
+                                <p className="text-sm text-gray-500 mb-1 font-medium">{__('general.account_balance')}</p>
                                 <p className="text-xl font-bold">{formatMoney(userBalance, currency)}</p>
                             </div>
                             {userBalance < unpaid && (
                                 <div className="p-4 bg-red-50 rounded-lg border border-red-100">
-                                    <p className="text-sm text-red-600 mb-1 font-medium">Due Balance</p>
+                                    <p className="text-sm text-red-600 mb-1 font-medium">{__('general.due_balance')}</p>
                                     <p className="text-xl font-bold text-red-700">{formatMoney(unpaid - userBalance, currency)}</p>
                                 </div>
                             )}
                             <div className="p-4 bg-gray-50 rounded-lg border border-gray-100">
-                                <p className="text-sm text-gray-500 mb-1 font-medium">Total Paid</p>
+                                <p className="text-sm text-gray-500 mb-1 font-medium">{__('general.total_paid')}</p>
                                 <p className="text-xl font-bold">{formatMoney(totalPaid, currency)}</p>
                             </div>
                             <div className="p-4 bg-gray-50 rounded-lg border border-gray-100">
-                                <p className="text-sm text-gray-500 mb-1 font-medium">Total Spend</p>
+                                <p className="text-sm text-gray-500 mb-1 font-medium">{__('general.total_spend')}</p>
                                 <p className="text-xl font-bold">{formatMoney(totalPaid - userBalance, currency)}</p>
                             </div>
                         </div>
@@ -69,7 +69,7 @@ export default function Reports({ client, dates = [], unpaid = 0 }) {
 
                 <Card>
                     <CardHeader>
-                        <CardTitle>Work Dates</CardTitle>
+                        <CardTitle>{__('general.work_dates')}</CardTitle>
                     </CardHeader>
                     <CardContent className="p-0">
                         {dates.length > 0 ? (
@@ -103,9 +103,7 @@ export default function Reports({ client, dates = [], unpaid = 0 }) {
                                 </TableBody>
                             </Table>
                         ) : (
-                            <div className="p-8 text-center text-gray-500">
-                                No timer reports found for this user.
-                            </div>
+                            <div className="p-8 text-center text-gray-500">{__('general.no_timer_reports_found_for_this_user')}</div>
                         )}
                     </CardContent>
                 </Card>

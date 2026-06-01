@@ -123,7 +123,7 @@ class FileController extends Controller
                 null
             );
 
-            return back()->with('success', 'File uploaded successfully.');
+            return back()->with('success', __('general.file_uploaded_successfully'));
 
         } catch (\Exception $e) {
             return back()->withErrors(['error' => 'File upload failed: ' . $e->getMessage()]);
@@ -136,12 +136,12 @@ class FileController extends Controller
         $tenant = Tenant::where('user_id', $user->id)->first();
 
         if (!$tenant || $file->tenant_id !== $tenant->id) {
-            abort(403, 'Unauthorized access to file.');
+            abort(403, __('general.unauthorized_access_to_file'));
         }
 
         $provider = $file->storageProvider;
         if (!$provider) {
-            abort(404, 'Storage provider not found.');
+            abort(404, __('general.storage_provider_not_found'));
         }
 
         try {
@@ -162,7 +162,7 @@ class FileController extends Controller
         $tenant = Tenant::where('user_id', $user->id)->first();
 
         if (!$tenant || $file->tenant_id !== $tenant->id) {
-            abort(403, 'Unauthorized access to file.');
+            abort(403, __('general.unauthorized_access_to_file'));
         }
 
         $provider = $file->storageProvider;
@@ -185,7 +185,7 @@ class FileController extends Controller
                 null
             );
 
-            return back()->with('success', 'File deleted successfully.');
+            return back()->with('success', __('general.file_deleted_successfully'));
 
         } catch (\Exception $e) {
             return back()->withErrors(['error' => 'File deletion failed: ' . $e->getMessage()]);

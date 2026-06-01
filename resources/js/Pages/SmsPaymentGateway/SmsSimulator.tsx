@@ -43,12 +43,12 @@ export default function SmsSimulator({ devices, webhook, token }: Props) {
         e.preventDefault();
 
         if (!selectedDeviceToken) {
-            toast.error(__('Please select a connected device to simulate the message for.'));
+            toast.error(__('general.please_select_a_connected_device_to_simulate_the_message_for'));
             return;
         }
 
         if (!sender.trim() || !message.trim()) {
-            toast.error(__('Please enter both sender name and message content.'));
+            toast.error(__('general.please_enter_both_sender_name_and_message_content'));
             return;
         }
 
@@ -69,15 +69,15 @@ export default function SmsSimulator({ devices, webhook, token }: Props) {
                 success: true,
                 data: response.data,
             });
-            toast.success(__('Message simulated successfully.'));
+            toast.success(__('general.message_simulated_successfully'));
         } catch (error: any) {
             console.error(error);
             setResult({
                 success: false,
-                error: error.response?.data?.message || error.message || __('An error occurred while simulating the message.'),
+                error: error.response?.data?.message || error.message || __('general.an_error_occurred_while_simulating_the_message'),
                 details: error.response?.data,
             });
-            toast.error(__('Failed to simulate message.'));
+            toast.error(__('general.failed_to_simulate_message'));
         } finally {
             setLoading(false);
         }
@@ -91,7 +91,7 @@ export default function SmsSimulator({ devices, webhook, token }: Props) {
                 <div className="mb-8">
                     <h1 className="text-3xl font-bold text-gray-900">{__('SMS Simulator')}</h1>
                     <p className="mt-2 text-sm text-gray-600">
-                        {__('Manually simulate receiving an SMS to test if the parser and webhook are working correctly. This is exactly what the Android app does.')}
+                        {__('general.manually_simulate_receiving_an_sms_to_test_if_the_parser_and_webhook_are_working_correctly_this_is_exactly_what_the_android_app_does')}
                     </p>
                 </div>
 
@@ -100,7 +100,7 @@ export default function SmsSimulator({ devices, webhook, token }: Props) {
                         <Card className="shadow-sm">
                             <CardHeader>
                                 <CardTitle>{__('Simulate Incoming SMS')}</CardTitle>
-                                <CardDescription>{__('Enter the details of the SMS you want to simulate.')}</CardDescription>
+                                <CardDescription>{__('general.enter_the_details_of_the_sms_you_want_to_simulate')}</CardDescription>
                             </CardHeader>
                             <CardContent>
                                 <form onSubmit={handleSimulate} className="space-y-6">
@@ -127,7 +127,7 @@ export default function SmsSimulator({ devices, webhook, token }: Props) {
                                             </SelectContent>
                                         </Select>
                                         <p className="text-xs text-muted-foreground">
-                                            {__('The device token is required to authenticate the incoming SMS.')}
+                                            {__('general.the_device_token_is_required_to_authenticate_the_incoming_sms')}
                                         </p>
                                     </div>
 
@@ -138,7 +138,7 @@ export default function SmsSimulator({ devices, webhook, token }: Props) {
                                             type="text"
                                             value={sender}
                                             onChange={(e) => setSender(e.target.value)}
-                                            placeholder="e& money, VF-Cash, CIB, etc."
+                                            placeholder={__('general.e_money_vf_cash_cib_etc')}
                                             required
                                         />
                                     </div>
@@ -149,7 +149,7 @@ export default function SmsSimulator({ devices, webhook, token }: Props) {
                                             id="message"
                                             value={message}
                                             onChange={(e) => setMessage(e.target.value)}
-                                            placeholder={__('Paste the exact SMS content here...')}
+                                            placeholder={__('general.paste_the_exact_sms_content_here')}
                                             className="min-h-[150px]"
                                             required
                                         />
@@ -227,7 +227,7 @@ export default function SmsSimulator({ devices, webhook, token }: Props) {
                                             {!result.data?.transaction_detected && (
                                                 <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-md text-sm">
                                                     <div className="font-semibold text-yellow-800">{__('No Transaction Detected')}</div>
-                                                    <p className="text-yellow-700 mt-1">{__('The system received the SMS but did not detect a valid financial transaction in it.')}</p>
+                                                    <p className="text-yellow-700 mt-1">{__('general.the_system_received_the_sms_but_did_not_detect_a_valid_financial_transaction_in_it')}</p>
                                                     {result.data?.debug && (
                                                          <pre className="text-xs overflow-auto bg-white p-2 rounded border mt-2 text-gray-700" dir="ltr">
                                                              {JSON.stringify(result.data?.debug, null, 2)}

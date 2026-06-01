@@ -88,6 +88,6 @@ class LicenseController extends Controller
         $device  = ActivatedDevice::where('tool_license_id', $license->id)->findOrFail($deviceId);
         $device->revoke();
 
-        return back()->with('success', 'Device activation revoked. That device can no longer use this license.');
+        return back()->with('success', __('general.device_activation_revoked_that_device_can_no_longer_use_this_license'));
     }
 }

@@ -28,8 +28,8 @@ class GoldStalePriceDetectedNotification extends Notification
         return (new MailMessage)
             ->subject('🕐 Gold Market Data is Stale')
             ->line("The gold price for market **{$this->marketKey}** has not been updated recently.")
-            ->line("Last successful fetch: {$lastFetch}")
-            ->line('Live portfolio valuations may be inaccurate until prices are refreshed.')
+            ->line(__('general.last_successful_fetch_lastfetch'))
+            ->line(__('general.live_portfolio_valuations_may_be_inaccurate_until_prices_are_refreshed'))
             ->action('View Live Prices', url('/isaas/gold-savers/live-prices'));
     }
 

@@ -23,16 +23,12 @@ export default function ConfirmPassword() {
 
     return (
         <GuestLayout>
-            <Head title="Confirm password" />
+            <Head title={__('general.confirm_password')} />
 
             <div className="space-y-6">
                 <div className="space-y-1.5">
-                    <h1 className="text-xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">
-                        Confirm your password
-                    </h1>
-                    <p className="text-xs text-zinc-500 dark:text-zinc-400 font-normal">
-                        Please confirm your identity before accessing restricted settings.
-                    </p>
+                    <h1 className="text-xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">{__('general.confirm_your_password')}</h1>
+                    <p className="text-xs text-zinc-500 dark:text-zinc-400 font-normal">{__('general.please_confirm_your_identity_before_accessing_restricted_settings')}</p>
                 </div>
 
                 <form onSubmit={submit} className="space-y-4">
@@ -75,10 +71,10 @@ export default function ConfirmPassword() {
                             {processing ? (
                                 <>
                                     <Loader2 className="w-4 h-4 animate-spin text-zinc-400 dark:text-zinc-600" />
-                                    <span>Verifying identity...</span>
+                                    <span>{__('general.verifying_identity')}</span>
                                 </>
                             ) : (
-                                <span>Confirm identity</span>
+                                <span>{__('general.confirm_identity')}</span>
                             )}
                         </Button>
                     </div>

@@ -78,7 +78,7 @@ class BookingProviderController extends Controller
                 }
             });
 
-            return redirect()->route('booking.providers.index')->with('success', 'Provider registered successfully with default weekday schedules.');
+            return redirect()->route('booking.providers.index')->with('success', __('general.provider_registered_successfully_with_default_weekday_schedules'));
         } catch (\Exception $e) {
             Log::error('Failed to register provider: ' . $e->getMessage());
             return back()->withErrors(['error' => 'Failed to create provider.']);
@@ -117,7 +117,7 @@ class BookingProviderController extends Controller
                 $provider->eventTypes()->sync($validated['event_type_ids'] ?? []);
             });
 
-            return redirect()->route('booking.providers.index')->with('success', 'Provider profile updated successfully.');
+            return redirect()->route('booking.providers.index')->with('success', __('general.provider_profile_updated_successfully'));
         } catch (\Exception $e) {
             Log::error('Failed to update provider: ' . $e->getMessage());
             return back()->withErrors(['error' => 'Failed to update provider profile.']);
@@ -160,7 +160,7 @@ class BookingProviderController extends Controller
                 }
             });
 
-            return redirect()->route('booking.providers.index')->with('success', 'Provider availability schedule updated successfully.');
+            return redirect()->route('booking.providers.index')->with('success', __('general.provider_availability_schedule_updated_successfully'));
         } catch (\Exception $e) {
             Log::error('Failed to save schedules: ' . $e->getMessage());
             return back()->withErrors(['error' => 'Failed to update availability schedule.']);

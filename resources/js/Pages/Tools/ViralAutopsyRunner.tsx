@@ -180,7 +180,7 @@ export default function ViralAutopsyRunner({ tool }: any) {
                     <div className="w-7 h-7 bg-gradient-to-br from-rose-500 to-orange-500 rounded-lg flex items-center justify-center shadow-sm">
                         <Zap className="w-4 h-4 text-white" />
                     </div>
-                    <span className="font-bold text-sm text-slate-800 tracking-tight">Viral Videos Finder</span>
+                    <span className="font-bold text-sm text-slate-800 tracking-tight">{__('general.viral_videos_finder')}</span>
                 </div>
                 <Badge variant="outline" className={`gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase ${status === 'running' ? 'bg-amber-50 border-amber-200 text-amber-700' : status === 'done' ? 'bg-emerald-50 border-emerald-200 text-emerald-700' : 'bg-slate-100 border-slate-200 text-slate-500'}`}>
                     <div className={`w-1.5 h-1.5 rounded-full ${status === 'running' ? 'bg-amber-500 animate-pulse' : status === 'done' ? 'bg-emerald-500' : 'bg-slate-400'}`} />
@@ -193,8 +193,8 @@ export default function ViralAutopsyRunner({ tool }: any) {
                 {/* URL Input card */}
                 <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-4">
                     <div>
-                        <h1 className="text-xl font-bold tracking-tight text-slate-900">Why did it go viral?</h1>
-                        <p className="text-sm text-slate-400 mt-1">Paste any TikTok URL — get a full breakdown with a Viral Score out of 100.</p>
+                        <h1 className="text-xl font-bold tracking-tight text-slate-900">{__('general.why_did_it_go_viral')}</h1>
+                        <p className="text-sm text-slate-400 mt-1">{__('general.paste_any_tiktok_url_get_a_full_breakdown_with_a_viral_score_out_of_100')}</p>
                     </div>
 
                     <div className="flex gap-3">
@@ -205,7 +205,7 @@ export default function ViralAutopsyRunner({ tool }: any) {
                                 value={url}
                                 onChange={e => setUrl(e.target.value)}
                                 onKeyDown={e => e.key === 'Enter' && handleAnalyze()}
-                                placeholder="https://www.tiktok.com/@user/video/..."
+                                placeholder={__('general.https_www_tiktok_com_user_video')}
                                 className="pl-9 h-11 text-sm bg-slate-50 font-mono"
                             />
                         </div>
@@ -293,12 +293,12 @@ export default function ViralAutopsyRunner({ tool }: any) {
                         </div>
 
                         {/* Engagement metrics */}
-                        <Section icon={TrendingUp} title="Engagement Metrics" color="text-emerald-600">
+                        <Section icon={TrendingUp} title={__('general.engagement_metrics')} color="text-emerald-600">
                             <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
                                 <StatChip label="Plays" value={Number(eng.plays).toLocaleString()} highlight />
-                                <StatChip label="Like Rate" value={eng.like_rate} highlight={parseFloat(eng.like_rate) > 5} />
-                                <StatChip label="Comment Rate" value={eng.comment_rate} />
-                                <StatChip label="Share Rate" value={eng.share_rate} />
+                                <StatChip label={__('general.like_rate')} value={eng.like_rate} highlight={parseFloat(eng.like_rate) > 5} />
+                                <StatChip label={__('general.comment_rate')} value={eng.comment_rate} />
+                                <StatChip label={__('general.share_rate')} value={eng.share_rate} />
                             </div>
                             {eng.signals?.length > 0 && (
                                 <div className="space-y-2">
@@ -313,12 +313,12 @@ export default function ViralAutopsyRunner({ tool }: any) {
                         </Section>
 
                         {/* Caption & Hook */}
-                        <Section icon={MessageSquare} title="Caption & Hook Analysis" color="text-violet-600">
+                        <Section icon={MessageSquare} title={__('general.caption_hook_analysis')} color="text-violet-600">
                             <div className="grid grid-cols-2 gap-3 mb-4">
-                                <StatChip label="Hook Type" value={cap.hook_type_label} />
-                                <StatChip label="Caption Score" value={`${cap.score}/30`} highlight={cap.score >= 20} />
+                                <StatChip label={__('general.hook_type')} value={cap.hook_type_label} />
+                                <StatChip label={__('general.caption_score')} value={`${cap.score}/30`} highlight={cap.score >= 20} />
                                 <StatChip label="Hashtags" value={`${cap.hashtag_count} tags`} />
-                                <StatChip label="Word Count" value={`${cap.word_count} words`} highlight={cap.word_count <= 30} />
+                                <StatChip label={__('general.word_count')} value={`${cap.word_count} words`} highlight={cap.word_count <= 30} />
                             </div>
                             {cap.triggers?.length > 0 && (
                                 <div className="flex flex-wrap gap-1.5 mb-4">
@@ -331,7 +331,7 @@ export default function ViralAutopsyRunner({ tool }: any) {
                         </Section>
 
                         {/* Sound strategy */}
-                        <Section icon={Music} title="Sound Strategy" color="text-pink-600">
+                        <Section icon={Music} title={__('general.sound_strategy')} color="text-pink-600">
                             <div className="grid grid-cols-2 gap-3 mb-3">
                                 <StatChip label="Sound" value={snd.title} />
                                 <StatChip label="Type" value={snd.is_original ? 'Original Audio' : 'Trending Sound'} highlight={!snd.is_original} />
@@ -346,7 +346,7 @@ export default function ViralAutopsyRunner({ tool }: any) {
                         </Section>
 
                         {/* Content structure */}
-                        <Section icon={Layout} title="Content Structure" color="text-blue-600">
+                        <Section icon={Layout} title={__('general.content_structure')} color="text-blue-600">
                             <div className="grid grid-cols-2 gap-3 mb-3">
                                 <StatChip label="Duration" value={`${str.duration_seconds}s`} highlight={str.duration_seconds <= 30} />
                                 <StatChip label="Format" value={str.duration_label?.replace('_', ' ')} />
@@ -360,11 +360,11 @@ export default function ViralAutopsyRunner({ tool }: any) {
                         </Section>
 
                         {/* Posting timing */}
-                        <Section icon={Clock} title="Posting Timing" color="text-teal-600">
+                        <Section icon={Clock} title={__('general.posting_timing')} color="text-teal-600">
                             <div className="grid grid-cols-3 gap-3 mb-3">
                                 <StatChip label="Day" value={tim.day} />
-                                <StatChip label="Hour (UTC)" value={`${tim.hour_utc}:00`} />
-                                <StatChip label="Peak Hour" value={tim.is_peak ? '✓ Yes' : '✗ No'} highlight={tim.is_peak} />
+                                <StatChip label={__('general.hour_utc')} value={`${tim.hour_utc}:00`} />
+                                <StatChip label={__('general.peak_hour')} value={tim.is_peak ? '✓ Yes' : '✗ No'} highlight={tim.is_peak} />
                             </div>
                             {tim.suggestions?.map((s: string, i: number) => <SuggestionPill key={i} text={s} />)}
                         </Section>
@@ -387,8 +387,7 @@ export default function ViralAutopsyRunner({ tool }: any) {
                             href={url} target="_blank" rel="noopener noreferrer"
                             className="flex items-center justify-center gap-2 w-full py-3 bg-white border border-slate-200 rounded-2xl text-sm font-bold text-slate-600 hover:bg-slate-50 transition-all"
                         >
-                            <ExternalLink className="w-4 h-4" /> View Original Video
-                        </a>
+                            <ExternalLink className="w-4 h-4" />{__('general.view_original_video')}</a>
                     </div>
                 )}
             </div>

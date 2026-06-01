@@ -52,7 +52,7 @@ class TenantDomainController extends Controller
 
         $domainService->generateToken($tenantDomain);
 
-        return back()->with('success', 'Domain added. Please verify ownership.');
+        return back()->with('success', __('general.domain_added_please_verify_ownership'));
     }
 
     public function verify(Request $request, $id, DomainVerificationService $domainService)
@@ -61,13 +61,13 @@ class TenantDomainController extends Controller
             ->findOrFail($id);
 
         if ($tenantDomain->is_verified) {
-            return back()->with('success', 'Domain is already verified.');
+            return back()->with('success', __('general.domain_is_already_verified'));
         }
 
         $verified = $domainService->verifyDnsTxtRecord($tenantDomain);
 
         if ($verified) {
-            return back()->with('success', 'Domain verified successfully! SSL provisioning will begin shortly.');
+            return back()->with('success', __('general.domain_verified_successfully_ssl_provisioning_will_begin_shortly'));
         }
 
         return back()->withErrors(['error' => 'DNS TXT record not found. Please ensure you added the record and wait for propagation.']);
@@ -80,6 +80,6 @@ class TenantDomainController extends Controller
             
         $tenantDomain->delete();
 
-        return back()->with('success', 'Domain removed successfully.');
+        return back()->with('success', __('general.domain_removed_successfully'));
     }
 }

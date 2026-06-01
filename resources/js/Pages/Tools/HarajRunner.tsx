@@ -42,7 +42,7 @@ function LeadCard({ lead, idx }: { lead: any; idx: number }) {
                     <p className="text-xs font-semibold text-emerald-600 truncate">{lead.price || '—'}</p>
                 </div>
             </div>
-            <Button variant="ghost" size="icon" onClick={copyRow} className="opacity-0 group-hover:opacity-100 transition-opacity h-8 w-8 hover:bg-slate-100" title="Copy row">
+            <Button variant="ghost" size="icon" onClick={copyRow} className="opacity-0 group-hover:opacity-100 transition-opacity h-8 w-8 hover:bg-slate-100" title={__('general.copy_row')}>
                 {copied ? <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" /> : <Clipboard className="w-3.5 h-3.5 text-slate-400" />}
             </Button>
         </div>
@@ -155,7 +155,7 @@ export default function HarajRunner({ tool }: any) {
         <div className="min-h-screen bg-slate-50 flex items-center justify-center font-sans">
             <div className="text-center space-y-3">
                 <div className="w-8 h-8 border-2 border-green-500 border-t-transparent rounded-full animate-spin mx-auto" />
-                <p className="text-sm font-semibold text-slate-500">Connecting to Runtime...</p>
+                <p className="text-sm font-semibold text-slate-500">{__('general.connecting_to_runtime')}</p>
             </div>
         </div>
     );
@@ -168,14 +168,13 @@ export default function HarajRunner({ tool }: any) {
                     <div className="w-7 h-7 bg-gradient-to-br from-green-500 to-emerald-600 rounded-lg flex items-center justify-center shadow-sm">
                         <ShoppingBag className="w-4 h-4 text-white" />
                     </div>
-                    <span className="font-bold text-sm text-slate-800 tracking-tight">Haraj Lead Extractor</span>
-                    <span className="text-[9px] font-black uppercase tracking-widest text-slate-400 bg-slate-100 rounded px-1.5 py-0.5">Saudi Arabia</span>
+                    <span className="font-bold text-sm text-slate-800 tracking-tight">{__('general.haraj_lead_extractor')}</span>
+                    <span className="text-[9px] font-black uppercase tracking-widest text-slate-400 bg-slate-100 rounded px-1.5 py-0.5">{__('general.saudi_arabia')}</span>
                 </div>
                 <div className="flex items-center gap-3">
                     {leads.length > 0 && (
                         <Button variant="outline" onClick={() => exportCSV(leads)} className="h-8 gap-1.5 px-3 bg-emerald-50 border-emerald-200 text-emerald-700 hover:bg-emerald-100 hover:text-emerald-800 text-xs font-bold">
-                            <Download className="w-3.5 h-3.5" /> Export CSV
-                        </Button>
+                            <Download className="w-3.5 h-3.5" />{__('general.export_csv')}</Button>
                     )}
                     <Badge variant="outline" className={`gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase ${status === 'running' ? 'bg-green-50 border-green-200 text-green-700' : status === 'done' ? 'bg-emerald-50 border-emerald-200 text-emerald-700' : 'bg-slate-100 border-slate-200 text-slate-500'}`}>
                         <div className={`w-1.5 h-1.5 rounded-full ${status === 'running' ? 'bg-green-500 animate-pulse' : status === 'done' ? 'bg-emerald-500' : 'bg-slate-400'}`} />
@@ -188,25 +187,25 @@ export default function HarajRunner({ tool }: any) {
                 {/* Config card */}
                 <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
                     <div className="mb-5">
-                        <h1 className="text-xl font-bold tracking-tight text-slate-900">Find leads on Haraj</h1>
-                        <p className="text-sm text-slate-400 mt-1">Saudi Arabia's largest classifieds platform. Search any category and extract real contact leads.</p>
+                        <h1 className="text-xl font-bold tracking-tight text-slate-900">{__('general.find_leads_on_haraj')}</h1>
+                        <p className="text-sm text-slate-400 mt-1">{__('general.saudi_arabia_s_largest_classifieds_platform_search_any_category_and_extract_real_contact_leads')}</p>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                         <div className="md:col-span-2">
-                            <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1.5">Keyword / Category</label>
+                            <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1.5">{__('general.keyword_category')}</label>
                             <div className="relative">
                                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                                 <Input
                                     type="text" value={keyword} onChange={e => setKeyword(e.target.value)}
                                     onKeyDown={e => e.key === 'Enter' && handleStart()}
-                                    placeholder="cars, electronics, furniture, real estate..."
+                                    placeholder={__('general.cars_electronics_furniture_real_estate')}
                                     className="pl-9 h-11 text-sm bg-slate-50"
                                 />
                             </div>
                         </div>
                         <div>
-                            <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1.5">Max Leads</label>
+                            <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1.5">{__('general.max_leads')}</label>
                             <div className="relative">
                                 <Users className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                                 <Input type="number" min={10} max={500} step={10} value={limit} onChange={e => setLimit(parseInt(e.target.value, 10))}
@@ -224,8 +223,7 @@ export default function HarajRunner({ tool }: any) {
                         ) : (
                             <Button onClick={handleStart} disabled={!keyword.trim()}
                                 className="h-11 gap-2 px-6 bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-md text-sm font-bold hover:opacity-90">
-                                <Play className="w-4 h-4" /> Start Extraction
-                            </Button>
+                                <Play className="w-4 h-4" />{__('general.start_extraction')}</Button>
                         )}
                         {leads.length > 0 && status !== 'running' && (
                             <Button variant="outline" onClick={() => { setLeads([]); setStatus('idle'); setProgress(0); }}
@@ -258,10 +256,10 @@ export default function HarajRunner({ tool }: any) {
                 {/* Stats */}
                 {leads.length > 0 && (
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 animate-in fade-in duration-300">
-                        <StatCard label="Total Leads" value={leads.length} icon={Users} color="bg-green-50 border-green-200" />
-                        <StatCard label="With Phone" value={leads.filter((l: any) => l.phone).length} icon={Phone} />
-                        <StatCard label="With Price" value={leads.filter((l: any) => l.price).length} icon={Tag} />
-                        <StatCard label="With Region" value={leads.filter((l: any) => l.region).length} icon={ChevronDown} />
+                        <StatCard label={__('general.total_leads')} value={leads.length} icon={Users} color="bg-green-50 border-green-200" />
+                        <StatCard label={__('general.with_phone')} value={leads.filter((l: any) => l.phone).length} icon={Phone} />
+                        <StatCard label={__('general.with_price')} value={leads.filter((l: any) => l.price).length} icon={Tag} />
+                        <StatCard label={__('general.with_region')} value={leads.filter((l: any) => l.region).length} icon={ChevronDown} />
                     </div>
                 )}
 
@@ -271,8 +269,7 @@ export default function HarajRunner({ tool }: any) {
                         <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
                             <h3 className="font-bold text-slate-800 text-sm">{leads.length} Leads Extracted from Haraj</h3>
                             <Button onClick={() => exportCSV(leads)} className="h-8 gap-1.5 px-3 bg-slate-900 text-white hover:bg-slate-800 text-xs font-bold">
-                                <Download className="w-3.5 h-3.5" /> Export CSV
-                            </Button>
+                                <Download className="w-3.5 h-3.5" />{__('general.export_csv')}</Button>
                         </div>
                         <div className="grid grid-cols-2 md:grid-cols-5 gap-3 px-5 py-2 bg-slate-50 border-b border-slate-100">
                             {['Name', 'Phone', 'Listing Title', '', 'Price'].map((h, i) => (
@@ -297,10 +294,8 @@ export default function HarajRunner({ tool }: any) {
                 {status === 'idle' && leads.length === 0 && (
                     <div className="py-20 text-center border border-dashed border-slate-200 rounded-2xl bg-white">
                         <ShoppingBag className="w-10 h-10 text-slate-300 mx-auto mb-4" />
-                        <h3 className="text-sm font-bold text-slate-700">Haraj has millions of active listings</h3>
-                        <p className="text-xs text-slate-400 mt-2 max-w-xs mx-auto">
-                            Enter a keyword or category to extract real Saudi contact leads from Haraj.com.sa — the largest Arabic classifieds platform in KSA.
-                        </p>
+                        <h3 className="text-sm font-bold text-slate-700">{__('general.haraj_has_millions_of_active_listings')}</h3>
+                        <p className="text-xs text-slate-400 mt-2 max-w-xs mx-auto">{__('general.enter_a_keyword_or_category_to_extract_real_saudi_contact_leads_from_haraj_com_sa_the_largest_arabic_classifieds_platform_in_ksa')}</p>
                     </div>
                 )}
             </div>

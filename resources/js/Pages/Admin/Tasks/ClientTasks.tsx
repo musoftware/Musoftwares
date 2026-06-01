@@ -210,7 +210,7 @@ export default function ClientTasks({ clients, selectedClient, todos, filters }:
     );
 
     return (
-        <AdminSidebarLayout title="Client Tasks" header="Client Tasks">
+        <AdminSidebarLayout title={__('general.client_tasks')} header="Client Tasks">
             <Head title={selectedClient ? `Tasks for ${selectedClient.name}` : "Select Client — Admin"} />
 
             <div className="space-y-6">
@@ -234,8 +234,7 @@ export default function ClientTasks({ clients, selectedClient, todos, filters }:
                             size="sm"
                             className="flex items-center gap-2 text-slate-600 hover:text-slate-900 border-slate-200"
                         >
-                            <ArrowLeft className="h-4 w-4" /> Back to Selection
-                        </Button>
+                            <ArrowLeft className="h-4 w-4" />{__('general.back_to_selection')}</Button>
                     )}
                 </div>
 
@@ -248,7 +247,7 @@ export default function ClientTasks({ clients, selectedClient, todos, filters }:
                                     <Search className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                                     <Input
                                         type="text"
-                                        placeholder="Search client by name or email..."
+                                        placeholder={__('general.search_client_by_name_or_email')}
                                         value={search}
                                         onChange={handleSearchChange}
                                         className="pl-9 h-10 border-slate-200 focus-visible:ring-indigo-500"
@@ -274,9 +273,7 @@ export default function ClientTasks({ clients, selectedClient, todos, filters }:
                                         <button
                                             onClick={() => setSearch('')}
                                             className="mt-3 text-xs font-semibold text-indigo-600 hover:text-indigo-800 underline"
-                                        >
-                                            Clear search
-                                        </button>
+                                        >{__('general.clear_search')}</button>
                                     )}
                                 </CardContent>
                             </Card>
@@ -307,8 +304,7 @@ export default function ClientTasks({ clients, selectedClient, todos, filters }:
                                             <Button 
                                                 onClick={() => handleSelectClient(client.id)}
                                                 className="w-full bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs h-9 rounded-lg"
-                                            >
-                                                View Focus Board <ChevronRight className="h-3.5 w-3.5 ml-1" />
+                                            >{__('general.view_focus_board')}<ChevronRight className="h-3.5 w-3.5 ml-1" />
                                             </Button>
                                         </CardContent>
                                     </Card>
@@ -325,9 +321,7 @@ export default function ClientTasks({ clients, selectedClient, todos, filters }:
                             <Card className="rounded-xl border border-indigo-200 bg-white shadow-sm overflow-hidden">
                                 <div className="bg-indigo-50 px-5 py-3 border-b border-indigo-100 flex items-center justify-between">
                                     <h3 className="font-bold text-indigo-900 flex items-center gap-2">
-                                        <CalendarCheck className="h-4 w-4 text-indigo-600" />
-                                        Schedule Focus Time
-                                    </h3>
+                                        <CalendarCheck className="h-4 w-4 text-indigo-600" />{__('general.schedule_focus_time')}</h3>
                                     <span className="text-xs font-semibold bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-full">
                                         Hourly Rate: {formatCurrency(selectedClient.hourly_rate || 0, selectedClient.currency)}/hr
                                     </span>
@@ -336,7 +330,7 @@ export default function ClientTasks({ clients, selectedClient, todos, filters }:
                                     <form onSubmit={submitFocusTask} className="space-y-4">
                                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                             <div className="space-y-1.5">
-                                                <label className="text-xs font-semibold text-slate-700 uppercase">Target Date</label>
+                                                <label className="text-xs font-semibold text-slate-700 uppercase">{__('general.target_date')}</label>
                                                 <Input 
                                                     type="date" 
                                                     value={scheduleData.date}
@@ -346,7 +340,7 @@ export default function ClientTasks({ clients, selectedClient, todos, filters }:
                                                 />
                                             </div>
                                             <div className="space-y-1.5">
-                                                <label className="text-xs font-semibold text-slate-700 uppercase">Start Time</label>
+                                                <label className="text-xs font-semibold text-slate-700 uppercase">{__('general.start_time')}</label>
                                                 <Input 
                                                     type="time" 
                                                     value={scheduleData.start_time}
@@ -356,7 +350,7 @@ export default function ClientTasks({ clients, selectedClient, todos, filters }:
                                                 />
                                             </div>
                                             <div className="space-y-1.5">
-                                                <label className="text-xs font-semibold text-slate-700 uppercase">End Time</label>
+                                                <label className="text-xs font-semibold text-slate-700 uppercase">{__('general.end_time')}</label>
                                                 <Input 
                                                     type="time" 
                                                     value={scheduleData.end_time}
@@ -387,7 +381,7 @@ export default function ClientTasks({ clients, selectedClient, todos, filters }:
                                                     type="text" 
                                                     value={scheduleData.title}
                                                     onChange={e => setScheduleData({...scheduleData, title: e.target.value})}
-                                                    placeholder="Describe the specific engineering outcome..."
+                                                    placeholder={__('general.describe_the_specific_engineering_outcome')}
                                                     className="border-slate-200 h-10"
                                                     required
                                                 />
@@ -409,9 +403,7 @@ export default function ClientTasks({ clients, selectedClient, todos, filters }:
                             <div className="space-y-4">
                                 <div className="flex items-center justify-between mb-2">
                                     <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-                                        <Activity className="h-5 w-5 text-slate-700" />
-                                        Active Sprint Items
-                                    </h2>
+                                        <Activity className="h-5 w-5 text-slate-700" />{__('general.active_sprint_items')}</h2>
                                     <Badge variant="outline" className="bg-slate-900 text-white font-semibold px-2 py-0.5 rounded text-xs">
                                         {todos.length}
                                     </Badge>
@@ -423,28 +415,24 @@ export default function ClientTasks({ clients, selectedClient, todos, filters }:
                                         type="text"
                                         value={newTodoTitle}
                                         onChange={e => setNewTodoTitle(e.target.value)}
-                                        placeholder="Add an item to the queue..."
+                                        placeholder={__('general.add_an_item_to_the_queue')}
                                         className="flex-grow rounded-lg shadow-sm bg-white"
                                     />
                                     <Button type="submit" disabled={!newTodoTitle.trim()} className="bg-slate-800 hover:bg-slate-900 text-white rounded-lg px-4 shadow-sm flex-shrink-0">
-                                        <PlusCircle className="h-4 w-4 mr-2" /> Add to Queue
-                                    </Button>
+                                        <PlusCircle className="h-4 w-4 mr-2" />{__('general.add_to_queue')}</Button>
                                 </form>
 
                                 {todos.length === 0 ? (
                                     <Card className="rounded-xl border border-dashed border-slate-300 bg-white shadow-sm">
                                         <CardContent className="flex flex-col items-center justify-center p-16 text-center">
                                             <CheckCircle2 className="h-12 w-12 text-slate-300 mb-4" />
-                                            <h3 className="font-semibold text-slate-700 text-sm">The queue is empty</h3>
-                                            <p className="text-xs text-slate-400 max-w-xs mt-1 mb-4">
-                                                Create the first task for this client to get started.
-                                            </p>
+                                            <h3 className="font-semibold text-slate-700 text-sm">{__('general.the_queue_is_empty')}</h3>
+                                            <p className="text-xs text-slate-400 max-w-xs mt-1 mb-4">{__('general.create_the_first_task_for_this_client_to_get_started')}</p>
                                             <Link 
                                                 href={`/admin/projects?client_id=${selectedClient.id}`}
                                                 className="inline-flex items-center justify-center px-4 h-9 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold"
                                             >
-                                                <ListTodo className="h-4 w-4 me-2" /> Create First Task
-                                            </Link>
+                                                <ListTodo className="h-4 w-4 me-2" />{__('general.create_first_task')}</Link>
                                         </CardContent>
                                     </Card>
                                 ) : (
@@ -456,9 +444,7 @@ export default function ClientTasks({ clients, selectedClient, todos, filters }:
                                                         <div className="flex flex-wrap items-center gap-2">
                                                             {!todo.is_paid ? (
                                                                 <>
-                                                                    <Badge className="bg-rose-600 hover:bg-rose-700 text-white text-[10px] font-bold px-2 py-1 rounded-none uppercase">
-                                                                        AWAITING SCHEDULING
-                                                                    </Badge>
+                                                                    <Badge className="bg-rose-600 hover:bg-rose-700 text-white text-[10px] font-bold px-2 py-1 rounded-none uppercase">{__('general.awaiting_scheduling')}</Badge>
                                                                     <span className="text-xs font-bold text-slate-500">
                                                                         {todo.start_at ? new Date(todo.start_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '—'}
                                                                     </span>
@@ -476,9 +462,7 @@ export default function ClientTasks({ clients, selectedClient, todos, filters }:
                                                                             <CalendarCheck className="h-2.5 w-2.5" /> Scheduled
                                                                         </Badge>
                                                                     ) : (
-                                                                        <Badge variant="outline" className="bg-amber-50 text-amber-600 border-amber-200 text-[10px] font-bold px-1.5 py-0.5">
-                                                                            Awaiting Scheduling
-                                                                        </Badge>
+                                                                        <Badge variant="outline" className="bg-amber-50 text-amber-600 border-amber-200 text-[10px] font-bold px-1.5 py-0.5">{__('general.awaiting_scheduling_1')}</Badge>
                                                                     )}
                                                                 </>
                                                             )}
@@ -525,8 +509,7 @@ export default function ClientTasks({ clients, selectedClient, todos, filters }:
                                                             href={safeRoute('admin.projects.index', { project: todo.task_id }, '/admin/projects')}
                                                             className="inline-flex items-center justify-center bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs h-8 px-3 rounded-lg shadow-sm"
                                                         >
-                                                            <Search className="h-3.5 w-3.5 me-1" /> View Task
-                                                        </Link>
+                                                            <Search className="h-3.5 w-3.5 me-1" />{__('general.view_task')}</Link>
                                                         {todo.is_paid && !todo.refunded && (
                                                             <Button
                                                                 onClick={() => handleToggleComplete(todo.id, todo.completed)}
@@ -552,15 +535,13 @@ export default function ClientTasks({ clients, selectedClient, todos, filters }:
                                                                     onClick={() => handlePayTodo(todo.id)}
                                                                     className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs h-8 px-3 rounded-lg flex items-center gap-1.5 shadow-sm"
                                                                 >
-                                                                    <Wallet className="h-3.5 w-3.5" /> Confirm & Schedule
-                                                                </Button>
+                                                                    <Wallet className="h-3.5 w-3.5" />{__('general.confirm_schedule')}</Button>
                                                                 <Button
                                                                     onClick={() => handleDeleteTodo(todo.id)}
                                                                     variant="destructive"
                                                                     className="font-semibold text-xs h-8 px-3 rounded-lg flex items-center gap-1.5 shadow-sm"
                                                                 >
-                                                                    <Trash2 className="h-3.5 w-3.5" /> Delete Item
-                                                                </Button>
+                                                                    <Trash2 className="h-3.5 w-3.5" />{__('general.delete_item')}</Button>
                                                             </div>
                                                         )}
                                                     </div>
@@ -578,7 +559,7 @@ export default function ClientTasks({ clients, selectedClient, todos, filters }:
                                 <div className="bg-white px-5 py-3 flex items-center gap-3 border-b border-slate-100">
                                     <ShieldCheck className="h-5 w-5 text-slate-700" />
                                     <div>
-                                        <h3 className="font-bold text-[10px] uppercase tracking-wider text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full inline-block mb-1">Admin View</h3>
+                                        <h3 className="font-bold text-[10px] uppercase tracking-wider text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full inline-block mb-1">{__('general.admin_view')}</h3>
                                         <h2 className="font-bold text-sm text-slate-800 leading-none">Managing Tasks for: {selectedClient.name}</h2>
                                     </div>
                                 </div>
@@ -589,17 +570,17 @@ export default function ClientTasks({ clients, selectedClient, todos, filters }:
                                             <p className="text-sm font-bold text-slate-800 break-all">{selectedClient.email}</p>
                                         </div>
                                         <div className="space-y-1">
-                                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Available Balance</span>
+                                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{__('general.available_balance')}</span>
                                             <p className={`text-sm font-bold ${selectedClient.balance <= 0 ? 'text-rose-600' : 'text-emerald-600'}`}>
                                                 {formatCurrency(selectedClient.balance, selectedClient.currency)}
                                             </p>
                                         </div>
                                         <div className="space-y-1">
-                                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Total Tasks</span>
+                                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{__('general.total_tasks')}</span>
                                             <p className="text-sm font-bold text-slate-800">{selectedClient.total_tasks}</p>
                                         </div>
                                         <div className="space-y-1">
-                                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Completed Tasks</span>
+                                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{__('general.completed_tasks')}</span>
                                             <p className="text-sm font-bold text-slate-800">{selectedClient.completed_tasks}</p>
                                         </div>
                                     </div>
@@ -609,8 +590,7 @@ export default function ClientTasks({ clients, selectedClient, todos, filters }:
                                             href={`/admin/projects?client_id=${selectedClient.id}`}
                                             className="inline-flex items-center justify-center w-full h-9 rounded-lg border border-slate-200 bg-slate-50 hover:bg-slate-100 transition-colors text-xs font-semibold text-slate-700 uppercase"
                                         >
-                                            <ListTodo className="h-4 w-4 me-2" /> All Client Tasks
-                                        </Link>
+                                            <ListTodo className="h-4 w-4 me-2" />{__('general.all_client_tasks')}</Link>
                                     </div>
                                 </CardContent>
                             </Card>

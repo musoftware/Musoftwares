@@ -28,7 +28,7 @@ class OrderMessageController extends Controller
             'body' => $validated['body']
         ]);
 
-        return redirect()->back()->with('success', 'Message sent.');
+        return redirect()->back()->with('success', __('general.message_sent'));
     }
 }
 

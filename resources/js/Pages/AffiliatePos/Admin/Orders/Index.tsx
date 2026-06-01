@@ -45,12 +45,12 @@ export default function OrdersIndex({ orders, filters }: any) {
 
     return (
         <div className="p-6 max-w-[1600px] mx-auto space-y-6 font-sans">
-            <Head title="Order Management" />
+            <Head title={__('general.order_management')} />
 
             <div className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-2xl font-semibold text-gray-900 tracking-tight">Order Management</h1>
-                    <p className="text-sm text-gray-500 mt-1">Manage and track all affiliate and store orders.</p>
+                    <h1 className="text-2xl font-semibold text-gray-900 tracking-tight">{__('general.order_management')}</h1>
+                    <p className="text-sm text-gray-500 mt-1">{__('general.manage_and_track_all_affiliate_and_store_orders')}</p>
                 </div>
             </div>
 
@@ -59,7 +59,7 @@ export default function OrdersIndex({ orders, filters }: any) {
                     <div className="flex items-center gap-4">
                         <div className="flex-1 max-w-sm">
                             <Input 
-                                placeholder="Search by Order ID, Name, or Phone..." 
+                                placeholder={__('general.search_by_order_id_name_or_phone')} 
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
                                 onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
@@ -68,10 +68,10 @@ export default function OrdersIndex({ orders, filters }: any) {
                         </div>
                         <Select value={status} onValueChange={(val) => { setStatus(val); handleSearch(); }}>
                             <SelectTrigger className="w-[180px] bg-white">
-                                <SelectValue placeholder="Filter by status" />
+                                <SelectValue placeholder={__('general.filter_by_status')} />
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem value="all">All Orders</SelectItem>
+                                <SelectItem value="all">{__('general.all_orders')}</SelectItem>
                                 <SelectItem value="new">New</SelectItem>
                                 <SelectItem value="preparing">Preparing</SelectItem>
                                 <SelectItem value="shipping">Shipping</SelectItem>
@@ -79,17 +79,15 @@ export default function OrdersIndex({ orders, filters }: any) {
                                 <SelectItem value="cancelled">Cancelled</SelectItem>
                             </SelectContent>
                         </Select>
-                        <Button variant="outline" onClick={handleSearch} className="ml-auto">
-                            Apply Filters
-                        </Button>
+                        <Button variant="outline" onClick={handleSearch} className="ml-auto">{__('general.apply_filters')}</Button>
                     </div>
                 </CardHeader>
                 <CardContent className="p-0">
                     <Table>
                         <TableHeader>
                             <TableRow className="bg-gray-50/80 hover:bg-gray-50/80">
-                                <TableHead className="font-semibold text-gray-600">Order ID</TableHead>
-                                <TableHead className="font-semibold text-gray-600">Customer Details</TableHead>
+                                <TableHead className="font-semibold text-gray-600">{__('general.order_id')}</TableHead>
+                                <TableHead className="font-semibold text-gray-600">{__('general.customer_details')}</TableHead>
                                 <TableHead className="font-semibold text-gray-600">Location</TableHead>
                                 <TableHead className="font-semibold text-gray-600 text-right">Total (EGP)</TableHead>
                                 <TableHead className="font-semibold text-gray-600">Status</TableHead>
@@ -100,9 +98,7 @@ export default function OrdersIndex({ orders, filters }: any) {
                         <TableBody>
                             {orders.data.length === 0 ? (
                                 <TableRow>
-                                    <TableCell colSpan={7} className="h-32 text-center text-gray-500">
-                                        No orders found.
-                                    </TableCell>
+                                    <TableCell colSpan={7} className="h-32 text-center text-gray-500">{__('general.no_orders_found')}</TableCell>
                                 </TableRow>
                             ) : (
                                 orders.data.map((order: any) => (
@@ -140,7 +136,7 @@ export default function OrdersIndex({ orders, filters }: any) {
                                             <div className="flex justify-end gap-2">
                                                 <Select onValueChange={(val) => handleStatusUpdate(order.id, val)}>
                                                     <SelectTrigger className="w-[130px] h-8 text-xs">
-                                                        <SelectValue placeholder="Update..." />
+                                                        <SelectValue placeholder={__('general.update')} />
                                                     </SelectTrigger>
                                                     <SelectContent>
                                                         <SelectItem value="preparing">Preparing</SelectItem>

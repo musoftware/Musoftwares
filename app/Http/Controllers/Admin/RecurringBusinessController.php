@@ -111,7 +111,7 @@ class RecurringBusinessController extends Controller
         $rCost->save();
         $rCost->apply();
 
-        return redirect()->route('admin.recurring_costs.index')->with('success', 'Recurring cost added successfully.');
+        return redirect()->route('admin.recurring_costs.index')->with('success', __('general.recurring_cost_added_successfully'));
     }
 
     public function edit_recurring_costs($id)
@@ -187,7 +187,7 @@ class RecurringBusinessController extends Controller
 
         $rCost->save();
 
-        return redirect()->route('admin.recurring_costs.index')->with('success', 'Recurring cost updated successfully.');
+        return redirect()->route('admin.recurring_costs.index')->with('success', __('general.recurring_cost_updated_successfully'));
     }
 
     public function recurring_costs_view($id)
@@ -248,14 +248,14 @@ class RecurringBusinessController extends Controller
     {
         $rCost = RecurringCost::findOrFail($id);
         $rCost->delete();
-        return redirect()->route('admin.recurring_costs.index')->with('success', 'Recurring cost deleted.');
+        return redirect()->route('admin.recurring_costs.index')->with('success', __('general.recurring_cost_deleted'));
     }
 
     public function recurring_costs_delete_with_transaction($id)
     {
         $rCost = RecurringCost::findOrFail($id);
         $rCost->delete_with_transactions();
-        return redirect()->route('admin.recurring_costs.index')->with('success', 'Recurring cost and generated transactions deleted.');
+        return redirect()->route('admin.recurring_costs.index')->with('success', __('general.recurring_cost_and_generated_transactions_deleted'));
     }
 
     // ==========================================
@@ -331,7 +331,7 @@ class RecurringBusinessController extends Controller
         $rIncome->save();
         $rIncome->apply();
 
-        return redirect()->route('admin.recurring_income.index')->with('success', 'Recurring income added successfully.');
+        return redirect()->route('admin.recurring_income.index')->with('success', __('general.recurring_income_added_successfully'));
     }
 
     public function edit_recurring_income($id)
@@ -407,7 +407,7 @@ class RecurringBusinessController extends Controller
 
         $rIncome->save();
 
-        return redirect()->route('admin.recurring_income.index')->with('success', 'Recurring income updated successfully.');
+        return redirect()->route('admin.recurring_income.index')->with('success', __('general.recurring_income_updated_successfully'));
     }
 
     public function recurring_income_view($id)
@@ -468,14 +468,14 @@ class RecurringBusinessController extends Controller
     {
         $rIncome = RecurringIncome::findOrFail($id);
         $rIncome->delete();
-        return redirect()->route('admin.recurring_income.index')->with('success', 'Recurring income deleted.');
+        return redirect()->route('admin.recurring_income.index')->with('success', __('general.recurring_income_deleted'));
     }
 
     public function recurring_income_delete_with_transaction($id)
     {
         $rIncome = RecurringIncome::findOrFail($id);
         $rIncome->delete_with_transactions();
-        return redirect()->route('admin.recurring_income.index')->with('success', 'Recurring income and generated transactions deleted.');
+        return redirect()->route('admin.recurring_income.index')->with('success', __('general.recurring_income_and_generated_transactions_deleted'));
     }
 
     // ==========================================
@@ -534,7 +534,7 @@ class RecurringBusinessController extends Controller
         $salary->save();
         $salary->apply();
 
-        return redirect()->route('admin.recurring_salaries.index')->with('success', 'Recurring salary added successfully.');
+        return redirect()->route('admin.recurring_salaries.index')->with('success', __('general.recurring_salary_added_successfully'));
     }
 
     public function edit_recurring_salaries($id)
@@ -605,7 +605,7 @@ class RecurringBusinessController extends Controller
 
         $salary->save();
 
-        return redirect()->route('admin.recurring_salaries.index')->with('success', 'Recurring salary updated successfully.');
+        return redirect()->route('admin.recurring_salaries.index')->with('success', __('general.recurring_salary_updated_successfully'));
     }
 
     public function recurring_salaries_view($id)
@@ -667,6 +667,6 @@ class RecurringBusinessController extends Controller
     {
         $salary = RecurringSalary::findOrFail($id);
         $salary->delete();
-        return redirect()->route('admin.recurring_salaries.index')->with('success', 'Recurring salary deleted.');
+        return redirect()->route('admin.recurring_salaries.index')->with('success', __('general.recurring_salary_deleted'));
     }
 }

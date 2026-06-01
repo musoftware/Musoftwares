@@ -52,25 +52,23 @@ export default function SerialUserDevicesIndex({ userDevices, filters, statuses,
     };
 
     return (
-        <AdminSidebarLayout title="Serial User Devices" header="Serial User Devices">
-            <Head title="User Device Assignments" />
+        <AdminSidebarLayout title={__('general.serial_user_devices')} header="Serial User Devices">
+            <Head title={__('general.user_device_assignments')} />
             <div className="min-h-screen bg-zinc-950 p-6 space-y-6">
                 {/* Header */}
                 <div className="flex items-center justify-between">
                     <div>
-                        <h1 className="text-2xl font-bold text-white tracking-tight">User Device Assignments</h1>
-                        <p className="text-zinc-400 text-sm mt-1">Map devices to platform users for license activation</p>
+                        <h1 className="text-2xl font-bold text-white tracking-tight">{__('general.user_device_assignments')}</h1>
+                        <p className="text-zinc-400 text-sm mt-1">{__('general.map_devices_to_platform_users_for_license_activation')}</p>
                     </div>
                     <div className="flex gap-2">
                         <Link href={route('admin.serial-user-devices.by-user')}>
                             <Button variant="outline" size="sm" className="border-zinc-700 text-zinc-300 hover:text-white hover:bg-zinc-800 gap-2">
-                                <Users className="w-4 h-4" /> By User
-                            </Button>
+                                <Users className="w-4 h-4" />{__('general.by_user')}</Button>
                         </Link>
                         <Link href={route('admin.serial-user-devices.assign')}>
                             <Button size="sm" className="bg-violet-600 hover:bg-violet-500 text-white gap-2">
-                                <Plus className="w-4 h-4" /> Assign Device
-                            </Button>
+                                <Plus className="w-4 h-4" />{__('general.assign_device')}</Button>
                         </Link>
                     </div>
                 </div>
@@ -97,7 +95,7 @@ export default function SerialUserDevicesIndex({ userDevices, filters, statuses,
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
                         <Input
                             className="pl-9 bg-zinc-900 border-zinc-700 text-white placeholder:text-zinc-500"
-                            placeholder="Search device ID, user..."
+                            placeholder={__('general.search_device_id_user')}
                             value={search}
                             onChange={e => setSearch(e.target.value)}
                             onKeyDown={e => e.key === 'Enter' && applyFilter('search', search)}
@@ -108,7 +106,7 @@ export default function SerialUserDevicesIndex({ userDevices, filters, statuses,
                             <SelectValue placeholder="Status" />
                         </SelectTrigger>
                         <SelectContent className="bg-zinc-900 border-zinc-700">
-                            <SelectItem value="all">All Statuses</SelectItem>
+                            <SelectItem value="all">{__('general.all_statuses')}</SelectItem>
                             {statuses.map(s => <SelectItem key={s} value={s} className="capitalize">{s}</SelectItem>)}
                         </SelectContent>
                     </Select>
@@ -121,8 +119,8 @@ export default function SerialUserDevicesIndex({ userDevices, filters, statuses,
                             <table className="w-full text-sm">
                                 <thead>
                                     <tr className="border-b border-zinc-800">
-                                        <th className="text-left px-4 py-3 text-zinc-400 font-medium">Device ID</th>
-                                        <th className="text-left px-4 py-3 text-zinc-400 font-medium">Assigned User</th>
+                                        <th className="text-left px-4 py-3 text-zinc-400 font-medium">{__('general.device_id')}</th>
+                                        <th className="text-left px-4 py-3 text-zinc-400 font-medium">{__('general.assigned_user')}</th>
                                         <th className="text-left px-4 py-3 text-zinc-400 font-medium">Notes</th>
                                         <th className="text-left px-4 py-3 text-zinc-400 font-medium">Assigned</th>
                                         <th className="text-left px-4 py-3 text-zinc-400 font-medium">Status</th>
@@ -131,7 +129,7 @@ export default function SerialUserDevicesIndex({ userDevices, filters, statuses,
                                 </thead>
                                 <tbody>
                                     {userDevices.data.length === 0 && (
-                                        <tr><td colSpan={6} className="text-center py-12 text-zinc-500">No assignments found.</td></tr>
+                                        <tr><td colSpan={6} className="text-center py-12 text-zinc-500">{__('general.no_assignments_found')}</td></tr>
                                     )}
                                     {userDevices.data.map(a => (
                                         <tr key={a.id} className="border-b border-zinc-800/50 hover:bg-zinc-800/30 transition-colors">

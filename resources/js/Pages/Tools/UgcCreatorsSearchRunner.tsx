@@ -9,15 +9,11 @@ export default function UgcCreatorsSearchRunner({ tool }: any) {
                 <div className="w-16 h-16 bg-blue-500/10 border border-blue-500/20 rounded-2xl flex items-center justify-center mx-auto mb-6">
                     <Users className="w-8 h-8 text-blue-400" />
                 </div>
-                <h1 className="text-2xl font-bold">Creators Finder</h1>
-                <p className="text-sm text-slate-400">
-                    Find and connect with UGC creators natively from your browser via the local runtime extension.
-                </p>
+                <h1 className="text-2xl font-bold">{__('general.creators_finder')}</h1>
+                <p className="text-sm text-slate-400">{__('general.find_and_connect_with_ugc_creators_natively_from_your_browser_via_the_local_runtime_extension')}</p>
                 <div className="pt-8 border-t border-slate-800">
-                    <p className="text-xs text-slate-500 uppercase tracking-widest font-black mb-4">Coming Soon</p>
-                    <Button variant="outline" className="bg-slate-900 border-slate-800 text-slate-300 hover:bg-slate-800">
-                        View Documentation
-                    </Button>
+                    <p className="text-xs text-slate-500 uppercase tracking-widest font-black mb-4">{__('general.coming_soon')}</p>
+                    <Button variant="outline" className="bg-slate-900 border-slate-800 text-slate-300 hover:bg-slate-800">{__('general.view_documentation')}</Button>
                 </div>
             </div>
         </div>

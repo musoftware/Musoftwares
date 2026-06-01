@@ -27,7 +27,7 @@ class TicketController extends Controller
      * Store a newly created resource in storage.
      */
     public function store(Request $request) {
-        return redirect()->route('erp.dashboard', ['section' => 'tickets'])->with('success', 'Ticket created successfully.');
+        return redirect()->route('erp.dashboard', ['section' => 'tickets'])->with('success', __('general.ticket_created_successfully'));
     }
 
     /**

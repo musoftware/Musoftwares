@@ -126,7 +126,7 @@ export default function AdminNotesPanel({ noteableType, noteableId, initialNotes
 
     return (
         <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-            <h3 className="text-lg font-medium mb-4">Internal Admin Notes</h3>
+            <h3 className="text-lg font-medium mb-4">{__('general.internal_admin_notes')}</h3>
 
             <div className="mb-6 space-y-4 max-h-96 overflow-y-auto pr-2">
                 {sortedNotes.map(note => (
@@ -164,7 +164,7 @@ export default function AdminNotesPanel({ noteableType, noteableId, initialNotes
                         <div className="text-sm prose text-slate-600" dangerouslySetInnerHTML={renderMarkdown(note.content)} />
                     </div>
                 ))}
-                {notes.length === 0 && <p className="text-sm text-gray-500">No notes found.</p>}
+                {notes.length === 0 && <p className="text-sm text-gray-500">{__('general.no_notes_found')}</p>}
             </div>
 
             <form onSubmit={handleAddNote} className="space-y-4 border-t pt-4">
@@ -174,7 +174,7 @@ export default function AdminNotesPanel({ noteableType, noteableId, initialNotes
                         <input
                             type="text"
                             className="w-full border-slate-300 rounded-[8px] shadow-sm text-sm focus:border-slate-900 focus:ring-slate-900 mb-4"
-                            placeholder="Note Title..."
+                            placeholder={__('general.note_title')}
                             value={title}
                             onChange={e => setTitle(e.target.value)}
                             required
@@ -183,7 +183,7 @@ export default function AdminNotesPanel({ noteableType, noteableId, initialNotes
                         <textarea
                             className="w-full border-slate-300 rounded-[8px] shadow-sm text-sm focus:border-slate-900 focus:ring-slate-900"
                             rows={3}
-                            placeholder="Add a new note (Markdown supported)..."
+                            placeholder={__('general.add_a_new_note_markdown_supported')}
                             value={content}
                             onChange={e => setContent(e.target.value)}
                             required
@@ -192,8 +192,8 @@ export default function AdminNotesPanel({ noteableType, noteableId, initialNotes
                     </div>
                     <div className="flex flex-col gap-4">
                         <select className="border-slate-300 rounded-[8px] text-sm focus:border-slate-900 focus:ring-slate-900" value={category} onChange={e => setCategory(e.target.value)} disabled={loading}>
-                            <option value="notes">General Notes</option>
-                            <option value="password">Password & Credentials</option>
+                            <option value="notes">{__('general.general_notes')}</option>
+                            <option value="password">{__('general.password_credentials')}</option>
                             <option value="anydesk">AnyDesk</option>
                         </select>
                         <button type="submit" disabled={loading || !content.trim() || !title.trim()} className="w-full px-4 py-2 bg-slate-900 text-white text-sm font-bold rounded-[8px] hover:bg-slate-800 disabled:opacity-50 font-sora">

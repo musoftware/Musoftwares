@@ -22,7 +22,7 @@ export default function Dashboard({ stats, upcoming_bookings }: DashboardProps) 
 
     return (
         <WorkspaceLayout
-            title="Booking Dashboard"
+            title={__('general.booking_dashboard')}
             workspaceName="Booking Settings"
             tenantId="SYS-BOOKING"
             menuItems={[
@@ -33,35 +33,35 @@ export default function Dashboard({ stats, upcoming_bookings }: DashboardProps) 
                 { id: 'exceptions', label: 'Exceptions', icon: CalendarOff, href: '/booking/exceptions', isActive: false },
             ]}
         >
-            <Head title="Booking Dashboard" />
+            <Head title={__('general.booking_dashboard')} />
             
             <div className="space-y-8">
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center">
                     <div>
                         <h1 className="text-2xl font-bold tracking-tight">Dashboard</h1>
-                        <p className="text-muted-foreground">Overview of your booking statistics and upcoming appointments.</p>
+                        <p className="text-muted-foreground">{__('general.overview_of_your_booking_statistics_and_upcoming_appointments')}</p>
                     </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                     <Card>
                         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">Today's Appointments</CardTitle>
+                            <CardTitle className="text-sm font-medium">{__('general.today_s_appointments')}</CardTitle>
                             <Clock className="h-4 w-4 text-muted-foreground" />
                         </CardHeader>
                         <CardContent>
                             <div className="text-2xl font-bold">{stats.today_appointments.toString()}</div>
-                            <p className="text-xs text-muted-foreground">Bookings for today</p>
+                            <p className="text-xs text-muted-foreground">{__('general.bookings_for_today')}</p>
                         </CardContent>
                     </Card>
                     <Card>
                         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">Total Bookings</CardTitle>
+                            <CardTitle className="text-sm font-medium">{__('general.total_bookings')}</CardTitle>
                             <Calendar className="h-4 w-4 text-muted-foreground" />
                         </CardHeader>
                         <CardContent>
                             <div className="text-2xl font-bold">{stats.total_bookings.toString()}</div>
-                            <p className="text-xs text-muted-foreground">All time appointments</p>
+                            <p className="text-xs text-muted-foreground">{__('general.all_time_appointments')}</p>
                         </CardContent>
                     </Card>
                     <Card>
@@ -71,7 +71,7 @@ export default function Dashboard({ stats, upcoming_bookings }: DashboardProps) 
                         </CardHeader>
                         <CardContent>
                             <div className="text-2xl font-bold"><CurrencyDisplay amount={stats.total_revenue} currency={currency} hideSymbol={false} /></div>
-                            <p className="text-xs text-muted-foreground">Paid appointments</p>
+                            <p className="text-xs text-muted-foreground">{__('general.paid_appointments')}</p>
                         </CardContent>
                     </Card>
                     <Card>
@@ -81,7 +81,7 @@ export default function Dashboard({ stats, upcoming_bookings }: DashboardProps) 
                         </CardHeader>
                         <CardContent>
                             <div className="text-2xl font-bold">{stats.cancelled_bookings.toString()}</div>
-                            <p className="text-xs text-muted-foreground">Total cancelled</p>
+                            <p className="text-xs text-muted-foreground">{__('general.total_cancelled')}</p>
                         </CardContent>
                     </Card>
                 </div>
@@ -89,13 +89,11 @@ export default function Dashboard({ stats, upcoming_bookings }: DashboardProps) 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     <Card className="col-span-2">
                         <CardHeader>
-                            <CardTitle>Upcoming Appointments</CardTitle>
+                            <CardTitle>{__('general.upcoming_appointments')}</CardTitle>
                         </CardHeader>
                         <CardContent>
                             {upcoming_bookings.length === 0 ? (
-                                <div className="text-center py-8 text-slate-500 text-sm">
-                                    No upcoming appointments found.
-                                </div>
+                                <div className="text-center py-8 text-slate-500 text-sm">{__('general.no_upcoming_appointments_found')}</div>
                             ) : (
                                 <div className="space-y-4">
                                     {upcoming_bookings.map((booking: any) => (

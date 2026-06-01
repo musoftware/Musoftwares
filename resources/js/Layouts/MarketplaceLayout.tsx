@@ -52,9 +52,7 @@ export default function MarketplaceLayout({
                                     <Link
                                         href={route('login')}
                                         className="text-gray-600 hover:text-gray-900"
-                                    >
-                                        Log in
-                                    </Link>
+                                    >{__('general.log_in')}</Link>
                                     <Link
                                         href={route('register')}
                                         className="rounded-md bg-indigo-600 px-4 py-2 text-white hover:bg-indigo-700"

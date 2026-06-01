@@ -56,25 +56,25 @@ export default function ResellersCreate() {
     ];
 
     return (
-        <WorkspaceLayout title="New Reseller" workspaceName="Musoftware Admin" tenantId="SYS-ADMIN" menuItems={menuItems}>
-            <Head title="New Reseller" />
+        <WorkspaceLayout title={__('general.new_reseller')} workspaceName="Musoftware Admin" tenantId="SYS-ADMIN" menuItems={menuItems}>
+            <Head title={__('general.new_reseller')} />
             <div className="max-w-2xl mx-auto space-y-6">
                 <ModulePageHeader
-                    title="Create Reseller Account"
-                    description="Designate a platform user as a reseller. They'll get a unique portal URL for their sub-users."
+                    title={__('general.create_reseller_account')}
+                    description={__('general.designate_a_platform_user_as_a_reseller_they_ll_get_a_unique_portal_url_for_their_sub_users')}
                 />
 
-                <OperationalCard title="Reseller Details">
+                <OperationalCard title={__('general.reseller_details')}>
                     <form onSubmit={submit} className="space-y-5">
                         {/* User Search */}
                         <div className="space-y-1.5">
-                            <Label htmlFor="user_search">Platform User <span className="text-red-500">*</span></Label>
+                            <Label htmlFor="user_search">{__('general.platform_user')}<span className="text-red-500">*</span></Label>
                             <div className="relative">
                                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted" />
                                 <Input
                                     id="user_search"
                                     className="pl-9"
-                                    placeholder="Search by name or email..."
+                                    placeholder={__('general.search_by_name_or_email_1')}
                                     value={userSearch}
                                     onChange={e => searchUsers(e.target.value)}
                                 />
@@ -110,10 +110,10 @@ export default function ResellersCreate() {
 
                         {/* Reseller Name */}
                         <div className="space-y-1.5">
-                            <Label htmlFor="name">Reseller / Company Name <span className="text-red-500">*</span></Label>
+                            <Label htmlFor="name">{__('general.reseller_company_name')}<span className="text-red-500">*</span></Label>
                             <Input
                                 id="name"
-                                placeholder="e.g. Acme Digital Services"
+                                placeholder={__('general.e_g_acme_digital_services')}
                                 value={form.name}
                                 onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
                             />
@@ -129,20 +129,20 @@ export default function ResellersCreate() {
                                 onChange={e => setForm(f => ({ ...f, currency: e.target.value }))}
                                 className="flex h-9 w-full rounded-md border border-border bg-surface px-3 py-1 text-sm text-text-primary shadow-sm focus:outline-none focus:ring-1 focus:ring-primary"
                             >
-                                <option value="USD">USD — US Dollar</option>
-                                <option value="EGP">EGP — Egyptian Pound</option>
-                                <option value="EUR">EUR — Euro</option>
-                                <option value="SAR">SAR — Saudi Riyal</option>
-                                <option value="AED">AED — UAE Dirham</option>
+                                <option value="USD">{__('general.usd_us_dollar')}</option>
+                                <option value="EGP">{__('general.egp_egyptian_pound')}</option>
+                                <option value="EUR">{__('general.eur_euro')}</option>
+                                <option value="SAR">{__('general.sar_saudi_riyal')}</option>
+                                <option value="AED">{__('general.aed_uae_dirham')}</option>
                             </select>
                         </div>
 
                         {/* Notes */}
                         <div className="space-y-1.5">
-                            <Label htmlFor="notes">Internal Notes</Label>
+                            <Label htmlFor="notes">{__('general.internal_notes_1')}</Label>
                             <Textarea
                                 id="notes"
-                                placeholder="Optional notes about this reseller..."
+                                placeholder={__('general.optional_notes_about_this_reseller')}
                                 rows={3}
                                 value={form.notes}
                                 onChange={e => setForm(f => ({ ...f, notes: e.target.value }))}
@@ -150,9 +150,7 @@ export default function ResellersCreate() {
                         </div>
 
                         <div className="flex items-center justify-between pt-2 border-t border-border">
-                            <p className="text-xs text-text-muted">
-                                A unique portal URL will be generated automatically. Balance starts at $0.
-                            </p>
+                            <p className="text-xs text-text-muted">{__('general.a_unique_portal_url_will_be_generated_automatically_balance_starts_at_0')}</p>
                             <Button type="submit" disabled={submitting || !form.user_id || !form.name} className="gap-1.5">
                                 {submitting ? 'Creating...' : 'Create Reseller'} <ChevronRight className="w-3.5 h-3.5" />
                             </Button>

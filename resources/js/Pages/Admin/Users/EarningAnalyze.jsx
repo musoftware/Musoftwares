@@ -46,9 +46,7 @@ function fmtBiz(amount, biz = null) {
 function MonthlyBarChart({ data, fmt }) {
     if (!data || data.length === 0) {
         return (
-            <div className="flex items-center justify-center h-44 text-slate-400 text-sm">
-                No earning data in the last 12 months.
-            </div>
+            <div className="flex items-center justify-center h-44 text-slate-400 text-sm">{__('general.no_earning_data_in_the_last_12_months')}</div>
         );
     }
 
@@ -248,8 +246,8 @@ export default function EarningAnalyze({
     const payoutWidth = Math.min(100, settlement?.payout_ratio ?? 0);
 
     return (
-        <AdminSidebarLayout title="Earning Analysis" header="Earning Analysis">
-            <Head title="Earning Analysis — Admin" />
+        <AdminSidebarLayout title={__('general.earning_analysis')} header="Earning Analysis">
+            <Head title={__('general.earning_analysis_admin')} />
 
             {/* ── Section 1: KPIs ───────────────────────────────────────── */}
             <div className="mb-8">
@@ -257,14 +255,14 @@ export default function EarningAnalyze({
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                     <MetricCard
                         icon={DollarSign}
-                        label="Total Commissions"
+                        label={__('general.total_commissions')}
                         value={fmt(stats?.total_earnings)}
                         sub="All-time referral earnings (business currency)"
                         tooltip="Sum of all referral commission earnings, normalized to your business currency using historical exchange rates."
                     />
                     <MetricCard
                         icon={Users}
-                        label="Unique Earners"
+                        label={__('general.unique_earners')}
                         value={(stats?.total_earners ?? 0).toLocaleString()}
                         sub="Users who earned commissions"
                         href="/admin/users"
@@ -279,7 +277,7 @@ export default function EarningAnalyze({
                     />
                     <MetricCard
                         icon={Clock}
-                        label="Pending Clearing"
+                        label={__('general.pending_clearing')}
                         value={fmt(stats?.pending_clearing)}
                         sub={stats?.overdue_clearing > 0
                             ? `⚠ ${fmt(stats.overdue_clearing)} overdue`
@@ -303,18 +301,18 @@ export default function EarningAnalyze({
 
             {/* ── Section 2: Annual Performance ─────────────────────────── */}
             <div className="mb-8">
-                <SectionLabel icon={TrendingUp} label="Annual Performance" />
+                <SectionLabel icon={TrendingUp} label={__('general.annual_performance')} />
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <MetricCard
                         icon={DollarSign}
-                        label="Opening Balance"
+                        label={__('general.opening_balance')}
                         value={fmt(annual?.opening_balance)}
                         sub={`Jan 1, ${new Date().getFullYear()}`}
                         tooltip="Total platform transaction balance as of January 1st this year. Serves as the fiscal year baseline."
                     />
                     <MetricCard
                         icon={Wallet}
-                        label="Current Balance"
+                        label={__('general.current_balance')}
                         value={fmt(annual?.closing_balance)}
                         sub="Updated in real-time"
                         tooltip="The sum of all platform transactions (business_amount) up to today. Represents total liquid funds on the platform."
@@ -324,9 +322,7 @@ export default function EarningAnalyze({
                         <CardContent className="p-5">
                             <div className="flex items-start justify-between gap-3">
                                 <div className="flex-1">
-                                    <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-2">
-                                        Net Annual Growth
-                                    </p>
+                                    <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-2">{__('general.net_annual_growth')}</p>
                                     <p className={`text-2xl font-bold tabular-nums ${growthPositive ? 'text-green-600' : 'text-red-600'}`}>
                                         {growthPositive ? '+' : ''}{fmt(annual?.net_growth)}
                                     </p>
@@ -356,11 +352,11 @@ export default function EarningAnalyze({
 
             {/* ── Section 3: Operational Liquidity ──────────────────────── */}
             <div className="mb-8">
-                <SectionLabel icon={Wallet} label="Operational Liquidity" />
+                <SectionLabel icon={Wallet} label={__('general.operational_liquidity')} />
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <MetricCard
                         icon={DollarSign}
-                        label="Floating Cash"
+                        label={__('general.floating_cash')}
                         value={fmt(liquidity?.floating_cash)}
                         sub="Total platform cash right now"
                         tooltip="All liquid funds held across all platform accounts."
@@ -368,7 +364,7 @@ export default function EarningAnalyze({
                     />
                     <MetricCard
                         icon={ArrowDownCircle}
-                        label="Unpaid Invoices"
+                        label={__('general.unpaid_invoices')}
                         value={fmt(liquidity?.unpaid_invoices)}
                         sub="Funds allocated to pending invoices"
                         danger={liquidity?.unpaid_invoices > 0}
@@ -377,7 +373,7 @@ export default function EarningAnalyze({
                     />
                     <MetricCard
                         icon={CheckCircle2}
-                        label="Available Liquidity"
+                        label={__('general.available_liquidity')}
                         value={fmt(liquidity?.available_liquidity)}
                         sub="Floating cash minus obligations"
                         success={liquidity?.available_liquidity >= 0}
@@ -389,16 +385,16 @@ export default function EarningAnalyze({
 
             {/* ── Section 4: Settlement & Withdrawals ───────────────────── */}
             <div className="mb-8">
-                <SectionLabel icon={ArrowUpRight} label="Settlement & Withdrawals" />
+                <SectionLabel icon={ArrowUpRight} label={__('general.settlement_withdrawals')} />
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
                     <MetricCard
-                        label="Total Earning Pool"
+                        label={__('general.total_earning_pool')}
                         value={fmt(settlement?.total_pool)}
                         sub="All-time referral commissions"
                         tooltip="The total cumulative value of all earnings ever generated through referrals."
                     />
                     <MetricCard
-                        label="Paid Out"
+                        label={__('general.paid_out')}
                         value={fmt(settlement?.withdrawn)}
                         sub="Approved withdrawal payouts"
                         success
@@ -407,7 +403,7 @@ export default function EarningAnalyze({
                         href="/admin/withdraw-requests"
                     />
                     <MetricCard
-                        label="In Clearing"
+                        label={__('general.in_clearing')}
                         value={fmt(settlement?.pending_clearing)}
                         sub={settlement?.clearing_start && settlement?.clearing_end
                             ? `${settlement.clearing_start} → ${settlement.clearing_end}`
@@ -416,7 +412,7 @@ export default function EarningAnalyze({
                         tooltip="Earnings locked in the holding period. These are committed but not yet withdrawable."
                     />
                     <MetricCard
-                        label="Ready to Withdraw"
+                        label={__('general.ready_to_withdraw')}
                         value={fmt(settlement?.ready_for_withdrawal)}
                         sub="Net available for payout now"
                         success={settlement?.ready_for_withdrawal > 0}
@@ -428,9 +424,7 @@ export default function EarningAnalyze({
                 <Card className="border-slate-200">
                     <CardContent className="p-4">
                         <div className="flex items-center justify-between mb-2">
-                            <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">
-                                Effective Payout Ratio
-                            </span>
+                            <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">{__('general.effective_payout_ratio')}</span>
                             <span className="text-sm font-bold text-slate-900 tabular-nums">
                                 {settlement?.payout_ratio ?? 0}%
                             </span>
@@ -450,17 +444,17 @@ export default function EarningAnalyze({
 
             {/* ── Section 5: Referral Funnel ────────────────────────────── */}
             <div className="mb-8">
-                <SectionLabel icon={Users} label="Referral Funnel" />
+                <SectionLabel icon={Users} label={__('general.referral_funnel')} />
                 <div className="grid grid-cols-2 gap-4">
                     <MetricCard
                         icon={ArrowUpRight}
-                        label="Total Referral Visits"
+                        label={__('general.total_referral_visits')}
                         value={(referral_funnel?.total_views ?? 0).toLocaleString()}
                         sub="Unique referral link clicks"
                     />
                     <MetricCard
                         icon={Users}
-                        label="Registrations via Referral"
+                        label={__('general.registrations_via_referral')}
                         value={(referral_funnel?.total_registers ?? 0).toLocaleString()}
                         sub="Users who signed up through a referral"
                     />
@@ -472,10 +466,8 @@ export default function EarningAnalyze({
                 <Card className="lg:col-span-2 border-slate-200">
                     <CardHeader className="pb-2">
                         <CardTitle className="flex items-center gap-2 text-sm font-semibold text-slate-800">
-                            <BarChart2 className="h-4 w-4 text-slate-500" />
-                            Monthly Earnings Trend
-                        </CardTitle>
-                        <CardDescription>Last 12 months — normalized to business currency</CardDescription>
+                            <BarChart2 className="h-4 w-4 text-slate-500" />{__('general.monthly_earnings_trend')}</CardTitle>
+                        <CardDescription>{__('general.last_12_months_normalized_to_business_currency')}</CardDescription>
                     </CardHeader>
                     <CardContent>
                         <MonthlyBarChart data={monthly_trend} fmt={fmt} />
@@ -484,8 +476,8 @@ export default function EarningAnalyze({
 
                 <Card className="border-slate-200">
                     <CardHeader className="pb-2">
-                        <CardTitle className="text-sm font-semibold text-slate-800">By Currency</CardTitle>
-                        <CardDescription>Raw earning distribution per currency</CardDescription>
+                        <CardTitle className="text-sm font-semibold text-slate-800">{__('general.by_currency')}</CardTitle>
+                        <CardDescription>{__('general.raw_earning_distribution_per_currency')}</CardDescription>
                     </CardHeader>
                     <CardContent className="p-0">
                         {currency_breakdown?.length > 0 ? (
@@ -516,9 +508,7 @@ export default function EarningAnalyze({
                                 </TableBody>
                             </Table>
                         ) : (
-                            <div className="flex items-center justify-center h-32 text-slate-400 text-sm">
-                                No currency data yet.
-                            </div>
+                            <div className="flex items-center justify-center h-32 text-slate-400 text-sm">{__('general.no_currency_data_yet')}</div>
                         )}
                     </CardContent>
                 </Card>
@@ -528,9 +518,7 @@ export default function EarningAnalyze({
             <Card className="mb-6 border-slate-200">
                 <CardHeader className="pb-2">
                     <CardTitle className="flex items-center gap-2 text-sm font-semibold text-slate-800">
-                        <Award className="h-4 w-4 text-slate-500" />
-                        Top Earners
-                    </CardTitle>
+                        <Award className="h-4 w-4 text-slate-500" />{__('general.top_earners')}</CardTitle>
                     <CardDescription>Ranked by referral commission (business currency)</CardDescription>
                 </CardHeader>
                 <CardContent className="p-0">
@@ -603,7 +591,7 @@ export default function EarningAnalyze({
                     ) : (
                         <div className="flex flex-col items-center justify-center h-36 text-slate-400 gap-2">
                             <TrendingUp className="h-8 w-8 opacity-40" />
-                            <p className="text-sm">No earners yet.</p>
+                            <p className="text-sm">{__('general.no_earners_yet')}</p>
                         </div>
                     )}
                 </CardContent>
@@ -614,10 +602,8 @@ export default function EarningAnalyze({
                 <CardHeader className="flex flex-row items-start justify-between pb-2">
                     <div>
                         <CardTitle className="flex items-center gap-2 text-sm font-semibold text-slate-800">
-                            <ArrowUpRight className="h-4 w-4 text-slate-500" />
-                            Recent Earnings
-                        </CardTitle>
-                        <CardDescription>Last 50 commission records</CardDescription>
+                            <ArrowUpRight className="h-4 w-4 text-slate-500" />{__('general.recent_earnings')}</CardTitle>
+                        <CardDescription>{__('general.last_50_commission_records')}</CardDescription>
                     </div>
                     <div className="flex gap-1.5">
                         {['all', 'pending', 'overdue', 'cleared'].map((s) => (
@@ -640,10 +626,10 @@ export default function EarningAnalyze({
                                 <TableRow className="bg-slate-50">
                                     <TableHead className="w-10 text-xs">ID</TableHead>
                                     <TableHead className="text-xs">Earner</TableHead>
-                                    <TableHead className="text-xs">Referred User</TableHead>
+                                    <TableHead className="text-xs">{__('general.referred_user')}</TableHead>
                                     <TableHead className="text-right text-xs">Amount</TableHead>
                                     <TableHead className="text-xs">Status</TableHead>
-                                    <TableHead className="text-xs">Clear Date</TableHead>
+                                    <TableHead className="text-xs">{__('general.clear_date')}</TableHead>
                                     <TableHead className="text-xs">Created</TableHead>
                                 </TableRow>
                             </TableHeader>
@@ -667,7 +653,7 @@ export default function EarningAnalyze({
                                                     {e.referred_user_name} <ExternalLink className="h-3 w-3 text-slate-400" />
                                                 </Link>
                                             ) : (
-                                                <span className="text-xs text-slate-400 italic">No referral</span>
+                                                <span className="text-xs text-slate-400 italic">{__('general.no_referral')}</span>
                                             )}
                                         </TableCell>
                                         <TableCell className="text-right">
@@ -696,7 +682,7 @@ export default function EarningAnalyze({
                     ) : (
                         <div className="flex flex-col items-center justify-center h-36 text-slate-400 gap-2">
                             <Minus className="h-8 w-8 opacity-40" />
-                            <p className="text-sm">No earnings match the selected filter.</p>
+                            <p className="text-sm">{__('general.no_earnings_match_the_selected_filter')}</p>
                         </div>
                     )}
                 </CardContent>

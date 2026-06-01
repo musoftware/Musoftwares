@@ -19,17 +19,16 @@ export default function VendorProductsIndex({ products }: any) {
 
     return (
         <div className="p-6 max-w-7xl mx-auto space-y-6">
-            <Head title="Vendor Products" />
+            <Head title={__('general.vendor_products')} />
 
             <div className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-2xl font-semibold text-gray-900 tracking-tight">My Products</h1>
-                    <p className="text-sm text-gray-500 mt-1">Manage your inventory, prices, and affiliate commissions.</p>
+                    <h1 className="text-2xl font-semibold text-gray-900 tracking-tight">{__('general.my_products')}</h1>
+                    <p className="text-sm text-gray-500 mt-1">{__('general.manage_your_inventory_prices_and_affiliate_commissions')}</p>
                 </div>
                 <Link href={route('affiliate_pos.vendor.products.create')}>
                     <Button className="bg-blue-600 hover:bg-blue-700">
-                        <PackagePlus className="w-4 h-4 mr-2" /> Add Product
-                    </Button>
+                        <PackagePlus className="w-4 h-4 mr-2" />{__('general.add_product')}</Button>
                 </Link>
             </div>
 
@@ -37,7 +36,7 @@ export default function VendorProductsIndex({ products }: any) {
                 <CardHeader className="bg-gray-50/50 border-b p-4">
                     <div className="max-w-md">
                         <Input 
-                            placeholder="Search products..." 
+                            placeholder={__('general.search_products')} 
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
                             className="bg-white"
@@ -58,9 +57,7 @@ export default function VendorProductsIndex({ products }: any) {
                         <TableBody>
                             {products.data.length === 0 ? (
                                 <TableRow>
-                                    <TableCell colSpan={5} className="h-32 text-center text-gray-500">
-                                        No products found. Start by adding one.
-                                    </TableCell>
+                                    <TableCell colSpan={5} className="h-32 text-center text-gray-500">{__('general.no_products_found_start_by_adding_one')}</TableCell>
                                 </TableRow>
                             ) : (
                                 products.data.map((product: any) => (

@@ -27,7 +27,7 @@ class ContractController extends Controller
      * Store a newly created resource in storage.
      */
     public function store(Request $request) {
-        return redirect()->route('erp.dashboard', ['section' => 'contracts'])->with('success', 'Contract drafted successfully.');
+        return redirect()->route('erp.dashboard', ['section' => 'contracts'])->with('success', __('general.contract_drafted_successfully'));
     }
 
     /**

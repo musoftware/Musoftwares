@@ -23,9 +23,7 @@ export default function Index({
                         onClick={markAllRead}
                         disabled={processing}
                         className="rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 disabled:opacity-50"
-                    >
-                        Mark All as Read
-                    </button>
+                    >{__('general.mark_all_as_read')}</button>
                 </div>
             }
         >
@@ -68,9 +66,7 @@ export default function Index({
                                                                 method="post"
                                                                 as="button"
                                                                 className="inline-flex items-center text-sm font-medium text-indigo-600 hover:text-indigo-900"
-                                                            >
-                                                                Mark Read
-                                                            </Link>
+                                                            >{__('general.mark_read_1')}</Link>
                                                         )}
                                                     </div>
                                                 </div>
@@ -79,9 +75,7 @@ export default function Index({
                                     )}
                                 </ul>
                             ) : (
-                                <div className="py-8 text-center text-gray-500">
-                                    No notifications found.
-                                </div>
+                                <div className="py-8 text-center text-gray-500">{__('general.no_notifications_found')}</div>
                             )}
 
                             {/* Pagination would go here */}

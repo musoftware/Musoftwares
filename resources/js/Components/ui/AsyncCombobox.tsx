@@ -130,7 +130,7 @@ export function AsyncCombobox({
       <PopoverContent className="w-[--radix-popover-trigger-width] p-0" align="start">
         <Command shouldFilter={false}>
           <CommandInput 
-            placeholder="Search..." 
+            placeholder={__('general.search')} 
             value={searchQuery}
             onValueChange={setSearchQuery}
           />
@@ -138,9 +138,7 @@ export function AsyncCombobox({
             <CommandEmpty>
               {loading ? (
                 <div className="flex items-center justify-center py-6 text-sm text-slate-500">
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Searching...
-                </div>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />{__('general.searching')}</div>
               ) : (
                 emptyText
               )}
@@ -191,9 +189,7 @@ export function AsyncCombobox({
               ))}
               {loading && options.length > 0 && (
                 <div className="flex items-center justify-center py-2 text-xs text-slate-500">
-                  <Loader2 className="mr-2 h-3 w-3 animate-spin" />
-                  Loading more...
-                </div>
+                  <Loader2 className="mr-2 h-3 w-3 animate-spin" />{__('general.loading_more')}</div>
               )}
             </CommandGroup>
           </CommandList>

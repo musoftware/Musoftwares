@@ -40,44 +40,44 @@ export default function Index({ sequences }: { sequences: any }) {
     };
 
     return (
-        <CrmLayout title="Automated Sequences" activeMenu="sequences">
+        <CrmLayout title={__('general.automated_sequences')} activeMenu="sequences">
             <div className="flex-1 space-y-4 p-8 pt-6">
             <div className="mb-6 flex justify-end">
                 <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
                     <DialogTrigger asChild>
-                        <Button><Plus className="w-4 h-4 mr-2" /> Create Sequence</Button>
+                        <Button><Plus className="w-4 h-4 mr-2" />{__('general.create_sequence')}</Button>
                     </DialogTrigger>
                     <DialogContent>
                         <form onSubmit={handleCreate}>
                             <DialogHeader>
-                                <DialogTitle>Create New Sequence</DialogTitle>
-                                <DialogDescription>{__('A sequence is a series of automated emails sent over time.')}</DialogDescription>
+                                <DialogTitle>{__('general.create_new_sequence')}</DialogTitle>
+                                <DialogDescription>{__('general.a_sequence_is_a_series_of_automated_emails_sent_over_time')}</DialogDescription>
                             </DialogHeader>
                             <div className="space-y-4 py-4">
                                 <div className="space-y-2">
-                                    <Label>Sequence Name</Label>
+                                    <Label>{__('general.sequence_name')}</Label>
                                     <Input 
                                         required 
                                         value={newSequence.name} 
                                         onChange={(e) => setNewSequence({...newSequence, name: e.target.value})} 
-                                        placeholder="e.g. Welcome Series" 
+                                        placeholder={__('general.e_g_welcome_series')} 
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <Label>Trigger Type</Label>
+                                    <Label>{__('general.trigger_type')}</Label>
                                     <select 
                                         className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm"
                                         value={newSequence.trigger_type}
                                         onChange={(e) => setNewSequence({...newSequence, trigger_type: e.target.value})}
                                     >
-                                        <option value="manual">Manual Enrollment</option>
-                                        <option value="on_register">On User Registration</option>
-                                        <option value="on_purchase">On Purchase</option>
+                                        <option value="manual">{__('general.manual_enrollment')}</option>
+                                        <option value="on_register">{__('general.on_user_registration')}</option>
+                                        <option value="on_purchase">{__('general.on_purchase')}</option>
                                     </select>
                                 </div>
                             </div>
                             <DialogFooter>
-                                <Button type="submit">Create Sequence</Button>
+                                <Button type="submit">{__('general.create_sequence')}</Button>
                             </DialogFooter>
                         </form>
                     </DialogContent>
@@ -110,7 +110,7 @@ export default function Index({ sequences }: { sequences: any }) {
                                     <div className="w-4 h-4 mr-2 rounded-full border-2 border-indigo-400 flex items-center justify-center">
                                         <div className="w-1.5 h-1.5 bg-indigo-400 rounded-full"></div>
                                     </div>
-                                    <span>Steps: <span className="font-medium text-gray-700">{seq.steps_count}</span> Emails/Messages</span>
+                                    <span>Steps: <span className="font-medium text-gray-700">{seq.steps_count}</span>{__('general.emails_messages')}</span>
                                 </div>
                             </div>
                         </div>
@@ -131,8 +131,8 @@ export default function Index({ sequences }: { sequences: any }) {
                 {sequences.data.length === 0 && (
                     <div className="col-span-full py-12 text-center text-gray-500 bg-white rounded-lg border shadow-sm">
                         <GitMerge className="w-12 h-12 mx-auto text-gray-300 mb-3" />
-                        <h3 className="text-lg font-medium text-gray-900">No Sequences Found</h3>
-                        <p className="mt-1">Create your first sequence to start automating your marketing.</p>
+                        <h3 className="text-lg font-medium text-gray-900">{__('general.no_sequences_found')}</h3>
+                        <p className="mt-1">{__('general.create_your_first_sequence_to_start_automating_your_marketing')}</p>
                     </div>
                 )}
             </div>

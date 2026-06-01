@@ -23,7 +23,7 @@ class ServicePackageController extends Controller
 
         $service->packages()->create($validated);
 
-        return redirect()->back()->with('success', 'Package added.');
+        return redirect()->back()->with('success', __('general.package_added'));
     }
 
     public function update(Request $request, Service $service, ServicePackage $package)
@@ -40,7 +40,7 @@ class ServicePackageController extends Controller
 
         $package->update($validated);
 
-        return redirect()->back()->with('success', 'Package updated.');
+        return redirect()->back()->with('success', __('general.package_updated'));
     }
 
     public function destroy(Service $service, ServicePackage $package)
@@ -49,6 +49,6 @@ class ServicePackageController extends Controller
 
         $package->delete();
 
-        return redirect()->back()->with('success', 'Package deleted.');
+        return redirect()->back()->with('success', __('general.package_deleted'));
     }
 }

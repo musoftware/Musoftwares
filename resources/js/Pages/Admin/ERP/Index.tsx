@@ -69,15 +69,13 @@ export default function Index({ tenants, filters, stats, auth }: IndexProps) {
     };
 
     return (
-        <AdminSidebarLayout title="ERP Overview" header="ERP Overview">
-            <Head title="ERP Admin Oversight" />
+        <AdminSidebarLayout title={__('general.erp_overview')} header="ERP Overview">
+            <Head title={__('general.erp_admin_oversight')} />
 
             <div className="space-y-6">
                 <div>
-                    <h1 className="text-2xl font-bold tracking-tight text-slate-900">ERP Workspaces Oversight</h1>
-                    <p className="text-sm text-slate-500 mt-1">
-                        Monitor active business tenant databases, system-wide billing statistics, and workspace health.
-                    </p>
+                    <h1 className="text-2xl font-bold tracking-tight text-slate-900">{__('general.erp_workspaces_oversight')}</h1>
+                    <p className="text-sm text-slate-500 mt-1">{__('general.monitor_active_business_tenant_databases_system_wide_billing_statistics_and_workspace_health')}</p>
                 </div>
 
                 {/* KPI Cards Grid */}
@@ -85,7 +83,7 @@ export default function Index({ tenants, filters, stats, auth }: IndexProps) {
                     <Card className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
                         <CardContent className="p-5 flex items-center justify-between">
                             <div className="space-y-1">
-                                <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Total Workspaces</span>
+                                <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">{__('general.total_workspaces')}</span>
                                 <h3 className="text-2xl font-bold text-slate-900">{stats.total_tenants}</h3>
                             </div>
                             <div className="p-3 bg-indigo-50 text-indigo-600 rounded-lg">
@@ -97,7 +95,7 @@ export default function Index({ tenants, filters, stats, auth }: IndexProps) {
                     <Card className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
                         <CardContent className="p-5 flex items-center justify-between">
                             <div className="space-y-1">
-                                <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Active Status</span>
+                                <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">{__('general.active_status')}</span>
                                 <h3 className="text-2xl font-bold text-emerald-600">{stats.active_tenants}</h3>
                             </div>
                             <div className="p-3 bg-emerald-50 text-emerald-600 rounded-lg">
@@ -109,7 +107,7 @@ export default function Index({ tenants, filters, stats, auth }: IndexProps) {
                     <Card className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
                         <CardContent className="p-5 flex items-center justify-between">
                             <div className="space-y-1">
-                                <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Overall Platform Revenue</span>
+                                <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">{__('general.overall_platform_revenue')}</span>
                                 <h3 className="text-2xl font-bold text-slate-900">
                                     {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(stats.total_revenue)}
                                 </h3>
@@ -123,7 +121,7 @@ export default function Index({ tenants, filters, stats, auth }: IndexProps) {
                     <Card className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
                         <CardContent className="p-5 flex items-center justify-between">
                             <div className="space-y-1">
-                                <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Total Active Staff</span>
+                                <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">{__('general.total_active_staff')}</span>
                                 <h3 className="text-2xl font-bold text-slate-900">{stats.total_team_members}</h3>
                             </div>
                             <div className="p-3 bg-indigo-50 text-indigo-600 rounded-lg">
@@ -136,13 +134,13 @@ export default function Index({ tenants, filters, stats, auth }: IndexProps) {
                 {/* Filter and Table Card */}
                 <Card className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
                     <div className="px-6 py-4 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                        <h3 className="font-semibold text-slate-800 text-sm">Workspace Registry</h3>
+                        <h3 className="font-semibold text-slate-800 text-sm">{__('general.workspace_registry')}</h3>
                         <form onSubmit={handleSearch} className="flex items-center gap-2 max-w-sm w-full">
                             <div className="relative w-full">
                                 <Search className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
                                 <Input 
                                     type="text" 
-                                    placeholder="Search by name, owner, or email..." 
+                                    placeholder={__('general.search_by_name_owner_or_email')} 
                                     value={search}
                                     onChange={e => setSearch(e.target.value)}
                                     className="pl-9 h-10 shadow-none border-slate-200 focus-visible:ring-indigo-500"
@@ -158,13 +156,13 @@ export default function Index({ tenants, filters, stats, auth }: IndexProps) {
                         <table className="w-full text-left text-sm border-collapse">
                             <thead>
                                 <tr className="bg-slate-50 border-b border-slate-100 text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                                    <th className="px-6 py-3.5">Workspace Name</th>
-                                    <th className="px-6 py-3.5">Owner / Contact</th>
+                                    <th className="px-6 py-3.5">{__('general.workspace_name')}</th>
+                                    <th className="px-6 py-3.5">{__('general.owner_contact')}</th>
                                     <th className="px-6 py-3.5 text-center">Clients</th>
                                     <th className="px-6 py-3.5 text-center">Invoices</th>
-                                    <th className="px-6 py-3.5 text-center">Team Size</th>
+                                    <th className="px-6 py-3.5 text-center">{__('general.team_size')}</th>
                                     <th className="px-6 py-3.5 text-right">Revenue</th>
-                                    <th className="px-6 py-3.5">Created At</th>
+                                    <th className="px-6 py-3.5">{__('general.created_at')}</th>
                                     <th className="px-6 py-3.5 text-right">Actions</th>
                                 </tr>
                             </thead>
@@ -174,10 +172,8 @@ export default function Index({ tenants, filters, stats, auth }: IndexProps) {
                                         <td colSpan={8} className="p-0">
                                             <div className="flex flex-col items-center justify-center p-12 text-center">
                                                 <ShieldAlert className="h-12 w-12 text-slate-300 mb-4" />
-                                                <h3 className="font-semibold text-slate-800 text-sm">No Workspaces Found</h3>
-                                                <p className="text-xs text-slate-500 max-w-xs mt-1">
-                                                    No tenants match your search filter or no tenants exist.
-                                                </p>
+                                                <h3 className="font-semibold text-slate-800 text-sm">{__('general.no_workspaces_found')}</h3>
+                                                <p className="text-xs text-slate-500 max-w-xs mt-1">{__('general.no_tenants_match_your_search_filter_or_no_tenants_exist')}</p>
                                             </div>
                                         </td>
                                     </tr>

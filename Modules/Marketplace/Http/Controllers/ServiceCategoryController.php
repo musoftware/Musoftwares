@@ -28,7 +28,7 @@ class ServiceCategoryController extends Controller
 
         $category = ServiceCategory::create($validated);
 
-        return redirect()->back()->with('success', 'Category created.');
+        return redirect()->back()->with('success', __('general.category_created'));
     }
 
     public function update(Request $request, ServiceCategory $category)
@@ -42,13 +42,13 @@ class ServiceCategoryController extends Controller
 
         $category->update($validated);
 
-        return redirect()->back()->with('success', 'Category updated.');
+        return redirect()->back()->with('success', __('general.category_updated'));
     }
 
     public function destroy(ServiceCategory $category)
     {
         $category->delete();
 
-        return redirect()->back()->with('success', 'Category deleted.');
+        return redirect()->back()->with('success', __('general.category_deleted'));
     }
 }

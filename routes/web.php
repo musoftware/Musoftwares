@@ -444,7 +444,7 @@ Route::middleware(['auth', 'verified', 'onboarding', 'admin'])->prefix('admin')-
         Route::post('skills/{skill}/reject', [\App\Http\Controllers\Admin\FreelanceSkillController::class, 'reject'])->name('skills.reject');
         Route::post('skills/block-user/{user}', [\App\Http\Controllers\Admin\FreelanceSkillController::class, 'blockUser'])->name('skills.block-user');
         Route::resource('skills', \App\Http\Controllers\Admin\FreelanceSkillController::class)->except(['show']);
-        Route::resource('jobs', \App\Http\Controllers\Admin\FreelanceJobController::class)->except(['create', 'store']);
+        Route::resource('jobs', \App\Http\Controllers\Admin\FreelanceJobController::class);
         Route::post('jobs/{job}/status', [\App\Http\Controllers\Admin\FreelanceJobController::class, 'updateStatus'])->name('jobs.status');
         Route::post('jobs/{job}/force-refund', [\App\Http\Controllers\Admin\FreelanceJobController::class, 'forceRefund'])->name('jobs.force-refund');
         Route::resource('contracts', \App\Http\Controllers\Admin\FreelanceContractController::class)->only(['index', 'show', 'destroy']);

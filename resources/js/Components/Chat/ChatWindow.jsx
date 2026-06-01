@@ -305,7 +305,7 @@ export default function ChatWindow({
                         onClick={() => fileInputRef.current?.click()}
                         disabled={readOnly}
                         className="rounded-full p-2 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700 disabled:opacity-50"
-                        title="Attach image"
+                        title={__('general.attach_image')}
                     >
                         <span role="img" aria-label="attachment">
                             📎

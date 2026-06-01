@@ -61,18 +61,17 @@ export function CrmCommandPalette({ open, setOpen, onOpenLead }) {
     return (
         <CommandDialog open={open} onOpenChange={setOpen}>
             <CommandInput 
-                placeholder="Search leads, campaigns, notes... (Ctrl+K)" 
+                placeholder={__('general.search_leads_campaigns_notes_ctrl_k')} 
                 value={query} 
                 onValueChange={setQuery} 
             />
             <CommandList>
                 {loading && (
                     <div className="p-4 flex items-center justify-center text-sm text-slate-500">
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Searching...
-                    </div>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />{__('general.searching')}</div>
                 )}
                 {!loading && query.length >= 2 && results.length === 0 && (
-                    <CommandEmpty>No results found.</CommandEmpty>
+                    <CommandEmpty>{__('general.no_results_found')}</CommandEmpty>
                 )}
                 
                 {results.length > 0 && (

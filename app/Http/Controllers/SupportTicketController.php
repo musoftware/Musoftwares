@@ -84,7 +84,7 @@ class SupportTicketController extends Controller
 
             DB::commit();
 
-            return redirect()->back()->with('success', 'Support ticket opened successfully.');
+            return redirect()->back()->with('success', __('general.support_ticket_opened_successfully'));
         } catch (\Exception $e) {
             DB::rollBack();
             return redirect()->back()->withErrors(['error' => 'Failed to create ticket: ' . $e->getMessage()]);
@@ -108,7 +108,7 @@ class SupportTicketController extends Controller
             }
         });
 
-        return redirect()->back()->with('success', 'Ticket resolved.');
+        return redirect()->back()->with('success', __('general.ticket_resolved'));
     }
 
     public function close($id)
@@ -127,7 +127,7 @@ class SupportTicketController extends Controller
             }
         });
 
-        return redirect()->back()->with('success', 'Ticket closed.');
+        return redirect()->back()->with('success', __('general.ticket_closed'));
     }
 
     public function destroy($id)
@@ -140,6 +140,6 @@ class SupportTicketController extends Controller
 
         $ticket->delete();
 
-        return redirect()->back()->with('success', 'Ticket deleted.');
+        return redirect()->back()->with('success', __('general.ticket_deleted'));
     }
 }

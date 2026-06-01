@@ -52,9 +52,7 @@ export default function AdminSidebarLayout({ title, header, user, children }: Ad
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
                             <DropdownMenuItem className="cursor-pointer rounded-lg text-sm text-rose-600 focus:bg-rose-50 focus:text-rose-700" asChild>
-                                <Link href={route().has('logout') ? route('logout') : '#'} method="post" as="button" className="w-full text-left">
-                                    Log out
-                                </Link>
+                                <Link href={route().has('logout') ? route('logout') : '#'} method="post" as="button" className="w-full text-left">{__('general.log_out')}</Link>
                             </DropdownMenuItem>
                         </DropdownMenuContent>
                     </DropdownMenu>

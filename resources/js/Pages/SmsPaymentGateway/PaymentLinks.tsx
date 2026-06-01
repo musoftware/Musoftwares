@@ -60,7 +60,7 @@ export default function PaymentLinks({ links }: Props) {
                 <div className="flex justify-between items-center mb-8">
                     <div>
                         <h1 className="text-3xl font-bold text-gray-900">{__('Quick Payment Links')}</h1>
-                        <p className="mt-2 text-sm text-gray-600">{__('Create instant payment links to share with your customers.')}</p>
+                        <p className="mt-2 text-sm text-gray-600">{__('general.create_instant_payment_links_to_share_with_your_customers')}</p>
                     </div>
                     <Button onClick={() => setIsCreating(!isCreating)} className="flex items-center gap-2">
                         <Plus className="w-4 h-4" />{__('Create New Link')}</Button>
@@ -120,7 +120,7 @@ export default function PaymentLinks({ links }: Props) {
                         <tbody className="bg-white divide-y divide-gray-200">
                             {links.data.length === 0 ? (
                                 <tr>
-                                    <td colSpan={5} className="px-6 py-12 text-center text-gray-500">{__('No previous payment links. Create your first link now!')}</td>
+                                    <td colSpan={5} className="px-6 py-12 text-center text-gray-500">{__('general.no_previous_payment_links_create_your_first_link_now')}</td>
                                 </tr>
                             ) : (
                                 links.data.map((link) => {

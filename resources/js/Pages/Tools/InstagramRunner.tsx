@@ -53,7 +53,7 @@ function UserCard({ user, idx }: { user: any; idx: number }) {
                     </p>
                 </div>
                 <div className="min-w-0">
-                    <p className="text-[9px] font-black uppercase tracking-wider text-slate-400 mb-0.5">Full Name</p>
+                    <p className="text-[9px] font-black uppercase tracking-wider text-slate-400 mb-0.5">{__('general.full_name')}</p>
                     <p className="text-xs text-slate-600 dark:text-slate-400 truncate">{user.full_name || '—'}</p>
                 </div>
                 <div className="min-w-0">
@@ -89,7 +89,7 @@ function UserCard({ user, idx }: { user: any; idx: number }) {
                 variant="ghost" size="icon"
                 onClick={copyRow}
                 className="opacity-0 group-hover:opacity-100 transition-opacity h-8 w-8 hover:bg-slate-100 dark:hover:bg-slate-800"
-                title="Copy row"
+                title={__('general.copy_row')}
             >
                 {copied ? <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" /> : <Clipboard className="w-3.5 h-3.5 text-slate-400" />}
             </Button>
@@ -121,8 +121,7 @@ function UsersTable({ users, status, onExport }: { users: any[]; status?: string
                     onClick={onExport}
                     className="h-8 gap-1.5 px-3 bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 hover:bg-slate-800 dark:hover:bg-slate-200 text-xs font-bold"
                 >
-                    <Download className="w-3.5 h-3.5" /> Export CSV
-                </Button>
+                    <Download className="w-3.5 h-3.5" />{__('general.export_csv')}</Button>
             </div>
 
             {/* Table header */}
@@ -553,7 +552,7 @@ export default function InstagramRunner({ tool }: any) {
         <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex items-center justify-center font-sans">
             <div className="text-center space-y-3">
                 <div className="w-8 h-8 border-2 border-purple-500 border-t-transparent rounded-full animate-spin mx-auto" />
-                <p className="text-sm font-semibold text-slate-500">Connecting to Runtime...</p>
+                <p className="text-sm font-semibold text-slate-500">{__('general.connecting_to_runtime')}</p>
             </div>
         </div>
     );
@@ -570,7 +569,7 @@ export default function InstagramRunner({ tool }: any) {
                             <circle cx="17.5" cy="6.5" r="1.5" fill="currentColor" stroke="none" />
                         </svg>
                     </div>
-                    <span className="font-bold text-sm text-slate-800 dark:text-slate-200 tracking-tight">Instagram Tool</span>
+                    <span className="font-bold text-sm text-slate-800 dark:text-slate-200 tracking-tight">{__('general.instagram_tool')}</span>
                 </div>
                 <div className="flex items-center gap-3">
                     {users.length > 0 && status !== 'idle' && (
@@ -579,8 +578,7 @@ export default function InstagramRunner({ tool }: any) {
                             onClick={() => exportCSV(users)}
                             className="h-8 gap-1.5 px-3 bg-emerald-50 border-emerald-200 text-emerald-700 hover:bg-emerald-100 hover:text-emerald-800 dark:bg-emerald-950 dark:border-emerald-800 dark:text-emerald-300 text-xs font-bold"
                         >
-                            <Download className="w-3.5 h-3.5" /> Export CSV
-                        </Button>
+                            <Download className="w-3.5 h-3.5" />{__('general.export_csv')}</Button>
                     )}
                     <Badge variant="outline" className={`gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase ${status === 'running' ? 'bg-purple-50 border-purple-200 text-purple-700 dark:bg-purple-950 dark:border-purple-800 dark:text-purple-300' : status === 'done' ? 'bg-emerald-50 border-emerald-200 text-emerald-700 dark:bg-emerald-950 dark:border-emerald-800 dark:text-emerald-300' : 'bg-slate-100 border-slate-200 text-slate-500 dark:bg-slate-900 dark:border-slate-700 dark:text-slate-400'}`}>
                         <div className={`w-1.5 h-1.5 rounded-full ${status === 'running' ? 'bg-purple-500 animate-pulse' : status === 'done' ? 'bg-emerald-500' : 'bg-slate-400'}`} />
@@ -622,13 +620,13 @@ export default function InstagramRunner({ tool }: any) {
                         {/* Config card */}
                         <div className="bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm">
                             <div className="mb-5">
-                                <h1 className="text-xl font-bold tracking-tight text-slate-900 dark:text-slate-100">Instagram Extraction</h1>
-                                <p className="text-sm text-slate-400 mt-1">Extract followers, likers, commenters, hashtag users and more.</p>
+                                <h1 className="text-xl font-bold tracking-tight text-slate-900 dark:text-slate-100">{__('general.instagram_extraction')}</h1>
+                                <p className="text-sm text-slate-400 mt-1">{__('general.extract_followers_likers_commenters_hashtag_users_and_more')}</p>
                             </div>
 
                             {/* Extraction type selector */}
                             <div className="mb-4">
-                                <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-2">Extraction Type</label>
+                                <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-2">{__('general.extraction_type')}</label>
                                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2">
                                     {EXTRACTION_TYPES.map(t => {
                                         const Icon = t.icon;
@@ -658,7 +656,7 @@ export default function InstagramRunner({ tool }: any) {
                                 {/* Account Selection */}
                                 <div className="md:col-span-2">
                                     <div className="flex items-center justify-between mb-2">
-                                        <label className="text-[10px] font-black uppercase tracking-wider text-slate-400">Selected Account</label>
+                                        <label className="text-[10px] font-black uppercase tracking-wider text-slate-400">{__('general.selected_account')}</label>
                                         {accounts.length > 0 && (
                                             <Button
                                                 variant="ghost" size="sm"
@@ -676,8 +674,8 @@ export default function InstagramRunner({ tool }: any) {
                                             <div className="w-10 h-10 bg-white dark:bg-slate-950 rounded-full flex items-center justify-center mx-auto mb-3 shadow-sm">
                                                 <Users className="w-5 h-5 text-slate-400" />
                                             </div>
-                                            <h4 className="text-sm font-bold text-slate-800 dark:text-slate-200 mb-1">No accounts added</h4>
-                                            <p className="text-xs text-slate-500 mb-4 max-w-xs mx-auto">Add an Instagram account to start extracting data.</p>
+                                            <h4 className="text-sm font-bold text-slate-800 dark:text-slate-200 mb-1">{__('general.no_accounts_added')}</h4>
+                                            <p className="text-xs text-slate-500 mb-4 max-w-xs mx-auto">{__('general.add_an_instagram_account_to_start_extracting_data')}</p>
                                             <Button onClick={handleAddAccount} disabled={addingAccount} className="h-9 px-4 bg-slate-900 hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-200 text-white dark:text-slate-900 text-xs font-bold">
                                                 {addingAccount ? <Loader2 className="w-3 h-3 animate-spin mr-1.5" /> : <Plus className="w-3 h-3 mr-1.5" />} Add Account
                                             </Button>
@@ -728,9 +726,7 @@ export default function InstagramRunner({ tool }: any) {
                                             })}
                                         </div>
                                     )}
-                                    <p className="text-[10px] text-slate-400 mt-2">
-                                        Note: If you have multiple Chrome profiles open, the system will automatically pull the logged-in Instagram account from all of them at once.
-                                    </p>
+                                    <p className="text-[10px] text-slate-400 mt-2">{__('general.note_if_you_have_multiple_chrome_profiles_open_the_system_will_automatically_pull_the_logged_in_instagram_account_from_all_of_them_at_once')}</p>
                                 </div>
 
                                 {/* Target */}
@@ -751,7 +747,7 @@ export default function InstagramRunner({ tool }: any) {
 
                                 {/* Limit */}
                                 <div>
-                                    <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1.5">Max Users</label>
+                                    <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1.5">{__('general.max_users')}</label>
                                     <div className="relative">
                                         <Users className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                                         <Input
@@ -768,30 +764,29 @@ export default function InstagramRunner({ tool }: any) {
                             {/* Advanced Settings */}
                             <div className="bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4">
                                 <h4 className="text-xs font-bold text-slate-800 dark:text-slate-200 mb-3 uppercase tracking-wide flex items-center gap-2">
-                                    <Database className="w-3.5 h-3.5 text-purple-500" /> Advanced Settings & Filtering
-                                </h4>
+                                    <Database className="w-3.5 h-3.5 text-purple-500" />{__('general.advanced_settings_filtering')}</h4>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <label className="flex items-start gap-2 cursor-pointer">
                                         <input type="checkbox" className="mt-1 rounded border-slate-300" checked={deepExtraction} onChange={e => setDeepExtraction(e.target.checked)} />
                                         <div>
                                             <p className="text-sm font-bold text-slate-700 dark:text-slate-300">Deep Extraction (Enrichment)</p>
-                                            <p className="text-[10px] text-slate-400 leading-tight mt-0.5">Visits each profile to extract Bio, Email, and Phone. Slower & uses more API requests.</p>
+                                            <p className="text-[10px] text-slate-400 leading-tight mt-0.5">{__('general.visits_each_profile_to_extract_bio_email_and_phone_slower_uses_more_api_requests')}</p>
                                         </div>
                                     </label>
                                     <label className="flex items-start gap-2 cursor-pointer">
                                         <input type="checkbox" className="mt-1 rounded border-slate-300" checked={mustHaveEmail} onChange={e => setMustHaveEmail(e.target.checked)} />
                                         <div>
-                                            <p className="text-sm font-bold text-slate-700 dark:text-slate-300">Must Have Email/Phone</p>
-                                            <p className="text-[10px] text-slate-400 leading-tight mt-0.5">Skip users who don't have an email or phone in their bio. (Requires Deep Extraction).</p>
+                                            <p className="text-sm font-bold text-slate-700 dark:text-slate-300">{__('general.must_have_email_phone')}</p>
+                                            <p className="text-[10px] text-slate-400 leading-tight mt-0.5">{__('general.skip_users_who_don_t_have_an_email_or_phone_in_their_bio_requires_deep_extraction')}</p>
                                         </div>
                                     </label>
                                     <label className="flex items-center gap-2 cursor-pointer">
                                         <input type="checkbox" className="rounded border-slate-300" checked={skipPrivate} onChange={e => setSkipPrivate(e.target.checked)} />
-                                        <span className="text-sm font-bold text-slate-700 dark:text-slate-300">Skip Private Accounts</span>
+                                        <span className="text-sm font-bold text-slate-700 dark:text-slate-300">{__('general.skip_private_accounts')}</span>
                                     </label>
                                     <div className="flex items-center gap-2">
                                         <span className="text-sm font-bold text-slate-700 dark:text-slate-300">Min Followers:</span>
-                                        <Input type="number" min="0" value={minFollowers} onChange={e => setMinFollowers(e.target.value === '' ? '' : Number(e.target.value))} className="h-8 w-24 text-xs" placeholder="e.g. 1000" />
+                                        <Input type="number" min="0" value={minFollowers} onChange={e => setMinFollowers(e.target.value === '' ? '' : Number(e.target.value))} className="h-8 w-24 text-xs" placeholder={__('general.e_g_1000')} />
                                     </div>
                                 </div>
                             </div>
@@ -812,8 +807,7 @@ export default function InstagramRunner({ tool }: any) {
                                         disabled={!target.trim()}
                                         className="h-11 gap-2 px-6 bg-gradient-to-r from-purple-600 via-pink-500 to-orange-400 text-white shadow-md text-sm font-bold hover:opacity-90"
                                     >
-                                        <Play className="w-4 h-4" /> Start Extraction
-                                    </Button>
+                                        <Play className="w-4 h-4" />{__('general.start_extraction')}</Button>
                                 )}
                                 {users.length > 0 && status !== 'running' && (
                                     <Button
@@ -879,10 +873,8 @@ export default function InstagramRunner({ tool }: any) {
                                         <circle cx="17.5" cy="6.5" r="1.5" fill="currentColor" stroke="none" />
                                     </svg>
                                 </div>
-                                <h3 className="text-sm font-bold text-slate-700 dark:text-slate-300">Instagram Extraction Tool</h3>
-                                <p className="text-xs text-slate-400 mt-2 max-w-xs mx-auto">
-                                    Extract followers, likers, commenters, and hashtag users. Select a type, enter a target, and start extracting.
-                                </p>
+                                <h3 className="text-sm font-bold text-slate-700 dark:text-slate-300">{__('general.instagram_extraction_tool')}</h3>
+                                <p className="text-xs text-slate-400 mt-2 max-w-xs mx-auto">{__('general.extract_followers_likers_commenters_and_hashtag_users_select_a_type_enter_a_target_and_start_extracting')}</p>
                             </div>
                         )}
                     </TabsContent>
@@ -898,8 +890,7 @@ export default function InstagramRunner({ tool }: any) {
                                         onClick={() => { setSelectedCampaign(null); setCampaignUsers([]); }}
                                         className="flex items-center gap-1.5 text-xs font-bold text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 transition-colors mb-4"
                                     >
-                                        <ArrowLeft className="w-3.5 h-3.5" /> Back to campaigns
-                                    </button>
+                                        <ArrowLeft className="w-3.5 h-3.5" />{__('general.back_to_campaigns')}</button>
 
                                     <div className="flex items-start justify-between">
                                         <div>
@@ -944,7 +935,7 @@ export default function InstagramRunner({ tool }: any) {
                                 {loadingDetail ? (
                                     <div className="py-16 text-center">
                                         <div className="w-6 h-6 border-2 border-purple-500 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
-                                        <p className="text-xs text-slate-400 font-medium">Loading users...</p>
+                                        <p className="text-xs text-slate-400 font-medium">{__('general.loading_users')}</p>
                                     </div>
                                 ) : (
                                     <UsersTable
@@ -956,14 +947,14 @@ export default function InstagramRunner({ tool }: any) {
                                 {!loadingDetail && campaignUsers.length === 0 && (
                                     <div className="py-16 text-center bg-white dark:bg-slate-950 border border-dashed border-slate-200 dark:border-slate-800 rounded-2xl">
                                         <Users className="w-8 h-8 text-slate-300 mx-auto mb-3" />
-                                        <p className="text-sm text-slate-500 font-medium">No users in this campaign</p>
+                                        <p className="text-sm text-slate-500 font-medium">{__('general.no_users_in_this_campaign')}</p>
                                     </div>
                                 )}
                             </div>
                         ) : (
                             <div className="space-y-4 animate-in fade-in duration-300">
                                 <div className="flex items-center justify-between">
-                                    <h2 className="text-lg font-bold text-slate-800 dark:text-slate-200">Past Campaigns</h2>
+                                    <h2 className="text-lg font-bold text-slate-800 dark:text-slate-200">{__('general.past_campaigns')}</h2>
                                     <Button
                                         variant="outline"
                                         onClick={loadCampaigns}
@@ -977,13 +968,13 @@ export default function InstagramRunner({ tool }: any) {
                                 {loadingCampaigns && campaigns.length === 0 ? (
                                     <div className="py-16 text-center">
                                         <div className="w-6 h-6 border-2 border-purple-500 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
-                                        <p className="text-xs text-slate-400 font-medium">Loading campaigns...</p>
+                                        <p className="text-xs text-slate-400 font-medium">{__('general.loading_campaigns')}</p>
                                     </div>
                                 ) : campaigns.length === 0 ? (
                                     <div className="py-20 text-center border border-dashed border-slate-200 dark:border-slate-800 rounded-2xl bg-white dark:bg-slate-950">
                                         <History className="w-10 h-10 text-slate-300 mx-auto mb-4" />
-                                        <h3 className="text-sm font-bold text-slate-700 dark:text-slate-300">No campaigns yet</h3>
-                                        <p className="text-xs text-slate-400 mt-2">Start an extraction from the Extract tab to see campaigns here.</p>
+                                        <h3 className="text-sm font-bold text-slate-700 dark:text-slate-300">{__('general.no_campaigns_yet')}</h3>
+                                        <p className="text-xs text-slate-400 mt-2">{__('general.start_an_extraction_from_the_extract_tab_to_see_campaigns_here')}</p>
                                     </div>
                                 ) : (
                                     <div className="bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm overflow-hidden">

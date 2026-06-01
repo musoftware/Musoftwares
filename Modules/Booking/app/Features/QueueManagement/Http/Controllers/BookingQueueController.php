@@ -15,7 +15,7 @@ class BookingQueueController extends Controller
     {
         // Enforce SaaS feature flag
         if (!feature('booking.queue_management')) {
-            abort(403, 'Unlock Queue Management: Manage walk-ins, waiting rooms, and realtime appointment queues.');
+            abort(403, __('general.unlock_queue_management_manage_walk_ins_waiting_rooms_and_realtime_appointment_queues'));
         }
 
         $queues = BookingQueue::withCount(['entries' => function ($q) {

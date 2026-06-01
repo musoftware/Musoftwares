@@ -61,7 +61,7 @@ export default function Dashboard({
 
     return (
         <AdminSidebarLayout 
-            title="Admin Platform"
+            title={__('general.admin_platform')}
             header="Admin Dashboard"
             user={auth?.user}
         >
@@ -72,8 +72,8 @@ export default function Dashboard({
                         <div className="flex items-center gap-2 mb-1">
                             <span className="bg-slate-100 text-slate-600 text-xs font-bold px-2 py-1 rounded uppercase tracking-wider">Overview</span>
                         </div>
-                        <h1 className="text-2xl font-bold text-slate-900">Admin Dashboard</h1>
-                        <p className="text-sm text-slate-500 mt-1">Monitor global platform revenue, tenants, and infrastructure.</p>
+                        <h1 className="text-2xl font-bold text-slate-900">{__('general.admin_dashboard')}</h1>
+                        <p className="text-sm text-slate-500 mt-1">{__('general.monitor_global_platform_revenue_tenants_and_infrastructure')}</p>
                     </div>
                     <div className="flex flex-wrap items-center gap-3">
                         <Button variant="outline" size="sm" onClick={toggleValues}>
@@ -97,13 +97,13 @@ export default function Dashboard({
                 </div>
 
                 {/* Quick Links */}
-                <OperationalCard title="Quick Actions">
+                <OperationalCard title={__('general.quick_actions')}>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                         <Link href="/admin/users/create" className="flex items-center justify-center gap-2 bg-slate-50 hover:bg-slate-100 text-slate-700 p-3 rounded-lg border border-slate-200 transition-colors">
-                            <UserPlus className="w-4 h-4" /> <span className="font-medium text-sm">Add User</span>
+                            <UserPlus className="w-4 h-4" /> <span className="font-medium text-sm">{__('general.add_user')}</span>
                         </Link>
                         <Link href="/admin/projects/create" className="flex items-center justify-center gap-2 bg-slate-50 hover:bg-slate-100 text-slate-700 p-3 rounded-lg border border-slate-200 transition-colors">
-                            <Briefcase className="w-4 h-4" /> <span className="font-medium text-sm">New Project</span>
+                            <Briefcase className="w-4 h-4" /> <span className="font-medium text-sm">{__('general.new_project')}</span>
                         </Link>
                         <Link href="/admin/calculator" className="flex items-center justify-center gap-2 bg-slate-50 hover:bg-slate-100 text-slate-700 p-3 rounded-lg border border-slate-200 transition-colors">
                             <Calculator className="w-4 h-4" /> <span className="font-medium text-sm">Calculator</span>
@@ -116,20 +116,20 @@ export default function Dashboard({
 
                 {/* Performance Overview (Financial) */}
                 <div>
-                    <h2 className="text-lg font-bold text-slate-900 mb-4">Performance Overview</h2>
+                    <h2 className="text-lg font-bold text-slate-900 mb-4">{__('general.performance_overview')}</h2>
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
-                        <MetricCard label="Monthly Revenue" value={maskValue(formatCurrency(stats?.revenueThisMonth, businessCurrency))} icon={DollarSign} />
-                        <MetricCard label="Monthly Expenses" value={maskValue(formatCurrency(stats?.monthlyExpenses, businessCurrency))} icon={ArrowDownRight} />
-                        <MetricCard label="Booking Price" value={maskValue(formatCurrency(stats?.bookingPrice, businessCurrency))} icon={Activity} />
-                        <MetricCard label="Hourly Rate" value={maskValue(formatCurrency(stats?.bookingRatePerHour, businessCurrency))} icon={Clock} />
-                        <MetricCard label="Pending Payments" value={maskValue(formatCurrency(stats?.pendingPayments, businessCurrency))} icon={ArrowUpRight} />
-                        <MetricCard label="Total Users" value={maskValue(stats?.totalUsers)} icon={Users} />
+                        <MetricCard label={__('general.monthly_revenue')} value={maskValue(formatCurrency(stats?.revenueThisMonth, businessCurrency))} icon={DollarSign} />
+                        <MetricCard label={__('general.monthly_expenses')} value={maskValue(formatCurrency(stats?.monthlyExpenses, businessCurrency))} icon={ArrowDownRight} />
+                        <MetricCard label={__('general.booking_price')} value={maskValue(formatCurrency(stats?.bookingPrice, businessCurrency))} icon={Activity} />
+                        <MetricCard label={__('general.hourly_rate')} value={maskValue(formatCurrency(stats?.bookingRatePerHour, businessCurrency))} icon={Clock} />
+                        <MetricCard label={__('general.pending_payments')} value={maskValue(formatCurrency(stats?.pendingPayments, businessCurrency))} icon={ArrowUpRight} />
+                        <MetricCard label={__('general.total_users')} value={maskValue(stats?.totalUsers)} icon={Users} />
                     </div>
                 </div>
 
                 {/* Charts */}
                 <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
-                    <OperationalCard title="Revenue Trajectory (12 Months)" className="lg:col-span-3">
+                    <OperationalCard title={__('general.revenue_trajectory_12_months')} className="lg:col-span-3">
                         <div className="h-[300px] w-full">
                             {chartData.length > 0 ? (
                                 <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={300}>
@@ -144,12 +144,12 @@ export default function Dashboard({
                                     </LineChart>
                                 </ResponsiveContainer>
                             ) : (
-                                <EmptyState icon={BarChart3} title="No revenue data yet" />
+                                <EmptyState icon={BarChart3} title={__('general.no_revenue_data_yet')} />
                             )}
                         </div>
                     </OperationalCard>
 
-                    <OperationalCard title="Module Breakdown" className="lg:col-span-2">
+                    <OperationalCard title={__('general.module_breakdown')} className="lg:col-span-2">
                         <div className="h-[300px] w-full">
                             {pieData.some((d: any) => d.value > 0) ? (
                                 <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={300}>
@@ -164,7 +164,7 @@ export default function Dashboard({
                                     </PieChart>
                                 </ResponsiveContainer>
                             ) : (
-                                <EmptyState icon={BarChart3} title="No module revenue yet" />
+                                <EmptyState icon={BarChart3} title={__('general.no_module_revenue_yet')} />
                             )}
                         </div>
                     </OperationalCard>
@@ -172,15 +172,15 @@ export default function Dashboard({
 
                 {/* Operational Metrics */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <MetricCard label="Total Projects" value={maskValue(operationalStats?.totalProjects)} icon={Briefcase} />
-                    <MetricCard label="Total Tasks" value={maskValue(operationalStats?.totalTasks)} icon={Activity} />
-                    <MetricCard label="Open Tickets" value={maskValue(operationalStats?.openTickets)} icon={Ticket} />
-                    <MetricCard label="Premium Users" value={maskValue(operationalStats?.premiumUsers)} icon={UserPlus} />
+                    <MetricCard label={__('general.total_projects')} value={maskValue(operationalStats?.totalProjects)} icon={Briefcase} />
+                    <MetricCard label={__('general.total_tasks')} value={maskValue(operationalStats?.totalTasks)} icon={Activity} />
+                    <MetricCard label={__('general.open_tickets')} value={maskValue(operationalStats?.openTickets)} icon={Ticket} />
+                    <MetricCard label={__('general.premium_users')} value={maskValue(operationalStats?.premiumUsers)} icon={UserPlus} />
                 </div>
 
                 {/* System Health & WhatsApp */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <OperationalCard title="System Health">
+                    <OperationalCard title={__('general.system_health')}>
                         <div className="grid grid-cols-2 gap-4">
                             <div className="bg-slate-50 p-4 rounded-lg border border-slate-100 flex items-center gap-3">
                                 <Database className="w-8 h-8 text-green-500" />
@@ -192,14 +192,14 @@ export default function Dashboard({
                             <div className="bg-slate-50 p-4 rounded-lg border border-slate-100 flex items-center gap-3">
                                 <Server className="w-8 h-8 text-blue-500" />
                                 <div>
-                                    <p className="text-xs text-slate-500 font-semibold uppercase">Server Load</p>
+                                    <p className="text-xs text-slate-500 font-semibold uppercase">{__('general.server_load')}</p>
                                     <p className="text-lg font-bold text-slate-900">{systemHealth?.serverLoad}</p>
                                 </div>
                             </div>
                             <div className="bg-slate-50 p-4 rounded-lg border border-slate-100 flex items-center gap-3">
                                 <HardDrive className="w-8 h-8 text-orange-500" />
                                 <div>
-                                    <p className="text-xs text-slate-500 font-semibold uppercase">Disk Usage</p>
+                                    <p className="text-xs text-slate-500 font-semibold uppercase">{__('general.disk_usage')}</p>
                                     <p className="text-lg font-bold text-slate-900">{systemHealth?.diskUsage}</p>
                                 </div>
                             </div>
@@ -213,15 +213,15 @@ export default function Dashboard({
                         </div>
                     </OperationalCard>
                     
-                    <OperationalCard title="WhatsApp Services">
+                    <OperationalCard title={__('general.whatsapp_services')}>
                         <div className="grid grid-cols-2 gap-4 h-full">
                             <div className="flex flex-col items-center justify-center p-6 bg-green-50 rounded-lg border border-green-100">
                                 <h3 className="text-3xl font-bold text-green-600 mb-1">{maskValue(systemHealth?.whatsappUsers)}</h3>
-                                <p className="text-sm text-green-800 font-medium">Active Users</p>
+                                <p className="text-sm text-green-800 font-medium">{__('general.active_users')}</p>
                             </div>
                             <div className="flex flex-col items-center justify-center p-6 bg-blue-50 rounded-lg border border-blue-100">
                                 <h3 className="text-3xl font-bold text-blue-600 mb-1">{maskValue(formatCurrency(systemHealth?.totalWhatsappBalance, businessCurrency))}</h3>
-                                <p className="text-sm text-blue-800 font-medium">Total Balance</p>
+                                <p className="text-sm text-blue-800 font-medium">{__('general.total_balance')}</p>
                             </div>
                         </div>
                     </OperationalCard>
@@ -229,29 +229,29 @@ export default function Dashboard({
 
                 {/* Recent Activities */}
                 <div>
-                    <h2 className="text-lg font-bold text-slate-900 mb-4 mt-8">Recent Activities</h2>
+                    <h2 className="text-lg font-bold text-slate-900 mb-4 mt-8">{__('general.recent_activities')}</h2>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <OperationalCard title="Recent Transactions" noPadding>
+                        <OperationalCard title={__('general.recent_transactions')} noPadding>
                             <DataTable 
                                 columns={recentTransactionsColumns}
                                 data={recentActivities?.transactions || []}
-                                emptyState={<EmptyState icon={Inbox} title="No transactions" />}
+                                emptyState={<EmptyState icon={Inbox} title={__('general.no_transactions')} />}
                                 className="border-0 shadow-none rounded-none"
                             />
                         </OperationalCard>
-                        <OperationalCard title="Recent Users" noPadding>
+                        <OperationalCard title={__('general.recent_users')} noPadding>
                             <DataTable 
                                 columns={recentUsersColumns}
                                 data={recentActivities?.users || []}
-                                emptyState={<EmptyState icon={Users} title="No users" />}
+                                emptyState={<EmptyState icon={Users} title={__('general.no_users')} />}
                                 className="border-0 shadow-none rounded-none"
                             />
                         </OperationalCard>
-                        <OperationalCard title="Recent Tickets" noPadding>
+                        <OperationalCard title={__('general.recent_tickets')} noPadding>
                             <DataTable 
                                 columns={recentTicketsColumns}
                                 data={recentActivities?.tickets || []}
-                                emptyState={<EmptyState icon={Ticket} title="No tickets" />}
+                                emptyState={<EmptyState icon={Ticket} title={__('general.no_tickets')} />}
                                 className="border-0 shadow-none rounded-none"
                             />
                         </OperationalCard>
@@ -260,7 +260,7 @@ export default function Dashboard({
 
                 {/* Business Intelligence */}
                 <div>
-                    <h2 className="text-lg font-bold text-slate-900 mb-4 mt-8">Business Intelligence</h2>
+                    <h2 className="text-lg font-bold text-slate-900 mb-4 mt-8">{__('general.business_intelligence')}</h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
                         <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
                             <div className="flex items-center gap-3 mb-6">
@@ -269,11 +269,11 @@ export default function Dashboard({
                             </div>
                             <div className="space-y-4">
                                 <div className="flex justify-between items-center border-b border-slate-100 pb-2">
-                                    <span className="text-sm text-slate-600">Net Profit</span>
+                                    <span className="text-sm text-slate-600">{__('general.net_profit')}</span>
                                     <span className="font-bold text-green-600">{maskValue(formatCurrency(stats?.revenueThisMonth - stats?.monthlyExpenses, businessCurrency))}</span>
                                 </div>
                                 <div className="flex justify-between items-center border-b border-slate-100 pb-2">
-                                    <span className="text-sm text-slate-600">Profit Margin</span>
+                                    <span className="text-sm text-slate-600">{__('general.profit_margin')}</span>
                                     <span className="font-bold text-slate-900">{stats?.monthlyExpenses > 0 ? maskValue(Math.round((stats?.revenueThisMonth / stats?.monthlyExpenses) * 100)) : 0}%</span>
                                 </div>
                             </div>
@@ -282,7 +282,7 @@ export default function Dashboard({
                         <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
                             <div className="flex items-center gap-3 mb-6">
                                 <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center text-blue-600"><Users className="w-5 h-5"/></div>
-                                <h3 className="font-bold text-slate-800">User Analytics</h3>
+                                <h3 className="font-bold text-slate-800">{__('general.user_analytics')}</h3>
                             </div>
                             <div className="space-y-4">
                                 <div className="flex justify-between items-center border-b border-slate-100 pb-2">
@@ -299,15 +299,15 @@ export default function Dashboard({
                         <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
                             <div className="flex items-center gap-3 mb-6">
                                 <div className="w-10 h-10 rounded-lg bg-orange-100 flex items-center justify-center text-orange-600"><Briefcase className="w-5 h-5"/></div>
-                                <h3 className="font-bold text-slate-800">Project & Task</h3>
+                                <h3 className="font-bold text-slate-800">{__('general.project_task')}</h3>
                             </div>
                             <div className="space-y-4">
                                 <div className="flex justify-between items-center border-b border-slate-100 pb-2">
-                                    <span className="text-sm text-slate-600">Project Completion</span>
+                                    <span className="text-sm text-slate-600">{__('general.project_completion')}</span>
                                     <span className="font-bold text-slate-900">{operationalStats?.totalProjects > 0 ? maskValue(Math.round((operationalStats?.completedProjects / operationalStats?.totalProjects) * 100)) : 0}%</span>
                                 </div>
                                 <div className="flex justify-between items-center border-b border-slate-100 pb-2">
-                                    <span className="text-sm text-slate-600">Task Completion</span>
+                                    <span className="text-sm text-slate-600">{__('general.task_completion')}</span>
                                     <span className="font-bold text-slate-900">{operationalStats?.totalTasks > 0 ? maskValue(Math.round((operationalStats?.completedTasks / operationalStats?.totalTasks) * 100)) : 0}%</span>
                                 </div>
                             </div>
@@ -316,15 +316,15 @@ export default function Dashboard({
                         <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
                             <div className="flex items-center gap-3 mb-6">
                                 <div className="w-10 h-10 rounded-lg bg-purple-100 flex items-center justify-center text-purple-600"><Ticket className="w-5 h-5"/></div>
-                                <h3 className="font-bold text-slate-800">Support & Ops</h3>
+                                <h3 className="font-bold text-slate-800">{__('general.support_ops')}</h3>
                             </div>
                             <div className="space-y-4">
                                 <div className="flex justify-between items-center border-b border-slate-100 pb-2">
-                                    <span className="text-sm text-slate-600">Urgent Tickets</span>
+                                    <span className="text-sm text-slate-600">{__('general.urgent_tickets')}</span>
                                     <span className="font-bold text-red-600">{maskValue(operationalStats?.urgentTickets)}</span>
                                 </div>
                                 <div className="flex justify-between items-center border-b border-slate-100 pb-2">
-                                    <span className="text-sm text-slate-600">Premium Rate</span>
+                                    <span className="text-sm text-slate-600">{__('general.premium_rate')}</span>
                                     <span className="font-bold text-slate-900">{stats?.totalUsers > 0 ? maskValue(Math.round((operationalStats?.premiumUsers / stats?.totalUsers) * 100)) : 0}%</span>
                                 </div>
                             </div>

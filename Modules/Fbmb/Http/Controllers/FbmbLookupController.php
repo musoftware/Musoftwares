@@ -103,7 +103,7 @@ class FbmbLookupController extends Controller
         $token = $request->query('token');
 
         if (! $token) {
-            abort(400, 'Missing download token.');
+            abort(400, __('general.missing_download_token'));
         }
 
         $record = FbmbLookupResult::where('download_token', $token)
@@ -111,15 +111,15 @@ class FbmbLookupController extends Controller
             ->first();
 
         if (! $record) {
-            abort(404, 'Download link not found.');
+            abort(404, __('general.download_link_not_found'));
         }
 
         if ($record->isExpired()) {
-            abort(410, 'This download link has expired (24 hours). Please run a new lookup.');
+            abort(410, __('general.this_download_link_has_expired_24_hours_please_run_a_new_lookup'));
         }
 
         if (! $record->fileExists()) {
-            abort(404, 'Result file not found. It may have been cleaned up.');
+            abort(404, __('general.result_file_not_found_it_may_have_been_cleaned_up'));
         }
 
         return response()->download($record->result_path, 'isaas_results.csv');

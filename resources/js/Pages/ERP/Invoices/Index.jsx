@@ -120,35 +120,30 @@ export default function Index({ invoices, stats, filters }) {
                                 <DropdownMenuItem
                                     onClick={() => router.post(route('erp.invoices.send', row.id))}
                                 >
-                                    <Send className="mr-2 h-4 w-4 text-slate-400" /> Issue Invoice
-                                </DropdownMenuItem>
+                                    <Send className="mr-2 h-4 w-4 text-slate-400" />{__('general.issue_invoice')}</DropdownMenuItem>
                             )}
                             {(row.status === 'sent' || row.status === 'partial') && (
                                 <>
                                     <DropdownMenuItem
                                         onClick={() => router.post(route('erp.invoices.mark-paid', row.id))}
                                     >
-                                        <CheckCircle className="mr-2 h-4 w-4 text-slate-400" /> Mark as Paid
-                                    </DropdownMenuItem>
+                                        <CheckCircle className="mr-2 h-4 w-4 text-slate-400" />{__('general.mark_as_paid')}</DropdownMenuItem>
                                     <DropdownMenuItem
                                         onClick={() => router.post(route('erp.invoices.pay-wallet', row.id))}
                                     >
-                                        <Wallet className="mr-2 h-4 w-4 text-slate-400" /> Pay with Wallet
-                                    </DropdownMenuItem>
+                                        <Wallet className="mr-2 h-4 w-4 text-slate-400" />{__('general.pay_with_wallet')}</DropdownMenuItem>
                                 </>
                             )}
                             <DropdownMenuItem
                                 onClick={() => router.get(route('erp.invoices.download', row.id))}
                             >
-                                <Download className="mr-2 h-4 w-4 text-slate-400" /> Download PDF
-                            </DropdownMenuItem>
+                                <Download className="mr-2 h-4 w-4 text-slate-400" />{__('general.download_pdf')}</DropdownMenuItem>
                             {(row.status === 'sent' || row.status === 'partial' || row.status === 'paid') && (
                                 <DropdownMenuItem
                                     onClick={() => router.post(route('erp.invoices.cancel', row.id))}
                                     className="text-rose-600 hover:text-rose-700 focus:text-rose-700"
                                 >
-                                    <CheckCircle className="mr-2 h-4 w-4 text-rose-500" /> Cancel Invoice
-                                </DropdownMenuItem>
+                                    <CheckCircle className="mr-2 h-4 w-4 text-rose-500" />{__('general.cancel_invoice')}</DropdownMenuItem>
                             )}
                         </DropdownMenuContent>
                     </DropdownMenu>
@@ -176,9 +171,7 @@ export default function Index({ invoices, stats, filters }) {
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div>
                         <h1 className="text-2xl font-semibold text-slate-900 tracking-tight">Invoices</h1>
-                        <p className="text-sm text-slate-500 mt-1">
-                            Manage billing, track payments, and follow up on overdues.
-                        </p>
+                        <p className="text-sm text-slate-500 mt-1">{__('general.manage_billing_track_payments_and_follow_up_on_overdues')}</p>
                     </div>
                     <div className="flex items-center gap-3">
                         <Button variant="outline" size="sm" className="shadow-none border-slate-200">
@@ -186,8 +179,7 @@ export default function Index({ invoices, stats, filters }) {
                         </Button>
                         <Button asChild size="sm" className="shadow-none bg-slate-900 text-white hover:bg-slate-800">
                             <Link href={route('erp.invoices.create')}>
-                                <Plus className="mr-2 h-4 w-4" /> New Invoice
-                            </Link>
+                                <Plus className="mr-2 h-4 w-4" />{__('general.new_invoice')}</Link>
                         </Button>
                     </div>
                 </div>
@@ -221,7 +213,7 @@ export default function Index({ invoices, stats, filters }) {
                     <div className="relative flex-1">
                         <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
                         <Input
-                            placeholder="Search invoice number or client..."
+                            placeholder={__('general.search_invoice_number_or_client')}
                             className="pl-9 h-10 shadow-none border-transparent bg-slate-50 focus:bg-white transition-colors"
                             defaultValue={filters?.search}
                             onBlur={(e) => handleFilterChange('search', e.target.value)}
@@ -233,7 +225,7 @@ export default function Index({ invoices, stats, filters }) {
                             defaultValue={filters?.status}
                             onChange={(e) => handleFilterChange('status', e.target.value)}
                         >
-                            <option value="">All Statuses</option>
+                            <option value="">{__('general.all_statuses')}</option>
                             <option value="draft">Draft</option>
                             <option value="sent">Sent</option>
                             <option value="paid">Paid</option>

@@ -121,7 +121,7 @@ class SubscriptionController extends Controller
             if (!$isFree && $request->payment_method === 'wallet') {
                 $user   = auth()->user();
                 if ($user->available_balance() < $price) {
-                    abort(422, 'Insufficient wallet balance.');
+                    abort(422, __('general.insufficient_wallet_balance'));
                 }
                 $user->add_balance(-1 * $price, "Subscribe to Tool: {$tool['title']}", 'used');
             }

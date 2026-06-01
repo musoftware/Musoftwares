@@ -193,7 +193,7 @@ export default function Index({ methods, filters, stats }: Props) {
                 <DropdownMenu>
                     <DropdownMenuTrigger
                         className="inline-flex h-8 w-8 items-center justify-center rounded-md text-slate-500 hover:bg-slate-100 hover:text-slate-900 transition-colors"
-                        aria-label="Open actions menu"
+                        aria-label={__('general.open_actions_menu')}
                     >
                         <MoreHorizontal className="h-4 w-4" />
                     </DropdownMenuTrigger>
@@ -205,8 +205,7 @@ export default function Index({ methods, filters, stats }: Props) {
                                 href={route('admin.payment-methods.show', m.id)}
                                 className="flex items-center w-full"
                             >
-                                <Eye className="mr-2 h-4 w-4" /> View Details
-                            </Link>
+                                <Eye className="mr-2 h-4 w-4" />{__('general.view_details')}</Link>
                         </DropdownMenuItem>
 
                         {m.status !== 'active' && (
@@ -232,8 +231,7 @@ export default function Index({ methods, filters, stats }: Props) {
                                 className="text-slate-600"
                                 onClick={() => handleUpdate(m.id, 'pending')}
                             >
-                                <Clock className="mr-2 h-4 w-4" /> Reset to Pending
-                            </DropdownMenuItem>
+                                <Clock className="mr-2 h-4 w-4" />{__('general.reset_to_pending')}</DropdownMenuItem>
                         )}
                     </DropdownMenuContent>
                 </DropdownMenu>
@@ -274,8 +272,8 @@ export default function Index({ methods, filters, stats }: Props) {
     // ─── Render ───────────────────────────────────────────────────────────────
 
     return (
-        <AdminSidebarLayout title="Payment Methods" header="Payment Methods">
-            <Head title="Payment Methods" />
+        <AdminSidebarLayout title={__('general.payment_methods')} header="Payment Methods">
+            <Head title={__('general.payment_methods')} />
 
             {/* Stats */}
             <div className="mb-6 grid grid-cols-2 sm:grid-cols-4 gap-4">

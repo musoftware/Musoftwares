@@ -100,7 +100,7 @@ export default function Device({ device, transactions }: DeviceProps) {
 
     return (
         <AuthenticatedLayout
-            header={<h2 className="font-semibold text-xl text-gray-800 leading-tight">Device Details</h2>}
+            header={<h2 className="font-semibold text-xl text-gray-800 leading-tight">{__('general.device_details')}</h2>}
         >
             <Head title={`Device - ${device.device_name || 'Terminal'}`} />
 
@@ -114,7 +114,7 @@ export default function Device({ device, transactions }: DeviceProps) {
                                 <Smartphone className="w-6 h-6 text-indigo-600" />
                                 {device.device_name || 'Linked Device'}
                             </h1>
-                            <p className="text-slate-500 mt-1">Comprehensive diagnostic data</p>
+                            <p className="text-slate-500 mt-1">{__('general.comprehensive_diagnostic_data')}</p>
                         </div>
                         <div className="flex gap-2">
                             <Button 
@@ -139,10 +139,10 @@ export default function Device({ device, transactions }: DeviceProps) {
                                     <Smartphone className="w-5 h-5" />
                                 </div>
                                 <div>
-                                    <p className="text-xs font-semibold text-slate-500 uppercase">Network Identity</p>
+                                    <p className="text-xs font-semibold text-slate-500 uppercase">{__('general.network_identity')}</p>
                                     <div className="flex flex-col gap-1 mt-1">
-                                        <p className="text-sm font-medium text-slate-500">S1: <span className="font-bold text-slate-800">{device.sim1_number ? mask(device.sim1_number, 'phone') : __('Not set')}</span></p>
-                                        <p className="text-sm font-medium text-slate-500">S2: <span className="font-bold text-slate-800">{device.sim2_number ? mask(device.sim2_number, 'phone') : __('Not set')}</span></p>
+                                        <p className="text-sm font-medium text-slate-500">S1: <span className="font-bold text-slate-800">{device.sim1_number ? mask(device.sim1_number, 'phone') : __('general.not_set')}</span></p>
+                                        <p className="text-sm font-medium text-slate-500">S2: <span className="font-bold text-slate-800">{device.sim2_number ? mask(device.sim2_number, 'phone') : __('general.not_set')}</span></p>
                                     </div>
                                 </div>
                             </CardContent>
@@ -153,7 +153,7 @@ export default function Device({ device, transactions }: DeviceProps) {
                                     <Activity className="w-5 h-5" />
                                 </div>
                                 <div>
-                                    <p className="text-xs font-semibold text-slate-500 uppercase">Live Status</p>
+                                    <p className="text-xs font-semibold text-slate-500 uppercase">{__('general.live_status')}</p>
                                     <p className="text-sm font-bold capitalize">{device.status}</p>
                                 </div>
                             </CardContent>
@@ -165,7 +165,7 @@ export default function Device({ device, transactions }: DeviceProps) {
                                     <Clock className="w-5 h-5" />
                                 </div>
                                 <div>
-                                    <p className="text-xs font-semibold text-slate-500 uppercase">Last Sync Pulse</p>
+                                    <p className="text-xs font-semibold text-slate-500 uppercase">{__('general.last_sync_pulse')}</p>
                                     <p className="text-sm font-bold">{device.last_seen_at ? new Date(device.last_seen_at).toLocaleString() : 'Never'}</p>
                                 </div>
                             </CardContent>
@@ -177,7 +177,7 @@ export default function Device({ device, transactions }: DeviceProps) {
                         <CardHeader>
                             <CardTitle className="text-lg flex items-center gap-2">
                                 <Settings className="w-5 h-5 text-indigo-500" />
-                                {__('Device Configuration')}
+                                {__('general.device_configuration')}
                             </CardTitle>
                         </CardHeader>
                         <CardContent>
@@ -193,11 +193,11 @@ export default function Device({ device, transactions }: DeviceProps) {
                                     </div>
                                 )}
                                 <div className="space-y-2 max-w-md">
-                                    <Label>{__('Device Name')}</Label>
+                                    <Label>{__('general.device_name')}</Label>
                                     <Input
                                         value={data.device_name}
                                         onChange={(e) => setData('device_name', e.target.value)}
-                                        placeholder={__('e.g. Branch 1 Phone')}
+                                        placeholder={__('general.e_g_branch_1_phone')}
                                     />
                                     {errors.device_name && <p className="text-sm text-red-500">{errors.device_name}</p>}
                                 </div>
@@ -207,16 +207,16 @@ export default function Device({ device, transactions }: DeviceProps) {
                                     <div className="space-y-4 p-4 border rounded-lg bg-slate-50">
                                         <div className="flex items-center justify-between">
                                             <div>
-                                                <h3 className="font-semibold text-slate-800">{__('SIM 1 Configuration')}</h3>
-                                                <p className="text-xs text-slate-500 mt-0.5">{device.sim1_number ? mask(device.sim1_number, 'phone') : __('Not set')}</p>
+                                                <h3 className="font-semibold text-slate-800">{__('general.sim_1_configuration')}</h3>
+                                                <p className="text-xs text-slate-500 mt-0.5">{device.sim1_number ? mask(device.sim1_number, 'phone') : __('general.not_set')}</p>
                                             </div>
                                             <Button type="button" variant="outline" size="sm" onClick={() => addConfig('sim1_configs')}>
                                                 <Plus className="w-4 h-4 mr-2" />
-                                                {__('Add Sender')}
+                                                {__('general.add_sender')}
                                             </Button>
                                         </div>
                                         {data.sim1_configs.length === 0 && (
-                                            <p className="text-sm text-slate-500 text-center py-4">{__('No senders configured for SIM 1.')}</p>
+                                            <p className="text-sm text-slate-500 text-center py-4">{__('general.no_senders_configured_for_sim_1')}</p>
                                         )}
                                         {data.sim1_configs.map((conf, idx) => (
                                             <div key={idx} className="bg-white p-3 border rounded-md shadow-sm space-y-3 relative">
@@ -231,25 +231,25 @@ export default function Device({ device, transactions }: DeviceProps) {
                                                 </Button>
                                                 <div className="pr-8 space-y-3">
                                                     <div className="space-y-1">
-                                                        <Label className="text-xs text-slate-500">{__('Allowed Sender')}</Label>
+                                                        <Label className="text-xs text-slate-500">{__('general.allowed_sender')}</Label>
                                                         <Select
                                                             value={conf.allowed_sender || ''}
                                                             onValueChange={(val) => updateConfig('sim1_configs', idx, 'allowed_sender', val)}
                                                         >
                                                             <SelectTrigger className="h-8">
-                                                                <SelectValue placeholder={__('Select Sender')} />
+                                                                <SelectValue placeholder={__('general.select_sender')} />
                                                             </SelectTrigger>
                                                             <SelectContent>
-                                                                <SelectItem value="VF-Cash">{__('Vodafone Cash (VF-Cash)')}</SelectItem>
-                                                                <SelectItem value="EtisalatCash">{__('e& money (Etisalat)')}</SelectItem>
-                                                                <SelectItem value="OrangeCash">{__('Orange Cash')}</SelectItem>
-                                                                <SelectItem value="WEPay">{__('WE Pay')}</SelectItem>
-                                                                <SelectItem value="NBE">{__('NBE (Al Ahly)')}</SelectItem>
-                                                                <SelectItem value="CIB">{__('CIB')}</SelectItem>
-                                                                <SelectItem value="BM">{__('Banque Misr')}</SelectItem>
-                                                                <SelectItem value="QNB">{__('QNB')}</SelectItem>
-                                                                <SelectItem value="BDC">{__('Banque du Caire')}</SelectItem>
-                                                                <SelectItem value="ADIB">{__('ADIB')}</SelectItem>
+                                                                <SelectItem value="VF-Cash">{__('general.vodafone_cash_vf_cash')}</SelectItem>
+                                                                <SelectItem value="EtisalatCash">{__('general.e_money_etisalat')}</SelectItem>
+                                                                <SelectItem value="OrangeCash">{__('general.orange_cash')}</SelectItem>
+                                                                <SelectItem value="WEPay">{__('general.we_pay')}</SelectItem>
+                                                                <SelectItem value="NBE">{__('general.nbe_al_ahly')}</SelectItem>
+                                                                <SelectItem value="CIB">{__('general.cib')}</SelectItem>
+                                                                <SelectItem value="BM">{__('general.banque_misr')}</SelectItem>
+                                                                <SelectItem value="QNB">{__('general.qnb')}</SelectItem>
+                                                                <SelectItem value="BDC">{__('general.banque_du_caire')}</SelectItem>
+                                                                <SelectItem value="ADIB">{__('general.adib')}</SelectItem>
                                                             </SelectContent>
                                                         </Select>
                                                     </div>
@@ -262,16 +262,16 @@ export default function Device({ device, transactions }: DeviceProps) {
                                     <div className="space-y-4 p-4 border rounded-lg bg-slate-50">
                                         <div className="flex items-center justify-between">
                                             <div>
-                                                <h3 className="font-semibold text-slate-800">{__('SIM 2 Configuration')}</h3>
-                                                <p className="text-xs text-slate-500 mt-0.5">{device.sim2_number ? mask(device.sim2_number, 'phone') : __('Not set')}</p>
+                                                <h3 className="font-semibold text-slate-800">{__('general.sim_2_configuration')}</h3>
+                                                <p className="text-xs text-slate-500 mt-0.5">{device.sim2_number ? mask(device.sim2_number, 'phone') : __('general.not_set')}</p>
                                             </div>
                                             <Button type="button" variant="outline" size="sm" onClick={() => addConfig('sim2_configs')}>
                                                 <Plus className="w-4 h-4 mr-2" />
-                                                {__('Add Sender')}
+                                                {__('general.add_sender')}
                                             </Button>
                                         </div>
                                         {data.sim2_configs.length === 0 && (
-                                            <p className="text-sm text-slate-500 text-center py-4">{__('No senders configured for SIM 2.')}</p>
+                                            <p className="text-sm text-slate-500 text-center py-4">{__('general.no_senders_configured_for_sim_2')}</p>
                                         )}
                                         {data.sim2_configs.map((conf, idx) => (
                                             <div key={idx} className="bg-white p-3 border rounded-md shadow-sm space-y-3 relative">
@@ -286,25 +286,25 @@ export default function Device({ device, transactions }: DeviceProps) {
                                                 </Button>
                                                 <div className="pr-8 space-y-3">
                                                     <div className="space-y-1">
-                                                        <Label className="text-xs text-slate-500">{__('Allowed Sender')}</Label>
+                                                        <Label className="text-xs text-slate-500">{__('general.allowed_sender')}</Label>
                                                         <Select
                                                             value={conf.allowed_sender || ''}
                                                             onValueChange={(val) => updateConfig('sim2_configs', idx, 'allowed_sender', val)}
                                                         >
                                                             <SelectTrigger className="h-8">
-                                                                <SelectValue placeholder={__('Select Sender')} />
+                                                                <SelectValue placeholder={__('general.select_sender')} />
                                                             </SelectTrigger>
                                                             <SelectContent>
-                                                                <SelectItem value="VF-Cash">{__('Vodafone Cash (VF-Cash)')}</SelectItem>
-                                                                <SelectItem value="EtisalatCash">{__('e& money (Etisalat)')}</SelectItem>
-                                                                <SelectItem value="OrangeCash">{__('Orange Cash')}</SelectItem>
-                                                                <SelectItem value="WEPay">{__('WE Pay')}</SelectItem>
-                                                                <SelectItem value="NBE">{__('NBE (Al Ahly)')}</SelectItem>
-                                                                <SelectItem value="CIB">{__('CIB')}</SelectItem>
-                                                                <SelectItem value="BM">{__('Banque Misr')}</SelectItem>
-                                                                <SelectItem value="QNB">{__('QNB')}</SelectItem>
-                                                                <SelectItem value="BDC">{__('Banque du Caire')}</SelectItem>
-                                                                <SelectItem value="ADIB">{__('ADIB')}</SelectItem>
+                                                                <SelectItem value="VF-Cash">{__('general.vodafone_cash_vf_cash')}</SelectItem>
+                                                                <SelectItem value="EtisalatCash">{__('general.e_money_etisalat')}</SelectItem>
+                                                                <SelectItem value="OrangeCash">{__('general.orange_cash')}</SelectItem>
+                                                                <SelectItem value="WEPay">{__('general.we_pay')}</SelectItem>
+                                                                <SelectItem value="NBE">{__('general.nbe_al_ahly')}</SelectItem>
+                                                                <SelectItem value="CIB">{__('general.cib')}</SelectItem>
+                                                                <SelectItem value="BM">{__('general.banque_misr')}</SelectItem>
+                                                                <SelectItem value="QNB">{__('general.qnb')}</SelectItem>
+                                                                <SelectItem value="BDC">{__('general.banque_du_caire')}</SelectItem>
+                                                                <SelectItem value="ADIB">{__('general.adib')}</SelectItem>
                                                             </SelectContent>
                                                         </Select>
                                                     </div>
@@ -315,7 +315,7 @@ export default function Device({ device, transactions }: DeviceProps) {
                                 </div>
                                 <div className="flex justify-end">
                                     <Button type="submit" disabled={processing}>
-                                        {processing ? __('Saving...') : __('Save Configuration')}
+                                        {processing ? __('Saving...') : __('general.save_configuration')}
                                     </Button>
                                 </div>
                             </form>
@@ -326,30 +326,26 @@ export default function Device({ device, transactions }: DeviceProps) {
                     <Card>
                         <CardHeader className="flex flex-row items-center justify-between">
                             <CardTitle className="text-lg flex items-center gap-2">
-                                <Database className="w-5 h-5 text-indigo-500" />
-                                Diagnostic Log & Transactions
-                            </CardTitle>
+                                <Database className="w-5 h-5 text-indigo-500" />{__('general.diagnostic_log_transactions')}</CardTitle>
                             {transactions.total > 0 && (
                                 <Button variant="destructive" size="sm" onClick={handleClearTransactions}>
-                                    <Eraser className="w-4 h-4 mr-2" />
-                                    Clear History
-                                </Button>
+                                    <Eraser className="w-4 h-4 mr-2" />{__('general.clear_history')}</Button>
                             )}
                         </CardHeader>
                         <CardContent>
                             {transactions.total === 0 ? (
                                 <div className="text-center py-8">
                                     <Database className="w-12 h-12 text-slate-200 mx-auto mb-3" />
-                                    <p className="text-slate-500">No terminal data available yet.</p>
+                                    <p className="text-slate-500">{__('general.no_terminal_data_available_yet')}</p>
                                 </div>
                             ) : (
                                 <div className="overflow-x-auto">
                                     <table className="w-full text-left text-sm text-slate-600">
                                         <thead className="bg-slate-50 text-slate-500 text-xs uppercase border-b border-t">
                                             <tr>
-                                                <th className="px-4 py-3 font-semibold">Event Date</th>
-                                                <th className="px-4 py-3 font-semibold">Data Stream</th>
-                                                <th className="px-4 py-3 font-semibold">Financial Impact</th>
+                                                <th className="px-4 py-3 font-semibold">{__('general.event_date')}</th>
+                                                <th className="px-4 py-3 font-semibold">{__('general.data_stream')}</th>
+                                                <th className="px-4 py-3 font-semibold">{__('general.financial_impact')}</th>
                                                 <th className="px-4 py-3 font-semibold">Integrity</th>
                                                 <th className="px-4 py-3 font-semibold text-right">Actions</th>
                                             </tr>
@@ -362,7 +358,7 @@ export default function Device({ device, transactions }: DeviceProps) {
                                                         <div className="text-xs">{new Date(tx.created_at).toLocaleTimeString()}</div>
                                                     </td>
                                                     <td className="px-4 py-3">
-                                                        <div className="font-semibold text-slate-900">Incoming Payload</div>
+                                                        <div className="font-semibold text-slate-900">{__('general.incoming_payload')}</div>
                                                         <div className="text-xs">{mask(tx.sender, 'sender')}</div>
                                                     </td>
                                                     <td className="px-4 py-3">

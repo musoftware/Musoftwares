@@ -31,16 +31,14 @@ export default function Downloads({ availableTools, downloads }: Props) {
     const host = typeof window !== 'undefined' ? (window.localStorage.getItem('musoftware_runtime_host') || '127.0.0.1') : '127.0.0.1';
 
     return (
-        <ToolsPublicLayout title="My Tools" activeNav="downloads">
-            <Head title="My Tools — Musoftware" />
+        <ToolsPublicLayout title={__('general.my_tools')} activeNav="downloads">
+            <Head title={__('general.my_tools_musoftware')} />
 
             <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-10">
 
                 {/* Page header */}
                 <div>
-                    <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
-                        My Tools
-                    </h1>
+                    <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">{__('general.my_tools')}</h1>
                     <p className="text-sm text-slate-500 mt-1">
                         Tools run directly in your browser — no download needed.
                         Make sure the{' '}
@@ -48,9 +46,7 @@ export default function Downloads({ availableTools, downloads }: Props) {
                             href={`http://${host}:18400/setup`}
                             className="text-indigo-600 hover:underline"
                             target="_blank"
-                        >
-                            Musoftware Runtime
-                        </Link>{' '}
+                        >{__('general.musoftware_runtime')}</Link>{' '}
                         is running on your computer.
                     </p>
                 </div>
@@ -58,9 +54,7 @@ export default function Downloads({ availableTools, downloads }: Props) {
                 {/* Available Tools */}
                 {availableTools.length > 0 ? (
                     <section className="space-y-4">
-                        <h2 className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
-                            Your Subscribed Tools
-                        </h2>
+                        <h2 className="text-xs font-semibold text-slate-400 uppercase tracking-wider">{__('general.your_subscribed_tools')}</h2>
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                             {availableTools.map(t => (
                                 <div
@@ -98,9 +92,7 @@ export default function Downloads({ availableTools, downloads }: Props) {
                                         <Button
                                             className="w-full gap-2 text-sm bg-indigo-600 hover:bg-indigo-500 text-white h-9"
                                         >
-                                            <ExternalLink className="h-3.5 w-3.5" />
-                                            Open Tool
-                                        </Button>
+                                            <ExternalLink className="h-3.5 w-3.5" />{__('general.open_tool')}</Button>
                                     </Link>
                                 </div>
                             ))}
@@ -111,46 +103,34 @@ export default function Downloads({ availableTools, downloads }: Props) {
                         <div className="w-14 h-14 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 flex items-center justify-center mx-auto mb-4">
                             <ShoppingBag className="h-6 w-6 text-slate-300" />
                         </div>
-                        <p className="text-sm font-semibold text-slate-700 dark:text-slate-300">No tools yet</p>
-                        <p className="text-xs text-slate-400 mt-1 mb-5">
-                            Subscribe to a tool to get started — many are free.
-                        </p>
+                        <p className="text-sm font-semibold text-slate-700 dark:text-slate-300">{__('general.no_tools_yet')}</p>
+                        <p className="text-xs text-slate-400 mt-1 mb-5">{__('general.subscribe_to_a_tool_to_get_started_many_are_free')}</p>
                         <Button
                             variant="outline"
                             size="sm"
                             onClick={() => router.visit(route('tools.explore'))}
-                        >
-                            Browse Tools
-                        </Button>
+                        >{__('general.browse_tools')}</Button>
                     </div>
                 )}
 
                 {/* Infrastructure Downloads */}
                 <section className="space-y-4">
-                    <h2 className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
-                        Infrastructure & Runtimes
-                    </h2>
+                    <h2 className="text-xs font-semibold text-slate-400 uppercase tracking-wider">{__('general.infrastructure_runtimes')}</h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         
                         {/* Desktop Runtime */}
                         <Card className="flex flex-col border-indigo-100 dark:border-indigo-900/50 bg-indigo-50/50 dark:bg-indigo-950/20 shadow-none">
                             <CardHeader className="pb-2">
                                 <CardTitle className="flex items-center gap-3 text-sm">
-                                    <Monitor className="h-5 w-5 text-indigo-500" />
-                                    Desktop Runtime
-                                </CardTitle>
+                                    <Monitor className="h-5 w-5 text-indigo-500" />{__('general.desktop_runtime')}</CardTitle>
                             </CardHeader>
                             <CardContent className="flex-1">
-                                <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-                                    The powerful background agent that executes tools directly on your computer. Required for heavy automation workflows.
-                                </p>
+                                <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">{__('general.the_powerful_background_agent_that_executes_tools_directly_on_your_computer_required_for_heavy_automation_workflows')}</p>
                             </CardContent>
                             <CardFooter className="flex items-center gap-2 pt-0">
                                 <a href={route('tools.download.agent', 'node')}>
                                     <Button size="sm" variant="outline" className="text-xs h-8 bg-white dark:bg-slate-900">
-                                        <Download className="h-3 w-3 mr-1.5" />
-                                        Download App
-                                    </Button>
+                                        <Download className="h-3 w-3 mr-1.5" />{__('general.download_app')}</Button>
                                 </a>
                                 <a href={`http://${host}:18400/setup`} target="_blank" className="text-xs text-indigo-600 hover:underline" rel="noreferrer">
                                     Check Status →
@@ -162,24 +142,18 @@ export default function Downloads({ availableTools, downloads }: Props) {
                         <Card className="flex flex-col border-emerald-100 dark:border-emerald-900/50 bg-emerald-50/50 dark:bg-emerald-950/20 shadow-none">
                             <CardHeader className="pb-2">
                                 <CardTitle className="flex items-center gap-3 text-sm">
-                                    <Globe className="h-5 w-5 text-emerald-500" />
-                                    Browser Extension
-                                    <Badge className="ml-2 text-[10px] uppercase tracking-wider bg-emerald-100 text-emerald-700 hover:bg-emerald-200 dark:bg-emerald-900 dark:text-emerald-300 dark:hover:bg-emerald-800 shadow-none">
+                                    <Globe className="h-5 w-5 text-emerald-500" />{__('general.browser_extension')}<Badge className="ml-2 text-[10px] uppercase tracking-wider bg-emerald-100 text-emerald-700 hover:bg-emerald-200 dark:bg-emerald-900 dark:text-emerald-300 dark:hover:bg-emerald-800 shadow-none">
                                         New
                                     </Badge>
                                 </CardTitle>
                             </CardHeader>
                             <CardContent className="flex-1">
-                                <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-                                    A lightweight execution layer that runs tools securely inside your browser. Used for social media and web-based tools.
-                                </p>
+                                <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">{__('general.a_lightweight_execution_layer_that_runs_tools_securely_inside_your_browser_used_for_social_media_and_web_based_tools')}</p>
                             </CardContent>
                             <CardFooter className="pt-0">
                                 <a href={route('tools.download.agent', 'extension')}>
                                     <Button size="sm" className="text-xs h-8 bg-emerald-600 hover:bg-emerald-500 text-white border-0">
-                                        <Download className="h-3 w-3 mr-1.5" />
-                                        Download Extension
-                                    </Button>
+                                        <Download className="h-3 w-3 mr-1.5" />{__('general.download_extension')}</Button>
                                 </a>
                             </CardFooter>
                         </Card>
@@ -190,9 +164,7 @@ export default function Downloads({ availableTools, downloads }: Props) {
                 {/* Usage History */}
                 {downloads.data.length > 0 && (
                     <section className="space-y-4">
-                        <h2 className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
-                            Recent Activity
-                        </h2>
+                        <h2 className="text-xs font-semibold text-slate-400 uppercase tracking-wider">{__('general.recent_activity')}</h2>
                         <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden divide-y divide-slate-100 dark:divide-slate-800">
                             {downloads.data.map(d => (
                                 <div key={d.id} className="flex items-center justify-between px-5 py-3.5 hover:bg-slate-50/60 dark:hover:bg-slate-800/40 transition-colors">

@@ -58,7 +58,7 @@ class AdminResellerController extends Controller
         }
 
         return redirect()->route('admin.resellers.index')
-            ->with('success', 'Reseller account created successfully.');
+            ->with('success', __('general.reseller_account_created_successfully'));
     }
 
     // ─── Show ─────────────────────────────────────────────────────────────────
@@ -99,7 +99,7 @@ class AdminResellerController extends Controller
 
         $this->adminResellerService->updateReseller($reseller, $request->validated());
 
-        return back()->with('success', 'Reseller updated.');
+        return back()->with('success', __('general.reseller_updated'));
     }
 
     // ─── Destroy ──────────────────────────────────────────────────────────────
@@ -110,7 +110,7 @@ class AdminResellerController extends Controller
         $this->adminResellerService->deleteReseller($reseller);
 
         return redirect()->route('admin.resellers.index')
-            ->with('success', 'Reseller deactivated.');
+            ->with('success', __('general.reseller_deactivated'));
     }
 
     // ─── Adjust Balance ───────────────────────────────────────────────────────
@@ -121,7 +121,7 @@ class AdminResellerController extends Controller
 
         $this->adminResellerService->adjustBalance($reseller, $request->validated());
 
-        return back()->with('success', 'Balance adjusted successfully.');
+        return back()->with('success', __('general.balance_adjusted_successfully'));
     }
 
     // ─── Sub-User: Suspend / Activate ─────────────────────────────────────────
@@ -130,14 +130,14 @@ class AdminResellerController extends Controller
     {
         $this->adminResellerService->suspendUser($resellerId, $userId);
 
-        return back()->with('success', 'Sub-user suspended.');
+        return back()->with('success', __('general.sub_user_suspended'));
     }
 
     public function activateUser(int $resellerId, int $userId): RedirectResponse
     {
         $this->adminResellerService->activateUser($resellerId, $userId);
 
-        return back()->with('success', 'Sub-user re-activated.');
+        return back()->with('success', __('general.sub_user_re_activated'));
     }
 
     // ─── Sharing: Clear Flag ──────────────────────────────────────────────────
@@ -146,13 +146,13 @@ class AdminResellerController extends Controller
     {
         $this->adminResellerService->clearSharingFlag($resellerId, $userId);
 
-        return back()->with('success', 'Sharing flag cleared. Sessions reset. User can log in again.');
+        return back()->with('success', __('general.sharing_flag_cleared_sessions_reset_user_can_log_in_again'));
     }
 
     public function toggleSharingCheck(Request $request, int $resellerId, int $userId): RedirectResponse
     {
         $state = $this->adminResellerService->toggleSharingCheck($resellerId, $userId);
-        return back()->with('success', "Sharing detection {$state} for this user.");
+        return back()->with('success', __('general.sharing_detection_state_for_this_user'));
     }
 
     // ─── Search Users (for Create form autocomplete) ──────────────────────────

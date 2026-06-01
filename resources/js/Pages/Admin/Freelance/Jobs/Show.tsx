@@ -3,21 +3,25 @@ import { Head, Link, router } from '@inertiajs/react';
 import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
 import { Button, buttonVariants } from '@/Components/ui/button';
 import { Badge } from '@/Components/ui/badge';
-import { ArrowLeft, Trash2, ShieldAlert, Edit, RefreshCw } from 'lucide-react';
+import { ArrowLeft, Trash2, ShieldAlert, Edit, RefreshCw, FileText } from 'lucide-react';
+import { ConfirmModal } from '@/Components/ui/ConfirmModal';
 import { __ } from '@/lib/i18n';
 
 export default function Show({ job }: any) {
+    const [deleteConfirm, setDeleteConfirm] = React.useState(false);
+    const [refundConfirm, setRefundConfirm] = React.useState(false);
+    const [deleteProposalConfirm, setDeleteProposalConfirm] = React.useState<any>(null);
     const handleDelete = () => {
-        if (confirm('Are you sure you want to delete this job permanently?')) {
-            router.delete(route('admin.freelance.jobs.destroy', job.id));
-        }
+        router.delete(route('admin.freelance.jobs.destroy', job.id));
+        setDeleteConfirm(false);
     };
 
-    const handleDeleteProposal = (proposalId: any) => {
-        if (confirm('Are you sure you want to delete this proposal?')) {
-            router.delete(route('admin.freelance.proposals.destroy', proposalId), {
+    const handleDeleteProposal = () => {
+        if (deleteProposalConfirm) {
+            router.delete(route('admin.freelance.proposals.destroy', deleteProposalConfirm), {
                 preserveScroll: true
             });
+            setDeleteProposalConfirm(null);
         }
     };
 
@@ -28,11 +32,10 @@ export default function Show({ job }: any) {
     };
 
     const forceRefund = () => {
-        if (confirm('Are you sure you want to cancel this job and force refund points to the client?')) {
-            router.post(route('admin.freelance.jobs.force-refund', job.id), {}, {
-                preserveScroll: true
-            });
-        }
+        router.post(route('admin.freelance.jobs.force-refund', job.id), {}, {
+            preserveScroll: true
+        });
+        setRefundConfirm(false);
     };
 
     return (
@@ -110,7 +113,7 @@ export default function Show({ job }: any) {
                                                 variant="ghost" 
                                                 size="sm" 
                                                 className="text-red-500 hover:text-red-700 hover:bg-red-50 opacity-0 group-hover:opacity-100 transition-opacity"
-                                                onClick={() => handleDeleteProposal(proposal.id)}
+                                                onClick={() => setDeleteProposalConfirm(proposal.id)}
                                                 title={__('freelance.delete_proposal')}
                                             >
                                                 <Trash2 className="h-4 w-4" />
@@ -121,6 +124,41 @@ export default function Show({ job }: any) {
                             </div>
                         ) : (
                             <div className="text-gray-500 text-sm">{__('freelance.no_proposals')}</div>
+                        )}
+                    </div>
+
+                    {/* Job Contracts Monitoring */}
+                    <div className="bg-white shadow rounded-lg p-6 mt-6">
+                        <h3 className="text-lg font-medium text-gray-900 mb-4 flex items-center">
+                            <FileText className="h-5 w-5 mr-2 text-slate-500" />
+                            {__('freelance.job_contracts', 'Job Contracts')}
+                        </h3>
+                        {job.contracts && job.contracts.length > 0 ? (
+                            <div className="space-y-4">
+                                {job.contracts.map((contract: any) => (
+                                    <div key={contract.id} className="border rounded-md p-4 bg-gray-50 flex justify-between items-center">
+                                        <div>
+                                            <div className="font-medium text-gray-900">{__('freelance.contract')} #{contract.id}</div>
+                                            <div className="text-xs text-gray-500 mt-1">
+                                                {__('freelance.freelancer')}: <span className="font-semibold text-slate-700">{contract.freelancer?.name}</span>
+                                            </div>
+                                        </div>
+                                        <div className="text-right flex items-center space-x-4">
+                                            <div>
+                                                <div className="font-semibold text-green-600">{contract.formatted_amount || contract.amount}</div>
+                                                <Badge variant="outline" className="capitalize text-xs">{__('freelance.' + contract.status) || contract.status}</Badge>
+                                            </div>
+                                            <Link href={route('admin.freelance.contracts.show', contract.id)}>
+                                                <Button variant="outline" size="sm">
+                                                    {__('freelance.view_contract', 'View Contract')}
+                                                </Button>
+                                            </Link>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        ) : (
+                            <div className="text-gray-500 text-sm">{__('freelance.no_contracts_yet', 'No contracts associated with this job yet.')}</div>
                         )}
                     </div>
                 </div>
@@ -185,7 +223,7 @@ export default function Show({ job }: any) {
                                 <Button 
                                     className="w-full bg-orange-100 text-orange-800 hover:bg-orange-200 justify-start" 
                                     variant="secondary"
-                                    onClick={forceRefund}
+                                    onClick={() => setRefundConfirm(true)}
                                 >
                                     <RefreshCw className="h-4 w-4 mr-2" />
                                     {__('freelance.force_refund')}
@@ -195,7 +233,7 @@ export default function Show({ job }: any) {
                             <Button 
                                 className="w-full justify-start" 
                                 variant="destructive"
-                                onClick={handleDelete}
+                                onClick={() => setDeleteConfirm(true)}
                             >
                                 <Trash2 className="h-4 w-4 mr-2" />
                                 {__('freelance.delete_job_permanent')}
@@ -204,6 +242,42 @@ export default function Show({ job }: any) {
                     </div>
                 </div>
             </div>
+
+            {/* Delete Proposal Modal */}
+            <ConfirmModal 
+                isOpen={!!deleteProposalConfirm} 
+                onCancel={() => setDeleteProposalConfirm(null)}
+                onConfirm={handleDeleteProposal}
+                title={__('freelance.confirm_delete_proposal')}
+                description={__('freelance.confirm_delete_proposal_msg')}
+                confirmLabel={__('freelance.delete')}
+                cancelLabel={__('freelance.cancel')}
+                variant="danger"
+            />
+
+            {/* Delete Job Modal */}
+            <ConfirmModal 
+                isOpen={deleteConfirm} 
+                onCancel={() => setDeleteConfirm(false)}
+                onConfirm={handleDelete}
+                title={__('freelance.confirm_delete_job')}
+                description={__('freelance.confirm_delete_job_msg')}
+                confirmLabel={__('freelance.delete')}
+                cancelLabel={__('freelance.cancel')}
+                variant="danger"
+            />
+
+            {/* Refund Job Modal */}
+            <ConfirmModal 
+                isOpen={refundConfirm} 
+                onCancel={() => setRefundConfirm(false)}
+                onConfirm={forceRefund}
+                title={__('freelance.confirm_force_refund')}
+                description={__('freelance.confirm_force_refund_msg')}
+                confirmLabel={__('freelance.force_refund')}
+                cancelLabel={__('freelance.cancel')}
+                variant="danger"
+            />
         </AdminSidebarLayout>
     );
 }

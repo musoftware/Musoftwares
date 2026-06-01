@@ -27,7 +27,7 @@ class ExpenseController extends Controller
      * Store a newly created resource in storage.
      */
     public function store(Request $request) {
-        return redirect()->route('erp.dashboard', ['section' => 'expenses'])->with('success', 'Expense logged successfully.');
+        return redirect()->route('erp.dashboard', ['section' => 'expenses'])->with('success', __('general.expense_logged_successfully'));
     }
 
     /**

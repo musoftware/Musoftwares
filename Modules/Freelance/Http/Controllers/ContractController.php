@@ -64,7 +64,7 @@ class ContractController extends Controller
 
         try {
             $this->completeContractAction->execute($contract, $request->user());
-            return back()->with('success', 'Contract marked as completed and funds paid to freelancer.');
+            return back()->with('success', __('general.contract_marked_as_completed_and_funds_paid_to_freelancer'));
         } catch (\Exception $e) {
             return back()->withErrors(['error' => 'Payout failed: ' . $e->getMessage()]);
         }
@@ -80,6 +80,6 @@ class ContractController extends Controller
         $contract->update(['status' => 'disputed']);
         // Here you would typically notify admins or trigger a dispute resolution process.
 
-        return back()->with('success', 'Contract dispute initiated.');
+        return back()->with('success', __('general.contract_dispute_initiated'));
     }
 }

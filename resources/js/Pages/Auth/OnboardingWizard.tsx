@@ -156,19 +156,17 @@ export default function OnboardingWizard({ user, countries }: Props) {
                     <div className="w-8 h-8 rounded-lg bg-primary text-primary-foreground flex items-center justify-center shadow-sm">
                         <ApplicationLogo className="w-4 h-4 fill-current" />
                     </div>
-                    <span className="font-semibold text-sm tracking-tight">Workspace Onboarding</span>
+                    <span className="font-semibold text-sm tracking-tight">{__('general.workspace_onboarding')}</span>
                 </div>
 
                 <div className="flex items-center space-x-4 text-xs text-muted-foreground">
-                    <span className="hidden sm:inline-block">Logged in as <strong className="text-foreground">{user.email}</strong></span>
+                    <span className="hidden sm:inline-block">{__('general.logged_in_as')}<strong className="text-foreground">{user.email}</strong></span>
                     <Link
                         href={route('logout')}
                         method="post"
                         as="button"
                         className="text-muted-foreground hover:text-foreground transition-colors"
-                    >
-                        Save & Exit
-                    </Link>
+                    >{__('general.save_exit')}</Link>
                 </div>
             </header>
 
@@ -222,10 +220,8 @@ export default function OnboardingWizard({ user, countries }: Props) {
                                     <div className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center mb-4 text-foreground">
                                         <Globe className="w-5 h-5" />
                                     </div>
-                                    <CardTitle className="text-xl sm:text-2xl">Where is your workspace based?</CardTitle>
-                                    <CardDescription className="mt-1.5 leading-relaxed">
-                                        Setting your primary operational location helps us optimize server routing, localized formatting, and legal compliance.
-                                    </CardDescription>
+                                    <CardTitle className="text-xl sm:text-2xl">{__('general.where_is_your_workspace_based')}</CardTitle>
+                                    <CardDescription className="mt-1.5 leading-relaxed">{__('general.setting_your_primary_operational_location_helps_us_optimize_server_routing_localized_formatting_and_legal_compliance')}</CardDescription>
                                 </CardHeader>
                                 <CardContent className="space-y-6 px-8 py-6">
                                     {/* Country Combobox Selector */}
@@ -235,7 +231,7 @@ export default function OnboardingWizard({ user, countries }: Props) {
                                             value={formData.country}
                                             onChange={(val) => setFormData(prev => ({ ...prev, country: String(val), city: '' }))}
                                             options={countries}
-                                            placeholder="Select a country..."
+                                            placeholder={__('general.select_a_country')}
                                             searchPlaceholder="Search country..."
                                         />
                                         {errors.country && <span className="text-xs text-destructive mt-1 block">{errors.country}</span>}
@@ -243,12 +239,12 @@ export default function OnboardingWizard({ user, countries }: Props) {
 
                                     {/* City Combobox Selector */}
                                     <div className="space-y-2">
-                                        <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">City / Operational Node</label>
+                                        <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{__('general.city_operational_node')}</label>
                                         <PremiumCombobox
                                             value={formData.city}
                                             onChange={(val) => setFormData(prev => ({ ...prev, city: String(val) }))}
                                             options={uniqueCities}
-                                            placeholder="Select a city..."
+                                            placeholder={__('general.select_a_city')}
                                             searchPlaceholder="Search or enter custom city..."
                                             icon={<MapPin className="w-4 h-4" />}
                                             allowCustomValue={true}
@@ -257,9 +253,7 @@ export default function OnboardingWizard({ user, countries }: Props) {
                                     </div>
                                 </CardContent>
                                 <CardFooter className="border-t px-8 py-4 flex justify-end bg-muted/30">
-                                    <Button onClick={nextStep} size="lg" className="h-11 px-6 rounded-xl font-medium shadow-sm">
-                                        Continue to Contact
-                                        <ArrowRight className="w-4 h-4 ml-2" />
+                                    <Button onClick={nextStep} size="lg" className="h-11 px-6 rounded-xl font-medium shadow-sm">{__('general.continue_to_contact')}<ArrowRight className="w-4 h-4 ml-2" />
                                     </Button>
                                 </CardFooter>
                             </motion.div>
@@ -277,16 +271,14 @@ export default function OnboardingWizard({ user, countries }: Props) {
                                     <div className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center mb-4 text-foreground">
                                         <Phone className="w-5 h-5" />
                                     </div>
-                                    <CardTitle className="text-xl sm:text-2xl">Communication Channels</CardTitle>
-                                    <CardDescription className="mt-1.5 leading-relaxed">
-                                        Secure operational communication lines for transaction notifications, 2FA alerts, and VIP dispatch.
-                                    </CardDescription>
+                                    <CardTitle className="text-xl sm:text-2xl">{__('general.communication_channels')}</CardTitle>
+                                    <CardDescription className="mt-1.5 leading-relaxed">{__('general.secure_operational_communication_lines_for_transaction_notifications_2fa_alerts_and_vip_dispatch')}</CardDescription>
                                 </CardHeader>
                                 <CardContent className="space-y-5 px-8 py-6">
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                         {/* Mobile 1 */}
                                         <div className="space-y-2">
-                                            <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Primary Mobile <span className="text-destructive">*</span></label>
+                                            <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{__('general.primary_mobile')}<span className="text-destructive">*</span></label>
                                             <Input
                                                 placeholder="+1 (555) 000-0000"
                                                 value={formData.mobile_1}
@@ -298,7 +290,7 @@ export default function OnboardingWizard({ user, countries }: Props) {
 
                                         {/* Mobile 2 */}
                                         <div className="space-y-2">
-                                            <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Secondary Mobile <span className="text-muted-foreground/70 font-normal lowercase">(optional)</span></label>
+                                            <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{__('general.secondary_mobile')}<span className="text-muted-foreground/70 font-normal lowercase">(optional)</span></label>
                                             <Input
                                                 placeholder="+1 (555) 999-9999"
                                                 value={formData.mobile_2}
@@ -313,7 +305,7 @@ export default function OnboardingWizard({ user, countries }: Props) {
                                         <div className="space-y-2">
                                             <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center space-x-1.5">
                                                 <Send className="w-3.5 h-3.5 text-blue-500" />
-                                                <span>Telegram Username</span>
+                                                <span>{__('general.telegram_username')}</span>
                                             </label>
                                             <div className="relative flex items-center">
                                                 <span className="absolute left-3 text-sm font-medium text-muted-foreground">@</span>
@@ -335,14 +327,10 @@ export default function OnboardingWizard({ user, countries }: Props) {
                                     <Button onClick={handleComplete} size="lg" className="h-11 px-8 rounded-xl font-medium shadow-md" disabled={saving}>
                                         {saving ? (
                                             <>
-                                                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                                                Configuring Workspace...
-                                            </>
+                                                <Loader2 className="w-4 h-4 mr-2 animate-spin" />{__('general.configuring_workspace')}</>
                                         ) : (
                                             <>
-                                                <Sparkles className="w-4 h-4 mr-2 text-amber-400" />
-                                                Complete Setup
-                                            </>
+                                                <Sparkles className="w-4 h-4 mr-2 text-amber-400" />{__('general.complete_setup')}</>
                                         )}
                                     </Button>
                                 </CardFooter>

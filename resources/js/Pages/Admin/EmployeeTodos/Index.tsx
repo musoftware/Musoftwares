@@ -302,7 +302,7 @@ export default function Index({ todos, filters, stats, users }: Props) {
                 <DropdownMenu>
                     <DropdownMenuTrigger
                         className="inline-flex h-8 w-8 items-center justify-center rounded-md text-slate-500 hover:bg-slate-100 hover:text-slate-900 transition-colors"
-                        aria-label="Open actions menu"
+                        aria-label={__('general.open_actions_menu')}
                     >
                         <MoreHorizontal className="h-4 w-4" />
                     </DropdownMenuTrigger>
@@ -329,10 +329,10 @@ export default function Index({ todos, filters, stats, users }: Props) {
         <div className="flex items-center gap-2 flex-wrap">
             <Select value={filters.recurring || 'all'} onValueChange={(val) => handleFilter('recurring', val === 'all' ? '' : val)}>
                 <SelectTrigger className="w-[150px] bg-white h-11 rounded-xl">
-                    <SelectValue placeholder="All Frequencies" />
+                    <SelectValue placeholder={__('general.all_frequencies')} />
                 </SelectTrigger>
                 <SelectContent>
-                    <SelectItem value="all">All Frequencies</SelectItem>
+                    <SelectItem value="all">{__('general.all_frequencies')}</SelectItem>
                     <SelectItem value="day">Daily</SelectItem>
                     <SelectItem value="week">Weekly</SelectItem>
                     <SelectItem value="month">Monthly</SelectItem>
@@ -342,10 +342,10 @@ export default function Index({ todos, filters, stats, users }: Props) {
 
             <Select value={filters.priority || 'all'} onValueChange={(val) => handleFilter('priority', val === 'all' ? '' : val)}>
                 <SelectTrigger className="w-[140px] bg-white h-11 rounded-xl">
-                    <SelectValue placeholder="All Priorities" />
+                    <SelectValue placeholder={__('general.all_priorities')} />
                 </SelectTrigger>
                 <SelectContent>
-                    <SelectItem value="all">All Priorities</SelectItem>
+                    <SelectItem value="all">{__('general.all_priorities')}</SelectItem>
                     <SelectItem value="high">High</SelectItem>
                     <SelectItem value="medium">Medium</SelectItem>
                     <SelectItem value="low">Low</SelectItem>
@@ -357,23 +357,21 @@ export default function Index({ todos, filters, stats, users }: Props) {
                     value={filters.user_id || ''}
                     onChange={(val) => handleFilter('user_id', val ? String(val) : '')}
                     options={users.map(u => ({ value: String(u.id), label: u.name }))}
-                    placeholder="All Employees"
+                    placeholder={__('general.all_employees')}
                     icon={<UserIcon className="w-4 h-4" />}
                 />
             </div>
 
             <Button onClick={openCreate} className="flex items-center gap-1.5 ml-auto h-11 rounded-xl">
-                <Plus className="h-4 w-4" />
-                New Todo
-            </Button>
+                <Plus className="h-4 w-4" />{__('general.new_todo')}</Button>
         </div>
     );
 
     // ─── Render ───────────────────────────────────────────────────────────────
 
     return (
-        <AdminSidebarLayout title="Employee Todos" header="Employee Recurring Todos">
-            <Head title="Employee Todos" />
+        <AdminSidebarLayout title={__('general.employee_todos')} header="Employee Recurring Todos">
+            <Head title={__('general.employee_todos')} />
 
             {/* Stats */}
             <div className="mb-6 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
@@ -423,7 +421,7 @@ export default function Index({ todos, filters, stats, users }: Props) {
                                 value={data.user_id}
                                 onChange={(val) => setData('user_id', val ? String(val) : '')}
                                 options={users.map((u) => ({ value: String(u.id), label: `${u.name} — ${u.email}` }))}
-                                placeholder="Select employee..."
+                                placeholder={__('general.select_employee_1')}
                                 icon={<UserIcon className="w-4 h-4" />}
                             />
                             {errors.user_id && <p className="text-xs text-red-500">{errors.user_id}</p>}
@@ -436,7 +434,7 @@ export default function Index({ todos, filters, stats, users }: Props) {
                                 id="et-title"
                                 value={data.title}
                                 onChange={(e) => setData('title', e.target.value)}
-                                placeholder="Todo title"
+                                placeholder={__('general.todo_title')}
                                 className="h-11 rounded-xl"
                                 required
                             />
@@ -450,7 +448,7 @@ export default function Index({ todos, filters, stats, users }: Props) {
                                 id="et-description"
                                 value={data.description}
                                 onChange={(e) => setData('description', e.target.value)}
-                                placeholder="Additional details…"
+                                placeholder={__('general.additional_details')}
                                 className="rounded-xl"
                                 rows={3}
                             />
@@ -462,7 +460,7 @@ export default function Index({ todos, filters, stats, users }: Props) {
                                 <Label htmlFor="et-priority">Priority</Label>
                                 <Select value={data.priority} onValueChange={(v) => setData('priority', v)}>
                                     <SelectTrigger className="w-full bg-white h-11 rounded-xl shadow-sm">
-                                        <SelectValue placeholder="Select priority..." />
+                                        <SelectValue placeholder={__('general.select_priority')} />
                                     </SelectTrigger>
                                     <SelectContent>
                                         <SelectItem value="low">Low</SelectItem>
@@ -474,10 +472,10 @@ export default function Index({ todos, filters, stats, users }: Props) {
                             </div>
 
                             <div className="space-y-1">
-                                <Label htmlFor="et-recurring">Recurs Every</Label>
+                                <Label htmlFor="et-recurring">{__('general.recurs_every')}</Label>
                                 <Select value={data.recurring} onValueChange={(v) => setData('recurring', v)}>
                                     <SelectTrigger className="w-full bg-white h-11 rounded-xl shadow-sm">
-                                        <SelectValue placeholder="Select frequency..." />
+                                        <SelectValue placeholder={__('general.select_frequency')} />
                                     </SelectTrigger>
                                     <SelectContent>
                                         <SelectItem value="day">Day</SelectItem>
@@ -507,7 +505,7 @@ export default function Index({ todos, filters, stats, users }: Props) {
                             </div>
 
                             <div className="space-y-1">
-                                <Label htmlFor="et-current_date">Start Date</Label>
+                                <Label htmlFor="et-current_date">{__('general.start_date')}</Label>
                                 <Input
                                     id="et-current_date"
                                     type="date"
@@ -523,12 +521,12 @@ export default function Index({ todos, filters, stats, users }: Props) {
                         {/* Conditional fields */}
                         {data.recurring === 'week' && (
                             <div className="space-y-1">
-                                <Label htmlFor="et-week">Days of Week <span className="text-slate-400 font-normal">(comma-separated, e.g. Monday,Wednesday)</span></Label>
+                                <Label htmlFor="et-week">{__('general.days_of_week')}<span className="text-slate-400 font-normal">(comma-separated, e.g. Monday,Wednesday)</span></Label>
                                 <Input
                                     id="et-week"
                                     value={data.recurring_times_week}
                                     onChange={(e) => setData('recurring_times_week', e.target.value)}
-                                    placeholder="Monday,Wednesday,Friday"
+                                    placeholder={__('general.monday_wednesday_friday')}
                                     className="h-11 rounded-xl"
                                 />
                             </div>
@@ -536,7 +534,7 @@ export default function Index({ todos, filters, stats, users }: Props) {
 
                         {data.recurring === 'month' && (
                             <div className="space-y-1">
-                                <Label htmlFor="et-month">Days of Month <span className="text-slate-400 font-normal">(comma-separated, e.g. 1,15)</span></Label>
+                                <Label htmlFor="et-month">{__('general.days_of_month')}<span className="text-slate-400 font-normal">(comma-separated, e.g. 1,15)</span></Label>
                                 <Input
                                     id="et-month"
                                     value={data.recurring_times_month}
@@ -549,7 +547,7 @@ export default function Index({ todos, filters, stats, users }: Props) {
 
                         {data.recurring === 'year' && (
                             <div className="space-y-1">
-                                <Label htmlFor="et-year">Day-Month pairs <span className="text-slate-400 font-normal">(comma-separated, e.g. 1-1,25-12)</span></Label>
+                                <Label htmlFor="et-year">{__('general.day_month_pairs')}<span className="text-slate-400 font-normal">(comma-separated, e.g. 1-1,25-12)</span></Label>
                                 <Input
                                     id="et-year"
                                     value={data.recurring_times_year}
@@ -577,12 +575,9 @@ export default function Index({ todos, filters, stats, users }: Props) {
                 <DialogContent className="max-w-sm">
                     <DialogHeader>
                         <DialogTitle className="flex items-center gap-2 text-red-600">
-                            <AlertTriangle className="h-5 w-5" />
-                            Delete Recurring Todo
-                        </DialogTitle>
+                            <AlertTriangle className="h-5 w-5" />{__('general.delete_recurring_todo')}</DialogTitle>
                     </DialogHeader>
-                    <p className="text-sm text-slate-600 mt-2">
-                        This will permanently delete the recurring todo <strong>and all its transaction history</strong>. This action cannot be undone.
+                    <p className="text-sm text-slate-600 mt-2">{__('general.this_will_permanently_delete_the_recurring_todo')}<strong>{__('general.and_all_its_transaction_history')}</strong>. This action cannot be undone.
                     </p>
                     <DialogFooter className="mt-4">
                         <Button variant="outline" onClick={() => setDeleteId(null)}>Cancel</Button>

@@ -325,7 +325,7 @@
     <!-- Service Gallery -->
     @if($landingPage->service->images->count() > 0)
         <div class="section-padding">
-            <h2 class="section-title">Our Creative Gallery</h2>
+            <h2 class="section-title">{{ __('general.our_creative_gallery') }}</h2>
             <div class="service-gallery">
                 @foreach($landingPage->service->images as $image)
                     <img alt="{{ $landingPage->hero_title }}" src="{{ asset($image->image_path) }}">
@@ -342,7 +342,7 @@
     <!-- Pricing Tables -->
     @if($landingPage->pricingTables->count() > 0)
         <div class="section-padding">
-            <h2 class="section-title">Choose Your Plan</h2>
+            <h2 class="section-title">{{ __('general.choose_your_plan') }}</h2>
             <div class="pricing-grid">
                 @foreach($landingPage->pricingTables as $pricing)
                     <div class="pricing-card {{ $pricing->is_popular ? 'popular' : '' }}">
@@ -375,7 +375,7 @@
     <!-- FAQs Section -->
     @if($landingPage->faqs->count() > 0)
         <div class="section-padding">
-            <h2 class="section-title">Got Questions?</h2>
+            <h2 class="section-title">{{ __('general.got_questions') }}</h2>
             <div class="row">
                 <div class="col-lg-10 mx-auto">
                     @foreach($landingPage->faqs as $faq)

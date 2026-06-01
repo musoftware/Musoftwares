@@ -9,17 +9,16 @@ import { UserPlus, Trash2 } from 'lucide-react';
 export default function AffiliateModeratorsIndex({ moderators }: any) {
     return (
         <div className="p-6 max-w-7xl mx-auto space-y-6">
-            <Head title="Team Moderators" />
+            <Head title={__('general.team_moderators')} />
 
             <div className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-2xl font-semibold text-gray-900 tracking-tight">Team Moderators</h1>
-                    <p className="text-sm text-gray-500 mt-1">Manage sub-accounts for your POS cashiers and marketers.</p>
+                    <h1 className="text-2xl font-semibold text-gray-900 tracking-tight">{__('general.team_moderators')}</h1>
+                    <p className="text-sm text-gray-500 mt-1">{__('general.manage_sub_accounts_for_your_pos_cashiers_and_marketers')}</p>
                 </div>
                 <Link href={route('affiliate_pos.affiliate.moderators.create')}>
                     <Button className="bg-blue-600 hover:bg-blue-700">
-                        <UserPlus className="w-4 h-4 mr-2" /> Add Moderator
-                    </Button>
+                        <UserPlus className="w-4 h-4 mr-2" />{__('general.add_moderator')}</Button>
                 </Link>
             </div>
 
@@ -37,7 +36,7 @@ export default function AffiliateModeratorsIndex({ moderators }: any) {
                         <TableBody>
                             {moderators.data.length === 0 ? (
                                 <TableRow>
-                                    <TableCell colSpan={4} className="h-32 text-center text-gray-500">No moderators found.</TableCell>
+                                    <TableCell colSpan={4} className="h-32 text-center text-gray-500">{__('general.no_moderators_found')}</TableCell>
                                 </TableRow>
                             ) : (
                                 moderators.data.map((mod: any) => (

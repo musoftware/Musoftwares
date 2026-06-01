@@ -32,7 +32,7 @@ export default function Index({ campaigns }) {
     };
 
     const handleDelete = (id) => {
-        if (confirm(__('Are you sure you want to delete this campaign?'))) {
+        if (confirm(__('general.are_you_sure_you_want_to_delete_this_campaign'))) {
             router.delete(route('crm.campaigns.destroy', id));
         }
     };
@@ -49,7 +49,7 @@ export default function Index({ campaigns }) {
     };
 
     return (
-        <CrmLayout title={__('Broadcast Campaigns')} activeMenu="campaigns">
+        <CrmLayout title={__('general.broadcast_campaigns')} activeMenu="campaigns">
             <div className="flex-1 space-y-4 p-8 pt-6">
             <div className="mb-6 flex justify-end">
                 <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
@@ -59,8 +59,8 @@ export default function Index({ campaigns }) {
                     <DialogContent>
                         <form onSubmit={handleCreate}>
                             <DialogHeader>
-                                <DialogTitle>{__('Create New Broadcast Campaign')}</DialogTitle>
-                                <DialogDescription>{__('Send a one-time message to a specific audience segment.')}</DialogDescription>
+                                <DialogTitle>{__('general.create_new_broadcast_campaign')}</DialogTitle>
+                                <DialogDescription>{__('general.send_a_one_time_message_to_a_specific_audience_segment')}</DialogDescription>
                             </DialogHeader>
                             <div className="space-y-4 py-4">
                                 <div className="space-y-2">
@@ -69,11 +69,11 @@ export default function Index({ campaigns }) {
                                         required 
                                         value={newCampaign.name} 
                                         onChange={(e) => setNewCampaign({...newCampaign, name: e.target.value})} 
-                                        placeholder={__('e.g. Summer Sale 2026')} 
+                                        placeholder={__('general.e_g_summer_sale_2026')} 
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <Label>{__('Campaign Type')}</Label>
+                                    <Label>{__('general.campaign_type')}</Label>
                                     <select 
                                         className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm"
                                         value={newCampaign.type}
@@ -83,15 +83,15 @@ export default function Index({ campaigns }) {
                                     </select>
                                 </div>
                                 <div className="space-y-2">
-                                    <Label>{__('Target Audience')}</Label>
+                                    <Label>{__('general.target_audience')}</Label>
                                     <select 
                                         className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm"
                                         value={newCampaign.target_audience}
                                         onChange={(e) => setNewCampaign({...newCampaign, target_audience: e.target.value})}
                                     >
-                                        <option value="all_leads">{__('All Leads')}</option>
-                                        <option value="active_users">{__('Active Users')}</option>
-                                        <option value="subscribers">{__('Newsletter Subscribers')}</option>
+                                        <option value="all_leads">{__('general.all_leads')}</option>
+                                        <option value="active_users">{__('general.active_users')}</option>
+                                        <option value="subscribers">{__('general.newsletter_subscribers')}</option>
                                     </select>
                                 </div>
                             </div>
@@ -117,18 +117,18 @@ export default function Index({ campaigns }) {
                             <div className="space-y-3 mb-6">
                                 <div className="flex items-center text-sm text-gray-500">
                                     <Send className="w-4 h-4 mr-2 text-indigo-400" />
-                                    <span>{__('Type:')} <span className="font-medium text-gray-700 capitalize">{campaign.type}</span></span>
+                                    <span>{__('general.type')} <span className="font-medium text-gray-700 capitalize">{campaign.type}</span></span>
                                 </div>
                                 <div className="flex items-center text-sm text-gray-500">
                                     <Users className="w-4 h-4 mr-2 text-blue-400" />
-                                    <span>{__('Audience:')} <span className="font-medium text-gray-700">{campaign.target_audience.replace('_', ' ')}</span></span>
+                                    <span>{__('general.audience')} <span className="font-medium text-gray-700">{campaign.target_audience.replace('_', ' ')}</span></span>
                                 </div>
                                 <div className="flex items-center text-sm text-gray-500">
                                     <Clock className="w-4 h-4 mr-2 text-gray-400" />
                                     <span>
-                                        {campaign.status === 'scheduled' ? `${__('Scheduled')}: ${new Date(campaign.scheduled_at).toLocaleString()}` : 
-                                         campaign.status === 'completed' ? `${__('Finished')}: ${new Date(campaign.completed_at).toLocaleDateString()}` : 
-                                         __('Not Scheduled')}
+                                        {campaign.status === 'scheduled' ? `${__('general.scheduled')}: ${new Date(campaign.scheduled_at).toLocaleString()}` : 
+                                         campaign.status === 'completed' ? `${__('general.finished')}: ${new Date(campaign.completed_at).toLocaleDateString()}` : 
+                                         __('general.not_scheduled')}
                                     </span>
                                 </div>
                             </div>
@@ -140,7 +140,7 @@ export default function Index({ campaigns }) {
                             </Button>
                             <Link href={route('crm.campaigns.show', campaign.id)}>
                                 <Button size="sm" variant="outline">
-                                    <Edit className="w-4 h-4 mr-2" /> {__('Manage Content')}
+                                    <Edit className="w-4 h-4 mr-2" /> {__('general.manage_content')}
                                 </Button>
                             </Link>
                         </div>
@@ -150,8 +150,8 @@ export default function Index({ campaigns }) {
                 {campaigns.data.length === 0 && (
                     <div className="col-span-full py-12 text-center text-gray-500 bg-white rounded-lg border shadow-sm">
                         <Send className="w-12 h-12 mx-auto text-gray-300 mb-3" />
-                        <h3 className="text-lg font-medium text-gray-900">{__('No Campaigns Found')}</h3>
-                        <p className="mt-1">{__('Create your first broadcast campaign to reach your audience.')}</p>
+                        <h3 className="text-lg font-medium text-gray-900">{__('general.no_campaigns_found')}</h3>
+                        <p className="mt-1">{__('general.create_your_first_broadcast_campaign_to_reach_your_audience')}</p>
                     </div>
                 )}
             </div>

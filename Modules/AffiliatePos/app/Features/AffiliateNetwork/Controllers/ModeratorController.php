@@ -50,17 +50,17 @@ class ModeratorController extends Controller
         // Assumes spatie/laravel-permission or similar is used in Musoftwares core
         $moderator->assignRole('moderator');
 
-        return back()->with('success', 'Moderator created successfully');
+        return back()->with('success', __('general.moderator_created_successfully'));
     }
 
     public function destroy(User $moderator)
     {
         if ($moderator->parent_id !== Auth::id()) {
-            abort(403, 'Unauthorized access.');
+            abort(403, __('general.unauthorized_access'));
         }
 
         $moderator->delete();
         
-        return back()->with('success', 'Moderator deleted successfully');
+        return back()->with('success', __('general.moderator_deleted_successfully'));
     }
 }

@@ -53,7 +53,7 @@ export function ActivityTimeline({ items, className, maxItems }: ActivityTimelin
 
     if (!displayed.length) {
         return (
-            <p className="text-sm text-slate-400 text-center py-6">No activity yet.</p>
+            <p className="text-sm text-slate-400 text-center py-6">{__('general.no_activity_yet')}</p>
         );
     }
 

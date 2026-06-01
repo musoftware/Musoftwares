@@ -38,7 +38,7 @@ class ResolveBookingTenantDomain
                 $request->attributes->set('tenant_id', $tenantId);
             } else {
                 // Domain not found or not verified
-                abort(404, 'Tenant not found for this domain.');
+                abort(404, __('general.tenant_not_found_for_this_domain'));
             }
         }
 

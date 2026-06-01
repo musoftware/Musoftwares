@@ -50,23 +50,19 @@ export default function TestMode({ testModeEnabled, webhook, testTransactionsCou
     };
 
     return (
-        <AuthenticatedLayout header={<h2 className="font-semibold text-xl text-gray-800 leading-tight">Simulation Environment</h2>}>
-            <Head title="Test Mode - Text Payment Gateway" />
+        <AuthenticatedLayout header={<h2 className="font-semibold text-xl text-gray-800 leading-tight">{__('general.simulation_environment')}</h2>}>
+            <Head title={__('general.test_mode_text_payment_gateway')} />
 
             <div className="py-8 md:py-12">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                         <div>
                             <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
-                                <Beaker className="w-6 h-6 text-indigo-600" />
-                                Test Environment
-                            </h1>
-                            <p className="text-slate-500 mt-1">Safely simulate incoming SMS payloads and test your application integrations.</p>
+                                <Beaker className="w-6 h-6 text-indigo-600" />{__('general.test_environment')}</h1>
+                            <p className="text-slate-500 mt-1">{__('general.safely_simulate_incoming_sms_payloads_and_test_your_application_integrations')}</p>
                         </div>
                         <Button variant="outline" onClick={() => router.visit(route('sms-payment-gateway.index'))}>
-                            <ArrowLeft className="w-4 h-4 mr-2" />
-                            Back to Dashboard
-                        </Button>
+                            <ArrowLeft className="w-4 h-4 mr-2" />{__('general.back_to_dashboard')}</Button>
                     </div>
 
                     <Card className="border-indigo-100 bg-indigo-50/30">
@@ -77,7 +73,7 @@ export default function TestMode({ testModeEnabled, webhook, testTransactionsCou
                                 </div>
                                 <div>
                                     <h3 className="text-lg font-bold text-slate-900">Sandbox Status: {testModeEnabled ? 'Active' : 'Offline'}</h3>
-                                    <p className="text-sm text-slate-600">When active, mock payloads are permitted and explicitly tagged as test data.</p>
+                                    <p className="text-sm text-slate-600">{__('general.when_active_mock_payloads_are_permitted_and_explicitly_tagged_as_test_data')}</p>
                                 </div>
                             </div>
                             <Button 
@@ -94,15 +90,13 @@ export default function TestMode({ testModeEnabled, webhook, testTransactionsCou
                         <Card className={!testModeEnabled ? 'opacity-60 pointer-events-none' : ''}>
                             <CardHeader>
                                 <CardTitle className="flex items-center gap-2">
-                                    <Zap className="w-5 h-5 text-indigo-500" />
-                                    Simulate SMS Arrival
-                                </CardTitle>
-                                <CardDescription>Trigger the Text Payment Gateway extraction engine as if a physical device received a text.</CardDescription>
+                                    <Zap className="w-5 h-5 text-indigo-500" />{__('general.simulate_sms_arrival')}</CardTitle>
+                                <CardDescription>{__('general.trigger_the_text_payment_gateway_extraction_engine_as_if_a_physical_device_received_a_text')}</CardDescription>
                             </CardHeader>
                             <CardContent>
                                 <form onSubmit={handleSmsSubmit} className="space-y-4">
                                     <div className="space-y-2">
-                                        <Label htmlFor="sender">SMS Sender Alias</Label>
+                                        <Label htmlFor="sender">{__('general.sms_sender_alias')}</Label>
                                         <Input
                                             id="sender"
                                             value={smsData.sender}
@@ -111,7 +105,7 @@ export default function TestMode({ testModeEnabled, webhook, testTransactionsCou
                                         />
                                     </div>
                                     <div className="space-y-2">
-                                        <Label htmlFor="sms_text">Raw Message Text</Label>
+                                        <Label htmlFor="sms_text">{__('general.raw_message_text')}</Label>
                                         <textarea
                                             id="sms_text"
                                             value={smsData.sms_text}
@@ -121,8 +115,7 @@ export default function TestMode({ testModeEnabled, webhook, testTransactionsCou
                                         />
                                     </div>
                                     <Button type="submit" disabled={processingSms} className="w-full bg-indigo-600 hover:bg-indigo-700">
-                                        <Send className="w-4 h-4 mr-2" /> Dispatch SMS Payload
-                                    </Button>
+                                        <Send className="w-4 h-4 mr-2" />{__('general.dispatch_sms_payload')}</Button>
                                 </form>
                             </CardContent>
                         </Card>
@@ -130,15 +123,13 @@ export default function TestMode({ testModeEnabled, webhook, testTransactionsCou
                         <Card className={!testModeEnabled ? 'opacity-60 pointer-events-none' : ''}>
                             <CardHeader>
                                 <CardTitle className="flex items-center gap-2">
-                                    <Zap className="w-5 h-5 text-emerald-500" />
-                                    Simulate Webhook Fire
-                                </CardTitle>
-                                <CardDescription>Bypass extraction and directly fire a synthetic test payload to your active webhook.</CardDescription>
+                                    <Zap className="w-5 h-5 text-emerald-500" />{__('general.simulate_webhook_fire')}</CardTitle>
+                                <CardDescription>{__('general.bypass_extraction_and_directly_fire_a_synthetic_test_payload_to_your_active_webhook')}</CardDescription>
                             </CardHeader>
                             <CardContent>
                                 {!webhook ? (
                                     <Alert className="bg-amber-50 text-amber-800 border-amber-200">
-                                        <AlertDescription>No active webhook configuration found. Register one first.</AlertDescription>
+                                        <AlertDescription>{__('general.no_active_webhook_configuration_found_register_one_first')}</AlertDescription>
                                     </Alert>
                                 ) : (
                                     <form onSubmit={handleHookSubmit} className="space-y-4">
@@ -154,7 +145,7 @@ export default function TestMode({ testModeEnabled, webhook, testTransactionsCou
                                             />
                                         </div>
                                         <div className="space-y-2">
-                                            <Label htmlFor="phone_number">Mock Target Identifier</Label>
+                                            <Label htmlFor="phone_number">{__('general.mock_target_identifier')}</Label>
                                             <Input
                                                 id="phone_number"
                                                 type="text"
@@ -164,26 +155,23 @@ export default function TestMode({ testModeEnabled, webhook, testTransactionsCou
                                             />
                                         </div>
                                         <Button type="submit" disabled={processingHook} className="w-full bg-emerald-600 hover:bg-emerald-700 text-white">
-                                            <Send className="w-4 h-4 mr-2" /> Fire Webhook
-                                        </Button>
+                                            <Send className="w-4 h-4 mr-2" />{__('general.fire_webhook')}</Button>
                                     </form>
                                 )}
 
                                 <div className="mt-8 pt-6 border-t">
                                     <div className="flex items-center justify-between mb-4">
                                         <h4 className="font-semibold text-slate-800 flex items-center gap-2">
-                                            <Database className="w-4 h-4" /> Sandbox Metrics
-                                        </h4>
+                                            <Database className="w-4 h-4" />{__('general.sandbox_metrics')}</h4>
                                         <Button variant="ghost" size="sm" onClick={handleClear} className="text-rose-600 hover:text-rose-700 hover:bg-rose-50">
-                                            <Trash2 className="w-4 h-4 mr-2" /> Flush Test Data
-                                        </Button>
+                                            <Trash2 className="w-4 h-4 mr-2" />{__('general.flush_test_data')}</Button>
                                     </div>
                                     <div className="flex justify-between items-center py-2 border-b text-sm">
-                                        <span className="text-slate-500">Simulated Transactions</span>
+                                        <span className="text-slate-500">{__('general.simulated_transactions')}</span>
                                         <span className="font-bold text-slate-700">{testTransactionsCount}</span>
                                     </div>
                                     <div className="flex justify-between items-center py-2 text-sm">
-                                        <span className="text-slate-500">Test Payment Orders</span>
+                                        <span className="text-slate-500">{__('general.test_payment_orders')}</span>
                                         <span className="font-bold text-slate-700">{testOrdersCount}</span>
                                     </div>
                                 </div>

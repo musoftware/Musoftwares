@@ -65,34 +65,33 @@ export default function Edit({ salary, currencies, users }) {
     const yearDaysList = getYearDaysList();
 
     return (
-        <AdminSidebarLayout title="Edit Recurring Salary" header="Business Operations">
-            <Head title="Edit Recurring Salary" />
+        <AdminSidebarLayout title={__('general.edit_recurring_salary')} header="Business Operations">
+            <Head title={__('general.edit_recurring_salary')} />
 
             <div className="mb-4">
                 <Link href={route('admin.recurring_salaries.index')} className="text-sm text-gray-500 hover:text-black flex items-center gap-1">
-                    <ArrowLeft className="w-4 h-4" /> Back to Recurring Salaries
-                </Link>
+                    <ArrowLeft className="w-4 h-4" />{__('general.back_to_recurring_salaries')}</Link>
             </div>
 
             <div className="bg-white border rounded-xl shadow-sm max-w-2xl overflow-hidden">
                 <div className="border-b px-6 py-4 bg-slate-50">
-                    <h2 className="text-lg font-bold text-slate-900">Edit Recurring Salary Details</h2>
-                    <p className="text-sm text-gray-500 mt-0.5">Modify the payroll parameters for this employee.</p>
+                    <h2 className="text-lg font-bold text-slate-900">{__('general.edit_recurring_salary_details')}</h2>
+                    <p className="text-sm text-gray-500 mt-0.5">{__('general.modify_the_payroll_parameters_for_this_employee')}</p>
                 </div>
 
                 <form onSubmit={handleUpdate} className="p-6 space-y-6">
                     <div className="space-y-2">
-                        <Label htmlFor="user_id">Employee / User</Label>
+                        <Label htmlFor="user_id">{__('general.employee_user')}</Label>
                         <select id="user_id" required className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm bg-white h-10" value={editSalary.user_id} onChange={e => setEditSalary({...editSalary, user_id: e.target.value})}>
-                            <option value="">Select Employee...</option>
+                            <option value="">{__('general.select_employee')}</option>
                             {usersList.map(u => <option key={u.id} value={u.id}>{u.name} ({u.email})</option>)}
                         </select>
                         {errors.user_id && <span className="text-red-600 text-xs block">{errors.user_id}</span>}
                     </div>
 
                     <div className="space-y-2">
-                        <Label htmlFor="title">Title / Description</Label>
-                        <Input id="title" required value={editSalary.title} onChange={e => setEditSalary({...editSalary, title: e.target.value})} placeholder="e.g. Monthly Salary" />
+                        <Label htmlFor="title">{__('general.title_description')}</Label>
+                        <Input id="title" required value={editSalary.title} onChange={e => setEditSalary({...editSalary, title: e.target.value})} placeholder={__('general.e_g_monthly_salary')} />
                         {errors.title && <span className="text-red-600 text-xs block">{errors.title}</span>}
                     </div>
 
@@ -113,12 +112,12 @@ export default function Edit({ salary, currencies, users }) {
 
                     <div className="space-y-2">
                         <Label htmlFor="reason">Note / Custom Reason (Optional)</Label>
-                        <Input id="reason" value={editSalary.reason} onChange={e => setEditSalary({...editSalary, reason: e.target.value})} placeholder="e.g. Senior Developer Rate" />
+                        <Input id="reason" value={editSalary.reason} onChange={e => setEditSalary({...editSalary, reason: e.target.value})} placeholder={__('general.e_g_senior_developer_rate')} />
                         {errors.reason && <span className="text-red-600 text-xs block">{errors.reason}</span>}
                     </div>
 
                     <div className="space-y-2">
-                        <Label htmlFor="start_date">Start Date</Label>
+                        <Label htmlFor="start_date">{__('general.start_date')}</Label>
                         <Input id="start_date" type="date" required value={editSalary.start_date} onChange={e => setEditSalary({...editSalary, start_date: e.target.value})} />
                         {errors.start_date && <span className="text-red-600 text-xs block">{errors.start_date}</span>}
                     </div>
@@ -145,7 +144,7 @@ export default function Edit({ salary, currencies, users }) {
 
                     {editSalary.recurring === 'week' && (
                         <div className="space-y-2">
-                            <Label htmlFor="week-days">Specific Week Days</Label>
+                            <Label htmlFor="week-days">{__('general.specific_week_days')}</Label>
                             <select
                                 id="week-days"
                                 multiple
@@ -164,7 +163,7 @@ export default function Edit({ salary, currencies, users }) {
 
                     {editSalary.recurring === 'month' && (
                         <div className="space-y-2">
-                            <Label htmlFor="month-days">Specific Month Days</Label>
+                            <Label htmlFor="month-days">{__('general.specific_month_days')}</Label>
                             <select
                                 id="month-days"
                                 multiple
@@ -183,7 +182,7 @@ export default function Edit({ salary, currencies, users }) {
 
                     {editSalary.recurring === 'year' && (
                         <div className="space-y-2">
-                            <Label htmlFor="year-days">Specific Year Dates</Label>
+                            <Label htmlFor="year-days">{__('general.specific_year_dates')}</Label>
                             <select
                                 id="year-days"
                                 multiple
@@ -202,8 +201,7 @@ export default function Edit({ salary, currencies, users }) {
 
                     <div className="flex gap-4 pt-4 border-t">
                         <Button type="submit" className="bg-black hover:bg-slate-800 text-white flex items-center gap-2">
-                            <Save className="w-4 h-4" /> Save Changes
-                        </Button>
+                            <Save className="w-4 h-4" />{__('general.save_changes')}</Button>
                         <Link href={route('admin.recurring_salaries.index')}>
                             <Button type="button" variant="outline">Cancel</Button>
                         </Link>

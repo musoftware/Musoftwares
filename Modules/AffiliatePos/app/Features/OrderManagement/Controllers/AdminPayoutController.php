@@ -55,6 +55,6 @@ class AdminPayoutController extends Controller
 
         $this->paymentService->processPayout($paymentRequest, $request->status);
         
-        return back()->with('success', 'Payout processed successfully');
+        return back()->with('success', __('general.payout_processed_successfully'));
     }
 }

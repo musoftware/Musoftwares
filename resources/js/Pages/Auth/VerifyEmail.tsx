@@ -15,26 +15,18 @@ export default function VerifyEmail({ status }: { status?: string }) {
 
     return (
         <GuestLayout>
-            <Head title="Verify email" />
+            <Head title={__('general.verify_email')} />
 
             <div className="space-y-6">
                 <div className="space-y-1.5">
-                    <h1 className="text-xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">
-                        Check your email
-                    </h1>
-                    <p className="text-xs text-zinc-500 dark:text-zinc-400 font-normal">
-                        We sent a verification link to your inbox.
-                    </p>
+                    <h1 className="text-xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">{__('general.check_your_email')}</h1>
+                    <p className="text-xs text-zinc-500 dark:text-zinc-400 font-normal">{__('general.we_sent_a_verification_link_to_your_inbox')}</p>
                 </div>
 
-                <p className="text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed font-normal">
-                    Please verify your email address to unlock full workspace access. If you didn't receive the email, we will gladly send you another.
-                </p>
+                <p className="text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed font-normal">{__('general.please_verify_your_email_address_to_unlock_full_workspace_access_if_you_didn_t_receive_the_email_we_will_gladly_send_you_another')}</p>
 
                 {status === 'verification-link-sent' && (
-                    <div className="rounded-lg bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-800 p-3 text-xs font-medium text-emerald-600 dark:text-emerald-400">
-                        A new verification link has been sent to your email address.
-                    </div>
+                    <div className="rounded-lg bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-800 p-3 text-xs font-medium text-emerald-600 dark:text-emerald-400">{__('general.a_new_verification_link_has_been_sent_to_your_email_address')}</div>
                 )}
 
                 <form onSubmit={submit} className="space-y-4 pt-2">
@@ -45,10 +37,10 @@ export default function VerifyEmail({ status }: { status?: string }) {
                         {processing ? (
                             <>
                                 <Loader2 className="w-4 h-4 animate-spin text-zinc-400 dark:text-zinc-600" />
-                                <span>Sending verification link...</span>
+                                <span>{__('general.sending_verification_link')}</span>
                             </>
                         ) : (
-                            <span>Resend verification email</span>
+                            <span>{__('general.resend_verification_email')}</span>
                         )}
                     </Button>
 
@@ -58,9 +50,7 @@ export default function VerifyEmail({ status }: { status?: string }) {
                             method="post"
                             as="button"
                             className="text-xs font-medium text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 transition-colors underline underline-offset-4 font-normal"
-                        >
-                            Log out
-                        </Link>
+                        >{__('general.log_out')}</Link>
                     </div>
                 </form>
             </div>

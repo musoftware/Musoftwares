@@ -71,7 +71,7 @@ class AdminGatewayClientController extends Controller
 
         return redirect()
             ->route('admin.musoftware-clients.index')
-            ->with('success', 'Client created successfully.');
+            ->with('success', __('general.client_created_successfully'));
     }
 
     /**
@@ -81,7 +81,7 @@ class AdminGatewayClientController extends Controller
     {
         $this->service->updateClient($gatewayClient, $request->validated());
 
-        return redirect()->back()->with('success', 'Client updated successfully.');
+        return redirect()->back()->with('success', __('general.client_updated_successfully'));
     }
 
     /**
@@ -91,7 +91,7 @@ class AdminGatewayClientController extends Controller
     {
         $this->service->regenerateClientSecret($gatewayClient);
 
-        return redirect()->back()->with('success', 'Secrets regenerated. Make sure to update your integration.');
+        return redirect()->back()->with('success', __('general.secrets_regenerated_make_sure_to_update_your_integration'));
     }
 
     /**
@@ -100,13 +100,13 @@ class AdminGatewayClientController extends Controller
     public function destroy(GatewayClient $gatewayClient)
     {
         if ($gatewayClient->payments()->where('status', 'success')->exists()) {
-            return redirect()->back()->with('danger', 'Cannot delete a client with successful payments.');
+            return redirect()->back()->with('danger', __('general.cannot_delete_a_client_with_successful_payments'));
         }
 
         $gatewayClient->delete();
 
         return redirect()
             ->route('admin.musoftware-clients.index')
-            ->with('success', 'Client deleted successfully.');
+            ->with('success', __('general.client_deleted_successfully'));
     }
 }

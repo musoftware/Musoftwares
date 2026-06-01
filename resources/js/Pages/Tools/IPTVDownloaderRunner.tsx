@@ -448,8 +448,8 @@ export default function IPTVDownloaderRunner() {
                         <Tv className="w-7 h-7 text-indigo-600 animate-spin" />
                     </div>
                     <div className="space-y-2">
-                        <h3 className="font-bold text-slate-800">Linking Runtime Engine...</h3>
-                        <p className="text-xs text-slate-500 leading-relaxed">Ensure the Musoftware desktop client is running on your computer to activate local playback and recording services.</p>
+                        <h3 className="font-bold text-slate-800">{__('general.linking_runtime_engine')}</h3>
+                        <p className="text-xs text-slate-500 leading-relaxed">{__('general.ensure_the_musoftware_desktop_client_is_running_on_your_computer_to_activate_local_playback_and_recording_services')}</p>
                     </div>
                     <div className="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
                         <div className="w-1/2 h-full bg-indigo-600 rounded-full animate-infinite-loading" />
@@ -469,8 +469,8 @@ export default function IPTVDownloaderRunner() {
                             <Tv className="w-4.5 h-4.5 text-white" />
                         </div>
                         <div>
-                            <span className="font-bold text-sm tracking-tight leading-none block">IPTV Recorder</span>
-                            <span className="text-[10px] font-bold text-indigo-600 uppercase tracking-widest mt-0.5 block">Desktop SDK</span>
+                            <span className="font-bold text-sm tracking-tight leading-none block">{__('general.iptv_recorder')}</span>
+                            <span className="text-[10px] font-bold text-indigo-600 uppercase tracking-widest mt-0.5 block">{__('general.desktop_sdk')}</span>
                         </div>
                     </div>
 
@@ -480,29 +480,26 @@ export default function IPTVDownloaderRunner() {
                             onClick={() => setActiveWorkspace('dashboard')}
                             className={`w-full justify-start gap-3 h-11 text-xs tracking-wide ${activeWorkspace === 'dashboard' ? 'bg-indigo-50 text-indigo-600 font-semibold' : 'text-slate-500 font-medium'}`}
                         >
-                            <Star className="w-4 h-4" /> Overview Dashboard
-                        </Button>
+                            <Star className="w-4 h-4" />{__('general.overview_dashboard')}</Button>
                         <Button
                             variant="ghost"
                             onClick={() => setActiveWorkspace('playlists')}
                             className={`w-full justify-start gap-3 h-11 text-xs tracking-wide ${activeWorkspace === 'playlists' ? 'bg-indigo-50 text-indigo-600 font-semibold' : 'text-slate-500 font-medium'}`}
                         >
-                            <List className="w-4 h-4" /> Manage Playlists
-                        </Button>
+                            <List className="w-4 h-4" />{__('general.manage_playlists')}</Button>
                         <Button
                             variant="ghost"
                             onClick={() => setActiveWorkspace('browser')}
                             className={`w-full justify-start gap-3 h-11 text-xs tracking-wide ${activeWorkspace === 'browser' ? 'bg-indigo-50 text-indigo-600 font-semibold' : 'text-slate-500 font-medium'}`}
                         >
-                            <Tv className="w-4 h-4" /> Channel Browser
-                        </Button>
+                            <Tv className="w-4 h-4" />{__('general.channel_browser')}</Button>
                         <Button
                             variant="ghost"
                             onClick={() => setActiveWorkspace('downloads')}
                             className={`w-full justify-start gap-3 h-11 text-xs tracking-wide ${activeWorkspace === 'downloads' ? 'bg-indigo-50 text-indigo-600 font-semibold' : 'text-slate-500 font-medium'}`}
                         >
                             <Download className="w-4 h-4" />
-                            <span className="flex-1 text-left">Downloads & Recs</span>
+                            <span className="flex-1 text-left">{__('general.downloads_recs')}</span>
                             {activeDownloadsCount > 0 && (
                                 <Badge variant="destructive" className="animate-pulse text-[9px] px-2 py-0.5 uppercase">
                                     {activeDownloadsCount} Active
@@ -516,8 +513,8 @@ export default function IPTVDownloaderRunner() {
                     <div className="flex items-center gap-3 px-1.5 py-1">
                         <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse border-2 border-white shadow-sm shadow-emerald-200" />
                         <div>
-                            <span className="text-[10px] font-black uppercase text-slate-800 tracking-wider">Engine Connected</span>
-                            <span className="text-[9px] text-slate-400 block mt-0.5">Local SQLite & Workers Ready</span>
+                            <span className="text-[10px] font-black uppercase text-slate-800 tracking-wider">{__('general.engine_connected')}</span>
+                            <span className="text-[9px] text-slate-400 block mt-0.5">{__('general.local_sqlite_workers_ready')}</span>
                         </div>
                     </div>
                 </div>
@@ -547,8 +544,8 @@ export default function IPTVDownloaderRunner() {
                         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-300">
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <h1 className="text-2xl font-black tracking-tight text-slate-900">Workspace Dashboard</h1>
-                                    <p className="text-sm text-slate-400 mt-1">Manage and record local streams directly on your hard drive.</p>
+                                    <h1 className="text-2xl font-black tracking-tight text-slate-900">{__('general.workspace_dashboard')}</h1>
+                                    <p className="text-sm text-slate-400 mt-1">{__('general.manage_and_record_local_streams_directly_on_your_hard_drive')}</p>
                                 </div>
                             </div>
 
@@ -559,7 +556,7 @@ export default function IPTVDownloaderRunner() {
                                         <List className="w-5 h-5 text-indigo-600" />
                                     </div>
                                     <div>
-                                        <p className="text-[10px] font-black uppercase text-slate-400 tracking-wider">Loaded Playlists</p>
+                                        <p className="text-[10px] font-black uppercase text-slate-400 tracking-wider">{__('general.loaded_playlists')}</p>
                                         <p className="text-2xl font-extrabold text-slate-900 mt-1">{playlists.length}</p>
                                     </div>
                                 </div>
@@ -569,7 +566,7 @@ export default function IPTVDownloaderRunner() {
                                         <Bookmark className="w-5 h-5 text-rose-600" />
                                     </div>
                                     <div>
-                                        <p className="text-[10px] font-black uppercase text-slate-400 tracking-wider">Bookmarked Channels</p>
+                                        <p className="text-[10px] font-black uppercase text-slate-400 tracking-wider">{__('general.bookmarked_channels')}</p>
                                         <p className="text-2xl font-extrabold text-slate-900 mt-1">
                                             {playlists.reduce((acc, curr) => acc + (curr.bookmarkedCount || 0), 0)}
                                         </p>
@@ -581,7 +578,7 @@ export default function IPTVDownloaderRunner() {
                                         <Download className="w-5 h-5 text-emerald-600" />
                                     </div>
                                     <div>
-                                        <p className="text-[10px] font-black uppercase text-slate-400 tracking-wider">Downloads History</p>
+                                        <p className="text-[10px] font-black uppercase text-slate-400 tracking-wider">{__('general.downloads_history_1')}</p>
                                         <p className="text-2xl font-extrabold text-slate-900 mt-1">{downloads.length}</p>
                                     </div>
                                 </div>
@@ -592,24 +589,19 @@ export default function IPTVDownloaderRunner() {
                                 <div className="absolute top-0 right-0 w-80 h-80 bg-indigo-500/10 rounded-full blur-3xl" />
                                 <div className="relative z-10 max-w-xl space-y-4">
                                     <div className="flex items-center gap-2 text-[10px] font-black text-indigo-400 tracking-widest uppercase">
-                                        <ShieldCheck className="w-4 h-4" /> Apple-Grade Architecture
-                                    </div>
-                                    <h2 className="text-xl font-bold tracking-tight">Zero-Install Stream Recording</h2>
-                                    <p className="text-sm text-slate-400 leading-relaxed">Our native Javascript engine parses live HLS indexes (.m3u8), tracks duplicates, and writes seamless TS stream chunks natively. No ffmpeg setup or complex local drivers required.</p>
+                                        <ShieldCheck className="w-4 h-4" />{__('general.apple_grade_architecture')}</div>
+                                    <h2 className="text-xl font-bold tracking-tight">{__('general.zero_install_stream_recording')}</h2>
+                                    <p className="text-sm text-slate-400 leading-relaxed">{__('general.our_native_javascript_engine_parses_live_hls_indexes_m3u8_tracks_duplicates_and_writes_seamless_ts_stream_chunks_natively_no_ffmpeg_setup_or_complex_local_drivers_required')}</p>
                                     <div className="flex gap-4 pt-2">
                                         <Button 
                                             onClick={() => setActiveWorkspace('playlists')} 
                                             variant="secondary"
                                             className="text-xs font-extrabold uppercase h-10 px-6 shadow-md"
-                                        >
-                                            Add M3U Playlist
-                                        </Button>
+                                        >{__('general.add_m3u_playlist')}</Button>
                                         <Button 
                                             onClick={() => setActiveWorkspace('browser')} 
                                             className="bg-indigo-600 text-white hover:bg-indigo-700 text-xs font-extrabold uppercase h-10 px-6 border border-indigo-500/30"
-                                        >
-                                            Browse Channels
-                                        </Button>
+                                        >{__('general.browse_channels')}</Button>
                                     </div>
                                 </div>
                             </div>
@@ -620,37 +612,37 @@ export default function IPTVDownloaderRunner() {
                     {activeWorkspace === 'playlists' && (
                         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-300">
                             <div>
-                                <h1 className="text-2xl font-black tracking-tight text-slate-900">Manage IPTV Playlists</h1>
-                                <p className="text-sm text-slate-400 mt-1">Import online playlists or load raw local .m3u files.</p>
+                                <h1 className="text-2xl font-black tracking-tight text-slate-900">{__('general.manage_iptv_playlists')}</h1>
+                                <p className="text-sm text-slate-400 mt-1">{__('general.import_online_playlists_or_load_raw_local_m3u_files')}</p>
                             </div>
 
                             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                                 {/* Left form box */}
                                 <div className="lg:col-span-1 space-y-6">
                                     <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm space-y-5">
-                                        <h3 className="font-extrabold text-slate-800 text-sm">Add New Playlist</h3>
+                                        <h3 className="font-extrabold text-slate-800 text-sm">{__('general.add_new_playlist')}</h3>
 
                                         <div className="flex bg-slate-100 p-1 rounded-xl">
-                                            <Button variant="ghost" onClick={() => setPlaylistType('m3u')} className={`flex-1 h-8 text-[10px] font-bold uppercase rounded-lg ${playlistType === 'm3u' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200/50'}`}>M3U URL / File</Button>
-                                            <Button variant="ghost" onClick={() => setPlaylistType('xtream')} className={`flex-1 h-8 text-[10px] font-bold uppercase rounded-lg ${playlistType === 'xtream' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200/50'}`}>Xtream API</Button>
+                                            <Button variant="ghost" onClick={() => setPlaylistType('m3u')} className={`flex-1 h-8 text-[10px] font-bold uppercase rounded-lg ${playlistType === 'm3u' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200/50'}`}>{__('general.m3u_url_file')}</Button>
+                                            <Button variant="ghost" onClick={() => setPlaylistType('xtream')} className={`flex-1 h-8 text-[10px] font-bold uppercase rounded-lg ${playlistType === 'xtream' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200/50'}`}>{__('general.xtream_api')}</Button>
                                         </div>
 
                                         <div className="space-y-4">
                                             <div className="space-y-1.5">
-                                                <Label className="text-[10px] font-black text-slate-400 uppercase">Playlist Name</Label>
-                                                <Input type="text" value={playlistName} onChange={e => setPlaylistName(e.target.value)} placeholder="e.g. Premium HD US" />
+                                                <Label className="text-[10px] font-black text-slate-400 uppercase">{__('general.playlist_name')}</Label>
+                                                <Input type="text" value={playlistName} onChange={e => setPlaylistName(e.target.value)} placeholder={__('general.e_g_premium_hd_us')} />
                                             </div>
 
                                             {playlistType === 'm3u' ? (
                                                 <div className="space-y-1.5">
-                                                    <Label className="text-[10px] font-black text-slate-400 uppercase">M3U Playlist URL</Label>
-                                                    <Input type="url" value={playlistUrl} onChange={e => setPlaylistUrl(e.target.value)} placeholder="http://example.com/get.php?auth=..." className="font-mono" />
+                                                    <Label className="text-[10px] font-black text-slate-400 uppercase">{__('general.m3u_playlist_url')}</Label>
+                                                    <Input type="url" value={playlistUrl} onChange={e => setPlaylistUrl(e.target.value)} placeholder={__('general.http_example_com_get_php_auth')} className="font-mono" />
                                                 </div>
                                             ) : (
                                                 <>
                                                     <div className="space-y-1.5">
-                                                        <Label className="text-[10px] font-black text-slate-400 uppercase">Server Host URL</Label>
-                                                        <Input type="url" value={xtreamHost} onChange={e => setXtreamHost(e.target.value)} placeholder="http://example.com:8080" className="font-mono" />
+                                                        <Label className="text-[10px] font-black text-slate-400 uppercase">{__('general.server_host_url')}</Label>
+                                                        <Input type="url" value={xtreamHost} onChange={e => setXtreamHost(e.target.value)} placeholder={__('general.http_example_com_8080')} className="font-mono" />
                                                     </div>
                                                     <div className="grid grid-cols-2 gap-4">
                                                         <div className="space-y-1.5">
@@ -681,12 +673,12 @@ export default function IPTVDownloaderRunner() {
                                                 </Button>
                                                 <div className="relative flex items-center justify-center my-4">
                                                     <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-slate-100" /></div>
-                                                    <span className="relative px-3 bg-white text-[9px] font-bold text-slate-400 uppercase">Or Upload File</span>
+                                                    <span className="relative px-3 bg-white text-[9px] font-bold text-slate-400 uppercase">{__('general.or_upload_file')}</span>
                                                 </div>
                                                 <Label className="w-full flex flex-col items-center justify-center py-5 border border-dashed border-slate-200 rounded-2xl hover:bg-slate-50/50 transition-all cursor-pointer">
                                                     <Folder className="w-6 h-6 text-slate-400 mb-1.5" />
-                                                    <span className="text-[10px] font-bold text-slate-700">Choose .m3u playlist file</span>
-                                                    <span className="text-[9px] text-slate-400 mt-0.5">Loads directly to local database</span>
+                                                    <span className="text-[10px] font-bold text-slate-700">{__('general.choose_m3u_playlist_file')}</span>
+                                                    <span className="text-[9px] text-slate-400 mt-0.5">{__('general.loads_directly_to_local_database')}</span>
                                                     <Input type="file" accept=".m3u,.m3u8,.txt" onChange={handleFileUpload} className="hidden" />
                                                 </Label>
                                             </>
@@ -702,13 +694,13 @@ export default function IPTVDownloaderRunner() {
                                 {/* Right list */}
                                 <div className="lg:col-span-2 space-y-4">
                                     <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm space-y-4">
-                                        <h3 className="font-extrabold text-slate-800 text-sm">Loaded Playlists</h3>
+                                        <h3 className="font-extrabold text-slate-800 text-sm">{__('general.loaded_playlists')}</h3>
                                         
                                         {playlists.length === 0 ? (
                                             <div className="py-20 text-center border border-dashed border-slate-200 rounded-2xl">
                                                 <Tv className="w-8 h-8 text-slate-300 mx-auto mb-3" />
-                                                <h3 className="text-xs font-bold text-slate-900">No Playlists Installed</h3>
-                                                <p className="text-xs text-slate-500 mt-1 max-w-xs mx-auto">Input a streaming subscription URL or load an M3U file to index television channels locally.</p>
+                                                <h3 className="text-xs font-bold text-slate-900">{__('general.no_playlists_installed')}</h3>
+                                                <p className="text-xs text-slate-500 mt-1 max-w-xs mx-auto">{__('general.input_a_streaming_subscription_url_or_load_an_m3u_file_to_index_television_channels_locally')}</p>
                                             </div>
                                         ) : (
                                             <div className="divide-y divide-slate-100">
@@ -734,9 +726,7 @@ export default function IPTVDownloaderRunner() {
                                                                 size="sm"
                                                                 onClick={() => { setSelectedPlaylistId(pl.id); setActiveWorkspace('browser'); }}
                                                                 className="h-8 text-[10px] font-bold uppercase"
-                                                            >
-                                                                Open Browser
-                                                            </Button>
+                                                            >{__('general.open_browser')}</Button>
                                                             <Button
                                                                 variant="ghost"
                                                                 size="icon"
@@ -761,8 +751,8 @@ export default function IPTVDownloaderRunner() {
                         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-300">
                             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                                 <div>
-                                    <h1 className="text-2xl font-black tracking-tight text-slate-900">Channel Index Browser</h1>
-                                    <p className="text-sm text-slate-400 mt-1">Search channels, toggle bookmarks, and initiate recordings.</p>
+                                    <h1 className="text-2xl font-black tracking-tight text-slate-900">{__('general.channel_index_browser')}</h1>
+                                    <p className="text-sm text-slate-400 mt-1">{__('general.search_channels_toggle_bookmarks_and_initiate_recordings')}</p>
                                 </div>
 
                                 <div className="flex items-center gap-3">
@@ -771,7 +761,7 @@ export default function IPTVDownloaderRunner() {
                                         onChange={(e: any) => { setSelectedPlaylistId(e.target.value); setSelectedGroup(''); }}
                                         className="h-9 w-48 min-w-0 rounded-lg border border-input bg-white px-2.5 py-1 text-sm font-bold transition-colors outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
                                     >
-                                        <option value="">Select Playlist...</option>
+                                        <option value="">{__('general.select_playlist')}</option>
                                         {playlists.map(pl => <option key={pl.id} value={pl.id}>{pl.name}</option>)}
                                     </select>
 
@@ -780,15 +770,14 @@ export default function IPTVDownloaderRunner() {
                                         onClick={() => setBookmarkedOnly(!bookmarkedOnly)}
                                         className="font-bold gap-1.5"
                                     >
-                                        <Star className={`w-3.5 h-3.5 ${bookmarkedOnly ? 'fill-white' : ''}`} /> Favorites Only
-                                    </Button>
+                                        <Star className={`w-3.5 h-3.5 ${bookmarkedOnly ? 'fill-white' : ''}`} />{__('general.favorites_only')}</Button>
                                 </div>
                             </div>
 
                             {/* Stream Type Tabs */}
                             {playlists.length > 0 && selectedPlaylistId && (
                                 <div className="flex border-b border-slate-200">
-                                    <Button variant="ghost" onClick={() => { setStreamType('live'); setSelectedGroup(''); }} className={`px-6 py-3 rounded-none h-auto text-xs font-bold uppercase border-b-2 ${streamType === 'live' ? 'text-indigo-600 border-indigo-600' : 'text-slate-400 border-transparent hover:text-slate-700'}`}>Live TV</Button>
+                                    <Button variant="ghost" onClick={() => { setStreamType('live'); setSelectedGroup(''); }} className={`px-6 py-3 rounded-none h-auto text-xs font-bold uppercase border-b-2 ${streamType === 'live' ? 'text-indigo-600 border-indigo-600' : 'text-slate-400 border-transparent hover:text-slate-700'}`}>{__('general.live_tv')}</Button>
                                     <Button variant="ghost" onClick={() => { setStreamType('vod'); setSelectedGroup(''); }} className={`px-6 py-3 rounded-none h-auto text-xs font-bold uppercase border-b-2 ${streamType === 'vod' ? 'text-indigo-600 border-indigo-600' : 'text-slate-400 border-transparent hover:text-slate-700'}`}>Movies (VOD)</Button>
                                     <Button variant="ghost" onClick={() => { setStreamType('series'); setSelectedGroup(''); }} className={`px-6 py-3 rounded-none h-auto text-xs font-bold uppercase border-b-2 ${streamType === 'series' ? 'text-indigo-600 border-indigo-600' : 'text-slate-400 border-transparent hover:text-slate-700'}`}>Series</Button>
                                 </div>
@@ -797,10 +786,8 @@ export default function IPTVDownloaderRunner() {
                             {playlists.length === 0 ? (
                                 <Card className="py-20 text-center border-dashed">
                                     <Tv className="w-8 h-8 text-slate-300 mx-auto mb-3" />
-                                    <h3 className="text-xs font-bold text-slate-900">No Playlists Registered</h3>
-                                    <Button onClick={() => setActiveWorkspace('playlists')} className="mt-4 uppercase font-bold text-xs">
-                                        Go Install Playlist
-                                    </Button>
+                                    <h3 className="text-xs font-bold text-slate-900">{__('general.no_playlists_registered')}</h3>
+                                    <Button onClick={() => setActiveWorkspace('playlists')} className="mt-4 uppercase font-bold text-xs">{__('general.go_install_playlist')}</Button>
                                 </Card>
                             ) : (
                                 <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
@@ -815,7 +802,7 @@ export default function IPTVDownloaderRunner() {
                                                     type="text"
                                                     value={searchQuery}
                                                     onChange={e => setSearchQuery(e.target.value)}
-                                                    placeholder="Search channels..."
+                                                    placeholder={__('general.search_channels')}
                                                     className="pl-9 h-10 text-xs font-semibold bg-slate-50"
                                                 />
                                             </div>
@@ -826,7 +813,7 @@ export default function IPTVDownloaderRunner() {
                                                     onClick={() => setSelectedGroup('')}
                                                     className={`w-full justify-between h-auto py-2 text-xs font-bold ${selectedGroup === '' ? 'bg-slate-100 text-slate-900' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'}`}
                                                 >
-                                                    <span>All Groups</span>
+                                                    <span>{__('general.all_groups')}</span>
                                                     <Badge variant="secondary" className="text-[10px] bg-slate-200/50">{totalChannelsCount}</Badge>
                                                 </Button>
                                                 
@@ -851,8 +838,8 @@ export default function IPTVDownloaderRunner() {
                                             {channels.length === 0 ? (
                                                 <div className="py-24 text-center">
                                                     <Search className="w-8 h-8 text-slate-300 mx-auto mb-3" />
-                                                    <h3 className="text-xs font-bold text-slate-900">No Matching Channels</h3>
-                                                    <p className="text-xs text-slate-500 mt-1">Try relaxing filters or changing search criteria</p>
+                                                    <h3 className="text-xs font-bold text-slate-900">{__('general.no_matching_channels')}</h3>
+                                                    <p className="text-xs text-slate-500 mt-1">{__('general.try_relaxing_filters_or_changing_search_criteria')}</p>
                                                 </div>
                                             ) : (
                                                 <div className="divide-y divide-slate-100">
@@ -927,14 +914,14 @@ export default function IPTVDownloaderRunner() {
                     {activeWorkspace === 'downloads' && (
                         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-300">
                             <div>
-                                <h1 className="text-2xl font-black tracking-tight text-slate-900">Downloads & Recordings</h1>
-                                <p className="text-sm text-slate-400 mt-1">Track active stream recording sessions and review files saved locally.</p>
+                                <h1 className="text-2xl font-black tracking-tight text-slate-900">{__('general.downloads_recordings')}</h1>
+                                <p className="text-sm text-slate-400 mt-1">{__('general.track_active_stream_recording_sessions_and_review_files_saved_locally')}</p>
                             </div>
 
                             {/* Active recording progress cards */}
                             {Object.keys(downloadTasks).length > 0 && (
                                 <div className="space-y-4">
-                                    <h3 className="font-extrabold text-slate-800 text-xs uppercase tracking-wider">Active Capture Sessions</h3>
+                                    <h3 className="font-extrabold text-slate-800 text-xs uppercase tracking-wider">{__('general.active_capture_sessions')}</h3>
                                     
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         {Object.values(downloadTasks).map(task => (
@@ -950,8 +937,7 @@ export default function IPTVDownloaderRunner() {
                                                         onClick={() => handleStopTask(task.id)}
                                                         className="h-7 bg-rose-50 hover:bg-rose-100 text-rose-600 border-rose-100 text-[9px] font-bold uppercase gap-1 shrink-0"
                                                     >
-                                                        <Square className="w-2.5 h-2.5 fill-rose-600" /> Stop Rec
-                                                    </Button>
+                                                        <Square className="w-2.5 h-2.5 fill-rose-600" />{__('general.stop_rec')}</Button>
                                                 </div>
 
                                                 <div className="space-y-1.5">
@@ -977,9 +963,7 @@ export default function IPTVDownloaderRunner() {
                                                         <Terminal className="w-3.5 h-3.5" />
                                                         {showLogsTaskId === task.id ? 'Hide Logs console' : 'View execution logs'}
                                                     </Button>
-                                                    <span className="text-[9px] px-2 py-0.5 bg-indigo-50 border border-indigo-100 rounded text-indigo-700 font-bold uppercase tracking-wider leading-none">
-                                                        Recording Live
-                                                    </span>
+                                                    <span className="text-[9px] px-2 py-0.5 bg-indigo-50 border border-indigo-100 rounded text-indigo-700 font-bold uppercase tracking-wider leading-none">{__('general.recording_live')}</span>
                                                 </div>
 
                                                 {/* Logs Terminal view */}
@@ -988,7 +972,7 @@ export default function IPTVDownloaderRunner() {
                                                         <p className="text-slate-500">// Stream worker terminal stdout capture</p>
                                                         {taskLogs[task.id]?.map((logLine, idx) => (
                                                             <p key={idx}>{logLine}</p>
-                                                        )) || <p className="text-slate-500">Awaiting stream packets...</p>}
+                                                        )) || <p className="text-slate-500">{__('general.awaiting_stream_packets')}</p>}
                                                     </div>
                                                 )}
                                             </div>
@@ -999,13 +983,13 @@ export default function IPTVDownloaderRunner() {
 
                             {/* Completed History List */}
                             <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm space-y-4">
-                                <h3 className="font-extrabold text-slate-800 text-sm">Download History & Archive</h3>
+                                <h3 className="font-extrabold text-slate-800 text-sm">{__('general.download_history_archive')}</h3>
 
                                 {downloads.length === 0 ? (
                                     <div className="py-20 text-center">
                                         <Download className="w-8 h-8 text-slate-300 mx-auto mb-3" />
-                                        <h3 className="text-xs font-bold text-slate-900 font-semibold">No recordings yet</h3>
-                                        <p className="text-xs text-slate-500 mt-1 max-w-xs mx-auto">Active and completed recording files appear here. Trigger a capture session to begin.</p>
+                                        <h3 className="text-xs font-bold text-slate-900 font-semibold">{__('general.no_recordings_yet')}</h3>
+                                        <p className="text-xs text-slate-500 mt-1 max-w-xs mx-auto">{__('general.active_and_completed_recording_files_appear_here_trigger_a_capture_session_to_begin')}</p>
                                     </div>
                                 ) : (
                                     <div className="divide-y divide-slate-100">
@@ -1081,7 +1065,7 @@ export default function IPTVDownloaderRunner() {
                                     <Tv className="w-4.5 h-4.5 text-indigo-600" />
                                 </div>
                                 <div>
-                                    <h3 className="font-extrabold text-slate-950 text-sm">Configure Stream Recording</h3>
+                                    <h3 className="font-extrabold text-slate-950 text-sm">{__('general.configure_stream_recording')}</h3>
                                     <span className="text-[10px] text-slate-400 block font-semibold mt-0.5">{showRecordConfig.name}</span>
                                 </div>
                             </div>
@@ -1092,7 +1076,7 @@ export default function IPTVDownloaderRunner() {
 
                         {/* Presets and Custom timing selector */}
                         <div className="space-y-4">
-                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-wide">Recording Duration</label>
+                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-wide">{__('general.recording_duration')}</label>
                             
                             <div className="grid grid-cols-2 gap-2.5">
                                 {[
@@ -1114,9 +1098,7 @@ export default function IPTVDownloaderRunner() {
                                     variant={recordDurationPreset === -1 ? "default" : "outline"}
                                     onClick={() => setRecordDurationPreset(-1)}
                                     className={`h-auto py-2.5 text-[10px] font-bold col-span-2 ${recordDurationPreset === -1 ? 'bg-indigo-600 hover:bg-indigo-700' : 'text-slate-600 hover:bg-slate-100'}`}
-                                >
-                                    Custom Seconds Duration
-                                </Button>
+                                >{__('general.custom_seconds_duration')}</Button>
                             </div>
 
                             {recordDurationPreset === -1 && (
@@ -1125,7 +1107,7 @@ export default function IPTVDownloaderRunner() {
                                         type="number"
                                         value={recordDurationCustom}
                                         onChange={e => setRecordDurationCustom(e.target.value)}
-                                        placeholder="Enter duration in seconds (e.g. 180)"
+                                        placeholder={__('general.enter_duration_in_seconds_e_g_180')}
                                         className="bg-slate-50 font-semibold"
                                     />
                                 </div>
@@ -1136,9 +1118,7 @@ export default function IPTVDownloaderRunner() {
                             onClick={triggerDownload}
                             className="w-full h-11 bg-indigo-600 hover:bg-indigo-700 text-xs font-black uppercase"
                         >
-                            <Play className="w-4 h-4 fill-white mr-2" />
-                            Start Capture Session
-                        </Button>
+                            <Play className="w-4 h-4 fill-white mr-2" />{__('general.start_capture_session')}</Button>
                     </div>
                 </div>
             )}

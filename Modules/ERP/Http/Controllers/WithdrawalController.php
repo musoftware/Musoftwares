@@ -108,7 +108,7 @@ class WithdrawalController extends Controller
                 ]);
             });
 
-            return back()->with('success', 'Withdrawal request created.');
+            return back()->with('success', __('general.withdrawal_request_created'));
         } catch (\Exception $e) {
             return back()->withErrors(['amount' => $e->getMessage()]);
         }
@@ -130,7 +130,7 @@ class WithdrawalController extends Controller
             'reviewed_at' => now(),
         ]);
 
-        return back()->with('success', 'Withdrawal approved.');
+        return back()->with('success', __('general.withdrawal_approved'));
     }
 
     public function markPaid(Request $request, Withdrawal $withdrawal)
@@ -196,7 +196,7 @@ class WithdrawalController extends Controller
                 ]);
             });
 
-            return back()->with('success', 'Withdrawal marked as paid and client balance deducted.');
+            return back()->with('success', __('general.withdrawal_marked_as_paid_and_client_balance_deducted'));
         } catch (\Exception $e) {
             return back()->withErrors(['amount' => $e->getMessage()]);
         }
@@ -223,7 +223,7 @@ class WithdrawalController extends Controller
             'reviewed_at'  => now(),
         ]);
 
-        return back()->with('success', 'Withdrawal rejected.');
+        return back()->with('success', __('general.withdrawal_rejected'));
     }
 
     // ── Cancel ────────────────────────────────────────────────────────
@@ -238,7 +238,7 @@ class WithdrawalController extends Controller
 
         $withdrawal->update(['status' => 'cancelled']);
 
-        return back()->with('success', 'Withdrawal cancelled.');
+        return back()->with('success', __('general.withdrawal_cancelled'));
     }
 
     // ── Auth guard helper ─────────────────────────────────────────────
@@ -251,7 +251,7 @@ class WithdrawalController extends Controller
     {
         $tenant = $this->resolveTenant();
         if ($withdrawal->tenant_id !== $tenant->id) {
-            abort(403, 'Unauthorized access to this withdrawal.');
+            abort(403, __('general.unauthorized_access_to_this_withdrawal'));
         }
     }
 }

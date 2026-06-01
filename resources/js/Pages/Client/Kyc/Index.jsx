@@ -78,7 +78,7 @@ export default function KycIndex({ auth, kycStatus, documents, missingDocs, requ
 
     return (
         <AuthenticatedLayout user={auth.user} header={<h2 className="font-semibold text-xl text-gray-800 leading-tight">Identity Verification (KYC)</h2>}>
-            <Head title="KYC Verification" />
+            <Head title={__('general.kyc_verification')} />
 
             <div className="max-w-5xl mx-auto py-10 px-4 sm:px-6 lg:px-8 space-y-8">
                 {/* STATUS BANNER */}
@@ -122,8 +122,8 @@ export default function KycIndex({ auth, kycStatus, documents, missingDocs, requ
                         {/* REQUIRED DOCUMENTS */}
                         <Card>
                             <CardHeader>
-                                <CardTitle className="flex items-center gap-2"><UploadCloud className="w-5 h-5" /> Upload Documents</CardTitle>
-                                <CardDescription>Please provide clear, readable photos of the following documents.</CardDescription>
+                                <CardTitle className="flex items-center gap-2"><UploadCloud className="w-5 h-5" />{__('general.upload_documents')}</CardTitle>
+                                <CardDescription>{__('general.please_provide_clear_readable_photos_of_the_following_documents')}</CardDescription>
                             </CardHeader>
                             <CardContent className="space-y-6">
                                 {[
@@ -196,18 +196,16 @@ export default function KycIndex({ auth, kycStatus, documents, missingDocs, requ
                             <CardFooter className="bg-slate-50 border-t border-slate-100 flex justify-between p-6 rounded-b-xl">
                                 <div className="text-xs text-slate-500">
                                     {missingDocs.length > 0 ? (
-                                        <span className="text-amber-600 flex items-center gap-1"><AlertCircle className="w-3.5 h-3.5"/> Missing required documents</span>
+                                        <span className="text-amber-600 flex items-center gap-1"><AlertCircle className="w-3.5 h-3.5"/>{__('general.missing_required_documents')}</span>
                                     ) : (
-                                        <span className="text-emerald-600 flex items-center gap-1"><CheckCircle2 className="w-3.5 h-3.5"/> All required documents uploaded</span>
+                                        <span className="text-emerald-600 flex items-center gap-1"><CheckCircle2 className="w-3.5 h-3.5"/>{__('general.all_required_documents_uploaded')}</span>
                                     )}
                                 </div>
                                 <Button 
                                     onClick={handleSubmitForReview} 
                                     disabled={!canSubmit}
                                     className={canSubmit ? 'bg-indigo-600 hover:bg-indigo-700 text-white' : ''}
-                                >
-                                    Submit Application
-                                </Button>
+                                >{__('general.submit_application')}</Button>
                             </CardFooter>
                         </Card>
 
@@ -215,29 +213,27 @@ export default function KycIndex({ auth, kycStatus, documents, missingDocs, requ
                         <div className="space-y-6">
                             <Card>
                                 <CardHeader>
-                                    <CardTitle className="text-base font-semibold">Verification Guidelines</CardTitle>
+                                    <CardTitle className="text-base font-semibold">{__('general.verification_guidelines')}</CardTitle>
                                 </CardHeader>
                                 <CardContent className="space-y-4 text-sm text-slate-600">
                                     <div className="flex items-start gap-3">
                                         <div className="w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center flex-shrink-0 text-slate-500 font-bold text-xs mt-0.5">1</div>
-                                        <p>Ensure documents are well-lit, fully visible, and not cut off at the edges.</p>
+                                        <p>{__('general.ensure_documents_are_well_lit_fully_visible_and_not_cut_off_at_the_edges')}</p>
                                     </div>
                                     <div className="flex items-start gap-3">
                                         <div className="w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center flex-shrink-0 text-slate-500 font-bold text-xs mt-0.5">2</div>
-                                        <p>Accepted formats: JPG, PNG, PDF. Maximum file size: 5MB per document.</p>
+                                        <p>{__('general.accepted_formats_jpg_png_pdf_maximum_file_size_5mb_per_document')}</p>
                                     </div>
                                     <div className="flex items-start gap-3">
                                         <div className="w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center flex-shrink-0 text-slate-500 font-bold text-xs mt-0.5">3</div>
-                                        <p>For the selfie, hold your ID next to your face so both are clearly readable.</p>
+                                        <p>{__('general.for_the_selfie_hold_your_id_next_to_your_face_so_both_are_clearly_readable')}</p>
                                     </div>
                                 </CardContent>
                             </Card>
 
                             <div className="bg-indigo-50/50 border border-indigo-100 p-5 rounded-xl space-y-2">
-                                <h4 className="font-semibold text-indigo-900 text-sm flex items-center gap-2"><ShieldCheck className="w-4 h-4 text-indigo-500"/> Bank-Grade Security</h4>
-                                <p className="text-xs text-indigo-700/80 leading-relaxed">
-                                    Your documents are encrypted and stored securely. They are only used for identity verification in compliance with anti-money laundering (AML) regulations and are never shared with third parties.
-                                </p>
+                                <h4 className="font-semibold text-indigo-900 text-sm flex items-center gap-2"><ShieldCheck className="w-4 h-4 text-indigo-500"/>{__('general.bank_grade_security')}</h4>
+                                <p className="text-xs text-indigo-700/80 leading-relaxed">{__('general.your_documents_are_encrypted_and_stored_securely_they_are_only_used_for_identity_verification_in_compliance_with_anti_money_laundering_aml_regulations_and_are_never_shared_with_third_parties')}</p>
                             </div>
                         </div>
                     </div>

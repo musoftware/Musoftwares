@@ -61,9 +61,7 @@ export default function IndexAdmin({ auth, withdrawals }) {
                                             <th className="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase">
                                                 Amount
                                             </th>
-                                            <th className="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase">
-                                                Bank Info
-                                            </th>
+                                            <th className="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase">{__('general.bank_info')}</th>
                                             <th className="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase">
                                                 Status
                                             </th>
@@ -150,9 +148,7 @@ export default function IndexAdmin({ auth, withdrawals }) {
                                                                 })
                                                             }
                                                             className="text-green-600 hover:text-green-900"
-                                                        >
-                                                            Mark Paid
-                                                        </button>
+                                                        >{__('general.mark_paid')}</button>
                                                     )}
                                                 </td>
                                             </tr>
@@ -162,9 +158,7 @@ export default function IndexAdmin({ auth, withdrawals }) {
                                                 <td
                                                     colSpan="6"
                                                     className="px-6 py-4 text-center text-sm text-gray-500"
-                                                >
-                                                    No withdrawals found.
-                                                </td>
+                                                >{__('general.no_withdrawals_found')}</td>
                                             </tr>
                                         )}
                                     </tbody>
@@ -195,13 +189,11 @@ export default function IndexAdmin({ auth, withdrawals }) {
                             {actionModal.type === 'reject' ? (
                                 <form onSubmit={handleReject}>
                                     <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                                        <h3 className="text-lg leading-6 font-medium text-gray-900">
-                                            Reject Withdrawal
-                                        </h3>
+                                        <h3 className="text-lg leading-6 font-medium text-gray-900">{__('general.reject_withdrawal')}</h3>
                                         <div className="mt-2">
                                             <textarea
                                                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
-                                                placeholder="Reason for rejection"
+                                                placeholder={__('general.reason_for_rejection')}
                                                 value={data.admin_notes}
                                                 onChange={(e) =>
                                                     setData(
@@ -243,14 +235,10 @@ export default function IndexAdmin({ auth, withdrawals }) {
                             ) : (
                                 <form onSubmit={handleMarkPaid}>
                                     <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                                        <h3 className="text-lg leading-6 font-medium text-gray-900">
-                                            Mark as Paid
-                                        </h3>
+                                        <h3 className="text-lg leading-6 font-medium text-gray-900">{__('general.mark_as_paid')}</h3>
                                         <div className="mt-2 space-y-4">
                                             <div>
-                                                <label className="block text-sm font-medium text-gray-700">
-                                                    Reference Number
-                                                </label>
+                                                <label className="block text-sm font-medium text-gray-700">{__('general.reference_number')}</label>
                                                 <input
                                                     type="text"
                                                     className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
@@ -296,9 +284,7 @@ export default function IndexAdmin({ auth, withdrawals }) {
                                             type="submit"
                                             disabled={processing}
                                             className="inline-flex w-full justify-center rounded-md border border-transparent bg-green-600 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-green-700 sm:ml-3 sm:w-auto sm:text-sm"
-                                        >
-                                            Mark Paid
-                                        </button>
+                                        >{__('general.mark_paid')}</button>
                                         <button
                                             type="button"
                                             onClick={() =>

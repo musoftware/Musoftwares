@@ -35,21 +35,21 @@ interface Props {
 export default function CheckoutSessions({ sessions }: Props) {
     const copyToClipboard = (url: string) => {
         navigator.clipboard.writeText(url);
-        toast.success(__('Copied to clipboard'));
+        toast.success(__('general.copied_to_clipboard'));
     };
 
     return (
-        <AuthenticatedLayout header={<h2 className="font-semibold text-xl text-gray-800 leading-tight">{__('Checkout Sessions')}</h2>}>
-            <Head title={__('Checkout Sessions')} />
+        <AuthenticatedLayout header={<h2 className="font-semibold text-xl text-gray-800 leading-tight">{__('general.checkout_sessions')}</h2>}>
+            <Head title={__('general.checkout_sessions')} />
 
             <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
                 <div className="flex justify-between items-center mb-8">
                     <div>
-                        <h1 className="text-3xl font-bold text-slate-900">{__('API Checkout Sessions')}</h1>
-                        <p className="mt-2 text-sm text-slate-600">{__('View all payment sessions created via your API keys.')}</p>
+                        <h1 className="text-3xl font-bold text-slate-900">{__('general.api_checkout_sessions')}</h1>
+                        <p className="mt-2 text-sm text-slate-600">{__('general.view_all_payment_sessions_created_via_your_api_keys')}</p>
                     </div>
                     <Button variant="outline" onClick={() => router.visit(route('sms-payment-gateway.index'))}>
-                        {__('Back to Dashboard')}
+                        {__('general.back_to_dashboard')}
                     </Button>
                 </div>
 
@@ -57,7 +57,7 @@ export default function CheckoutSessions({ sessions }: Props) {
                     <table className="min-w-full divide-y divide-slate-200">
                         <thead className="bg-slate-50">
                             <tr>
-                                <th scope="col" className="px-6 py-4 text-start text-xs font-semibold text-slate-500 uppercase tracking-wider">{__('Session ID')}</th>
+                                <th scope="col" className="px-6 py-4 text-start text-xs font-semibold text-slate-500 uppercase tracking-wider">{__('general.session_id')}</th>
                                 <th scope="col" className="px-6 py-4 text-start text-xs font-semibold text-slate-500 uppercase tracking-wider">{__('Amount')}</th>
                                 <th scope="col" className="px-6 py-4 text-start text-xs font-semibold text-slate-500 uppercase tracking-wider">{__('Customer')}</th>
                                 <th scope="col" className="px-6 py-4 text-start text-xs font-semibold text-slate-500 uppercase tracking-wider">{__('Status')}</th>
@@ -68,7 +68,7 @@ export default function CheckoutSessions({ sessions }: Props) {
                         <tbody className="bg-white divide-y divide-slate-100">
                             {sessions.data.length === 0 ? (
                                 <tr>
-                                    <td colSpan={6} className="px-6 py-12 text-center text-slate-500">{__('No checkout sessions found. Create one using the API.')}</td>
+                                    <td colSpan={6} className="px-6 py-12 text-center text-slate-500">{__('general.no_checkout_sessions_found_create_one_using_the_api')}</td>
                                 </tr>
                             ) : (
                                 sessions.data.map((session) => {
@@ -93,7 +93,7 @@ export default function CheckoutSessions({ sessions }: Props) {
                                                     <Badge className="bg-blue-50 text-blue-700 hover:bg-blue-100 border-blue-200"><Clock className="w-3 h-3 mr-1"/> {__('Open')}</Badge>
                                                 )}
                                                 {session.status === 'expired' && (
-                                                    <Badge className="bg-slate-100 text-slate-600 hover:bg-slate-200 border-slate-200"><XCircle className="w-3 h-3 mr-1"/> {__('Expired')}</Badge>
+                                                    <Badge className="bg-slate-100 text-slate-600 hover:bg-slate-200 border-slate-200"><XCircle className="w-3 h-3 mr-1"/> {__('general.expired')}</Badge>
                                                 )}
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500">
@@ -102,7 +102,7 @@ export default function CheckoutSessions({ sessions }: Props) {
                                             <td className="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
                                                 <div className="flex items-center justify-center gap-2">
                                                     <Button variant="outline" size="sm" onClick={() => copyToClipboard(checkoutUrl)} className="flex items-center gap-1">
-                                                        <Copy className="w-3 h-3" />{__('Copy URL')}
+                                                        <Copy className="w-3 h-3" />{__('general.copy_url')}
                                                     </Button>
                                                     <a href={checkoutUrl} target="_blank" rel="noreferrer" className="text-slate-400 hover:text-indigo-600 transition">
                                                         <ExternalLink className="w-4 h-4" />

@@ -305,7 +305,7 @@ export default function Show({ invoice, timeline, referral_earnings, has_smtp_ad
                                     <p className="text-sm text-slate-500">{auth.user?.email}</p>
                                 </div>
                                 <div className="text-right">
-                                    <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Billed To</p>
+                                    <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">{__('general.billed_to')}</p>
                                     <h3 className="text-base font-semibold text-slate-900">{invoice.client?.name}</h3>
                                     <p className="text-sm text-slate-500">{invoice.client?.email}</p>
                                     {invoice.project && (
@@ -319,15 +319,15 @@ export default function Show({ invoice, timeline, referral_earnings, has_smtp_ad
 
                             <div className="grid grid-cols-3 gap-6 py-5 border-y border-slate-100 mb-10">
                                 <div>
-                                    <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Issued Date</p>
+                                    <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">{__('general.issued_date')}</p>
                                 <p className="font-medium text-sm text-slate-900"><DateDisplay date={invoice.issued_at} /></p>
                                 </div>
                                 <div>
-                                    <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Due Date</p>
+                                    <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">{__('general.due_date')}</p>
                                 <p className="font-medium text-sm text-slate-900"><DateDisplay date={invoice.due_date} /></p>
                                 </div>
                                 <div className="text-right">
-                                    <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Amount Due</p>
+                                    <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">{__('general.amount_due')}</p>
                                     <p className="text-lg font-bold text-indigo-600">
                                         <CurrencyDisplay amount={invoice.amount} currency={invoice.amount_currency} />
                                     </p>
@@ -340,7 +340,7 @@ export default function Show({ invoice, timeline, referral_earnings, has_smtp_ad
                                         <div className="h-3 w-3 bg-rose-500 rounded-full animate-pulse"></div>
                                         <div>
                                             <p className="text-sm font-semibold text-indigo-900">LIVE TRACKING: {activeTimerItem.title}</p>
-                                            <p className="text-xs text-indigo-700/70">Session is currently active.</p>
+                                            <p className="text-xs text-indigo-700/70">{__('general.session_is_currently_active')}</p>
                                         </div>
                                     </div>
                                     <div className="text-2xl font-mono font-bold text-indigo-600">
@@ -406,8 +406,7 @@ export default function Show({ invoice, timeline, referral_earnings, has_smtp_ad
                         {invoice.costs?.length > 0 && (
                             <div>
                                 <h3 className="text-sm font-semibold text-slate-900 uppercase tracking-wider mb-4 flex items-center gap-2">
-                                    <Info className="h-4 w-4 text-rose-500" /> Internal Costs
-                                </h3>
+                                    <Info className="h-4 w-4 text-rose-500" />{__('general.internal_costs')}</h3>
                                 <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
                                     <Table>
                                         <TableBody>
@@ -423,7 +422,7 @@ export default function Show({ invoice, timeline, referral_earnings, has_smtp_ad
                                                         </Badge>
                                                     </TableCell>
                                                     <TableCell className="text-right py-4">
-                                                        {cost.payment_status === 'unpaid' && <Button size="sm" variant="ghost" className="text-rose-600 hover:bg-rose-50 hover:text-rose-700" onClick={() => router.post(route('erp.invoices.costs.mark-paid', { invoice: invoice.id, cost: cost.id }))}>Pay Now</Button>}
+                                                        {cost.payment_status === 'unpaid' && <Button size="sm" variant="ghost" className="text-rose-600 hover:bg-rose-50 hover:text-rose-700" onClick={() => router.post(route('erp.invoices.costs.mark-paid', { invoice: invoice.id, cost: cost.id }))}>{__('general.pay_now')}</Button>}
                                                     </TableCell>
                                                 </TableRow>
                                             ))}
@@ -443,8 +442,7 @@ export default function Show({ invoice, timeline, referral_earnings, has_smtp_ad
                         {/* PAYMENT HISTORY */}
                         <div>
                             <h3 className="text-sm font-semibold text-slate-900 uppercase tracking-wider mb-4 flex items-center gap-2">
-                                <History className="h-4 w-4 text-slate-400" /> Payment Status
-                            </h3>
+                                <History className="h-4 w-4 text-slate-400" />{__('general.payment_status')}</h3>
                             {invoice.status === 'paid' ? (
                                 <div className="flex items-center gap-4 p-5 rounded-2xl bg-emerald-50 border border-emerald-100">
                                     <div className="h-10 w-10 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600 shrink-0">
@@ -465,8 +463,7 @@ export default function Show({ invoice, timeline, referral_earnings, has_smtp_ad
                         {/* CLIENT WALLET QUICK ACTIONS */}
                         <div>
                             <h3 className="text-sm font-semibold text-slate-900 uppercase tracking-wider mb-4 flex items-center gap-2">
-                                <Wallet className="h-4 w-4 text-slate-400" /> Client Wallet
-                            </h3>
+                                <Wallet className="h-4 w-4 text-slate-400" />{__('general.client_wallet')}</h3>
                             <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 space-y-4">
                                 <div className="flex justify-between items-center">
                                     <p className="text-sm font-medium text-slate-500">{__('Available Balance')}</p>
@@ -489,8 +486,7 @@ export default function Show({ invoice, timeline, referral_earnings, has_smtp_ad
                         {referral_earnings?.length > 0 && (
                             <div>
                                 <h3 className="text-sm font-semibold text-slate-900 uppercase tracking-wider mb-4 flex items-center gap-2">
-                                    <CheckCircle className="h-4 w-4 text-emerald-500" /> Referral Distribution
-                                </h3>
+                                    <CheckCircle className="h-4 w-4 text-emerald-500" />{__('general.referral_distribution')}</h3>
                                 <div className="space-y-3">
                                     {referral_earnings.map((earning) => (
                                         <div key={earning.id} className="flex justify-between items-center text-sm p-4 bg-white rounded-2xl border border-slate-100 shadow-sm">

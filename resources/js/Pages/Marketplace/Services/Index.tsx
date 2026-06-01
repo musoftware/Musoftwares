@@ -20,9 +20,7 @@ export default function Index({ services }: any) {
     return (
         <AuthenticatedLayout
             header={
-                <h2 className="text-xl leading-tight font-semibold text-gray-800">
-                    Marketplace Services
-                </h2>
+                <h2 className="text-xl leading-tight font-semibold text-gray-800">{__('general.marketplace_services')}</h2>
             }
         >
             <Head title="Services" />
@@ -31,9 +29,7 @@ export default function Index({ services }: any) {
                     <div className="relative overflow-hidden bg-white p-6 shadow-sm sm:rounded-lg">
                         {loading && (
                             <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/50 backdrop-blur-sm">
-                                <div className="font-medium text-indigo-600">
-                                    Loading...
-                                </div>
+                                <div className="font-medium text-indigo-600">{__('general.loading')}</div>
                             </div>
                         )}
                         <h3 className="mb-4 text-lg font-bold">Services</h3>
@@ -69,9 +65,7 @@ export default function Index({ services }: any) {
                             </div>
                         ) : (
                             <div className="py-12 text-center">
-                                <p className="text-gray-500">
-                                    No services found.
-                                </p>
+                                <p className="text-gray-500">{__('general.no_services_found_1')}</p>
                             </div>
                         )}
 

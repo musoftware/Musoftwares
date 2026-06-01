@@ -31,16 +31,12 @@ export default function Login({
 
     return (
         <GuestLayout>
-            <Head title="Log in" />
+            <Head title={__('general.log_in')} />
 
             <div className="space-y-6">
                 <div className="space-y-1.5">
-                    <h1 className="text-xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">
-                        Log in to your account
-                    </h1>
-                    <p className="text-xs text-zinc-500 dark:text-zinc-400 font-normal">
-                        Enter your email and password to open your workspace.
-                    </p>
+                    <h1 className="text-xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">{__('general.log_in_to_your_account')}</h1>
+                    <p className="text-xs text-zinc-500 dark:text-zinc-400 font-normal">{__('general.enter_your_email_and_password_to_open_your_workspace')}</p>
                 </div>
 
                 {status && (
@@ -51,13 +47,11 @@ export default function Login({
 
                 <form onSubmit={submit} className="space-y-4">
                     <div className="space-y-2">
-                        <Label htmlFor="email" className="text-xs font-medium text-zinc-600 dark:text-zinc-400">
-                            Email address
-                        </Label>
+                        <Label htmlFor="email" className="text-xs font-medium text-zinc-600 dark:text-zinc-400">{__('general.email_address_1')}</Label>
                         <Input
                             id="email"
                             type="email"
-                            placeholder="name@company.com"
+                            placeholder={__('general.name_company_com')}
                             value={data.email}
                             autoComplete="username"
                             autoFocus
@@ -78,9 +72,7 @@ export default function Login({
                                 <Link
                                     href={route('password.request')}
                                     className="text-xs font-medium text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 transition-colors"
-                                >
-                                    Forgot password?
-                                </Link>
+                                >{__('general.forgot_password_1')}</Link>
                             )}
                         </div>
                         <div className="relative">
@@ -118,9 +110,7 @@ export default function Login({
                         <Label
                             htmlFor="remember"
                             className="text-xs font-normal text-zinc-600 dark:text-zinc-400 cursor-pointer select-none"
-                        >
-                            Remember me
-                        </Label>
+                        >{__('general.remember_me')}</Label>
                     </div>
 
                     <div className="pt-2">
@@ -132,10 +122,10 @@ export default function Login({
                             {processing ? (
                                 <>
                                     <Loader2 className="w-4 h-4 animate-spin text-zinc-400 dark:text-zinc-600" />
-                                    <span>Logging in...</span>
+                                    <span>{__('general.logging_in')}</span>
                                 </>
                             ) : (
-                                <span>Log in</span>
+                                <span>{__('general.log_in')}</span>
                             )}
                         </Button>
                     </div>
@@ -147,9 +137,7 @@ export default function Login({
                         <Link
                             href={route('register')}
                             className="font-medium text-zinc-900 hover:underline dark:text-zinc-100"
-                        >
-                            Sign up
-                        </Link>
+                        >{__('general.sign_up')}</Link>
                     </p>
                 </div>
             </div>

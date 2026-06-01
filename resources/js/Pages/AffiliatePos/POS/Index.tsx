@@ -37,7 +37,7 @@ export default function PosIndex({ initialProducts, categories }: any) {
 
     return (
         <div className="flex h-screen bg-gray-50 overflow-hidden font-sans">
-            <Head title="Point of Sale" />
+            <Head title={__('general.point_of_sale')} />
             
             {/* Main Product Area */}
             <div className="flex-1 flex flex-col h-full overflow-hidden">
@@ -47,14 +47,14 @@ export default function PosIndex({ initialProducts, categories }: any) {
                         <Button variant="ghost" size="icon" className="rounded-full">
                             <ArrowLeft className="w-5 h-5 text-gray-600" />
                         </Button>
-                        <h1 className="text-xl font-semibold text-gray-800 tracking-tight">Affiliate POS</h1>
+                        <h1 className="text-xl font-semibold text-gray-800 tracking-tight">{__('general.affiliate_pos')}</h1>
                     </div>
                     <div className="flex-1 max-w-xl mx-8">
                         <div className="relative">
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                             <Input 
                                 type="text"
-                                placeholder="Search by name, SKU, or scan barcode..."
+                                placeholder={__('general.search_by_name_sku_or_scan_barcode')}
                                 className="w-full pl-10 pr-4 py-6 rounded-xl border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all shadow-sm"
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -65,9 +65,7 @@ export default function PosIndex({ initialProducts, categories }: any) {
 
                 {/* Categories */}
                 <div className="bg-white border-b px-6 py-3 flex gap-2 overflow-x-auto no-scrollbar">
-                    <Button variant="default" className="rounded-full px-5">
-                        All Categories
-                    </Button>
+                    <Button variant="default" className="rounded-full px-5">{__('general.all_categories')}</Button>
                     {categories.map((cat: any) => (
                         <Button key={cat.id} variant="secondary" className="rounded-full px-5 text-gray-700 bg-gray-100 hover:bg-gray-200">
                             {cat.name}
@@ -110,9 +108,7 @@ export default function PosIndex({ initialProducts, categories }: any) {
             <div className="w-[400px] bg-white border-l shadow-xl flex flex-col z-10">
                 <div className="p-6 border-b bg-gray-50/50">
                     <h2 className="text-lg font-semibold flex items-center gap-2 text-gray-800">
-                        <ShoppingCart className="w-5 h-5" />
-                        Current Order
-                    </h2>
+                        <ShoppingCart className="w-5 h-5" />{__('general.current_order')}</h2>
                 </div>
 
                 {/* Cart Items */}
@@ -122,7 +118,7 @@ export default function PosIndex({ initialProducts, categories }: any) {
                             <div className="w-24 h-24 bg-gray-50 rounded-full flex items-center justify-center">
                                 <ShoppingCart className="w-10 h-10" />
                             </div>
-                            <p className="font-medium">Cart is empty</p>
+                            <p className="font-medium">{__('general.cart_is_empty')}</p>
                         </div>
                     ) : (
                         cart.map(item => (

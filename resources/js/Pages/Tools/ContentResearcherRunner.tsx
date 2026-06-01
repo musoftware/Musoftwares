@@ -200,8 +200,8 @@ export default function ContentResearcherRunner({ tool, subscription, runtimePor
             <div className="min-h-screen bg-[#F8FAFC] flex items-center justify-center font-sans">
                 <div className="text-center space-y-4">
                     <div className="w-10 h-10 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin mx-auto" />
-                    <p className="text-sm font-semibold text-slate-600">Syncing with Local Runtime Agent...</p>
-                    <p className="text-xs text-slate-400">Make sure your Musoftware Runtime is running on your machine.</p>
+                    <p className="text-sm font-semibold text-slate-600">{__('general.syncing_with_local_runtime_agent')}</p>
+                    <p className="text-xs text-slate-400">{__('general.make_sure_your_musoftware_runtime_is_running_on_your_machine')}</p>
                 </div>
             </div>
         );
@@ -221,20 +221,18 @@ export default function ContentResearcherRunner({ tool, subscription, runtimePor
                     <div className="w-12 h-12 bg-indigo-500 rounded-2xl flex items-center justify-center shadow-inner mb-6 shadow-indigo-200">
                         <Search className="w-6 h-6 text-white" />
                     </div>
-                    <h1 className="text-xl font-black tracking-tight text-slate-900 mb-2">Content Search</h1>
-                    <p className="text-sm font-medium text-slate-500 mb-8 leading-relaxed">
-                        Deep SERP analysis and intelligent SEO data extraction.
-                    </p>
+                    <h1 className="text-xl font-black tracking-tight text-slate-900 mb-2">{__('general.content_search')}</h1>
+                    <p className="text-sm font-medium text-slate-500 mb-8 leading-relaxed">{__('general.deep_serp_analysis_and_intelligent_seo_data_extraction')}</p>
 
                     <Tabs defaultValue="new" className="w-full">
                         <TabsList className="w-full grid grid-cols-2 mb-6 p-1 bg-slate-100 rounded-xl">
-                            <TabsTrigger value="new" className="rounded-lg text-xs font-bold data-[state=active]:bg-white data-[state=active]:shadow-sm">New Campaign</TabsTrigger>
+                            <TabsTrigger value="new" className="rounded-lg text-xs font-bold data-[state=active]:bg-white data-[state=active]:shadow-sm">{__('general.new_campaign')}</TabsTrigger>
                             <TabsTrigger value="history" className="rounded-lg text-xs font-bold data-[state=active]:bg-white data-[state=active]:shadow-sm">Database</TabsTrigger>
                         </TabsList>
 
                         <TabsContent value="new" className="space-y-6">
                             <div className="space-y-2">
-                                <Label className="text-xs font-bold uppercase tracking-wider text-slate-500 ml-1">Target Keyword</Label>
+                                <Label className="text-xs font-bold uppercase tracking-wider text-slate-500 ml-1">{__('general.target_keyword')}</Label>
                                 <Input 
                                     placeholder="e.g. 'Best SEO tools 2026'" 
                                     value={keyword}
@@ -244,7 +242,7 @@ export default function ContentResearcherRunner({ tool, subscription, runtimePor
                             </div>
 
                             <div className="space-y-2">
-                                <Label className="text-xs font-bold uppercase tracking-wider text-slate-500 ml-1">Search Engine</Label>
+                                <Label className="text-xs font-bold uppercase tracking-wider text-slate-500 ml-1">{__('general.search_engine')}</Label>
                                 <select 
                                     value={engine}
                                     onChange={(e) => setEngine(e.target.value as any)}
@@ -280,8 +278,8 @@ export default function ContentResearcherRunner({ tool, subscription, runtimePor
                                                 <CheckCircle className="w-3.5 h-3.5 text-white absolute opacity-0 peer-checked:opacity-100 transition-opacity" />
                                             </div>
                                             <div className="flex flex-col">
-                                                <span className="text-sm font-bold text-slate-800 group-hover:text-indigo-600 transition-colors">Recursive Discovery</span>
-                                                <span className="text-xs font-medium text-slate-500 leading-relaxed mt-0.5">Automatically crawl PAA and related searches.</span>
+                                                <span className="text-sm font-bold text-slate-800 group-hover:text-indigo-600 transition-colors">{__('general.recursive_discovery')}</span>
+                                                <span className="text-xs font-medium text-slate-500 leading-relaxed mt-0.5">{__('general.automatically_crawl_paa_and_related_searches')}</span>
                                             </div>
                                         </label>
                                     </div>
@@ -294,17 +292,13 @@ export default function ContentResearcherRunner({ tool, subscription, runtimePor
                                     variant="destructive"
                                     className="w-full h-12 rounded-xl font-bold shadow-lg shadow-rose-500/20 gap-2 mt-4"
                                 >
-                                    <Square className="w-4 h-4 fill-current" />
-                                    Stop Crawler
-                                </Button>
+                                    <Square className="w-4 h-4 fill-current" />{__('general.stop_crawler')}</Button>
                             ) : (
                                 <Button 
                                     onClick={handleStart}
                                     className="w-full h-12 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold shadow-lg shadow-indigo-500/25 gap-2 mt-4 transition-all"
                                 >
-                                    <Play className="w-4 h-4 fill-current" />
-                                    Start Campaign
-                                </Button>
+                                    <Play className="w-4 h-4 fill-current" />{__('general.start_campaign')}</Button>
                             )}
 
                             {status === 'error' && (
@@ -329,10 +323,10 @@ export default function ContentResearcherRunner({ tool, subscription, runtimePor
                                 {loadingCampaigns ? (
                                     <div className="flex items-center justify-center py-8 gap-2 text-slate-400">
                                         <Loader2 className="w-4 h-4 animate-spin" />
-                                        <span className="text-xs font-medium">Loading campaigns...</span>
+                                        <span className="text-xs font-medium">{__('general.loading_campaigns')}</span>
                                     </div>
                                 ) : campaigns.length === 0 ? (
-                                    <p className="text-xs text-slate-500 text-center py-8">No campaigns found. Start a new research to see results here.</p>
+                                    <p className="text-xs text-slate-500 text-center py-8">{__('general.no_campaigns_found_start_a_new_research_to_see_results_here')}</p>
                                 ) : campaigns.map((c) => (
                                     <div 
                                         key={c.id} 
@@ -393,7 +387,7 @@ export default function ContentResearcherRunner({ tool, subscription, runtimePor
                     {loadingCampaignData && (
                         <div className="h-full flex flex-col items-center justify-center text-slate-400 space-y-4">
                             <Loader2 className="w-8 h-8 animate-spin text-indigo-400" />
-                            <p className="text-sm font-medium">Loading campaign data...</p>
+                            <p className="text-sm font-medium">{__('general.loading_campaign_data')}</p>
                         </div>
                     )}
 
@@ -404,7 +398,7 @@ export default function ContentResearcherRunner({ tool, subscription, runtimePor
                                 <Database className="w-8 h-8 text-slate-300" />
                             </div>
                             <div className="text-center max-w-sm">
-                                <p className="text-sm font-bold text-slate-600 mb-1">No Data Yet</p>
+                                <p className="text-sm font-bold text-slate-600 mb-1">{__('general.no_data_yet')}</p>
                                 <p className="text-xs text-slate-400 leading-relaxed">
                                     {campaigns.length > 0 
                                         ? 'Select a campaign from the Database tab or start a new research run.' 
@@ -437,9 +431,7 @@ export default function ContentResearcherRunner({ tool, subscription, runtimePor
                                         className="gap-2 font-bold h-9 bg-white shadow-sm"
                                         disabled={displayData.length === 0}
                                     >
-                                        <Download className="w-3.5 h-3.5" />
-                                        Export CSV
-                                    </Button>
+                                        <Download className="w-3.5 h-3.5" />{__('general.export_csv')}</Button>
                                 </div>
                             )}
 
@@ -448,8 +440,8 @@ export default function ContentResearcherRunner({ tool, subscription, runtimePor
                                     <thead>
                                         <tr className="bg-slate-50 border-b border-slate-200 text-[10px] uppercase tracking-wider font-black text-slate-500 sticky top-0 z-10">
                                             <th className="px-4 py-3 whitespace-nowrap">Domain</th>
-                                            <th className="px-4 py-3 whitespace-nowrap">Page Title</th>
-                                            <th className="px-4 py-3 w-64">H1 & Snippet</th>
+                                            <th className="px-4 py-3 whitespace-nowrap">{__('general.page_title')}</th>
+                                            <th className="px-4 py-3 w-64">{__('general.h1_snippet')}</th>
                                             <th className="px-4 py-3 whitespace-nowrap text-right">Metrics</th>
                                         </tr>
                                     </thead>
@@ -459,7 +451,7 @@ export default function ContentResearcherRunner({ tool, subscription, runtimePor
                                                 <td colSpan={4} className="px-4 py-16 text-center">
                                                     <div className="flex flex-col items-center gap-3 text-slate-400">
                                                         <Loader2 className="w-6 h-6 animate-spin text-indigo-400" />
-                                                        <p className="text-xs font-medium">Waiting for results to stream in...</p>
+                                                        <p className="text-xs font-medium">{__('general.waiting_for_results_to_stream_in')}</p>
                                                     </div>
                                                 </td>
                                             </tr>
@@ -470,8 +462,7 @@ export default function ContentResearcherRunner({ tool, subscription, runtimePor
                                                 <tr key={i} className="hover:bg-slate-50/50 transition-colors group cursor-pointer">
                                                     <td className="px-4 py-3 align-top">
                                                         <p className="text-xs font-bold text-slate-900 truncate max-w-[150px]" title={r.domain}>{r.domain}</p>
-                                                        <a href={r.url} target="_blank" rel="noopener noreferrer" className="text-[10px] text-blue-600 hover:underline truncate max-w-[150px] flex items-center gap-1 mt-1">
-                                                            Open Link <ExternalLink className="w-3 h-3" />
+                                                        <a href={r.url} target="_blank" rel="noopener noreferrer" className="text-[10px] text-blue-600 hover:underline truncate max-w-[150px] flex items-center gap-1 mt-1">{__('general.open_link')}<ExternalLink className="w-3 h-3" />
                                                         </a>
                                                     </td>
                                                     <td className="px-4 py-3 align-top">
@@ -489,9 +480,7 @@ export default function ContentResearcherRunner({ tool, subscription, runtimePor
                                                                 {metrics.word_count || 0} Words
                                                             </Badge>
                                                             {(metrics.has_faq_schema || (r.schemas && r.schemas.includes('FAQ'))) && (
-                                                                <Badge variant="secondary" className="bg-emerald-50 text-emerald-700 hover:bg-emerald-50 text-[9px] font-bold px-1.5 py-0 h-5 border border-emerald-100 shadow-sm">
-                                                                    FAQ Schema
-                                                                </Badge>
+                                                                <Badge variant="secondary" className="bg-emerald-50 text-emerald-700 hover:bg-emerald-50 text-[9px] font-bold px-1.5 py-0 h-5 border border-emerald-100 shadow-sm">{__('general.faq_schema')}</Badge>
                                                             )}
                                                         </div>
                                                     </td>

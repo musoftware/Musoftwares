@@ -73,7 +73,7 @@
                                     </td>
                                     <td class="text-end px-4">
                                         <div class="dropdown">
-                                            <button class="at-btn at-btn-ghost at-btn-sm" type="button" data-bs-toggle="dropdown" aria-label="More options">
+                                            <button class="at-btn at-btn-ghost at-btn-sm" type="button" data-bs-toggle="dropdown" aria-label="{{ __('general.more_options') }}">
                                                 <i class="ti ti-dots-vertical"></i>
                                             </button>
                                             <ul class="dropdown-menu dropdown-menu-end">

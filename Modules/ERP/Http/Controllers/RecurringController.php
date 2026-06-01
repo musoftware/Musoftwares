@@ -134,7 +134,7 @@ class RecurringController extends Controller
 
         RecurringEntry::create($validated);
 
-        return redirect()->route('erp.recurring.index')->with('success', 'Recurring entry created.');
+        return redirect()->route('erp.recurring.index')->with('success', __('general.recurring_entry_created'));
     }
 
     private function calculateFirstRun($frequency, $startsAt, $day = null, $month = null)
@@ -172,7 +172,7 @@ class RecurringController extends Controller
     {
         $tenant = Tenant::where('user_id', Auth::id())->firstOrFail();
         if ($entry->tenant_id !== $tenant->id) {
-            abort(403, 'Unauthorized access to recurring entry.');
+            abort(403, __('general.unauthorized_access_to_recurring_entry'));
         }
     }
 
@@ -239,7 +239,7 @@ class RecurringController extends Controller
 
         $recurring->update($validated);
 
-        return redirect()->route('erp.recurring.index')->with('success', 'Recurring entry updated.');
+        return redirect()->route('erp.recurring.index')->with('success', __('general.recurring_entry_updated'));
     }
 
     public function destroy(RecurringEntry $recurring)
@@ -247,7 +247,7 @@ class RecurringController extends Controller
         $this->authorizeTenantRecurringEntry($recurring);
 
         $recurring->delete();
-        return redirect()->route('erp.recurring.index')->with('success', 'Recurring entry deleted.');
+        return redirect()->route('erp.recurring.index')->with('success', __('general.recurring_entry_deleted'));
     }
 
     public function pause(RecurringEntry $recurring)

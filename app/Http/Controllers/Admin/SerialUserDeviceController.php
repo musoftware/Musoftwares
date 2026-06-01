@@ -125,7 +125,7 @@ class SerialUserDeviceController extends Controller
 
         return redirect()
             ->route('admin.serial-user-devices.index')
-            ->with('success', 'Device assigned successfully.');
+            ->with('success', __('general.device_assigned_successfully'));
     }
 
     /**
@@ -136,7 +136,7 @@ class SerialUserDeviceController extends Controller
     {
         $this->serialUserDeviceService->updateStatus($serialUserDevice, $request->validated('status'));
 
-        return back()->with('success', 'Assignment status updated.');
+        return back()->with('success', __('general.assignment_status_updated'));
     }
 
     /**
@@ -146,7 +146,7 @@ class SerialUserDeviceController extends Controller
     {
         $this->serialUserDeviceService->unassignDevice($serialUserDevice);
 
-        return back()->with('success', 'Assignment removed.');
+        return back()->with('success', __('general.assignment_removed'));
     }
 
     /**

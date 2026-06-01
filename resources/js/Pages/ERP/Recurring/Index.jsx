@@ -72,20 +72,18 @@ export default function Index({ income, expense, stats }) {
     const { menuItems, lockedAddons, workspaceName, tenantId } = useERPMenu('invoices');
 
     return (
-        <ERPLayout title="Recurring Entries" workspaceName={workspaceName} tenantId={tenantId} menuItems={menuItems} lockedAddons={lockedAddons}>
+        <ERPLayout title={__('general.recurring_entries')} workspaceName={workspaceName} tenantId={tenantId} menuItems={menuItems} lockedAddons={lockedAddons}>
 
             <div className="py-12">
                 <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
                     <PageHeader
-                        title="Recurring Entries"
-                        subtitle="Manage your automated income and expenses"
+                        title={__('general.recurring_entries')}
+                        subtitle={__('general.manage_your_automated_income_and_expenses')}
                     >
                         <Link
                             href={route('erp.recurring.create')}
                             className="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 transition ease-in-out duration-150"
-                        >
-                            Create Entry
-                        </Link>
+                        >{__('general.create_entry')}</Link>
                     </PageHeader>
 
                     {/* Tab Bar */}
@@ -154,9 +152,7 @@ export default function Index({ income, expense, stats }) {
                                     </div>
                                     <div className="ml-5 w-0 flex-1">
                                         <dl>
-                                            <dt className="text-sm font-medium text-gray-500 truncate">
-                                                Next 7 days scheduled
-                                            </dt>
+                                            <dt className="text-sm font-medium text-gray-500 truncate">{__('general.next_7_days_scheduled')}</dt>
                                             <dd className="flex items-baseline">
                                                 <div className="text-2xl font-semibold text-gray-900">
                                                     {tabStats.next_7_days} entries
@@ -176,7 +172,7 @@ export default function Index({ income, expense, stats }) {
                                 <tr>
                                     <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
                                     <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Frequency</th>
-                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Next Run</th>
+                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{__('general.next_run')}</th>
                                     <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
                                     <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                                     <th scope="col" className="relative px-6 py-3">

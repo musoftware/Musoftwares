@@ -16,12 +16,12 @@ export default function Index({ articles, filters }) {
     };
 
     return (
-        <AdminSidebarLayout title="Blog Articles" header="Blog Articles Manager">
+        <AdminSidebarLayout title={__('general.blog_articles')} header="Blog Articles Manager">
             <div className="mb-6 flex items-center justify-between">
                 <form onSubmit={handleSearch} className="flex max-w-sm w-full relative">
                     <Input
                         type="text"
-                        placeholder="Search articles by title or content..."
+                        placeholder={__('general.search_articles_by_title_or_content')}
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
                         className="pl-10 h-10"
@@ -31,9 +31,7 @@ export default function Index({ articles, filters }) {
                 </form>
                 <Link href={route('admin.blog-articles.create')}>
                     <Button className="h-10 gap-2">
-                        <Plus className="h-4 w-4" />
-                        Add Article
-                    </Button>
+                        <Plus className="h-4 w-4" />{__('general.add_article')}</Button>
                 </Link>
             </div>
 
@@ -83,14 +81,14 @@ export default function Index({ articles, filters }) {
                                         {article.service?.seller ? (
                                             <span className="font-medium">{article.service.seller.name}</span>
                                         ) : (
-                                            <span className="text-gray-400 italic text-sm">System/Unknown</span>
+                                            <span className="text-gray-400 italic text-sm">{__('general.system_unknown')}</span>
                                         )}
                                     </td>
                                     <td className="p-4 text-right">
                                         <Dialog>
                                             <DialogTrigger asChild>
                                                 <Button variant="ghost" className="h-8 w-8 p-0">
-                                                    <span className="sr-only">Open menu</span>
+                                                    <span className="sr-only">{__('general.open_menu')}</span>
                                                     <MoreHorizontal className="h-4 w-4" />
                                                 </Button>
                                             </DialogTrigger>
@@ -128,8 +126,8 @@ export default function Index({ articles, filters }) {
                                     <td colSpan={7} className="p-12 text-center text-gray-500">
                                         <div className="flex flex-col items-center justify-center">
                                             <FileText className="h-10 w-10 text-gray-300 mb-3" />
-                                            <p className="text-lg font-medium text-gray-600">No articles found.</p>
-                                            <p className="text-sm text-gray-400 mt-1">Try adjusting your search query.</p>
+                                            <p className="text-lg font-medium text-gray-600">{__('general.no_articles_found')}</p>
+                                            <p className="text-sm text-gray-400 mt-1">{__('general.try_adjusting_your_search_query')}</p>
                                         </div>
                                     </td>
                                 </tr>

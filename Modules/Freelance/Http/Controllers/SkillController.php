@@ -31,7 +31,7 @@ class SkillController extends Controller
         ]);
 
         Skill::create($validated);
-        return back()->with('success', 'Skill created.');
+        return back()->with('success', __('general.skill_created'));
     }
 
     public function update(Request $request, Skill $skill)
@@ -42,12 +42,12 @@ class SkillController extends Controller
         ]);
 
         $skill->update($validated);
-        return back()->with('success', 'Skill updated.');
+        return back()->with('success', __('general.skill_updated'));
     }
 
     public function destroy(Skill $skill)
     {
         $skill->delete();
-        return back()->with('success', 'Skill deleted.');
+        return back()->with('success', __('general.skill_deleted'));
     }
 }

@@ -22,18 +22,18 @@ export default function PayoutsIndex({ payouts, filters }: any) {
 
     return (
         <div className="p-6 max-w-7xl mx-auto space-y-6">
-            <Head title="Payout Requests" />
+            <Head title={__('general.payout_requests')} />
 
             <div className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-2xl font-semibold text-gray-900 tracking-tight">Payout Requests</h1>
-                    <p className="text-sm text-gray-500 mt-1">Manage withdrawal requests from Affiliates and Vendors.</p>
+                    <h1 className="text-2xl font-semibold text-gray-900 tracking-tight">{__('general.payout_requests')}</h1>
+                    <p className="text-sm text-gray-500 mt-1">{__('general.manage_withdrawal_requests_from_affiliates_and_vendors')}</p>
                 </div>
             </div>
 
             <Card className="shadow-sm border-gray-200">
                 <CardHeader className="bg-gray-50/50 border-b pb-4">
-                    <CardTitle className="text-lg">Recent Requests</CardTitle>
+                    <CardTitle className="text-lg">{__('general.recent_requests')}</CardTitle>
                 </CardHeader>
                 <CardContent className="p-0">
                     <Table>
@@ -41,7 +41,7 @@ export default function PayoutsIndex({ payouts, filters }: any) {
                             <TableRow className="bg-gray-50/80 hover:bg-gray-50/80">
                                 <TableHead className="font-semibold text-gray-600">User</TableHead>
                                 <TableHead className="font-semibold text-gray-600">Method</TableHead>
-                                <TableHead className="font-semibold text-gray-600">Account Info</TableHead>
+                                <TableHead className="font-semibold text-gray-600">{__('general.account_info')}</TableHead>
                                 <TableHead className="font-semibold text-gray-600 text-right">Amount</TableHead>
                                 <TableHead className="font-semibold text-gray-600">Status</TableHead>
                                 <TableHead className="font-semibold text-gray-600 text-right">Actions</TableHead>
@@ -50,9 +50,7 @@ export default function PayoutsIndex({ payouts, filters }: any) {
                         <TableBody>
                             {payouts.data.length === 0 ? (
                                 <TableRow>
-                                    <TableCell colSpan={6} className="h-24 text-center text-gray-500">
-                                        No payout requests found.
-                                    </TableCell>
+                                    <TableCell colSpan={6} className="h-24 text-center text-gray-500">{__('general.no_payout_requests_found')}</TableCell>
                                 </TableRow>
                             ) : (
                                 payouts.data.map((payout: any) => (

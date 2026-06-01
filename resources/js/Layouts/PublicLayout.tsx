@@ -156,9 +156,7 @@ export default function PublicLayout({ children, auth: propAuth }: PublicLayoutP
                                     <Button 
                                         size="sm"
                                         className="bg-gradient-to-r from-indigo-500 via-indigo-650 to-purple-600 hover:opacity-95 text-white rounded-lg shadow-md shadow-indigo-500/10 border-0 flex items-center gap-1 group font-semibold h-9 px-4 cursor-pointer"
-                                    >
-                                        Start Free Trial
-                                        <ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-1 transition-transform" />
+                                    >{__('general.start_free_trial')}<ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-1 transition-transform" />
                                     </Button>
                                 </Link>
                             </>
@@ -169,7 +167,7 @@ export default function PublicLayout({ children, auth: propAuth }: PublicLayoutP
                     <button
                         onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                         className="flex md:hidden p-2 rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-100 border border-transparent hover:border-slate-200 transition-all focus:outline-none cursor-pointer"
-                        aria-label="Toggle Menu"
+                        aria-label={__('general.toggle_menu')}
                     >
                         {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
                     </button>
@@ -222,9 +220,7 @@ export default function PublicLayout({ children, auth: propAuth }: PublicLayoutP
                     <div className="p-6 border-t border-slate-100 bg-slate-50/50 space-y-4">
                         {auth?.user ? (
                             <Link href="/dashboard" className="block w-full">
-                                <Button className="w-full bg-slate-900 hover:bg-slate-800 text-white cursor-pointer">
-                                    Go to Dashboard
-                                </Button>
+                                <Button className="w-full bg-slate-900 hover:bg-slate-800 text-white cursor-pointer">{__('general.go_to_dashboard')}</Button>
                             </Link>
                         ) : (
                             <>
@@ -239,9 +235,7 @@ export default function PublicLayout({ children, auth: propAuth }: PublicLayoutP
                                     </Button>
                                 </Link>
                                 <Link href="/register?trial=true" className="block w-full">
-                                    <Button className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-lg cursor-pointer">
-                                        Start Free Trial
-                                    </Button>
+                                    <Button className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-lg cursor-pointer">{__('general.start_free_trial')}</Button>
                                 </Link>
                             </>
                         )}
@@ -266,13 +260,9 @@ export default function PublicLayout({ children, auth: propAuth }: PublicLayoutP
                                     musoftware
                                 </span>
                             </Link>
-                            <p className="text-sm leading-relaxed text-slate-500 max-w-xs font-light">
-                                One workspace for your clients, billing, services, and operations.
-                            </p>
+                            <p className="text-sm leading-relaxed text-slate-500 max-w-xs font-light">{__('general.one_workspace_for_your_clients_billing_services_and_operations')}</p>
                             <div className="inline-flex items-center gap-2 px-3 py-1 text-xs text-slate-500 font-light border border-slate-200 rounded-full">
-                                <div className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                                All systems operational
-                            </div>
+                                <div className="w-1.5 h-1.5 rounded-full bg-emerald-400" />{__('general.all_systems_operational')}</div>
                         </div>
 
                         {/* Column 2: Product */}
@@ -282,16 +272,16 @@ export default function PublicLayout({ children, auth: propAuth }: PublicLayoutP
                             </h3>
                             <ul className="mt-4 space-y-3">
                                 <li>
-                                    <a href="#overview" onClick={(e) => handleNavClick(e, '#overview')} className="text-sm hover:text-slate-950 transition-colors">Platform Features</a>
+                                    <a href="#overview" onClick={(e) => handleNavClick(e, '#overview')} className="text-sm hover:text-slate-950 transition-colors">{__('general.platform_features')}</a>
                                 </li>
                                 <li>
                                     <a href="#marketplace" onClick={(e) => handleNavClick(e, '#marketplace')} className="text-sm hover:text-slate-950 transition-colors">Marketplace</a>
                                 </li>
                                 <li>
-                                    <a href="#financials" onClick={(e) => handleNavClick(e, '#financials')} className="text-sm hover:text-slate-950 transition-colors">Financial Hub</a>
+                                    <a href="#financials" onClick={(e) => handleNavClick(e, '#financials')} className="text-sm hover:text-slate-950 transition-colors">{__('general.financial_hub')}</a>
                                 </li>
                                 <li>
-                                    <a href="#pricing" onClick={(e) => handleNavClick(e, '#pricing')} className="text-sm hover:text-slate-950 transition-colors">Pricing Plans</a>
+                                    <a href="#pricing" onClick={(e) => handleNavClick(e, '#pricing')} className="text-sm hover:text-slate-950 transition-colors">{__('general.pricing_plans')}</a>
                                 </li>
                             </ul>
                         </div>
@@ -303,16 +293,16 @@ export default function PublicLayout({ children, auth: propAuth }: PublicLayoutP
                             </h3>
                             <ul className="mt-4 space-y-3">
                                 <li>
-                                    <a href="#financials" onClick={(e) => handleNavClick(e, '#financials')} className="text-sm hover:text-slate-950 transition-colors">Invoices & Billing</a>
+                                    <a href="#financials" onClick={(e) => handleNavClick(e, '#financials')} className="text-sm hover:text-slate-950 transition-colors">{__('general.invoices_billing')}</a>
                                 </li>
                                 <li>
-                                    <a href="#overview" onClick={(e) => handleNavClick(e, '#overview')} className="text-sm hover:text-slate-950 transition-colors">Client Portal</a>
+                                    <a href="#overview" onClick={(e) => handleNavClick(e, '#overview')} className="text-sm hover:text-slate-950 transition-colors">{__('general.client_portal')}</a>
                                 </li>
                                 <li>
-                                    <a href="#workspace" onClick={(e) => handleNavClick(e, '#workspace')} className="text-sm hover:text-slate-950 transition-colors">Unified Workspace</a>
+                                    <a href="#workspace" onClick={(e) => handleNavClick(e, '#workspace')} className="text-sm hover:text-slate-950 transition-colors">{__('general.unified_workspace')}</a>
                                 </li>
                                 <li>
-                                    <a href="#communication" onClick={(e) => handleNavClick(e, '#communication')} className="text-sm hover:text-slate-950 transition-colors">Timers & Comm</a>
+                                    <a href="#communication" onClick={(e) => handleNavClick(e, '#communication')} className="text-sm hover:text-slate-950 transition-colors">{__('general.timers_comm')}</a>
                                 </li>
                             </ul>
                         </div>
@@ -327,13 +317,13 @@ export default function PublicLayout({ children, auth: propAuth }: PublicLayoutP
                                     <a href="https://laravel.com/docs" target="_blank" rel="noreferrer" className="text-sm hover:text-slate-950 transition-colors">Documentation</a>
                                 </li>
                                 <li>
-                                    <a href="#integrations" onClick={(e) => handleNavClick(e, '#integrations')} className="text-sm hover:text-slate-950 transition-colors">API Reference</a>
+                                    <a href="#integrations" onClick={(e) => handleNavClick(e, '#integrations')} className="text-sm hover:text-slate-950 transition-colors">{__('general.api_reference')}</a>
                                 </li>
                                 <li>
                                     <a href="#faq" onClick={(e) => handleNavClick(e, '#faq')} className="text-sm hover:text-slate-950 transition-colors">Changelog</a>
                                 </li>
                                 <li>
-                                    <a href="mailto:hello@musoftwares.com" className="text-sm hover:text-slate-950 transition-colors">Contact Support</a>
+                                    <a href="mailto:hello@musoftwares.com" className="text-sm hover:text-slate-950 transition-colors">{__('general.contact_support')}</a>
                                 </li>
                             </ul>
                         </div>
@@ -345,16 +335,16 @@ export default function PublicLayout({ children, auth: propAuth }: PublicLayoutP
                             </h3>
                             <ul className="mt-4 space-y-3">
                                 <li>
-                                    <Link href="/legal/privacy" className="text-sm hover:text-slate-950 transition-colors">Privacy Policy</Link>
+                                    <Link href="/legal/privacy" className="text-sm hover:text-slate-950 transition-colors">{__('general.privacy_policy')}</Link>
                                 </li>
                                 <li>
-                                    <Link href="/legal/terms" className="text-sm hover:text-slate-950 transition-colors">Terms of Service</Link>
+                                    <Link href="/legal/terms" className="text-sm hover:text-slate-950 transition-colors">{__('general.terms_of_service')}</Link>
                                 </li>
                                 <li>
-                                    <Link href="/legal/escrow" className="text-sm hover:text-slate-950 transition-colors">Escrow Protection</Link>
+                                    <Link href="/legal/escrow" className="text-sm hover:text-slate-950 transition-colors">{__('general.escrow_protection')}</Link>
                                 </li>
                                 <li>
-                                    <Link href="/legal/security" className="text-sm hover:text-slate-950 transition-colors">Security Audit</Link>
+                                    <Link href="/legal/security" className="text-sm hover:text-slate-950 transition-colors">{__('general.security_audit')}</Link>
                                 </li>
                             </ul>
                         </div>
@@ -366,7 +356,7 @@ export default function PublicLayout({ children, auth: propAuth }: PublicLayoutP
                             &copy; {new Date().getFullYear()} musoftware. All rights reserved.
                         </p>
                         <div className="flex gap-4 text-sm font-light text-slate-400">
-                            <span>Platform Secured</span>
+                            <span>{__('general.platform_secured')}</span>
                         </div>
                     </div>
                 </div>

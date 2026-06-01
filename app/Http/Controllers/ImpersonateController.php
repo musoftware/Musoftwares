@@ -10,7 +10,7 @@ class ImpersonateController extends Controller
     public function impersonate(Request $request, $id)
     {
         if (!$request->user()->hasRole('admin')) {
-            abort(403, 'Only admins can impersonate users.');
+            abort(403, __('general.only_admins_can_impersonate_users'));
         }
 
         if (Auth::id() == $id) {

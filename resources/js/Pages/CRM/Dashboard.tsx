@@ -11,39 +11,39 @@ export default function Dashboard({ stats }) {
 
     const cards = [
         {
-            title: __('Leads'),
-            description: __('Manage and track your leads pipeline'),
+            title: __('general.leads'),
+            description: __('general.manage_and_track_your_leads_pipeline'),
             icon: Users,
             href: route('crm.leads.index'),
-            stats: `${stats.total_leads} ${__('Total')} (${stats.new_leads} ${__('New')})`,
+            stats: `${stats.total_leads} ${__('Total')} (${stats.new_leads} ${__('general.new_1')})`,
             color: 'text-blue-600',
             bg: 'bg-blue-100',
         },
         {
-            title: __('Campaigns'),
-            description: __('Email marketing campaigns'),
+            title: __('general.campaigns'),
+            description: __('general.email_marketing_campaigns'),
             icon: Mail,
             href: route('crm.campaigns.index'),
-            stats: `${stats.active_campaigns} ${__('Active Campaigns')}`,
+            stats: `${stats.active_campaigns} ${__('general.active_campaigns')}`,
             color: 'text-indigo-600',
             bg: 'bg-indigo-100',
         },
         {
-            title: __('Sequences'),
-            description: __('Automated follow-up sequences'),
+            title: __('general.sequences'),
+            description: __('general.automated_follow_up_sequences'),
             icon: PlayCircle,
             href: route('crm.sequences.index'),
-            stats: `${stats.total_sequences} ${__('Sequences')}`,
+            stats: `${stats.total_sequences} ${__('general.sequences')}`,
             color: 'text-purple-600',
             bg: 'bg-purple-100',
         },
     ];
 
     return (
-        <CrmLayout title={__('Welcome')} activeMenu="dashboard">
+        <CrmLayout title={__('general.welcome')} activeMenu="dashboard">
             <ModulePageHeader 
-                title={__('CRM Dashboard')}
-                description={__('Overview of your marketing, leads, and automations.')}
+                title={__('general.crm_dashboard')}
+                description={__('general.overview_of_your_marketing_leads_and_automations')}
                 icon={BarChart3}
                 module="CRM"
             />
@@ -71,7 +71,7 @@ export default function Dashboard({ stats }) {
                                     href={card.href} 
                                     className="inline-flex items-center text-sm font-semibold text-indigo-600 hover:text-indigo-500 transition-colors"
                                 >
-                                    {__('Go to')} {card.title} <ArrowRight className="ml-1 h-4 w-4" />
+                                    {__('general.go_to')} {card.title} <ArrowRight className="ml-1 h-4 w-4" />
                                 </Link>
                             </div>
                         </CardContent>

@@ -68,7 +68,7 @@ export default function AdjustStock({ product }: { product: any }) {
                                         value={data.change_amount}
                                         onChange={(e) => setData('change_amount', e.target.value)}
                                         className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                                        placeholder="e.g. 5, -3"
+                                        placeholder={__('general.e_g_5_3')}
                                         required
                                     />
                                     <InputError message={errors.change_amount} className="mt-2" />

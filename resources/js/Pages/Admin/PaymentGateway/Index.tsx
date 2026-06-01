@@ -126,16 +126,16 @@ export default function Index({ clients, totals }: Props) {
     const items = clients?.data ?? [];
 
     return (
-        <AdminSidebarLayout title="Payment Gateway" header="Payment Gateway Clients">
-            <Head title="Admin — Payment Gateway" />
+        <AdminSidebarLayout title={__('general.payment_gateway')} header="Payment Gateway Clients">
+            <Head title={__('general.admin_payment_gateway')} />
 
             {/* ── Stats Row ─────────────────────────────────────────────── */}
             <div className="mb-6 grid grid-cols-2 gap-4 lg:grid-cols-5">
-                <StatCard icon={Users}      label="Total Clients"   value={String(totals.total_clients)}  sub={`${totals.active_clients} active`} />
-                <StatCard icon={CheckCircle} label="Payments Done"  value={String(totals.total_payments)} />
-                <StatCard icon={DollarSign} label="Total Volume"    value={formatCurrency(totals.total_volume, 'EGP')} />
-                <StatCard icon={TrendingUp} label="Our Commission"  value={formatCurrency(totals.total_commission, 'EGP')} />
-                <StatCard icon={Percent}    label="Default Rate"    value="40%" sub="Per payment" />
+                <StatCard icon={Users}      label={__('general.total_clients')}   value={String(totals.total_clients)}  sub={`${totals.active_clients} active`} />
+                <StatCard icon={CheckCircle} label={__('general.payments_done')}  value={String(totals.total_payments)} />
+                <StatCard icon={DollarSign} label={__('general.total_volume')}    value={formatCurrency(totals.total_volume, 'EGP')} />
+                <StatCard icon={TrendingUp} label={__('general.our_commission')}  value={formatCurrency(totals.total_commission, 'EGP')} />
+                <StatCard icon={Percent}    label={__('general.default_rate')}    value="40%" sub="Per payment" />
             </div>
 
             {/* ── Header bar ────────────────────────────────────────────── */}
@@ -145,9 +145,7 @@ export default function Index({ clients, totals }: Props) {
                     <span>{items.length} client{items.length !== 1 ? 's' : ''}</span>
                 </div>
                 <Button onClick={() => setIsCreateOpen(true)}>
-                    <Plus className="mr-2 h-4 w-4" />
-                    New Client
-                </Button>
+                    <Plus className="mr-2 h-4 w-4" />{__('general.new_client')}</Button>
             </div>
 
             {/* ── Table ─────────────────────────────────────────────────── */}
@@ -156,11 +154,11 @@ export default function Index({ clients, totals }: Props) {
                     <thead className="border-b bg-gray-50">
                         <tr>
                             <th className="p-4 font-medium text-gray-600">Client</th>
-                            <th className="p-4 font-medium text-gray-600">Client ID</th>
+                            <th className="p-4 font-medium text-gray-600">{__('general.client_id')}</th>
                             <th className="p-4 font-medium text-gray-600">Commission</th>
                             <th className="p-4 font-medium text-gray-600">Payments</th>
                             <th className="p-4 font-medium text-gray-600">Volume</th>
-                            <th className="p-4 font-medium text-gray-600">Our Earnings</th>
+                            <th className="p-4 font-medium text-gray-600">{__('general.our_earnings')}</th>
                             <th className="p-4 font-medium text-gray-600">Status</th>
                             <th className="p-4 font-medium text-gray-600 text-right">Actions</th>
                         </tr>
@@ -231,8 +229,8 @@ export default function Index({ clients, totals }: Props) {
                             <tr>
                                 <td colSpan={8} className="p-12 text-center">
                                     <CreditCard className="mx-auto mb-3 h-10 w-10 text-gray-200" />
-                                    <p className="font-medium text-gray-400">No clients yet</p>
-                                    <p className="mt-1 text-sm text-gray-300">Create your first gateway client to get started.</p>
+                                    <p className="font-medium text-gray-400">{__('general.no_clients_yet')}</p>
+                                    <p className="mt-1 text-sm text-gray-300">{__('general.create_your_first_gateway_client_to_get_started')}</p>
                                 </td>
                             </tr>
                         )}
@@ -263,7 +261,7 @@ export default function Index({ clients, totals }: Props) {
             <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
                 <DialogContent className="max-w-lg">
                     <DialogHeader>
-                        <DialogTitle>Create Gateway Client</DialogTitle>
+                        <DialogTitle>{__('general.create_gateway_client')}</DialogTitle>
                     </DialogHeader>
                     <form onSubmit={handleCreate}>
                         <div className="space-y-4 py-2">
@@ -273,18 +271,18 @@ export default function Index({ clients, totals }: Props) {
                                     id="name"
                                     value={formData.name}
                                     onChange={e => set('name', e.target.value)}
-                                    placeholder="e.g. Zara Egypt Store"
+                                    placeholder={__('general.e_g_zara_egypt_store')}
                                     required
                                 />
                             </div>
                             <div>
-                                <Label htmlFor="website">Website URL</Label>
+                                <Label htmlFor="website">{__('general.website_url')}</Label>
                                 <Input
                                     id="website"
                                     type="url"
                                     value={formData.website}
                                     onChange={e => set('website', e.target.value)}
-                                    placeholder="https://example.com"
+                                    placeholder={__('general.https_example_com')}
                                 />
                             </div>
                             <div className="grid grid-cols-2 gap-4">
@@ -325,7 +323,7 @@ export default function Index({ clients, totals }: Props) {
                                     onChange={e => set('allowed_ips', e.target.value)}
                                     placeholder="192.168.1.1, 10.0.0.1"
                                 />
-                                <p className="mt-1 text-xs text-gray-400">Comma-separated. Leave empty to allow all IPs.</p>
+                                <p className="mt-1 text-xs text-gray-400">{__('general.comma_separated_leave_empty_to_allow_all_ips')}</p>
                             </div>
                         </div>
                         <DialogFooter className="mt-6">

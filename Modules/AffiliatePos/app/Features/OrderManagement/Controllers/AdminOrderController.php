@@ -46,7 +46,7 @@ class AdminOrderController extends Controller
     public function updateStatus(UpdateOrderStatusRequest $request, Order $order)
     {
         $this->orderService->changeStatus($order, $request->status);
-        return back()->with('success', 'Order status updated successfully');
+        return back()->with('success', __('general.order_status_updated_successfully'));
     }
 
     public function updatePartialDelivery(Request $request, Order $order)
@@ -57,7 +57,7 @@ class AdminOrderController extends Controller
         ]);
 
         $this->orderService->partialDelivery($order, $request->order_item);
-        return back()->with('success', 'Partial delivery applied successfully');
+        return back()->with('success', __('general.partial_delivery_applied_successfully'));
     }
 
     public function bulkUpdateStatus(Request $request)
@@ -68,7 +68,7 @@ class AdminOrderController extends Controller
         ]);
 
         $this->orderService->bulkChangeStatus($request->ids, $request->status);
-        return back()->with('success', 'Status updated successfully');
+        return back()->with('success', __('general.status_updated_successfully_1'));
     }
 
     public function bulkAssignShipping(Request $request)
@@ -84,6 +84,6 @@ class AdminOrderController extends Controller
         }
 
         $this->orderService->bulkAssignShippingCompany($request->ids, $request->shipping_company_id, $companyName);
-        return back()->with('success', 'Shipping company assigned successfully');
+        return back()->with('success', __('general.shipping_company_assigned_successfully'));
     }
 }

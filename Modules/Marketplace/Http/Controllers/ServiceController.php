@@ -47,7 +47,7 @@ class ServiceController extends Controller
         if ($service->status !== 'active') {
             $user = auth()->user();
             if (!$user || ($user->id !== $service->seller_id && !$user->hasRole('admin'))) {
-                abort(404, 'Service not found or not active.');
+                abort(404, __('general.service_not_found_or_not_active'));
             }
         }
 
@@ -115,7 +115,7 @@ class ServiceController extends Controller
         });
 
         return redirect()->route('marketplace.services.show', $service->id)
-            ->with('success', 'Service submitted for review. It will be visible once approved.');
+            ->with('success', __('general.service_submitted_for_review_it_will_be_visible_once_approved'));
     }
 
     public function edit(Service $service)
@@ -195,7 +195,7 @@ class ServiceController extends Controller
         });
 
         return redirect()->route('marketplace.services.show', $service->id)
-            ->with('success', 'Service updated successfully and submitted for re-approval.');
+            ->with('success', __('general.service_updated_successfully_and_submitted_for_re_approval'));
     }
 
 }

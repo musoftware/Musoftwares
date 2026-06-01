@@ -9,21 +9,20 @@ import { CheckCircle2, Clock, XCircle, Wallet } from 'lucide-react';
 export default function AffiliatePayoutsIndex({ payouts }: any) {
     return (
         <div className="p-6 max-w-7xl mx-auto space-y-6">
-            <Head title="My Payouts" />
+            <Head title={__('general.my_payouts')} />
 
             <div className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-2xl font-semibold text-gray-900 tracking-tight">My Payouts</h1>
-                    <p className="text-sm text-gray-500 mt-1">Track your requested withdrawals and current status.</p>
+                    <h1 className="text-2xl font-semibold text-gray-900 tracking-tight">{__('general.my_payouts')}</h1>
+                    <p className="text-sm text-gray-500 mt-1">{__('general.track_your_requested_withdrawals_and_current_status')}</p>
                 </div>
                 <Button className="bg-blue-600 hover:bg-blue-700">
-                    <Wallet className="w-4 h-4 mr-2" /> Request Payout
-                </Button>
+                    <Wallet className="w-4 h-4 mr-2" />{__('general.request_payout')}</Button>
             </div>
 
             <Card className="shadow-sm border-gray-200">
                 <CardHeader className="bg-gray-50/50 border-b pb-4">
-                    <CardTitle className="text-lg">Payout History</CardTitle>
+                    <CardTitle className="text-lg">{__('general.payout_history')}</CardTitle>
                 </CardHeader>
                 <CardContent className="p-0">
                     <Table>
@@ -40,9 +39,7 @@ export default function AffiliatePayoutsIndex({ payouts }: any) {
                         <TableBody>
                             {payouts.data.length === 0 ? (
                                 <TableRow>
-                                    <TableCell colSpan={6} className="h-24 text-center text-gray-500">
-                                        No payout requests found.
-                                    </TableCell>
+                                    <TableCell colSpan={6} className="h-24 text-center text-gray-500">{__('general.no_payout_requests_found')}</TableCell>
                                 </TableRow>
                             ) : (
                                 payouts.data.map((payout: any) => (

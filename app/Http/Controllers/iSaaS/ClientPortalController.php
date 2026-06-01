@@ -42,6 +42,6 @@ class ClientPortalController extends Controller
             'status' => 'signed'
         ]);
 
-        return redirect()->back()->with('success', 'Contract signed successfully.');
+        return redirect()->back()->with('success', __('general.contract_signed_successfully'));
     }
 }

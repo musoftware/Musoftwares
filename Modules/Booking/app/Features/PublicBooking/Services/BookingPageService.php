@@ -38,11 +38,11 @@ class BookingPageService
         $settings = $this->repository->findBySlug($slug);
 
         if (!$settings) {
-            abort(404, 'Booking page not found.');
+            abort(404, __('general.booking_page_not_found'));
         }
 
         if (!$settings->is_active) {
-            abort(403, 'This booking page is currently inactive.');
+            abort(403, __('general.this_booking_page_is_currently_inactive'));
         }
 
         return [

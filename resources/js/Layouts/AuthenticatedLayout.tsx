@@ -127,16 +127,13 @@ function AuthenticatedContent({
                 <div className="bg-gradient-to-r from-amber-500 via-orange-600 to-rose-600 text-white text-xs font-semibold px-4 shadow-md flex items-center justify-between z-[50] sticky top-0" style={{ height: '36px' }}>
                     <div className="flex items-center gap-2">
                         <Shield className="h-4 w-4 text-amber-100 animate-pulse shrink-0" />
-                        <span className="truncate">
-                            You are currently impersonating <strong className="underline">{user?.name}</strong> ({user?.email}). All actions performed will be under this account's scope.
+                        <span className="truncate">{__('general.you_are_currently_impersonating')}<strong className="underline">{user?.name}</strong> ({user?.email}). All actions performed will be under this account's scope.
                         </span>
                     </div>
                     <Link
                         href={route('admin.stop-impersonate')}
                         className="bg-white/20 hover:bg-white/30 text-white font-bold py-1 px-3 rounded-full border border-white/20 hover:border-white/40 transition-all text-[11px] shrink-0"
-                    >
-                        Stop Impersonation
-                    </Link>
+                    >{__('general.stop_impersonation')}</Link>
                 </div>
             )}
 
@@ -179,11 +176,9 @@ function AuthenticatedContent({
                                                             <Building2 className="w-5 h-5 text-slate-400" /> ERP
                                                         </Link>
                                                         <Link href={safeRoute('billing.invoices.index')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-50 text-slate-700 font-medium">
-                                                            <FileText className="w-5 h-5 text-slate-400" /> My Invoices
-                                                        </Link>
+                                                            <FileText className="w-5 h-5 text-slate-400" />{__('general.my_invoices')}</Link>
                                                         <Link href={safeRoute('financial.add-balance')} onClick={() => setIsMobileOpen(false)} className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-emerald-50 text-emerald-700 font-medium">
-                                                            <Plus className="w-5 h-5 text-emerald-500" /> Add Balance
-                                                        </Link>
+                                                            <Plus className="w-5 h-5 text-emerald-500" />{__('general.add_balance')}</Link>
                                                     </>
                                                 )}
                                             </div>
@@ -238,22 +233,18 @@ function AuthenticatedContent({
                                                     <ArrowRightLeft className="w-4 h-4 text-slate-400" /> Transactions
                                                 </Link>
                                                 <Link href={safeRoute('financial.withdrawals')} className="flex items-center gap-3 px-2 py-1.5 rounded-md hover:bg-slate-50 text-sm font-medium text-slate-700">
-                                                    <ArrowUpRight className="w-4 h-4 text-slate-400" /> Request Withdrawal
-                                                </Link>
+                                                    <ArrowUpRight className="w-4 h-4 text-slate-400" />{__('general.request_withdrawal')}</Link>
                                                 <Link href={safeRoute('financial.payout-methods.index')} className="flex items-center gap-3 px-2 py-1.5 rounded-md hover:bg-slate-50 text-sm font-medium text-slate-700">
-                                                    <CreditCard className="w-4 h-4 text-slate-400" /> Payout Methods
-                                                </Link>
+                                                    <CreditCard className="w-4 h-4 text-slate-400" />{__('general.payout_methods')}</Link>
                                                 <Link href={safeRoute('billing.invoices.index')} className="flex items-center gap-3 px-2 py-1.5 rounded-md hover:bg-slate-50 text-sm font-medium text-slate-700">
-                                                    <FileText className="w-4 h-4 text-slate-400" /> My Invoices
-                                                </Link>
+                                                    <FileText className="w-4 h-4 text-slate-400" />{__('general.my_invoices')}</Link>
                                             </div>
                                         </div>
                                         <div>
-                                            <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2 px-2">Support & Workspace</h4>
+                                            <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2 px-2">{__('general.support_workspace')}</h4>
                                             <div className="space-y-0.5">
                                                 <Link href={safeRoute('tickets.index')} className="flex items-center gap-3 px-2 py-1.5 rounded-md hover:bg-slate-50 text-sm font-medium text-slate-700">
-                                                    <LifeBuoy className="w-4 h-4 text-slate-400" /> Support Tickets
-                                                </Link>
+                                                    <LifeBuoy className="w-4 h-4 text-slate-400" />{__('general.support_tickets')}</Link>
                                                 <Link href={safeRoute('messages.index')} className="flex items-center gap-3 px-2 py-1.5 rounded-md hover:bg-slate-50 text-sm font-medium text-slate-700">
                                                     <MessageSquare className="w-4 h-4 text-slate-400" /> Messages
                                                 </Link>
@@ -271,7 +262,7 @@ function AuthenticatedContent({
                                     </div>
                                     <DropdownMenuContent align="start" className="w-[320px] p-2 rounded-xl shadow-xl border border-slate-200 bg-white isolate z-50">
                                         <div className="px-2 py-2 mb-1 border-b border-slate-50">
-                                            <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Service Hubs</p>
+                                            <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">{__('general.service_hubs')}</p>
                                         </div>
                                         
                                         <DropdownMenuItem 
@@ -289,12 +280,10 @@ function AuthenticatedContent({
                                             </div>
                                             <div className="flex-1 min-w-0">
                                                 <div className="flex items-center justify-between">
-                                                    <p className={cn("text-sm font-medium", isFreelanceActive ? "text-emerald-900" : "text-slate-900")}>Freelance Hub</p>
-                                                    <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-emerald-100 text-emerald-700">Points-Based</span>
+                                                    <p className={cn("text-sm font-medium", isFreelanceActive ? "text-emerald-900" : "text-slate-900")}>{__('general.freelance_hub')}</p>
+                                                    <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-emerald-100 text-emerald-700">{__('general.points_based')}</span>
                                                 </div>
-                                                <p className={cn("text-xs truncate", isFreelanceActive ? "text-emerald-700/70" : "text-slate-500")}>
-                                                    Jobs, proposals &amp; earnings
-                                                </p>
+                                                <p className={cn("text-xs truncate", isFreelanceActive ? "text-emerald-700/70" : "text-slate-500")}>{__('general.jobs_proposals_amp_earnings')}</p>
                                             </div>
                                         </DropdownMenuItem>
 
@@ -313,12 +302,10 @@ function AuthenticatedContent({
                                             </div>
                                             <div className="flex-1 min-w-0">
                                                 <div className="flex items-center justify-between">
-                                                    <p className={cn("text-sm font-medium", isMarketplaceActive ? "text-violet-900" : "text-slate-900")}>Marketing Suite</p>
+                                                    <p className={cn("text-sm font-medium", isMarketplaceActive ? "text-violet-900" : "text-slate-900")}>{__('general.marketing_suite')}</p>
                                                     <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-violet-100 text-violet-700">Free</span>
                                                 </div>
-                                                <p className={cn("text-xs truncate", isMarketplaceActive ? "text-violet-700/70" : "text-slate-500")}>
-                                                    Services, clients &amp; campaigns
-                                                </p>
+                                                <p className={cn("text-xs truncate", isMarketplaceActive ? "text-violet-700/70" : "text-slate-500")}>{__('general.services_clients_amp_campaigns')}</p>
                                             </div>
                                         </DropdownMenuItem>
                                     </DropdownMenuContent>
@@ -341,7 +328,7 @@ function AuthenticatedContent({
                                         {/* Column 1: Core Systems */}
                                         <div className="flex flex-col gap-1">
                                             <div className="px-2 py-2 mb-1 border-b border-slate-50">
-                                                <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Core Systems</p>
+                                                <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">{__('general.core_systems')}</p>
                                             </div>
                                             
                                             <DropdownMenuItem 
@@ -384,7 +371,7 @@ function AuthenticatedContent({
                                                 </div>
                                                 <div className="flex-1 min-w-0">
                                                     <div className="flex items-center justify-between">
-                                                        <p className={cn("text-sm font-medium", isCrmActive ? "text-indigo-900" : "text-slate-900")}>Lead Gen CRM</p>
+                                                        <p className={cn("text-sm font-medium", isCrmActive ? "text-indigo-900" : "text-slate-900")}>{__('general.lead_gen_crm')}</p>
                                                         {isCrmActive && <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-indigo-100 text-indigo-700">Active</span>}
                                                         {!activeModules.crm && <Lock className="w-3.5 h-3.5 text-slate-400" />}
                                                     </div>
@@ -441,12 +428,10 @@ function AuthenticatedContent({
                                                 </div>
                                                 <div className="flex-1 min-w-0">
                                                     <div className="flex items-center justify-between">
-                                                        <p className={cn("text-sm font-medium", isRouteActive('fbmb.index') ? "text-teal-900" : "text-slate-900")}>iSAAS FB Lookup</p>
+                                                        <p className={cn("text-sm font-medium", isRouteActive('fbmb.index') ? "text-teal-900" : "text-slate-900")}>{__('general.isaas_fb_lookup')}</p>
                                                         {isRouteActive('fbmb.index') && <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-teal-100 text-teal-700">Active</span>}
                                                     </div>
-                                                    <p className={cn("text-xs truncate", isRouteActive('fbmb.index') ? "text-teal-700/70" : "text-slate-500")}>
-                                                        Search Mobile by FBID
-                                                    </p>
+                                                    <p className={cn("text-xs truncate", isRouteActive('fbmb.index') ? "text-teal-700/70" : "text-slate-500")}>{__('general.search_mobile_by_fbid')}</p>
                                                 </div>
                                             </DropdownMenuItem>
 
@@ -465,12 +450,10 @@ function AuthenticatedContent({
                                                 </div>
                                                 <div className="flex-1 min-w-0">
                                                     <div className="flex items-center justify-between">
-                                                        <p className={cn("text-sm font-medium", isRouteActive('sms-payment-gateway.index') ? "text-rose-900" : "text-slate-900")}>Payment Gateway</p>
+                                                        <p className={cn("text-sm font-medium", isRouteActive('sms-payment-gateway.index') ? "text-rose-900" : "text-slate-900")}>{__('general.payment_gateway')}</p>
                                                         {isRouteActive('sms-payment-gateway.index') && <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-rose-100 text-rose-700">Active</span>}
                                                     </div>
-                                                    <p className={cn("text-xs truncate", isRouteActive('sms-payment-gateway.index') ? "text-rose-700/70" : "text-slate-500")}>
-                                                        Android automated SMS
-                                                    </p>
+                                                    <p className={cn("text-xs truncate", isRouteActive('sms-payment-gateway.index') ? "text-rose-700/70" : "text-slate-500")}>{__('general.android_automated_sms')}</p>
                                                 </div>
                                             </DropdownMenuItem>
 
@@ -489,12 +472,10 @@ function AuthenticatedContent({
                                                 </div>
                                                 <div className="flex-1 min-w-0">
                                                     <div className="flex items-center justify-between">
-                                                        <p className={cn("text-sm font-medium", isRouteActive('isaas.gold-savers.index') ? "text-yellow-900" : "text-slate-900")}>Gold Savers</p>
+                                                        <p className={cn("text-sm font-medium", isRouteActive('isaas.gold-savers.index') ? "text-yellow-900" : "text-slate-900")}>{__('general.gold_savers')}</p>
                                                         {isRouteActive('isaas.gold-savers.index') && <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-yellow-100 text-yellow-700">Active</span>}
                                                     </div>
-                                                    <p className={cn("text-xs truncate", isRouteActive('isaas.gold-savers.index') ? "text-yellow-700/70" : "text-slate-500")}>
-                                                        Track your gold value
-                                                    </p>
+                                                    <p className={cn("text-xs truncate", isRouteActive('isaas.gold-savers.index') ? "text-yellow-700/70" : "text-slate-500")}>{__('general.track_your_gold_value')}</p>
                                                 </div>
                                             </DropdownMenuItem>
 
@@ -513,13 +494,11 @@ function AuthenticatedContent({
                                                 </div>
                                                 <div className="flex-1 min-w-0">
                                                     <div className="flex items-center justify-between">
-                                                        <p className={cn("text-sm font-medium", isToolsActive ? "text-fuchsia-900" : "text-slate-900")}>Tools &amp; Plugins</p>
+                                                        <p className={cn("text-sm font-medium", isToolsActive ? "text-fuchsia-900" : "text-slate-900")}>{__('general.tools_amp_plugins')}</p>
                                                         {isToolsActive && <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-fuchsia-100 text-fuchsia-700">Active</span>}
-                                                        {!isToolsActive && <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-slate-100 text-slate-500">Free Browse</span>}
+                                                        {!isToolsActive && <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-slate-100 text-slate-500">{__('general.free_browse')}</span>}
                                                     </div>
-                                                    <p className={cn("text-xs truncate", isToolsActive ? "text-fuchsia-700/70" : "text-slate-500")}>
-                                                        Extensions &amp; Licensing
-                                                    </p>
+                                                    <p className={cn("text-xs truncate", isToolsActive ? "text-fuchsia-700/70" : "text-slate-500")}>{__('general.extensions_amp_licensing')}</p>
                                                 </div>
                                             </DropdownMenuItem>
                                         </div>
@@ -554,7 +533,7 @@ function AuthenticatedContent({
                                         className="inline-flex items-center gap-1 h-8 min-w-[105px] justify-center px-3 text-xs font-medium border border-slate-200 rounded-full text-slate-700 hover:bg-slate-50 hover:border-slate-300 transition-colors duration-150"
                                     >
                                         <Plus className="w-3.5 h-3.5 shrink-0" />
-                                        <span>Add Balance</span>
+                                        <span>{__('general.add_balance')}</span>
                                     </Link>
 
                                     {/* Wallet pill — locked geometry */}
@@ -562,7 +541,7 @@ function AuthenticatedContent({
                                         <Link
                                             href={safeRoute('financial.transactions')}
                                             className="inline-flex items-center gap-1.5 h-8 min-w-[90px] justify-center px-3 bg-slate-100 hover:bg-slate-200 rounded-full transition-colors duration-150 text-xs font-medium text-slate-900"
-                                            title="Wallet Balance"
+                                            title={__('general.wallet_balance')}
                                         >
                                             <Wallet className="w-3.5 h-3.5 text-slate-500 shrink-0" />
                                             <span>{wallet ? `${Number(wallet.balance).toFixed(2)} ${wallet.currency}` : '$0.00'}</span>
@@ -579,7 +558,7 @@ function AuthenticatedContent({
                                     <Link
                                         href={safeRoute('points.index', undefined, '/points')}
                                         className="inline-flex items-center gap-1.5 h-8 min-w-[60px] justify-center px-3 bg-amber-50 hover:bg-amber-100 border border-amber-100/80 rounded-full transition-colors duration-150 text-xs font-medium text-amber-700"
-                                        title="Points/Connects Balance"
+                                        title={__('general.points_connects_balance')}
                                     >
                                         <Coins className="w-3.5 h-3.5 text-amber-500 shrink-0" />
                                         <span>{user?.points_balance !== undefined ? Number(user.points_balance).toLocaleString() : '0'}</span>
@@ -612,9 +591,7 @@ function AuthenticatedContent({
                                                 method="post" 
                                                 as="button" 
                                                 className="text-xs text-indigo-600 hover:text-indigo-700 font-medium bg-transparent border-0 cursor-pointer p-0"
-                                            >
-                                                Mark all read
-                                            </Link>
+                                            >{__('general.mark_all_read')}</Link>
                                         )}
                                     </div>
                                     <div className="max-h-[300px] overflow-y-auto p-2">
@@ -630,24 +607,18 @@ function AuthenticatedContent({
                                                         method="post" 
                                                         as="button" 
                                                         className="text-[10px] text-indigo-600 hover:underline shrink-0 bg-transparent border-0 cursor-pointer"
-                                                    >
-                                                        Mark read
-                                                    </Link>
+                                                    >{__('general.mark_read')}</Link>
                                                 </div>
                                             ))
                                         ) : (
-                                            <div className="px-2 py-6 text-center text-sm text-slate-500 font-light">
-                                                No new notifications
-                                            </div>
+                                            <div className="px-2 py-6 text-center text-sm text-slate-500 font-light">{__('general.no_new_notifications')}</div>
                                         )}
                                     </div>
                                     <div className="p-2 border-t border-slate-100">
                                         <Link 
                                             href={safeRoute('notifications.index')} 
                                             className={cn(buttonVariants({ variant: 'ghost', size: 'sm' }), "w-full text-xs text-slate-600 justify-center")}
-                                        >
-                                            View All
-                                        </Link>
+                                        >{__('general.view_all')}</Link>
                                     </div>
                                 </DropdownMenuContent>
                             </DropdownMenu>
@@ -675,47 +646,40 @@ function AuthenticatedContent({
                                                         className="cursor-pointer rounded-lg text-sm bg-indigo-50 text-indigo-700 focus:bg-indigo-100 focus:text-indigo-800 mb-1"
                                                         render={<Link href={safeRoute('admin.dashboard')} className="flex items-center w-full font-medium" />}
                                                     >
-                                                        <Shield className="mr-2 h-4 w-4 text-indigo-600" /> Admin Dashboard
-                                                    </DropdownMenuItem>
+                                                        <Shield className="mr-2 h-4 w-4 text-indigo-600" />{__('general.admin_dashboard')}</DropdownMenuItem>
                                                 )}
                                                 {user?.roles?.includes('moderator') && (
                                                     <DropdownMenuItem 
                                                         className="cursor-pointer rounded-lg text-sm bg-blue-50 text-blue-700 focus:bg-blue-100 focus:text-blue-800 mb-1"
                                                         render={<Link href={safeRoute('admin.tickets.index')} className="flex items-center w-full font-medium" />}
                                                     >
-                                                        <LifeBuoy className="mr-2 h-4 w-4 text-blue-600" /> Manage Tickets
-                                                    </DropdownMenuItem>
+                                                        <LifeBuoy className="mr-2 h-4 w-4 text-blue-600" />{__('general.manage_tickets')}</DropdownMenuItem>
                                                 )}
                                                 <DropdownMenuItem 
                                                     className="cursor-pointer rounded-lg text-sm"
                                                     render={<Link href={safeRoute('profile.edit')} className="flex items-center w-full" />}
                                                 >
-                                                    <User className="mr-2 h-4 w-4 text-slate-400" /> My Profile
-                                                </DropdownMenuItem>
+                                                    <User className="mr-2 h-4 w-4 text-slate-400" />{__('general.my_profile')}</DropdownMenuItem>
                                                 <DropdownMenuItem 
                                                     className="cursor-pointer rounded-lg text-sm"
                                                     render={<Link href={safeRoute('kyc.index')} className="flex items-center w-full" />}
                                                 >
-                                                    <Shield className="mr-2 h-4 w-4 text-slate-400" /> Identity Verification
-                                                </DropdownMenuItem>
+                                                    <Shield className="mr-2 h-4 w-4 text-slate-400" />{__('general.identity_verification')}</DropdownMenuItem>
                                                 <DropdownMenuItem 
                                                     className="cursor-pointer rounded-lg text-sm"
                                                     render={<Link href={safeRoute('financial.transactions')} className="flex items-center w-full" />}
                                                 >
-                                                    <History className="mr-2 h-4 w-4 text-slate-400" /> Balance History
-                                                </DropdownMenuItem>
+                                                    <History className="mr-2 h-4 w-4 text-slate-400" />{__('general.balance_history')}</DropdownMenuItem>
                                                 <DropdownMenuItem 
                                                     className="cursor-pointer rounded-lg text-sm"
                                                     render={<Link href={safeRoute('profile.edit')} className="flex items-center w-full" />}
                                                 >
-                                                    <Shield className="mr-2 h-4 w-4 text-slate-400" /> Security Settings
-                                                </DropdownMenuItem>
+                                                    <Shield className="mr-2 h-4 w-4 text-slate-400" />{__('general.security_settings')}</DropdownMenuItem>
                                                 <DropdownMenuItem 
                                                     className="cursor-pointer rounded-lg text-sm"
                                                     render={<Link href={safeRoute('settings.backup.index')} className="flex items-center w-full" />}
                                                 >
-                                                    <Download className="mr-2 h-4 w-4 text-slate-400" /> Backup & Restore
-                                                </DropdownMenuItem>
+                                                    <Download className="mr-2 h-4 w-4 text-slate-400" />{__('general.backup_restore')}</DropdownMenuItem>
                                                 <DropdownMenuItem 
                                                     className="cursor-pointer rounded-lg text-sm"
                                                     render={<Link href={safeRoute('subscriptions.manage')} className="flex items-center w-full" />}
@@ -738,8 +702,7 @@ function AuthenticatedContent({
                                             className="cursor-pointer rounded-lg text-sm text-rose-600 focus:text-rose-600 focus:bg-rose-50"
                                             render={<Link href={route('erp.team.logout')} method="post" as="button" className="flex items-center w-full font-medium" />}
                                         >
-                                            <LogOut className="mr-2 h-4 w-4" /> Logout Team Member
-                                        </DropdownMenuItem>
+                                            <LogOut className="mr-2 h-4 w-4" />{__('general.logout_team_member')}</DropdownMenuItem>
                                     )}
                                 </DropdownMenuContent>
                             </DropdownMenu>

@@ -260,7 +260,7 @@ export default function PricingBuilder({
                         </div>
                         <div className="text-right shrink-0 ml-2">
                             {item.type === 'module' && (
-                                <div className="text-[10px] text-slate-400 font-medium uppercase tracking-wider mb-0.5 text-right">Starts from</div>
+                                <div className="text-[10px] text-slate-400 font-medium uppercase tracking-wider mb-0.5 text-right">{__('general.starts_from')}</div>
                             )}
                             <span className="text-lg font-bold text-slate-900">
                                 {calculateItemPrice(item).toFixed(2)}
@@ -279,8 +279,8 @@ export default function PricingBuilder({
             <div className="flex-1 w-full space-y-10 text-left">
                 <section>
                     <div className="mb-4">
-                        <h2 className="text-xl font-semibold text-slate-900">Core Modules</h2>
-                        <p className="text-sm text-slate-500">The foundation for your business operations.</p>
+                        <h2 className="text-xl font-semibold text-slate-900">{__('general.core_modules')}</h2>
+                        <p className="text-sm text-slate-500">{__('general.the_foundation_for_your_business_operations')}</p>
                     </div>
                     <div className="grid grid-cols-1 gap-6">
                         {modules.map(module => {
@@ -313,8 +313,8 @@ export default function PricingBuilder({
                 <section>
                     <div className="mb-4 flex items-center justify-between">
                         <div>
-                            <h2 className="text-xl font-semibold text-slate-900">Automation Tools</h2>
-                            <p className="text-sm text-slate-500">Standalone tools to boost your productivity.</p>
+                            <h2 className="text-xl font-semibold text-slate-900">{__('general.automation_tools')}</h2>
+                            <p className="text-sm text-slate-500">{__('general.standalone_tools_to_boost_your_productivity')}</p>
                         </div>
                         {tools.length > 0 && (
                             <Button 
@@ -337,8 +337,8 @@ export default function PricingBuilder({
                 <div className="bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-sm">
                     <div className="p-6 bg-slate-50/50 border-b border-slate-100 flex flex-col gap-3">
                         <div>
-                            <h3 className="text-lg font-semibold text-slate-900">Workspace Summary</h3>
-                            <p className="text-sm text-slate-500">Select your preferred billing cycle</p>
+                            <h3 className="text-lg font-semibold text-slate-900">{__('general.workspace_summary')}</h3>
+                            <p className="text-sm text-slate-500">{__('general.select_your_preferred_billing_cycle')}</p>
                         </div>
                         
                         <div className="flex bg-slate-200/50 p-1 rounded-xl text-sm text-slate-500">
@@ -370,7 +370,7 @@ export default function PricingBuilder({
                                 <div className="w-12 h-12 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-3">
                                     <Layers className="w-6 h-6 text-slate-300" />
                                 </div>
-                                <p className="text-slate-500 text-sm">Select modules to build your workspace.</p>
+                                <p className="text-slate-500 text-sm">{__('general.select_modules_to_build_your_workspace')}</p>
                             </div>
                         ) : (
                             <div className="space-y-4">
@@ -397,7 +397,7 @@ export default function PricingBuilder({
                                 
                                 {toolsDiscount > 0 && (
                                     <div className="flex justify-between text-sm text-indigo-600 font-medium">
-                                        <span>Tools Volume Discount</span>
+                                        <span>{__('general.tools_volume_discount')}</span>
                                         <span>-{toolsDiscount.toFixed(2)}</span>
                                     </div>
                                 )}
@@ -417,7 +417,7 @@ export default function PricingBuilder({
                                 )}
 
                                 <div className="flex justify-between items-end">
-                                    <span className="text-base font-medium text-slate-900">Total To Pay</span>
+                                    <span className="text-base font-medium text-slate-900">{__('general.total_to_pay')}</span>
                                     <div className="text-right">
                                         <span className="text-3xl font-bold tracking-tight text-indigo-600">
                                             {Math.max(0, total - (!isNewSystem ? proratedRefund : 0)).toFixed(2)}
@@ -440,15 +440,11 @@ export default function PricingBuilder({
                                             ? 'bg-slate-900 hover:bg-slate-800 text-white shadow-sm'
                                             : 'bg-slate-100 text-slate-400 cursor-not-allowed'
                                     )}
-                                >
-                                    Start Building Your Workspace
-                                </Button>
+                                >{__('general.start_building_your_workspace')}</Button>
                             </Link>
                         )}
                         {!renderActions && (
-                            <p className="text-xs text-center text-slate-500 pt-2">
-                                No credit card required for 14-day trial on ERP & modules (Not applicable for tools).
-                            </p>
+                            <p className="text-xs text-center text-slate-500 pt-2">{__('general.no_credit_card_required_for_14_day_trial_on_erp_modules_not_applicable_for_tools')}</p>
                         )}
                     </div>
                 </div>

@@ -16,7 +16,7 @@ class TenantMiddleware
     public function handle(Request $request, Closure $next): Response
     {
         if (!auth()->guard('web')->check() && !auth()->guard('erp_team')->check()) {
-            abort(403, 'Unauthorized access.');
+            abort(403, __('general.unauthorized_access'));
         }
 
         // Stub: Checks if the user has an active ERP subscription.
@@ -24,7 +24,7 @@ class TenantMiddleware
         $hasErpSubscription = true;
 
         if (!$hasErpSubscription) {
-            abort(403, 'Requires an active ERP subscription.');
+            abort(403, __('general.requires_an_active_erp_subscription'));
         }
 
         return $next($request);

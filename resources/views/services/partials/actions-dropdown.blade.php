@@ -1,13 +1,12 @@
 <div class="dropdown">
-    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="More Actions">
+    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="{{ __('general.more_actions') }}">
         <i class="ti ti-dots"></i>
         <span class="d-none d-xl-inline ms-1">More</span>
     </button>
     <ul class="dropdown-menu dropdown-menu-end">
         {{-- Common actions --}}
         <li><a class="dropdown-item" href="{{ route('services.saved-replies', $service) }}">
-            <i class="ti ti-message me-2"></i>Saved Replies
-        </a></li>
+            <i class="ti ti-message me-2"></i>{{ __('general.saved_replies') }}</a></li>
         <li><hr class="dropdown-divider"></li>
 
         {{-- Landing Page Section --}}
@@ -24,13 +23,11 @@
         @if($service->landingPage)
             <li>
                 <a class="dropdown-item" href="{{ route('services.landing-page.show', $service->landingPage->slug) }}" target="_blank">
-                    <i class="ti ti-external-link me-2"></i>View Landing Page
-                </a>
+                    <i class="ti ti-external-link me-2"></i>{{ __('general.view_landing_page') }}</a>
             </li>
             <li>
                 <a class="dropdown-item" href="{{ route('services.landing-page.edit', $service) }}">
-                    <i class="ti ti-edit me-2"></i>Edit Landing Page
-                </a>
+                    <i class="ti ti-edit me-2"></i>{{ __('general.edit_landing_page') }}</a>
             </li>
             <li>
                 <a class="dropdown-item" href="{{ route('services.landing-page.submissions', $service) }}">
@@ -46,8 +43,7 @@
         @else
             <li>
                 <a class="dropdown-item" href="{{ route('services.landing-page.create', $service) }}">
-                    <i class="ti ti-plus me-2"></i>Create Landing Page
-                </a>
+                    <i class="ti ti-plus me-2"></i>{{ __('general.create_landing_page') }}</a>
             </li>
         @endif
 

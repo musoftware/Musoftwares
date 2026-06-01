@@ -29,7 +29,7 @@ class WithdrawalApprovedNotification extends Notification implements ShouldQueue
                     ->subject('Withdrawal Approved')
                     ->greeting('Hello ' . ($notifiable->name ?? 'User') . ',')
                     ->line('Your withdrawal request for ' . ($this->withdrawal->amount ?? '') . ' ' . ($this->withdrawal->currency ?? '') . ' has been approved.')
-                    ->line('The funds will be transferred to your selected payment method shortly.')
+                    ->line(__('general.the_funds_will_be_transferred_to_your_selected_payment_method_shortly'))
                     ->action('View Wallet', url('/app/wallet'));
     }
 

@@ -6,7 +6,7 @@
     <div class="dashboard-container at-mobile-scroll-fix">
         <x-client.section-header 
             icon="ti ti-history" 
-            title="Service History" 
+            title="{{ __('general.service_history') }}" 
             subtitle="View changes made to {{ $service->title }}">
             <a href="{{ route('services.mine') }}" class="at-btn at-btn-ghost at-btn-sm">
                 <i class="ti ti-arrow-left me-1"></i> Back
@@ -20,7 +20,7 @@
                         <thead>
                             <tr>
                                 <th>Date</th>
-                                <th>Changed By</th>
+                                <th>{{ __('general.changed_by') }}</th>
                                 <th>Title</th>
                                 <th>Price</th>
                                 <th>Reason</th>
@@ -34,7 +34,7 @@
                                         <div class="text-dark fw-semibold">{{ $history->created_at->format('M d, Y') }}</div>
                                         <div class="text-muted small">{{ $history->created_at->format('h:i A') }}</div>
                                     </td>
-                                    <td data-label="Changed By">
+                                    <td data-label="{{ __('general.changed_by') }}">
                                         {{ $history->user->name }}
                                     </td>
                                     <td data-label="Title">

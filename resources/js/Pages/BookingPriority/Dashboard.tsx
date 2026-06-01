@@ -8,14 +8,14 @@ export default function PriorityDashboard({ stats, recentEscalations }) {
     return (
         <div className="p-6 max-w-7xl mx-auto space-y-8">
             <div>
-                <h1 className="text-3xl font-bold tracking-tight">Priority & VIP Support</h1>
-                <p className="text-muted-foreground mt-2">Manage premium availability and fast-track queues.</p>
+                <h1 className="text-3xl font-bold tracking-tight">{__('general.priority_vip_support')}</h1>
+                <p className="text-muted-foreground mt-2">{__('general.manage_premium_availability_and_fast_track_queues')}</p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between pb-2">
-                        <CardTitle className="text-sm font-medium">Total VIP Customers</CardTitle>
+                        <CardTitle className="text-sm font-medium">{__('general.total_vip_customers')}</CardTitle>
                         <Crown className="h-4 w-4 text-amber-500" />
                     </CardHeader>
                     <CardContent>
@@ -33,7 +33,7 @@ export default function PriorityDashboard({ stats, recentEscalations }) {
                 </Card>
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between pb-2">
-                        <CardTitle className="text-sm font-medium">Priority Utilization</CardTitle>
+                        <CardTitle className="text-sm font-medium">{__('general.priority_utilization')}</CardTitle>
                         <TrendingUp className="h-4 w-4 text-emerald-500" />
                     </CardHeader>
                     <CardContent>
@@ -44,14 +44,14 @@ export default function PriorityDashboard({ stats, recentEscalations }) {
 
             <Card>
                 <CardHeader>
-                    <CardTitle>Recent Escalations</CardTitle>
+                    <CardTitle>{__('general.recent_escalations')}</CardTitle>
                 </CardHeader>
                 <CardContent>
                     <Table>
                         <TableHeader>
                             <TableRow>
                                 <TableHead>Date</TableHead>
-                                <TableHead>Booking Ref</TableHead>
+                                <TableHead>{__('general.booking_ref')}</TableHead>
                                 <TableHead>Level</TableHead>
                                 <TableHead>Reason</TableHead>
                             </TableRow>

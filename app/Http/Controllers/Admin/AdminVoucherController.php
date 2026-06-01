@@ -33,7 +33,7 @@ class AdminVoucherController extends Controller
     {
         $this->promotionService->createVoucher($request->validated());
 
-        return redirect()->back()->with('success', 'Voucher created successfully');
+        return redirect()->back()->with('success', __('general.voucher_created_successfully'));
     }
 
     public function show(Voucher $voucher)
@@ -55,13 +55,13 @@ class AdminVoucherController extends Controller
     {
         $this->promotionService->updateVoucher($voucher, $request->validated());
 
-        return redirect()->back()->with('success', 'Voucher updated successfully');
+        return redirect()->back()->with('success', __('general.voucher_updated_successfully'));
     }
 
     public function destroy(Voucher $voucher)
     {
         $voucher->delete();
 
-        return redirect()->route('admin.vouchers.index')->with('success', 'Voucher deleted successfully');
+        return redirect()->route('admin.vouchers.index')->with('success', __('general.voucher_deleted_successfully'));
     }
 }

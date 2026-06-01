@@ -34,8 +34,8 @@ export default function PricingStep({ data, setData, errors }: any) {
     return (
         <div className="space-y-8">
             <div>
-                <h2 className="text-2xl font-bold text-slate-900 mb-1">Scope & Pricing</h2>
-                <p className="text-sm text-slate-500">Offer up to 3 packages to give buyers more choices and increase your earnings.</p>
+                <h2 className="text-2xl font-bold text-slate-900 mb-1">{__('general.scope_pricing')}</h2>
+                <p className="text-sm text-slate-500">{__('general.offer_up_to_3_packages_to_give_buyers_more_choices_and_increase_your_earnings')}</p>
             </div>
 
             <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
@@ -66,7 +66,7 @@ export default function PricingStep({ data, setData, errors }: any) {
 
                         <div className="p-5 space-y-5 flex-1 flex flex-col">
                             <div className="space-y-1.5">
-                                <Label className="text-xs font-bold text-slate-600 uppercase tracking-wider">Name your package</Label>
+                                <Label className="text-xs font-bold text-slate-600 uppercase tracking-wider">{__('general.name_your_package')}</Label>
                                 <Input
                                     value={pkg.name}
                                     onChange={e => setPackageField(idx, 'name', e.target.value)}
@@ -81,7 +81,7 @@ export default function PricingStep({ data, setData, errors }: any) {
                                 <textarea
                                     value={pkg.description}
                                     onChange={e => setPackageField(idx, 'description', e.target.value)}
-                                    placeholder="Briefly describe what's included..."
+                                    placeholder={__('general.briefly_describe_what_s_included')}
                                     rows={4}
                                     maxLength={500}
                                     className="w-full rounded-xl border border-input bg-background px-3 py-2 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all h-full min-h-[100px]"
@@ -90,7 +90,7 @@ export default function PricingStep({ data, setData, errors }: any) {
 
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="space-y-1.5">
-                                    <Label className="text-xs font-bold text-slate-600 uppercase tracking-wider flex items-center gap-1">Delivery Time <Info className="w-3 h-3 text-slate-400" /></Label>
+                                    <Label className="text-xs font-bold text-slate-600 uppercase tracking-wider flex items-center gap-1">{__('general.delivery_time')}<Info className="w-3 h-3 text-slate-400" /></Label>
                                     <div className="relative">
                                         <Input
                                             type="number"

@@ -77,7 +77,7 @@ export default function Show({ campaign }) {
                         {campaign.name}
                         {campaign.status === 'draft' && <span className="ml-3 inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-800">Draft</span>}
                         {campaign.status === 'scheduled' && <span className="ml-3 inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800">Scheduled</span>}
-                        {campaign.status === 'sending' && <span className="ml-3 inline-flex items-center rounded-full bg-yellow-100 px-2.5 py-0.5 text-xs font-medium text-yellow-800">Sending...</span>}
+                        {campaign.status === 'sending' && <span className="ml-3 inline-flex items-center rounded-full bg-yellow-100 px-2.5 py-0.5 text-xs font-medium text-yellow-800">{__('general.sending')}</span>}
                         {campaign.status === 'paused' && <span className="ml-3 inline-flex items-center rounded-full bg-orange-100 px-2.5 py-0.5 text-xs font-medium text-orange-800">Paused</span>}
                         {campaign.status === 'completed' && <span className="ml-3 inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800">Completed</span>}
                     </h2>
@@ -94,18 +94,17 @@ export default function Show({ campaign }) {
                             <Dialog open={isAiOpen} onOpenChange={setIsAiOpen}>
                                 <DialogTrigger asChild>
                                     <Button variant="secondary" className="bg-indigo-100 text-indigo-700 hover:bg-indigo-200">
-                                        <Sparkles className="w-4 h-4 mr-2" /> AI Copywriter
-                                    </Button>
+                                        <Sparkles className="w-4 h-4 mr-2" />{__('general.ai_copywriter')}</Button>
                                 </DialogTrigger>
                                 <DialogContent>
                                     <DialogHeader>
-                                        <DialogTitle>AI Copywriter</DialogTitle>
+                                        <DialogTitle>{__('general.ai_copywriter')}</DialogTitle>
                                     </DialogHeader>
                                     <div className="space-y-4 py-4">
                                         <div className="space-y-2">
-                                            <Label>What is this campaign about?</Label>
+                                            <Label>{__('general.what_is_this_campaign_about')}</Label>
                                             <Textarea 
-                                                placeholder="e.g. Announcing a new 50% discount on all web design services for the next 48 hours..."
+                                                placeholder={__('general.e_g_announcing_a_new_50_discount_on_all_web_design_services_for_the_next_48_hours')}
                                                 value={aiForm.context}
                                                 onChange={e => setAiForm({...aiForm, context: e.target.value})}
                                                 rows={4}
@@ -119,8 +118,8 @@ export default function Show({ campaign }) {
                                                 onChange={e => setAiForm({...aiForm, tone: e.target.value})}
                                             >
                                                 <option value="professional">Professional</option>
-                                                <option value="urgent">Urgent / Flash Sale</option>
-                                                <option value="friendly">Friendly & Casual</option>
+                                                <option value="urgent">{__('general.urgent_flash_sale')}</option>
+                                                <option value="friendly">{__('general.friendly_casual')}</option>
                                             </select>
                                         </div>
                                         <Button className="w-full" onClick={handleGenerateAI} disabled={isGenerating}>
@@ -136,21 +135,18 @@ export default function Show({ campaign }) {
                             </Button>
                             
                             <Button onClick={handleSchedule} className="bg-blue-600 hover:bg-blue-700">
-                                <Clock className="w-4 h-4 mr-2" /> Schedule & Send
-                            </Button>
+                                <Clock className="w-4 h-4 mr-2" />{__('general.schedule_send')}</Button>
                         </>
                     )}
 
                     {campaign.status === 'scheduled' || campaign.status === 'sending' ? (
                         <Button onClick={handlePause} variant="outline" className="border-orange-200 text-orange-600 hover:bg-orange-50">
-                            <PauseCircle className="w-4 h-4 mr-2" /> Pause Campaign
-                        </Button>
+                            <PauseCircle className="w-4 h-4 mr-2" />{__('general.pause_campaign')}</Button>
                     ) : null}
 
                     {campaign.status === 'paused' && (
                         <Button onClick={handleResume} className="bg-green-600 hover:bg-green-700">
-                            <PlayCircle className="w-4 h-4 mr-2" /> Resume Campaign
-                        </Button>
+                            <PlayCircle className="w-4 h-4 mr-2" />{__('general.resume_campaign')}</Button>
                     )}
                 </div>
             </div>
@@ -159,8 +155,8 @@ export default function Show({ campaign }) {
                 <div className="mb-6 bg-blue-50 border-l-4 border-blue-400 p-4 rounded-r-md flex">
                     <AlertCircle className="w-5 h-5 text-blue-400 mr-3 mt-0.5" />
                     <div>
-                        <h3 className="text-sm font-medium text-blue-800">Campaign is locked</h3>
-                        <p className="text-sm text-blue-700 mt-1">This campaign has already been scheduled or sent. You cannot edit the content.</p>
+                        <h3 className="text-sm font-medium text-blue-800">{__('general.campaign_is_locked')}</h3>
+                        <p className="text-sm text-blue-700 mt-1">{__('general.this_campaign_has_already_been_scheduled_or_sent_you_cannot_edit_the_content')}</p>
                     </div>
                 </div>
             )}
@@ -168,27 +164,27 @@ export default function Show({ campaign }) {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <Card className={`border-t-4 border-t-blue-500 shadow-sm ${!isEditable ? 'opacity-80' : ''}`}>
                     <CardHeader>
-                        <CardTitle>{__('Email Content')}</CardTitle>
+                        <CardTitle>{__('general.email_content')}</CardTitle>
                         <CardDescription>{__('This will be sent to the recipient\'s primary email address.')}</CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4">
                         <div className="space-y-2">
-                            <Label>{__('Subject Line')}</Label>
+                            <Label>{__('general.subject_line')}</Label>
                             <Input 
                                 disabled={!isEditable}
                                 value={contentForm.email_subject_en}
                                 onChange={e => setContentForm({...contentForm, email_subject_en: e.target.value})}
-                                placeholder={__('Enter an engaging subject line...')}
+                                placeholder={__('general.enter_an_engaging_subject_line')}
                             />
                         </div>
                         <div className="space-y-2">
-                            <Label>{__('Email Body')}</Label>
+                            <Label>{__('general.email_body')}</Label>
                             <Textarea 
                                 disabled={!isEditable}
                                 rows={12}
                                 value={contentForm.email_content_en}
                                 onChange={e => setContentForm({...contentForm, email_content_en: e.target.value})}
-                                placeholder={__('Write your email content here...')}
+                                placeholder={__('general.write_your_email_content_here')}
                             />
                         </div>
                     </CardContent>
@@ -198,10 +194,10 @@ export default function Show({ campaign }) {
             {/* Delivery Stats Preview */}
             {campaign.status !== 'draft' && (
                 <div className="mt-8">
-                    <h3 className="text-lg font-bold mb-4">Delivery Overview</h3>
+                    <h3 className="text-lg font-bold mb-4">{__('general.delivery_overview')}</h3>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                         <div className="bg-white p-4 rounded-lg border shadow-sm text-center">
-                            <div className="text-sm text-gray-500">Total Recipients</div>
+                            <div className="text-sm text-gray-500">{__('general.total_recipients')}</div>
                             <div className="text-2xl font-bold text-gray-900">{campaign.recipients_count || 0}</div>
                         </div>
                         <div className="bg-white p-4 rounded-lg border shadow-sm text-center">
@@ -213,7 +209,7 @@ export default function Show({ campaign }) {
                             <div className="text-2xl font-bold text-red-600">--</div>
                         </div>
                         <div className="bg-white p-4 rounded-lg border shadow-sm text-center">
-                            <div className="text-sm text-gray-500">Open Rate</div>
+                            <div className="text-sm text-gray-500">{__('general.open_rate')}</div>
                             <div className="text-2xl font-bold text-indigo-600">--%</div>
                         </div>
                     </div>

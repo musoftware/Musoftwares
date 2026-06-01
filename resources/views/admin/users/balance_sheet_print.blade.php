@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8" />
-    <title>{{ $user->name }} - {{ __('Balance Sheet') }}</title>
+    <title>{{ $user->name }} - {{ __('general.balance_sheet') }}</title>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <style>
         * {
@@ -226,7 +226,7 @@
             <tr>
                 <td style="width: 60%;">
                     <div class="company-name">{{ \App\Models\AdminSettings::GetValue('business_name', 'Musoftware') }}</div>
-                    <div class="header-subtitle">{{ __('Balance Sheet') }}</div>
+                    <div class="header-subtitle">{{ __('general.balance_sheet') }}</div>
                 </td>
                 <td class="company-info">
                     @if (!empty(\App\Models\AdminSettings::GetValue('business_phone')))
@@ -266,7 +266,7 @@
         </div>
 
         {{-- Invoice Table --}}
-        <div class="section-title">{{ __('Invoice History') }}</div>
+        <div class="section-title">{{ __('general.invoice_history') }}</div>
         <div class="table-section">
             <table class="invoice-table">
                 <thead>
@@ -291,7 +291,7 @@
                         </tr>
                     @empty
                         <tr class="empty-row">
-                            <td colspan="6">{{ __('No unpaid invoices') }}</td>
+                            <td colspan="6">{{ __('general.no_unpaid_invoices') }}</td>
                         </tr>
                     @endforelse
                 </tbody>
@@ -303,7 +303,7 @@
             <table class="summary-table" cellpadding="0" cellspacing="0">
                 @if ($user->user_balance != 0)
                     <tr>
-                        <td class="summary-label">{{ __('Sub Remain') }}</td>
+                        <td class="summary-label">{{ __('general.sub_remain') }}</td>
                         <td class="summary-value">{{ App\Helpers\FinanceHelper::instance()->format_money($unpaid, $user->currency_id) }}</td>
                     </tr>
                     @if ($user->user_balance < $unpaid)
@@ -312,7 +312,7 @@
                             <td class="summary-value">{{ App\Helpers\FinanceHelper::instance()->format_money($user->user_balance, $user->currency_id) }}</td>
                         </tr>
                         <tr class="total-row">
-                            <td class="highlight-label">{{ __('Client Pay') }}</td>
+                            <td class="highlight-label">{{ __('general.client_pay') }}</td>
                             <td class="highlight-value">{{ App\Helpers\FinanceHelper::instance()->format_money($unpaid - $user->user_balance, $user->currency_id) }}</td>
                         </tr>
                     @else
@@ -321,13 +321,13 @@
                             <td class="summary-value">{{ App\Helpers\FinanceHelper::instance()->format_money($user->user_balance, $user->currency_id) }}</td>
                         </tr>
                         <tr class="total-row">
-                            <td class="summary-label">{{ __('Client Remaining') }}</td>
+                            <td class="summary-label">{{ __('general.client_remaining') }}</td>
                             <td class="positive-value">{{ App\Helpers\FinanceHelper::instance()->format_money($user->user_balance - $unpaid, $user->currency_id) }}</td>
                         </tr>
                     @endif
                 @elseif ($user->user_balance == 0)
                     <tr class="total-row">
-                        <td class="highlight-label">{{ __('Client Pay') }}</td>
+                        <td class="highlight-label">{{ __('general.client_pay') }}</td>
                         <td class="highlight-value">{{ App\Helpers\FinanceHelper::instance()->format_money($unpaid, $user->currency_id) }}</td>
                     </tr>
                 @endif
@@ -336,7 +336,7 @@
 
         {{-- Footer --}}
         <div class="footer">
-            {{ __('Generated on') }}: {{ now()->format('Y-m-d H:i') }}
+            {{ __('general.generated_on') }}: {{ now()->format('Y-m-d H:i') }}
         </div>
     </div>
 </body>

@@ -75,7 +75,7 @@ class AgentPluginController extends Controller
     public function download(Request $request, string $slug)
     {
         if (!$request->hasValidSignature()) {
-            abort(403, 'Invalid or expired download link.');
+            abort(403, __('general.invalid_or_expired_download_link'));
         }
 
         // Try downloading from the public/plugins folder first if it exists (.msp custom secure plugin first)
@@ -91,11 +91,11 @@ class AgentPluginController extends Controller
 
         $toolConfig = collect(config('tools'))->firstWhere('slug', $slug);
         if (!$toolConfig) {
-            abort(404, 'Plugin not found.');
+            abort(404, __('general.plugin_not_found'));
         }
         $version = $toolConfig['latestVersion'] ?? null; // Adjust according to config setup if needed
         if (!$version || !$version->file_path || !Storage::exists($version->file_path)) {
-            abort(404, 'Plugin file not found.');
+            abort(404, __('general.plugin_file_not_found'));
         }
         return Storage::download($version->file_path);
     }

@@ -15,19 +15,19 @@ export default function Index({ widgets }: { widgets: any }) {
 
     if (!hasAdvancedOps) {
         return (
-            <CrmLayout title={__('Web Forms')} activeMenu="widgets">
+            <CrmLayout title={__('general.web_forms')} activeMenu="widgets">
                 <ModulePageHeader 
-                    title={__('Web Forms')}
-                    description={__('Create and manage embeddable forms to capture leads from your external websites.')}
+                    title={__('general.web_forms')}
+                    description={__('general.create_and_manage_embeddable_forms_to_capture_leads_from_your_external_websites')}
                     icon={FormInput}
                 />
                 <div className="px-8 pb-8">
                     <UpgradeOverlay 
-                        title={__('Advanced Operations Required')}
-                        description={__('To create and manage Web Forms and capture leads directly into CRM, you need the Advanced Operations add-on.')}
+                        title={__('general.advanced_operations_required')}
+                        description={__('general.to_create_and_manage_web_forms_and_capture_leads_directly_into_crm_you_need_the_advanced_operations_add_on')}
                         icon={FormInput}
                         module="crm-advanced-operations"
-                        priceText={__('Subscribe to Advanced Operations')}
+                        priceText={__('general.subscribe_to_advanced_operations')}
                     />
                 </div>
             </CrmLayout>
@@ -35,15 +35,15 @@ export default function Index({ widgets }: { widgets: any }) {
     }
 
     return (
-        <CrmLayout title={__('Web Forms')} activeMenu="widgets">
+        <CrmLayout title={__('general.web_forms')} activeMenu="widgets">
             <ModulePageHeader 
-                title={__('Web Forms')}
-                description={__('Create and manage embeddable forms to capture leads from your external websites.')}
+                title={__('general.web_forms')}
+                description={__('general.create_and_manage_embeddable_forms_to_capture_leads_from_your_external_websites')}
                 icon={FormInput}
                 actions={
                     <Link href={route('crm.widgets.create')} className={buttonVariants({ className: "gap-2 bg-indigo-600 hover:bg-indigo-700 text-white" })}>
                         <Plus className="w-4 h-4" />
-                        {__('Create New Form')}
+                        {__('general.create_new_form')}
                     </Link>
                 }
             />
@@ -54,10 +54,10 @@ export default function Index({ widgets }: { widgets: any }) {
                         <table className="w-full text-sm text-left">
                             <thead className="bg-slate-50 text-slate-500 border-b border-slate-200">
                                 <tr>
-                                    <th className="px-6 py-4 font-medium">{__('Form Name')}</th>
+                                    <th className="px-6 py-4 font-medium">{__('general.form_name')}</th>
                                     <th className="px-6 py-4 font-medium">{__('Status')}</th>
-                                    <th className="px-6 py-4 font-medium">{__('Allowed Domains')}</th>
-                                    <th className="px-6 py-4 font-medium">{__('Leads Captured')}</th>
+                                    <th className="px-6 py-4 font-medium">{__('general.allowed_domains')}</th>
+                                    <th className="px-6 py-4 font-medium">{__('general.leads_captured')}</th>
                                     <th className="px-6 py-4 font-medium">{__('Created At')}</th>
                                     <th className="px-6 py-4 font-medium text-right">{__('Actions')}</th>
                                 </tr>
@@ -88,7 +88,7 @@ export default function Index({ widgets }: { widgets: any }) {
                                                 <Globe className="w-4 h-4 text-slate-400" />
                                                 {widget.allowed_domains && widget.allowed_domains.length > 0 
                                                     ? widget.allowed_domains.join(', ')
-                                                    : <span className="text-slate-400 italic">{__('Any domain (*)')}</span>
+                                                    : <span className="text-slate-400 italic">{__('general.any_domain')}</span>
                                                 }
                                             </div>
                                         </td>
@@ -102,7 +102,7 @@ export default function Index({ widgets }: { widgets: any }) {
                                         </td>
                                         <td className="px-6 py-4 text-right">
                                             <div className="flex items-center justify-end gap-2">
-                                                <Link href={route('crm.widgets.show', widget.id)} title={__('Get Embed Code')} className={buttonVariants({ variant: 'ghost', size: 'sm', className: 'text-slate-500 hover:text-indigo-600' })}>
+                                                <Link href={route('crm.widgets.show', widget.id)} title={__('general.get_embed_code')} className={buttonVariants({ variant: 'ghost', size: 'sm', className: 'text-slate-500 hover:text-indigo-600' })}>
                                                     <Code className="w-4 h-4" />
                                                 </Link>
                                                 <Link href={route('crm.widgets.edit', widget.id)} title={__('Settings')} className={buttonVariants({ variant: 'ghost', size: 'sm', className: 'text-slate-500 hover:text-indigo-600' })}>
@@ -118,11 +118,11 @@ export default function Index({ widgets }: { widgets: any }) {
                                         <td colSpan={6} className="px-6 py-12 text-center">
                                             <div className="flex flex-col items-center justify-center text-slate-500">
                                                 <Globe className="w-12 h-12 text-slate-300 mb-4" />
-                                                <p className="text-base font-medium text-slate-900">{__('No Web Forms yet')}</p>
-                                                <p className="text-sm mt-1 mb-4">{__('Create your first embeddable lead form.')}</p>
+                                                <p className="text-base font-medium text-slate-900">{__('general.no_web_forms_yet')}</p>
+                                                <p className="text-sm mt-1 mb-4">{__('general.create_your_first_embeddable_lead_form')}</p>
                                                 <Link href={route('crm.widgets.create')} className={buttonVariants({ variant: 'outline' })}>
                                                     <Plus className="w-4 h-4 mr-2" />
-                                                    {__('Create New Form')}
+                                                    {__('general.create_new_form')}
                                                 </Link>
                                             </div>
                                         </td>

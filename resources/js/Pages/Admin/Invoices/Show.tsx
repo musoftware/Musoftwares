@@ -200,7 +200,7 @@ export default function Show({ invoice }: { invoice: any }) {
     const getStatusBadge = (status: string) => {
         switch (status) {
             case 'paid': return <span className="inline-flex items-center rounded-full bg-green-500 px-3 py-1 text-sm font-medium text-white">Paid</span>;
-            case 'partially_paid': return <span className="inline-flex items-center rounded-full bg-yellow-400 px-3 py-1 text-sm font-medium text-black">Partially Paid</span>;
+            case 'partially_paid': return <span className="inline-flex items-center rounded-full bg-yellow-400 px-3 py-1 text-sm font-medium text-black">{__('general.partially_paid')}</span>;
             case 'cancelled': return <span className="inline-flex items-center rounded-full bg-gray-500 px-3 py-1 text-sm font-medium text-white">Cancelled</span>;
             case 'unpaid':
             default: return <span className="inline-flex items-center rounded-full bg-red-500 px-3 py-1 text-sm font-medium text-white">Unpaid</span>;
@@ -267,8 +267,7 @@ export default function Show({ invoice }: { invoice: any }) {
                 <Card className="shadow-sm border-gray-200">
                     <CardHeader className="pb-3 border-b border-gray-100 bg-gray-50/50">
                         <CardTitle className="text-base flex items-center text-gray-700">
-                            <User className="w-4 h-4 mr-2 text-gray-400" /> Client Profile
-                        </CardTitle>
+                            <User className="w-4 h-4 mr-2 text-gray-400" />{__('general.client_profile')}</CardTitle>
                     </CardHeader>
                     <CardContent className="pt-4">
                         <div className="flex items-center gap-3 mb-4">
@@ -314,18 +313,17 @@ export default function Show({ invoice }: { invoice: any }) {
                 <Card className="shadow-sm border-gray-200">
                     <CardHeader className="pb-3 border-b border-gray-100 bg-gray-50/50">
                         <CardTitle className="text-base flex items-center text-gray-700">
-                            <Receipt className="w-4 h-4 mr-2 text-gray-400" /> Invoice Summary
-                        </CardTitle>
+                            <Receipt className="w-4 h-4 mr-2 text-gray-400" />{__('general.invoice_summary')}</CardTitle>
                     </CardHeader>
                     <CardContent className="pt-4">
                         <div className="bg-gray-50 rounded-lg p-4 mb-4">
                             <div className="flex justify-between items-baseline">
-                                <span className="text-xs font-bold text-gray-500 uppercase tracking-wider">Total Payable</span>
+                                <span className="text-xs font-bold text-gray-500 uppercase tracking-wider">{__('general.total_payable')}</span>
                                 <span className="text-2xl font-black text-gray-900">{formatCurrency(currentTotal, invoice.currency)}</span>
                             </div>
                             {invoice.status === 'partially_paid' && (
                                 <div className="flex justify-between items-center mt-3 pt-3 border-t border-gray-200">
-                                    <span className="text-xs font-bold text-red-600 flex items-center"><Clock className="w-3 h-3 mr-1" /> Remaining Due</span>
+                                    <span className="text-xs font-bold text-red-600 flex items-center"><Clock className="w-3 h-3 mr-1" />{__('general.remaining_due')}</span>
                                     <span className="font-bold text-red-600">{formatCurrency(currentTotal - invoice.paid_amount, invoice.currency)}</span>
                                 </div>
                             )}
@@ -340,19 +338,19 @@ export default function Show({ invoice }: { invoice: any }) {
                             )}
                             {invoice.discount > 0 && (
                                 <div className="flex justify-between items-center py-1">
-                                    <span className="text-gray-500">Total Discount</span>
+                                    <span className="text-gray-500">{__('general.total_discount')}</span>
                                     <span className="font-medium text-orange-600">-{formatCurrency(invoice.discount, invoice.currency)}</span>
                                 </div>
                             )}
                             {invoice.tax > 0 && (
                                 <div className="flex justify-between items-center py-1">
-                                    <span className="text-gray-500">Tax Value</span>
+                                    <span className="text-gray-500">{__('general.tax_value')}</span>
                                     <span className="font-medium">{formatCurrency(invoice.tax, invoice.currency)}</span>
                                 </div>
                             )}
                             {invoice.cost > 0 && (
                                 <div className="flex justify-between items-center py-1">
-                                    <span className="text-gray-500">Net Revenue</span>
+                                    <span className="text-gray-500">{__('general.net_revenue')}</span>
                                     <span className="font-medium text-emerald-600">{formatCurrency(invoice.revenue, invoice.currency)}</span>
                                 </div>
                             )}
@@ -360,10 +358,8 @@ export default function Show({ invoice }: { invoice: any }) {
                         
                         {invoice.status !== 'paid' && (
                             <div className="mt-4 pt-4 border-t border-gray-100 flex justify-between items-center">
-                                <span className="text-xs font-bold text-gray-500 uppercase tracking-wider">Delivery Status</span>
-                                <Button onClick={() => { const s = prompt('Enter job status (done, processing, pending):', invoice.job_status || 'pending'); if(s) router.post(route('admin.invoices.change-job-status', invoice.id), { job_status: s }); }} variant="outline" size="sm" className="h-7 text-xs border-blue-200 text-blue-700 bg-blue-50 hover:bg-blue-100">
-                                    Update Status
-                                </Button>
+                                <span className="text-xs font-bold text-gray-500 uppercase tracking-wider">{__('general.delivery_status')}</span>
+                                <Button onClick={() => { const s = prompt('Enter job status (done, processing, pending):', invoice.job_status || 'pending'); if(s) router.post(route('admin.invoices.change-job-status', invoice.id), { job_status: s }); }} variant="outline" size="sm" className="h-7 text-xs border-blue-200 text-blue-700 bg-blue-50 hover:bg-blue-100">{__('general.update_status')}</Button>
                             </div>
                         )}
                     </CardContent>
@@ -373,19 +369,17 @@ export default function Show({ invoice }: { invoice: any }) {
                 <Card className="shadow-sm border-gray-200">
                     <CardHeader className="pb-3 border-b border-gray-100 bg-gray-50/50">
                         <CardTitle className="text-base flex items-center text-gray-700">
-                            <Clock className="w-4 h-4 mr-2 text-gray-400" /> Time Tracking
-                        </CardTitle>
+                            <Clock className="w-4 h-4 mr-2 text-gray-400" />{__('general.time_tracking')}</CardTitle>
                     </CardHeader>
                     <CardContent className="pt-4 flex flex-col items-center justify-center h-full min-h-[140px]">
                         <div className="text-3xl font-black text-gray-900 mb-1 flex items-center">
                             <Clock className="w-6 h-6 text-blue-500 opacity-20 mr-2" />
                             {invoice.total_timer_str || '00:00:00'}
                         </div>
-                        <div className="text-xs font-bold text-gray-500 uppercase tracking-wider text-center">Total Billable Hours</div>
+                        <div className="text-xs font-bold text-gray-500 uppercase tracking-wider text-center">{__('general.total_billable_hours')}</div>
                         
                         <Button onClick={handleAddTimerItem} variant="link" className="mt-4 text-blue-600 font-bold hover:text-blue-800">
-                            <Plus className="w-3 h-3 mr-1" /> Add Manual Entry
-                        </Button>
+                            <Plus className="w-3 h-3 mr-1" />{__('general.add_manual_entry')}</Button>
                     </CardContent>
                 </Card>
 
@@ -412,13 +406,13 @@ export default function Show({ invoice }: { invoice: any }) {
                             
                             <div className="bg-gray-50 rounded p-3 mb-2 space-y-2">
                                 <div className="flex justify-between items-center">
-                                    <span className="text-xs font-bold text-gray-500">Commission Rate</span>
+                                    <span className="text-xs font-bold text-gray-500">{__('general.commission_rate')}</span>
                                     <span className="font-bold text-blue-600">{invoice.affiliate_data.commission_percent}%</span>
                                 </div>
                                 
                                 {invoice.affiliate_data.is_paid && (
                                     <div className="flex justify-between items-center">
-                                        <span className="text-xs font-bold text-gray-500">Commission Earned</span>
+                                        <span className="text-xs font-bold text-gray-500">{__('general.commission_earned')}</span>
                                         <span className="font-bold text-green-600">{invoice.affiliate_data.actual_earned_str}</span>
                                     </div>
                                 )}
@@ -435,8 +429,7 @@ export default function Show({ invoice }: { invoice: any }) {
 
                             {invoice.affiliate_data.adds_to_total && (
                                 <div className="inline-flex items-center rounded bg-yellow-50 px-2 py-1 text-xs font-semibold text-yellow-800 border border-yellow-200">
-                                    <AlertCircle className="w-3 h-3 mr-1" /> Added to invoice total
-                                </div>
+                                    <AlertCircle className="w-3 h-3 mr-1" />{__('general.added_to_invoice_total')}</div>
                             )}
                         </CardContent>
                     </Card>
@@ -450,19 +443,15 @@ export default function Show({ invoice }: { invoice: any }) {
                         <span className="text-xs font-bold text-gray-500 uppercase tracking-wider mr-2">Quick Build:</span>
                         <div className="flex gap-2 w-full sm:w-auto">
                             <Button onClick={handleAddQtyItem} variant="outline" size="sm" className="flex-1 sm:flex-none border-dashed hover:border-blue-300 hover:text-blue-600 hover:bg-blue-50">
-                                <Layers className="w-4 h-4 mr-2 text-blue-500" /> Qty Item
-                            </Button>
+                                <Layers className="w-4 h-4 mr-2 text-blue-500" />{__('general.qty_item')}</Button>
                             <Button onClick={handleAddSimpleItem} variant="outline" size="sm" className="flex-1 sm:flex-none border-dashed hover:border-blue-300 hover:text-blue-600 hover:bg-blue-50">
-                                <Plus className="w-4 h-4 mr-2 text-blue-500" /> Simple Item
-                            </Button>
+                                <Plus className="w-4 h-4 mr-2 text-blue-500" />{__('general.simple_item')}</Button>
                             <Button onClick={handleAddTimerItem} variant="secondary" size="sm" className="hidden sm:flex bg-gray-100 text-gray-700 hover:bg-gray-200">
-                                <Clock className="w-4 h-4 mr-2" /> Log Time
-                            </Button>
+                                <Clock className="w-4 h-4 mr-2" />{__('general.log_time')}</Button>
                         </div>
                     </div>
                     <Button onClick={() => { if(confirm('Mark invoice as paid?')) router.post(route('admin.invoices.mark-paid', invoice.id)); }} variant="outline" size="sm" className="w-full md:w-auto border-dashed border-green-300 text-green-700 hover:bg-green-50">
-                        <CreditCard className="w-4 h-4 mr-2" /> Mark as Paid
-                    </Button>
+                        <CreditCard className="w-4 h-4 mr-2" />{__('general.mark_as_paid')}</Button>
                 </div>
             )}
 
@@ -470,12 +459,10 @@ export default function Show({ invoice }: { invoice: any }) {
             <Card className="shadow-sm border-gray-200 mb-8 overflow-hidden">
                 <div className="bg-gray-50 border-b px-4 py-3 flex items-center justify-between">
                     <div className="flex items-center text-gray-700 font-semibold">
-                        <List className="w-5 h-5 text-gray-400 mr-2" /> Invoice Items
-                    </div>
+                        <List className="w-5 h-5 text-gray-400 mr-2" />{__('general.invoice_items')}</div>
                     {isUnpaid && !isEditing && (
                         <Button variant="outline" size="sm" onClick={() => setIsEditing(true)}>
-                            <Edit2 className="w-4 h-4 mr-2" /> Edit Rows
-                        </Button>
+                            <Edit2 className="w-4 h-4 mr-2" />{__('general.edit_rows')}</Button>
                     )}
                 </div>
                 <div className="overflow-x-auto">
@@ -511,12 +498,12 @@ export default function Show({ invoice }: { invoice: any }) {
                                     <td className="px-4 py-3">
                                         {item.item_type === 'timer' ? (
                                             item.isNew ? (
-                                                <span className="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold bg-yellow-100 text-yellow-800 cursor-not-allowed opacity-70" title="Save invoice first to edit timer details">
+                                                <span className="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold bg-yellow-100 text-yellow-800 cursor-not-allowed opacity-70" title={__('general.save_invoice_first_to_edit_timer_details')}>
                                                     <Clock className="w-3 h-3 mr-1" />
                                                     <span className="capitalize">{item.item_type} (Save First)</span>
                                                 </span>
                                             ) : (
-                                                <Link href={route('admin.invoices.timer-details', item.id)} className="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold bg-yellow-100 text-yellow-800 hover:bg-yellow-200 transition-colors cursor-pointer" title="Click to edit timer details">
+                                                <Link href={route('admin.invoices.timer-details', item.id)} className="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold bg-yellow-100 text-yellow-800 hover:bg-yellow-200 transition-colors cursor-pointer" title={__('general.click_to_edit_timer_details')}>
                                                     <Clock className="w-3 h-3 mr-1" />
                                                     <span className="capitalize">{item.item_type}</span>
                                                 </Link>
@@ -536,7 +523,7 @@ export default function Show({ invoice }: { invoice: any }) {
                                                 value={item.item_title} 
                                                 onChange={(e) => handleItemChange(index, 'item_title', e.target.value)}
                                                 className="h-8 shadow-none"
-                                                placeholder="Item Name"
+                                                placeholder={__('general.item_name')}
                                             />
                                         ) : (
                                             item.item_title
@@ -586,9 +573,7 @@ export default function Show({ invoice }: { invoice: any }) {
                             ))}
                             {items.length === 0 && !isEditing && (
                                 <tr>
-                                    <td colSpan={6} className="px-4 py-8 text-center text-gray-500">
-                                        No items added to this invoice yet.
-                                    </td>
+                                    <td colSpan={6} className="px-4 py-8 text-center text-gray-500">{__('general.no_items_added_to_this_invoice_yet')}</td>
                                 </tr>
                             )}
                         </tbody>
@@ -610,8 +595,7 @@ export default function Show({ invoice }: { invoice: any }) {
                                                     <X className="w-4 h-4 mr-1" /> Cancel
                                                 </Button>
                                                 <Button type="button" onClick={handleSave} size="sm" disabled={isSaving} className="bg-blue-600 hover:bg-blue-700">
-                                                    <Check className="w-4 h-4 mr-1" /> Save Changes
-                                                </Button>
+                                                    <Check className="w-4 h-4 mr-1" />{__('general.save_changes')}</Button>
                                             </div>
                                         </div>
                                     </td>
@@ -628,7 +612,7 @@ export default function Show({ invoice }: { invoice: any }) {
                     <div className="flex items-center justify-between mb-4">
                         <div className="flex items-center gap-2">
                             <ChartLine className="w-5 h-5 text-gray-400" />
-                            <h3 className="text-lg font-bold text-gray-900">Adjustments & Pricing</h3>
+                            <h3 className="text-lg font-bold text-gray-900">{__('general.adjustments_pricing')}</h3>
                         </div>
                         <Button 
                             variant="ghost" 
@@ -645,9 +629,8 @@ export default function Show({ invoice }: { invoice: any }) {
                         <Card className="shadow-sm border-gray-200 h-full">
                             <CardContent className="p-5">
                                 <div className="flex items-center gap-2 font-bold text-gray-700 mb-2">
-                                    <AlertCircle className="w-4 h-4 text-orange-500" /> Apply Discount
-                                </div>
-                                <p className="text-sm text-gray-500 mb-4">Enter a fixed discount amount to reduce the total payable.</p>
+                                    <AlertCircle className="w-4 h-4 text-orange-500" />{__('general.apply_discount')}</div>
+                                <p className="text-sm text-gray-500 mb-4">{__('general.enter_a_fixed_discount_amount_to_reduce_the_total_payable')}</p>
                                 
                                 <div className="flex items-end gap-3 flex-wrap">
                                     <div className="flex-1 space-y-1 min-w-[150px]">
@@ -702,11 +685,10 @@ export default function Show({ invoice }: { invoice: any }) {
                             <Card className="shadow-sm border-0 bg-gray-900 text-white">
                                 <CardContent className="p-5">
                                     <div className="flex items-center gap-2 font-bold text-gray-400 mb-4 uppercase text-xs tracking-wider">
-                                        <ChartLine className="w-4 h-4" /> Pricing Health
-                                    </div>
+                                        <ChartLine className="w-4 h-4" />{__('general.pricing_health')}</div>
                                     <div className="space-y-4">
                                         <div className="flex justify-between items-center">
-                                            <span className="text-sm text-gray-400">Target Margin</span>
+                                            <span className="text-sm text-gray-400">{__('general.target_margin')}</span>
                                             <span className={`font-bold ${invoice.margin_percentage < 30 ? 'text-yellow-400' : 'text-green-400'}`}>
                                                 {invoice.margin_percentage}%
                                             </span>
@@ -720,11 +702,11 @@ export default function Show({ invoice }: { invoice: any }) {
                                         
                                         <div className="pt-4 border-t border-gray-800 space-y-2">
                                             <div className="flex justify-between items-center">
-                                                <span className="text-sm text-gray-400">Min Price</span>
+                                                <span className="text-sm text-gray-400">{__('general.min_price')}</span>
                                                 <span className="text-sm font-bold">{formatCurrency(invoice.min_price, invoice.currency)}</span>
                                             </div>
                                             <div className="flex justify-between items-center">
-                                                <span className="text-sm text-gray-400">Fair Market</span>
+                                                <span className="text-sm text-gray-400">{__('general.fair_market')}</span>
                                                 <span className="text-sm font-bold">{formatCurrency(invoice.fair_price, invoice.currency)}</span>
                                             </div>
                                         </div>
@@ -738,8 +720,7 @@ export default function Show({ invoice }: { invoice: any }) {
                     <Card className="shadow-sm border-gray-200 mt-6">
                         <CardHeader className="pb-3 border-b border-gray-100 bg-gray-50/50 flex flex-row items-center justify-between">
                             <CardTitle className="text-base flex items-center text-gray-700">
-                                <Calculator className="w-4 h-4 mr-2 text-gray-400" /> Internal Cost Lines
-                            </CardTitle>
+                                <Calculator className="w-4 h-4 mr-2 text-gray-400" />{__('general.internal_cost_lines')}</CardTitle>
                             {isUnpaid && (
                                 <div className="flex gap-2">
                                     <Button 
@@ -749,9 +730,7 @@ export default function Show({ invoice }: { invoice: any }) {
                                             setCostLines([...costLines, { id: 'new-' + crypto.randomUUID(), isNew: true, line_type: 'direct', amount: 0, description: '' }]);
                                         }}
                                         className="h-8 text-xs font-semibold uppercase tracking-wider bg-white"
-                                    >
-                                        Add Direct Cost
-                                    </Button>
+                                    >{__('general.add_direct_cost')}</Button>
                                     <Button 
                                         variant="outline" 
                                         size="sm" 
@@ -759,14 +738,12 @@ export default function Show({ invoice }: { invoice: any }) {
                                             setCostLines([...costLines, { id: 'new-' + crypto.randomUUID(), isNew: true, line_type: 'user_credit', amount: 0, description: '', credit_user_id: '' }]);
                                         }}
                                         className="h-8 text-xs font-semibold uppercase tracking-wider bg-white"
-                                    >
-                                        Add Team Credit
-                                    </Button>
+                                    >{__('general.add_team_credit')}</Button>
                                 </div>
                             )}
                         </CardHeader>
                         <CardContent className="pt-4">
-                            <p className="text-sm text-gray-500 mb-4">Record any third-party costs or internal credits associated with this invoice to correctly calculate Net Revenue.</p>
+                            <p className="text-sm text-gray-500 mb-4">{__('general.record_any_third_party_costs_or_internal_credits_associated_with_this_invoice_to_correctly_calculate_net_revenue')}</p>
                             
                             <div className="space-y-3">
                                 {costLines.map((line, index) => (
@@ -798,8 +775,8 @@ export default function Show({ invoice }: { invoice: any }) {
                                                                 setCostLines(newLines);
                                                             }}
                                                         >
-                                                            <option value="direct">Direct Cost</option>
-                                                            <option value="user_credit">User Credit</option>
+                                                            <option value="direct">{__('general.direct_cost')}</option>
+                                                            <option value="user_credit">{__('general.user_credit')}</option>
                                                         </select>
                                                     </div>
                                                     <div className="w-full sm:w-1/4">
@@ -827,7 +804,7 @@ export default function Show({ invoice }: { invoice: any }) {
                                                                     newLines[index].description = e.target.value;
                                                                     setCostLines(newLines);
                                                                 }}
-                                                                placeholder="Note..."
+                                                                placeholder={__('general.note')}
                                                             />
                                                             <Button 
                                                                 type="button" 
@@ -849,7 +826,7 @@ export default function Show({ invoice }: { invoice: any }) {
                                                 {line.line_type === 'user_credit' && (
                                                     <div className="flex sm:flex-row gap-3">
                                                         <div className="w-full sm:w-1/2">
-                                                            <Label className="text-xs text-gray-500">Credit User</Label>
+                                                            <Label className="text-xs text-gray-500">{__('general.credit_user')}</Label>
                                                             <PremiumCombobox
                                                                 value={line.credit_user_id || ''}
                                                                 options={line.credit_user_id && line.credit_user_name ? [{ value: line.credit_user_id, label: line.credit_user_name }] : []}
@@ -862,7 +839,7 @@ export default function Show({ invoice }: { invoice: any }) {
                                                                     setCostLines(newLines);
                                                                 }}
                                                                 asyncEndpoint={route('admin.resellers.search-users')}
-                                                                placeholder="Search User..."
+                                                                placeholder={__('general.search_user')}
                                                                 searchPlaceholder="Search by name or email..."
                                                                 className="h-9"
                                                             />
@@ -879,10 +856,8 @@ export default function Show({ invoice }: { invoice: any }) {
                                                             }}
                                                             className="bg-emerald-500 hover:bg-emerald-600 text-white h-8 px-3 text-xs font-semibold"
                                                         >
-                                                            <Receipt className="w-3.5 h-3.5 mr-1.5" />
-                                                            Record as paid
-                                                        </Button>
-                                                        <span className="text-xs text-gray-500 font-medium">Creates a client payment for this amount.</span>
+                                                            <Receipt className="w-3.5 h-3.5 mr-1.5" />{__('general.record_as_paid')}</Button>
+                                                        <span className="text-xs text-gray-500 font-medium">{__('general.creates_a_client_payment_for_this_amount')}</span>
                                                     </div>
                                                 )}
                                             </div>
@@ -891,16 +866,13 @@ export default function Show({ invoice }: { invoice: any }) {
                                 ))}
                                 
                                 {costLines.length === 0 && (
-                                    <div className="text-center py-6 text-sm text-gray-500 border border-dashed rounded-md bg-gray-50">
-                                        No internal cost lines recorded.
-                                    </div>
+                                    <div className="text-center py-6 text-sm text-gray-500 border border-dashed rounded-md bg-gray-50">{__('general.no_internal_cost_lines_recorded')}</div>
                                 )}
                                 
                                 {isUnpaid && costLines.length > 0 && (
                                     <div className="mt-4">
                                         <Button type="button" onClick={handleSave} disabled={isSaving} className="w-full h-10 bg-black text-white hover:bg-gray-900 font-bold tracking-wider flex items-center justify-center">
-                                            <Calculator className="w-4 h-4 mr-2" /> Save cost lines
-                                        </Button>
+                                            <Calculator className="w-4 h-4 mr-2" />{__('general.save_cost_lines')}</Button>
                                     </div>
                                 )}
                             </div>
@@ -915,12 +887,12 @@ export default function Show({ invoice }: { invoice: any }) {
                     {/* Totals */}
                     <div className="flex flex-wrap items-center gap-6 text-center md:text-left">
                         <div className="flex flex-col">
-                            <span className="text-xs font-bold text-gray-500 uppercase tracking-wider">Total Amount</span>
+                            <span className="text-xs font-bold text-gray-500 uppercase tracking-wider">{__('general.total_amount')}</span>
                             <span className="text-xl font-black text-gray-900">{formatCurrency(invoice.amount, invoice.currency)}</span>
                         </div>
                         {invoice.status === 'partially_paid' && (
                             <div className="flex flex-col">
-                                <span className="text-xs font-bold text-red-600 uppercase tracking-wider">Remaining Due</span>
+                                <span className="text-xs font-bold text-red-600 uppercase tracking-wider">{__('general.remaining_due')}</span>
                                 <span className="text-xl font-black text-red-600">{formatCurrency(invoice.amount - invoice.paid_amount, invoice.currency)}</span>
                             </div>
                         )}
@@ -934,14 +906,12 @@ export default function Show({ invoice }: { invoice: any }) {
                                     onClick={() => { if(confirm('Bill this invoice from client balance?')) router.post(route('admin.invoices.mark-paid', invoice.id)); }}
                                     className="bg-blue-600 hover:bg-blue-700"
                                 >
-                                    <Check className="w-4 h-4 mr-2" /> Bill from Balance
-                                </Button>
+                                    <Check className="w-4 h-4 mr-2" />{__('general.bill_from_balance')}</Button>
                                 <Button 
                                     variant="outline"
                                     onClick={() => { if(confirm('Mark this invoice as paid externally?')) router.post(route('admin.invoices.external-pay', invoice.id)); }}
                                 >
-                                    <Receipt className="w-4 h-4 mr-2" /> External Pay
-                                </Button>
+                                    <Receipt className="w-4 h-4 mr-2" />{__('general.external_pay')}</Button>
                                 <Button 
                                     onClick={() => {
                                         const amt = prompt('Enter partial payment amount:', String(invoice.amount));
@@ -951,8 +921,7 @@ export default function Show({ invoice }: { invoice: any }) {
                                     }}
                                     variant="outline"
                                 >
-                                    <CreditCard className="w-4 h-4 mr-2" /> Partial Pay
-                                </Button>
+                                    <CreditCard className="w-4 h-4 mr-2" />{__('general.partial_pay')}</Button>
                             </>
                         )}
                         {invoice.status === 'partially_paid' && (
@@ -966,8 +935,7 @@ export default function Show({ invoice }: { invoice: any }) {
                                 }}
                                 className="bg-blue-600 hover:bg-blue-700"
                             >
-                                <Plus className="w-4 h-4 mr-2" /> Add Payment
-                            </Button>
+                                <Plus className="w-4 h-4 mr-2" />{__('general.add_payment')}</Button>
                         )}
 
                         {invoice.status !== 'cancelled' && (
@@ -995,13 +963,13 @@ export default function Show({ invoice }: { invoice: any }) {
 
                         {invoice.status !== 'cancelled' && !invoice.is_published && (
                             <Link href={route('admin.invoices.notify', invoice.id)}>
-                                <Button variant="outline" title="Notify Client">
+                                <Button variant="outline" title={__('general.notify_client')}>
                                     <Share2 className="w-4 h-4" />
                                 </Button>
                             </Link>
                         )}
                         {invoice.is_published === 1 && (
-                            <span className="inline-flex items-center text-green-600" title="Notification Sent">
+                            <span className="inline-flex items-center text-green-600" title={__('general.notification_sent')}>
                                 <Check className="w-4 h-4" />
                             </span>
                         )}
@@ -1017,28 +985,26 @@ export default function Show({ invoice }: { invoice: any }) {
                             <div className="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0">
                                 <AlertCircle className="w-4 h-4 text-red-600" />
                             </div>
-                            <span className="font-bold text-red-600 uppercase text-xs tracking-wider">Danger Zone</span>
+                            <span className="font-bold text-red-600 uppercase text-xs tracking-wider">{__('general.danger_zone')}</span>
                         </div>
-                        <span className="text-sm text-red-500 font-medium">Irreversible actions</span>
+                        <span className="text-sm text-red-500 font-medium">{__('general.irreversible_actions')}</span>
                     </div>
                     <div className="p-4 flex flex-col sm:flex-row justify-end gap-3 items-stretch sm:items-center">
                         {(invoice.status === 'paid' || invoice.status === 'partially_paid') && (
-                            <div className="sm:mr-auto text-sm text-gray-500">Cancelling will void all related transactions.</div>
+                            <div className="sm:mr-auto text-sm text-gray-500">{__('general.cancelling_will_void_all_related_transactions')}</div>
                         )}
                         <Button 
                             variant="outline"
                             className="border-red-300 text-red-600 hover:bg-red-100 w-full sm:w-auto justify-center"
                             onClick={() => { if(confirm('Are you sure you want to cancel this invoice? This action is irreversible.')) router.post(route('admin.invoices.cancel', invoice.id)); }}
                         >
-                            <X className="w-4 h-4 mr-2" /> Cancel Invoice
-                        </Button>
+                            <X className="w-4 h-4 mr-2" />{__('general.cancel_invoice')}</Button>
                         <Button 
                             variant="outline"
                             className="border-red-300 text-red-600 hover:bg-red-100 w-full sm:w-auto justify-center"
                             onClick={() => { if(confirm('Are you sure you want to DELETE this invoice? This cannot be undone.')) router.post(route('admin.invoices.bulk-action'), { action: 'delete', invoices: [invoice.id] }); }}
                         >
-                            <Trash2 className="w-4 h-4 mr-2" /> Delete Invoice
-                        </Button>
+                            <Trash2 className="w-4 h-4 mr-2" />{__('general.delete_invoice')}</Button>
                     </div>
                 </div>
             )}

@@ -67,7 +67,7 @@ function KeywordRow({ kw, idx }: { kw: any; idx: number }) {
                 </div>
                 <div className="md:col-span-2 min-w-0">
                     <p className="text-[11px] text-slate-500 truncate" title={kw.subtitle || ''}>
-                        {kw.subtitle || <span className="text-slate-300 italic">No subtitles yet</span>}
+                        {kw.subtitle || <span className="text-slate-300 italic">{__('general.no_subtitles_yet')}</span>}
                     </p>
                 </div>
             </div>
@@ -80,7 +80,7 @@ function KeywordRow({ kw, idx }: { kw: any; idx: number }) {
                 variant="ghost" size="icon"
                 onClick={copyRow}
                 className="opacity-0 group-hover:opacity-100 transition-opacity h-7 w-7 hover:bg-slate-100"
-                title="Copy row"
+                title={__('general.copy_row')}
             >
                 {copied ? <CheckCircle2 className="w-3 h-3 text-emerald-500" /> : <Clipboard className="w-3 h-3 text-slate-400" />}
             </Button>
@@ -112,13 +112,12 @@ function KeywordsTable({ keywords, status, onExport }: { keywords: any[]; status
                     onClick={onExport}
                     className="h-8 gap-1.5 px-3 bg-slate-900 text-white hover:bg-slate-800 text-xs font-bold"
                 >
-                    <Download className="w-3.5 h-3.5" /> Export CSV
-                </Button>
+                    <Download className="w-3.5 h-3.5" />{__('general.export_csv')}</Button>
             </div>
 
             {/* Table header */}
             <div className="hidden md:grid grid-cols-3 gap-2 px-5 py-2 bg-slate-50 border-b border-slate-100">
-                <p className="text-[9px] font-black uppercase tracking-wider text-slate-400">Title / Keyword</p>
+                <p className="text-[9px] font-black uppercase tracking-wider text-slate-400">{__('general.title_keyword')}</p>
                 <p className="text-[9px] font-black uppercase tracking-wider text-slate-400 col-span-2">Subtitles (Related Keywords)</p>
             </div>
 
@@ -464,7 +463,7 @@ export default function ArticleMakerRunner({ tool }: any) {
         <div className="min-h-screen bg-slate-50 flex items-center justify-center font-sans">
             <div className="text-center space-y-3">
                 <div className="w-8 h-8 border-2 border-violet-500 border-t-transparent rounded-full animate-spin mx-auto" />
-                <p className="text-sm font-semibold text-slate-500">Connecting to Runtime...</p>
+                <p className="text-sm font-semibold text-slate-500">{__('general.connecting_to_runtime')}</p>
             </div>
         </div>
     );
@@ -477,7 +476,7 @@ export default function ArticleMakerRunner({ tool }: any) {
                     <div className="w-7 h-7 bg-gradient-to-br from-violet-500 to-indigo-600 rounded-lg flex items-center justify-center shadow-sm">
                         <FileText className="w-4 h-4 text-white" />
                     </div>
-                    <span className="font-bold text-sm text-slate-800 tracking-tight">AI Article Writer</span>
+                    <span className="font-bold text-sm text-slate-800 tracking-tight">{__('general.ai_article_writer')}</span>
                 </div>
                 <div className="flex items-center gap-3">
                     {keywords.length > 0 && discoverStatus !== 'idle' && (
@@ -486,8 +485,7 @@ export default function ArticleMakerRunner({ tool }: any) {
                             onClick={() => exportCSV(keywords)}
                             className="h-8 gap-1.5 px-3 bg-emerald-50 border-emerald-200 text-emerald-700 hover:bg-emerald-100 hover:text-emerald-800 text-xs font-bold"
                         >
-                            <Download className="w-3.5 h-3.5" /> Export CSV
-                        </Button>
+                            <Download className="w-3.5 h-3.5" />{__('general.export_csv')}</Button>
                     )}
                     <Badge variant="outline" className={`gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase ${discoverStatus === 'running' ? 'bg-violet-50 border-violet-200 text-violet-700' : discoverStatus === 'done' ? 'bg-emerald-50 border-emerald-200 text-emerald-700' : 'bg-slate-100 border-slate-200 text-slate-500'}`}>
                         <div className={`w-1.5 h-1.5 rounded-full ${discoverStatus === 'running' ? 'bg-violet-500 animate-pulse' : discoverStatus === 'done' ? 'bg-emerald-500' : 'bg-slate-400'}`} />
@@ -524,14 +522,14 @@ export default function ArticleMakerRunner({ tool }: any) {
                         {/* Config card */}
                         <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
                             <div className="mb-5">
-                                <h1 className="text-xl font-bold tracking-tight text-slate-900">Discover Long-Tail Keywords</h1>
-                                <p className="text-sm text-slate-400 mt-1">Expand any niche into hundreds of unique keyword ideas using autocomplete suggestions.</p>
+                                <h1 className="text-xl font-bold tracking-tight text-slate-900">{__('general.discover_long_tail_keywords')}</h1>
+                                <p className="text-sm text-slate-400 mt-1">{__('general.expand_any_niche_into_hundreds_of_unique_keyword_ideas_using_autocomplete_suggestions')}</p>
                             </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
                                 {/* Niche */}
                                 <div className="md:col-span-1">
-                                    <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1.5">Niche / Seed Keyword</label>
+                                    <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1.5">{__('general.niche_seed_keyword')}</label>
                                     <div className="relative">
                                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                                         <Input
@@ -539,7 +537,7 @@ export default function ArticleMakerRunner({ tool }: any) {
                                             value={niche}
                                             onChange={e => setNiche(e.target.value)}
                                             onKeyDown={e => e.key === 'Enter' && handleStartDiscover()}
-                                            placeholder="weight loss, crypto, SEO..."
+                                            placeholder={__('general.weight_loss_crypto_seo')}
                                             className="pl-9 h-11 text-sm bg-slate-50"
                                         />
                                     </div>
@@ -565,7 +563,7 @@ export default function ArticleMakerRunner({ tool }: any) {
 
                                 {/* Audience */}
                                 <div>
-                                    <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1.5">Region / Language</label>
+                                    <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1.5">{__('general.region_language')}</label>
                                     <div className="relative">
                                         <Globe className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                                         <select
@@ -583,7 +581,7 @@ export default function ArticleMakerRunner({ tool }: any) {
 
                                 {/* Limit */}
                                 <div>
-                                    <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1.5">Max Keywords</label>
+                                    <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1.5">{__('general.max_keywords')}</label>
                                     <div className="relative">
                                         <Hash className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                                         <Input
@@ -613,8 +611,7 @@ export default function ArticleMakerRunner({ tool }: any) {
                                         disabled={!niche.trim()}
                                         className="h-11 gap-2 px-6 bg-gradient-to-r from-violet-500 to-indigo-600 text-white shadow-md text-sm font-bold hover:opacity-90"
                                     >
-                                        <Play className="w-4 h-4" /> Start Discovery
-                                    </Button>
+                                        <Play className="w-4 h-4" />{__('general.start_discovery')}</Button>
                                 )}
 
                                 {/* Fetch Subtitles button */}
@@ -689,8 +686,8 @@ export default function ArticleMakerRunner({ tool }: any) {
                         {/* Stats */}
                         {keywords.length > 0 && (
                             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 animate-in fade-in duration-300">
-                                <StatCard label="Total Keywords" value={keywords.length} icon={Lightbulb} color="bg-violet-50 border-violet-200" />
-                                <StatCard label="With Subtitles" value={keywords.filter(k => k.subtitle).length} icon={BookOpen} color="bg-amber-50 border-amber-200" />
+                                <StatCard label={__('general.total_keywords')} value={keywords.length} icon={Lightbulb} color="bg-violet-50 border-violet-200" />
+                                <StatCard label={__('general.with_subtitles')} value={keywords.filter(k => k.subtitle).length} icon={BookOpen} color="bg-amber-50 border-amber-200" />
                                 <StatCard label="Published" value={keywords.filter(k => k.published_id > 0).length} icon={Send} color="bg-emerald-50 border-emerald-200" />
                                 <StatCard label="Source" value={SOURCES.find(s => s.value === source)?.label || source} icon={Globe} />
                             </div>
@@ -703,10 +700,8 @@ export default function ArticleMakerRunner({ tool }: any) {
                         {discoverStatus === 'idle' && keywords.length === 0 && (
                             <div className="py-20 text-center border border-dashed border-slate-200 rounded-2xl bg-white">
                                 <Sparkles className="w-10 h-10 text-slate-300 mx-auto mb-4" />
-                                <h3 className="text-sm font-bold text-slate-700">Discover thousands of keyword ideas</h3>
-                                <p className="text-xs text-slate-400 mt-2 max-w-xs mx-auto">
-                                    Enter a niche keyword and let AI Article Writer expand it into hundreds of unique long-tail keywords using Google & YouTube autocomplete.
-                                </p>
+                                <h3 className="text-sm font-bold text-slate-700">{__('general.discover_thousands_of_keyword_ideas')}</h3>
+                                <p className="text-xs text-slate-400 mt-2 max-w-xs mx-auto">{__('general.enter_a_niche_keyword_and_let_ai_article_writer_expand_it_into_hundreds_of_unique_long_tail_keywords_using_google_youtube_autocomplete')}</p>
                             </div>
                         )}
                     </TabsContent>
@@ -717,21 +712,21 @@ export default function ArticleMakerRunner({ tool }: any) {
                     <TabsContent value="wordpress" className="space-y-6">
                         <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
                             <div className="mb-5">
-                                <h1 className="text-xl font-bold tracking-tight text-slate-900">WordPress Publisher</h1>
-                                <p className="text-sm text-slate-400 mt-1">Connect your WordPress site and bulk-publish articles from discovered keywords.</p>
+                                <h1 className="text-xl font-bold tracking-tight text-slate-900">{__('general.wordpress_publisher')}</h1>
+                                <p className="text-sm text-slate-400 mt-1">{__('general.connect_your_wordpress_site_and_bulk_publish_articles_from_discovered_keywords')}</p>
                             </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                                 {/* WordPress URL */}
                                 <div>
-                                    <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1.5">WordPress URL</label>
+                                    <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1.5">{__('general.wordpress_url')}</label>
                                     <div className="relative">
                                         <Link2 className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                                         <Input
                                             type="text"
                                             value={wpUrl}
                                             onChange={e => setWpUrl(e.target.value)}
-                                            placeholder="https://your-site.com"
+                                            placeholder={__('general.https_your_site_com')}
                                             className="pl-9 h-11 text-sm bg-slate-50"
                                         />
                                     </div>
@@ -775,7 +770,7 @@ export default function ArticleMakerRunner({ tool }: any) {
                                     <textarea
                                         value={wpHtml}
                                         onChange={e => setWpHtml(e.target.value)}
-                                        placeholder='<p>Read more about this topic on our site...</p>'
+                                        placeholder={`<p>${__('general.read_more_about_this_topic_on_our_site')}</p>`}
                                         rows={3}
                                         className="w-full p-3 text-sm border border-slate-200 rounded-md outline-none focus:border-violet-400 bg-slate-50 resize-y font-mono"
                                     />
@@ -794,7 +789,7 @@ export default function ArticleMakerRunner({ tool }: any) {
                                             className="pl-9 h-11 text-sm bg-slate-50"
                                         />
                                     </div>
-                                    <p className="text-[10px] text-slate-400 mt-1">Higher delay = safer from rate limits</p>
+                                    <p className="text-[10px] text-slate-400 mt-1">{__('general.higher_delay_safer_from_rate_limits')}</p>
                                 </div>
                             </div>
 
@@ -806,8 +801,7 @@ export default function ArticleMakerRunner({ tool }: any) {
                                     disabled={!wpUrl || !wpUser || !wpPass}
                                     className="h-11 gap-2 px-5 border-slate-200 text-slate-700 hover:bg-slate-50 text-sm font-bold"
                                 >
-                                    <Link2 className="w-4 h-4" /> Test Connection
-                                </Button>
+                                    <Link2 className="w-4 h-4" />{__('general.test_connection')}</Button>
 
                                 {publishStatus === 'running' ? (
                                     <Button
@@ -815,8 +809,7 @@ export default function ArticleMakerRunner({ tool }: any) {
                                         onClick={async () => { await callRPC('article-maker.wordpress.stop'); setPublishStatus('done'); }}
                                         className="h-11 gap-2 px-6 bg-rose-50 border-rose-200 text-rose-700 hover:bg-rose-100 text-sm font-bold"
                                     >
-                                        <Square className="w-4 h-4" /> Stop Publishing
-                                    </Button>
+                                        <Square className="w-4 h-4" />{__('general.stop_publishing')}</Button>
                                 ) : (
                                     <Button
                                         onClick={handleStartPublish}
@@ -869,10 +862,8 @@ export default function ArticleMakerRunner({ tool }: any) {
                         {keywords.length === 0 && (
                             <div className="py-16 text-center border border-dashed border-slate-200 rounded-2xl bg-white">
                                 <FileText className="w-10 h-10 text-slate-300 mx-auto mb-4" />
-                                <h3 className="text-sm font-bold text-slate-700">No keywords to publish</h3>
-                                <p className="text-xs text-slate-400 mt-2 max-w-xs mx-auto">
-                                    Go to the Discover tab first to generate keywords, then come back here to publish them to WordPress.
-                                </p>
+                                <h3 className="text-sm font-bold text-slate-700">{__('general.no_keywords_to_publish')}</h3>
+                                <p className="text-xs text-slate-400 mt-2 max-w-xs mx-auto">{__('general.go_to_the_discover_tab_first_to_generate_keywords_then_come_back_here_to_publish_them_to_wordpress')}</p>
                             </div>
                         )}
                     </TabsContent>
@@ -888,8 +879,7 @@ export default function ArticleMakerRunner({ tool }: any) {
                                         onClick={() => { setSelectedCampaign(null); setCampaignKeywords([]); }}
                                         className="flex items-center gap-1.5 text-xs font-bold text-slate-500 hover:text-slate-700 transition-colors mb-4"
                                     >
-                                        <ArrowLeft className="w-3.5 h-3.5" /> Back to campaigns
-                                    </button>
+                                        <ArrowLeft className="w-3.5 h-3.5" />{__('general.back_to_campaigns')}</button>
 
                                     <div className="flex items-start justify-between">
                                         <div>
@@ -918,7 +908,7 @@ export default function ArticleMakerRunner({ tool }: any) {
                                     {campaignKeywords.length > 0 && (
                                         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-5">
                                             <StatCard label="Total" value={campaignKeywords.length} icon={Lightbulb} color="bg-violet-50 border-violet-200" />
-                                            <StatCard label="With Subtitles" value={campaignKeywords.filter(k => k.subtitle).length} icon={BookOpen} color="bg-amber-50 border-amber-200" />
+                                            <StatCard label={__('general.with_subtitles')} value={campaignKeywords.filter(k => k.subtitle).length} icon={BookOpen} color="bg-amber-50 border-amber-200" />
                                             <StatCard label="Published" value={campaignKeywords.filter(k => k.published_id > 0).length} icon={Send} color="bg-emerald-50 border-emerald-200" />
                                             <StatCard label="Source" value={selectedCampaign.source} icon={Globe} />
                                         </div>
@@ -928,7 +918,7 @@ export default function ArticleMakerRunner({ tool }: any) {
                                 {loadingDetail ? (
                                     <div className="py-16 text-center">
                                         <div className="w-6 h-6 border-2 border-violet-500 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
-                                        <p className="text-xs text-slate-400 font-medium">Loading keywords...</p>
+                                        <p className="text-xs text-slate-400 font-medium">{__('general.loading_keywords')}</p>
                                     </div>
                                 ) : (
                                     <KeywordsTable
@@ -940,14 +930,14 @@ export default function ArticleMakerRunner({ tool }: any) {
                                 {!loadingDetail && campaignKeywords.length === 0 && (
                                     <div className="py-16 text-center bg-white border border-dashed border-slate-200 rounded-2xl">
                                         <Lightbulb className="w-8 h-8 text-slate-300 mx-auto mb-3" />
-                                        <p className="text-sm text-slate-500 font-medium">No keywords in this campaign</p>
+                                        <p className="text-sm text-slate-500 font-medium">{__('general.no_keywords_in_this_campaign')}</p>
                                     </div>
                                 )}
                             </div>
                         ) : (
                             <div className="space-y-4 animate-in fade-in duration-300">
                                 <div className="flex items-center justify-between">
-                                    <h2 className="text-lg font-bold text-slate-800">Past Campaigns</h2>
+                                    <h2 className="text-lg font-bold text-slate-800">{__('general.past_campaigns')}</h2>
                                     <Button
                                         variant="outline"
                                         onClick={loadCampaigns}
@@ -961,13 +951,13 @@ export default function ArticleMakerRunner({ tool }: any) {
                                 {loadingCampaigns && campaigns.length === 0 ? (
                                     <div className="py-16 text-center">
                                         <div className="w-6 h-6 border-2 border-violet-500 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
-                                        <p className="text-xs text-slate-400 font-medium">Loading campaigns...</p>
+                                        <p className="text-xs text-slate-400 font-medium">{__('general.loading_campaigns')}</p>
                                     </div>
                                 ) : campaigns.length === 0 ? (
                                     <div className="py-20 text-center border border-dashed border-slate-200 rounded-2xl bg-white">
                                         <History className="w-10 h-10 text-slate-300 mx-auto mb-4" />
-                                        <h3 className="text-sm font-bold text-slate-700">No campaigns yet</h3>
-                                        <p className="text-xs text-slate-400 mt-2">Start a keyword discovery from the Discover tab to see campaigns here.</p>
+                                        <h3 className="text-sm font-bold text-slate-700">{__('general.no_campaigns_yet')}</h3>
+                                        <p className="text-xs text-slate-400 mt-2">{__('general.start_a_keyword_discovery_from_the_discover_tab_to_see_campaigns_here')}</p>
                                     </div>
                                 ) : (
                                     <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">

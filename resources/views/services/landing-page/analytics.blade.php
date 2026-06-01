@@ -7,20 +7,16 @@
             <div class="d-flex justify-content-between align-items-center">
                 <div>
                     <h2 class="mb-1">
-                        <i class="fas fa-chart-line me-2 text-primary"></i>
-                        A/B Testing Analytics
-                    </h2>
+                        <i class="fas fa-chart-line me-2 text-primary"></i>{{ __('general.a_b_testing_analytics') }}</h2>
                     <p class="text-muted mb-0">
                         {{ $service->title }} - {{ $landingPage->hero_title }}
                     </p>
                 </div>
                 <div>
                     <a href="{{ route('marketplace.landing-pages.index') }}" class="btn btn-outline-secondary">
-                        <i class="fas fa-arrow-left me-1"></i> Back to Landing Pages
-                    </a>
+                        <i class="fas fa-arrow-left me-1"></i>{{ __('general.back_to_landing_pages') }}</a>
                     <a href="{{ route('services.landing-page.edit', ['service' => $service, 'landingPage' => $landingPage]) }}" class="btn btn-primary">
-                        <i class="fas fa-edit me-1"></i> Edit Page
-                    </a>
+                        <i class="fas fa-edit me-1"></i>{{ __('general.edit_page') }}</a>
                 </div>
             </div>
         </div>
@@ -28,9 +24,7 @@
 
     @if($analytics->isEmpty())
         <div class="alert alert-info">
-            <i class="fas fa-info-circle me-2"></i>
-            No tracking data yet. Visit your landing page to start collecting analytics data.
-        </div>
+            <i class="fas fa-info-circle me-2"></i>{{ __('general.no_tracking_data_yet_visit_your_landing_page_to_start_collecting_analytics_data') }}</div>
     @else
         {{-- Summary Cards --}}
         <div class="row mb-4">
@@ -44,7 +38,7 @@
                                 </div>
                             </div>
                             <div class="flex-grow-1 ms-3">
-                                <div class="text-muted small">Total Views</div>
+                                <div class="text-muted small">{{ __('general.total_views') }}</div>
                                 <h4 class="mb-0">{{ $analytics->sum('total_views') }}</h4>
                             </div>
                         </div>
@@ -61,7 +55,7 @@
                                 </div>
                             </div>
                             <div class="flex-grow-1 ms-3">
-                                <div class="text-muted small">Total Clicks</div>
+                                <div class="text-muted small">{{ __('general.total_clicks') }}</div>
                                 <h4 class="mb-0">{{ $analytics->sum('total_clicks') }}</h4>
                             </div>
                         </div>
@@ -95,7 +89,7 @@
                                 </div>
                             </div>
                             <div class="flex-grow-1 ms-3">
-                                <div class="text-muted small">Avg Conversion Rate</div>
+                                <div class="text-muted small">{{ __('general.avg_conversion_rate') }}</div>
                                 <h4 class="mb-0">{{ number_format($analytics->avg('conversion_rate'), 2) }}%</h4>
                             </div>
                         </div>
@@ -108,9 +102,7 @@
         <div class="card border-0 shadow-sm">
             <div class="card-header bg-white py-3">
                 <h5 class="mb-0">
-                    <i class="fas fa-table me-2"></i>
-                    Variants Performance Comparison
-                </h5>
+                    <i class="fas fa-table me-2"></i>{{ __('general.variants_performance_comparison') }}</h5>
             </div>
             <div class="card-body p-0">
                 <div class="table-responsive">
@@ -122,10 +114,10 @@
                                 <th class="text-end">Views</th>
                                 <th class="text-end">Clicks</th>
                                 <th class="text-end">Conversions</th>
-                                <th class="text-end">Conversion Rate</th>
+                                <th class="text-end">{{ __('general.conversion_rate') }}</th>
                                 <th class="text-end">CTR</th>
-                                <th class="text-end">Avg Time</th>
-                                <th class="text-end">Scroll Depth</th>
+                                <th class="text-end">{{ __('general.avg_time') }}</th>
+                                <th class="text-end">{{ __('general.scroll_depth') }}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -170,7 +162,7 @@
             <div class="col-lg-6">
                 <div class="card border-0 shadow-sm">
                     <div class="card-header bg-white">
-                        <h6 class="mb-0">Conversion Rate by Variant</h6>
+                        <h6 class="mb-0">{{ __('general.conversion_rate_by_variant') }}</h6>
                     </div>
                     <div class="card-body">
                         <canvas id="conversionChart" height="200"></canvas>
@@ -180,7 +172,7 @@
             <div class="col-lg-6">
                 <div class="card border-0 shadow-sm">
                     <div class="card-header bg-white">
-                        <h6 class="mb-0">Traffic Distribution</h6>
+                        <h6 class="mb-0">{{ __('general.traffic_distribution') }}</h6>
                     </div>
                     <div class="card-body">
                         <canvas id="trafficChart" height="200"></canvas>

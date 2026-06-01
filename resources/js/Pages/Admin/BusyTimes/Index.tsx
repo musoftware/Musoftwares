@@ -141,7 +141,7 @@ export default function Index({ busyTimes, filters, stats }: Props) {
                     {row.is_recurring ? (
                         <><RefreshCw className="h-3 w-3" /> Recurring</>
                     ) : (
-                        <><CalendarDays className="h-3 w-3" /> One-off</>
+                        <><CalendarDays className="h-3 w-3" />{__('general.one_off')}</>
                     )}
                 </span>
             ),
@@ -164,8 +164,7 @@ export default function Index({ busyTimes, filters, stats }: Props) {
                     )}
                     {row.is_full_day ? (
                         <span className="text-xs text-slate-500 flex items-center gap-1">
-                            <Clock className="h-3 w-3" /> Full day
-                        </span>
+                            <Clock className="h-3 w-3" />{__('general.full_day')}</span>
                     ) : (
                         <span className="text-xs text-slate-500 flex items-center gap-1">
                             <Clock className="h-3 w-3" />
@@ -180,7 +179,7 @@ export default function Index({ busyTimes, filters, stats }: Props) {
             label: 'Reason',
             render: (row: BusyTime) => (
                 <span className="text-slate-600 text-sm line-clamp-1 max-w-[180px]" title={row.reason ?? ''}>
-                    {row.reason || <span className="text-slate-400 italic">No reason</span>}
+                    {row.reason || <span className="text-slate-400 italic">{__('general.no_reason')}</span>}
                 </span>
             ),
         },
@@ -215,7 +214,7 @@ export default function Index({ busyTimes, filters, stats }: Props) {
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                         <Button variant="ghost" className="h-8 w-8 p-0">
-                            <span className="sr-only">Open menu</span>
+                            <span className="sr-only">{__('general.open_menu')}</span>
                             <MoreHorizontal className="h-4 w-4" />
                         </Button>
                     </DropdownMenuTrigger>
@@ -247,16 +246,16 @@ export default function Index({ busyTimes, filters, stats }: Props) {
                 value={filters.is_recurring ?? ''}
                 onChange={(e) => handleFilter('is_recurring', e.target.value)}
             >
-                <option value="">All Types</option>
+                <option value="">{__('general.all_types')}</option>
                 <option value="1">Recurring</option>
-                <option value="0">One-off</option>
+                <option value="0">{__('general.one_off')}</option>
             </select>
             <select
                 className="h-9 rounded-md border border-slate-200 bg-white px-3 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
                 value={filters.is_active ?? ''}
                 onChange={(e) => handleFilter('is_active', e.target.value)}
             >
-                <option value="">All Statuses</option>
+                <option value="">{__('general.all_statuses')}</option>
                 <option value="1">Active</option>
                 <option value="0">Inactive</option>
             </select>
@@ -265,7 +264,7 @@ export default function Index({ busyTimes, filters, stats }: Props) {
                 value={filters.day_of_week ?? ''}
                 onChange={(e) => handleFilter('day_of_week', e.target.value)}
             >
-                <option value="">All Days</option>
+                <option value="">{__('general.all_days')}</option>
                 {DAYS_OF_WEEK.map((d) => (
                     <option key={d} value={d}>{d}</option>
                 ))}
@@ -274,8 +273,8 @@ export default function Index({ busyTimes, filters, stats }: Props) {
     );
 
     return (
-        <AdminSidebarLayout title="Busy Times" header="User Busy Times">
-            <Head title="Busy Times" />
+        <AdminSidebarLayout title={__('general.busy_times')} header="User Busy Times">
+            <Head title={__('general.busy_times')} />
 
             {/* Stats */}
             <div className="mb-6 grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -293,7 +292,7 @@ export default function Index({ busyTimes, filters, stats }: Props) {
                 </div>
                 <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm flex flex-col items-center justify-center">
                     <span className="text-2xl font-semibold text-amber-600">{stats.one_off}</span>
-                    <span className="text-xs text-slate-500 font-medium uppercase tracking-wider mt-1">One-off</span>
+                    <span className="text-xs text-slate-500 font-medium uppercase tracking-wider mt-1">{__('general.one_off')}</span>
                 </div>
             </div>
 

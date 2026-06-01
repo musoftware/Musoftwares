@@ -116,12 +116,11 @@ export default function DomainProspectorRunner({ tool }: any) {
                     <div className="w-7 h-7 bg-gradient-to-br from-indigo-600 to-rose-600 rounded-lg flex items-center justify-center shadow-sm">
                         <Target className="w-4 h-4 text-white" />
                     </div>
-                    <span className="font-bold text-sm text-slate-800 tracking-tight">Domain Finder</span>
+                    <span className="font-bold text-sm text-slate-800 tracking-tight">{__('general.domain_finder')}</span>
                 </div>
                 <div className="flex items-center gap-3">
                     <Button variant="outline" onClick={exportCsv} disabled={results.length === 0} className="h-8 text-xs font-bold gap-1.5">
-                        <Download className="w-3.5 h-3.5" /> Export CSV
-                    </Button>
+                        <Download className="w-3.5 h-3.5" />{__('general.export_csv')}</Button>
                     <Badge variant="outline" className={`gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase ${status === 'running' ? 'bg-amber-50 border-amber-200 text-amber-700' : status === 'done' ? 'bg-emerald-50 border-emerald-200 text-emerald-700' : 'bg-slate-100 border-slate-200 text-slate-500'}`}>
                         <div className={`w-1.5 h-1.5 rounded-full ${status === 'running' ? 'bg-amber-500 animate-pulse' : status === 'done' ? 'bg-emerald-500' : 'bg-slate-400'}`} />
                         {status === 'running' ? 'Prospecting...' : status === 'done' ? 'Finished' : 'Ready'}
@@ -134,20 +133,20 @@ export default function DomainProspectorRunner({ tool }: any) {
                 <div className="w-80 bg-white border-r border-slate-200 flex flex-col shrink-0 overflow-y-auto">
                     <div className="p-5 space-y-6">
                         <div>
-                            <h2 className="text-lg font-bold tracking-tight text-slate-900">Campaign Setup</h2>
-                            <p className="text-xs text-slate-500 mt-1">Batch analyze domains for acquisition and seller contact extraction.</p>
+                            <h2 className="text-lg font-bold tracking-tight text-slate-900">{__('general.campaign_setup')}</h2>
+                            <p className="text-xs text-slate-500 mt-1">{__('general.batch_analyze_domains_for_acquisition_and_seller_contact_extraction')}</p>
                         </div>
 
                         <div className="space-y-4">
                             <div className="space-y-1.5">
                                 <Label className="text-xs font-bold text-slate-700 flex justify-between">
-                                    <span>Target Domains</span>
+                                    <span>{__('general.target_domains')}</span>
                                     <span className="text-slate-400 font-normal">{domainsInput.split('\n').filter(d => d.trim()).length} total</span>
                                 </Label>
                                 <textarea
                                     value={domainsInput}
                                     onChange={e => setDomainsInput(e.target.value)}
-                                    placeholder="example.com&#10;awesome-domain.io&#10;acquire-me.net"
+                                    placeholder={__('general.example_com_10_awesome_domain_io_10_acquire_me_net')}
                                     className="w-full h-48 p-3 text-sm bg-slate-50 border border-slate-200 rounded-xl font-mono focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none resize-none"
                                     disabled={status === 'running'}
                                 />
@@ -159,18 +158,14 @@ export default function DomainProspectorRunner({ tool }: any) {
                                     variant="destructive"
                                     className="w-full h-11 rounded-xl text-sm font-bold shadow-md gap-2"
                                 >
-                                    <Square className="w-4 h-4 fill-current" />
-                                    Stop Prospecting
-                                </Button>
+                                    <Square className="w-4 h-4 fill-current" />{__('general.stop_prospecting')}</Button>
                             ) : (
                                 <Button
                                     onClick={handleStart}
                                     disabled={!domainsInput.trim()}
                                     className="w-full h-11 bg-gradient-to-r from-indigo-600 to-rose-600 text-white rounded-xl text-sm font-bold hover:opacity-90 shadow-md gap-2"
                                 >
-                                    <Play className="w-4 h-4 fill-current" />
-                                    Start Prospecting
-                                </Button>
+                                    <Play className="w-4 h-4 fill-current" />{__('general.start_prospecting')}</Button>
                             )}
 
                             {status === 'error' && (
@@ -208,7 +203,7 @@ export default function DomainProspectorRunner({ tool }: any) {
                                 <div className="w-16 h-16 rounded-2xl bg-white border border-slate-200 shadow-sm flex items-center justify-center">
                                     <FileText className="w-8 h-8 text-slate-300" />
                                 </div>
-                                <p className="text-sm font-medium">Add domains and start the campaign to prospect.</p>
+                                <p className="text-sm font-medium">{__('general.add_domains_and_start_the_campaign_to_prospect')}</p>
                             </div>
                         ) : (
                             <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden flex flex-col h-full animate-in fade-in duration-500">
@@ -218,9 +213,9 @@ export default function DomainProspectorRunner({ tool }: any) {
                                             <tr className="bg-slate-50 border-b border-slate-200 text-[10px] uppercase tracking-wider font-black text-slate-500 sticky top-0 z-10">
                                                 <th className="px-4 py-3 whitespace-nowrap">Domain</th>
                                                 <th className="px-4 py-3 whitespace-nowrap">Status</th>
-                                                <th className="px-4 py-3 whitespace-nowrap">For Sale</th>
-                                                <th className="px-4 py-3 w-64">Contact Emails</th>
-                                                <th className="px-4 py-3 whitespace-nowrap">Page Title</th>
+                                                <th className="px-4 py-3 whitespace-nowrap">{__('general.for_sale')}</th>
+                                                <th className="px-4 py-3 w-64">{__('general.contact_emails')}</th>
+                                                <th className="px-4 py-3 whitespace-nowrap">{__('general.page_title')}</th>
                                             </tr>
                                         </thead>
                                         <tbody className="divide-y divide-slate-100">
@@ -238,7 +233,7 @@ export default function DomainProspectorRunner({ tool }: any) {
                                                     </td>
                                                     <td className="px-4 py-3 align-middle">
                                                         {r.isForSale ? (
-                                                            <Badge className="bg-indigo-100 text-indigo-700 hover:bg-indigo-100 border-indigo-200 text-[10px]">Likely For Sale</Badge>
+                                                            <Badge className="bg-indigo-100 text-indigo-700 hover:bg-indigo-100 border-indigo-200 text-[10px]">{__('general.likely_for_sale')}</Badge>
                                                         ) : (
                                                             <span className="text-xs text-slate-400">-</span>
                                                         )}

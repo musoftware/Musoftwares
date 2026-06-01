@@ -42,7 +42,7 @@ export function DownloadPanel({
                     <CheckCircle2 className="h-4 w-4 text-emerald-600" />
                 </div>
                 <div>
-                    <p className="text-sm font-semibold text-slate-900">Active Subscription</p>
+                    <p className="text-sm font-semibold text-slate-900">{__('general.active_subscription')}</p>
                     <p className="text-xs text-slate-500">{userSubscription.plan_name} · {userSubscription.billing_cycle}</p>
                 </div>
             </div>
@@ -68,9 +68,7 @@ export function DownloadPanel({
                             target="_blank"
                             rel="noreferrer"
                             className="text-indigo-600 hover:underline"
-                        >
-                            Musoftware Runtime
-                        </a>.
+                        >{__('general.musoftware_runtime')}</a>.
                         Make sure it's running.
                     </span>
                 </div>
@@ -84,9 +82,7 @@ export function DownloadPanel({
                         </Button>
                     </Link>
                     <Link href={route('tools.tutorial', toolSlug)} className="block">
-                        <Button variant="outline" className="w-full gap-2 border-slate-200 text-slate-700 hover:bg-slate-50">
-                            Help & Tutorial
-                        </Button>
+                        <Button variant="outline" className="w-full gap-2 border-slate-200 text-slate-700 hover:bg-slate-50">{__('general.help_tutorial')}</Button>
                     </Link>
                 </div>
 

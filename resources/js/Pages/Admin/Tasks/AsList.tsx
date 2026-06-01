@@ -112,20 +112,16 @@ export default function AsList({ arrangedClients, clients, filters, stats, auth 
     const totalTasks = arrangedClients.reduce((sum, c) => sum + c.tasks.length, 0);
 
     return (
-        <AdminSidebarLayout title="Tasks List" header="Tasks List">
-            <Head title="All Active Tasks — Admin" />
+        <AdminSidebarLayout title={__('general.tasks_list')} header="Tasks List">
+            <Head title={__('general.all_active_tasks_admin')} />
 
             <div className="space-y-6">
                 {/* Page Header */}
                 <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
                     <div>
                         <h1 className="text-2xl font-bold tracking-tight text-slate-900 flex items-center gap-2">
-                            <ListTodo className="h-6 w-6 text-indigo-600" />
-                            Active Tasks — Platform Clients
-                        </h1>
-                        <p className="text-sm text-slate-500 mt-1">
-                            Platform-wide view of pending checklist items grouped by client → task board.
-                        </p>
+                            <ListTodo className="h-6 w-6 text-indigo-600" />{__('general.active_tasks_platform_clients')}</h1>
+                        <p className="text-sm text-slate-500 mt-1">{__('general.platform_wide_view_of_pending_checklist_items_grouped_by_client_task_board')}</p>
                     </div>
                 </div>
 
@@ -165,7 +161,7 @@ export default function AsList({ arrangedClients, clients, filters, stats, auth 
                                 onChange={e => handleClientChange(e.target.value)}
                                 className="h-9 rounded-md border border-slate-200 bg-white px-3 text-xs text-slate-700 shadow-none focus:outline-none focus:ring-1 focus:ring-indigo-500"
                             >
-                                <option value="">All Clients</option>
+                                <option value="">{__('general.all_clients')}</option>
                                 {clients.map(c => (
                                     <option key={c.id} value={c.id}>{c.name}</option>
                                 ))}
@@ -176,7 +172,7 @@ export default function AsList({ arrangedClients, clients, filters, stats, auth 
                                 <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
                                 <Input
                                     type="text"
-                                    placeholder="Search todo title or client name..."
+                                    placeholder={__('general.search_todo_title_or_client_name')}
                                     value={search}
                                     onChange={e => setSearch(e.target.value)}
                                     className="pl-9 h-9 shadow-none border-slate-200 text-xs focus-visible:ring-indigo-500"
@@ -205,7 +201,7 @@ export default function AsList({ arrangedClients, clients, filters, stats, auth 
                     <Card className="rounded-xl border border-dashed border-slate-300 bg-white shadow-sm">
                         <CardContent className="flex flex-col items-center justify-center p-16 text-center">
                             <ListTodo className="h-12 w-12 text-slate-300 mb-4" />
-                            <h3 className="font-semibold text-slate-700 text-sm">No Active Todos Found</h3>
+                            <h3 className="font-semibold text-slate-700 text-sm">{__('general.no_active_todos_found')}</h3>
                             <p className="text-xs text-slate-400 max-w-xs mt-1">
                                 {search || clientFilter
                                     ? 'No items match your current filters. Try clearing them.'
@@ -232,8 +228,7 @@ export default function AsList({ arrangedClients, clients, filters, stats, auth 
                                     <Link
                                         href={route('admin.users.show', clientGroup.client.id)}
                                         className="ml-auto text-xs text-indigo-600 hover:underline flex items-center gap-0.5"
-                                    >
-                                        View Client Profile <ChevronRight className="h-3.5 w-3.5" />
+                                    >{__('general.view_client_profile')}<ChevronRight className="h-3.5 w-3.5" />
                                     </Link>
                                 </div>
 
@@ -252,8 +247,7 @@ export default function AsList({ arrangedClients, clients, filters, stats, auth 
                                                 <Link
                                                     href={`/admin/tasks/client-tasks?client_id=${clientGroup.client.id}`}
                                                     className="text-xs text-indigo-600 hover:underline flex items-center gap-0.5 whitespace-nowrap"
-                                                >
-                                                    Open client focus board <ChevronRight className="h-3.5 w-3.5" />
+                                                >{__('general.open_client_focus_board')}<ChevronRight className="h-3.5 w-3.5" />
                                                 </Link>
                                             </div>
 

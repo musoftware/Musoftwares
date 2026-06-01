@@ -168,7 +168,7 @@ export default function FormatExtractorRunner({ tool }: any) {
                     <div className="w-7 h-7 bg-gradient-to-br from-teal-500 to-emerald-500 rounded-lg flex items-center justify-center shadow-sm">
                         <Dna className="w-4 h-4 text-white" />
                     </div>
-                    <span className="font-bold text-sm text-slate-800 tracking-tight">Format DNA Extractor</span>
+                    <span className="font-bold text-sm text-slate-800 tracking-tight">{__('general.format_dna_extractor')}</span>
                 </div>
                 <Badge variant="outline" className={`gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase ${status === 'running' ? 'bg-amber-50 border-amber-200 text-amber-700' : status === 'done' ? 'bg-emerald-50 border-emerald-200 text-emerald-700' : 'bg-slate-100 border-slate-200 text-slate-500'}`}>
                     <div className={`w-1.5 h-1.5 rounded-full ${status === 'running' ? 'bg-amber-500 animate-pulse' : status === 'done' ? 'bg-emerald-500' : 'bg-slate-400'}`} />
@@ -181,8 +181,8 @@ export default function FormatExtractorRunner({ tool }: any) {
                 {/* Input card */}
                 <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-4">
                     <div>
-                        <h1 className="text-xl font-bold tracking-tight text-slate-900">Extract the viral format</h1>
-                        <p className="text-sm text-slate-400 mt-1">Not copying content — copying the psychology and structure.</p>
+                        <h1 className="text-xl font-bold tracking-tight text-slate-900">{__('general.extract_the_viral_format')}</h1>
+                        <p className="text-sm text-slate-400 mt-1">{__('general.not_copying_content_copying_the_psychology_and_structure')}</p>
                     </div>
 
                     <div className="space-y-3">
@@ -193,7 +193,7 @@ export default function FormatExtractorRunner({ tool }: any) {
                                 value={url}
                                 onChange={e => setUrl(e.target.value)}
                                 onKeyDown={e => e.key === 'Enter' && handleExtract()}
-                                placeholder="https://www.tiktok.com/@user/video/..."
+                                placeholder={__('general.https_www_tiktok_com_user_video')}
                                 className="pl-9 h-11 text-sm bg-slate-50 font-mono"
                             />
                         </div>
@@ -201,7 +201,7 @@ export default function FormatExtractorRunner({ tool }: any) {
                             type="text"
                             value={niche}
                             onChange={e => setNiche(e.target.value)}
-                            placeholder="Niche (optional) — e.g. fitness, finance, food..."
+                            placeholder={__('general.niche_optional_e_g_fitness_finance_food')}
                             className="h-11 text-sm bg-slate-50"
                         />
                     </div>
@@ -249,7 +249,7 @@ export default function FormatExtractorRunner({ tool }: any) {
                             <div className="relative z-10">
                                 <div className="flex items-start justify-between gap-4 mb-3">
                                     <div>
-                                        <p className="text-[9px] font-black uppercase tracking-wider text-teal-400 mb-1">Source Video</p>
+                                        <p className="text-[9px] font-black uppercase tracking-wider text-teal-400 mb-1">{__('general.source_video')}</p>
                                         <p className="text-sm font-bold">@{src?.author}</p>
                                         <p className="text-xs text-slate-400 mt-1 font-mono truncate">{url}</p>
                                     </div>
@@ -261,7 +261,7 @@ export default function FormatExtractorRunner({ tool }: any) {
                                         <p className="text-sm font-black text-white">{Number(src?.plays).toLocaleString()}</p>
                                     </div>
                                     <div>
-                                        <p className="text-[9px] font-bold text-slate-400 uppercase">Like Rate</p>
+                                        <p className="text-[9px] font-bold text-slate-400 uppercase">{__('general.like_rate')}</p>
                                         <p className="text-sm font-black text-white">{src?.like_rate}</p>
                                     </div>
                                     <div>
@@ -277,15 +277,15 @@ export default function FormatExtractorRunner({ tool }: any) {
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-2">
                                     <Sparkles className="w-4 h-4 text-teal-500" />
-                                    <h3 className="font-bold text-slate-800 text-sm">Your Format Blueprint</h3>
+                                    <h3 className="font-bold text-slate-800 text-sm">{__('general.your_format_blueprint')}</h3>
                                 </div>
                                 <CopyButton text={fullBlueprint} />
                             </div>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                <BlueprintBlock icon={AlignLeft} label="Hook Template" value={qs?.hook_template} copyable color="bg-teal-50 border-teal-200" iconColor="text-teal-600" />
+                                <BlueprintBlock icon={AlignLeft} label={__('general.hook_template')} value={qs?.hook_template} copyable color="bg-teal-50 border-teal-200" iconColor="text-teal-600" />
                                 <BlueprintBlock icon={Layout} label="Structure" value={qs?.structure} copyable color="bg-violet-50 border-violet-200" iconColor="text-violet-600" />
-                                <BlueprintBlock icon={Clock} label="Target Duration" value={qs?.duration_target} color="bg-blue-50 border-blue-200" iconColor="text-blue-600" />
-                                <BlueprintBlock icon={Music} label="Sound Strategy" value={qs?.sound_strategy} color="bg-pink-50 border-pink-200" iconColor="text-pink-600" />
+                                <BlueprintBlock icon={Clock} label={__('general.target_duration')} value={qs?.duration_target} color="bg-blue-50 border-blue-200" iconColor="text-blue-600" />
+                                <BlueprintBlock icon={Music} label={__('general.sound_strategy')} value={qs?.sound_strategy} color="bg-pink-50 border-pink-200" iconColor="text-pink-600" />
                             </div>
                         </div>
 
@@ -298,21 +298,20 @@ export default function FormatExtractorRunner({ tool }: any) {
                         {/* Hook section */}
                         <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm space-y-3">
                             <h3 className="font-bold text-slate-800 text-sm flex items-center gap-2">
-                                <AlignLeft className="w-4 h-4 text-teal-500" /> Hook Breakdown
-                            </h3>
+                                <AlignLeft className="w-4 h-4 text-teal-500" />{__('general.hook_breakdown')}</h3>
                             <div className="grid grid-cols-2 gap-3">
                                 <div className="bg-slate-50 border border-slate-100 rounded-xl p-3">
                                     <p className="text-[9px] font-black uppercase tracking-wider text-slate-400 mb-1">Type</p>
                                     <p className="text-xs font-bold text-slate-800">{bp.hook?.type_label}</p>
                                 </div>
                                 <div className="bg-slate-50 border border-slate-100 rounded-xl p-3">
-                                    <p className="text-[9px] font-black uppercase tracking-wider text-slate-400 mb-1">Original Hook</p>
+                                    <p className="text-[9px] font-black uppercase tracking-wider text-slate-400 mb-1">{__('general.original_hook')}</p>
                                     <p className="text-xs font-medium text-slate-600 italic line-clamp-2">"{bp.hook?.original}"</p>
                                 </div>
                             </div>
                             <div className="bg-teal-900 rounded-xl p-3 flex items-start justify-between gap-3">
                                 <div>
-                                    <p className="text-[9px] font-black uppercase tracking-wider text-teal-400 mb-1">Fill-in Template</p>
+                                    <p className="text-[9px] font-black uppercase tracking-wider text-teal-400 mb-1">{__('general.fill_in_template')}</p>
                                     <p className="text-xs font-bold text-white">{bp.hook?.template}</p>
                                 </div>
                                 <CopyButton text={bp.hook?.template} />
@@ -322,8 +321,7 @@ export default function FormatExtractorRunner({ tool }: any) {
                         {/* Caption format */}
                         <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm space-y-3">
                             <h3 className="font-bold text-slate-800 text-sm flex items-center gap-2">
-                                <AlignLeft className="w-4 h-4 text-slate-500" /> Caption Format
-                            </h3>
+                                <AlignLeft className="w-4 h-4 text-slate-500" />{__('general.caption_format')}</h3>
                             <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
                                 {[
                                     { l: 'Hashtag Strategy', v: bp.caption?.hashtag_strategy },
@@ -339,7 +337,7 @@ export default function FormatExtractorRunner({ tool }: any) {
                             </div>
                             <div className="bg-slate-900 rounded-xl p-3 flex items-start justify-between gap-3">
                                 <div>
-                                    <p className="text-[9px] font-black uppercase tracking-wider text-slate-400 mb-1">Caption Template</p>
+                                    <p className="text-[9px] font-black uppercase tracking-wider text-slate-400 mb-1">{__('general.caption_template')}</p>
                                     <p className="text-xs font-bold text-emerald-400 font-mono whitespace-pre-wrap">{bp.caption?.template}</p>
                                 </div>
                                 <CopyButton text={bp.caption?.template} />
@@ -349,15 +347,14 @@ export default function FormatExtractorRunner({ tool }: any) {
                         {/* Sound strategy */}
                         <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm space-y-3">
                             <h3 className="font-bold text-slate-800 text-sm flex items-center gap-2">
-                                <Music className="w-4 h-4 text-pink-500" /> Sound Strategy
-                            </h3>
+                                <Music className="w-4 h-4 text-pink-500" />{__('general.sound_strategy')}</h3>
                             <div className="grid grid-cols-2 gap-3">
                                 <div className="bg-pink-50 border border-pink-100 rounded-xl p-3">
                                     <p className="text-[9px] font-black uppercase tracking-wider text-pink-400 mb-1">Strategy</p>
                                     <p className="text-xs font-bold text-pink-800 capitalize">{bp.sound?.strategy?.replace('_', ' ')}</p>
                                 </div>
                                 <div className="bg-pink-50 border border-pink-100 rounded-xl p-3">
-                                    <p className="text-[9px] font-black uppercase tracking-wider text-pink-400 mb-1">Sound Used</p>
+                                    <p className="text-[9px] font-black uppercase tracking-wider text-pink-400 mb-1">{__('general.sound_used')}</p>
                                     <p className="text-xs font-bold text-pink-800 truncate">{bp.sound?.sound_title || 'Unknown'}</p>
                                 </div>
                             </div>
@@ -366,7 +363,7 @@ export default function FormatExtractorRunner({ tool }: any) {
                             </div>
                             <div className="bg-slate-900 rounded-xl p-3 flex items-start justify-between gap-3">
                                 <div>
-                                    <p className="text-[9px] font-black uppercase tracking-wider text-slate-400 mb-1">Your Sound Template</p>
+                                    <p className="text-[9px] font-black uppercase tracking-wider text-slate-400 mb-1">{__('general.your_sound_template')}</p>
                                     <p className="text-xs font-bold text-emerald-400">{bp.sound?.template}</p>
                                 </div>
                                 <CopyButton text={bp.sound?.template} />
@@ -376,8 +373,7 @@ export default function FormatExtractorRunner({ tool }: any) {
                         {/* Duration recommendation */}
                         <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
                             <h3 className="font-bold text-slate-800 text-sm flex items-center gap-2 mb-3">
-                                <Clock className="w-4 h-4 text-blue-500" /> Duration Guide
-                            </h3>
+                                <Clock className="w-4 h-4 text-blue-500" />{__('general.duration_guide')}</h3>
                             <div className="flex items-center gap-4">
                                 <div className="text-center">
                                     <div className="text-3xl font-black text-blue-700">{bp.duration?.seconds}s</div>

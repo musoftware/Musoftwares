@@ -81,8 +81,8 @@ function NewCampaignModal({
                 {/* Header */}
                 <div className="px-6 py-5 border-b border-slate-100 flex items-center justify-between">
                     <div>
-                        <h2 className="text-sm font-bold">New Extraction Campaign</h2>
-                        <p className="text-xs text-muted-foreground mt-0.5">Define keyword and location to start finding businesses.</p>
+                        <h2 className="text-sm font-bold">{__('general.new_extraction_campaign')}</h2>
+                        <p className="text-xs text-muted-foreground mt-0.5">{__('general.define_keyword_and_location_to_start_finding_businesses')}</p>
                     </div>
                     <Button variant="ghost" size="icon" onClick={onClose} className="h-8 w-8 text-slate-400">
                         <X className="w-4 h-4" />
@@ -93,7 +93,7 @@ function NewCampaignModal({
                 <form onSubmit={handleSubmit} className="p-6 space-y-5">
                     {/* Campaign name */}
                     <div className="space-y-1.5">
-                        <Label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">Campaign Name <span className="font-normal text-slate-400">(optional)</span></Label>
+                        <Label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">{__('general.campaign_name')}<span className="font-normal text-slate-400">(optional)</span></Label>
                         <Input
                             type="text"
                             placeholder='e.g. "Restaurants – Amman"'
@@ -135,7 +135,7 @@ function NewCampaignModal({
                     {/* Limit */}
                     <div className="space-y-2">
                         <div className="flex items-center justify-between">
-                            <Label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Max Results</Label>
+                            <Label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">{__('general.max_results')}</Label>
                             <span className="text-sm font-bold text-slate-900 font-mono">{limit}</span>
                         </div>
                         <input
@@ -155,8 +155,8 @@ function NewCampaignModal({
                     <div className="p-4 bg-amber-50 border border-amber-100 rounded-xl space-y-2">
                         <div className="flex items-center justify-between">
                             <div>
-                                <p className="text-xs font-bold text-amber-900">Email Discovery</p>
-                                <p className="text-[11px] text-amber-700 mt-0.5">Visits each business website to find contact emails. Slower but more complete.</p>
+                                <p className="text-xs font-bold text-amber-900">{__('general.email_discovery')}</p>
+                                <p className="text-[11px] text-amber-700 mt-0.5">{__('general.visits_each_business_website_to_find_contact_emails_slower_but_more_complete')}</p>
                             </div>
                             <Switch checked={deepCrawl} onCheckedChange={setDeepCrawl} />
                         </div>
@@ -233,12 +233,12 @@ function SettingsPanel({ callRPC }: { callRPC: (a: string, d?: any) => Promise<a
         <form onSubmit={handleSave} className="space-y-8 max-w-2xl">
             <div>
                 <h1 className="text-2xl font-bold tracking-tight bg-gradient-to-r from-slate-950 to-slate-700 bg-clip-text text-transparent">Settings</h1>
-                <p className="text-xs text-slate-500 mt-1">Configure extraction behaviour, speed, and proxy rotation.</p>
+                <p className="text-xs text-slate-500 mt-1">{__('general.configure_extraction_behaviour_speed_and_proxy_rotation')}</p>
             </div>
 
             {/* Speed */}
             <Card className="p-6 space-y-4">
-                <h3 className="text-sm font-bold">Extraction Speed</h3>
+                <h3 className="text-sm font-bold">{__('general.extraction_speed')}</h3>
                 <div className="grid grid-cols-3 gap-3">
                     {[
                         { id: 'fast',      label: 'Fast',     desc: 'Quick scan, fewer results verified' },
@@ -262,8 +262,8 @@ function SettingsPanel({ callRPC }: { callRPC: (a: string, d?: any) => Promise<a
             <Card className="p-6">
                 <div className="flex items-center justify-between">
                     <div>
-                        <h3 className="text-sm font-bold">Invisible Mode</h3>
-                        <p className="text-xs text-muted-foreground mt-0.5">Run the browser invisibly in the background. Disable only for debugging.</p>
+                        <h3 className="text-sm font-bold">{__('general.invisible_mode')}</h3>
+                        <p className="text-xs text-muted-foreground mt-0.5">{__('general.run_the_browser_invisibly_in_the_background_disable_only_for_debugging')}</p>
                     </div>
                     <Switch checked={settings.headless} onCheckedChange={(checked) => setSettings((s: any) => ({ ...s, headless: checked }))} />
                 </div>
@@ -272,8 +272,8 @@ function SettingsPanel({ callRPC }: { callRPC: (a: string, d?: any) => Promise<a
             {/* Proxies */}
             <Card className="p-6 space-y-3">
                 <div>
-                    <h3 className="text-sm font-bold">Proxy Rotation <span className="text-xs font-normal text-muted-foreground">(Optional)</span></h3>
-                    <p className="text-xs text-muted-foreground mt-0.5">One proxy per line. Format: <code className="text-slate-700 bg-slate-100 px-1 rounded">http://user:pass@ip:port</code></p>
+                    <h3 className="text-sm font-bold">{__('general.proxy_rotation')}<span className="text-xs font-normal text-muted-foreground">(Optional)</span></h3>
+                    <p className="text-xs text-muted-foreground mt-0.5">One proxy per line. Format: <code className="text-slate-700 bg-slate-100 px-1 rounded">{__('general.http_user_pass_ip_port')}</code></p>
                 </div>
                 <Textarea
                     value={proxiesText}
@@ -488,8 +488,8 @@ export default function GoogleMapsRunner({ tool, subscription, runtimePort, plug
             <div className="min-h-screen bg-[#F8FAFC] flex items-center justify-center font-sans">
                 <div className="text-center space-y-4">
                     <div className="w-10 h-10 border-2 border-slate-900 border-t-transparent rounded-full animate-spin mx-auto" />
-                    <p className="text-sm font-semibold text-slate-600">Connecting to runtime...</p>
-                    <p className="text-xs text-slate-400">Make sure the Musoftware runtime is running on your machine.</p>
+                    <p className="text-sm font-semibold text-slate-600">{__('general.connecting_to_runtime_1')}</p>
+                    <p className="text-xs text-slate-400">{__('general.make_sure_the_musoftware_runtime_is_running_on_your_machine')}</p>
                 </div>
             </div>
         );
@@ -516,7 +516,7 @@ export default function GoogleMapsRunner({ tool, subscription, runtimePort, plug
                         <div className="w-6 h-6 bg-gradient-to-tr from-emerald-500 to-teal-600 rounded-lg flex items-center justify-center shadow-md shadow-emerald-500/25">
                             <MapPin className="w-3.5 h-3.5 text-white" />
                         </div>
-                        <span className="font-bold text-sm tracking-tight text-slate-900">Maps Lead Extractor</span>
+                        <span className="font-bold text-sm tracking-tight text-slate-900">{__('general.maps_lead_extractor')}</span>
                     </div>
 
                     <div className="h-4 w-px bg-slate-200" />
@@ -570,13 +570,13 @@ export default function GoogleMapsRunner({ tool, subscription, runtimePort, plug
                     <div className="flex-1 flex flex-col min-h-0 p-4">
                         <div className="flex items-center gap-1.5 mb-3">
                             <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
-                            <h3 className="text-[10px] font-black uppercase tracking-wider text-slate-400">Live Activity</h3>
+                            <h3 className="text-[10px] font-black uppercase tracking-wider text-slate-400">{__('general.live_activity')}</h3>
                         </div>
                         <div className="flex-1 overflow-y-auto space-y-2 scrollbar-thin">
                             {logs.length === 0 ? (
                                 <div className="text-center py-16 flex flex-col items-center gap-2">
                                     <HelpCircle className="w-6 h-6 text-slate-300" />
-                                    <span className="text-xs text-slate-400">Create a campaign to get started</span>
+                                    <span className="text-xs text-slate-400">{__('general.create_a_campaign_to_get_started')}</span>
                                 </div>
                             ) : logs.map(l => (
                                 <div key={l.id} className="p-2.5 bg-slate-50 rounded-lg border border-slate-100">
@@ -608,14 +608,13 @@ export default function GoogleMapsRunner({ tool, subscription, runtimePort, plug
                             <div className="flex items-center justify-between">
                                 <div>
                                     <h1 className="text-2xl font-bold tracking-tight bg-gradient-to-r from-slate-950 to-slate-700 bg-clip-text text-transparent">Campaigns</h1>
-                                    <p className="text-xs text-slate-500 mt-1">Each campaign targets a keyword + location and extracts matching businesses.</p>
+                                    <p className="text-xs text-slate-500 mt-1">{__('general.each_campaign_targets_a_keyword_location_and_extracts_matching_businesses')}</p>
                                 </div>
                                 <Button
                                     onClick={() => setShowNewModal(true)}
                                     className="gap-1.5"
                                 >
-                                    <Plus className="w-3.5 h-3.5" /> New Campaign
-                                </Button>
+                                    <Plus className="w-3.5 h-3.5" />{__('general.new_campaign')}</Button>
                             </div>
 
                             {/* Campaign Grid */}
@@ -624,14 +623,12 @@ export default function GoogleMapsRunner({ tool, subscription, runtimePort, plug
                                     <div className="w-14 h-14 bg-gradient-to-br from-emerald-100 to-teal-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
                                         <MapPin className="w-7 h-7 text-emerald-600" />
                                     </div>
-                                    <h3 className="text-sm font-bold text-slate-900">No campaigns yet</h3>
-                                    <p className="text-xs text-slate-500 mt-1.5 max-w-xs mx-auto">Create your first campaign to start extracting businesses from Google Maps.</p>
+                                    <h3 className="text-sm font-bold text-slate-900">{__('general.no_campaigns_yet')}</h3>
+                                    <p className="text-xs text-slate-500 mt-1.5 max-w-xs mx-auto">{__('general.create_your_first_campaign_to_start_extracting_businesses_from_google_maps')}</p>
                                     <Button
                                         onClick={() => setShowNewModal(true)}
                                         className="mt-6"
-                                    >
-                                        Create First Campaign
-                                    </Button>
+                                    >{__('general.create_first_campaign')}</Button>
                                 </Card>
                             ) : (
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -684,7 +681,7 @@ export default function GoogleMapsRunner({ tool, subscription, runtimePort, plug
                                                     <div className="flex items-center gap-1.5 mb-4">
                                                         <Badge variant="secondary" className="font-mono text-[10px]">max {camp.limit_count}</Badge>
                                                         {camp.deep_crawl && (
-                                                            <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-100">Email Discovery</Badge>
+                                                            <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-100">{__('general.email_discovery')}</Badge>
                                                         )}
                                                     </div>
 
@@ -695,8 +692,7 @@ export default function GoogleMapsRunner({ tool, subscription, runtimePort, plug
                                                             size="sm"
                                                             onClick={() => { setFilterCampaignId(camp.id); setActiveTab('results'); }}
                                                             className="text-xs h-8 text-slate-500 hover:text-slate-900"
-                                                        >
-                                                            View Results <ChevronRight className="w-3.5 h-3.5 ml-1" />
+                                                        >{__('general.view_results')}<ChevronRight className="w-3.5 h-3.5 ml-1" />
                                                         </Button>
 
                                                         <div className="flex items-center gap-2">
@@ -705,7 +701,7 @@ export default function GoogleMapsRunner({ tool, subscription, runtimePort, plug
                                                                 size="icon"
                                                                 onClick={() => handleDelete(camp.id, camp.name)}
                                                                 className="h-8 w-8 text-slate-300 hover:text-rose-500 hover:bg-rose-50"
-                                                                title="Delete campaign"
+                                                                title={__('general.delete_campaign')}
                                                             >
                                                                 <Trash2 className="w-3.5 h-3.5" />
                                                             </Button>
@@ -766,7 +762,7 @@ export default function GoogleMapsRunner({ tool, subscription, runtimePort, plug
                                 <div className="p-3.5 bg-emerald-50 border border-emerald-100 text-emerald-800 rounded-xl text-xs flex items-start gap-2.5">
                                     <CheckCircle className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
                                     <div>
-                                        <p className="font-bold">File saved to your computer</p>
+                                        <p className="font-bold">{__('general.file_saved_to_your_computer')}</p>
                                         <p className="text-[11px] opacity-90 mt-0.5 font-mono select-all break-all">{exportFilePath}</p>
                                     </div>
                                 </div>
@@ -778,7 +774,7 @@ export default function GoogleMapsRunner({ tool, subscription, runtimePort, plug
                                 <div className="relative flex-1 w-full">
                                     <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
                                     <Input
-                                        placeholder="Search by name, address, category, email..."
+                                        placeholder={__('general.search_by_name_address_category_email')}
                                         value={filterSearch}
                                         onChange={e => { setFilterSearch(e.target.value); setResultsOffset(0); }}
                                         className="pl-8"
@@ -791,7 +787,7 @@ export default function GoogleMapsRunner({ tool, subscription, runtimePort, plug
                                     onChange={e => { setFilterCampaignId(e.target.value); setResultsOffset(0); }}
                                     className="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-slate-900 w-full sm:w-44"
                                 >
-                                    <option value="">All Campaigns</option>
+                                    <option value="">{__('general.all_campaigns')}</option>
                                     {campaigns.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                                 </select>
 
@@ -820,8 +816,8 @@ export default function GoogleMapsRunner({ tool, subscription, runtimePort, plug
                             {results.length === 0 ? (
                                 <Card className="py-20 text-center border-dashed">
                                     <Database className="w-8 h-8 text-slate-300 mx-auto mb-3" />
-                                    <p className="text-sm font-bold text-slate-600">No results yet</p>
-                                    <p className="text-xs text-slate-400 mt-1">Run a campaign to extract businesses here.</p>
+                                    <p className="text-sm font-bold text-slate-600">{__('general.no_results_yet')}</p>
+                                    <p className="text-xs text-slate-400 mt-1">{__('general.run_a_campaign_to_extract_businesses_here')}</p>
                                 </Card>
                             ) : (
                                 <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden">
