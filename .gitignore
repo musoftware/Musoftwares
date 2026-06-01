@@ -209,3 +209,4 @@ playwright-report/*
 test-results/*
 debug_invoice.php
 composer.phar
+vendor.zip

@@ -1,6 +1,13 @@
 <?php
 
 return [
+    'share' => 'Share',
+    'share_24_hours' => 'Share (24 Hours)',
+    'share_3_days' => 'Share (3 Days)',
+    'share_1_month' => 'Share (1 Month)',
+    'link_copied' => 'Link copied to clipboard!',
+    'expires_at' => 'Expires at',
+
     'only_unpaid_invoices_can_be_edited' => 'only_unpaid_invoices_can_be_edited',
     'service_added_successfully' => 'service_added_successfully',
     'timer_session_deleted' => 'timer_session_deleted',

@@ -1,6 +1,16 @@
 <?php
 
 return [
+    'payment_successful_thank_you' => 'Payment successful. Thank you!',
+    'payment_failed_please_try_again' => 'Payment failed. Please try again.',
+    'return_to_home' => 'Return to Home',
+    'payment_failed' => 'Payment Failed',
+    'error_occurred' => 'An error occurred. Please try again.',
+    'processing' => 'Processing...',
+    'invoice_already_paid' => 'This invoice has already been paid.',
+    'invoice_cancelled' => 'This invoice has been cancelled.',
+    'invoice_total_zero' => 'This invoice total is zero.',
+
   '64_bit_os' => '64-bit OS',
   '64_bit_process' => '64-bit Process',
   'a_sequence_is_a_series_of_automated_emails_sent_over_time' => 'A sequence is a series of automated emails sent over time.',

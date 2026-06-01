@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Head, Link, router } from '@inertiajs/react';
+import axios from 'axios';
 import AdminSidebarLayout from '@/Layouts/AdminSidebarLayout';
 import { Button } from '@/Components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/Components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/Components/ui/dialog';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/Components/ui/dropdown-menu";
 import { Input } from "@/Components/ui/input";
 import { Label } from "@/Components/ui/label";
 import { PremiumCombobox } from '@/Components/ui/PremiumCombobox';
@@ -12,7 +14,7 @@ import { __ } from '@/lib/i18n';
 import { 
     Printer, Download, Share2, User, MapPin, Phone, Folder, Receipt, 
     Clock, Layers, Plus, CreditCard, List, Edit2, Check, X, Trash2,
-    ChartLine, AlertCircle, Network, Calculator, Merge
+    ChartLine, AlertCircle, Network, Calculator, Merge, ChevronDown
 } from 'lucide-react';
 
 export default function Show({ invoice }: { invoice: any }) {
@@ -27,6 +29,19 @@ export default function Show({ invoice }: { invoice: any }) {
     const [discountPercentage, setDiscountPercentage] = useState<number>(0);
     const [deletedItems, setDeletedItems] = useState<number[]>([]);
     const [deletedCostLines, setDeletedCostLines] = useState<number[]>([]);
+
+    const handleShareLink = async (duration: string) => {
+        try {
+            const response = await axios.post(route('admin.invoices.share-link', invoice.id), { duration });
+            if (response.data?.url) {
+                navigator.clipboard.writeText(response.data.url);
+                alert(__('admin.link_copied') + '\n' + __('admin.expires_at') + ': ' + response.data.expires_at);
+            }
+        } catch (error) {
+            console.error("Failed to generate share link", error);
+            alert(__('general.error_occurred'));
+        }
+    };
     
     // Feature states
     const [selectedItemsForMerge, setSelectedItemsForMerge] = useState<number[]>([]);
@@ -325,9 +340,24 @@ export default function Show({ invoice }: { invoice: any }) {
                             <Download className="w-4 h-4" />
                         </Button>
                     </div>
-                    <Button onClick={() => { navigator.clipboard.writeText(window.location.href); alert('Link copied!'); }} className="bg-blue-600 hover:bg-blue-700 h-10 px-4">
-                        <Share2 className="w-4 h-4 mr-2" /> Share
-                    </Button>
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button className="bg-blue-600 hover:bg-blue-700 h-10 px-4">
+                                <Share2 className="w-4 h-4 mr-2" /> {__('admin.share')} <ChevronDown className="w-4 h-4 ml-2" />
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                            <DropdownMenuItem onClick={() => handleShareLink('24_hours')}>
+                                {__('admin.share_24_hours', 'Share (24 Hours)')}
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handleShareLink('3_days')}>
+                                {__('admin.share_3_days', 'Share (3 Days)')}
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handleShareLink('1_month')}>
+                                {__('admin.share_1_month', 'Share (1 Month)')}
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
 
                 </div>
             </div>
